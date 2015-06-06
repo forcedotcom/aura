@@ -40,8 +40,18 @@
 	<aura:attribute name="testPanelFooter"  type="Aura.Component[]"/>
 	<aura:attribute name="testMakeScrollable"	 type="Boolean" default="false"/>
 	
-	<ui:outputText value="This is a Test App to Test Panel"/>
-	<ui:inputText class="appInput"/>
+	
+<div style="z-index:1; position:relative;">
+	<ui:block aura:id="overflowHidden">
+		 <aura:set attribute="right">
+		 	<ui:inputText class="appInput" aura:id="appInput" value="TestingCloseOnClickOutFeature" maxlength="10"/> <br/>
+  		 </aura:set>
+	 	<div id="bodyBlockDiv">This is a Test App to Test Panel</div>
+	</ui:block>
+</div>
+	<ui:block aura:id="overflowVisible" overflow="true" tag="span">
+		<div id="overflowVisibleBody">div in block body</div>
+	</ui:block>
 	
 	<uitest:panel2_Tester aura:id="tester"
 		panelType="{!v.testPanelType}"

@@ -19,7 +19,20 @@
     /**
      * Test to verify first inputElement is focused
      */
-    testPanelFocusOnFirstInput: {
+    testModalFocusOnFirstInput: {
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+        }, function(cmp) {
+        	$A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "inputPanelTypeClass");
+            }, "First input element should be focused.");
+        }]
+    },
+    
+    //Test case for W-2617236	
+    _testPanelFocusOnFirstInput: {
+    	attributes : {"testPanelType" : "panel"},
     	test: [function(cmp) {
     		this.createPanel(cmp);
         }, function(cmp) {
@@ -32,6 +45,7 @@
   
     /**
      * Test to verify firstElement is not focused when autoFocus is set to false
+     * Revisit once Bug: W-2616943 is fixed
      */
     testPanelNotFocusedOnFirstInputWithAutoFocusOff: {
     	attributes : {"testAutoFocus" : false},
@@ -90,12 +104,12 @@
     /**
      * Test large modal type
      */
-    _testModalLarge: {
+    testModalLarge: {
     	attributes : {"testFlavor" : "large"},
     	test: [function(cmp) {
     		this.createPanel(cmp);
     	}, function(cmp) {
-    		this.waitForPanelDialogOpen();
+    		this.waitForModalOpen();
     	}, function(cmp) {
     		this.verifyElementWithClassPresent("uiModal--large", true, "Modal should be of type large"); 
     	}]
@@ -110,10 +124,17 @@
     	}, function(cmp) {
     		this.waitForModalOpen();
     	}, function(cmp) {
-    		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"))
+    		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"));
+    		testerCmp.set("v.useHeader","true");
+    		testerCmp.set("v.useFooter","true");
     		testerCmp.find("createPanelBtn").get("e.press").fire();
     	}, function(cmp) {
     		this.waitForNumberOfPanels("modal", 2);
+    	}, function(cmp) {
+    		this.verifyElementWithClassPresent("defaultCustomPanelHeader", true, 
+			"Custom panel header should be present for second modal");
+    		this.verifyElementWithClassPresent("defaultCustomPanelFooter", true, 
+			"Custom panel footer should be present for second modal");
     	}]
     },
     
@@ -127,7 +148,7 @@
     		this.waitForModalOpen();
     	}, function(cmp) {
     		// second modal
-    		var panelTesterCmp = this.getPanelTesterComponent(cmp.find("tester"))
+    		var panelTesterCmp = this.getPanelTesterComponent(cmp.find("tester"));
     		panelTesterCmp.find("createPanelBtn").get("e.press").fire();
     	}, function(cmp) {
     		this.waitForNumberOfPanels("modal", 2);
@@ -135,6 +156,33 @@
     		this.closePanel(cmp);
     	}, function(cmp) {
     		this.waitForNumberOfPanels("modal", 1);
+    	}]
+    },
+    
+    /**
+     * Test open multiple modal and panels 
+     * And closing them should close top most panel/modal
+     */
+    testCloseMulitpleModalPanels: {
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalOpen();
+    	}, function(cmp) {
+    		// second panel
+    		var panelTesterCmp = this.getPanelTesterComponent(cmp.find("tester"));
+    		panelTesterCmp.set("v.panelType","panel");
+    		panelTesterCmp.set("v.flavor","full-screen");
+    		panelTesterCmp.find("createPanelBtn").get("e.press").fire();
+    	}, function(cmp) {
+    		this.waitForNumberOfPanels("panel", 1);
+    		this.waitForNumberOfPanels("modal", 1);
+        }, function(cmp) {
+    		this.closePanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalClose();
+    	}, function(cmp) {
+    		this.waitForNumberOfPanels("panel", 1);
     	}]
     },
     
@@ -166,6 +214,29 @@
     		var modal = $A.test.getElementByClass("uiModal");
     		$A.test.assertFalse($A.util.hasClass(modal, "active"), "Modal panel shold be hidden");
     	}]
+    },
+    
+    /**
+     * Open 1st panel with visible set and then open 2nd panel with visible unset
+     * Closing the 1st panel should not add active class to 2nd panel
+     * Bug: W-2617288
+     */
+    _testModalHiddenWithMultipleVisibleModal: {
+    	attributes : {"testIsVisible" : false},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalOpen();
+    	}, function(cmp) {
+    		var panelTesterCmp = this.getPanelTesterComponent(cmp.find("tester"));
+    		panelTesterCmp.set("v.isVisible","true");
+    		panelTesterCmp.find("createPanelBtn").get("e.press").fire();
+    	}, function(cmp) {
+    		this.closePanel(cmp, "Close", 2);
+    	}, function(cmp) {
+    		var modal = $A.test.getElementByClass("uiModal")[0];
+    		$A.test.addWaitForWithFailureMessage(false, function(){return $A.util.hasClass(modal,"active")}, "Modal panel shold be hidden");
+		}]
     },
     
     /**
@@ -274,6 +345,22 @@
     	}]
     },
     
+    /**
+     * Test close panel dialog with custom close dialog label
+     */
+    testClosePanelDialogWithCloseDialogLabel: {
+    	attributes : {"testPanelType" : "panel", "testCloseDialogLabel" : "CloseLabel"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.closePanel(cmp, "CloseLabel");
+    	}, function(cmp) {
+    		this.waitForPanelDialogClose();
+    	}]
+    },
+    
     verifyElementWithClassPresent : function(className, isPresent, errorMsg) {
     	var element = $A.test.getElementByClass(className);
     	var result = !$A.util.isUndefinedOrNull(element);
@@ -295,8 +382,16 @@
     	cmp.find("tester").find("createPanelBtn").get("e.press").fire();
     },
     
-    closePanel : function(cmp) {
-    	var closeBtn = $A.test.getElementByClass("closeBtn")[0];
+    closePanel : function(cmp, closeDialogLabel, totalPanels) {
+    	if($A.util.isUndefinedOrNull(closeDialogLabel)){
+    		closeDialogLabel = "Close";
+    	}
+    	if($A.util.isUndefinedOrNull(totalPanels)){
+    		totalPanels = 1;
+    	}
+    	var closeBtn = $A.test.getElementByClass("closeBtn")[totalPanels-1];
+    	var actualLabel = $A.test.getElementAttributeValue(closeBtn,"title");
+    	$A.test.assertEquals(closeDialogLabel, actualLabel, "Close Dialog Label is incorrect");
     	$A.test.clickOrTouch(closeBtn);
     },
     

@@ -22,20 +22,18 @@ import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.IE7, BrowserType.IE8})
 public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 	private final String APP = "/uitest/panel2_Test.app";
 	private final String PARAM_PANEL_TYPE = "&testPanelType=";
-	private final String PARAM_CLOSE_ON_CLICK_OUT = "&testcloseOnClickOut=";
-	private final String PARAM_AUTO_FOCUS = "&testAutoFocus=";
-	
+	private final String FLAVOR = "&testFlavor=";
 	private final String CREATE_PANEL_BUTTON = ".createPanelBtnClass";
 	private final String PANEL_DIALOG = ".uiPanel";
     private final String PANEL_MODAL = ".uiModal";
-    private final String CLOSE_BUTTON = ".closeBtn";	
+    private final String CLOSE_BUTTON = ".closeBtn";
+    private final String CLOSE_ON_CLICKOUT = ".inputcloseOnClickOutClass";	
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
     private final String ACTIVE_ELEMENT_TEXT = "return $A.test.getActiveElementText()";
     private final String APP_INPUT = ".appInput";
@@ -46,20 +44,21 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 	
 	 /**
      * [Accessibility] modal closing on Esc key.
+     * Bug: W-2616943
      */
-    public void testPressEscKeyOnModal() throws Exception{
-// need at least one uncommented test for jenkins builds to be happy
+    public void _testPressEscKeyOnModal() throws Exception{
     	open(APP);
-//    	openPanel();
-//    	waitForModalOpen();
-//    	
-//    	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-//    	activeElement.sendKeys(Keys.ESCAPE);
-//        waitForModalClose();
+    	openPanel();
+    	waitForModalOpen();
+    	
+    	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+    	activeElement.sendKeys(Keys.ESCAPE);
+        waitForModalClose();
     }
     
     /**
      * [Accessibility] panel dialog closing on Esc key.
+     * Bug: W-2617236	
      */
     public void _testPressEscKeyOnPanelDialog() throws Exception{
     	open(APP + "?" + PARAM_PANEL_TYPE + "panel");
@@ -74,13 +73,13 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Test multiple modal one above another, should close top panel when we press ESC on the newest panel
      */
-    public void _testMultipleModalPressEscKey() throws Exception{
+    public void testMultipleModalPressEscKey() throws Exception{
     	open(APP);
     	openPanel();
     	waitForModalOpen();
     	
     	//open second modal
-    	openPanel();
+    	openPanel(2);
     	waitForNumberOfPanels(PANEL_MODAL, 2);
     	
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
@@ -91,25 +90,9 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] panel dialog should not close when closeOnClickOut is not set to true
      */
-    public void _testPanelDialogWithCloseOnClickOutNotSet() throws Exception{
+    public void testPanelDialogWithCloseOnClickOutNotSet() throws Exception{
     	open(APP + "?" + 
-    			PARAM_PANEL_TYPE + "panel" +
-    			PARAM_CLOSE_ON_CLICK_OUT + "false");
-    	openPanel();
-    	waitForPanelDialogOpen();
-    	
-    	WebElement inputText = findDomElement(By.cssSelector(APP_INPUT));
-		inputText.click();
-    	waitForNumberOfPanels(PANEL_DIALOG, 2);
-    }
-    
-    /**
-     * [Accessibility] panel dialog should close when closeOnClickOut is set to true
-     */
-    public void _testPanelDialogWithCloseOnClickOutSet() throws Exception{
-    	open(APP + "?" + 
-    			PARAM_PANEL_TYPE + "panel" +
-    			PARAM_CLOSE_ON_CLICK_OUT + "true");
+    			PARAM_PANEL_TYPE + "panel");
     	openPanel();
     	waitForPanelDialogOpen();
     	
@@ -119,33 +102,61 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
     
     /**
+     * [Accessibility] panel dialog should close when closeOnClickOut is set to true
+     */
+    public void testPanelDialogWithCloseOnClickOutSet() throws Exception{
+    	open(APP + "?" + 
+    			PARAM_PANEL_TYPE + "panel");
+    	WebElement closeOutChexbox = findDomElement(By.cssSelector(CLOSE_ON_CLICKOUT));
+    	closeOutChexbox.click();
+    	openPanel();
+    	waitForPanelDialogOpen();
+    	
+    	WebElement inputText = findDomElement(By.cssSelector(APP_INPUT));
+		inputText.click();
+    	waitForNumberOfPanels(PANEL_DIALOG, 0);
+    }
+    
+    /**
      * Tabs on Modal overlay should do focus trapping and not close the overlay
      */
-    public void _testModalFocusTrapping() throws Exception{
-    	doTestCycleThroughPanelInputElements("modal", 20, false);
+    public void testModalFocusTrapping() throws Exception{
+    	String panelType = "modal";
+    	String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
+    	doTestCycleThroughPanelInputElements(url,"modal", 22, false);
     }
     
     /**
      * Tabs on panel dialog should close the panel and not trap the focus within the panel
      */
-    public void _testPanelDialogDoesNotDoFocusTrapping() throws Exception{
-    	doTestCycleThroughPanelInputElements("panel", 20, true);
+    public void testPanelDoesNotDoFocusTrapping() throws Exception{
+    	String panelType = "panel";
+    	String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
+    	doTestCycleThroughPanelInputElements(url, "panel", 22, true);
     }
     
-    private void doTestCycleThroughPanelInputElements(String panelType, int numElements, boolean doesPanelClose) throws Exception{
-    	open(APP + "?" + 
-    			PARAM_PANEL_TYPE + panelType +
-    			PARAM_AUTO_FOCUS + "true");
-    	
+    /**
+     * Tabs on panel with full-screen should close the panel and not trap the focus within the panel
+     */
+    public void testPanelWithFullScreenDoesNotDoFocusTrapping() throws Exception{
+    	String panelType = "panel";
+    	String flavor = "full-screen";
+    	String url = APP + "?" + PARAM_PANEL_TYPE + panelType + FLAVOR + flavor;
+    	doTestCycleThroughPanelInputElements(url, "panel", 22, true);
+    }
+    
+    private void doTestCycleThroughPanelInputElements(String url, String panelType, int numElements, boolean doesPanelClose) throws Exception{
+    	open(url);
     	openPanel();
     	if (panelType.equals("modal")) {
     		waitForModalOpen();
     	} else {
     		waitForPanelDialogOpen();
     	}
-    	
+    	List<WebElement> firstInput = findDomElements(By.cssSelector(".inputPanelTypeClass"));
+    	firstInput.get(1).click();
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-    	assertEquals("Focus should be on first element", "panel", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
+    	//assertEquals("Focus should be on first element", panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
     	
     	// cycle through input elements on panel
     	for (int i=1; i<numElements; i++) {
@@ -163,15 +174,20 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         		waitForPanelDialogClose();
         	}
     	} else {
-    		activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+    		/*activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         	assertEquals("Panel should not be close and focus should be on first element", 
-        			"panel", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
+        			panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));*/
+    		waitForModalOpen();
     	}
     }
-
+    
     private void openPanel() {
-    	WebElement createPanelBtn = getDriver().findElement(By.cssSelector(CREATE_PANEL_BUTTON));
-    	createPanelBtn.click();
+    	openPanel(1);
+    }
+
+    private void openPanel(int panelNumber) {
+    	List<WebElement> createPanelBtn = findDomElements(By.cssSelector(CREATE_PANEL_BUTTON));
+    	createPanelBtn.get(panelNumber-1).click();
     }
     
     @SuppressWarnings("unused")
@@ -180,34 +196,46 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     	closePanelBtn.click();
     }
     
-    private void waitForModalOpen() {
+    private void waitForModalOpen() throws InterruptedException {
     	waitForPanel(PANEL_MODAL, true);
     }
     
-    private void waitForModalClose() {
+    private void waitForModalClose() throws InterruptedException {
     	waitForPanel(PANEL_MODAL, false);
     }
     
-    private void waitForPanelDialogOpen() {
+    private void waitForPanelDialogOpen() throws InterruptedException {
     	waitForPanel(PANEL_DIALOG, true);
     }
     
-    private void waitForPanelDialogClose() {
+    private void waitForPanelDialogClose() throws InterruptedException {
     	waitForPanel(PANEL_DIALOG, false);
     }
     
-    private void waitForPanel(String panelType, boolean isOpen) {
+    private void waitForPanel(String panelType, boolean isOpen) throws InterruptedException {
     	By locator = By.cssSelector(panelType);
+    	pause(1000);
     	if (isOpen) {
-    		auraUITestingUtil.waitForElement("Panel " + panelType + " is not open", locator);
+    		List<WebElement> panels = findDomElements(locator);
+    		assertNotNull(String.format("Panel %s is not open",panelType), panels);
     	} else {
-    		auraUITestingUtil.waitForElementNotPresent("Panel " + panelType + " is not open", locator);
+    		assertFalse("Panel " + panelType + " is not open", isElementPresent(locator));
     	}
     }
     
-    private void waitForNumberOfPanels(String panelType, int numPanels) {
+    private void pause(long timeout) throws InterruptedException{
+		Thread.sleep(timeout);
+	}
+    
+    private void waitForNumberOfPanels(String panelType, int numPanels) throws InterruptedException {
+    	pause(1000);
     	By locator = By.cssSelector(panelType);
-    	List<WebElement> elements = findDomElements(locator);
-    	assertEquals("Number of panels open is incorrect", numPanels, elements.size());
+    	if(numPanels!=0){
+	    	List<WebElement> elements = findDomElements(locator);
+	    	assertEquals("Number of panels open is incorrect", numPanels, elements.size());
+    	}
+    	else{
+    		assertFalse("No panels should be opened", isElementPresent(locator));
+    	}
     }
 }

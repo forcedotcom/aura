@@ -35,7 +35,6 @@
     <aura:attribute name="showPointer" type="Boolean" default="false" description="Show a pointer that points to the referenceElement" />
     <aura:attribute name="header" type="Aura.Component[]" description="The header facet"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="The footer facet"/>
-
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
 

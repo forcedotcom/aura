@@ -26,6 +26,8 @@
         //move the dialog to the right position
         var referenceEl = cmp.get("v.referenceElement");
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
+
+        cmp.set('v.visible', true);
         
         if (referenceEl || referenceElementSelector) {
             panelEl.style.visibility = 'hidden';
@@ -78,12 +80,14 @@
 
     hide: function (cmp, callback) {
         var panelEl = cmp.getElement();
+
         this.lib.panelLibCore.hide(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
             onFinish: function() {
                 $A.util.removeOn(panelEl, 'keydown', cmp._windowKeyHandler);
                 $A.util.removeOn(document, 'click', cmp._mouseEventHandler);
+                cmp.set('v.visible', false);
                 callback && callback();
             }
         });

@@ -15,15 +15,18 @@
  */
 .THIS {
     display: none;
-}
-
-.THIS.open {
-    display: flex;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+.THIS.open {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
 }
 
 .THIS .modal-glass {
@@ -33,7 +36,6 @@
     bottom: 0;
     left: 0;
     background-color: #2A4158;
-    transition: opacity 300ms;
 }
 
 .THIS .modal-glass.fadein {
@@ -44,47 +46,61 @@
     display: none;
 }
 
-.THIS header {
+.THIS .modal-header {
     position: relative;
-    border-top-right-radius: 0.25rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom: 2px solid #e0e5ee;
-    padding: 1.5rem 1rem;
     text-align: center;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 }
 
-.THIS header .titles {
-    font-size: 1.5rem;
-    font-weight: 300;
-    line-height: 1.25;
+.THIS .modal-footer {
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 }
 
-.THIS footer {
-    border-top: 2px solid #e0e5ee;
-    border-bottom-right-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem;
-    padding: 0.75rem 1rem;
+.THIS .modal-header, .THIS .modal-footer, .THIS .modal-body {
+    background-color: #FFFFFE;
 }
 
-.THIS .body {
+.THIS .modal-body {
     padding: 1px 14px;
+    overflow: hidden;
+    overflow-y: auto;
 }
 
 .THIS .panel {
-    position: relative;
-    margin: auto;
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-    background-color: #FFFFFF;
-    overflow: visible;
-    z-index: 21;
-
-    max-width: 70%;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 3rem 0;
 }
 
-.THIS .container{
-    overflow: hidden;
+.THIS .modal-container{
+
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 0.25rem;
+    max-width: 40rem;
+    min-width: 20rem;
+    height: 100%;
 }
 
 .THIS .uiButton.closeBtn {
@@ -100,19 +116,6 @@
     border: none;
     box-shadow: none;
     color: #FFFFFF;
-}
-
-.THIS .titleBar {
-    padding: 0 14px;
-    color: #3C3D3E;
-    font-size: 15px;
-    text-align: center;
-    width: auto;
-    height: auto;
-    position: static;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    background-color: #FFFFFF;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */

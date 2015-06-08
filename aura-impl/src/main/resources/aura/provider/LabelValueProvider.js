@@ -119,7 +119,7 @@ LabelValueProvider.prototype.getQueueKey = function(section, name) {
 /**
  * returns $Label values
  */
-LabelValueProvider.prototype.getValues = function(values) {
+LabelValueProvider.prototype.getValues = function() {
     return this.values;
 };
 

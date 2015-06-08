@@ -70,13 +70,13 @@ public class FlavorAssortmentDefImplTest extends StyleTestCase {
     }
 
     public void testIterationOrderOfComputeOverrides() throws Exception {
-        // both of these should have flavors for sampleCmp1
+        // both of these should have flavors for x_sample
         String fmt = "<aura:flavors>"
                 + "<aura:use source='flavorTestAlt:flavors'/>"
                 + "<aura:use source='flavorTestAlt:flavorsAlt'/>"
                 + "</aura:flavors>";
 
-        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<FlavoredStyleDef> style = Flavors.customFlavorDescriptor(cmp1, "flavorTestAlt", "flavorsAlt");
 
         DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(fmt);
@@ -86,19 +86,18 @@ public class FlavorAssortmentDefImplTest extends StyleTestCase {
     }
 
     public void testSerialization() throws Exception {
-        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp1", ComponentDef.class);
-        DefDescriptor<ComponentDef> cmp2 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp2", ComponentDef.class);
-        DefDescriptor<ComponentDef> cmp3 = DefDescriptorImpl.getInstance("flavorTest:sampleCmp3", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
+        DefDescriptor<ComponentDef> cmp2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
 
         String fmt = "<aura:flavors>"
                 + "<aura:use source='flavorTestAlt:flavors'/>"
-                + "<aura:flavor component='*' default='default' context='{!$Browser.isPhone}'/>"
-                + "<aura:flavor component='*' default='neutral'/>"
+                + "<aura:flavor component='*' default='flavorA' context='{!$Browser.isPhone}'/>"
+                + "<aura:flavor component='*' default='flavorD'/>"
                 + "</aura:flavors>";
         DefDescriptor<FlavorAssortmentDef> fa = addContextAppFlavorAssortment(fmt);
 
-        addContextApp(String.format("<aura:application><%s/><%s/><%s/></aura:application>", cmp1.getDescriptorName(),
-                cmp2.getDescriptorName(), cmp3.getDescriptorName()));
+        addContextApp(String.format("<aura:application><%s/><%s/></aura:application>", cmp1.getDescriptorName(),
+                cmp2.getDescriptorName()));
 
         serializeAndGoldFile(fa.getDef());
     }

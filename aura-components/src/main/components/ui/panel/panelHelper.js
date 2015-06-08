@@ -21,7 +21,7 @@
     },
 
     show: function (cmp, callback) {
-
+        var autoFocus = cmp.get('v.autoFocus');
         var panelEl = cmp.getElement();
         //move the dialog to the right position
         var referenceEl = cmp.get("v.referenceElement");
@@ -37,7 +37,7 @@
         this.lib.panelLibCore.show(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'movefrom' + cmp.get('v.animation'),
-            autoFocus: cmp.get('v.autoFocus'),
+            autoFocus: false,
             onFinish: function() {
                 $A.util.on(panelEl, 'keydown', cmp._windowKeyHandler);
                 if (cmp.get('v.closeOnClickOut')) {
@@ -57,13 +57,18 @@
                         self.position(cmp, referenceEl);
                         requestAnimationFrame(function() {
                             panelEl.style.visibility = 'visible';
+                            //need to set focus after animation frame
+                            if (autoFocus) {
+                                self.lib.panelLibCore.setFocus(cmp);
+                            }
                         });
                     } else {
                         panelEl.style.visibility = 'visible';
+                        if (autoFocus) {
+                            self.lib.panelLibCore.setFocus(cmp);
+                        }
                         $A.warn('Target element for panel not found.');
                     }
-
-                      
                 }
 
                 callback && callback();
@@ -86,6 +91,9 @@
 
     close: function (cmp, callback) {
         cmp.hide(function () {
+            if (!cmp.isValid()) {
+                return;
+            }
             if(cmp.constraints) {
                 cmp.constraints.forEach(function(constraint) {
                     constraint.destroy();
@@ -102,6 +110,7 @@
     position: function(cmp, referenceEl) {
 
         var direction = cmp.get('v.direction'), 
+            showPointer = cmp.get('v.showPointer'),
             align, 
             targetAlign, 
             pointer,
@@ -110,7 +119,9 @@
         
         cmp.getElement().classList.add('positioned');
         cmp.getElement().classList.add(direction);
-        pointer = cmp.find('pointer').getElement();
+        if(showPointer) {
+            pointer = cmp.find('pointer').getElement();
+        }
 
         switch (direction) {
             case 'north':
@@ -167,16 +178,18 @@
                 pad: 5
             }));
 
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:pointer,
-                target:referenceEl,
-                align: align,
-                targetAlign: targetAlign,
-                enable: true,
-                pad: pointerPad
-            }));
+            if(pointer) {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:referenceEl,
+                    align: align,
+                    targetAlign: targetAlign,
+                    enable: true,
+                    pad: pointerPad
+                }));
+            }
 
-            if(direction === 'east') {
+            if(pointer && direction === 'east') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:pointer,
                     target:cmp.getElement(),
@@ -187,7 +200,7 @@
                 }));
             }
 
-            if(direction === 'west') {
+            if(pointer && direction === 'west') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:pointer,
                     target:cmp.getElement(),
@@ -198,24 +211,21 @@
                 }));
             }
             
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                element:pointer,
-                target:cmp.getElement(),
-                type:'bounding box',
-                enable: true,
-                boxDirections: bbDirections,
-                pad: 5
-            }));
+            if(pointer) {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    type:'bounding box',
+                    enable: true,
+                    boxDirections: bbDirections,
+                    pad: 5
+                }));
+            }
+            
 
             this.positioningLib.panelPositioning.reposition();
         } else {
             this.positioningLib.panelPositioning.reposition();
         }
-    },
-
-    update: function (cmp, content, callback) {
-        //TODO: need more work
-        cmp.set('v.body', content);
-        callback && callback();
     }
 })

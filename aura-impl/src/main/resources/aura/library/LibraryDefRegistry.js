@@ -26,31 +26,33 @@ function LibraryDefRegistry() {
 LibraryDefRegistry.prototype.auraType = "LibraryDefRegistry";
 
 /**
- * Returns an evaluated module or evaluates one.
- * @param {String} descriptor locator in the form namespace:libraryName:jsLibraryName or a libraryDefConfig
- * @param {Object} libraryDef if provided and the locator does not resolve to an evaluated module, the libraryDef
- *     is evaluated and registered. 
- * @returns {Object} Evaluated module instance.
+ * Returns a library from registry
+ * @param {String} descriptor name of a library.
+ * @returns {Object} library from registry
  */
-LibraryDefRegistry.prototype.getDef = function(descriptor, libraryDef) {
-	if ($A.util.isObject(descriptor)) {
-		libraryDef = descriptor;
-		descriptor = descriptor["descriptor"];
-	}
-	
-    aura.assert(descriptor, "library locator is required");
-    
-    if (libraryDef) {
-        this.libraryDefs[descriptor] = this.libraryDefs[descriptor] || {};
-        var registered = this.libraryDefs[descriptor];
-        
-	    $A.util.forEach($A.util.keys(libraryDef["includes"]), function(libName) {
-	        if (!(libName in registered)) {
-	            libraryDef["includes"][libName]($A.util.bind(this.define, this)); // adds to the registry 
-	        }
-	    }, this);
-    }
-    
+LibraryDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No libraries descriptor specified");
+    return this.libraryDefs[descriptor];
+};
+
+/**
+ * Returns library after creating and adding to the registry.
+ * @param {Object} config config of a library.
+ * @returns {Object} library from registry
+ */
+LibraryDefRegistry.prototype.createDef = function(config) {
+    $A.assert(config && config["descriptor"], "Library config required for registration");
+    var descriptor = config["descriptor"];
+
+    this.libraryDefs[descriptor] = this.libraryDefs[descriptor] || {};
+    var registered = this.libraryDefs[descriptor];
+
+    $A.util.forEach($A.util.keys(config["includes"]), function(libName) {
+        if (!(libName in registered)) {
+            config["includes"][libName]($A.util.bind(this.define, this)); // adds to the registry
+        }
+    }, this);
+
     return this.libraryDefs[descriptor];
 };
 

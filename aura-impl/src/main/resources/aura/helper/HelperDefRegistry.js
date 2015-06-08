@@ -25,22 +25,30 @@ function HelperDefRegistry(){
 HelperDefRegistry.prototype.auraType = "HelperDefRegistry";
 
 /**
- * Returns a HelperDef instance or config after adding to the registry.
- * Throws an error if componentDefDescriptor is not provided.
- * @param {Object} componentDefDescriptor Required. The descriptor for the componentDef object.
- * @param {Object} config Passes in a config, a HelperDef, or the name of a HelperDef.
- * @param {ComponentDef} componentDef If provided, resolves the HelperDefs in the component's hierarchy.
- * @param {Object} mapping of imports to library definitions.
- * @returns {HelperDef} HelperDef instance or config after adding to the registry
+ * Returns a HelperDef instance from registry
+ * @param {String} descriptor component definition descriptor to lookup on the HelperDef
+ * @returns {HelperDef} HelperDef from registry
  */
-HelperDefRegistry.prototype.getDef = function(componentDefDescriptor, componentDef, libraries){
-    aura.assert(componentDefDescriptor, "ComponentDef Descriptor is required");
-    var ret = this.helperDefs[componentDefDescriptor];
-    if(!ret){
-    	ret = new HelperDef(componentDef, libraries);
-        this.helperDefs[componentDefDescriptor] = ret;
+HelperDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No component descriptor specified");
+    return this.helperDefs[descriptor];
+};
+
+/**
+ * Returns a HelperDef after creating and adding to the registry.
+ * @param {ComponentDef} componentDef component definition
+ * @param {Object} libraries library defs map
+ * @returns {HelperDef}
+ */
+HelperDefRegistry.prototype.createDef = function(componentDef, libraries) {
+    $A.assert(componentDef, "Component definition is required to create ProviderDef");
+    var componentDescriptor = componentDef.getDescriptor().getQualifiedName();
+    var def = this.getDef(componentDescriptor);
+    if (!def) {
+        def = new HelperDef(componentDef, libraries);
+        this.helperDefs[componentDescriptor] = def;
     }
-    return ret;
+    return def;
 };
 
 Aura.Helper.HelperDefRegistry = HelperDefRegistry;

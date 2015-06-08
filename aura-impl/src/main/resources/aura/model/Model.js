@@ -68,7 +68,7 @@ Model.prototype.set=function(key,value){
     }
 };
 
-Model.prototype.destroy = function(async){
+Model.prototype.destroy = function(){
     this.data = this.def = this.component = null;
 };
 

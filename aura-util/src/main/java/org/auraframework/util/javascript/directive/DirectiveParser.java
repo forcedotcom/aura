@@ -151,7 +151,7 @@ public class DirectiveParser {
         errors.addAll(validator.validate(file.getName(), content.toString(), false, true));
         for (Directive d : directives) {
             List<JavascriptProcessingError> dErrors = d.validate(validator);
-            if (dErrors != null) {
+            if (dErrors != null && dErrors.size() > 0) {
                 errors.addAll(dErrors);
             }
         }

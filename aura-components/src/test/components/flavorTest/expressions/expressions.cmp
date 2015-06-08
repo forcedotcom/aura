@@ -1,0 +1,6 @@
+<aura:component>
+    <aura:attribute name="flav" type="String" default="flavorB"/>
+    <div>
+        <flavorTest:x_sample aura:id="target" aura:flavor="{!v.flav}">test</flavorTest:x_sample>
+    </div>
+</aura:component>

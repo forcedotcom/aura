@@ -15,7 +15,12 @@
  */
 .THIS {
     padding: 0.5em;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-flex-direction: row;
+    -webkit-justify-content: flex-end;
     flex-direction: row;
     justify-content: flex-end;
 }

@@ -1,0 +1,9 @@
+<aura:component description="sample component using markup that landmark would use">
+
+    <div aura:flavorable="true">
+        <span class="{!style.name + '__element'}">element</span>
+
+        <span class="{!style.name + '-something'}">dashed class name</span>
+    </div>
+
+</aura:component>

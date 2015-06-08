@@ -1,0 +1,3 @@
+<aura:component extensible="true" description="inheritance test helper component: a parent cmp that wraps a flavorable div around v.body">
+    <div class="wrapper" aura:id="wrapper" aura:flavorable="true">{!v.body}</div>
+</aura:component>

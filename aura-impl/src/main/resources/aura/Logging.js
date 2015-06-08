@@ -86,7 +86,7 @@
     /**
      * Throws error and show error dialog for failed assertion unless in production
      */
-    function devAssertError(level, message, e) {
+    function devAssertError(level, message) {
         $A.trace();
         
         if ($A.showErrors()) {
@@ -104,7 +104,7 @@
 
     $A.logger.subscribe("INFO", devDebugConsoleLog);
     $A.logger.subscribe("WARNING", devDebugConsoleLog);
-    // $A.logger.subscribe("ERROR", devDebugConsoleLog);
+    $A.logger.subscribe("ERROR", devDebugConsoleLog);
     $A.logger.subscribe("ASSERT", devAssertError);
 
     //#end

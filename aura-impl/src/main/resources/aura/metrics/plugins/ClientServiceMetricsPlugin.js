@@ -67,7 +67,7 @@ ClientServiceMetricsPlugin.prototype = {
     unbind: function (metricsService) {
         metricsService["unInstrument"]($A["clientService"], 'init');
     },
-    postProcess: function (marks) {
+    postProcess: function () {
         // Remove them all since we already got the appCreation metrics
         return [];
     }

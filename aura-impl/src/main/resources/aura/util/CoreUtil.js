@@ -483,7 +483,7 @@ Aura.Utils.CoreUtil.prototype.buildClass=function(oldClass, newClass, remove){
  * @export
  */
 Aura.Utils.CoreUtil.prototype.buildFlavorClass = function(cmp, flavor) {
-    $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "StyleDef not set for component");
+    $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "Missing StyleDef for component " + cmp.getDef().getDescriptor() + " (required for flavors)");
 
     if (this.isEmpty(flavor)) {
         return "";

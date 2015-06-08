@@ -25,7 +25,7 @@
 
 		// FIXME: LEGACY IE SUPPORT
 		// Fix for name being read only attribute on IE7
-		if ($A.get("$Browser.isIE7") && tag == "input") {
+		if ($A.get("$Browser.isIE7") && tag === "input") {
             var value = HTMLAttributes["name"];
 			if ($A.util.isEmpty(value)) {
 				element = document.createElement(tag);
@@ -71,7 +71,7 @@
 		if (HTMLAttributes) {
 			for (var name in HTMLAttributes) {
 				var lowerName = name.toLowerCase();
-				if (skipMap[lowerName] || lowerName.indexOf("on") == 0) {
+				if (skipMap[lowerName] || lowerName.indexOf("on") === 0) {
 					continue;
 				}
 				
@@ -126,7 +126,7 @@
 		}
 	},
 
-	unrender : function(component, helper) {
+	unrender : function(component) {
 		// Even if we don't have body we need to deattach the elements from the component itself
 		$A.renderingService.unrenderFacet(component, component.get("v.body"));
 	}

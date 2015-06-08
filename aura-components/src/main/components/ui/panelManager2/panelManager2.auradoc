@@ -18,16 +18,17 @@
 
 <aura:documentation>
     <aura:description>
-        <p><code>ui:​panelManager</code>​ handles dialogs created by the <code>ui:panelDialog</code> component. 
-          You only need one instance of <code>ui:​panelManager</code> in an app. 
+        <p><code>ui:​panelManager2</code>​ handles panels created by the <code>ui:panel</code> component. 
+          You only need one instance of <code>ui:​panelManager2</code> in an app. 
         </p>
 <pre>&lt;aura:component>    
-    &lt;div class="container">
-       &lt;ui:button press="{!c.showNonModal}" aura:id="detailTrigger" label="Show Non-Modal Dialog"/>
-       &lt;ui:button press="{!c.showModal}" aura:id="forModal" label="Show Modal Dialog"/>
-    &lt;/div>
-    &lt;ui:panelManager />
+    &lt;ui:panelManager2 aura:id="pm">
+            &lt;aura:set attribute="registeredPanels">
+                &lt;ui:panel alias="panel"/>
+                &lt;ui:modal alias="modal"/>
+            &lt;/aura:set>
+        &lt;/ui:panelManager2>
 &lt;/aura:component></pre>     
-    <p>To customize the dialog body, create your own component and pass it in the <code>body</code> attribute, or create a component dynamically. Display the dialog by firing the <code>ui:openPanel</code> event and set its parameters. See <code>ui:panelDialog</code> for more information.</p>   
+    <p> See <code>ui:panel</code> for more information.</p>   
   </aura:description>
 </aura:documentation>

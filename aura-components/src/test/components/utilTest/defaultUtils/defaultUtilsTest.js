@@ -174,7 +174,21 @@
             $A.test.assertEquals(expected, actual, "Object was not serialized in alphabetical order");
         }
     },
-    
+
+    testJsonOrderedEncodeDoesNotSerializeUndefined: {
+        test : function() {
+            var obj = {
+                a: null,
+                b: undefined,
+                c: "real"
+            };
+
+            var expected = '{"a":null,"c":"real"}';
+            var actual = $A.test.json.orderedEncode(obj);
+            $A.test.assertEquals(expected, actual, "Undefined entry should not be serialized");
+        }
+    },
+
     validateArray: function(array) {
         var i;
         for(i = 0; i < array.length; i++) {

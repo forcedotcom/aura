@@ -26,18 +26,18 @@
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Adds a listener to close the dialog when a user clicks outside the dialog" />
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog" />
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
-    <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when show or hide the panel." />
+    <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel" />
     <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog" />
-    <aura:attribute name="autoFocus" type="Boolean" default="true" />
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets the panel as the first focusable element"/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="referenceElementSelector" type="String" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />
     <aura:attribute name="showPointer" type="Boolean" default="false" description="Show a pointer that points to the referenceElement" />
-    <aura:attribute name="header" type="Aura.Component[]" />
-    <aura:attribute name="footer" type="Aura.Component[]" />
+    <aura:attribute name="header" type="Aura.Component[]" description="The header facet"/>
+    <aura:attribute name="footer" type="Aura.Component[]" description="The footer facet"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
-    <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
+    <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
 
     <div aura:id='panel'
          tabindex="-1"
@@ -50,20 +50,19 @@
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
            	<header class="panel-header">
-                <aura:If isTrue="{! v.title != '' &amp;&amp; v.title != null}">
-                    <div class="titles">
-                        <h2 id="{!'title_' + globalId}" class="{!(v.titleDisplay ? 'title' : 'assistiveText')}">{!v.title}</h2>
-                    </div>
+                <aura:If isTrue="{!!empty(v.title)}">
+                    <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                 </aura:If>
 
                  {!v.header}
 
                 <aura:if isTrue="{!v.showCloseButton}">
-                    <ui:button class="closeBtn" press="{!c.onCloseBtnPressed}"
+                    <ui:button class="closeBtn"
+                               press="{!c.onCloseBtnPressed}"
                                label="{!v.closeDialogLabel}"
                                buttonTitle="{!v.closeDialogLabel}"
-                               labelDisplay="false"
-                            >&times;</ui:button>
+                               labelDisplay="false">&times;
+                    </ui:button>
                 </aura:if>
             </header>
                 

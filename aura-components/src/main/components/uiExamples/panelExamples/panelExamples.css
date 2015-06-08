@@ -15,6 +15,11 @@
  */
 .THIS.viewport {
     position: absolute;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
     display:flex;
     flex-direction: column;
     width: 100%;
@@ -24,7 +29,11 @@
 
 .THIS.viewport header {
     background: #304a62;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-justify-content: flex-end;
     justify-content: flex-end;
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
@@ -35,6 +44,9 @@
     flex: 1;
 }
 
+.THIS.viewport nav a {
+    color: white;
+}
 .THIS.viewport footer {
     background: #304a62;
     padding: 0.75em 1rem;

@@ -61,20 +61,22 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
         if(config["libraryDefs"]) {
             defs = config["libraryDefs"];
             for (i = 0; i < defs.length; i++) {
-                $A.services.component.getLibraryDef(defs[i]);
+                $A.componentService.createLibraryDef(defs[i]);
             }
         }
         
         if (config["componentDefs"]) {
             defs = config["componentDefs"];
             for (i = 0; i < defs.length; i++) {
-                $A.services.component.getDef(defs[i]);
+                if (defs[i]["descriptor"]) {
+                    $A.componentService.createDef(defs[i]);
+                }
             }
         }
         if (config["eventDefs"]) {
             defs = config["eventDefs"];
             for (i = 0; i < defs.length; i++) {
-                $A.services.event.getEventDef(defs[i]);
+                $A.eventService.createEventDef(defs[i]);
             }
         }
         that.joinComponentConfigs(config["components"], that.currentAction.getId());
@@ -186,20 +188,24 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if(otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.services.component.getLibraryDef(defs[i]);
+            $A.componentService.createLibraryDef(defs[i]);
         }
     }
     
     if (otherContext["componentDefs"]) {
         defs = otherContext["componentDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.services.component.getDef(defs[i]);
+            // only create when component def is an object with descriptor key
+            // there are occasions when defs are just references (descriptor name)
+            if (defs[i]["descriptor"]) {
+                $A.componentService.createDef(defs[i]);
+            }
         }
     }
     if (otherContext["eventDefs"]) {
         defs = otherContext["eventDefs"];
         for (i = 0; i < defs.length; i++) {
-            $A.services.event.getEventDef(defs[i]);
+            $A.eventService.createEventDef(defs[i]);
         }
     }
 
@@ -338,19 +344,15 @@ Aura.Context.AuraContext.prototype.getApp = function() {
 Aura.Context.AuraContext.prototype.joinComponentConfigs = function(otherComponentConfigs, actionId) {
     var cP, idx, config, def;
     if (otherComponentConfigs) {
-        //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
-        $A.clientService.currentlyInSideEffectMode=true;
         for (idx = 0; idx < otherComponentConfigs.length; idx++) {
             config = otherComponentConfigs[idx];
             def = config["componentDef"];
-            if (def) {
-                $A.componentService.getDef(def);
+            if (def && def["descriptor"]) {
+                $A.componentService.createDef(def);
             }
             cP = config["creationPath"];
             this.componentConfigs[actionId+cP] = config;
         }
-        //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
-        delete $A.clientService.currentlyInSideEffectMode;
     }
 };
 

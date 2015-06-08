@@ -65,3 +65,19 @@ a.THIS.selectedDate {
        line-height: 45px;    
     }
 }
+
+/* medium size on desktop */
+a.THIS.medium {
+	font-size: 12px;
+	line-height: 30px;
+	height: 30px;
+    width: 30px;
+}
+
+/* small size on desktop */
+a.THIS.small {
+	font-size: 8px;
+	line-height: 20px;
+	height: 20px;
+    width: 20px;
+}

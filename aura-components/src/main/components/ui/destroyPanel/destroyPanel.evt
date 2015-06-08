@@ -16,7 +16,7 @@
 
 -->
 <aura:event type="APPLICATION" description="Create panel event">
-    <aura:attribute name="panelInstance" type="String" description="[GlobalId | panelInstance]"/>
-    <aura:attribute name="onDestroy"     type="Object"/>
+    <aura:attribute name="panelInstance" type="String" description="The global Id or panel instance to be destroyed"/>
+    <aura:attribute name="onDestroy"     type="Object" description="The callback after a panel is destroyed"/>
 
 </aura:event>

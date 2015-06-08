@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
  * @description A registry for ControllerDef instances.
  * @constructor
@@ -25,20 +26,28 @@ function ControllerDefRegistry(){
 ControllerDefRegistry.prototype.auraType = "ControllerDefRegistry";
 
 /**
- * Returns a ControllerDef instance from registry or config after adding to the registry.
- * Throws an error if config is not provided.
- * @param {Object} config Passes in a config, a ControllerDef, or the name of a ControllerDef.
+ * Returns a ControllerDef instance from registry
+ * @param {String} descriptor descriptor of a ControllerDef.
+ * @returns {ControllerDef} ControllerDef from registry
  */
-ControllerDefRegistry.prototype.getDef = function(config){
-    aura.assert(config, "ControllerDef Config required for registration");
-    // We don't re-register (or modify in any way) once we've registered
-    var descriptor = config.descriptor;
-    var ret = this.controllerDefs[descriptor];
-    if (!ret) {
-        ret = new ControllerDef(config);
-        this.controllerDefs[ret.getDescriptor().toString()] = ret;
+ControllerDefRegistry.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No ControllerDef descriptor specified");
+    return this.controllerDefs[descriptor];
+};
+
+/**
+ * Returns a ControllerDef after creating and adding to the registry.
+ * @param {object} config config of a ControllerDef.
+ * @return {ControllerDef}
+ */
+ControllerDefRegistry.prototype.createDef = function(config) {
+    $A.assert(config && config["descriptor"], "ControllerDef Config required for registration");
+    var def = this.getDef(config["descriptor"]);
+    if (!def) {
+        def = new ControllerDef(config);
+        this.controllerDefs[def.getDescriptor().toString()] = def;
     }
-    return ret;
+    return def;
 };
 
 Aura.Controller.ControllerDefRegistry = ControllerDefRegistry;

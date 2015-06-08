@@ -15,7 +15,6 @@
  */
 ({
 	debugLogEventListener : function(cmp, event, helper) {
-		var outputTab;
 		var type = event.getParam("type");
 		var output = event.getParam("message");
 
@@ -72,7 +71,7 @@
 					 "propertyReferenceValue", "value"];
 
 		// if in STATS mode include STATS's views.
-		if (opener.$A.getContext().getMode() == "STATS") {
+		if (opener.$A.getContext().getMode() === "STATS") {
 			views = views.concat(statsViews);
 		}
 

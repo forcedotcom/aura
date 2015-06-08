@@ -1,0 +1,10 @@
+<aura:component>
+    <!-- the parent (super) has the flavorable element, but we should still be able to set it on components that inherit from it -->
+    <flavorTest:inheritance_x_extensibleWrapper_bareChild aura:id="bareChild" aura:flavor="flavorA" />
+
+    <!-- the parent is just a wrapper with v.body, and the child has the flavorable element -->
+    <flavorTest:inheritance_x_extensibleBare_child aura:id="bareParent" aura:flavor="flavorA"/>
+
+    <!-- the parent has a flavorable element AND the child has a flavorable element -->
+    <!-- <flavorTest:inheritance_x_extensibleWrapper_child aura:id="both" aura:flavor="flavorA"></flavorTest:inheritance_x_extensibleWrapper_child> -->
+</aura:component>

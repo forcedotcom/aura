@@ -34,9 +34,10 @@ function ComponentDef(config) {
 
     this.superDef = this.initSuperDef(config["superDef"]);
     this.styleDef = config["styleDef"] ? new StyleDef(config["styleDef"]) : undefined;
+    this.flavoredStyleDef = config["flavoredStyleDef"] ? new StyleDef(config["flavoredStyleDef"]) : undefined;
 
-    this.controllerDef = config["controllerDef"] ? $A.componentService.getControllerDef(config["controllerDef"]) : undefined;
-    this.modelDef = config["modelDef"] ? $A.componentService.getModelDef(config["modelDef"]) : undefined;
+    this.controllerDef = config["controllerDef"] ? $A.componentService.createControllerDef(config["controllerDef"]) : undefined;
+    this.modelDef = config["modelDef"] ? $A.componentService.createModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
 
     // Initialize the concrete component class if provided
@@ -69,7 +70,7 @@ function ComponentDef(config) {
     }
 
     if (config["locationChangeEventDef"]) {
-        this.locationChangeEventDef = $A.eventService.getEventDef(config["locationChangeEventDef"]);
+        this.locationChangeEventDef = $A.eventService.createEventDef(config["locationChangeEventDef"]);
     } else {
         this.locationChangeEventDef = null;
     }
@@ -84,7 +85,7 @@ function ComponentDef(config) {
             var regConfig = cred[i];
             var name = regConfig["attributeName"];
             allEvents.push(name);
-            registerEventDefs[name] = $A.eventService.getEventDef(regConfig["eventDef"]);
+            registerEventDefs[name] = $A.eventService.createEventDef(regConfig["eventDef"]);
         }
     }
 
@@ -102,7 +103,7 @@ function ComponentDef(config) {
                     cmpHandlerDefs.push({
                         "name"     : handlerConfig["name"],
                         "action"   : handlerConfig["action"],
-                        "eventDef" : $A.eventService.getEventDef(handlerConfig["eventDef"])
+                        "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 } else {
                     if (!appHandlerDefs) {
@@ -110,7 +111,7 @@ function ComponentDef(config) {
                     }
                     appHandlerDefs.push({
                         "action"   : handlerConfig["action"],
-                        "eventDef" : $A.eventService.getEventDef(handlerConfig["eventDef"])
+                        "eventDef" : $A.eventService.createEventDef(handlerConfig["eventDef"])
                     });
                 }
 
@@ -137,10 +138,17 @@ function ComponentDef(config) {
 
     var imports = config["imports"];
     if (imports) {
-        this.libraryDefs = $A.util.reduce(imports, function(libraryDefs, imported) {
-            libraryDefs[imported["property"]] = $A.componentService.getLibraryDef(imported.name, imported["libraryDef"]);
-            return libraryDefs;
-        }, {});
+        this.libraryDefs = {};
+        var imp, lib;
+        for (var l = 0, len = imports.length; l < len; l++) {
+            imp = imports[l];
+            if (imp["libraryDef"]) {
+                lib = $A.componentService.createLibraryDef(imp["libraryDef"]);
+            } else {
+                lib = $A.componentService.getLibraryDef(imp["name"]);
+            }
+            this.libraryDefs[imp["property"]] = lib;
+        }
     }
 
     this.appHandlerDefs = appHandlerDefs || null;
@@ -164,14 +172,14 @@ function ComponentDef(config) {
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
     this.requiredVersionDefs = new RequiredVersionDefSet(config["requiredVersionDefs"]);
 
-    this.rendererDef = $A.componentService.getRendererDef(descriptor, config["rendererDef"]);
+    this.rendererDef = $A.componentService.createRendererDef(descriptor.getQualifiedName());
     this.initRenderer();
 
-    this.helperDef = $A.componentService.getHelperDef(descriptor, this, this.libraryDefs);
+    this.helperDef = $A.componentService.createHelperDef(this, this.libraryDefs);
 
     var providerDef = config["providerDef"];
     if (providerDef) {
-        this.providerDef = $A.componentService.getProviderDef(descriptor, providerDef);
+        this.providerDef = $A.componentService.createProviderDef(descriptor.getQualifiedName(), providerDef);
     } else {
         this.providerDef = null;
     }
@@ -286,6 +294,16 @@ ComponentDef.prototype.getAllStyleDefs = function() {
 };
 
 /**
+ * Gets all the FlavoredStyleDef objects, including inherited ones, for this
+ * ComponentDef.
+ *
+ * @returns {StyleDef}
+ */
+ComponentDef.prototype.getAllFlavoredStyleDefs = function() {
+    return this.allFlavoredStyleDefs;
+};
+
+/**
  * Gets the CSS class name to use for Components of this type. Includes the
  * class names from all StyleDefs, including inherited ones, associated with
  * this ComponentDef. If multiple class names are found, the return value is a
@@ -312,6 +330,16 @@ ComponentDef.prototype.getStyleClassName = function() {
 
         }
         this.styleClassName = className;
+
+        // also load flavored styles if necessary
+        if (!this.isCSSPreloaded) {
+            var flavoredStyleDefs = this.getAllFlavoredStyleDefs();
+            if (flavoredStyleDefs) {
+                for (var i = 0, len = flavoredStyleDefs.length; i < len; i++) {
+                    flavoredStyleDefs[i].apply();
+                }
+            }
+        }
     }
     return className;
 };
@@ -557,9 +585,17 @@ ComponentDef.prototype.getLayouts = function() {
  */
 ComponentDef.prototype.initSuperDef = function(config) {
     if (config) {
-        var sdef = $A.componentService.getDef(config);
-        $A.assert(sdef, "Super def undefined for " + this.descriptor + " value = " + config["descriptor"]);
-        return sdef;
+        var descriptor = config;
+        if (config["descriptor"]) {
+            descriptor = config["descriptor"];
+        }
+        // config could either be for a new component or for an existing def so we need to check first
+        var sDef = $A.componentService.registry.getDef(descriptor);
+        if (!sDef) {
+            sDef = $A.componentService.registry.createDef(config);
+        }
+        $A.assert(sDef, "Super def undefined for " + this.descriptor + " value = " + descriptor);
+        return sDef;
     }
     return null;
 };
@@ -578,6 +614,8 @@ ComponentDef.prototype.initRenderer = function() {
         rendererDef : this.rendererDef
     };
     this.allStyleDefs = [];
+    this.allFlavoredStyleDefs = [];
+
     var s = this.superDef;
     if (s) {
         if (!this.rendererDef) {
@@ -592,9 +630,16 @@ ComponentDef.prototype.initRenderer = function() {
         if (superStyles) {
             this.allStyleDefs = this.allStyleDefs.concat(superStyles);
         }
+        var superFlavoredStyles = s.getAllFlavoredStyleDefs();
+        if (superFlavoredStyles) {
+            this.allFlavoredStyleDefs = this.allFlavoredStyleDefs.concat(superFlavoredStyles);
+        }
     }
     if (this.styleDef) {
         this.allStyleDefs.push(this.styleDef);
+    }
+    if (this.flavoredStyleDef) {
+        this.allFlavoredStyleDefs.push(this.flavoredStyleDef);
     }
     if (!rd.rendererDef) {
         //

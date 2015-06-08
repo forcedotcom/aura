@@ -23,7 +23,7 @@
         
         if(trunc){
             trunc = 1 * trunc;
-            value = aura.util.truncate(value, trunc, ellipsis, truncateByWord);
+            value = $A.util.truncate(value, trunc, ellipsis, truncateByWord);
         }
         return [document.createTextNode($A.util.isUndefinedOrNull(value)?'':value)];
     },

@@ -212,7 +212,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
 
     if (evtObj["eventDef"]) {
         // register the event with the EventDefRegistry
-        $A.eventService.getEventDef(evtObj["eventDef"]);
+        $A.eventService.createEventDef(evtObj["eventDef"]);
     }
 
     if ($A.eventService.hasHandlers(descriptor)) {
@@ -426,9 +426,7 @@ AuraClientService.prototype.doActionCallback = function(response, collector, fli
                     // Create a client side action instance to go with the server created action response
                     //
                     var descriptor = actionResponse["action"];
-                    var actionDef = $A.services.component.getActionDef({
-                        descriptor : descriptor
-                    });
+                    var actionDef = $A.componentService.getActionDef(descriptor);
                     action = actionDef.newInstance();
                     action.setStorable();
                     action.setParams(actionResponse["params"]);
@@ -742,9 +740,6 @@ AuraClientService.prototype.handleAppCache = function() {
             window.applicationCache.swapCache();
         }
 
-        // Clear out our componentDefs in localStorage
-        $A.componentService.registry.clearCache();
-
         location.reload(true);
     }
 
@@ -997,44 +992,40 @@ AuraClientService.prototype.idle = function() {
  */
 
 AuraClientService.prototype.initDefs = function(config) {
-    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
-    this.currentlyInSideEffectMode=true;
 
-    var evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
+    var i,
+        evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
-    for ( var j = 0; j < evtConfigs.length; j++) {
-        $A.eventService.getEventDef(evtConfigs[j]);
+    for (i = 0; i < evtConfigs.length; i++) {
+        $A.eventService.createEventDef(evtConfigs[i]);
     }
     $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 
     var libraryConfigs = $A.util.json.resolveRefs(config["libraryDefs"]);
     $A.Perf.mark("Registered Libraries [" + libraryConfigs.length + "]");
-    for (j = 0; j < libraryConfigs.length; j++) {
-        $A.componentService.getLibraryDef(libraryConfigs[j]);
+    for (i = 0; i < libraryConfigs.length; i++) {
+        $A.componentService.createLibraryDef(libraryConfigs[i]);
     }
     $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
 
     var controllerConfigs = $A.util.json.resolveRefs(config["controllerDefs"]);
     $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
-    for (j = 0; j < controllerConfigs.length; j++) {
-        $A.componentService.getControllerDef(controllerConfigs[j]);
+    for (i = 0; i < controllerConfigs.length; i++) {
+        $A.componentService.createControllerDef(controllerConfigs[i]);
     }
     $A.Perf.endMark("Registered Controllers [" + controllerConfigs.length + "]");
 
     var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
     $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
-    for ( var i = 0; i < comConfigs.length; i++) {
-        $A.componentService.getDef(comConfigs[i]);
+    for (i = 0; i < comConfigs.length; i++) {
+        $A.componentService.createDef(comConfigs[i]);
     }
     $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
 
     var namespaces = config["namespaces"];
-    for(var i=0;i<namespaces.length;i++){
-        this.namespaces[namespaces[i]]=true;
+    for(i = 0; i < namespaces.length; i++){
+        this.namespaces[namespaces[i]] = true;
     }
-
-    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
-    delete this.currentlyInSideEffectMode;
 
     $A.Perf.endMark("PageStart");
 
@@ -1292,7 +1283,7 @@ AuraClientService.prototype.parseAndFireEvent = function(evtObj) {
 
     if (evtObj["eventDef"]) {
         // register the event with the EventDefRegistry
-        $A.eventService.getEventDef(evtObj["eventDef"]);
+        $A.eventService.createEventDef(evtObj["eventDef"]);
     }
 
     if ($A.eventService.hasHandlers(descriptor)) {
@@ -1740,10 +1731,6 @@ AuraClientService.prototype.processActions = function() {
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {
-    //JBUCH: HACK: FIXME: REMOVE WHEN GETDEF NO LONGER CREATES DEFS
-    if(this.currentlyInSideEffectMode){
-        return true;
-    }
     if(definition&&definition.getDescriptor){
         var context;
         var currentAccess;

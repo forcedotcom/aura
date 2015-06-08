@@ -18,7 +18,7 @@
 <aura:component extensible="true" description="Panel manager 2">
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-    <aura:attribute name="registeredPanels" type="Aura.ComponentDefRef[]" description=""/>
+    <aura:attribute name="registeredPanels" type="Aura.ComponentDefRef[]" description="A list of managed panels"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>
 
     <aura:handler event="ui:createPanel"  action="{!c.createPanel}"/>

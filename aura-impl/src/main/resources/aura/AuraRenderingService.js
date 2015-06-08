@@ -437,10 +437,6 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
                 this.associateElements(info.component, renderedElements);
                 ret = ret.concat(renderedElements);
                 calculatedPosition+=renderedElements.length;
-                //JBUCH: HALO: TODO: STILL NECESSARY?
-                for(var r=0;r<renderedElements.length;r++){
-                    this.addAuraClass(component, renderedElements[r]);
-                }
                 break;
             case "unrender":
                 if (!this.isMarker(component._marker)) {
@@ -781,8 +777,8 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
     var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
 
-    if (cmp.isFlavorable()) {
-        var vp = cmp.getComponentValueProvider();
+    if (concrete.isFlavorable() ) {
+        var vp = concrete.getComponentValueProvider();
         if (vp) {
             flavorClassName = vp.get("style.flavor");
         }
@@ -799,6 +795,9 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
         }
     } else if (flavorClassName) {
         $A.util.addClass(element, flavorClassName);
+        if (element["tagName"]) {
+            element["auraClass"] = $A.util.buildClass(element["auraClass"],flavorClassName);
+        }
     }
 };
 

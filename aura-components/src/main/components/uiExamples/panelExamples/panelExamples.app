@@ -32,18 +32,11 @@
             </nav>
         </header>
         <div class="controls">
-            <ui:button label="Create panel with custom header" press="{!c.createPanelWithHeader}"/>
-            <ui:button label="Create panelType: full screen panel" press="{!c.createFullPanel}"/>
-            <ui:button label="Create panelType: Modal" press="{!c.createModal}"/>
-            <ui:button label="Create panelType: Large Modal" press="{!c.createLargeModal}"/>
-            <ui:button label="Create panel with lazy load" press="{!c.lazyLoadPanel}"/>
-            <!--
-            <div class="panels">
-                <div class="panel1">panel 1: <ui:button press="{!c.openPanel1}" label="open" /> <ui:button press="{!c.hidePanel1}" label="hide" /> <ui:button press="{!c.showPanel1}" label="show" /></div>
-                <div class="panel2">panel 2: <ui:button press="{!c.openPanel2}" label="open" /> <ui:button press="{!c.hidePanel2}" label="hide" /> <ui:button press="{!c.showPanel2}" label="show" /></div>
-                <div class="panel3">panel 3: <ui:button press="{!c.openPanel3}" label="open" /> <ui:button press="{!c.hidePanel3}" label="hide" /> <ui:button press="{!c.showPanel3}" label="show" /></div>
-            </div>
-            -->
+            <ui:button label="Create panelType: panel, flavor: custom" class='customer-header-button' press="{!c.createPanelWithHeader}"/>
+            <ui:button label="Create panelType: panel, flavor: full screen" press="{!c.createFullPanel}"/>
+            <ui:button label="Create panelType: modal" press="{!c.createModal}"/>
+            <ui:button label="Create panelType: modal, flavor: large" press="{!c.createLargeModal}"/>
+            <ui:button label="Update content after panel created" press="{!c.lazyLoadPanel}"/>
         </div>
         <footer>
         </footer>

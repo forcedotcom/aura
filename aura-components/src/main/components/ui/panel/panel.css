@@ -27,12 +27,6 @@
     display: block;
 }
 
-.THIS.positioned {
-    border: 1px solid #d8dde6;
-    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
-    -webkit-filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.16));
-}
-
 .THIS.positioned .panel-header {
     border: none;
 }
@@ -97,14 +91,6 @@
 
 .THIS .panel-header {
     position: relative;
-    border-top-right-radius: 0.25rem;
-    border-top-left-radius: 0.25rem;
-    border-bottom: 2px solid #e0e5ee;
-}
-
-.THIS .panel-header .titles {
-    padding: 1.5rem 1rem;
-    text-align: center;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */

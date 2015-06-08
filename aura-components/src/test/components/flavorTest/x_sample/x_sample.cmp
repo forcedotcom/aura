@@ -1,0 +1,3 @@
+<aura:component description="test helper component: a basic flavorable component">
+    <div aura:id="sample" aura:flavorable="true">Sample Flavorable Component {!v.body}</div>
+</aura:component>

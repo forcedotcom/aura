@@ -40,13 +40,13 @@
                 var results = [];
                 for (var j = 0; j < elems.length; j++) {
                     var el = elems[j];
-                    if (typeof el == "number") {// something we should replace
+                    if (typeof el === "number") {// something we should replace
                         var sub = items[el];
                         if (!sub) {
                             // there was nothing passed in to substitute
                             sub = document.createTextNode("{" + el + "}");
                         }
-                        if(!aura.util.isArray(sub)){
+                        if(!$A.util.isArray(sub)){
                             sub = [sub];
                         }
                         if (itemUsed[el] === true) {

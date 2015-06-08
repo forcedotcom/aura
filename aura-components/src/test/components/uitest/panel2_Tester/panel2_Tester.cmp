@@ -1,0 +1,77 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="panelType"    type="String"  default="modal"/>
+	<aura:attribute name="title"        type="String"  default="New Panel"/>
+	<aura:attribute name="titleDisplay" type="Boolean" default="true"/>
+	<aura:attribute name="class"        type="String"/>
+	<aura:attribute name="flavor"       type="String"/>
+	<aura:attribute name="isVisible"    type="Boolean" default="true"/>
+	<aura:attribute name="startOfDialogLabel" type="String"  default="Start of Dialog"/>
+	<aura:attribute name="closeOnClickOut"    type="Boolean" default="false"/>
+	<aura:attribute name="showCloseButton"    type="Boolean" default="true"/>
+	<aura:attribute name="closeDialogLabel"   type="String"  default="Close"/>
+	<aura:attribute name="useTransition"      type="Boolean" default="true"/>
+	<aura:attribute name="animation"    type="String"  default="bottom"/>
+	<aura:attribute name="autoFocus"    type="Boolean" default="true"/>
+	<aura:attribute name="direction"    type="String"  default="north"/>
+	<aura:attribute name="showPointer"  type="Boolean" default="false"/>
+	<aura:attribute name="referenceElement"         type="Object"/>
+	<aura:attribute name="useReferenceElement"      type="Boolean" default="false"/>
+	<aura:attribute name="referenceElementSelector" type="String"/>
+	<aura:attribute name="useHeader"    type="Boolean" default="false"/>
+	<aura:attribute name="useFooter"    type="Boolean" default="false"/>
+	<aura:attribute name="panelHeader"  type="Aura.Component[]"/>
+	<aura:attribute name="panelFooter"  type="Aura.Component[]"/>
+	<aura:attribute name="makeScrollable"     type="Boolean" default="false"/>
+	
+	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
+	
+	<aura:handler name="init" value="{!this}" action="{!c.init}"></aura:handler> 
+	
+	<div class="info">
+		<ui:outputText value="Create a panel to your liking"/>
+	</div>
+	
+	<div class="container">
+		<div class="testPanelModal">
+			<ui:inputText     aura:id="inputPanelType"          label="Panel Type"       value="{!v.panelType}"      class="inputPanelTypeClass"/>
+			<ui:inputText     aura:id="inputTitle"              label="Title"            value="{!v.title}"          class="inputTitle`Class"/>
+			<ui:inputCheckbox aura:id="inputTitleDisplay"       label="Disaplay Title"   value="{!v.titleDisplay}"   class="inputTitleDisplayClass"/>
+			<ui:inputText     aura:id="inputClass"              label="class"            value="{!v.class}"          class="inputClassClass"/>
+			<ui:inputText     aura:id="inputFlavor"             label="Flavor"           value="{!v.flavor}"         class="inputFlavorClass"/>
+			<ui:inputCheckbox aura:id="inputIsVisible"          label="Is Visible"       value="{!v.isVisible}"      class="inputIsVisibleClass"/>
+			<ui:inputText     aura:id="inputStartOfDialogLabel" label="Start of Dialog Label" value="{!v.startOfDialogLabel}" class="inputStartOfDialogLabelClass"/>
+			<ui:inputCheckbox aura:id="inputCloseOnClickOut"    label="Close on Click Out"    value="{!v.closeOnClickOut}"    class="inputcloseOnClickOutClass"/>
+			<ui:inputCheckbox aura:id="inputShowCloseButton"    label="Show Close Button"     value="{!v.showCloseButton}"    class="inputShowCloseButtonClass"/>
+			<ui:inputText     aura:id="inputCloseDialogLabel"   label="Close Dialog Label"    value="{!v.closeDialogLabel}"   class="inputDialogLabelClass"/>
+			<ui:inputCheckbox aura:id="inputUseTransition"      label="Use Transition"   value="{!v.useTransition}"  class="inputUseTransitionClass"/>
+			<ui:inputText     aura:id="inputAnimation"          label="Animation"        value="{!v.animation}"      class="inputAnimationClass"/>
+			<ui:inputCheckbox aura:id="inputAutoFocus"          label="Auto Focus"       value="{!v.autoFocus}"      class="inputAutoFocusClass"/>
+			<ui:inputText     aura:id="inputDirection"          label="Direction"        value="{!v.direction}"      class="inputDirectionClass"/>
+			<ui:inputCheckbox aura:id="inputShowPointer"        label="Show Pointer"     value="{!v.showPointer}"    class="inputShowPointerClass"/>
+			<ui:inputCheckbox aura:id="inputUseReferenceElement"      label="Use Reference Element"          value="{!v.useReferenceElement}"         class="inputUseReferenceElement"/>
+			<ui:inputText     aura:id="inputReferenceElementSelector" label="Reference Element Selector"     value="{!v.referenceElementSelector}"    class="inputReferenceElementSelector"/>
+			<ui:inputCheckbox aura:id="inputUseHeader"          label="Use Header"       value="{!v.useHeader}"      class="inputUseHeaderClass"/>
+			<ui:inputCheckbox aura:id="inputUseFooter"          label="Use Footer"       value="{!v.useFooter}"      class="inputUseFooterClass"/>
+			<ui:inputCheckbox aura:id="inputMakeScrollable"     label="Make Scrollable"  value="{!v.makeScrollable}" class="inputMakeScrollableClass"/>
+			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
+		</div>		
+	</div>
+		
+</aura:component>

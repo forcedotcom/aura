@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
+import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.instance.*;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -48,15 +49,21 @@ public class ComponentController {
 
         public AuraClientException(String desc, String id, String message, String jsStack) {
             super(message);
-            JavascriptPseudoAction action = null;
+            Action action = null;
             if (desc != null && id != null) {
                 try {
-                    action = (JavascriptPseudoAction) Aura.getInstanceService().getInstance(desc,
-                            ActionDef.class);
-                    action.setId(id);
-                    action.addError(this);
+                    action = Aura.getInstanceService().getInstance(desc, ActionDef.class);
                 } catch (QuickFixException e) {
                     // Uh... okay, we fell over running an action we now can't even define.
+                }
+                if (action instanceof JavascriptPseudoAction) {
+                    JavascriptPseudoAction jpa = (JavascriptPseudoAction)action;
+                    jpa.setId(id);
+                    jpa.addError(this);
+                } else if (action instanceof JavaAction) {
+                    JavaAction ja = (JavaAction)action;
+                    ja.setId(id);
+                    ja.addException(this, Action.State.ERROR, false, false);
                 }
             }
 

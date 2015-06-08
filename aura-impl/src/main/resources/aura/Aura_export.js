@@ -49,6 +49,9 @@ AuraInstance.prototype["clearBeaconData"] = AuraInstance.prototype.Perf.clearBea
 AuraInstance.prototype["removeStats"] = AuraInstance.prototype.Perf.removeStats;
 AuraInstance.prototype["isLoadFired"] = AuraInstance.prototype.Perf.isLoadFired;
 
+AuraInstance.prototype["installOverride"] = AuraInstance.prototype.installOverride;
+AuraInstance.prototype["uninstallOverride"] = AuraInstance.prototype.uninstallOverride;
+
 // //#end
 
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -56,4 +59,70 @@ AuraInstance.prototype["devToolService"] = AuraInstance.prototype.devToolService
 AuraInstance.prototype["getQueryStatement"] = AuraInstance.prototype.getQueryStatement;
 AuraInstance.prototype["qhelp"] = AuraInstance.prototype.qhelp;
 //#end
+
+//
+// Ideally, this would be done with names and using the closure compiler to generate them. That would make
+// this much simpler and cleaner, including allowing us to not have separate functions for replace and restore
+// it could all be done with two sets of instance/name pairs (1) plain names, (2) bound names.
+//
+Aura.OverrideMap = function OverrideMap() {
+    this.map = {
+        "enqueueAction":new Aura.Utils.Override($A.clientService, $A.clientService.enqueueAction, false,
+            function(bound) {
+                $A.enqueueAction = bound;
+                $A["enqueueAction"] = bound;
+                $A.clientService.enqueueAction = bound;
+                $A.clientService["enqueueAction"] = bound;
+            },
+            function(orig, bound) {
+                $A.enqueueAction = bound;
+                $A["enqueueAction"] = bound;
+                $A.clientService.enqueueAction = orig;
+                $A.clientService["enqueueAction"] = orig;
+            }),
+        "ClientService.decode":new Aura.Utils.Override($A.clientService, $A.clientService.decode, false,
+            function(bound) {
+                $A.clientService.decode = bound;
+            },
+            function(orig, bound) {
+                $A.clientService.decode = orig;
+            }),
+        "ClientService.send":new Aura.Utils.Override($A.clientService, $A.clientService.send, false,
+            function(bound) {
+                $A.clientService.send = bound;
+            },
+            function(orig, bound) {
+                $A.clientService.send = orig;
+            }),
+        "ClientService.receive":new Aura.Utils.Override($A.clientService, $A.clientService.receive, false,
+            function(bound) {
+                $A.clientService.receive = bound;
+            },
+            function(orig, bound) {
+                $A.clientService.receive = orig;
+            }),
+        "ClientService.getAvailableXHR":new Aura.Utils.Override($A.clientService, $A.clientService.getAvailableXHR,
+            false,
+            function(bound) {
+                $A.clientService.getAvailableXHR = bound;
+            },
+            function(orig, bound) {
+                $A.clientService.getAvailableXHR = orig;
+            }),
+        "Action.finishAction":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.finishAction, true,
+            function(bound) {
+                Aura.Controller.Action.prototype.finishAction = bound;
+            },
+            function(orig, bound) {
+                Aura.Controller.Action.prototype.finishAction = orig;
+            }),
+        "Action.abort":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.abort, true,
+            function(bound) {
+                Aura.Controller.Action.prototype.abort = bound;
+            },
+            function(orig, bound) {
+                Aura.Controller.Action.prototype.abort = orig;
+            })
+    };
+};
 

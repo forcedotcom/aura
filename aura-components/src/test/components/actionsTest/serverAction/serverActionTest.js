@@ -29,7 +29,7 @@
     testEnqueuedCallbackJavascriptError : {
         test : function(cmp) {
             $A.test.expectAuraWarning("Callback failed: java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground");
-            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
+            $A.test.expectAuraError("this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
@@ -40,7 +40,7 @@
 
     testRunActionsCallbackJavascriptError : {
         test : function(cmp) {
-            $A.test.expectAuraError("Uncaught error in actionCallback : this is intentional");
+            $A.test.expectAuraError("this is intentional");
             var a = $A.test.getAction(cmp, "c.executeInForeground", null, function() {
                 throw new Error("this is intentional");
             });
@@ -141,10 +141,10 @@
     testStorableRetry: {
         test : [ function(cmp) {
             // prime storage
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, "prime");
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
             a.setStorable();
             $A.enqueueAction(a);
-            $A.test.addWaitForAction(true, "prime");
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }, function(cmp) {
             var errorMsg = "Action callback error from test",
                 warningMsg = "Finishing cached action failed. Trying to refetch from server",
@@ -168,9 +168,8 @@
                 }
             });
             a.setStorable();
-            $A.test.markForCompletion(a, "action1");
             $A.enqueueAction(a);
-            $A.test.addWaitForAction(true, "action1");
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }]
     },
 
@@ -180,10 +179,10 @@
     testStorableRetry_errorOnRetry: {
         test : [ function(cmp) {
             // prime storage
-            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined, "prime");
+            var a = $A.test.getAction(cmp, "c.executeInForeground", undefined);
             a.setStorable();
             $A.enqueueAction(a);
-            $A.test.addWaitForAction(true, "prime");
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); });
         }, function(cmp) {
             var errorMsg = "Action callback error from test",
                 warningMsg = "Finishing cached action failed. Trying to refetch from server",

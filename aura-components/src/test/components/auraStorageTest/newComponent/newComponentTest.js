@@ -17,9 +17,9 @@
     /**
      * Verify the numbering of Actions.
      * Actions have two part numbering. The format is as shown below: 
-     * x:y 
+     * x;a 
      * 	X -> Action instance number. Each instance of an Action object gets a new number.
-     *  Y -> Denotes the num maintained by context. 
+     *  a -> Denotes action
      */
     testActionIds:{
         test:[function(cmp){
@@ -45,9 +45,7 @@
             
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
-                    //After a action request was sent to server, context will increment its counter.
                     var d = cmp.get("c.getBaseball");
-                    $A.test.assertEquals(2, $A.getContext().getNum(), "Context lost track of request numbers" )
                     $A.test.assertEquals(++startactioncount+";a", d.getId(),
                         "Action Numbering gone wild - Server Action(4)");
             });

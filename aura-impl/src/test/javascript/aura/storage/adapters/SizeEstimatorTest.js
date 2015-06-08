@@ -23,7 +23,6 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             window: Object.Global(),
             document: { createDocumentFragment: function() {} },
             Json: function() {},
-            Transport: function() {},
             Style: function() {},
             Bitset: {},
             NumberFormat: {},

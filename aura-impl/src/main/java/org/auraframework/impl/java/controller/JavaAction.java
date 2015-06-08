@@ -97,7 +97,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
      * @param loggable should this exception be run through the 'exception
      *            adapter'.
      */
-    private void addException(Throwable t, State newState, boolean loggable, boolean wrap) {
+    public void addException(Throwable t, State newState, boolean loggable, boolean wrap) {
         this.state = newState;
         if (t instanceof AuraHandledException) {
             this.errors.add(t);

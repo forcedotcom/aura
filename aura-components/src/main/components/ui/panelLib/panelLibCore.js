@@ -18,6 +18,15 @@ function () {
 
     var lib = {
 
+
+        validateAnimationName: function(animName) {
+
+            if(animName && animName === 'bottom') {
+                return true;
+            }
+            return false;
+        },
+
         /**
          * returns the initial, first and last focusable in the given panel
          * @param containerEl
@@ -141,14 +150,22 @@ function () {
                 animEnd    = this.getAnimationEndEventName(),
                 animName   = config.animationName,
                 panel = cmp.getElement(),
+                useTransition = config.useTransition,
                 animEl = config.animationEl || panel;
 
+            //make sure animation name is valid 
+            if(useTransition) {
+                useTransition = this.validateAnimationName(animName);
+            }
+            
             //need to notify panel manager to de-activate other panels;
             cmp.getEvent('notify').setParams({
                 action: 'beforeShow',
                 typeOf: 'ui:panel',
                 payload: { panelInstance: cmp.getGlobalId() }
             }).fire();
+
+
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function (e) {
@@ -165,7 +182,7 @@ function () {
             };
 
             panel.setAttribute("aria-hidden", 'false');
-            if (config.useTransition) {
+            if (useTransition) {
                 animEl.addEventListener(animEnd, finishHandler, false);
                 $A.util.addClass(animEl, 'transitioning ' + animName);
                 $A.util.addClass(panel, 'open');
@@ -185,7 +202,14 @@ function () {
             var animEnd    = this.getAnimationEndEventName(),
                 animName   = config.animationName,
                 panel = cmp.getElement(),
+                useTransition = config.useTransition,
                 animEl = config.animationEl || panel;
+
+            //make sure animation name is valid 
+            if(useTransition) {
+                useTransition = this.validateAnimationName(animName);
+            }
+
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function (e) {
                 if (config.useTransition) {
@@ -199,7 +223,7 @@ function () {
             };
 
             panel.setAttribute("aria-hidden", 'true');
-            if (config.useTransition) {
+            if (useTransition) {
                 animEl.addEventListener(animEnd, finishHandler, false);
                 $A.util.addClass(animEl,  'transitioning ' + animName);
             } else {

@@ -106,8 +106,9 @@
 
     /**
      * Verify chaining the same action multiple times.
+     *
      */
-    testChainSameActionTwice:{
+    testChainActionTwice:{
         test:[function(cmp){
                 var multiply = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
                     //Server call back function will be called back twice
@@ -118,11 +119,21 @@
                         cmp.set('v.callbackCount',
                             cmp.get('v.callbackCount')+1);
                     });
+                var multiply2 = $A.test.getAction(cmp,"c.multiply", {"a" : 2},
+                    //Server call back function will be called back twice
+                    function(action){
+                        $A.test.assertEquals("SUCCESS",action.getState());
+                        $A.test.assertEquals(200*cmp.get('v.callbackCount'),
+                            action.getReturnValue());
+                        cmp.set('v.callbackCount',
+                            cmp.get('v.callbackCount')+1);
+                    });
                 multiply.setChained();
+                multiply2.setChained();
                 var add = $A.test.getAction(cmp,"c.add",{
                                             "a" : 1, "b" : 99,
                                             "actions": $A.util.json.encode({
-                                                actions: [multiply, multiply]
+                                                actions: [multiply, multiply2]
                                             })
                                         },function(action){
                                             $A.test.assertEquals("SUCCESS",action.getState());

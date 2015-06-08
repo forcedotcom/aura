@@ -15,5 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component>
-</aura:component>
+
+<aura:documentation>
+    <aura:description>
+        <p><code>ui:modal</code> represents a modal panel that has a header, footer, and close button. It allows only interaction within the modal panel when it's opened.
+        You can customize all parts of the modal panel, including sizing and positioning. See <code>ui:panel</code> for more information.</p>
+    </aura:description>
+</aura:documentation>

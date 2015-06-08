@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @description Transport metrics plugin
+ * @description Client Service metrics plugin
  * @constructor
  */
 var ClientServiceMetricsPlugin = function ClientServiceMetricsPlugin(config) {

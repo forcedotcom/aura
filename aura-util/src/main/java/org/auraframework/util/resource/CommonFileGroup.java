@@ -290,7 +290,7 @@ public abstract class CommonFileGroup implements FileGroup {
      */
     protected void addFile(File f) throws FileNotFoundException {
         if (!f.exists() || !f.isFile() || !this.filter.accept(f)) {
-            throw new FileNotFoundException("File did not exist or was not a valid, acceptable file: " + f.getAbsolutePath());
+            throw new FileNotFoundException("File did not exist or was not a valid, acceptable file: " + f);
         }
         bundle.addFile(f);
     }
@@ -298,6 +298,9 @@ public abstract class CommonFileGroup implements FileGroup {
     @Override
     public File addFile(String s) throws IOException {
         File f = root.toPath().resolve(s).toFile();
+        if (f == null) {
+            throw new FileNotFoundException("File did not exist or was not a valid, acceptable file: " + s);
+        }
         addFile(f);
         return f;
     }

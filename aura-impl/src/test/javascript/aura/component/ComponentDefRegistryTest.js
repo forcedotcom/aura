@@ -137,64 +137,6 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
             Assert.Equal(expected, actual);
 
         }
-
-        [Fact]
-        function ReturnsDefIfFound() {
-            // Arrange
-            var expected = "ComponentDef";
-            var target = new ComponentDefRegistry();
-            var descriptor = "markup://foo:bar";
-            target.componentDefs[descriptor] = expected;
-            var actual;
-
-            // Act
-            mockAuraUtil(function () {
-                actual = target.getDef(descriptor);
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function SupportsShortHandFormatOfDescriptor() {
-            // Arrange
-            var expected = "ComponentDef";
-            var target = new ComponentDefRegistry();
-            var descriptor = "markup://foo:bar";
-            target.componentDefs[descriptor] = expected;
-            var actual;
-
-            // Act
-            mockAuraUtil(function () {
-                actual = target.getDef("foo:bar");
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function SupportsDescriptorInMapFormat() {
-            // Arrange
-            var expected = "ComponentDef";
-            var target = new ComponentDefRegistry();
-            var descriptor = "markup://foo:bar";
-            target.componentDefs[descriptor] = expected;
-            var actual;
-
-            // Act
-            mockAuraUtil(function () {
-                actual = target.getDef({
-                    "descriptor": "foo:bar"
-                });
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-
     }
 
     [Fixture]
@@ -355,6 +297,13 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
                         }
                     },
                     deleteStorage: function() {}
+                },
+                getContext: function() {
+                    return {
+                        getApp: function() {
+                            return "foo";
+                        }
+                    }
                 }
             });
         };

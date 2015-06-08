@@ -69,7 +69,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
             defs = config["componentDefs"];
             for (i = 0; i < defs.length; i++) {
                 if (defs[i]["descriptor"]) {
-                    $A.componentService.createDef(defs[i]);
+                    $A.componentService.saveComponentConfig(defs[i]);
                 }
             }
         }
@@ -356,7 +356,7 @@ Aura.Context.AuraContext.prototype.joinComponentConfigs = function(otherComponen
             config = otherComponentConfigs[idx];
             def = config["componentDef"];
             if (def && def["descriptor"]) {
-                $A.componentService.createDef(def);
+                $A.componentService.saveComponentConfig(def);
             }
             cP = config["creationPath"];
             this.componentConfigs[actionId+cP] = config;

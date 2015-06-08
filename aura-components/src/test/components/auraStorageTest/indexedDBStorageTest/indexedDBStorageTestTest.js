@@ -63,7 +63,7 @@
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(result) { cmp._append("result length = "+result.length); return cmp._storage.getSize(); })
                 .then(function(size) {
-                    $A.test.assertTrue(size >= 2 && size < 2.1, "testGetSize: Expected size of 2, but got " + size);
+                    $A.test.assertTrue(size >= 2 && size < 2.2, "testGetSize: Expected size of 2, but got " + size);
                     completed = true;
                 }, cmp._die);
 
@@ -81,7 +81,7 @@
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function() { return cmp._storage.getSize(); })
                 .then(function(size) {
-                    $A.test.assertTrue(size >= 8 && size < 8.1, "testGetSize: Expected size of 12, but got " + size);
+                    $A.test.assertTrue(size >= 8 && size < 8.3, "testGetSize: Expected size of 8, but got " + size);
                     completed = true;
                 }, cmp._die);
 
@@ -98,7 +98,7 @@
                 .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
                 .then(function(results) { return cmp._storage.getSize(); })
                 .then(function(size) {
-                    $A.test.assertTrue(size >= 4 && size < 4.1, "testGetSize: Expected size of 4, but got " + size);
+                    $A.test.assertTrue(size >= 4 && size < 4.3, "testGetSize: Expected size of 4, but got " + size);
                     completed = true;
                 }, cmp._die);
 

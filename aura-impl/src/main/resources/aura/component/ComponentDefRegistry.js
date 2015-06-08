@@ -33,14 +33,6 @@ ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
  */
 ComponentDefRegistry.prototype.getDef = function(descriptor) {
     $A.assert(descriptor, "No ComponentDef descriptor specified");
-
-    if (descriptor["descriptor"]) {
-        descriptor = descriptor["descriptor"];
-    }
-
-    if ($A.util.isString(descriptor) && descriptor.indexOf("://") < 0) {
-        descriptor = "markup://" + descriptor; // support shorthand
-    }
     return this.componentDefs[descriptor];
 };
 
@@ -113,22 +105,24 @@ ComponentDefRegistry.prototype.useDefinitionStorage = function() {
 ComponentDefRegistry.prototype.setupDefinitionStorage = function() {
     if (this.useDefStore === undefined) {
         this.useDefStore = false;
-        var storage = $A.storageService.initStorage(
-            this.auraType,  // name
-            true,           // persistent
-            false,          // secure
-            2048000,        // maxSize 2MB
-            1209600,        // defaultExpiration (2 weeks)
-            0,              // defaultAutoRefreshInterval
-            true,           // debugLoggingEnabled
-            false           // clearStorageOnInit
-        );
-        if (storage.isPersistent()) {
-            // we only want a persistent storage
-            this.definitionStorage = storage;
-            this.useDefStore = true;
-        } else {
-            $A.storageService.deleteStorage(this.auraType);
+        if ($A.getContext().getApp()) {
+            var storage = $A.storageService.initStorage(
+                this.auraType,  // name
+                true,           // persistent
+                false,          // secure
+                2048000,        // maxSize 2MB
+                1209600,        // defaultExpiration (2 weeks)
+                0,              // defaultAutoRefreshInterval
+                true,           // debugLoggingEnabled
+                false           // clearStorageOnInit
+            );
+            if (storage.isPersistent()) {
+                // we only want a persistent storage
+                this.definitionStorage = storage;
+                this.useDefStore = true;
+            } else {
+                $A.storageService.deleteStorage(this.auraType);
+            }
         }
     }
 };
@@ -151,7 +145,7 @@ ComponentDefRegistry.prototype.restoreAllFromStorage = function() {
                 // TODO W-2512654: revisit "isExpired"
                 if (!item["isExpired"] && $A.util.isUndefinedOrNull(defRegistry.componentDefs[descriptor])) {
                     var config = $A.util.json.decode(item["value"]);
-                    defRegistry.saveComponentDef(config);
+                    $A.componentService.saveComponentConfig(config);
                 }
             }
             $A.log("ComponentDefRegistry: restored " + len + " definitions from storage into registry");

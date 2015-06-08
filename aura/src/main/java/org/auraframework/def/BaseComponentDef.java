@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.def.design.DesignDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -88,6 +89,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException;
 
+    Set<PropertyReference> getExpressionRefs();
+    
     List<AttributeDefRef> getFacets();
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;

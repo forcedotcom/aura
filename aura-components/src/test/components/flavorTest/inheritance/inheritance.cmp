@@ -2,9 +2,27 @@
     <!-- the parent (super) has the flavorable element, but we should still be able to set it on components that inherit from it -->
     <flavorTest:inheritance_x_extensibleWrapper_bareChild aura:id="bareChild" aura:flavor="flavorA" />
 
+    <!-- the parent (super) has the flavorable element, but we should still be able to set it on components that inherit from it -->
+    <flavorTest:inheritance_x_extensibleWrapper_markupChild aura:id="markupChild" aura:flavor="flavorA"/>
+
     <!-- the parent is just a wrapper with v.body, and the child has the flavorable element -->
     <flavorTest:inheritance_x_extensibleBare_child aura:id="bareParent" aura:flavor="flavorA"/>
 
     <!-- the parent has a flavorable element AND the child has a flavorable element -->
-    <!-- <flavorTest:inheritance_x_extensibleWrapper_child aura:id="both" aura:flavor="flavorA"></flavorTest:inheritance_x_extensibleWrapper_child> -->
+    <flavorTest:inheritance_x_extensibleWrapper_child aura:id="both" aura:flavor="flavorA"></flavorTest:inheritance_x_extensibleWrapper_child>
+
+     <!-- the parent has a flavorable element, and the child only has text -->
+    <flavorTest:inheritance_x_extensibleWrapper_textChild aura:id="textChild" aura:flavor="flavorA"></flavorTest:inheritance_x_extensibleWrapper_textChild>
+
+    <!-- the parent has a wrapper div (not flavorable), and the child ONLY has a flavorable div at the top level -->
+    <flavorTest:inheritance_x_extensibleMarkupWrapper_flatChild aura:id="flatChild" aura:flavor="flavorB"></flavorTest:inheritance_x_extensibleMarkupWrapper_flatChild>
+
+    <!-- the parent has a wrapper div (not flavorable), and the child has a flavorable div at the top level and non-flavorable div inside that -->
+    <flavorTest:inheritance_x_extensibleMarkupWrapper_outerChild aura:id="outerChild" aura:flavor="flavorB"></flavorTest:inheritance_x_extensibleMarkupWrapper_outerChild>
+
+    <!-- the parent has a wrapper div (not flavorable), and the child has a flavorable div at the second level -->
+    <flavorTest:inheritance_x_extensibleMarkupWrapper_innerChild aura:id="innerChild" aura:flavor="flavorB"></flavorTest:inheritance_x_extensibleMarkupWrapper_innerChild>
+
+    <!-- the parent has a wrapper div (not flavorable), and the child has a flavorable div at the top level and other non-flavorable divs at the top level -->
+    <flavorTest:inheritance_x_extensibleMarkupWrapper_peersChild aura:id="peersChild" aura:flavor="flavorB"></flavorTest:inheritance_x_extensibleMarkupWrapper_peersChild>
 </aura:component>

@@ -1,0 +1,5 @@
+<aura:component extends="flavorTest:inheritance_x_extensibleMarkupWrapper" description="inheritance test helper component: flavorable element at top level with peers">
+    <div class="outer" aura:flavorable="true">Extensible Markup Wrapper - Peers</div>
+    <div class="peer1"><span></span></div>
+    <div class="peer2"></div>
+</aura:component>

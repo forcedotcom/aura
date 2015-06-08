@@ -267,7 +267,7 @@ var ComponentPriv = (function() { // Scoping priv
                     // todo-- nathan: this is probably wrong
                     if (!$A.util.isUndefinedOrNull(flavor)) {
                        flavor = valueFactory.create(flavor, null, cmp.getComponentValueProvider());
-                       return $A.util.buildFlavorClass(cmp, $A.util.isExpression(flavor) ? flavor.evaluate() : flavor);
+                       return $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
                     }
                     return null;
                 }
@@ -1521,7 +1521,7 @@ Component.prototype.destroy = function(async) {
     if (concrete && this !== concrete && concrete.isValid()) {
         return concrete.destroy(async);
     }
-    
+
     this.fire("destroy");
 
     if (this.priv && !this._destroying) {

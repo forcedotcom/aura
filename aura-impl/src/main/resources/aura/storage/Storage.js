@@ -63,7 +63,7 @@ var AuraStorage = function AuraStorage(config) {
 };
 
 /**
- * Returns the name of the storage type. For example, "smartStore", "websql", or "memory".
+ * Returns the name of the storage type. For example, "indexeddb" or "memory".
  * @returns {String} The storage type.
  */
 AuraStorage.prototype.getName = function() {
@@ -109,7 +109,6 @@ AuraStorage.prototype.clear = function() {
  * @returns {Promise} A Promise that will fetch an item from storage.
  */
 AuraStorage.prototype.get = function(key) {
-    // This needs to also be asynchronous to map to IndexedDB, WebSQL, SmartStore that are all async worlds
     var that = this;
     var promise = this.adapter.getItem(this.version + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);

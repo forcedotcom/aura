@@ -18,10 +18,16 @@ package org.auraframework.impl.root.parser.handler;
 import java.util.Collections;
 import java.util.List;
 
-import javax.xml.stream.*;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -59,11 +65,11 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
     protected DefDescriptor<P> getParentDefDescriptor(){
         return parentHandler.getDefDescriptor();
     }
-    
+
     @Override
     public boolean isInPrivilegedNamespace() {
         return parentHandler != null && parentHandler.isInPrivilegedNamespace();
-	}
+    }
 
     protected List<ComponentDefRef> tokenizeChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
@@ -71,33 +77,33 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
         boolean skip = getWhitespaceBehavior() == WhitespaceBehavior.OPTIMIZE ? AuraTextUtil
                 .isNullEmptyOrWhitespace(text) : AuraTextUtil.isNullOrEmpty(text);
 
-        if (!skip) {
-            TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation(), getWhitespaceBehavior());
-            return tokenizer.asComponentDefRefs(parentHandler);
-        }
-        return Collections.emptyList();
+                if (!skip) {
+                    TextTokenizer tokenizer = TextTokenizer.tokenize(text, getLocation(), getWhitespaceBehavior());
+                    return tokenizer.asComponentDefRefs(parentHandler);
+                }
+                return Collections.emptyList();
     }
-    
+
     /*
      * This method is essentially a generic HTML parser. If we ever refactor XMLHandler to allow handlers without
      * Definitions, this should probably be pulled into its own handler.
      */
     protected String handleHTML() throws QuickFixException, XMLStreamException {
         StringBuilder sb = new StringBuilder();
-        
+
         String startTag = getTagName();
-        
+
         if (HtmlTag.allowed(startTag)) {
             StringBuilder attrs = new StringBuilder();
             for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
                 attrs.append(String.format(" %s=\"%s\"", xmlReader.getAttributeName(i), xmlReader.getAttributeValue(i)));
             }
-            
+
             sb.append(String.format("<%s%s>", startTag, attrs.toString()));
         } else {
             error("Found invalid tag <%s>", startTag);
         }
-                
+
         loop: while (xmlReader.hasNext()) {
             int next = xmlReader.next();
             switch (next) {
@@ -122,11 +128,11 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
                 error("found something of type: %s", next);
             }
         }
-        
+
         sb.append(String.format("</%s>", startTag));
         return sb.toString();
     }
-    
+
     protected String handleHTMLText() {
         String text = xmlReader.getText();
         String ret = "";
@@ -134,8 +140,8 @@ public abstract class ParentedTagHandler<T extends Definition, P extends RootDef
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             ret = AuraTextUtil.replaceSimple(text,  new String[]{"<", ">"}, new String[]{"&lt;", "&gt;"});
         }
-        
+
         return ret;
-        
+
     }
 }

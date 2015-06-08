@@ -15,14 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.MethodDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.root.event.RegisterEventDefImpl;
@@ -46,8 +55,8 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_EXTENDS,
             RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_API_VERSION, ATTRIBUTE_ACCESS);
-	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_PROVIDER).addAll(ALLOWED_ATTRIBUTES).build();
+    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            RootTagHandler.ATTRIBUTE_SUPPORT, ATTRIBUTE_PROVIDER).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final InterfaceDefImpl.Builder builder = new InterfaceDefImpl.Builder();
 
@@ -77,14 +86,14 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
             AttributeDefHandler<InterfaceDef> handler=new AttributeDefHandler<>(this, xmlReader, source);
             AttributeDefImpl attributeDef = handler.getElement();
             DefDescriptor<AttributeDef> attributeDesc = attributeDef.getDescriptor();
-//            if (builder.getAttributeDefs().containsKey(attributeDesc)) {
-//                tagError(
-//                        "There is already an attribute named '%s' on %s '%s'.",
-//                        handler.getParentHandler().getDefDescriptor(),
-//                        attributeDesc.getName(),
-//                        "%s", "%s"
-//                );
-//            }
+            //            if (builder.getAttributeDefs().containsKey(attributeDesc)) {
+            //                tagError(
+            //                        "There is already an attribute named '%s' on %s '%s'.",
+            //                        handler.getParentHandler().getDefDescriptor(),
+            //                        attributeDesc.getName(),
+            //                        "%s", "%s"
+            //                );
+            //            }
             builder.addAttributeDef(attributeDesc,attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
             RequiredVersionDefHandler<InterfaceDef> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
@@ -96,9 +105,9 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
                         handler.getParentHandler().getDefDescriptor(),
                         requiredVersionDesc.getName(),
                         "%s", "%s"
-                );
+                        );
             }
-        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
+            builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else if (RegisterEventHandler.TAG.equalsIgnoreCase(tag)) {
             RegisterEventDefImpl regDef = new RegisterEventHandler<>(this, xmlReader, source).getElement();
             builder.events.put(regDef.getAttributeName(), regDef);

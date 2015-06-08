@@ -23,7 +23,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptionDef;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.ExampleDef;
 import org.auraframework.impl.documentation.DocumentationDefImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -36,7 +39,7 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = Collections.emptySet();
 
     private final DocumentationDefImpl.Builder builder = new DocumentationDefImpl.Builder();
-    
+
     // counter used to index DescriptionDefs with no explicit id
     private int idCounter = 0;
 
@@ -72,19 +75,19 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
-        
+
         if (DescriptionDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
-        	String name = desc.getName();
+            DescriptionDef desc = new DescriptionDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+            String name = desc.getName();
             builder.addDescription(name, desc);
-            
+
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	ExampleDef ex = new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
-        	String name = ex.getName();
-        	builder.addExample(name, ex);
-        	
+            ExampleDef ex = new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+            String name = ex.getName();
+            builder.addExample(name, ex);
+
         } else {
-        	throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
+            throw new XMLStreamException(String.format("<%s> cannot contain tag %s", getHandledTag(), tag));
         }
     }
 
@@ -92,9 +95,9 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     protected void handleChildText() throws XMLStreamException, QuickFixException {
         String text = xmlReader.getText();
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
-        	throw new XMLStreamException(String.format(
-        			"<%s> can contain only <aura:description> and <aura:example> tags.\nFound text: %s",
-        			getHandledTag(), text));
+            throw new XMLStreamException(String.format(
+                    "<%s> can contain only <aura:description> and <aura:example> tags.\nFound text: %s",
+                    getHandledTag(), text));
         }
     }
 
@@ -106,10 +109,10 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     @Override
     public void writeElement(DocumentationDef def, Appendable out) throws IOException {
     }
-    
+
     String getNextId() {
-    	String ret = Integer.toString(idCounter);
-    	idCounter++;
-    	return ret;
+        String ret = Integer.toString(idCounter);
+        idCounter++;
+        return ret;
     }
 }

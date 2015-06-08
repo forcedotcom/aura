@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.service.testdata;
+package org.auraframework.impl.service.testdata;
 
 import java.math.BigDecimal;
 import java.text.DateFormat;

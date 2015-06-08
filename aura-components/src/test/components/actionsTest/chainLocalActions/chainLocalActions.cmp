@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.java.controller.ActionChainingController" render="client">
+<aura:component controller="java://org.auraframework.impl.java.controller.ActionChainingController" render="client">
     <aura:attribute type="String" name="responseOrder" default=""/>
     <ui:button press="{!c.handleClick}" label="Add Two numbers"/>
     <ui:button press="{!c.callServerButPassNoChainedActions}" label="Add Two numbers and pass null for chained actions parameter"/>

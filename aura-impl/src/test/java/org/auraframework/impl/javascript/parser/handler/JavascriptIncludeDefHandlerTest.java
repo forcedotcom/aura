@@ -16,8 +16,8 @@
 package org.auraframework.impl.javascript.parser.handler;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionTest;
 import org.auraframework.def.IncludeDef;
+import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mock;

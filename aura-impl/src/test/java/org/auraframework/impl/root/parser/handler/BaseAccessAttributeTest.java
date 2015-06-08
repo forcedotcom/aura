@@ -470,7 +470,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
 		
 		if(testCase == TestCase.INVALID_DYNAMIC){
-			return "org.auraframework.test.TestAccessMethods.invalid";
+			return "org.auraframework.impl.test.util.TestAccessMethods.invalid";
 		}
 		
 		if(testCase == TestCase.AUTHENTICATED_UNAUTHENTICATED){
@@ -478,11 +478,11 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		}
 		
 		if(testCase == TestCase.VALUE_METHOD){
-			return "GLOBAL,org.auraframework.test.TestAccessMethods.allowGlobal";
+			return "GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal";
 		}
 		
 		if(testCase == TestCase.METHOD_AUTHENTICATION){
-			return "org.auraframework.test.TestAccessMethods.allowGlobal,AUTHENTICATED";
+			return "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED";
 		}
 		
 		if(testCase.toString().contains("INVALID")){
@@ -499,7 +499,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				access.append("GLOBAL,");
 			}
 			else{
-				return "org.auraframework.test.TestAccessMethods.allowGlobal";
+				return "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal";
 			}
 		}
 		
@@ -508,7 +508,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				access.append("PUBLIC,");
 			}
 			else{
-				return "org.auraframework.test.TestAccessMethods.allowPublic";
+				return "org.auraframework.impl.test.util.TestAccessMethods.allowPublic";
 			}
 		}
 		
@@ -517,7 +517,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				access.append("PRIVATE,");
 			}
 			else{
-				return "org.auraframework.test.TestAccessMethods.allowPrivate";
+				return "org.auraframework.impl.test.util.TestAccessMethods.allowPrivate";
 			}
 		}
 		
@@ -526,7 +526,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				access.append("INTERNAL,");
 			}
 			else{
-				return "org.auraframework.test.TestAccessMethods.allowInternal";
+				return "org.auraframework.impl.test.util.TestAccessMethods.allowInternal";
 			}
 		}
 				
@@ -535,7 +535,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				access.append("UNAUTHENTICATED,");
 			}
 			else{
-				return "org.auraframework.test.TestAccessMethods.allowUnAuthenticated";
+				return "org.auraframework.impl.test.util.TestAccessMethods.allowUnAuthenticated";
 			}
 		}
 		else{					
@@ -544,7 +544,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					access.append("AUTHENTICATED,");
 				}
 				else{
-					return "org.auraframework.test.TestAccessMethods.allowAuthenticated";
+					return "org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated";
 				}
 			}
 		}				
@@ -565,16 +565,16 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		
 		if(access == "" || access.equals("BLAH")  
 		   || access.equals("AUTHENTICATED,UNAUTHENTICATED") 
-		   || access.equals("org.auraframework.test.TestAccessMethods.invalid")
-		   || access.equals("org.auraframework.test.TestAccessMethods.allowAuthenticated")
-		   || access.equals("org.auraframework.test.TestAccessMethods.allowUnAuthenticated")
-		   || access.equals("GLOBAL,org.auraframework.test.TestAccessMethods.allowGlobal")){
+		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.invalid")
+		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated")
+		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.allowUnAuthenticated")
+		   || access.equals("GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal")){
 			return false;
 		}	
 		
 		String[] accessValues;
 		
-		if(access.startsWith("org.auraframework.test.TestAccessMethods.")){
+		if(access.startsWith("org.auraframework.impl.test.util.TestAccessMethods.")){
 			String[] vals =  access.split("\\.");
 			String val = vals[vals.length-1];
 			

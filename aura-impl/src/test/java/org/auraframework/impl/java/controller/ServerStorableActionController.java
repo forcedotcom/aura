@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.java.controller;
+package org.auraframework.impl.java.controller;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,35 +51,35 @@ public class ServerStorableActionController {
         Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
         List<Action> actions = Lists.newArrayList();
         for(String actionCursor : actionsToMark){
-            if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$storedAction")){
+            if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$storedAction")){
                 for (int n = 0; n < 10; n++) {
                     Map<String, Object> params = Maps.newHashMap();
                     params.put("message", "some really cool message #" + (n + 1));
                     runActionAndMarkStorable(actions,
                             actionCursor, params, true);
                 }
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$simpleValuesAsParams")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$simpleValuesAsParams")){
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 params.put("year", 2012);
                 params.put("mvp", "Buster Posey");
                 runActionAndMarkStorable(actions, actionCursor, params, true);
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$complexValuesAsParams")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$complexValuesAsParams")){
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 params.put("players", Arrays.asList("Buster Posey","Pablo Sandavol", "Angel Pagan"));
                 runActionAndMarkStorable(actions, actionCursor, params, true);
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$returnNothing")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$returnNothing")){
                 runActionAndMarkStorable(actions, actionCursor, null, true);
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$throwsException")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$throwsException")){
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 runActionAndMarkStorable(actions, actionCursor, params, true);
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$unStoredAction")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$unStoredAction")){
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 runActionAndMarkStorable(actions, actionCursor, params, false);
-            }else if(actionCursor.equals("java://org.auraframework.java.controller.ServerStorableActionController/ACTION$getComponent")){
+            }else if(actionCursor.equals("java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$getComponent")){
                 Map<String, Object> params = Maps.newHashMap();
                 params.put("testName", testName);
                 runActionAndMarkStorable(actions, actionCursor, params, true);

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.http;
+package org.auraframework.impl.context;
 
 import java.util.Locale;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.auraframework.http.AuraContextFilter;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.AuraTestCase;
 import org.mockito.Mockito;

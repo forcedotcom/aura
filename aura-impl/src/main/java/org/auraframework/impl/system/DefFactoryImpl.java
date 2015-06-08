@@ -17,7 +17,9 @@ package org.auraframework.impl.system;
 
 import java.util.Set;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.system.DefFactory;
 import org.auraframework.system.Source;
 

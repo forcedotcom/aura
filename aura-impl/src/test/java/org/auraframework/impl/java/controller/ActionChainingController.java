@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.java.controller;
+package org.auraframework.impl.java.controller;
 
 import java.io.StringReader;
 import java.util.Collection;

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.impl.system;
 
 import java.util.Map;
 
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
 import org.auraframework.test.client.UserAgent;
 

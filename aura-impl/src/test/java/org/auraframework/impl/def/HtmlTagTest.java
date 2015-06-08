@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.def;
 
+import org.auraframework.def.HtmlTag;
 import org.auraframework.impl.AuraImplTestCase;
 
 /**

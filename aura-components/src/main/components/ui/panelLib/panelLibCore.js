@@ -20,8 +20,7 @@ function () {
 
 
         validateAnimationName: function(animName) {
-
-            if(animName && animName === 'bottom') {
+        	if(animName && animName.match(/^move(to|from)bottom$/)) {
                 return true;
             }
             return false;
@@ -155,7 +154,7 @@ function () {
 
             //make sure animation name is valid 
             if(useTransition) {
-                useTransition = this.validateAnimationName(animName);
+            	useTransition = this.validateAnimationName(animName);
             }
             
             //need to notify panel manager to de-activate other panels;

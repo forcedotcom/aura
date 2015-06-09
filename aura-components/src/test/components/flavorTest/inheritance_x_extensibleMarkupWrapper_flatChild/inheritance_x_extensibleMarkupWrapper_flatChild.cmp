@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:inheritance_x_extensibleMarkupWrapper" description="inheritance test helper component: flavorable element at top level">
+    <div class="flatChild" aura:flavorable="true">Extensible Markup Wrapper - Flat Child</div>
+</aura:component>

@@ -777,10 +777,17 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
     var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
 
-    if (concrete.isFlavorable() ) {
+    if (concrete.isFlavorable()) {
+        var flavorName;
         var vp = concrete.getComponentValueProvider();
-        if (vp) {
-            flavorClassName = vp.get("style.flavor");
+        if (vp && vp.getConcreteComponent()) { // check if flavor for parent cmp was set on child cmp
+            flavorName = vp.getConcreteComponent().get("style.flavor");
+        }
+        if (vp && !flavorName) {
+            flavorName = vp.get("style.flavor");
+        }
+        if (flavorName) {
+            flavorClassName = $A.util.buildFlavorClass(vp, flavorName);
         }
     }
 

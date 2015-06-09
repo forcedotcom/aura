@@ -56,7 +56,7 @@ public class DialogUITest extends WebDriverTestCase {
     private final String SUBMITTED = "Data Submited";
     private final String NOT_SUBMITTED = "Data Not Submitted";
     private final String RESULT_LABEL = "input[class*='resultLabel']";
-    private final String LAUNCH_DIALOG = "launchDialogButton default uiBlock uiButton";
+    private final String LAUNCH_DIALOG = "launchDialogButton uiBlock uiButton";
 
     public DialogUITest(String name) {
         super(name);
@@ -83,7 +83,7 @@ public class DialogUITest extends WebDriverTestCase {
         clickOnElementOrPressEnter(element);
         waitForComponentToChangeStatus("div[class*='dialog']", "className", "hidden", true);
 
-        String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium default uiDialog']"))
+        String dialogDivClass = driver.findElement(By.cssSelector("div[class*='medium uiDialog']"))
                 .getAttribute("className");
         assertTrue("DialogBox did not appear on the screen", !dialogDivClass.contains("hidden"));
     }

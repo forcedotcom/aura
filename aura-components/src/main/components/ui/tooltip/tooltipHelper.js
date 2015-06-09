@@ -209,6 +209,10 @@
 		var disabled = component.get('v.disabled');
 		var node = component.getElement();
 
+		if(trigger === 'none') {
+			disabled = true;
+		}
+
 		if(!disabled && trigger === 'focus') {
 			showTrigger = 'focus';
 			hideTrigger = 'blur';

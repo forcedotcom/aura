@@ -19,8 +19,8 @@
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="tooltipBody" type="String" access="INTERNAL" default="false" description="The message to display in the tooltip"/>
     <aura:attribute name="disabled" type="Boolean" access="INTERNAL" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
-    <aura:attribute access="INTERNAL" name="advanced" type="Boolean" default="false" description="Uses JavaScript positioning. The default is &quot;false&quot;."/>
-    <aura:attribute access="INTERNAL" name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;."/>
+    <aura:attribute access="INTERNAL" name="advanced" type="Boolean" default="false" description="Determines if the tooltip uses JavaScript positioning. The default is &quot;false&quot;. Setting it to false creates the tooltip using CSS only."/>
+    <aura:attribute access="INTERNAL" name="trigger" type="String" default="hover" description="The event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;. Only &quot;focus&quot; and &quot;click&quot; are keyboard accessible."/>
     <aura:attribute name="triggerClass" type="String" access="INTERNAL" description="The CSS class for the trigger element"/>
     <aura:attribute name="isVisible" access="INTERNAL" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
 
@@ -32,7 +32,7 @@
     <aura:attribute name="delay" default="0" access="INTERNAL" type="Integer" description="Appearance delay in ms" />
     <aura:attribute name="class" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
 
-     <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go"/>
+     <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go. Valid values are &quot;north&quot;, &quot;south&quot;, &quot;west&quot;, and &quot;east&quot;. The default is &quot;north&quot;."/>
    
      <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
     <aura:method name="show" access="INTERNAL"/>

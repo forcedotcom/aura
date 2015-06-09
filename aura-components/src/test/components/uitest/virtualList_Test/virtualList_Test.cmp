@@ -1,0 +1,65 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<aura:component>
+<!-- 
+     These items should be modified to get the desired result. I.e. 0 items per page, 100 items per page, 
+     3000 items per page, or 6000 items per page
+-->
+    <aura:attribute name="pageSize" type="Integer" default="100"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"/>
+    <aura:attribute name="totalPages" type="Integer" default="5"/>
+    
+
+<!--**********************************************************************************************************-->
+
+    
+    
+    <aura:attribute name="template" type="Aura.ComponentDefRef[]" description="template">
+        <test:testVirtualListTemplate/>
+    </aura:attribute>
+	<div class="header">
+		    <ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
+		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
+			<br/>
+		</div>
+    <div>
+        <ui:virtualList 
+            aura:id="list" 
+            itemVar="item">
+            <aura:set attribute="dataProvider">
+                <!--<test:testVirtualListDataProvider aura:id="data"/>-->
+            <uitest:virtualList_TestDataProvider      aura:id="provider"
+                                                   pageSize="{!v.pageSize}"
+                                                   currentPage="{!v.currentPage}"
+                                                   totalPages="{!v.totalPages}"
+                                                   totalItems="{!v.totalItems}"
+                                                   />
+            </aura:set>
+
+            <aura:set attribute="itemTemplate">
+                <test:testVirtualListTemplate
+                    id="{!item._id}"
+                    index="{!item.index}"
+                    name="{!item.name}"
+                    balance="{!item.balance}"
+                    friends="{!item.friends}"
+                />
+            </aura:set>
+        </ui:virtualList>
+    </div>
+
+</aura:component>

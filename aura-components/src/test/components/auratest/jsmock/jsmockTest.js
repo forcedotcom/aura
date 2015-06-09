@@ -129,6 +129,57 @@
 		}]
 	},
 	
+	/*
+	 * This test mocking with storable actions. we have two answers in the stub, the action get to run 3 times.
+	 * 1st time it consume 1st answer, 2nd time it get response from storage,
+	 * then we clear the storage, so 3nd time it consume 2nd answer
+	 */
+	testActionStringWithStorable : {
+		mocks : [{
+		    type : "ACTION",
+			stubs : [{
+                                method : { name : "getString" },
+                                answers : [{
+                                        value : "what I expected First"
+                                },{
+                                        value : "what I expected Again"
+                                }]
+                            }
+			]
+		}],
+		test : [function(cmp) {
+			$A.storageService.getStorage("actions").clear();
+	        var a = $A.test.getAction(cmp, "c.getString", undefined, function(a) {
+	        	$A.test.assertTrue(a.isStorable(), "during first run, action should be storable");
+	        	$A.test.assertFalse(a.isFromStorage(), "during first run, action shouldn't come from storage");
+	        	$A.test.assertEquals("what I expected First", a.returnValue, "during first run, return value should from 1nd answer of our mock");
+	        });
+	        a.setStorable();
+	        $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([a]); }, "fail waiting for 1st action to finish");
+            $A.enqueueAction(a);
+		}, function(cmp) {
+			var a = $A.test.getAction(cmp, "c.getString", undefined, function(a) {
+                $A.test.assertTrue(a.isStorable(), "during second run, action should be storable");
+                $A.test.assertTrue(a.isFromStorage(), "during second run, action should come from storage");
+    	        $A.test.assertEquals("what I expected First", a.returnValue, "during second run, return value should from storage");
+    	        //now let's clear the storage, so action 2 down there won't get a hit
+    	        $A.storageService.getStorage("actions").clear();
+            });
+			a.setStorable();
+			$A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([a]); }, "fail waiting for 2nd action to finish");
+            $A.enqueueAction(a);
+		}, function(cmp) {
+			var a = $A.test.getAction(cmp, "c.getString", undefined, function(a) {
+                $A.test.assertTrue(a.isStorable(), "during third run, action should be storable");
+                $A.test.assertFalse(a.isFromStorage(), "during third run, action shouldn't come from storage");
+    	        $A.test.assertEquals("what I expected Again", a.returnValue, "during third run, return value should from 2nd answer of our mock");
+            });
+			a.setStorable();
+			$A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([a]); }, "fail waiting for 3nd action to finish");
+            $A.enqueueAction(a);
+		}]
+	},
+	
 	_testActionThrows : {
 		mocks : [{
 		    type : "ACTION",

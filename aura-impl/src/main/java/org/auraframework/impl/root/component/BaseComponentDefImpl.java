@@ -1481,6 +1481,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return false;
         }
     }
+    
+    @Override
+    public Set<PropertyReference> getExpressionRefs() {
+    	return expressionRefs;
+    }
 
     /**
      * @see ComponentDef#getFacets()

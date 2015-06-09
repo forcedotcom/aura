@@ -77,6 +77,7 @@
 			component._tooltip = node;
 			component._tooltip.style.display = 'block';
 			document.body.appendChild(node);
+
 			lib.createRelationship({
 				element:ttbodyNode,
 				target:component._trigger,
@@ -123,7 +124,7 @@
                     align: 'left center',
                     targetAlign: 'right center',
                     enable: true,
-                    pad: 15
+                    pad: 0
                 });
             }
             

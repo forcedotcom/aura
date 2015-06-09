@@ -899,5 +899,16 @@ public class AuraUITestingUtil {
             throw new RuntimeException(ex);
         }
     }
+    
+    /**
+     * Return true if div has scrollBar
+     * @param elementClassName
+     * @return
+     */
+	public boolean hasScrollBar(String elementClassName) {
+		String js = "var elementBody = $A.test.getElementByClass('"+elementClassName+"')[0];return (elementBody.scrollHeight !== elementBody.offsetHeight);";
+		boolean hasScroll = this.getBooleanEval(js);
+		return hasScroll;
+	}
 
 }

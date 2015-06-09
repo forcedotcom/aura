@@ -39,6 +39,7 @@
 	<aura:attribute name="panelHeader"  type="Aura.Component[]"/>
 	<aura:attribute name="panelFooter"  type="Aura.Component[]"/>
 	<aura:attribute name="makeScrollable"     type="Boolean" default="false"/>
+	<aura:attribute name="nonScrollable"     type="Boolean" default="false"/>
 	
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
 	
@@ -70,6 +71,7 @@
 			<ui:inputCheckbox aura:id="inputUseHeader"          label="Use Header"       value="{!v.useHeader}"      class="inputUseHeaderClass"/>
 			<ui:inputCheckbox aura:id="inputUseFooter"          label="Use Footer"       value="{!v.useFooter}"      class="inputUseFooterClass"/>
 			<ui:inputCheckbox aura:id="inputMakeScrollable"     label="Make Scrollable"  value="{!v.makeScrollable}" class="inputMakeScrollableClass"/>
+			<ui:inputCheckbox aura:id="inputNonScrollable"     label="Non Scrollable Modal"  value="{!v.nonScrollable}" class="inputNonScrollableClass"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
 		</div>		
 	</div>

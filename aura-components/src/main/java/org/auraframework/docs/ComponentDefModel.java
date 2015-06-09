@@ -63,8 +63,10 @@ public class ComponentDefModel {
         definition = descriptor.getDef();
 
         ReferenceTreeModel.assertAccess(definition);
-        
-        showSource = !Aura.getConfigAdapter().isProduction();
+
+        // Show source tab if there is no default namespace (e.g. running raw open source) or if the target and source namespace are the same
+        String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
+        showSource = defaultNamespace == null || ReferenceTreeModel.getReferencingDescriptor().getNamespace().equalsIgnoreCase(definition.getDescriptor().getNamespace());
 
         String type = null;
         if (definition instanceof RootDefinition) {

@@ -17,6 +17,8 @@
 -->
 <aura:component>
     <aura:attribute name="name" type="String"/>
-    <ui:button label="Change Name" press="{!c.nameChange}"/>
-    <ui:label label="{!v.name}"/>
+    <ui:button class="changeNameButton" label="Change Name" press="{!c.nameChange}"/>
+    <ui:label label="{!v.name}"/><br/>
+    <ui:outputText class="expectedNameChange" aura:id="outputName" value=""/> <br/><br/>
+    
 </aura:component>

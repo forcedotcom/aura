@@ -34,7 +34,8 @@
                 <li>{!i.name}</li>
             </aura:iteration>
         </ul>
-        <ui:button label="Show yourself!" press="{!c.like}"/>
+        <ui:button class="showItemInfo" label="Show yourself!" press="{!c.like}"/>
+        <ui:outputText class="outputItemInfo" aura:id="outputItemInfo" value=""/> <br/><br/>
         <p style="text-align:right">Click counter: <span class="counter">{!v.counter}</span></p>
         <test:testVirtualListTemplateChild name="{!v.name}"/>
     </div>

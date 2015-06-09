@@ -139,7 +139,7 @@ public class ReferenceTreeModel {
         return tree;
     }
 
-    private static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
+    static DefDescriptor<ApplicationDef> getReferencingDescriptor() {
         String defaultNamespace = Aura.getConfigAdapter().getDefaultNamespace();
         if (defaultNamespace == null) {
             defaultNamespace = "aura";

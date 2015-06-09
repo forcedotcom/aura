@@ -114,8 +114,12 @@
 			visible: cmp.get("v.isVisible"),
 			panelConfig : config,
 			onCreate : function(panel){
-                cmp._panel = panel;
-            }
+				cmp._panel = panel;
+				cmp.find("IdCreated").set("v.value", panel.getGlobalId());
+			},
+			onDestroy : function(panelId){
+				cmp.find("IdDestroyed").set("v.value", panelId);
+			}
 		}).fire();
 	}
 

@@ -48,6 +48,8 @@
 	<div class="info">
 		<ui:outputText value="Create a panel to your liking"/>
 	</div>
+	ID of NEW Panel/Modal created: <ui:outputText class="IdCreated" aura:id="IdCreated" value=""/> <br/><br/>
+	ID of Destroyed Panel/Modal: <ui:outputText class="IdDestroyed" aura:id="IdDestroyed" value=""/> <br/><br/>
 	
 	<div class="container">
 		<div class="testPanelModal">

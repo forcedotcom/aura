@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.fixedHeaderTable tbody {
-	display: block;
-	overflow: auto;
+.THIS tbody, .THIS thead, .THIS tr, .THIS th, .THIS td  {
+	vertical-align: middle;
 }

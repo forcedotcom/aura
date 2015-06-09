@@ -16,6 +16,7 @@
 
 -->
 <aura:component>
+	<aura:attribute name="tableFlavor" type="String"/>
     <aura:attribute name="sortBy" type="String"/>
     <aura:attribute name="pageSize" type="Integer" default="10"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
@@ -42,7 +43,7 @@
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
 		</div>
 	
-		<ui:virtualDataGrid aura:id="grid" onsort="{!c.onsort}" fixedHeader="true">
+		<ui:virtualDataGrid aura:id="grid" aura:flavor="{!v.tableFlavor}" onsort="{!c.onsort}" fixedHeader="true">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
 				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>

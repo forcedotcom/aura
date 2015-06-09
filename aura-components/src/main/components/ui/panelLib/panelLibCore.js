@@ -76,9 +76,10 @@ function () {
          * returns the key event handler function that do things based on the config
          * @param cmp
          * @param config {closeOnEsc, trapFocus, closeOnTabOut}
+         * @param closeAction the caller defined close action
          * @returns {Function}
          */
-        getKeyEventListener: function(cmp, config) {
+        getKeyEventListener: function(cmp, config, closeAction) {
             var me = this, config = config || {};
 
             return function(e) {
@@ -91,7 +92,11 @@ function () {
                 if (keyCode == 27 && config.closeOnEsc) {
                     //escape to close
                     $A.util.squash(e);
-                    cmp.close(cmp);
+                    if ($A.util.isFunction(closeAction)) {
+                    	closeAction(cmp, "closeOnEsc");
+                    } else {
+                        cmp.close();
+                    }
                 } else if (keyCode == 9) {
                     //close on tab out
                     var shiftPressed = event.shiftKey,
@@ -109,7 +114,11 @@ function () {
                     } else if (config.closeOnTabOut) {
                         if (current === focusables.last && !shiftPressed) {
                             $A.util.squash(event, true);
-                            cmp.close(cmp);
+                            if ($A.util.isFunction(closeAction)) {
+                            	closeAction(cmp, "closeOnTabOut");
+                            } else {
+                                cmp.close();
+                            }
                         }
                     }
                 }
@@ -120,9 +129,10 @@ function () {
          * returns the mouse event handler function that do things base on the config
          * @param panelCmp
          * @param config {closeOnClickOut}
+         * @param closeAction the caller defined close action
          * @returns {Function}
          */
-        getMouseEventListener: function(panelCmp, config) {
+        getMouseEventListener: function(panelCmp, config, closeAction) {
             return function(e) {
                 if (!panelCmp.isValid()) {
                     return;
@@ -133,7 +143,11 @@ function () {
                 if (config.closeOnClickOut) {
                     var clickedInside = $A.util.contains(panelEl, target);
                     if (panelEl && !clickedInside) {
-                        panelCmp.close();
+                    	if ($A.util.isFunction(closeAction)) {
+                        	closeAction(panelCmp, "closeOnClickOut");
+                        } else {
+                    	    panelCmp.close();
+                        }
                     }
                 }
             }

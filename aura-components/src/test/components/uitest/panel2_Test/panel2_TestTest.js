@@ -326,6 +326,10 @@
     		this.closePanel(cmp);
     	}, function(cmp) {
     		this.waitForModalClose();
+    	}, function(cmp) {
+    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
+    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Modal is not destroyed correctly");
     	}]
     },
     
@@ -342,6 +346,10 @@
     		this.closePanel(cmp);
     	}, function(cmp) {
     		this.waitForPanelDialogClose();
+    	}, function(cmp) {
+    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
+    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Panel is not destroyed correctly");
     	}]
     },
     

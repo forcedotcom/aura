@@ -84,6 +84,16 @@
 	    			}
 	    		}
 			});
+		}else if (cmp.get("v.nonScrollable")) {
+				// body of panel is just a bunch of text
+				panelBody = $A.newCmp({
+		    		componentDef: "markup://ui:outputText",
+		    		attributes: {
+		    			values: {
+		    				value: "Salesforce.com Salesforce.com"
+		    			}
+		    		}
+				});
 		} else {
 			// body of panel is more interesting
 			panelBody = $A.newCmp([{
@@ -104,8 +114,12 @@
 			visible: cmp.get("v.isVisible"),
 			panelConfig : config,
 			onCreate : function(panel){
-                cmp._panel = panel;
-            }
+				cmp._panel = panel;
+				cmp.find("IdCreated").set("v.value", panel.getGlobalId());
+			},
+			onDestroy : function(panelId){
+				cmp.find("IdDestroyed").set("v.value", panelId);
+			}
 		}).fire();
 	}
 

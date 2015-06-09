@@ -18,6 +18,7 @@ package org.auraframework.def;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;

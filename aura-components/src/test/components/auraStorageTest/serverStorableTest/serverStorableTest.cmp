@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.java.controller.ServerStorableActionController" render="client">
+<aura:component controller="java://org.auraframework.impl.java.controller.ServerStorableActionController" render="client">
     <aura:attribute type="String" name="responseOrder" default=""/>
     <aura:attribute name="defaultExpiration" type="Integer" default="60"/>
     <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="60"/>

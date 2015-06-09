@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.auraframework.component.AuraComponentTestBuilder;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.test.UnitTestCase;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
@@ -111,9 +110,9 @@ public class RegistrySerializerTest extends UnitTestCase {
         System.out.println(logger.getErrorLogEntries());
         assertEquals("Error logs should be empty", 1, logger.getErrorLogEntries().size());
     }
-    
+
     public enum LoggerLevel { ERROR, WARN, INFO, DEBUG};
-    
+
     private static class TestLoggerEntry {
         public final LoggerLevel level;
         public final String message;

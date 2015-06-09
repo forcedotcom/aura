@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework;
+package org.auraframework.impl.adapter;
 
+import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.adapter.MockConfigAdapterImpl;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLoaderImpl;
 import org.auraframework.util.ServiceLocator;

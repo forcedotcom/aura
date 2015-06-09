@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test;
+package org.auraframework.impl.test.util;
 
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;

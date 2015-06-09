@@ -20,6 +20,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.impl.css.util.Flavors;
+import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 

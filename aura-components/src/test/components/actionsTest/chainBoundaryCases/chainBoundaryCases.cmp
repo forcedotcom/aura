@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.java.controller.ActionChainingController">
+<aura:component controller="java://org.auraframework.impl.java.controller.ActionChainingController">
     <aura:attribute type="String" name="responseOrder" default=""/>
     <aura:attribute type="Integer" name="callbackCount" default="0"/>
     <aura:registerevent name="press" type="ui:press"/>

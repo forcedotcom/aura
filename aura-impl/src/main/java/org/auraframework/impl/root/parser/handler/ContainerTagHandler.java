@@ -15,26 +15,36 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import javax.xml.stream.*;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ComponentDefRef.Load;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.HtmlTag;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.*;
-
-import java.util.Set;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 
 /**
  * Abstract handler for tags that contain other tags.
  */
 public abstract class ContainerTagHandler<T extends Definition> extends XMLHandler<T>
-        implements ExpressionContainerHandler {
+implements ExpressionContainerHandler {
     protected Location startLocation;
     protected WhitespaceBehavior whitespaceBehavior = BaseComponentDef.DefaultWhitespaceBehavior;
     protected DefDescriptor<T> defDescriptor;
@@ -161,31 +171,31 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
     protected DefinitionAccess readAccessAttribute() throws InvalidAccessValueException {
         String access = getAttributeValue(ATTRIBUTE_ACCESS);
         if (access != null) {
-        	DefinitionAccess a;
-			try {
-	        	String namespace = source.getDescriptor().getNamespace();
-				a = Aura.getDefinitionParserAdapter().parseAccess(namespace, access);
-	        	a.validate(namespace, allowAuthenticationAttribute(), allowPrivateAttribute());
-			} catch (InvalidAccessValueException e) {
-				// re-throw with location
-				throw new InvalidAccessValueException(e.getMessage(), getLocation());
-			}
-        	return a;
+            DefinitionAccess a;
+            try {
+                String namespace = source.getDescriptor().getNamespace();
+                a = Aura.getDefinitionParserAdapter().parseAccess(namespace, access);
+                a.validate(namespace, allowAuthenticationAttribute(), allowPrivateAttribute());
+            } catch (InvalidAccessValueException e) {
+                // re-throw with location
+                throw new InvalidAccessValueException(e.getMessage(), getLocation());
+            }
+            return a;
         }
         else {
-        	return null;
+            return null;
         }
     }
 
-	protected  boolean allowAuthenticationAttribute() {
-		return false;
-	}
+    protected  boolean allowAuthenticationAttribute() {
+        return false;
+    }
 
-	protected boolean allowPrivateAttribute() {
-		return false;
-	}
+    protected boolean allowPrivateAttribute() {
+        return false;
+    }
 
-	/**
+    /**
      * @return this container's tag. May return a more generic term for the
      *         class of tag expected if more than one is handled. Not safe for
      *         tag comparisons, only for messaging. For comparisons, use
@@ -234,26 +244,26 @@ public abstract class ContainerTagHandler<T extends Definition> extends XMLHandl
             return new ComponentDefRefHandler<P>(parentHandler, xmlReader, source);
         }
     }
-    
+
     /**
      * If we are dealing with a source that supports a default namespace
      * then tags need to re-written to make sure they have the correct parent ns
-     * Ex: 
+     * Ex:
      * parentNs:foobar
-     * --------------- 
+     * ---------------
      * <aura:component><aura:iteration items="{!v.items}" var="item"><c:blurg item={!item} /></></>
-     * 
+     *
      * In this case c:blurg needs to be returned as parentNs:blurg so we can link it to the correct source.
      */
     @Override
     protected final String getTagName() {
         String tagName = super.getTagName();
-        
+
         if (tagName.indexOf(':') != -1 && isDefaultNamespaceUsed(tagName.substring(0, tagName.indexOf(':')))) {
             // use parent ns for the child
-            tagName = source.getDescriptor().getNamespace() + tagName.substring(source.getDefaultNamespace().length()); 
+            tagName = source.getDescriptor().getNamespace() + tagName.substring(source.getDefaultNamespace().length());
         }
-        
+
         return tagName;
     }
 }

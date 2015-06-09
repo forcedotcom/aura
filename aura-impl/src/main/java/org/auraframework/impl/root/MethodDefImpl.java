@@ -15,15 +15,24 @@
  */
 package org.auraframework.impl.root;
 
-import org.auraframework.def.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.MethodDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * The definition of a MethodDef.
@@ -34,7 +43,7 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     private final DefDescriptor<? extends RootDefinition> parentDescriptor;
     private final String action;
     private final SerializeToType serializeTo;
-    
+
     protected MethodDefImpl(Builder builder) {
         super(builder);
         this.parentDescriptor = builder.parentDescriptor;
@@ -76,7 +85,7 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        
+
         String name = this.descriptor.getName();
         // Calls the validateMethodName method in AuraTextUtil.java to check if its a valid method name
         if (!AuraTextUtil.validateMethodName(name)) {

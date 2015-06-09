@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.mock;
+package org.auraframework.impl.test.mock;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,6 +33,10 @@ import org.auraframework.instance.ComponentConfig;
 import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.test.mock.MockAction;
+import org.auraframework.test.mock.MockModel;
+import org.auraframework.test.mock.MockModelDef;
+import org.auraframework.test.mock.MockProviderDef;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.mockito.Mockito;
 

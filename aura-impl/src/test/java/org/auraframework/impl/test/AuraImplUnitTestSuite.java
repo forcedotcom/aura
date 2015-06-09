@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.test;
 
-import org.auraframework.impl.AuraImplTestCase;
+import junit.framework.TestSuite;
 
-/**
- */
-public abstract class DefinitionTest<T extends Definition> extends AuraImplTestCase {
+import org.auraframework.test.TestInventory;
+import org.auraframework.test.TestInventory.Type;
+import org.auraframework.util.ServiceLocator;
 
-    public DefinitionTest(String name) {
-        super(name);
+public class AuraImplUnitTestSuite {
+    public static TestSuite suite() throws Exception {
+        TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraImplTestInventory");
+        TestSuite suite = inventory.getTestSuite(Type.UNIT);
+        suite.setName("aura-impl unit tests");
+        return suite;
     }
-
 }

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.impl.root.library.LibraryDefImpl;
 import org.auraframework.impl.root.library.LibraryDefImpl.Builder;
 import org.auraframework.system.AuraContext.Authentication;

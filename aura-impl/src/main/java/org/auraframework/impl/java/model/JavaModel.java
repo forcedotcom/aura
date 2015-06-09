@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
-
 import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.instance.InstanceStack;
@@ -124,11 +125,11 @@ public class JavaModel implements Model {
 
     /**
      * Get a value.
-     * 
+     *
      * This method is a rather painful departure from aura best practices, as it
      * is not really in a definition. This should probably be fixed, and the
      * exceptions cleaned up.
-     * 
+     *
      * @param root The object from which we want to extract the property
      * @param key the key for the property.
      * @param def the model definition.

@@ -10,7 +10,7 @@
 			for (var n = 1; n <= 10; n++) {
 				(function() {
 					var action;
-					var key = "java://org.auraframework.java.controller.ServerStorableActionController/" +
+					var key = "java://org.auraframework.impl.java.controller.ServerStorableActionController/" +
 							"ACTION$storedAction:{\"message\":\"some really cool message #" + n + "\"}";
 					var expected = "[from server] some really cool message #" + n;
 
@@ -39,7 +39,7 @@
     	},function(cmp){
     		//Run the action that sets up other actions to be storable
     		this.initiateServerAction(cmp, "testStorageOfServerActionWithSimpleValues",
-    				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$simpleValuesAsParams"] );
+    				["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$simpleValuesAsParams"] );
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var storedAction = cmp.get("c.simpleValuesAsParams");
@@ -95,7 +95,7 @@
    		 	this.resetCounter(cmp, "testStorageOfServerActionWithListValues");
     	},function(cmp){
     		this.initiateServerAction(cmp, "testStorageOfServerActionWithListValues",
-    				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$complexValuesAsParams"]);
+    				["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$complexValuesAsParams"]);
             $A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var storedAction = cmp.get("c.complexValuesAsParams");
@@ -129,7 +129,7 @@
    		 	this.resetCounter(cmp, "testStorageOfFailedServerActions");
     	},function(cmp){
     		this.initiateServerAction(cmp, "testStorageOfFailedServerActions",
-    				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$throwsException"]);
+    				["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$throwsException"]);
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var storedAction = cmp.get("c.throwsException");
@@ -165,7 +165,7 @@
 	   	},function(cmp){
 	   		//Run the action that sets up other actions to be storable
 	   		this.initiateServerAction(cmp, "testStorageofActionWithNoParams",
-	   				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$returnNothing"] );
+	   				["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$returnNothing"] );
 	        $A.test.addWaitFor(false, $A.test.isActionPending,
 	                   function(){
 	           			var action = cmp.get("c.returnNothing");
@@ -200,7 +200,7 @@
 	   		this.resetCounter(cmp, "testChainingUnstoredAction");
     	},function(cmp){
     		this.initiateServerAction(cmp, "testChainingUnstoredAction",
-    				["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$unStoredAction"]);
+    				["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$unStoredAction"]);
     		$A.test.addWaitFor(false, $A.test.isActionPending,
                     function(){
             			var unstoredAction = cmp.get("c.unStoredAction");
@@ -223,7 +223,7 @@
     	}, function(cmp){
     		//Run the action that sets up other actions to be storable
             this.initiateServerAction(cmp, "testComponentsFromStoredServerAction",
-                ["java://org.auraframework.java.controller.ServerStorableActionController/ACTION$getComponent"]);
+                ["java://org.auraframework.impl.java.controller.ServerStorableActionController/ACTION$getComponent"]);
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){
                     var storedAction = cmp.get("c.getComponent");

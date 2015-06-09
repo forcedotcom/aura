@@ -101,17 +101,17 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
     
     public void testParseStaticMethods()throws Exception{
         //Positive test case
-        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.test.TestAccessMethods.allowGlobal");
+        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
         assertTrue(access.isGlobal());
         
         //Negative test cases
         for(String s : new String[]{
-                "org.auraframework.test.TestAccessMethods.privateMethod",
-                "org.auraframework.test.TestAccessMethods.allowAuthenticated", //Return type is not Access
-                "java://org.auraframework.test.TestAccessMethods.allowGlobal",
-                "org.auraframework.test.TestAccessMethods.nonStaticMethod",
-                "org.auraframework.test.TestAccessMethods.allowGlobal, org.auraframework.test.TestAccessMethods.allowPrivate",
-                "org.auraframework.test.TestAccessMethods.lostSoul",
+                "org.auraframework.impl.test.util.TestAccessMethods.privateMethod",
+                "org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated", //Return type is not Access
+                "java://org.auraframework.impl.test.util.TestAccessMethods.allowGlobal",
+                "org.auraframework.impl.test.util.TestAccessMethods.nonStaticMethod",
+                "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal, org.auraframework.impl.test.util.TestAccessMethods.allowPrivate",
+                "org.auraframework.impl.test.util.TestAccessMethods.lostSoul",
                 "org.auraframework.test.LostParent.lostSoul",
                 })
         {
@@ -122,7 +122,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
                 //Expected
             }
         }
-        access = definitionParser.parseAccess(null, "org.auraframework.test.TestAccessMethods.throwsException");
+        access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.throwsException");
         try{
             access.isGlobal();
             fail("Should throw an AuraRuntimeException when access method throws an exception.");
@@ -133,7 +133,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
     }
     
     public void testValidation_AccessLevelAndStaticMethodSpecified()throws Exception{
-        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.test.TestAccessMethods.allowGlobal, PRIVATE");
+        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal, PRIVATE");
         try{
             access.validate(null, false, false);
             fail("Access attribute may not specify enum value when a static method is also specified");
@@ -190,7 +190,7 @@ public class DefinitionAccessImplTest extends AuraImplTestCase {
     }
     
     public void testValidation_StaticMethodsUsageRestriction() throws Exception{
-        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.test.TestAccessMethods.allowGlobal");
+        DefinitionAccess access = definitionParser.parseAccess(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
         access.validate(StringSourceLoader.DEFAULT_NAMESPACE, false, false);
         
         //static methods not supported in custom namespaces

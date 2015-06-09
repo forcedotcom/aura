@@ -18,8 +18,11 @@ package org.auraframework.test.root.component.attributes;
 import java.util.List;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.def.*;
 import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;

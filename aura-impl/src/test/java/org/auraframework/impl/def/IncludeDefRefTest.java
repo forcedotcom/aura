@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.def;
 
 import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.IncludeDef;
+import org.auraframework.def.IncludeDefRef;
+import org.auraframework.def.LibraryDef;
 import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;

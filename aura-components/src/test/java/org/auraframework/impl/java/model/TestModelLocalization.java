@@ -30,7 +30,7 @@ import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.components.ui.InputOption;
-import org.auraframework.service.testdata.LocalizationServiceTestData;
+import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.util.AuraLocale;

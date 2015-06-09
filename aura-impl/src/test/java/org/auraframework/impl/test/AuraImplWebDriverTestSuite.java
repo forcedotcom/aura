@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework;
+package org.auraframework.impl.test;
 
 import junit.framework.TestSuite;
 
@@ -21,11 +21,12 @@ import org.auraframework.test.TestInventory;
 import org.auraframework.test.TestInventory.Type;
 import org.auraframework.util.ServiceLocator;
 
-public class AuraImplIntegrationTestSuite {
+public class AuraImplWebDriverTestSuite {
     public static TestSuite suite() throws Exception {
         TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraImplTestInventory");
-        TestSuite suite = inventory.getTestSuite(Type.INTEGRATION);
-        suite.setName("aura-impl integrationtests");
+        TestSuite suite = inventory.getTestSuite(Type.WEB);
+        suite.setName("aura-impl webdriver tests");
         return suite;
     }
+
 }

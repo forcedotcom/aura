@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.def;
+package org.auraframework.impl.root.component;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,9 +25,29 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.ThemeDef;
 import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;

@@ -48,7 +48,8 @@
 	 */
 	handleKeyPress: function(component, event) {
 		// SPACE
-		if (event.keyCode === 32) {
+		var code = (event.keyCode ? event.keyCode : event.which);
+		if (code === 32) {
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
 			

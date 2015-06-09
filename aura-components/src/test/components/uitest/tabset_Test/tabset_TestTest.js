@@ -78,6 +78,97 @@
         }]
 	},
 	
+
+
+	testLazyRendering_renderedState : {
+			attributes : {"renderItem" : "tab_lazyCustomTab"},
+	        test : [function (cmp){
+	        	//verify selected tab
+	        	this.matchSectionAndAnchor('Tab 2', 'Tab 2 Content');
+
+	        	//false, true, false
+				this._assertTabHasRendered(
+					cmp,
+					false,
+					'lazytab1'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab2'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					false,
+					'lazytab3'
+				);
+	        }, function(cmp){
+				var tabSet = cmp.find("tabset_lazyLoading").getElement();
+				var lis = tabSet.getElementsByTagName("li");
+				$A.test.clickOrTouch(lis[0].children[0]);
+	        }, function(cmp){
+	        	//verify selected tab
+				this.matchSectionAndAnchor('Tab 1', 'Tab 1 Content');
+
+				//true, true, false
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab1'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab2'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					false,
+					'lazytab3'
+				);
+	        }, function(cmp){
+				var tabSet = cmp.find("tabset_lazyLoading").getElement();
+				var lis = tabSet.getElementsByTagName("li");
+				$A.test.clickOrTouch(lis[2].children[0]);
+	        }, function(cmp){
+	        	//verify selected tab
+				this.matchSectionAndAnchor('Tab 3', 'Tab 3 Content');
+
+				//true, true, true
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab1'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab2'
+				);
+
+				this._assertTabHasRendered(
+					cmp,
+					true,
+					'lazytab3'
+				);
+	        }]
+		},
+
+		_assertTabHasRendered: function(cmp, isRendered, tabId){
+			$A.test.assertEquals(
+	    	 	isRendered,
+	    	 	$A.util.getBooleanValue(cmp.find(tabId).get("v.rendered")),
+	    	 	tabId +  ' should have v.rendered = "' + isRendered + '"'
+	    	)
+		},
+
+	
+	
 	/*************************************************************************************************************
      * HELPER FUNCTIONS
      ************************************************************************************************************/

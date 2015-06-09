@@ -13,9 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS .block {
-    padding: 20px;
-    border-width: 1px 0 0 0;
-    border-color: gray;
-    border-style: solid;
+.THIS .tabset1 {
+	width: 800px;
+}
+
+.THIS .header{
+	margin-bottom:5px;
+	font-size:20px;
+	font-weight:bold;
+	color:blue;
+	text-align:center;
+}
+
+
+.THIS .popupTargetContainer{
+	width:200px;
+}
+
+.THIS.block{
+	margin:10px;
+	padding:20px;
+	border:1px solid black;
+}
+
+.THIS.extraFooter{
+	padding:20px;
+	margin-top:20px;
+	border-top:2px dotted #ccc;
+}
+
+.THIS h1{
+	font-size:25px;
+	color:blue;
+	margin-bottom:20px;
+	border-bottom:2px solid #aaa;
+	text-align:center;
+}
+
+
+.THIS h2{
+	font-size:20px;
+	color:tomato;
+	margin-bottom:20px;
+	border-bottom:2px solid #eee;
 }

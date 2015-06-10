@@ -50,6 +50,9 @@ Aura.Services.MetricsService.DEFAULT  = 'default';
  *@private
 **/
 Aura.Services.MetricsService.prototype.initialize = function () {
+    // #if {"modes" : ["PTEST"]}
+        this.setClearCompletedTransactions(false);
+    // #end
     this.getPageStartTime();
     this.transactionStart('bootstrap','app');
     this.initializePlugins();
@@ -656,10 +659,6 @@ Aura.Services.MetricsService.prototype.registerPlugin = function (pluginConfig) 
     var pluginName       = pluginConfig["name"],
         PluginContructor = pluginConfig["plugin"];
     this.registeredPlugins[pluginName] = PluginContructor;
-
-    if (this.doneBootstrap) { // activate inmediately if we are done with bootstrap
-        this.initializePlugin(pluginName, PluginContructor);
-    }
 };
 
 /**

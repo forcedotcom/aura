@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <div aura:id="null">
         <aura:iteration items="{!m.stringListNull}" var="x">
             {!x+7} ghost in this shell

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">    
+<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">    
 	<ui:outputPercent aura:id="outputPercentEmpty" value="{!m.stringEmpty}" /> <br/> 
     <ui:outputPercent aura:id="outputPercentNull" value="{!m.stringNull}" /> <br/> 
 </aura:component>

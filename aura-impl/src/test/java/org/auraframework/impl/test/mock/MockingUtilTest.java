@@ -67,7 +67,7 @@ public class MockingUtilTest extends WebDriverTestCase {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService()
-                .getDefDescriptor("java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
+                .getDefDescriptor("java://org.auraframework.components.test.java.model.TestJavaModel", ModelDef.class);
         DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
                         "{!m.string}<aura:iteration items='{!m.stringList}' var='i'>{!i}</aura:iteration>"));
@@ -81,7 +81,7 @@ public class MockingUtilTest extends WebDriverTestCase {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
-                "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
+                "java://org.auraframework.components.test.java.model.TestJavaModel", ModelDef.class);
         DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
@@ -97,7 +97,7 @@ public class MockingUtilTest extends WebDriverTestCase {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
-                "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
+                "java://org.auraframework.components.test.java.model.TestJavaModel", ModelDef.class);
         DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),
@@ -116,7 +116,7 @@ public class MockingUtilTest extends WebDriverTestCase {
             Aura.getContextService().startContext(Mode.SELENIUM, Format.HTML, Authentication.AUTHENTICATED);
         }
         DefDescriptor<ModelDef> modelDefDescriptor = Aura.getDefinitionService().getDefDescriptor(
-                "java://org.auraframework.impl.java.model.TestJavaModel", ModelDef.class);
+                "java://org.auraframework.components.test.java.model.TestJavaModel", ModelDef.class);
         DefDescriptor<ApplicationDef> appDescriptor = addSourceAutoCleanup(
                 ApplicationDef.class,
                 String.format(baseApplicationTag, String.format("model='%s'", modelDefDescriptor.getQualifiedName()),

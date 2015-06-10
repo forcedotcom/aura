@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestModel">
+<aura:component model="java://org.auraframework.components.test.java.model.TestModel">
     <aura:attribute name="value" type="String"/>
     <div> {!m.firstThing}</div>
     <div> {!v.value}</div>

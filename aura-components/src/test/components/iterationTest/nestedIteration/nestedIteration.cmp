@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestIterationModel">
 
 	<table class="testRoot">
 		<aura:iteration items="{!m.data}" var="outer" indexVar="index" start="13" end="19">

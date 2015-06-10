@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" model="java://org.auraframework.impl.java.model.TestModel">
+<aura:component extensible="true" model="java://org.auraframework.components.test.java.model.TestModel">
 
     <aura:iteration items="{!m.stringList}" var="item">
         <iterationTest:iterationWithModelInnerCmp aura:id="innerCmp" value="{!item}"/>

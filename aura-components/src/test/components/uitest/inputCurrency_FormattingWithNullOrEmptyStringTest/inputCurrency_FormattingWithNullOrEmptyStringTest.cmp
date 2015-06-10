@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.TestJavaModel">    
+<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">    
     <ui:inputCurrency aura:id="inputCurrencyEmpty" value="{!m.stringEmpty}" /> <br/> 
     <ui:inputCurrency aura:id="inputCurrencyNull" value="{!m.stringNull}" /> <br/> 
 </aura:component>

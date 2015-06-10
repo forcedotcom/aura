@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="loadLevelTest:lazyLoadHelper" render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component extends="loadLevelTest:lazyLoadHelper" render="client" model="java://org.auraframework.components.test.java.model.TestIterationModel">
 
     <aura:attribute name="start" type="Integer"/>
     <aura:attribute name="end" type="Integer"/>

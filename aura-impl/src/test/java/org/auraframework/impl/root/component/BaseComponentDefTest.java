@@ -433,14 +433,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testModelMultipleExplicit() throws Exception {
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "model='java://org.auraframework.impl.java.model.TestModel,js://test.jsModel'",
+                String.format(baseTag, "model='java://org.auraframework.components.test.java.model.TestModel,js://test.jsModel'",
                         ""));
         try {
             compDesc.getDef();
             fail("Should not be able to load component with multiple models");
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Invalid Descriptor Format: java://org.auraframework.impl.java.model.TestModel,js://test.jsModel[MODEL]");
+                    "Invalid Descriptor Format: java://org.auraframework.components.test.java.model.TestModel,js://test.jsModel[MODEL]");
         }
     }
 
@@ -449,7 +449,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void _testModelExplicitAndImplicit() throws Exception {
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "model='java://org.auraframework.impl.java.model.TestModel'", ""));
+                String.format(baseTag, "model='java://org.auraframework.components.test.java.model.TestModel'", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(modelDesc, "{obj:{}}");
@@ -563,7 +563,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetLocalModelDefDescriptorWithExplicitJsonModel() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel'", "").getDescriptor();
+                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel'", "").getDescriptor();
         DefDescriptor<ModelDef> dd = define(
                 baseTag,
                 "model='js://test.jsModel' extends='" + ddParent.getNamespace() + ":"
@@ -579,13 +579,13 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetLocalModelDefDescriptorWithJavaModel() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
+                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel2'", "").getDescriptor();
         DefDescriptor<ModelDef> dd = define(
                 baseTag,
-                "model='java://org.auraframework.impl.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
+                "model='java://org.auraframework.components.test.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
                         + ddParent.getName() + "'", "").getLocalModelDefDescriptor();
         assertNotNull(dd);
-        assertEquals("java://org.auraframework.impl.java.model.TestModel", dd.getQualifiedName());
+        assertEquals("java://org.auraframework.components.test.java.model.TestModel", dd.getQualifiedName());
     }
 
     /**
@@ -618,7 +618,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(
                 baseTag,
-                String.format("extends='%s' model='java://org.auraframework.impl.java.model.TestModel'",
+                String.format("extends='%s' model='java://org.auraframework.components.test.java.model.TestModel'",
                         parentDesc.getDescriptorName()), ""));
 
         List<DefDescriptor<ModelDef>> dds = compDesc.getDef().getModelDefDescriptors();
@@ -631,7 +631,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 return input.getQualifiedName();
             }
         });
-        Set<String> expected = ImmutableSet.of("java://org.auraframework.impl.java.model.TestModel",
+        Set<String> expected = ImmutableSet.of("java://org.auraframework.components.test.java.model.TestModel",
                 "js://test.jsModel", grandParentModelDesc.getQualifiedName());
         if (!names.containsAll(expected)) {
             fail("Missing expected models. Expected: " + expected + ", Actual: " + names);
@@ -655,10 +655,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetModelDefWithJavaModel() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
+                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel2'", "").getDescriptor();
         ModelDef d = define(
                 baseTag,
-                "model='java://org.auraframework.impl.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
+                "model='java://org.auraframework.components.test.java.model.TestModel' extends='" + ddParent.getNamespace() + ":"
                         + ddParent.getName() + "'", "").getModelDef();
         assertNotNull(d);
         assertEquals("TestModel", d.getName());
@@ -670,7 +670,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     public void testGetModelDefWithJsonModel() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestModel2'", "").getDescriptor();
+                "extensible='true' model='java://org.auraframework.components.test.java.model.TestModel2'", "").getDescriptor();
         ModelDef d = define(
                 baseTag,
                 "model='js://test.jsModel' extends='" + ddParent.getNamespace() + ":"
@@ -698,14 +698,14 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testGetModelDefWithImplicitAndExplicit() throws QuickFixException {
         DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, "model='java://org.auraframework.impl.java.model.TestModel'", ""));
+                String.format(baseTag, "model='java://org.auraframework.components.test.java.model.TestModel'", ""));
         DefDescriptor<ModelDef> modelDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, ModelDef.class,
                 DefDescriptor.JAVASCRIPT_PREFIX);
         addSourceAutoCleanup(modelDesc, "{obj:{}}");
 
         ModelDef d = compDesc.getDef().getModelDef();
         assertNotNull(d);
-        assertEquals("java://org.auraframework.impl.java.model.TestModel", d.getDescriptor().getQualifiedName());
+        assertEquals("java://org.auraframework.components.test.java.model.TestModel", d.getDescriptor().getQualifiedName());
     }
 
     /**
@@ -727,7 +727,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 .getDescriptor();
         List<DefDescriptor<ControllerDef>> dds = define(
                 baseTag,
-                "controller='java://org.auraframework.component.test.java.controller.TestController' extends='"
+                "controller='java://org.auraframework.components.test.java.controller.TestController' extends='"
                         + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDefDescriptors();
         assertNotNull(dds);
         assertEquals(2, dds.size());
@@ -738,7 +738,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
             }
         });
         assertTrue(names.containsAll(ImmutableSet.of(
-                "java://org.auraframework.component.test.java.controller.TestController",
+                "java://org.auraframework.components.test.java.controller.TestController",
                 "java://org.auraframework.impl.java.controller.TestController2")));
     }
 
@@ -759,7 +759,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 .getDescriptor();
         ControllerDef d = define(
                 baseTag,
-                "controller='java://org.auraframework.component.test.java.controller.TestController' extends='"
+                "controller='java://org.auraframework.components.test.java.controller.TestController' extends='"
                         + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDef();
         assertNotNull(d);
         String name = d.getDescriptor().getQualifiedName();
@@ -1222,7 +1222,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesWithServersideModel() throws Exception {
-        T baseComponentDef = define(baseTag, "model='java://org.auraframework.impl.java.model.TestJavaModel'", "");
+        T baseComponentDef = define(baseTag, "model='java://org.auraframework.components.test.java.model.TestJavaModel'", "");
         assertTrue("When a component has a model, the component has server dependencies .",
                 baseComponentDef.hasLocalDependencies());
         assertEquals(true, this.serializeAndReadAttributeFromDef(baseComponentDef, "hasServerDeps"));
@@ -1298,7 +1298,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      */
     public void testHasLocalDependenciesInheritedServersideModel() throws QuickFixException {
         String parentContent = String.format(baseTag,
-                "extensible='true' model='java://org.auraframework.impl.java.model.TestJavaModel'", "");
+                "extensible='true' model='java://org.auraframework.components.test.java.model.TestJavaModel'", "");
         DefDescriptor<T> parent = addSourceAutoCleanup(getDefClass(), parentContent);
 
         DefDescriptor<T> child = addSourceAutoCleanup(getDefClass(),

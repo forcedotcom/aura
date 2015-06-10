@@ -1524,7 +1524,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     public void testJavaProtocolIsCached() throws Exception {
         DefDescriptor<ControllerDef> controllerDef = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.component.test.java.controller.TestController", ControllerDef.class);
+                "java://org.auraframework.components.test.java.controller.TestController", ControllerDef.class);
         controllerDef.getDef();
         String prefix = controllerDef.getPrefix();
         assertEquals(prefix, "java");

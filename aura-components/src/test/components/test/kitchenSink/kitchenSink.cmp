@@ -19,8 +19,8 @@
     Has almost everything that a component could use except renderers
 -->
 <aura:component
-        model="java://org.auraframework.impl.java.model.TestModel"
-        controller="java://org.auraframework.component.test.java.controller.TestController"
+        model="java://org.auraframework.components.test.java.model.TestModel"
+        controller="java://org.auraframework.components.test.java.controller.TestController"
         provider="js://test.kitchenSink,java://org.auraframework.impl.java.provider.TestComponnetConfigProviderAIS">
     <aura:attribute name="strAttribute" type="String" default="Apple"/>
     <aura:attribute name="valueFromJSProvider" type="String" default="Empty"/>

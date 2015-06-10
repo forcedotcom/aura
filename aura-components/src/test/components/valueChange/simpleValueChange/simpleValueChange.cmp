@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.impl.java.model.ValueChangeModel">
+<aura:component model="java://org.auraframework.components.test.java.model.ValueChangeModel">
     <aura:attribute name="observed" type="String" default="first"/>
     <aura:attribute name="observedB" type="string" default="observedB"/>
     <aura:attribute name="observedC" type="string" default="observedC"/>

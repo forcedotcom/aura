@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component implements="auratest:rerenderInterface" abstract="true" extensible="true" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component implements="auratest:rerenderInterface" abstract="true" extensible="true" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="toggleAbstract" type="Boolean"/>
     <div>
         <div class="boxed">

@@ -92,7 +92,7 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
 
     public void testForEachStringList() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                "model='java://org.auraframework.components.test.java.model.TestJavaModel'",
                 "<aura:iteration items='{!m.stringList}' var='x'>{!'[' + x + ']'}</aura:iteration>"), ComponentDef.class,
                 null, "[one][two][three]");
     }
@@ -113,19 +113,19 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
 /*
     public void testForEachEmptyList() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                "model='java://org.auraframework.components.test.java.model.TestJavaModel'",
                 "<aura:iteration items='{!m.emptyList}' var='x'>[{!x}]</aura:iteration>"), ComponentDef.class, null, "");
     }
 */
     public void testEmptyListLength() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'", "{!m.emptyList.length}"),
+                "model='java://org.auraframework.components.test.java.model.TestJavaModel'", "{!m.emptyList.length}"),
                 ComponentDef.class, null, "0");
     }
 
     public void testMultidimListLength() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'", "{!m.listOfList.length}"),
+                "model='java://org.auraframework.components.test.java.model.TestJavaModel'", "{!m.listOfList.length}"),
                 ComponentDef.class, null, "3");
     }
 /*
@@ -133,14 +133,14 @@ public class ServersideRenderedComponentsTest extends AuraImplTestCase {
         assertRenderedHTML(
                 String.format(
                         baseComponentTag,
-                        "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                        "model='java://org.auraframework.components.test.java.model.TestJavaModel'",
                         "<aura:iteration items='{!m.listOfList}' var='x'>{!x.length}:<aura:iteration items='{!x}' var='y'>[{!y}]</aura:iteration></aura:iteration>"),
                 ComponentDef.class, null, "3:[one][two][three]3:[un][do][tres]3:[ek][do][theen]");
     }
 
     public void testForEachMultidimListIndex() throws Exception {
         assertRenderedHTML(String.format(baseComponentTag,
-                "model='java://org.auraframework.impl.java.model.TestJavaModel'",
+                "model='java://org.auraframework.components.test.java.model.TestJavaModel'",
                 "{!m.listOfList[2].length}:<aura:iteration items='{!m.listOfList[2]}' var='x'>[{!x}]</aura:iteration>"),
                 ComponentDef.class, null, "3:[ek][do][theen]");
     }

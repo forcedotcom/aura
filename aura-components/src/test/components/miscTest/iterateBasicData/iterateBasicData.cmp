@@ -1,4 +1,4 @@
-<aura:component model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component model="java://org.auraframework.components.test.java.model.TestIterationModel">
     <aura:attribute name="color" default="white" type="String"/>
     <aura:attribute name="rowNumber" type="List"/>
     <aura:attribute name="start" type="Integer"/>

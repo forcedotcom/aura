@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+<aura:component model='java://org.auraframework.components.test.java.model.TestJavaModel'>
     <ui:outputRichText value='{!m.stringNull}' aura:id='myComp1'/> <br/>    
     <ui:outputRichText value='{!m.stringEmpty}' aura:id='myComp2'/> <br/>    
     <ui:outputRichText value='{!m.text}' aura:id='myComp3'/> <br/>    

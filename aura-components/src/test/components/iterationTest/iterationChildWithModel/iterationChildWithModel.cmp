@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
 <aura:attribute name="fromiteration" type="string"/>
 <aura:attribute name="fromparent" type="string"/>
 from my model: {!m.integer} and {!m.string}

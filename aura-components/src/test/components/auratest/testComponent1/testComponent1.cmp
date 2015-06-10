@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="auratest:testInterface" extends="auratest:testComponent3" controller="java://org.auraframework.component.test.java.controller.JavaTestController" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component extensible="true" implements="auratest:testInterface" extends="auratest:testComponent3" controller="java://org.auraframework.components.test.java.controller.JavaTestController" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="myString" type="String" default="Default String"/>
     <auratest:testComponent2 myInteger="1"/>
 </aura:component>

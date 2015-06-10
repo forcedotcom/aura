@@ -19,7 +19,7 @@
     This component is the same as arrayIterationPreloaded but the test does not explicitly declare it as a
     dependency and thus creating the component dynamically will take a differnet code path, going through iteration.cmp
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="value" type="String[]" description="The list of messages to be displayed."/>
 
     <aura:iteration items="{!v.value}" var="message">

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="cmpType" type="string" default="Decimal" />
     <aura:attribute name="ref" type="Object" />
 

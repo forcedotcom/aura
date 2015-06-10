@@ -1,4 +1,4 @@
-<aura:component model="java://org.auraframework.impl.java.model.PlayerFacetModel">
+<aura:component model="java://org.auraframework.components.test.java.model.PlayerFacetModel">
     <aura:attribute name="name" type="String"/>
     <aura:attribute name="nickName" type="String"/>
     

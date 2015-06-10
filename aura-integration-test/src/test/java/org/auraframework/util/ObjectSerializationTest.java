@@ -71,13 +71,13 @@ public class ObjectSerializationTest extends AuraImplTestCase {
         assertTrue(newtest.getBrowsers().isEmpty());
         assertTrue(newtest.getTestLabels().isEmpty());
         Definition controllerDef = newtest.getLocalDefs().get(0);
-        assertEquals("java://org.auraframework.component.test.java.controller.JavaTestController", controllerDef.getDescriptor()
+        assertEquals("java://org.auraframework.components.test.java.controller.JavaTestController", controllerDef.getDescriptor()
                 .getQualifiedName());
         assertEquals("what I expected",
                 ((ControllerDef) controllerDef).createAction("getString", ImmutableMap.<String, Object> of())
                         .getReturnValue().toString());
         Definition modelDef = newtest.getLocalDefs().get(1);
-        assertEquals("java://org.auraframework.impl.java.model.TestJavaModel", modelDef.getDescriptor()
+        assertEquals("java://org.auraframework.components.test.java.model.TestJavaModel", modelDef.getDescriptor()
                 .getQualifiedName());
         assertEquals("<suite-level>",
                 ((ModelDef) modelDef).newInstance().getValue(new PropertyReferenceImpl("secret", null)).toString());

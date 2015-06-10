@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestIterationModel">
     
     <!-- attributes for the array -->
     <aura:attribute name="start" type="integer" default="0"/>

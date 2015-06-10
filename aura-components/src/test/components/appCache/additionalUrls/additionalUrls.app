@@ -16,7 +16,7 @@
 
 -->
 <aura:application access="global" useAppcache="true" render="client"
-    controller="java://org.auraframework.component.test.java.controller.TestController"
+    controller="java://org.auraframework.components.test.java.controller.TestController"
     additionalAppCacheURLs="{!c.getAppCacheUrls}">
     <div>This should appear after the appcache has been populated.</div>
 </aura:application>

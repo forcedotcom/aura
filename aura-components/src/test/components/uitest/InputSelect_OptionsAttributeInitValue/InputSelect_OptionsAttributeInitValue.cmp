@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+<aura:component model='java://org.auraframework.components.test.java.model.TestJavaModel'>
     <aura:attribute name="whichToRender" type="String" default="VUWND"/>
     <!--
         Checking for case when no default value is given in inputSelect, 

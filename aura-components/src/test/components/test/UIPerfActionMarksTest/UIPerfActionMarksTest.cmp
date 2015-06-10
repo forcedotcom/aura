@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <ui:button label="Fire Background Action" press="{!c.backgroundAction}" class="backgroundButton" />
     <ui:button label="Fire Foreground Action" press="{!c.foregroundAction}" class="foregroundButton" />
     <ui:button label="Fire Multiple Foreground Action" press="{!c.multipleForegroundActions}" class="multiForegroundButton" />

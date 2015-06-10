@@ -43,7 +43,7 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET })
     public void testUpdateOnAttribute_UsingStringSource() throws Exception {
         String event = "blur";
-        String baseTag = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
+        String baseTag = "<aura:component  model=\"java://org.auraframework.components.test.java.model.TestJavaModel\"> "
                 + "<div id=\"%s\">" + event + ":"
                 + "<ui:inputText aura:id=\"%s\" class=\"%s\" value=\"{!m.string}\" updateOn=\"%s\"/>" + "</div>"
                 + "<div id=\"output\">" + "output: <ui:outputText value=\"{!m.string}\"/>" + "</div>"
@@ -301,7 +301,7 @@ public class InputTextUITest extends WebDriverTestCase {
     }
 
     public void testNullValue() throws Exception {
-        String cmpSource = "<aura:component  model=\"java://org.auraframework.impl.java.model.TestJavaModel\"> "
+        String cmpSource = "<aura:component  model=\"java://org.auraframework.components.test.java.model.TestJavaModel\"> "
                 + "<ui:inputText value=\"{!m.stringNull}\"/>" + "</aura:component>";
         DefDescriptor<ComponentDef> inputTextNullValue = addSourceAutoCleanup(ComponentDef.class, cmpSource);
         open(String.format("/%s/%s.cmp", inputTextNullValue.getNamespace(), inputTextNullValue.getName()));

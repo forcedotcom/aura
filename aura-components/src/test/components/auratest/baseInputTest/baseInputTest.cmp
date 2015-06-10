@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <aura:attribute name="cmpType" type="string"/>
     <aura:attribute name="ref" type="Object"/>
 

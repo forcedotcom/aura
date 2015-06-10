@@ -1,4 +1,4 @@
-<aura:component model="java://org.auraframework.impl.java.model.TeamFacetModel">
+<aura:component model="java://org.auraframework.components.test.java.model.TeamFacetModel">
     <aura:attribute name="name" type="String"/>
     <aura:attribute name="city" type="String"/>
     

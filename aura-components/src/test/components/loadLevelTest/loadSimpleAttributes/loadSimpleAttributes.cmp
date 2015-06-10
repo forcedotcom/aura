@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" extends="loadLevelTest:lazyLoadHelper"  model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" extends="loadLevelTest:lazyLoadHelper"  model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="stringAttribute" type="String"/>
     <aura:attribute name="integerAttribute" type="Integer"/>
     <aura:attribute name="booleanAttribute" type="Boolean"/>

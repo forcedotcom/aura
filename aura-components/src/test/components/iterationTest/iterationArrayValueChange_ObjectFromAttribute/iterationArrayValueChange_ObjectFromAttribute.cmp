@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestIterationModel">
     <!-- init mapdata and listdata in controller -->
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
     

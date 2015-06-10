@@ -14,6 +14,6 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-<aura:application controller="java://org.auraframework.component.test.java.controller.JavaTestController">
+<aura:application controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <auraStorage:init name="actions" maxSize="10"/>
 </aura:application>

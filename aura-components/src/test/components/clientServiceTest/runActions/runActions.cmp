@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <div aura:id="results"/>
 </aura:component>

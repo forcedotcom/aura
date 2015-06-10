@@ -24,8 +24,8 @@
         Note that the ariaDescribedBy attribute is set in this components init function.-->
     <aura:if isTrue="{!v.caseToRender == 'testMultiULToOne'}">
 	    <ui:inputText aura:id="inputTextId" label="hello"/>
-        <ui:inputDefaultError aura:id="error1" errors="first error, second error, third error, fourth error"/>
-        <ui:inputDefaultError aura:id="error2" errors="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError aura:id="error1" value="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError aura:id="error2" value="first error, second error, third error, fourth error"/>
     	<br/>
     </aura:if>
 
@@ -117,7 +117,7 @@
     <!--Should have 1 error -->
     <aura:if isTrue="{!v.caseToRender == 'testInputDefaultError'}">
         <uitest:inputDefaultError_Test aura:id="inputErrorTest" caseToRender="all"/>
-        <ui:inputDefaultError errors="first error, second error, third error, fourth error"/>
+        <ui:inputDefaultError value="first error, second error, third error, fourth error"/>
     </aura:if>
 
       <!--Should Pass Since there are no headers -->

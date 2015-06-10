@@ -75,7 +75,6 @@ Test.Aura.BrowserSupportedUtilTest = function() {
             })(function(){
                 var CurrentObject = window.Object;
                 window.Object = override === MockObject ? MockObject : window.Object;
-                [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
                 [Import("aura-impl/src/main/resources/aura/util/Util.js")]
                 try {
                     delegate(new Aura.Utils.Util());

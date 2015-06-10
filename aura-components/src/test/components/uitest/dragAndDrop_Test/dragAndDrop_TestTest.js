@@ -15,7 +15,7 @@
  */
 
 ({
-    browsers : [ "S1_DESKTOP" ],
+	browsers : [ "GOOGLECHROME", "FIREFOX", "IE11", "SAFARI" ],
     
     getDataTransfer: function() {
     	return {

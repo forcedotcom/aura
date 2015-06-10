@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 ({
-    "addError": function(cmp) {
-        cmp.find("inputText1").set("v.errors", [{ "message" : "I'm an error" }]);
-    },
+    doInit: function(component) {
+        var domId = component.get('v.domId');
 
-    "clearErrors": function(cmp) {
-        cmp.find("inputText1").set("v.errors", null);
+        if (!domId) {
+            var globalId = component.getGlobalId();
+            component.set("v.domId", globalId);
+        }
     }
 })

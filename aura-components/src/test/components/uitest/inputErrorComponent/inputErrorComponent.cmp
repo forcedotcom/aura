@@ -16,11 +16,17 @@
 
 -->
 <aura:component>
-  <aura:attribute name="inputText1" type="String" />
-  <aura:attribute name="inputText2" type="String" />
-  <ui:button label="Add Error" press="c.addError" /> <br />
-  <ui:button label="Clear Errors" press="c.clearErrors" /> <br />
-  <div aura:id="inputBlock1">
-    <ui:inputText aura:id="inputText1" value="{!v.inputText1}" /> <br />
-  </div>
+    <aura:attribute name="errors" type="Object[]" description="The list of errors to be displayed."/>
+    <aura:attribute name="ariaDescribedBy" type="String" default=""/>
+    <aura:attribute name="domId" type="String"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+	<aura:renderIf isTrue="{! !empty(v.errors)}">
+	    <ul id="{!v.domId}" class="uiInputDefaultError">
+	        <aura:iteration items="{!v.errors}" var="error">
+	            <li>{!error.message}</li>
+	        </aura:iteration>
+	    </ul>
+	</aura:renderIf>
 </aura:component>

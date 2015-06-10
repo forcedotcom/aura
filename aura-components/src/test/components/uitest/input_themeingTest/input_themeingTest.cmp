@@ -23,5 +23,5 @@
 	<ui:label label="ui:inputText not focused "/><ui:inputText/><br/>
 	<ui:label label="ui:inputSearch "/><ui:inputSearch/> <br/>
 	<ui:label label="ui:inputSearch with clear "/><ui:inputSearch value="clear" showClear="true"/> <br/>
-	<ui:label label="ui:inputDefaultError "/><ui:inputDefaultError errors="error1, error2, error3"/> <br/>
+	<ui:label label="ui:inputDefaultError "/><ui:inputDefaultError value="error1, error2, error3"/> <br/>
 </aura:component>

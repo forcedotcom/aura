@@ -115,24 +115,24 @@
             if (is24HourFormat === true) {
                 if (this.validateNumber(hours, 0, 23)) {
                     $A.util.removeClass(hoursCmp.getElement(), "error");
-                    errorCmp.set("v.errors", []);
+                    errorCmp.set("v.value", null);
                     $A.util.addClass(errorCmp.getElement(), "hide");
                     return true;
                 } else {
                 	$A.util.addClass(hoursCmp.getElement(), "error");
-                    errorCmp.set("v.errors", ["Please input a valid hour value (0 - 23)."]);
+                    errorCmp.set("v.value", ["Please input a valid hour value (0 - 23)."]);
                     $A.util.removeClass(errorCmp.getElement(), "hide");
                     return false;
                 }
             } else {
                 if (this.validateNumber(hours, 1, 12)) {
                     $A.util.removeClass(hoursCmp.getElement(), "error");
-                    errorCmp.set("v.errors", []);
+                    errorCmp.set("v.value", null);
                     $A.util.addClass(errorCmp.getElement(), "hide");
                     return true;
                 } else {
                 	$A.util.addClass(hoursCmp.getElement(), "error");
-                    errorCmp.set("v.errors", ["Please input a valid hour value (1 - 12)."]);
+                    errorCmp.set("v.value", ["Please input a valid hour value (1 - 12)."]);
                     $A.util.removeClass(errorCmp.getElement(), "hide");
                     return false;
                 }
@@ -149,12 +149,12 @@
             if (this.validateNumber(minutes, 0, 59)) {
             	$A.util.removeClass(minutesCmp.getElement(), "error");
                 errorCmp.set("v.class", "hide");
-                errorCmp.set("v.errors", []);
+                errorCmp.set("v.value", null);
                 return true;
             } else {
             	$A.util.addClass(minutesCmp.getElement(), "error");
                 errorCmp.set("v.class", "");
-                errorCmp.set("v.errors", ["Please input a valid minute value (0 - 59)."]);
+                errorCmp.set("v.value", ["Please input a valid minute value (0 - 59)."]);
                 return false;
             }
         }

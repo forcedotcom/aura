@@ -18,19 +18,23 @@
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible"
     description="The default implementation of field-level errors, which iterates over the value and displays the message.">
 
-    <aura:attribute access="GLOBAL" name="errors" type="Object[]" description="The list of errors to be displayed."/>
+    <aura:attribute access="GLOBAL" name="value" type="String[]" description="The list of errors strings to be displayed."/>
+    <aura:attribute name="errors" type="Object[]" description="The list of errors objects to be displayed."/>
 
     <aura:attribute name="domId" type="String"
         description="DOM id of the list of errors. By default, this attribute resolved to the globalId of the component to avoid id collision." />
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
-	<aura:renderIf isTrue="{! !empty(v.errors)}">
+	<aura:if isTrue="{! !empty(v.value) || !empty(v.errors)}">
 	    <ul id="{!v.domId}" class="{!v.class}">
-	        <aura:iteration items="{!v.errors}" var="error">
-	            <li>{!error.message}</li>
+	        <aura:iteration items="{!v.value}" var="message">
+	            <li>{!message}</li>
 	        </aura:iteration>
+            <aura:iteration items="{!v.errors}" var="error">
+                <li>{!error.message}</li>
+            </aura:iteration>
 	    </ul>
-	</aura:renderIf>
+	</aura:if>
 
 </aura:component>

@@ -93,7 +93,8 @@ AuraComponentService.prototype.getRenderingComponentForElement = function(elemen
  * Gets the attribute provider for the provided element.
  * @param {Object} element The element whose attribute provider is to be returned
  * @memberOf AuraComponentService
- * @private
+ * @public
+ * @export
  */
 AuraComponentService.prototype.getAttributeProviderForElement = function(element) {
     return this.getRenderingComponentForElement(element).getAttributeValueProvider();

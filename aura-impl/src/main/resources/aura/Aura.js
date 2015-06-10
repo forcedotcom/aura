@@ -929,7 +929,7 @@ AuraInstance.prototype.uninstallOverride = function(name, fn) {
     if (!override) {
         throw new Error("$A.uninstallOverride: Invalid name: "+name);
     }
-    override.uninstall(fn, map);
+    override.uninstall(fn);
 };
 
 /**

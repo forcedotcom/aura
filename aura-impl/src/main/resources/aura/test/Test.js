@@ -502,7 +502,7 @@ TestInstance.prototype.print = function(value) {
  * @param {Object|String} e the error object or message.
  * @private
  */
-TestInstance.prototype.auraError = function(level, msg, error) {
+TestInstance.prototype.auraError = function(level, msg) {
     if (!this.putMessage(this.preErrors, this.expectedErrors, msg)) {
         this.fail(msg);
     }
@@ -524,7 +524,7 @@ TestInstance.prototype.expectAuraError = function(e) {
  * @param {String} w The warning message.
  * @private
  */
-TestInstance.prototype.auraWarning = function(level, msg, error) {
+TestInstance.prototype.auraWarning = function(level, msg) {
     if (!this.putMessage(this.preWarnings, this.expectedWarnings, msg)) {
         if(this.failOnWarning) {
             this.fail("Unexpected warning = "+msg);
@@ -935,7 +935,7 @@ TestInstance.prototype.getTextByComponent = function(component){
         var elements = component.getElements();
         if(elements){
             //If the component has an array of elements
-            for(var i=0;i<elements.length;i++){
+            for(i=0;i<elements.length;i++){
                 if(elements[i].nodeType !== 8/*COMMENT*/){
                     ret += this.getText(elements[i]);
                 }

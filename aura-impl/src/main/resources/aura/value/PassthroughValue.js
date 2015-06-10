@@ -331,7 +331,7 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
 /**
  * Returns true if the referenced component has not been destroyed.
  */
-PassthroughValue.prototype.isValid = function(expression) {
+PassthroughValue.prototype.isValid = function() {
 
     var valueProvider = this.getComponent();
 

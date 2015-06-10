@@ -323,8 +323,8 @@ IndexedDBStorageAdapter.prototype.executeQueue = function() {
  * @return {Promise} a promise.
  */
 IndexedDBStorageAdapter.prototype.enqueue = function(execute) {
-    var that = this,
-        promise;
+    var that = this;
+    var promise;
 
     if (this.ready === false) {
         promise = new Promise(function(success, error) {
@@ -671,7 +671,7 @@ IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, erro
         that.log("deleted successfully");
         success();
     };
-    dbRequest.onblocked = function(event) {
+    dbRequest.onblocked = function() {
         // Cannot error here because IE may come to this callback before success
         that.log("blocked from being deleted");
     };

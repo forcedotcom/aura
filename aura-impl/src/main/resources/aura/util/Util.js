@@ -747,7 +747,7 @@ Aura.Utils.Util.prototype.trim = function(value){
 Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
-    return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index,position){
+    return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index){
         if(formatArguments[index]==undefined){
             //#if {"modes" : ["PRODUCTION"]}
             match='';
@@ -2005,10 +2005,10 @@ Aura.Utils.Util.prototype.toArray = function(collection) {
 /** @export */
 Aura.Utils.Util.prototype.setText = function(node, text) {
     if (node.textContent !== undefined) {
-        //webkit & ff
+        //IE9 or up, and all other browsers
         node.textContent = text;
-    } else if (styleElement.innerText !== undefined) {
-        //chrome, safari, IE
+    } else if (node.innerText !== undefined) {
+        //IE8 or down, note: FF doesn't have this
         node.innerText = text;
     }
 };

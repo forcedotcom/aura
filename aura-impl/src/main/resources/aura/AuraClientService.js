@@ -163,13 +163,13 @@ AuraClientService = function AuraClientService () {
 
     var acs = this;
 
-    Aura.Utils.Util.prototype.on(window, "beforeunload", function(event) {
+    Aura.Utils.Util.prototype.on(window, "beforeunload", function() {
         if (!$A.util.isIE) {
             acs.isUnloading = true;
         }
     });
 
-    Aura.Utils.Util.prototype.on(window, "load", function(event) {
+    Aura.Utils.Util.prototype.on(window, "load", function() {
         // Lazy load data-src scripts
         var scripts = document.getElementsByTagName("script");
         if (scripts) {
@@ -507,7 +507,7 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
-        var storage, toStore, needUpdate, errorHandler;
+        var storage, toStore, needUpdate, errorHandler, key;
 
     try {
         needUpdate = action.updateFromResponse(actionResponse);
@@ -529,7 +529,7 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
                 key = action.getStorageKey();
             } catch (e) {
                 if (errorHandler && $A.util.isFunction(errorHandler)) {
-                    errorHandler(error);
+                    errorHandler(e);
                 } else {
                     $A.logger.auraErrorHelper(e, action);
                 }
@@ -593,7 +593,7 @@ AuraClientService.prototype.maybeAbortAction = function(action) {
 /**
  * Count the available XHRs, including abortable ones.
  */
-AuraClientService.prototype.countAvailableXHRs = function(isBackground) {
+AuraClientService.prototype.countAvailableXHRs = function() {
     // FIXME : this needs to figure out what XHRs can be aborted.
     return this.availableXHRs.length;
 };
@@ -721,11 +721,11 @@ AuraClientService.prototype.handleAppCache = function() {
         }
     }
 
-    function handleAppcacheChecking(e) {
+    function handleAppcacheChecking() {
         document._appcacheChecking = true;
     }
 
-    function handleAppcacheUpdateReady(event) {
+    function handleAppcacheUpdateReady() {
         if (window.applicationCache.swapCache) {
             window.applicationCache.swapCache();
         }
@@ -763,7 +763,7 @@ AuraClientService.prototype.handleAppCache = function() {
         if (manifestURL) {
             setTimeout(function() {
                 var xhr = acs.createXHR();
-                qs = acs.buildParams({
+                var qs = acs.buildParams({
                         "aura.error" : "true"
                 });
                 xhr["open"]("GET", manifestURL+"?"+qs, true);
@@ -793,17 +793,17 @@ AuraClientService.prototype.handleAppCache = function() {
         }
     }
 
-    function handleAppcacheNoUpdate(e) {
+    function handleAppcacheNoUpdate() {
         if (acs.isDevMode()) {
             showProgress(100);
         }
     }
 
-    function handleAppcacheCached(e) {
+    function handleAppcacheCached() {
         showProgress(100);
     }
 
-    function handleAppcacheObsolete(e) {
+    function handleAppcacheObsolete() {
         acs.hardRefresh();
     }
 
@@ -1161,7 +1161,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             //
             var labelAction = $A.get("c.aura://ComponentController.loadLabels");
             // no parameters, no callback.
-            labelAction.setCallback(acs, function(a) {});
+            labelAction.setCallback(acs, function() {});
             acs.enqueueAction(labelAction);
         }, "loadComponent");
     });
@@ -1202,7 +1202,7 @@ AuraClientService.prototype.popStack = function(name) {
     if (this.auraStack.length > 0) {
         lastName = this.auraStack.pop();
         if (lastName !== name) {
-            $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+auraStack);
+            $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+this.auraStack);
         }
     } else {
         $A.warning("Pop from empty stack");
@@ -1319,7 +1319,7 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
                 that.collectServerAction(action, index);
             }
         },
-        function(err) {
+        function() {
             // error fetching from storage so go to the server
             that.collectServerAction(action, index);
         }
@@ -1454,7 +1454,7 @@ AuraClientService.prototype.finishCollection = function() {
     // This will only be true if we opt for stored actions after send.
     //
     if (this.collector.actionsToComplete.length) {
-        for (i = 0; i < this.collector.actionsToComplete.length; i++) {
+        for (var i = 0; i < this.collector.actionsToComplete.length; i++) {
             this.collector.collected.push(undefined);
         }
         this.continueCompletions();
@@ -1602,8 +1602,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var that = this;
     var action;
     var context = $A.getContext();
+    var i;
 
-    for (var i = 0; i < actions.length; i++) {
+    for (i = 0; i < actions.length; i++) {
         action = actions[i];
         if (!action.callAllAboardCallback(context)) {
             action.finishAction(context);
@@ -1620,6 +1621,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     }
 
     var processed = false;
+    var qs;
     try {
         qs = this.buildParams({
             "message" : $A.util.json.encode({
@@ -1629,7 +1631,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             "aura.context" : context.encodeForServer()
         });
     } catch (e) {
-        for (var i = 0; i < actions.length; i++) {
+        for (i = 0; i < actions.length; i++) {
             action = actions[i];
             action.markException(e);
             action.finishAction(context);
@@ -1856,7 +1858,7 @@ AuraClientService.prototype.processIncompletes = function(auraXHR, noAbort) {
 
     for (id in actions) {
         if (actions.hasOwnProperty(id)) {
-            action = actions[id];
+            var action = actions[id];
             if (noAbort || !action.isAbortable()) {
                 action.incomplete($A.getContext());
             } else {
@@ -2099,7 +2101,7 @@ AuraClientService.prototype.injectComponentAsync = function(config, locatorDomId
     // Now we go ahead and stick a label load on the request.
     //
     var labelAction = $A.get("c.aura://ComponentController.loadLabels");
-    labelAction.setCallback(this, function(a) {});
+    labelAction.setCallback(this, function() {});
     acs.enqueueAction(labelAction);
 };
 
@@ -2291,7 +2293,7 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     storage.get(actionKey).then(function(response) {
         if (!!response && !!response.value) {
             storage.put(actionKey, response.value)
-                .then(function() { callback(true); }, function(err) {
+                .then(function() { callback(true); }, function() {
                     // FIXME: what to do.
                 });
         } else {

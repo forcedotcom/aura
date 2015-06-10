@@ -221,7 +221,7 @@
      * Closing the 1st panel should not add active class to 2nd panel
      * Bug: W-2617288
      */
-    _testModalHiddenWithMultipleVisibleModal: {
+    testModalHiddenWithMultipleVisibleModal: {
     	attributes : {"testIsVisible" : false},
     	test: [function(cmp) {
     		this.createPanel(cmp);

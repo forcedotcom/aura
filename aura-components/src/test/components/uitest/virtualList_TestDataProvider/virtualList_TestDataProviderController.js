@@ -7,7 +7,7 @@ init: function (cmp) {
     handleProvide: function (cmp, evt, hlp) {
         var currentPage = cmp.get('v.currentPage'),
             pageSize = cmp.get('v.pageSize'),
-            tasks = hlp.createTasks(cmp, currentPage, pageSize);
-        hlp.fireDataChangeEvent(cmp, tasks);
+            items = hlp.createItems(cmp, currentPage, pageSize);
+        hlp.fireDataChangeEvent(cmp, items);
     }
 })

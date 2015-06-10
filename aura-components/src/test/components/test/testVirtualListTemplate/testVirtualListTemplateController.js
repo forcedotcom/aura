@@ -15,13 +15,20 @@
  */
 ({
     like: function (cmp, evt, helper) {
-        alert([
+    	var itemClicked = {};
+    	itemClicked["_id"] = cmp.get('v.id');
+    	itemClicked["index"] = cmp.get('v.index');
+    	itemClicked["balance"] = cmp.get('v.balance');
+    	itemClicked["name"] = cmp.get('v.name');
+    	itemClicked["friends"] = cmp.get('v.friends');
+        /*alert([
             'Hey! you click in the item with id:' + cmp.get('v.id'),
             'Name: ' + cmp.get('v.name'),
             'Salary: ' + cmp.get('v.balance'),
             'Counter: ' + cmp.get('v.counter'),
             'Friends: \n\t' + cmp.get('v.friends').map(function(i){return i.name;}).join('\n\t')
-        ].join('\n'));
+        ].join('\n'));*/
+        cmp.find("outputItemInfo").set("v.value", "ItemClicked: "+JSON.stringify(itemClicked));
     },
     count: function (cmp, evt, helper) {
         var elmt = cmp.getElement();

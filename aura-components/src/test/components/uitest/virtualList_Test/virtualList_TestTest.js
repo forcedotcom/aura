@@ -26,7 +26,7 @@
   },
   
   getRenderedRows : function(cmp) {
-	  var tbody = document.getElementsByClassName("item");
+	  var tbody = this.getRenderedItems();
 	  var rows = [];
 	  for (var j = 0; j < tbody.length; j++) {
 		  var row = {};
@@ -46,9 +46,22 @@
 	  return rows;
   },
   
+  getRenderedItems: function(){
+	  return $A.test.select(".item");
+  },
+  
   getItemRenderedValue : function(element, columnName){
 	  return $A.test.getText(element.getElementsByClassName(columnName)[0].getElementsByTagName("span")[0]);
   },
+  
+  getInfoButton : function(itemNumber){
+	  return $A.test.select(".showItemInfo")[itemNumber-1];
+  },
+  
+  getChangeNameButton : function(itemNumber){
+	  return $A.test.select(".changeNameButton")[itemNumber-1];
+  },
+  
   
 
   /**************************************************HELPER FUNCTIONS END**************************************************/
@@ -60,5 +73,67 @@
 			  var renderedData = this.getRenderedRows(cmp);
 			  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
 		  }
-  }
+  },
+  
+  /**
+   * Bug: W-2620483
+   */
+  _testSwappingItemsOnVirtualListRendersCorrectly : {
+	  test : [function(cmp){
+		  // test initial state
+		  var initialData = cmp.find("list").get("v.items");
+		  var renderedData = this.getRenderedRows(cmp);
+		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
+	  }, function(cmp) {
+		  emptyDataButton = $A.test.select(".kitchenButtonEmptyData")[0];
+		  $A.test.clickOrTouch(emptyDataButton);
+	  }, function(cmp) {
+		  $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+	  }, function(cmp) {
+		  emptyDataButton = $A.test.select(".kitchenButton")[0];
+		  $A.test.clickOrTouch(emptyDataButton);
+	  }, function(cmp) {
+		  var initialData = cmp.find("list").get("v.items");
+		  var renderedData = this.getRenderedRows(cmp);
+		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
+    }]
+  },
+  
+  /**
+   * Verify Virtual List works with large Number of Items
+   */
+  _testWithLargeData : {
+  	  attributes : {"pageSize" : 3000},
+      test : function(cmp){
+    	  var initialData = cmp.find("list").get("v.items");
+		  var renderedData = this.getRenderedRows(cmp);
+		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
+	  }
+  },
+  
+  /**
+   * Test verifying that when there is no data present dataGrid does not fail
+   */
+  testNoDataPresent : {
+	  attributes : {"pageSize" : 0},
+      test : function(cmp){
+    	  $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+      }
+  },
+  
+  /**
+   * Test verifying that when there is no data present dataGrid does not fail
+   */
+  _testActionOnItem : {
+	  test : [function(cmp){
+		  var initialData = cmp.find("list").get("v.items");
+		  var renderedData = this.getRenderedRows(cmp);
+		  var changeNameBtn = this.getChangeNameButton(1);
+		  $A.test.clickOrTouch(changeNameBtn);
+	}, function(cmp) {
+		  expectedString = "Expected Name Change";
+		  $A.test.addWaitForWithFailureMessage(true, function(){return $A.test.contains($A.test.getText($A.test.select(".expectedNameChange")[0]), expectedString);}, "Name should be changed");
+	}]
+  },
+
 })

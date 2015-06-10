@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	createTasks: function (cmp, currentPage, pageSize) {
+	createItems: function (cmp, currentPage, pageSize) {
     	var items = [];
 
         // Hack to make 'zero based'. 

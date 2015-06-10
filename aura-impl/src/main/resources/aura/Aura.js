@@ -67,7 +67,6 @@ window['$A'] = {};
 // #include aura.util.NumberFormat
 // #include aura.util.DocLevelHandler
 // #include aura.storage.adapters.SizeEstimator
-// #include aura.util.CoreUtil
 // #include aura.util.Util
 // #include aura.Logger
 // #include aura.util.Override

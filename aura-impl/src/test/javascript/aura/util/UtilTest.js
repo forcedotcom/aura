@@ -38,7 +38,6 @@ Test.Aura.UtilTest = function() {
             $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
         })(function(){
-            [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
             [Import("aura-impl/src/main/resources/aura/util/Util.js")]
             delegate();
         });
@@ -271,7 +270,6 @@ Test.Aura.UtilTest = function() {
                 Aura: Aura,
                 navigator:{userAgent : userAgentOverride }
             })(function(){
-                [Import("aura-impl/src/main/resources/aura/util/CoreUtil.js")]
                 [Import("aura-impl/src/main/resources/aura/util/Util.js")]
                 delegate();
             });

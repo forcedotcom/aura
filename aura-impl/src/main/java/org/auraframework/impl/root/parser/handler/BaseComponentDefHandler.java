@@ -45,7 +45,6 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Flavors;
@@ -58,7 +57,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Source;
 import org.auraframework.system.SubDefDescriptor;
@@ -279,8 +277,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
         MasterDefRegistry mdr = context.getDefRegistry();
         context.pushCallingDescriptor(builder.getDescriptor());
         try {
-            Mode mode = context.getMode();
-
             super.readAttributes();
             String controllerName = getAttributeValue(ATTRIBUTE_CONTROLLER);
             DefDescriptor<ControllerDef> controllerDescriptor = null;
@@ -414,15 +410,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 builder.setDefaultFlavor(defaultFlavor);
             }
 
-            // Do not consider Javascript Test suite defs in PROD and PRODDEBUG modes.
-            if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
-                // See if there is a test suite that has the same qname.
-                DefDescriptor<TestSuiteDef> jsTestSuiteDescriptor = DefDescriptorImpl
-                        .getInstance(jsDescriptorName, TestSuiteDef.class);
-                if (mdr.exists(jsTestSuiteDescriptor)) {
-                    builder.testSuiteDefDescriptor = jsTestSuiteDescriptor;
-                }
-            }
             String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);
             if (extendsName != null) {
                 builder.extendsDescriptor = getDefDescriptor(extendsName,

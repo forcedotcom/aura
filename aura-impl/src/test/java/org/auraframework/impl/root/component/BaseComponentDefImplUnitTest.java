@@ -75,8 +75,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     @Mock
     protected ComponentDef templateDef;
     @Mock
-    protected DefDescriptor<TestSuiteDef> testSuiteDefDescriptor;
-    @Mock
     protected DefDescriptor<StyleDef> styleDescriptor;
     protected List<DefDescriptor<RendererDef>> rendererDescriptors;
     protected List<DefDescriptor<HelperDef>> helperDescriptors;
@@ -239,7 +237,6 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         builder.modelDefDescriptor = this.modelDefDescriptor;
         builder.extendsDescriptor = this.extendsDescriptor;
         builder.templateDefDescriptor = this.templateDefDescriptor;
-        builder.testSuiteDefDescriptor = this.testSuiteDefDescriptor;
         builder.styleDescriptor = this.styleDescriptor;
         builder.rendererDescriptors = this.rendererDescriptors;
         builder.helperDescriptors = this.helperDescriptors;

@@ -25,6 +25,15 @@
         }
     },
 
+    testNothingForEmptyValue : {
+        attributes : {
+            "value" : ""
+        },
+        test : function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+        }
+    },
+
     testNothingForEmptyErrors : {
         attributes : {
             "errors" : []
@@ -41,7 +50,7 @@
         }
     },
 
-    testEmptyStringForString : {
+    testEmptyStringForStringError : {
         attributes : {
             "errors" : [ "justastring" ]
         },
@@ -52,7 +61,7 @@
         }
     },
 
-    testEmptyStringForNoMessage : {
+    testEmptyStringForNoMessageError : {
         attributes : {
             "errors" : [ {
                 "stack" : "ignored"
@@ -78,6 +87,17 @@
         }
     },
 
+    testSingleValue : {
+        attributes : {
+            "value" : "single"
+        },
+        test : function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(1, ul.children.length);
+            $A.test.assertEquals("single", $A.test.getText(ul.children[0]));
+        }
+    },
+
     testMultipleErrors : {
         attributes : {
             "errors" : [ {
@@ -97,6 +117,19 @@
         }
     },
 
+    testMultipleValues : {
+        attributes : {
+            "value" : "first,second,third"
+        },
+        test : function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(3, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            $A.test.assertEquals("second", $A.test.getText(ul.children[1]));
+            $A.test.assertEquals("third", $A.test.getText(ul.children[2]));
+        }
+    },
+
     testSetErrors : {
         attributes : {},
         test : [ function(cmp) {
@@ -106,6 +139,19 @@
             }, {
                 "message" : "second"
             } ]);
+        }, function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(2, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            $A.test.assertEquals("second", $A.test.getText(ul.children[1]));
+        } ]
+    },
+
+    testSetValue : {
+        attributes : {},
+        test : [ function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+            cmp.set("v.value", [ "first", "second" ]);
         }, function(cmp) {
             var ul = cmp.getElement();
             $A.test.assertEquals(2, ul.children.length);
@@ -137,18 +183,111 @@
         attributes : {
             "errors" : [ {
                 "message" : "first"
-            }, {
-                "message" : "second"
             } ]
+        },
+        test : [ function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(1, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            cmp.set("v.errors");
+        }, function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+        } ]
+    },
+
+    testClearErrorsWithNull : {
+        attributes : {
+            "errors" : [ {
+                "message" : "first"
+            } ]
+        },
+        test : [ function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(1, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            cmp.set("v.errors", null);
+        }, function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+        } ]
+    },
+
+    testClearValueWithEmptyList : {
+        attributes : {
+            "value" : "first,second"
         },
         test : [ function(cmp) {
             var ul = cmp.getElement();
             $A.test.assertEquals(2, ul.children.length);
             $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
             $A.test.assertEquals("second", $A.test.getText(ul.children[1]));
-            cmp.set("v.errors");
+            cmp.set("v.value", []);
         }, function(cmp) {
             $A.test.assertNull(cmp.getElement());
+        } ]
+    },
+
+    testClearValueWithUndefined : {
+        attributes : {
+            "value" : "first"
+        },
+        test : [ function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(1, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            cmp.set("v.value");
+        }, function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+        } ]
+    },
+
+    testClearValueWithNull : {
+        attributes : {
+            "value" : "first"
+        },
+        test : [ function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(1, ul.children.length);
+            $A.test.assertEquals("first", $A.test.getText(ul.children[0]));
+            cmp.set("v.value", null);
+        }, function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+        } ]
+    },
+
+    testValueAndErrorsIndependent : {
+        attributes : {},
+        test : [ function(cmp) {
+            $A.test.assertNull(cmp.getElement());
+            cmp.set("v.value", [ "v1", "v2" ]);
+            cmp.set("v.errors", [ {
+                "message" : "e1"
+            } ])
+        }, function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(3, ul.children.length);
+            $A.test.assertEquals("v1", $A.test.getText(ul.children[0]));
+            $A.test.assertEquals("v2", $A.test.getText(ul.children[1]));
+            $A.test.assertEquals("e1", $A.test.getText(ul.children[2]));
+
+            cmp.set("v.value", []);
+            cmp.set("v.errors", [ {
+                "message" : "e3"
+            }, {
+                "message" : "e4"
+            } ])
+        }, function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(2, ul.children.length);
+            $A.test.assertEquals("e3", $A.test.getText(ul.children[0]));
+            $A.test.assertEquals("e4", $A.test.getText(ul.children[1]));
+
+            cmp.set("v.value", [ "v3" ]);
+        }, function(cmp) {
+            var ul = cmp.getElement();
+            $A.test.assertEquals(3, ul.children.length);
+            $A.test.assertEquals("v3", $A.test.getText(ul.children[0]));
+            $A.test.assertEquals("e3", $A.test.getText(ul.children[1]));
+            $A.test.assertEquals("e4", $A.test.getText(ul.children[2]));
         } ]
     }
 })

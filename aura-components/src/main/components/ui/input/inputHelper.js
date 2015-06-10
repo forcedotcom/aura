@@ -323,7 +323,6 @@
     	if (this.hasLabel(component)) {
     		var inputEl = this.getInputElement(component);
     		$A.util.addClass(inputEl, component.getConcreteComponent().getDef().getStyleClassName());
-//            $A.util.addClass(component, component.getConcreteComponent().getDef().getStyleClassName())
         }
     },
 

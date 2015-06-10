@@ -2438,17 +2438,19 @@ Component.prototype.unrender = function() {
     return superComponent ? superComponent["unrender"]() : undefined;
 };
 
+/**
+ * Get the expected version number of a component based on its caller's requiredVersionDefs
+ */
 Component.prototype.getVersion = function() {
+    if (!this.isValid()) {
+        return null;
+    }
+
     var context = $A.getContext();
     var ns = this.getDef().getDescriptor().getNamespace();
     var ret = null;
     if (context) {
         ret = context.getAccessVersion(ns);
-    }
-
-    // when currentAccess is not available, fall back to component itself
-    if (!ret) {
-        ret = this.getDef().getRequiredVersionDefs().getDef(ns);
     }
 
     return ret ? ret.getVersion() : null;

@@ -54,6 +54,10 @@
             body.push(divComponent);
             component.set("v.body", body);
         }
+        var errorCmp = component.get("v.errorComponent")[0];
+        if ($A.util.isComponent(errorCmp)) {
+            this.addAriaDescribedBy(component, errorCmp.getGlobalId());
+        }
     },
     /**
      * Helper method that will check to make sure that we are looking at a valid position.
@@ -219,10 +223,7 @@
                 this,
                 function(errorCmp) {
                     component.set("v.errorComponent", errorCmp);
-
-                    var concreteCmp = component.getConcreteComponent();
-                    var concreteHelper = concreteCmp.getDef().getHelper();
-                    concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
+                    this.addAriaDescribedBy(component, errorCmp.getGlobalId());
                 },
                 {
                     "componentDef": "markup://ui:inputDefaultError",
@@ -236,10 +237,10 @@
         }
     },
 
-    updateAriaDescribedBy : function(component, errorCmpId) {
+    addAriaDescribedBy : function(component, errorCmpId) {
         var ariaDesc = component.get("v.ariaDescribedBy");
         ariaDesc = this.addTokenToString(ariaDesc, errorCmpId);
-        this.setAttribute(component, {key: "ariaDescribedBy", value: ariaDesc});
+        component.set("v.ariaDescribedBy", ariaDesc);
     },
 
     updateErrorElement : function(component) {

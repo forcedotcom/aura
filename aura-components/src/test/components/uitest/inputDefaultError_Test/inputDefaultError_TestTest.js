@@ -34,14 +34,16 @@
      * Verify that the component actually is how we expect it to be
      */
     verifyInputDefaultStructure : function(input, ul, ulLength, childLength, ulIndex2Use){
-         $A.test.assertEquals(ulLength, ul.length, "uiInputDefaultError unordered list was not found");
+         $A.test.assertEquals(ulLength, (ul || []).length, "uiInputDefaultError unordered list was not found");
 
-         //Grab the uls children and verify that there are three
-         var chlds = ul[ulIndex2Use].children;
-         $A.test.assertEquals(childLength, chlds.length, "The amount of children is incorrect");
+         if (ul && ul[ulIndex2Use]) {
+            //Grab the uls children and verify that there are three
+            var chlds = ul[ulIndex2Use].children;
+            $A.test.assertEquals(childLength, chlds.length, "The amount of children is incorrect");
 
-       //Verify aria-describedby value on the input tags matches the ul of inputDefaultError
-        this.verifyAriaIdCorrect(ul[ulIndex2Use], input)
+            //Verify aria-describedby value on the input tags matches the ul of inputDefaultError
+            this.verifyAriaIdCorrect(ul[ulIndex2Use], input)
+        }
     },
 
     /**
@@ -167,28 +169,30 @@
         }]
     },
 
-    //Show inputDefault error then take it away (DOES NOT WORK!) W-2302015
-    _testInputDefaultWorkWithErrorComponentAttribute : {
+    //Show inputDefault error then take it away
+    testInputDefaultWorkWithErrorComponentAttribute : {
         attributes: {"caseToRender" : "customUsage"},
-        test : function(cmp) {
-
-            //Grab ul with errors
+        test : [function(cmp) {
             var ul = $A.test.getElementByClass("uiInputDefaultError");
             var input = cmp.find("customUsageInvalid").getElement();
-            //InputDefaultError Should be rendered already
-            this.verifyInputDefaultStructure(input, ul, 1, 0, 0);
-
+            //InputDefaultError should not be rendered already
+            this.verifyInputDefaultStructure(input, ul, 0, 0, 0);
+        }, function(cmp){
             //Validate the components
             this.fireErrorValidation(cmp.find("validate"), false);
-
+        }, function(cmp){
+            var ul = $A.test.getElementByClass("uiInputDefaultError");
+            var input = cmp.find("customUsageInvalid").getElement();
             this.verifyInputDefaultStructure(input, ul, 1, 3, 0);
-
+        }, function(cmp){
             //Validate the components
-            this.fireErrorValidation(cmp.find("validate"), false);
-
-            this.verifyInputDefaultStructure(input, ul, 1, 0, 0);
-
-        }
+            this.fireErrorValidation(cmp.find("validate"), true);
+        }, function(cmp){
+            var ul = $A.test.getElementByClass("uiInputDefaultError");
+            var input = cmp.find("customUsageInvalid").getElement();
+            //InputDefaultError should not be rendered anymore
+            this.verifyInputDefaultStructure(input, ul, 0, 0, 0);
+        }]
     },
 
     /**

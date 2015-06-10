@@ -25,7 +25,7 @@
     	<ui:menu aura:id="menu" class="{!v.class}">
     		<ui:menuList aura:id="menuList" attachToBody="true" menuFocusChange="{!c.handleMenuFocusChange}" menuCollapse="{!c.handleMenuCollapse}">
     			<aura:iteration items="{!v.dropzoneMenu}" var="menu">
-    				<ui:actionMenuItem value="{!menu.value}" label="{!menu.label}" menuSelect="{!c.handleMenuSelect}" focus="{!c.handleFocus}"/>
+    				<ui:actionMenuItem value="{!menu.value}" label="{!menu.label}" menuSelect="{!c.handleMenuSelect}"/>
     			</aura:iteration>
     		</ui:menuList>
     	</ui:menu>

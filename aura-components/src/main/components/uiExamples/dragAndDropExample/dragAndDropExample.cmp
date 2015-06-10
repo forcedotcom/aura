@@ -19,6 +19,7 @@
 	
 	<aura:attribute name="_context1" access="private" type="Object"/>
 	<aura:attribute name="_context2" access="private" type="Object"/>
+	<aura:attribute name="_context3" access="private" type="Object"/>
 	<aura:attribute name="_accessibilityComponent" access="private" type="String"/>
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
@@ -26,16 +27,45 @@
 	<ui:dragAndDropAccessibilityMenu aura:id="accessibilityComponent"/>
 	
 	<div class="container">
-		<ui:dropzone inContextOf="{!v._context1}" label="List A" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}">
+		<ui:dropzone inContextOf="{!v._context1}" label="List A" types="move,copy" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}">
 			<ui:infinitelist aura:id="list" itemVar="item">
+				<aura:set attribute="header">
+					<ui:outputLabel value="Move &amp; Copy Dropzone"/>
+				</aura:set>
 				<aura:set attribute="dataProvider">
-					<uiExamples:dragAndDropProvider prefix="Acme" count="5"/>
+					<uiExamples:dragAndDropProvider prefix="Acme (move)" count="5"/>
 				</aura:set>
 				<aura:set attribute="itemTemplate">
 					<li>
 						<ui:draggable inContextOf="{!v._context1}"
-									  dragEnd="{!c.handleDragEnd}"
 									  dataTransfer="{!item}"
+									  type="move"
+									  dragEnd="{!c.handleDragEnd}"
+									  class="sampleCard"
+									  dragClass="dragging"
+									  dragImageClass="dragImage"
+									  accessibilityComponent="{!v._accessibilityComponent}">
+							<p>{!item}</p>
+						</ui:draggable>
+					</li>
+				</aura:set>
+			</ui:infinitelist>
+		</ui:dropzone>
+		
+		<ui:dropzone inContextOf="{!v._context2}" label="List B" types="move" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}" >
+			<ui:infinitelist aura:id="list" itemVar="item">
+				<aura:set attribute="header">
+					<ui:outputLabel value="Move Dropzone"/>
+				</aura:set>
+				<aura:set attribute="dataProvider">
+					<uiExamples:dragAndDropProvider prefix="Foo (move)" count="3"/>
+				</aura:set>
+				<aura:set attribute="itemTemplate">
+					<li>
+						<ui:draggable inContextOf="{!v._context2}" 
+									  dataTransfer="{!item}"
+									  type="move"
+									  dragEnd="{!c.handleDragEnd}"
 									  class="sampleCard"
 									  dragClass="dragging"
 									  accessibilityComponent="{!v._accessibilityComponent}">
@@ -46,15 +76,19 @@
 			</ui:infinitelist>
 		</ui:dropzone>
 		
-		<ui:dropzone inContextOf="{!v._context2}" label="List B" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}" >
+		<ui:dropzone inContextOf="{!v._context3}" label="List C" types="copy" class="sampleList" dragOverClass="dragOver" drop="{!c.handleDrop}" >
 			<ui:infinitelist aura:id="list" itemVar="item">
+				<aura:set attribute="header">
+					<ui:outputLabel value="Copy Dropzone"/>
+				</aura:set>
 				<aura:set attribute="dataProvider">
-					<uiExamples:dragAndDropProvider prefix="Foo" count="3"/>
+					<uiExamples:dragAndDropProvider prefix="Bar (copy)" count="4"/>
 				</aura:set>
 				<aura:set attribute="itemTemplate">
 					<li>
-						<ui:draggable inContextOf="{!v._context2}" 
+						<ui:draggable inContextOf="{!v._context3}" 
 									  dataTransfer="{!item}"
+									  type="copy"
 									  dragEnd="{!c.handleDragEnd}"
 									  class="sampleCard"
 									  dragClass="dragging"

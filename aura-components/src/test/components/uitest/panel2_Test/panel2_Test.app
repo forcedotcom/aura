@@ -39,6 +39,7 @@
 	<aura:attribute name="testPanelHeader"  type="Aura.Component[]"/>
 	<aura:attribute name="testPanelFooter"  type="Aura.Component[]"/>
 	<aura:attribute name="testMakeScrollable"	 type="Boolean" default="false"/>
+	<aura:attribute name="nonScrollable"	 type="Boolean" default="false"/>
 	
 	
 <div style="z-index:1; position:relative;">

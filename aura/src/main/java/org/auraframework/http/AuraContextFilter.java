@@ -92,7 +92,7 @@ public class AuraContextFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
-            IOException {
+    IOException {
 
         if (Aura.getContextService().isEstablished()) {
             LOG.error("Aura context was not released correctly! New context will NOT be created.");
@@ -131,8 +131,8 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
-            ServletException {
+    public AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+    ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
         Format f = format.get(request);
@@ -220,7 +220,7 @@ public class AuraContextFilter implements Filter {
                         MasterDefRegistry registry = context.getDefRegistry();
                         Set<Definition> mocks = testContext.getLocalDefs();
                         if (mocks != null) {
-                        	boolean error = false;
+                            boolean error = false;
                             boolean doReset = testReset.get(request);
                             for (Definition def : mocks) {
                                 try {
@@ -234,7 +234,7 @@ public class AuraContextFilter implements Filter {
                                 }
                             }
                             if (error) {
-                            	testContextAdapter.release();
+                                testContextAdapter.release();
                             }
                         }
                     }
@@ -324,7 +324,7 @@ public class AuraContextFilter implements Filter {
     protected Mode getMode(HttpServletRequest request, Map<String, Object> configMap) {
         Mode m = getModeParam(request, configMap);
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        
+
         if (m == null) {
             m = configAdapter.getDefaultMode();
         }
@@ -362,7 +362,7 @@ public class AuraContextFilter implements Filter {
         return getMode(request, configMap);
     }
 
-    protected void endContext() {
+    public void endContext() {
         Aura.getContextService().endContext();
     }
 

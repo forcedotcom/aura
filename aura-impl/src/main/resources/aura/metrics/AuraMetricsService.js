@@ -77,11 +77,15 @@ Aura.Services.MetricsService.prototype.instrument = function (instance, method, 
             ret;
 
         if (beforeFn) {
-            before.apply(this, Array.prototype.concat.apply(mark, arguments));
+            Array.prototype.unshift.call(arguments, mark);
+            before.apply(this, arguments);
+            Array.prototype.shift.call(arguments);
         }
 
         if (override) {
-            ret = override.apply(this, Array.prototype.concat.apply(original, arguments));
+            Array.prototype.unshift.call(arguments, original);
+            ret = override.apply(this, arguments);
+            Array.prototype.shift.call(arguments);
         } else {
             ret = original.apply(this, arguments);
         }
@@ -93,7 +97,8 @@ Aura.Services.MetricsService.prototype.instrument = function (instance, method, 
         mark = !override && self.markEnd(ns, method);
 
         if (afterFn) {
-            after.apply(this, Array.prototype.concat.apply(mark, arguments));
+            Array.prototype.unshift.call(arguments, mark);
+            after.apply(this, arguments);
         }
 
         return ret;

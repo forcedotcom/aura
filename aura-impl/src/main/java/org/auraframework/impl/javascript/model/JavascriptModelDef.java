@@ -16,10 +16,15 @@
 package org.auraframework.impl.javascript.model;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.TypeDef;
+import org.auraframework.def.ValueDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Model;
@@ -33,8 +38,8 @@ import com.google.common.collect.Maps;
 
 public class JavascriptModelDef extends DefinitionImpl<ModelDef> implements ModelDef {
 
-	private static final long serialVersionUID = -7806398631336437625L;
-	private final Map<String, JavascriptValueDef> memberMap;
+    private static final long serialVersionUID = -7806398631336437625L;
+    private final Map<String, JavascriptValueDef> memberMap;
 
     protected JavascriptModelDef(Builder builder) {
         super(builder);

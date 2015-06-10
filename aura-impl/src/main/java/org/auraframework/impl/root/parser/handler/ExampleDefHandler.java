@@ -21,7 +21,9 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.ExampleDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.documentation.ExampleDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
@@ -42,7 +44,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
             ATTRIBUTE_LABEL);
 
     private final StringBuilder body = new StringBuilder();
-    
+
     private final ExampleDefImpl.Builder builder = new ExampleDefImpl.Builder();
 
     public ExampleDefHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
@@ -84,7 +86,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
         String exampleName = String.format("%s_%s", parentDesc.getDescriptorName(), name);
         builder.setDescriptor(DefDescriptorImpl.getInstance(exampleName, ExampleDef.class));
     }
-    
+
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         body.append(handleHTML());
@@ -103,7 +105,7 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
     @Override
     protected ExampleDefImpl createDefinition() throws QuickFixException {
         builder.setDescription(body.toString());
-        
+
         return builder.build();
     }
 

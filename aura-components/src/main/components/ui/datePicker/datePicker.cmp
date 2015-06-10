@@ -28,6 +28,7 @@
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
     <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. We support large/medium/small for now."/>
+    <aura:attribute name="showToday" type="Boolean" default="true" description="Indicates whether a Today link should display at the bottom. If there is a time portion, the Today link wouldn't show up even this is set to true."/>
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
@@ -86,9 +87,11 @@
                     <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}" dimension="{!v.dimension}"/>
                 </div>
                 <aura:set attribute="else">
-                    <div class="buttonBar">
-                        <ui:button aura:id="today" press="{!c.selectToday}" keydown="{!c.handleTabToday}" class="calToday" label="Today"/>
-                    </div>
+                    <aura:if isTrue="{!v.showToday}">
+                        <div class="buttonBar">
+                            <ui:button aura:id="today" press="{!c.selectToday}" keydown="{!c.handleTabToday}" class="calToday" label="Today"/>
+                        </div>
+                    </aura:if>
                 </aura:set>
             </aura:if>
         </div><!-- scroller -->

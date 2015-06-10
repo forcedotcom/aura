@@ -63,7 +63,6 @@ window['$A'] = {};
 
 // -- Utils ------------------------------------------------------------
 // #include aura.util.ExportSymbolsHelper
-// #include aura.util.Transport
 // #include aura.util.Style
 // #include aura.util.Bitset
 // #include aura.util.NumberFormat
@@ -72,6 +71,7 @@ window['$A'] = {};
 // #include aura.util.CoreUtil
 // #include aura.util.Util
 // #include aura.Logger
+// #include aura.util.Override
 
 // -- Errors ------------------------------------------------------------
 // #include aura.AuraError
@@ -146,9 +146,6 @@ window['$A'] = {};
 // #include aura.controller.ControllerDef
 // #include aura.controller.ControllerDefRegistry
 // #include aura.controller.ActionDefRegistry
-// #include aura.controller.ActionQueue
-// #include aura.controller.ActionCollector
-// #include aura.controller.FlightCounter
 
 // -- Attribute ----------------------------------------------------------
 // #include aura.attribute.AttributeDef
@@ -491,14 +488,14 @@ function AuraInstance () {
      *
      * @public
      */
-    this.getCurrentTransactionId = this.clientService.getCurrentTransasctionId.bind(this.clientService);
+    this.getCurrentTransactionId = this.clientService.getCurrentTransactionId.bind(this.clientService);
 
     /**
      * Set the current abortable transaction ID.
      *
      * @public
      */
-    this.setCurrentTransactionId = this.clientService.setCurrentTransasctionId.bind(this.clientService);
+    this.setCurrentTransactionId = this.clientService.setCurrentTransactionId.bind(this.clientService);
 
     /**
      * pops current portion of attribute's creationPath from stack
@@ -625,6 +622,7 @@ function AuraInstance () {
         	}
         }
     });
+
 }
 
 /**
@@ -892,6 +890,50 @@ AuraInstance.prototype.set = function(key, value) {
     return valueProvider["set"](path.join('.'), value);
 };
 
+Aura.OverrideMap$Instance = undefined;
+
+/**
+ * Override a function in aura.
+ *
+ * This should only be available to plugins, and only works on functions designed for this purpose.
+ *
+ * @param {string} name the name of the override point
+ * @param {Function} fn the function to insert in the chain.
+ * @param {Object} scope a scope for invoking the function.
+ * @param {number} priority a priority for the function (0 = highest -> first, 100 = lowest ->last, default 50)
+ * @public
+ */
+AuraInstance.prototype.installOverride = function(name, fn, scope, priority) {
+    if (Aura.OverrideMap$Instance === undefined) {
+        Aura.OverrideMap$Instance = new Aura.OverrideMap();
+    }
+    if (priority === undefined) {
+        priority = 50;
+    }
+    var override = Aura.OverrideMap$Instance.map[name];
+    if (!override) {
+        throw new Error("$A.installOverride: Invalid name: "+name);
+    }
+    $A.assert(fn && $A.util.isFunction(fn), "Function must be a defined function");
+    override.install(fn, scope, priority);
+};
+
+/**
+ * Remore an override in aura.
+ *
+ * @public
+ */
+AuraInstance.prototype.uninstallOverride = function(name, fn) {
+    if (Aura.OverrideMap$Instance === undefined) {
+        Aura.OverrideMap$Instance = new Aura.OverrideMap();
+    }
+    var override = Aura.OverrideMap$Instance.map[name];
+    if (!override) {
+        throw new Error("$A.uninstallOverride: Invalid name: "+name);
+    }
+    override.uninstall(fn, map);
+};
+
 /**
  * Gets the component that is passed to a controller method. For example, <code>$A.getRoot().get("v.attrName");</code> returns the attribute from the root component.
  * @public
@@ -1088,7 +1130,7 @@ window['aura'] = window['$A'];
 
 // -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin
-// #include aura.metrics.plugins.ServerActionsMetricsPlugin
+// #include aura.metrics.plugins.QueuedActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}

@@ -9,6 +9,20 @@
 
         $A.test.addWaitFor(true, function() { return completed; });
     },
+
+    resetCounter:function(cmp, _testName){
+        var a = cmp.get('c.resetCounter');
+        a.setParams({ testName: _testName }),
+        $A.test.enqueueAction(a);
+    },
+
+    executeAction:function(cmp, actionName, actionParam, additionalProperties, extraCallback){
+        var helper = cmp.getDef().getHelper()
+        return helper.executeAction.call(helper, cmp, actionName, actionParam, additionalProperties, extraCallback);
+    },
+    findAndSetText:function(cmp, targetCmpId, msg){
+        cmp.find(targetCmpId).getElement().innerHTML = msg;
+    },
     /**
      * Verify the default adapter selected when auraStorage:init is used without
      * any specification.
@@ -135,15 +149,15 @@
             // storage, and should always give a zero response.
             //
             $A.test.setTestTimeout(30000);
-            var a = cmp.get("c.fetchDataRecord");
-            a.setParams({testName : "testSetStorableAPI"});
-            a.setStorable();
-            $A.test.enqueueAction(a);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]); },
+            var fetch1 = cmp.get("c.fetchDataRecord");
+            fetch1.setParams({testName : "testSetStorableAPI"});
+            fetch1.setStorable();
+            $A.test.enqueueAction(fetch1);
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([fetch1]); },
                 function(){
-                    $A.test.assertEquals("SUCCESS", a.getState());
-                    $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
-                    $A.test.assertEquals(0, a.getReturnValue().Counter, "Wrong counter value seen in response");
+                    $A.test.assertEquals("SUCCESS", fetch1.getState());
+                    $A.test.assertFalse(fetch1.isFromStorage(), "Failed to excute action at server");
+                    $A.test.assertEquals(0, fetch1.getReturnValue().Counter, "Wrong counter value seen in response");
                     //Set response stored time
                     cmp._requestStoredTime = new Date().getTime();
                 });
@@ -153,15 +167,15 @@
             // cause a refresh.
             //
             $A.test.setTestTimeout(30000);
-            var aSecond = cmp.get("c.fetchDataRecord");
+            var fetch2 = cmp.get("c.fetchDataRecord");
             var that = this;
-            aSecond.setParams({testName : "testSetStorableAPI"});
-            aSecond.setStorable();
-            $A.test.enqueueAction(aSecond);
-            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([aSecond]); },
+            fetch2.setParams({testName : "testSetStorableAPI"});
+            fetch2.setStorable();
+            $A.test.enqueueAction(fetch2);
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([fetch2]); },
                 function(){
-                    $A.test.assertEquals("SUCCESS", aSecond.getState());
-                    $A.test.assertEquals(0, aSecond.getReturnValue().Counter, "aSecond response invalid.");
+                    $A.test.assertEquals("SUCCESS", fetch2.getState());
+                    $A.test.assertEquals(0, fetch2.getReturnValue().Counter, "fetch 2 response invalid.");
                     $A.test.assertEquals("", that.textForName(cmp, "refreshBegin"),
                             "refreshBegin fired unexpectedly");
                     $A.test.assertEquals("", that.textForName(cmp, "refreshEnd"),
@@ -190,8 +204,12 @@
             $A.test.callServerAction(block, true);
             var requestTime;
             //Wait till the block action is executed
-            $A.test.addWaitFor(false, $A.test.isActionPending,
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([block]); },
                 function(){
+                    $A.test.assertEquals("", this.textForName(cmp, "refreshBegin"),
+                            "refreshBegin fired unexpectedly");
+                    $A.test.assertEquals("", this.textForName(cmp, "refreshEnd"),
+                            "refreshEnd fired unexpectedly");
                     var aThird = cmp.get("c.fetchDataRecord");
                     aThird.setParams({testName : "testSetStorableAPI"});
                     //Keeping the auto refresh time to 0, helps testing the override
@@ -258,11 +276,9 @@
             this.resetCounter(cmp, "testSkipCallbackOnRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-        	//First action which fetches the response from server.
-            var a = $A.run(function(){
-                return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
+            //First action which fetches the response from server.
+            var a = this.executeAction(cmp, "c.fetchDataRecord",
                     {testName:cmp._testName}, function(a){a.setStorable();})
-            });
             //Wait for first callback
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
@@ -275,10 +291,8 @@
                 });
         }, function(cmp) {
             // Specify that callback should not be called in case of refresh, so callback count should be 1 (for get())
-            var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
-                        {testName:cmp._testName}, function(a){a.setStorable({"executeCallbackIfUpdated":false});})
-                });
+            var a = this.executeAction(cmp, "c.fetchDataRecord",
+                {testName:cmp._testName}, function(a){a.setStorable({"executeCallbackIfUpdated":false});})
             $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
     	            function() {
             			//From cached response
@@ -331,6 +345,7 @@
                 $A.test.enqueueAction(aSecond);
                 $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([aSecond]); },
                     function() {
+                        $A.test.assertEquals("SUCCESS", aSecond.getState(), "failed to fetch cached response");
                         $A.test.assertTrue(aSecond.isFromStorage(), "failed to fetch cached response");
                         //Refresh interval should default to 0 and refresh should happen.
                         $A.test.addWaitFor("refreshEnd", function() {
@@ -756,15 +771,46 @@
      */
     testActionKeyOverloading : {
         test : [ function(cmp) {
-            cmp.getDef().getHelper().testActionKeyOverloadingStage1.call(this, cmp);
+            $A.test.setTestTimeout(30000);
+            this.resetCounter(cmp, "testActionKeyOverloading");
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionKeyOverloadingStage2.call(this, cmp);
+            var a = cmp.get("c.substring");
+            a.setParams({testName : "testActionKeyOverloading", param1 : 999});
+            a.setStorable();
+            $A.test.enqueueAction(a);
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                    $A.test.assertEquals(0, a.getReturnValue()[0], "Wrong counter value seen in response");
+                    $A.test.assertEquals(999, a.getReturnValue()[1]);
+                });
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionKeyOverloadingStage3.call(this, cmp);
+            //Controller name is a substring of previous controller
+            var a = cmp.get("c.string");
+            a.setParams({testName : "testActionKeyOverloading", param1 : 999});
+            a.setStorable();
+            $A.test.enqueueAction(a);
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    $A.test.assertFalse(a.isFromStorage(), "should not have fetched from cache");
+                    $A.test.assertEquals(1, a.getReturnValue()[0], "Wrong counter value seen in response");
+                    $A.test.assertEquals(999, a.getReturnValue()[1]);
+                });
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionKeyOverloadingStage4.call(this, cmp);
+            //Controller name is the same as previous controller but different parameter value
+            var a = cmp.get("c.string");
+            a.setParams({testName : "testActionKeyOverloading", param1 : 9999});
+            a.setStorable();
+            $A.test.enqueueAction(a);
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    $A.test.assertFalse(a.isFromStorage(), "Failed to excute action at server");
+                    $A.test.assertEquals(2, a.getReturnValue()[0], "Wrong counter value seen in response");
+                    $A.test.assertEquals(9999, a.getReturnValue()[1]);
+                });
         } ]
     },
+    
     /**
      * Grouping multiple actions and setting them to be storable.
      */
@@ -774,15 +820,62 @@
             defaultAutoRefreshInterval : 60
         },
         test : [ function(cmp) {
-            cmp.getDef().getHelper().testActionGroupingStage1.call(this, cmp);
+            $A.test.setTestTimeout(30000);
+            this.resetCounter(cmp, "testActionGrouping_A");
+            this.resetCounter(cmp, "testActionGrouping_B");
+            this.resetCounter(cmp, "testActionGrouping_notStored");
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionGroupingStage2.call(this, cmp);
+            var a1 = cmp.get("c.substring");
+            a1.setParams({testName : "testActionGrouping_A", param1 : 999});
+            a1.setStorable();
+            $A.enqueueAction(a1);
+            var b1 = cmp.get("c.string");
+            b1.setParams({testName : "testActionGrouping_B", param1 : 666});
+            b1.setStorable();
+            $A.enqueueAction(b1);
+            //1 Unstored action
+            var notStored = cmp.get("c.fetchDataRecord");
+            notStored.setParams({testName : "testActionGrouping_notStored"});
+            $A.enqueueAction(notStored);
+            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionGroupingStage3.call(this, cmp);
+            //Run a action whose response has been previously stored
+            var a2 = cmp.get("c.substring");
+            a2.setParams({testName : "testActionGrouping_A", param1 : 999});
+            a2.setStorable();
+            $A.test.enqueueAction(a2);
+            $A.test.addWaitFor("SUCCESS", function(){return a2.getState()},
+                function(){
+                    $A.log($A.storageService.getStorage("actions"));
+                    $A.test.assertTrue(a2.isFromStorage(), "Failed to fetch action from storage");
+                    $A.test.assertEquals(0, a2.getReturnValue()[0], "Wrong counter value seen in response");
+                    $A.test.assertEquals(999, a2.getReturnValue()[1]);
+                });
         }, function(cmp) {
-            cmp.getDef().getHelper().testActionGroupingStage4.call(this, cmp);
+            //Run a action whose response has been previously stored
+            var b2 = cmp.get("c.string");
+            b2.setParams({testName : "testActionGrouping_B", param1 : 666});
+            b2.setStorable();
+            $A.enqueueAction(b2);
+            //Run a action which was previously not marked to be stored and group it with the one above
+            var notStoredAgain = cmp.get("c.fetchDataRecord");
+            notStoredAgain.setParams({testName : "testActionGrouping_notStored"});
+            $A.test.enqueueAction(notStoredAgain);
+            $A.test.addWaitFor("SUCCESS", function(){return b2.getState()},
+                function(){
+                    $A.test.assertTrue(b2.isFromStorage(), "failed to fetch action from cache");
+                    $A.test.assertEquals(0, b2.getReturnValue()[0], "Wrong counter value seen in response");
+                    $A.test.assertEquals(666, b2.getReturnValue()[1]);
+                });
+            $A.test.addWaitFor(false, $A.test.isActionPending,
+                function(){
+                    $A.test.assertFalse(notStoredAgain.isFromStorage(), "Failed to group stored actions and unstored actions.");
+                    $A.test.assertEquals(1, notStoredAgain.getReturnValue().Counter, 
+                        "Counter value should have been incremented for unstored action");
+                    });
         } ]
     },
+
     /**
      * Abortable actions and caching
      */
@@ -819,12 +912,13 @@
 
                 // Why does abortable work only in another action's callback? Gerald?
                 // Gordon Answers: Abortable only works for currently enqueued actions.
-                var a = cmp.get("c.fetchDataRecord");
-                a.setParams({
+                var fetch = cmp.get("c.fetchDataRecord");
+                fetch.setParams({
                         testName : "testAbortableAction"
                     });
-                $A.test.enqueueAction(a);
-                $A.test.runAfterIf(function() { return "SUCCESS" === a.getState(); }, function() {
+                $A.test.enqueueAction(fetch);
+                $A.test.runAfterIf(function() { return $A.test.areActionsComplete([fetch]); }, function() {
+                        $A.test.assertEquals("SUCCESS", fetch.getState(), "fetchDataRecord should have succeeded.");
                         $A.test.blockRequests();
                         $A.run(function() { $A.enqueueAction(abortable1); });
                         $A.run(function() { $A.enqueueAction(abortable2); });
@@ -872,10 +966,6 @@
             } ]
     },
 
-    resetCounter : function(cmp, testName) {
-        cmp.getDef().getHelper().resetCounters(cmp, testName);
-    },
-
     /**
      * If a refresh contains the same response as what is stored, then skip
      * replaying the callback. The callback for the stored response is still
@@ -892,11 +982,7 @@
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            var a = $A.run(function(){
-                return cmp.getDef().getHelper()
-                    .executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
-                        function(a){a.setStorable();})
-                });
+            var a = this.executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a){a.setStorable();});
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -913,10 +999,8 @@
             var now = new Date().getTime();
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
         }, function(cmp) {
-            var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
-                        function(a){a.setStorable({"executeCallbackIfUpdated":true});})
-                });
+            var a = this.executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName},
+                function(a){a.setStorable({"executeCallbackIfUpdated":true});});
             $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -946,10 +1030,8 @@
             this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            var a = $A.run(function(){
-                return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
-                    {testName:cmp._testName}, function(a){a.setStorable();})
-            });
+            var a = this.executeAction(cmp, "c.fetchDataRecord",
+                {testName:cmp._testName}, function(a){a.setStorable();});
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -959,10 +1041,8 @@
                 });
         }, function(cmp) {
             // this response will be different so callback count should be +2 (for get(), then refresh())
-            var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecord",
-                        {testName:cmp._testName}, function(a){a.setStorable();})
-                });
+            var a = this.executeAction(cmp, "c.fetchDataRecord",
+                {testName:cmp._testName}, function(a){a.setStorable();});
             $A.test.addWaitFor("3", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("1", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -994,12 +1074,9 @@
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            var a = $A.run(function(){
-                return cmp.getDef().getHelper()
-                    .executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
+            var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
                         function(a){a.setStorable();},
                         function(a){$A.test.clearAndAssertComponentConfigs(a);});
-                });
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -1016,11 +1093,9 @@
             var now = new Date().getTime();
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
         }, function(cmp) {
-            var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
+            var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
                         function(a){a.setStorable();},
                         function(a){$A.test.clearAndAssertComponentConfigs(a);});
-                });
             $A.test.addWaitFor("refreshEnd", function(){return $A.test.getText(cmp.find("refreshEnd").getElement());},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -1052,11 +1127,9 @@
             this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalComponentsInRefresh");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
-            var a = $A.run(function(){
-                return cmp.getDef().getHelper().executeAction(cmp, "c.fetchDataRecordWithComponents",
+            var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents",
                     {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();},
                         function(a){$A.test.clearAndAssertComponentConfigs(a);});
-            });
             $A.test.addWaitFor("1", function(){return $A.test.getText(cmp.find("callbackCounter").getElement())},
                 function() {
                     $A.test.assertEquals("0", $A.test.getText(cmp.find("staticCounter").getElement()));
@@ -1066,14 +1139,10 @@
                 });
         }, function(cmp) {
             // this response will be different(has extra component but same return value) so callback count should be +2 (for get(), then refresh())
-            var a = $A.run(function(){
-                    return cmp.getDef().getHelper().executeAction(
-                        cmp,
-                        "c.fetchDataRecordWithComponents",
+            var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents",
                         {testName:cmp._testName, extraComponentsCreated:true},
                         function(a){ a.setStorable(); },
                         function(a){ $A.test.clearAndAssertComponentConfigs(a); });
-                });
 
             var completed = false;
             $A.test.addWaitFor(
@@ -1121,13 +1190,14 @@
             this.resetCounter(cmp, "testRefreshErrorResponseNotStored");
             $A.test.addWaitFor(false, $A.test.isActionPending);
         },function(cmp) {
-        	var a = cmp.get("c.fetchDataRecord");
+            var a = cmp.get("c.fetchDataRecord");
+            var that = this;
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
             	//sanity check
             	$A.test.assertEquals(action.getReturnValue(),"anything really","we are not using the correct stub");
-                cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
+                that.findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML,10)+1);
             });
             $A.test.enqueueAction(a);
@@ -1138,10 +1208,11 @@
                 });
         }, function(cmp) {
             var a = cmp.get("c.fetchDataRecord");
+            var that = this;
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
-            	cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter",
+            	that.findAndSetText(cmp, "callbackCounter",
                     parseInt(cmp.find("callbackCounter").getElement().innerHTML,10)+1);
             });
             $A.test.enqueueAction(a);
@@ -1158,11 +1229,12 @@
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
         }, function(cmp) {
             var a = cmp.get("c.fetchDataRecord");
+            var that = this;
             a.setParams({testName : "testRefreshErrorResponseNotStored"});
             a.setStorable();
             a.setCallback(cmp, function(action){
                 var newCount = parseInt(cmp.find("callbackCounter").getElement().innerHTML,10) + 1;
-                cmp.getDef().getHelper().findAndSetText(cmp, "callbackCounter", newCount);
+                that.findAndSetText(cmp, "callbackCounter", newCount);
                 // first action run will be stored refresh action
                 if (newCount == 4) {
                     $A.storageService.getStorage("actions").get(a.getStorageKey()).then(
@@ -1186,28 +1258,29 @@
 
     testStorageKeyVersionString: {
         attributes : {
-            "version" : "TrustyTahr"
-        },
-        test: function(cmp) {
-            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
-        }
-    },
-
-    testStorageKeyVersionNumber: {
-        attributes : {
-            "version" : 34.0
-        },
-        test: function (cmp) {
-            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
-        }
-    },
-
-    testStorageKeyVersionAsPartOfKey: {
-        attributes : {
             "version" : "testing"
         },
         test: function(cmp) {
-            cmp.getDef().getHelper().testStorageKeyVersion(cmp);
+            var key = "testingtesting123",
+                version = cmp.get("v.version"),
+                expected = "YO!",
+                storage = $A.storageService.getStorage("actions");
+            storage.put(key, expected).then(function() {
+                return storage.adapter.getItem(version + key);
+            })
+            .then(function(item) {
+                $A.test.assertEquals(expected, item["value"], "Storage with prefixed key should correct value");
+            })
+            .then(function() {
+                return storage.getAll();
+            })
+            .then(function(items) {
+                $A.test.assertEquals(1, items.length, "Storage should only have one item");
+                $A.util.forEach(items, function(item) {
+                    $A.test.assertEquals(key, item["key"], "Key should not have prefix when returned to user");
+                    $A.test.assertEquals(expected, item["value"]["value"], "Item with prefixed key should correct value");
+                })
+            }, function(error) { $A.test.fail(error); });
         }
     },
 

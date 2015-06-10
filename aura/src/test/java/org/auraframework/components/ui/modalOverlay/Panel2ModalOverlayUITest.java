@@ -15,6 +15,8 @@
  */
 package org.auraframework.components.ui.modalOverlay;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
@@ -34,8 +36,11 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String PANEL_MODAL = ".uiModal";
     private final String CLOSE_BUTTON = ".closeBtn";
     private final String CLOSE_ON_CLICKOUT = ".inputcloseOnClickOutClass";	
+    private final String MAKE_SCROLLABLE = ".inputMakeScrollableClass";
+    private final String MAKE_NONSCROLLABLE = ".inputNonScrollableClass";
+    
+    
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
-    private final String ACTIVE_ELEMENT_TEXT = "return $A.test.getActiveElementText()";
     private final String APP_INPUT = ".appInput";
     
 	public Panel2ModalOverlayUITest(String name) {
@@ -71,6 +76,38 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
     
     /**
+     * Test modal does have scrollbar when content is not so long
+     * Test case: W-2615146
+     */
+    public void testModalWithScrollBar() throws Exception{
+    	verifyScrollbarPresent(true, MAKE_SCROLLABLE);
+    }
+    
+    /**
+     * Test modal does have scrollbar when content is not so long
+     * Test case: W-2615146
+     */
+    public void testModalWithoutScrollBar() throws Exception{
+    	verifyScrollbarPresent(false, MAKE_NONSCROLLABLE);
+    }
+    
+    private void verifyScrollbarPresent(boolean hasScrollbar, String locator) throws MalformedURLException, URISyntaxException, InterruptedException {
+    	open(APP);
+    	String errorMessage = "Scroller should not be present for Modal body";
+    	WebElement makeScrollable = findDomElement(By.cssSelector(locator));
+    	makeScrollable.click();
+    	
+    	if(hasScrollbar){
+    		errorMessage = "Scroller should be present for Modal body";
+    	}
+    	openPanel();
+    	waitForModalOpen();
+    	String bodyClassName = "modal-body";
+    	boolean hasScroll = auraUITestingUtil.hasScrollBar(bodyClassName);
+    	assertEquals(errorMessage, hasScrollbar, hasScroll);
+   }
+
+	/**
      * Test multiple modal one above another, should close top panel when we press ESC on the newest panel
      */
     public void testMultipleModalPressEscKey() throws Exception{

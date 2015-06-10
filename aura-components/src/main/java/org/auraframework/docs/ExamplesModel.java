@@ -15,11 +15,19 @@
  */
 package org.auraframework.docs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DocumentationDef;
+import org.auraframework.def.ExampleDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -44,20 +52,20 @@ public class ExamplesModel {
                     switch (type) {
                     case DOCUMENTATION:
                         Map<String, String> m;
-                        
+
                         try {
                             DocumentationDef docDef = (DocumentationDef)descriptor.getDef();
-    
+
                             Collection<ExampleDef> exampleDefs = docDef.getExampleDefs();
-                            
-                            
+
+
                             for (ExampleDef example : exampleDefs) {
                                 m = new TreeMap<String, String>();
-                                
+
                                 m.put("label", example.getLabel());
                                 m.put("description", example.getDescription());
                                 m.put("ref", example.getRef().getDescriptorName());
-                                
+
                                 examples.add(m);
                             }
                         } catch (Exception e) {
@@ -69,7 +77,7 @@ public class ExamplesModel {
                                 examples.add(m);
                             }
                         }
-                        
+
                         break;
                     default: // not including other types in scan
                     }

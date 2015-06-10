@@ -156,7 +156,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraUnhandledException.class,
                 "org.auraframework.throwable.AuraExecutionException: " +
                         "java://org.auraframework.component.test.java.controller.TestController: " +
-                        "java.lang.RuntimeException: intentionally generated");
+                "java.lang.RuntimeException: intentionally generated");
     }
 
     /**
@@ -176,7 +176,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkFailAction(controller, "sumValues", args, State.ERROR, AuraUnhandledException.class,
                 "org.auraframework.throwable.AuraExecutionException: " +
                         "java://org.auraframework.impl.java.controller.TestControllerWithParameters: " +
-                        "java.lang.NullPointerException");
+                "java.lang.NullPointerException");
 
         // Passing the wrong type (Strings instead of Integers)
         args.put("a", "x");
@@ -434,8 +434,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log a server action",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
@@ -450,8 +450,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log a server action and selected parameter assignment",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
@@ -472,13 +472,13 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log first server action and selected parameter assignment",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
         assertTrue(
                 "Failed to log second server action and selected parameter assignment",
                 logs.get(0)
-                        .containsKey(
-                                "action_2$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                .containsKey(
+                        "action_2$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
@@ -493,8 +493,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log a server action and multiple params",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
@@ -507,8 +507,8 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log a server action and param with null value",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
@@ -522,35 +522,35 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Logging custom action param time failed to call toString() of the custom type",
                 logs.get(0)
-                        .containsKey(
-                                "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
+                .containsKey(
+                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_ChainingActions() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.java.controller.ActionChainingController");
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ActionChainingController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("a", 1);
         params.put("b", 1);
         params.put(
                 "actions",
-                "{\"actions\":[{\"descriptor\":\"java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply\",\"params\":{\"a\":2}}]}");
+                "{\"actions\":[{\"descriptor\":\"java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$multiply\",\"params\":{\"a\":2}}]}");
         Action selectParamLoggingAction = controller.createAction("add", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
         assertEquals(1, logs.size());
         assertTrue(
                 "Failed to log server action",
                 logs.get(0).containsKey(
-                        "action_1$java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
+                        "action_1$java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$add"));
         assertTrue(
                 "Failed to log chained server action",
                 logs.get(0).containsKey(
-                        "action_2$java://org.auraframework.java.controller.ActionChainingController/ACTION$multiply"));
+                        "action_2$java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$multiply"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_ChainingIdenticalActions() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.java.controller.ActionChainingController");
+        ControllerDef controller = getJavaController("java://org.auraframework.impl.java.controller.ActionChainingController");
         List<Action> actions = Lists.newArrayList();
         Map<String, Object> params = Maps.newHashMap();
         Action action;
@@ -558,7 +558,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         params.put("b", 1);
         params.put(
                 "actions",
-                "{\"actions\":[{\"descriptor\":\"java://org.auraframework.java.controller.ActionChainingController/ACTION$add\",\"params\":{\"a\":2, \"actions\":\"\"}}]}");
+                "{\"actions\":[{\"descriptor\":\"java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$add\",\"params\":{\"a\":2, \"actions\":\"\"}}]}");
         action = controller.createAction("add", params);
         actions.add(action);
 
@@ -574,15 +574,15 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertTrue(
                 "Failed to log server action",
                 logs.get(0).containsKey(
-                        "action_1$java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
+                        "action_1$java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$add"));
         assertTrue(
                 "Failed to log chained server action",
                 logs.get(0).containsKey(
-                        "action_2$java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
+                        "action_2$java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$add"));
         assertTrue(
                 "Failed to log chained server action",
                 logs.get(0).containsKey(
-                        "action_3$java://org.auraframework.java.controller.ActionChainingController/ACTION$add"));
+                        "action_3$java://org.auraframework.impl.java.controller.ActionChainingController/ACTION$add"));
     }
 
     private List<Map<String, Object>> runActionsAndReturnLogs(List<Action> actions) throws Exception {

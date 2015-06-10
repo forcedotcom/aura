@@ -25,7 +25,6 @@ Test.Aura.BrowserSupportedUtilTest = function() {
     var Aura = {
         Utils: {
             Json:function() {},
-            Transport:function() {},
             Style:function() {},
             Bitset:{},
             NumberFormat:{}
@@ -64,7 +63,6 @@ Test.Aura.BrowserSupportedUtilTest = function() {
                 window:Object.Global(),
                 document:{createDocumentFragment:function() {}},
                 Json:function() {},
-                Transport:function() {},
                 Style:function() {},
                 Bitset:{},
                 NumberFormat:{},

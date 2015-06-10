@@ -29,6 +29,7 @@
 
 }
 
+
 .THIS .body-basic {
 	bottom:100%;
 	left:50%;
@@ -73,16 +74,32 @@
 	transform: translateX(-50%) translateY(-3px);
 }
 
+
 .THIS .pointer {
+	border-bottom: none;
 	border-left: 13px solid transparent;
 	border-right: 13px solid transparent;
 	border-top: 13px solid #16325c;
 }
 
 .THIS .east .pointer {
+	border-left: none;
 	border-right: 13px solid #16325c;
 	border-bottom: 13px solid transparent;
 	border-top: 13px solid transparent;
+}
+.THIS .west .pointer {
+	border-left: 13px solid #16325c;
+	border-right: none;
+	border-bottom: 13px solid transparent;
+	border-top: 13px solid transparent;
+}
+
+.THIS .south .pointer {
+	border-top: none;
+	border-right: 13px solid transparent;
+	border-left: 13px solid transparent;
+	border-bottom: 13px solid #16325c;
 }
 
 .THIS.tooltip-basic .tooltip {

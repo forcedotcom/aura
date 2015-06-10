@@ -26,7 +26,7 @@
          Use events such as <code>ui:createPanel</code> and <code>ui:destroyPanel</code> to display or destroy your panels.
          You can customize a panel's styling, header, body, footer. You can also customize the close button with your own logic.
         </p>
-        <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>.</p>
+        <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>. You must register your panels using <code>ui:panelManager2</code> before you can create them.</p>
 <pre>createPanelWithHeader: function (cmp, event, helper) {
     var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
         header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
@@ -124,8 +124,9 @@
 			<td>Destroys the constraint, cleaning up element references.</td>
 		</tr>
 		</table>
-		<p>This is an example that sets up a constraint that positions an element north of a target element.</p>		
-<pre>var el = cmp.find('myDiv').getElement();
+		<p>This example sets up a constraint that positions an element north of a target element.</p>		
+<pre>var lib = helper.lib.panelPositioning;
+var el = cmp.find('myDiv').getElement();
 var panel = cmp.find('panel').getElement();
 lib.createRelationship({
 	element:panel,

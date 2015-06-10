@@ -31,12 +31,11 @@
         aura:id="theTip" 
         tooltipBody="You have to use the advanced mode in this case.">?&lt;/ui:tooltip>
 &lt;ui:button label="Click me to show tooltip" press="{!c.handleClick}" /></pre>
-        <p>In your client-side controller, hide and display the tooltip using the <code>hide()</code> and <code>show()</code> component methods.
+        <p>In your custom trigger, hide and display the tooltip using the <code>hide()</code> and <code>show()</code> component methods. To check whether the tooltip is visible, use the <code>isVisible</code> attribute.
         See the Examples tab for more information.</p>
         <p>    
 		The fade animation can be customized using these attributes: <code>fadeIn</code>, <code>fadeInDuration</code>, <code>fadeOut</code>, and <code>fadeOutDuration</code>. 
-		You can also use the <code>delay</code> attribute to delay the appearance of the tooltip. By default, <code>advanced="false"</code> creates the tooltip using CSS only. 
-		Using <code>advanced="true"</code> creates the tooltip using JavaScript.
+		You can also use the <code>delay</code> attribute to delay the appearance of the tooltip.
 		</p>
 	</aura:description>	
 		<aura:example name="tooltipExample1" ref="auradocs:demoTooltip" label="Displaying the Tooltip using Fade Animation">

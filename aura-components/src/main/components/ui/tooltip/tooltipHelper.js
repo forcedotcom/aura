@@ -77,6 +77,7 @@
 			component._tooltip = node;
 			component._tooltip.style.display = 'block';
 			document.body.appendChild(node);
+
 			lib.createRelationship({
 				element:ttbodyNode,
 				target:component._trigger,
@@ -123,7 +124,7 @@
                     align: 'left center',
                     targetAlign: 'right center',
                     enable: true,
-                    pad: 15
+                    pad: 0
                 });
             }
             
@@ -207,6 +208,10 @@
 		var trigger = component.get('v.trigger');
 		var disabled = component.get('v.disabled');
 		var node = component.getElement();
+
+		if(trigger === 'none') {
+			disabled = true;
+		}
 
 		if(!disabled && trigger === 'focus') {
 			showTrigger = 'focus';

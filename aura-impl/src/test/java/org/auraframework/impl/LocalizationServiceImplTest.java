@@ -26,8 +26,8 @@ import java.util.TimeZone;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.service.LocalizationService;
-import org.auraframework.service.testdata.LocalizationServiceTestData;
 import org.auraframework.test.AuraTestCase;
 import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraLocale;

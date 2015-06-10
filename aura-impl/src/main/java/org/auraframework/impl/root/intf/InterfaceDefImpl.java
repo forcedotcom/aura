@@ -23,7 +23,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.MethodDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.MasterDefRegistry;
@@ -87,7 +93,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
      * quick pass to ensure everything this extends and registers exists TODO:
      * lots of logic around making sure this doesn't clash with what it extends
      * #W-689596
-     * 
+     *
      * @throws QuickFixException
      */
     @Override
@@ -100,12 +106,12 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
             if (def == null) {
                 throw new DefinitionNotFoundException(extended, getLocation());
             }
-            
+
             if (extended.equals(descriptor)) {
                 throw new InvalidDefinitionException(String.format("%s cannot extend itself", getDescriptor()),
                         getLocation());
             }
-            
+
             registry.assertAccess(descriptor, def);
         }
 
@@ -124,7 +130,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
      * children to the provided set. The set may then be used to analyze
      * freshness of all of those types to see if any of them should be
      * recompiled from source.
-     * 
+     *
      * @param dependencies A Set that this method will append RootDescriptors to
      *            for every RootDef that this InterfaceDef requires
      * @throws QuickFixException
@@ -189,7 +195,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
 
     @Override
     public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
-    	throw new UnsupportedOperationException("InterfaceDef cannot contain RequiredVersionDefs.");
+        throw new UnsupportedOperationException("InterfaceDef cannot contain RequiredVersionDefs.");
     }
 
     @Override

@@ -21,7 +21,10 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -54,8 +57,8 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
             ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
-	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY).addAll(ALLOWED_ATTRIBUTES).build();
+    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -89,22 +92,22 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-	@Override
+    @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
 
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
-        	error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
+            error("Attribute '%s' is required on <%s>", ATTRIBUTE_NAME, TAG);
         }
-        
+
         builder.setParentDescriptor(getParentDefDescriptor());
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, AttributeDef.class));
         builder.setLocation(getLocation());
         builder.setRequired(getBooleanAttributeValue(ATTRIBUTE_REQUIRED));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
-      
+
         String type = Optional.fromNullable(getAttributeValue(ATTRIBUTE_TYPE)).or(defaultType).orNull();
-		builder.setTypeDefDescriptor(getDefDescriptor(type, TypeDef.class));
+        builder.setTypeDefDescriptor(getDefDescriptor(type, TypeDef.class));
 
         String serializeTo = getAttributeValue(ATTRIBUTE_SERIALIZE_TO);
         if (serializeTo != null) {
@@ -126,12 +129,12 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         else {
             builder.setVisibility(AttributeDef.Visibility.PUBLIC);
         }
-        
+
         try {
-			builder.setAccess(readAccessAttribute());
-		} catch (InvalidAccessValueException e) {
-			builder.setParseError(e);
-		}
+            builder.setAccess(readAccessAttribute());
+        } catch (InvalidAccessValueException e) {
+            builder.setParseError(e);
+        }
     }
 
     @Override
@@ -181,9 +184,9 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     public void writeElement(AttributeDefImpl def, Appendable out) {
     }
 
-	@Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
-    
+    @Override
+    protected boolean allowPrivateAttribute() {
+        return true;
+    }
+
 }

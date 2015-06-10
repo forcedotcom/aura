@@ -17,6 +17,11 @@
 <aura:component>
     <aura:attribute name="caseToRender" type="String" default="default" />
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    
+    <aura:method name="validateInput">
+        <aura:attribute name="errors" type="List"/>
+    </aura:method>
+    
     <!--
        Test that will verify that the the inputDefault error shows up when there is an error, and doesn't when there isn't an error  
     -->
@@ -52,6 +57,19 @@
     	<br/>
     </aura:if>
     
+     <!-- 
+          Test verifying that the inputDefault component can be used by itself
+      -->
+    <aura:if isTrue="{!v.caseToRender == 'staticCustomError'}">
+	    <ui:label for="staticCustomErrorInvalid" label="staticCustomError"/>
+	    <ui:inputNumber class="formInput" aura:id="staticCustomErrorInvalid" value="100000" placeholder="at least 6 chars">
+	      <aura:set attribute="errorComponent">
+	      	 <uitest:inputErrorComponent/>
+	      </aura:set>
+	    </ui:inputNumber>   
+    	<br/>
+    </aura:if>
+
     <!--
          Individual test per input component. If a component extends another component and doesn't overwrite the html, I thought of that as one text
          These tests are just to make sure that the ul shows up for all of these components
@@ -66,28 +84,28 @@
 	    	<ui:inputSelectOption text="hello4b" label="hello4b"/>
 	    </ui:inputSelect>
 	    <br />
-     </aura:if>
+    </aura:if>
     
     <aura:if isTrue="{!v.caseToRender == 'search' || v.caseToRender == 'all'}">
-       <ui:label for="searchInvalid" label="testingInvalidInput"/>
-       <ui:inputSearch aura:id="searchInvalid"/>
+        <ui:label for="searchInvalid" label="testingInvalidInput"/>
+        <ui:inputSearch aura:id="searchInvalid"/>
      	<br/>
     </aura:if>
     
-     <aura:if isTrue="{!v.caseToRender == 'textArea' || v.caseToRender == 'all'}">
-       <ui:label label="Test for inputRichText"/>
+    <aura:if isTrue="{!v.caseToRender == 'textArea' || v.caseToRender == 'all'}">
+        <ui:label label="Test for inputRichText"/>
         <ui:label for="textAreaInvalid" label="testingInvalidInput"/>
         <ui:inputTextArea aura:id="textAreaInvalid"/>
      	<br/>
     </aura:if>
     
-     <aura:if isTrue="{!v.caseToRender == 'date' || v.caseToRender == 'all'}">
+    <aura:if isTrue="{!v.caseToRender == 'date' || v.caseToRender == 'all'}">
         <ui:label for="dateInvalid" label="testingInvalidInput"/>
         <ui:inputDate aura:id="dateInvalid"/>
      	<br/>
     </aura:if>
     
-       <aura:if isTrue="{!v.caseToRender == 'dateTime'}">
+    <aura:if isTrue="{!v.caseToRender == 'dateTime'}">
         <ui:label for="dateTimeInvalid" label="testingInvalidInput"/>
         <ui:inputDateTime aura:id="dateTimeInvalid"/>
      	<br/>
@@ -105,24 +123,24 @@
      	<br/>
     </aura:if>
     
-     <aura:if isTrue="{!v.caseToRender == 'autoCompleteTextArea' || v.caseToRender == 'all'}">
+    <aura:if isTrue="{!v.caseToRender == 'autoCompleteTextArea' || v.caseToRender == 'all'}">
         <ui:label for="autoCompleteTextAreaInvalid" label="testingInvalidInput"/>
         <ui:inputTextAreaForAutoComplete aura:id="autoCompleteTextAreaInvalid"/>
      	<br/>
     </aura:if>
     
-     <aura:if isTrue="{!v.caseToRender == 'autoCompleteText' || v.caseToRender == 'all'}">
+    <aura:if isTrue="{!v.caseToRender == 'autoCompleteText' || v.caseToRender == 'all'}">
         <ui:label for="autoCompleteTextInvalid" label="testingInvalidInput"/>
         <ui:inputTextForAutoComplete aura:id="autoCompleteTextInvalid"/>
      	<br/>
     </aura:if>
     
-    
-     <aura:if isTrue="{!v.caseToRender == 'text' || v.caseToRender == 'all'}">
+    <aura:if isTrue="{!v.caseToRender == 'text' || v.caseToRender == 'all'}">
  	   <ui:label label="Test for inputEmail, inputPhone, inputSecret, InputURL"/>
        <ui:label for="textInvalid" label="testingInvalidInput"/>
        <ui:inputText aura:id="textInvalid"/>
        <br/>
-     </aura:if>
+    </aura:if>
+    
     <ui:button label="validate" press="{!c.validateInput}" aura:id="validate"/>
 </aura:component>

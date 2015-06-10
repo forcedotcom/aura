@@ -41,8 +41,10 @@
 
     	//Going through Array. This id array will be either of size 1 or 12.
     	//It will get the component associated with each element then invalidate it
+
+    	var params = evt.getParam("arguments");
     	for(var i = 0; i < componentIdArray.length; i++){
-    		helper.addErrorsToCmp(cmp.find(componentIdArray[i] +"Invalid"));
+    		helper.addErrorsToCmp(cmp.find(componentIdArray[i] +"Invalid"), params && params.errors);
     	}
 
     }

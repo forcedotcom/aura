@@ -164,8 +164,8 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                 .getDefDescriptor(cmpDesc,  DefDescriptor.CSS_PREFIX, StyleDef.class);
     	//fill in component to be injected
         String jsProviderName = jsProviderdesc.getQualifiedName();
-        String systemAttributes = "model='java://org.auraframework.impl.java.model.TestModel' "
-                + "controller='java://org.auraframework.component.test.java.controller.TestController' "
+        String systemAttributes = "model='java://org.auraframework.components.test.java.model.TestModel' "
+                + "controller='java://org.auraframework.components.test.java.controller.TestController' "
                 + "provider='" + jsProviderName
                 + ",java://org.auraframework.impl.java.provider.TestComponnetConfigProviderAIS' ";
         String bodyMarkup = "<aura:attribute name='strAttribute' type='String' default='Apple'/> "

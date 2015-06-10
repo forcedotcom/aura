@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+<aura:component model='java://org.auraframework.components.test.java.model.TestJavaModel'>
     <ui:outputDateTime value='{!m.timestamp}' timezone='America/Chicago' format='M/d/yy h:m' aura:id='NumericValueFromJava'/>
 </aura:component>

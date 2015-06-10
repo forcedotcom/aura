@@ -16,7 +16,7 @@
 
 -->
 <aura:component
-	controller="java://org.auraframework.component.ui.UIScrollerDataProvider"
+	controller="java://org.auraframework.components.ui.UIScrollerDataProvider"
 	description="A test scroller for testing performance.">
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>

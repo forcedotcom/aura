@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="auratest:rerenderAbstract" extensible="true" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component extends="auratest:rerenderAbstract" extensible="true" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="toggleParent" type="Boolean"/>
 
     <div class="boxed">

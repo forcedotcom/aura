@@ -15,8 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.TestControllerBean"
-model="java://org.auraframework.impl.java.model.TestModelBean">
+<aura:component controller="java://org.auraframework.components.test.java.controller.TestControllerBean"
+model="java://org.auraframework.components.test.java.model.TestModelBean">
     <aura:handler name="init" value="{!this}" action="{!c.onInitChild}"></aura:handler> 
     <aura:attribute name="childCounter" type="string"/>
     <p/>

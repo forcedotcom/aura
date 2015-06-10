@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" model="java://org.auraframework.impl.java.model.TestModel">
+<aura:component extensible="true" model="java://org.auraframework.components.test.java.model.TestModel">
     <aura:attribute name="value" type="String"/>
 
     <div>

@@ -30,19 +30,19 @@ public class ForEachUITest extends WebDriverTestCase {
         super(name);
     }
 
-    private static String FOREACH_COMPONENT = "<aura:component access=\"GLOBAL\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_COMPONENT = "<aura:component access=\"GLOBAL\" model=\"java://org.auraframework.components.test.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
             + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"
             + "</div>\n" + "</aura:component>";
 
-    private static String FOREACH_APP = "<aura:application access=\"GLOBAL\" render=\"client\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_APP = "<aura:application access=\"GLOBAL\" render=\"client\" model=\"java://org.auraframework.components.test.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
             + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"
             + "</div>" + "</aura:application>";
 
-    private static String FOREACH_APP_SERVER = "<aura:application access=\"GLOBAL\" render=\"server\" model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+    private static String FOREACH_APP_SERVER = "<aura:application access=\"GLOBAL\" render=\"server\" model=\"java://org.auraframework.components.test.java.model.TestJavaModel\">"
             + "Result:"
             + "<div id=\"list_content\">"
             + "<aura:iteration items=\"{!m.%s}\" var=\"i\">{!i}</aura:iteration>"

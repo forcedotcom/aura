@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component provider="java://org.auraframework.component.builder.BuilderComponentProvider">
+<aura:component provider="java://org.auraframework.components.builder.BuilderComponentProvider">
 </aura:component>

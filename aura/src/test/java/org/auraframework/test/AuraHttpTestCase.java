@@ -347,7 +347,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     /**
      * Convenience method for executing an Action
      * 
-     * @param descriptor fully qualified descriptor string for the action - e.g. java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString
+     * @param descriptor fully qualified descriptor string for the action - e.g. java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString
      * @param params a set of name value string pairs to use as parameters to the post call.
      * @return a {@link HttpPost}
      * @throws Exception

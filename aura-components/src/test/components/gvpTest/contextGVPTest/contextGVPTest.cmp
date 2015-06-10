@@ -1,4 +1,4 @@
-<aura:component controller="java://org.auraframework.component.test.java.controller.ContextVPTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.ContextVPTestController">
   <div aura:id="data">{!$Global.isVoiceOver}</div>
   <div aura:id="insertion"/>
 </aura:component>

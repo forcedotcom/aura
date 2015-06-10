@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="listofList" type="List"/>
     <aura:attribute name="Objects" type="Object[]"/>
 

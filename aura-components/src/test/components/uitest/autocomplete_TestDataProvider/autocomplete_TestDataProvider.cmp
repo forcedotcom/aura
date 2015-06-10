@@ -17,7 +17,7 @@
 -->
 <aura:component extends="ui:dataProvider"
 	description="A test data provider to test autocomplete component."
-	model="java://org.auraframework.impl.java.model.TestJavaModel">
+	model="java://org.auraframework.components.test.java.model.TestJavaModel">
 	<aura:attribute name="dataType" type="String"/> 
     <!-- <aura:handler name="provide" action="{!c.provide}"/> -->
 </aura:component>

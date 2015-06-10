@@ -117,7 +117,7 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
             DefDescriptor<ComponentDef> withRequiredAttribute) {
         return addSourceAutoCleanup(
                 ComponentDef.class,
-                "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\"><aura:iteration items='{!m.stringList}' var='i'><"
+                "<aura:component model=\"java://org.auraframework.components.test.java.model.TestJavaModel\"><aura:iteration items='{!m.stringList}' var='i'><"
                         + withRequiredAttribute.getDescriptorName() + "/></aura:iteration></aura:component>");
     }
 
@@ -130,7 +130,7 @@ public class ForEachDefTest extends DefinitionTest<ComponentDef> {
 
     private DefDescriptor<ComponentDef> registerComponentMissingInheritedRequiredAttribute(
             DefDescriptor<ComponentDef> required) {
-        String contents = "<aura:component model=\"java://org.auraframework.impl.java.model.TestJavaModel\">"
+        String contents = "<aura:component model=\"java://org.auraframework.components.test.java.model.TestJavaModel\">"
                 + "<aura:iteration items='{!m.stringList}' var='i'><" + required.getDescriptorName()
                 + "/></aura:iteration></aura:component>";
         return addSourceAutoCleanup(ComponentDef.class, contents);

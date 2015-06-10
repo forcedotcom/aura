@@ -1,4 +1,4 @@
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="tochange" type="Integer"/>
     <aura:attribute name="newvalue" type="string"/>
     <aura:attribute name="newEndIndex" type="Integer" default="26"/>

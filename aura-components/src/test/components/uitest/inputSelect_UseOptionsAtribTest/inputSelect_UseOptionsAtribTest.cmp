@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+<aura:component model='java://org.auraframework.components.test.java.model.TestJavaModel'>
     
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <ui:inputSelect aura:id="dynamicSelect"/>

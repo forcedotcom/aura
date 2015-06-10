@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestIterationModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestIterationModel">
 <aura:attribute name="list" type="List"/>
 <aura:attribute name="start" type="integer" default="4"/>
 <aura:attribute name="end" type="integer" default="14"/>

@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <forEachDefTest:basicDataType string="{!m.stringList}" number="{!m.integerList}" bool="{!m.booleanList}" aura:id="basicDataType"/>
 
     <forEachDefTest:collectionDataType listOfList="{!m.listOfList}" Objects="{!m.integerList}" aura:id="collection"/>

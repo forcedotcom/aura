@@ -102,7 +102,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);

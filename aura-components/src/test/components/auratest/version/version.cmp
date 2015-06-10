@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.VersionTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.VersionTestController">
     <aura:attribute name="value" type="String" default="click to call server getAccessVersion"/>
     <aura:require namespace="auratest" version="1.0"/>
     <auratest:test_button label="{!v.value}" aura:id="testbtn"/>

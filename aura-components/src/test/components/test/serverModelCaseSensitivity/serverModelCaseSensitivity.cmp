@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
 
     <!-- Corresponds to getString() on model -->
     <div aura:id="string1">{!m.string}</div>

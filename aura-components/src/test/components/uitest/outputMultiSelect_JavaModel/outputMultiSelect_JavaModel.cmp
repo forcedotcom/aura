@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model='java://org.auraframework.impl.java.model.TestJavaModel'>
+<aura:component model='java://org.auraframework.components.test.java.model.TestJavaModel'>
     <ui:outputMultiSelect  value='{!m.string}' aura:id='String' />
     <br/>
     <ui:outputMultiSelect  value='{!m.stringArray}' aura:id='StringArray' />

@@ -95,7 +95,7 @@ public abstract class AuraImplTestCase extends AuraTestCase {
     /**
      * Convenience method to create an instance of a JavaModel given the qualified name.
      * 
-     * @param qualifiedName For example: java://org.auraframework.impl.java.model.TestModel
+     * @param qualifiedName For example: java://org.auraframework.components.test.java.model.TestModel
      * @return
      * @throws Exception
      */

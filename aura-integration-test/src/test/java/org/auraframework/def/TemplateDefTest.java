@@ -248,7 +248,7 @@ public class TemplateDefTest extends AuraImplTestCase {
                 ComponentDef.class,
                 String.format(
                         baseComponentTag,
-                        "isTemplate='true' extends='aura:template' model='java://org.auraframework.impl.java.model.TestModel'",
+                        "isTemplate='true' extends='aura:template' model='java://org.auraframework.components.test.java.model.TestModel'",
                         extraScriptTags + extraStyleTags + extraMetaTags));
 
         StringBuffer sb = new StringBuffer();

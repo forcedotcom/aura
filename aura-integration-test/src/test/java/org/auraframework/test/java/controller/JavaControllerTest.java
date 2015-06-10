@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.component.test.java.controller.JavaTestController;
+import org.auraframework.components.test.java.controller.JavaTestController;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -144,7 +144,7 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     public void testActionNoParameters() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Map<String, Object> empty = new HashMap<>();
         Map<String, Object> hasOne = new HashMap<>();
         hasOne.put("a", "don't care");
@@ -155,7 +155,7 @@ public class JavaControllerTest extends AuraImplTestCase {
         checkPassAction(controller, "getString", empty, State.SUCCESS, "TestController");
         checkFailAction(controller, "throwException", empty, State.ERROR, AuraUnhandledException.class,
                 "org.auraframework.throwable.AuraExecutionException: " +
-                        "java://org.auraframework.component.test.java.controller.TestController: " +
+                        "java://org.auraframework.components.test.java.controller.TestController: " +
                 "java.lang.RuntimeException: intentionally generated");
     }
 
@@ -270,14 +270,14 @@ public class JavaControllerTest extends AuraImplTestCase {
         } catch (DefinitionNotFoundException e) {
             assertEquals("No CONTROLLER named java://goats found", e.getMessage());
         }
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Map<String, Object> empty = new HashMap<>();
         try {
             controller.createAction("imNotHere", empty);
             fail("Should not be able to create JavaAction when method does not exist in Controller class");
         } catch (DefinitionNotFoundException e) {
             assertEquals(
-                    "No ACTION named java://org.auraframework.component.test.java.controller.TestController/ACTION$imNotHere found",
+                    "No ACTION named java://org.auraframework.components.test.java.controller.TestController/ACTION$imNotHere found",
                     e.getMessage());
         }
     }
@@ -286,7 +286,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify controller can be accessed in system namespace
      */
     public void testControllerInSystemNamespace() throws Exception {
-        String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
+        String resourceSource = "<aura:component controller='java://org.auraframework.components.test.java.controller.TestController'>Hello World!</aura:component>";
 
         DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 resourceSource,
@@ -303,7 +303,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Verify controller can not be accessed in custom namespace
      */
     public void testControllerInCustomNamespace() throws Exception {
-        String resourceSource = "<aura:component controller='java://org.auraframework.component.test.java.controller.TestController'>Hello World!</aura:component>";
+        String resourceSource = "<aura:component controller='java://org.auraframework.components.test.java.controller.TestController'>Hello World!</aura:component>";
 
         DefDescriptor<? extends Definition> dd = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 resourceSource,
@@ -313,7 +313,7 @@ public class JavaControllerTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected NoAccessException");
         } catch (NoAccessException e) {
-            String errorMessage = "Access to controller 'org.auraframework.component.test.java.controller:TestController' from namespace '"
+            String errorMessage = "Access to controller 'org.auraframework.components.test.java.controller:TestController' from namespace '"
                     + StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE
                     + "' in '"
                     + dd.getQualifiedName()
@@ -329,15 +329,15 @@ public class JavaControllerTest extends AuraImplTestCase {
     }
 
     public void testGetSubDefinition() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         ActionDef subDef = controller.getSubDefinition("getString");
         assertEquals("SubDefinition is the wrong type", ActionDef.ActionType.SERVER, subDef.getActionType());
-        assertEquals("java://org.auraframework.component.test.java.controller.TestController/ACTION$getString", subDef
+        assertEquals("java://org.auraframework.components.test.java.controller.TestController/ACTION$getString", subDef
                 .getDescriptor().getQualifiedName());
     }
 
     public void testGetNullSubDefinition() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         ActionDef subDefNonExistent = controller.getSubDefinition("iDontExist");
         assertNull("Trying to retrieve non-existent subdefiniton should return null", subDefNonExistent);
     }
@@ -346,7 +346,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Tests to verify the APIs on Action to mark actions as storable.
      */
     public void testStorable() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Action freshAction = controller.createAction("getString", null);
 
         assertTrue("Expected an instance of JavaAction", freshAction instanceof JavaAction);
@@ -392,7 +392,7 @@ public class JavaControllerTest extends AuraImplTestCase {
      * Tests to verify the logging of params
      */
     public void testParamLogging() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         JavaAction nonLoggableStringAction = (JavaAction) controller.createAction("getString", null);
         JavaAction nonLoggableIntAction = (JavaAction) controller.createAction("getInt", null);
         JavaAction loggableStringAction = (JavaAction) controller.createAction("getLoggableString",
@@ -426,7 +426,7 @@ public class JavaControllerTest extends AuraImplTestCase {
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_NoParams() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.TestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Map<String, Object> params = Maps.newHashMap();
         Action nonLoggableStringAction = controller.createAction("getString", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(nonLoggableStringAction));
@@ -435,12 +435,12 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Failed to log a server action",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.TestController/ACTION$getString"));
+                        "action_1$java://org.auraframework.components.test.java.controller.TestController/ACTION$getString"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_SelectParameters() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("strparam", "BoogaBoo");
         params.put("intparam", 1);
@@ -451,12 +451,12 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Failed to log a server action and selected parameter assignment",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                        "action_1$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_MultipleIdenticalActions() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params1 = Maps.newHashMap();
         params1.put("strparam", "BoogaBoo");
         params1.put("intparam", 1);
@@ -473,17 +473,17 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Failed to log first server action and selected parameter assignment",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                        "action_1$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
         assertTrue(
                 "Failed to log second server action and selected parameter assignment",
                 logs.get(0)
                 .containsKey(
-                        "action_2$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
+                        "action_2$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getSelectedParamLogging{strparam,BoogaBoo}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_MultipleParameters() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("we", "we");
         params.put("two", "two");
@@ -494,12 +494,12 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Failed to log a server action and multiple params",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
+                        "action_1$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getMultiParamLogging{we,we}{two,two}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_NullValuesForParameters() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         Action selectParamLoggingAction = controller.createAction("getLoggableString", params);
         List<Map<String, Object>> logs = runActionsAndReturnLogs(Lists.newArrayList(selectParamLoggingAction));
@@ -508,12 +508,12 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Failed to log a server action and param with null value",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
+                        "action_1$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getLoggableString{param,null}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")
     public void testParamLogging_ParametersOfCustomDataType() throws Exception {
-        ControllerDef controller = getJavaController("java://org.auraframework.component.test.java.controller.JavaTestController");
+        ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.JavaTestController");
         Map<String, Object> params = Maps.newHashMap();
         params.put("param", new JavaTestController.CustomParamType());
         Action selectParamLoggingAction = controller.createAction("getCustomParamLogging", params);
@@ -523,7 +523,7 @@ public class JavaControllerTest extends AuraImplTestCase {
                 "Logging custom action param time failed to call toString() of the custom type",
                 logs.get(0)
                 .containsKey(
-                        "action_1$java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
+                        "action_1$java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getCustomParamLogging{param,CustomParamType_toString}"));
     }
 
     @ThreadHostileTest("TestLoggingAdapter not thread-safe")

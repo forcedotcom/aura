@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.component.loadLevel.GatedModel">
+<aura:component model="java://org.auraframework.components.loadLevel.GatedModel">
     <aura:attribute type="String" name="waitId"/>
     Lazy Kid:<loadLevelTest:serverComponent aura:load="lazy" waitId="lazyKid" aura:id="kid"/>
 </aura:component>

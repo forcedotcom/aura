@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://org.auraframework.impl.java.model.TestJavaModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestJavaModel">
     <aura:attribute name="string" type="String[]"/>
     <aura:attribute name="number" type="Integer[]"/>
     <aura:attribute name="bool" type="Boolean[]"/>

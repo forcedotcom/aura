@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application access="unauthenticated" controller="java://org.auraframework.component.test.java.controller.TestControllerLocalization" model="java://org.auraframework.impl.java.model.TestModelLocalization">
+<aura:application access="unauthenticated" controller="java://org.auraframework.components.test.java.controller.TestControllerLocalization" model="java://org.auraframework.components.test.java.model.TestModelLocalization">
     <aura:attribute name="hardCoded" type="String" default="Values hard coded on server.." description="Description"/>
     <aura:attribute name="submitCount" type="number"/>
     <aura:registerevent name="press" type="ui:press"/>

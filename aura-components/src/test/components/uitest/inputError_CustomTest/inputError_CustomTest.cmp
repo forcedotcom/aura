@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component controller="java://org.auraframework.component.test.java.controller.JavaTestController">
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
 	<aura:attribute name="errorMessage" type="String"/>
 	
 	<ui:inputText aura:id="inputCmp" value="" onError="{!c.handleError}" onClearErrors="{!c.handleClearError}"/> <br/>

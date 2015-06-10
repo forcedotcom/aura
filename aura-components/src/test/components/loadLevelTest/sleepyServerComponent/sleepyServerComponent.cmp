@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.component.loadLevel.SleepyServerModel">
+<aura:component model="java://org.auraframework.components.loadLevel.SleepyServerModel">
     Sleepy Server component {!globalId}<br/>
 </aura:component>

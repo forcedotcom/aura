@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.impl.java.model.TestJavaModel" access="GLOBAL">
+<aura:application model="java://org.auraframework.components.test.java.model.TestJavaModel" access="GLOBAL">
     <aura:attribute name="attr" type="String" default="An Aura of Lightning Lumenated the Plume" />
     <aura:attribute name="map" type="Object" default="{!m.map}" />
 

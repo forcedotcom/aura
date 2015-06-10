@@ -154,7 +154,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         ServerAction a = new ServerAction(
-                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString",
+                "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString",
                 actionParams);
         a.run();
         String rawRes = a.getrawResponse();
@@ -193,12 +193,12 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
-        qNameList.add("java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
+        qNameList.add("java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString");
         actionParamsArrayList.add(actionParams);
 
         Map<String, Object> actionParams1 = new HashMap<>();
         actionParams1.put("param", 6);
-        qNameList.add("java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getInt");
+        qNameList.add("java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getInt");
         actionParamsArrayList.add(actionParams1);
 
         ServerAction a = new ServerAction(qNameList, actionParamsArrayList);
@@ -216,7 +216,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);
@@ -255,7 +255,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         Map<String, Object> message = new HashMap<>();
         Map<String, Object> actionInstance = new HashMap<>();
         actionInstance.put("descriptor",
-                "java://org.auraframework.component.test.java.controller.JavaTestController/ACTION$getString");
+                "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString");
         Map<String, Object> actionParams = new HashMap<>();
         actionParams.put("param", "some string");
         actionInstance.put("params", actionParams);

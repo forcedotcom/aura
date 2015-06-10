@@ -203,7 +203,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     public void testProdCmpModelThrowsDuringInstantiation() throws Exception {
         setProdConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
+                "<aura:component model='java://org.auraframework.components.test.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertNoStacktrace();
     }
@@ -214,10 +214,10 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     public void testCmpModelThrowsDuringInstantiation() throws Exception {
         setDevContextWithoutConfig();
         DefDescriptor<?> cdd = addSourceAutoCleanup(ComponentDef.class,
-                "<aura:component model='java://org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
+                "<aura:component model='java://org.auraframework.components.test.java.model.TestModelThrowsDuringInstantiation'></aura:component>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
         assertStacktrace(
-                "java.lang.RuntimeException: surprise! at org.auraframework.impl.java.model.TestModelThrowsDuringInstantiation.",
+                "java.lang.RuntimeException: surprise! at org.auraframework.components.test.java.model.TestModelThrowsDuringInstantiation.",
                 "(TestModelThrowsDuringInstantiation.java:");
     }
 

@@ -125,12 +125,26 @@
     		this.waitForModalOpen();
     	}, function(cmp) {
     		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"));
+    		modal1GlobalId = this.getGlobalIdForPanelModal(1);
+    		var modal1VisibleAttrValue = $A.getCmp(modal1GlobalId).get("v.visible");
+//    		Uncomment Me once bug W-2619412 fixed
+//    		$A.test.assertTrue(modal1VisibleAttrValue, "Visible Attribute should be set for new modal opened");
+    		
     		testerCmp.set("v.useHeader","true");
     		testerCmp.set("v.useFooter","true");
     		testerCmp.find("createPanelBtn").get("e.press").fire();
     	}, function(cmp) {
+    		test = this.getPanelTesterComponent(cmp.find("tester"))
     		this.waitForNumberOfPanels("modal", 2);
     	}, function(cmp) {
+    		var modal2GlobalId = this.getGlobalIdForPanelModal(2);
+    		var modal2VisibleAttrValue = $A.getCmp(modal2GlobalId).get("v.visible");
+    		var modal1VisibleAttrValue = $A.getCmp(modal1GlobalId).get("v.visible");
+    		
+//    		Uncomment Me once bug W-2619412 fixed
+//    		$A.test.assertFalse(modal1VisibleAttrValue, "Visible Attribute should not be set for old modal opened");
+//    		$A.test.assertTrue(modal2VisibleAttrValue, "Visible Attribute should be set for new modal opened");
+    		
     		this.verifyElementWithClassPresent("defaultCustomPanelHeader", true, 
 			"Custom panel header should be present for second modal");
     		this.verifyElementWithClassPresent("defaultCustomPanelFooter", true, 
@@ -481,4 +495,8 @@
 			}, "Panel was not " + expectedState);
     	}
     },
+    
+    getGlobalIdForPanelModal : function(panelNumber){
+    	return $A.test.getText($A.test.select(".IdCreated")[panelNumber-1]);
+    }
 })

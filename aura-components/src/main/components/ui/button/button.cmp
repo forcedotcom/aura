@@ -18,7 +18,6 @@
 <aura:component extensible="true" support="GA" access="GLOBAL"
     description="Represents a button element.">
 
-    <aura:attribute name="theme" type="String" default="default" description="The default CSS style used to display the button."/>
     <aura:attribute name="buttonTitle" type="String" access="GLOBAL" description="The text displayed in a tooltip when the mouse pointer hovers over the button."/>
     <aura:attribute name="buttonType" type="String" default="button" access="GLOBAL" description="Specifies the type attribute in the HTML input element. Default value is &quot;button&quot;."/>
     <aura:attribute name="class" type="String" default="" access="GLOBAL" description="A CSS style to be attached to the button. This style is added in addition to base styles output by the component."/>
@@ -36,7 +35,7 @@
     <aura:registerevent name="keydown" type="ui:keydown" description="The controller method that runs when a key is pressed down on the button."/>
     <aura:registerevent name="press" type="ui:press" access="GLOBAL" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
 
-    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' '+v.theme+' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}" tabindex="{!v.tabIndex}" aura:flavorable="true">
+    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}" tabindex="{!v.tabIndex}" aura:flavorable="true">
         <aura:if isTrue="{!v.iconImgSrc != '' || v.iconClass != ''}">
             <img src="{!v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{!v.iconClass+' icon bLeft'}" alt=""/>
         </aura:if>

@@ -23,11 +23,6 @@
 	flex: 1;
 	-webkit-flex: 1;
 	width: 15em;
-	list-style-type: none;
-}
-
-.THIS .sampleList.dragOver {
-	background-color: #f1f1f1;
 }
 
 .THIS .sampleList .listContent {
@@ -47,14 +42,6 @@
 	border-radius: .3125rem;
 }
 
-.THIS .sampleCard:active {
-	outline: none; /* since this will interfere with dragImage in drag and drop operation */
-}
-
 .THIS .sampleCard.dragging {
 	border: 2px dashed #000;
-}
-
-.THIS .dragImage {
-	background-color: #e9967a;
 }

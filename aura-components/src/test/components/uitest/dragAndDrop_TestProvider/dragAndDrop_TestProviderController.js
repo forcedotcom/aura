@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	handleDropComplete: function (component, event, helper) {
-		helper.handleDropComplete(component, event);
-	},
-	
-	setDropStatus: function (component, event, helper) {
-		var params = event.getParam("arguments");
-		if (component.$dragOperation$) {
-			component.$dragOperation$.$dropOperationStatus$.setDropStatus(params.isSuccessful);
-		}
-	},
-	
-	fireDragEnd: function (component, event, helper) {
-		var params = event.getParam("arguments");
-		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);
-	}
+({    
+    provide: function(component, event, helper){
+        var prefix = component.get("v.prefix");
+        var count = component.get("v.count");
+    	var data = [];
+        
+        for (var i = 0; i < count; i++) {
+        	data.push(prefix + " " + (i + 1));
+        }
+        
+        helper.fireDataChangeEvent(component, data);
+    }
 })

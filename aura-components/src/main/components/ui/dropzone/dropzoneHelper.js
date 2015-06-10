@@ -15,7 +15,30 @@
  */
 ({
 	resetCssClass: function(component) {
-		component.set("v.theClass", component.get("v.class"));
+		var cssClass = component.get("v.class").trim();
+		var dragOverClass = component.get("v.dragOverClass").trim();
+		var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass").trim();
+		
+		if (!$A.util.isEmpty(dragOverClass)) {
+			cssClass = cssClass.replace(new RegExp(dragOverClass, "g"), "");
+		}
+		
+		if (!$A.util.isEmpty(dragOverAccessibilityClass)) {
+			cssClass = cssClass.replace(new RegExp(dragOverAccessibilityClass, "g"), "");
+		}
+		
+		component.set("v.class", cssClass.trim());
+	},
+	
+	setDragOverClass: function(component, isInAccessibilityMode) {
+		var dragOverClass = component.get("v.dragOverClass");
+		if (isInAccessibilityMode) {
+			var dragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
+			if (!$A.util.isEmpty(dragOverAccessibilityClass)) {
+				dragOverClass = dragOverAccessibilityClass;
+			}
+		}
+		component.set("v.class", component.get("v.class").trim() + " " + dragOverClass.trim());
 	},
 	
 	/**
@@ -24,19 +47,15 @@
 	 * @param {Event} event - HTML DOM Event for dragenter
 	 */
 	handleDragEnter: function(component, event) {
-		this.fireDragEnter(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+		var isValid = this.setDropEffect(component, event);
+		if (isValid) {
+			this.fireDragEnter(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+		}
 	},
 	
 	fireDragEnter: function(component, targetComponent, isInAccessibilityMode) {
 		// Set onDragOver class
-		var onDragOverClass = component.get("v.dragOverClass");
-		if (isInAccessibilityMode) {
-			var onDragOverAccessibilityClass = component.get("v.dragOverAccessibilityClass");
-			if (!$A.util.isEmpty(onDragOverAccessibilityClass)) {
-				onDragOverClass = onDragOverAccessibilityClass;
-			}
-		}
-		component.set("v.theClass", component.get("v.class") + " " + onDragOverClass);
+		this.setDragOverClass(component, isInAccessibilityMode);
 		
 		var dragEvent = component.getEvent("dragEnter");
 		dragEvent.setParams({
@@ -47,23 +66,53 @@
 		dragEvent.fire();
 	},
 	
+	setDropEffect: function(component, event) {
+		var effectAllowed = event.dataTransfer.effectAllowed;
+		var types = component.get("v.types");
+		
+		if (effectAllowed === "all" || types.indexOf(effectAllowed) > -1) {
+			// The actual effect that will be used, 
+			// and should always be one of the possible values of effectAllowed.
+			event.dataTransfer.dropEffect = effectAllowed;
+			return true;
+		} else {
+			event.dataTransfer.dropEffect = "none";
+			return false;
+		}
+	},
+	
 	/**
 	 * Handle dragover event. This handler is called every few hundred milliseconds.
 	 * @param {Aura.Component} component - this component
 	 * @param {Event} event - HTML DOM Event for dragover
 	 */
 	handleDragOver: function(component, event) {
-		var effectAllowed = event.dataTransfer.effectAllowed;
-		var types = component.get("v.types");
-		if (effectAllowed === "all" || types.indexOf(effectAllowed) > -1) {
+		var isValid = this.setDropEffect(component, event);
+		if (isValid) {
 			if (event.preventDefault) {
 				// Necessary. Allows us to drop, i.e. this is a dropzone component
 				event.preventDefault(); 
 			}
 			
-			// The actual effect that will be used, 
-			// and should always be one of the possible values of effectAllowed.
-			event.dataTransfer.dropEffect = effectAllowed;
+			// Throttle and fire dragOver
+			var dragOverInterval = component.get("v.dragOverInterval");
+			if (!$A.util.isNumber(dragOverInterval) || dragOverInterval < 100) {
+				dragOverInterval = 100;
+			}
+			
+			if (!component.$dragOperation$) {
+				component.$dragOperation$ = {
+					"$dragOverTimeout$": false
+				};
+			}
+			
+			if (!component.$dragOperation$.$dragOverTimeout$) {
+				component.$dragOperation$.$dragOverTimeout$ = true;
+				setTimeout(function() {
+					component.$dragOperation$.$dragOverTimeout$ = false;
+				}, dragOverInterval);
+				this.fireDragOver(component, $A.componentService.getRenderingComponentForElement(event.target));
+			}
 			
 			// Prevent default behavior in certain browser such as
 			// navigate to link when the dropzone is an anchor element
@@ -73,12 +122,22 @@
 		return true;
 	},
 	
+	fireDragOver: function(component, targetComponent) {
+		var dragEvent = component.getEvent("dragOver");
+		dragEvent.setParams({
+			"dropComponent": component,
+			"dropComponentTarget": targetComponent,
+			"isInAccessibilityMode": false	// no dragOver in accessibility mode
+		});
+		dragEvent.fire();
+	},
+	
 	/**
 	 * Handle dragleave event.
 	 * @param {Aura.Component} component - this component
 	 * @param {Event} event - HTML DOM Event for dragleave
 	 */
-	handleDragLeave: function(component, event) {		
+	handleDragLeave: function(component, event) {
 		this.fireDragLeave(component, $A.componentService.getRenderingComponentForElement(event.target), false);
 	},
 	
@@ -101,23 +160,23 @@
 	 * @param {Event} event - HTML DOM Event for drop
 	 */
 	handleDrop: function(component, event) {
-		if (event.stopPropagation) {
-			// stops some browsers from redirecting.
-			event.stopPropagation();
-		}
-		
-		// Get draggable component
-		var auraId = event.dataTransfer.getData("aura/id");
-		var dragComponent = $A.getCmp(auraId);
+		// stops some browsers from redirecting.
+		if (event.stopPropagation) { event.stopPropagation(); }
+		if (event.preventDefault) { event.preventDefault(); }
 		
 		// Check for supported drop operation
 		var supportedTypes = component.get("v.types");
 		var operationType = event.dataTransfer.effectAllowed;
 		if (operationType === "all" || supportedTypes.indexOf(operationType) > -1) {	
+			var auraId = null;
 			var dataTransfer = {};
-			if (!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isValid()) {
-				dataTransfer = dragComponent.get("v.dataTransfer");
+			
+			if ($A.util.isIE) {
+				var dataTransfer = JSON.parse(event.dataTransfer.getData("Text"));
+				auraId = dataTransfer["aura/id"];
+				delete dataTransfer["aura/id"];
 			} else {
+				var auraId = event.dataTransfer.getData("aura/id");
 				var dataTransferTypes = event.dataTransfer.types;
 				for (var i = 0; i < dataTransferTypes.length; i++) {
 					var dataTransferType = dataTransferTypes[i];
@@ -126,6 +185,9 @@
 					}
 				}
 			}
+			
+			// Get draggable component
+			var dragComponent = auraId === null ? null : $A.getCmp(auraId);
 			
 			this.fireDrop(component, operationType, dataTransfer, dragComponent, $A.componentService.getRenderingComponentForElement(event.target), false);
 		}
@@ -137,6 +199,10 @@
 	fireDrop: function(component, operationType, dataTransfer, dragComponent, targetComponent, isInAccessibilityMode) {
 		// reset onDragOver class
 		this.resetCssClass(component);
+		
+		if(!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isValid()) {
+			dragComponent.setDropStatus(true);
+		}
 		
 		var dragEvent = component.getEvent("drop");
 		dragEvent.setParams({

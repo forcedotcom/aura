@@ -15,14 +15,16 @@
  */
 ({
 	init: function(component, event, helper) {
-		var context = component.find("list");
-		component.set("v._context1", context[0]);
-		component.set("v._context2", context[1]);
-		component.set("v._context3", context[2]);
-		component.set("v._accessibilityComponent", component.find("accessibilityComponent").getGlobalId());
+		var draggableContext = component.find("list");
+		component.set("v._dropzoneContext1", draggableContext[0]);
+		component.set("v._dropzoneContext2", draggableContext[1]);
+		component.set("v._dropzoneContext3", draggableContext[2]);
+		component.set("v._draggableContext1", draggableContext[0]);
+		component.set("v._draggableContext2", draggableContext[1]);
+		component.set("v._draggableContext3", draggableContext[2]);
 	},
 	
-	handleDrop: function(component, event, helper) {
+	handleDrop: function(component, event, helper) {	
 		$A.dragAndDropService.fireDropComplete(event, true);
 	},
 	
@@ -31,28 +33,25 @@
 		if (dropComplete) {
 			// Calculate index to be removed
 			var record = event.getParam("data");
-			var type = event.getParam("type");
 	    	var source = $A.dragAndDropService.getContext(event.getParam("dragComponent"));
 	    	var items = source.get("v.items");
 	    	
-	    	if (type === "move") {
-		    	var removeIndex = -1;
-		    	for (var i = 0; i < items.length; i++) {
-					if (record === items[i]) {
-						removeIndex = i;
-						break;
-					}
-		    	}
-		    	
-				var removeParams = {
-					"index": removeIndex,
-					"count": 1,
-					"remove": true
-				};
-				
-				// Remove data transfer
-				$A.dragAndDropService.removeDataTransfer(event, removeParams);
+	    	var removeIndex = -1;
+	    	for (var i = 0; i < items.length; i++) {
+				if (record === items[i]) {
+					removeIndex = i;
+					break;
+				}
 	    	}
+	    	
+			var removeParams = {
+				"index": removeIndex,
+				"count": 1,
+				"remove": true
+			};
+			
+			// Remove data transfer
+			$A.dragAndDropService.removeDataTransfer(event, removeParams);
 			
 			// Add data transfer
 			var target = $A.dragAndDropService.getContext(event.getParam("dropComponent"));

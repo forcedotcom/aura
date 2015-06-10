@@ -13,11 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	$dropOperationStatus$: null,
-	
+({	
 	resetCssClass: function(component) {
-		component.set("v.theClass", component.get("v.class"));
+		var cssClass = component.get("v.class").trim();
+		var dragClass = component.get("v.dragClass").trim();
+		var dragAccessibilityClass = component.get("v.dragAccessibilityClass").trim();
+		
+		if (!$A.util.isEmpty(dragClass)) {
+			cssClass = cssClass.replace(new RegExp(dragClass, "g"), "");
+		}
+		
+		if (!$A.util.isEmpty(dragAccessibilityClass)) {
+			cssClass = cssClass.replace(new RegExp(dragAccessibilityClass, "g"), "");
+		}
+		
+		component.set("v.class", cssClass.trim());
+	},
+	
+	setDragClass: function(component, isInAccessibilityMode) {
+		var dragClass = component.get("v.dragClass");
+		if (isInAccessibilityMode) {
+			var dragAccessibilityClass = component.get("v.dragAccessibilityClass");
+			if (!$A.util.isEmpty(dragAccessibilityClass)) {
+				dragClass = dragAccessibilityClass;
+			}
+		}
+		component.set("v.class", component.get("v.class").trim() + " " + dragClass.trim());
 	},
 	
 	/**
@@ -27,7 +48,8 @@
 	 */
 	handleKeyPress: function(component, event) {
 		// SPACE
-		if (event.keyCode === 32) {
+		var code = (event.keyCode ? event.keyCode : event.which);
+		if (code === 32) {
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
 			
@@ -55,19 +77,35 @@
 		
 		// Set aura-id of this draggable component so that 
 		// we can pass this component to the dropzone
-		event.dataTransfer.setData("aura/id", component.getGlobalId());
+		var auraId = component.getGlobalId();
 		
 		// Set data to be transferred between drag component and drop component
 		var dataTransfer = component.get("v.dataTransfer");
 		if (!$A.util.isUndefinedOrNull(dataTransfer)) {
 			if($A.util.isString(dataTransfer)) {
-				event.dataTransfer.setData("text/plain", dataTransfer);
+				dataTransfer = { "text/plain": dataTransfer};
+			}
+			
+			if ($A.util.isIE) {
+				dataTransfer["aura/id"] = auraId;
+				event.dataTransfer.setData("Text", JSON.stringify(dataTransfer));
 			} else {
+				event.dataTransfer.setData("aura/id", auraId);
 				for (var key in dataTransfer) {
 					if (key !== "aura/id" && dataTransfer.hasOwnProperty(key)) {
 						event.dataTransfer.setData(key, dataTransfer[key]);
 					}
 				}
+			}
+		}
+		
+		// Set custom dragImage
+		var dragImageClass = component.get("v.dragImageClass");
+		if (!$A.util.isEmpty(dragImageClass)) {
+			if (typeof event.dataTransfer.setDragImage === "function") {
+				var offsetX = 15, offsetY = 15;
+				var dragImage = this.createDragImage(component, event.pageX, event.pageY, offsetX, offsetY);
+				event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 			}
 		}
 		
@@ -88,6 +126,62 @@
 		});
 		dragEvent.fire();
 	},
+	
+	/**
+	 * Create custom drag image.
+	 * @param {Aura.Component} component - this component
+	 * @param {int} x - the x coordinate where this dragImage will be positioned
+	 * @param {int} y - the y coordinate where this dragImage will be positioned
+	 * @param {int} offsetX - the x coordinate offset relative to mouse pointer
+	 * @param {int} offsetY - the y coordinate offset relative to mouse pointer
+	 */
+	createDragImage: function(component, x, y, offsetX, offsetY) {
+		var theElement = component.getElement();
+		
+		// Clone a copy of original draggable element and use it as a dragImage
+		var dragImage = document.createElement("div");
+		$A.util.addClass(dragImage, component.get("v.class"));
+		$A.util.addClass(dragImage, component.get("v.dragImageClass"));
+		
+		for (var i = 0; i < theElement.childNodes.length; i++) {
+			dragImage.appendChild(theElement.childNodes[i].cloneNode(true));
+		}
+		
+		dragImage.style.position = "fixed";
+		dragImage.style.width = theElement.clientWidth + "px";
+		dragImage.style.top = (y - offsetY) + "px";
+		dragImage.style.left = (x - offsetX) + "px";
+		dragImage.style.zIndex = "-1";
+		
+		// In order for dragImage to render properly, dragImage must be visible 
+		// to use (i.e. putting it off the screen won't work). But we can remove 
+		// the dragImage element right after the dragImage is rendered.
+		setTimeout(function() {
+			dragImage.parentNode.removeChild(dragImage);
+		});
+		
+		theElement.parentNode.insertBefore(dragImage, theElement.nextSibling);
+		return dragImage;
+	},
+	
+	isDropEventSuccessful: function(component, event) {
+		if (!component.isValid()) {
+			return false;
+		}
+		
+		var dropEffect = event.dataTransfer.dropEffect;
+		if (dropEffect === "none" && $A.util.isIE) {
+			// Don't return false right away, since IE always 
+			// returns "none" even though the drop has been performed
+			// successfully. This is not the right way to check
+			// whether or not drop has been performed since this
+			// doesn't handle drag and draop cross different context, 
+			// e.g. dropping on different browser windows.
+			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();		
+		}
+		
+		return dropEffect === component.get("v.type");
+	},
 
 	/**
 	 * Handle dragend event.
@@ -95,8 +189,8 @@
 	 * @param {Event} event - HTML DOM Event for dragend
 	 */
 	handleDragEnd: function(component, event) {
-		var dropEffect = event.dataTransfer.dropEffect;
-		this.fireDragEnd(component, dropEffect === component.get("v.type"), false);
+		var isSuccess = this.isDropEventSuccessful(component, event);
+		this.fireDragEnd(component, isSuccess, false);
 	},
 	
 	fireDragEnd: function(component, isValid, isInAccessibilityMode) {
@@ -135,35 +229,41 @@
 	 * @param {Aura.Event} [event] - the Aura event for dropComplete
 	 */
 	updateDropOperationStatus: function(component, eventType, event) {
-		if (this.$dropOperationStatus$ == null) {
-			this.$dropOperationStatus$ = {
-				"dragEnd": null,
-				"dropComplete": null,
+		var dragOperationStatus = null
+		var dragOperation = component.$dragOperation$;
+		if ($A.util.isUndefinedOrNull(dragOperation)) {
+			// This could happen when drag and drop is performed in different
+			// context, i.e. drag and drop between windows
+			dragOperationStatus = this.newDropOperationStatus();
+			component.$dragOperation$ = {
+				"$dropOperationStatus$": dragOperationStatus
 			};
+		} else {
+			dragOperationStatus = component.$dragOperation$.$dropOperationStatus$;
 		}
 		
 		if (eventType === "dragEnd") {
-			this.$dropOperationStatus$["dragEnd"] = {
+			dragOperationStatus.setDragEndStatus({
 				"type": component.get("v.type")
-			};
+			});
 		} else if (eventType === "dropComplete") {
-			this.$dropOperationStatus$["dropComplete"] = {
+			dragOperationStatus.setDropStatus(true);
+			dragOperationStatus.setDropCompleteStatus({
 				"dropComponent": event.getParam("dropComponent"),
 				"status": event.getParam("dropComplete")
-			};
+			});
 		}
 		
-		// Ultimately this should be implemented with either Promise
-		// or Object.observe() instead of dirty checking. However,
-		// IE doesn't support either of those.
-		if (this.$dropOperationStatus$["dragEnd"] !== null && this.$dropOperationStatus$["dropComplete"] !== null) {
+		var dragEndStatus = dragOperationStatus.getDragEndStatus();
+		var dragCompleteStatus = dragOperationStatus.getDropCompleteStatus();
+		if (dragEndStatus !== null && dragCompleteStatus !== null) {
 			var dragEvent = component.getEvent("dragEnd");
 			dragEvent.setParams({
-				"type": this.$dropOperationStatus$["dragEnd"]["type"],
+				"type": dragEndStatus["type"],
 				"dragComponent": component,
-				"dropComponent": this.$dropOperationStatus$["dropComplete"]["dropComponent"],
+				"dropComponent": dragCompleteStatus["dropComponent"],
 				"data": component.get("v.dataTransfer"),
-				"dropComplete": this.$dropOperationStatus$["dropComplete"]["status"]
+				"dropComplete": dragCompleteStatus["status"]
 			});
 			dragEvent.fire();
 		}
@@ -174,20 +274,27 @@
 	 * @param {Aura.Component} component - this component
 	 */
 	enterDragOperation: function(component, isInAccessibilityMode) {
-		this.$dropOperationStatus$ = null;
-		
-		// set onDrag class
-		var onDragClass = component.get("v.dragClass");
-		if (isInAccessibilityMode) {
-			var onDragAccessibilityClass = component.get("v.dragAccessibilityClass");
-			if (!$A.util.isEmpty(onDragAccessibilityClass)) {
-				onDragClass = onDragAccessibilityClass;
-			}
-		}
-		component.set("v.theClass", component.get("v.class") + " " + onDragClass);
+		component.$dragOperation$ = {
+			"$dropOperationStatus$": this.newDropOperationStatus()
+		};
+		this.setDragClass(component, isInAccessibilityMode);
 		
 		// Set aria-describe
 		component.set("v.ariaGrabbed", true);
+	},
+	
+	newDropOperationStatus: function() {
+		return {
+			"dragEnd": null,
+			"dropSuccessful": false,
+			"dropComplete": null,
+			"setDragEndStatus": function(status) { this["dragEnd"] = status; },
+			"setDropStatus": function(isSuccessful) { this["dropSuccessful"] = isSuccessful; },
+			"setDropCompleteStatus": function(status) { this["dropComplete"] = status; },
+			"getDragEndStatus": function() { return this["dragEnd"]; },
+			"getDropStatus": function() { return this["dropSuccessful"]; },
+			"getDropCompleteStatus": function() { return this["dropComplete"]; },
+		};
 	},
 	
 	/**

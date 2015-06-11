@@ -121,7 +121,7 @@
             }, "first pill should be focused");
         }
     },
-
+    
     DOWNARROW_KEY: 40,
     testEnterOnAutoCompleteItemCreatesPill: {
         test: function (cmp) {
@@ -207,6 +207,38 @@
                 return document.activeElement===secondPill.getElement();
             }, "second pill should be focused");
         }
+    },
+    
+    /**
+     * ui:pillContainer should remove noinput class
+     * Bug: W-2622542
+     */
+    testFocusOnPillAfterDeleteAndAfterMaxReached: {
+        attributes: {
+            maxAllowed: 2
+        },
+        test: [function (cmp) {
+            pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+            this._inputPill(textInput, this.PILLS[1].label);
+
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var secondPill = pillContainer.find("pill")[1];
+                return document.activeElement===secondPill.getElement();
+            }, "second pill should be focused");
+        }, function(cmp){
+        	$A.test.assertTrue($A.util.hasClass(pillContainer.getElement(),"noinput"), "Pill Container should have className noinput after reaching max allowed pills");
+        	var secondPill = pillContainer.find("pill")[1];
+            this._fireKeydownEvent(secondPill, this.BACKSPACE_KEY);
+
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var firstPill = pillContainer.find("pill")[0];
+                return document.activeElement === firstPill.getElement();
+            }, "first pill should be focused");
+        }, function(cmp){
+        	$A.test.assertFalse($A.util.hasClass(pillContainer.getElement(),"noinput"), "Pill Container should not have className noinput after deleting a pill");
+        }]
     },
 
     _getInput: function(cmp) {

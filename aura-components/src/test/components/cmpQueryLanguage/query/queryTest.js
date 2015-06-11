@@ -93,6 +93,9 @@
      */
     testQueryOnCustomViews:{
         test:function(cmp){
+            // create componentDef for providerDef to be registered
+            $A.componentService.getDef("markup://provider:clientProvider");
+
             var result = $A.getQueryStatement().from("componentDef").query();
             this.verifyQueryResultCount(result, $A.componentService.getRegisteredComponentDescriptors().length);
             $A.test.assertEquals("ComponentDef" , result.rows[0].auraType);

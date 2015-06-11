@@ -279,7 +279,7 @@ var ComponentPriv = (function() { // Scoping priv
      * A reference to the ComponentDefinition for this instance
      */
     ComponentPrivInner.prototype.setupComponentDef = function(config) {
-        var componentDef = $A.componentService.registry.getDef(config["componentDef"]);
+        var componentDef = $A.componentService.getDef(config["componentDef"]);
         $A.assert(componentDef, "componentDef is required");
         this.componentDef = componentDef;
     };

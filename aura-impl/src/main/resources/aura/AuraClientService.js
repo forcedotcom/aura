@@ -1011,7 +1011,7 @@ AuraClientService.prototype.initDefs = function(config) {
     var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
     $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
     for (i = 0; i < comConfigs.length; i++) {
-        $A.componentService.createDef(comConfigs[i]);
+        $A.componentService.saveComponentConfig(comConfigs[i]);
     }
     $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
 

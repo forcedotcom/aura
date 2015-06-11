@@ -43,6 +43,8 @@ function AuraComponentService () {
     // Collection of all the component classes we generate for
     // proper stack traces and proper use of prototypical inheritance
     this.classConstructors={};
+
+    this.savedComponentConfigs = {};
 }
 
 /**
@@ -698,14 +700,29 @@ AuraComponentService.prototype.index = function(component){
 /**
  * Gets the component definition from the registry.
  *
- * @param {String|Object} config The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
+ * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @returns {ComponentDef} The metadata of the component
  *
  * @public
  * @export
  */
-AuraComponentService.prototype.getDef = function(config){
-    var def = this.registry.getDef(config);
+AuraComponentService.prototype.getDef = function(descriptor) {
+    $A.assert(descriptor, "No ComponentDef descriptor specified");
+
+    if (descriptor["descriptor"]) {
+        descriptor = descriptor["descriptor"];
+    }
+    if ($A.util.isString(descriptor) && descriptor.indexOf("://") < 0) {
+        descriptor = "markup://" + descriptor; // support shorthand
+    }
+
+    var def = this.registry.getDef(descriptor);
+
+    if (!def) {
+        // check and create from saved configs
+        def = this.createFromSavedComponentConfigs(descriptor);
+    }
+
     if (def && !$A.clientService.allowAccess(def)) {
         // #if {"modes" : ["DEVELOPMENT"]}
         $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
@@ -717,6 +734,29 @@ AuraComponentService.prototype.getDef = function(config){
     return def;
 };
 
+/**
+ * Checks for saved component config, creates if available, and deletes the config
+ *
+ * @param {String} descriptor component descriptor to check and create
+ * @return {ComponentDef} component definition if config available
+ * @private
+ */
+AuraComponentService.prototype.createFromSavedComponentConfigs = function(descriptor) {
+    var def,
+        config = this.savedComponentConfigs[descriptor];
+    if (config) {
+        def = this.createDef(config);
+        delete this.savedComponentConfigs[descriptor];
+    }
+    return def;
+};
+
+/**
+ * Creates ComponentDef from provided config
+ * @param {Object} config component definition config
+ * @return {ComponentDef}
+ * @private
+ */
 AuraComponentService.prototype.createDef = function(config) {
     return this.registry.createDef(config);
 };
@@ -950,6 +990,17 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
      * real AttDefRefs from random junk
      */
     return config && config["descriptor"];
+};
+
+/**
+ * Saves component config so it can be use later when component def is exactly used.
+ * Allows Aura to only create ComponentDef when needed
+ *
+ * @param {Object} config component definition config
+ */
+AuraComponentService.prototype.saveComponentConfig = function(config) {
+    $A.assert(config && config["descriptor"], "ComponentDef config required for registration");
+    this.savedComponentConfigs[config["descriptor"]] = config;
 };
 
 Aura.Services.AuraComponentService = AuraComponentService;

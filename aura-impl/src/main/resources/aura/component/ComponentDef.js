@@ -590,9 +590,9 @@ ComponentDef.prototype.initSuperDef = function(config) {
             descriptor = config["descriptor"];
         }
         // config could either be for a new component or for an existing def so we need to check first
-        var sDef = $A.componentService.registry.getDef(descriptor);
+        var sDef = $A.componentService.getDef(descriptor);
         if (!sDef) {
-            sDef = $A.componentService.registry.createDef(config);
+            sDef = $A.componentService.createDef(config);
         }
         $A.assert(sDef, "Super def undefined for " + this.descriptor + " value = " + descriptor);
         return sDef;

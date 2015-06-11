@@ -36,14 +36,14 @@
  * @constructor
  */
 IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
-    var that = this;
-
     this.instanceName = config["name"];
     this.sizeMax = config["maxSize"];
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
     this.db = undefined;
     this.ready = undefined;
     this.pendingRequests = [];
+
+    // FIXME: fix size calculation
     this.sizeLastReal = 0;
     this.sizeGuess = 0;
     this.sizeErrorBar = 0;
@@ -63,27 +63,11 @@ IndexedDBStorageAdapter = function IndexedDBStorageAdapter(config) {
     this.limitItem = 0.25*this.sizeMax;     // 25% for a single item.
     this.limitError = 0.5*this.sizeMax;     // 50% for the error bar
 
-    // FIXME: we should use the name of the storage here, and the DB should be per webapp
-    this.tableName = "keyStore";
+    var context = $A.getContext();
+    // objectStore name is the descriptor of current app or cmp
+    this.tableName = (context && (context.app || context.cmp)) || "store";
 
-    // Set version number on open call to avoid weirdness when deleting/recreating DBs of the same name
-    var dbRequest = window.indexedDB.open(this.instanceName, 1);
-    dbRequest.onupgradeneeded = function (e) {
-        that.createTables(e.target.result);
-    };
-    dbRequest.onsuccess = function(e) {
-        that.setupDB(e.target.result);
-    };
-    dbRequest.onerror = function(e) {
-        // this means we have no storage.
-        that.ready = false;
-        var message = "open() - Error opening DB";
-        message += (e.target.error && e.target.error.message) ? ": "+e.target.error.message : "";
-        that.log(message);
-    };
-    dbRequest.onblocked = function() {
-        that.log("open() - Blocked from opening DB, most likely by another open browser tab");
-    };
+    this.initialize();
 };
 
 IndexedDBStorageAdapter.NAME = "indexeddb";
@@ -96,6 +80,37 @@ IndexedDBStorageAdapter.NAME = "indexeddb";
  */
 IndexedDBStorageAdapter.prototype.getName = function() {
     return IndexedDBStorageAdapter.NAME;
+};
+
+IndexedDBStorageAdapter.prototype.initialize = function(version) {
+    // Set version number when changing schema ie adding index, etc
+    var dbRequest,
+        that = this;
+    if (version) {
+        // version is dynamic because it needs to be incremented when we need to create a objectStore
+        // for the current app or cmp. IndexedDB only allows modifications to db or objectStore during
+        // version change. Hence, we check for the existence of the table and increment the version
+        // if it needs to be created
+        dbRequest = window.indexedDB.open(this.instanceName, version);
+    } else {
+        dbRequest = window.indexedDB.open(this.instanceName);
+    }
+    dbRequest.onupgradeneeded = function (e) {
+        that.createTables(e);
+    };
+    dbRequest.onsuccess = function(e) {
+        that.setupDB(e);
+    };
+    dbRequest.onerror = function(e) {
+        // this means we have no storage.
+        that.ready = false;
+        var message = "open() - Error opening DB";
+        message += (e.target.error && e.target.error.message) ? ": " + e.target.error.message : "";
+        that.log(message);
+    };
+    dbRequest.onblocked = function() {
+        that.log("open() - Blocked from opening DB, most likely by another open browser tab");
+    };
 };
 
 /**
@@ -117,6 +132,25 @@ IndexedDBStorageAdapter.prototype.getSize = function() {
             that.walkInternal(success, error, false);
         });
     }
+};
+
+/**
+ * Returns scope prefix text for keys;
+ * @returns {String}
+ * @private
+ */
+IndexedDBStorageAdapter.prototype.getScopedPrefix = function() {
+    return this.scope + "_";
+};
+
+/**
+ * Strips scope prefix from key and returns original key
+ * @param {String} key key from storage with prefix
+ * @returns {String}
+ * @private
+ */
+IndexedDBStorageAdapter.prototype.stripScopedPrefix = function(key) {
+    return key.replace(this.getScopedPrefix(), "");
 };
 
 /**
@@ -206,38 +240,62 @@ IndexedDBStorageAdapter.prototype.sweep = function() {
  * Initialize the structure with a new DB.
  *
  * @private
- * @param {IndexedDB} db the database.
+ * @param {Event} event IndexedDB event
  */
-IndexedDBStorageAdapter.prototype.setupDB = function(db) {
-    $A.assert(this.db === undefined);
+IndexedDBStorageAdapter.prototype.setupDB = function(event) {
+    var db = event.target.result;
+    var self = this;
     this.db = db;
-    this.db.onError = function(e) {
-        if (e.message) {
-            //FIXME:
-            $A.error(e.error);
-        }
+    this.db.onerror = function(e) {
+        self.log("IndexedDBStorageAdapter error event called for " + self.instanceName, e);
+    };
+    this.db.onabort = function(e) {
+        self.log("IndexedDBStorageAdapter abort event called for " + self.instanceName, e);
     };
     this.db.onversionchange = function(e) {
+        self.log("IndexedDBStorageAdapter onversionchanged event called for " + self.instanceName, e);
         e.target.close();
     };
-    if (!this.db.objectStoreNames.contains(this.tableName)) {
-        this.createTables(db);
+
+    if (!db.objectStoreNames.contains(this.tableName)) {
+        // objectStore does not exist so increment version so we can create it
+        var currentVersion = db["version"];
+        db.close();
+        this.initialize(currentVersion + 1);
+    } else {
+        this.ready = true;
+        this.executeQueue();
     }
-    this.ready = true;
-    this.executeQueue();
 };
 
 /**
  * Create tables in a new db.
  *
  * @private
- * @param {IndexedDB} db the database.
+ * @param {Event} event IndexedDB event
  */
-IndexedDBStorageAdapter.prototype.createTables = function(db) {
+IndexedDBStorageAdapter.prototype.createTables = function(event) {
+    var db = event.target.result,
+        transaction = event.target.transaction,
+        objectStore;
+
+    // these checks are required because IndexedDB will error on existing things
+
     if (!db.objectStoreNames.contains(this.tableName)) {
-        var objectStore = db.createObjectStore(this.tableName, { "keyPath": "key" });
-        objectStore.createIndex("expires", "expires", {"unique": false});
+        // non existent table
+        objectStore = db.createObjectStore(this.tableName, {"keyPath": "key"});
+    } else if (transaction) {
+        // existing table
+        objectStore = transaction.objectStore(this.tableName);
     }
+
+    if (objectStore) {
+        if (!objectStore.indexNames.contains("expires")) {
+            // check for existing index
+            objectStore.createIndex("expires", "expires", {"unique": false});
+        }
+    }
+
 };
 
 /**
@@ -265,11 +323,12 @@ IndexedDBStorageAdapter.prototype.executeQueue = function() {
  * @return {Promise} a promise.
  */
 IndexedDBStorageAdapter.prototype.enqueue = function(execute) {
-    var that = this;
+    var that = this,
+        promise;
 
     if (this.ready === false) {
         promise = new Promise(function(success, error) {
-            error("IndexedDBStorageAdapte.enqueue: database failed to initialize");
+            error("IndexedDBStorageAdapter.enqueue: database failed to initialize");
         });
     } else if (this.ready === undefined) {
         promise = new Promise(function(success, error) {
@@ -335,9 +394,9 @@ IndexedDBStorageAdapter.prototype.walkInternal = function(success, error, sendRe
                 count += 1;
                 if (sendResult) {
                     var sent = {
-                        "key":icursor.key,
-                        "value":store["item"]["value"],
-                        "expires":store["expires"]
+                        "key": store["key"],
+                        "value": store["item"]["value"],
+                        "expires": store["expires"]
                     };
                     result.push(sent);
                 }
@@ -356,10 +415,10 @@ IndexedDBStorageAdapter.prototype.walkInternal = function(success, error, sendRe
         }
     };
     cursor.onerror = function(event) {
-        error("IndexedDBStorageAdapter.getAll: Transaction failed: "+event.error);
+        error("IndexedDBStorageAdapter.getAll: Transaction failed: " + event.error);
     };
     cursor.onabort = function(event) {
-        error("IndexedDBStorageAdapter.getAll: Transaction aborted: "+event.error);
+        error("IndexedDBStorageAdapter.getAll: Transaction aborted: " + event.error);
     };
 };
 
@@ -382,10 +441,10 @@ IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, success,
         "key":key,
         "item":item,
         "size":size,
-        "expires":expires
+        "expires": expires
     };
     if (size > this.limitItem) {
-        error("IndexedDBStorageAdapter.setItem(): Item larger than size limit of "+this.limitItem);
+        error("IndexedDBStorageAdapter.setItem(): Item larger than size limit of " + this.limitItem);
         return;
     }
     if (size + this.sizeGuess + this.sizeErrorBar > this.limitSweepHigh || this.sizeErrorBar > this.limitError) {
@@ -397,14 +456,14 @@ IndexedDBStorageAdapter.prototype.setItemInternal = function(key, item, success,
 
     var objectStoreRequest = objectStore.put(storable);
     transaction.onabort = function(event) {
-        error("IndexedDBStorageAdapter.setItem: Transaction aborted: "+event.error);
+        error("IndexedDBStorageAdapter.setItem: Transaction aborted: " + event.error);
     };
     objectStoreRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
-        that.log("DIED "+event.error);
-        error("IndexedDBStorageAdapter.setItem: Transaction failed: "+event.error);
+        that.log("DIED " + event.error);
+        error("IndexedDBStorageAdapter.setItem: Transaction failed: " + event.error);
     };
 };
 
@@ -421,13 +480,13 @@ IndexedDBStorageAdapter.prototype.removeItemInternal = function(key, success, er
     this.updateSize(-this.sizeAvg, this.sizeAvg);
     var removeRequest = objectStore['delete'](key);
     transaction.onabort = function(event) {
-        error("IndexedDBStorageAdapter.removeItem: Transaction aborted: "+event.error);
+        error("IndexedDBStorageAdapter.removeItem: Transaction aborted: " + event.error);
     };
     removeRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
-        error("IndexedDBStorageAdapter.removeItem: Transaction failed: "+event.error);
+        error("IndexedDBStorageAdapter.removeItem: Transaction failed: " + event.error);
     };
 };
 
@@ -443,13 +502,13 @@ IndexedDBStorageAdapter.prototype.clearInternal = function(success, error) {
     //FIXME: probably should do an object here.
     objectStore.clear();
     transaction.onabort = function(event) {
-        error("IndexedDBStorageAdapter.clear: Transaction aborted: "+event.error);
+        error("IndexedDBStorageAdapter.clear: Transaction aborted: " + event.error);
     };
     transaction.oncomplete = function() {
         success();
     };
     transaction.onerror = function(event) {
-        error("IndexedDBStorageAdapter.clear: Transaction failed: "+event.error);
+        error("IndexedDBStorageAdapter.clear: Transaction failed: " + event.error);
     };
     this.setSize(0, 0);
 };
@@ -473,6 +532,7 @@ IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success,
         var transaction = this.db.transaction([this.tableName], "readwrite");
         var objectStore = transaction.objectStore(this.tableName);
         var index = objectStore.index("expires");
+        // FIXME: utilize bounds (range) with index
         var cursor = index.openCursor();
         var count = 0;
         var size = 0;
@@ -585,6 +645,10 @@ IndexedDBStorageAdapter.prototype.log = function (msg, obj) {
     }
 };
 
+/**
+ * Deletes the ENTIRE db which may contain tables belonging to other app/cmp
+ * @return {Promise} promise that deletes the entire database
+ */
 IndexedDBStorageAdapter.prototype.deleteStorage = function() {
     var that = this;
     var execute = function(success, error) {
@@ -610,7 +674,7 @@ IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, erro
     dbRequest.onblocked = function(event) {
         // Cannot error here because IE may come to this callback before success
         that.log("blocked from being deleted");
-    }; 
+    };
 };
 
 // Only register this adapter if the IndexedDB API is present

@@ -59,8 +59,10 @@
             var item = evt.getParam('value');
             this._rerenderDirtyElement(cmp, item);
         }
-
-        
+    },
+    ignorePTVChanges: function (cmp, ignore) {
+        cmp._ptv.sync = ignore;
+        cmp._ptv.ignoreChanges = ignore;
     },
     _initializeItemTemplate: function (cmpTemplate) {
         var container = document.createDocumentFragment();

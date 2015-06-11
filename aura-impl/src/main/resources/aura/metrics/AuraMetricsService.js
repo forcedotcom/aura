@@ -31,6 +31,7 @@ Aura.Services.MetricsService = function MetricsService(config) {
     this.beaconProviders           = {};
     this.transactions              = {};
     this.doneBootstrap             = false;
+    this.pluginsInitialized        = false;
     this.clearCompleteTransactions = true; // In PTEST Mode this is set to false (see initialize method)
 
     // #if {"excludeModes" : ["PRODUCTION"]}
@@ -130,6 +131,7 @@ Aura.Services.MetricsService.prototype.initializePlugins = function () {
     for (var plugin in this.registeredPlugins) {
         this.initializePlugin(plugin, this.registeredPlugins[plugin]);
     }
+    this.pluginsInitialized = true;
 };
 
 /**
@@ -659,6 +661,10 @@ Aura.Services.MetricsService.prototype.registerPlugin = function (pluginConfig) 
     var pluginName       = pluginConfig["name"],
         PluginContructor = pluginConfig["plugin"];
     this.registeredPlugins[pluginName] = PluginContructor;
+
+    if (this.pluginsInitialized) {
+        this.initializePlugin(pluginName, PluginContructor);
+    }
 };
 
 /**

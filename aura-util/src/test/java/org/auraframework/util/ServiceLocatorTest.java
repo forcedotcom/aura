@@ -19,8 +19,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator.ServiceLocatorException;
 import org.auraframework.util.sampleServices.AbstractService;
 import org.auraframework.util.sampleServices.AbstractServiceImpl;
@@ -50,6 +48,8 @@ import org.auraframework.util.sampleServices.SimpleService;
 import org.auraframework.util.sampleServices.SingleImplService;
 import org.auraframework.util.sampleServices.SingleImplServiceImplementation;
 import org.auraframework.util.sampleServices.UnimplementedService;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Unit tests for {@link ServiceLocator}.

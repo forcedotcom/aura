@@ -26,14 +26,14 @@ import org.auraframework.test.PooledRemoteWebDriverFactory;
 import org.auraframework.test.RemoteWebDriverFactory;
 import org.auraframework.test.SauceUtil;
 import org.auraframework.test.SeleniumServerLauncher;
-import org.auraframework.test.TestInventory;
 import org.auraframework.test.WebDriverProvider;
 import org.auraframework.test.configuration.JettyTestServletConfig;
 import org.auraframework.test.DefinitionServiceImplTest.AuraTestRegistryProviderWithNulls;
-import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
 import org.auraframework.util.ServiceLoaderImpl.PrimaryImpl;
+import org.auraframework.util.test.configuration.TestServletConfig;
+import org.auraframework.util.test.util.TestInventory;
 import org.openqa.selenium.net.PortProber;
 
 @AuraConfiguration

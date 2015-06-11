@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /** Test class for the from-jars-only variation of an AuraJavascriptGroup */
 public class CompiledGroupTest extends UnitTestCase {

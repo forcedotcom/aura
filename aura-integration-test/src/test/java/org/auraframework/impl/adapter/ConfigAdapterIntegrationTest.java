@@ -31,11 +31,11 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.ServiceLocatorMocker;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.resource.ResourceLoader;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

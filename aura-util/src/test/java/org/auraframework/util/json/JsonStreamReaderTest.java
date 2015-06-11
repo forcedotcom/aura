@@ -24,17 +24,16 @@ import java.io.Reader;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.IOUtil;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 import org.auraframework.util.json.JsonStreamReader.JsonStreamParseException;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;

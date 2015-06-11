@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
 /**

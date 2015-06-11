@@ -37,9 +37,9 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.auraframework.test.TestInventory;
-import org.auraframework.test.TestInventory.Type;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
 
 /*This class was made for the maven surefire plugin to use to run the Integration Tests
  The regular AuraIntegrationTests.java class was rewritten to allow the tests to be run in parallel.

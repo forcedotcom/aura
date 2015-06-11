@@ -38,12 +38,12 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Unit tests for {@link ClientLibraryServiceImpl}. Coverage should include {@link ClientLibraryResolverRegistryImpl},

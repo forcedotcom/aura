@@ -15,7 +15,7 @@
  */
 package org.auraframework.util.json;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.collect.ImmutableList;
 

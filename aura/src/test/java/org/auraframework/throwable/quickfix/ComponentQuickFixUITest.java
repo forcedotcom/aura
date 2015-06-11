@@ -16,7 +16,7 @@
 package org.auraframework.throwable.quickfix;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Quick fix testing for Components.

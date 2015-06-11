@@ -25,10 +25,10 @@ import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.AuraTestLabels;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.AuraTestLabels;
 
 /**
  * This test verifies that the aura servlet checks for CSRF token before

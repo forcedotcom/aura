@@ -27,7 +27,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
  * Tests for creating new markup bundles when you attempt to load a component that doesn't exist in the browser.

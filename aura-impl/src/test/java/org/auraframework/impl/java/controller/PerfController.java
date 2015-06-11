@@ -22,11 +22,11 @@ import java.util.logging.Logger;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.testsetrunner.TestSetRunnerState;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.util.UnitTestCase;
 
 @Controller
 public class PerfController {

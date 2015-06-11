@@ -42,11 +42,11 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

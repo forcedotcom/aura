@@ -15,7 +15,7 @@
  */
 package org.auraframework.test.performance;
 
-import org.auraframework.test.perf.metrics.PerfMetricsComparator;
+import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.json.JSONArray;
 
 public class PerfMetricsUtil {

@@ -30,9 +30,9 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.AuraTestLabels;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Automation to verify the functioning of AuraResourceServlet. AuraResourceServlet is used to preload definitions of

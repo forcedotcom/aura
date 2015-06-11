@@ -23,9 +23,9 @@ import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;

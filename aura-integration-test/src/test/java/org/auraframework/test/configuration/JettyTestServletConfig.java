@@ -30,6 +30,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.auraframework.Aura;
 import org.auraframework.test.AuraJettyServer;
+import org.auraframework.util.test.configuration.TestServletConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 

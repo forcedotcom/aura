@@ -22,11 +22,11 @@ import java.util.logging.Logger;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.auraframework.test.TestInventory;
-import org.auraframework.test.TestInventory.Type;
-import org.auraframework.test.annotation.PerfTestSuite;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.annotation.PerfTestSuite;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
 
 @UnAdaptableTest
 @PerfTestSuite

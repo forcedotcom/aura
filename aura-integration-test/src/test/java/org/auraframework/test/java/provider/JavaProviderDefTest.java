@@ -29,13 +29,13 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.Provider;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Ignore;
 
 import com.google.common.collect.Maps;

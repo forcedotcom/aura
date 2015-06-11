@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class GlobMatcherTest extends UnitTestCase {
     private static class GMTSet {

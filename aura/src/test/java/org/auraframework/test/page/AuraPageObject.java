@@ -23,7 +23,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.configuration.TestServletConfig;
+import org.auraframework.util.test.configuration.TestServletConfig;
 
 public abstract class AuraPageObject<T extends BaseComponentDef> implements PageObject {
     

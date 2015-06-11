@@ -20,9 +20,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.auraframework.def.ComponentDef;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.collect.Lists;
 

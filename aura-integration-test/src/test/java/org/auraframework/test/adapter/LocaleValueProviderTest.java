@@ -32,8 +32,8 @@ import org.auraframework.impl.adapter.LocaleValueProvider;
 import org.auraframework.impl.adapter.LocaleValueProvider.LocalizedLabel;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 @UnAdaptableTest
 public class LocaleValueProviderTest extends AuraImplTestCase {
 

@@ -18,9 +18,9 @@ package org.auraframework.def;
 import java.io.IOException;
 
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class DescriptorFilterTest extends UnitTestCase {
     public DescriptorFilterTest(String name) {

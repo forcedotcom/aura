@@ -17,7 +17,7 @@ package org.auraframework.http;
 
 import org.apache.http.HttpStatus;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.AuraTestLabels;
+import org.auraframework.util.test.annotation.AuraTestLabels;
 
 /**
  * Automation to verify the handling of urls by AuraRewriteFilter.

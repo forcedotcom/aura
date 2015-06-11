@@ -39,9 +39,9 @@ import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.annotation.IntegrationTest;
-import org.auraframework.test.configuration.TestServletConfig;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.annotation.IntegrationTest;
+import org.auraframework.util.test.configuration.TestServletConfig;
 
 /**
  * Base class for all Aura integration tests.

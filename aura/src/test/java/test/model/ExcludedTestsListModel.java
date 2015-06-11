@@ -29,7 +29,6 @@ import junit.framework.TestSuite;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.test.ComponentJSTestSuiteTest;
-import org.auraframework.test.TestInventory;
 import org.auraframework.test.WebDriverProvider;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil;
@@ -37,6 +36,7 @@ import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
+import org.auraframework.util.test.util.TestInventory;
 
 import com.google.common.collect.Lists;
 

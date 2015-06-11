@@ -35,7 +35,7 @@ import org.auraframework.def.ThemeDef;
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

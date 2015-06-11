@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 import org.auraframework.impl.util.AuraLocaleImpl;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Verify implementation of JavaLocalizedTypeUtil used to convert data from a

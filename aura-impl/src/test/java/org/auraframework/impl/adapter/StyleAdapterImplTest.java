@@ -26,8 +26,8 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.util.ServiceLoader;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 import com.salesforce.omakase.ast.declaration.Declaration;

@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.system.Location;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * expressiony test

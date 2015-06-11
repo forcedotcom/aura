@@ -18,7 +18,7 @@ package org.auraframework.impl.context;
 import java.lang.reflect.Field;
 
 import org.auraframework.impl.context.LoggingContextImpl.Timer;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class LoggingTimerTest extends UnitTestCase {
 

@@ -21,8 +21,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 
 /**

@@ -15,9 +15,9 @@
  */
 package configuration;
 
-import org.auraframework.test.TestInventory;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.util.test.util.TestInventory;
 
 /**
  */

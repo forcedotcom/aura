@@ -17,8 +17,8 @@ package org.auraframework.util.javascript;
 
 import java.util.List;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
 

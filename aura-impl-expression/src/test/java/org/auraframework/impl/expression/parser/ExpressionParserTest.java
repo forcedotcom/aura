@@ -21,9 +21,9 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.AuraImplExpressionTestCase;
 import org.auraframework.impl.expression.LiteralImpl;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Tests for the expression parser

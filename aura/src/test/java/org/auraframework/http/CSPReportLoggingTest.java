@@ -29,9 +29,9 @@ import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.adapter.TestLoggingAdapter;
-import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 
 import com.google.common.collect.Lists;

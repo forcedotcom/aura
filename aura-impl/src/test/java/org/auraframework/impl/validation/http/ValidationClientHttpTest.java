@@ -22,8 +22,8 @@ import java.net.URL;
 import java.util.List;
 
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.AuraFiles;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationClient;
 import org.auraframework.util.validation.ValidationTestUtil;
 

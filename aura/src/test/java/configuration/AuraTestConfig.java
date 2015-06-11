@@ -17,9 +17,9 @@ package configuration;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.impl.source.StringSourceLoader;
-import org.auraframework.test.TestInventory;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.util.test.util.TestInventory;
 
 /**
  */

@@ -16,11 +16,11 @@
 package org.auraframework.test.perf;
 
 import org.auraframework.test.SauceUtil;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
-import org.auraframework.test.perf.metrics.PerfMetrics;
-import org.auraframework.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
+import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.junit.Ignore;
 import org.openqa.selenium.By;
 

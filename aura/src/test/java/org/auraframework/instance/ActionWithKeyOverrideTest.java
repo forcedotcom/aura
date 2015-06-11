@@ -21,8 +21,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class ActionWithKeyOverrideTest extends UnitTestCase {
 

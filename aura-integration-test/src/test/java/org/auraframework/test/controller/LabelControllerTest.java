@@ -25,7 +25,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 import com.google.common.collect.Maps;
 

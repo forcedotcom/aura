@@ -17,7 +17,7 @@ package org.auraframework.test.perf.core;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.annotation.PerfCmpTest;
+import org.auraframework.util.test.annotation.PerfCmpTest;
 
 /**
  * Base class for Aura WebDriver tests.

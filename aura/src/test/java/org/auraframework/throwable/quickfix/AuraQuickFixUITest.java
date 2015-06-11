@@ -17,7 +17,7 @@ package org.auraframework.throwable.quickfix;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 
 /**

@@ -30,9 +30,9 @@ import java.util.TimeZone;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.util.AuraImplFiles;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.resource.FileGroup;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 import org.mockito.Mockito;
 

@@ -23,8 +23,8 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 public class DefDescriptorImplTest extends AuraImplTestCase {
 

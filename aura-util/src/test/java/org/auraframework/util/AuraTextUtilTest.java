@@ -18,7 +18,7 @@ package org.auraframework.util;
 import java.util.Arrays;
 import java.util.List;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class AuraTextUtilTest extends UnitTestCase {
     /**

@@ -15,7 +15,7 @@
  */
 package org.auraframework.util.type;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.type.TypeUtil.ConversionException;
 
 /**

@@ -17,8 +17,8 @@ package org.auraframework.test.perf.core;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.annotation.PerfCustomTest;
-import org.auraframework.test.perf.metrics.PerfMetricsComparator;
+import org.auraframework.util.test.annotation.PerfCustomTest;
+import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 

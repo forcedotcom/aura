@@ -84,21 +84,21 @@ Aura.OverrideMap = function OverrideMap() {
             function(bound) {
                 $A.clientService.decode = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 $A.clientService.decode = orig;
             }),
         "ClientService.send":new Aura.Utils.Override($A.clientService, $A.clientService.send, false,
             function(bound) {
                 $A.clientService.send = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 $A.clientService.send = orig;
             }),
         "ClientService.receive":new Aura.Utils.Override($A.clientService, $A.clientService.receive, false,
             function(bound) {
                 $A.clientService.receive = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 $A.clientService.receive = orig;
             }),
         "ClientService.getAvailableXHR":new Aura.Utils.Override($A.clientService, $A.clientService.getAvailableXHR,
@@ -106,21 +106,21 @@ Aura.OverrideMap = function OverrideMap() {
             function(bound) {
                 $A.clientService.getAvailableXHR = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 $A.clientService.getAvailableXHR = orig;
             }),
         "Action.finishAction":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.finishAction, true,
             function(bound) {
                 Aura.Controller.Action.prototype.finishAction = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 Aura.Controller.Action.prototype.finishAction = orig;
             }),
         "Action.abort":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.abort, true,
             function(bound) {
                 Aura.Controller.Action.prototype.abort = bound;
             },
-            function(orig, bound) {
+            function(orig) {
                 Aura.Controller.Action.prototype.abort = orig;
             })
     };

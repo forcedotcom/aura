@@ -211,7 +211,7 @@ Aura.Utils.Util.prototype.isUndefinedOrNull = function(obj){
  * @export
  */
 Aura.Utils.Util.prototype.isEmpty = function(obj){
-    return this.isUndefinedOrNull(obj) || obj === '' || (this.isArray(obj) && obj.length === 0) || (this.isObject(obj) && this.keys(obj).length === 0);
+    return obj === undefined || obj === null || obj === '' || (obj instanceof Array && obj.length === 0) || (obj instanceof Object && Object.keys(obj).length === 0);
 };
 
 /**

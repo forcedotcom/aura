@@ -83,6 +83,7 @@ function () {
             var me = this, config = config || {};
 
             return function(e) {
+                
                 if (!cmp.isValid()) {
                     return;
                 }
@@ -137,6 +138,7 @@ function () {
                 if (!panelCmp.isValid()) {
                     return;
                 }
+                
                 var event = e || window.event,
                     panelEl = panelCmp.getElement(),
                     target = event.target || event.srcElement;
@@ -187,6 +189,8 @@ function () {
                     animEl.removeEventListener(animEnd, finishHandler);
                 }
                 $A.util.addClass(panel, 'active');
+                
+                cmp.set('v.visible', true);
 
                 if (config.autoFocus) {
                     me.setFocus(cmp);
@@ -222,6 +226,8 @@ function () {
             if(useTransition) {
                 useTransition = this.validateAnimationName(animName);
             }
+            
+            cmp.set('v.visible', false);
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function (e) {
@@ -231,6 +237,8 @@ function () {
                 }
                 $A.util.removeClass(panel, 'open');
                 $A.util.removeClass(panel, 'active');
+
+                
 
                 config.onFinish && config.onFinish();
             };

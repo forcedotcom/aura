@@ -17,7 +17,7 @@
  */
 Function.RegisterNamespace("Test.Components.Ui.PanelPositioning");
 
-[Fixture,Skip("There's a disconnect between local and server files causing these to error.")]
+[Fixture]
 Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 	"use strict";
 	var targetHelper,
@@ -93,7 +93,7 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 
 			var actual = proxy.getNode();
 			
-			Assert.Equal(el, proxy.getNode());
+			Assert.Equal(expected, proxy.getNode());
 		}
 
 		[Fact]
@@ -172,6 +172,7 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 					left: "0px",
 					top: "0px"
 			});
+			
 			var proxy = new positioningNS.ElementProxy(el, "foo");
 			proxy.set("left", 314);
 

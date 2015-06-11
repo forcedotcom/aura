@@ -21,6 +21,7 @@
 
     show: function(cmp, callback) {
         var containerEl = cmp.getElement(),
+            autoFocus = $A.util.getBooleanValue(cmp.get('v.autoFocus')),
             panel = cmp.find('panel').getElement();
 
         this.mask(cmp);
@@ -29,9 +30,20 @@
             useTransition: $A.util.getBooleanValue(cmp.get('v.useTransition')),
             animationName: 'movefrom' + cmp.get('v.animation'),
             animationEl: panel,
-            autoFocus: $A.util.getBooleanValue(cmp.get('v.autoFocus')),
+            autoFocus: autoFocus,
             onFinish: function() {
                 $A.util.on(containerEl, 'keydown', cmp._windowKeyHandler);
+
+                // For modal panels if autofocus is false the close button
+                // should be focused.
+                // 
+                // 
+                if(!autoFocus) {
+                    var closeButton = containerEl.querySelector('.closeBtn');
+                    if(closeButton) {
+                        closeButton.focus();
+                    }
+                }
                 callback && callback();
             }
         });

@@ -31,9 +31,9 @@ function (constraint, elementProxyFactory) {
 
     var directionMap = {
         vert: {
-            top: 'south',
+            top: 'top',
             center: 'middle',
-            bottom: 'north'
+            bottom: 'bottom'
         },
 
         horiz: {

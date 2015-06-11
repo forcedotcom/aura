@@ -23,6 +23,9 @@ function(w) {
         },
         left: function(inp, targetBox, elementBox) {
             return inp;
+        },
+        bottom: function(inp, targetBox, elementBox) {
+            return inp + targetBox.height;
         }
     };
 
@@ -49,13 +52,30 @@ function(w) {
         if(conf.targetAlign) {
             targetAlign = conf.targetAlign.split(/\s/);
             this._transformX = transformFunctions[targetAlign[0]];
-            this._transformY = transformFunctions[targetAlign[1]];
+            this._transformY = transformFunctions[targetAlign[1]] ? transformFunctions[targetAlign[1]] : this._transformY;
         }
 
         var self = this;
         
         switch(type) {
 
+            case 'top':
+                this._exp = function(targetBox, elementBox) {
+
+                    return {
+                        top: self._transformY(targetBox.top, targetBox, elementBox) + pad
+                    };
+                };
+                break;
+
+            case 'bottom':
+                this._exp = function(targetBox, elementBox) {
+
+                    return {
+                        top: self._transformY(targetBox.top, targetBox, elementBox) - elementBox.height - pad
+                    }
+                }
+                break;
 
             case 'center' :
 
@@ -65,22 +85,6 @@ function(w) {
                         left: self._transformX(targetBox.left, targetBox, elementBox) - 0.5 * elementBox.width
                     };
                 };
-                break;
-            case 'north' : 
-                this._exp = function(targetBox, elementBox) {
-
-                    return {
-                        top: targetBox.top - elementBox.height - pad
-                    };
-                };
-                break;
-            case 'south' :
-
-                this._exp = function(targetBox, elementBox) {
-                    return {
-                        top: targetBox.bottom + pad
-                    }
-                }
                 break;
             case 'middle' :
                 this._exp = function(targetBox, elementBox) {
@@ -98,7 +102,9 @@ function(w) {
                 break;
 
             case 'right' :
+            
                 this._exp = function(targetBox, elementBox) {
+
                     return {
                         left: self._transformX(targetBox.left, targetBox, elementBox) - elementBox.width - pad
                     }
@@ -120,8 +126,9 @@ function(w) {
                 this._exp = function(targetBox, elementBox) {
                     var retBox = {};
 
-                    if(boxDirs.top &&  elementBox.top + window.scrollY < targetBox.top + window.scrollY + pad) {
-                        retBox.top = targetBox.top + window.scrollY + pad;
+                    if(boxDirs.top &&  elementBox.top  < targetBox.top + pad) {
+                        
+                        retBox.top = targetBox.top  + pad;
                     }
 
                     if(boxDirs.left && elementBox.left < targetBox.left + pad) {
@@ -174,8 +181,11 @@ function(w) {
      */
     Constraint.prototype.updateValues = function() {
         if(!this._disabled) {
+            
             this._targetElement.refresh();
+            
             this._pendingBox = this._exp(this._targetElement, this._el);
+            
         }
     }
 
@@ -183,6 +193,7 @@ function(w) {
      * Compute the new position
      */
     Constraint.prototype.reposition = function() {
+        
         var el = this._el;
         if(!this._disabled) {
             for(var val in this._pendingBox) {

@@ -54,7 +54,7 @@
              tabindex="-1"
 	     	 class="{! 'hidden panel panelDialog ' + $Browser.formFactor + ' ' + v.class}"
          	 role="dialog" 
-             aria-labeledby="{!'title_' + globalId}">
+             aria-labelledby="{!'title_' + globalId}">
              
 	        <div aura:id="content" role="document" class="{! v.body.length || v.detail ? 'headerAndBody' : 'headerOnly' }"> 
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>

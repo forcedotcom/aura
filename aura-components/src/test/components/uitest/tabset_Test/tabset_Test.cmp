@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-    <aura:attribute name="renderItem"      type="String" default="all"/>
+    <aura:attribute name="renderItem"      type="String" default="none"/>
     <aura:attribute name="lazyRender"      type="Boolean" default="true"/>
     <aura:attribute name="closable"        type="Boolean" default="false"/>
     <aura:attribute name="conditionalShow" type="Boolean" default="true"/>
@@ -43,7 +43,7 @@
 	                    tab 3 contents
 	            </ui:tab>
 	            <ui:tab title="Leads" closable="{!v.closable}">
-	                    tab 4 contents
+	                    <a href="#">tab 4 contents</a>
 	            </ui:tab>
 	            <ui:tab title="Chatter" active="true" aura:id="chatter" >
 	                    tab 5 contents
@@ -82,7 +82,6 @@
 	            <ui:button label="Activate By Index" press="{!c.activateTabByIndex}" aura:id="activateByIndex"/>
 	            <ui:button label="Active By Title"   press="{!c.activateTabByName}" aura:id="activateByName"/>
 	     </div>
-	     <br/>
     </aura:if>
     
     <aura:if isTrue="{! v.renderItem == 'nestedTabs' || v.renderItem == 'all'}">
@@ -104,7 +103,6 @@
 		        </ui:tab>
 		    </ui:tabset>
 	    </div>
-	    <br/>
     </aura:if>
      <aura:if isTrue="{! v.renderItem == 'noTabs'}">
 	    <div class="block">    
@@ -112,7 +110,6 @@
 	        <ui:tabset aura:id="noTabsTabSet" class="tabset1" lazyRenderTabs="{!true}">
 	        </ui:tabset>
 	    </div>
-	    <br/>
     </aura:if>
     <aura:if isTrue="{! v.renderItem == 'tab' || v.renderItem == 'all'}">
 	    <div class="block">    
@@ -126,13 +123,48 @@
 	            </ui:tab> 
 	        </uitest:tabset_extendsTest>
 	        
+	        <ui:inputTextArea aura:id="inputTabContent"  class="inputTabContent" placeholder="content" />
 	    </div>
-	    <ui:inputTextArea aura:id="inputTabContent"  class="inputTabContent" placeholder="content" />
-     </aura:if>
-    
-    
-    
-    
-    
-    
+     </aura:if>  
+
+
+
+	<aura:if isTrue="{! v.renderItem == 'tab_lazyCustomTab'}">
+		<div class="block">
+			<h1>tab_lazyCustomTab</h1>
+			<uitest:tabset_extendsTest aura:id="tabset_lazyLoading" class="tabset" lazyRenderTabs="true">
+				<uitest:tab_lazyCustomTab aura:id="lazytab1" title="Tab 1">Tab 1 Content</uitest:tab_lazyCustomTab>
+				<uitest:tab_lazyCustomTab aura:id="lazytab2" title="Tab 2" active="true">Tab 2 Content</uitest:tab_lazyCustomTab>
+				<uitest:tab_lazyCustomTab aura:id="lazytab3" title="Tab 3">Tab 3 Content</uitest:tab_lazyCustomTab>
+			</uitest:tabset_extendsTest>
+		</div>
+	</aura:if>
+	
+	<!---extra data-->
+	<div class="extraFooter">
+		<div>
+			<h2>Test Variables</h2>
+			<div>
+				<div><b>renderItem:</b> {!v.renderItem}</div>
+				<div><b>lazyRender:</b> {!v.lazyRender}</div>
+				<div><b>closable:</b> {!v.closable}</div>
+				<div><b>conditionalShow:</b> {!v.conditionalShow}</div>
+			</div>
+		</div>
+		<aura:if isTrue="{! v.renderItem == 'none'}">
+		<div style="margin-top:15px;">
+			<h2>Missing Attribute</h2>
+			<div>
+				Please set renderItem attribute to be, choose the following<br /><br />
+				<ul>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=basic">basic</a></li>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=nestedTabs">nestedTabs</a></li>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=noTabs">noTabs</a></li>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=tab">tab</a></li>
+					<li><a href="/uitest/tabset_Test.cmp?renderItem=tab_lazyCustomTab">tab_lazyCustomTab</a></li>
+				</ul>
+			</div>
+		</div>
+		</aura:if>
+	</div>
 </aura:component>

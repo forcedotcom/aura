@@ -1,0 +1,9 @@
+<aura:component extends="ui:tab">
+	<aura:attribute name="rendered" type="Boolean" default="false"/>
+	<section aura:id="tabBody"  role="tabpanel">
+		<div>
+			<b>rendered:</b> {!v.rendered}
+		</div>
+        {!v.body}
+    </section>
+</aura:component>

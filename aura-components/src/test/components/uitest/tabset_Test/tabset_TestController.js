@@ -53,5 +53,4 @@
         var e = cmp.find('tabset2').get("e.activateTab");
         e.setParams({"index": 6}).fire();
     }
-    
 })

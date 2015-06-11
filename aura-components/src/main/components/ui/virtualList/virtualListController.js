@@ -27,9 +27,13 @@
         cmp._initializing = false;
     },
     handleItemsChange: function (cmp, event, helper) {
+        helper.ignorePTVChanges(cmp, true);
+
         helper.markClean(cmp, 'v.items');
         helper.createVirtualList(cmp);
-        helper.markDirty(cmp); // So we go into the rerender
+        helper.markDirty(cmp); 
+        
+        helper.ignorePTVChanges(cmp, false);
     },
     /** This function gets call as the "callback" from the dataProvider */
     handleDataChange: function(cmp, evt, helper) {

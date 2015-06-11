@@ -19,47 +19,47 @@
   /**************************************************HELPER FUNCTIONS**************************************************/
   
   compareArray: function(arr1, arr2, errorMessage) {
-	  $A.test.assertEquals(arr1.length, arr2.length, errorMessage);
-	  for (var i = 0; i < arr1.length; i++) {
-		  $A.test.assertEquals(JSON.stringify(arr1[i]), JSON.stringify(arr2[i]),errorMessage)
-	  }
+      $A.test.assertEquals(arr1.length, arr2.length, errorMessage);
+      for (var i = 0; i < arr1.length; i++) {
+          $A.test.assertEquals(JSON.stringify(arr1[i]), JSON.stringify(arr2[i]),errorMessage)
+      }
   },
   
   getRenderedRows : function(cmp) {
-	  var tbody = this.getRenderedItems();
-	  var rows = [];
-	  for (var j = 0; j < tbody.length; j++) {
-		  var row = {};
-		  row["_id"] = parseInt(this.getItemRenderedValue(tbody[j], "id"));
-		  
-		  row["index"] = parseInt(this.getItemRenderedValue(tbody[j], "index"));
-		  row["balance"] = parseInt(this.getItemRenderedValue(tbody[j], "balance"));
-		  row["name"] = this.getItemRenderedValue(tbody[j], "name");
-		  row["friends"] = [];
-		  for (var k = 0; k < 3; k++) {
-			  row["friends"][k] = {};
-			  row["friends"][k]["id"] = k;
-			  row["friends"][k]["name"] = $A.test.getText(tbody[j].getElementsByTagName("li")[k]);
-		  }
-		  rows.push(row);
-	  }
-	  return rows;
+      var tbody = this.getRenderedItems();
+      var rows = [];
+      for (var j = 0; j < tbody.length; j++) {
+          var row = {};
+          row["_id"] = parseInt(this.getItemRenderedValue(tbody[j], "id"));
+          
+          row["index"] = parseInt(this.getItemRenderedValue(tbody[j], "index"));
+          row["balance"] = parseInt(this.getItemRenderedValue(tbody[j], "balance"));
+          row["name"] = this.getItemRenderedValue(tbody[j], "name");
+          row["friends"] = [];
+          for (var k = 0; k < 3; k++) {
+              row["friends"][k] = {};
+              row["friends"][k]["id"] = k;
+              row["friends"][k]["name"] = $A.test.getText(tbody[j].getElementsByTagName("li")[k]);
+          }
+          rows.push(row);
+      }
+      return rows;
   },
   
   getRenderedItems: function(){
-	  return $A.test.select(".item");
+      return $A.test.select(".item");
   },
   
   getItemRenderedValue : function(element, columnName){
-	  return $A.test.getText(element.getElementsByClassName(columnName)[0].getElementsByTagName("span")[0]);
+      return $A.test.getText(element.getElementsByClassName(columnName)[0].getElementsByTagName("span")[0]);
   },
   
-  getInfoButton : function(itemNumber){
-	  return $A.test.select(".showItemInfo")[itemNumber-1];
+  getInfoButton : function(rowNumber){
+      return $A.test.select(".showItemInfo")[rowNumber-1];
   },
   
-  getChangeNameButton : function(itemNumber){
-	  return $A.test.select(".changeNameButton")[itemNumber-1];
+  getChangeNameButton : function(rowNumber){
+      return $A.test.select(".changeNameButton")[rowNumber-1];
   },
   
   
@@ -67,73 +67,116 @@
   /**************************************************HELPER FUNCTIONS END**************************************************/
   
   testVirtualListRenderedCorrectly : {
-	  test :function(cmp) {
-			  // test initial state
-			  var initialData = cmp.find("list").get("v.items");
-			  var renderedData = this.getRenderedRows(cmp);
-			  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
-		  }
+      test :function(cmp) {
+              // test initial state
+              var initialData = cmp.find("list").get("v.items");
+              var renderedData = this.getRenderedRows(cmp);
+              this.compareArray(initialData, renderedData, "The virtualList rendered data correctly");
+          }
   },
   
   /**
+   * Switching data provider renders virtualList correctly.
    * Bug: W-2620483
    */
-  _testSwappingItemsOnVirtualListRendersCorrectly : {
-	  test : [function(cmp){
-		  // test initial state
-		  var initialData = cmp.find("list").get("v.items");
-		  var renderedData = this.getRenderedRows(cmp);
-		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
-	  }, function(cmp) {
-		  emptyDataButton = $A.test.select(".kitchenButtonEmptyData")[0];
-		  $A.test.clickOrTouch(emptyDataButton);
-	  }, function(cmp) {
-		  $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
-	  }, function(cmp) {
-		  emptyDataButton = $A.test.select(".kitchenButton")[0];
-		  $A.test.clickOrTouch(emptyDataButton);
-	  }, function(cmp) {
-		  var initialData = cmp.find("list").get("v.items");
-		  var renderedData = this.getRenderedRows(cmp);
-		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
-    }]
+  testSwapRowsOnVirtualListReRendersCorrectly : {
+      test : [function(cmp){
+          // test initial state
+          var initialData = cmp.find("list").get("v.items");
+          var renderedData = this.getRenderedRows(cmp);
+          this.compareArray(initialData, renderedData, "The virtualList rendered data correctly");
+      }, function(cmp) {
+          emptyDataButton = $A.test.select(".kitchenButtonEmptyData")[0];
+          $A.test.clickOrTouch(emptyDataButton);
+      }, function(cmp) {
+          $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+      }, function(cmp) {
+          emptyDataButton = $A.test.select(".kitchenButton")[0];
+          $A.test.clickOrTouch(emptyDataButton);
+      }, function(cmp) {
+          var initialData = cmp.find("list").get("v.items");
+          var renderedData = this.getRenderedRows(cmp);
+          this.compareArray(initialData, renderedData, "The virtualList re-rendered data correctly");
+      }, function(cmp) {
+          emptyDataButton = $A.test.select(".kitchenButtonEmptyData")[0];
+          $A.test.clickOrTouch(emptyDataButton);
+      }, function(cmp) {
+          $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+      }]
   },
   
   /**
    * Verify Virtual List works with large Number of Items
    */
   testWithLargeData : {
-  	  attributes : {"pageSize" : 3000},
+      attributes : {"pageSize" : 3000},
       test : function(cmp){
-    	  var initialData = cmp.find("list").get("v.items");
-		  var renderedData = this.getRenderedRows(cmp);
-		  this.compareArray(initialData, renderedData, "The grid's rendered data don't match its data model");
-	  }
-  },
-  
-  /**
-   * Test verifying that when there is no data present dataGrid does not fail
-   */
-  testNoDataPresent : {
-	  attributes : {"pageSize" : 0},
-      test : function(cmp){
-    	  $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+          var initialData = cmp.find("list").get("v.items");
+          var renderedData = this.getRenderedRows(cmp);
+          this.compareArray(initialData, renderedData, "The virtualList rendered data correctly");
       }
   },
   
   /**
    * Test verifying that when there is no data present dataGrid does not fail
    */
-  _testActionOnItem : {
-	  test : [function(cmp){
-		  var initialData = cmp.find("list").get("v.items");
-		  var renderedData = this.getRenderedRows(cmp);
-		  var changeNameBtn = this.getChangeNameButton(1);
-		  $A.test.clickOrTouch(changeNameBtn);
-	}, function(cmp) {
-		  expectedString = "Expected Name Change";
-		  $A.test.addWaitForWithFailureMessage(true, function(){return $A.test.contains($A.test.getText($A.test.select(".expectedNameChange")[0]), expectedString);}, "Name should be changed");
-	}]
+  testNoDataPresent : {
+      attributes : {"pageSize" : 0},
+      test : function(cmp){
+          $A.test.assertFalsy(this.getRenderedItems().length, "There should be no Items in the virtual List")
+      }
   },
-
+  
+  /**
+   * Test verifying that when there is no data present dataGrid does not fail
+   */
+  testActionOnItem : {
+      test : [function(cmp){
+            initialData = cmp.find("list").get("v.items");
+            initialRenderedData = this.getRenderedRows(cmp);
+            rowNumber = 10;
+            var changeNameBtn = this.getChangeNameButton(rowNumber);
+            $A.test.clickOrTouch(changeNameBtn);
+      }, function(cmp) {
+	    	expectedString = "Expected Name Change";
+	    	expectedName = $A.test.getText($A.test.select(".expectedNameChange")[rowNumber-1]);
+	    	$A.test.addWaitForWithFailureMessage(true, function(){return $A.test.contains(expectedName, expectedString);}, "Name should be changed");
+	    	$A.test.assertTrue($A.test.contains(expectedName, initialData[rowNumber-1].name), "Name is not changed correcly for Row "+ rowNumber);
+    	  	var renderedData = this.getRenderedRows(cmp);
+            this.compareArray(initialData, renderedData, "The virtualList rendered data correctly after Row "+ rowNumber +" was changed");
+            initialRenderedData.splice(rowNumber-1, 1);
+            renderedData.splice(rowNumber-1, 1);
+            this.compareArray(initialRenderedData, renderedData, "The virtualList did not render data correctly  after Row "+ rowNumber +" was changed");
+            rowNumber = 25;
+            var changeNameBtn = this.getChangeNameButton(rowNumber);
+            $A.test.clickOrTouch(changeNameBtn);
+      }, function(cmp) {
+            expectedName = $A.test.getText($A.test.select(".expectedNameChange")[rowNumber-1]);
+	    	$A.test.addWaitForWithFailureMessage(true, function(){return $A.test.contains(expectedName, expectedString);}, "Name should be changed");
+	    	$A.test.assertTrue($A.test.contains(expectedName, initialData[rowNumber-1].name), "Name is not changed correcly for Row "+ rowNumber);
+    	  	var renderedData = this.getRenderedRows(cmp);
+            this.compareArray(initialData, renderedData, "The virtualList rendered data correctly after Row "+ rowNumber +" was changed");
+      }]
+  },
+  
+  /**
+   * Verify Child cmp handles change event correctly
+   */
+  testActionOnChildCmpRendersInfoCorrectly : {
+      test : [function(cmp){
+            initialData = cmp.find("list").get("v.items");
+            initialRenderedData = this.getRenderedRows(cmp);
+            rowNumber = 1;
+      	  	var infoBtn = this.getInfoButton(rowNumber);
+      	  	$A.test.clickOrTouch(infoBtn);
+      }, function(cmp) {
+          var changeNameBtn = this.getChangeNameButton(rowNumber);
+          $A.test.clickOrTouch(changeNameBtn);
+      }, function(cmp) {
+	    	expectedString = "Expected Name Change";
+	    	expectedInfo = JSON.stringify(initialRenderedData[rowNumber-1]);
+	    	actualInfo = $A.test.getText($A.test.select(".outputItemInfo")[rowNumber-1]);
+	    	$A.test.assertEquals(expectedInfo, actualInfo, "Action from Child Cmp did not update the info for Row " + rowNumber);
+      }]
+  }
 })

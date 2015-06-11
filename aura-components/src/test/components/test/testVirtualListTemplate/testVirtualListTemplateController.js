@@ -28,7 +28,7 @@
             'Counter: ' + cmp.get('v.counter'),
             'Friends: \n\t' + cmp.get('v.friends').map(function(i){return i.name;}).join('\n\t')
         ].join('\n'));*/
-        cmp.find("outputItemInfo").set("v.value", "ItemClicked: "+JSON.stringify(itemClicked));
+        cmp.find("outputItemInfo").set("v.value", JSON.stringify(itemClicked));
     },
     count: function (cmp, evt, helper) {
         var elmt = cmp.getElement();

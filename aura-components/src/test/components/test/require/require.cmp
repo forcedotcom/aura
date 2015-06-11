@@ -16,13 +16,6 @@
 
 -->
 <aura:component>
-    <aura:attribute type="String" name="requestVersion"/>
-
-    <aura:if isTrue="{!'2.0' == version}">
-        <aura:text aura:id="versionInExp" value="2.0"/>
-    </aura:if>
-
-    <aura:method name="version" action="{!c.getVersionInCntlr}"/>
-    <aura:method name="versionByValProvider" action="{!c.getVersionByValProvider}"/>
-    <aura:method name="versionInExpression" action="{!c.getVersionInExpression}"/>
+    <aura:attribute type="String" name="requestVersion" default="default"/>
+    <aura:method name="version" action="{!c.version}"/>
 </aura:component>

@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:attribute type="String" name="requestVersion" default="default"/>
+    <aura:method name="version" action="{!c.version}"/>
+</aura:component>

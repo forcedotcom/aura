@@ -16,13 +16,10 @@
 
 -->
 <aura:component>
-    <aura:attribute type="String" name="requestVersion"/>
+    <aura:attribute type="Aura.Component" name="cmp"/>
+    <aura:attribute type="String" name="requestVersionInChild" default="default"/>
 
-    <aura:if isTrue="{!'2.0' == version}">
-        <aura:text aura:id="versionInExp" value="2.0"/>
-    </aura:if>
+    <aura:method name="versionInChild" action="{!c.getVersionInChildCmp}"/>
 
-    <aura:method name="version" action="{!c.getVersionInCntlr}"/>
-    <aura:method name="versionByValProvider" action="{!c.getVersionByValProvider}"/>
-    <aura:method name="versionInExpression" action="{!c.getVersionInExpression}"/>
+    <aura:require namespace="componentTest" version="1.5"/>
 </aura:component>

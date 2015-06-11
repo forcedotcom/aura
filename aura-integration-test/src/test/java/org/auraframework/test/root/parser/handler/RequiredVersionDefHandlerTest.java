@@ -26,13 +26,14 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
     public RequiredVersionDefHandlerTest(String name) {
         super(name);
     }
-    
+
     public void testRequiredVersionPositiveCase() throws Exception {
         String markup = "<aura:require namespace='auratest' version='1.0'/>";
         DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-        desc.getDef();
+
+        assertEquals("1.0", desc.getDef().getRequiredVersion("auratest").getVersion());
     }
-    
+
     //test when namespace is missing, same thing apply to version
     public void testRequiredVersionMissNamespace() throws Exception {
         String markup = "<aura:require version='1.0'/>";
@@ -45,7 +46,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
                     "Attribute 'namespace' and 'version' are required on <aura:require>");
         }
     }
-    
+
     //test when namespace is empty, samething apply to version
     public void testRequiredVersionEmptyNamespace() throws Exception {
         String markup = "<aura:require namespace='' version='1.0'/>";
@@ -58,7 +59,7 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
                     "Attribute 'namespace' and 'version' are required on <aura:require>");
         }
     }
-    
+
     //test when version is missing, same thing apply to version
     public void testRequiredVersionMissVersion() throws Exception {
         String markup = "<aura:require namespace='auratest'/>";
@@ -71,26 +72,51 @@ public class RequiredVersionDefHandlerTest extends AuraImplTestCase {
                         "Attribute 'namespace' and 'version' are required on <aura:require>");
         }
     }
-        
-        //test when version is empty, samething apply to version
+
+    //test when version is empty, samething apply to version
     public void testRequiredVersionEmptyVersion() throws Exception {
         String markup = "<aura:require namespace='auratest' version=''/>";
         try {
-                DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
-                desc.getDef();
-                fail("we are suppose to error out when version is empty");
+            DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
+            desc.getDef();
+            fail("we are suppose to error out when version is empty");
         } catch (Exception e) {
                 checkExceptionContains(e, InvalidDefinitionException.class,
                         "Attribute 'namespace' and 'version' are required on <aura:require>");
         }
     }
-    
+
+    // test when same namespace is required multi times in one component
+    public void testRequireDefineSameNamespaceMutliTimes() throws Exception {
+        String markup = "<aura:require namespace='auratest' version='1.0'/>" +
+                        "<aura:require namespace='auratest' version='2.0'/>";
+        try {
+            DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
+            desc.getDef();
+            fail("It should error out when aura:require is defined multi times in one component.");
+        } catch (Exception e) {
+                checkExceptionContains(e, InvalidDefinitionException.class,
+                        "There is already a namespace 'auratest' on component");
+        }
+    }
+
+    public void testRequireDefineMutliNamespaces() throws Exception {
+        String markup = "<aura:require namespace='auratest' version='1.0'/>" +
+                        "<aura:require namespace='test' version='2.0'/>";
+
+        DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
+ 
+        assertEquals(2, desc.getDef().getRequiredVersionDefs().size());
+        assertEquals("1.0", desc.getDef().getRequiredVersion("auratest").getVersion());
+        assertEquals("2.0", desc.getDef().getRequiredVersion("test").getVersion());
+    }
+
     //test when namespace doesn't exsit -- there is currently no check for that.
     //if we decide to do the verification on server side, enable this test
     //if we decide to the check on client side, remove this one, write a UI test, or add a component JS test.
     public void _testRequiredVersionInvalidNamespace() throws Exception {
         String markup = "<aura:require namespace='I do not exist' version='1.0'/>";
-        try { 
+        try {
             DefDescriptor<ComponentDef> desc = getSimpleCmpDesc(markup);
             desc.getDef();
             fail("we should error out when namespace doesn't exist");

@@ -15,20 +15,9 @@
  */
 
 ({
-    testAuraRequireHasNamespaceAndVersion: {
-        test: [function(cmp) {
-            var version = cmp.getVersion();
-            if (version) {
-                $A.test.assertEquals("1.0", version);
-            }
-        }]
-    },
-
-    testVersionExpression: {
-        test: [function(cmp) {
-            var target = cmp.find('testbtn');
-            $A.test.assertEquals("", target.getElement().textContent);
-        }]
+    version: function(cmp) {
+        var version = cmp.getVersion();
+        cmp.set("v.requestVersion", version);
     }
 })
 

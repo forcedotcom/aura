@@ -15,14 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute type="String" name="requestVersion"/>
-
-    <aura:if isTrue="{!'2.0' == version}">
-        <aura:text aura:id="versionInExp" value="2.0"/>
-    </aura:if>
-
-    <aura:method name="version" action="{!c.getVersionInCntlr}"/>
-    <aura:method name="versionByValProvider" action="{!c.getVersionByValProvider}"/>
-    <aura:method name="versionInExpression" action="{!c.getVersionInExpression}"/>
+<aura:component extensible="true">
+    <aura:attribute type="String" name="requestVersionInSuper" default="default"/>
+    {!v.body}
 </aura:component>

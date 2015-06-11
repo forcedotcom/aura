@@ -47,11 +47,11 @@ public class JSTestCaseModel {
         TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");
         
         String baseUrl = component.getAttributes().getValue("url").toString();
-        Set<Entry<String, Object>> attributes = caseDef.getAttributeValues().entrySet();
+        Map<String, Object> attributes = caseDef.getAttributeValues();
         List<NameValuePair> newParams = Lists.newArrayList();
         String hash = "";
-        if (!attributes.isEmpty()) {
-            for (Entry<String, Object> entry : attributes) {
+        if (!(attributes == null || attributes.isEmpty())) {
+            for (Entry<String, Object> entry : attributes.entrySet()) {
                 String key = entry.getKey();
                 String value;
                 if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {

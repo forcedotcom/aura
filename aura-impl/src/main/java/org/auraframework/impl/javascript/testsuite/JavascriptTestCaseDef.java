@@ -44,7 +44,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         super(DefDescriptorImpl.getInstance(suiteDescriptor.getQualifiedName() + "/" + DefType.TESTCASE + "$" + name,
                 TestCaseDef.class), location, null);
         this.suiteDescriptor = suiteDescriptor;
-        this.attributes = AuraUtil.immutableMap(attributes);
+        this.attributes = attributes == null ? null : AuraUtil.immutableMap(attributes);
         this.defType = defType;
         this.testLabels = AuraUtil.immutableSet(testLabels);
         this.browsers = AuraUtil.immutableSet(browsers);

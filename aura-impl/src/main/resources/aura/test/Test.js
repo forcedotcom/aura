@@ -1444,23 +1444,45 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
     if(this.inProgress >= 0){
         return;
     }
-    this.install();
-
-    var that = this;
     this.inProgress = 2;
-    if(!timeoutOverride) {
-        timeoutOverride = 10;
-    }
-    this.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
 
-    this.cmp = $A.getRoot();
-    this.suite = aura.util.json.decode(code);
     if (quickFixException) {
         this.logError(quickFixException);
         this.doTearDown();
         return;
     }
 
+    this.install();
+
+    if(!timeoutOverride) {
+        timeoutOverride = 10;
+    }
+    this.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
+
+    if (typeof code === "string") {
+        this.suite = aura.util.json.decode(code);
+    } else {
+        this.suite = code;
+    }
+
+    var that = this;
+    var checkForTarget = function() {
+        if ($A.getRoot()) {
+            that.runInternal(name);
+            return;
+        }
+        setTimeout(checkForTarget, 50);
+    };
+    checkForTarget();
+};
+
+/**
+ * @private
+ */
+TestInstance.prototype.runInternal = function(name) {
+    var that = this;
+
+    this.cmp = $A.getRoot();
     var useLabel = function(labelName){
         var suiteLevel = that.suite[labelName] || false;
         var testLevel = that.suite[name][labelName];

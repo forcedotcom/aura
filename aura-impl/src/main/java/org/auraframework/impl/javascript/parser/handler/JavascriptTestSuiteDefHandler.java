@@ -58,14 +58,14 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         builder.code = source.getContents();
     }
 
-    private void putMocks(Map<String,Object> mocksMap, List<Object> mocks) {
+    private void putMocks(Map<String, Object> mocksMap, List<Object> mocks) {
         if (mocks == null) {
             return;
         }
         for (Object obj : mocks) {
             @SuppressWarnings("unchecked")
-            Map<String,Object> mock = (Map<String,Object>)obj;
-            mocksMap.put((String)mock.get("type") + "@@@" + (String)mock.get("descriptor"), mock);
+            Map<String, Object> mock = (Map<String, Object>) obj;
+            mocksMap.put((String) mock.get("type") + "@@@" + (String) mock.get("descriptor"), mock);
         }
     }
 
@@ -84,7 +84,7 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         List<String> suiteLabels = (List<String>) map.get("labels");
         String suiteScrumTeam = (String) map.get("scrumTeam");
         String suiteOwner = (String) map.get("owner");
-        
+
         List<String> suiteBrowsers = (List<String>) (List<?>) map.get("browsers");
         // Verify that we can parse.
         List<Object> suiteMocks = (List<Object>) map.get("mocks");
@@ -111,12 +111,16 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 }
 
                 Map<String, Object> caseAttributes = (Map<String, Object>) value.get("attributes");
-                Map<String, Object> attributes = Maps.newHashMap();
+                Map<String, Object> attributes = null;
                 if (suiteAttributes != null) {
-                    attributes.putAll(suiteAttributes);
+                    attributes = Maps.newHashMap(suiteAttributes);
                 }
                 if (caseAttributes != null) {
-                    attributes.putAll(caseAttributes);
+                    if (attributes == null) {
+                        attributes = Maps.newHashMap(caseAttributes);
+                    } else {
+                        attributes.putAll(caseAttributes);
+                    }
                 }
 
                 List<String> caseLabels = (List<String>) (List<?>) value.get("labels");
@@ -127,20 +131,20 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
                 if (caseLabels != null) {
                     labels.addAll(caseLabels);
                 }
-                
+
                 String caseScrumTeam = (String) value.get("scrumTeam");
                 String caseOwner = (String) value.get("owner");
                 String scrumTeam = "";
                 String owner = "";
-                
-                //For scrumTeam
+
+                // For scrumTeam
                 if (!Strings.isNullOrEmpty(suiteScrumTeam)) {
                     scrumTeam = suiteScrumTeam;
                 }
                 if (!Strings.isNullOrEmpty(caseScrumTeam)) {
                     scrumTeam = caseScrumTeam;
                 }
-                //For Owner
+                // For Owner
                 if (!Strings.isNullOrEmpty(suiteOwner)) {
                     owner = suiteOwner;
                 }

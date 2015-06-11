@@ -15,10 +15,13 @@
  */
 /*jslint sub:true */
 
+/**
+ * @private
+ */
 TestInstance.prototype.putMessage = function(pre, expected, msg) {
-	if (typeof msg !== "string") {
-		msg = ""+msg;
-	}
+    if (typeof msg !== "string") {
+        msg = "" + msg;
+    }
     for (var i = 0; i < expected.length; i++) {
         if (expected[i] === undefined) {
             continue;
@@ -35,6 +38,9 @@ TestInstance.prototype.putMessage = function(pre, expected, msg) {
     return false;
 };
 
+/**
+ * @private
+ */
 TestInstance.prototype.expectMessage = function(pre, expected, msg) {
     if (pre !== null) {
         for (var i = 0; i < pre.length; i++) {
@@ -53,8 +59,8 @@ TestInstance.prototype.expectMessage = function(pre, expected, msg) {
 /**
  * Set any common entries in the two arrays to undefined.
  * 
- * This is used to compare two arrays of error messages, leaving only unexpected errors received (in the pre array)
- * and expected errors not received (in the expected array).
+ * This is used to compare two arrays of error messages, leaving only unexpected errors received (in the pre array) and
+ * expected errors not received (in the expected array).
  * 
  * @private
  */
@@ -72,24 +78,29 @@ TestInstance.prototype.clearExpected = function(pre, expected) {
 
 /**
  * Register a global error handler to catch uncaught javascript errors.
+ * 
  * @ignore
  */
-window.onerror = (function(){
+window.onerror = (function() {
     var origHandler = window.onerror;
     /** @inner */
-    var newHandler = function(msg, url, line){
-        var error = { message: "Uncaught js error: " + msg };
-        if(url){
+    var newHandler = function(msg, url, line) {
+        var error = {
+            message : "Uncaught js error: " + msg
+        };
+        if (url) {
             error["url"] = url;
         }
-        if(line){
+        if (line) {
             error["line"] = line;
         }
         TestInstance.prototype.errors.push(error);
     };
 
-    if(origHandler) {
-        return function(){ return origHandler.apply(this, arguments) || newHandler.apply(this, arguments); };
+    if (origHandler) {
+        return function() {
+            return origHandler.apply(this, arguments) || newHandler.apply(this, arguments);
+        };
     } else {
         return newHandler;
     }
@@ -97,23 +108,28 @@ window.onerror = (function(){
 
 /**
  * Used to keep track of errors happening in test modes.
+ * 
  * @private
  */
-TestInstance.prototype.logError = function(msg, e){
+TestInstance.prototype.logError = function(msg, e) {
     var errors = TestInstance.prototype.errors;
     var err;
     var p, i;
 
     if (e) {
-        err = { "message": msg + ": " + (e.message || e.toString()) };
-        for (p in e){
-            if(p=="message"){
+        err = {
+            "message" : msg + ": " + (e.message || e.toString())
+        };
+        for (p in e) {
+            if (p == "message") {
                 continue;
             }
             err[p] = "" + e[p];
         }
     } else {
-        err = { "message": msg };
+        err = {
+            "message" : msg
+        };
     }
 
     // Don't add duplicate entries
@@ -130,7 +146,7 @@ TestInstance.prototype.logError = function(msg, e){
 
 /**
  * Tear down a test.
- *
+ * 
  * @private
  */
 TestInstance.prototype.doTearDown = function() {
@@ -138,20 +154,20 @@ TestInstance.prototype.doTearDown = function() {
     var that = this;
 
     // check if already tearing down
-    if(this.inProgress > 1){
+    if (this.inProgress > 1) {
         this.inProgress = 1;
-    }else {
+    } else {
         return;
     }
     try {
         for (i = 0; i < this.cleanups.length; i++) {
             this.cleanups[i]();
         }
-    } catch(ce){
+    } catch (ce) {
         this.logError("Error during cleanup", ce);
     }
-    try{
-        if(this.suite["tearDown"]){
+    try {
+        if (this.suite["tearDown"]) {
             if (this.doNotWrapInAuraRun) {
                 this.suite["tearDown"].call(this.suite, this.cmp);
             } else {
@@ -160,13 +176,18 @@ TestInstance.prototype.doTearDown = function() {
                 });
             }
         }
-        setTimeout(function(){that.inProgress--;}, 100);
-    }catch(e){
+        setTimeout(function() {
+            that.inProgress--;
+        }, 100);
+    } catch (e) {
         this.logError("Error during tearDown", e);
         this.inProgress = 0;
     }
 };
 
+/**
+ * @private
+ */
 TestInstance.prototype.logErrors = function(error, label, errorArray) {
     var i;
 
@@ -174,72 +195,73 @@ TestInstance.prototype.logErrors = function(error, label, errorArray) {
         for (i = 0; i < errorArray.length; i++) {
             if (errorArray[i] !== undefined) {
                 if (error) {
-                    this.logError(label+errorArray[i]);
+                    this.logError(label + errorArray[i]);
                 } else {
-                    $A.log(label+errorArray[i]);
+                    $A.log(label + errorArray[i]);
                 }
             }
         }
     }
 };
-    
+
 /**
  * Periodic callback to handle continuing operations.
- *
+ * 
  * @private
  */
 TestInstance.prototype.continueWhenReady = function() {
     var that = this;
-    var internalCWR = function () {
+    var internalCWR = function() {
         that.continueWhenReady();
     };
     if (this.inProgress < 2) {
         return;
     }
     var errors = TestInstance.prototype.errors;
-    if(errors.length > 0){
+    if (errors.length > 0) {
         this.doTearDown();
         return;
     }
-    try{
-        if((this.inProgress > 1) && (new Date().getTime() > this.timeoutTime)){
-            if(this.waits.length > 0){
+    try {
+        if ((this.inProgress > 1) && (new Date().getTime() > this.timeoutTime)) {
+            if (this.waits.length > 0) {
                 var texp = this.waits[0].expected;
-                if($A.util.isFunction(texp)){
+                if ($A.util.isFunction(texp)) {
                     texp = texp().toString();
                 }
                 var tact = this.waits[0].actual;
                 var val = tact;
-                if($A.util.isFunction(tact)){
+                if ($A.util.isFunction(tact)) {
                     val = tact().toString();
                     tact = tact.toString();
                 }
                 var failureMessage = "";
-                if(!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)){
+                if (!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)) {
                     failureMessage = "; Failure Message: " + this.waits[0].failureMessage;
                 }
-                throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val + failureMessage);
-            }else{
+                throw new Error("Test timed out waiting for: " + tact + "; Expected: " + texp + "; Actual: " + val
+                        + failureMessage);
+            } else {
                 throw new Error("Test timed out");
             }
         }
-        if(this.inProgress > 2){
+        if (this.inProgress > 2) {
             setTimeout(internalCWR, 200);
-        }else{
-            if(this.waits.length > 0){
+        } else {
+            if (this.waits.length > 0) {
                 var exp = this.waits[0].expected;
-                if($A.util.isFunction(exp)){
+                if ($A.util.isFunction(exp)) {
                     exp = exp();
                 }
                 var act = this.waits[0].actual;
-                if($A.util.isFunction(act)){
+                if ($A.util.isFunction(act)) {
                     act = act();
                 }
-                if(exp === act){
+                if (exp === act) {
                     var callback = this.waits[0].callback;
-                    if(callback){
-                        //Set the suite as scope for callback function.
-                        //Helpful to expose test suite as 'this' in callbacks for addWaitFor           
+                    if (callback) {
+                        // Set the suite as scope for callback function.
+                        // Helpful to expose test suite as 'this' in callbacks for addWaitFor
                         if (this.doNotWrapInAuraRun) {
                             callback.call(this.suite, this.cmp);
                         } else {
@@ -250,17 +272,17 @@ TestInstance.prototype.continueWhenReady = function() {
                     }
                     this.waits.shift();
                     setTimeout(internalCWR, 1);
-                }else{
+                } else {
                     setTimeout(internalCWR, 200);
                 }
             } else {
-                this.logErrors(true, "Did not receive expected error: ",this.expectedErrors);
+                this.logErrors(true, "Did not receive expected error: ", this.expectedErrors);
                 this.expectedErrors = [];
 
-                this.logErrors(true, "Did not receive expected warning: ",this.expectedWarnings);
+                this.logErrors(true, "Did not receive expected warning: ", this.expectedWarnings);
                 this.expectedWarnings = [];
 
-                if (this.stages.length === 0){
+                if (this.stages.length === 0) {
                     this.doTearDown();
                 } else {
                     this.lastStage = this.stages.shift();
@@ -275,8 +297,8 @@ TestInstance.prototype.continueWhenReady = function() {
                 }
             }
         }
-    }catch(e){
-        if(this.lastStage) {
+    } catch (e) {
+        if (this.lastStage) {
             e["lastStage"] = this.lastStage;
         }
         this.logError("Test error", e);
@@ -284,13 +306,12 @@ TestInstance.prototype.continueWhenReady = function() {
     }
 };
 
-
 /**
  * Provide some information about the current state of the test.
- *
+ * 
  * This is used by webdriver to get information to display.
- *
- * @private
+ * 
+ * @export
  */
 TestInstance.prototype.getDump = function() {
     var status = "";
@@ -298,16 +319,19 @@ TestInstance.prototype.getDump = function() {
     if (errors.length > 0) {
         status += "errors {" + $A.test.print($A.test.getErrors()) + "} ";
     }
-    if (this.waits.length > 0 ) {
+    if (this.waits.length > 0) {
         var actual;
         try {
             actual = this.waits[0].actual();
-        } catch (ignore) {}
-        var failureMessage = "";
-        if(!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)){
-        	failureMessage = " Failure Message: {" + this.waits[0].failureMessage + "}";
+        } catch (ignore) {
         }
-        status += "waiting for {" + $A.test.print(this.waits[0].expected) + "} currently {" + $A.test.print(actual) + "}" + failureMessage + " from {" + $A.test.print(this.waits[0].actual) + "} after {" + $A.test.print(this.lastStage) + "} ";
+        var failureMessage = "";
+        if (!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)) {
+            failureMessage = " Failure Message: {" + this.waits[0].failureMessage + "}";
+        }
+        status += "waiting for {" + $A.test.print(this.waits[0].expected) + "} currently {" + $A.test.print(actual)
+                + "}" + failureMessage + " from {" + $A.test.print(this.waits[0].actual) + "} after {"
+                + $A.test.print(this.lastStage) + "} ";
     } else if (!$A.util.isUndefinedOrNull(this.lastStage)) {
         status += "executing {" + $A.test.print(this.lastStage) + "} ";
     }
@@ -316,6 +340,8 @@ TestInstance.prototype.getDump = function() {
 
 /**
  * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
+ * 
+ * @private
  */
 TestInstance.prototype.appCacheEvents = (function() {
     var appCacheEvents = [];
@@ -350,4 +376,3 @@ TestInstance.prototype.appCacheEvents = (function() {
 
     return appCacheEvents;
 })();
-

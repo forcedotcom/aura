@@ -15,10 +15,9 @@
  */
 /*jslint evil:true, sub:true */
 
-
 /**
  * Utility functions for component testing, accessible using $A.test.
- *
+ * 
  * @constructor
  */
 TestInstance = function() {
@@ -41,50 +40,50 @@ TestInstance = function() {
     this.sentXHRCount = 0;
 };
 
-//#include aura.test.Test_private
+// #include aura.test.Test_private
 
 /**
  * The set of errors accumulated.
- *
- * Note that this set of errors is 'static', since it can be accessed from window.onerror even before
- * the $A.test instance is initialized. We are careful to update it globally on the prototype instead of
- * in the class.
+ * 
+ * Note that this set of errors is 'static', since it can be accessed from window.onerror even before the $A.test
+ * instance is initialized. We are careful to update it globally on the prototype instead of in the class.
  */
 TestInstance.prototype.errors = [];
 
 /**
- *
- * @description Asynchronously wait for a condition before continuing with the next
- * stage of the test case.  The wait condition is checked after the
- * current test stage is completed but before the next stage is started.
- *
- * @example
- * <code>$A.test.addWaitFor("i was updated", function(){<br/>
+ * 
+ * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
+ *              condition is checked after the current test stage is completed but before the next stage is started.
+ * 
+ * @example <code>$A.test.addWaitFor("i was updated", function(){<br/>
  * return element.textContent;}, function(){alert("the wait is over"});</code>
- *
- * @param {Object} expected
- *             The value to compare against. If expected is a function,
- *             it will evaluate it before comparison.
- * @param {Object} testFunction
- *             A function to evaluate and compare against expected.
- * @param {Function} callback
- *             Invoked after the comparison evaluates to true
+ * 
+ * @param {Object}
+ *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
+ * @param {Object}
+ *            testFunction A function to evaluate and compare against expected.
+ * @param {Function}
+ *            callback Invoked after the comparison evaluates to true
+ * @export
  */
-TestInstance.prototype.addWaitFor = function(expected, testFunction, callback){
+TestInstance.prototype.addWaitFor = function(expected, testFunction, callback) {
     this.addWaitForWithFailureMessage(expected, testFunction, null, callback);
 };
 
 /**
- * @description Asynchronously wait for an action to complete before continuing with the next
- * stage of the test case.  The wait condition is checked after the
- * current test stage is completed but before the next stage is started.
- *
- * @example
- * <code>$A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
- *
- * @param {Object} success true if the action should succeed.
- * @param {Object} actionName the name of the action from createAction
- * @param {Function} callback Invoked after the action completes
+ * @description Asynchronously wait for an action to complete before continuing with the next stage of the test case.
+ *              The wait condition is checked after the current test stage is completed but before the next stage is
+ *              started.
+ * 
+ * @example <code>$A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
+ * 
+ * @param {Object}
+ *            success true if the action should succeed.
+ * @param {Object}
+ *            actionName the name of the action from createAction
+ * @param {Function}
+ *            callback Invoked after the action completes
+ * @export
  */
 TestInstance.prototype.addWaitForAction = function(success, actionName, callback) {
     var theAction = actionName;
@@ -93,7 +92,7 @@ TestInstance.prototype.addWaitForAction = function(success, actionName, callback
     if ($A.util.isUndefinedOrNull(this.completed[theAction])) {
         this.fail("Unregistered name " + theAction);
     }
-    this.addWaitForWithFailureMessage(true,  function() {
+    this.addWaitForWithFailureMessage(true, function() {
         if (that.isActionComplete(theAction)) {
             if (that.isActionSuccessfullyComplete(theAction) !== success) {
                 that.fail("Action " + theAction + " did not complete with success = " + success);
@@ -105,103 +104,124 @@ TestInstance.prototype.addWaitForAction = function(success, actionName, callback
 };
 
 /**
- *
- * @description Asynchronously wait for a condition before continuing with the next
- * stage of the test case.  The wait condition is checked after the
- * current test stage is completed but before the next stage is started.
- *
- *  @example
- * <code>$A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
+ * 
+ * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
+ *              condition is checked after the current test stage is completed but before the next stage is started.
+ * 
+ * @example <code>$A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
  *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});</code>
- *
- * @param {Object} expected The value to compare against. If expected is a function, it will evaluate it before
- *             comparison.
- * @param {Object} testFunction A function to evaluate and compare against expected.
- * @param {String} failureMessage The message that is returned if the condition is not true
- * @param {Function} callback Invoked after the comparison evaluates to true
+ * 
+ * @param {Object}
+ *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
+ * @param {Object}
+ *            testFunction A function to evaluate and compare against expected.
+ * @param {String}
+ *            failureMessage The message that is returned if the condition is not true
+ * @param {Function}
+ *            callback Invoked after the comparison evaluates to true
+ * @export
  */
-TestInstance.prototype.addWaitForWithFailureMessage = function(expected, testFunction, failureMessage, callback){
+TestInstance.prototype.addWaitForWithFailureMessage = function(expected, testFunction, failureMessage, callback) {
     if (!$A.util.isFunction(testFunction)) {
         this.fail("addWaitFor expects a function to evaluate for comparison, but got: " + testFunction);
     }
     if (callback && !$A.util.isFunction(callback)) {
         this.fail("addWaitFor expects a function for callback, but got: " + callback);
     }
-    this.waits.push({ expected:expected, actual:testFunction, callback:callback , failureMessage:failureMessage});
+    this.waits.push({
+        expected : expected,
+        actual : testFunction,
+        callback : callback,
+        failureMessage : failureMessage
+    });
 };
-
 
 /**
  * Block requests from being sent to the server.
- *
- * This routine can be used to artificially force actions to be held on the client to be sent to
- * the server at a later date. It can be used to simulate delays in processing (or rapid action
- * queueing on the client).
+ * 
+ * This routine can be used to artificially force actions to be held on the client to be sent to the server at a later
+ * date. It can be used to simulate delays in processing (or rapid action queueing on the client).
+ * 
+ * @export
  */
-TestInstance.prototype.blockRequests = function () {
-    this.blockForeground +=1;
-    this.blockBackground +=1;
+TestInstance.prototype.blockRequests = function() {
+    this.blockForeground += 1;
+    this.blockBackground += 1;
 };
 
 /**
  * Block only foreground actions from being sent to the server.
+ * 
+ * @export
  */
 TestInstance.prototype.blockForegroundRequests = function() {
-    this.blockForeground +=1;
+    this.blockForeground += 1;
 };
 
 /**
  * Block only background actions from being sent to the server.
+ * 
+ * @export
  */
 TestInstance.prototype.blockBackgroundRequests = function() {
-    this.blockBackground +=1;
+    this.blockBackground += 1;
 };
 
 /**
  * Release requests to be sent to the server.
- *
+ * 
  * This must be called after blockRequests, otherwise it may result in unknown consequences.
+ * 
+ * @export
  */
-TestInstance.prototype.releaseRequests = function () {
-    this.blockForeground -=1;
-    this.blockBackground -=1;
+TestInstance.prototype.releaseRequests = function() {
+    this.blockForeground -= 1;
+    this.blockBackground -= 1;
     $A.clientService.process();
 };
 
 /**
  * Release only foreground requests from being sent to the server.
- *
+ * 
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
+ * 
+ * @export
  */
 TestInstance.prototype.releaseForegroundRequests = function() {
-    this.blockForeground -=1;
+    this.blockForeground -= 1;
     $A.clientService.process();
 };
 
 /**
  * Release only background actions from being sent to the server.
- *
+ * 
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
+ * 
+ * @export
  */
 TestInstance.prototype.releaseBackgroundRequests = function() {
-    this.blockBackground -=1;
+    this.blockBackground -= 1;
     $A.clientService.process();
 };
 
 /**
  * Get total count of foreground and background requests sent to the server.
- *
- * This routine can be used to get a before and after count on server requests to attempt to verify
- * we are only sending the necessary amount of requests.
+ * 
+ * This routine can be used to get a before and after count on server requests to attempt to verify we are only sending
+ * the necessary amount of requests.
+ * 
+ * @export
  */
-TestInstance.prototype.getSentRequestCount = function () {
+TestInstance.prototype.getSentRequestCount = function() {
     return this.sentXHRCount;
 };
 
 /**
  * Check to see if an array of actions have all completed.
+ * 
+ * @export
  */
 TestInstance.prototype.areActionsComplete = function(actions) {
     var state;
@@ -219,8 +239,10 @@ TestInstance.prototype.areActionsComplete = function(actions) {
 
 /**
  * Add a cleanup function that is run on teardown.
- *
- * @param {Function} cleanupFunction the function to run on teardown.
+ * 
+ * @param {Function}
+ *            cleanupFunction the function to run on teardown.
+ * @export
  */
 TestInstance.prototype.addCleanup = function(cleanupFunction) {
     this.cleanups.push(cleanupFunction);
@@ -228,14 +250,19 @@ TestInstance.prototype.addCleanup = function(cleanupFunction) {
 
 /**
  * Get an instance of an action based on the specified parameters and callback function.
- *
- * @param {Component} component The Component on which to search for the action
- * @param {String} name The name of the action from the component's perspective (e.g. "c.doSomething")
- * @param {Object} params The parameters to pass to the action
- * @param {Function} callback The callback function to execute for the action, or if not a function a name for the action
+ * 
+ * @param {Component}
+ *            component The Component on which to search for the action
+ * @param {String}
+ *            name The name of the action from the component's perspective (e.g. "c.doSomething")
+ * @param {Object}
+ *            params The parameters to pass to the action
+ * @param {Function}
+ *            callback The callback function to execute for the action, or if not a function a name for the action
  * @returns {Action} An instance of the action
+ * @export
  */
-TestInstance.prototype.getAction = function(component, name, params, callback){
+TestInstance.prototype.getAction = function(component, name, params, callback) {
     var action = component.get(name);
     if (params) {
         action.setParams(params);
@@ -252,59 +279,71 @@ TestInstance.prototype.getAction = function(component, name, params, callback){
 
 /**
  * Run a set of actions as a transaction.
- *
- * This is a wrapper around runActions allowing a test to safely run a set of actions as a
- * single transaction with a callback.
- *
- * @param {Array} actions A list of actions to run.
- * @param {Object} scope The scope for the callback.
- * @param {Function} callback The callback
+ * 
+ * This is a wrapper around runActions allowing a test to safely run a set of actions as a single transaction with a
+ * callback.
+ * 
+ * @param {Array}
+ *            actions A list of actions to run.
+ * @param {Object}
+ *            scope The scope for the callback.
+ * @param {Function}
+ *            callback The callback
+ * @export
  */
 TestInstance.prototype.runActionsAsTransaction = function(actions, scope, callback) {
     $A.assert(!$A.services.client.inAuraLoop(), "runActionsAsTransaction called from inside Aura call stack");
-    $A.run(function() { $A.services.client.runActions(actions, scope, callback); });
+    $A.run(function() {
+        $A.services.client.runActions(actions, scope, callback);
+    });
 };
 
 /**
  * Enqueue an action, ensuring that it is safely inside an aura call.
- *
- * @param {Action} action
- *          The action to enqueue.
- * @param {Boolean} background
- *          Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
+ * 
+ * @param {Action}
+ *            action The action to enqueue.
+ * @param {Boolean}
+ *            background Set to true to run the action in the background, otherwise the value of action.isBackground()
+ *            is used.
+ * @export
  */
 TestInstance.prototype.enqueueAction = function(action, background) {
-    $A.run(function() { $A.enqueueAction(action, background); });
+    $A.run(function() {
+        $A.enqueueAction(action, background);
+    });
 };
 
 /**
- *
+ * 
  * @description Get an instance of a server action that is not available to the component.
- *
- * @example
- * <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
+ * 
+ * @example <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
  *          {name:"aura:text", attributes:{value:"valuable"}},<br/>
  *          function(action){alert(action.getReturnValue().attributes.values.value)})</code>
- *
- * @param {Component} component
- *            The scope to run the action with, even if the action is not visible to it
- * @param {String} descriptor
- *            The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
- * @param {Object} params
- *            The parameters to pass to the action, as a Map (name:value)
- * @param {Object} returnType
- *            The return type descriptor for the action, e.g. java://java.lang.String
- * @param {Function} callback
- *            An optional callback to execute with the component as the scope
+ * 
+ * @param {Component}
+ *            component The scope to run the action with, even if the action is not visible to it
+ * @param {String}
+ *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
+ * @param {Object}
+ *            params The parameters to pass to the action, as a Map (name:value)
+ * @param {Object}
+ *            returnType The return type descriptor for the action, e.g. java://java.lang.String
+ * @param {Function}
+ *            callback An optional callback to execute with the component as the scope
  * @returns {Action} an instance of the action
+ * @export
  */
 TestInstance.prototype.getExternalAction = function(component, descriptor, params, returnType, callback) {
     var paramDefs = [];
-    for (var k in params) {
+    for ( var k in params) {
         if (k === 'length' || !params.hasOwnProperty(k)) {
             continue;
         }
-        paramDefs.push({"name":k});
+        paramDefs.push({
+            "name" : k
+        });
     }
     var def = new ActionDef({
         "name" : descriptor,
@@ -323,50 +362,48 @@ TestInstance.prototype.getExternalAction = function(component, descriptor, param
 
 /**
  * Clear out component configs returned by an action.
- *
- * This must be called within the action callback. It fails if no components are
- * cleared.
- *
- * @param {Action} action
- *      The action to clear.
+ * 
+ * This must be called within the action callback. It fails if no components are cleared.
+ * 
+ * @param {Action}
+ *            action The action to clear.
+ * @export
  */
 TestInstance.prototype.clearAndAssertComponentConfigs = function(a) {
     if ($A.getContext().clearComponentConfigs(a.getId()) === 0) {
-        this.fail("No component configs were cleared for "+a.getStorageKey());
+        this.fail("No component configs were cleared for " + a.getStorageKey());
     }
 };
 
 /**
  * Peek if there are any pending server actions.
- *
- * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes
- * to require 'this', either the uses will need to be refactored, or isActionPending will need to be
- * auto-bound.
- *
+ * 
+ * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes to require 'this',
+ * either the uses will need to be refactored, or isActionPending will need to be auto-bound.
+ * 
  * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.
- * @public
+ * @export
  */
 TestInstance.prototype.isActionPending = function() {
     return !$A.clientService.idle();
 };
 
 /**
- * Invoke a server action.  At the end of current test case stage, the
- * test will wait for any actions to complete before continuing to the
- * next stage of the test case.
+ * Invoke a server action. At the end of current test case stage, the test will wait for any actions to complete before
+ * continuing to the next stage of the test case.
  * 
- * @param {Action} action
- *            The action to invoke
- * @param {Boolean} doImmediate
- *             If set to true, the request will be sent immediately, otherwise
- *             the action will be handled as any other Action and may
- *             be queued behind prior requests.
+ * @param {Action}
+ *            action The action to invoke
+ * @param {Boolean}
+ *            doImmediate If set to true, the request will be sent immediately, otherwise the action will be handled as
+ *            any other Action and may be queued behind prior requests.
+ * @export
  */
-TestInstance.prototype.callServerAction = function(action, doImmediate){
-    if(this.inProgress === 0){
+TestInstance.prototype.callServerAction = function(action, doImmediate) {
+    if (this.inProgress === 0) {
         return;
     }
-    var actions = $A.util.isArray(action) ? action : [action];
+    var actions = $A.util.isArray(action) ? action : [ action ];
     var that = this;
     var i;
     if (!!doImmediate) {
@@ -376,7 +413,9 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
             this.fail("$A.test.callServerAction: Unable to send actions");
         }
         if ($A.clientService.send(auraXHR, actions, "POST")) {
-            this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
+            this.addWaitFor(true, function() {
+                return that.areActionsComplete(actions);
+            });
         } else {
             // whoops couldn't send
             $A.clientService.releaseXHR(auraXHR);
@@ -386,16 +425,20 @@ TestInstance.prototype.callServerAction = function(action, doImmediate){
         for (i = 0; i < actions.length; i++) {
             $A.enqueueAction(actions[i]);
         }
-        this.addWaitFor(true, function() {return that.areActionsComplete(actions);});
+        this.addWaitFor(true, function() {
+            return that.areActionsComplete(actions);
+        });
     }
 };
 
 /**
  * Set whether the server is reachable, to mimick being offline.
- *
+ * 
  * Note that this will not work with IE < 10 (see W-2537764).
- *
- * @param {Boolean} reachable True or absent to make the server reachable; otherwise the server is made unreachable.
+ * 
+ * @param {Boolean}
+ *            reachable True or absent to make the server reachable; otherwise the server is made unreachable.
+ * @export
  */
 TestInstance.prototype.setServerReachable = function(reachable) {
     if (arguments.length === 0 || reachable) {
@@ -405,69 +448,72 @@ TestInstance.prototype.setServerReachable = function(reachable) {
     }
 };
 
-
 /**
- * Invoke a callback after the provided condition evaluates to truthy,
- * checking on the condition every specified interval.
- * Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an expression evaluating to true.
- * @param {Function} conditionFunction
- *             The function to evaluate
- * @param {Function} callback
- *             The callback function to run if conditionFunction evaluates to truthy
- * @param {Number} intervalInMs
- *             The number of milliseconds between each evaluation of conditionFunction
+ * Invoke a callback after the provided condition evaluates to truthy, checking on the condition every specified
+ * interval. Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an
+ * expression evaluating to true.
+ * 
+ * @param {Function}
+ *            conditionFunction The function to evaluate
+ * @param {Function}
+ *            callback The callback function to run if conditionFunction evaluates to truthy
+ * @param {Number}
+ *            intervalInMs The number of milliseconds between each evaluation of conditionFunction
+ * @export
  */
-TestInstance.prototype.runAfterIf = function(conditionFunction, callback, intervalInMs){
+TestInstance.prototype.runAfterIf = function(conditionFunction, callback, intervalInMs) {
     var that = this;
     if (this.inProgress === 0) {
         return;
     }
     try {
         if (conditionFunction()) {
-            if(callback){
-               callback();
+            if (callback) {
+                callback();
             }
         } else {
             this.inProgress++;
             if (!intervalInMs) {
                 intervalInMs = 500;
             }
-            setTimeout(function(){
+            setTimeout(function() {
                 that.runAfterIf(conditionFunction, callback);
                 that.inProgress--;
-            },intervalInMs);
+            }, intervalInMs);
             return;
         }
-    } catch(e) {
+    } catch (e) {
         this.logError("Error in runAfterIf", e);
     }
 };
 
 /**
  * Set test to timeout in a period of miliseconds from now.
- * @param {Number} timeoutMsec
- *             The number of milliseconds from the current time when the test should
- *             timeout
+ * 
+ * @param {Number}
+ *            timeoutMsec The number of milliseconds from the current time when the test should timeout
+ * @export
  */
-TestInstance.prototype.setTestTimeout = function(timeoutMsec){
+TestInstance.prototype.setTestTimeout = function(timeoutMsec) {
     this.timeoutTime = new Date().getTime() + timeoutMsec;
 };
 /**
  * Return whether the test is finished.
- * @returns {Boolean}
- *             Returns true if the test has completed, or false otherwise.
+ * 
+ * @returns {Boolean} Returns true if the test has completed, or false otherwise.
+ * @export
  */
-TestInstance.prototype.isComplete = function(){
+TestInstance.prototype.isComplete = function() {
     return this.inProgress === 0;
 };
 
 /**
- * Get the list of errors seen by the test, not including any errors
- * handled explicitly by the framework.
- * @returns {string} Returns an empty string if no errors are seen, else a json
- *             encoded list of errors
+ * Get the list of errors seen by the test, not including any errors handled explicitly by the framework.
+ * 
+ * @returns {string} Returns an empty string if no errors are seen, else a json encoded list of errors
+ * @export
  */
-TestInstance.prototype.getErrors = function(){
+TestInstance.prototype.getErrors = function() {
     var errors = TestInstance.prototype.errors;
     if (errors.length > 0) {
         return $A.util.json.encode(errors);
@@ -477,12 +523,13 @@ TestInstance.prototype.getErrors = function(){
 };
 
 /**
- * Essentially a toString method, except strings are enclosed with
- * double quotations.  Returns a string even for undefined/null value.
- * @param {Object} value
- *             The value that will be converted to a String
- * @returns {String}
- *              The value that is returned as a String type
+ * Essentially a toString method, except strings are enclosed with double quotations. Returns a string even for
+ * undefined/null value.
+ * 
+ * @param {Object}
+ *            value The value that will be converted to a String
+ * @returns {String} The value that is returned as a String type
+ * @private
  */
 TestInstance.prototype.print = function(value) {
     if (value === undefined) {
@@ -498,8 +545,9 @@ TestInstance.prototype.print = function(value) {
 
 /**
  * Internally used error function to log an error for a given test.
- *
- * @param {Object|String} e the error object or message.
+ * 
+ * @param {Object|String}
+ *            e the error object or message.
  * @private
  */
 TestInstance.prototype.auraError = function(level, msg) {
@@ -509,10 +557,11 @@ TestInstance.prototype.auraError = function(level, msg) {
 };
 
 /**
- * Tell the test that we expect an error. Test will fail if expected error
- * is not received.
- *
- * @param {string} e The error message that we expect.
+ * Tell the test that we expect an error. Test will fail if expected error is not received.
+ * 
+ * @param {string}
+ *            e The error message that we expect.
+ * @export
  */
 TestInstance.prototype.expectAuraError = function(e) {
     this.expectMessage(this.preErrors, this.expectedErrors, e);
@@ -520,26 +569,29 @@ TestInstance.prototype.expectAuraError = function(e) {
 
 /**
  * Internally used warning function to log a warning for a given test.
- *
- * @param {String} w The warning message.
+ * 
+ * @param {String}
+ *            w The warning message.
  * @private
  */
 TestInstance.prototype.auraWarning = function(level, msg) {
     if (!this.putMessage(this.preWarnings, this.expectedWarnings, msg)) {
-        if(this.failOnWarning) {
-            this.fail("Unexpected warning = "+msg);
+        if (this.failOnWarning) {
+            this.fail("Unexpected warning = " + msg);
         }
-        $A.log("Unexpected warning = "+msg);
+        $A.log("Unexpected warning = " + msg);
         return false;
     }
     return true;
 };
 
 /**
- * Tell the test that we expect a warning. If this function is called and the
- * test does not receive the expected warning, the test will fail.
- *
- * @param {String} w the warning message that we expect.
+ * Tell the test that we expect a warning. If this function is called and the test does not receive the expected
+ * warning, the test will fail.
+ * 
+ * @param {String}
+ *            w the warning message that we expect.
+ * @export
  */
 TestInstance.prototype.expectAuraWarning = function(w) {
     this.expectMessage(this.preWarnings, this.expectedWarnings, w);
@@ -547,11 +599,14 @@ TestInstance.prototype.expectAuraWarning = function(w) {
 
 /**
  * Assert that the current component HTML is Accessibility compliant.
- *
+ * 
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
- *
- * @param {String} errorMessage The message that is returned if the condition is not false
- * @throws {Error} Throws Error containing concatenated string representation of all accessibility errors found
+ * 
+ * @param {String}
+ *            errorMessage The message that is returned if the condition is not false
+ * @throws {Error}
+ *             Throws Error containing concatenated string representation of all accessibility errors found
+ * @export
  */
 TestInstance.prototype.assertAccessible = function() {
     var res = aura.devToolService.checkAccessibility();
@@ -561,48 +616,51 @@ TestInstance.prototype.assertAccessible = function() {
 };
 
 /**
- *
- * @description Assert that if(condition) check evaluates to true.
- * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
- *
- * @example
- * Positive: <code>assertTruthy("helloWorld")</code>,
- * Negative: <code>assertTruthy(null)</code>
- *
- * @param {Object} condition The condition to evaluate
- * @param {String} assertMessage The message that is returned if the condition is not true
+ * 
+ * @description Assert that if(condition) check evaluates to true. A truthy value refers to an Object, a string, a
+ *              non-zero number, a non-empty array, or true.
+ * 
+ * @example Positive: <code>assertTruthy("helloWorld")</code>, Negative: <code>assertTruthy(null)</code>
+ * 
+ * @param {Object}
+ *            condition The condition to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the condition is not true
+ * @export
  */
 TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
     if (!condition) {
-        this.fail(assertMessage, "\nExpected: {truthy} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {truthy} but Actual: {" + condition + "}");
     }
 };
 
- /**
+/**
  * Assert that the if(condition) check evaluates to false.
- *
- * @param {Object} condition The condition to evaluate
- * @param {String} assertMessage The message that is returned if the condition is not false
+ * 
+ * @param {Object}
+ *            condition The condition to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the condition is not false
  * @description A falsey value refers to zero, an empty string, null, undefined, or false.
- *
- * @example
- * Negative: <code>assertFalsy("helloWorld")</code>,
- * Postive: <code>assertFalsy(null)</code>
+ * 
+ * @example Negative: <code>assertFalsy("helloWorld")</code>, Postive: <code>assertFalsy(null)</code>
+ * @export
  */
 TestInstance.prototype.assertFalsy = function(condition, assertMessage) {
     if (condition) {
-        this.fail(assertMessage, "\nExpected: {falsy} but Actual: {"+condition+"}");
-        }
+        this.fail(assertMessage, "\nExpected: {falsy} but Actual: {" + condition + "}");
+    }
 };
 
- /**
+/**
  * Assert that if(condition) check evaluates to true.
- *
- * @param {Object} condition The condition to evaluate
- * @param {String} assertMessage The message that is returned if the condition is not true
- * @description
- * Positive: assert("helloWorld"),
- * Negative: assert(null)
+ * 
+ * @param {Object}
+ *            condition The condition to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the condition is not true
+ * @description Positive: assert("helloWorld"), Negative: assert(null)
+ * @export
  */
 TestInstance.prototype.assert = function(condition, assertMessage) {
     this.assertTruthy(condition, assertMessage);
@@ -610,18 +668,22 @@ TestInstance.prototype.assert = function(condition, assertMessage) {
 
 /**
  * Assert that the two values provided are equal.
- *
- * @param {Object} arg1 The argument to evaluate against arg2
- * @param {Object} arg2 The argument to evaluate against arg1
- * @param {String} assertMessage The message that is returned if the two values are not equal
+ * 
+ * @param {Object}
+ *            arg1 The argument to evaluate against arg2
+ * @param {Object}
+ *            arg2 The argument to evaluate against arg1
+ * @param {String}
+ *            assertMessage The message that is returned if the two values are not equal
+ * @export
  */
-TestInstance.prototype.assertEquals = function(arg1, arg2, assertMessage){
-    if(arg1 !== arg2){
-        var extraMessage = "\nExpected: {"+arg1+"} but Actual: {"+arg2+"}";
-        if(typeof arg1 !== typeof arg2){
+TestInstance.prototype.assertEquals = function(arg1, arg2, assertMessage) {
+    if (arg1 !== arg2) {
+        var extraMessage = "\nExpected: {" + arg1 + "} but Actual: {" + arg2 + "}";
+        if (typeof arg1 !== typeof arg2) {
             var arg1Type = (arg1 === null) ? "null" : typeof arg1;
             var arg2Type = (arg2 === null) ? "null" : typeof arg2;
-            extraMessage += "\nType Mismatch, Expected type: {"+arg1Type+"} but Actual type: {"+arg2Type+"}";
+            extraMessage += "\nType Mismatch, Expected type: {" + arg1Type + "} but Actual type: {" + arg2Type + "}";
         }
         this.fail(assertMessage, extraMessage);
     }
@@ -629,151 +691,191 @@ TestInstance.prototype.assertEquals = function(arg1, arg2, assertMessage){
 
 /**
  * Assert that the two string values provided are equal ignoring whitespace.
- *
+ * 
  * This is important when checking constructed strings, as browsers may handle them differently.
- *
- * @param {string} arg1 The argument to evaluate against arg2
- * @param {string} arg2 The argument to evaluate against arg1
- * @param {String} assertMessage The message that is returned if the two values are not equal
+ * 
+ * @param {string}
+ *            arg1 The argument to evaluate against arg2
+ * @param {string}
+ *            arg2 The argument to evaluate against arg1
+ * @param {String}
+ *            assertMessage The message that is returned if the two values are not equal
+ * @export
  */
-TestInstance.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertMessage){
-    var arg1s = arg1.replace(/\s+/gm,'').replace(/^ | $/gm,'');
-    var arg2s = arg2.replace(/\s+/gm,'').replace(/^ | $/gm,'');
+TestInstance.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, assertMessage) {
+    var arg1s = arg1.replace(/\s+/gm, '').replace(/^ | $/gm, '');
+    var arg2s = arg2.replace(/\s+/gm, '').replace(/^ | $/gm, '');
     this.assertEquals(arg1s, arg2s, assertMessage);
 };
 
 /**
  * Assert that a string starts with another.
- *
- * @param {Object} start The start string.
- * @param {Object} full The string that is expected to start with the start string
- * @param {String} assertMessage The message that is returned if the two values are not equal
+ * 
+ * @param {Object}
+ *            start The start string.
+ * @param {Object}
+ *            full The string that is expected to start with the start string
+ * @param {String}
+ *            assertMessage The message that is returned if the two values are not equal
+ * @export
  */
-TestInstance.prototype.assertStartsWith = function(start, full, assertMessage){
-    if(!full || !full.indexOf || full.indexOf(start) !== 0){
+TestInstance.prototype.assertStartsWith = function(start, full, assertMessage) {
+    if (!full || !full.indexOf || full.indexOf(start) !== 0) {
         var fullStart = full;
-        if (fullStart.length > start.length+20) {
-            fullStart = fullStart.substring(0, start.length+20) + "...";
+        if (fullStart.length > start.length + 20) {
+            fullStart = fullStart.substring(0, start.length + 20) + "...";
         }
-        this.fail(assertMessage, "\nExpected string to start with: {"+start+"} but Actual: {"+fullStart+"}");
+        this.fail(assertMessage, "\nExpected string to start with: {" + start + "} but Actual: {" + fullStart + "}");
     }
 };
 
 /**
  * Complement of assertEquals, throws Error if arg1===arg2.
- *
- * @param {Object} arg1 The argument to evaluate against arg2
- * @param {Object} arg2 The argument to evaluate against arg1
- * @param {String} assertMessage The message that is returned if the two values are equal
-     */
+ * 
+ * @param {Object}
+ *            arg1 The argument to evaluate against arg2
+ * @param {Object}
+ *            arg2 The argument to evaluate against arg1
+ * @param {String}
+ *            assertMessage The message that is returned if the two values are equal
+ * @export
+ */
 TestInstance.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
     if (arg1 === arg2) {
-        this.fail(assertMessage, "\nExpected values to not be equal but both were: {"+arg1+"}");
+        this.fail(assertMessage, "\nExpected values to not be equal but both were: {" + arg1 + "}");
     }
 };
 
 /**
  * Assert that the value is not undefined.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if arg1 is undefined
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if arg1 is undefined
+ * @export
  */
 TestInstance.prototype.assertDefined = function(condition, assertMessage) {
     if (condition === undefined) {
-        this.fail(assertMessage, "\nExpected: {defined} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {defined} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Assert that the condition === true.
- *
- * @param {Boolean} condition The condition to evaluate
- * @param {String} assertMessage The message that is returned if the condition !==true
+ * 
+ * @param {Boolean}
+ *            condition The condition to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the condition !==true
+ * @export
  */
-TestInstance.prototype.assertTrue = function(condition, assertMessage){
+TestInstance.prototype.assertTrue = function(condition, assertMessage) {
     if (condition !== true) {
-        this.fail(assertMessage, "\nExpected: {true} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {true} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Assert that the condition === false.
- *
- * @param {Boolean} condition The condition to evaluate
- * @param {String} assertMessage The message that is returned if the condition !==false
+ * 
+ * @param {Boolean}
+ *            condition The condition to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the condition !==false
+ * @export
  */
-TestInstance.prototype.assertFalse = function(condition, assertMessage){
+TestInstance.prototype.assertFalse = function(condition, assertMessage) {
     if (condition !== false) {
-        this.fail(assertMessage, "\nExpected: {false} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {false} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Assert that the value passed in is undefined.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if the argument is not undefined
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the argument is not undefined
+ * @export
  */
 TestInstance.prototype.assertUndefined = function(condition, assertMessage) {
     if (condition !== undefined) {
-        this.fail(assertMessage, "\nExpected: {undefined} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {undefined} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Assert that the value passed in is not undefined or null.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if the argument is not undefined or null
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the argument is not undefined or null
+ * @export
  */
 TestInstance.prototype.assertNotUndefinedOrNull = function(condition, assertMessage) {
     if ($A.util.isUndefinedOrNull(condition)) {
-        this.fail(assertMessage, "\nExpected: {defined or non-null} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {defined or non-null} but Actual: {" + condition + "}");
     }
 };
 
- /**
+/**
  * Assert that the value passed in is either undefined or null.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if the argument is not undefined or null
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the argument is not undefined or null
+ * @export
  */
-TestInstance.prototype.assertUndefinedOrNull = function(condition, assertMessage){
+TestInstance.prototype.assertUndefinedOrNull = function(condition, assertMessage) {
     if (!$A.util.isUndefinedOrNull(condition)) {
-        this.fail(assertMessage, "\nExpected: {undefined or null} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {undefined or null} but Actual: {" + condition + "}");
     }
 };
 
- /**
+/**
  * Assert that value === null.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if the value !==null
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the value !==null
+ * @export
  */
-TestInstance.prototype.assertNull = function(condition, assertMessage){
+TestInstance.prototype.assertNull = function(condition, assertMessage) {
     if (condition !== null) {
-        this.fail(assertMessage, "\nExpected: {null} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {null} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Assert that value !== null.
- *
- * @param {Object} condition The argument to evaluate
- * @param {String} assertMessage The message that is returned if the value is null
+ * 
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the value is null
+ * @export
  */
-TestInstance.prototype.assertNotNull = function(condition, assertMessage){
+TestInstance.prototype.assertNotNull = function(condition, assertMessage) {
     if (condition === null) {
-        this.fail(assertMessage, "\nExpected: {non-null} but Actual: {"+condition+"}");
+        this.fail(assertMessage, "\nExpected: {non-null} but Actual: {" + condition + "}");
     }
 };
 
 /**
  * Throw an Error, making a test fail with the specified message.
- *
- * @param {String} assertMessage Defaults to "Assertion failure", if assertMessage is not provided
- * @param {String} extraInfoMessage
- * @throws {Error} Throws error with a message
+ * 
+ * @param {String}
+ *            assertMessage Defaults to "Assertion failure", if assertMessage is not provided
+ * @param {String}
+ *            extraInfoMessage
+ * @throws {Error}
+ *             Throws error with a message
+ * @export
  */
 TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
     var msg = assertMessage || "Assertion failure";
@@ -787,29 +889,31 @@ TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
 
 /**
  * Get an object's prototype.
- * @param {Object} instance
- *              The instance of the object
- * @returns {Object}
- *              The prototype of the specified object
+ * 
+ * @param {Object}
+ *            instance The instance of the object
+ * @returns {Object} The prototype of the specified object
+ * @export
  */
 TestInstance.prototype.getPrototype = function(instance) {
-    return (instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance))) || instance.__proto || instance.constructor.prototype;
+    return (instance && (Object.getPrototypeOf && Object.getPrototypeOf(instance))) || instance.__proto
+            || instance.constructor.prototype;
 };
 
 /**
  * Replace a function on an object with a restorable override.
- * @param {Object} instance
- *              The instance of the object
- * @param {String} name
- *              The name of the function to be replaced
- * @param {Function} newFunction
- *              The new function that replaces originalFunction
- * @returns {Function}
- *             The override (newFunction) with an added "restore"
- *             function that, when invoked, will restore originalFunction
- *             on instance
+ * 
+ * @param {Object}
+ *            instance The instance of the object
+ * @param {String}
+ *            name The name of the function to be replaced
+ * @param {Function}
+ *            newFunction The new function that replaces originalFunction
+ * @returns {Function} The override (newFunction) with an added "restore" function that, when invoked, will restore
+ *          originalFunction on instance
  * @throws {Error}
  *             Throws an error if instance does not have originalFunction as a property
+ * @export
  */
 TestInstance.prototype.overrideFunction = function(instance, name, newFunction) {
     var originalFunction = instance[name];
@@ -821,7 +925,7 @@ TestInstance.prototype.overrideFunction = function(instance, name, newFunction) 
 
     // Now lets see if there is a corresponding private (obfuscated) version that we also need to mock
     var nonExportedFunctionName;
-    for (var key in instance) {
+    for ( var key in instance) {
         var f;
         try {
             f = instance[key];
@@ -841,7 +945,7 @@ TestInstance.prototype.overrideFunction = function(instance, name, newFunction) 
     override.originalFunction = originalFunction;
     override.nonExportedFunctionName = nonExportedFunctionName;
 
-    override["restore"] = function(){
+    override["restore"] = function() {
         override.originalInstance[name] = override.originalFunction;
 
         if (override.nonExportedFunctionName) {
@@ -850,7 +954,7 @@ TestInstance.prototype.overrideFunction = function(instance, name, newFunction) 
     };
 
     // if we're overriding an override, update it's pointer to restore to us
-    if(originalFunction.originalInstance){
+    if (originalFunction.originalInstance) {
         originalFunction.originalInstance = override;
     }
 
@@ -858,49 +962,45 @@ TestInstance.prototype.overrideFunction = function(instance, name, newFunction) 
 };
 
 /**
- * Add a handler function to an existing object's function.
- * The handler may be attached before or after the target function.
- * If attached after (postProcess === true), the handler will be
- * invoked with the original function's return value followed by
- * the original arguments.  If attached before (postProcess !== true),
- * the handler will be invoked with just the original arguments.
- * @param {Object} instance
- *              The instance of the object
- * @param {String} name
- *              The name of the function whose arguments are applied to the handler
- * @param {Function} newFunction
- *              The target function to attach the handler to
- * @param {Boolean} postProcess
- *             Set to true if the handler will be called after the target function
- *             or false if the handler will be called before originalFunction
- * @returns {Function}
- *             The override of originalFunction, which has a "restore"
- *             function that, when invoked, will restore originalFunction
- *             on instance
+ * Add a handler function to an existing object's function. The handler may be attached before or after the target
+ * function. If attached after (postProcess === true), the handler will be invoked with the original function's return
+ * value followed by the original arguments. If attached before (postProcess !== true), the handler will be invoked with
+ * just the original arguments.
+ * 
+ * @param {Object}
+ *            instance The instance of the object
+ * @param {String}
+ *            name The name of the function whose arguments are applied to the handler
+ * @param {Function}
+ *            newFunction The target function to attach the handler to
+ * @param {Boolean}
+ *            postProcess Set to true if the handler will be called after the target function or false if the handler
+ *            will be called before originalFunction
+ * @returns {Function} The override of originalFunction, which has a "restore" function that, when invoked, will restore
+ *          originalFunction on instance
+ * @export
  */
-TestInstance.prototype.addFunctionHandler = function(instance, name, newFunction, postProcess){
+TestInstance.prototype.addFunctionHandler = function(instance, name, newFunction, postProcess) {
     var handler = newFunction;
     var originalFunction = instance[name];
-    return this.overrideFunction(instance, name, postProcess ?
-        function(){
-            handler.apply(this, originalFunction.apply(this, arguments), arguments);
-        } :
-        function(){
-            handler.apply(this, arguments);
-            originalFunction.apply(this, arguments);
-        }
-    );
+    return this.overrideFunction(instance, name, postProcess ? function() {
+        handler.apply(this, originalFunction.apply(this, arguments), arguments);
+    } : function() {
+        handler.apply(this, arguments);
+        originalFunction.apply(this, arguments);
+    });
 };
 
 /**
  * Get a DOM node's outerHTML.
- * @param {Node} node
- *              The node to get outer HTML from
- * @returns {String}
- *              The outer HTML
+ * 
+ * @param {Node}
+ *            node The node to get outer HTML from
+ * @returns {String} The outer HTML
+ * @export
  */
 TestInstance.prototype.getOuterHtml = function(node) {
-    return node.outerHTML || (function(n){
+    return node.outerHTML || (function(n) {
         var div = document.createElement('div');
         div.appendChild(n.cloneNode(true));
         var h = div.innerHTML;
@@ -910,12 +1010,13 @@ TestInstance.prototype.getOuterHtml = function(node) {
 };
 
 /**
- * Get the text content of a DOM node. Tries <code>innerText</code> followed by
- * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
- * @param {Node} node
- *              The node to get the text content from
- * @returns {String}
- *              The text content of the specified DOM node
+ * Get the text content of a DOM node. Tries <code>innerText</code> followed by <code>textContext</code>, followed
+ * by <code>nodeValue</code> to take browser differences into account.
+ * 
+ * @param {Node}
+ *            node The node to get the text content from
+ * @returns {String} The text content of the specified DOM node
+ * @export
  */
 TestInstance.prototype.getText = function(node) {
     return $A.util.getText(node);
@@ -923,15 +1024,16 @@ TestInstance.prototype.getText = function(node) {
 
 /**
  * Get the textContent of all elements rendered by this component.
- * @param {Component} component
- *              The component to get the text content from
- * @returns {String}
- *              The text content of the specified component
+ * 
+ * @param {Component}
+ *            component The component to get the text content from
+ * @returns {String} The text content of the specified component
+ * @export
  */
-TestInstance.prototype.getTextByComponent = function(component){
+TestInstance.prototype.getTextByComponent = function(component) {
     var ret = "";
     var i;
-    if(component){
+    if (component) {
         var elements = component.getElements();
         if(elements){
             //If the component has an array of elements
@@ -947,21 +1049,20 @@ TestInstance.prototype.getTextByComponent = function(component){
 
 /**
  * Get the current value for a style for a DOMElement.
- *
- * @param {DOMElement} elem
- *              The element to get the CSS property value from
- * @param {String} Style
- *              The property name to retrieve
- * @returns {String}
- *              The CSS property value of the specified DOMElement
+ * 
+ * @param {DOMElement}
+ *            elem The element to get the CSS property value from
+ * @param {String}
+ *            Style The property name to retrieve
+ * @returns {String} The CSS property value of the specified DOMElement
+ * @export
  */
-TestInstance.prototype.getStyle = function(elem, style){
+TestInstance.prototype.getStyle = function(elem, style) {
     var val = "";
-    if(document.defaultView && document.defaultView.getComputedStyle){
+    if (document.defaultView && document.defaultView.getComputedStyle) {
         val = document.defaultView.getComputedStyle(elem, "").getPropertyValue(style);
-    }
-    else if(elem.currentStyle){
-        style = style.replace(/\-(\w)/g, function (s, ch){
+    } else if (elem.currentStyle) {
+        style = style.replace(/\-(\w)/g, function(s, ch) {
             return ch.toUpperCase();
         });
         val = elem.currentStyle[style];
@@ -971,22 +1072,23 @@ TestInstance.prototype.getStyle = function(elem, style){
 
 /**
  * Filter out comment nodes from a list of nodes.
- * @param {Array|Object} nodes
- *              The list of nodes to filter
- * @returns {Array}
- *              The list of nodes without comment nodes
+ * 
+ * @param {Array|Object}
+ *            nodes The list of nodes to filter
+ * @returns {Array} The list of nodes without comment nodes
+ * @export
  */
-TestInstance.prototype.getNonCommentNodes = function(nodes){
+TestInstance.prototype.getNonCommentNodes = function(nodes) {
     var ret = [];
     if ($A.util.isObject(nodes)) {
-        for(var i in nodes){
-            if(nodes[i].nodeType && nodes[i].nodeType !== 8) {
+        for ( var i in nodes) {
+            if (nodes[i].nodeType && nodes[i].nodeType !== 8) {
                 ret.push(nodes[i]);
             }
         }
     } else {
-        for(var j = 0; j < nodes.length; j++){
-            if(8 !== nodes[j].nodeType) {
+        for (var j = 0; j < nodes.length; j++) {
+            if (8 !== nodes[j].nodeType) {
                 ret.push(nodes[j]);
             }
         }
@@ -996,13 +1098,14 @@ TestInstance.prototype.getNonCommentNodes = function(nodes){
 
 /**
  * Check if a node has been "deleted" by Aura.
- * @param {Node} node
- *              The node to check
- * @returns {Boolean}
- *              Returns true if the specified node has been deleted, or false otherwise
+ * 
+ * @param {Node}
+ *            node The node to check
+ * @returns {Boolean} Returns true if the specified node has been deleted, or false otherwise
+ * @export
  */
-TestInstance.prototype.isNodeDeleted = function(node){
-    if (!node.parentNode){
+TestInstance.prototype.isNodeDeleted = function(node) {
+    if (!node.parentNode) {
         return true;
     }
     var div = document.createElement("div");
@@ -1013,8 +1116,9 @@ TestInstance.prototype.isNodeDeleted = function(node){
 
 /**
  * Return a node list and pass each argument as a separate parameter.
- * @returns {Array}
- *              The list of nodes contained in the document node
+ * 
+ * @returns {Array} The list of nodes contained in the document node
+ * @export
  */
 TestInstance.prototype.select = function() {
     return document.querySelectorAll.apply(document, arguments);
@@ -1022,14 +1126,15 @@ TestInstance.prototype.select = function() {
 
 /**
  * Check if a string contains another string.
- * @param {String} testString
- *             The string to check
- * @param {String} targetString
- *             The string to look for within testString
- * @returns {Boolean}
- *              Return true if testString contains targetString, or false otherwise
-     */
-TestInstance.prototype.contains = function(testString, targetString){
+ * 
+ * @param {String}
+ *            testString The string to check
+ * @param {String}
+ *            targetString The string to look for within testString
+ * @returns {Boolean} Return true if testString contains targetString, or false otherwise
+ * @export
+ */
+TestInstance.prototype.contains = function(testString, targetString) {
     if (!$A.util.isUndefinedOrNull(testString)) {
         return (testString.indexOf(targetString) != -1);
     }
@@ -1037,40 +1142,46 @@ TestInstance.prototype.contains = function(testString, targetString){
 };
 
 /**
- * Compares values. In the case of an Array or Object, compares first level references only.
- * In the case of a literal, directly compares value and type equality.
- *
- * @param {Object} expected The source value to compare.
- * @param {Object} actual The target value to compare.
+ * Compares values. In the case of an Array or Object, compares first level references only. In the case of a literal,
+ * directly compares value and type equality.
+ * 
+ * @param {Object}
+ *            expected The source value to compare.
+ * @param {Object}
+ *            actual The target value to compare.
  * @returns {Object} The result of the comparison, with reasons.
+ * @export
  */
-TestInstance.prototype.compareValues = function(expected, actual){
+TestInstance.prototype.compareValues = function(expected, actual) {
     return $A.util.compareValues(expected, actual);
 };
 
 /**
  * Returns a reference to the object that is currently designated as the active element in the document.
- *
+ * 
  * @returns {DOMElement} The current active element.
+ * @export
  */
-TestInstance.prototype.getActiveElement = function(){
+TestInstance.prototype.getActiveElement = function() {
     return document.activeElement;
 };
 
 /**
  * Returns the inner text of the current active element in the document.
- *
+ * 
  * @returns {String} The text of the current active DOM element.
+ * @export
  */
-TestInstance.prototype.getActiveElementText = function(){
+TestInstance.prototype.getActiveElementText = function() {
     return this.getText(document.activeElement);
 };
 
 /**
  * Used by getElementsByClassNameCustom for IE7
+ * 
  * @private
  */
-TestInstance.prototype.walkTheDOM = function (node, func) {
+TestInstance.prototype.walkTheDOM = function(node, func) {
     func(node);
     node = node.firstChild;
     while (node) {
@@ -1081,18 +1192,18 @@ TestInstance.prototype.walkTheDOM = function (node, func) {
 
 /**
  * custom util to get element by class name for IE7
+ * 
  * @private
  */
-TestInstance.prototype.getElementsByClassNameCustom = function (className, parentElement) {
+TestInstance.prototype.getElementsByClassNameCustom = function(className, parentElement) {
     var results = [];
 
-    if($A.util.isUndefinedOrNull(parentElement)){
+    if ($A.util.isUndefinedOrNull(parentElement)) {
         parentElement = document.body;
     }
 
     this.walkTheDOM(parentElement, function(node) {
-        var a, c = node.className,
-            i;
+        var a, c = node.className, i;
         if (c) {
             a = c.split(' ');
             for (i = 0; i < a.length; i++) {
@@ -1108,11 +1219,15 @@ TestInstance.prototype.getElementsByClassNameCustom = function (className, paren
 
 /**
  * Gets the first element on the page starting from parentElement, that has the specified class name.
- * @param {Object} parentElement DOM element that we want to start at.
- * @param {String} classname The CSS class name.
+ * 
+ * @param {Object}
+ *            parentElement DOM element that we want to start at.
+ * @param {String}
+ *            classname The CSS class name.
  * @returns {Object} The first element denoting the class, or null if none is found.
+ * @export
  */
-TestInstance.prototype.findChildWithClassName = function(parentElement, className){
+TestInstance.prototype.findChildWithClassName = function(parentElement, className) {
     var results = this.getElementsByClassNameCustom(className, parentElement);
     if (results && results.length > 0) {
         return results;
@@ -1122,17 +1237,20 @@ TestInstance.prototype.findChildWithClassName = function(parentElement, classNam
 
 /**
  * Gets the first element on the page that have the specified class name.
- * @param {String} classname The CSS class name.
+ * 
+ * @param {String}
+ *            classname The CSS class name.
  * @returns {Object} The element denoting the class, or null if none is found.
+ * @export
  */
-TestInstance.prototype.getElementByClass = function(classname){
-     var ret;
+TestInstance.prototype.getElementByClass = function(classname) {
+    var ret;
 
-     if(document.getElementsByClassName){
-         ret = document.getElementsByClassName(classname);
-    } else if(document.querySelectorAll){
-         ret = document.querySelectorAll("." + classname);
-     } else {
+    if (document.getElementsByClassName) {
+        ret = document.getElementsByClassName(classname);
+    } else if (document.querySelectorAll) {
+        ret = document.querySelectorAll("." + classname);
+    } else {
         ret = this.getElementsByClassNameCustom(classname);
     }
 
@@ -1145,18 +1263,24 @@ TestInstance.prototype.getElementByClass = function(classname){
 /**
  * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
  * question's answer.
- * @param {Object} element The HTML element whose corresponding DOM event is to be fired.
- * @param {String} eventName Initializes the given event that bubbles up through the event chain.
- * @param {Boolean} canBubble Optional. True if the event can be bubbled, defaults to true.
- * @param {Boolean} cancelable Optional. Indicates whether the event is cancelable or not, defaults to true.
+ * 
+ * @param {Object}
+ *            element The HTML element whose corresponding DOM event is to be fired.
+ * @param {String}
+ *            eventName Initializes the given event that bubbles up through the event chain.
+ * @param {Boolean}
+ *            canBubble Optional. True if the event can be bubbled, defaults to true.
+ * @param {Boolean}
+ *            cancelable Optional. Indicates whether the event is cancelable or not, defaults to true.
+ * @export
  */
-TestInstance.prototype.fireDomEvent = function (element, eventName, canBubble, cancelable) {
+TestInstance.prototype.fireDomEvent = function(element, eventName, canBubble, cancelable) {
     var event;
     if (document.createEvent) {
         event = document.createEvent("HTMLEvents");
 
-        canBubble = $A.util.isUndefinedOrNull(canBubble) ?  true : canBubble;
-        cancelable = $A.util.isUndefinedOrNull(cancelable) ?  true : cancelable;
+        canBubble = $A.util.isUndefinedOrNull(canBubble) ? true : canBubble;
+        cancelable = $A.util.isUndefinedOrNull(cancelable) ? true : cancelable;
 
         event.initEvent(eventName, canBubble, cancelable);
 
@@ -1171,15 +1295,16 @@ TestInstance.prototype.fireDomEvent = function (element, eventName, canBubble, c
 
 /**
  * Issue a click on the element.
- *
- * @param {HTMLElement} element
- *          The element to click on.
- * @param {Boolean} canBubble
- *          true to allow bubbling of the click.
- * @param {Boolean} cancelable
- *          Indicates whether the event is cancelable or not.
+ * 
+ * @param {HTMLElement}
+ *            element The element to click on.
+ * @param {Boolean}
+ *            canBubble true to allow bubbling of the click.
+ * @param {Boolean}
+ *            cancelable Indicates whether the event is cancelable or not.
+ * @export
  */
-TestInstance.prototype.clickOrTouch = function (element, canBubble, cancelable) {
+TestInstance.prototype.clickOrTouch = function(element, canBubble, cancelable) {
     if ($A.util.isUndefinedOrNull(element.click)) {
         this.fireDomEvent(element, "click", canBubble, cancelable);
     } else {
@@ -1189,12 +1314,14 @@ TestInstance.prototype.clickOrTouch = function (element, canBubble, cancelable) 
 
 /**
  * Checks if the specified node is a text node.
- * @param {Node} node
- *          The node to check
+ * 
+ * @param {Node}
+ *            node The node to check
  * @returns {Boolean} true if node is text node.
+ * @export
  */
-TestInstance.prototype.isInstanceOfText = function(node){
-    if(window.Text){
+TestInstance.prototype.isInstanceOfText = function(node) {
+    if (window.Text) {
         return node instanceof window.Text;
     }
     return node.nodeType == 3;
@@ -1202,91 +1329,115 @@ TestInstance.prototype.isInstanceOfText = function(node){
 
 /**
  * Checks if the specified element is an anchor element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is an anchor element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfAnchorElement = function(element){
+TestInstance.prototype.isInstanceOfAnchorElement = function(element) {
     return this.isInstanceOf(element, window.HTMLAnchorElement, "a");
 };
 
 /**
  * Checks if the specified element is an input element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is an input element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfInputElement = function(element){
+TestInstance.prototype.isInstanceOfInputElement = function(element) {
     return this.isInstanceOf(element, window.HTMLInputElement, "input");
 };
 
 /**
  * Checks if the specified element is a list element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is a list element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfLiElement = function(element){
+TestInstance.prototype.isInstanceOfLiElement = function(element) {
     return this.isInstanceOf(element, window.HTMLLiElement, "li");
 };
 
 /**
  * Checks if the specified element is a paragraph element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is a paragraph element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfParagraphElement = function(element){
+TestInstance.prototype.isInstanceOfParagraphElement = function(element) {
     return this.isInstanceOf(element, window.HTMLParagraphElement, "p");
 };
 
 /**
  * Checks if the specified element is a button element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is a button element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfButtonElement = function(element){
+TestInstance.prototype.isInstanceOfButtonElement = function(element) {
     return this.isInstanceOf(element, window.HTMLButtonElement, "button");
 };
 
 /**
  * Checks if the specified element is an image element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is an image element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfImageElement = function(element){
+TestInstance.prototype.isInstanceOfImageElement = function(element) {
     return this.isInstanceOf(element, window.HTMLImageElement, "img");
 };
 
 /**
  * Checks if the specified element is a div element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is a div element.
-     */
-TestInstance.prototype.isInstanceOfDivElement = function(element){
+ * @export
+ */
+TestInstance.prototype.isInstanceOfDivElement = function(element) {
     return this.isInstanceOf(element, window.HTMLDivElement, "div");
 };
 
 /**
  * Checks if the specified element is a span element.
- * @param {HTMLElement} element The element to check
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
  * @returns {Boolean} true if element is a span element.
+ * @export
  */
-TestInstance.prototype.isInstanceOfSpanElement = function(element){
+TestInstance.prototype.isInstanceOfSpanElement = function(element) {
     return this.isInstanceOf(element, window.HTMLSpanElement, "span");
 };
 
 /**
  * Checks if the specified element is an instance of another element.
- *
- * @param {HTMLElement} element
- *          The element to check
- * @param {HTMLElement} elementType
- *          Checks element against elementType
- * @param {String} tag
- *          Check element.tagName against tag
- * @returns {Boolean} true if element is of type elementType. Or if elementType
- *                    is undefined, check element is of type ELEMENT_NODE and
- *                    it's tagName is equal to tag
+ * 
+ * @param {HTMLElement}
+ *            element The element to check
+ * @param {HTMLElement}
+ *            elementType Checks element against elementType
+ * @param {String}
+ *            tag Check element.tagName against tag
+ * @returns {Boolean} true if element is of type elementType. Or if elementType is undefined, check element is of type
+ *          ELEMENT_NODE and it's tagName is equal to tag
+ * @export
  */
-TestInstance.prototype.isInstanceOf = function(element, elementType, tag){
-    if(elementType){
+TestInstance.prototype.isInstanceOf = function(element, elementType, tag) {
+    if (elementType) {
         return element instanceof elementType;
     }
     return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
@@ -1294,17 +1445,18 @@ TestInstance.prototype.isInstanceOf = function(element, elementType, tag){
 
 /**
  * Returns set of keys on passed in Object.
- *
- * @param {Object} obj
- *          Object to retrieve set of keys from.
+ * 
+ * @param {Object}
+ *            obj Object to retrieve set of keys from.
+ * @export
  */
-TestInstance.prototype.objectKeys = function(obj){
+TestInstance.prototype.objectKeys = function(obj) {
     if (Object.keys) {
         return Object.keys(obj);
     } else {
         var result = [];
-        for(var name in obj) {
-            if (obj.hasOwnProperty(name)){
+        for ( var name in obj) {
+            if (obj.hasOwnProperty(name)) {
                 result.push(name);
             }
         }
@@ -1314,17 +1466,21 @@ TestInstance.prototype.objectKeys = function(obj){
 
 /**
  * Return attributeValue of an element
- * @param {HTMLElement} element The element from which to retrieve data.
- * @param {String} attributeName The name of attribute to look up on element.
+ * 
+ * @param {HTMLElement}
+ *            element The element from which to retrieve data.
+ * @param {String}
+ *            attributeName The name of attribute to look up on element.
+ * @export
  */
-TestInstance.prototype.getElementAttributeValue = function(element,attributeName){
-            return $A.util.getElementAttributeValue(element, attributeName);
+TestInstance.prototype.getElementAttributeValue = function(element, attributeName) {
+    return $A.util.getElementAttributeValue(element, attributeName);
 };
 
 /**
  * Add an event handler. If component is specified, the handler will be applied to component events. If component is not
  * specified, the handler will be applied to application events.
- *
+ * 
  * @param {String}
  *            eventName The registered name, for component events; the descriptor name for application events.
  * @param {Function}
@@ -1334,6 +1490,7 @@ TestInstance.prototype.getElementAttributeValue = function(element,attributeName
  * @param {Boolean}
  *            insert For component events only, insert the handler at the front of the list if true, otherwise at the
  *            end
+ * @export
  */
 TestInstance.prototype.addEventHandler = function(eventName, handler, component, insert) {
     if ($A.util.isUndefinedOrNull(component)) {
@@ -1359,28 +1516,36 @@ TestInstance.prototype.addEventHandler = function(eventName, handler, component,
 };
 
 // Used by tests to modify framework source to trigger JS last mod update
-/** @ignore */
-TestInstance.prototype.dummyFunction = function(){
+/**
+ * @export
+ */
+TestInstance.prototype.dummyFunction = function() {
     return '@@@TOKEN@@@';
 };
 
+/**
+ * @export
+ */
 TestInstance.prototype.getAppCacheEvents = function() {
     return this.appCacheEvents;
 };
 
 /**
  * Extract the error message from Aura error div(the grey error message on the page)
- *
+ * 
  * @returns {String} The text of the Aura error
+ * @export
  */
-TestInstance.prototype.getAuraErrorMessage = function(){
+TestInstance.prototype.getAuraErrorMessage = function() {
     return this.getText($A.util.getElement("auraErrorMessage"));
 };
 
 /**
  * Override function for client service get XHR.
+ * 
+ * @private
  */
-TestInstance.prototype.getAvailableXHROverride = function (config, isBackground) {
+TestInstance.prototype.getAvailableXHROverride = function(config, isBackground) {
     if (!isBackground && this.blockForeground) {
         return null;
     }
@@ -1392,8 +1557,10 @@ TestInstance.prototype.getAvailableXHROverride = function (config, isBackground)
 
 /**
  * Override send so that we can account for packets.
+ * 
+ * @private
  */
-TestInstance.prototype.sendOverride = function (config, auraXHR, actions, method, options) {
+TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method, options) {
     if (this.disconnectedNoSend) {
         return false;
     }
@@ -1406,8 +1573,10 @@ TestInstance.prototype.sendOverride = function (config, auraXHR, actions, method
 
 /**
  * Override decode so that we can fail out packets.
+ * 
+ * @private
  */
-TestInstance.prototype.decodeOverride = function (config, response, noStrip) {
+TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     if (this.disconnected) {
         return null;
     }
@@ -1416,7 +1585,7 @@ TestInstance.prototype.decodeOverride = function (config, response, noStrip) {
 
 /**
  * Install all of the overrides needed.
- *
+ * 
  * @private
  */
 TestInstance.prototype.install = function() {
@@ -1428,20 +1597,20 @@ TestInstance.prototype.install = function() {
 
 /**
  * Run the test
- *
- * @param {String} name
- *          The name of the test in the suite to run
- * @param {String} code
- *          The full test suite code
- * @param {Integer} timeoutOverride
- *          Optional. Use to increase the test timeout by specified time in seconds. If not set the test will
- *          use a default timeout of 10 seconds.
- *
- * @public
+ * 
+ * @param {String}
+ *            name The name of the test in the suite to run
+ * @param {String}
+ *            code The full test suite code
+ * @param {Integer}
+ *            timeoutOverride Optional. Use to increase the test timeout by specified time in seconds. If not set the
+ *            test will use a default timeout of 10 seconds.
+ * 
+ * @export
  */
 TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixException) {
     // check if test has already started running, since frame loads from layouts may trigger multiple runs
-    if(this.inProgress >= 0){
+    if (this.inProgress >= 0) {
         return;
     }
     this.inProgress = 2;
@@ -1454,7 +1623,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
 
     this.install();
 
-    if(!timeoutOverride) {
+    if (!timeoutOverride) {
         timeoutOverride = 10;
     }
     this.timeoutTime = new Date().getTime() + 1000 * timeoutOverride;
@@ -1483,7 +1652,7 @@ TestInstance.prototype.runInternal = function(name) {
     var that = this;
 
     this.cmp = $A.getRoot();
-    var useLabel = function(labelName){
+    var useLabel = function(labelName) {
         var suiteLevel = that.suite[labelName] || false;
         var testLevel = that.suite[name][labelName];
         return (testLevel === undefined) ? suiteLevel : testLevel;
@@ -1493,13 +1662,13 @@ TestInstance.prototype.runInternal = function(name) {
     this.doNotWrapInAuraRun = useLabel("doNotWrapInAuraRun");
 
     this.stages = this.suite[name]["test"];
-    this.stages = $A.util.isArray(this.stages) ? this.stages : [this.stages];
+    this.stages = $A.util.isArray(this.stages) ? this.stages : [ this.stages ];
 
     var auraErrorsExpectedDuringInit = this.suite[name]["auraErrorsExpectedDuringInit"] || [];
     var auraWarningsExpectedDuringInit = this.suite[name]["auraWarningsExpectedDuringInit"] || [];
 
     try {
-        if(this.suite["setUp"]){
+        if (this.suite["setUp"]) {
             if (this.doNotWrapInAuraRun) {
                 this.suite["setUp"].call(this.suite, this.cmp);
             } else {
@@ -1509,20 +1678,21 @@ TestInstance.prototype.runInternal = function(name) {
             }
         }
 
-    // Fail now if we got any unexpected errors or warnings during test initialization/setup
-    this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
+        // Fail now if we got any unexpected errors or warnings during test initialization/setup
+        this.clearExpected(this.preErrors, auraErrorsExpectedDuringInit);
 
-    this.logErrors(true, "Received unexpected error: ",this.preErrors);
-    this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
-    this.preErrors = null;
+        this.logErrors(true, "Received unexpected error: ", this.preErrors);
+        this.logErrors(true, "Did not receive expected error during init: ", auraErrorsExpectedDuringInit);
+        this.preErrors = null;
 
-    this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
+        this.clearExpected(this.preWarnings, auraWarningsExpectedDuringInit);
 
-    this.logErrors(this.failOnWarning, "Received unexpected warning: ",this.preWarnings);
-    this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ", auraWarningsExpectedDuringInit);
-    this.preWarnings = null;
+        this.logErrors(this.failOnWarning, "Received unexpected warning: ", this.preWarnings);
+        this.logErrors(this.failOnWarning, "Did not receive expected warning during init: ",
+                auraWarningsExpectedDuringInit);
+        this.preWarnings = null;
 
-    }catch(e){
+    } catch (e) {
         this.logError("Error during setUp", e);
         this.doTearDown();
     }
@@ -1531,52 +1701,64 @@ TestInstance.prototype.runInternal = function(name) {
 };
 
 /**
- * @description Asynchronously wait for CKEditor instance in inputRichText component to be ready
- * before continuing to enter test data.
- *
- *  @example
- * <code>$A.test.executeAfterCkEditorIsReady(inputRichTextComponent, function(){<br/>
+ * @description Asynchronously wait for CKEditor instance in inputRichText component to be ready before continuing to
+ *              enter test data.
+ * 
+ * @example <code>$A.test.executeAfterCkEditorIsReady(inputRichTextComponent, function(){<br/>
  *   inputRichTextComponent.set('v.value', 'tab1 content'); });</code>
- *
- * @param {Component} ui:inputRichText component, or a component that extends it, that you are entering data in.
- * @param {Function} callback Invoked after the CKEditor is ready for user input
+ * 
+ * @param {Component}
+ *            ui:inputRichText component, or a component that extends it, that you are entering data in.
+ * @param {Function}
+ *            callback Invoked after the CKEditor is ready for user input
+ * @export
  */
 TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextComponent, callback) {
-    if(!inputRichTextComponent.isInstanceOf("ui:inputRichText")) {
-            this.fail("The component has to be an instance of ui:inputRichText or extend it");
+    if (!inputRichTextComponent.isInstanceOf("ui:inputRichText")) {
+        this.fail("The component has to be an instance of ui:inputRichText or extend it");
     }
 
     var editorReady = false;
-    var instance =  $A.util.lookup(window, "CKEDITOR", "instances", inputRichTextComponent.getGlobalId());
+    var instance = $A.util.lookup(window, "CKEDITOR", "instances", inputRichTextComponent.getGlobalId());
 
     if (instance === undefined) {
         this.fail("CKEDITOR instance was not found.");
     }
 
-    instance["on"]("instanceReady", function() { editorReady = true; });
+    instance["on"]("instanceReady", function() {
+        editorReady = true;
+    });
 
     this.addWaitForWithFailureMessage(true, function() {
         // In case the test missed the instanceReady event, we can check
         // status of the instance.
-        return instance.status === "ready" || editorReady; },
-        "Editor was not initialized", callback);
+        return instance.status === "ready" || editorReady;
+    }, "Editor was not initialized", callback);
 };
 
 /**
  * Reload the Global Value Providers on the client by calling the GlobalValueProviders.js constructor.
- *
- * @param {Object} gvp an optional serialized GVP to load.
- * @param {Function} callback an optional callback invoked after the GVP has finished its
- *  asynchronous initialization.
+ * 
+ * @param {Object}
+ *            gvp an optional serialized GVP to load.
+ * @param {Function}
+ *            callback an optional callback invoked after the GVP has finished its asynchronous initialization.
+ * @export
  */
 TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
     $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
 };
 
+/**
+ * @export
+ */
 TestInstance.prototype.getCreationPath = function(cmp) {
     return cmp.priv.creationPath;
 };
 
+/**
+ * @export
+ */
 TestInstance.prototype.createHttpRequest = function() {
     if (window.XMLHttpRequest) {
         return new XMLHttpRequest();
@@ -1602,14 +1784,17 @@ TestInstance.prototype.createHttpRequest = function() {
 
 /**
  * Json instance for test. Used to export Json methods for testing.
- *
+ * 
  * @constructor
  */
-JsonTestInstance = function() {};
+JsonTestInstance = function() {
+};
 
 /**
  * Serializes object in alphabetical asc order. Sorts object keys during serialization.
- * @param {Object} obj Object to be serialized
+ * 
+ * @param {Object}
+ *            obj Object to be serialized
  * @returns {String} serialized order object
  * @export
  */
@@ -1622,8 +1807,6 @@ JsonTestInstance.prototype.orderedEncode = function(obj) {
  */
 TestInstance.prototype.json = new JsonTestInstance();
 
-//#include aura.test.Test_export
-
 Aura.Test = {};
 Aura.Test.Test = TestInstance;
 
@@ -1635,14 +1818,22 @@ $A.test = new TestInstance();
 $A.logger.subscribe("WARNING", $A.test.auraWarning.bind($A.test));
 $A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
 
-//Should try to remove this hack
-(function(originalDestroy){
+/**
+ * Should try to remove this hack
+ * 
+ * @ignore
+ */
+(function(originalDestroy) {
     Component.prototype.destroy = function() {
         return originalDestroy.call(this, false);
     };
 })(Component.prototype.destroy);
 
-// For Selenium
+/**
+ * For Selenium
+ * 
+ * @ignore
+ */
 AuraLayoutService.fireOnload = function() {
     window.console.log("AuraLayoutService.fireOnload");
     var frame = window.frameElement;
@@ -1652,4 +1843,3 @@ AuraLayoutService.fireOnload = function() {
         frame.dispatchEvent(loadEvent);
     }
 };
-

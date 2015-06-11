@@ -29,10 +29,11 @@
                 referenceElementSelector: refEl,
                 showCloseButton: false,
                 closeOnClickOut: true,
-                useTransition: false,
+                useTransition: true,
                 body  : body,
                 direction: 'south',
-                showPointer: true
+                showPointer: true,
+                animation: 'pop'
             },
             onCreate: function (panel) {
                 console.log('createPanel ' + panel);
@@ -51,13 +52,37 @@
                 referenceElementSelector: refEl,
                 showCloseButton: false,
                 closeOnClickOut: true,
-                useTransition: false,
+                useTransition: true,
                 body  : body,
                 direction: 'east',
                 showPointer: true
             },
             onCreate: function (panel) {
                 console.log('createPanel ' + panel);
+            }
+
+        }).fire();
+    },
+
+    createPanelWithHeader: function (cmp, event, helper) {
+        var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
+            header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
+
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                referenceElementSelector: '.customer-header-button',
+                showPointer: true,
+                direction: 'south',
+                useTransition: false,
+                showCloseButton: false,
+                flavor: 'custom',
+                header: header,
+                body  : body
+            },
+            onCreate: function (panel) {
+                header.setAttributeValueProvider(panel);
             }
 
         }).fire();
@@ -150,6 +175,7 @@
             panelConfig : {
                 title: 'Modal Header',
                 body  : body,
+                flavor: 'custom',
                 footer: footer
             },
             onCreate: function (panel) {
@@ -169,10 +195,34 @@
                 title: 'Modal Header',
                 flavor: 'large',
                 body  : body,
-                footer: footer
+                footer: footer,
+                animation: 'bottom',
+                closeAnimation: 'top'
             },
             onCreate: function (panel) {
                 console.log('createmodal ' + panel);
+            }
+
+        }).fire();
+    },
+
+    lazyLoadPanel: function(cmp) {
+        var spinner = $A.newCmp({componentDef: 'ui:spinner'});
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'modal',
+            visible: true,
+            panelConfig : {
+                title: 'Modal Header',
+                body  : spinner,
+                flavor: 'custom',
+                animation: 'left'
+            },
+            onCreate: function (panel) {
+                //simulating panel content has server dependencies and updates panel after content is loaded
+                setTimeout(function() {
+                    var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
+                    panel.update(body);
+                }, 1000);
             }
 
         }).fire();

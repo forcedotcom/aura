@@ -45,7 +45,8 @@ function (constraint, elementProxyFactory) {
 
 
 
-    function reposition() {
+    function reposition(callback) {
+
         timeoutHandler = false;
         // this semaphore is to make sure
         // if reposition is called twice within one frame
@@ -58,6 +59,10 @@ function (constraint, elementProxyFactory) {
                     constraint.reposition();
                 });
                 elementProxyFactory.bakeOff();
+                
+                if(callback) {
+                    callback();
+                }
             });
             repositionScheduled = true;
         }

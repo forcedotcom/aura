@@ -30,6 +30,7 @@
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
     <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel" />
     <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog" />
+    <aura:attribute name="closeAnimation" type="String" description="Adds a different animation for closing the panel" />
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets the panel as the first focusable element"/>
     <aura:attribute name="referenceElementSelector" type="String" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />

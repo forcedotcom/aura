@@ -27,12 +27,17 @@
         var panelEl = cmp.getElement();
         //move the dialog to the right position
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
-        
+
         cmp.set('v.visible', true);
-        var referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
+        
+        if (referenceElementSelector) {
+            panelEl.style.visibility = 'hidden';
+            
+        }
+
         var self = this;
 
-        var conf = {
+        this.lib.panelLibCore.show(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'movefrom' + cmp.get('v.animation'),
             autoFocus: false,
@@ -47,9 +52,9 @@
                     }, 0);
                 }
                 
+                var referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
                 if(referenceEl) {
-                    panelEl.style.visibility = 'hidden';
-                    
+                    self.position(cmp, referenceEl);
                     requestAnimationFrame(function() {
                         panelEl.style.visibility = 'visible';
                         //need to set focus after animation frame
@@ -67,27 +72,12 @@
             
                 callback && callback();
             }
-        }
-
-        if (referenceEl) {
-            panelEl.style.opacity = '0';
-            panelEl.style.display = 'block';
-            this.position(cmp, referenceEl, function() {
-                panelEl.style.opacity = '1';
-                self.lib.panelLibCore.show(cmp, conf);
-            });
-        } else {
-            this.lib.panelLibCore.show(cmp, conf);
-        }
-
-       
-
-        
+        });
     },
 
     hide: function (cmp, callback) {
         var panelEl = cmp.getElement();
-        panelEl.style.opacity = 0;
+
         this.lib.panelLibCore.hide(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
@@ -118,7 +108,7 @@
         });
     },
 
-    position: function(cmp, referenceEl, callback) {
+    position: function(cmp, referenceEl) {
 
         var direction = cmp.get('v.direction'), 
             showPointer = cmp.get('v.showPointer'),
@@ -234,9 +224,9 @@
             }
             
 
-            this.positioningLib.panelPositioning.reposition(callback);
+            this.positioningLib.panelPositioning.reposition();
         } else {
-            this.positioningLib.panelPositioning.reposition(callback);
+            this.positioningLib.panelPositioning.reposition();
         }
     }
 })

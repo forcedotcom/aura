@@ -22,6 +22,8 @@
     <aura:dependency resource="markup://uiExamples:modalContent" type="COMPONENT"/>
     <aura:dependency resource="markup://uiExamples:panelContent" type="COMPONENT"/>
     <aura:dependency resource="markup://uiExamples:panelFooter" type="COMPONENT"/>
+    <aura:dependency resource="markup://uiExamples:panelHeader" type="COMPONENT"/>
+    <aura:dependency resource="markup://ui:spinner" type="COMPONENT"/>
 
     <section class="viewport">
         <header class="header">
@@ -37,27 +39,32 @@
         <div class="content container">
             <article>
                 <h4>Panels</h4>
-                <ui:button label="Modal" press="{!c.createModal}"></ui:button>
-                <ui:button label="Full Screen Panel" press="{!c.createFullPanel}"/>
+                <ui:button class="flat-btn" label="Modal" press="{!c.createModal}"></ui:button>
+                <!-- <ui:button class="flat-btn" label="Full Screen Panel" press="{!c.createFullPanel}"/> -->
+            </article>
+            <article class="controls">
+                <ui:button label="Large Modal (flavor)" class="flat-btn" press="{!c.createLargeModal}"/>
+                <ui:button label="Lazy load content" class="flat-btn" press="{!c.lazyLoadPanel}"/>
+                <ui:button label="Flavored Panel with a pointer" class='customer-header-button flat-btn' press="{!c.createPanelWithHeader}"/>
             </article>
             <article class="positioned">
                 <h4>Positioned Panels</h4>
                 <p>
-                    <ui:button class="positioned-target" label="South" press="{!c.openNotification}"/>
+                    <ui:button class="positioned-target flat-btn" label="South" press="{!c.openNotification}"/>
                 </p>
                 <p>
-                    <ui:button class="positioned-target-east" label="East" press="{!c.openEastPanel}"/>
+                    <ui:button class="positioned-target-east flat-btn" label="East" press="{!c.openEastPanel}"/>
                 </p>
                 <p class="west">
-                    <ui:button class="positioned-target-west" label="West" press="{!c.openWestPanel}"/>
+                    <ui:button class="positioned-target-west flat-btn" label="West" press="{!c.openWestPanel}"/>
                 </p>
                 <p>
-                    <ui:button class="positioned-target-north" label="North" press="{!c.openNorthPanel}"/>
+                    <ui:button class="positioned-target-north flat-btn" label="North" press="{!c.openNorthPanel}"/>
                 </p>
             </article>
             <article>
                 <h4>Tooltips</h4>
-                <p>This is a paragraph with a <ui:tooltip triggerClass="my-tt" tooltipBody="This is a CSS-only tooltip, perfect for long lists. (long tooltips are ok too)">word</ui:tooltip> that has a tooltip on it.</p>
+                <p>This is a paragraph with a <ui:tooltip advanced="false" triggerClass="my-tt" tabIndex="-1" tooltipBody="This is a CSS-only tooltip, perfect for long lists. (long tooltips are ok too)">word</ui:tooltip> that has a tooltip on it.</p>
                 <p><ui:tooltip triggerClass="my-tt" advanced="true" tooltipBody="The position adjusts to fit the viewport.">Here</ui:tooltip> is a tooltip that barely fits</p>
                 <p><ui:tooltip fadeInDuration="500" fadeOutDuration="500" triggerClass="my-tt" advanced="true" trigger="click" tooltipBody="Also it fades in!">This one</ui:tooltip> you trigger with a click</p>
                 <p>This one is <ui:tooltip fadeInDuration="500" fadeOutDuration="500" direction="east" triggerClass="my-tt" advanced="true" trigger="click" tooltipBody="This is tooltip goes to the east, also supported: south and west!">east</ui:tooltip></p>

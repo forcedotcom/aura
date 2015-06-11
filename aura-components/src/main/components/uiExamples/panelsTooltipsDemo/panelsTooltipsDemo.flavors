@@ -15,10 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <div>
-        <ui:button class="flat-btn" label="open new panel" press="{!c.openNewPanel}"/>
-        <ui:button class="flat-btn" label="Cancel" />
-        <ui:button class="flat-btn" label="Save" />
-    </div>
-</aura:component>
+<aura:flavors>
+    <aura:use source="uiExamples:panelsTooltipsDemo" />
+</aura:flavors>

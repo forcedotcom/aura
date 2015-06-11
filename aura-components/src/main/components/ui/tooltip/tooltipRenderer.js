@@ -28,6 +28,9 @@
         var delay = component.get('v.delay');
         var direction = component.get('v.direction');
         var disabled = component.get('v.disabled');
+        var tabIndex = component.get('v.tabIndexOverride');
+
+
         if(!fadeInDuration) {
             fadeInDuration = 0;
         }
@@ -70,6 +73,12 @@
             '-webkit-transition-delay:' + delay  + 'ms', 
             'transition-delay:' + delay  + 'ms'
         ];
+
+        if(tabIndex === 0 || Math.abs(tabIndex) > 0) {
+            component.set('v.tabIndex', tabIndex);
+        } else {
+            component.set('v.tabIndex', 0);
+        }
 
         component.set('v.tooltipStyle', styleDeclaration.join(';'));
         component.set('v.domId', domId);

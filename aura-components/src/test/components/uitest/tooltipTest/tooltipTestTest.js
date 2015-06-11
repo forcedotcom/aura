@@ -114,6 +114,7 @@
 	
 	/**
 	 * Test to check Trigger Attribute with Advanced set to true
+	 *
 	 */
 	testTrigger: {
 		
@@ -121,7 +122,7 @@
 			var triggers = ['triggerhoverlabel', 'triggerclicklabel', 'inputadvtrue', 'triggernonelabel', 'triggeremptylabel' ];
 			var tooltips = ['triggerhover', 'triggerclick', 'triggerfocus', 'triggernone', 'triggerempty' ];
 			var domEvents = ['mouseover', 'click', 'focus', 'mouseover', 'mouseover'];
-			var assertions = [true, true, true, false, true];
+			var assertions = [true, true, true, false, false];
 	
 			for(var i = 0; i < triggers.length; i++) {
 				function checkTrigger(ttLabel, triggerLabel) {

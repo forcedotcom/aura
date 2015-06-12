@@ -30,7 +30,10 @@
         }]
     },
     
-    //Test case for W-2617236	
+    /**
+     * Verify First input is focused when autoFocus is set
+     * Test case for W-2643030
+     */
     _testPanelFocusOnFirstInput: {
     	attributes : {"testPanelType" : "panel"},
     	test: [function(cmp) {
@@ -44,18 +47,18 @@
     },
   
     /**
-     * Test to verify firstElement is not focused when autoFocus is set to false
-     * Revisit once Bug: W-2616943 is fixed
+     * Test to verify ESC button is focused when autoFocus is set to false
+     * Revisit once Bug: W-2617212 is fixed
      */
     testPanelNotFocusedOnFirstInputWithAutoFocusOff: {
     	attributes : {"testAutoFocus" : false},
     	test: [function(cmp) {
     		this.createPanel(cmp);
     	}, function(cmp) {
-    		$A.test.addWaitForWithFailureMessage("body", function() {
-    			var activeElement = $A.test.getActiveElement();
-    			return activeElement.tagName.toLowerCase();
-    		}, "First input element should not be focused.");
+    		$A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "closeBtn");
+            }, "Esc button should be focused for Modal");
     	}]
     },
   

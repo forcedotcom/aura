@@ -58,6 +58,14 @@
 		config["autoFocus"] = $A.util.getBooleanValue(cmp.get("v.autoFocus"));
 		config["class"] = cmp.get("v.class");
 		config["flavor"] = cmp.get("v.flavor");
+		//provide an option not to destroy the panel when closeOnClickOut is set to true.
+		//Bug: W-2619406
+		var CustomizeCloseAction = $A.util.getBooleanValue(cmp.get("v.customizeCloseAction"));
+		if(CustomizeCloseAction){
+			config["closeAction"] = function(cmp, reason){
+										cmp.set("v.closeActionCalled", "CloseActionCustomMethodCalled when " + reason);
+									}
+	 	}
 		helper.createHeaderFooterInstance(cmp, true);
 		var useHeader = $A.util.getBooleanValue(cmp.get("v.useHeader"));
 		var panelHeader = cmp.get("v.panelHeader");

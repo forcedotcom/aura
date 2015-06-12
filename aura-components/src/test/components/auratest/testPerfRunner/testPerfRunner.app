@@ -15,7 +15,9 @@
     limitations under the License.
 -->
 <aura:application>
-<aura:attribute name="scope" type="String"/>
+	<aura:attribute name="scope" type="String"/>
+	<aura:attribute name="keyword" type="String"/>
+	
 	<div class="viewport">
 		<header>
 			<span class="icon-rocket"></span>
@@ -27,7 +29,7 @@
 			</span>
 		</header>
 		<section class="center">
-    		<auratest:testPerfRunnerContainer aura:id="container" scope="{!v.scope}" aura:load="lazy"/>
+    		<auratest:testPerfRunnerContainer aura:id="container" scope="{!v.scope}" keyword="{!v.keyword}" aura:load="lazy"/>
     	</section>
     	<footer>
     		<span class="status-bar"></span>

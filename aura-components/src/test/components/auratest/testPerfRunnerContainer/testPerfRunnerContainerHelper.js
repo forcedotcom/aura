@@ -16,26 +16,26 @@
         return status;
     },
     createRow: function (t) {
-        return [
-            '<li class="list-test-item" data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : ' ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">',
-                '<div class="parts">',
-                    '<div class="checkbox">',
-                    '<input type="checkbox" data-testid="' + t.name + '"/></div>',
-                    '<div class="test">',
-                        '<p class="name">' + this._parseTestName(t.name) + '</p>',
-                        '<p class="ns">'+ this._parseTestNameSpace(t.name) + '</p>',
-                    '</div>',
-                    '<div class="status">',
-                        '<span class="icon status-icon" data-state-text="'+ this._parseStatus(t.status) + '"></span>',
-                        '<span class="icon results"></span>',
-                    '</div>',
-                    '<div class="jsConsole">',
-                        '<a href="' + t.jsConsole + '" target="_blank">','<span class="icon icon-meter"></span></a>',
-                    '</div>',
-                '</div>',
-                '<div class="exception"></div>',
-            '</li>'
-        ].join('');
+    	//changes from array join to string concat for performance reason
+        return '<li class="list-test-item" data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : 'data-unit="true" ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
+                '<div class="parts">' +
+                	'<div class="test-type"></div>' +
+                    '<div class="checkbox">'+
+                    '<input type="checkbox" class="chk-test" data-testid="' + t.name + '" /></div>' +
+                    '<div class="test">' +
+                        '<p class="name">' + this._parseTestName(t.name) + '</p>' +
+                        '<p class="ns">'+ this._parseTestNameSpace(t.name) + '</p>' +
+                    '</div>' +
+                    '<div class="status">' +
+                        '<span class="icon status-icon" data-state-text="'+ this._parseStatus(t.status) + '"></span>' +
+                        '<span class="icon results"></span>' +
+                    '</div>' +
+                    '<div class="jsConsole">' +
+                        '<a href="' + t.jsConsole + '" target="_blank"><span class="icon icon-meter"></span></a>' + 
+                    '</div>' +
+                '</div>' +
+                '<div class="exception"></div>' +
+            '</li>';
     },
     buildDOM: function (testArray) {
         var placeholder = document.createElement('div'),
@@ -53,22 +53,39 @@
         var testsPerBlock = 100;
         var container = document.createElement("div");
             container.className = "test-container";
-
-        var list = document.createElement("ul");
-            list.className = "list";
-
-        var items = [];
+        
+            
+        var selectedList = document.createElement("ul");
+        selectedList.className = "list selected-list";
+        container.appendChild(selectedList);
+            
+        var curTestsPerBlock = testsPerBlock;
+        var list;
+        
         var length = testArray.length;
         for(var c=0;c<length;c++){
-            items.push(this.createRow(testArray[c]));
-        }
-
-        while(items.length) {
-            list.innerHTML = items.splice(0, testsPerBlock).join('');
-            container.appendChild(list);
-
-            list = document.createElement("ul");
-            list.className = "list list-hidden";
+        	if (list === undefined){
+    			//first ul
+    			list = document.createElement("ul");
+                list.className = "list";
+                container.appendChild(list);
+    		}
+        	else if(curTestsPerBlock === 0){
+        		//subsequent ul
+        		curTestsPerBlock = testsPerBlock;
+    			list = document.createElement("ul");
+                list.className = "list list-hidden";
+                container.appendChild(list);
+        	}
+        	
+        	//insert to the dom
+        	list.insertAdjacentHTML(
+    			'beforeend',
+    			this.createRow(testArray[c])
+			);
+        	
+        	//decrease count
+        	curTestsPerBlock--;
         }
 
         var spacer = document.createElement("div");
@@ -81,25 +98,54 @@
 
     attachEvents: function (cmp, dom) {
         var self        = this,
+        	inputOperator = dom.getElementsByClassName("search-ops")[0],
+        	inputCaseSensitive = dom.querySelector('.search-case-sensitive input'),
+        	labelCountSelected = dom.querySelector('#count_selected'),
             inputSearch = dom.getElementsByClassName('search')[0],
-            selectAll   = dom.getElementsByClassName('select')[0],
+            selectAll   = dom.getElementsByClassName('toggle_select_all')[0],
+            scrollToTop   = dom.getElementsByClassName('scroll_to_top')[0],
             runButton   = dom.getElementsByClassName('run')[0],
-            integButton = dom.getElementsByClassName('integ')[0],
-            failButton  = dom.getElementsByClassName('failed')[0],
-            testContainer = dom.getElementsByClassName("test-container")[0];
-
-        integButton.addEventListener('click', function (e) {
-            self.toggleIntegrationTests(integButton, dom, e);
-        });
+            failButton  = dom.getElementsByClassName('toggle_failed')[0],
+            testContainer = dom.getElementsByClassName("test-container")[0],
+            selectedList = testContainer.querySelector('.selected-list'),
+            toggleTestType = dom.querySelector('.toggle_test_type');
+        
+        var timeoutDebounce, totalDebounceTime = 1500;
 
         failButton.addEventListener('click', function (e) {
             self.toggleFailTests(cmp, failButton, dom, e);
         });
 
-        inputSearch.addEventListener('input', function (e) {
-            self.filterTests(dom, e.target.value);
-        });
-
+        
+        var handlerSearchInputChange = function () {
+        	if(timeoutDebounce){
+    			clearTimeout(timeoutDebounce);
+    		}
+    		
+    		//doing a little stuff here
+        	testContainer.style.opacity = '0.2';
+        	
+    		//little debounce
+			timeoutDebounce = setTimeout(function(){
+        		self.filterTests(
+    				dom,
+    				inputSearch.value,
+    				inputOperator.value,
+    				inputCaseSensitive.checked,
+    				toggleTestType.querySelector('input.test_integ').checked,
+    				toggleTestType.querySelector('input.test_unit').checked
+				);
+        		testContainer.style.opacity = '';
+        	}, totalDebounceTime);
+        };
+        inputSearch.addEventListener('input', handlerSearchInputChange);
+        inputOperator.addEventListener('input', handlerSearchInputChange);
+        inputCaseSensitive.addEventListener('change', handlerSearchInputChange);
+        var testTypeInputs = toggleTestType.querySelectorAll('input');
+        for (var i = 0; i < testTypeInputs.length; i++){
+        	testTypeInputs[i].addEventListener('change', handlerSearchInputChange);
+        }
+        
         selectAll.addEventListener('click', function (e) {
             self.toggleSelection(selectAll, dom, e);
         });
@@ -107,6 +153,7 @@
         runButton.addEventListener('click', function (e) {
             self.runTests(cmp, dom, e);
         });
+        
 
         testContainer.addEventListener("scroll", function TestContainer_OnScroll(e) {
             var spacer = testContainer.getElementsByClassName("spacer")[0];
@@ -124,8 +171,47 @@
                 spacer.style.height = (5000 * hiddenLists.length) + "px";
             }
         });
+        
+        scrollToTop.addEventListener('click', function(){
+        	testContainer.scrollTop = 0;
+        });
+        
+        //delegate for checkbox state
+        testContainer.addEventListener('click', function(e){        	
+        	if (e.target.nodeName === "INPUT" && e.target.classList.contains('chk-test')){
+        		//get the closest li
+    			var targettedRow = e.target;
+            	while(targettedRow && targettedRow.nodeName !== "LI"){
+            		targettedRow = targettedRow.parentNode;
+            	}
+        		
+        		if (e.target.checked === true){
+        			//move to top
+        			selectedList.insertAdjacentElement("AfterBegin", targettedRow);
+            	}
+        		else{
+        			if (targettedRow.parentElement.classList.contains('selected-list')){
+        				//move the stuff back to the end of the list
+        				selectedList.insertAdjacentElement("BeforeEnd", targettedRow);
+        			}
+        		}
+        		targettedRow.classList.toggle("hl-row");
+        		
+        		//update the selected test count
+        		var countSelected = testContainer.querySelectorAll('.chk-test:checked').length;
+        		self._updateSelectedTestCount(dom, countSelected);
+        	}
+        });
+        
+        
+        //filter on page load if needed
+        //handle initial attribute if any query string
+        var keyword = cmp.get('v.keyword');
+        if (keyword !== undefined && keyword.length > 0){
+        	handlerSearchInputChange();
+        }
     },
-
+    
     showAllSections: function() {
         var lists = document.getElementsByClassName("list-hidden");
         for(var c=0,length=lists.length;c<length;c++) {
@@ -184,30 +270,99 @@
             input = filtered[i];
             input.checked = needsCheck;
         }
-
+        
+    	this._updateSelectedTestCount(dom, needsCheck ? filtered.length : 0);
     },
-    filterTests: function (dom, query) {
-        var children  = dom.getElementsByClassName("list-test-item"),
-            matches   = [],
-            regexp, li, name, i;
-
-        for (i = 0; i < children.length; i++) {
-            $A.util.setDataAttribute(children[i], 'visible', "visible");
+    _updateSelectedTestCount: function(dom, count){
+    	dom.querySelector('#count_selected').innerHTML = count > 0 ? ' (' + count + ' selected)' : ' !'
+    },
+    calcOrOperators: function(regexp, name){
+    	for (var j = 0; j < regexp.length; j++){
+        	if (regexp[j].test(name) === true) {
+        		//at least one match
+        		return true;
+        	}
         }
-        if (query) {
-            regexp = new RegExp(query,'i');
+    	
+    	return false;
+    },
+    calcAndOperators: function(regexp, name){
+    	for (var j = 0; j < regexp.length; j++){
+        	if (regexp[j].test(name) === false) {
+        		//at least one not matched, return
+        		return false;
+        	}
+        }
+    	
+    	return true;//all matched
+    },
+    filterTests: function (dom, query, logicOps, isCaseSensitive, test_integ, test_unit) {   	
+        var children  = dom.getElementsByClassName("list-test-item"),
+        	calcOperator = logicOps === 'AND' ? this.calcAndOperators : this.calcOrOperators,
+			hasAtLeastOneVisible = false,
+            matches   = [],
+            regexp = [], li, name, i, queries;
+        
+        
+        query = query || '';
+        query = query.trim()
+
+    	if (query.length === 0 && test_integ && test_unit){
+    		//when it is empty, just show it
+        	for (i = 0; i < children.length; i++) {
+                $A.util.setDataAttribute(children[i], 'visible', 'visible');
+            }
+    	}
+    	else {
+        	//allow use of , to match multiple item
+    		if (query.length > 0){
+    			queries = query.split(',');
+            	
+            	for (var i = 0 ; i < queries.length; i++){
+            		var query_str = queries[i].trim();
+            		if (query_str.length > 0){
+            			regexp.push(
+        					new RegExp(query_str, isCaseSensitive ? '' : 'i')
+    					);
+            		}
+            	}
+    		}
+        	
             for (i = 0; i < children.length; i++) {
+            	var isVisible = false;
+            	
                 li = children[i];
                 if (li.getElementsByTagName("input")[0].checked) {
-                    continue;
+                	//if checked, always visible
+                    isVisible = true;
                 }
-                name = li.getElementsByClassName('ns')[0].textContent;
-                if (!regexp.test(name)) {
-                    $A.util.setDataAttribute(li, 'visible', "hidden");
-                } 
+                else{
+                	name = li.getElementsByClassName('ns')[0].textContent;
+                	
+                	if (test_integ === true && $A.util.getDataAttribute(li, 'integ') === 'true'){
+                		isVisible = true;
+                	}
+                	else if (test_unit === true && $A.util.getDataAttribute(li, 'unit') === 'true'){
+                		isVisible = true;
+                	}
+                	
+                    //calling the regex match
+                	if (isVisible === true && queries !== undefined){
+                		//only need regex again if isvisible true
+                		isVisible = calcOperator(regexp, name);
+                	}
+                }
                 
+                hasAtLeastOneVisible = hasAtLeastOneVisible || isVisible;
+                                
+                $A.util.setDataAttribute(children[i], 'visible', isVisible === true ? 'visible' : 'hidden');
+            }
+            
+            if(hasAtLeastOneVisible === false){
+            	alert('There is no test matching your filter');
             }
         }
+        
         this.showAllSections();
     },
     _getLiFromInput: function (input) {

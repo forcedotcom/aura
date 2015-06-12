@@ -593,7 +593,7 @@ AuraClientService.prototype.maybeAbortAction = function(action) {
 /**
  * Count the available XHRs, including abortable ones.
  */
-AuraClientService.prototype.countAvailableXHRs = function() {
+AuraClientService.prototype.countAvailableXHRs = function(/*isBackground*/) {
     // FIXME : this needs to figure out what XHRs can be aborted.
     return this.availableXHRs.length;
 };
@@ -1161,7 +1161,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             //
             var labelAction = $A.get("c.aura://ComponentController.loadLabels");
             // no parameters, no callback.
-            labelAction.setCallback(acs, function() {});
+            labelAction.setCallback(acs, function(/*action*/) {});
             acs.enqueueAction(labelAction);
         }, "loadComponent");
     });
@@ -1319,7 +1319,7 @@ AuraClientService.prototype.getStoredResult = function(action, storage, index) {
                 that.collectServerAction(action, index);
             }
         },
-        function() {
+        function(/*error*/) {
             // error fetching from storage so go to the server
             that.collectServerAction(action, index);
         }
@@ -2293,7 +2293,7 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     storage.get(actionKey).then(function(response) {
         if (!!response && !!response.value) {
             storage.put(actionKey, response.value)
-                .then(function() { callback(true); }, function() {
+                .then(function() { callback(true); }, function(/*error*/) {
                     // FIXME: what to do.
                 });
         } else {

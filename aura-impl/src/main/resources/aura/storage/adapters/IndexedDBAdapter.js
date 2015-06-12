@@ -108,7 +108,7 @@ IndexedDBStorageAdapter.prototype.initialize = function(version) {
         message += (e.target.error && e.target.error.message) ? ": " + e.target.error.message : "";
         that.log(message);
     };
-    dbRequest.onblocked = function() {
+    dbRequest.onblocked = function(/*error*/) {
         that.log("open() - Blocked from opening DB, most likely by another open browser tab");
     };
 };
@@ -671,7 +671,7 @@ IndexedDBStorageAdapter.prototype.deleteStorageInternal = function(success, erro
         that.log("deleted successfully");
         success();
     };
-    dbRequest.onblocked = function() {
+    dbRequest.onblocked = function(/*error*/) {
         // Cannot error here because IE may come to this callback before success
         that.log("blocked from being deleted");
     };

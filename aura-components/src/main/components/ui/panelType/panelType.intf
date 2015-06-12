@@ -19,6 +19,8 @@
     <aura:attribute name="alias" type="String" description="The registered name of panel"/>
     <aura:attribute name="activatable" type="Boolean" default="true" description="Determines if panel can be activated or deactivated when other panels are shown or closed. The default is true."/>
     <aura:attribute name="visible" type="Boolean" default="false" description="Whether or not the panel is visible (read only)"/>
+    <aura:attribute name="header" type="Aura.Component[]" description="The header of the panel" />
+    <aura:attribute name="footer" type="Aura.Component[]" description="The footer of the panel" />
 
     <aura:registerEvent name="notify" type="ui:notify" />
 
@@ -29,7 +31,7 @@
         <aura:attribute name="callback" type="Object"/>
     </aura:method>
     <aura:method name="update" description="Updates the body of the panel">
-        <aura:attribute name="body" type="Aura.Component[]" description="content to update" />
+        <aura:attribute name="facets" type="Object" description="Facets to update. e.g. header, body, footer" />
         <aura:attribute name="callback" type="Object"/>
     </aura:method>
     <aura:method name="close" description="hides and fires destroy">

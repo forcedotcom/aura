@@ -55,7 +55,7 @@
                 body  : body
             },
             onCreate: function (panel) {
-                header.setAttributeValueProvider(panel);
+                $A.log('panel created ' + panel);
             }
 
         }).fire();
@@ -111,22 +111,23 @@
     },
 
     lazyLoadPanel: function(cmp) {
-        var spinner = $A.newCmp({componentDef: 'ui:spinner'});
-        $A.get('e.ui:createPanel').setParams({
-            panelType   :'modal',
-            visible: true,
-            panelConfig : {
-                title: 'Modal Header',
-                body  : spinner
-            },
-            onCreate: function (panel) {
-                //simulating panel content has server dependencies and updates panel after content is loaded
-                setTimeout(function() {
-                    var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-                    panel.update(body);
-                }, 1000);
-            }
-
-        }).fire();
+        $A.componentService.createComponent('ui:spinner', null, function(spinner){
+            $A.get('e.ui:createPanel').setParams({
+                panelType   :'modal',
+                visible: true,
+                panelConfig : {
+                    title: 'Modal Header',
+                    body  : spinner
+                },
+                onCreate: function (panel) {
+                    //simulating panel content has server dependencies and updates panel after content is loaded
+                    setTimeout(function() {
+                        $A.componentService.createComponent('uiExamples:modalContent', null, function(body){
+                            panel.update({body:body});
+                        });
+                    }, 1000);
+                }
+            }).fire();
+        });
     }
 })

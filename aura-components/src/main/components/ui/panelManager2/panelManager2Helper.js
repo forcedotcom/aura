@@ -81,7 +81,16 @@
             });
         }
     },
-
+    /*
+    * Get Active panel
+    * @public
+    */
+    getActivePanel: function (cmp, callback) {
+        // TODO: Instead of assuming is the last one (which doesnt guarantee that is "active")
+        // Change the logic on active to make sure we save that state internally
+        var stack = this.PANELS_STACK;
+        callback(stack[stack.length - 1]);
+    },
     /*
     * Sets the context in which the panel is created
     * This is mostly to figure out the the relationship between two panels
@@ -114,9 +123,20 @@
         //flavor is not an attribute
         delete config.flavor;
         $A.util.apply(mergedDef.attributes.values, config); // merge panel config with DefRef
-        var panel = $A.newCmp(mergedDef, cmp);/*cmp:AVP*/
-        var body  = panel.get('v.body')[0];
-        body.setAttributeValueProvider(panel);
+        var panel = $A.newCmp(mergedDef, cmp),/*cmp:AVP*/
+            header  = panel.get('v.header')[0],
+            body  = panel.get('v.body')[0],
+            footer  = panel.get('v.footer')[0];
+
+        if (body) {
+            //set body as value provider so that body component can handle events that are fired in header and body
+            header &&  header.setAttributeValueProvider(body);
+            footer &&  footer.setAttributeValueProvider(body);
+            body.setAttributeValueProvider(panel);
+        } else {
+            header &&  header.setAttributeValueProvider(panel);
+            footer &&  footer.setAttributeValueProvider(panel);
+        }
 
         return panel;
     },

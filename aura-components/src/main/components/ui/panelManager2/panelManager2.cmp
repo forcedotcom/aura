@@ -16,14 +16,14 @@
 
 -->
 <aura:component extensible="true" description="Panel manager 2">
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
     <aura:attribute name="registeredPanels" type="Aura.ComponentDefRef[]" description="A list of managed panels"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>
 
-    <aura:handler event="ui:createPanel"  action="{!c.createPanel}"/>
-    <aura:handler event="ui:destroyPanel" action="{!c.destroyPanel}"/>
+    <aura:handler event="ui:createPanel"    action="{!c.createPanel}"/>
+    <aura:handler event="ui:destroyPanel"   action="{!c.destroyPanel}"/>
+    <aura:handler event="ui:getActivePanel" action="{!c.getActivePanel}"/>
 
     <div aura:id="container" class="{!$Browser.formFactor}"/>
-
 </aura:component>

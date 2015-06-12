@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -261,7 +263,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         if (defaultFlavor != null) {
             // component must be flavorable
-            if (!hasFlavorableChild()) {
+            if (!hasFlavorableChild() && !inheritsFlavorableChild()) {
                 throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
                         + "specified on a component with no flavorable children", location);
             }
@@ -473,9 +475,13 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         if (defaultFlavor != null) {
-            // flavor name must exist on the flavor descriptor
-            if (!flavorDescriptor.getDef().getFlavorNames().contains(defaultFlavor)) {
-                throw new FlavorNameNotFoundException(defaultFlavor, flavorDescriptor);
+            Set<String> allFlavorNames = getAllFlavorNames();
+
+            // check that each flavor name exists on this component or a parent
+            for (String f : Splitter.on(",").trimResults().split(defaultFlavor)) {
+                if (!allFlavorNames.contains(f)) {
+                    throw new FlavorNameNotFoundException(f, flavorDescriptor);
+                }
             }
         }
     }
@@ -1236,6 +1242,20 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         return defaultFlavor;
     }
 
+
+    @Override
+    public Set<String> getAllFlavorNames() throws QuickFixException {
+        Set<String> allFlavorNames = new HashSet<>();
+        if (flavorDescriptor != null) {
+            allFlavorNames.addAll(flavorDescriptor.getDef().getFlavorNames());
+        }
+        if (extendsDescriptor != null) {
+            allFlavorNames.addAll(extendsDescriptor.getDef().getAllFlavorNames());
+        }
+        return allFlavorNames;
+    }
+
+
     public static abstract class Builder<T extends BaseComponentDef> extends
             RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
@@ -1471,7 +1491,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return false;
         }
     }
-    
+
     @Override
     public Set<PropertyReference> getExpressionRefs() {
     	return expressionRefs;

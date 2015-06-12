@@ -186,11 +186,19 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException If there is a problem loading the flavor def.
      */
     String getDefaultFlavorOrImplicit() throws QuickFixException;
-    
+
+    /**
+     * Gets the set of defined flavor names in this component and all parent components.
+     *
+     * @return The set of defined flavor names.
+     * @throws QuickFixException If there is a problem loading a flavor or parent def.
+     */
+    Set<String> getAllFlavorNames() throws QuickFixException;
+
     /**
      * Get the generated JavaScript class for this component.
-     * This class includes setting up its inheritance, its render methods and its helper methods. 
-     * The rest of the definition of the class comes back as meta data in a JSON object. 
+     * This class includes setting up its inheritance, its render methods and its helper methods.
+     * The rest of the definition of the class comes back as meta data in a JSON object.
      * Which further configures the generated JavaScript class.
      * If not provided, will use the base Component() constructor, but won't have a valid helper, so this is pretty much required now.
      *

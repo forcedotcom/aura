@@ -81,5 +81,5 @@
                 $A.test.assertEquals(expected, $A.util.style.getCSSProperty(toTest, "color"));
             });
         }
-    },
+    }
 })

@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 ({
-    /** test changing the default to a new custom flavors (not in the component bundle) */
-    testFlavorAppOverrideFromNewDefault: {
-        browsers: [ 'GOOGLECHROME'],
+    testBothLevels: {
+        /** if parent and child both have flavorable elements, both should get the default */
         test: function(cmp) {
-            var target = cmp.find("target");
-            var el = target.getElement();
-            var expected = $A.util.buildFlavorClass(target, "amazing");
-            $A.test.assertTrue($A.util.hasClass(el, expected));
-
-            var style = $A.util.style;
-            var margin = style.getCSSProperty(el, "margin");
-            $A.test.assertEquals("10px", margin);
+            var outer = $A.util.buildFlavorClass(cmp.getSuper(), "second");
+            var inner = $A.util.buildFlavorClass(cmp, "second");
+            $A.test.assertTrue($A.util.hasClass(cmp.getElement(), outer));
+            $A.test.assertTrue($A.util.hasClass(cmp.getElement().firstChild, inner));
         }
     }
 })

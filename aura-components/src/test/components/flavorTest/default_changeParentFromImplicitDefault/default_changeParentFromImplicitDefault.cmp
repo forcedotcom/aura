@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:default_x_extensibleImplicitDefault" defaultFlavor="alt">
+    Change parent from implicit default
+</aura:component>

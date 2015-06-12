@@ -19,7 +19,7 @@
         test: function(cmp) {
             var target = cmp.find("target");
             var el = target.getElement();
-            expected = $A.util.buildFlavorClass(target, "default");
+            var expected = $A.util.buildFlavorClass(target, "default");
             $A.test.assertTrue($A.util.hasClass(el, expected));
 
             // the original default flavor doesn't have a margin, that rule should be deleted and

@@ -1,0 +1,4 @@
+<aura:flavors>
+    <aura:use source="flavorTest:overrides_flavors"/>
+    <aura:flavor component="flavorTest:x_sample" default="base, neutral"/>
+</aura:flavors>

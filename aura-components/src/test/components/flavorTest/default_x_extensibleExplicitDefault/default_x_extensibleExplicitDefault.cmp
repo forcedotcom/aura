@@ -1,0 +1,3 @@
+<aura:component defaultFlavor="first" extensible="true">
+       <div aura:flavorable="true">{!v.body}</div>
+</aura:component>

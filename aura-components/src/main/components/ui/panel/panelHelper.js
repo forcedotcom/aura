@@ -26,12 +26,11 @@
         var autoFocus = cmp.get('v.autoFocus');
         var panelEl = cmp.getElement();
         //move the dialog to the right position
-        var referenceEl = cmp.get("v.referenceElement");
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
 
         cmp.set('v.visible', true);
         
-        if (referenceEl || referenceElementSelector) {
+        if (referenceElementSelector) {
             panelEl.style.visibility = 'hidden';
             
         }
@@ -53,28 +52,24 @@
                     }, 0);
                 }
                 
-                if (referenceEl || referenceElementSelector) {
-                    if(referenceElementSelector) {
-                        referenceEl = document.querySelector(referenceElementSelector);
-                    }
-                    if(referenceEl) {
-                        self.position(cmp, referenceEl);
-                        requestAnimationFrame(function() {
-                            panelEl.style.visibility = 'visible';
-                            //need to set focus after animation frame
-                            if (autoFocus) {
-                                self.lib.panelLibCore.setFocus(cmp);
-                            }
-                        });
-                    } else {
+                var referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
+                if(referenceEl) {
+                    self.position(cmp, referenceEl);
+                    requestAnimationFrame(function() {
                         panelEl.style.visibility = 'visible';
+                        //need to set focus after animation frame
                         if (autoFocus) {
                             self.lib.panelLibCore.setFocus(cmp);
                         }
-                        $A.warn('Target element for panel not found.');
+                    });
+                } else {
+                    panelEl.style.visibility = 'visible';
+                    if (autoFocus) {
+                        self.lib.panelLibCore.setFocus(cmp);
                     }
+                    $A.warning('Target element for panel not found.');
                 }
-
+            
                 callback && callback();
             }
         });

@@ -16,7 +16,7 @@
 ({
     nameChange: function (cmp, event, helper) {
     	var name = cmp.get('v.name');
-        var newName = Math.random();
+        var newName = Math.random().toString(36).substr(2, 10);
         cmp.set('v.name', newName);
         cmp.find("outputName").set("v.value", "Expected Name Change: "+newName);
     }

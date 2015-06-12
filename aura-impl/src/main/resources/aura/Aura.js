@@ -715,6 +715,21 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
 
             // restore component definitions from AuraStorage into memory
             $A.componentService.registry.restoreAllFromStorage();
+
+            // add default handler to aura:systemError event
+            $A.eventService.addHandler({
+                'event': 'aura:systemError',
+                'globalId': cmp.getGlobalId(),
+                'handler': function(event) {
+                    if (event["handled"]) {
+                        return;
+                    }
+
+                    $A.message(event.getParam("message"));
+
+                    event["handled"] = true;
+                 }});
+
             $A.initialized = true;
         }
         $A.finishInit(doNotCallUIPerfOnLoad);
@@ -820,6 +835,10 @@ AuraInstance.prototype.warning = function(w, e) {
  * @param {String} msg The message to display.
  */
 AuraInstance.prototype.message = function(msg) {
+    if (!this.displayErrors) {
+        return;
+    }
+
     var message = $A.util.getElement("auraErrorMessage");
     message.innerHTML = "";
     message.appendChild(document.createTextNode(msg));

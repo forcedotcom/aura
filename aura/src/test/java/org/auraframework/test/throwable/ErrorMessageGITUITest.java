@@ -62,7 +62,6 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
         open("/clientApiTest/auraError.app?setFriendlyErrorHandled=false", Mode.DEV);
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         assertDisplayedErrorMessage("Friendly Error Test");
-        assertStacktracePresent();
     }
 
     public void testFriendlyErrorDisplaysErrorIfNotHandled_ProdMode() throws Exception {

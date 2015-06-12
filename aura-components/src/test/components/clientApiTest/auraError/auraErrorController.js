@@ -29,11 +29,18 @@
     },
 
     handleSystemError: function(cmp, event) {
+        if (event["handled"]) {
+            return;
+        }
+
+        $A.message(event.getParam("message"));
         cmp.set("v.systemErrorHandled", true);
         var afe = event.getParam('auraError');
         if (afe && cmp.get("v.setFriendlyErrorHandled")) {
             afe["handled"] = true;
         }
+
+        event["handled"] = true;
     },
 
     throwErrorWithCode: function(cmp) {

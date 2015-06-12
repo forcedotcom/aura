@@ -246,7 +246,7 @@ TestInstance.prototype.continueWhenReady = function() {
             }
         }
         if (this.inProgress > 2) {
-            setTimeout(internalCWR, 200);
+            setTimeout(internalCWR, 50);
         } else {
             if (this.waits.length > 0) {
                 var exp = this.waits[0].expected;
@@ -273,7 +273,7 @@ TestInstance.prototype.continueWhenReady = function() {
                     this.waits.shift();
                     setTimeout(internalCWR, 1);
                 } else {
-                    setTimeout(internalCWR, 200);
+                    setTimeout(internalCWR, 50);
                 }
             } else {
                 this.logErrors(true, "Did not receive expected error: ", this.expectedErrors);

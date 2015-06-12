@@ -39,7 +39,7 @@
             if(!win.aura.test.isComplete()){
                 setTimeout(function(){
                     cmp.getDef().getHelper().runTest(cmp);
-                }, 250);
+                }, 10);
                 return;
             }
         }
@@ -51,7 +51,7 @@
         if(!win.aura.test.isComplete()){
             setTimeout(function(){
                 cmp.getDef().getHelper().displayResults(cmp, win);
-            }, 250);
+            }, 50);
             return;
         }
         var rerun = cmp.find("rerun").getElement();

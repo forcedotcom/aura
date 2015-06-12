@@ -58,7 +58,7 @@
 			if (accessibilityComponent) {
 				var concreteCmp = $A.componentService.get(accessibilityComponent);
 				if (concreteCmp.isInstanceOf("ui:dragAndDropAccessibility")) {
-					concreteCmp.startDragAndDrop([component]);
+					concreteCmp.startDragAndDrop([component], event.target);
 				}
 			}
 			
@@ -104,7 +104,8 @@
 		if (!$A.util.isEmpty(dragImageClass)) {
 			if (typeof event.dataTransfer.setDragImage === "function") {
 				var offsetX = 15, offsetY = 15;
-				var dragImage = this.createDragImage(component, event.pageX, event.pageY, offsetX, offsetY);
+				var cssClasses = [component.get("v.class"), component.get("v.dragImageClass")];
+				var dragImage = this.createDragImage(event.target, cssClasses, event.pageX, event.pageY, offsetX, offsetY);
 				event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
 			}
 		}
@@ -129,26 +130,26 @@
 	
 	/**
 	 * Create custom drag image.
-	 * @param {Aura.Component} component - this component
+	 * @param {HTMLElement} element - the draggable element
+	 * @parma {String[]} cssClasses - css classes to be attached
 	 * @param {int} x - the x coordinate where this dragImage will be positioned
 	 * @param {int} y - the y coordinate where this dragImage will be positioned
 	 * @param {int} offsetX - the x coordinate offset relative to mouse pointer
 	 * @param {int} offsetY - the y coordinate offset relative to mouse pointer
 	 */
-	createDragImage: function(component, x, y, offsetX, offsetY) {
-		var theElement = component.getElement();
-		
+	createDragImage: function(element, cssClasses, x, y, offsetX, offsetY) {
 		// Clone a copy of original draggable element and use it as a dragImage
 		var dragImage = document.createElement("div");
-		$A.util.addClass(dragImage, component.get("v.class"));
-		$A.util.addClass(dragImage, component.get("v.dragImageClass"));
+		$A.util.forEach(cssClasses, function(cssClass) {
+			$A.util.addClass(dragImage, cssClass);
+		});
 		
-		for (var i = 0; i < theElement.childNodes.length; i++) {
-			dragImage.appendChild(theElement.childNodes[i].cloneNode(true));
+		for (var i = 0; i < element.childNodes.length; i++) {
+			dragImage.appendChild(element.childNodes[i].cloneNode(true));
 		}
 		
 		dragImage.style.position = "fixed";
-		dragImage.style.width = theElement.clientWidth + "px";
+		dragImage.style.width = element.clientWidth + "px";
 		dragImage.style.top = (y - offsetY) + "px";
 		dragImage.style.left = (x - offsetX) + "px";
 		dragImage.style.zIndex = "-1";
@@ -160,7 +161,7 @@
 			dragImage.parentNode.removeChild(dragImage);
 		});
 		
-		theElement.parentNode.insertBefore(dragImage, theElement.nextSibling);
+		element.parentNode.insertBefore(dragImage, element.nextSibling);
 		return dragImage;
 	},
 	

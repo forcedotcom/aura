@@ -16,6 +16,6 @@
 ({
 	startDragAndDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.startDragAndDrop(component, params.draggables);
+		helper.startDragAndDrop(component, params.draggables, params.target);
 	}
 })

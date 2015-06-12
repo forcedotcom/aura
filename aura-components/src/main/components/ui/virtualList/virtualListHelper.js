@@ -17,7 +17,12 @@
     DELEGATED_EVENTS: [
         'click',
         'mouseover',
-        'mouseout'
+        'mouseout',
+        'keypress',
+        'dragstart',
+        'dragend',
+        'dragenter',
+        'dragleave'
     ],
     initialize: function (cmp) {
         // Internal variables we use
@@ -197,7 +202,7 @@
         return htmlAttr && htmlAttr[eventTypeAttribute];
     },
     _eventDelegator: function (cmp, e) {
-         var type     = e.type,
+        var type     = e.type,
             target    = e.target,
             ref       = cmp.get('v.itemVar'),
             handlers  = [],
@@ -222,6 +227,10 @@
             target = target.parentElement;
         }
 
+        if (!handlers.length > 0) {
+        	return;
+        }
+        
         if (item) {
             // Seting up the event with some custom properties
             e.templateItem = item;

@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 ({
+	handleDragStart: function (component, event, helper) {
+		helper.handleDragStart(component, event);
+	},
+	
+	handleDragEnd: function (component, event, helper) {
+		helper.handleDragEnd(component, event);
+	},
+	
+	handleKeyPress: function (component, event, helper) {
+		helper.handleKeyPress(component, event);
+	},
+	
 	handleDropComplete: function (component, event, helper) {
 		helper.handleDropComplete(component, event);
 	},

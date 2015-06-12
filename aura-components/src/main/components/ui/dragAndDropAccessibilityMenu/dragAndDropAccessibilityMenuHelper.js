@@ -16,7 +16,7 @@
 ({
 	$isDropPerformed$: false,
 	
-	startDragAndDrop: function(component, draggables) {
+	startDragAndDrop: function(component, draggables, target) {
 		component.set("v.draggables", draggables);
 		
 		// This assumes homogeneous operation type
@@ -50,14 +50,38 @@
 		menu.getEvent("popupTriggerPress").fire();
 		
 		// position accessibility menu
-		var menuElement = menu.getElement();
-		var refElement = draggables[0].getElement();
-		var refBoundingRect = refElement.getBoundingClientRect();
-		var thisBoundingRect = menuElement.getBoundingClientRect();
-		menuElement.style.top = (refBoundingRect.top - thisBoundingRect.top + (refElement.offsetHeight * 0.25)) + "px";
-		menuElement.style.left = (refBoundingRect.left - thisBoundingRect.left + (refElement.offsetWidth * 0.75)) + "px";
+		this.position(menu, target);
 	},
-	
+
+	position: function(targetComponent, referenceEl) {
+		targetComponent.constraints = [];
+
+		// This is for positioning on the center right of the target component
+		targetComponent.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+			align:'right center', 
+			element:targetComponent.getElement(),
+			target:referenceEl,
+			targetAlign: 'right center',
+			enable: true
+		}));
+		
+		// This is for positioning near the window edges. 
+		targetComponent.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+			element:targetComponent.getElement(),
+			target: window,
+			type: 'bounding box',
+			boxDirections: {
+				top:false,
+				bottom:true,
+				left:false,
+				right:true
+			},
+			enable: true,
+			pad: 100
+		}));
+		this.positioningLib.panelPositioning.reposition();
+	},
+
 	/**
 	 * @return true all draggables are in the same context as dropzone
 	 */
@@ -73,9 +97,16 @@
 	},
 	
 	handleMenuCollapse: function(component) {
-		var menuElement = component.find("menu").getElement();
+		var menu = component.find("menu");
+		var menuElement = menu.getElement();
 		menuElement.style.top = "0px";
 		menuElement.style.left = "0px";
+		
+		if(menu.constraints) {
+			menu.constraints.forEach(function(constraint) {
+				constraint.destroy();
+			});
+		}
 		
 		var draggables = component.get("v.draggables");
 		if (draggables.length > 0) {
@@ -87,6 +118,8 @@
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
 		}
+		
+		
 	},
 	
 	handleMenuFocusChange: function(previousItem, currentItem) {

@@ -31,7 +31,6 @@
     <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel" />
     <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog" />
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets the panel as the first focusable element"/>
-    <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="referenceElementSelector" type="String" description="The reference node to which this dialog should be positioned" />
     <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />
     <aura:attribute name="showPointer" type="Boolean" default="false" description="Show a pointer that points to the referenceElement" />

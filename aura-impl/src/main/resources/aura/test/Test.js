@@ -545,12 +545,12 @@ TestInstance.prototype.print = function(value) {
 
 /**
  * Internally used error function to log an error for a given test.
- * 
- * @param {Object|String}
- *            e the error object or message.
+ * @param level ERROR
+ * @param msg message to display
+ * this is being called by Logger.prototype.notify
  * @private
  */
-TestInstance.prototype.auraError = function(level, msg) {
+TestInstance.prototype.auraError = function(level, msg/*, error*/) { 
     if (!this.putMessage(this.preErrors, this.expectedErrors, msg)) {
         this.fail(msg);
     }
@@ -569,9 +569,9 @@ TestInstance.prototype.expectAuraError = function(e) {
 
 /**
  * Internally used warning function to log a warning for a given test.
- * 
- * @param {String}
- *            w The warning message.
+ * @param level WARNING
+ * @param msg message to display
+ * this is being called by Logger.prototype.notify
  * @private
  */
 TestInstance.prototype.auraWarning = function(level, msg) {

@@ -23,7 +23,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext.GlobalValue;
-import org.auraframework.test.util.AuraPrivateAccessor;
+import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 @Controller
 public class ContextVPTestController {

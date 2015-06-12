@@ -19,7 +19,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  */

@@ -31,10 +31,10 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.AuraTestLabels;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.AuraTestLabels;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
  * Test class to verify that clientside cache is invalidated by Aura Servlet.

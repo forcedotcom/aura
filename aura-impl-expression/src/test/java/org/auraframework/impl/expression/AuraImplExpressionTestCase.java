@@ -16,7 +16,7 @@
 package org.auraframework.impl.expression;
 
 import org.auraframework.expression.Expression;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Base test class for testing the expression parser.

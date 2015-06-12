@@ -34,6 +34,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraExceptionInfo;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Base class for unit tests referencing the Aura framework.

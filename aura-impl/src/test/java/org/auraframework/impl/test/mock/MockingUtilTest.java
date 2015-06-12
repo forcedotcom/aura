@@ -31,9 +31,9 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.mock.MockModel;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.mockito.Mockito;
 import org.openqa.selenium.By;
 

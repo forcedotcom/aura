@@ -35,8 +35,8 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 import com.google.common.collect.ImmutableMap;
 

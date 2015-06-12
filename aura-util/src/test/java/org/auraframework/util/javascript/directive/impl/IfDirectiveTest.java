@@ -18,13 +18,13 @@ package org.auraframework.util.javascript.directive.impl;
 import java.io.File;
 import java.util.EnumSet;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.directive.Directive;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.DirectiveParser;
 import org.auraframework.util.javascript.directive.DirectiveType;
 import org.auraframework.util.javascript.directive.DirectiveTypes;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.collect.ImmutableList;
 

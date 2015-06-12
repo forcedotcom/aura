@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.IOUtil;
-import org.auraframework.util.test.PerfGoldFilesUtil;
+import org.auraframework.util.test.diff.PerfGoldFilesUtil;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

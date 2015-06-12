@@ -24,8 +24,8 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

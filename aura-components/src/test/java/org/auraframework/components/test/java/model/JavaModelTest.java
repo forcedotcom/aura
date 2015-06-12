@@ -32,12 +32,12 @@ import org.auraframework.instance.Model;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations;
 import org.auraframework.system.Location;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * This class provides automation for Java models.

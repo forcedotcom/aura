@@ -16,16 +16,13 @@
 package org.auraframework.impl.context;
 
 import java.io.File;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.auraframework.adapter.ComponentLocationAdapter;
-
 import org.auraframework.impl.AuraImplTestCase;
-
-import org.auraframework.test.annotation.AuraTestLabels;
+import org.auraframework.util.test.annotation.AuraTestLabels;
 
 public class AuraRegistryProviderImplTest extends AuraImplTestCase {
     public AuraRegistryProviderImplTest(String name) {

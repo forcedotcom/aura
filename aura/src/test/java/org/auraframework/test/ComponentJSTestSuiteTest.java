@@ -40,12 +40,12 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.test.annotation.WebDriverTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.WebDriverTest;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * @since: 224

@@ -27,8 +27,8 @@ import java.nio.file.FileSystems;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.FileChangeEvent;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;

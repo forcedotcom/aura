@@ -22,8 +22,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Arrays;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.Utf8InputStreamReader;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.base.Charsets;
 

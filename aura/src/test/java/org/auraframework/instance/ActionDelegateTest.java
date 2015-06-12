@@ -15,7 +15,7 @@
  */
 package org.auraframework.instance;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Maps;

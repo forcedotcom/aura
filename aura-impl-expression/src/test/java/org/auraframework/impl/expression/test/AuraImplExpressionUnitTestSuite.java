@@ -17,9 +17,9 @@ package org.auraframework.impl.expression.test;
 
 import junit.framework.TestSuite;
 
-import org.auraframework.test.TestInventory;
-import org.auraframework.test.TestInventory.Type;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
 
 public class AuraImplExpressionUnitTestSuite {
     public static TestSuite suite() throws Exception {

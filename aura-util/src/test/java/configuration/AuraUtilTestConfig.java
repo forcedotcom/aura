@@ -18,11 +18,11 @@ package configuration;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
-import org.auraframework.test.AnnotationTestFilter;
-import org.auraframework.test.TestFilter;
-import org.auraframework.test.TestInventory;
 import org.auraframework.util.ServiceLoaderImpl.AuraConfiguration;
 import org.auraframework.util.ServiceLoaderImpl.Impl;
+import org.auraframework.util.test.util.AnnotationTestFilter;
+import org.auraframework.util.test.util.TestFilter;
+import org.auraframework.util.test.util.TestInventory;
 import org.junit.Ignore;
 
 import com.google.common.collect.Sets;

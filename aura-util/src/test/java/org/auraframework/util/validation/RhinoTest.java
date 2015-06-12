@@ -17,8 +17,8 @@ package org.auraframework.util.validation;
 
 import javax.script.ScriptEngine;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.phobos.script.javascript.RhinoScriptEngineFactory;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Sanity tests to verify the rhino engine we use works as expected.

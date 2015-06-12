@@ -21,9 +21,9 @@ import java.util.Map;
 import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
-import org.auraframework.test.perf.metrics.PerfMetrics;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
-import org.auraframework.test.perf.metrics.PerfRunsCollector;
+import org.auraframework.util.test.perf.metrics.PerfMetrics;
+import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
 import org.json.JSONObject;
 import org.junit.Ignore;
 

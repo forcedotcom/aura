@@ -30,10 +30,10 @@ import junit.framework.TestSuite;
 
 import org.auraframework.test.ComponentJSTestSuiteTest.ComponentTestCase;
 import org.auraframework.test.IntegrationTestCase;
-import org.auraframework.test.TestInventory;
-import org.auraframework.test.TestInventory.Type;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
 
 import com.google.common.collect.Maps;
 

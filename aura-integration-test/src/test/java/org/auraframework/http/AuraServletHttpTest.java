@@ -42,13 +42,13 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.ServiceLocatorMocker;
-import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 /**
  * Automation to verify the handling of AuraServlet requests.

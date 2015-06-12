@@ -17,8 +17,8 @@ package org.auraframework.test.perf;
 
 import java.io.File;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.test.perf.PerfResultsUtil.ResultsJSON;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.json.JSONObject;
 
 public final class PerfResultsUtilTest extends UnitTestCase {

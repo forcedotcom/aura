@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.auraframework.cache.Cache;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mockito;
 

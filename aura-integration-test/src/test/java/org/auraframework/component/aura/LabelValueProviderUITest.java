@@ -18,8 +18,8 @@ package org.auraframework.component.aura;
 import java.util.Map;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
 /**

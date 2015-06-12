@@ -15,7 +15,7 @@
  */
 package org.auraframework.system;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public class LocationTest extends UnitTestCase {
     private static final Location testLocationFileOnly = new Location("filenameonly", 10);

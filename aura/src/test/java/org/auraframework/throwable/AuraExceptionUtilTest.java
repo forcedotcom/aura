@@ -18,8 +18,8 @@ package org.auraframework.throwable;
 import java.io.IOError;
 
 import org.auraframework.system.Location;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Tests for AuraExceptionUtil.

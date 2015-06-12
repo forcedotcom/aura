@@ -21,9 +21,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.parser.StyleParser;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
  * Automation to verify that CSS validation override. Aura enforces validation of CSS in component bundles. This css

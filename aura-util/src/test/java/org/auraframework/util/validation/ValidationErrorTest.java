@@ -17,10 +17,10 @@ package org.auraframework.util.validation;
 
 import java.util.Map;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.util.UnitTestCase;
 
 public final class ValidationErrorTest extends UnitTestCase {
 

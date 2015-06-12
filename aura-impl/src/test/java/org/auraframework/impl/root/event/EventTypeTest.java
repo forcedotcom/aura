@@ -16,7 +16,7 @@
 package org.auraframework.impl.root.event;
 
 import org.auraframework.def.EventType;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
 */

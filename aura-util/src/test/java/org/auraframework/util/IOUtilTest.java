@@ -17,8 +17,8 @@ package org.auraframework.util;
 
 import java.io.File;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.IOUtil.DeleteFailedException;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.io.Files;
 

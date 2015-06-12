@@ -20,9 +20,9 @@ import static org.mockito.Mockito.when;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.controller.TimeZoneInfoController;
 import org.auraframework.impl.controller.TimeZoneInfoController.TimeZoneInfo;
-import org.auraframework.test.ServiceLocatorMocker;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.ServiceLoader;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 

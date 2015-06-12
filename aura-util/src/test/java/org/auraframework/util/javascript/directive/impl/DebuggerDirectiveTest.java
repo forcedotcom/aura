@@ -17,9 +17,9 @@ package org.auraframework.util.javascript.directive.impl;
 
 import java.util.Set;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.directive.Directive;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Tests to verify functions of Debugger Directive {@link DebuggerDirective}.

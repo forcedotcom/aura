@@ -45,14 +45,14 @@ import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Location;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
-import org.auraframework.test.annotation.ThreadHostileTest;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;

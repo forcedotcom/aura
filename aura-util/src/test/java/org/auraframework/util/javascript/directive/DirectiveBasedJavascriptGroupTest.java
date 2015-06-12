@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.EnumSet;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.collect.ImmutableList;
 

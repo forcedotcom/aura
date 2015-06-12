@@ -18,10 +18,10 @@ package org.auraframework.impl.adapter;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLoaderImpl;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.sampleServices.UnimplementedService;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * Unit tests for various service and adapter registration.

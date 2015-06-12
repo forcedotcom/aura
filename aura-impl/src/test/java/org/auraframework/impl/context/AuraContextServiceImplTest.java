@@ -26,8 +26,8 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.AuraPrivateAccessor;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 public class AuraContextServiceImplTest extends AuraImplTestCase {
 

@@ -16,7 +16,7 @@
 package org.auraframework.components.ui.inputMultiSelect;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTest;
+import org.auraframework.util.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;

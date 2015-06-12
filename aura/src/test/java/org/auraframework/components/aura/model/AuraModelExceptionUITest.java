@@ -18,7 +18,7 @@ package org.auraframework.components.aura.model;
 import java.util.List;
 
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

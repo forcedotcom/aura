@@ -25,8 +25,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Scanner;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.io.Files;
 

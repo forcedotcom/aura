@@ -15,7 +15,7 @@
  */
 package org.auraframework.util.javascript.directive;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  */

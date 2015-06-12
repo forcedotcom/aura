@@ -32,8 +32,8 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
-import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.util.ServiceLoader;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;

@@ -19,9 +19,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.LimitedLengthInputStream;
 import org.auraframework.util.LimitedLengthInputStream.StreamFinishedListener;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Tests for the LimitedLengthInputStream

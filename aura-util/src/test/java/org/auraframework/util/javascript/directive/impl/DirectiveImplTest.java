@@ -19,11 +19,11 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptValidator;
 import org.auraframework.util.javascript.directive.DirectiveBasedJavascriptGroup;
 import org.auraframework.util.javascript.directive.JavascriptGeneratorMode;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Tests for DirectiveImpl {@link DirectiveImpl}. DirectiveImpl Expects to

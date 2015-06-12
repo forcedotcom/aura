@@ -31,8 +31,8 @@ import junit.framework.TestCase;
 import junit.framework.TestResult;
 
 import org.auraframework.test.WebDriverProvider;
-import org.auraframework.test.annotation.ThreadHostileTest;
 import org.auraframework.util.AuraUtil;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**
  * This executor handles the execution of test cases

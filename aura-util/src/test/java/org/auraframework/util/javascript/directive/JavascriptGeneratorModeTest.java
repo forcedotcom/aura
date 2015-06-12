@@ -17,7 +17,7 @@ package org.auraframework.util.javascript.directive;
 
 import java.util.HashSet;
 
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Automation to verify JavascriptGeneratorMode class.

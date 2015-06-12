@@ -25,11 +25,11 @@ import java.util.Map;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.test.ServiceLocatorMocker;
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;

@@ -19,7 +19,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 /**
  * Unit tests for {@link ThemeDef} {@link DefDescriptor}s.

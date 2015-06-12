@@ -25,11 +25,12 @@ import java.util.logging.Logger;
 
 import org.auraframework.test.SauceUtil;
 import org.auraframework.test.WebDriverTestCase.UnexpectedError;
-import org.auraframework.test.perf.rdp.CPUProfilerAnalyzer;
-import org.auraframework.test.perf.rdp.RDPNotification;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.perf.PerfUtil;
+import org.auraframework.util.test.perf.rdp.CPUProfilerAnalyzer;
+import org.auraframework.util.test.perf.rdp.RDPNotification;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openqa.selenium.JavascriptExecutor;

@@ -24,9 +24,9 @@ import org.auraframework.impl.adapter.StyleAdapterImplTest.TestStyleAdapter;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
-import org.auraframework.test.ServiceLocatorMocker;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLoader;
+import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 

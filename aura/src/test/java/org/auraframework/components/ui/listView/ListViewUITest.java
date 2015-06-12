@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.auraframework.test.WebDriverTestCase;
 import org.auraframework.test.WebDriverUtil.BrowserType;
-import org.auraframework.test.annotation.PerfTest;
+import org.auraframework.util.test.annotation.PerfTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

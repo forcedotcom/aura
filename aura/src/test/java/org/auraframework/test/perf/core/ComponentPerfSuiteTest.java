@@ -35,12 +35,12 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.TestInventory;
-import org.auraframework.test.TestInventory.Type;
 import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.annotation.PerfTestSuite;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.ServiceLocator;
+import org.auraframework.util.test.annotation.PerfTestSuite;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.util.TestInventory;
+import org.auraframework.util.test.util.TestInventory.Type;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;

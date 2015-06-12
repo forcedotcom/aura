@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.Utf8InputStreamReader;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;

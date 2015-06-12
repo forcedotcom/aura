@@ -21,8 +21,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.auraframework.test.AuraHttpTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 import java.io.File;
 import java.io.FileReader;

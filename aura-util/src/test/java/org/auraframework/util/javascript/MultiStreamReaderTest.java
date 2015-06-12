@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
-import org.auraframework.test.UnitTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;

@@ -18,8 +18,8 @@ package org.auraframework.util.css;
 import java.io.File;
 import java.util.List;
 
-import org.auraframework.test.UnitTestCase;
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.validation.ValidationError;
 
 import com.google.common.base.Charsets;

@@ -16,9 +16,10 @@
 package org.auraframework.impl.util;
 
 import junit.framework.TestSuite;
-import org.auraframework.test.UnitTestCase;
-import org.auraframework.test.annotation.UnAdaptableTest;
-import org.auraframework.test.annotation.UnitTest;
+
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.auraframework.util.test.annotation.UnitTest;
+import org.auraframework.util.test.util.UnitTestCase;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

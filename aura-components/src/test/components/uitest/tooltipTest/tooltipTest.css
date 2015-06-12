@@ -37,6 +37,18 @@
 	float:left;
 	margin-top:20px;
 	margin-bottom:20px;
-	margin-left:20px;
+	margin-left:30px;
 }
 
+.THIS .case:hover{
+
+}
+.THIS .tooltip-trigger2 {
+	text-decoration: underline;
+	font-color:red;
+}
+.THIS .logo {
+	margin-left: 10px;
+	height:40px;
+	width:60px;
+}

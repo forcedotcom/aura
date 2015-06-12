@@ -51,13 +51,9 @@
                     <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}" iconUrl="{!item.icon.url}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" maxCharacters="{!v.maxCharactersInPill}" onHandledEvent="{!c.handlePillEvent}"/>
                 </li>
             </aura:iteration>
-
-            <aura:if isTrue="{!v.pillInput.length>0 &amp;&amp; v.items.length&lt;v.maxAllowed}">
-                <li role="presentation" class="pillContainerListItem">
-                    {!v.pillInput}
-                </li>
-            </aura:if>
-
+            <li role="presentation" class="pillContainerListItem">
+                {!v.pillInput}
+            </li>
         </ul>
         <a aura:id="showMore" class="showMore" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
     </div>

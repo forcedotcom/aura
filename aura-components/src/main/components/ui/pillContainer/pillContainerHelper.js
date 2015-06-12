@@ -29,7 +29,11 @@
                     $A.run(function () {
                         var pillItems = cmp.find('pill');
                         if (!$A.util.isEmpty(pillItems)) {
-                            pillItems[pillItems.length-1].focus();
+                            if ($A.util.isArray(pillItems)) {
+                                pillItems[pillItems.length - 1].focus();
+                            } else {
+                                pillItems.focus();
+                            }
                         }
                     })
                 }, 0);
@@ -146,9 +150,10 @@
         var itemsLength = cmp.get("v.items").length
         var maxAllowed = cmp.get("v.maxAllowed");
         if (!$A.util.isEmpty(pillInput) && itemsLength < maxAllowed) {
+            $A.util.removeClass(cmp.getElement(), 'noinput');
             pillInput[0].focus();
         } else {
-            $A.util.addClass(cmp.getElement(), 'noinput');
+           $A.util.addClass(cmp.getElement(), 'noinput');
         }
 
     },

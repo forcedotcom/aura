@@ -55,3 +55,7 @@
 .THIS.focused input {
     width:auto;
 }
+
+.THIS.noinput input {
+    display: none;
+}

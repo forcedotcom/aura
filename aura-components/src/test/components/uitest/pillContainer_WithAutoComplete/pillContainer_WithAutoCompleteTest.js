@@ -241,6 +241,39 @@
         }]
     },
 
+    testInsertPillWithMaxAllowedOne: {
+        attributes: {
+            maxAllowed: 1
+        },
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+
+            $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
+        }
+    },
+
+    testRemovePillWithMaxAllowedOne: {
+        attributes: {
+            maxAllowed: 1
+        },
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+
+            this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
+
+            var firstPill = pillContainer.find("pill");
+            this._fireKeydownEvent(firstPill, this.BACKSPACE_KEY);
+
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return document.activeElement === textInput.getElement();
+            }, "input should be focused");
+        }
+    },
+
     _getInput: function(cmp) {
         return cmp.find("autocomplete").getSuper().find("input");
     },

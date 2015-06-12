@@ -49,7 +49,10 @@
         	var mockAsyncCmp = {
         			get : function() {
         				return {fire : function() {}}
-        			}
+        			},
+					isValid: function() {
+						return true;
+					}
         	};
         	$A.test.assertUndefined(cmp._registeredComponents, 
         			"Registered component initial status is not correct.");

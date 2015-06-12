@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 
 ({
     /**
@@ -25,13 +25,13 @@
         var maxConcurrency = cmp.get("v.maxConcurrency");
         var asyncCmp = "";
 
-        while(numOfLoadingComponents < maxConcurrency && registeredComponents.length > 0) {
+        while (numOfLoadingComponents < maxConcurrency && registeredComponents.length > 0) {
             // get the next registered component to load
-       	    asyncCmp = registeredComponents.shift();
+            asyncCmp = registeredComponents.shift();
             cmp._registeredComponents = registeredComponents;
 
             // fire load event
-            if(asyncCmp) {
+            if (asyncCmp && asyncCmp.isValid()) {
                 asyncCmp.get("e.load").fire();
 
                 // increment loadingComponents count

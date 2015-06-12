@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 ({
-    load: function(cmp, event, helper) {
+    load: function (cmp, event, helper) {
         var imageElement = cmp.getElement().getElementsByTagName("img")[0];
         imageElement.src = cmp.get("v.actualImageSrc");
-        // refresh default image and notify asyncComponentManager when new image is loaded.
-        imageElement.onload = function() {
-            $A.get("e.ui:asyncComponentLoaded").setParams({
-                asyncComponent: cmp
-            }).fire();
-        };
-
-        // notify asyncComponentManager when image is loaded with error
-        imageElement.onerror = function() {
-            $A.get("e.ui:asyncComponentLoaded").setParams({
-                asyncComponent: cmp
-            }).fire();
-        };
+        var callback = $A.getCallback(function () {
+            if (cmp && cmp.isValid()) {
+                $A.get("e.ui:asyncComponentLoaded").fire({"asyncComponent": cmp});
+            }
+        });
+        // notify asyncComponentManager when image is loaded (or there was an error)
+        imageElement.onload = callback;
+        imageElement.onerror = callback;
     }
 })

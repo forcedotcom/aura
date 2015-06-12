@@ -38,6 +38,8 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String CLOSE_ON_CLICKOUT = ".inputcloseOnClickOutClass";	
     private final String MAKE_SCROLLABLE = ".inputMakeScrollableClass";
     private final String MAKE_NONSCROLLABLE = ".inputNonScrollableClass";
+    private final String ENABLE_CUSTOM_CLOSEACTION = ".inputCustomizeCloseAction";
+    private final String INPUT_PANELTYPE = ".inputPanelTypeClass";
     
     
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
@@ -49,9 +51,9 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 	
 	 /**
      * [Accessibility] modal closing on Esc key.
-     * Bug: W-2616943
+     * Bug: W-2617212
      */
-    public void _testPressEscKeyOnModal() throws Exception{
+    public void testPressEscKeyOnModal() throws Exception{
     	open(APP);
     	openPanel();
     	waitForModalOpen();
@@ -63,19 +65,52 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     
     /**
      * [Accessibility] panel dialog closing on Esc key.
-     * Bug: W-2617236	
+     * Revisit once Bug: W-2643030 is fixed
      */
-    public void _testPressEscKeyOnPanelDialog() throws Exception{
+    public void testPressEscKeyOnPanelDialog() throws Exception{
     	open(APP + "?" + PARAM_PANEL_TYPE + "panel");
     	openPanel();
     	waitForPanelDialogOpen();
     	
-    	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-    	activeElement.sendKeys(Keys.ESCAPE);
+    	WebElement fistInputElement = findDomElements(By.cssSelector(INPUT_PANELTYPE)).get(1);
+    	fistInputElement.click();
+    	
+    	fistInputElement.sendKeys(Keys.ESCAPE);
         waitForPanelDialogClose();
     }
     
     /**
+     * Verify custom close action
+     * Bug: W-2619406
+     */
+    public void testPressEscKeyOnPanelDialogWhenCloseActionSet() throws Exception{
+    	open(APP + "?" + PARAM_PANEL_TYPE + "panel");
+    	WebElement enableCustomCloseAction = findDomElement(By.cssSelector(ENABLE_CUSTOM_CLOSEACTION));
+    	enableCustomCloseAction.click();
+    	
+    	openPanel();
+    	waitForPanelDialogOpen();
+    	
+    	WebElement fistInputElement = findDomElements(By.cssSelector(INPUT_PANELTYPE)).get(1);
+    	fistInputElement.click();
+    	
+    	fistInputElement.sendKeys(Keys.ESCAPE);
+    	//ESC does not close the panel
+    	waitForPanelDialogOpen();
+    	String actionType = "closeOnEsc";
+    	verifyCustomCloseActionMethodCalled(actionType);
+    }
+    
+    private void verifyCustomCloseActionMethodCalled(String actionType) {
+    	String panelGlobalId = findDomElements(By.cssSelector(".IdCreated")).get(0).getText();
+    	String attrValueExp = auraUITestingUtil.getValueFromCmpExpression(panelGlobalId, "v.closeActionCalled");
+        
+    	String attrValueText = (String) auraUITestingUtil.getEval(attrValueExp);
+    	String expectedText = String.format("CloseActionCustomMethodCalled when %s", actionType);
+    	assertEquals("Custom close on Action method was not called", expectedText, attrValueText);
+    }
+
+	/**
      * Test modal does have scrollbar when content is not so long
      * Test case: W-2615146
      */
@@ -155,12 +190,36 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
     
     /**
+     * Verify custom close action
+     * Bug: W-2619406
+     */
+    public void testPanelDialogWithCloseOnClickOutSetAndCustomCloseActionSet() throws Exception{
+    	open(APP + "?" + 
+    			PARAM_PANEL_TYPE + "panel");
+    	WebElement closeOutChexbox = findDomElement(By.cssSelector(CLOSE_ON_CLICKOUT));
+    	closeOutChexbox.click();
+    	WebElement enableCustomCloseAction = findDomElement(By.cssSelector(ENABLE_CUSTOM_CLOSEACTION));
+        enableCustomCloseAction.click();
+    	openPanel();
+    	waitForPanelDialogOpen();
+    	
+    	WebElement inputText = findDomElement(By.cssSelector(APP_INPUT));
+		inputText.click();
+		//Click outside should not close the panel
+        waitForPanelDialogOpen();
+        
+        String actionType = "closeOnClickOut";
+        verifyCustomCloseActionMethodCalled(actionType);
+    }
+    
+    /**
      * Tabs on Modal overlay should do focus trapping and not close the overlay
      */
     public void testModalFocusTrapping() throws Exception{
     	String panelType = "modal";
     	String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
-    	doTestCycleThroughPanelInputElements(url,"modal", 22, false);
+    	open(url);
+    	cycleThroughPanelInputElements(url,"modal", false);
     }
     
     /**
@@ -169,7 +228,23 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     public void testPanelDoesNotDoFocusTrapping() throws Exception{
     	String panelType = "panel";
     	String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
-    	doTestCycleThroughPanelInputElements(url, "panel", 22, true);
+    	open(url);
+    	cycleThroughPanelInputElements(url, "panel", true);
+    }
+    
+    /**
+     * Verify custom close action
+     * Bug: W-2619406
+     */
+    public void testPanelTabOutCallsCustomCloseActionWhenSet() throws Exception{
+    	String panelType = "panel";
+    	String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
+    	open(url);
+    	WebElement enableCustomCloseAction = findDomElement(By.cssSelector(ENABLE_CUSTOM_CLOSEACTION));
+        enableCustomCloseAction.click();
+    	cycleThroughPanelInputElements(url, "panel", false);
+    	String actionType = "closeOnTabOut";
+        verifyCustomCloseActionMethodCalled(actionType);
     }
     
     /**
@@ -179,22 +254,22 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     	String panelType = "panel";
     	String flavor = "full-screen";
     	String url = APP + "?" + PARAM_PANEL_TYPE + panelType + FLAVOR + flavor;
-    	doTestCycleThroughPanelInputElements(url, "panel", 22, true);
+    	open(url);
+    	cycleThroughPanelInputElements(url, "panel", true);
     }
     
-    private void doTestCycleThroughPanelInputElements(String url, String panelType, int numElements, boolean doesPanelClose) throws Exception{
-    	open(url);
+    private void cycleThroughPanelInputElements(String url, String panelType, boolean doesPanelClose) throws Exception{
     	openPanel();
     	if (panelType.equals("modal")) {
     		waitForModalOpen();
     	} else {
     		waitForPanelDialogOpen();
     	}
-    	List<WebElement> firstInput = findDomElements(By.cssSelector(".inputPanelTypeClass"));
+    	List<WebElement> firstInput = findDomElements(By.cssSelector(INPUT_PANELTYPE));
     	firstInput.get(1).click();
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
     	//assertEquals("Focus should be on first element", panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-    	
+    	int numElements = 23;
     	// cycle through input elements on panel
     	for (int i=1; i<numElements; i++) {
     		activeElement.sendKeys(Keys.TAB);
@@ -214,7 +289,11 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     		/*activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         	assertEquals("Panel should not be close and focus should be on first element", 
         			panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));*/
-    		waitForModalOpen();
+    		if (panelType.equals("modal")) {
+        		waitForModalOpen();
+        	} else {
+        		waitForPanelDialogOpen();
+        	}
     	}
     }
     

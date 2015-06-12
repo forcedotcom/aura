@@ -40,7 +40,9 @@
 	<aura:attribute name="panelFooter"  type="Aura.Component[]"/>
 	<aura:attribute name="makeScrollable"     type="Boolean" default="false"/>
 	<aura:attribute name="nonScrollable"     type="Boolean" default="false"/>
-	
+	<aura:attribute name="customizeCloseAction"     type="Boolean" default="false"/>
+	<aura:attribute name="closeActionCalled"    type="String"  default=""/>
+
 	<aura:dependency resource="markup://ui:createPanel" type="EVENT"/> 
 	
 	<aura:handler name="init" value="{!this}" action="{!c.init}"></aura:handler> 
@@ -50,7 +52,6 @@
 	</div>
 	ID of NEW Panel/Modal created: <ui:outputText class="IdCreated" aura:id="IdCreated" value=""/> <br/><br/>
 	ID of Destroyed Panel/Modal: <ui:outputText class="IdDestroyed" aura:id="IdDestroyed" value=""/> <br/><br/>
-	
 	<div class="container">
 		<div class="testPanelModal">
 			<ui:inputText     aura:id="inputPanelType"          label="Panel Type"       value="{!v.panelType}"      class="inputPanelTypeClass"/>
@@ -74,6 +75,7 @@
 			<ui:inputCheckbox aura:id="inputUseFooter"          label="Use Footer"       value="{!v.useFooter}"      class="inputUseFooterClass"/>
 			<ui:inputCheckbox aura:id="inputMakeScrollable"     label="Make Scrollable"  value="{!v.makeScrollable}" class="inputMakeScrollableClass"/>
 			<ui:inputCheckbox aura:id="inputNonScrollable"     label="Non Scrollable Modal"  value="{!v.nonScrollable}" class="inputNonScrollableClass"/>
+			<ui:inputCheckbox aura:id="inputCustomizeCloseAction"     label="Customize CloseAction"  value="{!v.customizeCloseAction}" class="inputCustomizeCloseAction"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
 		</div>		
 	</div>

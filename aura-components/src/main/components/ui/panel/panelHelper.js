@@ -15,9 +15,11 @@
  */
 ({
     init: function(cmp, event) {
+    	var closeAction = cmp.get("v.closeAction");
         //handler for closeOnEsc and closeOnTabOut
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true});
-        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: true});
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
+        //handler for closeOnClickOut
+        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: true}, closeAction);
     },
 
     show: function (cmp, callback) {

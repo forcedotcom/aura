@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Mode;
 
 /**
  */
@@ -50,7 +49,7 @@ public class AuraRewriteFilter implements Filter {
 
     }
 
-    private static String createURI(String namespace, String name, String defType, String access, String qs) {
+    static String createURI(String namespace, String name, String defType, String access, String qs) {
         String ret = String.format(uriPattern, namespace, name, defType, access);
 
         if (qs != null) {
@@ -75,7 +74,6 @@ public class AuraRewriteFilter implements Filter {
             newUri = createURI(pubMatcher.group(1), pubMatcher.group(2), DefType.APPLICATION.name(),
                     Authentication.UNAUTHENTICATED.name(), qs);
         } else {
-            Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
             String ns;
             String name;
             String type = null;
@@ -93,15 +91,8 @@ public class AuraRewriteFilter implements Filter {
                 }
             }
             if (matcher != null) {
-                if (mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG) {
-                    qs = String.format("descriptor=%s:%s&defType=%s", matcher.group(1), matcher.group(2), type);
-                    ns = "aurajstest";
-                    name = "jstest";
-                    type = DefType.APPLICATION.name();
-                } else {
-                    ns = matcher.group(1);
-                    name = matcher.group(2);
-                }
+                ns = matcher.group(1);
+                name = matcher.group(2);
                 newUri = createURI(ns, name, type, Authentication.AUTHENTICATED.name(), qs);
             }
 

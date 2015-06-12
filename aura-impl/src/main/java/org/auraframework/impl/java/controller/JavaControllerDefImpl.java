@@ -65,8 +65,8 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
      * Add our dependencies to the set.
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+        super.appendDependencies(dependencies, true);
         // FIXME: put all of our action dependencies in here...
     }
     /**

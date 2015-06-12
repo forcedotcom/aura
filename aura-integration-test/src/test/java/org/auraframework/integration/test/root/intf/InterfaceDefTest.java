@@ -39,7 +39,8 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-@SuppressWarnings("deprecation")
+import com.google.common.collect.Sets;
+
 public class InterfaceDefTest extends AuraImplTestCase {
 
     public InterfaceDefTest(String name) {
@@ -66,14 +67,17 @@ public class InterfaceDefTest extends AuraImplTestCase {
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, eventDefs, null, extensions,
                 "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider");
-        Set<DefDescriptor<?>> expected = new HashSet<>();
+        Set<DefDescriptor<?>> expected = Sets.newHashSet();
         expected.add(DefDescriptorImpl.getInstance(
                 "java://org.auraframework.impl.java.provider.TestComponentDescriptorProvider", ProviderDef.class));
         expected.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         expected.add(eventDescriptor);
-        Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        def.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        def.appendDependencies(dependencies, true);
         assertEquals("dependencies are incorrect", expected, dependencies);
+        dependencies = Sets.newHashSet();
+        def.appendDependencies(dependencies, false);
+        assertEquals("dependencies are incorrect with includeExtends = false", expected, dependencies);
     }
 
     public void testValidateDefinitionNullDescriptor() throws Exception {
@@ -213,7 +217,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testEqualsWithDifferentLocations() {
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(vendor
                 .makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null, new Location("filename1", 4, 4,
-                        1000), null, null);
+                1000), null, null);
         assertFalse(
                 "InterfacesDefs with different locations shouldn't have been equal",
                 vendor.makeInterfaceDef(vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null,

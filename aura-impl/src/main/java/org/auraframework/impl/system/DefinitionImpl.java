@@ -129,9 +129,19 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     /**
      * @throws QuickFixException
      * @see Definition#appendDependencies(java.util.Set)
+     * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
      */
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        appendDependencies(dependencies, true);
+    }
+
+    /**
+     * @throws QuickFixException
+     * @see Definition#appendDependencies(java.util.Set, boolean)
+     */
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
     }
 
     /**
@@ -394,5 +404,23 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
     @Override
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public void setHasServerDependencies(boolean hasServerDependencies) {
+    }
+
+    @Override
+    public void setHasServerPassthroughDependencies(boolean hasServerDependencies) {
+    }
+    
+    @Override
+    public boolean hasServerDependencies() {
+        return false;
+    }
+    
+    @Override
+    public boolean hasServerPassthroughDependencies() {
+        return false;
     }
 }

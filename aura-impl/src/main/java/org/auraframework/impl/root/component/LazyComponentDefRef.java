@@ -52,10 +52,10 @@ public class LazyComponentDefRef extends ComponentDefRefImpl {
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         DefDescriptor<?> descriptor = (DefDescriptor<?>) getAttributeDefRef("refDescriptor").getValue(); 
         dependencies.add(descriptor);
-        super.appendDependencies(dependencies);
+        super.appendDependencies(dependencies, true);
     }
 
     @Override

@@ -17,6 +17,7 @@ package org.auraframework.impl.root.library;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -98,8 +99,8 @@ public class IncludeDefRefImpl extends DefinitionImpl<IncludeDefRef> implements 
     }
 
     @Override
-    public void appendDependencies(java.util.Set<org.auraframework.def.DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+        super.appendDependencies(dependencies, true);
         dependencies.add(includeDescriptor);
         if (imports != null) {
             for (DefDescriptor<IncludeDef> imported : imports) {

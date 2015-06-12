@@ -29,6 +29,7 @@ import org.auraframework.cache.Cache;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -706,11 +707,61 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
 
             Set<DefDescriptor<?>> newDeps = Sets.newHashSet();
-            cd.def.appendDependencies(newDeps);
+            cd.def.appendDependencies(newDeps, false);
 
-            for (DefDescriptor<?> dep : newDeps) {
-                getHelper(dep, cc, stack, cd.def);
+            //
+            // We have to special case for both templates and for extends here. First we get our extends,
+            // which only applies for BaseComponentDef (ugh).
+            //
+            boolean hasServerDeps = false;
+            boolean hasServerPassthroughDeps = false;
+            DefDescriptor<?> superDesc = null;
+            if (cd.def instanceof BaseComponentDef) {
+                superDesc = ((BaseComponentDef)cd.def).getExtendsDescriptor();
+                if (newDeps.contains(superDesc)) {
+                    superDesc = null;
+                }
             }
+            if (superDesc != null) {
+                newDeps.add(superDesc);
+            }
+
+            //
+            // During the loop through all direct dependencies, we additively determine if
+            // there is a server dependency.
+            //
+            for (DefDescriptor<?> dep : newDeps) {
+                Definition d = getHelper(dep, cc, stack, cd.def);
+                if (d != null) {
+                    boolean isTemplate = (d instanceof ComponentDef && ((ComponentDef)d).isTemplate());
+                    boolean isSuper = dep.equals(superDesc);
+
+                    // Pass through dependencies only if a super or not a template
+                    if (!hasServerPassthroughDeps && (!isTemplate || isSuper)) {
+                        hasServerPassthroughDeps = d.hasServerPassthroughDependencies();
+                    }
+                    // direct dependencies only if a not a template, for supers, special case.
+                    if (!hasServerDeps && !isTemplate) {
+                        if (isSuper) {
+                            hasServerDeps = d.hasServerPassthroughDependencies();
+                        } else {
+                            hasServerDeps = d.hasServerDependencies();
+                        }
+                    }
+                }
+            }
+            //
+            // Finally, we add the local defs, as here we need to have already loaded the
+            // definitions that we depend on. (double ugh)
+            //
+            if (!hasServerPassthroughDeps) {
+                hasServerPassthroughDeps = cd.def.hasServerPassthroughDependencies();
+            }
+            cd.def.setHasServerPassthroughDependencies(hasServerPassthroughDeps);
+            if (!hasServerDeps) {
+                hasServerDeps = cd.def.hasServerDependencies();
+            }
+            cd.def.setHasServerDependencies(hasServerDeps);
 
             return cd.def;
         } finally {

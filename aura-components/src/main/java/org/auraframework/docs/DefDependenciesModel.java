@@ -59,7 +59,7 @@ public class DefDependenciesModel {
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
 
-        def.appendDependencies(deps);
+        def.appendDependencies(deps, true);
 
         for (DefDescriptor<?> dep : deps) {
         	if (ReferenceTreeModel.hasAccess(dep.getDef())) {

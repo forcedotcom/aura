@@ -1636,8 +1636,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public void validateDefinition() throws QuickFixException {
         }
 
+        /**
+         * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
+         */
         @Override
         public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+            appendDependencies(dependencies, true);
+        }
+
+        @Override
+        public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         }
 
         @Override
@@ -1735,6 +1743,24 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         @Override
         public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
+        }
+
+        @Override
+        public boolean hasServerDependencies() {
+            return false;
+        }
+
+        @Override
+        public boolean hasServerPassthroughDependencies() {
+            return false;
+        }
+
+        @Override
+        public void setHasServerDependencies(boolean hasServerDependencies) {
+        }
+
+        @Override
+        public void setHasServerPassthroughDependencies(boolean hasServerDependencies) {
         }
     }
 

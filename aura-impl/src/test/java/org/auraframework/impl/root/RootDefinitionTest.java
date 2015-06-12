@@ -31,7 +31,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest<T> {
+public abstract class RootDefinitionTest<T extends RootDefinition> extends DefinitionTest {
 
     private final Class<T> defClass;
     protected final String baseTag;

@@ -67,7 +67,10 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
     public void testAppendsDependencies() throws Exception {
         FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
-        fi.appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependenciesFalse = new HashSet<>();
+        fi.appendDependencies(dependencies, true);
+        fi.appendDependencies(dependenciesFalse, false);
+        assertEquals("flavors should not use includeExtends", dependencies, dependenciesFalse);
 
         DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);

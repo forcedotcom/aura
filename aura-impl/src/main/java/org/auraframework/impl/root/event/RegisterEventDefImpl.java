@@ -83,7 +83,7 @@ public final class RegisterEventDefImpl extends DefinitionImpl<EventDef> impleme
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         dependencies.add(descriptor);
     }
 

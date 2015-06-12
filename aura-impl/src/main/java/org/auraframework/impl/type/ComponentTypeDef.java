@@ -93,7 +93,7 @@ public class ComponentTypeDef extends DefinitionImpl<TypeDef> implements TypeDef
      */
     @Override
     public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-        ((ComponentDefRef) instance).appendDependencies(deps);
+        ((ComponentDefRef) instance).appendDependencies(deps, true);
     }
 
 }

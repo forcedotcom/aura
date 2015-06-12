@@ -81,12 +81,12 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         for (FlavorIncludeDef flavorIncludeDef : flavorIncludeDefs) {
-            flavorIncludeDef.appendDependencies(dependencies);
+            flavorIncludeDef.appendDependencies(dependencies, true);
         }
         for (FlavorDefaultDef flavorDefaultDef : flavorDefaultDefs) {
-            flavorDefaultDef.appendDependencies(dependencies);
+            flavorDefaultDef.appendDependencies(dependencies, true);
         }
     }
 

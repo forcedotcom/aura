@@ -64,7 +64,7 @@ public class ThemeDefRefImplTest extends StyleTestCase {
         ThemeDefRef def = source(String.format("<aura:importTheme name='%s'/>", desc.getDescriptorName()));
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        def.appendDependencies(deps);
+        def.appendDependencies(deps, true);
         assertTrue(deps.contains(desc));
     }
 

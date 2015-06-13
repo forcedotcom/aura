@@ -33,11 +33,11 @@
      * Verify that the component actually is how we expect it to be
      */
     verifyInputDefaultStructure : function(input, ul, childrenLength){
-         //Grab the uls children and verify that there are three
-         var children = ul.children;
-         $A.test.assertEquals(childrenLength, children.length, "The amount of children is incorrect");
+        // Grab the uls children and verify that there are three
+        var children = ul.children;
+        $A.test.assertEquals(childrenLength, children.length, "The amount of children is incorrect");
 
-       //Verify aria-describedby value on the input tags matches the ul of inputDefaultError
+        // Verify aria-describedby value on the input tags matches the ul of inputDefaultError
         this.verifyAriaIdCorrect(ul, input)
     },
 
@@ -64,7 +64,7 @@
   * HELPER FUNCTION END
   ************************************************************************************************************/
 
-     //Testing that the input default component can still links up correctly when validated during the init.
+     // Testing that the input default component can still links up correctly when validated during the init.
     testInputDefaultDynamic : {
         attributes : {"caseToRender" : "dynamic"},
         test : [function(cmp) {
@@ -74,18 +74,18 @@
         },function(cmp){
             var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
             var input = $A.test.getElementByClass("class1");
-            //Grabbing the original id (the first element created)
+            // Grabbing the original id (the first element created)
             var aId = $A.util.getElementAttributeValue(ul,"id");
 
             this.verifyInputDefaultStructure(input[0], ul, 1)
         }, function(cmp){
-             //Validate the components
+             // Validate the components
             this.fireErrorValidation(cmp.find("new_button"), false);
         }, function(cmp){
             var uls = $A.test.getElementByClass("uiInputDefaultError");
             var aId = $A.util.getElementAttributeValue(uls[0],"id");
 
-            //Verify second dynamically created input works correctly
+            // Verify second dynamically created input works correctly
             var input = $A.test.getElementByClass("class2");
             this.verifyInputDefaultStructure(input[0], uls[1], 1);
 
@@ -98,24 +98,24 @@
     testInputDefaultShowsWithOnlyOneItem : {
         attributes : {"caseToRender" : "default"},
         test : [function(cmp) {
-            //Verify that there are no inputDefaultErrors or uls on the page
+            // Verify that there are no inputDefaultErrors or uls on the page
             $A.test.assertEquals(document.getElementsByTagName("ul").length, 0, "There should be no uls present")
         }, function(cmp){
-            //Validate the components
+            // Validate the components
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp){
             var chldsText = "",
             ul = null,
             chlds = null,
             i = 0;
-            //There should only be on ul/inputDefaultError component on the page
+            // There should only be on ul/inputDefaultError component on the page
             ul = $A.test.getElementByClass("uiInputDefaultError")[0];
 
             this.validateBasic(cmp,"defaultInvalid");
 
-             //Grab the uls children and verify that there are three
+             // Grab the uls children and verify that there are three
             var chlds = ul.children;
-            //Verify error messages are correct
+            // Verify error messages are correct
             for(i = 0; i< chlds.length; i++){
                 chldsText = $A.util.getText(chlds[i]);
                 $A.test.assertTrue(this.ERROR_OUTPUT.indexOf(chldsText) > -1, "Error message that is present is incorrect");
@@ -130,18 +130,18 @@
         browsers: ["-IE7"],
         attributes: {"caseToRender" : "default"},
         test : [function(cmp){
-            //Validate the components
+            // Validate the components
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp){
             this.validateBasic(cmp,"defaultInvalid");
         }, function(cmp){
-            //Remove errors
+            // Remove errors
             this.fireErrorValidation(cmp.find("validate"), true);
         }, function(cmp){
-            //UL should no longer exist
+            // UL should no longer exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an inputDefaultError on the page!");
-            //Make the component have errors again
+            // Make the component have errors again
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp){
             this.validateBasic(cmp,"defaultInvalid");
@@ -151,19 +151,19 @@
     testInputDefaultWorkWithErrorComponentAttribute : {
         attributes: {"caseToRender" : "customUsage"},
         test : [function(cmp) {
-            //UL should not exist
+            // UL should not exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an inputDefaultError on the page!");
 
-            //Validate the components
+            // Validate the components
             this.fireErrorValidation(cmp.find("validate"), false);
         },function(cmp){
             this.validateBasic(cmp,"customUsageInvalid");
         },function(cmp){
-            //Validate the components
+            // Validate the components
             this.fireErrorValidation(cmp.find("validate"), true);
         },function(cmp){
-            //UL should no longer exist
+            // UL should no longer exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an inputDefaultError on the page!");
         }]
@@ -172,7 +172,7 @@
     testStaticCustomErrorComponentAttribute : {
         attributes: {"caseToRender" : "staticCustomError"},
         test : [function(cmp) {
-            //UL should not exist
+            // UL should not exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an uiInputDefaultError on the page!");
 
@@ -194,44 +194,7 @@
             // Clear errors
             this.fireErrorValidation(cmp.find("validate"), true);
         }, function(cmp) {
-            //UL should not exist
-            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
-                    "There should not be an uiInputDefaultError on the page!");
-        }]
-    },
-
-    // need to update ariaDescribedBy
-    // This is "late-binding" the errorComponent attribute after input component instantiation
-    _testSetCustomErrorComponentAttribute : {
-        attributes: {"caseToRender" : "textArea"},
-        test : [function(cmp) {
-            //UL should not exist
-            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
-                    "There should not be an uiInputDefaultError on the page!");
-
-            // Set errorComponent
-            var thisComponent = cmp.find("textAreaInvalid");
-            var created = false;
-            $A.createComponent("uitest:inputErrorComponent", {}, function(errorCmp) {
-                thisComponent.set("v.errorComponent", [errorCmp]);
-                created = true;
-            });
-            $A.test.addWaitFor(true, function() {
-                return created;
-            });
-        }, function(cmp) {
-            // Set errors
-            this.fireErrorValidation(cmp.find("validate"), false);
-        },function(cmp){
-            var thisComponent = cmp.find("textAreaInvalid");
-            var errorComponent = thisComponent.get("v.errorComponent")[0];
-            $A.test.assertEquals("markup://uitest:inputErrorComponent", errorComponent.getDef().getDescriptor().toString());
-            this.validateBasic(cmp,"textAreaInvalid");
-        }, function(cmp) {
-            // Clear errors
-            this.fireErrorValidation(cmp.find("validate"), true);
-        }, function(cmp) {
-            //UL should not exist
+            // UL should not exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an uiInputDefaultError on the page!");
         }]
@@ -267,7 +230,166 @@
             // Clear errors
             this.fireErrorValidation(cmp.find("validate"), true);
         }, function(cmp) {
-            //UL should not exist
+            // UL should not exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
+                    "There should not be an uiInputDefaultError on the page!");
+        }]
+    },
+
+    testValueOnly : {
+        attributes: {"caseToRender" : "clientCreated"},
+        test : [function(cmp) {
+            var created = false;
+            $A.createComponent("ui:inputDefaultError", { value : ["one","two"] }, function(errorCmp) {
+                $A.createComponent("ui:inputText", {
+                    "errorComponent" : [ errorCmp ]
+                }, function(inputCmp){
+                    cmp.index("clientCreatedInvalid", inputCmp.getGlobalId());
+                    var newBody = cmp.getSuper().get("v.body");
+                    newBody.unshift(inputCmp);
+                    cmp.set("v.body", newBody);
+                    created = true;
+                });
+            });
+            $A.test.addWaitFor(true, function() {
+                return created;
+            });
+        }, function(cmp) {
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("clientCreatedInvalid").getElement();
+
+            var children = ul.children;
+            $A.test.assertEquals(2, children.length, "The amount of children is incorrect");
+            $A.test.assertEquals("one", $A.util.getText(children[0]));
+            $A.test.assertEquals("two", $A.util.getText(children[1]));
+
+            // Clear value
+            cmp.find("clientCreatedInvalid").get("v.errorComponent")[0].set("v.value", []);
+        }, function(cmp) {
+            // UL should not exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
+                    "There should not be an uiInputDefaultError on the page!");
+        }]
+    },
+    
+    testValueIsIndependentOfErrors : {
+        attributes: {"caseToRender" : "textArea"},
+        test : [function(cmp) {
+            // Set errors
+            this.fireErrorValidation(cmp.find("validate"), false);
+        }, function(cmp) {
+            this.validateBasic(cmp, "textAreaInvalid");
+            
+            // Update both value and errors
+            cmp.find("textAreaInvalid").get("v.errorComponent")[0].set("v.value", [ "value1", "value2" ]);
+            cmp.validateInput([ { message : "error1" } ]);
+        }, function(cmp) {
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("textAreaInvalid").getElement();
+
+            var children = ul.children;
+            $A.test.assertEquals(3, children.length, "The amount of children is incorrect");
+            $A.test.assertEquals("value1", $A.util.getText(children[0]));
+            $A.test.assertEquals("value2", $A.util.getText(children[1]));
+            $A.test.assertEquals("error1", $A.util.getText(children[2]));
+            
+            // Update only value
+            cmp.find("textAreaInvalid").get("v.errorComponent")[0].set("v.value", [ "value3" ]);
+        }, function(cmp) {
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("textAreaInvalid").getElement();
+
+            var children = ul.children;
+            $A.test.assertEquals(2, children.length, "The amount of children is incorrect");
+            $A.test.assertEquals("value3", $A.util.getText(children[0]));
+            $A.test.assertEquals("error1", $A.util.getText(children[1]));
+
+            // Clear errors
+            cmp.validateInput([]);
+        }, function(cmp) {
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("textAreaInvalid").getElement();
+
+            var children = ul.children;
+            $A.test.assertEquals(1, children.length, "The amount of children is incorrect");
+            $A.test.assertEquals("value3", $A.util.getText(children[0]));
+
+            // Clear value
+            cmp.find("textAreaInvalid").get("v.errorComponent")[0].set("v.value", []);
+        }, function(cmp) {
+            // UL should not exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
+                    "There should not be an uiInputDefaultError on the page!");
+        }]
+    },
+    
+    // Modifying the errors attribute on the errorComponent should propagate to the input component
+    _testErrorsUpdatedViaErrorComponent : {
+        attributes: {"caseToRender" : "textArea"},
+        test : [function(cmp) {
+            // Set errors
+            this.fireErrorValidation(cmp.find("validate"), false);
+        }, function(cmp) {
+            this.validateBasic(cmp, "textAreaInvalid");
+            
+            // Update errors on errorComponent
+            cmp.find("textAreaInvalid").get("v.errorComponent")[0].set("v.errors", [ { message : "last man standing" } ]);
+        }, function(cmp) {
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("textAreaInvalid").getElement();
+
+            var children = ul.children;
+            $A.test.assertEquals(1, children.length, "The amount of children is incorrect");
+            $A.test.assertEquals("last man standing", $A.util.getText(children[0]));
+            
+            var inputErrors = cmp.find("textAreaInvalid").get("v.errors");
+            $A.test.assertEquals(1, inputErrors.length);
+            $A.test.assertEquals("last man standing", inputErrors[0].message);
+
+            // Clear errors on errorComponent
+            cmp.find("textAreaInvalid").get("v.errorComponent")[0].set("v.errors", []);
+        }, function(cmp) {
+            // UL should not exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
+                    "There should not be an uiInputDefaultError on the page!");
+
+            var inputErrors = cmp.find("textAreaInvalid").get("v.errors");
+            $A.test.assertEquals(0, inputErrors.length);
+        }]
+    },
+    
+    // need to update ariaDescribedBy
+    // This is "late-binding" the errorComponent attribute after input component instantiation
+    _testSetCustomErrorComponentAttribute : {
+        attributes: {"caseToRender" : "textArea"},
+        test : [function(cmp) {
+            // UL should not exist
+            $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
+                    "There should not be an uiInputDefaultError on the page!");
+
+            // Set errorComponent
+            var thisComponent = cmp.find("textAreaInvalid");
+            var created = false;
+            $A.createComponent("uitest:inputErrorComponent", {}, function(errorCmp) {
+                thisComponent.set("v.errorComponent", [errorCmp]);
+                created = true;
+            });
+            $A.test.addWaitFor(true, function() {
+                return created;
+            });
+        }, function(cmp) {
+            // Set errors
+            this.fireErrorValidation(cmp.find("validate"), false);
+        },function(cmp){
+            var thisComponent = cmp.find("textAreaInvalid");
+            var errorComponent = thisComponent.get("v.errorComponent")[0];
+            $A.test.assertEquals("markup://uitest:inputErrorComponent", errorComponent.getDef().getDescriptor().toString());
+            this.validateBasic(cmp,"textAreaInvalid");
+        }, function(cmp) {
+            // Clear errors
+            this.fireErrorValidation(cmp.find("validate"), true);
+        }, function(cmp) {
+            // UL should not exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an uiInputDefaultError on the page!");
         }]
@@ -302,7 +424,7 @@
             // Clear errors
             this.fireErrorValidation(cmp.find("validate"), true);
         }, function(cmp) {
-            //UL should not exist
+            // UL should not exist
             $A.test.assertUndefinedOrNull($A.test.getElementByClass("uiInputDefaultError"),
                     "There should not be an uiInputDefaultError on the page!");
         }]
@@ -358,7 +480,7 @@
         }]
     },
 
-    //This component is special because it has two inputDefaultErrors already on page
+    // This component is special because it has two inputDefaultErrors already on page
     testCmpWithInputDateTime : {
         attributes: { "caseToRender" : "dateTime"},
         test : [function(cmp) {

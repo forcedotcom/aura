@@ -157,57 +157,117 @@
 	 */
     testRadioMenuCreatedByIteration:{
     	test: [function(cmp) {
-				menuLabel = cmp.find("iterationTrigger");
-				radioMenu = cmp.find("iterationRadioMenu");
-				ouptutButton = cmp.find("radioIterationButton");
-				menuItems = radioMenu.get("v.childMenuItems");
-				item1 = menuItems[1];
-				item2 = menuItems[2];
-				outputText = "iterationRadioMenuResult"
-				menuLabel.get("e.click").fire();
-				//check if menu is visible
-				$A.test.addWaitForWithFailureMessage(true, 
-						function(){
-							return $A.util.hasClass(radioMenu.getElement(),"visible")
-						}, "Radio Menu created by Iteration should be visible");
-			},function(cmp){
-				//Select first item from the menu
-				item1.get('e.click').fire();
-				//check if first item is selected
-				$A.test.addWaitForWithFailureMessage(true, 
-						function(){
-							return item1.get('v.selected')
-						}, "Radio Menu created by iteration should have item 1 selected");
-			},function(cmp){
-				//Test case for W-1617363
-				$A.test.assertDefined(item1.get('v.value'),"value of item1 should be defined");
-				$A.test.assertEquals(item1.get('v.value'), item1.get('v.label'), "Value of Item1 is not correct");
-				//select 2nd item from the menu
-				item2.get('e.click').fire();
-				$A.test.addWaitForWithFailureMessage(true, 
-						function(){
-							return item2.get('v.selected')
-							}, "Radio Menu created by iteration should have item 2 selected");
-			},function(cmp){
-				//menu item 1 should be unchecked after selecting item2
-				$A.test.assertFalse(item1.get('v.selected'),"Radio Menu item 1 should be unchecked");
-				menuLabel.get("e.click").fire();
-				$A.test.addWaitForWithFailureMessage(false,
-						function(){
-							return $A.util.hasClass(radioMenu.getElement(),"visible")
-						}, "Radio Menu created by Iteration should not be visible");
-	    	}, function(cmp){
-	    		ouptutButton.get('e.press').fire();
-				var expectedOutputText = item2.get('v.label');
-				$A.test.addWaitForWithFailureMessage(expectedOutputText, 
-						function(){
-							return cmp.find(outputText).get('v.value')
-						}, "Output text did not get updated for Menu created by iteration");
-		  }
-	    
+			menuLabel = cmp.find("iterationTrigger");
+			menu = cmp.find("iterationRadioMenu");
+			ouptutButton = cmp.find("radioIterationButton");
+			outputText = cmp.find("iterationRadioMenuResult");
+
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, true, "Radio Menu created by Iteration should be visible")
+
+			menuItems = menu.get("v.childMenuItems");
+			this.verifyChildMenuItems(menuItems, 4);
+		},function(cmp){
+			item1 = menuItems[0];
+			item2 = menuItems[1];
+			this.verifyMenuItemSelected(item1, "Radio Menu created by iteration should have item 1 selected");
+			this.verifyMenuItemSelected(item2, "Radio Menu created by iteration should have item 2 selected");
+			this.verifyMenuItemNotSelected(item1, "Radio Menu created by iteration should have item 1 deselected");
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, false, "Radio Menu created by Iteration should not be visible");
+
+			this.verifyOutputText(ouptutButton, outputText, item2.get('v.label'), "Output text did not get updated for Menu created by iteration");
+
+			}
         ]
     },
-    
+
+
+	/**
+	 * Test to verify radiobox menu item created inside an if condition works when interacting with the menu items
+	 * using AURA API
+	 */
+	testMenuItemsInsideIf:{
+		attributes: { menuCondition : "true" },
+		test: [function(cmp) {
+			menuLabel = cmp.find("conditionTrigger");
+			menu = cmp.find("conditionRadioMenu");
+			ouptutButton = cmp.find("radioConditionButton");
+			outputText = cmp.find("conditionRadioMenuResult");
+
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, true, "Radio Menu created in a condition should be visible")
+
+			menuItems = menu.get("v.childMenuItems");
+			this.verifyChildMenuItems(menuItems, 2);
+		}, function(cmp) {
+			item1 = menuItems[0];
+			item2 = menuItems[1];
+			this.verifyMenuItemSelected(item1, "Radio Menu created in a condition should have item 1 selected");
+			this.verifyMenuItemSelected(item2, "Radio Menu created in a condition should have item 2 selected");
+			this.verifyMenuItemNotSelected(item1, "Radio Menu created in a condition should have item 1 deselected");
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, false, "Radio Menu created in a condition should not be visible");
+
+			this.verifyOutputText(ouptutButton, outputText, item2.get('v.label'), "Output text did not get updated for Menu created in a condition");
+
+		}]
+	},
+
+	/**
+	 * Test to verify radiobox menu item created inside an else condition works when interacting with the menu items
+	 * using AURA API
+	 */
+	testMenuItemsInsideElse:{
+		attributes: { menuCondition : "false" },
+		test: [function(cmp) {
+			menuLabel = cmp.find("conditionTrigger");
+			menu = cmp.find("conditionRadioMenu");
+			ouptutButton = cmp.find("radioConditionButton");
+			outputText = cmp.find("conditionRadioMenuResult");
+
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, true, "Radio Menu created in a condition should be visible")
+
+			menuItems = menu.get("v.childMenuItems");
+			this.verifyChildMenuItems(menuItems, 3);
+		}, function(cmp) {
+			item1 = menuItems[0];
+			item2 = menuItems[1];
+			this.verifyMenuItemSelected(item1, "Radio Menu created in a condition should have item 1 selected");
+			this.verifyMenuItemSelected(item2, "Radio Menu created in a condition should have item 2 selected");
+			this.verifyMenuItemNotSelected(item1, "Radio Menu created in a condition should have item 1 deselected");
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, false, "Radio Menu created in a condition should not be visible");
+
+			this.verifyOutputText(ouptutButton, outputText, item2.get('v.label'), "Output text did not get updated for Menu created in a condition");
+
+		}]
+	},
+
+	/**
+	 * Test to verify nested menu items work
+	 * using AURA API
+	 */
+	testNestedMenuItems:{
+		attributes: { menuCondition : "true" },
+		test: [function(cmp) {
+			menuLabel = cmp.find("conditionIterationTrigger");
+			menu = cmp.find("conditionIterationMenu");
+			ouptutButton = cmp.find("conditionIterationButton");
+			outputText = cmp.find("conditionIterationMenuResult");
+
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, true, "Menu created with nested menu items should be visible")
+
+			menuItems = menu.get("v.childMenuItems");
+			this.verifyChildMenuItems(menuItems, 6);
+		}, function(cmp) {
+			item1 = menuItems[2];
+			item2 = menuItems[3];
+			this.verifyMenuItemSelected(item1, "Menu created with nested menu items should have item 1 selected");
+			this.verifyMenuItemSelected(item2, "Menu created with nested menu items should have item 2 selected");
+			this.verifyMenuItemNotSelected(item1, "Menu created with nested menu items should have item 1 deselected");
+			this.verifyMenuVisibilityOnClick(menuLabel, menu, false, "Menu created with nested menu items should not be visible");
+
+			this.verifyOutputText(ouptutButton, outputText, item2.get('v.label'), "Output text did not get updated for Menu created with nested menu items");
+
+		}]
+	},
+
     /**
 	 * General Test to verify focus on menu item using AURA API  
 	 */
@@ -391,4 +451,38 @@
 	        }
       ]
   },
+
+	verifyMenuItemSelected: function(menuItem, message) {
+		//Test case for W-1617363
+		$A.test.assertDefined(menuItem.get('v.value'),"value of menuItem should be defined");
+		$A.test.assertEquals(menuItem.get('v.value'), menuItem.get('v.label'), "Value of menuItem is not correct");
+		//select item from the menu
+		menuItem.get('e.click').fire();
+		$A.test.assertTrue(menuItem.get('v.selected'), message);
+	},
+
+	verifyMenuItemNotSelected: function(menuItem, message) {
+		$A.test.assertFalse(menuItem.get('v.selected'), message);
+	},
+	
+	verifyChildMenuItems: function(menuItems, expectedLength) {
+		$A.test.assertEquals(menuItems.length, expectedLength, "Incorrect number of child items found");
+	},
+	
+	verifyMenuVisibilityOnClick: function(menuLabel, menu, visible, message) {
+		menuLabel.get("e.click").fire();
+		//check if menu is visible
+		$A.test.addWaitForWithFailureMessage(visible,
+			function () {
+				return $A.util.hasClass(menu.getElement(), "visible")
+			}, message);
+	},
+
+	verifyOutputText: function(outputButton, outputText, expectedText, message) {
+		ouptutButton.get('e.press').fire();
+		$A.test.addWaitForWithFailureMessage(expectedText,
+			function(){
+				return outputText.get('v.value')
+			}, message);
+	}
 })

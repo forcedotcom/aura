@@ -17,6 +17,9 @@
     updateTriggerLabel: function(cmp, event, helper) {
         helper.handleUpdateTriggerLabel(cmp, event, "trigger");
     },
+    updateTriggerLabelForNestedMenuItems: function(cmp, event, helper) {
+        helper.handleUpdateTriggerLabel(cmp, event, "triggerNested");
+    },
     updateLabel: function(cmp, event, helper) {
         helper.handleUpdateTriggerLabel(cmp, event, "mytrigger");
     },
@@ -41,6 +44,12 @@
     },
     getRadioIterationMenuSelected: function(cmp, event, helper) {
         helper.menuSelect(cmp, event, "iterationRadioMenu");
+    },
+    getRadioConditionMenuSelected: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "conditionRadioMenu");
+    },
+    getConditionIterationMenuSelected: function(cmp, event, helper) {
+        helper.menuSelect(cmp, event, "conditionIterationMenu");
     },
     menuCollapse: function(cmp){
     	 cmp.set("v.collapseEventFired", true);

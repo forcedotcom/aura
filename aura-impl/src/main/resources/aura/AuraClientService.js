@@ -1650,9 +1650,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         // Ordering is important. auraXHR will no longer be valid after processed.
         if (processed == false && auraXHR.request["readyState"] == 4) {
             processed = true;
+
+            $A.Perf.endMark("Received Response - XHR " + auraXHR.marker);
             that.receive(auraXHR);
         }
     };
+
     if (options && options["headers"]) {
         var key, headers = options["headers"];
 
@@ -1662,6 +1665,10 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             }
         }
     }
+
+    // Delete all this jiffy nonsense start of 200 release
+    $A.Perf.mark("Received Response - XHR " + auraXHR.marker);
+
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         auraXHR.request["send"](qs);
@@ -1778,6 +1785,8 @@ AuraClientService.prototype.receive = function(auraXHR) {
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage, noAbort) {
+    $A.Perf.mark("Callback Complete - XHR " + auraXHR.marker);
+
     var action, actionResponses, response;
     var token = responseMessage["token"];
     if (token) {
@@ -1828,6 +1837,8 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             $A.error(e);
         }
     }
+
+    $A.Perf.endMark("Callback Complete - XHR " + auraXHR.marker);
 };
 
 AuraClientService.prototype.buildFakeAction = function(response) {

@@ -370,6 +370,8 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
         desc = desc.getDescriptor().getQualifiedName();
     } else if (desc.getQualifiedName) {
         desc = desc.getQualifiedName();
+    } else if (desc.indexOf("://") === -1) {
+        desc = "markup://" + desc;
     }
 
     // KRIS:
@@ -382,7 +384,7 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
         componentClassDef();
     }
 
-    var classConstructor = this.getComponentClass(desc) || Component;
+    var classConstructor = this.getComponentClass(desc);
 
     return new classConstructor(config, localCreation);
 };
@@ -409,8 +411,6 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, classCon
  * @export
  */
 AuraComponentService.prototype.getComponentClass = function(descriptor) {
-	descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
-    
     var storedConstructor = this.classConstructors[descriptor];
 
     if(!storedConstructor) {
@@ -434,7 +434,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
  * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
  */
 AuraComponentService.prototype.hasComponentClass = function(descriptor) {
-    descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
+    //descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
 
     return !!(descriptor in this.classConstructorExporter || descriptor in this.classConstructors);
 };

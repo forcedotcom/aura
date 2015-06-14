@@ -21,7 +21,7 @@
         test: function(component){
             var helper = component.getDef().getHelper();
             $A.test.assertNotUndefinedOrNull(helper, "even the component has no helper, we still should get a Helper object");
-            $A.test.assertEquals($A.componentService.getComponentClass("test:testCmpNoJSHelper").prototype.helper, helper );
+            $A.test.assertEquals($A.componentService.getComponentClass("markup://test:testCmpNoJSHelper").prototype.helper, helper );
         }
     }
 })

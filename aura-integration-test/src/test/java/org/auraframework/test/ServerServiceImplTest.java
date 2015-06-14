@@ -686,7 +686,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
                 "<aura:application></aura:application>", AuraContext.Mode.DEV);
 
         assertTrue("aura:html component class not included in app js",
-                js.contains("addComponentClass(\"aura$html"));
+                js.contains("addComponentClass(\"markup://aura:html"));
 
         String start = "$A.clientService.initDefs(";
         int index = js.indexOf(start);

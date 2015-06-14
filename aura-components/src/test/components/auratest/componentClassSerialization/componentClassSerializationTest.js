@@ -24,7 +24,7 @@
 			$A.test.addWaitFor(true, function() {
 					return cmp.requestComplete;
 				}, function() {
-					var actual = $A.componentService.getComponentClass("auradev:componentClass");
+					var actual = $A.componentService.getComponentClass("markup://auradev:componentClass");
 					$A.test.assertUndefined(actual);
 				}
 			);

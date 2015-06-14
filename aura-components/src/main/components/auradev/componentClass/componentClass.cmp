@@ -16,6 +16,8 @@
 
 -->
 <aura:component description="Renders the concrete javascript class for a component." isTemplate="true">
+	<aura:attribute name="fullyQualifiedName" type="String" required="true"/>
+	<aura:attribute name="superFullyQualifiedName" type="String" required="true"/>
     <aura:attribute name="className" type="String" required="true"/>
     <aura:attribute name="superClassName" type="String" required="true"/>
     <aura:attribute name="helperProperties" type="java://List&lt;org.auraframework.impl.ServerServiceImpl.HelperInfo&gt;" required="true"/>
@@ -25,9 +27,9 @@
     <aura:attribute name="rootComponent" type="Boolean" required="true"/>
 
 <!-- Emit the component class -->
-$A.componentService.addComponentClass("{!v.className}", function() {
+$A.componentService.addComponentClass("{!v.fullyQualifiedName}", function() {
     <aura:if isTrue="{!v.superClassName != '$A.Component'}">
-    var {!v.superClassName} = $A.componentService.getComponentClass("{!v.superClassName}");
+    var {!v.superClassName} = $A.componentService.getComponentClass("{!v.superFullyQualifiedName}");
     </aura:if>
     var {!v.className} = function {!v.className}(config, localCreation, creatingPrototype) {
         {!v.superClassName}.call(this, config, localCreation, creatingPrototype); 

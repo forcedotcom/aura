@@ -18,6 +18,7 @@
  * @description Creates a new AttributeDef instance, including the descriptor.
  * @constructor
  * @param {Object} config
+ * @export
  */
 function AttributeDef(config){
     this.descriptor = new DefDescriptor(config["name"]);
@@ -49,6 +50,7 @@ AttributeDef.prototype.auraType = "AttributeDef";
 /**
  * Gets the descriptor. Returns a DefDescriptor object that contains the metadata for the attribute.
  * @returns {DefDescriptor} The qualified name for a DefDescriptor object has the format <code>prefix://namespace:name</code>.
+ * @export
  */
 AttributeDef.prototype.getDescriptor = function(){
     return this.descriptor;
@@ -58,6 +60,7 @@ AttributeDef.prototype.getDescriptor = function(){
  * Checks whether the attribute definition is required.
  * Returns true by default.
  * @returns {Boolean} True by default.
+ * @export
  */
 AttributeDef.prototype.isRequired = function(){
     return this.required === true;
@@ -76,6 +79,7 @@ AttributeDef.prototype.getTypeDef = function(){
 /**
  * Gets the default value.
  * @returns {Object}
+ * @export
  */
 AttributeDef.prototype.getDefault = function(){
     return $A.util.copy(this.defaultValue);
@@ -86,11 +90,15 @@ AttributeDef.prototype.getDefault = function(){
  * 
  * @returns {String}
  * @private
+ * @export
  */
 AttributeDef.prototype.getTypeDefDescriptor = function(){
     return this.typeDefDescriptor;
 };
 
+/**
+ * @export
+ */
 AttributeDef.prototype.getNativeType = function() {
     $A.assert(this.typeDefDescriptor, "getNativeType() failed as there was no typeDefDescriptor for attribute " + this.getDescriptor() + ". Eacha attribute must have a definition before being set.");
     if(this.typeDefDescriptor.lastIndexOf("[]") === this.typeDefDescriptor.length - 2) {
@@ -112,5 +120,3 @@ AttributeDef.prototype.getNativeType = function() {
 };
 
 Aura.Attribute.AttributeDef = AttributeDef;
-
-//#include aura.attribute.AttributeDef_export

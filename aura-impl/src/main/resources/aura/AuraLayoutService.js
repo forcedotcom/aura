@@ -409,7 +409,14 @@ var AuraLayoutService = function() {
             delete this.init;
         }
     };
-    // #include aura.AuraLayoutService_export
+    
+    layoutService["refreshLayout"] = layoutService.refreshLayout;
+    layoutService["back"] = layoutService.back;
+    layoutService["pop"] = layoutService.pop;
+	layoutService["clearHistory"] = layoutService.clearHistory;
+	layoutService["layout"] = layoutService.layout;
+	layoutService["setCurrentLayoutTitle"] = layoutService.setCurrentLayoutTitle;
+
     return layoutService;
 };
 

@@ -184,8 +184,14 @@ var AuraStorageService = function(){
         //#end
     };
 
-    //#include aura.storage.AuraStorageService_export
-
+    storageService["getStorage"] = storageService.getStorage;
+    storageService["initStorage"] = storageService.initStorage;
+    storageService["registerAdapter"] = storageService.registerAdapter;
+    storageService["deleteStorage"] = storageService.deleteStorage;
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    	storageService["createAdapter"] = storageService.createAdapter;
+    	storageService["selectAdapter"] = storageService.selectAdapter;
+    //#end
     return storageService;
 };
 

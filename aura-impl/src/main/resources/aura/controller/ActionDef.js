@@ -21,6 +21,7 @@
  * @constructor
  * @param {Object}
  *            config
+ * @export
  */
 function ActionDef(config) {
     this.name = config["name"];
@@ -60,12 +61,16 @@ function ActionDef(config) {
     }
 }
 
+/**
+ * @export
+ */
 ActionDef.prototype.auraType = "ActionDef";
 
 /**
  * Gets the name of this Action. The name is the unique identifier that the component can use to call this Action.
  * 
  * @returns {String}
+ * @export
  */
 ActionDef.prototype.getName = function() {
     return this.name;
@@ -96,6 +101,7 @@ ActionDef.prototype.getActionType = function() {
  * 
  * @public
  * @returns {!boolean}
+ * @export
  */
 ActionDef.prototype.isClientAction = function() {
     return this.actionType === "CLIENT";
@@ -106,6 +112,7 @@ ActionDef.prototype.isClientAction = function() {
  * 
  * @public
  * @returns {!boolean}
+ * @export
  */
 ActionDef.prototype.isServerAction = function() {
     return this.actionType === "SERVER";
@@ -149,5 +156,3 @@ ActionDef.prototype.toString = function() {
 };
 
 Aura.Controller.ActionDef = ActionDef;
-
-// #include aura.controller.ActionDef_export

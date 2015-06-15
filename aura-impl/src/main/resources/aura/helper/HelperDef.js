@@ -18,6 +18,7 @@
  * @description Creates a HelperDef instance.
  * @constructor
  * @protected
+ * @export
  */
 function HelperDef(componentDef, libraries){
     var functions = [];
@@ -41,12 +42,16 @@ function HelperDef(componentDef, libraries){
     this.functions = functions;
 }
 
+/**
+ * @export
+ */
 HelperDef.prototype.auraType = "HelperDef";
 
 /**
  * Returns the functions for HelperDef.
  *
  * @public
+ * @export
  */
 HelperDef.prototype.getFunctions = function HelperDef$getFunctions(){
     return this.functions;
@@ -63,5 +68,3 @@ HelperDef.prototype.toJSON = function() {
 };
 
 Aura.Helper.HelperDef = HelperDef;
-
-//#include aura.helper.HelperDef_export

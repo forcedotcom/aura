@@ -18,12 +18,16 @@
  * @description Creates a ProviderDef instance with the provide method. An error is displayed if the provider method is not found.
  * @constructor
  * @protected
+ * @export
  */
 function ProviderDef(config){
     this.provideMethod = aura.util.json.decodeString(config["provide"]);
     $A.assert(this.provideMethod, "Provide method not found");
 }
 
+/**
+ * @export
+ */
 ProviderDef.prototype.auraType = "ProviderDef";
 
 /**
@@ -56,5 +60,3 @@ ProviderDef.prototype.provide = function(component, localCreation, callback) {
 };
 
 Aura.Provider.ProviderDef = ProviderDef;
-
-//#include aura.provider.ProviderDef_export

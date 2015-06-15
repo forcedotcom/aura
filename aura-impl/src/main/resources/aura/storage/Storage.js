@@ -18,6 +18,7 @@
  * @description The storage service implementation
  * @constructor
  * @param {Object} config The configuration describing the characteristics of the storage to be created.
+ * @export
  */
 var AuraStorage = function AuraStorage(config) {
     this.name = config["name"];
@@ -65,6 +66,7 @@ var AuraStorage = function AuraStorage(config) {
 /**
  * Returns the name of the storage type. For example, "indexeddb" or "memory".
  * @returns {String} The storage type.
+ * @export
  */
 AuraStorage.prototype.getName = function() {
     return this.adapter.getName();
@@ -73,6 +75,7 @@ AuraStorage.prototype.getName = function() {
 /**
  * Asynchronously gets the current storage size in KB.
  * @returns {Promise} A Promise that will get the current storage size in KB.
+ * @export
  */
 AuraStorage.prototype.getSize = function() {
     return this.adapter.getSize()
@@ -82,6 +85,7 @@ AuraStorage.prototype.getSize = function() {
 /**
  * Returns the maximum storage size in KB.
  * @returns {number} The maximum storage size in KB.
+ * @export
  */
 AuraStorage.prototype.getMaxSize = function() {
     return this.maxSize / 1024.0;
@@ -98,6 +102,7 @@ AuraStorage.prototype.getDefaultAutoRefreshInterval = function() {
 /**
  * Returns a promise that clears the storage.
  * @returns {Promise} A Promise that will clear storage.
+ * @export
  */
 AuraStorage.prototype.clear = function() {
     return this.adapter.clear();
@@ -107,6 +112,7 @@ AuraStorage.prototype.clear = function() {
  * Asynchronously gets an item from storage corresponding to the specified key.
  * @param {String} key The item key. This is the key used when the item was added to storage using put().
  * @returns {Promise} A Promise that will fetch an item from storage.
+ * @export
  */
 AuraStorage.prototype.get = function(key) {
     var that = this;
@@ -127,6 +133,7 @@ AuraStorage.prototype.get = function(key) {
 /**
  * Asynchronously gets all items from storage
  * @returns {Promise} A Promise that will fetch all items from storage.
+ * @export
  */
 AuraStorage.prototype.getAll = function() {
     var that = this;
@@ -150,6 +157,7 @@ AuraStorage.prototype.getAll = function() {
  * @param {String} key The key of the item to store.
  * @param {Object} value The value of the item to store.
  * @returns {Promise} A Promise that will put the value in storage.
+ * @export
  */
 AuraStorage.prototype.put = function(key, value) {
     var now = new Date().getTime();
@@ -238,6 +246,7 @@ AuraStorage.prototype.sweep = function() {
 /**
  * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the
  * connection goes offline.
+ * @export
  */
 AuraStorage.prototype.suspendSweeping = function() {
     this.log("suspendSweeping()");
@@ -247,6 +256,7 @@ AuraStorage.prototype.suspendSweeping = function() {
 
 /**
  * Resumes sweeping to remove expired storage adapters.
+ * @export
  */
 AuraStorage.prototype.resumeSweeping = function() {
     this.log("resumeSweeping()");
@@ -268,6 +278,7 @@ AuraStorage.prototype.log = function() {
 /**
  * Whether current storage implementation is persistent
  * @returns {boolean} true if persistent
+ * @export
  */
 AuraStorage.prototype.isPersistent = function() {
     return this.persistent;
@@ -276,6 +287,7 @@ AuraStorage.prototype.isPersistent = function() {
 /**
  * Whether current storage implementation is secure
  * @returns {boolean} true if secure
+ * @export
  */
 AuraStorage.prototype.isSecure = function() {
     return this.secure;
@@ -283,6 +295,7 @@ AuraStorage.prototype.isSecure = function() {
 
 /**
  * Sets the storage version. Cannot be set unless never set.
+ * @export
  */
 AuraStorage.prototype.setVersion  = function(version) {
     // ensure string
@@ -292,6 +305,7 @@ AuraStorage.prototype.setVersion  = function(version) {
 /**
  * Returns the storage version.
  * @returns {String} storage version.
+ * @export
  */
 AuraStorage.prototype.getVersion  = function() {
     return this.version;
@@ -308,5 +322,3 @@ AuraStorage.prototype.deleteStorage = function() {
         });
     }
 };
-
-//#include aura.storage.Storage_export

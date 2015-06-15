@@ -19,6 +19,7 @@
  * @constructor
  * @param {Object} config
  * @platform
+ * @export
  */
 function Event(config) {
     this.source = config["component"];
@@ -39,6 +40,7 @@ Event.prototype.auraType = "Event";
  *
  * @returns {Object}
  * @platform
+ * @export
  */
 Event.prototype.getSource = function() {
     return this.source;
@@ -47,6 +49,7 @@ Event.prototype.getSource = function() {
 /**
  * Gets the Event Definition.
  * Returns an EventDef object.
+ * @export
  */
 Event.prototype.getDef = function(){
     return this.eventDef;
@@ -56,6 +59,7 @@ Event.prototype.getDef = function(){
  * Sets wether the event can bubble or not
  * @param {Boolean} bubble The param wether this event should bubble or not
  * The default is false
+ * @export
  */
 Event.prototype.stopPropagation = function() {
     this.eventStopPropagation = true;
@@ -66,6 +70,7 @@ Event.prototype.stopPropagation = function() {
  * This type of event was used historically as a construct to call an action of a child 
  * Since the advent of "methods", this type of event communication is discouraged and a "method" is preferred.
  * NOTE: Calling events on a child is discouraged and will be deprecated
+ * @export
  */
 Event.prototype.setComponentEvent = function(){
     this.componentEvent = true;
@@ -76,6 +81,7 @@ Event.prototype.setComponentEvent = function(){
  * Gets the name of the Event.
  * Returns a name of type String, the unique identifier that the component can use to call this Action.
  * @platform
+ * @export
  */
 Event.prototype.getName = function(){
     return this.eventName;
@@ -86,6 +92,7 @@ Event.prototype.getName = function(){
  * Maps key in config to attributeDefs.
  * @param {Object} config The parameters for the Event.
  * @platform
+ * @export
  */
 Event.prototype.setParams = function(config) {
     if (this.fired) {
@@ -112,6 +119,7 @@ Event.prototype.setParams = function(config) {
  * @param {String} key The name of the parameter.
  * @param {Object} value The value of the parameter.
  * @platform
+ * @export
  */
 Event.prototype.setParam = function(key, value) {
     if (this.fired && this.componentEvent) {
@@ -128,6 +136,7 @@ Event.prototype.setParam = function(key, value) {
  * Gets an Event parameter. Returns the parameters.
  * @param {String} name The name of the Event. For example, <code>event.getParam("button")</code> returns the value of the pressed mouse button (0, 1, or 2).
  * @platform
+ * @export
  */
 Event.prototype.getParam = function(name){
     return this.params[name];
@@ -136,6 +145,7 @@ Event.prototype.getParam = function(name){
 /**
  * Gets all the Event parameters. Returns the collection of parameters.
  * @platform
+ * @export
  */
 Event.prototype.getParams = function(){
     return this.params;
@@ -199,8 +209,8 @@ Event.prototype.dispatchComponentEventHandlers = function () {
  * Maps the component handlers to the event dispatcher.
  * @param {Object} params Optional A set of parameters for the Event. Any previous parameters of the same name will be overwritten.
  * @platform
+ * @export
  */
-
 Event.prototype.fire = function(params) {
     var self = this;
 
@@ -236,4 +246,3 @@ Event.prototype.fire = function(params) {
 };
 
 Aura.Event.Event = Event;
-//#include aura.event.Event_export

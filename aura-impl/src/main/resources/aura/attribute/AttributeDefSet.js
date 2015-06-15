@@ -19,6 +19,7 @@
  * @param {Object} configs For each configs object provided, a new AttributeDef instance is added
  * @constructor
  * @protected
+ * @export
  */
 function AttributeDefSet(configs,defaultNamespace) {
     if (configs) {
@@ -43,6 +44,7 @@ AttributeDefSet.prototype.auraType = "AttributeDefSet";
 /**
  * For each AttributeDef value, pass it into the given function.
  * @param {Function} f The function to pass the values into.
+ * @export
  */
 AttributeDefSet.prototype.each = function(f) {
     var values = this.values;
@@ -58,6 +60,7 @@ AttributeDefSet.prototype.each = function(f) {
  * Returns the AttributeDef object.
  * @param {String} name The name of the AttributeDef instance, which matches the qualified name of the attributeDef descriptor.
  * @returns {AttributeDef} An AttributeDef object is stored in a parent definition, such as a ComponentDef object.
+ * @export
  */
 AttributeDefSet.prototype.getDef = function(name) {
     return (this.values&&this.values[name.split('.')[0]])||null;
@@ -81,5 +84,3 @@ AttributeDefSet.prototype.getNames = function() {
 AttributeDefSet.prototype.getValues = function() {
     return this.values;
 };
-
-//#include aura.attribute.AttributeDefSet_export

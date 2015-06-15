@@ -18,6 +18,7 @@
  * @description The Event Definition including the descriptor, type, and attributes.
  * An EventDef instance is created as part of Aura initialization.
  * @constructor
+ * @export
  */
 function EventDef(config) {
     this.descriptor = new DefDescriptor(config["descriptor"]);
@@ -33,6 +34,7 @@ EventDef.prototype.auraType = "EventDef";
 /**
  * Gets the event descriptor. (e.g. markup://foo:bar)
  * @returns {Object}
+ * @export
  */
 EventDef.prototype.getDescriptor = function(){
     return this.descriptor;
@@ -41,6 +43,7 @@ EventDef.prototype.getDescriptor = function(){
 /**
  * Gets the event type.
  * @returns {Object}
+ * @export
  */
 EventDef.prototype.getEventType = function() {
     return this.type;
@@ -49,6 +52,7 @@ EventDef.prototype.getEventType = function() {
 /**
  * Gets the attribute definitions.
  * @returns {AttributeDef}
+ * @export
  */
 EventDef.prototype.getAttributeDefs = function() {
     return this.attributeDefs;
@@ -57,6 +61,7 @@ EventDef.prototype.getAttributeDefs = function() {
 /**
  * Gets the event definition for the immediate super type.
  * @returns {EventDef} The EventDef for the immediate super type, or null if none exists (should only be null for aura:event)
+ * @export
  */
 EventDef.prototype.getSuperDef = function() {
     return this.superDef;
@@ -76,5 +81,3 @@ EventDef.prototype.initSuperDef = function(config) {
 };
 
 Aura.Event.EventDef = EventDef;
-
-//#include aura.event.EventDef_export

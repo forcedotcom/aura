@@ -17,6 +17,7 @@
 /**
  * @description Creates a new ModelDef instance.
  * @constructor
+ * @export
  */
 function ModelDef(config){
     this.descriptor = new DefDescriptor(config["descriptor"]);
@@ -29,6 +30,9 @@ function ModelDef(config){
     }
 }
 
+/**
+ * @export
+ */
 ModelDef.prototype.auraType = "ModelDef";
 
 /**
@@ -58,4 +62,3 @@ ModelDef.prototype.getMembers = function() {
 };
 
 Aura.Model.ModelDef = ModelDef;
-//#include aura.model.ModelDef_export

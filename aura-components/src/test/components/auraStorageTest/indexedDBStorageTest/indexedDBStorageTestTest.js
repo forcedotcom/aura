@@ -371,7 +371,7 @@
                     return cmp._storage.getSize();
                 }).then(function(size) {
                     cmp._append("post getAll size = "+size);
-                    $A.assert(size < 5.0, "Size is too large");
+                    $A.assert(size < 5.3, "Size is too large");
                     completed = true;
                 }, cmp._die);
 

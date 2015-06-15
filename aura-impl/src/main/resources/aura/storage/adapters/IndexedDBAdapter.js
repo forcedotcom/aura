@@ -135,25 +135,6 @@ IndexedDBStorageAdapter.prototype.getSize = function() {
 };
 
 /**
- * Returns scope prefix text for keys;
- * @returns {String}
- * @private
- */
-IndexedDBStorageAdapter.prototype.getScopedPrefix = function() {
-    return this.scope + "_";
-};
-
-/**
- * Strips scope prefix from key and returns original key
- * @param {String} key key from storage with prefix
- * @returns {String}
- * @private
- */
-IndexedDBStorageAdapter.prototype.stripScopedPrefix = function(key) {
-    return key.replace(this.getScopedPrefix(), "");
-};
-
-/**
  * Get an item from the store by key.
  *
  * @param {*} key the key to look up.
@@ -532,8 +513,8 @@ IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success,
         var transaction = this.db.transaction([this.tableName], "readwrite");
         var objectStore = transaction.objectStore(this.tableName);
         var index = objectStore.index("expires");
-        // FIXME: utilize bounds (range) with index
-        var cursor = index.openCursor();
+        var expiredBound = IDBKeyRange.upperBound(now);
+        var cursor = index.openCursor(expiredBound);
         var count = 0;
         var size = 0;
         var expiredSize = 0;
@@ -566,8 +547,8 @@ IndexedDBStorageAdapter.prototype.expireCache = function(requestedSize, success,
                 if (success) {
                     success();
                 }
-                if (size > this.limitSweepHigh) {
-                    this.expireCache(0);
+                if (size > that.limitSweepHigh) {
+                    that.expireCache(0);
                 }
             }
         };

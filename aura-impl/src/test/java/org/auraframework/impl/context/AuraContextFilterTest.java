@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.auraframework.http.AuraContextFilter;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.AuraTestCase;
+import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
@@ -36,9 +37,9 @@ public class AuraContextFilterTest extends AuraTestCase {
     private void assertContextPath(AuraContextFilter filter, HttpServletRequest mock, String input, String expected)
             throws Exception {
         Mockito.when(mock.getContextPath()).thenReturn(input);
-        AuraContext context = filter.startContext(mock, null, null);
+        AuraContext context = AuraPrivateAccessor.invoke(filter, "startContext", mock, null, null);
         assertEquals(expected, context.getContextPath());
-        filter.endContext();
+        AuraPrivateAccessor.invoke(filter, "endContext");
     }
 
     public void testStartContextContextPath() throws Exception {

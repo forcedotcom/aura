@@ -1,1 +1,1 @@
-/l/{"mode":"UTEST","app":"#REPLACED#","fwuid":"#FAKEUID#","themes":["markup://test:fakeTheme"],"test":"org.auraframework.http.AuraBaseServletUrlTest.testCssUrlWithProvidedTheme"}/app.css
+/l/{"mode":"UTEST","app":"#REPLACED#","fwuid":"#FAKEUID#","themes":["markup://test:fakeTheme"],"test":"org.auraframework.integration.test.http.AuraBaseServletUrlTest.testCssUrlWithProvidedTheme"}/app.css

@@ -118,7 +118,7 @@
                 }
 
                 var listElems = component.getElements();
-                var ignoreElements = component.get("v.elementsToIgnoreClicking");
+                var ignoreElements = component.get("v.ignoredElements");
                 var clickOutside = true;
                 if (listElems) {
                     var ret = true;

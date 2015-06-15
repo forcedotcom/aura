@@ -168,15 +168,23 @@
      * Tell list component which elements it should ignore to handle collapse.
      *
      */
-    setInputElements: function(component) {
+    setIgnoredElements: function(component) {
         var inputCmp = component.find("input");
         var listCmp = component.find("list");
         if (inputCmp && listCmp) {
             var elems = inputCmp.getElements();
-            listCmp.set("v.elementsToIgnoreClicking", elems);
+            listCmp.set("v.ignoredElements", elems);
         }
     },
-    
+
+    addIgnoredElement: function(component, element) {
+        var listCmp = component.find("list");
+        if (listCmp) {
+            var ignoreElements = listCmp.get("v.ignoredElements");
+            ignoreElements.push(element);
+        }
+    },
+
     updateAriaAttributes: function(component, event) {
         var inputCmp = component.find("input");
         if (inputCmp) {

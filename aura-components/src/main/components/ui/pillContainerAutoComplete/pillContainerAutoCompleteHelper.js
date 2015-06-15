@@ -76,5 +76,28 @@
             parameters: this._fetchParameters
         });
         fetchDataEvt.fire();
+    },
+
+
+    addParentListElementAsInput: function(component) {
+
+        //get parent pill container
+        var element = component.getElement().parentElement;
+        var htmlComponent = $A.componentService.getRenderingComponentForElement(element);
+        if (!$A.util.isUndefinedOrNull(htmlComponent)) {
+            var concreteComponent = htmlComponent.getComponentValueProvider().getConcreteComponent();
+            if (concreteComponent.isInstanceOf("ui:pillContainer")) {
+
+                //add pill container list element as an input element
+                var listComponent = concreteComponent.find("list");
+                if (listComponent) {
+                    var listElement = listComponent.getElement();
+                    if (listElement) {
+                        this.addIgnoredElement(component.getSuper(), listElement);
+                    }
+                }
+            }
+
+        }
     }
 })

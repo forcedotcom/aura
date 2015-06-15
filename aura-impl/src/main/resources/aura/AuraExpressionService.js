@@ -13,100 +13,110 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
+
 /**
- * @description The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
+ * @description The Aura Expression Service, accessible using $A.expressionService.
+ * Processes Expressions.
  * @constructor
+ * @export
  */
-function AuraExpressionService() {
-	var expressionService = {
+function AuraExpressionService() {}
 
-		/**
-		 * Trims markup syntax off a given string expression, removing leading {!
-		 * and trailing } notation.
-		 *
-		 * @param {Object}
-		 *            expression The expression to be normalized.
-		 * @returns {Object} The normalized string, or the input parameter, if
-		 *          it was not a string.
-		 */
-        normalize : function(expression) {
-            expression = (expression+'').
-            // Strip expression wrappers: {!x.x.x} -> x.x.x
-                replace(/^\s*\{\!|\}\s*$/g, '').
-            // Normalize Array indices: x.x[2] -> x.x.2
-                replace(/\[(\d+)\]/g,".$1");
-			return expression;
-		},
+/**
+ * Trims markup syntax off a given string expression, removing
+ * expression notation, and array notation.
+ *
+ * @param {Object}
+ *            expression The expression to be normalized.
+ * @returns {Object} The normalized string, or the input parameter, if
+ *          it was not a string.
+ * @export
+ */
+AuraExpressionService.prototype.normalize = function(expression) {
 
-		/**
-		 * Resolves a hierarchical dot expression in string form against the
-		 * provided object if possible.
-		 *
-		 * @param {String}
-		 *            expression The string expression to be resolved.
-		 * @param {Object}
-		 *            container The object against which to resolve the
-		 *            expression.
-         * @param {Boolean}
-         *            rawValue Whether or not to evaluate expressions.
-		 * @returns {Object} The target of the expression, or undefined.
-		 */
-		resolve : function(expression, container, rawValue) {
-			var target = container;
-			var path = expression;
-            if(!$A.util.isArray(path)) {
-                path = path.split('.');
+    if (typeof expression === "string") {
+
+        expression = expression.trim();
+
+        // Remove leading {! and {# as well as trailing } notation.
+        if (expression.charAt(0) === "{" && expression.charAt(expression.length - 1) === "}" &&
+            (expression.charAt(1) === "!" || expression.charAt(1) == "#")) {
+
+            expression = expression.slice(2, -1).trim();
+        }
+
+        // Convert array notation from "attribute[index]" to "attribute.index"
+        var startBrace = expression.indexOf('[');
+        while(startBrace >= 0){
+            var endBrace = expression.indexOf(']', startBrace + 1);
+            expression = expression.substring(0, startBrace) +
+                '.' + expression.substring(startBrace + 1, endBrace) +
+                expression.substring(endBrace + 1);
+            startBrace = expression.indexOf('[', endBrace - 1);
+        }
+    }
+
+    return expression;
+};
+
+/**
+ * Resolves a hierarchical dot expression in string form against the
+ * provided object if possible.
+ *
+ * @param {String}
+ *            expression The string expression to be resolved.
+ * @param {Object}
+ *            container The object against which to resolve the
+ *            expression.
+ * @param {Boolean}
+ *            rawValue Whether or not to evaluate expressions.
+ * @returns {Object} The target of the expression, or undefined.
+ * @export
+ */
+AuraExpressionService.prototype.resolve = function(expression, container, rawValue) {
+    var target = container;
+    var path = expression;
+    if(!$A.util.isArray(path)) {
+        path = path.split('.');
+    }
+    var segment;
+    while (!$A.util.isUndefinedOrNull(target) && path.length) {
+        segment = path.shift();
+        //#if {"modes" : ["DEVELOPMENT"]}
+        if(!target["hasOwnProperty"](segment)) {
+            var searchkey = segment.toLowerCase();
+            for(var key in target){
+                if(target.hasOwnProperty(key) && key.toLowerCase() == searchkey) {
+                    // You can't include container and target in the error, as it will json serialize it and causes a max iteration exception.
+                    $A.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
+                    return;
+                }
             }
-            var segment;
-            while (!$A.util.isUndefinedOrNull(target) && path.length) {
-            	segment = path.shift();
-            	//#if {"modes" : ["DEVELOPMENT"]}
-            	if(!target["hasOwnProperty"](segment)) {
-            		var searchkey = segment.toLowerCase();
-            		for(var key in target){
-            			if(target.hasOwnProperty(key) && key.toLowerCase() == searchkey) {
-            				// You can't include container and target in the error, as it will json serialize it and causes a max iteration exception.
-    						$A.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
-            				return;
-            			}
-            		}					
-				}
-            	//#end
-				
-				target = target[segment];
-			  
-				if (!rawValue&&$A.util.isExpression(target)) {
-					target = target.evaluate();
-				}
-			}
-			return target;
-		},
+        }
+        //#end
 
-		/**
-		 * @protected
-		 */
-		create : function(valueProvider, config) {
-			return valueFactory.create(config, null, valueProvider);
-		},
+        target = target[segment];
 
-		/**
-		 * @private
-		 */
-		// TODO: unify with above create method
-		createPassthroughValue : function(primaryProviders, cmp) {
-			return new PassthroughValue(primaryProviders, cmp);
-		}
+        if (!rawValue&&$A.util.isExpression(target)) {
+            target = target.evaluate();
+        }
+    }
+    return target;
+};
 
-    };
-	
-	expressionService["create"] = expressionService.create;
-	expressionService["createPassthroughValue"] = expressionService.createPassthroughValue;
-	expressionService["normalize"] = expressionService.normalize;
-	expressionService["resolve"] = expressionService.resolve;
+/**
+ * @export
+ */
+AuraExpressionService.prototype.create = function(valueProvider, config) {
+    return valueFactory.create(config, null, valueProvider);
+};
 
-
-	return expressionService;
-}
+/**
+ * @export
+ */
+// TODO: unify with above create method
+AuraExpressionService.prototype.createPassthroughValue = function(primaryProviders, cmp) {
+    return new PassthroughValue(primaryProviders, cmp);
+};
 
 Aura.Services.AuraExpressionService = AuraExpressionService;

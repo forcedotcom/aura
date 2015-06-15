@@ -34,7 +34,7 @@
      * Verify First input is focused when autoFocus is set
      * Test case for W-2643030
      */
-    _testPanelFocusOnFirstInput: {
+    testPanelFocusOnFirstInput: {
     	attributes : {"testPanelType" : "panel"},
     	test: [function(cmp) {
     		this.createPanel(cmp);

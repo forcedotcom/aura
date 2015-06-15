@@ -54,32 +54,42 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * Bug: W-2617212
      */
     public void testPressEscKeyOnModal() throws Exception{
-    	open(APP);
-    	openPanel();
-    	waitForModalOpen();
-    	
-    	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-    	activeElement.sendKeys(Keys.ESCAPE);
-        waitForModalClose();
+    	String panelType = "modal";
+    	verifyCloseOnEsc(panelType);
     }
     
     /**
      * [Accessibility] panel dialog closing on Esc key.
-     * Revisit once Bug: W-2643030 is fixed
+     * Bug: W-2643030
      */
     public void testPressEscKeyOnPanelDialog() throws Exception{
-    	open(APP + "?" + PARAM_PANEL_TYPE + "panel");
-    	openPanel();
-    	waitForPanelDialogOpen();
-    	
-    	WebElement fistInputElement = findDomElements(By.cssSelector(INPUT_PANELTYPE)).get(1);
-    	fistInputElement.click();
-    	
-    	fistInputElement.sendKeys(Keys.ESCAPE);
-        waitForPanelDialogClose();
+    	String panelType = "panel";
+    	verifyCloseOnEsc(panelType);
     }
     
-    /**
+    private void verifyCloseOnEsc(String panelType) throws MalformedURLException, URISyntaxException, InterruptedException {
+		String url = APP;
+    	boolean isPanel = panelType.contains("panel");
+    	if(isPanel){
+			url += "?" + PARAM_PANEL_TYPE + panelType;
+		}
+    	open(url);
+    	openPanel();
+    	if(isPanel){
+    		waitForPanelDialogOpen();
+        }else{
+        	waitForModalOpen();
+        }
+    	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+    	activeElement.sendKeys(Keys.ESCAPE);
+    	if(isPanel){
+    		waitForPanelDialogClose();
+        }else{
+        	waitForModalClose();
+        }
+	}
+
+	/**
      * Verify custom close action
      * Bug: W-2619406
      */

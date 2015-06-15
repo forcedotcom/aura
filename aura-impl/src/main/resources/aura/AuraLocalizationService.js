@@ -975,7 +975,53 @@ var AuraLocalizationService = function AuraLocalizationService() {
             return n < 10 ? '00' + n : n  < 100 ? '0' + n : n;
         }
     };
-    //#include aura.AuraLocalizationService_export
+    
+    localizationService["formatNumber"] = localizationService.formatNumber;
+    localizationService["getNumberFormat"] = localizationService.getNumberFormat;
+    localizationService["getDefaultNumberFormat"] = localizationService.getDefaultNumberFormat;
+    localizationService["formatPercent"] = localizationService.formatPercent;
+    localizationService["getDefaultPercentFormat"] = localizationService.getDefaultPercentFormat;
+    localizationService["formatCurrency"] = localizationService.formatCurrency;
+    localizationService["getDefaultCurrencyFormat"] = localizationService.getDefaultCurrencyFormat;
+    localizationService["displayDuration"] = localizationService.displayDuration;
+    localizationService["displayDurationInDays"] = localizationService.displayDurationInDays;
+    localizationService["displayDurationInHours"] = localizationService.displayDurationInHours;
+    localizationService["displayDurationInMilliseconds"] = localizationService.displayDurationInMilliseconds;
+    localizationService["displayDurationInMinutes"] = localizationService.displayDurationInMinutes;
+    localizationService["displayDurationInMonths"] = localizationService.displayDurationInMonths;
+    localizationService["displayDurationInSeconds"] = localizationService.displayDurationInSeconds;
+    localizationService["displayDurationInYears"] = localizationService.displayDurationInYears;
+    localizationService["duration"] = localizationService.duration;
+    localizationService["endOf"] = localizationService.endOf;  
+    localizationService["formatDate"] = localizationService.formatDate;
+    localizationService["formatDateUTC"] = localizationService.formatDateUTC;
+    localizationService["formatTime"] = localizationService.formatTime;
+    localizationService["formatTimeUTC"] = localizationService.formatTimeUTC;
+    localizationService["formatDateTime"] = localizationService.formatDateTime;
+    localizationService["formatDateTimeUTC"] = localizationService.formatDateTimeUTC;
+    localizationService["getDaysInDuration"] = localizationService.getDaysInDuration;
+    localizationService["getHoursInDuration"] = localizationService.getHoursInDuration;
+    localizationService["getLocalizedDateTimeLabels"] = localizationService.getLocalizedDateTimeLabels;
+    localizationService["getMillisecondsInDuration"] = localizationService.getMillisecondsInDuration;
+    localizationService["getMinutesInDuration"] = localizationService.getMinutesInDuration;
+    localizationService["getMonthsInDuration"] = localizationService.getMonthsInDuration;
+    localizationService["getSecondsInDuration"] = localizationService.getSecondsInDuration;
+    localizationService["getYearsInDuration"] = localizationService.getYearsInDuration;
+    localizationService["isAfter"] = localizationService.isAfter;
+    localizationService["isBefore"] = localizationService.isBefore;
+    localizationService["isPeriodTimeView"] = localizationService.isPeriodTimeView;
+    localizationService["isSame"] = localizationService.isSame;
+    localizationService["parseDateTime"] = localizationService.parseDateTime;
+    localizationService["parseDateTimeISO8601"] = localizationService.parseDateTimeISO8601;
+    localizationService["parseDateTimeUTC"] = localizationService.parseDateTimeUTC;
+    localizationService["startOf"] = localizationService.startOf;
+    localizationService["toISOString"] = localizationService.toISOString;
+    localizationService["translateFromLocalizedDigits"] = localizationService.translateFromLocalizedDigits;
+    localizationService["translateFromOtherCalendar"] = localizationService.translateFromOtherCalendar;
+    localizationService["translateToLocalizedDigits"] = localizationService.translateToLocalizedDigits;
+    localizationService["translateToOtherCalendar"] = localizationService.translateToOtherCalendar;
+    localizationService["WallTimeToUTC"] = localizationService.WallTimeToUTC;
+    localizationService["UTCToWallTime"] = localizationService.UTCToWallTime;
 
     return localizationService;
 };

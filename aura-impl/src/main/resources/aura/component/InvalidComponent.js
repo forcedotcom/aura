@@ -19,6 +19,7 @@
  * @class InvalidComponent
  * @constructor
  * @private
+ * @export
  */
 function InvalidComponent(){
     // Never used directly - just its prototype is leveraged
@@ -27,11 +28,13 @@ function InvalidComponent(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.auraType = "Component";
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getDef = function() {
     return null;
@@ -39,6 +42,7 @@ InvalidComponent.prototype.getDef = function() {
 
 /**
  * @protected
+ * @export
  */
 InvalidComponent.prototype.index = function(){
     this.raiseInvalidComponentError("index", arguments);
@@ -46,6 +50,7 @@ InvalidComponent.prototype.index = function(){
 
 /**
  * @protected
+ * @export
  */
 InvalidComponent.prototype.deIndex = function(){
     // Unfortunately, there are some bizarre loops with deIndex and destroy.
@@ -56,6 +61,7 @@ InvalidComponent.prototype.deIndex = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.find = function(){
     this.raiseInvalidComponentError("find", arguments);
@@ -83,6 +89,9 @@ InvalidComponent.prototype.findInstanceOf = function(){
     this.raiseInvalidComponentError("findInstanceOf", arguments);
 };
 
+/**
+ * @export
+ */
 InvalidComponent.prototype.isInstanceOf = function(){
     this.raiseInvalidComponentError("isInstanceOf", arguments);
 };
@@ -97,6 +106,7 @@ InvalidComponent.prototype.implementsDirectly = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.addHandler = function(){
     this.raiseInvalidComponentError("addHandler", arguments);
@@ -104,6 +114,7 @@ InvalidComponent.prototype.addHandler = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.addValueHandler = function(){
     this.raiseInvalidComponentError("addValueHandler", arguments);
@@ -117,12 +128,14 @@ InvalidComponent.prototype.finishDestroy = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.destroy = function(){
 };
 
 /**
  * @protected
+ * @export
  */
 InvalidComponent.prototype.isRendered = function() {
     this.raiseInvalidComponentError("isRendered", arguments);
@@ -158,12 +171,14 @@ InvalidComponent.prototype.getRenderer = function() {
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getGlobalId = function() {
 };
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getLocalId = function() {
     this.raiseInvalidComponentError("getLocalId", arguments);
@@ -171,6 +186,7 @@ InvalidComponent.prototype.getLocalId = function() {
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getRendering = function(){
     this.raiseInvalidComponentError("getRendering", arguments);
@@ -178,6 +194,7 @@ InvalidComponent.prototype.getRendering = function(){
 
 /**
  * @protected
+ * @export
  */
 InvalidComponent.prototype.getSuper = function(){
     this.raiseInvalidComponentError("getSuper", arguments);
@@ -185,6 +202,7 @@ InvalidComponent.prototype.getSuper = function(){
 
 /**
  * @protected
+ * @export
  */
 InvalidComponent.prototype.associateElement = function(){
     this.raiseInvalidComponentError("associateElement", arguments);
@@ -192,6 +210,7 @@ InvalidComponent.prototype.associateElement = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getElements = function(){
     this.raiseInvalidComponentError("getElements", arguments);
@@ -199,6 +218,7 @@ InvalidComponent.prototype.getElements = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getElement = function(){
     this.raiseInvalidComponentError("getElement", arguments);
@@ -206,6 +226,7 @@ InvalidComponent.prototype.getElement = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.get = function(){
     this.raiseInvalidComponentError("get", arguments);
@@ -213,6 +234,7 @@ InvalidComponent.prototype.get = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.set = function () {
     this.raiseInvalidComponentError("set", arguments);
@@ -220,6 +242,7 @@ InvalidComponent.prototype.set = function () {
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getConcreteComponent = function(){
     this.raiseInvalidComponentError("getConcreteComponent", arguments);
@@ -227,6 +250,7 @@ InvalidComponent.prototype.getConcreteComponent = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.isConcrete = function() {
     this.raiseInvalidComponentError("isConcrete", arguments);
@@ -234,6 +258,7 @@ InvalidComponent.prototype.isConcrete = function() {
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getEventDispatcher = function(){
     this.raiseInvalidComponentError("getEventDispatcher", arguments);
@@ -241,6 +266,7 @@ InvalidComponent.prototype.getEventDispatcher = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getModel = function(){
     this.raiseInvalidComponentError("getModel", arguments);
@@ -248,6 +274,7 @@ InvalidComponent.prototype.getModel = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.getEvent = function() {
     this.raiseInvalidComponentError("getEvent", arguments);
@@ -270,6 +297,7 @@ InvalidComponent.prototype.fire = function() {
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.isValid = function(){
     return false;
@@ -277,6 +305,7 @@ InvalidComponent.prototype.isValid = function(){
 
 /**
  * @public
+ * @export
  */
 InvalidComponent.prototype.toString = function(){
     return "InvalidComponent" + (this._description ? ' ' + this._description : '');
@@ -289,6 +318,9 @@ InvalidComponent.prototype.toJSON = function(){
     this.raiseInvalidComponentError("toJSON", arguments);
 };
 
+/**
+ * @export
+ */
 InvalidComponent.prototype.getFacets = function() {
     this.raiseInvalidComponentError("getFacets", arguments);
 };
@@ -310,5 +342,3 @@ InvalidComponent.prototype.raiseInvalidComponentError = function(func, args) {
 };
 
 Aura.Component.InvalidComponent = InvalidComponent;
-
-//#include aura.component.InvalidComponent_export

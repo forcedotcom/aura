@@ -188,7 +188,10 @@ var AuraStyleService = function() {
         }
     };
 
-    // #include aura.AuraStyleService_export
+    styleService["applyTheme"] = styleService.applyTheme;
+    styleService["applyThemes"] = styleService.applyThemes;
+    styleService["removeThemes"] = styleService.removeThemes;
+    
 
     return styleService;
 };

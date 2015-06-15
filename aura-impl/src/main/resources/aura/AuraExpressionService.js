@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*jslint sub: true */
 /**
  * @description The Aura Expression Service, accessible using $A.expressionService.  Processes Expressions.
  * @constructor
@@ -98,8 +99,12 @@ function AuraExpressionService() {
 		}
 
     };
+	
+	expressionService["create"] = expressionService.create;
+	expressionService["createPassthroughValue"] = expressionService.createPassthroughValue;
+	expressionService["normalize"] = expressionService.normalize;
+	expressionService["resolve"] = expressionService.resolve;
 
-	// #include aura.AuraExpressionService_export
 
 	return expressionService;
 }

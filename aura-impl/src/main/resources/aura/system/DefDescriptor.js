@@ -17,6 +17,7 @@
  * @description Creates a new DefDescriptor (definition descriptor) instance, including the prefix and namespace.
  * @constructor
  * @param {Object} descriptor Throws an error if descriptor is null or undefined.
+ * @export
  */
 function DefDescriptor(descriptor){
     var prefix=DefDescriptor.normalize(descriptor).split("://");
@@ -48,11 +49,15 @@ DefDescriptor.normalize=function(descriptor){
 };
 
 // Prototype Members
+/**
+ * @export
+ */
 DefDescriptor.prototype.auraType = "DefDescriptor";
 
 /**
  * Gets the qualified name.
  * @returns {String}
+ * @export
  */
 DefDescriptor.prototype.getQualifiedName = function(){
     return this.qualifiedName;
@@ -61,6 +66,7 @@ DefDescriptor.prototype.getQualifiedName = function(){
 /**
  * Gets the namespace.
  * @returns {String} namespace
+ * @export
  */
 DefDescriptor.prototype.getNamespace = function(){
     return this.namespace;
@@ -69,6 +75,7 @@ DefDescriptor.prototype.getNamespace = function(){
 /**
  * Gets the name part of the qualified name.
  * @returns {String}
+ * @export
  */
 DefDescriptor.prototype.getName = function(){
     return this.name;
@@ -77,6 +84,7 @@ DefDescriptor.prototype.getName = function(){
 /**
  * Gets the prefix of the DefDescriptor.
  * @returns {String}
+ * @export
  */
 DefDescriptor.prototype.getPrefix = function(){
     return this.prefix;
@@ -85,11 +93,10 @@ DefDescriptor.prototype.getPrefix = function(){
 /**
  * Returns the qualified name in string format.
  * @returns {String}
+ * @export
  */
 DefDescriptor.prototype.toString = function(){
     return this.getQualifiedName();
 };
 
 Aura.System.DefDescriptor = DefDescriptor;
-
-//#include aura.system.DefDescriptor_export

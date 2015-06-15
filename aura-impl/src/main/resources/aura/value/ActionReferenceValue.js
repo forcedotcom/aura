@@ -27,6 +27,7 @@
  * @param {Component} component A Component object associated with this type.
  * @constructor
  * @protected
+ * @export
  */
 function ActionReferenceValue(actionDef, def, component){
     this.actionDef = actionDef;
@@ -36,10 +37,14 @@ function ActionReferenceValue(actionDef, def, component){
 //#end
 }
 
+/**
+ * @export
+ */
 ActionReferenceValue.prototype.auraType = "Value";
 
 /**
  * Returns the unwrapped value. This is a new ActionDef instance based on the associated component.
+ * @export
  */
 ActionReferenceValue.prototype.getAction = function(){
     return this.actionDef.newInstance(this.component);
@@ -47,6 +52,7 @@ ActionReferenceValue.prototype.getAction = function(){
 
 /**
  * Always returns false as the object is immutable.
+ * @export
  */
 ActionReferenceValue.prototype.isDirty = function(){
     return false;
@@ -54,6 +60,7 @@ ActionReferenceValue.prototype.isDirty = function(){
 
 /**
  * Destroys the component and its action definition.
+ * @export
  */
 ActionReferenceValue.prototype.destroy = function(){
 //#if {"modes" : ["STATS"]}
@@ -65,10 +72,10 @@ ActionReferenceValue.prototype.destroy = function(){
 
 /**
  * Returns this type as a String.
+ * @export
  */
 ActionReferenceValue.prototype.toString = function(){
     return "ActionReferenceValue";
 };
 
 Aura.Value.ActionReferenceValue = ActionReferenceValue;
-//#include aura.value.ActionReferenceValue_export

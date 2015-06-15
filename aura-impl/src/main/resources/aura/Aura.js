@@ -544,71 +544,73 @@ function AuraInstance () {
 
     this.Component = Component;
 
-    // TODO: convert to //#exportSymbols when available
-    exp(this,
-        "getCurrentTransactionId", this.getCurrentTransactionId,
-        "setCurrentTransactionId", this.setCurrentTransactionId,
-        "clientService", this.clientService,
-        "componentService", this.componentService,
-        "serializationService", this.serializationService,
-        "renderingService", this.renderingService,
-        "expressionService", this.expressionService,
-        "historyService", this.historyService,
-        "localizationService", this.localizationService,
-        "eventService", this.eventService,
-        "layoutService", this.layoutService,
-        "metricsService", this.metricsService,
-        "storageService", this.storageService,
-        "styleService", this.styleService,
-        "services", this.services,
-        "enqueueAction", this.enqueueAction,
-        "deferAction", this.deferAction,
-        "render", this.render,
-        "rerender", this.rerender,
-        "unrender", this.unrender,
-        "afterRender", this.afterRender,
-        "logger", this.logger,
-        "getCmp", this.getCmp,
-        "getComponent", this.getComponent,
-        "pushCreationPath", this.pushCreationPath,
-        "popCreationPath", this.popCreationPath,
-        "setCreationPathIndex", this.setCreationPathIndex,
+    //	Google Closure Compiler Symbol Exports
+	this["getCurrentTransactionId"] = this.getCurrentTransactionId;
+    this["setCurrentTransactionId"] = this.setCurrentTransactionId;
+    this["clientService"] = this.clientService;
+    this["componentService"] = this.componentService;
+    this["serializationService"] = this.serializationService;
+    this["renderingService"] = this.renderingService;
+    this["expressionService"] = this.expressionService;
+    this["historyService"] = this.historyService;
+    this["localizationService"] = this.localizationService;
+    this["eventService"] = this.eventService;
+    this["layoutService"] = this.layoutService;
+    this["metricsService"] = this.metricsService;
+    this["storageService"] = this.storageService;
+    this["styleService"] = this.styleService;
+    this["services"] = this.services;
+    this["enqueueAction"] = this.enqueueAction;
+    this["deferAction"] = this.deferAction;
+    this["render"] = this.render;
+    this["rerender"] = this.rerender;
+    this["unrender"] = this.unrender;
+    this["afterRender"] = this.afterRender;
+    this["logger"] = this.logger;
+    this["getCmp"] = this.getCmp;
+    this["getComponent"] = this.getComponent;
+    this["pushCreationPath"] = this.pushCreationPath;
+    this["popCreationPath"] = this.popCreationPath;
+    this["setCreationPathIndex"] = this.setCreationPathIndex;
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            "devToolService", this.devToolService,
-            "getQueryStatement", this.devToolService.newStatement,
-            "qhelp", function() { return this.devToolService.help();},
+        this["devToolService"] = this.devToolService;
+        this["getQueryStatement"] = this.devToolService.newStatement;
+        this["qhelp"] = function() { return this.devToolService.help();};
         //#end
-        "createComponent", this.createComponent,
-        "createComponents", this.createComponents,
-        "newCmp", this.newCmp,
-        "newCmpDeprecated", this.newCmpDeprecated,
-        "newCmpAsync", this.newCmpAsync,
-        "getEvt", this.getEvt,
-        "Component", this.Component,
+    this["createComponent"] = this.createComponent;
+    this["createComponents"] = this.createComponents;
+    this["newCmp"] = this.newCmp;
+    this["newCmpDeprecated"] = this.newCmpDeprecated;
+    this["newCmpAsync"] = this.newCmpAsync;
+    this["getEvt"] = this.getEvt;
+    this["Component"] = this.Component;
 
-        "auraError", this.auraError,
-        "auraFriendlyError", this.auraFriendlyError);
+    this["auraError"] = this.auraError;
+    this["auraFriendlyError"] = this.auraFriendlyError;
+    
+    
     var services = this.services;
 
     // TODO: convert to //#exportSymbols when available
-    exp(services,
-        "rendering", services.rendering,
-        "event", services.event,
-        "component", services.component,
-        "client", services.client,
-        "history", services.history,
-        "l10n", services.localization,
-        "storage", services.storage,
-        "metrics", services.metrics,
-        "cmp", services.cmp,
-        "e", services.e,
-        "c", {
-                get: function(name) {
-                    var path = (name||'').split('.');
-                    return services.cmp.getControllerDef(path.shift()).get(path.shift());
-                }
-            }
-    );
+    
+
+    services["rendering"] = services.rendering;
+    services["event"] = services.event;
+    services["component"] = services.component;
+    services["client"] = services.client;
+    services["history"] = services.history;
+    services["l10n"] = services.localization;
+    services["storage"] = services.storage;
+    services["metrics"] = services.metrics;
+    services["cmp"] = services.cmp;
+    services["e"] = services.e;
+    services["c"] = {
+			            get: function(name) {
+			                var path = (name||'').split('.');
+			                return services.cmp.getControllerDef(path.shift()).get(path.shift());
+			            }
+    				};
+    
 
     this.eventService.addHandler({
         event : 'aura:clientRedirect',

@@ -18,6 +18,7 @@
  * @description A Value wrapper for a function call.
  * @constructor
  * @protected
+ * @export
  */
 function FunctionCallValue(config, valueProvider){
     this.func = expressionFunctions[config["key"]];
@@ -45,6 +46,7 @@ FunctionCallValue.prototype.auraType = "Value";
 
 /**
  * Sets the isDirty flag to false.
+ * @export
  */
 FunctionCallValue.prototype.isDirty = function(){
 	for (var i = 0; i < this.args.length; i++) {
@@ -78,6 +80,9 @@ FunctionCallValue.prototype.evaluate = function(valueProvider){
     return result;
 };
 
+/**
+ * @export
+ */
 FunctionCallValue.prototype.addChangeHandler=function(cmp, key, fcv) {
     if(this.byValue){
         return;
@@ -108,6 +113,9 @@ FunctionCallValue.prototype.getChangeHandler=function(cmp, key, fcv) {
     };
 };
 
+/**
+ * @export
+ */
 FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
     if(this.byValue){
         return;
@@ -122,6 +130,7 @@ FunctionCallValue.prototype.removeChangeHandler=function(cmp, key){
 
 /**
  * Destroys the value wrapper.
+ * @export
  */
 FunctionCallValue.prototype.destroy = function(){
 //#if {"modes" : ["STATS"]}
@@ -137,6 +146,7 @@ FunctionCallValue.prototype.destroy = function(){
 /**
  * Helpful for logging/debugging.  Prints String value of the wrapped object.
  * @returns {String} FunctionCallValue
+ * @export
  */
 FunctionCallValue.prototype.toString = function(){
 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -147,7 +157,4 @@ FunctionCallValue.prototype.toString = function(){
 };
 
 Aura.Value.FunctionCallValue = FunctionCallValue;
-
-//#include aura.value.FunctionCallValue_export
-
 

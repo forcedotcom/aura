@@ -18,6 +18,7 @@
  * @description A Value wrapper for a property reference.
  * @constructor
  * @protected
+ * @export
  */
 function PropertyReferenceValue(path, valueProvider) {
     var isArray=$A.util.isArray(path);
@@ -53,6 +54,9 @@ PropertyReferenceValue.prototype.set = function(value) {
     this.valueProvider.set(this.expression,value);
 };
 
+/**
+ * @export
+ */
 PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, rebind) {
     var valueProvider=this.valueProvider;
     var expression = this.expression;
@@ -84,6 +88,9 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
 };
 
 
+/**
+ * @export
+ */
 PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     var valueProvider=this.valueProvider;
     var expression = this.expression;
@@ -98,6 +105,7 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
 
 /**
  * Returns true if the property reference starts with '$'.
+ * @export
  */
 PropertyReferenceValue.prototype.isGlobal = function() {
     return this.path && this.path[0] && this.path[0].charAt(0) === '$';
@@ -130,6 +138,7 @@ PropertyReferenceValue.prototype.equals = function (target){
 
 /**
  * Sets the isDirty flag to false.
+ * @export
  */
 PropertyReferenceValue.prototype.isDirty = function() {
     var valueProvider = this.valueProvider;
@@ -148,6 +157,7 @@ PropertyReferenceValue.prototype.isDirty = function() {
 
 /**
  * Destroys the path.
+ * @export
  */
 PropertyReferenceValue.prototype.destroy = function() {
     // #if {"modes" : ["STATS"]}
@@ -158,6 +168,7 @@ PropertyReferenceValue.prototype.destroy = function() {
 
 /**
  * Returns "PropertyReferenceValue" as String.
+ * @export
  */
 PropertyReferenceValue.prototype.toString = function() {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -174,4 +185,3 @@ PropertyReferenceValue.prototype.toJSON = function() {
 };
 
 Aura.Value.PropertyReferenceValue = PropertyReferenceValue;
-// #include aura.value.PropertyReferenceValue_export

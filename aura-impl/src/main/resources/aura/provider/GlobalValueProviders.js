@@ -30,6 +30,7 @@
  * @param {Function} initCallback an optional callback invoked after the GVP has finished its
  *  asynchronous initialization.
  * @constructor
+ * @export
  */
  function GlobalValueProviders (gvp, initCallback) {
     this.valueProviders = {
@@ -202,6 +203,7 @@ GlobalValueProviders.prototype.getValueProvider = function(type) {
  * @param {String} expression
  * @param {Component} component
  * @return {String} The value of expression
+ * @export
  */
 GlobalValueProviders.prototype.get = function(expression, callback) {
     expression=$A.expressionService.normalize(expression).split('.');
@@ -212,4 +214,3 @@ GlobalValueProviders.prototype.get = function(expression, callback) {
 };
 
 Aura.Provider.GlobalValueProviders = GlobalValueProviders;
-//#include aura.provider.GlobalValueProviders_export

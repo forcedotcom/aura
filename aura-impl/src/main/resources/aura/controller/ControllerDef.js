@@ -19,6 +19,7 @@
  * A ControllerDef instance is created as part of the ComponentDef initialization.
  * @constructor
  * @param {Object} config
+ * @export
  */
 function ControllerDef(config){
     this.descriptor = config["descriptor"];
@@ -32,6 +33,9 @@ function ControllerDef(config){
     }
 }
 
+/**
+ * @export
+ */
 ControllerDef.prototype.auraType = "ControllerDef";
 
 /**
@@ -46,6 +50,7 @@ ControllerDef.prototype.getDescriptor = function(){
  * Gets the Action Definition.
  * @param {String} key The data key to look up on the element.
  * @returns {Object}
+ * @export
  */
 ControllerDef.prototype.getActionDef = function(key){
     var action = this.actionDefs[key];
@@ -60,10 +65,10 @@ ControllerDef.prototype.getActionDef = function(key){
  * Gets the value of the Controller Definition based on the given key.
  * @param {String} key The data key to look up on the element.
  * @returns {Object} A new Action Definition instance
+ * @export
  */
 ControllerDef.prototype.get = function(key){
     return this.getActionDef(key).newInstance();
 };
 
 Aura.Controller.ControllerDef = ControllerDef;
-//#include aura.controller.ControllerDef_export

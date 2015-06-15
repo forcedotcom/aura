@@ -18,6 +18,7 @@
  * @description A value provider that resolves against a few primary providers first, then falls back on a component.
  * @constructor
  * @protected
+ * @export
  */
 function PassthroughValue(primaryProviders, component) {
     this.primaryProviders = primaryProviders;
@@ -27,6 +28,9 @@ function PassthroughValue(primaryProviders, component) {
     this.errors = {};
 }
 
+/**
+ * @export
+ */
 PassthroughValue.prototype.auraType = "Value";
 
 /**
@@ -34,6 +38,7 @@ PassthroughValue.prototype.auraType = "Value";
  * it needs it's own value change handler logic. Essentially you should be able to treat
  * it like a component for change events. It does not mark dirty though, since a passthrough
  * does have anything to rerender, marking dirty is the responsibilithy of the referencing components.
+ * @export
  */
 PassthroughValue.prototype.addValueHandler = function(config) {
     // KRIS: HALO:
@@ -84,6 +89,7 @@ PassthroughValue.prototype.addValueHandler = function(config) {
 /**
  * Delegates de-indexing logic to the wrapped value provider.
  * Likely delegating to a wrapped component.
+ * @export
  */
 PassthroughValue.prototype.deIndex = function () {
     var valueProvider = this.getComponent();
@@ -102,6 +108,7 @@ PassthroughValue.prototype.deIndex = function () {
 
  /**
  * Fires handlers registered for the specified key when the value changes
+ * @export
  */
 PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, index) {
     var handlers = this.handlers["change"];
@@ -134,6 +141,7 @@ PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, inde
 /**
  * Returns the primary providers associated with the given key or the Component.
  * @param {String} key The data key to look up on the primary providers.
+ * @export
  */
 PassthroughValue.prototype.get = function(key) {
     var path = key.split('.');
@@ -155,6 +163,7 @@ PassthroughValue.prototype.get = function(key) {
 
 /**
  * Returns the Component.
+ * @export
  */
 PassthroughValue.prototype.getComponent = function() {
     return this.component;
@@ -195,6 +204,7 @@ PassthroughValue.prototype.getExpression = function(expression) {
 /**
  * Returns a reference to a key on the the primary provider or the Component.
  * @param {String} key The data key for which to return a reference.
+ * @export
  */
 PassthroughValue.prototype.getReference = function(key) {
     key = aura.expressionService.normalize(key);
@@ -212,6 +222,7 @@ PassthroughValue.prototype.getReference = function(key) {
 /**
  * Delegates indexing logic to the wrapped value provider.
  * Likely delegating to a wrapped component.
+ * @export
  */
 PassthroughValue.prototype.index = function () {
     var valueProvider = this.getComponent();
@@ -231,6 +242,7 @@ PassthroughValue.prototype.index = function () {
 /**
  * Removes a handler for the specified type of event. Currently only supports
  * 'change'.
+ * @export
  */
 PassthroughValue.prototype.removeValueHandler = function(config) {
     var path = config.value.split(".");
@@ -275,6 +287,7 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
  * Sets the value of the primary providers associated value.
  * @param {String} key The data key to look up on the primary providers.
  * @param {Object} v The value to be set.
+ * @export
  */
 PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
    var path = key.split('.');
@@ -346,5 +359,3 @@ PassthroughValue.prototype.isValid = function() {
 
     return false;
 };
-
-//#include aura.value.PassthroughValue_export

@@ -22,6 +22,7 @@
  *
  * @constructor
  * @protected
+ * @export
  */
 function ComponentDef(config) {
     var descriptor = new DefDescriptor(config["descriptor"]);
@@ -185,6 +186,9 @@ function ComponentDef(config) {
     }
 }
 
+/**
+ * @export
+ */
 ComponentDef.prototype.auraType = "ComponentDef";
 
 /**
@@ -192,6 +196,7 @@ ComponentDef.prototype.auraType = "ComponentDef";
  *
  * @returns {DefDescriptor} A DefDescriptor object contains a prefix, namespace,
  *          and name.
+ * @export
  */
 ComponentDef.prototype.getDescriptor = function() {
     return this.descriptor;
@@ -202,6 +207,7 @@ ComponentDef.prototype.getDescriptor = function() {
  * abstract.
  *
  * @returns {Boolean} True if component is abstract, or false otherwise.
+ * @export
  */
 ComponentDef.prototype.isAbstract = function() {
     return this.isAbs;
@@ -212,6 +218,7 @@ ComponentDef.prototype.isAbstract = function() {
  * exists (should only be null for aura:component).
  *
  * @return {ComponentDef} The ComponentDef for the immediate super type
+ * @export
  */
 ComponentDef.prototype.getSuperDef = function() {
     return this.superDef;
@@ -221,6 +228,7 @@ ComponentDef.prototype.getSuperDef = function() {
  * Returns a HelperDef object.
  *
  * @returns {HelperDef}
+ * @export
  */
 ComponentDef.prototype.getHelperDef = function() {
     return this.helperDef;
@@ -230,6 +238,7 @@ ComponentDef.prototype.getHelperDef = function() {
  * Gets the Helper instance
  *
  * @returns {Helper}
+ * @export
  */
 ComponentDef.prototype.getHelper = function() {
     var def = this.getHelperDef();
@@ -243,6 +252,7 @@ ComponentDef.prototype.getHelper = function() {
  * Returns a RendererDef object.
  *
  * @returns {RendererDef}
+ * @export
  */
 ComponentDef.prototype.getRendererDef = function() {
     return this.rendererDef;
@@ -278,6 +288,7 @@ ComponentDef.prototype.getRenderingDetails = function() {
  * Returns a ProviderDef object associated with this ComponentDef.
  *
  * @returns {ProviderDef}
+ * @export
  */
 ComponentDef.prototype.getProviderDef = function() {
     return this.providerDef;
@@ -311,6 +322,7 @@ ComponentDef.prototype.getAllFlavoredStyleDefs = function() {
  * DOM elements rendered by Components of this type.
  *
  * @returns {String} The style class name
+ * @export
  */
 ComponentDef.prototype.getStyleClassName = function() {
     var className = this.styleClassName;
@@ -348,6 +360,7 @@ ComponentDef.prototype.getStyleClassName = function() {
  * Gets the style definition. Returns a StyleDef object.
  *
  * @returns {StyleDef}
+ * @export
  */
 ComponentDef.prototype.getStyleDef = function() {
     return this.styleDef;
@@ -358,6 +371,7 @@ ComponentDef.prototype.getStyleDef = function() {
  * default specified on the component def.
  *
  * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
+ * @export
  */
 ComponentDef.prototype.getDefaultFlavor = function() {
     if ($A.util.isUndefined(this.flavorOverride)) {
@@ -387,6 +401,7 @@ ComponentDef.prototype.getDefaultFlavor = function() {
  * Gets whether this def has at least one flavorable child element.
  *
  * @returns {Boolean}
+ * @export
  */
 ComponentDef.prototype.hasFlavorableChild = function() {
     return !!this.flavorableChild;
@@ -396,6 +411,7 @@ ComponentDef.prototype.hasFlavorableChild = function() {
  * Gets the set of default flavor overrides.
  *
  * @returns {FlavorAssortmentDef}
+ * @export
  */
 ComponentDef.prototype.getDefaultFlavors = function() {
     return this.defaultFlavors;
@@ -405,6 +421,7 @@ ComponentDef.prototype.getDefaultFlavors = function() {
  * Gets all the attribute definitions. Returns an AttributeDef object.
  *
  * @returns {AttributeDefSet}
+ * @export
  */
 ComponentDef.prototype.getAttributeDefs = function() {
     return this.attributeDefs;
@@ -414,6 +431,7 @@ ComponentDef.prototype.getAttributeDefs = function() {
  * Gets the component facets. A facet is any attribute of type Aura.Component[].
  *
  * @returns {Object}
+ * @export
  */
 ComponentDef.prototype.getFacets = function() {
     return this.facets;
@@ -423,6 +441,7 @@ ComponentDef.prototype.getFacets = function() {
  * Gets the controller definition. Returns a ControllerDef object.
  *
  * @returns {ControllerDef}
+ * @export
  */
 ComponentDef.prototype.getControllerDef = function() {
     return this.controllerDef;
@@ -432,6 +451,7 @@ ComponentDef.prototype.getControllerDef = function() {
  * Gets the model definition. Returns a ModelDef object.
  *
  * @returns {ModelDef}
+ * @export
  */
 ComponentDef.prototype.getModelDef = function() {
     return this.modelDef;
@@ -456,6 +476,7 @@ ComponentDef.valueEvents = {
  * @param {Boolean}
  *            includeValueEvents Set to true to include the value events.
  * @returns{Object}
+ * @export
  */
 ComponentDef.prototype.getEventDef = function(name, includeValueEvents) {
     var ret = this.registerEventDefs[name];
@@ -493,6 +514,7 @@ ComponentDef.prototype.getEventNameByDescriptor = function(descriptor) {
  * Gets all events associated with the Component.
  *
  * @returns {Object}
+ * @export
  */
 ComponentDef.prototype.getAllEvents = function() {
     return this.allEvents;
@@ -502,6 +524,7 @@ ComponentDef.prototype.getAllEvents = function() {
  * Gets the application handler definitions.
  *
  * @returns {Object}
+ * @export
  */
 ComponentDef.prototype.getAppHandlerDefs = function() {
     return this.appHandlerDefs;
@@ -511,6 +534,7 @@ ComponentDef.prototype.getAppHandlerDefs = function() {
  * Gets the component handler definitions.
  *
  * @returns {Object}
+ * @export
  */
 ComponentDef.prototype.getCmpHandlerDefs = function() {
     return this.cmpHandlerDefs;
@@ -529,6 +553,7 @@ ComponentDef.prototype.getValueHandlerDefs = function() {
  * Converts a ComponentDef object to type String.
  *
  * @returns {String}
+ * @export
  */
 ComponentDef.prototype.toString = function() {
     return this.getDescriptor().getQualifiedName();
@@ -543,6 +568,7 @@ ComponentDef.prototype.toString = function() {
  *            <code>namespace:componentName</code> (e.g.,
  *            <code>ui:button</code>).
  * @returns {Boolean} True if the Component is an instance, or false otherwise.
+ * @export
  */
 ComponentDef.prototype.isInstanceOf = function(name) {
     var thisName = this.descriptor.getNamespace() + ":" + this.descriptor.getName();
@@ -567,6 +593,7 @@ ComponentDef.prototype.implementsDirectly = function(type) {
 /**
  * Gets the location change event. Returns the qualified name of the event in
  * the format <code>markup://aura:locationChange</code>.
+ * @export
  */
 ComponentDef.prototype.getLocationChangeEvent = function() {
     var evt = this.locationChangeEventDef;
@@ -576,6 +603,9 @@ ComponentDef.prototype.getLocationChangeEvent = function() {
     return "markup://aura:locationChange";
 };
 
+/**
+ * @export
+ */
 ComponentDef.prototype.getLayouts = function() {
     return this.layouts;
 };
@@ -654,5 +684,3 @@ ComponentDef.prototype.initRenderer = function() {
 };
 
 Aura.Component.ComponentDef = ComponentDef;
-
-// #include aura.component.ComponentDef_export

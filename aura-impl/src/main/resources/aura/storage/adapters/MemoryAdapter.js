@@ -297,9 +297,15 @@ MemoryStorageAdapter.prototype.getMRU = function() {
 };
 // #end
 
-//#include aura.storage.adapters.MemoryAdapter_export
-
 Aura.Storage.MemoryStorageAdapter = MemoryStorageAdapter;
+
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+MemoryStorageAdapter.prototype["getSize"] = MemoryStorageAdapter.prototype.getSize;
+MemoryStorageAdapter.prototype["getMRU"] = MemoryStorageAdapter.prototype.getMRU;
+MemoryStorageAdapter.prototype["getAll"] = MemoryStorageAdapter.prototype.getAll;
+//#end
+
 
 $A.storageService.registerAdapter({
     "name": MemoryStorageAdapter.NAME,

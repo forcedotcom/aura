@@ -35,6 +35,7 @@ function AuraHistoryService() {
  * @param {Object} token The provided token set to the current location hash
  * @memberOf AuraHistoryService
  * @public
+ * @export
  */
 AuraHistoryService.prototype.set = function(token) {
     if (token) {
@@ -70,6 +71,7 @@ AuraHistoryService.prototype.set = function(token) {
  * 
  * @memberOf AuraHistoryService
  * @public
+ * @export
  */
 AuraHistoryService.prototype.get = function() {
     // 
@@ -85,6 +87,7 @@ AuraHistoryService.prototype.get = function() {
  *
  * @memberOf AuraHistoryService
  * @public
+ * @export
  */
 AuraHistoryService.prototype.back = function() {
     if (!$A.util.isIOSWebView()) {
@@ -111,6 +114,7 @@ AuraHistoryService.prototype.back = function() {
  * @param {String} title The new title
  * @memberOf AuraHistoryService
  * @public
+ * @export
  */
 AuraHistoryService.prototype.setTitle = function(title) {
     document.title = title;
@@ -121,6 +125,7 @@ AuraHistoryService.prototype.setTitle = function(title) {
  * 
  * @memberOf AuraHistoryService
  * @public
+ * @export
  */
 AuraHistoryService.prototype.forward = function() {
     if (!$A.util.isIOSWebView()) {
@@ -141,6 +146,7 @@ AuraHistoryService.prototype.forward = function() {
  * Resets history
  *
  * @public
+ * @export
  */
 AuraHistoryService.prototype.reset = function () {
     this.history = [];
@@ -279,5 +285,3 @@ AuraHistoryService.prototype.parseLocation = function(location) {
 };
 
 Aura.Services.AuraHistoryService = AuraHistoryService;
-
-//#include aura.AuraHistoryService_export

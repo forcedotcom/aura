@@ -37,6 +37,7 @@
  * @param {boolean}
  *            caboose should this action wait for the next non boxcar action?
  * @platform
+ * @export
  */
 function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
     this.def = def;
@@ -84,6 +85,9 @@ Action.getStorage = function() {
 // Instance methods:
 
 Action.prototype.nextActionId = 1;
+/**
+ * @export
+ */
 Action.prototype.auraType = "Action";
 
 /**
@@ -91,6 +95,7 @@ Action.prototype.auraType = "Action";
  *
  * @returns {string}
  * @private
+ * @export
  */
 Action.prototype.getId = function() {
     return this.id;
@@ -316,6 +321,7 @@ Action.prototype.getCurrentPath = function() {
  *
  * @public
  * @returns {ActionDef} The action definition, including its name, origin, and descriptor.
+ * @export
  */
 Action.prototype.getDef = function() {
     return this.def;
@@ -329,6 +335,7 @@ Action.prototype.getDef = function() {
  *            config The key/value pairs that specify the Action. The key is an attribute on the given component.
  *             For example, <code>serverAction.setParams({ "record": id });</code> sets a parameter on <code>serverAction</code>.
  * @platform
+ * @export
  */
 Action.prototype.setParams = function(config) {
     var paramDefs = this.paramDefs;
@@ -346,6 +353,7 @@ Action.prototype.setParams = function(config) {
  * @param {Object}
  *            value the value to set.
  * @platform
+ * @export
  */
 Action.prototype.setParam = function(key, value) {
     var paramDef = this.paramDefs[key];
@@ -363,6 +371,7 @@ Action.prototype.setParam = function(key, value) {
  *            name The name of the Action.
  * @returns {Object} The parameter value
  * @platform
+ * @export
  */
 Action.prototype.getParam = function(name) {
     return this.params[name];
@@ -374,6 +383,7 @@ Action.prototype.getParam = function(name) {
  * @public
  * @returns {Object} The key/value pairs that specify the Action.
  * @platform
+ * @export
  */
 Action.prototype.getParams = function() {
     return this.params;
@@ -411,6 +421,7 @@ Action.prototype.getComponent = function() {
  * @param {String}
  *            name The action state for which the callback is to be associated with.
  * @platform
+ * @export
  */
 Action.prototype.setCallback = function(scope, callback, name) {
     if (!$A.util.isFunction(callback)) {
@@ -451,6 +462,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  * @public
  * @returns {string} the abortable id that was set for this action.
  * @platform
+ * @export
  */
  Action.prototype.getCallback = function (type) {
     return this.callbacks[type];
@@ -469,6 +481,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  * @param {Function}
  *      callback the function to call.
  *
+ * @export
  */
 Action.prototype.setAllAboardCallback = function(scope, callback) {
     if (!$A.util.isFunction(callback)) {
@@ -548,6 +561,7 @@ Action.prototype.wrapCallback = function(scope, callback) {
  * @public
  * @param {Event}
  *            evt The event that calls the Action.
+ * @export
  */
 Action.prototype.run = function(evt) {
     this.runDeprecated(evt);
@@ -563,6 +577,7 @@ Action.prototype.run = function(evt) {
  * @public
  * @param {Event}
  *            evt The event that calls the Action.
+ * @export
  */
 Action.prototype.runDeprecated = function(evt) {
     $A.assert(this.def && this.def.isClientAction(),
@@ -592,6 +607,7 @@ Action.prototype.runDeprecated = function(evt) {
  *   "INCOMPLETE": The server didn't return a response. The server might be down or the client might be offline.
  *   "ABORTED": The action was aborted. You can register a callback for this explicitly
  * @platform
+ * @export
  */
 Action.prototype.getState = function() {
     return this.state;
@@ -602,6 +618,7 @@ Action.prototype.getState = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Action.prototype.getReturnValue = function() {
     return this.returnValue;
@@ -628,6 +645,7 @@ Action.prototype.getReturnValue = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Action.prototype.getError = function() {
     return this.error;
@@ -638,6 +656,7 @@ Action.prototype.getError = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Action.prototype.isBackground = function() {
     return this.background === true;
@@ -649,6 +668,7 @@ Action.prototype.isBackground = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Action.prototype.setBackground = function() {
     this.background = true;
@@ -666,6 +686,7 @@ Action.prototype.setBackground = function() {
  * @public
  * @param {Action}
  *            action The action to run.
+ * @export
  */
 Action.prototype.runAfter = function(action) {
     $A.clientService.enqueueAction(action);
@@ -892,6 +913,7 @@ Action.prototype.abort = function() {
  * true.
  *
  * @param {Boolean} value : defaults to setting to true, only sets false if === false
+ * @export
  */
 Action.prototype.setAbortable = function(value) {
     if (value !== false) {
@@ -924,6 +946,7 @@ Action.prototype.setAbortableId = function(id) {
  *
  * @private
  * @param {Action} the action which is the logical parent of this action.
+ * @export
  */
 Action.prototype.setParentAction = function(action) {
     if($A.util.isUndefinedOrNull(action) || $A.util.isUndefined(action.auraType) || action.auraType!=="Action"
@@ -951,6 +974,7 @@ Action.prototype.getAbortableId = function() {
 
 /**
  * Checks if this action is a refresh.
+ * @export
  */
 Action.prototype.isRefreshAction = function() {
     return this.originalResponse !== undefined;
@@ -961,6 +985,7 @@ Action.prototype.isRefreshAction = function() {
  *
  * @public
  * @returns {Boolean} The function is abortable (true), or false otherwise.
+ * @export
  */
 Action.prototype.isAbortable = function() {
     return this.abortable;
@@ -974,6 +999,7 @@ Action.prototype.isAbortable = function() {
  * @param {Object}
  *            val
  * @returns {Boolean} Set to true if the Action should be exclusive, or false otherwise.
+ * @export
  */
 Action.prototype.setExclusive = function(val) {
     this.exclusive = val === undefined ? true : val;
@@ -984,6 +1010,7 @@ Action.prototype.setExclusive = function(val) {
  *
  * @public
  * @returns {Boolean}
+ * @export
  */
 Action.prototype.isExclusive = function() {
     return this.exclusive || false;
@@ -997,6 +1024,7 @@ Action.prototype.isExclusive = function() {
  *            config Optional. A set of key/value pairs that specify the storage options to set. You can set the
  *            following options: <code>ignoreExisting</code> and <code>refresh</code>.
  * @platform
+ * @export
  */
 Action.prototype.setStorable = function(config) {
     $A.assert(this.def && this.def.isServerAction(),
@@ -1017,6 +1045,7 @@ Action.prototype.setStorable = function(config) {
  *
  * @public
  * @returns {Boolean}
+ * @export
  */
 Action.prototype.isStorable = function() {
     var ignoreExisting = this.storableConfig && this.storableConfig["ignoreExisting"];
@@ -1032,6 +1061,7 @@ Action.prototype.isStorable = function() {
  * forever if nothing goes to the server.
  *
  * @public
+ * @export
  */
 Action.prototype.setCaboose = function() {
     this.caboose = true;
@@ -1043,6 +1073,7 @@ Action.prototype.setCaboose = function() {
  *
  * @public
  * @returns {boolean}
+ * @export
  */
 Action.prototype.isCaboose = function() {
     return this.caboose;
@@ -1059,6 +1090,7 @@ Action.prototype._isStorable = function() {
  * Gets the storage key in name-value pairs.
  *
  * @private
+ * @export
  */
 Action.prototype.getStorageKey = function() {
     return Action.getStorageKey(
@@ -1072,6 +1104,7 @@ Action.prototype.getStorageKey = function() {
  *
  * @public
  * @returns {Boolean}
+ * @export
  */
 Action.prototype.isFromStorage = function() {
     return !$A.util.isUndefinedOrNull(this.storage);
@@ -1081,6 +1114,7 @@ Action.prototype.isFromStorage = function() {
  * Chains a function to run after the current Action. For server-side Actions only.
  *
  * @public
+ * @export
  */
 Action.prototype.setChained = function() {
     this.chained = true;
@@ -1101,6 +1135,7 @@ Action.prototype.isChained = function() {
  * Returns the key/value pairs of the Action id, descriptor, and parameters in JSON format.
  *
  * @public
+ * @export
  */
 Action.prototype.toJSON = function() {
     return {
@@ -1212,6 +1247,7 @@ Action.prototype.getRetryFromStorageAction = function() {
  *
  * @returns {Storage}
  * @private
+ * @export
  */
 Action.prototype.getStorage = function() {
     return Action.getStorage();
@@ -1263,5 +1299,3 @@ Action.prototype.fireRefreshEvent = function(event, responseUpdated) {
 };
 
 Aura.Controller.Action = Action;
-
-// #include aura.controller.Action_export

@@ -127,6 +127,7 @@
         <webdriver.remote.server /> <!-- http://localhost:4444/wd/hub/ -->
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
+		<webdriver.timeout>30</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <xdisplay.exec>Xvfb</xdisplay.exec>
@@ -239,6 +240,7 @@
                                     <webdriver.remote.server>${webdriver.remote.server}</webdriver.remote.server>
                                     <webdriver.reusebrowser>${webdriver.reusebrowser}</webdriver.reusebrowser>
                                     <webdriver.browser.type>${webdriver.browser.type}</webdriver.browser.type>
+                                    <webdriver.timeout>${webdriver.timeout}</webdriver.timeout>
                                     <skipIntTests>${skipIntTests}</skipIntTests>
                                 </systemPropertyVariables>
                             </configuration>

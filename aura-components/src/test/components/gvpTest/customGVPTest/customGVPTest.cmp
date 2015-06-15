@@ -15,6 +15,6 @@
     limitations under the License.
 -->
 
-<aura:component template="gvpTest:customGVPTemplate">
+<aura:component template="gvpTest:customGVPTemplate" render="client">
     <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
 </aura:component>

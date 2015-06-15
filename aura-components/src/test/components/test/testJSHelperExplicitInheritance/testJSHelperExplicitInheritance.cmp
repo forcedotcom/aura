@@ -15,8 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component helper='js://test.testJSHelperSuper'>
-
+<aura:component render="client" helper='js://test.testJSHelperSuper'>
 </aura:component>
 <!--Test to verify that when a second generation helper is specified using helper directive,
 only helpers on second generation component are accessible from foreign component -->

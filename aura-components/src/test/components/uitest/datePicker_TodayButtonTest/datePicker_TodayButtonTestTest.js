@@ -482,4 +482,4 @@
         cmp.set('v.timezone1', 'America/Los_Angeles');
         cmp.set('v.timezone2', 'Asia/Bankok');
     }
-});
+})

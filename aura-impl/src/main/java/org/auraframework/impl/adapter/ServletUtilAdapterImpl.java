@@ -469,6 +469,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             return HTML_CONTENT_TYPE;
         case SVG:
             return SVG_CONTENT_TYPE;
+        default:
         }
         return ("text/plain");
     }

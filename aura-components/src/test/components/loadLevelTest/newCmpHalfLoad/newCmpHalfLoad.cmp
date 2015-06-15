@@ -27,6 +27,4 @@
     <aura:attribute name="controllerFuncToCreateCmp" type="String" default="c.createCmpByFetchingDefFromServer"/>
     
     {!v.body} 
-
-
 </aura:component>

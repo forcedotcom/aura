@@ -24,6 +24,7 @@
         var body = cmp.find('output').get('v.body');
         body = newCmpList.concat(body);
         cmp.find('output').set('v.body', body);
+        cmp._bodyUpdated = true;
     },
     addInside: function(cmp, event, helper) {
         var newCmpList = helper.newComponentList(cmp, [{
@@ -43,6 +44,7 @@
         body.splice(index+1, 0, newCmpList[1]);
 
         cmp.find('output').set('v.body', body);
+        cmp._bodyUpdated = true;
     },
     addAfter: function(cmp, event, helper) {
         var newCmpList = helper.newComponentList(cmp, [{
@@ -54,5 +56,6 @@
         var body = cmp.find('output').get('v.body');
         body = body.concat(newCmpList);
         cmp.find('output').set('v.body', body);
+        cmp._bodyUpdated = true;
     }
 })

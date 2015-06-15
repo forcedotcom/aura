@@ -53,7 +53,7 @@ TestInstance = function() {
  */
 TestInstance.prototype.errors = [];
 
-//#include aura.test.Test_private
+// #include aura.test.Test_private
 
 /**
  *
@@ -547,13 +547,15 @@ TestInstance.prototype.print = function(value) {
 
 /**
  * Internally used error function to log an error for a given test.
- * @param level ERROR
- * @param msg message to display
- * this is being called by Logger.prototype.notify
+ * 
+ * @param level
+ *            ERROR
+ * @param msg
+ *            message to display this is being called by Logger.prototype.notify
  * @private
  * @function Test#auraError
  */
-TestInstance.prototype.auraError = function(level, msg/*, error*/) {
+TestInstance.prototype.auraError = function(level, msg/* , error */) {
     if (!this.putMessage(this.preErrors, this.expectedErrors, msg)) {
         this.fail(msg);
     }
@@ -573,9 +575,11 @@ TestInstance.prototype.expectAuraError = function(e) {
 
 /**
  * Internally used warning function to log a warning for a given test.
- * @param level WARNING
- * @param msg message to display
- * this is being called by Logger.prototype.notify
+ * 
+ * @param level
+ *            WARNING
+ * @param msg
+ *            message to display this is being called by Logger.prototype.notify
  * @private
  * @function Test#auraWarning
  */
@@ -1099,10 +1103,10 @@ TestInstance.prototype.getTextByComponent = function(component) {
     var i;
     if (component) {
         var elements = component.getElements();
-        if(elements){
-            //If the component has an array of elements
-            for(i=0;i<elements.length;i++){
-                if(elements[i].nodeType !== 8/*COMMENT*/){
+        if (elements) {
+            // If the component has an array of elements
+            for (i = 0; i < elements.length; i++) {
+                if (elements[i].nodeType !== 8/* COMMENT */) {
                     ret += this.getText(elements[i]);
                 }
             }
@@ -1999,15 +2003,20 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
         this.suite = code;
     }
 
+    var continueRun = this.runInternal.bind(this, name);
+    setTimeout(this.waitForRoot.bind(this, continueRun), 1);
+};
+
+/**
+ * @private
+ */
+TestInstance.prototype.waitForRoot = function(callback) {
     var that = this;
-    var checkForTarget = function() {
-        if ($A.getRoot()) {
-            that.runInternal(name);
-            return;
-        }
-        setTimeout(checkForTarget, 50);
-    };
-    checkForTarget();
+    if ($A.getRoot()) {
+        setTimeout(callback, 1); // give browser a moment to settle down 
+        return;
+    }
+    setTimeout(that.waitForRoot.bind(that, callback), 50);
 };
 
 /**

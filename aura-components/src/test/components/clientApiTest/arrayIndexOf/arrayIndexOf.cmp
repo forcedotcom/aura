@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
     <aura:attribute name="array" type="String[]" default="red,green,blue,green,yellow" />
 </aura:component>

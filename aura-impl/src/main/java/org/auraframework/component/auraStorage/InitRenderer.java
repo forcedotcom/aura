@@ -48,7 +48,7 @@ public class InitRenderer implements Renderer {
 
         String script = String.format(
                 "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
-                name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration, defaultAutoRefreshInterval,
+                name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(), defaultAutoRefreshInterval.longValue(),
                 debugLoggingEnabled, clearStorageOnInit, version);
 
         Boolean onlyUseStorageIfRequested = (Boolean) attributes.getValue("requireUseStorageQueryParam");

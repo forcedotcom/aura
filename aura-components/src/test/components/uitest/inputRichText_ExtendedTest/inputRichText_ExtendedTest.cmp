@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:inputRichText">
+<aura:component render="client" extends="ui:inputRichText">
 	<aura:attribute name="value" type="String" default="abc"/>
 </aura:component>

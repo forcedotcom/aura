@@ -26,7 +26,7 @@
     <aura:attribute name="test" type="String"/>
     <ui:tabset aura:id="tabs" class="jstestTabset">
         <aura:iteration items="{!m.testCases}" var="case">
-            <aurajstest:jstestCase aura:id="test" case="{!case}" url="{!m.url}" suite="{!m.testSuite}" done="{!c.testDone}"/>
+            <aurajstest:jstestCase aura:id="test" case="{!case}" url="{!m.url}" done="{!c.testDone}"/>
         </aura:iteration>
     </ui:tabset>
 

@@ -15,19 +15,20 @@
     limitations under the License.
 
 -->
-<aura:component>
-<aura:attribute name="dontset" type="string"/>
-<aura:attribute name="dontset2" type="string"/>
+<aura:component render="client">
+	<aura:attribute name="dontset" type="string"/>
+	<aura:attribute name="dontset2" type="string"/>
+	
     <div class="{!v.dontset}">
-    should have no class
+    	should have no class
     </div>
     <div class="{!v.dontset + 'aClass'}">
-    should have aClass
+    	should have aClass
     </div>
     <div class="{!'aClass2' + v.dontset2}">
-    should have aClass2
+    	should have aClass2
     </div>
     <div class="{!v.dontset + v.dontset2}">
-    should have no class
+    	should have no class
     </div>
 </aura:component>

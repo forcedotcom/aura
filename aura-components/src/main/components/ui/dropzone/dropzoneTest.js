@@ -80,4 +80,4 @@
             $A.test.assertEquals(expected, actual);
         }
     }
-});
+})

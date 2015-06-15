@@ -252,4 +252,4 @@
             weekdaysArray ? weekdaysArray.length : 0
         )
     }
-});
+})

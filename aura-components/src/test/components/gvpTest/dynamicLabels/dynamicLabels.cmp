@@ -17,6 +17,6 @@
 -->
 <!--GVP -> Global Value Providers related tests-->
 <!--Test component to verify behavior of labels used by dynamically created components-->
-<aura:component>
+<aura:component render="client">
     <div aura:id="container" />
 </aura:component>

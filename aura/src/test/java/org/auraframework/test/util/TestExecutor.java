@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Logger;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -39,6 +40,7 @@ import org.auraframework.util.test.annotation.ThreadHostileTest;
  */
 public class TestExecutor {
     public static final int NUM_THREADS = Integer.parseInt(System.getProperty("testThreadCount", "4"));
+    private static final Logger logger = Logger.getLogger("TestExecutor");
     private final ExecutorService executor;
 
     /**
@@ -140,11 +142,16 @@ public class TestExecutor {
 
             // Run the test.
             lock.lock();
+            long start = System.nanoTime();
             try {
                 test.run(result);
                 return result;
             } finally {
                 lock.unlock();
+                if (test instanceof TestCase) {
+                    logger.info(String.format("Finished: %s.%s {elapsed=%sms}", test.getClass().getName(),
+                            ((TestCase) test).getName(), ((System.nanoTime() - start) / 1000000)));
+                }
             }
         }
     }

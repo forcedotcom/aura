@@ -24,8 +24,8 @@
         }
     },
 
-    //we can pass string to Integer attribute, it will get convert into number
-    //we can pass number to String attribute, it will get conver into String
+    // we can pass string to Integer attribute, it will get converted into number
+    // we can pass number to String attribute, it will get converted into String
     testIntegerTypeWithString: {
         attributes: {
             typeInteger: "123",
@@ -33,10 +33,10 @@
         },
         test: function(cmp) {
             var value = cmp.get("v.typeInteger");
-            $A.test.assertTrue(typeof value === "number");
+            $A.test.assertEquals("number", typeof value);
 
             var valueStr = cmp.get("v.typeString");
-            $A.test.assertTrue(typeof valueStr === "string");
+            $A.test.assertEquals("string", typeof valueStr);
         }
     },
 
@@ -219,15 +219,15 @@
 
     testSetTypeWithDupElements : {
         attributes : {
-            typeSet : ['1','1', 1]
+            typeSet : "['1','1', 1]"  // must be a string to pass through converters
         },
         test : function(cmp) {
             var except = ['1', 1];
             var actual = cmp.get("v.typeSet");
-            $A.test.assertTrue($A.util.isArray(actual));
+            $A.test.assertTrue($A.util.isArray(actual), "v.typeSet should be an array");
 
             var result = $A.test.compareValues(except.sort(), actual.sort());
-            $A.test.assertTrue(result['match'], result['reasons']);
+            $A.test.assertTrue(result['match'], JSON.stringify(result['reasons']));
         }
     }
 })

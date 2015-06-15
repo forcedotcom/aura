@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
     <aura:attribute name="intName" type="Integer" default="12"/>
     <aura:attribute name="longName" type="Long" default="1212312412142"/>
     <aura:attribute name="doubleName" type="Double" default="12.30"/>
@@ -30,5 +30,4 @@
     <aura:attribute name="componentName" type="Aura.Component"/>
     <aura:attribute name="componentDefRefArrayName" type="Aura.ComponentDefRef[]"/>
     <aura:attribute name="actionName" type="Aura.Action"/>
-
 </aura:component>

@@ -31,32 +31,28 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Mode;
 
 /**
  */
 public class AuraRewriteFilter implements Filter {
+
+    public static final Pattern DESCRIPTOR_PATTERN = Pattern.compile("^/([^/]*)/([^/]*).(app|cmp)");
 
     private ServletContext servletContext;
 
     private static final String uriPattern = "/aura?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.access=%s";
 
     private static final Pattern publicPattern = Pattern.compile("^/public/([^/]*)/([^/]*).app");
-    private static final Pattern appPattern = Pattern.compile("^/([^/]*)/([^/]*).app");
-    private static final Pattern cmpPattern = Pattern.compile("^/([^/]*)/([^/]*).cmp");
 
     @Override
     public void destroy() {
-
     }
 
     private static String createURI(String namespace, String name, String defType, String access, String qs) {
         String ret = String.format(uriPattern, namespace, name, defType, access);
-
         if (qs != null) {
             ret = String.format("%s&%s", ret, qs);
         }
-
         return ret;
     }
 
@@ -75,36 +71,13 @@ public class AuraRewriteFilter implements Filter {
             newUri = createURI(pubMatcher.group(1), pubMatcher.group(2), DefType.APPLICATION.name(),
                     Authentication.UNAUTHENTICATED.name(), qs);
         } else {
-            Mode mode = AuraContextFilter.mode.get(request, Mode.PROD);
-            String ns;
-            String name;
-            String type = null;
-            Matcher matcher = null;
+            Matcher matcher = DESCRIPTOR_PATTERN.matcher(path);
 
-            Matcher appMatcher = appPattern.matcher(path);
-            if (appMatcher.matches()) {
-                matcher = appMatcher;
-                type = DefType.APPLICATION.name();
-            } else {
-                Matcher cmpMatcher = cmpPattern.matcher(path);
-                if (cmpMatcher.matches()) {
-                    matcher = cmpMatcher;
-                    type = DefType.COMPONENT.name();
-                }
+            if (matcher.matches()) {
+                DefType type = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
+                newUri = createURI(matcher.group(1), matcher.group(2), type.name(),
+                        Authentication.AUTHENTICATED.name(), qs);
             }
-            if (matcher != null) {
-                if (mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG) {
-                    qs = String.format("descriptor=%s:%s&defType=%s", matcher.group(1), matcher.group(2), type);
-                    ns = "aurajstest";
-                    name = "jstest";
-                    type = DefType.APPLICATION.name();
-                } else {
-                    ns = matcher.group(1);
-                    name = matcher.group(2);
-                }
-                newUri = createURI(ns, name, type, Authentication.AUTHENTICATED.name(), qs);
-            }
-
         }
         if (newUri != null && !newUri.isEmpty()) {
             RequestDispatcher dispatcher = servletContext.getRequestDispatcher(newUri);

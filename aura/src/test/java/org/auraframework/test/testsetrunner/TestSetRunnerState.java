@@ -183,7 +183,7 @@ public class TestSetRunnerState {
 
                 String url = "";
                 if (t instanceof ComponentTestCase) {
-                    url = ((ComponentTestCase) t).getTestUrlForManualRun();
+                    url = ((ComponentTestCase) t).getUrl();
                 }
 
                 if (t instanceof PerfExecutorTest) {

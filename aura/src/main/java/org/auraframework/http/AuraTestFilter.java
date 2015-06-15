@@ -18,14 +18,10 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -35,13 +31,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.auraframework.Aura;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
@@ -54,12 +47,9 @@ import org.auraframework.util.json.JsonReader;
 public class AuraTestFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
-    private static final Pattern descPattern = Pattern.compile("^/([^/]*)/([^/]*).(app|cmp)");
     private static final StringParam test = new StringParam(AuraServlet.AURA_PREFIX + "test", 0, false);
     private static final BooleanParam testReset = new BooleanParam(AuraServlet.AURA_PREFIX + "testReset", false);
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);
-
-    private ServletContext servletContext;
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
@@ -77,30 +67,7 @@ public class AuraTestFilter implements Filter {
         }
 
         HttpServletRequest request = (HttpServletRequest) req;
-        if ("GET".equals(request.getMethod())) {
-            // TODO: replace mode check with aura.test param
-            AuraContext context = Aura.getContextService().getCurrentContext();
-            Mode mode = context.getMode();
-            if (mode == Mode.JSTEST || mode == Mode.JSTESTDEBUG) {
-                String path = request.getPathInfo();
-                path = path == null ? "" : path;
-                Matcher matcher = descPattern.matcher(path);
-                if (matcher.matches()) {
-                    String descriptor = matcher.group(1) + ":" + matcher.group(2);
-                    DefType defType = "app".equals(matcher.group(3)) ? DefType.APPLICATION : DefType.COMPONENT;
-                    String url = AuraRewriteFilter.createURI("aurajstest", "jstest", DefType.APPLICATION.name(),
-                            Authentication.AUTHENTICATED.name(),
-                            String.format("descriptor=%s&defType=%s", descriptor, defType.name()));
-
-                    RequestDispatcher dispatcher = servletContext.getRequestDispatcher(url);
-                    if (dispatcher != null) {
-                        dispatcher.forward(req, res);
-                        return;
-                    }
-                }
-            }
-        }
-
+        
         // handle mocks
         TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
         if (testContextAdapter != null) {
@@ -165,7 +132,6 @@ public class AuraTestFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        servletContext = filterConfig.getServletContext();
     }
 
     @Override

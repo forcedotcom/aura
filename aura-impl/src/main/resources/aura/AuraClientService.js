@@ -481,7 +481,7 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
         tid = parseInt(abortableId, 10);
 
         if (!(tid <= this.nextTransactionId)) {
-            $A.error("ActionQueue.setCurrentTransactionId(): invalid transaction id: "+tid);
+            $A.error("AuraClientService.setCurrentTransactionId(): invalid transaction id: "+tid);
             return;
         }
         if (tid > this.lastTransactionId) {
@@ -1648,7 +1648,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.request["open"](method, url, true);
     auraXHR.request["onreadystatechange"] = function() {
         // Ordering is important. auraXHR will no longer be valid after processed.
-        if (processed == false && auraXHR.request["readyState"] == 4) {
+        if (processed === false && auraXHR.request["readyState"] === 4) {
             processed = true;
 
             $A.Perf.endMark("Received Response - XHR " + auraXHR.marker);

@@ -14,113 +14,96 @@
  * limitations under the License.
  */
 ({
-	setUp: function(cmp) {
-		var receiverCmp = "markup://"+cmp.get("v.receiverCmp");
-		var receiverCmpAuraId = cmp.get("v.receiverCmpAuraId");
-    	var config = {
+	//in setUp, we create the receiver component, push it to body
+    setUp: function(cmp) {
+        var receiverCmp = "markup://"+cmp.get("v.receiverCmp");
+        var receiverCmpAuraId = cmp.get("v.receiverCmpAuraId");
+        var config = {
             componentDef:receiverCmp,
             localId:receiverCmpAuraId
         };
-		this.pushNewCmpToBody(cmp, config, true);
-	},
-	
-	pushNewCmpToBody : function(cmp, config, replaceBody) {
-		$A.componentService.newComponentAsync(
-	            this,
-	            function(newCmp){
-	            	var body = cmp.get("v.body");
-	            	if(replaceBody) {
-	            		body = [newCmp];
-	            	} else {
-	            		body.push(newCmp);
-	            	}
-	                cmp.set("v.body", body);
-	                cmp.index(config.localId, newCmp.getGlobalId());
-	            },
-	            config
-	        );
-	},
-	
-	waitForReceiverCmpCreated : function(cmp) {
-		$A.test.addWaitFor(true, 
-        		function() { 
-        			var receiverCmp = cmp.find("receiverCmp"); 
-        			return (receiverCmp !== undefined); }, 
-	        		function() {}
-        	);
-	},
-	
-	
-	/**
-     * ask receiverCmp to create a new Cmp whose definition is not available at the client.
-     * This definition would be fetched from the server by a server action
-     * kill receiverCmp before server action does its callback
-     */
-    testCmpCreatedByFetchingDefFromServer:{
-    	attributes:{ 
-    		receiverCmp: "loadLevelTest:newCmpWithValueProvider",
-    		receiverCmpAuraId: "receiverCmp",
-    		controllerFuncToCreateCmp: "c.createCmpByFetchingDefFromServer"
-    	},
-        test:[ function(cmp) {
-        	//$A.test.setTestTimeout(6000000);//for stepping through
-        	this.waitForReceiverCmpCreated(cmp);
-        },
-        function(cmp){
-        	$A.test.blockRequests();
-        	//ask server for new cmp
-        	var receiverCmp = cmp.find("receiverCmp");
-        	receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp")).runDeprecated();//c.createCmpByFetchingDefFromServer
-        	//kill the receiver cmp
-        	$A.test.releaseRequests();
-        	receiverCmp.destroy();
-        	$A.test.addWaitFor(false, function() { return $A.test.isActionPending(); }, 
-        		function(){
-        			/* we can create a new cmp put it to v.body. but that's not necessary, as long as we wait until
-        			 * actions are finished, inValid cmp will get removed, and re-rendering happens after the this 
-        			 * test stage won't cause any problems. 
-        			var receiverCmp = "markup://"+cmp.get("v.receiverCmp");
-        			var receiverCmpAuraId = cmp.get("v.receiverCmpAuraId")+"_new";
-        	    	var config = {
-        	            componentDef:receiverCmp,
-        	            localId:receiverCmpAuraId
-        	        };
-        			this.pushNewCmpToBody(cmp, config, true);
-        			*/
-        		}
-        	);
-        }
-        ]
+        this.pushNewCmpToBody(cmp, config, true);
     },
     
-    //TODO: not working because of W-2547251 . also I'm working on a different solution
-    //now we have no control over when the request with the server action (getComponent) is send, also when the response is back
-    //this means receiver cmp could got destroyed before request is send. that's ok for the first test in this file, but blow up at this test
-    _testCmpCreatedByFetchingMapFromServer:{
-    	attributes:{ 
-    		receiverCmp: "loadLevelTest:newCmpWithValueProvider",
-    		receiverCmpAuraId: "receiverCmp",
-    		controllerFuncToCreateCmp: "c.createCmpWithMapValuePropRefValueFromServer"
-    	},
+    pushNewCmpToBody : function(cmp, config, replaceBody) {
+        $A.componentService.newComponentAsync(
+                this,
+                function(newCmp){
+                    var body = cmp.get("v.body");
+                    if(replaceBody) {
+                        body = [newCmp];
+                    } else {
+                        body.push(newCmp);
+                    }
+                    cmp.set("v.body", body);
+                    cmp.index(config.localId, newCmp.getGlobalId());
+                },
+                config
+            );
+    },
+    
+    waitForReceiverCmpCreated : function(cmp) {
+        $A.test.addWaitForWithFailureMessage(true, 
+                function() { 
+                    var receiverCmp = cmp.find("receiverCmp"); 
+                    return (receiverCmp !== undefined); }, 
+                "Waiting for receiver component being created failed"
+            );
+    },
+    
+    /**
+     * ask receiverCmp(newCmpWithValueProvider) to create a new component(displayMap) whose definition is not available 
+     * at the client. This definition would be fetched from the server by a server action
+     * kill receiverCmp BEFORE the request is send. 
+     * 
+     * NOTE: displayMap.cmp has attributes refer to receiverCmp's attribute(v.stringAttribute) twice, 
+     * once we kill newCmpWithValueProvider, it will error out during encoding actions for request
+     */
+    testCmpCreatedByFetchingMapFromServer:{
+        attributes:{ 
+            receiverCmp: "loadLevelTest:newCmpWithValueProvider",
+            receiverCmpAuraId: "receiverCmp",
+            controllerFuncToCreateCmp: "c.createCmpWithMapValuePropRefValueFromServer"
+        },
         test:[ function(cmp) {
-        	//$A.test.setTestTimeout(6000000);//for stepping through
-        	this.waitForReceiverCmpCreated(cmp);
+            //$A.test.setTestTimeout(6000000);//for stepping through
+            this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){
-        	$A.test.blockRequests();
-        	//ask server for new cmp
-        	var receiverCmp = cmp.find("receiverCmp");
-        	var actionToCreateNewCmp = receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp"));
-        	
-        	actionToCreateNewCmp.runDeprecated();//c.createCmpByFetchingDefFromServer
-        	//kill the receiver cmp
-        	$A.test.releaseRequests();
-        	receiverCmp.destroy();
-        	
-        	$A.test.addWaitFor(false, function() { return $A.test.isActionPending(); }, 
-        		function(){
-        		}
-        	);
+            var receiverCmp = cmp.find("receiverCmp");
+
+            var actionToCreateNewCmp = receiverCmp.get(cmp.get("v.controllerFuncToCreateCmp"));
+            
+            var cb_handle;
+            var destroy_done = false;
+            // watch for _any_ action.
+            var preSendCallback = function(receiverCmp, actions) {
+                var i;
+                var action = undefined;
+                for (i = 0; i < actions.length; i++) {
+                    if (actions[i].getDef().name === "getComponent" && 
+                    		actions[i].getParams().name === "markup://loadLevelTest:displayMap") {
+                        action = actions[i];
+                        break;
+                    }
+                }
+                if (action) {
+                	receiverCmp.destroy();
+                    $A.test.removePrePostSendCallback(cb_handle);
+                    $A.test.addWaitForWithFailureMessage(true, 
+                    		function() { return $A.test.areActionsComplete([action]); },
+                    		"Action "+action.getDef()+" didn't finish");
+                    destroy_done = true;
+                    var errmsg = "Invalid component tried calling function [get] with arguments [v.stringAttribute], markup://loadLevelTest:newCmpWithValueProvider";
+                	$A.test.expectAuraError(errmsg);
+                	$A.test.expectAuraError(errmsg);
+                }
+            };
+            cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback.bind(this, receiverCmp), undefined );
+            $A.test.addWaitFor(true, function() { return destroy_done; });
+
+            //now run the action
+            actionToCreateNewCmp.runDeprecated();//c.createCmpByFetchingDefFromServer
         }
         ]
     }

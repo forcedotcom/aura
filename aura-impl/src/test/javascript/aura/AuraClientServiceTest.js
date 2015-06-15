@@ -31,6 +31,11 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
+    	"Date": {
+    		getTime : function() {
+    			return "today is a good day";
+    		}
+    	},
         "$A": {
             log : function() {},
             assert : function(condition, message) {
@@ -61,6 +66,51 @@ Test.Aura.AuraClientServiceTest = function() {
        Aura: Aura
     });
 
+    [Fixture]
+    function testAuraXHR() {
+    	[Fact]
+    	function CreateNewAuraXHR() {
+    		// Arrange
+            var target = new Aura.Services.AuraClientService$AuraXHR();
+            // Assert
+            Assert.Equal(2, target.iteration);//because we call reset() in the constructor
+            Assert.Equal(0, target.length);
+            Assert.Equal(false, target.foreground);// FIXME: this will go away in iteration 2.
+    	}
+    	
+    	[Fact, Skip("Lin : figure out how to mock Date()")]
+    	function MarkAuraXHR() {
+    		// Arrange
+            var expected = "today is a good day";
+            var target = new Aura.Services.AuraClientService$AuraXHR();
+
+            // Act
+            target.mark();
+            var actual = target.time;
+
+            // Assert
+            Assert.Equal(expected, actual);
+    	}
+    	
+    	[Fact]
+    	function AddAndGetAction() {
+    		// Arrange
+    		var newAction = new MockAction();
+    		var target = new Aura.Services.AuraClientService$AuraXHR();
+    		
+    		// Act
+    		target.addAction(newAction);
+    		
+    		// Assert
+    		Assert.Equal(1, newAction.id);
+    		Assert.Equal(newAction, target.actions[1]);
+    		// Act and Assert
+    		Assert.Equal(newAction, target.getAction(1));
+    		// Assert
+    		Assert.Equal(undefined, target.actions[1]);//after the getAction above, this become undefined
+    	}
+    };
+    
     [Fixture]
     function testCreateIntegrationErrorConfig() {
         [Fact]
@@ -113,6 +163,7 @@ Test.Aura.AuraClientServiceTest = function() {
     var MockAction = function(type) {
         this.setBackground = Stubs.GetMethod();
         this.id = ++id;
+        this.getId = function() { return this.id; } ;
         if (type === undefined) {
             type = "server";
         }

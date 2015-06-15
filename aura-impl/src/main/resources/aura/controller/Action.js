@@ -65,11 +65,16 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     // FIXME: only for runActions - deprecated
     this.completion = undefined;
+    
+    // FIXME: creation path
     this.pathStack = [];
     this.canCreate = true;
     // start with a body
     this.pushCreationPath("body");
     this.setCreationPathIndex(0);
+
+    // FIXME: need to expose for plugins
+    this.refreshAction = undefined;
 }
 
 // Static methods:
@@ -1182,6 +1187,8 @@ Action.prototype.copyToRefresh = function() {
     refreshAction.abortable = this.abortable;
     refreshAction.abortableId = this.abortableId;
     refreshAction.background = this.background;
+
+    this.refreshAction = refreshAction;
 
     return refreshAction;
 };

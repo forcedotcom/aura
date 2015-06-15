@@ -31,7 +31,7 @@
     <aura:require namespace="test" version="123456.0"/>
     <aura:require namespace="componentTest" version="3.0"/>
 
-    <test:require aura:id="testCmp" versionEvt="{!c.versionInChild}"/>
+    <test:require aura:id="testCmp" versionEvt="{!c.updateVersionFromVersionEvent}"/>
 
     <aura:registerEvent name="versionEvt" type="auratest:testEvent"/>
 </aura:component>

@@ -15,7 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute type="String" name="requestVersion" default="default"/>
-    <aura:method name="version" action="{!c.version}"/>
+<aura:component controller="java://org.auraframework.components.test.java.controller.VersionTestController">
+    <aura:attribute type="String" name="version" default="default"/>
+
+    <aura:method name="updateVersion" action="{!c.updateVersion}"/>
+    <aura:method name="fireEventWithVersionInServerController"
+                 action="{!c.fireEventWithVersionInServerController}"/>
+
+    <aura:registerEvent name="versionEvt" type="auratest:testEvent"/>
 </aura:component>
+

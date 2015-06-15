@@ -1,6 +1,6 @@
 ({
-    getVersionInSuperCmp: function(cmp) {
-        var version = cmp.getVersion();
-        cmp.set("v.requestVersionInSuper", version);
+    updateWithVersionInSuperComponent: function(cmp) {
+        cmp.set("v.versionInSuperCmp", cmp.getVersion());
     }
 })
+

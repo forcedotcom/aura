@@ -15,29 +15,21 @@
     limitations under the License.
 
 -->
-<aura:component extends="auratest:versioningSuper">
-    <aura:attribute type="String" name="requestVersion"/>
+<aura:component render="client" extends="auratest:versioningSuper">
+    <aura:attribute type="String" name="version"/>
+    <aura:attribute type="Boolean" name="actionDone" default="false"/>
 
     <auratest:require aura:id="auratestCmp"/>
     <componentTest:require aura:id="sameNamespaceCmp"/>
-    <test:require aura:id="noVersionRequireCmp"/>
+    <test:require aura:id="noVersionRequiredCmp"/>
 
-    <auratest:requireHolder aura:id="auratestHolder"/>
-    <test:requireHolder aura:id="testHolder"/>
+    <auratest:requireConsumer aura:id="requireConsumerInAuraTest"/>
+    <test:requireConsumer aura:id="requireConsumerInTest"/>
 
-    <aura:require namespace ="auratest" version="2.0"/><br/>
+    <aura:require namespace ="auratest" version="2.0"/>
 
-    Requested Version: {!v.requestVersion}<br/>
-
-    <ui:button aura:id="versionInExp" label="versionInExpression" press="{!c.getVersionInExp}"/><br/>
-    <ui:button aura:id="versionInCntlr" label="versionInController" press="{!c.getVersionInCntlr}"/><br/>
-    <ui:button aura:id="versionByValProvider" label="versionByValueProvider" press="{!c.getVersionByValProvider}"/><br/>
-    <ui:button aura:id="versionInCreatedCmp" label="getVersionInCreatedComponent" press="{!c.getVersionInCreatedCmp}"/><br/>
-    <ui:button aura:id="versionInSameNsCmp" label="getVersionInSameNamespaceCmp" press="{!c.getVersionInSameNsCmp}"/><br/>
-    <ui:button aura:id="versionInNoRequireCmp" label="getVersionInNoRequiredVersionCmp" press="{!c.getVersionInNoRequireCmp}"/><br/>
-    <ui:button aura:id="versionInSuperCmp" label="getVersionInSuperCmp" press="{!c.getVersionInSuperCmp}"/><br/>
-    <ui:button aura:id="versionInGchildCmp" label="getVersionInGrandchildCmp" press="{!c.getVersionInGchildCmp}"/><br/>
-    <ui:button aura:id="versionInMultiParentCmp" label="getVersionInMultiParentCmp" press="{!c.getVersionInMultiParentCmp}"/><br/>
+    Requested Version: {!v.version}<br/><br/>
 
     {!v.body}
 </aura:component>
+

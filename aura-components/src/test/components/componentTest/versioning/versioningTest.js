@@ -1,55 +1,194 @@
 ({
     /**
-     * verify version value provider can be used correctly in expression
+     * Verify version value provider can be used in equals comparison with number expression,
+     * e.g {!version==2.0}
+     *
+     * TODO: W-2643528
      */
-    testGetRequiredVersionInLogicExpression: {
+    _testVerionInExpressionWithEqualsComparison: {
         test: function(cmp) {
-            var button = cmp.find("versionInExp");
-            $A.test.clickOrTouch(button.getElement());
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.updateWithEqualsComponentExist();
 
-            var actual = cmp.get("v.requestVersion");
-            $A.test.assertEquals("2.0", actual);
+            $A.test.assertTrue(targetComponent.get("v.cmpExist"));
         }
     },
 
-   /**
-     * Verify required version can be retrieved in client controller
+    /**
+     * Verify version value provider can be used in inequality comparsion expression,
+     * e.g. {!version>2.0}.
      */
-    testGetRequiredVersionInController: {
+    testVerionInExpressionWithInequalityComparison: {
         test: function(cmp) {
-            var button = cmp.find("versionInCntlr");
-            $A.test.clickOrTouch(button.getElement());
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.updateWithInequalityComparisonComponentExist();
 
-            var actual = cmp.get("v.requestVersion");
-            $A.test.assertEquals("2.0", actual);
+            $A.test.assertTrue(targetComponent.get("v.cmpExist"),
+                    "Component should exist.");
         }
+    },
+
+    /**
+     * Verify version in bound expression
+     */
+    testVersionInBoundExpression: {
+        test: function(cmp) {
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.udpateWithBoundVersionExpression();
+
+            var actual = targetComponent.get("v.version");
+            $A.test.assertEquals('2.0', actual);
+        }
+    },
+
+    /**
+     * Verify version in unbound expression
+     */
+    testVersionInUnboundExpression: {
+        test: function(cmp) {
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.udpateWithUnboundVersionExpression();
+
+            var actual = targetComponent.get("v.version");
+            $A.test.assertEquals('2.0', actual);
+        }
+    },
+
+    testVersionInInitHandler: {
+        test: function(cmp) {
+            $A.test.assertEquals('2.0', cmp.find("auratestCmp").get("v.version"));
+        }
+    },
+
+    /**
+     * TODO: W-2643371
+     */
+    _testVersionInRender: {
+        test: function(cmp) {
+            // render(), afterRender(), rerender() get called before
+            // running test case.
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.udpateWithUnboundVersionExpression();
+
+            var actual = targetComponent.get("v.version");
+            $A.test.assertEquals('2.0', actual);
+        }
+    },
+
+    /**
+     * TODO: W-2643371
+     */
+    _testVersionInRerender: {
+        test: function(cmp) {
+            // render(), afterRender(), rerender() get called before
+            // running test case.
+            var targetComponent = cmp.find("auratestCmp");
+            var actual = targetComponent.get("v.versionInRender");
+
+            $A.test.assertEquals('2.0', actual);
+        }
+    },
+
+    /**
+     * TODO: W-2643371
+     */
+    _testVersionInAfterRender: {
+        test: function(cmp) {
+            var targetComponent = cmp.find("auratestCmp");
+            var actual = targetComponent.get("v.versionInRerender");
+
+            $A.test.assertEquals('2.0', actual);
+        }
+    },
+
+    /**
+     * TODO: W-2643371
+     */
+    _testVersionInUnrender: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInAuraTestCmpUnrender");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+   /**
+     * Verify getting version by getVersion method in client controller
+     */
+    testVersionFromGetVersionMethod: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInAuraTestCmpController");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+    /**
+     * Verify the version returned from getVersion() can do logic comparison
+     * in client side controller.
+     */
+    testVersionComparisonInController: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionFromVersionComparisonInAuraTestCmp");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+   /**
+     * Verify getting version by getVersion method in client controller
+     */
+    testVersionFromGetVersionMethod: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInAuraTestCmpController");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+    /**
+     * Verify the version returned from getVersion() can do logic comparison
+     * in client side controller.
+     */
+    testVersionComparisonInController: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionFromVersionComparisonInAuraTestCmp");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
     },
 
     /**
      * verify required version can be retrieved by version value provider
      */
-    testGetRequiredVersionInControllerByVersionValueProvier: {
+    testVersionInControllerByVersionValueProvier: {
         test: function(cmp) {
-            var button = cmp.find("versionByValProvider");
-            $A.test.clickOrTouch(button.getElement());
+            var targetComponent = cmp.find("auratestCmp");
+            targetComponent.updateVersionByComponentValueProvider();
 
-            var actual = cmp.get("v.requestVersion");
+            var actual = targetComponent.get("v.version");
+            this.updateVersion(cmp, actual);
             $A.test.assertEquals("2.0", actual);
-        }
-    },
-
-    testGetVersionInDynamicallyCreatedComponent: {
-        test: function(cmp) {
-            var button = cmp.find("versionInCreatedCmp");
-            $A.test.clickOrTouch(button.getElement());
-
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() {
-                        var actual = cmp.get("v.requestVersion");
-                        return actual === "2.0";
-                    },
-                    "Failed to get requested version from created component."
-            );
         }
     },
 
@@ -58,12 +197,13 @@
      * Since it's not allowed to require version for same namespace, this
      * should always act same as no required version declared.
      */
-    testGetRequiredVersionInSameNamespaceComponent: {
+    testVersionInSameNamespaceComponent: {
         test: function(cmp) {
-            var button = cmp.find("versionInSameNsCmp");
-            $A.test.clickOrTouch(button.getElement());
+            var targetComponent = cmp.find("sameNamespaceCmp");
+            targetComponent.updateVersion();
 
-            var actual = cmp.get("v.requestVersion");
+            var actual = targetComponent.get("v.version");
+            this.updateVersion(cmp, actual);
             $A.test.assertUndefinedOrNull(actual);
         }
     },
@@ -71,12 +211,13 @@
     /**
      * verify getting version from no required version namespace component
      */
-    testGetVersionFromNoRequiredVersionComponent: {
+    testVersionFromNoRequiredVersionComponent: {
         test: function(cmp) {
-            var button = cmp.find("versionInNoRequireCmp");
-            $A.test.clickOrTouch(button.getElement());
+            var targetComponent = cmp.find("noVersionRequiredCmp");
+            targetComponent.updateVersion();
 
-            var actual = cmp.get("v.requestVersion");
+            var actual = targetComponent.get("v.version");
+            this.updateVersion(cmp, actual);
             $A.test.assertUndefinedOrNull(actual);
         }
     },
@@ -84,54 +225,85 @@
     /**
      * Verify getting required version in super component
      */
-    testGetVersionInSuperComponent: {
-        test: function(cmp) {
-            var button = cmp.find("versionInSuperCmp");
-            $A.test.clickOrTouch(button.getElement());
-            $A.test.assertUndefinedOrNull(cmp.get("v.requestVersionInSuper"));
-        }
+    testVersionInSuperComponent: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInSuperComponent");
+                $A.enqueueAction(action);
+            },
+            function(cmp) {
+                $A.test.assertUndefinedOrNull(cmp.get("v.versionInSuperCmp"));
+            }
+        ]
     },
 
     /**
      * Verify grandchild component's version depends on its parent required version
      */
-    testGetVersionInGrandchildComponent: {
+    testVersionInGrandchildComponent: {
         test: function(cmp) {
-            var button = cmp.find("versionInGchildCmp");
-            $A.test.clickOrTouch(button.getElement());
+            var component = cmp.find("requireConsumerInAuraTest");
+            component.updateWithVersionInConsumedComponentInTest();
+            this.updateVersion(cmp, component.get("v.versionInConsumedCmp"))
 
-            var actual = cmp.get("v.requestVersion");
-            $A.test.assertEquals("3.0", actual);
+            var actual = cmp.get("v.version");
+            $A.test.assertEquals("123456.0", actual);
         }
     },
 
     /**
-     * Verify getVersion when a component as attribute in different namespace
-     * components.
+     * Verify getVersion() returns its caller's request version when a component as attribute
+     * in different namespace components.
      */
-    testGetVersionInCmpWithMultiParent: {
-        test: function(cmp) {
-            var button = cmp.find("versionInMultiParentCmp");
-            $A.test.clickOrTouch(button.getElement());
+    testVersionInMultiHostedComponent: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInMultiHostedComponent");
+                $A.enqueueAction(action);
 
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() {
-                        var versionInAuraTestCmp = cmp.find("auratestHolder").get("v.requestVersionInChild");
-                        return versionInAuraTestCmp === "3.0";
-                    },
-                    "Failed to get requested version when the component is an attribute of in different" +
-                    "namespace components: parent component under 'auratest' namespace."
-            );
-            $A.test.addWaitForWithFailureMessage(true,
-                    function() {
-                        var versionInTestCmp = cmp.find("testHolder").get("v.requestVersionInChild");
-                        return versionInTestCmp === "1.5";
-                    },
-                    "Failed to get requested version when the component is an attribute of in different" +
-                    "namespace components: parent component under 'test' namespace."
-            );
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() {
+                            return cmp.get("v.actionDone");
+                        },
+                        "Failed to get requested version from created component."
+                );
+            },
+            function(cmp) {
+                var versionConsumedInAuraTest = cmp.find("requireConsumerInAuraTest").get("v.versionInConsumedCmp");
+                var versionConsumedInTest = cmp.find("requireConsumerInTest").get("v.versionInConsumedCmp");
 
-        }
+                this.updateVersion(cmp, versionConsumedInAuraTest + ", " + versionConsumedInTest);
+                $A.test.assertEquals("3.0", versionConsumedInAuraTest,
+                        "Incorrect requested version when host component under 'auratest' namespace: " +
+                        versionConsumedInAuraTest);
+                $A.test.assertEquals("1.5", versionConsumedInTest,
+                        "Incorrect requested version when host component under 'test' namespace: " +
+                        versionConsumedInTest);
+            }
+        ]
+    },
+
+    testVersionInDynamicallyCreatedComponent: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.updateWithVersionInCreatedComponent");
+                $A.enqueueAction(action);
+
+                $A.test.addWaitForWithFailureMessage(true,
+                        function() {
+                            return cmp.get("v.actionDone");
+                        },
+                        "Failed to get requested version from created component."
+                );
+            },
+            function(cmp) {
+                $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+    updateVersion: function(cmp, version) {
+        cmp.set("v.version", version);
     }
 })
 

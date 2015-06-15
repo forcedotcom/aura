@@ -165,6 +165,7 @@ function (scrollUtil) {
                 animName   = config.animationName,
                 panel = cmp.getElement(),
                 useTransition = config.useTransition,
+                closeButton,
                 animEl = config.animationEl || panel;
 
             //make sure animation name is valid 
@@ -193,6 +194,15 @@ function (scrollUtil) {
 
                 if (config.autoFocus) {
                     me.setFocus(cmp);
+                } else {
+
+                    // If auto focus is false attempt to focus
+                    // on the close button.
+                    closeButton = cmp.getElement().querySelector('.closeBtn');
+
+                    if(closeButton && closeButton.focus) {
+                        closeButton.focus();
+                    }
                 }
                 config.onFinish && config.onFinish();
             };
@@ -291,6 +301,8 @@ function (scrollUtil) {
          * @param active
          */
         setActive: function(cmp, active) {
+
+
             if (!cmp.isValid() && !cmp.isRendered()) {
                 return;
             }

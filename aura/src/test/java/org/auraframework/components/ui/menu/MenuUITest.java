@@ -179,6 +179,9 @@ public class MenuUITest extends WebDriverTestCase {
         testActionMenuForApp(MENUTEST_APP, "Image");
     }
 
+    public void testActionMenuNestedMenuItems() throws MalformedURLException, URISyntaxException {
+        testActionMenuForApp(MENUTEST_APP, "Nested");
+    }
     /**
      * Uncomment test once W-2515040 is fixed
      * 

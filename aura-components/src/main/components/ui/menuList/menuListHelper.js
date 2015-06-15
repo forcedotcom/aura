@@ -16,34 +16,26 @@
 ({
     setEventHandlersOnChildren: function(component) {
         var children = [];
-        var body = component.get("v.body");
-        for (var i = 0; i < body.length; i++) {
-            var child = body[i];
-            if (child.isInstanceOf("ui:menuItem")) {
-            	child.addHandler("menuSelect", component, "c.onMenuItemSelected");
-                children.push(child);
-            } else if (child.isInstanceOf("aura:iteration")) { // support external iteration
-                var iters = child.get("v.body");
-                for (var k = 0; k < iters.length; k++) {
-                    var iter = iters[k];
-                    if (iter.isInstanceOf("ui:menuItem")) {
-                    	iter.addHandler("menuSelect", component, "c.onMenuItemSelected");
-                        children.push(iter);
-                    }
-                }
-            }
-        }
+        this.setHandlersOnMenuItems(component, component.get("v.body"), children);
+
         var items = component.find("item");
         if (items && $A.util.isArray(items)) {
-            for (var j = 0; j < items.length; j++) {
-                var item = items[j];
-                if (item.isInstanceOf("ui:menuItem")) {
-                	item.addHandler("menuSelect", component, "c.onMenuItemSelected");
-                    children.push(item);
-                }
+            this.setHandlersOnMenuItems(component, items, children);
+        }
+
+        component.set("v.childMenuItems", children);
+    },
+
+    setHandlersOnMenuItems: function(component, items, children) {
+        for (var i = 0; i < items.length; i++) {
+            var child = items[i];
+            if (child.isInstanceOf("ui:menuItem")) {
+                child.addHandler("menuSelect", component, "c.onMenuItemSelected");
+                children.push(child);
+            } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
+                this.setHandlersOnMenuItems(component, child.get("v.body"), children);
             }
         }
-        component.set("v.childMenuItems", children);
     },
     
     getMenuItem: function(component, index) {

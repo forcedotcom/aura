@@ -267,7 +267,7 @@
             				<transformationSet>
               					<dir>${basedir}/target/failsafe-reports</dir>
               					<includes>
-              						<include>TEST-org.auraframework.AuraIntegrationTests.xml</include>
+              						<include>TEST-org.auraframework.integration.test.AuraIntegrationTests.xml</include>
               					</includes>
               					<outputDir>${project.build.directory}/failsafe-reports</outputDir>
               					<stylesheet>${basedir}/target/tools/jstest/jstest-junit.xslt</stylesheet>

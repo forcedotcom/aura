@@ -19,7 +19,7 @@
 		cmp.set('v.myDate', newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate());
 	},
 
-	getInput : function(cmp, event) {
+	getInput : function(cmp) {
 
 		var fName = cmp.find("inFName").get("v.value");
 		var lName = cmp.find("inLName").get("v.value");

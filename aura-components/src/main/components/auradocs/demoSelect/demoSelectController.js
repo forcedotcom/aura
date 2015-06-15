@@ -26,21 +26,21 @@
         
     },
 
-	onSingleSelectChange: function(cmp, evt) {
+	onSingleSelectChange: function(cmp) {
          var selectCmp = cmp.find("InputSelectSingle");
-         resultCmp = cmp.find("singleResult");
+         var resultCmp = cmp.find("singleResult");
          resultCmp.set("v.value", selectCmp.get("v.value"));
 	 },
 
-	 onMultiSelectChange: function(cmp, evt) {
+	 onMultiSelectChange: function(cmp) {
          var selectCmp = cmp.find("InputSelectMultiple");
-         resultCmp = cmp.find("multiResult");
+         var resultCmp = cmp.find("multiResult");
          resultCmp.set("v.value", selectCmp.get("v.value"));
 	 },
 	 
-	 onChange: function(cmp, evt) {
+	 onChange: function(cmp) {
 		 var dynamicCmp = cmp.find("InputSelectDynamic");
-		 resultCmp = cmp.find("dynamicResult");
+		 var resultCmp = cmp.find("dynamicResult");
 		 resultCmp.set("v.value", dynamicCmp.get("v.value"));
 	 }
 	 

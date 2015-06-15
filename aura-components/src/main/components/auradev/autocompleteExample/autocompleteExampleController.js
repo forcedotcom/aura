@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    handleInputChange: function(component, event, helper) {
+    handleInputChange: function(component, event) {
         var keyword = event.getParam("value");
         var acCmp = component.find("autoComplete");
         if (acCmp) {
@@ -44,11 +44,11 @@
         }
     },
     
-    handleMatchDone: function(component, event, helper) {
+    handleMatchDone: function(component, event) {
         console.log("There are " + event.getParam("size") + " matched options.");
     },
     
-    handleSelectOption: function(component, event, helper) {
-        var optionCmp = event.getParam("option");
+    handleSelectOption: function(component, event) {
+        event.getParam("option");
     }
 })

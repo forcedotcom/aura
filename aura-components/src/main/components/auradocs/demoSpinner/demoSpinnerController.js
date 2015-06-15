@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    toggleSpinner: function(cmp, event) {
+    toggleSpinner: function(cmp) {
         var spinner = cmp.find('spinner');
         var evt = spinner.get("e.toggle");
         

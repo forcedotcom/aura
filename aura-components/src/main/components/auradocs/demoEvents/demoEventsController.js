@@ -24,7 +24,7 @@
 			helper.getUnwrapped(cmp, "middle button");
 		} else if(buttonValue===2){
 			helper.getUnwrapped(cmp, "right click");
-		};
+		}
 	},
 
 	inspMouseUp : function(cmp, event, helper){
@@ -87,7 +87,7 @@
 		helper.getUnwrapped(cmp, "copy");
 	},
 
-	clearEvents : function(cmp, event){
+	clearEvents : function(cmp){
 		cmp.find("outputValue").set("v.value", "");
 	}
 })

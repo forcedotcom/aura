@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide : function DemoPanelProvider(cmp, localCreation) {
+    provide : function DemoPanelProvider(cmp) {
         var demo = cmp.get('v.demo');
         $A.assert(!$A.util.isUndefinedOrNull(demo));
         return 'markup://auradocs:' + demo + 'Demo';

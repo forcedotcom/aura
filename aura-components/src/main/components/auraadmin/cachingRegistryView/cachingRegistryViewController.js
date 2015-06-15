@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    toggleView: function(cmp, event) {
+    toggleView: function(cmp) {
         var val = $A.util.getBooleanValue(cmp.get("v.expanded"));
         cmp.set("v.expanded", !val);
     }

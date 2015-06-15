@@ -18,7 +18,7 @@
     	helper.update(cmp);
     },
     
-    showStats : function(cmp, event, helper){
+    showStats : function(cmp){
     	alert("Storage name: " + cmp.get("v.storageName") + "\nImplementation: " + cmp.get("v.implementation"));
     }
 })

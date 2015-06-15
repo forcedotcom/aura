@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    friendlyErrorThrow : function(cmp, event){
+    friendlyErrorThrow : function(cmp){
         var afe = new $A.auraFriendlyError();
         afe.data = {"friendlyMessage": "Hello friend, you've encountered an error!"};
         throw afe;
@@ -39,7 +39,7 @@
         }
     },
 
-    hideErrorDialog: function(cmp, event){
+    hideErrorDialog: function(cmp){
         var dialog= cmp.find('errorOverlay');
         var close = $A.get("e.ui:closeDialog");
         close.setParams({

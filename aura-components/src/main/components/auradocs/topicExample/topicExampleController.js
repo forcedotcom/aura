@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    show : function(cmp, evt){
+    show : function(cmp){
         var evt = $A.get("e.auradocs:focusDef");
         evt.setParams({
             descriptor : cmp.get("v.descriptor"),

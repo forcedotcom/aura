@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    updateAuraAssist : function(cmp, event){
+    updateAuraAssist : function(cmp){
         var a = cmp.get("c.updateAuraAssistServer");
 
         a.setCallback(cmp, function(action){

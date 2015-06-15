@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
-    refresh : function(cmp, event){
+    refresh : function(cmp){
         var frame = Ext.getCmp(cmp.find("frame").getElement().id).el.dom;
         frame.contentWindow.location.reload(true);
     },
 
-    updateLocation : function(cmp, event){
+    updateLocation : function(cmp){
         var locationBar = cmp.find("locationBar").getElement();
         var frame = cmp.find("frame").getElement();
         frame.contentWindow.location = locationBar.value;

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 ({
-    controllerThrow : function(component, event) {
+    controllerThrow : function(component) {
         throw new $A.auraError("Controller Error Test");
     },
 
     helperThrow : function(cmp, event, helper) {
-        helper.helperThrow(cmp);
+        helper.helperThrow();
     }
 })

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	init: function(component, event, helper) {
+	init: function(component) {
 		var draggableContext = component.find("list");
 		component.set("v._dropzoneContext1", draggableContext[0]);
 		component.set("v._dropzoneContext2", draggableContext[1]);
@@ -22,11 +22,11 @@
 		component.set("v._draggableContext2", draggableContext[1]);
 	},
 	
-	handleDrop: function(component, event, helper) {	
+	handleDrop: function(component, event) {	
 		$A.dragAndDropService.fireDropComplete(event, true);
 	},
 	
-	handleDragEnd: function(component, event, helper) {
+	handleDragEnd: function(component, event) {
 		var dropComplete = $A.util.getBooleanValue(event.getParam("dropComplete"));
 		if (dropComplete) {
 			// Calculate index to be removed
@@ -49,7 +49,7 @@
 			};
 			
 			// Remove data transfer
-			var remove = $A.dragAndDropService.removeDataTransfer(event, removeParams);
+			$A.dragAndDropService.removeDataTransfer(event, removeParams);
 			
 			// Add data transfer
 			var target = $A.dragAndDropService.getContext(event.getParam("dropComponent"));

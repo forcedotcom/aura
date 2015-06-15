@@ -40,7 +40,7 @@
      */
     handleLocationChange : function(cmp, event, helper) {
         var token = event.getParam('token');
-        if (token == cmp.get('v.layoutToken')) {
+        if (token === cmp.get('v.layoutToken')) {
             // only process updates if this tree is part of the new layout.
             helper.doUpdate(cmp);
         }

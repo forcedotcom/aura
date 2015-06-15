@@ -31,7 +31,8 @@
 
     updateBody: function (component) {
         if(component.get("v.loaded")===false){
-            return component._queueUpdate=true;
+        	component._queueUpdate=true;
+            return component._queueUpdate;
         }
         component.set("v.loaded",false);
         var itemInfo = component._itemInfo.slice();
@@ -44,7 +45,7 @@
                 for (var i = 0; i < itemInfo.length; i++) {
                     if (itemInfo[i].item === item) {
                         components = itemInfo[i].components;
-                        if (itemInfo[i].index != index) {
+                        if (itemInfo[i].index !== index) {
                             for (var j = 0; j < components.length; j++) {
                                 var avp = components[j].getAttributeValueProvider();
                                 if (avp) {

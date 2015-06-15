@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    fix : function(cmp, evt){
+    fix : function(cmp){
         var quickFix = cmp.get("v.quickFix");
         var ui = quickFix["ui"];
         if (ui) {
@@ -43,7 +43,7 @@
                 attributes: quickFix["attributes"]
             });
 
-            a.setCallback(cmp, function(action){
+            a.setCallback(cmp, function(){
                 alert("woohoo");
             });
 

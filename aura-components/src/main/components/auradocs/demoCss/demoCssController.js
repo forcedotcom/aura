@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 ({
-	applyCSS: function(cmp, event) {
+	applyCSS: function(cmp) {
 		var el = cmp.find('changeIt');
 		$A.util.addClass(el.getElement(), 'changeMe');
 	},
 	
-	removeCSS: function(cmp, event) {
+	removeCSS: function(cmp) {
 		var el = cmp.find('changeIt');
 		$A.util.removeClass(el.getElement(), 'changeMe');
 	}

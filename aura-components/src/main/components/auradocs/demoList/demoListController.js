@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	show: function(component, event, helper) {        
+	show: function(component) {        
         var list = component.find("listData");
         list.get("e.triggerDataProvider").fire();
 	}

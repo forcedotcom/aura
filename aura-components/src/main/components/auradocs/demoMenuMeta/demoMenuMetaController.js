@@ -51,7 +51,7 @@
             triggerCmp.set("v.class", className);
         }
     },
-    getMenuSelected: function(cmp, event) {
+    getMenuSelected: function(cmp) {
         var menuCmp = cmp.find("checkboxMenu");
         var menuItems = menuCmp.get("v.childMenuItems");
         var values = [];

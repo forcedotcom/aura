@@ -125,7 +125,7 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    public AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
+    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
     ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
@@ -314,7 +314,7 @@ public class AuraContextFilter implements Filter {
         return getMode(request, configMap);
     }
 
-    public void endContext() {
+    protected void endContext() {
         Aura.getContextService().endContext();
     }
 

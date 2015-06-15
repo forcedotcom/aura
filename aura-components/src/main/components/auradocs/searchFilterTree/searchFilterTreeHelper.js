@@ -28,9 +28,9 @@
              * @param query
              *            the search query to match against
              */
-            helper.SearchFilterVisitor = function(query) {
-                this.query = query;
-                this.queryRe = new RegExp(query, "i");
+            helper.SearchFilterVisitor = function(qry) {
+            	this.query = qry;
+                this.queryRe = new RegExp(qry, "i");
                 // Maintain a stack of {node : <node>, match : boolean} objects
                 // to track visitation state.
                 this.stack = [];
@@ -76,6 +76,7 @@
                     node.set('v.expanded', false);
                 } else {
                     var title = node.get('v.item.title') || '' + node.get('v.title') || '';
+                    console.log(title);
                     // If a node matches then expand and show it.
                     node.set('v.expanded', true);
                     // This is not strictly necessary until we start hiding on non-matches.

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    helperThrow : function(cmp){
+    helperThrow : function(){
         throw new $A.auraError("Helper Error Test");
     }
 })

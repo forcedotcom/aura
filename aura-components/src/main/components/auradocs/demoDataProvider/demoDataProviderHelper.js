@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide: function(component, event, controller) {
+    provide: function(component, event) {
         var dataProvider = component.getConcreteComponent();
         if (!dataProvider._loadedOnce) {
             // This dataProvider should come fully equipped with an initial data payload in its model.
@@ -24,9 +24,9 @@
             action.setParams({
                //Set parameters for the list here
             });
-            action.setCallback(this, function(action) {
-                if (action.getState() === "SUCCESS") {
-                    var result = action.getReturnValue();                    
+            action.setCallback(this, function(act) {
+                if (act.getState() === "SUCCESS") {
+                    var result = act.getReturnValue();                    
                     this.fireDataChangeEvent(dataProvider, result); 
                 }
             });

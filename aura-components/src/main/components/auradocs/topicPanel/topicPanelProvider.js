@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide : function TopicPanelProvider(cmp, localCreation) {
+    provide : function TopicPanelProvider(cmp) {
         var topic = cmp.get('v.topic');
         $A.assert(!$A.util.isUndefinedOrNull(topic));
         return 'markup://auradocs:' + topic + 'Topic';

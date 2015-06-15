@@ -19,8 +19,8 @@
 		for(var i = items.length-1; i >= 0; i--){
 			if(items[i].selected===true){
 				items.splice(i, 1);
-			};
-		};
+			}
+		}
 		cmp.set("m.items", items);
 	},
 
@@ -40,7 +40,7 @@
 			items.push(newTodo);
 			input.set("v.value", "");
 			cmp.set("m.items", items);
-		};
+		}
 	},
 
 	crossout : function(cmp, event){

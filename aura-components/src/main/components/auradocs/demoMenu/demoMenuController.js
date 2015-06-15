@@ -30,7 +30,7 @@
             triggerCmp.set("v.label", label);
         }
     },
-    getMenuSelected: function(cmp, event) {
+    getMenuSelected: function(cmp) {
         var menuCmp = cmp.find("checkboxMenu");
         var menuItems = menuCmp.get("v.childMenuItems");
         var values = [];
@@ -43,7 +43,7 @@
         var resultCmp = cmp.find("result");
         resultCmp.set("v.value", values.join(","));
     },
-    getRadioMenuSelected: function(cmp, event) {
+    getRadioMenuSelected: function(cmp) {
         var menuCmp = cmp.find("radioMenu");
         var menuItems = menuCmp.get("v.childMenuItems");
         var values = [];

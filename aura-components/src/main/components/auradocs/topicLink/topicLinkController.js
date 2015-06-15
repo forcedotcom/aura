@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    open : function(cmp, event){
+    open : function(cmp){
         var topicName = cmp.get("v.topic");
         var evt = $A.get("e.auradocs:openTopic");
         evt.setParams({

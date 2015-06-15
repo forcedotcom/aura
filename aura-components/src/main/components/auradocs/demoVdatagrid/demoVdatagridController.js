@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	init : function(cmp, evt) {
+	init : function(cmp) {
 		
 		var rowData = [{id: 1, name: "name1"}, 
 		                   {id: 2, name: "name2"},
@@ -24,7 +24,7 @@
 		cmp.set("v.data", rowData);
 	},
 	
-	addRow : function(cmp, evt) {
+	addRow : function(cmp) {
 		var currData = cmp.get("v.data");
 		var newId = currData.length + 1;
 		var rowData = [{id: newId, name: "name" + newId}];

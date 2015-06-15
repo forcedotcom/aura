@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	getInput : function(cmp, event) {
+	getInput : function(cmp) {
 		var textI = cmp.find("textI");
 
 		// Get the text value
@@ -25,7 +25,7 @@
 		textO.set("v.value", textvalue);
 	},
 
-	getDate : function(cmp, event) {
+	getDate : function(cmp) {
 		// Set the new date
 		var newdate = new Date();
 		cmp.set("v.myDate", newdate.getFullYear() + "-" + (newdate.getMonth() + 1) + "-" + newdate.getDate());

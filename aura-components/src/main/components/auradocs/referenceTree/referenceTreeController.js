@@ -17,7 +17,7 @@
     /**
      * Wire the ui:tree to its decorators.
      */
-    doInit : function(cmp, evt, helper) {
+    doInit : function(cmp) {
         var tree = cmp.find('tree');
         cmp.find('topicTree').set('v.tree', tree);
         cmp.find('searchTree').set('v.tree', tree);

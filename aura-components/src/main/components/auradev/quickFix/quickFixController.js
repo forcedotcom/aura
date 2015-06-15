@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    fix : function(cmp, evt){
+    fix : function(cmp){
     	var values = $A.util.formToMap(cmp.find("form").getElement());
         var a = cmp.get("c.doFix");
         var quickFix = cmp.get("v.quickFix");

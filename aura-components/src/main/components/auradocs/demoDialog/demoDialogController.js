@@ -26,7 +26,7 @@
 	},
 	
 	
-	hideDialog: function(cmp, event){
+	hideDialog: function(cmp){
 		var msg= cmp.find('overlay');
 		var close = $A.get("e.ui:closeDialog");
 		close.setParams({

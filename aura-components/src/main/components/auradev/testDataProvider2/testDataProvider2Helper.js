@@ -22,9 +22,9 @@
         action.setParams({
             "keyword": keyword
         });
-        action.setCallback(this, function(action) {
-            if (action.getState() === "SUCCESS") {
-                var result = action.getReturnValue();                    
+        action.setCallback(this, function(act) {
+            if (act.getState() === "SUCCESS") {
+                var result = act.getReturnValue();                    
                 this.fireDataChangeEvent(dataProvider, result); 
             }
         });

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 ({
-    replaceBodyContent : function(component, event){
+    replaceBodyContent : function(component){
         //Update the content
-        var value = component.find("content").set("v.value", "new content");
+        component.find("content").set("v.value", "new content");
         var scroller = component.find("pullToRefresh");
         
         //Call the refresh action on ui:scroller

@@ -91,7 +91,7 @@
      * 
      * @return {boolean} false if there was no tree to process.
      */
-    preprocessTree : function(cmp, evt) {
+    preprocessTree : function(cmp) {
         cmp._topicMap = {};
         cmp._parentMap = {};
         cmp._activeCmp = null;

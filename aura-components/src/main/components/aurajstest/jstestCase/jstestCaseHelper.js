@@ -33,7 +33,9 @@
         var win = frame.contentWindow?frame.contentWindow:frame.contentDocument.window;
         try {
             var root = win.$A.getRoot();
-        }catch(e){}
+        }catch(e){
+        	// Do nothing
+        }
 
         if(!root){
             if(!win.aura.test.isComplete()){
@@ -54,14 +56,12 @@
             }, 50);
             return;
         }
-        var rerun = cmp.find("rerun").getElement();
         //IF there were any errors in the test case (excluding assertions in callback functions)
         if(win.aura.test.getErrors()!==""){
             cmp.set("v.status", "fail");
             var msg = "";
             var errorsInCallbackFunc = eval("("+win.aura.test.getErrors()+")");
             var error = null;
-            var errorInfo = "";
             for(var i=0;i<errorsInCallbackFunc.length;i++){
                 error = errorsInCallbackFunc[i];
                 msg += error.message;

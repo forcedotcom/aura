@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender : function(cmp, helper) {
+    afterRender : function(cmp) {
         cmp.getSuper().getElement().scrollTop = 0;
         this.superAfterRender();
     }

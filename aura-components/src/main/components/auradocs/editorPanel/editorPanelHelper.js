@@ -25,16 +25,16 @@
 		if (codeContent == null) {
 			useLines = false;
 			codeContent = "(Source code not available for " + descriptor + ")";
-		} else if (descriptor.indexOf("apex://") == 0) {
+		} else if (descriptor.indexOf("apex://") === 0) {
 			parserFile = ["../contrib/apex/js/tokenizeapex.js", "../contrib/apex/js/parseapex.js"];
 			stylesheet = "/auraFW/resources/codemirror/contrib/apex/css/apexcolors.css";
-		} else if (descriptor.indexOf("java://") == 0) {
+		} else if (descriptor.indexOf("java://") === 0) {
 			parserFile = ["../contrib/java/js/tokenizejava.js", "../contrib/java/js/parsejava.js"];
 			stylesheet = "/auraFW/resources/codemirror/contrib/java/css/javacolors.css";
-		} else if (descriptor.indexOf("js://") == 0 || descriptor.indexOf("markup://aura:library") == 0) {
+		} else if (descriptor.indexOf("js://") === 0 || descriptor.indexOf("markup://aura:library") == 0) {
 			parserFile = ["tokenizejavascript.js", "parsejavascript.js"];
 			stylesheet = "/auraFW/resources/codemirror/css/jscolors.css";
-		} else if (descriptor.indexOf("css://") == 0) {
+		} else if (descriptor.indexOf("css://") === 0) {
 			parserFile = "parsecss.js";
 			stylesheet = "/auraFW/resources/codemirror/css/csscolors.css";
 		}
@@ -67,7 +67,7 @@
 						}
 					});
 
-					on(element,"mouseout", function(e){
+					on(element,"mouseout", function(){
 						s.textDecoration = 'none';
 						s.fontWeight = 'normal';
 						s.cursor = 'default';

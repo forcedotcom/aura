@@ -46,12 +46,12 @@
                 var root = nodes[i];
                 var searchVisitor = helper.initSearchFilterVisitor(searchTerm);
                 
-                if (searchTerm != '') {
+                if (searchTerm !== '') {
                     var callback = function(args) {
                         args.visitor = searchVisitor;
-                        var event = root.getEvent("traverse");
-                        event.setParams(args);
-                        event.fire();
+                        var evt = root.getEvent("traverse");
+                        evt.setParams(args);
+                        evt.fire();
                     };
                     root.getEvent("makeVisitor").setParams({
                         "visitor" : null,
@@ -68,7 +68,7 @@
                         "traverser" : "PostOrderTraverser",
                         "callback" : function(args) {
                             args.visitor.funcToApply = function(node) {
-                                node.set('v.hidden', false)
+                                node.set('v.hidden', false);
                             };
                             root.getEvent("traverse").setParams(args).fire();
                         }

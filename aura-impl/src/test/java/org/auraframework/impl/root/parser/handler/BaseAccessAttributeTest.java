@@ -27,10 +27,10 @@ import org.auraframework.def.LibraryDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.AuraContext.Access;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.Source;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 

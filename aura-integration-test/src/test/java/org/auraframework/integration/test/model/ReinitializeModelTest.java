@@ -27,8 +27,6 @@ import org.auraframework.instance.Component;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import test.model.TestReinitializeModelWithCount;
-
 public class ReinitializeModelTest extends AuraImplTestCase {
     private final boolean debug = false;
 
@@ -36,10 +34,10 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     String attributeTag = "<aura:attribute name=%s type=%s default=%s/>";
     String attributeTag2 = "<aura:attribute name=%s type=%s/>";
     String componentTagIf = "<ifTest:testIfWithModel attr=%s/>";
-    String componentTagWithModelAndAttr = "<aura:component model='java://test.model.%s' extensible='true'>"
+    String componentTagWithModelAndAttr = "<aura:component model='java://%s' extensible='true'>"
             + "<aura:attribute name='attrInParent' type='String' default=%s/>" + "%s" + "<br/>Parent CMP<br/>"
             + "m.valueParent={!m.valueParent}" + "%s" + "{!v.body}" + "</aura:component>";
-    String componentTagIfWithModelAndAttr = "<aura:component render='client' model='java://test.model.%s'>"
+    String componentTagIfWithModelAndAttr = "<aura:component render='client' model='java://%s'>"
             + "<aura:attribute name='attr' type='String' default=%s/>"
             + "%s" + "<br/>INNER CMP -- value of attr: {!v.attr} , value from module: {!m.value}<br/>"
             + "%s" + "</aura:component>";
@@ -165,11 +163,11 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     }
 
     public void testReinitializedModelSuperCmp() throws Exception {
-        runTestReinitializedModelSuperCmp(false, "TestReinitializeModel");
+        runTestReinitializedModelSuperCmp(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
     public void testReinitializedModelSuperCmpWithCount() throws Exception {
-        runTestReinitializedModelSuperCmp(true, "TestReinitializeModelWithCount");
+        runTestReinitializedModelSuperCmp(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
 
     /*
@@ -241,11 +239,11 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     }
 
     public void testSameCmpSameModel() throws Exception {
-        runTestSameCmpSameModel(false, "TestReinitializeModel");
+        runTestSameCmpSameModel(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
     public void testSameCmpSameModelWithCount() throws Exception {
-        runTestSameCmpSameModel(true, "TestReinitializeModelWithCount");
+        runTestSameCmpSameModel(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
 
     /*
@@ -301,11 +299,11 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     }
 
     public void testDiffCMPSameModel() throws Exception {
-        runTestDiffCMPSameModel(false, "TestReinitializeModel");
+        runTestDiffCMPSameModel(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
     public void testDiffCMPSameModelWithCount() throws Exception {
-        runTestDiffCMPSameModel(true, "TestReinitializeModelWithCount");
+        runTestDiffCMPSameModel(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
 
     /*
@@ -368,11 +366,11 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     }
 
     public void testNestedCmp() throws Exception {
-        runTestNestedCmp(false, "TestReinitializeModel");
+        runTestNestedCmp(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
     public void testNestedCmpCount() throws Exception {
-        runTestNestedCmp(true, "TestReinitializeModelWithCount");
+        runTestNestedCmp(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
 
     /*
@@ -391,7 +389,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
                 "<aura:attribute name='componentArray' type='Aura.Component[]'>" + cmpString + "</aura:attribute>";
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(ComponentDef.class, String.format(
                 "<aura:component render='client'>" + attributeSource +
-                        "%s</aura:component>", "'{!v.componentArray}'"));
+                "%s</aura:component>", "'{!v.componentArray}'"));
         Component mainCMP = Aura.getInstanceService().getInstance(def, attributesMain);
         if (testModelWithCount) {
             assertEquals(1, TestReinitializeModelWithCount.getCount());
@@ -429,11 +427,11 @@ public class ReinitializeModelTest extends AuraImplTestCase {
     }
 
     public void testCmpAsAttribute() throws Exception {
-        runTestCmpAsAttribute(false, "TestReinitializeModel");
+        runTestCmpAsAttribute(false, "org.auraframework.components.test.java.model.TestReinitializeModel");
     }
 
     public void testCmpAsAttributeCount() throws Exception {
-        runTestCmpAsAttribute(true, "TestReinitializeModelWithCount");
+        runTestCmpAsAttribute(true, "org.auraframework.integration.test.model.TestReinitializeModelWithCount");
     }
 
     /*
@@ -490,7 +488,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(
-                        "<aura:component model=\"java://test.model.TestReinitializeModel\"><aura:attribute name=\"attr\" type=\"String\" default=\"defaultValue\"/>%s</aura:component>",
+                        "<aura:component model=\"java://org.auraframework.components.test.java.model.TestReinitializeModel\"><aura:attribute name=\"attr\" type=\"String\" default=\"defaultValue\"/>%s</aura:component>",
                         source));
         Component ifcmp = Aura.getInstanceService().getInstance(def, attributes);
         assertEquals("value from attr:defaultValue,value from model:defaultValue", getRenderedBaseComponent(ifcmp));
@@ -538,7 +536,7 @@ public class ReinitializeModelTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> def = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(
-                        "<aura:component model=\"java://test.model.TestReinitializeModel\"><aura:attribute name='listToShow' type='List'/>%s</aura:component>",
+                        "<aura:component model=\"java://org.auraframework.components.test.java.model.TestReinitializeModel\"><aura:attribute name='listToShow' type='List'/>%s</aura:component>",
                         source));
         Component iteration = Aura.getInstanceService().getInstance(def, attributes);
         assertEquals("qrs", getRenderedBaseComponent(iteration));

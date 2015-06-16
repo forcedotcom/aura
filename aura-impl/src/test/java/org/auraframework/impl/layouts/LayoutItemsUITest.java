@@ -15,8 +15,8 @@
  */
 package org.auraframework.impl.layouts;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 
 /**

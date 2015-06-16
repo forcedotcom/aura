@@ -23,10 +23,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.auraframework.test.SauceUtil;
-import org.auraframework.test.WebDriverTestCase.UnexpectedError;
+import org.auraframework.test.util.AuraUITestingUtil;
+import org.auraframework.test.util.SauceUtil;
+import org.auraframework.test.util.WebDriverTestCase.UnexpectedError;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.AuraUITestingUtil;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.perf.rdp.CPUProfilerAnalyzer;

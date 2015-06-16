@@ -19,9 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.client.methods.HttpRequestBase;
-import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.util.AuraHttpTestCase;
 
 import com.google.common.collect.Maps;
+
 import org.auraframework.util.json.Json;
 
 public final class ValidationHttpTest extends AuraHttpTestCase {

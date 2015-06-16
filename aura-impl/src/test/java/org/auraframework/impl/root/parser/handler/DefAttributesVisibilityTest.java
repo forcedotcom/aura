@@ -27,7 +27,7 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 import com.google.common.collect.Sets;

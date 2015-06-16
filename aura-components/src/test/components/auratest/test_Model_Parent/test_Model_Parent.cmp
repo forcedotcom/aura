@@ -16,7 +16,7 @@
 
 -->
 <!-- reinitializeModelTest.java use this component -->
-<aura:component extensible="true" model="java://test.model.TestReinitializeModel">
+<aura:component extensible="true" model="java://org.auraframework.components.test.java.model.TestReinitializeModel">
     <aura:attribute name="attrInParent" type="String" default="default attribute in Parent"/>
     <br/>Parent CMP<br/>
     m.valueParent={!m.valueParent}

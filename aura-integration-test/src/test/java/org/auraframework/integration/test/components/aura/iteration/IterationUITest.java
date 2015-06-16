@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.aura.iteration;
 
 import java.util.List;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

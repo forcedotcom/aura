@@ -33,14 +33,13 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
+import org.auraframework.def.ImportDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.ImportDef;
 import org.auraframework.def.RootDefinition.SupportLevel;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.root.RootDefinitionImplUnitTest;
@@ -61,7 +60,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
-        extends RootDefinitionImplUnitTest<I, D, B> {
+extends RootDefinitionImplUnitTest<I, D, B> {
 
     protected boolean isAbstract;
     protected boolean isExtensible;
@@ -88,9 +87,9 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
     protected String render;
     protected WhitespaceBehavior whitespaceBehavior;
     protected List<DependencyDef> dependencies;
-    
+
     protected static DefinitionAccess GLOBAL_ACCESS;
-    
+
     static {
         try {
             GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "GLOBAL");
@@ -136,7 +135,7 @@ public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImp
         Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
         Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
         Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-        
+
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
         this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);

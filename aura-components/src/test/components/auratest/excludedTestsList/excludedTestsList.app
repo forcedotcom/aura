@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application model="java://test.model.ExcludedTestsListModel">
+<aura:application model="java://org.auraframework.components.test.java.model.ExcludedTestsListModel">
     <div class="title">Browser Compatibility Excluded Tests</div><br></br>
 
     <p>

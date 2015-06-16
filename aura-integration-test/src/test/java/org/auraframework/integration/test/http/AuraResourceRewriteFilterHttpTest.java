@@ -16,7 +16,7 @@
 package org.auraframework.integration.test.http;
 
 import org.apache.http.HttpStatus;
-import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 
 /**

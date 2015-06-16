@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:dataProvider" model="java://test.model.test_InfiniteListCsccModel">
+<aura:component extends="ui:dataProvider" model="java://org.auraframework.components.test.java.model.test_InfiniteListCsccModel">
 </aura:component>

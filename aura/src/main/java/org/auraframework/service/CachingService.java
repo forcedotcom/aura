@@ -24,7 +24,8 @@ import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.system.*;
+import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
 
 import com.google.common.base.Optional;
@@ -39,39 +40,39 @@ import com.google.common.base.Optional;
  */
 public interface CachingService extends AuraService {
 
-	
-	/**
-	 * Provided a builder object that can create a cache with key K and type T
-	 * 
-	 * @param K - the type of keys stored in this cache
-	 * @param T - the type of objects stored in this cache
-	 *            
-	 * @return - A new cacheBuilder whose build method can build a new cache.
-	 */
+
+    /**
+     * Provided a builder object that can create a cache with key K and type T
+     *
+     * @param K - the type of keys stored in this cache
+     * @param T - the type of objects stored in this cache
+     *
+     * @return - A new cacheBuilder whose build method can build a new cache.
+     */
     <K, T> CacheBuilder<K, T> getCacheBuilder();
 
-	Cache<DefDescriptor<?>, Boolean> getExistsCache();
+    Cache<DefDescriptor<?>, Boolean> getExistsCache();
 
-	Cache<DefDescriptor<?>, Optional<? extends Definition>> getDefsCache();
+    Cache<DefDescriptor<?>, Optional<? extends Definition>> getDefsCache();
 
-	Cache<String, String> getStringsCache();
+    Cache<String, String> getStringsCache();
 
-	Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
+    Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
 
-	Cache<String, DependencyEntry> getDepsCache();
+    Cache<String, DependencyEntry> getDepsCache();
 
-	Cache<String, String> getClientLibraryOutputCache();
-    
+    Cache<String, String> getClientLibraryOutputCache();
+
     Cache<String, Set<String>>  getClientLibraryUrlsCache();
-	
+
     Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache();
 
     Lock getReadLock();
-	
-	Lock getWriteLock();
-	
-	void notifyDependentSourceChange(
-			Collection<WeakReference<SourceListener>> listeners,
-			DefDescriptor<?> source, SourceMonitorEvent event, String filePath);
+
+    Lock getWriteLock();
+
+    void notifyDependentSourceChange(
+            Collection<WeakReference<SourceListener>> listeners,
+            DefDescriptor<?> source, SourceMonitorEvent event, String filePath);
 
 }

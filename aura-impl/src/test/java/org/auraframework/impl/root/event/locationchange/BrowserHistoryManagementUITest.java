@@ -18,9 +18,9 @@ package org.auraframework.impl.root.event.locationchange;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

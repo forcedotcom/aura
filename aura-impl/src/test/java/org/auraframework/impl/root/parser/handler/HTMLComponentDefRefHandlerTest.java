@@ -29,9 +29,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
+import org.auraframework.test.source.StringSource;
 
 public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
 

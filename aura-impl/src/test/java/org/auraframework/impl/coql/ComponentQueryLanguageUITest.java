@@ -17,7 +17,7 @@ package org.auraframework.impl.coql;
 
 import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;

@@ -25,12 +25,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
-import org.auraframework.adapter.MockConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
+import org.auraframework.test.adapter.MockConfigAdapter;
+import org.auraframework.test.source.StringSourceLoader;
 
 import com.google.common.collect.ImmutableSortedSet;
 

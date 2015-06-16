@@ -27,6 +27,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.Lists;

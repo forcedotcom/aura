@@ -21,7 +21,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.NoAccessException;
 
 /**

@@ -41,10 +41,10 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
 import org.auraframework.system.SourceListener;
-import org.auraframework.test.AuraTestCase;
-import org.auraframework.test.DummyHttpServletRequest;
-import org.auraframework.test.DummyHttpServletResponse;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.test.util.AuraTestCase;
+import org.auraframework.test.util.DummyHttpServletRequest;
+import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 
 /**

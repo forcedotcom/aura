@@ -29,7 +29,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.UnAdaptableTest;

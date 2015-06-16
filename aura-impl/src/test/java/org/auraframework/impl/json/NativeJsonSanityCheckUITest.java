@@ -16,7 +16,7 @@
 package org.auraframework.impl.json;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

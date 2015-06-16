@@ -16,8 +16,8 @@
 package org.auraframework.impl.clientlibrary;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 

@@ -21,10 +21,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.instance.*;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

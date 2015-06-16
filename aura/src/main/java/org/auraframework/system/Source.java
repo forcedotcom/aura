@@ -140,7 +140,7 @@ public abstract class Source<D extends Definition> implements Serializable {
      * {@link org.auraframework.impl.source.ResourceSource} ) or the working
      * directory ({@link org.auraframework.impl.source.FileSource}), but it can
      * be something else (e.g. for
-     * {@link org.auraframework.impl.source.StringSource}).
+     * {@link org.auraframework.test.source.StringSource}).
      * 
      * @return the system id.
      */

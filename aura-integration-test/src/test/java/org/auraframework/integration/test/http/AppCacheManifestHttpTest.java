@@ -33,8 +33,8 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraHttpTestCase;
 import org.auraframework.test.client.UserAgent;
+import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 

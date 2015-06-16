@@ -213,30 +213,43 @@
 			disabled = true;
 		}
 
-		if(!disabled && trigger === 'focus') {
-			showTrigger = 'focus';
-			hideTrigger = 'blur';
+		if(!disabled && trigger === 'click') {
+			node.addEventListener('click', self.toggle.bind(self, component));
+		} else if(!disabled || trigger !== 'none') {
 
-			//stupid focus doesn't bubble.
+
+			// if hover is the trigger, focus should still
+			// work for a11y
+						//stupid focus doesn't bubble.
 			var list = node.querySelectorAll('a,object,input,select,textarea,button,[tabindex]');
 
 			for (var i = 0; i < list.length; i++) {
-				list[i].addEventListener(showTrigger, function() {
+				list[i].addEventListener('focus', function() {
 					self.show.call(self, component);
 				});
-				list[i].addEventListener(hideTrigger, function() {
+				list[i].addEventListener('blur', function() {
 					self.hide.call(self, component);
 				});
 			}
-		} else if(!disabled && trigger === 'click') {
-			node.addEventListener('click', self.toggle.bind(self, component));
-		} else if(!disabled || trigger !== 'none') {
-			node.addEventListener(showTrigger, function() {
+
+			node.addEventListener('focus', function() {
 				self.show.call(self, component);
 			});
-			node.addEventListener(hideTrigger, function() {
+
+			node.addEventListener('blur', function() {
 				self.hide.call(self, component);
 			});
+
+
+			if(trigger === 'hover') {
+				node.addEventListener(showTrigger, function() {
+					self.show.call(self, component);
+				});
+				node.addEventListener(hideTrigger, function() {
+					self.hide.call(self, component);
+				});
+			}
+			
 		}
 		component._trigger = node;
 		this.buildTooltip(component);

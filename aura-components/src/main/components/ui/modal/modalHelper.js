@@ -19,15 +19,27 @@
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
     },
 
+    validateAnimationName: function(name) {
+        return name.match(/top|left|right|bottom|center|pop/) ? true : false;
+    },
+
     show: function(cmp, callback) {
         var containerEl = cmp.getElement(),
             autoFocus = $A.util.getBooleanValue(cmp.get('v.autoFocus')),
+            useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
             panel = cmp.find('panel').getElement();
 
+        if(useTransition) {
+            useTransition = this.validateAnimationName(cmp.get('v.animation'));
+        }
         this.mask(cmp);
+        if(useTransition) {
+            panel.style.opacity = 0;
+            containerEl.style.display = 'block';
+        }
 
-        this.lib.panelLibCore.show(cmp, {
-            useTransition: $A.util.getBooleanValue(cmp.get('v.useTransition')),
+        var config = {
+            useTransition: useTransition,
             animationName: 'movefrom' + cmp.get('v.animation'),
             animationEl: panel,
             autoFocus: autoFocus,
@@ -46,7 +58,19 @@
                 }
                 callback && callback();
             }
-        });
+        };
+
+        var self = this;
+        if(useTransition) {
+            setTimeout(function() {
+                panel.style.opacity = 1;
+                self.lib.panelLibCore.show(cmp, config);
+            }, 50);
+        } else {
+            self.lib.panelLibCore.show(cmp, config);
+        }
+        
+        
     },
 
     close: function (cmp, callback) {
@@ -64,25 +88,59 @@
     hide: function (cmp, callback) {
         var containerEl = cmp.getElement(),
             panel = cmp.find('panel').getElement(),
+            animationName = cmp.get('v.animation'),
+            useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
+            closeAnimation = cmp.get('v.closeAnimation'),
             mask = cmp.find('modal-glass').getElement();
 
-        mask.style.opacity = '0';
-        panel.style.opacity = '0';
+        
+        if(useTransition) {
+            panel.style.opacity = '0';
+            setTimeout(function() {
+                 mask.style.opacity = '0';
+            }, 50);
+        }
+        
+        // mask.classList.remove('fadein');
+        if(closeAnimation) {
+            animationName = closeAnimation;
+        }
 
-        this.lib.panelLibCore.hide(cmp, {
-            useTransition: $A.util.getBooleanValue(cmp.get('v.useTransition')),
-            animationName: 'moveto' + cmp.get('v.animation'),
+
+        var config = {
+            useTransition: useTransition,
+            animationName: 'moveto' + animationName,
             animationEl: panel,
             onFinish: function() {
                 $A.util.removeOn(containerEl, 'keydown', cmp._windowKeyHandler);
-                callback && callback();
+                if(callback) { //give time for all transitions to complete
+                    setTimeout(callback, 2);
+                }
             }
-        });
+        };
+
+        if(closeAnimation) {
+            config.animationName = 'moveto' + closeAnimation;
+        }
+
+        this.lib.panelLibCore.hide(cmp, config);
     },
 
     mask: function(cmp) {
+        var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
         var mask = cmp.find('modal-glass').getElement();
-        $A.util.addClass(mask, 'fadeIn');
+
         $A.util.removeClass(mask, 'hidden');
+        $A.util.addClass(mask, 'fadein');
+        if(useTransition) {
+            setTimeout(function() {
+                mask.style.opacity = 0.8;
+            },10);
+        } else {
+            mask.style.opacity = 1;
+        }
+        
+        
+        
     }
 })

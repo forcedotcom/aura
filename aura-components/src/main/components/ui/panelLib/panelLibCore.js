@@ -20,7 +20,7 @@ function () {
 
 
         validateAnimationName: function(animName) {
-        	if(animName && animName.match(/^move(to|from)bottom$/)) {
+        	if(animName && animName.match(/^move(to|from)(bottom|top|left|right|center|pop)$/)) {
                 return true;
             }
             return false;
@@ -200,9 +200,14 @@ function () {
 
             panel.setAttribute("aria-hidden", 'false');
             if (useTransition) {
+
                 animEl.addEventListener(animEnd, finishHandler, false);
+                setTimeout(function() {
+                     $A.util.addClass(panel, 'open');
+                 },10)
                 $A.util.addClass(animEl, 'transitioning ' + animName);
-                $A.util.addClass(panel, 'open');
+               
+
             } else {
                 $A.util.addClass(panel, 'open');
                 finishHandler();
@@ -233,14 +238,18 @@ function () {
             var finishHandler = function (e) {
                 if (config.useTransition) {
                     panel.removeEventListener(animEl, finishHandler);
-                    $A.util.removeClass(animEl, 'transitioning ' + animName);
-                }
-                $A.util.removeClass(panel, 'open');
-                $A.util.removeClass(panel, 'active');
+                    
+                }                
 
                 
 
                 config.onFinish && config.onFinish();
+                setTimeout(function() {
+                    $A.util.removeClass(panel, 'open');
+                    $A.util.removeClass(panel, 'active');
+                    $A.util.removeClass(animEl, 'transitioning ' + animName);
+                }, 1000); //make sure all transitions are finished
+                
             };
 
             panel.setAttribute("aria-hidden", 'true');

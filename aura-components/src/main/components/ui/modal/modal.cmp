@@ -26,7 +26,8 @@
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
     <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel." />
-    <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog"/>
+    <aura:attribute name="animation" type="String" default="center" description="Adds animation to the dialog"/>
+    <aura:attribute name="closeAnimation" type="String" description="Adds animation to the dialog"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets initial focus on the first item in the panel" />
     <aura:attribute name="header" type="Aura.Component[]" description="The header facet" />
     <aura:attribute name="footer" type="Aura.Component[]" description="The footer facet" />

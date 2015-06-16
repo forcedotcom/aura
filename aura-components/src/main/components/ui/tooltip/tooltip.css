@@ -26,7 +26,7 @@
 	width: intrinsic;
 	width: -moz-max-content;
 	width: -webkit-max-content;
-
+	pointer-events: none;
 }
 
 
@@ -62,6 +62,7 @@
 	position: absolute;
 	top:0;
 	left: 0;
+	pointer-events: none;
 }
 
 .THIS .pointer-basic {
@@ -69,8 +70,9 @@
 	position: absolute;
 	width: 0; 
 	height: 0; 
-	bottom:100%;
+	bottom: 12px;
 	left: 50%;
+	pointer-events: none;
 	transform: translateX(-50%) translateY(-3px);
 }
 
@@ -120,24 +122,29 @@
 }
 
 
-.THIS.tooltip-basic:hover .tooltip {
+.THIS.tooltip-basic:hover .tooltip,
+.THIS.tooltip-basic:focus .tooltip {
 	opacity: 0.999;
 }
 
-.THIS.tooltip-basic:hover .tooltip.disabled {
+.THIS.tooltip-basic:hover .tooltip.disabled,
+.THIS.tooltip-basic:focus .tooltip.disabled {
 	display: none;
 }
 
-.THIS.tooltip-trigger:hover .fade-out.tooltip {
+.THIS.tooltip-trigger:hover .fade-out.tooltip,
+.THIS.tooltip-trigger:focus .fade-out.tooltip {
 	transition: none;
 }
 
 
-.THIS.tooltip-trigger:hover .fade-in.tooltip {
+.THIS.tooltip-trigger:hover .fade-in.tooltip,
+.THIS.tooltip-trigger:focus .fade-out.tooltip {
 	transition: 500ms opacity;
 }
 
-.THIS.tooltip-trigger:hover .fade-in.fade-out.tooltip {
+.THIS.tooltip-trigger:hover .fade-in.fade-out.tooltip,
+.THIS.tooltip-trigger:focus .fade-out.tooltip {
 	transition: 500ms opacity;
 }
 

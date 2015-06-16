@@ -22,7 +22,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.def.*;
 import org.auraframework.impl.root.component.ComponentDefRefArrayImpl;
 import org.auraframework.impl.type.ComponentDefRefArrayTypeDef;
 import org.auraframework.instance.Component;
@@ -34,7 +33,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
  * Aura.ComponentDefRef[](@link aura.impl.type.ComponentDefRefArrayTypeDef) Unit
  * tests for attributes of type {@link Component}, {@link ComponentDefRef}, and
  * {@link ComponentDefRefArrayTypeDef}
- * 
+ *
  * @userStory a07B0000000MniV
  */
 public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
@@ -44,7 +43,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
 
     /**
      * Postive test case.
-     * 
+     *
      * @throws Exception
      */
     public void testUsageOfComponentDefRefArray() throws Exception {
@@ -73,7 +72,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
     /**
      * Verify that not initializing attribute of type Aura.ComponentDefRef[]
      * works fine.
-     * 
+     *
      * @throws Exception
      */
     public void testEmptyBodyForComponentDefRefArray() throws Exception {
@@ -88,7 +87,7 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
 
     /**
      * Verify that Aura.ComponentDefRef is not a valid attribute type.
-     * 
+     *
      * @throws Exception
      */
     public void testComponentDefRefIsNotValidType() throws Exception {
@@ -122,14 +121,14 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
     /**
      * Verify that invalid markup in body of Attribute of type
      * Aura.ComponentDefRef[] is handled.
-     * 
+     *
      * @throws Exception
      */
     public void testMarkupValidationInComponentDefRefArray() throws Exception {
         // Incomplete formula
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "",
                 "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
-                // Unclosed formula field
+                        // Unclosed formula field
                         "<aura:text value='{!aura/>" + "</aura:attribute>"));
         try {
             Aura.getInstanceService().getInstance(desc);
@@ -139,20 +138,20 @@ public class AuraComponentAttributeTypeTest extends AuraImplTestCase {
             checkExceptionContains(e,InvalidDefinitionException.class, "[2,102]");
         }
 
-         desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
-         "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
-         "<nonexistant:cmp/>"+
-         "</aura:attribute>") );
-         
-         try{
-        	 Aura.getDefinitionService().getDefinition(desc);
-        	 fail("Should have failed creation because of non existing component.");
-         }catch(Exception e){
-        	 checkExceptionStart(e,DefinitionNotFoundException.class, 
-        			 "No COMPONENT named markup://nonexistant:cmp found");
-         }
+        desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
+                "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
+                        "<nonexistant:cmp/>"+
+                "</aura:attribute>") );
 
-         /*W-1300410 : this should fail as serverComponentWReqAttr is missing a 'required' attribute
+        try{
+            Aura.getDefinitionService().getDefinition(desc);
+            fail("Should have failed creation because of non existing component.");
+        }catch(Exception e){
+            checkExceptionStart(e,DefinitionNotFoundException.class,
+                    "No COMPONENT named markup://nonexistant:cmp found");
+        }
+
+        /*W-1300410 : this should fail as serverComponentWReqAttr is missing a 'required' attribute
          desc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag,"",
          "<aura:attribute type='Aura.ComponentDefRef[]' name='attr'>" +
          "<loadLevelTest:serverComponentWReqAttr/>"+

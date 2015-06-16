@@ -24,8 +24,8 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.impl.java.controller.JavaAction;
+import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
@@ -34,9 +34,6 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.def.*;
-import org.auraframework.test.instance.*;
-import org.auraframework.test.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
@@ -47,7 +44,7 @@ public class ComponentController {
     /**
      * A Java exception representing a <em>Javascript</em> error condition, as
      * reported from client to server for forensic logging.
-     * 
+     *
      * @since 194
      */
     public static class AuraClientException extends Exception {
@@ -127,13 +124,13 @@ public class ComponentController {
     /**
      * Called when the client-side code encounters a failed client-side action, to allow server-side
      * record of the code error.
-     * 
+     *
      * @param desc The name of the client action failing
      * @param id The id of the client action failing
      * @param error The javascript error message of the failure
      * @param stack Not always available (it's browser dependent), but if present, a browser-dependent
      *      string describing the Javascript stack for the error.  Some frames may be obfuscated,
-     *      anonymous, omitted after inlining, etc., but it may help diagnosis. 
+     *      anonymous, omitted after inlining, etc., but it may help diagnosis.
      */
     @AuraEnabled
     public static void reportFailedAction(@Key(value = "failedAction") String desc, @Key("failedId") String id,

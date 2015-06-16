@@ -16,10 +16,8 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
-import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignOptionDef;
-import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.design.DesignOptionDefImpl;
 import org.auraframework.impl.root.parser.handler.ContainerTagHandler;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
@@ -59,14 +57,10 @@ public class DesignOptionDefHandler extends ParentedTagHandler<DesignOptionDef, 
             error("Attribute '%s' is required on <%s>", ATTRIBUTE_KEY, TAG);
         }
         String value = getAttributeValue(ATTRIBUTE_VALUE);
+        String access = getAttributeValue(ATTRIBUTE_ACCESS);
         builder.setKey(key);
         builder.setValue(value);
-        DefinitionAccess access = readAccessAttribute();
-        if (access != null) {
-            builder.setAccess(access);
-        } else {
-            builder.setAccess(new DefinitionAccessImpl(null, "public"));
-        }
+        builder.setAccess(access);
     }
 
     @Override

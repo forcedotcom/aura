@@ -16,7 +16,6 @@
 package org.auraframework.util.javascript.directive.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.EnumSet;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,7 +71,7 @@ public class IncludeDirectiveTest extends UnitTestCase {
             // Expected the Javascript group to throw an error while adding an
             // invalid file
             assertTrue("Add File function failed because of an unexpected error message",
-                e.getMessage().indexOf("reallyconkyinclude") != -1);
+                    e.getMessage().indexOf("reallyconkyinclude") != -1);
         }
         if (failed) {
             fail("should have failed because 'reallyconkyinclude' is an invalid javascript file to include");
@@ -96,7 +95,7 @@ public class IncludeDirectiveTest extends UnitTestCase {
             failed = true;
         } catch (Throwable expected) {
             assertTrue("Add File function failed because of an unexpected error message",
-                expected.getMessage().indexOf("haha.js") != -1);
+                    expected.getMessage().indexOf("haha.js") != -1);
         }
         if (failed) {
             fail("Should have failed processing a non-existing file");

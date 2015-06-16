@@ -20,7 +20,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -40,8 +42,6 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.def.*;
-import org.auraframework.test.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.IntegrationTest;
 import org.auraframework.util.test.configuration.TestServletConfig;
@@ -49,6 +49,7 @@ import org.auraframework.util.test.configuration.TestServletConfig;
 /**
  * Base class for all Aura integration tests.
  */
+@SuppressWarnings("deprecation")
 @IntegrationTest
 public abstract class IntegrationTestCase extends AuraTestCase {
     private TestServletConfig servletConfig = null;
@@ -100,7 +101,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Sets up get request method for httpclient. Includes ability to follow redirects and set request headers
-     * 
+     *
      * @param path
      * @param followRedirects
      * @param headers
@@ -126,7 +127,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Performs request method
-     * 
+     *
      * @param method request method
      * @return request response
      * @throws Exception
@@ -138,7 +139,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
     /**
      * Performs request method with HttpContext. HttpContext typically contains cookie store with all cookies to include
      * with request
-     * 
+     *
      * @param method request method
      * @param context httpcontext
      * @return request response
@@ -170,7 +171,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets status code of response
-     * 
+     *
      * @param response request response
      * @return status code
      */
@@ -180,7 +181,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets string body of response
-     * 
+     *
      * @param response request response
      * @return response body
      * @throws IOException
@@ -192,7 +193,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets content type of response
-     * 
+     *
      * @param response request response
      * @return content type
      */
@@ -202,7 +203,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets charset of response
-     * 
+     *
      * @param response request response
      * @return charset
      */
@@ -213,7 +214,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Gets mime type of response
-     * 
+     *
      * @param response request response
      * @return mime type
      */
@@ -223,7 +224,7 @@ public abstract class IntegrationTestCase extends AuraTestCase {
 
     /**
      * Get the relative URL for a given BaseComponentDef descriptor.
-     * 
+     *
      * @param desc the DefDescriptor of a BaseComponentDef
      * @return the relative URL for the descriptor
      */

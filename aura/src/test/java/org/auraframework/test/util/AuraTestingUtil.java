@@ -17,10 +17,8 @@ package org.auraframework.test.util;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -28,9 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nullable;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.message.BasicNameValuePair;
 import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -58,7 +53,7 @@ public class AuraTestingUtil {
     private static AtomicLong nonce = new AtomicLong(System.currentTimeMillis());
 
     private Set<DefDescriptor<?>> cleanUpDds;
-    
+
     public void tearDown() {
         if (cleanUpDds != null) {
             StringSourceLoader loader = StringSourceLoader.getInstance();
@@ -86,7 +81,7 @@ public class AuraTestingUtil {
     /**
      * Retrieves the source of a component resource. Note: Works only for markup://string:XXXXX components and not for
      * any other namespace. By default, test util is aware of StringSourceLoader only.
-     * 
+     *
      * @param descriptor Descriptor of the resource you want to see the source of
      * @return
      */
@@ -116,7 +111,7 @@ public class AuraTestingUtil {
      * Generate a {@link DefDescriptor} with a unique name. If namePrefix does not contain a namespace, the descriptor
      * will be created in the 'string' namespace. If namePrefix does not contain the name portion (i.e. it is null,
      * empty, or just a namespace with the trailing delimiter), 'thing' will be used as the base name.
-     * 
+     *
      * @param namePrefix if non-null, then generate some name with the given prefix for the descriptor.
      * @param defClass the interface of the type definition
      * @param bundle the bundle for this descriptor
@@ -129,7 +124,7 @@ public class AuraTestingUtil {
 
     /**
      * Convenience method to create a description and load a source in one shot.
-     * 
+     *
      * @param defClass interface of the definition represented by this source
      * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
@@ -140,7 +135,7 @@ public class AuraTestingUtil {
 
     /**
      * Convenience method to create a description and load a source in one shot.
-     * 
+     *
      * @param defClass interface of the definition represented by this source
      * @param contents source contents
      * @param namePrefix package name prefix
@@ -150,10 +145,10 @@ public class AuraTestingUtil {
             String namePrefix) {
         return addSourceAutoCleanup(defClass, contents, namePrefix, true);
     }
-    
+
     /**
      * Convenience method to create a description and load a source in one shot.
-     * 
+     *
      * @param defClass interface of the definition represented by this source
      * @param contents source contents
      * @param namePrefix package name prefix
@@ -170,18 +165,18 @@ public class AuraTestingUtil {
 
     /**
      * Convenience method to create a description and load a source in one shot.
-     * 
+     *
      * @param descriptor descriptor for the source to be created
      * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
      */
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents) {
-    	return addSourceAutoCleanup(descriptor, contents, true);
+        return addSourceAutoCleanup(descriptor, contents, true);
     }
 
     /**
      * Convenience method to create a description and load a source in one shot.
-     * 
+     *
      * @param descriptor descriptor for the source to be created
      * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
@@ -195,7 +190,7 @@ public class AuraTestingUtil {
 
     /**
      * Remove a definition from the source loader.
-     * 
+     *
      * @param descriptor the descriptor identifying the loaded definition to remove.
      */
     public <T extends Definition> void removeSource(DefDescriptor<T> descriptor) {
@@ -210,7 +205,7 @@ public class AuraTestingUtil {
      * of a preloaded set, the mock will not be effective, so it's safer to clear any cached defs after setting up mocks
      * but before executing a test. This relies on source change notifications to get the servlets to clear their
      * caches.
-     * 
+     *
      * @param defs the Definitions to be cleared from any caches
      * @throws InterruptedException
      */
@@ -265,7 +260,7 @@ public class AuraTestingUtil {
     /**
      * Start a context and set up default values.
      */
-    protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc) 
+    protected AuraContext setupContext(Mode mode, Format format, DefDescriptor<? extends BaseComponentDef> desc)
             throws QuickFixException {
         AuraContext ctxt = Aura.getContextService().startContext(mode, format, Authentication.AUTHENTICATED, desc);
         ctxt.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
@@ -299,7 +294,7 @@ public class AuraTestingUtil {
             boolean modified) throws QuickFixException {
         return getContextURL(mode, format, Aura.getDefinitionService().getDefDescriptor(desc, type), modified);
     }
-    
+
     @Deprecated
     public String getContext(Mode mode, Format format, String desc, Class<? extends BaseComponentDef> type,
             boolean modified) throws QuickFixException {
@@ -420,5 +415,5 @@ public class AuraTestingUtil {
         sb.setCharAt(3, flip);
         return sb.toString();
     }
-   
+
 }

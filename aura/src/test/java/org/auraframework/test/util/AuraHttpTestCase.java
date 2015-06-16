@@ -67,6 +67,7 @@ import com.google.common.collect.Maps;
 /**
  * Base class with some helper methods specific to Aura.
  */
+@SuppressWarnings("deprecation")
 public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     public AuraHttpTestCase(String name) {
@@ -76,7 +77,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     /**
      * Given a URL to post a GET request, this method compares the actual status code of the response with an expected
      * status code.
-     * 
+     *
      * @param msg Error message that should be displayed if the actual response does not match the expected response
      * @param url URL to be used to execute the GET request
      * @param statusCode expected status code of response
@@ -95,12 +96,12 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     /**
      * Helper method to check that a response has the default X-FRAME-OPTIONS and Content-Security-Policy headers. If
      * your test doesn't use the default security policy, you get to roll your own validation of that, of course.
-     * 
+     *
      * Asserts if anything is wrong.
-     * 
+     *
      * As a safety provision, if the config adapter *isn't* recognized as "ours," we don't check anything. (This covers
      * the fact that inside SFDC, we have a different config adapter with a different default CSP.)
-     * 
+     *
      * @param response
      * @param guarded If {@code true}, check that we HAVE headers. If {@code false}, check that they are absent.
      * @param allowInline Allows inline script-src and style-src
@@ -145,7 +146,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * Helper to take the Content-Security-Policy header and break it into its individual components. If the header is
      * missing, this will fail the test with an assertion. Otherwise, a map keyed by the various CSP directives
      * (script-src, style-src, etc.) with the literal values of each directive is returned.
-     * 
+     *
      * @param response
      * @return a map of directive to value.
      */
@@ -168,7 +169,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Clear cookies from httpclient cookie store
-     * 
+     *
      * @throws Exception
      */
     protected void clearCookies() throws Exception {
@@ -177,7 +178,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie with name and value
-     * 
+     *
      * @param name cookie name
      * @param value cookie value
      * @throws Exception
@@ -189,7 +190,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie to httpclient cookie store
-     * 
+     *
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -204,7 +205,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Adds cookie to httpclient cookie store
-     * 
+     *
      * @param cookie cookie
      * @throws Exception
      */
@@ -214,7 +215,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates HttpContext with httpclient cookie store. Allows cookies to be part of specific request method.
-     * 
+     *
      * @return http context
      * @throws Exception
      */
@@ -227,7 +228,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks there is no cookie in httpclient cookie store
-     * 
+     *
      * @param domain cookie domain
      * @param name cookie name
      * @param path cookie path
@@ -245,7 +246,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Checks for cookie
-     * 
+     *
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -267,7 +268,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates cookie with only provided name and value
-     * 
+     *
      * @param name cookie name
      * @param value cookie value
      * @return
@@ -280,7 +281,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Creates cookie
-     * 
+     *
      * @param domain cookie domain
      * @param name cookie name
      * @param value cookie value
@@ -297,7 +298,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Gets all cookies in httpclient cookie store
-     * 
+     *
      * @return cookies
      * @throws Exception
      */
@@ -307,7 +308,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Gets httpclient cookie store
-     * 
+     *
      * @return cookie store
      * @throws Exception
      */
@@ -317,7 +318,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Given the a path on the api server, return a {@link HttpPost} that has the appropriate headers and server name.
-     * 
+     *
      * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt>.
      * @param params a set of name value string pairs to use as parameters to the post call.
@@ -346,7 +347,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Convenience method for executing an Action
-     * 
+     *
      * @param descriptor fully qualified descriptor string for the action - e.g. java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString
      * @param params a set of name value string pairs to use as parameters to the post call.
      * @return a {@link HttpPost}
@@ -364,7 +365,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
         String jsonMessage = Json.serialize(message);
-        
+
         if (postParams == null) {
             postParams = Maps.newHashMap();
         }
@@ -374,7 +375,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         if (!postParams.containsKey("aura.context")) {
             postParams
-                    .put("aura.context", Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
+            .put("aura.context", Aura.getContextService().getCurrentContext().serialize(EncodingStyle.Normal));
         }
         HttpPost post = obtainPostMethod("/aura", postParams);
         perform(post);
@@ -384,7 +385,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Given a path on the api server, return a {@link HttpGet} that has the appropriate headers and server name.
-     * 
+     *
      * @param path the relative path to the server, such as <tt>/services/Soap</tt> or
      *            <tt>/servlet/servlet.SForceMailMerge</tt> Follows redirects by default.
      * @return a {@link HttpGet}
@@ -408,7 +409,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
 
     /**
      * Build a URL for a get from the given parameters with all the standard parameters set.
-     * 
+     *
      * This is a convenience function to make gets more consistent. It sets:
      * <ul>
      * <li>aura.tag: the descriptor to get.</li>
@@ -422,7 +423,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * </ul>
      * </li>
      * </ul>
-     * 
+     *
      * @param mode the Aura mode to use.
      * @param format the format (HTML vs JSON) to use
      * @param desc the name of the descriptor to set as the primary object.
@@ -433,14 +434,14 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     protected HttpGet obtainAuraGetMethod(Mode mode, Format format,
             String desc, Class<? extends BaseComponentDef> type,
             Map<String, String> params, Header[] headers)
-            throws QuickFixException, MalformedURLException, URISyntaxException {
+                    throws QuickFixException, MalformedURLException, URISyntaxException {
         return obtainAuraGetMethod(mode, format, Aura.getDefinitionService()
                 .getDefDescriptor(desc, type), params, headers);
     }
 
     /**
      * Build a URL for a get from the given parameters with all the standard parameters set from a descriptor.
-     * 
+     *
      * This is a convenience function to make gets more consistent. It sets:
      * <ul>
      * <li>aura.tag: the name of the descriptor to get.</li>
@@ -454,7 +455,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
      * </ul>
      * </li>
      * </ul>
-     * 
+     *
      * @param mode the Aura mode to use.
      * @param format the format (HTML vs JSON) to use
      * @param desc the descriptor to set as the primary object.
@@ -464,7 +465,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     protected HttpGet obtainAuraGetMethod(Mode mode, Format format,
             DefDescriptor<? extends BaseComponentDef> desc,
             Map<String, String> params, Header[] headers)
-            throws QuickFixException, MalformedURLException, URISyntaxException {
+                    throws QuickFixException, MalformedURLException, URISyntaxException {
         List<NameValuePair> urlparams = Lists.newArrayList();
         urlparams.add(new BasicNameValuePair("aura.tag", String.format("%s:%s",
                 desc.getNamespace(), desc.getName())));
@@ -512,7 +513,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         /**
          * Constructor for Server action using two array lists Note that each list must be of equal length or will throw
          * an IllegalArgumentException
-         * 
+         *
          * @param qualifiedName
          * @param actionParams
          */
@@ -532,7 +533,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         /**
          * Will insert the given key-value pair as a parameter in the first entry of the action parameters list.
          * Corresponds with the first entry in the qualified names list.
-         * 
+         *
          * @param name Description of parameter
          * @param value Object of action parameter
          * @return Returns instance of Server Action
@@ -559,7 +560,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
          * Will insert the given key-value pair as a parameter for the given qualified name. Throws
          * IllegalArguementException if qualified name is not found. Cannot distinguish between multiple qualified names
          * with the same name.
-         * 
+         *
          * @param qualifiedName The name of the qualified Name you are adding a parameter for.
          * @param name Description of the parameter
          * @param value Object of the action parameter
@@ -647,7 +648,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                     fail("Error response:" + rawResponse);
                 }
                 Map<String, Object> json = (Map<String, Object>) new JsonReader()
-                        .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
+                .read(rawResponse.substring(AuraBaseServlet.CSRF_PROTECT.length()));
                 ArrayList<Map<String, Object>> actions = (ArrayList<Map<String, Object>>) json.get("actions");
                 for (Map<String, Object> action : actions) {
 

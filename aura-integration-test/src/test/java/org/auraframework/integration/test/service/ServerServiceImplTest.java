@@ -99,6 +99,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             return null;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Visibility getVisibility() {
             return null;
@@ -285,15 +286,15 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Test for W-2085617 This test is to verify when we have shared component between actions, they get serialized into
      * response correctly.
-     * 
+     *
      * Test Setup: EmptyAction a,b,c : when it run, it put whatever response has into their return value ShareCmpAction
      * d,e,f: when it run, it update the attribute of shared component, run its delegate action(a,b orc), then get the
      * latest shared_component(in Json format) from its delegate action's return value as its return value.
-     * 
+     *
      * when b runs, a has finish running, so b will have shared_component of a e will have shared_component of a in its
      * return value (with attrA) when c runs, b has finish running, so c will have shared_components of a & b e will
      * have shared_component of b in its return value (with attrB)
-     * 
+     *
      * @throws Exception
      */
     public void testSharedCmp() throws Exception {
@@ -337,7 +338,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     /**
      * Check that our EmptyAction is properly serialized.
-     * 
+     *
      * This does a positive and negative test, ensuring that we only serialize what we should.
      */
     @SuppressWarnings("unchecked")
@@ -426,7 +427,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     /**
      * Test a simple action that serializes a specific value.
-     * 
+     *
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleAction() throws Exception {
@@ -443,7 +444,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
     /**
      * Test a simple action that serializes a specific value.
-     * 
+     *
      * We carefully test only the parts that we care about for ServerService.
      */
     public void testSimpleActionWithExtras() throws Exception {
@@ -656,7 +657,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         assertTrue(
                 "Default unrender function should be used when component extends the root component but was <"
                         + unrenderFunction + ">",
-                unrenderFunction.contains(defaultUnrender));
+                        unrenderFunction.contains(defaultUnrender));
     }
 
     /**

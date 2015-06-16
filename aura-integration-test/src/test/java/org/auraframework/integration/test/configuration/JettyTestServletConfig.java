@@ -37,6 +37,7 @@ import org.eclipse.jetty.server.Server;
 /**
  * @since 0.0.59
  */
+@SuppressWarnings("deprecation")
 public class JettyTestServletConfig implements TestServletConfig {
 
     private static final Logger LOG = Logger.getLogger(JettyTestServletConfig.class.getSimpleName());

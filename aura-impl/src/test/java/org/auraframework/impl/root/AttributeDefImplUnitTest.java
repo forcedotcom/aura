@@ -18,12 +18,12 @@ package org.auraframework.impl.root;
 import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.AttributeDef.SerializeToType;
 import org.auraframework.def.Definition.Visibility;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.root.AttributeDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
@@ -37,8 +37,9 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
 
+@SuppressWarnings("deprecation")
 public class AttributeDefImplUnitTest extends
-        DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
+DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
 
     @Mock
     protected DefDescriptor<? extends RootDefinition> parentDescriptor;
@@ -107,10 +108,10 @@ public class AttributeDefImplUnitTest extends
     }
 
     public void testSerializeDefaultValue() throws Exception {
-    	this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
+        this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
         Json json = Mockito.mock(Json.class);
         AttributeDef def = buildDefinition();
-		def.serialize(json);
+        def.serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
         inOrder.verify(json).writeMapBegin();
         inOrder.verify(json).writeMapEntry("default", "Hello");

@@ -59,6 +59,7 @@ import org.mockito.Mockito;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
+@SuppressWarnings("deprecation")
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
 extends RootDefinitionImplUnitTest<I, D, B> {
 

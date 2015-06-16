@@ -26,8 +26,8 @@ import org.auraframework.system.AuraContext.Format;
 
 /**
  * Shared stuff for the child tests.
- * 
- * 
+ *
+ *
  * @since 0.0.224
  */
 public abstract class BaseComponentDefHTMLFormatAdapterTest<T extends Definition> extends AuraImplTestCase {
@@ -37,6 +37,7 @@ public abstract class BaseComponentDefHTMLFormatAdapterTest<T extends Definition
 
     public abstract Class<T> getDefClass();
 
+    @SuppressWarnings("unchecked")
     protected String doWrite(T def) throws Exception {
         Aura.getContextService().getCurrentContext().setApplicationDescriptor((DefDescriptor<? extends BaseComponentDef>) def.getDescriptor());
         FormatAdapter<T> adapter = AuraImpl.getFormatAdapter(Format.HTML.name(), getDefClass());

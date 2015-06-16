@@ -257,25 +257,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private static AddableDef<?> addable[] = new AddableDef[] {
-            // Ignoring top level bundle defs.
-            // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-            // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-            // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-            // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-            // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-            // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
-            new AddableDef<>(ControllerDef.class, "js://%s.%s",
-                    "({method: function(cmp) {}})"),
-            new AddableDef<>(HelperDef.class, "js://%s.%s",
-                    "({method: function(cmp) {}})"),
-            // new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
-            //        "({provide: function(cmp) {}})"),
-            new AddableDef<>(RendererDef.class, "js://%s.%s",
-                    "({render: function(cmp) {}})"),
-            new AddableDef<>(StyleDef.class, "css://%s.%s",
-                    ".THIS {display:block;}"),
-            // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
-            // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+        // Ignoring top level bundle defs.
+        // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
+        new AddableDef<>(ControllerDef.class, "js://%s.%s",
+                "({method: function(cmp) {}})"),
+                new AddableDef<>(HelperDef.class, "js://%s.%s",
+                        "({method: function(cmp) {}})"),
+                        // new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
+                        //        "({provide: function(cmp) {}})"),
+                        new AddableDef<>(RendererDef.class, "js://%s.%s",
+                                "({render: function(cmp) {}})"),
+                                new AddableDef<>(StyleDef.class, "css://%s.%s",
+                                        ".THIS {display:block;}"),
+                                        // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+                                        // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
     };
 
     private MasterDefRegistry resetDefRegistry() {
@@ -288,7 +288,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private <T extends Definition> void checkAddRemove(DefDescriptor<?> tld, String suid,
-                                                       AddableDef<T> toAdd) throws QuickFixException {
+            AddableDef<T> toAdd) throws QuickFixException {
         DefDescriptor<T> dd;
         String uid, ouid;
         Set<DefDescriptor<?>> deps;
@@ -642,7 +642,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
 
-        // another getDef on other registry instance should now compile zero additional times 
+        // another getDef on other registry instance should now compile zero additional times
         registry = getDefRegistry(true);
         assertNotNull(registry.getDef(cmpDesc));
         Mockito.verify(registry, Mockito.times(0)).compileDE(Mockito.eq(cmpDesc));
@@ -761,7 +761,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // Manually add dependency to inner component
         DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:dependency resource=\"" + depCmpDesc1.getQualifiedName()
-                        + "\"/></aura:component>");
+                + "\"/></aura:component>");
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(
@@ -963,7 +963,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private boolean isInDescriptorFilterCache(DescriptorFilter filter, Set<DefDescriptor<?>> results,
-                                              MasterDefRegistryImpl mdr) throws Exception {
+            MasterDefRegistryImpl mdr) throws Exception {
         // taking the long road in determining what is in the cache because the current key implementation for
         // the descriptor cache is difficult to recreate.
         Cache<String, Set<DefDescriptor<?>>> cache = AuraPrivateAccessor.get(mdr, "descriptorFilterCache");
@@ -1011,7 +1011,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     private <D extends Definition> void callAssertAccess(MasterDefRegistryImpl mdr,
             DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache)
-            throws Exception {
+                    throws Exception {
         Method assertAccess = mdr.getClass().getMethod("assertAccess", DefDescriptor.class,
                 Definition.class, Cache.class);
         assertAccess.setAccessible(true);
@@ -1077,9 +1077,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         try {
             callAssertAccess(mdr, null, desc.getDef(), mockAccessCheckCache);
         } catch (InvocationTargetException ite) {
-        	ex = ite.getTargetException();
+            ex = ite.getTargetException();
         } catch (Exception e) {
-        	ex = e;
+            ex = e;
         }
         if (ex == null) {
             fail("Expected NoAccessException because accessCache has reason to block def");
@@ -1481,16 +1481,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> unprivilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
                 DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", unprivilegedNamespace),
                         ComponentDef.class),
-                String.format(baseComponentTag, "access='global'",
-                        String.format("<%s/>", privilegedCmp.getDescriptorName())),
-                false);
+                        String.format(baseComponentTag, "access='global'",
+                                String.format("<%s/>", privilegedCmp.getDescriptorName())),
+                                false);
 
         // in privileged namespace depending on unprivileged cmp
         DefDescriptor<ComponentDef> privilegedRoot = getAuraTestingUtil().addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag, "access='global'",
                         String.format("<%s/>", unprivilegedCmp.getDescriptorName())),
-                null, true);
+                        null, true);
 
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         assertTrue(configAdapter.isPrivilegedNamespace(privilegedCmp.getNamespace()));
@@ -1588,7 +1588,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                                 + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
                                 + "return this.superRender();"
                                 + "}})",
-                        "cstring1.labelProvider", false);
+                                "cstring1.labelProvider", false);
         DefDescriptor<ApplicationDef> appInLayoutsBundleDef = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application>    before    <div aura:id='content'/>    after</aura:application>",
@@ -1664,6 +1664,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             return null;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public Visibility getVisibility() {
             return Visibility.PRIVATE;

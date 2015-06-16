@@ -16,12 +16,12 @@
 package org.auraframework.test.perf.util;
 
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
-import org.json.JSONArray;
 
 public class PerfMetricsUtil {
 
-    private PerfMetricsComparator perfMetricsComparator;
+    //private PerfMetricsComparator perfMetricsComparator;
 
+    /*
     private void collectMetrics(JSONArray metrics) {
         perfMetricsComparator = getPerfMetricsComparator();
     }
@@ -29,6 +29,7 @@ public class PerfMetricsUtil {
     private void prepareResults() {
         // TODO collect results from client app and compare
     }
+     */
 
     public PerfMetricsComparator getPerfMetricsComparator() {
         return CUSTOM_COMPARATOR;

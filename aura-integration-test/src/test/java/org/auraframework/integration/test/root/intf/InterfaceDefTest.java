@@ -39,6 +39,7 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
+@SuppressWarnings("deprecation")
 public class InterfaceDefTest extends AuraImplTestCase {
 
     public InterfaceDefTest(String name) {
@@ -212,7 +213,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testEqualsWithDifferentLocations() {
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(vendor
                 .makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null, new Location("filename1", 4, 4,
-                1000), null, null);
+                        1000), null, null);
         assertFalse(
                 "InterfacesDefs with different locations shouldn't have been equal",
                 vendor.makeInterfaceDef(vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), null, null,

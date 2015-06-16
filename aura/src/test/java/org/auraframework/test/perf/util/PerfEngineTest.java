@@ -38,7 +38,7 @@ import org.json.JSONArray;
 public class PerfEngineTest<T> extends TestSuite implements PerfTestFramework {
 
     private PerfConfigUtil perfConfigUtil;
-    private PerfMetricsUtil perfMetricsUtil;
+    //private PerfMetricsUtil perfMetricsUtil;
 
     private static final Logger LOG = Logger.getLogger(PerfEngineTest.class.getSimpleName());
 

@@ -37,7 +37,7 @@ public class GateKeeper {
         private final long time = System.currentTimeMillis();
     }
 
-    static private ConcurrentHashMap<String, Gate> pending = new ConcurrentHashMap<String, Gate>();
+    static private ConcurrentHashMap<String, Gate> pending = new ConcurrentHashMap<>();
 
     /**
      * Internal routine to get a gate.
@@ -64,7 +64,7 @@ public class GateKeeper {
     public static void waitForGate(String id) throws InterruptedException {
         if (!getGate(id).latch.await(60, TimeUnit.SECONDS)) {
             throw new AuraRuntimeException("GateKeeper "+id
-                                           +" never released - This is probably a test bug in a different test.");
+                    +" never released - This is probably a test bug in a different test.");
         }
     }
 

@@ -23,7 +23,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.util.AuraFiles;
 
 /**

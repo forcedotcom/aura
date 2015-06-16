@@ -120,6 +120,7 @@
     
     /**
      * Test open multiple panel modals
+     * Use case for bug: W-2619412
      */
     testOpenMultipleModals: {
     	test: [function(cmp) {
@@ -129,10 +130,7 @@
     	}, function(cmp) {
     		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"));
     		modal1GlobalId = this.getGlobalIdForPanelModal(1);
-    		var modal1VisibleAttrValue = $A.getCmp(modal1GlobalId).get("v.visible");
-//    		Uncomment Me once bug W-2619412 fixed
-//    		$A.test.assertTrue(modal1VisibleAttrValue, "Visible Attribute should be set for new modal opened");
-    		
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.getCmp(modal1GlobalId).get("v.visible");}, "Visible Attribute should be set for new modal opened");
     		testerCmp.set("v.useHeader","true");
     		testerCmp.set("v.useFooter","true");
     		testerCmp.find("createPanelBtn").get("e.press").fire();
@@ -143,11 +141,8 @@
     		var modal2GlobalId = this.getGlobalIdForPanelModal(2);
     		var modal2VisibleAttrValue = $A.getCmp(modal2GlobalId).get("v.visible");
     		var modal1VisibleAttrValue = $A.getCmp(modal1GlobalId).get("v.visible");
-    		
-//    		Uncomment Me once bug W-2619412 fixed
-//    		$A.test.assertFalse(modal1VisibleAttrValue, "Visible Attribute should not be set for old modal opened");
-//    		$A.test.assertTrue(modal2VisibleAttrValue, "Visible Attribute should be set for new modal opened");
-    		
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.getCmp(modal2GlobalId).get("v.visible");}, "Visible Attribute should be set for new modal opened");
+    		$A.test.assertTrue(modal1VisibleAttrValue, "Visible Attribute should not be set for old modal opened");
     		this.verifyElementWithClassPresent("defaultCustomPanelHeader", true, 
 			"Custom panel header should be present for second modal");
     		this.verifyElementWithClassPresent("defaultCustomPanelFooter", true, 
@@ -230,6 +225,10 @@
     	}, function(cmp) {
     		var modal = $A.test.getElementByClass("uiModal");
     		$A.test.assertFalse($A.util.hasClass(modal, "active"), "Modal panel shold be hidden");
+    	}, function(cmp) {
+    		//use case for bug: W-2619412
+    		modal1GlobalId = this.getGlobalIdForPanelModal(1);
+			$A.test.addWaitForWithFailureMessage(false, function(){return $A.getCmp(modal1GlobalId).get("v.visible");}, "Visible Attribute should be set to false for non-visible modal");
     	}]
     },
     

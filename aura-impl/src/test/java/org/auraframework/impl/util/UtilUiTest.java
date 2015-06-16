@@ -17,7 +17,7 @@ package org.auraframework.impl.util;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 
 public class UtilUiTest extends WebDriverTestCase {

@@ -20,10 +20,10 @@ import java.util.List;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.test.source.StringSourceLoader;
 
 @Controller
 public class StringSourceController {

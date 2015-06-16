@@ -27,16 +27,16 @@ import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.instance.Action.State;
 import org.auraframework.instance.ComponentConfig;
-import org.auraframework.test.AuraTestingUtil;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.mock.MockAction;
 import org.auraframework.test.mock.MockModel;
 import org.auraframework.test.mock.MockModelDef;
 import org.auraframework.test.mock.MockProviderDef;
+import org.auraframework.test.source.StringSource;
+import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.mockito.Mockito;
 

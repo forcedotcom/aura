@@ -22,7 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.auraframework.http.AuraContextFilter;
 import org.auraframework.system.AuraContext;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.mockito.Mockito;
 

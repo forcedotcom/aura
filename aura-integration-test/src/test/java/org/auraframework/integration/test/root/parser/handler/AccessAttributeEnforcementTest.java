@@ -23,8 +23,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.def.*;
 import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.Source;
+import org.auraframework.test.source.StringSourceLoader;
 
 public class AccessAttributeEnforcementTest extends
 		BaseAccessAttributeEnforcementTest {

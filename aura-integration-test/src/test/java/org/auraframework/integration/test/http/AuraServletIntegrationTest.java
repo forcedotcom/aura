@@ -24,7 +24,7 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.IntegrationTestCase;
+import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 
 /**

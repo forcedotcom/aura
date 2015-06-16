@@ -21,10 +21,9 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.source.StringSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-
+import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 public class RegisterEventHandlerTest extends AuraImplTestCase {

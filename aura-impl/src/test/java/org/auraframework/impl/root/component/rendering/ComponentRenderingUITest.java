@@ -15,7 +15,7 @@
  */
 package org.auraframework.impl.root.component.rendering;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;

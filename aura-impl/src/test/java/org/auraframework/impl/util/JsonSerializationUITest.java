@@ -19,7 +19,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 
 public class JsonSerializationUITest extends WebDriverTestCase {
     public JsonSerializationUITest(String name) {

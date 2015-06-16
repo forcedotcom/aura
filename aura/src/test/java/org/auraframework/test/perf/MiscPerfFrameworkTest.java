@@ -18,10 +18,10 @@ package org.auraframework.test.perf;
 import java.util.List;
 import java.util.Map;
 
-import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
 import org.json.JSONObject;

@@ -15,8 +15,8 @@
  */
 package org.auraframework.impl.root.theme;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.CheckAccessibility;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.openqa.selenium.By;
 
 /**

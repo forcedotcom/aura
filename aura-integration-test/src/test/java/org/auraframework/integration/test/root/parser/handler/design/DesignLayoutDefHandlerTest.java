@@ -20,7 +20,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 

@@ -17,7 +17,7 @@ package org.auraframework.integration.test.components.auraStorage;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 
 public class NamedAuraStorageUITest extends WebDriverTestCase {
     public NamedAuraStorageUITest(String name){

@@ -16,9 +16,9 @@
 package org.auraframework.impl.appCache;
 
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverTestCase.TargetBrowsers;
-import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.openqa.selenium.By;
 

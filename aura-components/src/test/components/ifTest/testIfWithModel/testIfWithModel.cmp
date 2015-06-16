@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component render="client" model="java://test.model.TestReinitializeModel">
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestReinitializeModel">
 <!-- TestReinitializeModel set its value by attr down here -->
     <aura:attribute name="attr" type="String" default="defaultValue"/>
     <br/>INNER CMP -- value of attr: {!v.attr} , value from module: {!m.value}<br/>

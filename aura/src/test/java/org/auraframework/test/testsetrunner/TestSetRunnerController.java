@@ -26,8 +26,8 @@ import junit.framework.TestResult;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.TestExecutor.TestRun;
-import org.auraframework.test.TestExecutor;
+import org.auraframework.test.util.TestExecutor;
+import org.auraframework.test.util.TestExecutor.TestRun;
 
 /**
  * This controller handles the execution and result collection of test cases on behalf of client-initiated requests.

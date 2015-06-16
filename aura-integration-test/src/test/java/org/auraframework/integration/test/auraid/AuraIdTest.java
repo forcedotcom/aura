@@ -23,7 +23,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.id.AuraId;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 
 public class AuraIdTest extends AuraTestCase {
 

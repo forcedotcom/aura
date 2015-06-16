@@ -19,15 +19,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.impl.java.controller.JavaAction;
-import org.auraframework.instance.*;
+import org.auraframework.instance.Action;
+import org.auraframework.instance.Application;
+import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
+import org.auraframework.test.def.*;
+import org.auraframework.test.instance.*;
+import org.auraframework.test.system.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;

@@ -33,7 +33,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.json.JsonSerializationContext;
 
 /**

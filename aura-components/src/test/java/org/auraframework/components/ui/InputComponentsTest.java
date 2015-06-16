@@ -25,7 +25,7 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 
 /**
  * Automation for ui:input component.

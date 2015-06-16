@@ -132,7 +132,7 @@
                               "modelDef":{
                                 "s":13,
                                 "v":{
-                                  "descriptor":"java://test.model.TestReinitializeModel",
+                                  "descriptor":"java://org.auraframework.components.test.java.model.TestReinitializeModel",
                                   "members":[
                                     {
                                       "s":14,

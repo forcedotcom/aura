@@ -17,7 +17,7 @@ package org.auraframework.controller.java;
 
 import org.auraframework.Aura;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 
 /**
  * Let tests adjust servlet configuration.

@@ -15,8 +15,8 @@
  */
 package org.auraframework.test.perf;
 
-import org.auraframework.test.SauceUtil;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
+import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;

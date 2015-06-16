@@ -35,7 +35,7 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;

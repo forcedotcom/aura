@@ -24,8 +24,10 @@ import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.system.*;
+import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.SourceListener;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
+import org.auraframework.test.system.*;
 
 import com.google.common.base.Optional;
 

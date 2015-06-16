@@ -23,8 +23,8 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.source.StringSourceLoader;
 import org.auraframework.system.SourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 
 import com.google.common.collect.Lists;
 

@@ -21,7 +21,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 
-import org.auraframework.test.AuraHttpTestCase;
+import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationClient;

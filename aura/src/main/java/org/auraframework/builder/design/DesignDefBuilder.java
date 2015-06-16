@@ -16,8 +16,9 @@
 package org.auraframework.builder.design;
 
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.*;
+import org.auraframework.test.def.*;
 
 public interface DesignDefBuilder extends RootDefinitionBuilder<DesignDef> {
     public DesignDefBuilder addAttributeDesign(DefDescriptor<DesignAttributeDef> desc,

@@ -15,8 +15,8 @@
  */
 package org.auraframework.impl;
 
-import org.auraframework.test.WebDriverTestCase;
-import org.auraframework.test.WebDriverUtil.BrowserType;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoAlertPresentException;

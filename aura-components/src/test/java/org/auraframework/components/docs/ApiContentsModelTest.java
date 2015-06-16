@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.auraframework.components.ui.TreeNode;
 import org.auraframework.docs.ApiContentsModel;
-import org.auraframework.test.IntegrationTestCase;
+import org.auraframework.test.util.IntegrationTestCase;
 
 public class ApiContentsModelTest extends IntegrationTestCase {
 

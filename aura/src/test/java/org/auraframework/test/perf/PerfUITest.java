@@ -15,7 +15,7 @@
  */
 package org.auraframework.test.perf;
 
-import org.auraframework.test.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.PerfTest;
 
 /**

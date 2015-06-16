@@ -18,7 +18,7 @@ package org.auraframework.impl;
 import org.auraframework.Aura;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.impl.source.StringSourceLoader;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 

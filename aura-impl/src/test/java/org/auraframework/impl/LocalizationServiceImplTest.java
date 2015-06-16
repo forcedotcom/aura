@@ -28,7 +28,7 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.service.LocalizationService;
-import org.auraframework.test.AuraTestCase;
+import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.util.AuraLocale;
 import org.auraframework.util.date.DateConverter;
 import org.auraframework.util.date.DateService;

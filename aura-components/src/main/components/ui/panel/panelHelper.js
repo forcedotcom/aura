@@ -28,7 +28,7 @@
         //move the dialog to the right position
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
 
-        cmp.set('v.visible', true);
+        
         
         if (referenceElementSelector) {
             panelEl.style.visibility = 'hidden';

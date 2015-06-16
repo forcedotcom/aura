@@ -29,8 +29,6 @@ function EventDef(config) {
     delete config[Json.ApplicationKey.ACCESS];
 }
 
-EventDef.prototype.auraType = "EventDef";
-
 /**
  * Gets the event descriptor. (e.g. markup://foo:bar)
  * @returns {Object}

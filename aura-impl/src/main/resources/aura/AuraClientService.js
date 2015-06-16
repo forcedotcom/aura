@@ -105,7 +105,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
 
 /**
  * @description The Aura Client Service.
- * 
+ *
  * There be dragons here.
  *
  * Manage the queue of actions sent to the server.
@@ -479,7 +479,7 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
             return;
         }
         tid = parseInt(abortableId, 10);
-        
+
         if (!(tid <= this.nextTransactionId)) {
             $A.error("ActionQueue.setCurrentTransactionId(): invalid transaction id: "+tid);
             return;
@@ -975,7 +975,7 @@ AuraClientService.prototype.idle = function() {
 /**
  * Initialize definitions.
  *
- * FIXME: why is this exported 
+ * FIXME: why is this exported
  *
  * This should never be called by client code. It is exposed, but deleted after
  * first use.
@@ -1713,7 +1713,7 @@ AuraClientService.prototype.createXHR = function() {
 
 /**
  * Create an encoded string of parameters.
- * 
+ *
  * @param {Map} map A map of parameter names and values
  * @returns {String} The encoded parameters
  * @private
@@ -2185,9 +2185,11 @@ AuraClientService.prototype.clearPreviousAbortableActions = function() {
  * @export
  */
 AuraClientService.prototype.enqueueAction = function(action, background) {
+
     $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
-    $A.assert(!$A.util.isUndefined(action.auraType)&& action.auraType==="Action",
-            "Cannot call EnqueueAction() with a non Action parameter.");
+    $A.assert($A.util.isAction(action),
+        "Cannot call EnqueueAction() with a non Action parameter.");
+
     if (background) {
         $A.warning("Do not use the deprecated background parameter");
     }

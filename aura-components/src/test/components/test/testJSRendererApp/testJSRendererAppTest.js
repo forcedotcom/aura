@@ -24,10 +24,9 @@
     testRendererDefProperties:{
         test:function(cmp){
             //Access the Renderer Def of test:testJSRenderer
-            aura.test.assertNotNull(cmp.getDef().getRendererDef());
             var rendererDef = cmp.getDef().getRendererDef();
             //Make sure what you actually accessed was a RendererDef
-            aura.test.assertEquals('RendererDef',rendererDef.auraType,"Was expecting to find a rendererDef object.");
+            aura.test.assertAuraType("RendererDef", rendererDef, "Was expecting to find a rendererDef object.");
             //Verify that the render object is initialized on the RendererDef
             aura.test.assertNotNull(rendererDef.renderMethod, "Render object not found on the renderer def of this componentDef.");
             //Verify that the rerender object is initialized on the RendererDef

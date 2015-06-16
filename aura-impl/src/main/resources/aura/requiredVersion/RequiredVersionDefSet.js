@@ -31,8 +31,6 @@ function RequiredVersionDefSet(configs) {
     }
 }
 
-RequiredVersionDefSet.prototype.auraType = "RequiredVersionDefSet";
-
 /**
  * Returns the RequiredVersionDef object.
  * @param {String} name The name of the RequiredVersionDef instance, which matches the qualified name of the requiredVersionDef descriptor.

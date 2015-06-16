@@ -98,6 +98,18 @@ Aura.Utils.Util.prototype.isObject = function(obj){
 };
 
 /**
+ * Checks whether the specified object is a plain object or literal.
+ * A plain object is created using "{}" or "new Object()".
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object is a plain object, or false otherwise.
+ * @export
+ */
+Aura.Utils.Util.prototype.isPlainObject = function(obj){
+    return obj instanceof Object && obj.constructor === Object.prototype.constructor;
+};
+
+/**
  * Checks whether the specified object is a valid error.
  * A valid error: Is not a DOM element, native browser class (XMLHttpRequest), falsey,
  * array, function string or number.
@@ -1897,7 +1909,7 @@ Aura.Utils.Util.prototype.getWindowSize = function() {
 };
 
 /**
- * Checks if the object is an aura component.
+ * Checks if the object is an Aura component.
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is a component, or return false otherwise.
@@ -1908,7 +1920,7 @@ Aura.Utils.Util.prototype.isComponent = function(obj) {
 };
 
 /**
- * Checks if the object is an aura value expression.
+ * Checks if the object is an Aura value expression.
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is an expression, or false otherwise.
@@ -1919,14 +1931,26 @@ Aura.Utils.Util.prototype.isExpression = function (obj) {
 };
 
 /**
- * Checks if the object is an aura value object via auraType property.
+ * Checks if the object is an Aura value object.
  *
  * @param {Object} obj The object to check for.
- * @returns {Boolean} True if the object type is a component, or return false otherwise.
+ * @returns {Boolean} True if the object type is an Aura value (PropertyReferenceValue, FunctionCallValue, PassthroughValue, or ActionReferenceValue).
  * @export
  */
 Aura.Utils.Util.prototype.isValue = function(obj) {
-    return (obj && obj.auraType === 'Value')||false;
+    return obj instanceof PropertyReferenceValue || obj instanceof FunctionCallValue ||
+        obj instanceof PassthroughValue || obj instanceof ActionReferenceValue ;
+};
+
+/**
+ * Checks if the object is an Aura action object.
+ *
+ * @param {Object} obj The object to check for.
+ * @returns {Boolean} True if the object type is an Aura Action.
+ * @export
+ */
+Aura.Utils.Util.prototype.isAction = function(obj) {
+    return obj instanceof Action;
 };
 
 /**

@@ -38,11 +38,6 @@ function ActionReferenceValue(actionDef, def, component){
 }
 
 /**
- * @export
- */
-ActionReferenceValue.prototype.auraType = "Value";
-
-/**
  * Returns the unwrapped value. This is a new ActionDef instance based on the associated component.
  * @export
  */

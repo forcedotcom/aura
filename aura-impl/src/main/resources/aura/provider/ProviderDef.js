@@ -26,14 +26,9 @@ function ProviderDef(config){
 }
 
 /**
- * @export
- */
-ProviderDef.prototype.auraType = "ProviderDef";
-
-/**
  * Runs the provide method on the component and returns the component definition.
  * Throws an error if the provide method is not found.
- * @param {Component} component 
+ * @param {Component} component
  * @param {Boolean} localCreation
  * @param {Function} callback
  */

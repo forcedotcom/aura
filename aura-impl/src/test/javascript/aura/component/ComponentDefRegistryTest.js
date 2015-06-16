@@ -17,7 +17,7 @@ Function.RegisterNamespace("Test.Aura.Component");
 
 [Fixture]
 Test.Aura.Component.ComponentDefRegistryTest = function () {
-    
+
     var Aura = {Component: {}};
 
     Mocks.GetMocks(Object.Global(), {
@@ -99,22 +99,6 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         },
         Aura: Aura
     });
-
-    [Fixture]
-    function AuraType() {
-        [Fact]
-        function HasCorrectAuraType() {
-            // Arrange
-            var expected = "ComponentDefRegistry";
-
-            // Act
-            var target = new ComponentDefRegistry();
-            var actual = target.auraType;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-    }
 
     [Fixture]
     function GetDef() {

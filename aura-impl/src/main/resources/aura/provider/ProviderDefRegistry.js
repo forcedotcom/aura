@@ -23,8 +23,6 @@ function ProviderDefRegistry(){
     this.providerDefs = {};
 }
 
-ProviderDefRegistry.prototype.auraType = "ProviderDefRegistry";
-
 /**
  * Returns a ProviderDef instance from registry
  * @param {String} descriptor component definition descriptor to lookup on the providerDef

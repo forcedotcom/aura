@@ -29,7 +29,7 @@
             var cmpAttribute = cmp.get('v.componentArrayName');
             aura.test.assertEquals('object', typeof cmpAttribute, "Aura Component array type attribute should be provided as a object");
             aura.test.assertEquals(1, cmpAttribute.length)
-            aura.test.assertEquals('Component', cmpAttribute[0].auraType);
+            aura.test.assertTrue($A.util.isComponent(cmpAttribute[0]));
         }
     }
 })

@@ -33,14 +33,14 @@
                 value = value[0];
                 //Make sure it looks like a cdr.
                 $A.test.assertTrue($A.util.isObject(value));
-                $A.test.assertEquals(undefined, value.auraType);
+                $A.test.assertFalse($A.util.isComponent(value)); // Assert it's not an instance.
                 $A.test.assertTrue(value.componentDef !== undefined);
                 $A.test.assertEquals("markup://ui:button", value.componentDef);
                 //construct it.
                 $A.componentService.newComponentAsync(
                     this,
                     function(newCmp){
-                        $A.test.assertEquals("Component", newCmp.auraType);
+                        $A.test.assertTrue($A.util.isComponent(newCmp));
                         $A.test.assertEquals("markup://ui:button", newCmp.getDef().getDescriptor().toString());
                         $A.test.assertEquals("hi", newCmp.get("v.label"));
                     },

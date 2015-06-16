@@ -21,7 +21,7 @@
  */
 function RendererDef(descriptor){
     var componentClass = $A.componentService.getComponentClass(descriptor);
-    
+
     if(componentClass) {
         var ccPrototype = componentClass.prototype;
 
@@ -46,9 +46,6 @@ function RendererDef(descriptor){
         //#end
     }
 }
-
-RendererDef.prototype.auraType = "RendererDef";
-RendererDef.prototype["auraType"] = RendererDef.prototype.auraType;
 
 /**
  * Gets the renderer methods recursively in the component's hierarchy.

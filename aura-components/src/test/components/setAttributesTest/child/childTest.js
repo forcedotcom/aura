@@ -36,7 +36,7 @@
     _testSettingValueOfInheritedComponentAttribute_SecondLevelInheritance:{
         test:function(cmp){
             /**TODO: Should verify the value of attribute through API too.
-             * aura.test.assertEquals('Component',cmp.get('v.ComponentTypeAttribute')[0].auraType, "Attribute value was expected to be a component.")
+             * aura.test.assertTrue($A.util.isComponent(cmp.get('v.ComponentTypeAttribute')[0]), "Attribute value was expected to be a component.")
             var attrValue = cmp.get('v.ComponentTypeAttribute')[0];
             aura.test.assertEquals('markup://test:test_button',attrValue.getDef().getDescriptor().getQualifiedName(), "Attribute should have been a button.")
             aura.test.assertEquals('childX_Button',$A.test.getText(attrValue.getElement()), "ComponentTypeAttribute should have been assigned a button with label: childX_Button.");

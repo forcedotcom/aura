@@ -29,7 +29,7 @@
      */
     testComponentAsAttributeValue:{
         test:function(cmp){
-            aura.test.assertEquals('Component',cmp.get('v.ComponentTypeAttribute')[0].auraType, "Attribute value was expected to be a component.")
+            aura.test.assertTrue($A.util.isComponent(cmp.get('v.ComponentTypeAttribute')[0]), "Attribute value was expected to be a component.")
             //Access the Aura.Component type attribute
             var cmpAttrValue = cmp.get('v.ComponentTypeAttribute')[0];
             aura.test.assertEquals('markup://test:test_button',cmpAttrValue.getDef().getDescriptor().getQualifiedName(), "Attribute should have been a button.")

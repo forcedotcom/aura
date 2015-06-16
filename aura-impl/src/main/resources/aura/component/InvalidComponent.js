@@ -30,12 +30,6 @@ function InvalidComponent(){
  * @public
  * @export
  */
-InvalidComponent.prototype.auraType = "Component";
-
-/**
- * @public
- * @export
- */
 InvalidComponent.prototype.getDef = function() {
     return null;
 };

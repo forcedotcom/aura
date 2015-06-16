@@ -187,11 +187,6 @@ function ComponentDef(config) {
 }
 
 /**
- * @export
- */
-ComponentDef.prototype.auraType = "ComponentDef";
-
-/**
  * Returns a DefDescriptor object.
  *
  * @returns {DefDescriptor} A DefDescriptor object contains a prefix, namespace,

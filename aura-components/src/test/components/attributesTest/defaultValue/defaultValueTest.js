@@ -150,7 +150,7 @@
     testDefaultValueComponentArrayIsArrayOfComponents: {
         test: function(cmp) {
             var cmpValue = cmp.get("v.componentDefault");
-            $A.test.assertEquals("Component", cmpValue[0].auraType);
+            $A.test.assertTrue($A.util.isComponent(cmpValue[0]));
         }
     },
 

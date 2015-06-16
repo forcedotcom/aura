@@ -39,13 +39,11 @@ function AttributeDef(config){
         if(nativeType==="object") {
             this.defaultValue=null;
         } else if(nativeType==="array") {
-            this.defaultValue=[];   
+            this.defaultValue=[];
         }
     }
     this.required = config["required"] === true;
 }
-
-AttributeDef.prototype.auraType = "AttributeDef";
 
 /**
  * Gets the descriptor. Returns a DefDescriptor object that contains the metadata for the attribute.
@@ -68,7 +66,7 @@ AttributeDef.prototype.isRequired = function(){
 
 /**
  * Gets the type definition. Returns a TypeDef object.
- * 
+ *
  * @returns {TypeDef}
  * @private
  */
@@ -87,7 +85,7 @@ AttributeDef.prototype.getDefault = function(){
 
 /**
  * Gets the type of the definition descriptor.
- * 
+ *
  * @returns {String}
  * @private
  * @export

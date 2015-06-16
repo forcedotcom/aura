@@ -23,8 +23,6 @@ function ActionDefRegistry(){
     this.actionDefs = {};
 }
 
-ActionDefRegistry.prototype.auraType = "ActionDefRegistry";
-
 /**
  * Returns an ActionDef instance from registry
  * @param {String} descriptor name of an ActionDef.

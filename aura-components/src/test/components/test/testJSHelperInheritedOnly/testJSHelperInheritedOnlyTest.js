@@ -32,7 +32,7 @@
             $A.test.assertNotUndefinedOrNull(helperDef);
             $A.test.assertNotUndefinedOrNull(helperDef.getFunctions);
             $A.test.assertNotUndefinedOrNull(helperDef.getFunctions());
-            $A.test.assertEquals(helperDef.auraType, "HelperDef");
+            $A.test.assertAuraType("HelperDef", helperDef);
         }
     },
     /**

@@ -22,8 +22,6 @@ function ModelDefRegistry(){
     this.modelDefs = {};
 }
 
-ModelDefRegistry.prototype.auraType = "ModelDefRegistry";
-
 /**
  * Returns a ModelDef instance from registry
  * @param {String} descriptor name of a ModelDef.

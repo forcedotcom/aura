@@ -17,7 +17,7 @@
 
 /**
  * Utility functions for component testing, accessible using $A.test.
- * 
+ *
  * @constructor
  */
 TestInstance = function() {
@@ -44,20 +44,20 @@ TestInstance = function() {
 
 /**
  * The set of errors accumulated.
- * 
+ *
  * Note that this set of errors is 'static', since it can be accessed from window.onerror even before the $A.test
  * instance is initialized. We are careful to update it globally on the prototype instead of in the class.
  */
 TestInstance.prototype.errors = [];
 
 /**
- * 
+ *
  * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
  *              condition is checked after the current test stage is completed but before the next stage is started.
- * 
+ *
  * @example <code>$A.test.addWaitFor("i was updated", function(){<br/>
  * return element.textContent;}, function(){alert("the wait is over"});</code>
- * 
+ *
  * @param {Object}
  *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
  * @param {Object}
@@ -74,9 +74,9 @@ TestInstance.prototype.addWaitFor = function(expected, testFunction, callback) {
  * @description Asynchronously wait for an action to complete before continuing with the next stage of the test case.
  *              The wait condition is checked after the current test stage is completed but before the next stage is
  *              started.
- * 
+ *
  * @example <code>$A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
- * 
+ *
  * @param {Object}
  *            success true if the action should succeed.
  * @param {Object}
@@ -104,13 +104,13 @@ TestInstance.prototype.addWaitForAction = function(success, actionName, callback
 };
 
 /**
- * 
+ *
  * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
  *              condition is checked after the current test stage is completed but before the next stage is started.
- * 
+ *
  * @example <code>$A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
  *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});</code>
- * 
+ *
  * @param {Object}
  *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
  * @param {Object}
@@ -138,10 +138,10 @@ TestInstance.prototype.addWaitForWithFailureMessage = function(expected, testFun
 
 /**
  * Block requests from being sent to the server.
- * 
+ *
  * This routine can be used to artificially force actions to be held on the client to be sent to the server at a later
  * date. It can be used to simulate delays in processing (or rapid action queueing on the client).
- * 
+ *
  * @export
  */
 TestInstance.prototype.blockRequests = function() {
@@ -151,7 +151,7 @@ TestInstance.prototype.blockRequests = function() {
 
 /**
  * Block only foreground actions from being sent to the server.
- * 
+ *
  * @export
  */
 TestInstance.prototype.blockForegroundRequests = function() {
@@ -160,7 +160,7 @@ TestInstance.prototype.blockForegroundRequests = function() {
 
 /**
  * Block only background actions from being sent to the server.
- * 
+ *
  * @export
  */
 TestInstance.prototype.blockBackgroundRequests = function() {
@@ -169,9 +169,9 @@ TestInstance.prototype.blockBackgroundRequests = function() {
 
 /**
  * Release requests to be sent to the server.
- * 
+ *
  * This must be called after blockRequests, otherwise it may result in unknown consequences.
- * 
+ *
  * @export
  */
 TestInstance.prototype.releaseRequests = function() {
@@ -182,10 +182,10 @@ TestInstance.prototype.releaseRequests = function() {
 
 /**
  * Release only foreground requests from being sent to the server.
- * 
+ *
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
- * 
+ *
  * @export
  */
 TestInstance.prototype.releaseForegroundRequests = function() {
@@ -195,10 +195,10 @@ TestInstance.prototype.releaseForegroundRequests = function() {
 
 /**
  * Release only background actions from being sent to the server.
- * 
+ *
  * Callers must be aware of what requests are currently blocked. Releasing requests that are not blocked will result in
  * unknown consequences.
- * 
+ *
  * @export
  */
 TestInstance.prototype.releaseBackgroundRequests = function() {
@@ -208,10 +208,10 @@ TestInstance.prototype.releaseBackgroundRequests = function() {
 
 /**
  * Get total count of foreground and background requests sent to the server.
- * 
+ *
  * This routine can be used to get a before and after count on server requests to attempt to verify we are only sending
  * the necessary amount of requests.
- * 
+ *
  * @export
  */
 TestInstance.prototype.getSentRequestCount = function() {
@@ -220,7 +220,7 @@ TestInstance.prototype.getSentRequestCount = function() {
 
 /**
  * Check to see if an array of actions have all completed.
- * 
+ *
  * @export
  */
 TestInstance.prototype.areActionsComplete = function(actions) {
@@ -239,7 +239,7 @@ TestInstance.prototype.areActionsComplete = function(actions) {
 
 /**
  * Add a cleanup function that is run on teardown.
- * 
+ *
  * @param {Function}
  *            cleanupFunction the function to run on teardown.
  * @export
@@ -250,7 +250,7 @@ TestInstance.prototype.addCleanup = function(cleanupFunction) {
 
 /**
  * Get an instance of an action based on the specified parameters and callback function.
- * 
+ *
  * @param {Component}
  *            component The Component on which to search for the action
  * @param {String}
@@ -279,10 +279,10 @@ TestInstance.prototype.getAction = function(component, name, params, callback) {
 
 /**
  * Run a set of actions as a transaction.
- * 
+ *
  * This is a wrapper around runActions allowing a test to safely run a set of actions as a single transaction with a
  * callback.
- * 
+ *
  * @param {Array}
  *            actions A list of actions to run.
  * @param {Object}
@@ -300,7 +300,7 @@ TestInstance.prototype.runActionsAsTransaction = function(actions, scope, callba
 
 /**
  * Enqueue an action, ensuring that it is safely inside an aura call.
- * 
+ *
  * @param {Action}
  *            action The action to enqueue.
  * @param {Boolean}
@@ -315,13 +315,13 @@ TestInstance.prototype.enqueueAction = function(action, background) {
 };
 
 /**
- * 
+ *
  * @description Get an instance of a server action that is not available to the component.
- * 
+ *
  * @example <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
  *          {name:"aura:text", attributes:{value:"valuable"}},<br/>
  *          function(action){alert(action.getReturnValue().attributes.values.value)})</code>
- * 
+ *
  * @param {Component}
  *            component The scope to run the action with, even if the action is not visible to it
  * @param {String}
@@ -362,9 +362,9 @@ TestInstance.prototype.getExternalAction = function(component, descriptor, param
 
 /**
  * Clear out component configs returned by an action.
- * 
+ *
  * This must be called within the action callback. It fails if no components are cleared.
- * 
+ *
  * @param {Action}
  *            action The action to clear.
  * @export
@@ -377,10 +377,10 @@ TestInstance.prototype.clearAndAssertComponentConfigs = function(a) {
 
 /**
  * Peek if there are any pending server actions.
- * 
+ *
  * NOTE: this is used as a predicate and does not have access to 'this'. If this function changes to require 'this',
  * either the uses will need to be refactored, or isActionPending will need to be auto-bound.
- * 
+ *
  * @returns {Boolean} Returns true if there are pending server actions, or false otherwise.
  * @export
  */
@@ -391,7 +391,7 @@ TestInstance.prototype.isActionPending = function() {
 /**
  * Invoke a server action. At the end of current test case stage, the test will wait for any actions to complete before
  * continuing to the next stage of the test case.
- * 
+ *
  * @param {Action}
  *            action The action to invoke
  * @param {Boolean}
@@ -433,9 +433,9 @@ TestInstance.prototype.callServerAction = function(action, doImmediate) {
 
 /**
  * Set whether the server is reachable, to mimick being offline.
- * 
+ *
  * Note that this will not work with IE < 10 (see W-2537764).
- * 
+ *
  * @param {Boolean}
  *            reachable True or absent to make the server reachable; otherwise the server is made unreachable.
  * @export
@@ -452,7 +452,7 @@ TestInstance.prototype.setServerReachable = function(reachable) {
  * Invoke a callback after the provided condition evaluates to truthy, checking on the condition every specified
  * interval. Truthy values can refer to a non-empty String, a non-zero number, a non-empty array, an object, or an
  * expression evaluating to true.
- * 
+ *
  * @param {Function}
  *            conditionFunction The function to evaluate
  * @param {Function}
@@ -489,7 +489,7 @@ TestInstance.prototype.runAfterIf = function(conditionFunction, callback, interv
 
 /**
  * Set test to timeout in a period of miliseconds from now.
- * 
+ *
  * @param {Number}
  *            timeoutMsec The number of milliseconds from the current time when the test should timeout
  * @export
@@ -499,7 +499,7 @@ TestInstance.prototype.setTestTimeout = function(timeoutMsec) {
 };
 /**
  * Return whether the test is finished.
- * 
+ *
  * @returns {Boolean} Returns true if the test has completed, or false otherwise.
  * @export
  */
@@ -509,7 +509,7 @@ TestInstance.prototype.isComplete = function() {
 
 /**
  * Get the list of errors seen by the test, not including any errors handled explicitly by the framework.
- * 
+ *
  * @returns {string} Returns an empty string if no errors are seen, else a json encoded list of errors
  * @export
  */
@@ -525,7 +525,7 @@ TestInstance.prototype.getErrors = function() {
 /**
  * Essentially a toString method, except strings are enclosed with double quotations. Returns a string even for
  * undefined/null value.
- * 
+ *
  * @param {Object}
  *            value The value that will be converted to a String
  * @returns {String} The value that is returned as a String type
@@ -550,7 +550,7 @@ TestInstance.prototype.print = function(value) {
  * this is being called by Logger.prototype.notify
  * @private
  */
-TestInstance.prototype.auraError = function(level, msg/*, error*/) { 
+TestInstance.prototype.auraError = function(level, msg/*, error*/) {
     if (!this.putMessage(this.preErrors, this.expectedErrors, msg)) {
         this.fail(msg);
     }
@@ -558,7 +558,7 @@ TestInstance.prototype.auraError = function(level, msg/*, error*/) {
 
 /**
  * Tell the test that we expect an error. Test will fail if expected error is not received.
- * 
+ *
  * @param {string}
  *            e The error message that we expect.
  * @export
@@ -588,7 +588,7 @@ TestInstance.prototype.auraWarning = function(level, msg) {
 /**
  * Tell the test that we expect a warning. If this function is called and the test does not receive the expected
  * warning, the test will fail.
- * 
+ *
  * @param {String}
  *            w the warning message that we expect.
  * @export
@@ -599,9 +599,9 @@ TestInstance.prototype.expectAuraWarning = function(w) {
 
 /**
  * Assert that the current component HTML is Accessibility compliant.
- * 
+ *
  * @description Calls the checkAccessibilty method to verify certain tags are accessible.
- * 
+ *
  * @param {String}
  *            errorMessage The message that is returned if the condition is not false
  * @throws {Error}
@@ -616,12 +616,12 @@ TestInstance.prototype.assertAccessible = function() {
 };
 
 /**
- * 
+ *
  * @description Assert that if(condition) check evaluates to true. A truthy value refers to an Object, a string, a
  *              non-zero number, a non-empty array, or true.
- * 
+ *
  * @example Positive: <code>assertTruthy("helloWorld")</code>, Negative: <code>assertTruthy(null)</code>
- * 
+ *
  * @param {Object}
  *            condition The condition to evaluate
  * @param {String}
@@ -636,13 +636,13 @@ TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
 
 /**
  * Assert that the if(condition) check evaluates to false.
- * 
+ *
  * @param {Object}
  *            condition The condition to evaluate
  * @param {String}
  *            assertMessage The message that is returned if the condition is not false
  * @description A falsey value refers to zero, an empty string, null, undefined, or false.
- * 
+ *
  * @example Negative: <code>assertFalsy("helloWorld")</code>, Postive: <code>assertFalsy(null)</code>
  * @export
  */
@@ -654,7 +654,7 @@ TestInstance.prototype.assertFalsy = function(condition, assertMessage) {
 
 /**
  * Assert that if(condition) check evaluates to true.
- * 
+ *
  * @param {Object}
  *            condition The condition to evaluate
  * @param {String}
@@ -668,7 +668,7 @@ TestInstance.prototype.assert = function(condition, assertMessage) {
 
 /**
  * Assert that the two values provided are equal.
- * 
+ *
  * @param {Object}
  *            arg1 The argument to evaluate against arg2
  * @param {Object}
@@ -691,9 +691,9 @@ TestInstance.prototype.assertEquals = function(arg1, arg2, assertMessage) {
 
 /**
  * Assert that the two string values provided are equal ignoring whitespace.
- * 
+ *
  * This is important when checking constructed strings, as browsers may handle them differently.
- * 
+ *
  * @param {string}
  *            arg1 The argument to evaluate against arg2
  * @param {string}
@@ -710,7 +710,7 @@ TestInstance.prototype.assertEqualsIgnoreWhitespace = function(arg1, arg2, asser
 
 /**
  * Assert that a string starts with another.
- * 
+ *
  * @param {Object}
  *            start The start string.
  * @param {Object}
@@ -731,7 +731,7 @@ TestInstance.prototype.assertStartsWith = function(start, full, assertMessage) {
 
 /**
  * Complement of assertEquals, throws Error if arg1===arg2.
- * 
+ *
  * @param {Object}
  *            arg1 The argument to evaluate against arg2
  * @param {Object}
@@ -748,7 +748,7 @@ TestInstance.prototype.assertNotEquals = function(arg1, arg2, assertMessage) {
 
 /**
  * Assert that the value is not undefined.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -763,7 +763,7 @@ TestInstance.prototype.assertDefined = function(condition, assertMessage) {
 
 /**
  * Assert that the condition === true.
- * 
+ *
  * @param {Boolean}
  *            condition The condition to evaluate
  * @param {String}
@@ -778,7 +778,7 @@ TestInstance.prototype.assertTrue = function(condition, assertMessage) {
 
 /**
  * Assert that the condition === false.
- * 
+ *
  * @param {Boolean}
  *            condition The condition to evaluate
  * @param {String}
@@ -793,7 +793,7 @@ TestInstance.prototype.assertFalse = function(condition, assertMessage) {
 
 /**
  * Assert that the value passed in is undefined.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -808,7 +808,7 @@ TestInstance.prototype.assertUndefined = function(condition, assertMessage) {
 
 /**
  * Assert that the value passed in is not undefined or null.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -823,7 +823,7 @@ TestInstance.prototype.assertNotUndefinedOrNull = function(condition, assertMess
 
 /**
  * Assert that the value passed in is either undefined or null.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -838,7 +838,7 @@ TestInstance.prototype.assertUndefinedOrNull = function(condition, assertMessage
 
 /**
  * Assert that value === null.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -853,7 +853,7 @@ TestInstance.prototype.assertNull = function(condition, assertMessage) {
 
 /**
  * Assert that value !== null.
- * 
+ *
  * @param {Object}
  *            condition The argument to evaluate
  * @param {String}
@@ -867,8 +867,42 @@ TestInstance.prototype.assertNotNull = function(condition, assertMessage) {
 };
 
 /**
+ * Assert that the value is an instance of the expected type.
+ *
+ * @param {String}
+ *            type The type expected
+ * @param {Object}
+ *            condition The argument to evaluate
+ * @param {String}
+ *            assertMessage The message that is returned if the value is null
+ * @export
+ */
+TestInstance.prototype.assertAuraType = function(type, condition, assertMessage) {
+    switch (type) {
+        case "Action": return condition instanceof Action;
+        case "ActionDef": return condition instanceof ActionDef;
+
+        case "Event": return condition instanceof Event;
+        case "EventDef": return condition instanceof EventDef;
+
+        case "Component": return condition instanceof Component;
+        case "ComponentDef": return condition instanceof ComponentDef;
+
+        case "ControllerDef": return condition instanceof ControllerDef;
+        case "HelperDef": return condition instanceof HelperDef;
+        case "RendererDef": return condition instanceof RendererDef;
+        case "ProviderDef": return condition instanceof ProviderDef;
+
+        case "ModelDef": return condition instanceof ModelDef;
+
+        default: this.fail(assertMessage, "\nExpected: Aura object of type {" + type + "}");
+    }
+};
+
+
+/**
  * Throw an Error, making a test fail with the specified message.
- * 
+ *
  * @param {String}
  *            assertMessage Defaults to "Assertion failure", if assertMessage is not provided
  * @param {String}
@@ -889,7 +923,7 @@ TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
 
 /**
  * Get an object's prototype.
- * 
+ *
  * @param {Object}
  *            instance The instance of the object
  * @returns {Object} The prototype of the specified object
@@ -902,7 +936,7 @@ TestInstance.prototype.getPrototype = function(instance) {
 
 /**
  * Replace a function on an object with a restorable override.
- * 
+ *
  * @param {Object}
  *            instance The instance of the object
  * @param {String}
@@ -966,7 +1000,7 @@ TestInstance.prototype.overrideFunction = function(instance, name, newFunction) 
  * function. If attached after (postProcess === true), the handler will be invoked with the original function's return
  * value followed by the original arguments. If attached before (postProcess !== true), the handler will be invoked with
  * just the original arguments.
- * 
+ *
  * @param {Object}
  *            instance The instance of the object
  * @param {String}
@@ -993,7 +1027,7 @@ TestInstance.prototype.addFunctionHandler = function(instance, name, newFunction
 
 /**
  * Get a DOM node's outerHTML.
- * 
+ *
  * @param {Node}
  *            node The node to get outer HTML from
  * @returns {String} The outer HTML
@@ -1012,7 +1046,7 @@ TestInstance.prototype.getOuterHtml = function(node) {
 /**
  * Get the text content of a DOM node. Tries <code>innerText</code> followed by <code>textContext</code>, followed
  * by <code>nodeValue</code> to take browser differences into account.
- * 
+ *
  * @param {Node}
  *            node The node to get the text content from
  * @returns {String} The text content of the specified DOM node
@@ -1024,7 +1058,7 @@ TestInstance.prototype.getText = function(node) {
 
 /**
  * Get the textContent of all elements rendered by this component.
- * 
+ *
  * @param {Component}
  *            component The component to get the text content from
  * @returns {String} The text content of the specified component
@@ -1049,7 +1083,7 @@ TestInstance.prototype.getTextByComponent = function(component) {
 
 /**
  * Get the current value for a style for a DOMElement.
- * 
+ *
  * @param {DOMElement}
  *            elem The element to get the CSS property value from
  * @param {String}
@@ -1072,7 +1106,7 @@ TestInstance.prototype.getStyle = function(elem, style) {
 
 /**
  * Filter out comment nodes from a list of nodes.
- * 
+ *
  * @param {Array|Object}
  *            nodes The list of nodes to filter
  * @returns {Array} The list of nodes without comment nodes
@@ -1098,7 +1132,7 @@ TestInstance.prototype.getNonCommentNodes = function(nodes) {
 
 /**
  * Check if a node has been "deleted" by Aura.
- * 
+ *
  * @param {Node}
  *            node The node to check
  * @returns {Boolean} Returns true if the specified node has been deleted, or false otherwise
@@ -1116,7 +1150,7 @@ TestInstance.prototype.isNodeDeleted = function(node) {
 
 /**
  * Return a node list and pass each argument as a separate parameter.
- * 
+ *
  * @returns {Array} The list of nodes contained in the document node
  * @export
  */
@@ -1126,7 +1160,7 @@ TestInstance.prototype.select = function() {
 
 /**
  * Check if a string contains another string.
- * 
+ *
  * @param {String}
  *            testString The string to check
  * @param {String}
@@ -1144,7 +1178,7 @@ TestInstance.prototype.contains = function(testString, targetString) {
 /**
  * Compares values. In the case of an Array or Object, compares first level references only. In the case of a literal,
  * directly compares value and type equality.
- * 
+ *
  * @param {Object}
  *            expected The source value to compare.
  * @param {Object}
@@ -1158,7 +1192,7 @@ TestInstance.prototype.compareValues = function(expected, actual) {
 
 /**
  * Returns a reference to the object that is currently designated as the active element in the document.
- * 
+ *
  * @returns {DOMElement} The current active element.
  * @export
  */
@@ -1168,7 +1202,7 @@ TestInstance.prototype.getActiveElement = function() {
 
 /**
  * Returns the inner text of the current active element in the document.
- * 
+ *
  * @returns {String} The text of the current active DOM element.
  * @export
  */
@@ -1178,7 +1212,7 @@ TestInstance.prototype.getActiveElementText = function() {
 
 /**
  * Used by getElementsByClassNameCustom for IE7
- * 
+ *
  * @private
  */
 TestInstance.prototype.walkTheDOM = function(node, func) {
@@ -1192,7 +1226,7 @@ TestInstance.prototype.walkTheDOM = function(node, func) {
 
 /**
  * custom util to get element by class name for IE7
- * 
+ *
  * @private
  */
 TestInstance.prototype.getElementsByClassNameCustom = function(className, parentElement) {
@@ -1219,7 +1253,7 @@ TestInstance.prototype.getElementsByClassNameCustom = function(className, parent
 
 /**
  * Gets the first element on the page starting from parentElement, that has the specified class name.
- * 
+ *
  * @param {Object}
  *            parentElement DOM element that we want to start at.
  * @param {String}
@@ -1237,7 +1271,7 @@ TestInstance.prototype.findChildWithClassName = function(parentElement, classNam
 
 /**
  * Gets the first element on the page that have the specified class name.
- * 
+ *
  * @param {String}
  *            classname The CSS class name.
  * @returns {Object} The element denoting the class, or null if none is found.
@@ -1263,7 +1297,7 @@ TestInstance.prototype.getElementByClass = function(classname) {
 /**
  * Given an HTML element and an eventName, fire the corresponding DOM event. Code adapted from a stack overflow
  * question's answer.
- * 
+ *
  * @param {Object}
  *            element The HTML element whose corresponding DOM event is to be fired.
  * @param {String}
@@ -1295,7 +1329,7 @@ TestInstance.prototype.fireDomEvent = function(element, eventName, canBubble, ca
 
 /**
  * Issue a click on the element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to click on.
  * @param {Boolean}
@@ -1314,7 +1348,7 @@ TestInstance.prototype.clickOrTouch = function(element, canBubble, cancelable) {
 
 /**
  * Checks if the specified node is a text node.
- * 
+ *
  * @param {Node}
  *            node The node to check
  * @returns {Boolean} true if node is text node.
@@ -1329,7 +1363,7 @@ TestInstance.prototype.isInstanceOfText = function(node) {
 
 /**
  * Checks if the specified element is an anchor element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is an anchor element.
@@ -1341,7 +1375,7 @@ TestInstance.prototype.isInstanceOfAnchorElement = function(element) {
 
 /**
  * Checks if the specified element is an input element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is an input element.
@@ -1353,7 +1387,7 @@ TestInstance.prototype.isInstanceOfInputElement = function(element) {
 
 /**
  * Checks if the specified element is a list element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is a list element.
@@ -1365,7 +1399,7 @@ TestInstance.prototype.isInstanceOfLiElement = function(element) {
 
 /**
  * Checks if the specified element is a paragraph element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is a paragraph element.
@@ -1377,7 +1411,7 @@ TestInstance.prototype.isInstanceOfParagraphElement = function(element) {
 
 /**
  * Checks if the specified element is a button element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is a button element.
@@ -1389,7 +1423,7 @@ TestInstance.prototype.isInstanceOfButtonElement = function(element) {
 
 /**
  * Checks if the specified element is an image element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is an image element.
@@ -1401,7 +1435,7 @@ TestInstance.prototype.isInstanceOfImageElement = function(element) {
 
 /**
  * Checks if the specified element is a div element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is a div element.
@@ -1413,7 +1447,7 @@ TestInstance.prototype.isInstanceOfDivElement = function(element) {
 
 /**
  * Checks if the specified element is a span element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @returns {Boolean} true if element is a span element.
@@ -1425,7 +1459,7 @@ TestInstance.prototype.isInstanceOfSpanElement = function(element) {
 
 /**
  * Checks if the specified element is an instance of another element.
- * 
+ *
  * @param {HTMLElement}
  *            element The element to check
  * @param {HTMLElement}
@@ -1445,7 +1479,7 @@ TestInstance.prototype.isInstanceOf = function(element, elementType, tag) {
 
 /**
  * Returns set of keys on passed in Object.
- * 
+ *
  * @param {Object}
  *            obj Object to retrieve set of keys from.
  * @export
@@ -1466,7 +1500,7 @@ TestInstance.prototype.objectKeys = function(obj) {
 
 /**
  * Return attributeValue of an element
- * 
+ *
  * @param {HTMLElement}
  *            element The element from which to retrieve data.
  * @param {String}
@@ -1480,7 +1514,7 @@ TestInstance.prototype.getElementAttributeValue = function(element, attributeNam
 /**
  * Add an event handler. If component is specified, the handler will be applied to component events. If component is not
  * specified, the handler will be applied to application events.
- * 
+ *
  * @param {String}
  *            eventName The registered name, for component events; the descriptor name for application events.
  * @param {Function}
@@ -1532,7 +1566,7 @@ TestInstance.prototype.getAppCacheEvents = function() {
 
 /**
  * Extract the error message from Aura error div(the grey error message on the page)
- * 
+ *
  * @returns {String} The text of the Aura error
  * @export
  */
@@ -1542,7 +1576,7 @@ TestInstance.prototype.getAuraErrorMessage = function() {
 
 /**
  * Override function for client service get XHR.
- * 
+ *
  * @private
  */
 TestInstance.prototype.getAvailableXHROverride = function(config, isBackground) {
@@ -1557,7 +1591,7 @@ TestInstance.prototype.getAvailableXHROverride = function(config, isBackground) 
 
 /**
  * Override send so that we can account for packets.
- * 
+ *
  * @private
  */
 TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method, options) {
@@ -1573,7 +1607,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
 
 /**
  * Override decode so that we can fail out packets.
- * 
+ *
  * @private
  */
 TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
@@ -1585,7 +1619,7 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
 
 /**
  * Install all of the overrides needed.
- * 
+ *
  * @private
  */
 TestInstance.prototype.install = function() {
@@ -1597,7 +1631,7 @@ TestInstance.prototype.install = function() {
 
 /**
  * Run the test
- * 
+ *
  * @param {String}
  *            name The name of the test in the suite to run
  * @param {String}
@@ -1605,7 +1639,7 @@ TestInstance.prototype.install = function() {
  * @param {Integer}
  *            timeoutOverride Optional. Use to increase the test timeout by specified time in seconds. If not set the
  *            test will use a default timeout of 10 seconds.
- * 
+ *
  * @export
  */
 TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixException) {
@@ -1703,10 +1737,10 @@ TestInstance.prototype.runInternal = function(name) {
 /**
  * @description Asynchronously wait for CKEditor instance in inputRichText component to be ready before continuing to
  *              enter test data.
- * 
+ *
  * @example <code>$A.test.executeAfterCkEditorIsReady(inputRichTextComponent, function(){<br/>
  *   inputRichTextComponent.set('v.value', 'tab1 content'); });</code>
- * 
+ *
  * @param {Component}
  *            ui:inputRichText component, or a component that extends it, that you are entering data in.
  * @param {Function}
@@ -1738,7 +1772,7 @@ TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextCompo
 
 /**
  * Reload the Global Value Providers on the client by calling the GlobalValueProviders.js constructor.
- * 
+ *
  * @param {Object}
  *            gvp an optional serialized GVP to load.
  * @param {Function}
@@ -1784,7 +1818,7 @@ TestInstance.prototype.createHttpRequest = function() {
 
 /**
  * Json instance for test. Used to export Json methods for testing.
- * 
+ *
  * @constructor
  */
 JsonTestInstance = function() {
@@ -1792,7 +1826,7 @@ JsonTestInstance = function() {
 
 /**
  * Serializes object in alphabetical asc order. Sorts object keys during serialization.
- * 
+ *
  * @param {Object}
  *            obj Object to be serialized
  * @returns {String} serialized order object
@@ -1820,7 +1854,7 @@ $A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
 
 /**
  * Should try to remove this hack
- * 
+ *
  * @ignore
  */
 (function(originalDestroy) {
@@ -1831,7 +1865,7 @@ $A.logger.subscribe("ERROR", $A.test.auraError.bind($A.test));
 
 /**
  * For Selenium
- * 
+ *
  * @ignore
  */
 AuraLayoutService.fireOnload = function() {

@@ -34,7 +34,7 @@ Test.Stubs.Aura=new function(){
             setCallback:function(scope,callback,name){this.callback=callback;},
             setParams:function(params){this.params=params;},
             toJSON:function(){return {id:this.id,descriptor:{},params:this.params}}
-        },{auraType:"Action",callback:callback||null,params:params||{},returnValue:returnValue||{},state:state||{}});
+        },{callback:callback||null,params:params||{},returnValue:returnValue||{},state:state||{}});
     };
 
     this.GetController=function(target){

@@ -20,8 +20,7 @@
     testControllerNotExposedGlobally:{
 	test : function(component){
 	    var controller = component.get("c.functionName1");
-	    $A.test.assertNotNull(controller);
-	    $A.test.assertEquals("Action", controller.auraType);
+	    $A.test.assertTrue($A.util.isAction(controller));
 	    $A.test.assertFalse($A.util.isFunction(window.functionName1), "Controller method exposed on window");
 	    $A.test.assertFalse($A.util.isFunction(window.setFocus), "Controller methods exposed on window");
 	}

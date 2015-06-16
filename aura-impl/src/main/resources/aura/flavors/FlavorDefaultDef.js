@@ -38,8 +38,6 @@ function FlavorDefaultDef(config) {
     }
 }
 
-FlavorDefaultDef.prototype.auraType = "FlavorDefaultDef";
-
 /**
  * Returns a flavor for the given component descriptor.
  * @param {DefDescriptor} componentDescriptor The component descriptor, e.g., "ui:button".

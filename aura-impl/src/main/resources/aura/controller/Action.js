@@ -85,10 +85,6 @@ Action.getStorage = function() {
 // Instance methods:
 
 Action.prototype.nextActionId = 1;
-/**
- * @export
- */
-Action.prototype.auraType = "Action";
 
 /**
  * Gets the Action Id.
@@ -949,8 +945,7 @@ Action.prototype.setAbortableId = function(id) {
  * @export
  */
 Action.prototype.setParentAction = function(action) {
-    if($A.util.isUndefinedOrNull(action) || $A.util.isUndefined(action.auraType) || action.auraType!=="Action"
-            || !action.abortable) {
+    if(!(action instanceof Action) || !action.abortable) {
         throw new Error("Action.setParentAction(): The provided parent action must be a valid abortable Action: " + action);
     }
     if (action.abortableId === undefined) {

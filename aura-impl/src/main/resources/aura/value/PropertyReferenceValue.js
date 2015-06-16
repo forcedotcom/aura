@@ -32,8 +32,6 @@ function PropertyReferenceValue(path, valueProvider) {
     // #end
 }
 
-PropertyReferenceValue.prototype.auraType = "Value";
-
 /**
  * Returns the dereferenced value indicated by the path supplied.
  */

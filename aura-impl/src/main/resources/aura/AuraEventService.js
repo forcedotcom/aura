@@ -154,7 +154,7 @@ AuraEventService.prototype.bubbleEvent = function(evt) {
         // Look for a facet value provider (some providers may just be extending definitions)
         do {
             var next = cmp.getComponentValueProvider();
-            if (next === cmp || next.auraType !== Component.prototype.auraType) {
+            if (next === cmp || !(next instanceof Component)) {
                 // We are at the top-level now, so we are done;
                 return;
             }

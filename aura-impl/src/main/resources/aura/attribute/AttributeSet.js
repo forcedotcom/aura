@@ -39,8 +39,6 @@ function AttributeSet(attributes, attributeDefSet) {
 	// #end
 }
 
-AttributeSet.prototype.auraType = "AttributeSet";
-
 /**
  * Whether attribute exists
  *
@@ -304,7 +302,7 @@ AttributeSet.prototype.isTypeOfArray = function(attributeName) {
  */
 AttributeSet.prototype.merge = function(attributes, attributeDefSet) {
 	if(attributeDefSet){
-        $A.assert(attributeDefSet.auraType === "AttributeDefSet", "AttributeSet.merge: A valid AttributeDefSet is required to merge attributes.");
+        $A.assert(attributeDefSet instanceof AttributeDefSet, "AttributeSet.merge: A valid AttributeDefSet is required to merge attributes.");
         this.attributeDefSet = attributeDefSet;
     }
 

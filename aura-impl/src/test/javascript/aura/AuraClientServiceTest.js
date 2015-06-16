@@ -60,7 +60,7 @@ Test.Aura.AuraClientServiceTest = function() {
         document:{},
        Aura: Aura
     });
-    
+
     [Fixture]
     function testCreateIntegrationErrorConfig() {
         [Fact]
@@ -111,7 +111,6 @@ Test.Aura.AuraClientServiceTest = function() {
     var id = 0;
 
     var MockAction = function(type) {
-        this.auraType = "Action";
         this.setBackground = Stubs.GetMethod();
         this.id = ++id;
         if (type === undefined) {

@@ -24,8 +24,6 @@ function ComponentDefRegistry(){
     this.dynamicNamespaces = [];
 }
 
-ComponentDefRegistry.prototype.auraType = "ComponentDefRegistry";
-
 /**
  * Returns a ComponentDef instance from registry
  * @param {String|Object} descriptor name of a ComponentDef.
@@ -107,7 +105,7 @@ ComponentDefRegistry.prototype.setupDefinitionStorage = function() {
         this.useDefStore = false;
         if ($A.getContext().getApp()) {
             var storage = $A.storageService.initStorage(
-                this.auraType,  // name
+                "ComponentDefRegistry",  // name
                 true,           // persistent
                 false,          // secure
                 2048000,        // maxSize 2MB
@@ -121,7 +119,7 @@ ComponentDefRegistry.prototype.setupDefinitionStorage = function() {
                 this.definitionStorage = storage;
                 this.useDefStore = true;
             } else {
-                $A.storageService.deleteStorage(this.auraType);
+                $A.storageService.deleteStorage("ComponentDefRegistry");
             }
         }
     }

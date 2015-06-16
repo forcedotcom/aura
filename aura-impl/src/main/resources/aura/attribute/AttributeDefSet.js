@@ -39,8 +39,6 @@ function AttributeDefSet(configs,defaultNamespace) {
     }
 }
 
-AttributeDefSet.prototype.auraType = "AttributeDefSet";
-
 /**
  * For each AttributeDef value, pass it into the given function.
  * @param {Function} f The function to pass the values into.

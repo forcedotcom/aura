@@ -22,8 +22,6 @@ function HelperDefRegistry(){
     this.helperDefs = {};
 }
 
-HelperDefRegistry.prototype.auraType = "HelperDefRegistry";
-
 /**
  * Returns a HelperDef instance from registry
  * @param {String} descriptor component definition descriptor to lookup on the HelperDef

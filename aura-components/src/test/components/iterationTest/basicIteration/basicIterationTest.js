@@ -21,7 +21,7 @@
         $A.test.assertEquals(1, value.length);
         value = value[0];
         $A.test.assertTrue(typeof value === "object");
-        $A.test.assertEquals(undefined, value.auraType);
+        $A.test.assertFalse($A.util.isComponent(value)); // Assert it's not an instance.
         $A.test.assertEquals(undefined, value.getDef);
         $A.test.assertEquals("markup://aura:expression", value.componentDef.descriptor);
     },
@@ -46,12 +46,12 @@
             $A.test.assertEquals(2, body.length);
             value = body[0];
             $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
             value = body[1];
             $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
         }
@@ -80,14 +80,14 @@
 
             value = body[0];
             $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("0:alpha,", value.get("v.value"));
             $A.test.assertFalse(value.isRendered());
             $A.test.assertEquals(0, value.getElements().length);
             value = body[1];
             $A.test.assertTrue($A.util.isObject(value));
-            $A.test.assertEquals("Component", value.auraType);
+            $A.test.assertTrue($A.util.isComponent(value));
             $A.test.assertEquals("markup://aura:expression", value.getDef().getDescriptor().getQualifiedName());
             $A.test.assertEquals("1:omega,", value.get("v.value"));
             $A.test.assertFalse(value.isRendered());
@@ -219,7 +219,7 @@
             $A.test.assertEquals("1:beta,", value.get("v.value"));
         }
     },
- 
+
     /** Iteration rerender stays stable */
     testEmptyAndFill:{
         attributes:{ items:"alpha,beta" },
@@ -301,7 +301,7 @@
             $A.test.addWaitForWithFailureMessage(true,
                     function() {
                         return cmp.get("v.iterationCompleteFired");
-                    }, 
+                    },
                     "Iteration's iterationComplete event not fired on cmp load",
                     function() {
                         $A.test.assertEquals("Initialize", cmp.get("v.iterationCompleteOperation"),
@@ -325,7 +325,7 @@
             $A.test.addWaitForWithFailureMessage(true,
                     function() {
                         return cmp.get("v.iterationCompleteFired");
-                    }, 
+                    },
                     "Iteration's iterationComplete event not fired when modifying items in iteration",
                     function() {
                         $A.test.assertEquals("Update", cmp.get("v.iterationCompleteOperation"));
@@ -347,7 +347,7 @@
             $A.test.addWaitForWithFailureMessage(true,
                     function() {
                         return cmp.get("v.iterationCompleteFired");
-                    }, 
+                    },
                     "Iteration's iterationComplete event not fired when setting items to current values",
                     function() {
                         $A.test.assertEquals("Update", cmp.get("v.iterationCompleteOperation"));
@@ -374,7 +374,7 @@
             $A.test.addWaitForWithFailureMessage(true,
                     function() {
                         return cmp.get("v.iterationCompleteFired");
-                    }, 
+                    },
                     "Iteration's iterationComplete event not fired when changing template",
                     function() {
                         $A.test.assertEquals("Initialize", cmp.get("v.iterationCompleteOperation"));

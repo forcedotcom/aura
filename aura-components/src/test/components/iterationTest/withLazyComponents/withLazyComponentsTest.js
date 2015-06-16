@@ -16,7 +16,7 @@
 ({
 	labels : [ "threadHostile" ],
     /**
-     * Verify simple lazy loading case. 
+     * Verify simple lazy loading case.
      */
     // TODO: W-2406307: remaining Halo test failure
     _testSimpleLazyLoading:{
@@ -51,16 +51,16 @@
 
                 //Placeholder for lazy component
                 var placeholder = body[0];
-                $A.test.assertTrue(typeof placeholder === "object");
-                $A.test.assertEquals("Component", placeholder.auraType);
+                $A.test.assertTrue($A.util.isObject(placeholder));
+                $A.test.assertTrue($A.util.isComponent(placeholder));
                 $A.test.assertEquals("markup://aura:placeholder", placeholder.getDef().getDescriptor().getQualifiedName());
 
                 //Actual lazy loaded component
                 var placeholderBody = placeholder.get("v.body");
                 $A.test.assertTrue(placeholderBody instanceof Array);
                 $A.test.assertEquals(1, placeholderBody.length);
-                $A.test.assertTrue(typeof placeholderBody[0] === "object");
-                $A.test.assertEquals("Component", placeholderBody[0].auraType);
+                $A.test.assertTrue($A.util.isObject(placeholderBody[0]));
+                $A.test.assertTrue($A.util.isComponent(placeholderBody[0]));
                 $A.test.assertEquals("markup://loadLevelTest:serverComponent", placeholderBody[0].getDef().getDescriptor().getQualifiedName());
 
                 //Verify that the placeholder's elements were associated with the iteration component
@@ -101,7 +101,7 @@
                 $A.test.assertEquals("placeholder", item.getDef().getDescriptor().getName(),
                 "Expected a placeholder for lazy loading component.");
             }
-            
+
             helper.resumeGateId(cmp, "withAttributes");
 
             //Verify first item is replaced by expected value

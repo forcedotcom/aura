@@ -29,11 +29,6 @@ function PassthroughValue(primaryProviders, component) {
 }
 
 /**
- * @export
- */
-PassthroughValue.prototype.auraType = "Value";
-
-/**
  * Since PassthroughValue can have its own set of values that can be listen for changes,
  * it needs it's own value change handler logic. Essentially you should be able to treat
  * it like a component for change events. It does not mark dirty though, since a passthrough

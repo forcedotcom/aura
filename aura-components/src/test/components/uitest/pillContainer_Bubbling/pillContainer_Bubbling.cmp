@@ -1,0 +1,7 @@
+<aura:component>
+    <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
+    <aura:handler name="pillInserted" event="ui:response" action="{!c.processPillInserted}"/>
+    <aura:handler name="pillRemoved" event="ui:response" action="{!c.processPillRemoved}"/>
+    <ui:pillContainer aura:id="pillContainer" maxAllowed="{!v.maxAllowed}"></ui:pillContainer>
+    <ui:inputText aura:id="result"/>
+</aura:component>

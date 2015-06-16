@@ -16,11 +16,11 @@
 ({
     afterRender: function(component, helper) {
         this.superAfterRender();
-        helper.setIgnoredElements(component);
+        helper.addParentListElementAsInput(component);
     },
-    
+
     rerender: function(component, helper) {
         this.superRerender();
-        helper.setIgnoredElements(component);
+        helper.addParentListElementAsInput(component);
     }
 })

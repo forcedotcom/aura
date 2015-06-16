@@ -26,6 +26,16 @@
     doNotWrapInAuraRun: true,
 
 
+    testBlurEventBubble: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            cmp.find("autocomplete").focus();
+            var result = cmp.find("result");
+            result.getElement().focus();
+            $A.test.assertEquals("blur",result.get("v.value"),"blur event didn't bubble");
+        }
+    },
+
     testInsertEventBubble: {
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
@@ -40,7 +50,10 @@
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0]] );
             pillContainer.find("pill").getElement().getElementsByClassName("deleteIcon")[0].click();
-            $A.test.assertEquals("removed",cmp.find("result").get("v.value"),"remove event didn't bubble");
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return cmp.find("result").get("v.value") === "removed";
+            }, "remove event didn't bubble");
         }
     },
 

@@ -22,6 +22,14 @@
 
     processPillRemoved: function (cmp) {
         cmp.find("result").set("v.value","removed");
+    },
+
+    processBlur: function (cmp) {
+        cmp.find("result").set("v.value","blur");
+    },
+
+    processFocus: function (cmp) {
+        cmp.find("result").set("v.value","focus");
     }
 
 })

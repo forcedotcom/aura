@@ -14,29 +14,43 @@
  * limitations under the License.
  */
 ({
-    updateError : function(component, event, helper){
-        var showErrors = component.get("v.showErrors");
+    updateError : function(cmp, event, helper){
+        var errors = event.getParam("value");
+
+        var showErrors = cmp.get("v.showErrors");
         if (showErrors) {
-            helper.updateError(component);
+            helper.updateError(cmp, errors);
+        }
+
+        if ($A.util.isEmpty(errors)) {
+            var clearEvent = cmp.getEvent("onClearErrors");
+            if (clearEvent) {
+                clearEvent.fire();
+            }
+        } else {
+            var errorEvent = cmp.getEvent("onError");
+            if (errorEvent) {
+                errorEvent.fire({errors: errors});
+            }
         }
     },
 
-    init : function(component, event, helper) {
-        helper.buildBody(component);
+    init : function(cmp, event, helper) {
+        helper.buildBody(cmp);
     },
 
-    handleLabelChange : function (component) {
-        var labelComponent = component.find("inputLabel");
+    handleLabelChange : function (cmp) {
+        var labelComponent = cmp.find("inputLabel");
         if (!$A.util.isUndefinedOrNull(labelComponent)) {
-            labelComponent.set("v.label",component.get("v.label"));
+            labelComponent.set("v.label", cmp.get("v.label"));
         }
     },
 
-    handleLabelPositionChange : function (component, evt, helper) {
+    handleLabelPositionChange : function (cmp, evt, helper) {
         // Currently only handle labelDisplay to avoid rearranging the DOM
-        var labelComponent = component.find("inputLabel");
+        var labelComponent = cmp.find("inputLabel");
         if (!$A.util.isUndefinedOrNull(labelComponent)) {
-            labelComponent.set("v.labelDisplay", helper.checkValidPosition(component.get("v.labelPosition")) != "hidden");
+            labelComponent.set("v.labelDisplay", helper.checkValidPosition(cmp.get("v.labelPosition")) != "hidden");
         }
     }
 })

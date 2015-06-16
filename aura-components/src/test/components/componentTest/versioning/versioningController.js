@@ -1,57 +1,41 @@
 ({
-    getVersionInExp: function(cmp) {
-        var targetComponent = cmp.find("auratestCmp");
-        targetComponent.version();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersion"));
-    },
-
-    getVersionInCntlr: function (cmp) {
-        var targetComponent = cmp.find("auratestCmp");
-        targetComponent.version();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersion"));
-    },
-
-    getVersionByValProvider: function(cmp) {
-        var targetComponent = cmp.find("auratestCmp");
-        targetComponent.versionByValProvider();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersion"));
-    },
-
-    getVersionInCreatedCmp: function(cmp) {
-        $A.createComponent("auratest:require", null, function(newCmp) {
-                newCmp.version()
-                cmp.set("v.requestVersion", newCmp.get("v.requestVersion"));
-            });
-    },
-
-    getVersionInSameNsCmp: function(cmp) {
-        var targetComponent = cmp.find("sameNamespaceCmp");
-        targetComponent.version();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersion"));
-    },
-
-    // version in grandchild component
-    getVersionInNoRequireCmp: function(cmp) {
-        var targetComponent = cmp.find("noVersionRequireCmp");
-        targetComponent.version();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersion"));
-    },
-
-    getVersionInGchildCmp: function(cmp) {
-        var targetComponent = cmp.find("auratestHolder");
-        targetComponent.versionInTestCmp();
-        cmp.set("v.requestVersion", targetComponent.get("v.requestVersionInChild"));
-    },
-
-    getVersionInMultiParentCmp: function(cmp) {
+    updateWithVersionInMultiHostedComponent: function(cmp) {
         $A.createComponent("componentTest:require", null, function(newCmp) {
-                var holderComponent = cmp.find("auratestHolder");
-                holderComponent.set("v.cmp", newCmp);
-                holderComponent.versionInChild();
+                var consumerInAuraTest = cmp.find("requireConsumerInAuraTest");
+                var consumerInTest = cmp.find("requireConsumerInTest");
+                consumerInAuraTest.set("v.consumedCmp", newCmp);
+                consumerInTest.set("v.consumedCmp", newCmp);
 
-                holderComponent = cmp.find("testHolder");
-                holderComponent.set("v.cmp", newCmp);
-                holderComponent.versionInChild();
+                consumerInAuraTest.updateWithVersionInConsumedComponent();
+                consumerInTest.updateWithVersionInConsumedComponent();
+                cmp.set("v.actionDone", true);
             });
+    },
+
+    updateWithVersionInCreatedComponent: function(cmp, evt, helper) {
+        $A.createComponent("auratest:require", null, function(newCmp) {
+                newCmp.updateVersionFromGetVersionMethod()
+                helper.updateVersion(cmp, newCmp.get("v.version"));
+                cmp.set("v.actionDone", true);
+            });
+    },
+
+    updateWithVersionInAuraTestCmpController: function(cmp, evt, helper) {
+        var targetComponent = cmp.find("auratestCmp");
+        targetComponent.updateVersionFromGetVersionMethod();
+        helper.updateVersion(cmp, targetComponent.get("v.version"));
+    },
+
+    updateWithVersionFromVersionComparisonInAuraTestCmp: function(cmp, evt, helper) {
+        var targetComponent = cmp.find("auratestCmp");
+        targetComponent.updateVersionIfLargerThanOne();
+        helper.updateVersion(cmp, targetComponent.get("v.version"));
+    },
+
+    updateWithVersionInAuraTestCmpUnrender: function(cmp, evt, helper) {
+        var targetComponent = cmp.find("auratestCmp");
+        cmp.unrender();
+        helper.updateVersion(cmp, targetComponent.get("v.version"));
     }
 })
+

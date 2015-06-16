@@ -16,6 +16,6 @@
 
 -->
 <aura:component extensible="true">
-    <aura:attribute type="String" name="requestVersionInSuper" default="default"/>
+    <aura:attribute type="String" name="versionInSuperCmp" default="default"/>
     {!v.body}
 </aura:component>

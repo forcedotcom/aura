@@ -15,17 +15,42 @@
  */
 
 ({
-    getVersionInCntlr: function(cmp) {
+    init: function(cmp, evt, helper) {
+        helper.updateVersion(cmp, cmp.getVersion());
+    },
+
+    updateVersionFromGetVersionMethod: function(cmp, evt, helper) {
+        helper.updateVersion(cmp, cmp.getVersion());
+    },
+
+    updateVersionByComponentValueProvider: function(cmp, evt, helper) {
+        helper.updateVersion(cmp, cmp.get("version"));
+    },
+
+    updateVersionIfLargerThanOne: function(cmp, evt, helper) {
         var version = cmp.getVersion();
-        cmp.set("v.requestVersion", version);
+        if(version > 1.0) {
+            helper.updateVersion(cmp, version);
+        } else {
+            helper.updateVersion(cmp,
+                "Request version is not larger than 1.0: " + version);
+        }
     },
 
-    getVersionByValProvider: function(cmp) {
-        cmp.set("v.requestVersion", cmp.get("version"));
+    udpateWithBoundVersionExpression: function(cmp, evt, helper) {
+        helper.updateVersion(cmp, cmp.find("boundVersionExpression").get("v.value"));
     },
 
-    getVersionInExpression: function(cmp) {
-        var version = cmp.get("v.versionInExp");
-        cmp.set("v.requestVersion", version);
+    udpateWithUnboundVersionExpression: function(cmp, evt, helper) {
+        helper.updateVersion(cmp, cmp.find("unboundVersionExpression").get("v.value"));
+    },
+
+    updateWithEqualsComponentExist: function(cmp, evt, helper){
+        helper.updateComponentExist(cmp, !!cmp.find('equals'));
+    },
+
+    updateWithInequalityComparisonComponentExist: function(cmp, evt, helper){
+        helper.updateComponentExist(cmp, !!cmp.find('inequality'));
     }
 })
+

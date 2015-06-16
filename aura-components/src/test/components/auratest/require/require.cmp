@@ -16,13 +16,40 @@
 
 -->
 <aura:component>
-    <aura:attribute type="String" name="requestVersion"/>
+    <aura:attribute type="String" name="version"/>
+    <aura:attribute type="Boolean" name="cmpExist"/>
+    <aura:attribute type="String" name="versionInRender"/>
+    <aura:attribute type="String" name="versionInAfterRender"/>
+    <aura:attribute type="String" name="versionInRerender"/>
 
-    <aura:if isTrue="{!'2.0' == version}">
-        <aura:text aura:id="versionInExp" value="2.0"/>
+    <aura:if isTrue="{!2.0 == version}">
+        <div aura:id="equals"></div>
     </aura:if>
 
-    <aura:method name="version" action="{!c.getVersionInCntlr}"/>
-    <aura:method name="versionByValProvider" action="{!c.getVersionByValProvider}"/>
-    <aura:method name="versionInExpression" action="{!c.getVersionInExpression}"/>
+    <aura:if isTrue="{!version > 1}">
+        <div aura:id="inequality"></div>
+    </aura:if>
+
+    Version In Bound Expression: <aura:text aura:id="boundVersionExpression" value="{!version}"/><br/>
+    Version In Unbound Expression: <aura:text aura:id="unboundVersionExpression" value="{#version}"/>
+    <br/>
+
+    <aura:method name="updateVersionFromGetVersionMethod"
+                 action="{!c.updateVersionFromGetVersionMethod}"/>
+    <aura:method name="updateVersionByComponentValueProvider"
+                 action="{!c.updateVersionByComponentValueProvider}"/>
+    <aura:method name="udpateWithBoundVersionExpression"
+                 action="{!c.udpateWithBoundVersionExpression}"/>
+    <aura:method name="udpateWithUnboundVersionExpression"
+                 action="{!c.udpateWithUnboundVersionExpression}"/>
+    <aura:method name="updateWithEqualsComponentExist"
+                 action="{!c.updateWithEqualsComponentExist}"/>
+    <aura:method name="updateWithInequalityComparisonComponentExist"
+                 action="{!c.updateWithInequalityComparisonComponentExist}"/>
+    <aura:method name="updateVersionIfLargerThanOne"
+                 action="{!c.updateVersionIfLargerThanOne}"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
 </aura:component>
+

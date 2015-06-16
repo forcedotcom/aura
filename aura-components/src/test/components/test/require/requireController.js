@@ -15,9 +15,21 @@
  */
 
 ({
-    version: function(cmp) {
-        var version = cmp.getVersion();
-        cmp.set("v.requestVersion", version);
+    updateVersion: function(cmp) {
+        cmp.set("v.version", cmp.getVersion());
+    },
+
+    fireEventWithVersionInServerController: function(cmp) {
+        var a = cmp.get("c.getContextAccessVersion");
+        a.setCallback(this, function(action){
+            if(action.getState() === "SUCCESS") {
+                var e = cmp.getEvent("versionEvt");
+                e.setParams({
+                    "att1": action.returnValue
+                });
+                e.fire();
+            }
+        });
+        $A.enqueueAction(a);
     }
 })
-

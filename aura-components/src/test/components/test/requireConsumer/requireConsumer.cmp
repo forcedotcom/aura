@@ -16,10 +16,10 @@
 
 -->
 <aura:component>
-    <aura:attribute type="Aura.Component" name="cmp"/>
-    <aura:attribute type="String" name="requestVersionInChild" default="default"/>
+    <aura:attribute type="Aura.Component" name="consumedCmp"/>
+    <aura:attribute type="String" name="versionInConsumedCmp" default="default"/>
 
-    <aura:method name="versionInChild" action="{!c.getVersionInChildCmp}"/>
+    <aura:method name="updateWithVersionInConsumedComponent" action="{!c.updateWithVersionInConsumedComponent}"/>
 
     <aura:require namespace="componentTest" version="1.5"/>
 </aura:component>

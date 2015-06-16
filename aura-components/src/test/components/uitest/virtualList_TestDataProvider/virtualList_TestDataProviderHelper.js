@@ -23,7 +23,7 @@
         
         for (var i = 1; i <= pageSize; i++) {
         	tmpId = ((currentPage * pageSize) + i);
-        	randomNumber = Math.floor(Math.random()*1E16),
+        	randomNumber = Math.floor(Math.random()*1E13),
             items.push({
                 _id           : randomNumber,
                 index: tmpId,

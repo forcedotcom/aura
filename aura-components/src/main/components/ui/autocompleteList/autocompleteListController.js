@@ -30,6 +30,11 @@
         selectEvt.fire();
     },
 
+    handleMouseDown: function(component, event, helper) {
+        //prevent loss of focus from the auto complete input
+       event.preventDefault();
+    },
+
     handleListHighlight: function(component, event, helper) {
         helper.handleListHighlight(component, event);
     },

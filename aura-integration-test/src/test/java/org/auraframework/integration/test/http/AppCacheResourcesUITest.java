@@ -627,7 +627,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              */
             return ImmutableList.of(new Request(2, getUrl(), null, 200),
                     new Request(2, "/auraResource", "manifest", 200),
-                    new Request("/auraResource", "css", 200),
+                    new Request(2, "/auraResource", "css", 200),
                     new Request(2, "/auraResource", "js", 200));
         default:
             /*

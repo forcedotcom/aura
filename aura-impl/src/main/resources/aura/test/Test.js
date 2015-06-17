@@ -1609,12 +1609,11 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
     	this.prePostSendConfigs = [];
 	    for (i = 0; i < processing.length; i++) {
 	        cb_config = processing[i];
-	        // If we are watiching on _certain_ action
 	        // If this action has been refreshed, track that one instead.
 	        if (cb_config.action && cb_config.action.refreshAction) {
 	            cb_config.action = cb_config.action.refreshAction;
 	        }
-	        if (cb_config.action && !(cb_config.action in actions)) {
+	        if (cb_config.action && !( actions.indexOf(cb_config.action) >= 0)) {
 	            if (cb_config.action.getState() == 'NEW') {
 	                this.prePostSendConfigs.push(cb_config);//push it back, we will check in the next send
 	            } else {
@@ -1629,11 +1628,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
 	            this.prePostSendConfigs.push(cb_config);
 	        }
 	        if (cb_config.preSendCallback) {
-	        	if(cb_config.action) {
-	        		cb_config.preSendCallback(cb_config.action, actions);
-	        	} else {
-	        		cb_config.preSendCallback(actions);
-	        	}
+	        	cb_config.preSendCallback(actions, cb_config.action);
 	        }
 	        if (cb_config.postSendCallback) {
 	            post_callbacks.push(cb_config);//save the callback to post_callbacks so we can go through them after the real send call
@@ -1645,11 +1640,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
         this.sentXHRCount += 1;
     }
     for (i = 0; i < post_callbacks.length; i++) {
-    	if(post_callbacks[i].action) {
-    		post_callbacks[i].postSendCallback(post_callbacks[i].action, actions);
-    	} else {
-    		post_callbacks[i].postSendCallback(actions);
-    	}
+    		post_callbacks[i].postSendCallback(actions, post_callbacks[i].action);
     }
     return value;
 };
@@ -1688,20 +1679,24 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  * @param action the action to watch for (undefined/null means any action)
  * @param preSendCallback the hook function for before send.
  * @param postSendCallback the hook function for after send.
+ * one of preSendCallback and postSendCallback can be null, but not both of them
  * @return a handle to remove the callback (only needed if the action is empty).
  * 
  * @export
  */
 TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallback, postSendCallback) {
+	if ( (!preSendCallback)&&(!postSendCallback) ) {
+		throw new Error("Test.addPrePostSendCallback: one of the callback must be not-null");
+	}
     if (preSendCallback !== null && preSendCallback !== undefined) {
         if (!(preSendCallback instanceof Function)) {
-            throw new Error("Test.addPrePostSendCallback: preSendCallback must be undefined or a function found "
+            throw new Error("Test.addPrePostSendCallback: preSendCallback must be a function"
                 +preSendCallback);
         }
     }
     if (postSendCallback !== null && postSendCallback !== undefined) {
         if (!(postSendCallback instanceof Function)) {
-            throw new Error("Test.addPrePostSendCallback: preSendCallback must be undefined or a function found "
+            throw new Error("Test.addPrePostSendCallback: preSendCallback must be a function"
                 +postSendCallback);
         }
     }

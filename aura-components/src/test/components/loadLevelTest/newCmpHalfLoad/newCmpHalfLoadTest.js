@@ -66,7 +66,7 @@
             controllerFuncToCreateCmp: "c.createCmpWithMapValuePropRefValueFromServer"
         },
         test:[ function(cmp) {
-            //$A.test.setTestTimeout(6000000);//for stepping through
+            $A.test.setTestTimeout(6000000);//for stepping through
             this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){
@@ -77,7 +77,7 @@
             var cb_handle;
             var destroy_done = false;
             // watch for _any_ action.
-            var preSendCallback = function(receiverCmp, actions) {
+            var preSendCallback = function(actions) {
                 var i;
                 var action = undefined;
                 for (i = 0; i < actions.length; i++) {
@@ -89,21 +89,81 @@
                 }
                 if (action) {
                 	receiverCmp.destroy();
+                	//because we are watching all actions, once we are done, need to remove the callback handler
                     $A.test.removePrePostSendCallback(cb_handle);
                     $A.test.addWaitForWithFailureMessage(true, 
                     		function() { return $A.test.areActionsComplete([action]); },
-                    		"Action "+action.getDef()+" didn't finish");
+                    		"Action we are watching didn't finish"
+                    		);
+                    //let the test know we have destroy the receiverCmp
                     destroy_done = true;
+                    //we expect the error twice because two reference to receiverCmp's attribute
                     var errmsg = "Invalid component tried calling function [get] with arguments [v.stringAttribute], markup://loadLevelTest:newCmpWithValueProvider";
                 	$A.test.expectAuraError(errmsg);
                 	$A.test.expectAuraError(errmsg);
                 }
             };
-            cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback.bind(this, receiverCmp), undefined );
+            cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback, undefined );
             $A.test.addWaitFor(true, function() { return destroy_done; });
 
             //now run the action
-            actionToCreateNewCmp.runDeprecated();//c.createCmpByFetchingDefFromServer
+            actionToCreateNewCmp.runDeprecated();//this will run createCmpByFetchingDefFromServer of newCmpWithValueProviderController.js
+        }
+        ]
+    },
+    
+    /**
+     * This test is similar as the one above, the main difference is we create&enqueue a server action(getComponents) 
+     * in the test, this allow us to watch *that* action only via addPrePostSendCallback, instead of watching 
+     * all actions
+     * 
+     * ask receiverCmp(newCmpWithValueProvider) to replace its body with couple new component(auratest:text) 
+     * kill receiverCmp BEFORE the request is send. 
+     */
+    testCmpCreatedByFetchingMapFromServerWatchSingleAction:{
+        attributes:{ 
+            receiverCmp: "loadLevelTest:newCmpWithValueProvider",
+            receiverCmpAuraId: "receiverCmp",
+        },
+        test:[ function(cmp) {
+            //$A.test.setTestTimeout(6000000);//for stepping through
+            this.waitForReceiverCmpCreated(cmp);
+        },
+        function(cmp){
+            var receiverCmp = cmp.find("receiverCmp");
+            var action = cmp.get("c.getComponents");
+            action.setParams({
+                input : 2,
+            	token : "Bla"
+            });
+
+            action.setCallback(cmp, function(action){
+            	var cmpArray = action.getReturnValue();
+            	receiverCmp.set("v.body", cmpArray);
+            });
+            
+            var cb_handle;
+            var destroy_done = false;
+            // watch for the action we gonna enqueue
+            var preSendCallback = function(actions, actionToWatch) {
+                if (actionToWatch) {
+                	receiverCmp.destroy();
+                    $A.test.addWaitForWithFailureMessage(true, 
+                    		function() { return $A.test.areActionsComplete([actionToWatch]); },
+                    		"Action we are watching didn't finish"
+                    		);
+                    //let the test know we have destroy the receiverCmp
+                    destroy_done = true;
+                    var errorMsg = "Invalid component tried calling function [set] with arguments [v.body,[object Object],[object Object]], markup://loadLevelTest:newCmpWithValueProvider";
+                    $A.test.expectAuraError(errorMsg);
+                }
+            };
+            cb_handle = $A.test.addPrePostSendCallback(action, preSendCallback, undefined);
+            $A.test.addWaitFor(true, function() { return destroy_done; });
+
+            //now enqueue the action
+            $A.enqueueAction(action);
+            
         }
         ]
     }

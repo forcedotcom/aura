@@ -50,8 +50,24 @@
      * Test to verify ESC button is focused when autoFocus is set to false
      * Revisit once Bug: W-2617212 is fixed
      */
-    testPanelNotFocusedOnFirstInputWithAutoFocusOff: {
+    testModalFocusOnCloseBtnWithAutoFocusNotSet: {
     	attributes : {"testAutoFocus" : false},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		$A.test.addWaitForWithFailureMessage(true, function() {
+                var activeElement = $A.test.getActiveElement();
+                return $A.util.hasClass(activeElement, "closeBtn");
+            }, "Esc button should be focused for Modal");
+    	}]
+    },
+    
+    /**
+     * Test to verify ESC button is focused when autoFocus is set to false
+     * Revisit once Bug: W-2616150 is fixed
+     */
+    testPanelFocusOnCloseBtnWithAutoFocusNotSet: {
+    	attributes : {"testPanelType" : "panel", "testAutoFocus" : false},
     	test: [function(cmp) {
     		this.createPanel(cmp);
     	}, function(cmp) {
@@ -123,6 +139,39 @@
      * Use case for bug: W-2619412
      */
     testOpenMultipleModals: {
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForModalOpen();
+    	}, function(cmp) {
+    		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"));
+    		modal1GlobalId = this.getGlobalIdForPanelModal(1);
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.getCmp(modal1GlobalId).get("v.visible");}, "Visible Attribute should be set for new modal opened");
+    		testerCmp.set("v.useHeader","true");
+    		testerCmp.set("v.useFooter","true");
+    		testerCmp.find("createPanelBtn").get("e.press").fire();
+    	}, function(cmp) {
+    		test = this.getPanelTesterComponent(cmp.find("tester"))
+    		this.waitForNumberOfPanels("modal", 2);
+    	}, function(cmp) {
+    		var modal2GlobalId = this.getGlobalIdForPanelModal(2);
+    		var modal2VisibleAttrValue = $A.getCmp(modal2GlobalId).get("v.visible");
+    		var modal1VisibleAttrValue = $A.getCmp(modal1GlobalId).get("v.visible");
+			$A.test.addWaitForWithFailureMessage(true, function(){return $A.getCmp(modal2GlobalId).get("v.visible");}, "Visible Attribute should be set for new modal opened");
+    		$A.test.assertTrue(modal1VisibleAttrValue, "Visible Attribute should not be set for old modal opened");
+    		this.verifyElementWithClassPresent("defaultCustomPanelHeader", true, 
+			"Custom panel header should be present for second modal");
+    		this.verifyElementWithClassPresent("defaultCustomPanelFooter", true, 
+			"Custom panel footer should be present for second modal");
+    	}]
+    },
+    
+    
+    /**
+     * Test close multiple panels
+     * Use case for bug: W-2619412
+     */
+    testCloseMultiplePanels: {
     	test: [function(cmp) {
     		this.createPanel(cmp);
     	}, function(cmp) {

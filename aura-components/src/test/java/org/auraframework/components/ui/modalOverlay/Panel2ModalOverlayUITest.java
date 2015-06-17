@@ -40,6 +40,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String MAKE_NONSCROLLABLE = ".inputNonScrollableClass";
     private final String ENABLE_CUSTOM_CLOSEACTION = ".inputCustomizeCloseAction";
     private final String INPUT_PANELTYPE = ".inputPanelTypeClass";
+    private final String INPUT_AUTOFOCUS = ".inputAutoFocusClass";
     
     
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
@@ -53,27 +54,54 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
      * [Accessibility] modal closing on Esc key.
      * Bug: W-2617212
      */
-    public void testPressEscKeyOnModal() throws Exception{
+    public void testPressEscKeyOnModalWithAutoFocusSet() throws Exception{
     	String panelType = "modal";
-    	verifyCloseOnEsc(panelType);
+    	Boolean autoFocus = true;
+    	verifyCloseOnEsc(panelType, autoFocus);
     }
     
     /**
      * [Accessibility] panel dialog closing on Esc key.
      * Bug: W-2643030
      */
-    public void testPressEscKeyOnPanelDialog() throws Exception{
+    public void testPressEscKeyOnPanelDialogWithAutoFocusSet() throws Exception{
     	String panelType = "panel";
-    	verifyCloseOnEsc(panelType);
+    	Boolean autoFocus = true;
+    	verifyCloseOnEsc(panelType, autoFocus);
     }
     
-    private void verifyCloseOnEsc(String panelType) throws MalformedURLException, URISyntaxException, InterruptedException {
+    /**
+     * [Accessibility] modal closing on Esc key.
+     * Bug: W-2617212
+     */
+    public void testPressEscKeyOnModalWithAutoFocusNotSet() throws Exception{
+    	String panelType = "modal";
+    	Boolean autoFocus = false;
+    	verifyCloseOnEsc(panelType, autoFocus);
+    }
+    
+    /**
+     * [Accessibility] panel dialog closing on Esc key.
+     * Bug: W-2643030
+     */
+    public void testPressEscKeyOnPanelDialogWithAutoFocusNotSet() throws Exception{
+    	String panelType = "panel";
+    	Boolean autoFocus = false;
+    	verifyCloseOnEsc(panelType, autoFocus);
+    }
+    
+    private void verifyCloseOnEsc(String panelType, Boolean autoFocus) throws MalformedURLException, URISyntaxException, InterruptedException {
 		String url = APP;
     	boolean isPanel = panelType.contains("panel");
     	if(isPanel){
 			url += "?" + PARAM_PANEL_TYPE + panelType;
 		}
     	open(url);
+    	if(!autoFocus){
+    		//disable autoFocus
+    		WebElement autoFocusElement = findDomElement(By.cssSelector(INPUT_AUTOFOCUS));
+    		autoFocusElement.click();
+    	}
     	openPanel();
     	if(isPanel){
     		waitForPanelDialogOpen();

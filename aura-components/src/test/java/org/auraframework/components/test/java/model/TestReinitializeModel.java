@@ -38,25 +38,25 @@ public class TestReinitializeModel {
         } else {
             this.value = "attr";
             this.valueParent = "attrInParent";
-            this.itemList = new ArrayList<String>();
+            this.itemList = new ArrayList<>();
         }
     }
-    
+
     @AuraEnabled
     public String getValue() {
         return value;
     }
-    
+
     @AuraEnabled
     public String getValueParent() {
         return valueParent;
     }
-    
+
     @AuraEnabled
     public ArrayList<String> getItemList() {
         return itemList;
     }
-    
+
     private String value;
     private String valueParent;
     private ArrayList<String> itemList;

@@ -75,7 +75,7 @@ public class ResourceLoaderTest extends UnitTestCase {
         /**
          * <pre>
          * The test folders are all rooted at /path/to/testRootFolder with the following defaults
-         * 
+         *
          *  / : the test root
          *  /TestName-ORIG : the original source files that will be cached and read back
          *  /TestName-TEMP: the temp dir used to create the file-based loader
@@ -114,7 +114,6 @@ public class ResourceLoaderTest extends UnitTestCase {
         writer.close();
     }
 
-    @SuppressWarnings("resource")
     private String readStreamAsString(InputStream is) {
         Scanner scanner = new Scanner(is);
         String ret = scanner.useDelimiter("\\A").next();

@@ -26,26 +26,19 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
-import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Automation to verify the implementation of AuraFrameworkServlet. AuraFrameworkServlet responds to requests of pattern
  * /auraFW/* This config is stored in aura/dist/config/web.xml for aura running on jetty. In SFDC build, the config is
  * in main-sfdc/config/aura.conf AuraFrameworkServlet sets resources to be cached for 45 days.
- * 
+ *
  * @since 0.0.298
  */
 public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
@@ -151,7 +144,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
                 "/auraFW/home/", "/auraFW/resources/aura/home", "/auraFW/resources/foo/bar",
                 // Make sure the regex used in implementation doesn't barf
                 "/auraFW/resources/aura/resources/aura/auraIdeLogo.png",
-                "/auraFW/resources/aura/auraIdeLogo.png/resources/aura/" };
+        "/auraFW/resources/aura/auraIdeLogo.png/resources/aura/" };
         for (String url : badUrls) {
             HttpGet get = obtainGetMethod(url);
             int statusCode = getStatusCode(perform(get));
@@ -168,13 +161,13 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(response);
         get.releaseConnection();
         assertEquals(failureMsg, expectedResponseStatus, statusCode);
-        
+
     }
 
     /**
      * Verify that incomplete resource path returns SC_NOT_FOUND(404). Subsequent requests for valid resource on the
      * same path are successful.
-     * 
+     *
      * @throws Exception
      */
     public void testRequestingFolderAsFileNotAllowed() throws Exception {

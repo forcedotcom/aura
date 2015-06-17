@@ -15,7 +15,6 @@
  */
 package org.auraframework.test.localization;
 
-import org.auraframework.test.*;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.CheckAccessibility;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -33,7 +32,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDate/outputDate components
     public void testDateComponents() throws Exception {
         open(URL);
@@ -69,7 +68,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDateTime/outputDateTime components
     public void testDateTimeComponents() throws Exception {
         open(URL);
@@ -108,7 +107,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputNumber/outputNumber components
     public void _testNumberComponents() throws Exception {
         open(URL);
@@ -141,7 +140,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputPercent/outputPercent components
     public void testPercentComponents() throws Exception {
         open(URL);
@@ -174,7 +173,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
 
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
-            BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+        BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputCurrency/outputCurrency components
     public void testCurrencyComponents() throws Exception {
         open(URL);

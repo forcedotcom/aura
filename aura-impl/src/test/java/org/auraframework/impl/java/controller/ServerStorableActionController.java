@@ -15,7 +15,9 @@
  */
 package org.auraframework.impl.java.controller;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.auraframework.Aura;
@@ -26,7 +28,6 @@ import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
-import org.auraframework.test.instance.*;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

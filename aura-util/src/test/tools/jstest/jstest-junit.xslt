@@ -8,7 +8,7 @@
       <xsl:apply-templates select="node()|@*" />
     </xsl:copy>
   </xsl:template>
-  <xsl:template match="//skippedtestcase[@classname='org.auraframework.test.ComponentJSTestSuiteTest$ComponentTestCase']">
+  <xsl:template match="//skippedtestcase[@classname='org.auraframework.test.ComponentJSTestSuite$ComponentTestCase']">
     <xsl:copy>
       <xsl:attribute name="classname">
         <xsl:value-of select="concat($jstestPrefix, substring-before(@name, '$'))" />
@@ -20,7 +20,7 @@
       <xsl:copy-of select="child::*" />
     </xsl:copy>
   </xsl:template>
-  <xsl:template match="//testcase[@classname='org.auraframework.test.ComponentJSTestSuiteTest$ComponentTestCase']">
+  <xsl:template match="//testcase[@classname='org.auraframework.test.ComponentJSTestSuite$ComponentTestCase']">
     <xsl:copy>
       <xsl:attribute name="classname">
         <xsl:value-of select="concat($jstestPrefix, substring-before(@name, '$'))" />

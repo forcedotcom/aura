@@ -53,8 +53,8 @@ import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
- * 
- * 
+ *
+ *
  * @since 0.0.139
  */
 public class AuraServletHttpTest extends AuraHttpTestCase {
@@ -76,7 +76,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             if (ancestors == null) {
                 return null;
             }
-            List<String> list = new ArrayList<String>(ancestors.length);
+            List<String> list = new ArrayList<>(ancestors.length);
             for (String item : ancestors) {
                 list.add(item);
             }
@@ -85,26 +85,26 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         @Override
         public Collection<String> getFrameSources() {
-            return new ArrayList<String>(0);
+            return new ArrayList<>(0);
         }
 
         @Override
         public Collection<String> getScriptSources() {
-            List<String> list = new ArrayList<String>(1);
+            List<String> list = new ArrayList<>(1);
             list.add(null);
             return list;
         }
 
         @Override
         public Collection<String> getStyleSources() {
-            List<String> list = new ArrayList<String>(1);
+            List<String> list = new ArrayList<>(1);
             list.add(null);
             return list;
         }
 
         @Override
         public Collection<String> getConnectSources() {
-            List<String> list = new ArrayList<String>(2);
+            List<String> list = new ArrayList<>(2);
             list.add("www.itrustu.com/");
             list.add("www.also.com/other");
             return list;
@@ -117,7 +117,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         @Override
         public Collection<String> getDefaultSources() {
-            List<String> list = new ArrayList<String>(1);
+            List<String> list = new ArrayList<>(1);
             list.add(null);
             return list;
         }
@@ -129,7 +129,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
         @Override
         public Collection<String> getObjectSources() {
-            return new ArrayList<String>(0);
+            return new ArrayList<>(0);
         }
 
         @Override
@@ -250,7 +250,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     /**
      * This is actually an invalid test.
-     * 
+     *
      */
     public void testPostWithOldLastMod() throws Exception {
         Map<String, Object> message = new HashMap<>();
@@ -334,7 +334,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     /**
      * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning with a double or more slash
      * is taken as a hostname (i.e. as if it were http: + the location),
-     * 
+     *
      */
     public void testNoCacheDoubleSlash() throws Exception {
         assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s",
@@ -527,7 +527,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     /**
      * Wiggle factor.
-     * 
+     *
      * This is intended to allow for variance between the local date and the server date, along with any latency that
      * might occur. Currently it is set to 1 hour, which should be more than enough to account for offsets, but short
      * enough so that we don't really care.
@@ -536,9 +536,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     /**
      * Submit a request and check that the 'long cache' is set correctly.
-     * 
+     *
      * See documentation for {@link #WIGGLE_FACTOR}.
-     * 
+     *
      * @param url the url
      */
     private void assertResponseSetToLongCache(String url) throws Exception {
@@ -566,9 +566,9 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
 
     /**
      * Submit a request and check that the 'no cache' is set correctly.
-     * 
+     *
      * We are very generous with the expires time here, as we really don't care other than to have it well in the past.
-     * 
+     *
      * @param url the url path.
      */
     private void assertResponseSetToNoCache(String url) throws Exception {
@@ -637,7 +637,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
      * Verify the Script tag to fetch the Aura Framework JS has nonce. The initial get request for an application gets a
      * template as response. Part of the template response should be a script tag which fetches the Aura FW JS. The URL
      * for the js file should have nonce indicating the last mod of the JS group.
-     * 
+     *
      * @throws Exception
      */
     public void testJSFrameworkUrlHasNonce() throws Exception {

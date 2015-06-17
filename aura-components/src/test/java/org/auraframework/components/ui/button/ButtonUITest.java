@@ -37,6 +37,7 @@ public class ButtonUITest extends WebDriverTestCase {
         WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
         wait.withMessage("Required label error not displayed");
         wait.until(new ExpectedCondition<Boolean>() {
+            @SuppressWarnings("deprecation")
             @Override
             public Boolean apply(WebDriver d) {
                 return auraUITestingUtil.getQuickFixMessage().contains(errorMsg);

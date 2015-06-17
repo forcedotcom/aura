@@ -44,10 +44,11 @@ import org.auraframework.util.IOUtil;
  * Original: CadenceGoogleChart Handles building a url request to the Google
  * Charts API.
  */
+@SuppressWarnings("deprecation")
 public class PTestGoogleChart {
     private static final String BASE_URL = "http://chart.apis.google.com/chart";
     private static final String[] SERIES_COLORS = { "3072F3", "FF9900", "555555", "49188F", "80C65A", "224499",
-            "990066", "76A4FB", "008000", "A4653A" };
+        "990066", "76A4FB", "008000", "A4653A" };
 
     private final String title;
     private final List<ChartAxisPoints> axisPoints;
@@ -132,7 +133,7 @@ public class PTestGoogleChart {
      * Creates a Map of the params necessary to make a request to the Google
      * Charts API. See http://code.google.com/apis/chart/docs/making_charts.html
      * to try and make sense of the param names.
-     * 
+     *
      * @returns A Map of request parameters and their values.
      */
     public Map<String, String> buildRequestParams() {
@@ -147,13 +148,13 @@ public class PTestGoogleChart {
         data.put("chdl", buildSeriesLegend()); // set the chart legend items
 
         data.put("chxt", "x,y,x,y"); // set the visible axes. (one extra axis
-                                     // defined to provide the "ms" label)
+        // defined to provide the "ms" label)
 
         // set the y-axis range
         data.put("chxr", String.format("0,1,%s|1,0,%s", getMaxXDataPointForChart(), getMaxYDataPointForChart()));
         data.put("chg", "10,10,1,5"); // Grid lines
         data.put("chxl", buildAxisLabels()); // add labels for the data points
-                                             // on the x-axis
+        // on the x-axis
 
         // specify colors for our data series. If there are more series than
         // colors provided, Google Charts will cycle
@@ -190,7 +191,7 @@ public class PTestGoogleChart {
      * Encodes a list of values into the Google Charts API "extended encoding",
      * scaling to the supplied max value.
      * http://code.google.com/apis/chart/docs/data_formats.html#extended
-     * 
+     *
      * Try and dig into their data formats sometime. They're pretty annoying.
      */
     public String buildDataPoints() {
@@ -231,11 +232,10 @@ public class PTestGoogleChart {
     /**
      * Write the chart to the specified file. If the file already exists, it
      * will be replaced.
-     * 
+     *
      * @param file Write to this file.
      * @return Whether the file was successfully created.
      */
-    @SuppressWarnings("deprecation")
     public boolean writeToFile(File file) throws IOException {
 
         HttpParams httpParams = new BasicHttpParams();

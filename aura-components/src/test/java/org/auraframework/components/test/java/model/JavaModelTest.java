@@ -62,22 +62,22 @@ public class JavaModelTest extends AuraImplTestCase {
 
         @Override
         public String getNamespace() {
-            return TestModel.class.getPackage().getName();
+            return org.auraframework.components.test.java.model.TestModel.class.getPackage().getName();
         }
 
         @Override
         public String getName() {
-            return TestModel.class.getSimpleName();
+            return org.auraframework.components.test.java.model.TestModel.class.getSimpleName();
         }
 
         @Override
         public String getQualifiedName() {
-            return getPrefix() + "://" + TestModel.class.getName();
+            return getPrefix() + "://" + org.auraframework.components.test.java.model.TestModel.class.getName();
         }
 
         @Override
         public String getDescriptorName() {
-            return TestModel.class.getName();
+            return org.auraframework.components.test.java.model.TestModel.class.getName();
         }
 
         @Override

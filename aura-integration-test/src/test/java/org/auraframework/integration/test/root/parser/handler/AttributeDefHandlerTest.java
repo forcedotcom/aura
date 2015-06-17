@@ -41,6 +41,7 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
+@SuppressWarnings("deprecation")
 public class AttributeDefHandlerTest extends AuraImplTestCase {
 
     public AttributeDefHandlerTest(String name) {
@@ -234,7 +235,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     private XMLStreamReader getXmlReader(StringSource<AttributeDef> attributeSource) throws FactoryConfigurationError,
-            XMLStreamException {
+    XMLStreamException {
         XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(attributeSource.getHashingReader());
         xmlReader.next();
         return xmlReader;

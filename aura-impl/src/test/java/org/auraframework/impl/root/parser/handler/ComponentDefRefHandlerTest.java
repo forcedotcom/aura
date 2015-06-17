@@ -144,7 +144,7 @@ public class ComponentDefRefHandlerTest extends AuraImplTestCase {
         cdrHandler.readSystemAttributes();
         cdrHandler.createDefinition();
 
-        DefDescriptor<ComponentDef> dd = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
+        Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
 
         assertEquals("fake", cdrHandler.createDefinition().getFlavor());
     }

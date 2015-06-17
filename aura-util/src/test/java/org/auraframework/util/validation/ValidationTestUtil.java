@@ -21,8 +21,6 @@ import java.util.List;
 
 import org.junit.Assert;
 
-import org.auraframework.util.validation.ValidationError;
-
 /**
  * Misc helper methods for validation tests.
  */
@@ -57,7 +55,7 @@ public final class ValidationTestUtil {
         boolean cssLintErrorsReported = !System.getProperty("java.version").startsWith("1.6");
 
         Assert.assertEquals(cssLintErrorsReported ? 5 : 3, errors.size());
-        ArrayList<String> expectedErrors=new ArrayList();
+        ArrayList<String> expectedErrors = new ArrayList<>();
         expectedErrors.add("basicController.js [line 5, column 1] js/custom: Starting '(' missing");
         expectedErrors.add("basicController.js [line 7, column 20] jslint: Expected ';' and instead saw '}'");
         expectedErrors.add("basic.cmp [line 1, column 1] cmp/custom: Abstract component markup://validationTest:basic must be extensible");

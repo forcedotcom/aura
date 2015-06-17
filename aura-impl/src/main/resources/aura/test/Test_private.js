@@ -227,12 +227,15 @@ TestInstance.prototype.continueWhenReady = function() {
             if (this.waits.length > 0) {
                 var texp = this.waits[0].expected;
                 if ($A.util.isFunction(texp)) {
-                    texp = texp().toString();
+                	if(text()) {
+                		texp = texp().toString();
+                	}
                 }
                 var tact = this.waits[0].actual;
                 var val = tact;
                 if ($A.util.isFunction(tact)) {
-                    val = tact().toString();
+                    val = tact();
+                    if(val) { val = val.toString(); }
                     tact = tact.toString();
                 }
                 var failureMessage = "";

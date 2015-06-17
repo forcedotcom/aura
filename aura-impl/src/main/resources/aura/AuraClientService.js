@@ -726,7 +726,7 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheUpdateReady() {
-        if (window.applicationCache.swapCache) {
+        if (window.applicationCache.swapCache && window.applicationCache.status === window.applicationCache.UPDATEREADY) {
             window.applicationCache.swapCache();
         }
 

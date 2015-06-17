@@ -35,5 +35,11 @@
         } else {
             helper.broadcastNotify(cmp, event.getSource(), event.getParams());
         }
+    },
+    getActivePanel: function (cmp, event, helper) {
+        var callback = event.getParam('callback');
+        if (callback) {
+            helper.getActivePanel(cmp, callback);
+        }
     }
 })

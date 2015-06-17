@@ -17,6 +17,26 @@
     init: function(cmp) {
         //handler for tab key to trap the focus within the modal
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
+        //create default close button
+        if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
+            $A.componentService.createComponent('ui:button', {
+                'body': $A.newCmp({componentDef: 'aura:text', attributes: {values: {value: 'x'}}}),
+                'class': "closeBtn",
+                'press': cmp.getReference("c.onCloseBtnPressed"),
+                'label': cmp.get('v.closeDialogLabel'),
+                'buttonTitle': cmp.get('v.closeDialogLabel'),
+                'labelDisplay': "false"
+            }, function(button){
+                cmp.set('v.closeButton', button);
+            });
+        }
+    },
+
+    _getKeyHandler: function(cmp) {
+        if (!cmp._keyHandler) {
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
+        }
+        return cmp._keyHandler;
     },
 
     validateAnimationName: function(name) {
@@ -24,10 +44,11 @@
     },
 
     show: function(cmp, callback) {
-        var containerEl = cmp.getElement(),
+        var self = this,
+            containerEl = cmp.getElement(),
             autoFocus = $A.util.getBooleanValue(cmp.get('v.autoFocus')),
             useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
-            panel = cmp.find('panel').getElement();
+            panel = this._findContainedComponent(cmp, 'panel').getElement();
 
         if(useTransition) {
             useTransition = this.validateAnimationName(cmp.get('v.animation'));
@@ -44,18 +65,7 @@
             animationEl: panel,
             autoFocus: autoFocus,
             onFinish: function() {
-                $A.util.on(containerEl, 'keydown', cmp._windowKeyHandler);
-
-                // For modal panels if autofocus is false the close button
-                // should be focused.
-                // 
-                // 
-                if(!autoFocus) {
-                    var closeButton = containerEl.querySelector('.closeBtn');
-                    if(closeButton) {
-                        closeButton.focus();
-                    }
-                }
+                $A.util.on(containerEl, 'keydown', self._getKeyHandler(cmp));
                 callback && callback();
             }
         };
@@ -69,8 +79,16 @@
         } else {
             self.lib.panelLibCore.show(cmp, config);
         }
-        
-        
+    },
+
+    _findContainedComponent: function(cmp, id) {
+        var p = cmp;
+        var container = cmp.find(id);
+        while (!container && p.isInstanceOf("ui:modal")) {
+            p = p.getSuper();
+            container = p.find(id);
+        }
+        return container;
     },
 
     close: function (cmp, callback) {
@@ -86,13 +104,13 @@
     },
 
     hide: function (cmp, callback) {
-        var containerEl = cmp.getElement(),
-            panel = cmp.find('panel').getElement(),
+        var self = this,
+            containerEl = cmp.getElement(),
             animationName = cmp.get('v.animation'),
             useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
             closeAnimation = cmp.get('v.closeAnimation'),
-            mask = cmp.find('modal-glass').getElement();
-
+            panel = this._findContainedComponent(cmp, 'panel').getElement(),
+            mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
         
         if(useTransition) {
             panel.style.opacity = '0';
@@ -112,7 +130,7 @@
             animationName: 'moveto' + animationName,
             animationEl: panel,
             onFinish: function() {
-                $A.util.removeOn(containerEl, 'keydown', cmp._windowKeyHandler);
+                $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
                 if(callback) { //give time for all transitions to complete
                     setTimeout(callback, 2);
                 }
@@ -128,7 +146,7 @@
 
     mask: function(cmp) {
         var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
-        var mask = cmp.find('modal-glass').getElement();
+        var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
 
         $A.util.removeClass(mask, 'hidden');
         $A.util.addClass(mask, 'fadein');

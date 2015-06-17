@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function () {
+function (scrollUtil) {
     'use strict';
 
     var lib = {
-
 
         validateAnimationName: function(animName) {
         	if(animName && animName.match(/^move(to|from)(bottom|top|left|right|center|pop)$/)) {
@@ -267,8 +266,22 @@ function () {
          * @param body
          * @param callback
          */
-        updatePanel: function(cmp, body, callback) {
-            cmp.set('v.body', body);
+        updatePanel: function(panel, facets, callback) {
+            if ($A.util.isObject(facets)) {
+                var facet, body = facets['body'] || panel;
+                for (var key in facets) {
+                    facet = facets[key];
+                    if (facets.hasOwnProperty(key) && $A.util.isComponent(facet)) {
+                        panel.set('v.' + key, facet);
+                        if (key === 'header' || key === 'footer') {
+                            //need to set body as value provider so that body component can handle events fired from header and footer
+                            facet.setAttributeValueProvider(body);
+                        } else {
+                            facet.setAttributeValueProvider(panel);
+                        }
+                    }
+                }
+            }
             callback && callback();
         },
 
@@ -348,7 +361,12 @@ function () {
             var focusables = this.getFocusables(cmp.getElement());
             focusables.initial && focusables.initial.focus();
         },
-
+        scopeScroll: function (dom) {
+            scrollUtil.scope(dom);
+        },
+        unscopeScroll: function (dom) {
+            scrollUtil.unscope(dom);
+        },
         ANIMATION_END_EVENT_NAMES : {
             webkit : 'webkitAnimationEnd',
             o : 'oAnimationEnd',

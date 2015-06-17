@@ -45,7 +45,7 @@
 
     update: function(cmp, event, helper){
         var args = event.getParam && event.getParam('arguments');
-        helper.lib.panelLibCore.updatePanel(cmp, args.body, args.callback);
+        helper.lib.panelLibCore.updatePanel(cmp, args.facets, args.callback);
     },
 
     onNotify: function(cmp, event) {

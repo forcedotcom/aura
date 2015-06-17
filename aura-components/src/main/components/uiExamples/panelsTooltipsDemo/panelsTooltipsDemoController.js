@@ -221,7 +221,7 @@
                 //simulating panel content has server dependencies and updates panel after content is loaded
                 setTimeout(function() {
                     var body = $A.newCmp({componentDef: 'uiExamples:modalContent'});
-                    panel.update(body);
+                    panel.update({ body : body });
                 }, 1000);
             }
 

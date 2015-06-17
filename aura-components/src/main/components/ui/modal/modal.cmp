@@ -16,7 +16,7 @@
 
 -->
 
-<aura:component implements="ui:panelType">
+<aura:component implements="ui:panelType" extensible="true">
     <aura:import library="ui:panelLib" property="lib"/>
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
@@ -29,11 +29,11 @@
     <aura:attribute name="animation" type="String" default="center" description="Adds animation to the dialog"/>
     <aura:attribute name="closeAnimation" type="String" description="Adds animation to the dialog"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets initial focus on the first item in the panel" />
-    <aura:attribute name="header" type="Aura.Component[]" description="The header facet" />
-    <aura:attribute name="footer" type="Aura.Component[]" description="The footer facet" />
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
+    
+    <aura:attribute name="closeButton" type="Aura.Component[]" />
 
     <div aura:flavorable="true" class="{!v.class}">
 
@@ -43,7 +43,7 @@
              tabindex="-1"
              class="panel"
              role="dialog"
-             aria-labeledby="{!'title_' + globalId}">
+             aria-labelledby="{!'title_' + globalId}">
 
             <div aura:id="content" role="document" class="modal-container">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
@@ -53,20 +53,14 @@
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                     </aura:If>
                     {!v.header}
-                    <aura:if isTrue="{!v.showCloseButton}">
-                        <ui:button class="closeBtn" press="{!c.onCloseBtnPressed}"
-                                   label="{!v.closeDialogLabel}"
-                                   buttonTitle="{!v.closeDialogLabel}"
-                                   labelDisplay="false"
-                                >&times;</ui:button>
-                    </aura:if>
+                    {!v.closeButton}
                 </header>
 
-                <div aura:id="body" class="modal-body">
+                <div aura:id="body" class="modal-body scrollable">
                     {!v.body}
                 </div>
 
-                <footer class="modal-footer">
+                <footer class="{!'modal-footer' + (empty(v.footer) ? ' empty' : '')}">
                     {!v.footer}
                 </footer>
             </div>

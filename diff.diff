@@ -1,0 +1,12 @@
+diff --git a/aura-components/src/main/components/ui/panel/panel.css b/aura-components/src/main/components/ui/panel/panel.css
+index d605124..71f5866 100644
+--- a/aura-components/src/main/components/ui/panel/panel.css
++++ b/aura-components/src/main/components/ui/panel/panel.css
+@@ -161,7 +161,6 @@
+ }
+ 
+ .THIS.movefrompop {
+-    border: 5px solid red;
+     visibility: visible;
+     animation: movefrompop .2s linear;
+ }

@@ -161,7 +161,6 @@
 }
 
 .THIS.movefrompop {
-    border: 5px solid red;
     visibility: visible;
     animation: movefrompop .2s linear;
 }

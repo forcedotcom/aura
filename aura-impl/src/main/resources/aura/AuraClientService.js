@@ -755,20 +755,8 @@ AuraClientService.prototype.handleAppCache = function() {
             acs.hardRefresh();
         }
 
-        var manifestURL = acs.getManifestURL();
         if (acs.isDevMode()) {
             showProgress(-1);
-        }
-
-        if (manifestURL) {
-            setTimeout(function() {
-                var xhr = acs.createXHR();
-                var qs = acs.buildParams({
-                        "aura.error" : "true"
-                });
-                xhr["open"]("GET", manifestURL+"?"+qs, true);
-                xhr["send"]();
-            }, 500);
         }
 
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {

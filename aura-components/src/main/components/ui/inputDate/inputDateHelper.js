@@ -49,7 +49,10 @@
             if (value) {
                 currentDate = $A.localizationService.parseDateTime(value, "yyyy-MM-dd");
             }
-            datePicker.set("v.value", this.getDateString(currentDate));
+            // if invalid text is entered in the inputText, currentDate will be null
+            if (!$A.util.isUndefinedOrNull(currentDate)) {
+                datePicker.set("v.value", this.getDateString(currentDate));
+            }
             datePicker.set("v.visible", true);
         }
     },

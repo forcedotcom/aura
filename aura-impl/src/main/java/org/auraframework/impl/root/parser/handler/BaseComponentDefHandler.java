@@ -233,11 +233,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
             body.add(cdr);
         }
-
-        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = readRequiredVersionDefs();
-        if(requiredVersionDefs != null) {
-        	builder.setRequiredVersionDefs(requiredVersionDefs);
-        }
     }
 
     protected abstract B createBuilder();
@@ -528,6 +523,10 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             atBuilder.setValue(body);
             AttributeDefRef adr = atBuilder.build();
             builder.facets.add(adr);
+        }
+        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = readRequiredVersionDefs(defDescriptor);
+        if(requiredVersionDefs != null) {
+        	builder.setRequiredVersionDefs(requiredVersionDefs);
         }
 
         return builder.build();

@@ -18,6 +18,7 @@ package org.auraframework.impl.adapter;
 import java.util.Map;
 
 import org.auraframework.adapter.DefinitionParserAdapter;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.DefinitionAccessImpl;
@@ -34,7 +35,7 @@ public class DefinitionParserAdapterImpl implements DefinitionParserAdapter {
     }
 
 	@Override
-	public Map<String, String> getRequiredVersions() {
+	public Map<String, String> getRequiredVersions(DefDescriptor<?> desc) {
 		return null;
 	}
 

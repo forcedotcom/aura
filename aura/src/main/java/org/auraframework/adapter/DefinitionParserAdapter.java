@@ -19,12 +19,11 @@ import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 
 public interface DefinitionParserAdapter extends AuraAdapter {
     /* parse the value of the ACCESS attribute */
     DefinitionAccess parseAccess(String namespace, String access) throws InvalidAccessValueException;
     
-    Map<String, String> getRequiredVersions();
+    Map<String, String> getRequiredVersions(DefDescriptor<?> desc);
 }

@@ -53,8 +53,11 @@
         var ms = 0;
         if (value) {
             var currDate = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
-            secs = currDate.getUTCSeconds();
-            ms = currDate.getUTCMilliseconds();
+            // if invalid text is entered in the inputText, currentDate will be null
+            if (!$A.util.isUndefinedOrNull(currDate)) {
+                secs = currDate.getUTCSeconds();
+                ms = currDate.getUTCMilliseconds();
+            }
         }
 
         var dateValue = event.getParam("value");

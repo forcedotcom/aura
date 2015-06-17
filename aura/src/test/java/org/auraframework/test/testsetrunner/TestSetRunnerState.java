@@ -28,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import org.auraframework.test.ComponentJSTestSuite.ComponentTestCase;
+import org.auraframework.test.ComponentJSTest.ComponentTestCase;
 import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.ServiceLocator;

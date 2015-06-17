@@ -99,9 +99,9 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
    
     }
 
-    protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs() {
+    protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs(DefDescriptor<?> desc) {
     	Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
-    	Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions();
+    	Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions(desc);
     	if (requiredVersions != null) {
     		requiredVersionDefs = Maps.newHashMap();
     		for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {

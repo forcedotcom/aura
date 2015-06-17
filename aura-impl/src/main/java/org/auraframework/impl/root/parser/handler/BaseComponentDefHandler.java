@@ -154,7 +154,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
             }
 
             builder.getAttributeDefs().put(attributeDef.getDescriptor(),attributeDef);
-        } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (isInPrivilegedNamespace && RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
         	RequiredVersionDefHandler<T> handler = new RequiredVersionDefHandler<>(this,xmlReader, source);
             RequiredVersionDefImpl requiredVersionDef = handler.getElement();
         	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef.getDescriptor();

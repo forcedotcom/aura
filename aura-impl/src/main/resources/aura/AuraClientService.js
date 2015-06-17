@@ -978,7 +978,7 @@ AuraClientService.prototype.initDefs = function(config) {
         evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
     for (i = 0; i < evtConfigs.length; i++) {
-        $A.eventService.createEventDef(evtConfigs[i]);
+        $A.eventService.saveEventConfig(evtConfigs[i]);
     }
     $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
 

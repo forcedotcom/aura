@@ -44,7 +44,14 @@ function AuraComponentService () {
     // proper stack traces and proper use of prototypical inheritance
     this.classConstructors={};
 
+    // holds ComponentDef configs to be created
     this.savedComponentConfigs = {};
+
+    // references ControllerDef descriptor to its ComponentDef descriptor
+    this.controllerDefRelationship = {};
+
+    // references ActionDef descriptor to its ComponentDef descriptor
+    this.actionDefRelationship = {};
 }
 
 /**
@@ -768,7 +775,30 @@ AuraComponentService.prototype.createDef = function(config) {
  * @private
  */
 AuraComponentService.prototype.getControllerDef = function(descriptor) {
-    return this.controllerDefRegistry.getDef(descriptor);
+    return this.getDefFromRelationship(descriptor, this.controllerDefRelationship, this.controllerDefRegistry);
+};
+
+/**
+ * ControllerDef and ActionDef are within ComponentDef. ComponentDef(s) are only created when used so
+ * we need to create the component def if ControllerDef or ActionDef is requested directly
+ *
+ * @param {String} descriptor descriptor for definition
+ * @param {Object} relationshipMap relationship map referencing ComponentDef descriptor
+ * @param {Object} registry registry that hold definition type
+ * @return {*} Def definition
+ */
+AuraComponentService.prototype.getDefFromRelationship = function(descriptor, relationshipMap, registry) {
+    var def = registry.getDef(descriptor);
+    if (!def && relationshipMap[descriptor]) {
+        var componentDefDescriptor = relationshipMap[descriptor];
+        if (this.savedComponentConfigs[componentDefDescriptor]) {
+            this.getDef(componentDefDescriptor);
+            // def should be in its registry once ComponentDef is created
+            def = registry.getDef(descriptor);
+        }
+    }
+    return def;
+
 };
 
 /**
@@ -778,7 +808,10 @@ AuraComponentService.prototype.getControllerDef = function(descriptor) {
  * @private
  */
 AuraComponentService.prototype.createControllerDef = function(config) {
-    return this.controllerDefRegistry.createDef(config);
+    var def = this.controllerDefRegistry.createDef(config);
+    // delete reference when created
+    delete this.controllerDefRelationship[def.getDescriptor()];
+    return def;
 };
 
 /**
@@ -788,7 +821,7 @@ AuraComponentService.prototype.createControllerDef = function(config) {
  * @private
  */
 AuraComponentService.prototype.getActionDef = function(descriptor) {
-    return this.actionDefRegistry.getDef(descriptor);
+    return this.getDefFromRelationship(descriptor, this.actionDefRelationship, this.actionDefRegistry);
 };
 
 /**
@@ -798,7 +831,10 @@ AuraComponentService.prototype.getActionDef = function(descriptor) {
  * @private
  */
 AuraComponentService.prototype.createActionDef = function(config) {
-    return this.actionDefRegistry.createDef(config);
+    var def = this.actionDefRegistry.createDef(config);
+    // delete reference when created
+    delete this.actionDefRelationship[def.getDescriptor()];
+    return def;
 };
 
 /**
@@ -993,14 +1029,39 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
 };
 
 /**
- * Saves component config so it can be use later when component def is exactly used.
+ * Saves component config so it can be use later when component def is actually used.
  * Allows Aura to only create ComponentDef when needed
+ *
+ * Also save reference to componentDef for its ControllerDef and ActionDefs in cases
+ * where direct access to the defs are needed
  *
  * @param {Object} config component definition config
  */
 AuraComponentService.prototype.saveComponentConfig = function(config) {
     $A.assert(config && config["descriptor"], "ComponentDef config required for registration");
-    this.savedComponentConfigs[config["descriptor"]] = config;
+    var componentDescriptor = config["descriptor"];
+    this.savedComponentConfigs[componentDescriptor] = config;
+
+    var controllerDef = config["controllerDef"];
+    if (controllerDef) {
+        if (controllerDef["descriptor"]) {
+            // save reference to component descriptor for ControllerDef
+            this.controllerDefRelationship[controllerDef["descriptor"]] = componentDescriptor;
+        }
+        if (controllerDef["actionDefs"]) {
+            var i,
+                actionDefs = controllerDef["actionDefs"],
+                len = actionDefs.length;
+
+            for (i = 0; i < len; i++) {
+                // loop and save reference to ComponentDef descriptor for each ActionDef
+                var actionDef = actionDefs[i];
+                if (actionDef["descriptor"]) {
+                    this.actionDefRelationship[actionDef["descriptor"]] = componentDescriptor;
+                }
+            }
+        }
+    }
 };
 
 Aura.Services.AuraComponentService = AuraComponentService;

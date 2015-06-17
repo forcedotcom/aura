@@ -74,7 +74,7 @@ ActionDef.prototype.getName = function() {
 /**
  * Gets the Action Descriptor.
  *
- * @returns {Object}
+ * @returns {String} descriptor of ActionDef
  * @private
  */
 ActionDef.prototype.getDescriptor = function() {

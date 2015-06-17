@@ -23,11 +23,12 @@ import org.auraframework.util.json.Json;
 import java.io.IOException;
 
 public class DesignOptionDefImpl extends DefinitionImpl<DesignOptionDef> implements DesignOptionDef {
-    private final String key, value;
+    private final String key, value, access;
     protected DesignOptionDefImpl(Builder builder) {
         super(builder);
         this.key = builder.key;
         this.value = builder.value;
+        this.access = builder.access;
     }
 
     @Override
@@ -41,10 +42,15 @@ public class DesignOptionDefImpl extends DefinitionImpl<DesignOptionDef> impleme
     }
 
     @Override
+    public String getAccessString() {
+        return access;
+    }
+
+    @Override
     public void serialize(Json json) throws IOException { }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DesignOptionDef> {
-        private String key, value;
+        private String key, value, access;
         public Builder() {
             super(DesignOptionDef.class);
         }
@@ -60,6 +66,10 @@ public class DesignOptionDefImpl extends DefinitionImpl<DesignOptionDef> impleme
 
         public void setValue(String value) {
             this.value = value;
+        }
+
+        public void setAccess(String value) {
+            this.access = value;
         }
     }
 }

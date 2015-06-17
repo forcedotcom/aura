@@ -44,30 +44,6 @@
         helper.handlePillEvent(cmp, event);
     },
 
-    processPillInserted: function(cmp, event, helper) {
-        var pillInput = cmp.get("v.pillInput");
-        if (!$A.util.isEmpty(pillInput)) {
-            var element = pillInput[0].getElement();
-            if (helper._hasReachedMax(cmp, cmp.get("v.items"))) {
-                $A.util.addClass(element, "invisible");
-            } else {
-            	$A.util.removeClass(element, "invisible");
-            }
-        }
-    },
-
-    processPillRemoved: function(cmp, event, helper) {
-        var pillInput = cmp.get("v.pillInput");
-        var pillContainer = cmp.getElement();
-        if (!$A.util.isEmpty(pillInput)) {
-            var element = pillInput[0].getElement();
-            $A.util.removeClass(element, "invisible");
-        }
-        if($A.util.hasClass(pillContainer, "noinput")){
-        	$A.util.removeClass(pillContainer, 'noinput');
-        }
-    },
-
     focusOnInputBox: function(cmp, event, helper) {
         helper.focusOnInputBox(cmp);
     },

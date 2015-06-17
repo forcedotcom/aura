@@ -56,6 +56,7 @@
             else if (!this._itemExists(curItems, newItems[i])) {
                 itemsIsUpdated = true;
                 curItems.push(newItems[i]);
+                this._processPillInserted(cmp);
                 cmp.get("e.pillInserted").fire();
             }
         }
@@ -247,6 +248,7 @@
                 // remove found item
                 items.splice(i, 1);
                 cmp.set('v.items', items);
+                this._processPillRemoved(cmp);
                 cmp.get("e.pillRemoved").fire();
                 if (items.length <= 0) {
                     this.focusOnInputBox(cmp);
@@ -268,5 +270,31 @@
                 break;
             }
         }
+    },
+
+
+    _processPillInserted: function(cmp) {
+        var pillInput = cmp.get("v.pillInput");
+        if (!$A.util.isEmpty(pillInput)) {
+            var element = pillInput[0].getElement();
+            if (this._hasReachedMax(cmp, cmp.get("v.items"))) {
+                $A.util.addClass(element, "invisible");
+            } else {
+                $A.util.removeClass(element, "invisible");
+            }
+        }
+    },
+
+    _processPillRemoved: function(cmp) {
+        var pillInput = cmp.get("v.pillInput");
+        var pillContainer = cmp.getElement();
+        if (!$A.util.isEmpty(pillInput)) {
+            var element = pillInput[0].getElement();
+            $A.util.removeClass(element, "invisible");
+        }
+        if($A.util.hasClass(pillContainer, "noinput")){
+            $A.util.removeClass(pillContainer, 'noinput');
+        }
     }
+
 })

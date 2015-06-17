@@ -41,8 +41,6 @@
     </aura:method>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    <aura:handler name="pillInserted" action="{!c.processPillInserted}"/>
-    <aura:handler name="pillRemoved" action="{!c.processPillRemoved}"/>
 
     <div aura:flavorable="true"  onmousedown="{!c.onClickBackground}">
         <ul aura:id="list" class="orderedList">

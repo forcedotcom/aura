@@ -145,6 +145,17 @@
             $A.test.assertFalse(list.get("v.visible"), "list should be hidden");
         }
     },
+    
+    testAutoCompleteListContentVisible: {
+        test: [function (cmp) {
+	            pillContainer = cmp.find("pillContainer");
+	            this._createPillUsingAutoCompleteList(cmp);
+	        }, function(cmp){
+	        	var list = cmp.find("autocomplete").getSuper().find("list");
+	        	$A.test.assertTrue(list.get("v.visible"), "list should be visible");
+	        }
+        ]
+    },
 
     testAllowNewFalse: {
         test: function (cmp) {
@@ -307,14 +318,19 @@
             inputChangeEvt.fire();
         }
     },
-
-    _createPillByAutoComplete: function (cmp) {
-        var textInput = this._getInput(cmp);
+    
+    _createPillUsingAutoCompleteList: function(cmp){
+    	var textInput = this._getInput(cmp);
         var autocomplete = cmp.find("autocomplete");
         var value = this.PILLS[0].label.substring(0, 4);
         textInput.set("v.value", value);
         this._fireInputchange(autocomplete, value);
+    },
 
+    _createPillByAutoComplete: function (cmp) {
+        var textInput = this._getInput(cmp);
+        this._createPillUsingAutoCompleteList(cmp);
+        
         this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
         return textInput;

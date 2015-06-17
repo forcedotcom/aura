@@ -38,6 +38,8 @@ TestInstance = function() {
     this.blockForeground = 0;
     this.blockBackground = 0;
     this.sentXHRCount = 0;
+    
+    this.prePostSendConfigs = [];
 };
 
 // #include aura.test.Test_private
@@ -1595,12 +1597,50 @@ TestInstance.prototype.getAvailableXHROverride = function(config, isBackground) 
  * @private
  */
 TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method, options) {
+    var post_callbacks = [];
+    var processing = this.prePostSendConfigs;
+    var cb_config;
+    var i;
+
     if (this.disconnectedNoSend) {
         return false;
+    }
+    if(processing) {
+    	this.prePostSendConfigs = [];
+	    for (i = 0; i < processing.length; i++) {
+	        cb_config = processing[i];
+	        // If this action has been refreshed, track that one instead.
+	        if (cb_config.action && cb_config.action.refreshAction) {
+	            cb_config.action = cb_config.action.refreshAction;
+	        }
+	        if (cb_config.action && !( actions.indexOf(cb_config.action) >= 0)) {
+	            if (cb_config.action.getState() == 'NEW') {
+	                this.prePostSendConfigs.push(cb_config);//push it back, we will check in the next send
+	            } else {
+	                // whoops, removing without call, warn the user
+	                $A.warning("Callback never called for "+config.action.getId()+" in state "+config.action.getState());
+	            }
+	            continue;//move on to the next cb_config
+	        }
+	        //at this point either we find the action we are watching for, or we are watching _any_ action.
+	        //if we are watching _any_ action, push it back, user should remove the cb_config in the callback once they are done
+	        if (!cb_config.action) {
+	            this.prePostSendConfigs.push(cb_config);
+	        }
+	        if (cb_config.preSendCallback) {
+	        	cb_config.preSendCallback(actions, cb_config.action);
+	        }
+	        if (cb_config.postSendCallback) {
+	            post_callbacks.push(cb_config);//save the callback to post_callbacks so we can go through them after the real send call
+	        }
+	    }
     }
     var value = config["fn"].call(config["scope"], auraXHR, actions, method, options);
     if (value) {
         this.sentXHRCount += 1;
+    }
+    for (i = 0; i < post_callbacks.length; i++) {
+    		post_callbacks[i].postSendCallback(actions, post_callbacks[i].action);
     }
     return value;
 };
@@ -1618,6 +1658,73 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
 };
 
 /**
+ * A simple structure to hold values.
+ *
+ * @struct
+ */
+TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSendCallback) {
+    this.action = action;
+    this.preSendCallback = preSendCallback;
+    this.postSendCallback = postSendCallback;
+};
+
+/**
+ * Add a pre/post send callback.
+ *
+ * This function allows a test to insert a hook either pre or post send of XHR.
+ *
+ * Note that for the post XHR callback the XHR has actually not been 'sent', but actions are serialized
+ * and put in the actual request, so changing actions will have no effect at that point.
+ *
+ * @param action the action to watch for (undefined/null means any action)
+ * @param preSendCallback the hook function for before send.
+ * @param postSendCallback the hook function for after send.
+ * one of preSendCallback and postSendCallback can be null, but not both of them
+ * @return a handle to remove the callback (only needed if the action is empty).
+ * 
+ * @export
+ */
+TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallback, postSendCallback) {
+	if ( (!preSendCallback)&&(!postSendCallback) ) {
+		throw new Error("Test.addPrePostSendCallback: one of the callback must be not-null");
+	}
+    if (preSendCallback !== null && preSendCallback !== undefined) {
+        if (!(preSendCallback instanceof Function)) {
+            throw new Error("Test.addPrePostSendCallback: preSendCallback must be a function"
+                +preSendCallback);
+        }
+    }
+    if (postSendCallback !== null && postSendCallback !== undefined) {
+        if (!(postSendCallback instanceof Function)) {
+            throw new Error("Test.addPrePostSendCallback: preSendCallback must be a function"
+                +postSendCallback);
+        }
+    }
+    if (action && action.getState() !== "NEW") {
+        throw new Error("Test.addPrePostSendCallback: action has already been sent/completed "+action.getState());
+    }
+    var config = new TestInstance.prototype.PrePostConfig(action, preSendCallback, postSendCallback);
+    this.prePostSendConfigs.push(config);
+    return config;
+};
+
+/**
+ * Remove a previously added callback.
+ * 
+ * @export
+ */
+TestInstance.prototype.removePrePostSendCallback = function (handle) {
+    var i;
+
+    for (i = 0; i < this.prePostSendConfigs.length; i++) {
+        if (this.prePostSendConfigs[i] === handle) {
+            this.prePostSendConfigs.splice(i, 1);
+            return;
+        }
+    }
+};
+
+/**
  * Install all of the overrides needed.
  *
  * @private
@@ -1628,6 +1735,8 @@ TestInstance.prototype.install = function() {
     $A.installOverride("ClientService.send", this.sendOverride, this, 100);
     $A.installOverride("ClientService.decode", this.decodeOverride, this, 100);
 };
+
+
 
 /**
  * Run the test

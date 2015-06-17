@@ -17,7 +17,7 @@
     },
 
     executeAction:function(cmp, actionName, actionParam, additionalProperties, extraCallback){
-        var helper = cmp.getDef().getHelper()
+        var helper = cmp.getDef().getHelper();
         return helper.executeAction.call(helper, cmp, actionName, actionParam, additionalProperties, extraCallback);
     },
     findAndSetText:function(cmp, targetCmpId, msg){

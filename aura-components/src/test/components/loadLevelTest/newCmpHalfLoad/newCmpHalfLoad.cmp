@@ -15,12 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component controller="java://org.auraframework.components.test.java.controller.JavaTestController">
     <!-- 
         we gonna create this receiverCmp in test setUp, then in our test, receiverCmp will create a new cmp.
-        then before the new cmp get back to receiverCmp, we  in-validate receiverCmp.
+        then before the new cmp get back to receiverCmp, we destroy receiverCmp.
         This is what happens when people navigate to some page, create something,
-        then navigate away from the page before the new thing is loaded.
+        then hit cancel before the new thing is loaded.
     -->
     <aura:attribute name="receiverCmp" type="String" default="loadLevelTest:newCmpWithValueProvider"/>
     <aura:attribute name="receiverCmpAuraId" type="String" default="receiverCmp"/>

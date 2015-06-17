@@ -1029,7 +1029,7 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
 };
 
 /**
- * Saves component config so it can be use later when component def is exactly used.
+ * Saves component config so it can be use later when component def is actually used.
  * Allows Aura to only create ComponentDef when needed
  *
  * Also save reference to componentDef for its ControllerDef and ActionDefs in cases

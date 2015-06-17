@@ -135,52 +135,62 @@
 
 .THIS .panel.movefrombottom {
     visibility: visible;
-    animation: movefrombottom-modal .4s ease both;
+    animation: movefrombottom-modal .4s ease-in-out;
 }
 
 .THIS .panel.movetobottom {
     visibility: visible;
-    animation: movetobottom-modal .4s ease both;
+    animation: movetobottom-modal .4s ease-in-out;
 }
 
 .THIS .panel.movefromtop {
     visibility: visible;
-    animation: movefromtop-modal .4s ease both;
+    animation: movefromtop-modal .4s ease-in-out;
 }
 
 .THIS .panel.movetotop{
     visibility: visible;
-    animation: movetotop-modal .4s ease both;
+    animation: movetotop-modal .4s ease-in-out;
 }
 
 .THIS .panel.movefromleft {
     visibility: visible;
-    animation: movefromleft-modal .4s ease both;
+    animation: movefromleft-modal .4s ease-in-out;
 }
 
 .THIS .panel.movetoleft{
     visibility: visible;
-    animation: movetoleft-modal .4s ease both;
+    animation: movetoleft-modal .4s ease-in-out;
 }
 
 .THIS .panel.movefromright {
     visibility: visible;
-    animation: movefromright-modal .4s ease both;
+    animation: movefromright-modal .4s ease-in-out;
 }
 
 .THIS .panel.movetoright {
     visibility: visible;
-    animation: movetoright-modal .4s ease both;
+    animation: movetoright-modal .4s ease-in-out;
 }
 
 .THIS .panel.movefromcenter {
     visibility: visible;
-    animation: movefromcenter .4s ease both;
+    animation: movefromcenter .4s ease-in-out;
 }
 
 .THIS .panel.movetocenter {
     visibility: visible;
-    animation: movetocenter .4s ease both;
+    animation: movetocenter .4s ease-in-out;
+}
+
+.THIS .panel.movefrompop {
+    visibility: visible;
+    animation: movefrompop-modal .2s linear;
+}
+
+.THIS .panel.movetopop {
+    visibility: visible;
+    animation: movetopop-modal .2s ease-in-out;
 }
 
 /* ANIMATIONS */
@@ -267,3 +277,33 @@
 		transform:translate3d(0px, 0px , 0px);
     }
 }
+
+@keyframes movetopop-modal {
+    from { 
+       -webkit-transform:scale3d(1,1,1);
+       transform:scale3d(1,1,1);
+    }
+
+    to {
+        -webkit-transform:scale3d(.97,.97,1);
+        transform:scale3d(.97,.97,1);
+    }
+}
+@keyframes movefrompop-modal {
+
+    0% {
+        -webkit-transform:scale3d(.97,.97,1);
+        transform:scale3d(.97,.97,1);
+    }
+
+    60% {
+        -webkit-transform:scale3d(1.02,1.02,1);
+        transform:scale3d(1.02,1.02,1);
+    }
+
+    100% { 
+       -webkit-transform:scale3d(1,1,1);
+       transform:scale3d(1,1,1);
+    }
+}
+

@@ -413,6 +413,7 @@ Action.prototype.getComponent = function() {
  *  * ERROR: if the action has an error (including javascript errors for client side actions)
  *  * INCOMPLETE: if a server side action failed to complete because there is no connection
  *  * ABORTED: if the action is aborted via abort()
+ *  * REFRESH: for server side storable actions, this will be called instead of the SUCCESS action when the storage is refreshed.
  *
  * @public
  * @param {Object}
@@ -764,7 +765,7 @@ Action.prototype.updateFromResponse = function(response) {
             var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
             var refreshedComponents = $A.util.json.encode(response["components"]);
             if (refreshedComponents === originalComponents) {
-                this.getStorage().log("Action.updateFromResponse(): skipping duplicate response: " + this.getId());
+                $A.log("Action.updateFromResponse(): skipping duplicate response: " + this.getStorageKey() + ", " + this.getId());
                 return false;
             }
         }

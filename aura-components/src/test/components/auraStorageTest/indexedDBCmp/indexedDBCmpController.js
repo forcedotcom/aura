@@ -29,7 +29,7 @@
         cmp.set("v.status", "Adding");
         var key = cmp.get("v.key");
         var value = cmp.get("v.value");
-        cmp._storage.put(key, value)
+        return cmp._storage.put(key, value)
             .then(function(){
                 cmp.set("v.status", "Done Adding");
             }, function(error) {

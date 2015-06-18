@@ -192,4 +192,19 @@ ComponentDefRegistry.prototype.removeDef = function(descriptor) {
     }
 };
 
+/**
+ * Clears storage
+ * @return {Promise} Promise when storage is cleared
+ */
+ComponentDefRegistry.prototype.clearStorage = function() {
+    var promise;
+    if (this.useDefinitionStorage()) {
+        promise = this.definitionStorage.clear();
+    } else {
+        promise = Promise["resolve"]();
+    }
+
+    return promise;
+};
+
 Aura.Component.ComponentDefRegistry = ComponentDefRegistry;

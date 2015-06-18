@@ -275,8 +275,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
             if (descr != null && descr.getDefType().equals(DefType.APPLICATION)) {
                 ApplicationDef def = (ApplicationDef) descr.getDef();
                 for (String s : def.getAdditionalAppCacheURLs()) {
-                    sw.write(s);
-                    sw.write('\n');
+                    if (s != null) {
+                        sw.write(s);
+                        sw.write('\n');
+                    }
                 }
             }
 

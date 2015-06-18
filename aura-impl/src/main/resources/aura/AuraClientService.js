@@ -536,7 +536,7 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
                 return;
             }
 
-            toStore = action.getStored(storage.getName());
+            toStore = action.getStored();
 
             if (toStore) {
                 storage.put(key, toStore).then(
@@ -730,7 +730,9 @@ AuraClientService.prototype.handleAppCache = function() {
             window.applicationCache.swapCache();
         }
 
-        location.reload(true);
+        $A.componentService.registry.clearStorage().then(function() {
+            window.location.reload(true);
+        });
     }
 
     function handleAppcacheError(e) {
@@ -1048,23 +1050,29 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
 /**
  * Load a component.
  *
- * @param {DefDescriptor}
- *            descriptor The key for a definition with a qualified name
- *            of the format prefix://namespace:name
- * @param {Map}
- *            attributes The configuration data to use. If specified,
- *            attributes are used as a key value pair.
- * @param {function}
- *            callback The callback function to run
- * @param {String}
- *            defType Sets the defType to "COMPONENT"
+ * This function does a very complex dance to try to bring up the app as fast as possible. This is really
+ * important in the case of persistent storage.
+ *
+ * @param {DefDescriptor} descriptor The key for a definition with a qualified name of the format prefix://namespace:name
+ * @param {Object} attributes The configuration data to use. If specified, attributes are used as a key value pair.
+ * @param {function} callback The callback function to run
+ * @param {String} defType Sets the defType to "COMPONENT"
+ * 
  * @memberOf AuraClientService
  * @private
  */
 AuraClientService.prototype.loadComponent = function(descriptor, attributes, callback, defType) {
     var acs = this;
-    this.runAfterInitDefs(function() {
-        $A.run(function() {
+    this.loadTokenFromStorage().then(
+        function (value) {
+            if (value && value.value["token"]) {
+                acs._token = value.value["token"];
+            }
+        }, function(err) {
+            $A.log("AuraClientService.loadComponent(): failed to load token: " + err);
+        });
+    this.runAfterInitDefs(function () {
+        $A.run(function () {
             var desc = new DefDescriptor(descriptor);
             var tag = desc.getNamespace() + ":" + desc.getName();
 
@@ -1072,7 +1080,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             var action = $A.get("c.aura://ComponentController." + method);
 
             action.setStorable({
-                "ignoreExisting" : true
+                "refresh": 0
             });
             //
             // No, really, do not abort this. The setStorable above defaults this
@@ -1083,67 +1091,99 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             action.setAbortable(false);
 
             action.setParams({
-                name : tag,
-                attributes : attributes
+                name: tag,
+                attributes: attributes
             });
 
-            action.setCallback(acs, function(a) {
-                var state = a.getState();
+            //
+            // we use stored and loaded here to track the various race conditions and prevent
+            // them.
+            // * stored === true means that we have either succeeded or are still in process to initialize
+            //   from storage.
+            // * loaded === undefined means that nothing has returned an error.
+            // * loaded === false means that something has failed.
+            // * loaded truthy means we have initialized.
+            //
+            var stored = false;
+            var loaded = undefined;
+            var storage = Action.prototype.getStorage();
 
-                if (state === "SUCCESS") {
-                    callback(a.getReturnValue());
-                } else if (state === "INCOMPLETE"){
-                    // Use a stored response if one exists
-                    var storage = Action.prototype.getStorage();
-                    if (storage) {
-                        // TODO W-2512654: storage.get() returns expired items, need to check
-                        // value['isExpired'] in the multiple gets() below
-                        var key = action.getStorageKey();
-                        acs.loadTokenFromStorage()
-                            .then(function(value) {
-                                if (value && value.value && value.value["token"]) {
-                                    this._token = value.value["token"];
-                                }
-                            }, function(err) {
-                                // So this isn't good: we don't have the CSRF token so if we go back online the server
-                                // Actions will fail due to not having a token. But cached data remains accessible so we
-                                // warn rather than error.
-                                $A.warning("AuraClientService.loadComponent(): failed to load token: " + err);
-                            })
-                            // load getApplication() from storage
-                            .then(function() { return storage.get(key); })
-                            .then(
-                            function(value) {
-                                if (value) {
-                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE using stored action response.", [action, value.value]);
-                                    $A.run(function() {
-                                        action.updateFromResponse(value.value);
-                                        action.finishAction($A.getContext());
-                                    });
-                                } else {
-                                    $A.error("Unable to load application.");
-                                }
-                            }, function() {
-                                $A.error("Unable to load application.");
-                            }
-                        );
+            var failCallback = function (force, err) {
+                //
+                // The first failure here means just mark loaded so that the second failure will
+                // post an error. The second error dies.
+                //
+                if (loaded === false || force) {
+                    err = err || "";
+                    $A.error("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                } else if (!loaded) {
+                    loaded = false;
+                }
+            };
+
+            //
+            // SUCCESS callback cases
+            // (1) From storage: Get the token from storage, and if successful, initialize the app. Note that
+            // this has a race condition with the server. If we initialize the app from storage, remember
+            // that we have.
+            // (2) Server callback, storage incomplete. Save the token and initialize the app.
+            // (3) Server callback, storage completed initialization. Save the token, fire an event to
+            // allow the app to give the user the chance to refresh. This should only happen if the response
+            // has changed.
+            //
+            action.setCallback(acs,
+                function (a) {
+                    if (storage && a.isFromStorage()) {
+                        stored = true;
+                        if (!loaded) {
+                            loaded = "STORAGE";
+                            callback(a.getReturnValue());
+                        }
+                    } else {
+                        if (!loaded) {
+                            loaded = "SERVER";
+                            callback(a.getReturnValue());
+                        } else {
+                            var key = a.getStorageKey(),
+                                toStore = a.getStored();
+
+                            var storeCallback = function() {
+                                $A.log("getApplication response changed. Firing aura:applicationRefreshed event");
+                                $A.getEvt("markup://aura:applicationRefreshed").fire();
+                            };
+
+                            // Fires applicationRefreshed only after the new response is saved
+                            // Guarantees the new action response is there before page reloads
+                            storage.put(key, toStore).then(storeCallback, storeCallback);
+                        }
                     }
-                } else {
-                    //
-                    // This can be either error or aborted, and we really should only
-                    // see error.
-                    //
+                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
+                }, "SUCCESS");
+            //
+            // INCOMPLETE: If we did not initialize from storage, flag an error, otherwise it is a no-op.
+            //
+            action.setCallback(acs,
+                function () {
+                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
+                    failCallback(!stored, " : No connection to server");
+                }, "INCOMPLETE");
+            //
+            // ERROR: this is generally trouble, but if we already initialized, we won't flag it.
+            //
+            action.setCallback(acs,
+                function (a) {
+                    // This should only be called in the case of a refresh action that fails for some
+                    // reason. In this case, we really would like to gack, and act as if nothing happened.
                     var errors = a.getError();
+                    var errorStr = "";
 
                     if (errors && errors[0] && errors[0].message) {
-                        $A.error(a.getError()[0].message);
-                    } else {
-                        $A.error("Unable to load component, action state = "+state);
+                        errorStr = errors[0].message;
                     }
-                }
-
-                $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-            });
+                    $A.log("$A.loadComponent(): Refresh failed:\n" + errorStr);
+                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
+                    failCallback(!stored, errorStr);
+                }, "ERROR");
 
             acs.enqueueAction(action);
 

@@ -32,8 +32,9 @@ public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
      * ui:pillContainer dropdown expands on focus
      * Need to revisit Bug: W-2628705
      */
-    /* FIXME kwtan: Temp comment out this failed test
-    public void testAutoCompleteListContentVisible() throws MalformedURLException, URISyntaxException {
+    public void testAutoCompleteListContentVisible() {
+        /* FIXME kwtan: Temp comment out this failed test
+    throws MalformedURLException, URISyntaxException
         open(CMP_URL);
         WebDriver driver = this.getDriver();
         String uiInput = ".uiInput";
@@ -42,5 +43,5 @@ public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
         auraUITestingUtil.pressEnter(input);
         input.sendKeys("test");
     }
-     */
-}
+         */
+    }

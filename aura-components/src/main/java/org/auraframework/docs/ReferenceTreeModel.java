@@ -61,56 +61,61 @@ public class ReferenceTreeModel {
 
     private static final <E extends Definition> List<TreeNode> makeTreeNodes(String prefix, Class<E> type)
             throws QuickFixException {
-        String sep = prefix.equals("markup") ? ":" : ".";
-        DefinitionService definitionService = Aura.getDefinitionService();
-        List<TreeNode> ret = Lists.newArrayList();
-
-        Map<String, TreeNode> namespaceTreeNodes = Maps.newHashMap();
-        DefDescriptor<E> matcher = definitionService.getDefDescriptor(String.format("%s://*%s*", prefix, sep), type);
-        Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
-        ConfigAdapter configAdapter = Aura.getConfigAdapter();
-        for (DefDescriptor<E> desc : descriptors) {
-            if (desc == null) {
-                // Getting null here after commit 2037c31ddc81eae3edaf6ddd5bcfd0009fefe1bd. This causes a NPE and
-                // breaks the left nav of the reference tab.
-                continue;
-            }
-            String namespace = desc.getNamespace();
-            if (configAdapter.isDocumentedNamespace(namespace)) {
-                try {
-                    E def = desc.getDef();
-                    if (hasAccess(def)) {
-                        TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
-                        if (namespaceTreeNode == null) {
-                            namespaceTreeNode = new TreeNode(null, namespace);
-                            namespaceTreeNodes.put(namespace, namespaceTreeNode);
-                            ret.add(namespaceTreeNode);
-                        }
-
-                        String href = String.format("#reference?descriptor=%s%s%s", namespace, sep, desc.getName());
-
-                        href += "&defType=" + desc.getDefType().name().toLowerCase();
-
-                        // Preload the def
-                        try {
-                            desc.getDef();
-                        } catch (Throwable t) {
-                            // ignore problems, we were only trying to preload
-                        }
-
-                        namespaceTreeNode.addChild(new TreeNode(href, desc.getName()));
-                    }
-                } catch (Exception x) {
-                    // Skip any invalid def
-                    // System.out.printf("\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n",
-                    // desc, x.toString());
-                }
-            }
+    	Aura.getContextService().pushSystemContext();
+        try {
+	        String sep = prefix.equals("markup") ? ":" : ".";
+	        DefinitionService definitionService = Aura.getDefinitionService();
+	        List<TreeNode> ret = Lists.newArrayList();
+	
+	        Map<String, TreeNode> namespaceTreeNodes = Maps.newHashMap();
+	        DefDescriptor<E> matcher = definitionService.getDefDescriptor(String.format("%s://*%s*", prefix, sep), type);
+	        Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
+	        ConfigAdapter configAdapter = Aura.getConfigAdapter();
+	        for (DefDescriptor<E> desc : descriptors) {
+	            if (desc == null) {
+	                // Getting null here after commit 2037c31ddc81eae3edaf6ddd5bcfd0009fefe1bd. This causes a NPE and
+	                // breaks the left nav of the reference tab.
+	                continue;
+	            }
+	            
+	            String namespace = desc.getNamespace();
+	            if (configAdapter.isDocumentedNamespace(namespace)) {
+	                try {
+	                    E def = desc.getDef();
+	                    if (hasAccess(def)) {
+	                        TreeNode namespaceTreeNode = namespaceTreeNodes.get(desc.getNamespace());
+	                        if (namespaceTreeNode == null) {
+	                            namespaceTreeNode = new TreeNode(null, namespace);
+	                            namespaceTreeNodes.put(namespace, namespaceTreeNode);
+	                            ret.add(namespaceTreeNode);
+	                        }
+	
+	                        String href = String.format("#reference?descriptor=%s%s%s", namespace, sep, desc.getName());
+	
+	                        href += "&defType=" + desc.getDefType().name().toLowerCase();
+	
+	                        // Preload the def
+	                        try {
+	                            desc.getDef();
+	                        } catch (Throwable t) {
+	                            // ignore problems, we were only trying to preload
+	                        }
+	
+	                        namespaceTreeNode.addChild(new TreeNode(href, desc.getName()));
+	                    }
+	                } catch (Exception x) {
+	                    // Skip any invalid def
+	                    System.out.printf("\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n", desc, x.toString());
+	                }
+	            }
+	        }
+	
+	        Collections.sort(ret);
+	
+	        return ret;
+        } finally {
+            Aura.getContextService().popSystemContext();
         }
-
-        Collections.sort(ret);
-
-        return ret;
     }
 
     @AuraEnabled

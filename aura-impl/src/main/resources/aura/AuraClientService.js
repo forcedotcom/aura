@@ -888,10 +888,13 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
  * Note that in testing, this can be used to make the host appear unreachable.
  *
  * @param {string} host the host name of the server.
+ * @param {string} sid optional session ID.
  * @export
  */
-AuraClientService.prototype.initHost = function(host) {
+AuraClientService.prototype.initHost = function(host, sid) {
     this._host = host || "";
+    this._sid = sid || "";
+    
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     delete AuraClientService.prototype.initHost;
     delete AuraClientService.prototype["initHost"];
@@ -1616,7 +1619,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
                 "actions" : actionsToSend
             }),
             "aura.token" : this._token,
-            "aura.context" : context.encodeForServer()
+            "aura.context" : context.encodeForServer(), 
+        	"sid" : this._sid
         });
     } catch (e) {
         for (i = 0; i < actions.length; i++) {
@@ -1626,7 +1630,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         }
     }
 
-    var url = this._host+"/aura";
+    var url = this._host + "/aura";
     if (qs && method !== "POST") {
         url = url + "?" + qs;
     }

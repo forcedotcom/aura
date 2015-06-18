@@ -49,7 +49,7 @@ public final class ValidationClient {
 
     /**
      * Performs validation of all definitions found under path.
-     * 
+     *
      * @return the errors found
      */
     public static List<String> validate(String path) throws Exception {
@@ -65,7 +65,7 @@ public final class ValidationClient {
 
     /**
      * Performs validation of all definitions found under path and writes the errors to report.
-     * 
+     *
      * @param exit if true will exit the JVM running aura after writing the report
      */
     public static void validate(String path, String report, boolean exit) throws Exception {
@@ -135,7 +135,7 @@ public final class ValidationClient {
 
     private static List<String> parseErrors(Reader inputReader) throws IOException {
         BufferedReader reader = new BufferedReader(inputReader);
-        List<String> errors = new ArrayList<String>();
+        List<String> errors = new ArrayList<>();
         String line;
         while ((line = reader.readLine()) != null) {
             errors.add(line);

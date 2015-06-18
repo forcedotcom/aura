@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /*
+/*
  * Copyright (C) 2006 Sun Microsystems, Inc. All rights reserved.
  * Use is subject to license terms.
  *
@@ -39,10 +39,17 @@
 
 package org.auraframework.util.phobos.script.javascript;
 
-import org.auraframework.util.phobos.script.util.*;
-import javax.script.*;
-import java.io.*;
-import java.util.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
+
+import org.auraframework.util.phobos.script.util.DeTagifier;
 
 /**
  * Embedded javascript interpreter.
@@ -53,9 +60,9 @@ public class EmbeddedRhinoScriptEngine extends RhinoScriptEngine {
 
     public EmbeddedRhinoScriptEngine() {
         detagifier = new DeTagifier("context.getWriter().write(\"",
-                                    "\");\n",
-                                    "context.getWriter().write(",
-                                    ");\n");
+                "\");\n",
+                "context.getWriter().write(",
+                ");\n");
     }
 
     @Override

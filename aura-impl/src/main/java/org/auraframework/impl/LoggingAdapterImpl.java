@@ -28,7 +28,7 @@ import aQute.bnd.annotation.component.Component;
 @Component (provide=AuraServiceProvider.class)
 public class LoggingAdapterImpl implements LoggingAdapter {
 
-    private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<LoggingContext>();
+    private static ThreadLocal<LoggingContext> currentContext = new ThreadLocal<>();
 
     @Override
     public LoggingContext establish() {

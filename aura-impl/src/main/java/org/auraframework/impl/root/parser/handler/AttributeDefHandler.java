@@ -92,6 +92,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);
@@ -169,7 +170,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        ContainerTagHandler parentHandler=getParentHandler();
+        ContainerTagHandler<?> parentHandler = getParentHandler();
         if(parentHandler!=null) {
             body.add(getDefRefHandler(getParentHandler()).getElement());
         }

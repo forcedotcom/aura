@@ -88,7 +88,7 @@ public class LayoutDefHandler<P extends RootDefinition> extends ParentedTagHandl
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (LayoutItemDefHandler.TAG.equalsIgnoreCase(tag)) {
-            LayoutItemDef layoutItem = new LayoutItemDefHandler<P>(getParentHandler(), builder.getName(), xmlReader,
+            LayoutItemDef layoutItem = new LayoutItemDefHandler<>(getParentHandler(), builder.getName(), xmlReader,
                     source).getElement();
             builder.addLayoutItemDef(layoutItem);
         } else {

@@ -32,9 +32,9 @@ public class SampleIterationModel {
     private final List<Object> data;
 
     public SampleIterationModel() {
-        data = new LinkedList<Object>();
+        data = new LinkedList<>();
         for (int i = 0; i < 26; i++) {
-            Map<String, Object> theMap = new HashMap<String, Object>();
+            Map<String, Object> theMap = new HashMap<>();
             char c = (char) ('a' + i);
             theMap.put("letters", "" + c + c + c);
             data.add(theMap);

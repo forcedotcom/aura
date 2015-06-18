@@ -79,7 +79,7 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
 
     @Override
     public List<String> getDescriptions(){
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<>();
 
         for (DescriptionDef descDef : descriptionDefs.values()) {
             ret.add(descDef.getDescription());
@@ -127,8 +127,8 @@ public class DocumentationDefImpl extends RootDefinitionImpl<DocumentationDef> i
             super(DocumentationDef.class);
         }
 
-        private final LinkedHashMap<String, DescriptionDef> descriptionMap = new LinkedHashMap<String, DescriptionDef>();
-        private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<String, ExampleDef>();
+        private final LinkedHashMap<String, DescriptionDef> descriptionMap = new LinkedHashMap<>();
+        private final LinkedHashMap<String, ExampleDef> exampleMap = new LinkedHashMap<>();
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()

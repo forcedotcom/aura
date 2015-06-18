@@ -82,7 +82,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
-        RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
+RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     public static final DefDescriptor<InterfaceDef> ROOT_MARKER = DefDescriptorImpl.getInstance(
             "markup://aura:rootComponent", InterfaceDef.class);
@@ -228,7 +228,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         }
 
         for(MethodDef def : this.methodDefs.values()) {
-        	def.validateDefinition();
+            def.validateDefinition();
         }
 
         // an abstract component that you can't extend is pretty useless
@@ -252,7 +252,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                         String.format(
                                 "Component %s cannot be a rootComponent and extend %s", getDescriptor(),
                                 this.extendsDescriptor),
-                        getLocation());
+                                getLocation());
             }
         }
 
@@ -360,22 +360,22 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
         AttributeDef facetAttributeDef;
         for (AttributeDefRef facet : this.facets) {
-        	facetAttributeDef = this.getAttributeDef(facet.getDescriptor().getName());
-        	if(facetAttributeDef != null) {
-        		try {
-        			facet.parseValue(facetAttributeDef.getTypeDef());
-        		} catch(InvalidExpressionException exception) {
+            facetAttributeDef = this.getAttributeDef(facet.getDescriptor().getName());
+            if(facetAttributeDef != null) {
+                try {
+                    facet.parseValue(facetAttributeDef.getTypeDef());
+                } catch(InvalidExpressionException exception) {
                     // Kris:
                     // This is going to fail a good handfull of things at the moment, I need to
                     // Uncomment and test against the app before trying to check this in.
-        			// Mode mode = Aura.getContextService().getCurrentContext().getMode();
-        			// if(mode.isDevMode() || mode.isTestMode()) {
-	          //       	throw new InvalidValueSetTypeException(
-	          //       			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()),
-	          //       			exception.getLocation());
-        			// }
+                    // Mode mode = Aura.getContextService().getCurrentContext().getMode();
+                    // if(mode.isDevMode() || mode.isTestMode()) {
+                    //       	throw new InvalidValueSetTypeException(
+                    //       			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", facetAttributeDef.getName(), facetAttributeDef.getTypeDef().getName(), facet.getValue().getClass().getName()),
+                    //       			exception.getLocation());
+                    // }
                 }
-        	}
+            }
             facet.validateReferences();
         }
 
@@ -489,6 +489,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     /**
      * Does all the validation of the expressions defined in this component
      */
+    @SuppressWarnings("deprecation")
     private void validateExpressionRefs() throws QuickFixException {
         for (PropertyReference e : expressionRefs) {
             String root = e.getRoot();
@@ -901,11 +902,11 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
             return getDescriptor().equals(other.getDescriptor())
                     && controllerDescriptors.equals(other.controllerDescriptors)
                     && (modelDefDescriptor == null ? other.modelDefDescriptor == null
-                            : modelDefDescriptor.equals(other.modelDefDescriptor))
+                    : modelDefDescriptor.equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
-                            : extendsDescriptor.equals(other.extendsDescriptor))
+                    : extendsDescriptor.equals(other.extendsDescriptor))
                     && (cmpThemeDescriptor == null ? other.cmpThemeDescriptor == null
-                            : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
+                    : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -985,7 +986,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
                 if (helperDef != null && !helperDef.isLocal()) {
                     json.writeMapEntry("helperDef", helperDef);
                 }
-                */
+                 */
 
                 json.writeMapEntry("styleDef", getStyleDef());
                 if (flavorDescriptor != null) {
@@ -1093,7 +1094,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
     }
 
     protected abstract void serializeFields(Json json) throws IOException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * @see ComponentDef#getRendererDescriptor()
@@ -1257,7 +1258,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
 
     public static abstract class Builder<T extends BaseComponentDef> extends
-            RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
+    RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
 
         public Builder(Class<T> defClass) {
             super(defClass);
@@ -1486,7 +1487,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
         case APPLICATION:
             return descriptor.equals(other)
                     || (extendsDescriptor != null && getSuperDef()
-                            .isInstanceOf(other));
+                    .isInstanceOf(other));
         default:
             return false;
         }
@@ -1494,7 +1495,7 @@ public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 
     @Override
     public Set<PropertyReference> getExpressionRefs() {
-    	return expressionRefs;
+        return expressionRefs;
     }
 
     /**

@@ -65,7 +65,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
 
     private static final Pattern LABEL_GVP_PATTERN = Pattern.compile("(\\$Label\\.\\w+\\.\\w+)",
             Pattern.DOTALL | Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    
+
     public static enum TokenType {
         PLAINTEXT(DefDescriptorImpl.getInstance("aura:text", ComponentDef.class)),
         EXPRESSION(DefDescriptorImpl.getInstance("aura:expression", ComponentDef.class));
@@ -77,7 +77,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
         }
     }
 
-    private final List<Token> tokens = new ArrayList<Token>();
+    private final List<Token> tokens = new ArrayList<>();
     private final Location location;
     private final String text;
     private final WhitespaceBehavior whitespaceBehavior;
@@ -110,7 +110,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
      * Parse the input text and represent it locally as a list of tokens. If a
      * {@link TokenType#PLAINTEXT} token looks like a malformed expression, then
      * throw a {@link org.auraframework.throwable.quickfix.QuickFixException}
-     * 
+     *
      * @throws AuraValidationException
      */
     private void doTokenize() throws AuraValidationException {
@@ -147,7 +147,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
     /**
      * This token is not a valid expression. If it looks like it wanted to be an
      * expression rather than real plain-text, then throw a validation error.
-     * 
+     *
      * @throws AuraValidationException if the plain text token looks like a
      *             malformed expression.
      */
@@ -166,7 +166,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
         }
 
         Token token = new Token(TokenType.PLAINTEXT, begin, end);
-		tokens.add(token);
+        tokens.add(token);
     }
 
     public void addExpressionRefs(ExpressionContainerHandler handler) throws AuraValidationException {
@@ -177,7 +177,7 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
 
     public List<ComponentDefRef> asComponentDefRefs(ExpressionContainerHandler cmpHandler)
             throws AuraValidationException {
-        List<ComponentDefRef> ret = new ArrayList<ComponentDefRef>();
+        List<ComponentDefRef> ret = new ArrayList<>();
         for (Token token : tokens) {
             ComponentDefRef cdr = token.createComponentDefRef(cmpHandler);
             if (cdr != null) {
@@ -247,11 +247,11 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
          * notifying the parent componentdef whenever an expression is found
          */
         private Object createValue(ExpressionContainerHandler cmpHandler) throws AuraValidationException {
-        	Object result;
+            Object result;
             String raw = getRawValue();
             Set<PropertyReference> propRefs = null;
             if (type == TokenType.EXPRESSION) {
-            	propRefs = Sets.newHashSetWithExpectedSize(2);
+                propRefs = Sets.newHashSetWithExpectedSize(2);
                 Expression e = AuraImpl.getExpressionAdapter().buildExpression(unwrap(raw), location);
                 e.gatherPropertyReferences(propRefs);
                 e.setByValue(raw.charAt(1)=='#');
@@ -260,29 +260,29 @@ public class TextTokenizer implements Iterable<TextTokenizer.Token> {
                 // Let's see if we can find any "naked" $Label.section.name references in the plain text
                 Matcher matcher = LABEL_GVP_PATTERN.matcher(raw);
                 while (matcher.find()) {
-        	        String labelRef = matcher.group();
-        	        
-        	        if (propRefs == null) {
-                    	propRefs = Sets.newHashSet();
-        	        }
-        	        
-					propRefs.add(new PropertyReferenceImpl(labelRef, location));
+                    String labelRef = matcher.group();
+
+                    if (propRefs == null) {
+                        propRefs = Sets.newHashSet();
+                    }
+
+                    propRefs.add(new PropertyReferenceImpl(labelRef, location));
                 }
-            	
+
                 result = raw;
             }
-            
+
             if (propRefs != null) {
-            	cmpHandler.addExpressionReferences(propRefs);
+                cmpHandler.addExpressionReferences(propRefs);
             }
-            
+
             return result;
         }
 
         /**
          * creates a component def ref for this token, either a text or
          * expression component
-         * 
+         *
          * @return - null if undesirable whitespace, else a ComponentDefRef for
          *         the given token
          */

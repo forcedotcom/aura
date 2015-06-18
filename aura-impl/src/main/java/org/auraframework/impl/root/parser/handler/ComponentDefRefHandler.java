@@ -57,7 +57,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         super(parentHandler, xmlReader, source);
         builder.setDescriptor(DefDescriptorImpl.getInstance(getTagName(), ComponentDef.class));
         builder.setLocation(getLocation());
-        body = new ArrayList<ComponentDefRef>();
+        body = new ArrayList<>();
     }
 
     /**
@@ -69,7 +69,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         super(parentHandler, xmlReader, source);
         builder.setDescriptor(descriptor);
         builder.setLocation(getLocation());
-        body = new ArrayList<ComponentDefRef>();
+        body = new ArrayList<>();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         // any attributes we find are in that list.
         // TODOJT: possibly those arguments are like *Param objects with
         // built-in value validation?
-        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new LinkedHashMap<DefDescriptor<AttributeDef>, AttributeDefRef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDefRef> attributes = new LinkedHashMap<>();
 
         for (int i = 0; i < xmlReader.getAttributeCount(); i++) {
             String attName = xmlReader.getAttributeLocalName(i);
@@ -168,7 +168,7 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         String tag = getTagName();
         if (AttributeDefRefHandler.TAG.equalsIgnoreCase(tag)) {
-            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<P>(getParentHandler(), xmlReader, source)
+            AttributeDefRefImpl attributeDefRef = new AttributeDefRefHandler<>(getParentHandler(), xmlReader, source)
                     .getElement();
             builder.setAttribute(attributeDefRef.getDescriptor(), attributeDefRef);
         } else {

@@ -37,7 +37,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 //import com.google.common.cache.Cache;
 //import com.google.common.cache.CacheBuilder;
@@ -58,12 +57,12 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
 
 
     public ClientLibraryServiceImpl() {
-    
-    	outputCache = Aura.getCachingService().getClientLibraryOutputCache();
-    
+
+        outputCache = Aura.getCachingService().getClientLibraryOutputCache();
+
         urlsCache = Aura.getCachingService().getClientLibraryUrlsCache();
     }
-  
+
     /**
      * Gets resolver for resolution. Empty string if none
      *
@@ -171,7 +170,7 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
         // 'prefix' string on output if it is a relative URL.
         //
         String key = new StringBuilder(uid).append(":").append(type).append(":").append(mode)
-            .append(":").append(nonce).append(":").append(contextPath).toString();
+                .append(":").append(nonce).append(":").append(contextPath).toString();
         Set<String> urls = urlsCache.getIfPresent(key);
 
         if (urls == null) {

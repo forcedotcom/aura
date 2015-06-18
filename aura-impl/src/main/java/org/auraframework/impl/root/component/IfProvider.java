@@ -44,7 +44,7 @@ public class IfProvider implements ComponentConfigProvider {
         BaseComponent<?, ?> component = context.getCurrentComponent();
         InstanceStack iStack = context.getInstanceStack();
         ComponentConfig cc = new ComponentConfig();
-        List<Component> components = new ArrayList<Component>();
+        List<Component> components = new ArrayList<>();
         Map<String, Object> m = Maps.newHashMapWithExpectedSize(1);
         m.put("body", components);
         cc.setAttributes(m);

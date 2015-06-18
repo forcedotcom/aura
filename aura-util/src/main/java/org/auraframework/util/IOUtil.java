@@ -130,7 +130,7 @@ public class IOUtil {
     /**
      * Count the number of characters read by the stream while throwing away the data. The stream will be closed after
      * reading, so it should not be used again.
-     * 
+     *
      * @param br
      * @return
      * @throws IOException
@@ -164,7 +164,7 @@ public class IOUtil {
         File parent = canonFile.getParentFile();
         if (parent != null) {
             mkdirs(parent); // ignore the return as it may have been created
-                            // already
+            // already
         }
         // lastly, let's make this directory
         canonFile.mkdir();
@@ -172,17 +172,17 @@ public class IOUtil {
 
     /**
      * List all files inside the given directory
-     * 
+     *
      * @param rootDir
      * @param excludeDirs true if only files need to be listed and not directories. false if both.
      * @param recursive true to list files from sub folders recursively
      */
     public static File[] listFiles(File rootDir, boolean excludeDirs, boolean recursive) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         int depth = (recursive) ? Integer.MAX_VALUE : 0;
         listFiles(rootDir, files, depth);
         if (excludeDirs) {
-            List<File> rf = new ArrayList<File>(files.size());
+            List<File> rf = new ArrayList<>(files.size());
             for (File f : files) {
                 if (!f.isDirectory()) {
                     rf.add(f);
@@ -195,7 +195,7 @@ public class IOUtil {
 
     /**
      * A method used by listfiles to list the files recursively in the subfolders
-     * 
+     *
      * @param at
      * @param files
      * @param depth
@@ -243,12 +243,12 @@ public class IOUtil {
 
     /**
      * Recursively delete.
-     * 
+     *
      * This makes a best attempt to delete the file/directory in question. It will recurse down any directory structure
      * and delete all subdirectories/files. If for some reason a directory is not readable, we throw
      * {@link DirectoryNotReadableException}, with the name of the directory. If a delete fails, we throw
      * {@link DeleteFailedException} with the file we could not delete.
-     * 
+     *
      * @param file The file to recursively delete.
      * @throws DeleteFailedException if the delete fails for any reason.
      */
@@ -274,7 +274,7 @@ public class IOUtil {
 
     /**
      * Create a JAR file containing the directory structure given by the folder.
-     * 
+     *
      * @param folder the folder to recursively scan to fill the jar
      * @param jarFile the file that should contain the newly created jar.
      */

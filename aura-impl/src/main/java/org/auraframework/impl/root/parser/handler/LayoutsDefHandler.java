@@ -78,7 +78,7 @@ public class LayoutsDefHandler extends RootTagHandler<LayoutsDef> {
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         String tag = getTagName();
         if (LayoutDefHandler.TAG.equalsIgnoreCase(tag)) {
-            builder.addLayoutDef(new LayoutDefHandler<LayoutsDef>(this, xmlReader, source).getElement());
+            builder.addLayoutDef(new LayoutDefHandler<>(this, xmlReader, source).getElement());
         } else {
             error("Found unexpected tag %s", tag);
         }

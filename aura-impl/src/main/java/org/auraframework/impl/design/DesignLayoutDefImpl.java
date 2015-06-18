@@ -15,7 +15,10 @@
  */
 package org.auraframework.impl.design;
 
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignLayoutDef;
 import org.auraframework.def.design.DesignSectionDef;
@@ -25,11 +28,11 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 public class DesignLayoutDefImpl extends DefinitionImpl<DesignLayoutDef> implements DesignLayoutDef {
+
+    private static final long serialVersionUID = -6058393181603727999L;
     private final Set<DesignSectionDef> sections;
     private final String name;
 

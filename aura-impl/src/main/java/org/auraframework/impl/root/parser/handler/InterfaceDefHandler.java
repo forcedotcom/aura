@@ -30,7 +30,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.MethodDef;
 import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
@@ -66,12 +65,12 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
 
     public InterfaceDefHandler(DefDescriptor<InterfaceDef> descriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(descriptor, source, xmlReader);
-        builder.events = new HashMap<String, RegisterEventDef>();
-        builder.methods = new HashMap<DefDescriptor<MethodDef>, MethodDef>();
+        builder.events = new HashMap<>();
+        builder.methods = new HashMap<>();
         if (source != null) {
             builder.setOwnHash(source.getHash());
         }
-        builder.extendsDescriptors = new HashSet<DefDescriptor<InterfaceDef>>();
+        builder.extendsDescriptors = new HashSet<>();
     }
 
     @Override

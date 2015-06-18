@@ -83,7 +83,7 @@ public class ApiContentsModel {
                 jsonReader.next();
                 List<Object> readSymbols = jsonReader.getList();
                 symbols = Maps.newTreeMap();
-                List<Map<String, Object>> classes = new ArrayList<Map<String, Object>>();
+                List<Map<String, Object>> classes = new ArrayList<>();
                 for (Object symbol : readSymbols) {
                     Map<String, Object> map = (Map<String, Object>) symbol;
                     if (!map.containsKey("access")) {

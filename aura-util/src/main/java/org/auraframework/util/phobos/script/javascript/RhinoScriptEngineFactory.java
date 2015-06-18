@@ -38,10 +38,16 @@
  */
 
 package org.auraframework.util.phobos.script.javascript;
-import javax.script.*;
-import java.util.*;
-import org.mozilla.javascript.*;
-import org.auraframework.util.phobos.script.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
+
+import javax.script.ScriptEngine;
+
+import org.auraframework.util.phobos.script.util.ScriptEngineFactoryBase;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 
 /**
  * Factory to create RhinoScriptEngine
@@ -59,7 +65,7 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
     private ContextFactory.Listener listener;
 
     public RhinoScriptEngineFactory() {
-    	System.out.println("RhinoScriptEngineFactory");
+        System.out.println("RhinoScriptEngineFactory");
     }
 
     public RhinoScriptEngineFactory(ContextFactory.Listener listener) {
@@ -152,10 +158,12 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         return value;
     }
 
+    /*
     private String getProperty(String name, String defaultValue) {
         String s = getProperty(name);
         return (s == null ? defaultValue : s);
     }
+     */
 
     @Override
     public String getMethodCallSyntax(String obj, String method, String... args) {
@@ -204,7 +212,7 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
     private static List<String> extensions;
 
     static {
-        names = new ArrayList<String>(7);
+        names = new ArrayList<>(7);
         names.add("rhino-nonjdk");
         names.add("js");
         names.add("rhino");
@@ -214,14 +222,14 @@ public class RhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         names.add("ecmascript");
         names = Collections.unmodifiableList(names);
 
-        mimeTypes = new ArrayList<String>(4);
+        mimeTypes = new ArrayList<>(4);
         mimeTypes.add("application/javascript");
         mimeTypes.add("application/ecmascript");
         mimeTypes.add("text/javascript");
         mimeTypes.add("text/ecmascript");
         mimeTypes = Collections.unmodifiableList(mimeTypes);
 
-        extensions = new ArrayList<String>(1);
+        extensions = new ArrayList<>(1);
         extensions.add("js");
         extensions = Collections.unmodifiableList(extensions);
     }

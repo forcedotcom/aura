@@ -49,10 +49,10 @@
 
 package org.auraframework.util.phobos.script.util;
 
-import java.io.Reader;
-import java.io.IOException;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class DeTagifier {
 
@@ -85,7 +85,7 @@ public class DeTagifier {
         int state = START;
         while (-1 != (i = reader.read())) {
             //ignore control-M
-            if (i == (int)'\r') {
+            if (i == '\r') {
                 continue;
             }
 
@@ -102,93 +102,93 @@ public class DeTagifier {
     }
 
     public int processChar(int state, char c, CharHolder charHolder)
-                throws IOException {
+            throws IOException {
 
-         switch (state) {
-             case START:
-                 if (c == '<') {
-                     return INSIDE_INITIAL_START_TAG;
-                 } else {
-                     charHolder.put(outputStart);
-                     charHolder.put(c);
-                     return IN_OUTPUTBLOCK;
-                 }
-             case IN_CODEBLOCK:
-                 if (c == '%') {
-                     return INSIDE_END_TAG;
-                 } else {
-                     charHolder.put(c);
-                     return IN_CODEBLOCK;
-                 }
-             case IN_OUTPUTBLOCK:
-                 if (c == '<') {
-                     return INSIDE_START_TAG;
-                 } else if (c == '\n') {
-                     charHolder.put('\\');
-                     charHolder.put('n');
-                     charHolder.put(outputEnd);
-                     charHolder.put(outputStart);
-                     return IN_OUTPUTBLOCK;
-                 } else if (c == '"') {
-                     charHolder.put('\\');
-                     charHolder.put(c);
-                     return IN_OUTPUTBLOCK;
-                 } else {
-                     charHolder.put(c);
-                     return IN_OUTPUTBLOCK;
-                 }
-             case IN_EXPRBLOCK:
-                 if (c == '%') {
-                     return INSIDE_EXPR_END_TAG;
-                 }
-                 else {
-                     charHolder.put(c);
-                     return IN_EXPRBLOCK;
-                 }
-             case INSIDE_INITIAL_START_TAG:
-             case INSIDE_START_TAG:
-                 if (c == '%') {
-                     if (state == INSIDE_START_TAG) {
-                         charHolder.put(outputEnd);
-                     }
-                     return INSIDE_CODE_EXPR_BLOCK;
-                 } else {
-                     if (state == INSIDE_INITIAL_START_TAG) {
-                        charHolder.put(outputStart);
-                     }
-                     charHolder.put('<');
-                     charHolder.put(c);
-                     return IN_OUTPUTBLOCK;
-                 }
-             case INSIDE_END_TAG:
-                 if (c == '>') {
-                     charHolder.put(outputStart);
-                     return IN_OUTPUTBLOCK;
-                 } else {
-                     charHolder.put('%');
-                     charHolder.put(c);
-                     return IN_CODEBLOCK;
-                 }
-             case INSIDE_CODE_EXPR_BLOCK:
-                 if (c == '=') {
-                     charHolder.put(exprStart);
-                     return IN_EXPRBLOCK;
-                 } else {
-                     charHolder.put(c);
-                     return IN_CODEBLOCK;
-                 }
-             case INSIDE_EXPR_END_TAG:
-                 if (c == '>') {
-                     charHolder.put(exprEnd);
-                     charHolder.put(outputStart);
-                     return IN_OUTPUTBLOCK;
-                 } else {
-                     charHolder.put('%');
-                     charHolder.put(c);
-                     return IN_EXPRBLOCK;
-                 }
-         }
-         return INVALID_STATE;
+        switch (state) {
+        case START:
+            if (c == '<') {
+                return INSIDE_INITIAL_START_TAG;
+            } else {
+                charHolder.put(outputStart);
+                charHolder.put(c);
+                return IN_OUTPUTBLOCK;
+            }
+        case IN_CODEBLOCK:
+            if (c == '%') {
+                return INSIDE_END_TAG;
+            } else {
+                charHolder.put(c);
+                return IN_CODEBLOCK;
+            }
+        case IN_OUTPUTBLOCK:
+            if (c == '<') {
+                return INSIDE_START_TAG;
+            } else if (c == '\n') {
+                charHolder.put('\\');
+                charHolder.put('n');
+                charHolder.put(outputEnd);
+                charHolder.put(outputStart);
+                return IN_OUTPUTBLOCK;
+            } else if (c == '"') {
+                charHolder.put('\\');
+                charHolder.put(c);
+                return IN_OUTPUTBLOCK;
+            } else {
+                charHolder.put(c);
+                return IN_OUTPUTBLOCK;
+            }
+        case IN_EXPRBLOCK:
+            if (c == '%') {
+                return INSIDE_EXPR_END_TAG;
+            }
+            else {
+                charHolder.put(c);
+                return IN_EXPRBLOCK;
+            }
+        case INSIDE_INITIAL_START_TAG:
+        case INSIDE_START_TAG:
+            if (c == '%') {
+                if (state == INSIDE_START_TAG) {
+                    charHolder.put(outputEnd);
+                }
+                return INSIDE_CODE_EXPR_BLOCK;
+            } else {
+                if (state == INSIDE_INITIAL_START_TAG) {
+                    charHolder.put(outputStart);
+                }
+                charHolder.put('<');
+                charHolder.put(c);
+                return IN_OUTPUTBLOCK;
+            }
+        case INSIDE_END_TAG:
+            if (c == '>') {
+                charHolder.put(outputStart);
+                return IN_OUTPUTBLOCK;
+            } else {
+                charHolder.put('%');
+                charHolder.put(c);
+                return IN_CODEBLOCK;
+            }
+        case INSIDE_CODE_EXPR_BLOCK:
+            if (c == '=') {
+                charHolder.put(exprStart);
+                return IN_EXPRBLOCK;
+            } else {
+                charHolder.put(c);
+                return IN_CODEBLOCK;
+            }
+        case INSIDE_EXPR_END_TAG:
+            if (c == '>') {
+                charHolder.put(exprEnd);
+                charHolder.put(outputStart);
+                return IN_OUTPUTBLOCK;
+            } else {
+                charHolder.put('%');
+                charHolder.put(c);
+                return IN_EXPRBLOCK;
+            }
+        }
+        return INVALID_STATE;
 
     }
 

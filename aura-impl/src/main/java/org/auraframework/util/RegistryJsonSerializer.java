@@ -58,7 +58,7 @@ public class RegistryJsonSerializer {
     }
 
     public static void serializeToFile(String file) throws QuickFixException, IOException {
-        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<String, Map<String, Map<String, Map<String, String>>>>();
+        Map<String, Map<String, Map<String, Map<String, String>>>> components = new TreeMap<>();
         loadMetadataForComponents(components);
         writeMetadataToFile(components, file);
     }
@@ -81,7 +81,7 @@ public class RegistryJsonSerializer {
         Map<String, Map<String, String>> componentDetails;
 
         for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-            component = new TreeMap<String, Map<String, Map<String, String>>>();
+            component = new TreeMap<>();
             try {
                 ComponentDef compDef = descriptor.getDef();
                 String compName = descriptor.getNamespace() + ":" + compDef.getName();
@@ -91,9 +91,9 @@ public class RegistryJsonSerializer {
 
                 Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = compDef.getAttributeDefs();
                 if (attDefs != null && attDefs.size() > 0) {
-                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    componentDetails = new TreeMap<>();
                     for (DefDescriptor<AttributeDef> attDef : attDefs.keySet()) {
-                        Map<String, String> attributePros = new TreeMap<String, String>();
+                        Map<String, String> attributePros = new TreeMap<>();
                         attributePros.put("type", attDefs.get(attDef).getTypeDef().getName());
                         String desc = attDefs.get(attDef).getDescription();
                         if (desc != null) {
@@ -106,9 +106,9 @@ public class RegistryJsonSerializer {
 
                 Map<String, RegisterEventDef> eventDefs = compDef.getRegisterEventDefs();
                 if (eventDefs != null && eventDefs.size() > 0) {
-                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    componentDetails = new TreeMap<>();
                     for (String eventDef : eventDefs.keySet()) {
-                        Map<String, String> eventPros = new TreeMap<String, String>();
+                        Map<String, String> eventPros = new TreeMap<>();
                         eventPros.put(TYPE_KEY, "Action");
                         String desc = eventDefs.get(eventDef).getDescription();
                         if (desc != null) {
@@ -122,9 +122,9 @@ public class RegistryJsonSerializer {
 
                 Collection<EventHandlerDef> handlerDefs = compDef.getHandlerDefs();
                 if (handlerDefs != null && handlerDefs.size() > 0) {
-                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    componentDetails = new TreeMap<>();
                     for (EventHandlerDef handlerDef : handlerDefs) {
-                        Map<String, String> eventHandlerProps = new TreeMap<String, String>();
+                        Map<String, String> eventHandlerProps = new TreeMap<>();
                         String desc = handlerDef.getDescription();
                         if (desc != null) {
                             eventHandlerProps.put(DESCRIPTION_KEY, desc);
@@ -137,14 +137,14 @@ public class RegistryJsonSerializer {
 
                 String desc = compDef.getDescription();
                 if (desc != null) {
-                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    componentDetails = new TreeMap<>();
                     componentDetails.put(desc, new TreeMap<String, String>());
                     component.put(DESCRIPTION_KEY, componentDetails);
                 }
 
                 String support = compDef.getSupport().toString();
                 if (support != null) {
-                    componentDetails = new TreeMap<String, Map<String, String>>();
+                    componentDetails = new TreeMap<>();
                     componentDetails.put(support, new TreeMap<String, String>());
                     component.put(SUPPORT_KEY, componentDetails);
                 }

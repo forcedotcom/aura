@@ -15,10 +15,12 @@
  */
 package org.auraframework.impl.design;
 
-import com.google.common.collect.Sets;
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.management.modelmbean.XMLParseException;
+
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.def.design.DesignLayoutComponentDef;
@@ -28,12 +30,11 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import javax.management.modelmbean.XMLParseException;
-import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import com.google.common.collect.Sets;
 
 public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implements DesignItemsDef{
+
+    private static final long serialVersionUID = 4644414865773818291L;
     private Set<DesignLayoutItemDef> items;
     private final String name;
 
@@ -98,6 +99,8 @@ public class DesignItemsDefImpl extends DefinitionImpl<DesignItemsDef> implement
             if (items.contains(cmp)) {
                 setParseError(new InvalidDefinitionException(String.format(
                         "Design layout component: %s already defined", cmp.getName()), getLocation()) {
+
+                    private static final long serialVersionUID = -4518804498390928999L;
                 });
             } else {
                 items.add(new DesignLayoutItemDefImpl(cmp));

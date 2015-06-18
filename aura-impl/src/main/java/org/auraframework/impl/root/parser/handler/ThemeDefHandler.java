@@ -128,7 +128,7 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
         String tag = getTagName();
 
         if (VarDefHandler.TAG.equalsIgnoreCase(tag)) {
-            VarDef def = new VarDefHandler<ThemeDef>(this, xmlReader, source).getElement();
+            VarDef def = new VarDefHandler<>(this, xmlReader, source).getElement();
             if (builder.vars().containsKey(def.getName())) {
                 error("Duplicate var %s", def.getName());
             }
@@ -141,7 +141,7 @@ public final class ThemeDefHandler extends RootTagHandler<ThemeDef> {
                 error("tag %s must come before all declared vars", ThemeDefRefHandler.TAG);
             }
 
-            ThemeDefRef def = new ThemeDefRefHandler<ThemeDef>(this, xmlReader, source).getElement();
+            ThemeDefRef def = new ThemeDefRefHandler<>(this, xmlReader, source).getElement();
             if (builder.imports().contains(def.getThemeDescriptor())) {
                 error("Duplicate theme import %s", def.getName());
             }

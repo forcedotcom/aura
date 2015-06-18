@@ -39,12 +39,42 @@
 
 package org.auraframework.util.phobos.script.javascript;
 
-import org.auraframework.util.phobos.script.util.*;
-import javax.script.*;
-import org.mozilla.javascript.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.Method;
-import java.io.*;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.script.AbstractScriptEngine;
+import javax.script.Bindings;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.Invocable;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
+import javax.script.SimpleScriptContext;
+
+import org.auraframework.util.phobos.script.util.ExtendedScriptException;
+import org.auraframework.util.phobos.script.util.InterfaceImplementor;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.LazilyLoadedCtor;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Script;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Synchronizer;
+import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.Wrapper;
 
 
 /**
@@ -65,7 +95,7 @@ import java.util.*;
  *
  */
 public class RhinoScriptEngine extends AbstractScriptEngine
-        implements  Invocable, Compilable {
+implements  Invocable, Compilable {
 
     public static final boolean DEBUG = false;
     private static final String TOPLEVEL_SCRIPT_NAME = "META-INF/toplevel.js";
@@ -81,7 +111,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
     /* map used to store indexed properties in engine scope
      * refer to comment on 'indexedProps' in ExternalScriptable.java.
      */
-    private Map indexedProps;
+    private Map<Object, Object> indexedProps;
 
     private ScriptEngineFactory factory;
     private InterfaceImplementor implementor;
@@ -119,7 +149,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
             });
         }
     }
-    */
+     */
 
     /**
      * Creates a new instance of RhinoScriptEngine
@@ -135,37 +165,37 @@ public class RhinoScriptEngine extends AbstractScriptEngine
              */
             topLevel = new ImporterTopLevel(cx, false);
             new LazilyLoadedCtor(topLevel, "JSAdapter",
-                "org.auraframework.util.script.javascript.JSAdapter",
-                false);
+                    "org.auraframework.util.script.javascript.JSAdapter",
+                    false);
             // add top level functions
             String names[] = { "bindings", "scope", "sync"  };
             topLevel.defineFunctionProperties(names, RhinoScriptEngine.class, ScriptableObject.DONTENUM);
 
             processAllTopLevelScripts(cx);
         } finally {
-            cx.exit();
+            Context.exit();
         }
 
-        indexedProps = new HashMap();
+        indexedProps = new HashMap<>();
 
         //construct object used to implement getInterface
         implementor = new InterfaceImplementor(this) {
-                @Override
-                protected Object convertResult(Method method, Object res)
-                                            throws ScriptException {
-                    Class desiredType = method.getReturnType();
-                    if (desiredType == Void.TYPE) {
-                        return null;
-                    } else {
-                        return Context.jsToJava(res, desiredType);
-                    }
+            @Override
+            protected Object convertResult(Method method, Object res)
+                    throws ScriptException {
+                Class<?> desiredType = method.getReturnType();
+                if (desiredType == Void.TYPE) {
+                    return null;
+                } else {
+                    return Context.jsToJava(res, desiredType);
                 }
+            }
         };
     }
 
     @Override
     public Object eval(Reader reader, ScriptContext ctxt)
-    throws ScriptException {
+            throws ScriptException {
         Object ret;
 
         Context cx = enterContext();
@@ -192,8 +222,8 @@ public class RhinoScriptEngine extends AbstractScriptEngine
             int line = (line = jse.lineNumber()) == 0 ? -1 : line;
             Object value = jse.getValue();
             String str = (value != null && value.getClass().getName().equals("org.mozilla.javascript.NativeError") ?
-                          value.toString() :
-                          jse.toString());
+                    value.toString() :
+                        jse.toString());
             throw new ExtendedScriptException(jse, str, jse.sourceName(), line);
         } catch (RhinoException re) {
             if (DEBUG) re.printStackTrace();
@@ -202,7 +232,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         } catch (IOException ee) {
             throw new ScriptException(ee);
         } finally {
-            cx.exit();
+            Context.exit();
         }
 
         return unwrapReturnValue(ret);
@@ -233,13 +263,13 @@ public class RhinoScriptEngine extends AbstractScriptEngine
     //Invocable methods
     @Override
     public Object invokeFunction(String name, Object... args)
-    throws ScriptException, NoSuchMethodException {
+            throws ScriptException, NoSuchMethodException {
         return invokeMethod(null, name, args);
     }
 
     @Override
     public Object invokeMethod(Object thiz, String name, Object... args)
-    throws ScriptException, NoSuchMethodException {
+            throws ScriptException, NoSuchMethodException {
 
         Context cx = enterContext();
         try {
@@ -248,12 +278,12 @@ public class RhinoScriptEngine extends AbstractScriptEngine
             }
 
             if (thiz != null && !(thiz instanceof Scriptable)) {
-                thiz = cx.toObject(thiz, topLevel);
+                thiz = Context.toObject(thiz, topLevel);
             }
 
             Scriptable engineScope = getRuntimeScope(context);
             Scriptable localScope = (thiz != null)? (Scriptable) thiz :
-                                                    engineScope;
+                engineScope;
             Object obj = ScriptableObject.getProperty(localScope, name);
             if (! (obj instanceof Function)) {
                 throw new NoSuchMethodException("no such method: " + name);
@@ -265,22 +295,22 @@ public class RhinoScriptEngine extends AbstractScriptEngine
                 scope = engineScope;
             }
             Object result = func.call(cx, scope, localScope,
-                                      wrapArguments(args));
+                    wrapArguments(args));
             return unwrapReturnValue(result);
         } catch (JavaScriptException jse) {
             if (DEBUG) jse.printStackTrace();
             int line = (line = jse.lineNumber()) == 0 ? -1 : line;
             Object value = jse.getValue();
             String str = (value != null && value.getClass().getName().equals("org.mozilla.javascript.NativeError") ?
-                          value.toString() :
-                          jse.toString());
+                    value.toString() :
+                        jse.toString());
             throw new ExtendedScriptException(jse, str, jse.sourceName(), line);
         } catch (RhinoException re) {
             if (DEBUG) re.printStackTrace();
             int line = (line = re.lineNumber()) == 0 ? -1 : line;
             throw new ExtendedScriptException(re, re.toString(), re.sourceName(), line);
         } finally {
-            cx.exit();
+            Context.exit();
         }
     }
 
@@ -308,13 +338,13 @@ public class RhinoScriptEngine extends AbstractScriptEngine
 
     private static final String printSource =
             "function print(str) {                         \n" +
-            "    if (typeof(str) == 'undefined') {         \n" +
-            "        str = 'undefined';                    \n" +
-            "    } else if (str == null) {                 \n" +
-            "        str = 'null';                         \n" +
-            "    }                                         \n" +
-            "    context.getWriter().println(String(str)); \n" +
-            "}";
+                    "    if (typeof(str) == 'undefined') {         \n" +
+                    "        str = 'undefined';                    \n" +
+                    "    } else if (str == null) {                 \n" +
+                    "        str = 'null';                         \n" +
+                    "    }                                         \n" +
+                    "    context.getWriter().println(String(str)); \n" +
+                    "}";
 
     Scriptable getRuntimeScope(ScriptContext ctxt) {
         if (ctxt == null) {
@@ -336,7 +366,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
         try {
             cx.evaluateString(newScope, printSource, "print", 1, null);
         } finally {
-            cx.exit();
+            Context.exit();
         }
         return newScope;
     }
@@ -360,13 +390,14 @@ public class RhinoScriptEngine extends AbstractScriptEngine
             }
 
             Scriptable scope = getRuntimeScope(context);
+            @SuppressWarnings("deprecation")
             Script scr = cx.compileReader(scope, preProcessScriptSource(script), filename, 1, null);
             ret = new RhinoCompiledScript(this, scr);
         } catch (Exception e) {
             if (DEBUG) e.printStackTrace();
             throw new ScriptException(e);
         } finally {
-            cx.exit();
+            Context.exit();
         }
         return ret;
     }
@@ -454,10 +485,10 @@ public class RhinoScriptEngine extends AbstractScriptEngine
                 ScriptContext ctx = ((ExternalScriptable)arg).getContext();
                 Bindings bind = ctx.getBindings(ScriptContext.ENGINE_SCOPE);
                 return Context.javaToJS(bind,
-                           ScriptableObject.getTopLevelScope(thisObj));
+                        ScriptableObject.getTopLevelScope(thisObj));
             }
         }
-        return cx.getUndefinedValue();
+        return Context.getUndefinedValue();
     }
 
     /**
@@ -489,7 +520,7 @@ public class RhinoScriptEngine extends AbstractScriptEngine
                 return res;
             }
         }
-        return cx.getUndefinedValue();
+        return Context.getUndefinedValue();
     }
 
     /**

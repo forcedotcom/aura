@@ -17,9 +17,7 @@ package org.auraframework.impl.root;
 
 import java.io.IOException;
 
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.util.json.Json;
 
@@ -28,26 +26,26 @@ import org.auraframework.util.json.Json;
  */
 public class RequiredVersionDefImpl extends DefinitionImpl<RequiredVersionDef> implements RequiredVersionDef {
 
-	private static final long serialVersionUID = 339932997904996301L;
-	private final String version;
+    private static final long serialVersionUID = 339932997904996301L;
+    private final String version;
 
-	protected RequiredVersionDefImpl(Builder builder) {
-		super(builder);
-		this.version = builder.version;
-	}
+    protected RequiredVersionDefImpl(Builder builder) {
+        super(builder);
+        this.version = builder.version;
+    }
 
-	@Override
-	public String getVersion() {
-		return this.version;
-	}
+    @Override
+    public String getVersion() {
+        return this.version;
+    }
 
-	@Override
-	public void serialize(Json json) throws IOException {
-		json.writeMapBegin();
-		json.writeMapEntry("namespace", this.descriptor.getName());
-		json.writeMapEntry("version", version);
-		json.writeMapEnd();
-	}
+    @Override
+    public void serialize(Json json) throws IOException {
+        json.writeMapBegin();
+        json.writeMapEntry("namespace", this.descriptor.getName());
+        json.writeMapEntry("version", version);
+        json.writeMapEnd();
+    }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<RequiredVersionDef> {
 
@@ -56,7 +54,7 @@ public class RequiredVersionDefImpl extends DefinitionImpl<RequiredVersionDef> i
         }
 
         private String version;
-        
+
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
          */
@@ -65,14 +63,14 @@ public class RequiredVersionDefImpl extends DefinitionImpl<RequiredVersionDef> i
             return new RequiredVersionDefImpl(this);
         }
 
-		/**
-		 * Sets the version for this instance.
-		 * 
-		 * @param version The version.
-		 */
-		public Builder setVersion(String version) {
-			this.version = version;
-			return this;
-		}
+        /**
+         * Sets the version for this instance.
+         *
+         * @param version The version.
+         */
+        public Builder setVersion(String version) {
+            this.version = version;
+            return this;
+        }
     }
 }

@@ -35,8 +35,8 @@ import org.auraframework.system.SourceWriter;
  */
 public class ParserFactory {
 
-    private static EnumMap<Format, Parser> parsers = new EnumMap<Format, Parser>(Format.class);
-    private static EnumMap<Format, SourceWriter> writers = new EnumMap<Format, SourceWriter>(Format.class);
+    private static EnumMap<Format, Parser> parsers = new EnumMap<>(Format.class);
+    private static EnumMap<Format, SourceWriter> writers = new EnumMap<>(Format.class);
 
     static {
         parsers.put(Format.XML, XMLParser.getInstance());

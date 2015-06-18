@@ -29,7 +29,7 @@ import aQute.bnd.annotation.component.Component;
 @Component (provide=AuraServiceProvider.class)
 public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
 
-    protected static final Map<DefType, String> defaults = new EnumMap<DefType, String>(DefType.class);
+    protected static final Map<DefType, String> defaults = new EnumMap<>(DefType.class);
 
     static {
         defaults.put(DefType.ACTION, DefDescriptor.JAVA_PREFIX);

@@ -56,7 +56,7 @@ public final class SourceFactory {
         for (SourceLoader loader : loaders) {
             for (String namespace : loader.getNamespaces()) {
                 mutableNamespaces.add(namespace);
-                
+
                 // Track and system/privileged namespaces
                 //
                 // This code is rather broken, as this now assumes that we build source factories for every
@@ -64,10 +64,10 @@ public final class SourceFactory {
                 // to make it work.
                 //
                 if (loader instanceof PrivilegedNamespaceSourceLoader) {
-                	PrivilegedNamespaceSourceLoader privilegedLoader = (PrivilegedNamespaceSourceLoader)loader;
-	                if (privilegedLoader.isPrivilegedNamespace(namespace)) {
-	                	configAdapter.addPrivilegedNamespace(namespace);
-	                }
+                    PrivilegedNamespaceSourceLoader privilegedLoader = (PrivilegedNamespaceSourceLoader)loader;
+                    if (privilegedLoader.isPrivilegedNamespace(namespace)) {
+                        configAdapter.addPrivilegedNamespace(namespace);
+                    }
                 }
 
                 for (String prefix : loader.getPrefixes()) {
@@ -75,15 +75,15 @@ public final class SourceFactory {
                     if (mutableLoaderMap.containsKey(key)) {
                         throw new AuraRuntimeException(String.format(
                                 "Namespace/Prefix combination %s claimed by 2 SourceLoaders : %s and %s", key
-                                        .toString(), mutableLoaderMap.get(key).getClass().getName(), loader.getClass()
-                                        .getName()));
+                                .toString(), mutableLoaderMap.get(key).getClass().getName(), loader.getClass()
+                                .getName()));
                     }
 
                     mutableLoaderMap.put(key, loader);
                 }
             }
         }
-        
+
         this.namespaces = AuraUtil.immutableSet(mutableNamespaces);
         this.loaders = AuraUtil.immutableMap(mutableLoaderMap);
     }
@@ -107,7 +107,7 @@ public final class SourceFactory {
         String namespace = matcher.getNamespace();
         Class<T> primaryInterface = (Class<T>) matcher.getDefType().getPrimaryInterface();
         if (WILD.equals(namespace)) {
-            Set<DefDescriptor<T>> ret = new HashSet<DefDescriptor<T>>();
+            Set<DefDescriptor<T>> ret = new HashSet<>();
             for (String ns : namespaces) {
                 ret.addAll(find(primaryInterface, matcher.getPrefix(), ns));
             }
@@ -118,7 +118,7 @@ public final class SourceFactory {
     }
 
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-        Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> ret = new HashSet<>();
 
         for (Map.Entry<LoaderKey, SourceLoader> entry : this.loaders.entrySet()) {
             if (matcher.matchPrefix(entry.getKey().getPrefix())
@@ -182,7 +182,7 @@ public final class SourceFactory {
 
         /**
          * Gets the namespace for this instance.
-         * 
+         *
          * @return The namespace.
          */
         public String getNamespace() {
@@ -191,7 +191,7 @@ public final class SourceFactory {
 
         /**
          * Gets the prefix for this instance.
-         * 
+         *
          * @return The prefix.
          */
         public String getPrefix() {

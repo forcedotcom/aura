@@ -45,8 +45,8 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_TYPE,
             RootTagHandler.ATTRIBUTE_DESCRIPTION, RootTagHandler.ATTRIBUTE_API_VERSION, ATTRIBUTE_ACCESS, ATTRIBUTE_EXTENDS);
-	private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			RootTagHandler.ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
+    private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
+            RootTagHandler.ATTRIBUTE_SUPPORT).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final EventDefImpl.Builder builder = new EventDefImpl.Builder();
 
@@ -79,15 +79,15 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
             builder.getAttributeDefs().put(DefDescriptorImpl.getInstance(attributeDef.getName(), AttributeDef.class),
                     attributeDef);
         } else if (RequiredVersionDefHandler.TAG.equalsIgnoreCase(tag)) {
-        	RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<EventDef>(this,
-        			xmlReader, source).getElement();
-        	DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
-        			.getDescriptor();
-        	if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
-        		error("Duplicate namespace %s found on tag %s",
-        				requiredVersionDesc.getName(), tag);
-        	}	
-        	builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
+            RequiredVersionDefImpl requiredVersionDef = new RequiredVersionDefHandler<>(this,
+                    xmlReader, source).getElement();
+            DefDescriptor<RequiredVersionDef> requiredVersionDesc = requiredVersionDef
+                    .getDescriptor();
+            if (builder.getRequiredVersionDefs().containsKey(requiredVersionDesc)) {
+                error("Duplicate namespace %s found on tag %s",
+                        requiredVersionDesc.getName(), tag);
+            }
+            builder.getRequiredVersionDefs().put(requiredVersionDesc, requiredVersionDef);
         } else {
             error("Found unexpected tag %s", tag);
         }
@@ -114,7 +114,7 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
         if (builder.eventType == null) {
             error("Event type attribute was invalid: %s", typeString);
         }
-        
+
         builder.setAccess(readAccessAttribute());
     }
 
@@ -135,10 +135,10 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     protected RootDefinitionBuilder<EventDef> getBuilder() {
         return builder;
     }
-    
-	@Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
-    
+
+    @Override
+    protected boolean allowPrivateAttribute() {
+        return true;
+    }
+
 }

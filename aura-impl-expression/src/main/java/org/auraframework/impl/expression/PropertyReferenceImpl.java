@@ -26,7 +26,6 @@ import org.auraframework.expression.ExpressionType;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProvider;
-import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -77,7 +76,7 @@ public class PropertyReferenceImpl implements PropertyReference {
             AuraContext lc = Aura.getContextService().getCurrentContext();
             GlobalValueProvider globalValueProvider = lc.getGlobalProviders().get(root);
             if (globalValueProvider != null) {
-				ret = globalValueProvider.getValue(getStem());
+                ret = globalValueProvider.getValue(getStem());
             }
         }
         return ret;

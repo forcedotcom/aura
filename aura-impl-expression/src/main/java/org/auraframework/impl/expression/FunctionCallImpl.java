@@ -64,7 +64,7 @@ public class FunctionCallImpl implements FunctionCall {
 
     @Override
     public Object evaluate(ValueProvider vp) throws QuickFixException {
-        List<Object> list = new ArrayList<Object>(args.size());
+        List<Object> list = new ArrayList<>(args.size());
         for (Expression e : args) {
             list.add(e.evaluate(vp));
         }

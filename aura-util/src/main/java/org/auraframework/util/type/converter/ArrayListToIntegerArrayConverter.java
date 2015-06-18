@@ -37,7 +37,7 @@ public class ArrayListToIntegerArrayConverter implements Converter<ArrayList, In
             return new Integer[0];
         }
 
-        ArrayList<Integer> convertedValues = new ArrayList<Integer>(value.size());
+        ArrayList<Integer> convertedValues = new ArrayList<>(value.size());
 
         for (String s : (ArrayList<String>) value) {
             convertedValues.add(Integer.valueOf(s));

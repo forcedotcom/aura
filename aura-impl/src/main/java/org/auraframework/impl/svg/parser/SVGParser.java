@@ -16,6 +16,17 @@
 package org.auraframework.impl.svg.parser;
 
 
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Pattern;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -28,16 +39,6 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
-
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Pattern;
 
 public class SVGParser implements Parser {
     private static final SVGParser instance = new SVGParser();
@@ -68,7 +69,7 @@ public class SVGParser implements Parser {
             "onpause", "onplay", "onplaying", "onprogress", "onratechange", "onseeked", "onseeking", "onstalled",
             "onsuspend", "ontimeupdate", "onvolumechange", "onwaiting", "onmessage", "onmousewheel", "ononline",
             "onoffline", "onpopstate", "onshow", "onstorage", "ontoggle", "onwheel"));
-    
+
     static {
         xmlInputFactory = XMLInputFactory.newInstance();
 
@@ -100,23 +101,23 @@ public class SVGParser implements Parser {
     @SuppressWarnings("unchecked")
     @Override
     public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws SVGParserException,
-            QuickFixException {
+    QuickFixException {
         if (descriptor.getDefType() == DefType.SVG) {
             XMLStreamReader reader = null;
             String contents = source.getContents();
             //If the file is too big throw before we parse the whole thing.
-            D ret = (D) new SVGDefHandler<SVGDef>((DefDescriptor<SVGDef>) descriptor,
+            D ret = (D) new SVGDefHandler<>((DefDescriptor<SVGDef>) descriptor,
                     (Source<SVGDef>) source).createDefinition();
             try (StringReader stringReader = new StringReader(contents)){
                 reader = xmlInputFactory.createXMLStreamReader(stringReader);
                 if (reader != null) {
                     LOOP:
-                    while (reader.hasNext()) {
-                        int type = reader.next();
-                        switch (type) {
+                        while (reader.hasNext()) {
+                            int type = reader.next();
+                            switch (type) {
                             case XMLStreamConstants.END_DOCUMENT:
                                 break LOOP;
-                            //This is plain text inside the file
+                                //This is plain text inside the file
                             case XMLStreamConstants.CHARACTERS:
                                 if (DISSALOWED_LIST.matcher(reader.getText()).matches()) {
                                     throw new InvalidDefinitionException(String.format(
@@ -148,8 +149,8 @@ public class SVGParser implements Parser {
                                 throw new InvalidDefinitionException(String.format(
                                         "Found unexpected element in xml."),
                                         XMLParser.getLocation(reader, source));
+                            }
                         }
-                    }
                 }
             } catch (XMLStreamException e) {
                 throw new SVGParserException(StringEscapeUtils.escapeHtml4(e.getMessage()));

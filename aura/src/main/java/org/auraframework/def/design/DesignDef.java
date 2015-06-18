@@ -15,17 +15,16 @@
  */
 package org.auraframework.def.design;
 
+import java.util.List;
+import java.util.Map;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
- * 
+ *
  * DesignDef handles .design files within the component bundle
- * 
+ *
  */
 public interface DesignDef extends RootDefinition {
     @Override
@@ -34,16 +33,16 @@ public interface DesignDef extends RootDefinition {
     /**
      * Get all of the attribute design definitions belonging to this design definition, empty if no attribute designs
      * were defined.
-     * 
+     *
      * @return a map of attribute design definitions
      */
     public Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> getAttributeDesignDefs();
 
     /**
      * Retrieve an attribute design definition by name.
-     * 
+     *
      * @param name
-     * 
+     *
      * @return the attribute design definition
      */
     public DesignAttributeDef getAttributeDesignDef(String name);
@@ -70,7 +69,7 @@ public interface DesignDef extends RootDefinition {
 
     /**
      * Get the simple label for this design definition. May be null.
-     * 
+     *
      * @return the label, may be null
      */
     public String getLabel();
@@ -78,7 +77,7 @@ public interface DesignDef extends RootDefinition {
     /**
      * Return the design template definition. The design template definition will describe which interfaces are allowed
      * in named template regions. May be null.
-     * 
+     *
      * @return the design template definition, may be null
      */
     public DesignTemplateDef getDesignTemplateDef();

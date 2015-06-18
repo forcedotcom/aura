@@ -52,46 +52,46 @@ public class AdminModel {
     private final Map<String,Object> stringsData;
     private final Map<String,Object> descriptorFilterData;
 
-// TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
-//        a least-common-denominator implementation
-    
-//    private Map<String,Object> getStats(CacheStats stats) {
-//        Map<String, Object> data = Maps.newHashMap();
-//
-//        data.put("evictionCount", String.valueOf(stats.evictionCount()));
-//        data.put("hitCount", String.valueOf(stats.hitCount()));
-//        data.put("hitRate", String.valueOf(stats.hitRate()));
-//        data.put("missCount", String.valueOf(stats.missCount()));
-//        data.put("missRate", String.valueOf(stats.missRate()));
-//        data.put("requestCount", String.valueOf(stats.requestCount()));
-//        return data;
-//    }
+    // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
+    //        a least-common-denominator implementation
 
-//    private void addDefsStats(Map<String, Object> data, Collection<Optional<? extends Definition>> defs) {
-//        List<Map<String, Object>> defsData = Lists.newArrayListWithCapacity(defs.size());
-//        int nulls = 0;
-//
-//        data.put("defs", defsData);
-//        for (Optional<? extends Definition> odef : defs) {
-//            Definition def = odef.orNull();
-//            if (def != null) {
-//                Map<String, Object> defData = Maps.newHashMap();
-//                defData.put("class", def.getClass().getName());
-//                defData.put("descriptor", def.getDescriptor().getQualifiedName());
-//                defData.put("type", def.getDescriptor().getDefType());
-//                defData.put("location", def.getLocation());
-//                defsData.add(defData);
-//            } else {
-//                nulls += 1;
-//            }
-//        }
-//        data.put("nulls", nulls);
-//    }
-    
+    //    private Map<String,Object> getStats(CacheStats stats) {
+    //        Map<String, Object> data = Maps.newHashMap();
+    //
+    //        data.put("evictionCount", String.valueOf(stats.evictionCount()));
+    //        data.put("hitCount", String.valueOf(stats.hitCount()));
+    //        data.put("hitRate", String.valueOf(stats.hitRate()));
+    //        data.put("missCount", String.valueOf(stats.missCount()));
+    //        data.put("missRate", String.valueOf(stats.missRate()));
+    //        data.put("requestCount", String.valueOf(stats.requestCount()));
+    //        return data;
+    //    }
+
+    //    private void addDefsStats(Map<String, Object> data, Collection<Optional<? extends Definition>> defs) {
+    //        List<Map<String, Object>> defsData = Lists.newArrayListWithCapacity(defs.size());
+    //        int nulls = 0;
+    //
+    //        data.put("defs", defsData);
+    //        for (Optional<? extends Definition> odef : defs) {
+    //            Definition def = odef.orNull();
+    //            if (def != null) {
+    //                Map<String, Object> defData = Maps.newHashMap();
+    //                defData.put("class", def.getClass().getName());
+    //                defData.put("descriptor", def.getDescriptor().getQualifiedName());
+    //                defData.put("type", def.getDescriptor().getDefType());
+    //                defData.put("location", def.getLocation());
+    //                defsData.add(defData);
+    //            } else {
+    //                nulls += 1;
+    //            }
+    //        }
+    //        data.put("nulls", nulls);
+    //    }
+
     public Map<String,Object> getMockMap() {
-    	HashMap<String,Object> map = new HashMap<String,Object>();
-    	map.put("not available", "not available");
-    	return map;
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("not available", "not available");
+        return map;
     }
 
     public AdminModel() throws JMException {
@@ -141,7 +141,7 @@ public class AdminModel {
     public Map<String, Object> getDefsData() {
         return defsData;
     }
-    
+
     @AuraEnabled
     public Map<String, Object> getExistsData() {
         return existsData;

@@ -15,10 +15,9 @@
  */
 package org.auraframework.def.design;
 
-import org.auraframework.def.Definition;
-import org.auraframework.def.RootDefinition;
-
 import java.util.Set;
+
+import org.auraframework.def.Definition;
 
 public interface DesignSectionDef extends Definition  {
     /**

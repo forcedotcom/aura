@@ -16,7 +16,6 @@
 package org.auraframework.impl.java.model;
 
 import java.io.IOException;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
@@ -25,13 +24,11 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.auraframework.Aura;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.JavaModelDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
-
 import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -46,7 +43,7 @@ import org.auraframework.util.json.Json;
 
 /**
  * JavaModelDef describes a single java model.
- * 
+ *
  * The framework imposes a two stage construction/validation framework onto
  */
 public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaModelDef {
@@ -149,7 +146,7 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
             return DefDescriptorImpl.getInstance(type.value(), TypeDef.class);
         }
     }
-    
+
     public static class Builder extends DefinitionImpl.BuilderImpl<ModelDef> {
 
         public Builder() {
@@ -177,10 +174,10 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         public void setUseAdapter(boolean useAdapter) {
             this.useAdapter = useAdapter;
         }
-        
+
         @Override
         public JavaModelDefImpl build() {
-            this.memberMap = new TreeMap<String, JavaValueDef>();
+            this.memberMap = new TreeMap<>();
             for (Method method : this.modelClass.getMethods()) {
                 if (method.getAnnotation(AuraEnabled.class) != null) {
                     try {

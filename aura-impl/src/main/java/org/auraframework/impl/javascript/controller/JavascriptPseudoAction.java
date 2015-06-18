@@ -104,7 +104,7 @@ public class JavascriptPseudoAction implements Action {
 
     public void addError(AuraClientException e) {
         if (errorList == null) {
-            errorList = new ArrayList<Object>();
+            errorList = new ArrayList<>();
         }
         errorList.add(e);
     }

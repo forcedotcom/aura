@@ -37,8 +37,6 @@ import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
@@ -72,6 +70,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -82,14 +82,14 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String TIMESTAMP_PROPERTY = "aura.build.timestamp";
     private static final String VERSION_PROPERTY = "aura.build.version";
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
-    
+
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
     private static final Set<String> CANONICAL_NAMESPACES = Sets.newHashSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
-    
+
     private static final Set<String> UNDOCUMENTED_NAMESPACES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("auradocs").build();
-    
+
     private static final Set<String> CACHEABLE_PREFIXES = ImmutableSet.of("aura", "java");
 
     protected final Set<Mode> allModes = EnumSet.allOf(Mode.class);
@@ -174,11 +174,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 || Boolean.parseBoolean(validateCssString.trim());
 
         effectiveTimezones = readEquivalentTimezones();
-        
+
         if (!isProduction()) {
             AuraFileMonitor.start();
         }
-        
+
         Aura.getContextService().registerGlobal("isVoiceOver", true, false);
         Aura.getContextService().registerGlobal("dynamicTypeSize", true, "");
     }
@@ -191,7 +191,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public boolean isTestAllowed() {
         return !isProduction();
     }
-    
+
     @Override
     public Set<Mode> getAvailableModes() {
         return allModes;
@@ -216,7 +216,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public String getDefaultNamespace() {
         return null;
     }
-    
+
     @Override
     public boolean isUnsecuredPrefix(String prefix) {
         return UNSECURED_PREFIXES.contains(prefix);
@@ -247,7 +247,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 if (destFiles != null && destFiles.length > 0) {
                     resourceDest.mkdirs(); // If we got this far without this directory, just create it.
                     for (File f : destFiles) {
-                    	logger.info(f);
+                        logger.info(f);
                         InputStream is = new FileInputStream(f);
                         OutputStream os = new FileOutputStream(new File(resourceDest, f.getName()));
                         IOUtil.copyStream(is, os);
@@ -279,11 +279,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String resetCss = "resetCSS";
 
         try {
-            DefDescriptor appDesc = context.getApplicationDescriptor();
+            DefDescriptor<?> appDesc = context.getApplicationDescriptor();
             if (appDesc != null) {
                 BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
                 if (templateDef.isTemplate()) {
-                    BaseComponent template = Aura.getInstanceService().getInstance(templateDef);
+                    BaseComponent<?, ?> template = (BaseComponent<?, ?>) Aura.getInstanceService().getInstance(templateDef);
                     if (useNormalizeCss(template)) {
                         resetCss = "normalize";
                     }
@@ -304,8 +304,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      * @return whether normalizeCss attribute is set to true
      * @throws QuickFixException
      */
-    private boolean useNormalizeCss(BaseComponent template) throws QuickFixException {
-        BaseComponent valueProviderTemplate = template;
+    private boolean useNormalizeCss(BaseComponent<?, ?> template) throws QuickFixException {
+        BaseComponent<?, ?> valueProviderTemplate = template;
         boolean baseTemplate = true;
         if (template.getSuper() != null && ((BaseComponentDef) template.getSuper().getDescriptor().getDef()).isTemplate()) {
             // super template is the value provider for the attribute
@@ -390,7 +390,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         return equivalents;
     }
-    
+
     @Override
     public String getHTML5ShivURL() {
         String ret = null;

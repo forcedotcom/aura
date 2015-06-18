@@ -193,7 +193,7 @@ public class JsonStreamReader {
      * <br>
      * Note that the JSON string is assumed to be UTF-8 when JsonStreamReader is
      * constructed with an InputStream.
-     * 
+     *
      * @param binaryInput The raw InputStream to read from
      */
     public JsonStreamReader(InputStream binaryInput) {
@@ -239,7 +239,7 @@ public class JsonStreamReader {
      * {@link #isRecursiveReadEnabled()}), then calling this method will cause a
      * recursive read to occur on the current object if the current position is
      * at the beginning of an object.
-     * 
+     *
      * @throws JsonStreamParseException Thrown if the current JSON token is not
      *             OBJECT or, for when recursive reading is disabled,
      *             OBJECT_START. When recursive reading is disabled, this
@@ -276,7 +276,7 @@ public class JsonStreamReader {
      * {@link #isRecursiveReadEnabled()}), then calling this method will cause a
      * recursive read to occur on the current array if the current position is
      * at the beginning of an array.
-     * 
+     *
      * @throws JsonStreamParseException Thrown if the current JSON token is not
      *             ARRAY or, for when recursive reading is disabled,
      *             ARRAY_START. When recursive reading is disabled, this
@@ -340,7 +340,7 @@ public class JsonStreamReader {
         assertCurrentToken(BINARY_STREAM);
         return ((LimitedLengthInputStream) current).getLength();
     }
-    
+
     public int getCharNum() {
         return charNum;
     }
@@ -455,7 +455,7 @@ public class JsonStreamReader {
                 } else if (result.equals("NaN")) {
                     current = Double.NaN;
                     token = NUMBER;
-                } 
+                }
                 if (hint == STRING || hint == LITERAL) {
                     if (token != null) {
                         // Guaranteed to fail.
@@ -728,7 +728,7 @@ public class JsonStreamReader {
      * after consuming the '/' character, but before either the second '/' or
      * the '*'. If the next character read is <i>not</i> one of those two (i.e.
      * this is not a comment), it will throw a {@link JsonStreamParseException}.
-     * 
+     *
      * @return a {@link JsComment} with the comment text and location
      * @throws IOException
      * @throws JsonEndOfStreamException if there is no next character
@@ -819,7 +819,7 @@ public class JsonStreamReader {
     private String readFunctionBody() throws IOException, JsonEndOfStreamException {
         // We have to have a bit of a stack in order to find the end of function
         // body properly.
-        ArrayDeque<JsonConstant> stack = new ArrayDeque<JsonConstant>();
+        ArrayDeque<JsonConstant> stack = new ArrayDeque<>();
         StringBuilder sb = new StringBuilder();
         char c;
         JsonConstant token;
@@ -895,7 +895,7 @@ public class JsonStreamReader {
     /**
      * Literal Strings can only be used as keys in maps, so the entry separator
      * and whitespace chars are treated as the delimiters.
-     * 
+     *
      * @return
      * @throws IOException
      */

@@ -29,8 +29,8 @@ import com.google.common.collect.Sets;
 
 /**
  * Delegates and combines calls to all ServiceLoaders currently in the classpath
- * 
- * 
+ *
+ *
  * @since 0.0.233
  */
 public class ServiceLocator implements ServiceLoader {
@@ -42,20 +42,20 @@ public class ServiceLocator implements ServiceLoader {
     /**
      * Cache backing get(Class)
      */
-    private final ConcurrentMap<Class<?>, Optional<Object>> instanceCache = new ConcurrentHashMap<Class<?>, Optional<Object>>();
+    private final ConcurrentMap<Class<?>, Optional<Object>> instanceCache = new ConcurrentHashMap<>();
 
     /**
      * Cache backing get(Class, String)
      */
-    private final ConcurrentMap<Class<?>, ConcurrentMap<String, Optional<Object>>> namedInstanceCache = new ConcurrentHashMap<Class<?>, ConcurrentMap<String, Optional<Object>>>();
+    private final ConcurrentMap<Class<?>, ConcurrentMap<String, Optional<Object>>> namedInstanceCache = new ConcurrentHashMap<>();
 
     /**
      * Cache backing getAll(Class)
      */
-    private final ConcurrentMap<Class<?>, Set<?>> setCache = new ConcurrentHashMap<Class<?>, Set<?>>();
+    private final ConcurrentMap<Class<?>, Set<?>> setCache = new ConcurrentHashMap<>();
 
-    private static ThreadLocal<ServiceLoader> alternateServiceLocator = new ThreadLocal<ServiceLoader>();
-    
+    private static ThreadLocal<ServiceLoader> alternateServiceLocator = new ThreadLocal<>();
+
     /**
      * If this is not called, then ServiceLoaderImpl is used as the only
      * ServiceLoader. If this is called, all caches will be invalidated and the
@@ -66,7 +66,7 @@ public class ServiceLocator implements ServiceLoader {
      * others will be consulted. So, even if a latter loader would have a bean
      * that overrides an earlier one because it is marked with @Primary, the
      * earlier one will be used.
-     * 
+     *
      * @param loaders
      */
     public static void init(ServiceLoader... loaders) {
@@ -91,10 +91,10 @@ public class ServiceLocator implements ServiceLoader {
      * Get the singleton
      */
     public static final ServiceLoader get() {
-    	ServiceLoader altInstance = alternateServiceLocator.get();
-    	if(alternateServiceLocator.get() != null){
-    		return altInstance;
-    	}
+        ServiceLoader altInstance = alternateServiceLocator.get();
+        if(alternateServiceLocator.get() != null){
+            return altInstance;
+        }
         return instance;
     }
 
@@ -138,7 +138,7 @@ public class ServiceLocator implements ServiceLoader {
         try {
             ConcurrentMap<String, Optional<Object>> c = namedInstanceCache.get(type);
             if (c == null) {
-                c = new ConcurrentHashMap<String, Optional<Object>>();
+                c = new ConcurrentHashMap<>();
                 namedInstanceCache.putIfAbsent(type, c);
             }
             Optional<Object> o = c.get(name);

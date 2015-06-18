@@ -34,73 +34,73 @@ import org.auraframework.util.json.JsonSerializable;
  */
 @Model
 public class DatePickerModel {
-    
+
     @AuraEnabled
     public String getLangLocale() throws QuickFixException {
         AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
         return locale.getLanguageLocale().toString();
     }
-    
+
     @AuraEnabled
     public List<LocalizedLabel> getMonthLabels() throws QuickFixException {
         AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
         DateFormatSymbols monthSymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] months = monthSymbols.getMonths();
         String[] shortMonths = monthSymbols.getShortMonths();
-        ArrayList<LocalizedLabel> monthList = new ArrayList<LocalizedLabel>(12);
+        ArrayList<LocalizedLabel> monthList = new ArrayList<>(12);
         for (int i = 0; i < months.length - 1; i++) {
             monthList.add(new LocalizedLabel(months[i], shortMonths[i]));
         }
         return monthList;
     }
-    
+
     @AuraEnabled
     public String getLabelForToday() throws QuickFixException {
         LocalizationAdapter la = Aura.getLocalizationAdapter();
         return la.getLabel("Related_Lists", "task_mode_today");
     }
-    
+
     @AuraEnabled
     public List<LocalizedLabel> getWeekdayLabels() throws QuickFixException {
         AuraLocale locale = Aura.getLocalizationAdapter().getAuraLocale();
         DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] weekdays = weekdaySymbols.getWeekdays();
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();
-        ArrayList<LocalizedLabel> weekdayList = new ArrayList<LocalizedLabel>(7);
+        ArrayList<LocalizedLabel> weekdayList = new ArrayList<>(7);
         for (int i = 1; i < weekdays.length; i++) {
             weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i].toUpperCase(locale.getLanguageLocale())));
         }
         return weekdayList;
     }
-    
+
     public static class LocalizedLabel implements JsonSerializable {
         /** Full name of month */
         private String fullName;
         /** Short name of month */
         private String shortName;
-        
+
         public LocalizedLabel(String fullName, String shortName) {
             this.fullName = fullName;
             this.shortName = shortName;
         }
-        
+
         @AuraEnabled
         public String getFullName() {
             return this.fullName;
         }
-        
+
         @AuraEnabled
         public String getShortName() {
             return this.shortName;
         }
-        
+
         @Override
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
             json.writeMapKey("fullName");
             json.writeValue(this.getFullName());
             json.writeMapKey("shortName");
-            json.writeValue(this.getShortName());                
+            json.writeValue(this.getShortName());
             json.writeMapEnd();
         }
     }

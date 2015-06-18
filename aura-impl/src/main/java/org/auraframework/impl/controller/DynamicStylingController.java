@@ -37,6 +37,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.base.Optional;
@@ -77,6 +78,7 @@ public final class DynamicStylingController {
 
         DefinitionService defService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
+        MasterDefRegistry mdr = context.getDefRegistry();
 
         // convert the string theme descriptors to real descriptors
         List<DefDescriptor<ThemeDef>> themes = new ArrayList<>(themeDescriptors.size());
@@ -98,6 +100,17 @@ public final class DynamicStylingController {
 
         // add any client-loaded style defs (todo-- check for dupes?)
         for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
+            // include inner deps
+            String descUid = mdr.getUid(null, desc);
+            if (descUid != null) {
+                for (DefDescriptor<?> dep : mdr.getDependencies(descUid)) {
+                    DefDescriptor<StyleDef> style = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                    if (style.exists() && !styles.contains(style)) {
+                        styles.add(style);
+                    }
+                }
+            }
+
             DefDescriptor<StyleDef> style = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
             if (style.exists() && !styles.contains(style)) {
                 styles.add(style);

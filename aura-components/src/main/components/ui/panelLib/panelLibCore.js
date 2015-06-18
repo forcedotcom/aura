@@ -78,8 +78,8 @@ function (scrollUtil) {
          * @param closeAction the caller defined close action
          * @returns {Function}
          */
-        getKeyEventListener: function(cmp, config, closeAction) {
-            var me = this, config = config || {};
+        getKeyEventListener: function(cmp, conf, closeAction) {
+            var me = this, config = conf || {};
 
             return function(e) {
                 
@@ -151,7 +151,7 @@ function (scrollUtil) {
                         }
                     }
                 }
-            }
+            };
         },
 
         /**
@@ -213,7 +213,7 @@ function (scrollUtil) {
                 animEl.addEventListener(animEnd, finishHandler, false);
                 setTimeout(function() {
                      $A.util.addClass(panel, 'open');
-                 },10)
+                 },10);
                 $A.util.addClass(animEl, 'transitioning ' + animName);
                
 
@@ -278,7 +278,7 @@ function (scrollUtil) {
          */
         updatePanel: function(panel, facets, callback) {
             if ($A.util.isObject(facets)) {
-                var facet, body = facets['body'] || panel;
+                var facet, body = facets.body || panel;
                 for (var key in facets) {
                     facet = facets[key];
                     if (facets.hasOwnProperty(key) && $A.util.isComponent(facet)) {

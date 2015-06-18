@@ -202,7 +202,7 @@
         //find the panel to active
         for (var panel, i = this.PANELS_STACK.length - 1; i >= 0; i--) {
             panel = this.PANELS_STACK[i];
-            if (panel && panel.isValid() && panel.get('v.visible') && panel.get('v.activatable')) {
+            if (panel && panel.isValid() && panel.get('v.visible')) {
                 panel.setActive(true);
                 break;
             }
@@ -216,7 +216,7 @@
     deactivateAllPanelInstances: function(cmp, activePanel) {
         for (var panel, i = this.PANELS_STACK.length - 1; i >= 0; i--) {
             panel = this.PANELS_STACK[i];
-            if (panel && panel.isValid() && !panel.get('v.activatable') && panel !== activePanel) {
+            if (panel && panel.isValid() && panel !== activePanel) {
                 panel.setActive(false);
             }
         }

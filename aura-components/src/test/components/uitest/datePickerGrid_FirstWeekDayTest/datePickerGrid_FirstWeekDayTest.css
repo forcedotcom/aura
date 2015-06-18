@@ -1,0 +1,14 @@
+.THIS .attributeValues i{
+	color:red;
+	margin-left:20px;
+}
+
+.THIS h1{
+	text-align: center;
+	font-weight:bold;
+	font-size:25px;
+}
+
+.THIS .datepickerWrap{
+	margin-top:10px;
+}

@@ -42,6 +42,6 @@ public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
         auraUITestingUtil.pressEnter(input);
         input.sendKeys("test");
-    }
          */
     }
+}

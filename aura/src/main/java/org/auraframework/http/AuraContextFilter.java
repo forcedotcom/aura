@@ -82,7 +82,7 @@ public class AuraContextFilter implements Filter {
 
     private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
 
-    private static final AuraTestFilter testFilter = new AuraTestFilter();
+    protected static final AuraTestFilter testFilter = new AuraTestFilter();
     
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,

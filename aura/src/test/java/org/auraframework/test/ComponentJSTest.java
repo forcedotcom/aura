@@ -56,7 +56,7 @@ import com.google.common.collect.Sets;
  */
 @UnAdaptableTest
 @WebDriverTest
-public class ComponentJSTestSuite extends TestSuite {
+public class ComponentJSTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {
         TestSuite suite = new NamespaceTestSuite("*");

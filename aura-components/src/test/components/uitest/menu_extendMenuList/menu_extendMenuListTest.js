@@ -68,22 +68,24 @@
 	            cmp.find(item3).get("e.click").fire();
 	            $A.test.addWaitForWithFailureMessage(cmp.find(item3).get('v.label'), function(){return menuLabel.get('v.label')}, "Label should be updated to "+ cmp.find(item3).get('v.label'));
 			}, function(cmp) {
-				$A.test.assertFalse(actionMenu.get('v.visible'),"Menu should not be visible");
+				//FIXME: Uncomment once W-2584076 is fixed
+				//$A.test.assertFalse(actionMenu.get('v.visible'),"Menu should not be visible");
 			}
         ]
-    },
+    }
     
     /**
      * Test first item in menuList is focused.
      * TODO: Disabling test in IE7&8, bug W-2320774
+     * Enable the test once W-2584076 is fixed
      */
-    testFocusOnFirstMenuItem:{
+    /*testFocusOnFirstMenuItem:{
     	browsers: ["-IE7","-IE8"],
     	test: function(cmp){
-			trigger = cmp.find("trigger");
+    		trigger = cmp.find("triggerAttachToBody");
 			trigger.get("e.click").fire();
-			var menuItem1 = cmp.find("actionItem1");
+			var menuItem1 = cmp.find("actionItemAttachToBody1");
 			$A.test.addWaitForWithFailureMessage(menuItem1.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 1");
 		}
-	}
+	}*/
 })

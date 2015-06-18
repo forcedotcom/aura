@@ -34,7 +34,6 @@
 		var target = component.getElement();
 		var lib = this.lib.panelPositioning;
 		var bbDirections;
-
 		var targetAlign, align;
 
 		switch (direction) {
@@ -165,9 +164,12 @@
 		var tt = this.buildTooltip(component);
 		this.updatePosition(component, false);
 		component.set('v.isVisible', true, false);
-		tt.classList.add('visible');
 		requestAnimationFrame(function() {
-			tt.classList.add('visible');
+			tt.classList.add('transition-start');
+			requestAnimationFrame(function() {
+				tt.classList.add('visible');
+			});
+			
 		});
 	},
 
@@ -190,6 +192,7 @@
 	hide: function(component) {
 		var tt = this.buildTooltip(component);
 		tt.classList.remove('visible');
+
 		component.set('v.isVisible', false, false);
 	},
 

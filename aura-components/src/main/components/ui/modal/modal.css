@@ -45,7 +45,7 @@
 }
 
 .THIS .modal-glass.fadein {
-   
+
     transition: opacity .2s;
     /*opacity: .8;*/
     /*background-color: green;*/
@@ -72,7 +72,7 @@
 }
 
 .THIS .modal-body {
-    padding: 1px 14px;
+    padding: 2px 14px;
     overflow: hidden;
     overflow-y: auto;
 }
@@ -199,7 +199,7 @@
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, 16px , 0px);
 		transform:translate3d(0px, 16px , 0px);
     }
@@ -209,7 +209,7 @@
         -webkit-transform:translate3d(0px, 16px , 0px);
 		transform:translate3d(0px, 16px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
@@ -220,7 +220,7 @@
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, -16px , 0px);
 		transform:translate3d(0px, -16px , 0px);
     }
@@ -230,7 +230,7 @@
         -webkit-transform:translate3d(0px, -16px , 0px);
 		transform:translate3d(0px, -16px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
@@ -241,7 +241,7 @@
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(-16px, 0px , 0px);
 		transform:translate3d(-16px, 0px , 0px);
     }
@@ -251,7 +251,7 @@
         -webkit-transform:translate3d(-16px, 0px , 0px);
 		transform:translate3d(-16px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
@@ -262,7 +262,7 @@
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(16px, 0px , 0px);
 		transform:translate3d(16px, 0 , 0px);
     }
@@ -272,14 +272,14 @@
         -webkit-transform:translate3d(16px, 0px , 0px);
 		transform:translate3d(16px, 0px , 0px);
     }
-    to { 
+    to {
         -webkit-transform:translate3d(0px, 0px , 0px);
 		transform:translate3d(0px, 0px , 0px);
     }
 }
 
 @keyframes movetopop-modal {
-    from { 
+    from {
        -webkit-transform:scale3d(1,1,1);
        transform:scale3d(1,1,1);
     }
@@ -301,7 +301,7 @@
         transform:scale3d(1.02,1.02,1);
     }
 
-    100% { 
+    100% {
        -webkit-transform:scale3d(1,1,1);
        transform:scale3d(1,1,1);
     }

@@ -23,9 +23,10 @@
     <aura:attribute name="year" type="Integer" description="The currently rendered year."/>
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
     <aura:attribute name="dimension" type="String" default="large" description="The size of the date picker. Valid values: large, medium, small"/>
+    <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
     
     <!-- private attributes -->
-    <aura:attribute name="_setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
+    <aura:attribute name="_setFocus" type="Boolean" default="true" description="The internal state of setFocus."/>
     <aura:attribute name="_namesOfWeekdays" type="List" description="The names of the week days based on locale."/>
     
     <aura:registerevent name="hide" type="ui:change" description="The event fired when the date picker is hidden from view."/>

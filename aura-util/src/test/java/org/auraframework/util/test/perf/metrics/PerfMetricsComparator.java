@@ -144,10 +144,14 @@ public class PerfMetricsComparator {
         for (String name : expectedMetricNames) {
             PerfMetric expected = expectedMetrics.getMetric(name);
             PerfMetric actual = actualMetrics.getNonnullMetric(name);
+            //PerfMetric actual = actualMetrics.getMetric(name);
+            // Only a subset of metrics may be compared.
+            //if(actual==null) continue;
+            
             String units = expected.getUnits();
 
-            int expectedValue = expected.getIntValue();
-            int actualValue = (actual != null) ? actual.getIntValue() : -1;
+            long expectedValue = expected.getIntValue();
+            long actualValue = (actual != null) ? actual.getIntValue() : -1;
 
             int allowedDelta = 0;
             int allowedPercent = getAllowedVariability(name);

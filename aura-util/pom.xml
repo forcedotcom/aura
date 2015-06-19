@@ -90,6 +90,10 @@
             <artifactId>bnd</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+        	<groupId>com.google.code.gson</groupId>
+        	<artifactId>gson</artifactId>
+        </dependency>
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>

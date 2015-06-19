@@ -43,9 +43,42 @@ public final class GoldFileUtils {
 
     public void assertPerfDiff(UnitTestCase test, String resultsBaseFilename, PerfMetrics actual) throws Exception {
         PerfDiffUtils diff = new PerfDiffUtils(test, resultsBaseFilename);
-        assertDiffInternal(actual, diff);
+        assertDiff(actual, diff);
     }
 
+    private <T> void assertDiff(T testResults, DiffUtils<T> diff) throws Exception {
+    	URL url = diff.getUrl();
+        Throwable exceptionFound = null;
+        String message = null;
+
+        try {
+            diff.assertDiff(testResults, null);
+        } catch (FileNotFoundException e) {
+            exceptionFound = e;
+            message = String.format("Missing gold file, commit a goldfile at this url: %s", url);
+        } catch (Throwable t) {
+            exceptionFound = t;
+            message = "Gold file differences found";
+            message += "\nDifferences";
+            if (testResults instanceof PerfMetrics) {
+                message += " using the median (*) perf test run metric values";
+            }
+            message += ":\n" + t.getMessage();
+        }
+
+        if (exceptionFound != null) {
+            /*if (testResults instanceof PerfMetrics) {
+                LOG.info("new gold file contents:\n"
+                        + PerfGoldFilesUtil.toGoldFileText((PerfMetrics) testResults, false));
+            }*/
+
+            // add info about creating/updating log file in the assertion message
+            Error error = new AssertionFailedError(message);
+            error.setStackTrace(exceptionFound.getStackTrace());
+            throw error;
+        } 
+    }
+    
     private <T> void assertDiffInternal(T testResults, DiffUtils<T> diff) throws Exception {
         URL url = diff.getUrl();
         Throwable exceptionFound = null;

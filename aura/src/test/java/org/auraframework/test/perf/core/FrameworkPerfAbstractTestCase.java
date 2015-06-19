@@ -20,7 +20,7 @@ import org.auraframework.util.test.annotation.PerfFrameworkTest;
 /**
  * Base class for Aura WebDriver tests.
  */
-@PerfFrameworkTest
+//@PerfFrameworkTest
 public abstract class FrameworkPerfAbstractTestCase extends AbstractPerfTestCase {
     public FrameworkPerfAbstractTestCase(String name) {
         super(name);

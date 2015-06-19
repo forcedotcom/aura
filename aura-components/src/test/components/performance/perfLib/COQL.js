@@ -88,6 +88,18 @@ function COQL() {
                 results[view] = end[view].diff(start[view]);
             }
             return results;
+        },
+        getResults: function (endSnapshot, startSnaphost) {
+            var diff    = this.diff(endSnapshot, startSnaphost),
+                results = {};
+
+            for (var key in diff) {
+                results[key] = {
+                    added   : diff[key].added.rowCount,
+                    removed : diff[key].removed.rowCount
+                };
+            }
+            return results;
         }
     }
 }

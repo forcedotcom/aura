@@ -29,7 +29,7 @@ import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
 @UnAdaptableTest
-@PerfTestSuite
+//@PerfTestSuite
 public class CustomPerfTestSuiteTest extends TestSuite {
 
     private static final Logger LOG = Logger.getLogger(CustomPerfTestSuiteTest.class.getSimpleName());

@@ -63,6 +63,14 @@ public class PerfMetric extends JSONObject implements Comparable<PerfMetric> {
         }
     }
 
+    public final long getLongValue() {
+        try {
+            return getLong("value");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     public final Object getValue() {
         try {
             return get("value");

@@ -93,6 +93,7 @@ public class AuraPerfTests extends TestSuite {
         if (RUN_PERF_TESTS) {
             logger.info("Filtering only test annotated with @PerfTest");
         }
+        
         Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
         List<Callable<TestResult>> queue = Lists.newLinkedList();
         List<Callable<TestResult>> hostileQueue = Lists.newLinkedList();

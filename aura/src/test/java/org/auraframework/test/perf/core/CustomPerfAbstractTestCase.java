@@ -27,7 +27,7 @@ import com.google.common.base.Function;
 /**
  * Base class for Aura WebDriver tests.
  */
-@PerfCustomTest
+//@PerfCustomTest
 public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
 
     private static final String PERF_START_MARKER_SUFFIX = ":start";

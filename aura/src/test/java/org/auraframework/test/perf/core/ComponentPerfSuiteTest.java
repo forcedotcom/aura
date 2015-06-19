@@ -47,7 +47,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 @UnAdaptableTest
-@PerfTestSuite
+//@PerfTestSuite
 public class ComponentPerfSuiteTest extends TestSuite {
     // List components that we can't able to instantiate from client side.
     // The reason could be a dependency to a server side model. Eg. ui:inputDate

@@ -41,10 +41,10 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
         Class<? extends UnitTestCase> testClass = test.getClass();
         String relativeResourceName = testClass.getSimpleName() + (goldName.startsWith("/") ? "" : "/")
                 + goldName;
-
+              
         String explicitResultsFolder = test.getExplicitGoldResultsFolder();
         if (explicitResultsFolder != null) {
-            srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + relativeResourceName);
+            srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + goldName);       	
             return;
         }
 

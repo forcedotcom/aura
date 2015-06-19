@@ -71,13 +71,27 @@ public final class RDPUtil {
         events.add(timelineEvent);
 
         // add also the nested records
-        if (timelineEvent.has("children")) {
+        /*if (timelineEvent.has("children")) {
             JSONArray children = timelineEvent.getJSONArray("children");
             for (int i = 0; i < children.length(); i++) {
                 addTimelineEvent(events, children.getJSONObject(i));
             }
-        }
+        }*/
     }
+    
+    /**
+     * @return flattened list of all timeline events (i.e. including children events)
+     */
+    public static List<JSONObject> flattenedTraceEvents(List<RDPNotification> notifications) {
+        List<JSONObject> events = Lists.newArrayList();
+        for (RDPNotification notification : notifications) {
+            if (notification.isTraceEvent()) {
+                events.add(notification.getTraceEvent());
+            }
+        }
+        return events;
+    }
+
 
     /**
      * @return notifications between MARK_TIMELINE_START and MARK_TIMELINE_END (if they exist, otherwise return all
@@ -88,14 +102,14 @@ public final class RDPUtil {
         List<RDPNotification> filtered = Lists.newArrayList();
         boolean skip = notificationsContainTimelineStamp(notifications, startStamp);
         for (RDPNotification notification : notifications) {
-            if (skip && notification.isTimelineEvent()
-                    && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), startStamp)) {
+            if (skip && notification.isTraceEvent()
+                    && TraceEventUtil.containsTimelineTimeStamp(notification.getTraceEvent(), startStamp)) {
                 skip = false;
             }
             if (!skip) {
                 filtered.add(notification);
-                if (notification.isTimelineEvent()
-                        && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), endStamp)) {
+                if (notification.isTraceEvent()
+                        && TraceEventUtil.containsTimelineTimeStamp(notification.getTraceEvent(), endStamp)) {
                     break;
                 }
             }
@@ -104,20 +118,20 @@ public final class RDPUtil {
     }
 
     /**
-     * @return timeline events between MARK_TIMELINE_START and MARK_TIMELINE_END (if they exist, otherwise return the
+     * @return timeline events between "perfRunner:start" and "perfRunner:end" (if they exist, otherwise return the
      *         whole timeline)
      */
-    public static List<JSONObject> filteredTimeline(List<JSONObject> timelineEvents,
+    public static List<JSONObject> filteredTimeline(List<JSONObject> traceEvents,
             String startStamp, String endStamp) {
         List<JSONObject> filtered = Lists.newArrayList();
-        boolean skip = containsTimelineStamp(timelineEvents, startStamp);
-        for (JSONObject event : timelineEvents) {
-            if (skip && TimelineEventUtil.isTimelineTimeStamp(event, startStamp)) {
+        boolean skip = containsTimelineStamp(traceEvents, startStamp);
+        for (JSONObject event : traceEvents) {
+            if (skip && TraceEventUtil.isTimelineTimeStamp(event, startStamp)) {
                 skip = false;
             }
             if (!skip) {
                 filtered.add(event);
-                if (TimelineEventUtil.isTimelineTimeStamp(event, endStamp)) {
+                if (TraceEventUtil.isTimelineTimeStamp(event, endStamp)) {
                     break;
                 }
             }
@@ -130,7 +144,7 @@ public final class RDPUtil {
             return false;
         }
         for (JSONObject event : timelineEvents) {
-            if (TimelineEventUtil.containsTimelineTimeStamp(event, timeStamp)) {
+            if (TraceEventUtil.containsTimelineTimeStamp(event, timeStamp)) {
                 return true;
             }
         }
@@ -142,8 +156,8 @@ public final class RDPUtil {
             return false;
         }
         for (RDPNotification notification : notifications) {
-            if (notification.isTimelineEvent()
-                    && TimelineEventUtil.containsTimelineTimeStamp(notification.getTimelineEvent(), timeStamp)) {
+            if (notification.isTraceEvent()
+                    && TraceEventUtil.containsTimelineTimeStamp(notification.getTraceEvent(), timeStamp)) {
                 return true;
             }
         }

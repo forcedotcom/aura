@@ -20,7 +20,7 @@
     browsers:["GOOGLECHROME","SAFARI"],
     
     /**
-     * Sets up the test, caching the component, setting the action storages expiry time and creating an action for
+     * Sets up the test, caching the component, setting the action storages expire time and creating an action for
      * testing.
      */
     setUp: function(component) {
@@ -34,6 +34,28 @@
         this._action.setStorable(true);
         this._actionDescriptor = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString";
         this._actionParams = this._action.getParams();
+    },
+    
+    /**
+     * We don't increase RequestCount if the action is from storage
+     */
+    testSentRequestCount: {
+    	 test : [function(component) {
+    		 var startCount = $A.test.getSentRequestCount();
+    		 var callback = function() {
+    			 $A.test.assertEquals(startCount+1, $A.test.getSentRequestCount(), 
+    					 "we don't expect SentRequestCount to increase when action response is from storage");
+    		 }
+             this.prepareAction();
+             $A.test.addWaitForWithFailureMessage(startCount+1, 
+            		 function() { return $A.test.getSentRequestCount(); }, 
+            		 "expect 1 extra sent request",
+            		 function() {
+            			 this.prepareAction(callback);
+            		 }
+            );
+         }
+    	 ]
     },
     
     /**
@@ -208,12 +230,14 @@
     /**
      * Fires this._action and waits for the server's response.
      */
-    prepareAction: function(component) {
+    prepareAction: function(callback) {
         var actionReceived = false,
             action = this._action;
-        
         action.setCallback(this._component, function() {
             actionReceived = true;
+            if(callback && callback instanceof Function) {
+            	callback();
+            }
         });
         
         $A.run(function() {

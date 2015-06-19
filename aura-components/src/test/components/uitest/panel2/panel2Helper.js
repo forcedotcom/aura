@@ -49,7 +49,7 @@
         });
     },
     notify: function (cmp, event) {
-        event.setParam('currentTarget', cmp.getGlobalId());
+    	event.setParam('currentTarget', cmp.getGlobalId());
     },
     setActive: function(cmp, active) {
         //this will rerender, but it's ok for testing purpose

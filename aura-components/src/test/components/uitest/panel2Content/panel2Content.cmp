@@ -18,7 +18,7 @@
 <aura:component extensible="true" description="Panel2">
     <aura:registerEvent name="notify" type="ui:notify"/>
     <aura:attribute name="counter" type="Integer" default="0"/>
-    <aura:method name="test">
+    <aura:method name="incrementCounter">
         <aura:attribute name="payload" type="Object"/>
     </aura:method>
 
@@ -27,8 +27,8 @@
         <div>
             <p>{!v.title}</p>
             <p>Counter {!v.counter}</p>
-            <ui:button label="Notify!" press="{!c.notify}"/>
-            <ui:button label="Notify All!" press="{!c.notifyAll}"/>
+            <ui:button aura:id="notify" label="Notify!" press="{!c.notify}"/>
+            <ui:button aura:id="notifyAll" label="Notify All!" press="{!c.notifyAll}"/>
         </div>
     </div>
 </aura:component>

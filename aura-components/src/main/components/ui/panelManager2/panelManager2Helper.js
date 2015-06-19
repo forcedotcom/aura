@@ -265,7 +265,7 @@
                     this.notifyPanelContent(content, config);
                 } 
             }
-        } if (scope === 'self') {
+        } else if (scope === 'self') {
         	if (currentTarget) {
                 currentTarget = $A.getComponent(currentTarget);
                 this.notifyPanelContent(currentTarget.get('v.body')[0], config);

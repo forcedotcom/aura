@@ -486,6 +486,35 @@
     },
 
     /**
+     * Verify indexedDB is scoped per app
+     */
+    testIndexedDBScopedByApp: {
+        test: [
+            function(cmp) {
+                var completed = false;
+                var storage = $A.storageService.getStorage("browserdb");
+
+                var request = indexedDB.open('browserdb');
+                request.onsuccess = function(event) {
+                    objectStoreNames = event.target.result.objectStoreNames;
+                    $A.test.assertEquals(1, objectStoreNames.length);
+
+                    // We use app/cmp name work as table name. An app should only get items from its own table.
+                    var descriptor = cmp.getDef().getDescriptor();
+                    var expected = descriptor.getNamespace() + ":" + descriptor.getName();
+                    $A.test.assertEquals(expected, objectStoreNames[0]);
+                    completed = true;
+                };
+                request.onerror = function(event) {
+                    $A.test.fail("Failed to connect to 'browserdb': " + event.target.error);
+                }
+
+                $A.test.addWaitFor(true, function() { return completed; });
+            }
+        ]
+    },
+
+    /**
      * Store an item in the database and reload the page (iframe) to verify data is persisted.
      */
     testReloadPage: {
@@ -548,7 +577,7 @@
         $A.test.addWaitFor(true, function() {
             return cmp._frameLoaded
                    && document.getElementById("myFrame").contentWindow.$A
-                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined; 
+                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
         });
     },
 
@@ -585,9 +614,9 @@
                 }, cmp._die);
 
             $A.test.addWaitFor(
-                    true, 
+                    true,
                     function() {
-                        return completed; 
+                        return completed;
                     }, function() {
                         $A.test.assertUndefined($A.storageService.getStorage(dbName),
                                 "Storage service still has reference to deleted database "+dbName);
@@ -605,7 +634,7 @@
             // This is necessary only on slower browsers when the first command we run is a delete
             cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
-            
+
             $A.storageService.getStorage("browserdb").getSize()
                 .then(function() { completed = true; }, cmp._die);
 
@@ -636,7 +665,7 @@
             // This is necessary only on slower browsers when the first command we run is a delete
             cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
-            
+
             $A.storageService.getStorage("browserdb").getSize()
                 .then(function() { completed = true; }, cmp._die);
 

@@ -278,16 +278,36 @@ function (scrollUtil) {
          */
         updatePanel: function(panel, facets, callback) {
             if ($A.util.isObject(facets)) {
-                var facet, body = facets.body || panel;
+                var facet, body = facets['body'] || panel.get('v.body');
                 for (var key in facets) {
                     facet = facets[key];
                     if (facets.hasOwnProperty(key) && $A.util.isComponent(facet)) {
                         panel.set('v.' + key, facet);
-                        if (key === 'header' || key === 'footer') {
-                            //need to set body as value provider so that body component can handle events fired from header and footer
-                            facet.setAttributeValueProvider(body);
+                    }
+                }
+                if (!$A.util.isEmpty(body)) {
+                    //set body as value provider to route the events to the body
+                    //presume only one root body component
+                    var avp = $A.util.isComponent(body) ? body : body[0],
+                        header = facets['header'] || panel.get('v.header'), 
+                        footer = facets['footer'] || panel.get('v.footer');
+                    
+                    if (!$A.util.isEmpty(header)) {
+                        if ($A.util.isComponent(header)) {
+                            header.setAttributeValueProvider(avp);
                         } else {
-                            facet.setAttributeValueProvider(panel);
+                            for (var i = 0, length = header.length; i < length; i++) {
+                                header[i].setAttributeValueProvider(avp);
+                            }
+                        }
+                    }
+                    if (!$A.util.isEmpty(footer)) {
+                        if ($A.util.isComponent(header)) {
+                            header.setAttributeValueProvider(avp);
+                        } else {
+                            for (var i = 0, length = footer.length; i < length; i++) {
+                                footer[0].setAttributeValueProvider(avp);
+                            }
                         }
                     }
                 }
@@ -301,8 +321,6 @@ function (scrollUtil) {
          * @param active
          */
         setActive: function(cmp, active) {
-
-
             if (!cmp.isValid() && !cmp.isRendered()) {
                 return;
             }

@@ -1,0 +1,17 @@
+<aura:component controller="java://org.auraframework.components.test.java.controller.VersionTestController"
+                model="java://org.auraframework.impl.java.model.VersionTestModel">
+
+    <aura:attribute type="Boolean" name="actionDone" default="false"/>
+    <aura:attribute type="String" name="version"/>
+
+    <aura:text aura:id="versionFromModel" value="{!m.version}"/>
+
+    <aura:method name="updateVersionFromClientController" action="{!c.updateVersionFromClientController}"/>
+    <aura:method name="updateVersionFromServerController" action="{!c.updateVersionFromServerController}"/>
+    <aura:method name="updateVersionFromServerModel" action="{!c.updateVersionFromServerModel}"/>
+    <aura:method name="fireVersionEvent" action="{!c.fireVersionEvent}"/>
+
+    <aura:registerEvent name="versionEvt" type="auratest:testEvent"/>
+    <aura:handler name="versionEvt" action="{!c.updateVersionFromServerController}"/>
+
+</aura:component>

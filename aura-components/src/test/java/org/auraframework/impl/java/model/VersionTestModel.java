@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.test.java.controller;
+
+package org.auraframework.impl.java.model;
 
 import org.auraframework.Aura;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Annotations.AuraEnabled;
+import org.auraframework.system.Annotations.Model;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-@Controller
-public class VersionTestController {
+@Model
+public class VersionTestModel {
+
     @AuraEnabled
-    public static String getContextAccessVersion() throws QuickFixException {
+    public String getVersion() throws QuickFixException {
         AuraContext ac = Aura.getContextService().getCurrentContext();
         return ac.getAccessVersion();
     }

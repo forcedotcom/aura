@@ -21,13 +21,16 @@
 
     fireEventWithVersionInServerController: function(cmp) {
         var a = cmp.get("c.getContextAccessVersion");
-        a.setCallback(this, function(action){
-            if(action.getState() === "SUCCESS") {
+        a.setCallback(this, function(response){
+            var state = response.getState();
+            if(state === "SUCCESS") {
                 var e = cmp.getEvent("versionEvt");
                 e.setParams({
-                    "att1": action.returnValue
+                    "att1": response.returnValue
                 });
                 e.fire();
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+                $A.test.fail("Failed to get version from server: "+response.getError());
             }
         });
         $A.enqueueAction(a);

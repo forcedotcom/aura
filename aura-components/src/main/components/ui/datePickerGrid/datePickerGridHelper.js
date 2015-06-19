@@ -129,16 +129,16 @@
                     className = "weekday";
                 }
                 if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
-                    className += " prevMonth"
+                    className += " prevMonth";
                 } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
-                    className += " nextMonth"
+                    className += " nextMonth";
                 }
 
                 if (this.dateEquals(d, today)) {
                     className += " todayDate";
                 }
                 if (this.dateEquals(d, selectedDate)) {
-                    className += " selectedDate"
+                    className += " selectedDate";
                     cellCmp.set("v.tabIndex", 0);
                 } else {
                     cellCmp.set("v.tabIndex", -1);
@@ -315,5 +315,21 @@
         var updateTitleEvent = component.get("e.updateCalendarTitle");
         updateTitleEvent.setParams({month: month, year: year});
         updateTitleEvent.fire();
+    },
+
+    updateNameOfWeekDays: function(component){
+        var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // The week days in Java is 1 - 7
+        var namesOfWeekDays = $A.get("$Locale.nameOfWeekdays");
+        component.set("v._namesOfWeekdays", namesOfWeekDays);
+        var days = [];
+        if ($A.util.isNumber(firstDayOfWeek) && $A.util.isArray(namesOfWeekDays)) {
+            for (var i = firstDayOfWeek; i < namesOfWeekDays.length; i++) {
+                days.push(namesOfWeekDays[i]);
+            }
+            for (var j = 0; j < firstDayOfWeek; j++) {
+                days.push(namesOfWeekDays[j]);
+            }
+            component.set("v._namesOfWeekdays", days);
+        }
     }
-})
+});

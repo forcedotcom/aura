@@ -15,5 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:menuList">
+<aura:component extensible="false" extends="ui:menuList">
+    {!v.body}
 </aura:component>

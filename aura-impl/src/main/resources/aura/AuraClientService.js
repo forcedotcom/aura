@@ -185,6 +185,7 @@ AuraClientService = function AuraClientService () {
     var auraXHR = new Aura.Services.AuraClientService$AuraXHR();
     this.availableXHRs = [ auraXHR ];
     this.allXHRs = [ auraXHR ];
+    this.actionStoreMap = {};
     this.collector = undefined;
     // FIXME: this will go away in iteration 2.
     this.foregroundXHR = undefined;
@@ -499,20 +500,18 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
  * Note that it does this inside an $A.run to provide protection against error returns, and to notify the user if an
  * error occurs.
  *
- * @param {Action}
- *            action the action.
- * @param {Boolean}
- *            noAbort if false abortable actions will be aborted.
- * @param {Object}
- *            actionResponse the server response.
+ * @param {Action} action the action.
+ * @param {Object} actionResponse the server response.
+ * @param {string} key the storage key (may be null).
+ * @param {Boolean} store should we store the response to storage?
  * @private
  */
-AuraClientService.prototype.singleAction = function(action, noAbort, actionResponse) {
-        var storage, toStore, needUpdate, errorHandler, key;
+AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
+    var storage, toStore, needUpdate, errorHandler;
 
     try {
         needUpdate = action.updateFromResponse(actionResponse);
-        if (noAbort || !action.isAbortable()) {
+        if (action.getAbortableId() === this.lastTransactionId || !action.isAbortable()) {
             if (needUpdate) {
                 action.finishAction($A.getContext());
             }
@@ -522,10 +521,13 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
         } else {
             action.abort();
         }
+        if (store) {
         storage = action.getStorage();
+        }
         if (storage) {
             errorHandler = action.getStorageErrorHandler();
 
+            if (!key) {
             try {
                 key = action.getStorageKey();
             } catch (e) {
@@ -535,6 +537,7 @@ AuraClientService.prototype.singleAction = function(action, noAbort, actionRespo
                     $A.logger.auraErrorHelper(e, action);
                 }
                 return;
+            }
             }
 
             toStore = action.getStored();
@@ -1620,6 +1623,59 @@ AuraClientService.prototype.finishProcessing = function() {
     }
 };
 
+AuraClientService.prototype.deDupe = function(action) {
+    var key, entry, dupes;
+
+    if (!action.isStorable()) {
+        return;
+    }
+    try {
+        key = action.getStorageKey();
+    } catch (e) {
+        // whoops, well, shit... no key. abort.
+        return false;
+    }
+    entry = this.actionStoreMap[key];
+    if (entry && !(entry.action.getState() === 'NEW' || entry.action.getState() === 'RUNNING')) {
+        dupes = entry.dupes;
+        $A.warning("Unfinished handling of action for key "+key);
+        entry = undefined;
+    }
+    if (!entry) {
+        entry = {};
+        entry.action = action;
+        if (dupes) {
+            entry.dupes = dupes;
+        }
+        this.actionStoreMap[key] = entry;
+        this.actionStoreMap[action.getId()] = key;
+        return false;
+    } else if (entry.action !== action) {
+        if (!entry.dupes) {
+            entry.dupes = [ action ];
+        } else {
+            entry.dupes.push(action);
+        }
+        return true;
+    }
+    return false;
+};
+
+AuraClientService.prototype.getAndClearDupes = function(key) {
+    if (!key || !this.actionStoreMap[key]) {
+        return undefined;
+    }
+    var entry;
+    var dupes;
+
+    // we have a mapping.
+    entry = this.actionStoreMap[key];
+    dupes = entry.dupes;
+    delete this.actionStoreMap[entry.action.getId()];
+    delete this.actionStoreMap[key];
+    return dupes;
+};
+
 /**
  * Send an xhr with a set of actions.
  *
@@ -1646,6 +1702,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         action = actions[i];
         if (!action.callAllAboardCallback(context)) {
             action.finishAction(context);
+            continue;
+        }
+        if (this.deDupe(action)) {
             continue;
         }
         auraXHR.addAction(action);
@@ -1799,19 +1858,18 @@ AuraClientService.prototype.buildParams = function(map) {
  * @private
  */
 AuraClientService.prototype.receive = function(auraXHR) {
-    var responseMessage, noAbort;
+    var responseMessage;
     this.auraStack.push("AuraClientService$receive");
     if (auraXHR.transactionId) {
         this.setCurrentTransactionId(auraXHR.transactionId);
     }
     try {
         responseMessage = this.decode(auraXHR.request);
-        noAbort = auraXHR.transactionId === this.lastTransactionId;
 
         if (responseMessage) {
-            this.processResponses(auraXHR, responseMessage, noAbort);
+            this.processResponses(auraXHR, responseMessage);
         } else if (!this.isUnloading) {
-            this.processIncompletes(auraXHR, noAbort);
+            this.processIncompletes(auraXHR);
         }
         this.fireDoneWaiting();
     } catch (e) {
@@ -1826,10 +1884,10 @@ AuraClientService.prototype.receive = function(auraXHR) {
     return responseMessage;
 };
 
-AuraClientService.prototype.processResponses = function(auraXHR, responseMessage, noAbort) {
+AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {
     $A.Perf.mark("Callback Complete - XHR " + auraXHR.marker);
 
-    var action, actionResponses, response;
+    var action, actionResponses, response, dupes;
     var token = responseMessage["token"];
     if (token) {
         this._token = token;
@@ -1872,7 +1930,14 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (action == null) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
-                this.singleAction(action, noAbort, response);
+                var key = this.actionStoreMap[action.getId()];
+                dupes = this.getAndClearDupes(key);
+                this.singleAction(action, response, key, true);
+                if (dupes) {
+                    for (var i = 0; i < dupes.length; i++) {
+                        this.singleAction(dupes[i], response, key, false);
+                    }
+                }
             }
         } catch (e) {
             $A.logger.auraErrorHelper(e, action);
@@ -1905,17 +1970,28 @@ AuraClientService.prototype.buildFakeAction = function(response) {
     return action;
 };
 
-AuraClientService.prototype.processIncompletes = function(auraXHR, noAbort) {
+AuraClientService.prototype.processIncompletes = function(auraXHR) {
     var actions = auraXHR.actions;
-    var id;
+    var id, action, key, dupes;
 
     for (id in actions) {
         if (actions.hasOwnProperty(id)) {
-            var action = actions[id];
-            if (noAbort || !action.isAbortable()) {
+            action = actions[id];
+            if ((action.getAbortableId() === this.lastTransactionId) || !action.isAbortable()) {
                 action.incomplete($A.getContext());
             } else {
                 action.abort();
+            }
+            key = this.actionStoreMap[action.getId()];
+            dupes = this.getAndClearDupes(key);
+            if (dupes) {
+                for (var i = 0; i < dupes.length; i++) {
+                    if ((dupes[i].getAbortableId() === this.lastTransactionId) || !dupes[i].isAbortable()) {
+                        dupes[i].incomplete($A.getContext());
+                    } else {
+                        dupes[i].abort();
+                    }
+                }
             }
         }
     }

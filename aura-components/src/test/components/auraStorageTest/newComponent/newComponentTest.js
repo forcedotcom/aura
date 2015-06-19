@@ -150,7 +150,6 @@
             /**
              * Group of actions, store them.
              */
-            //$A.test.assertEquals("1:1.1", cmp.getGlobalId(), "Invalid GlobalId for root component");
             var a = cmp.get("c.getRosterFromStorage");
             a.runDeprecated();
             var that = this;
@@ -161,7 +160,10 @@
                     that.verifyTeamFacet(cmp, teamActionNum);
                     //Verify result of second action
                     var playerActionNum = that.getActionNumberFromPage(cmp)[1];
-                    that.verifyPlayersFacet(cmp, playerActionNum);
+                    //
+                    // This is because we only execute the action once on the server.
+                    // 
+                    that.verifyTeamFacet(cmp, playerActionNum, "Players");
                 });
         },function(cmp){
             /**Individual action to get players, should be from storage. 
@@ -191,7 +193,7 @@
                     $A.test.assertEquals("SUCCESS", a.getState());
                     $A.test.assertTrue(a.isFromStorage(), "Action should have been from storage");
                     var playerActionNum = cmp.test.getActionNumberFromPage(cmp)[0];
-                    cmp.test.verifyPlayersFacet(cmp, playerActionNum);
+                    cmp.test.verifyTeamFacet(cmp, playerActionNum, "Players");
                 });
         } ]
     },
@@ -208,8 +210,9 @@
      * Verifies the contents of the Players DIV.
      * 
      */
-    verifyPlayersFacet:function(cmp, playerActionNum){
-        var players = cmp.find("Players");
+    verifyPlayersFacet:function(cmp, playerActionNum, name){
+        name = name || "Players";
+        var players = cmp.find(name);
         var player1Facet = players.get("v.body")[0];
         $A.test.assertTruthy(player1Facet , "Could not find new playerFacet in body.");
         $A.test.assertEquals(playerActionNum, 
@@ -243,9 +246,10 @@
     /**
      * Verifies the contents of the Team DIV.
      */
-    verifyTeamFacet:function(cmp, teamActionNum){
+    verifyTeamFacet:function(cmp, teamActionNum, name){
+        name = name || "Team";
         //Verify result of first action
-        var team = cmp.find("Team");
+        var team = cmp.find(name);
         var teamFacet = team.get("v.body")[0];
         $A.test.assertTruthy(teamFacet , "Could not find new teamFacet in body.");
         $A.test.assertEquals(teamActionNum, 

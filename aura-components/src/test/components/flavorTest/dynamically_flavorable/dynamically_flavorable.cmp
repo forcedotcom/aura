@@ -1,0 +1,6 @@
+<aura:component extends="flavorTest:dynamically_flavorable_x_parent">
+    <div aura:id="target">
+        Dynamically Flavorable
+        <span aura:id="inner"> - inner</span>
+    </div>
+</aura:component>

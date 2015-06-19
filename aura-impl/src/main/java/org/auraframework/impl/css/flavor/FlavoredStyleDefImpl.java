@@ -103,7 +103,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     @Override
     public void validateReferences() throws QuickFixException {
         DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(getDescriptor());
-        if (!cmp.getDef().hasFlavorableChild()) {
+        if (!cmp.getDef().hasFlavorableChild() && !cmp.getDef().isDynamicallyFlavorable()) {
             throw new InvalidDefinitionException(
                     String.format("%s must contain at least one aura:flavorable element", cmp), getLocation());
         }

@@ -163,11 +163,13 @@ function ComponentDef(config) {
     if (config["hasFlavorableChild"]) {
         this.flavorableChild = true;
     }
+    if (config["dynamicallyFlavorable"]) {
+        // TODONM remove
+        this.dynamicallyFlavorable = config["dynamicallyFlavorable"];
+    }
 
     if (config["defaultFlavors"]) { // for applications
         this.defaultFlavors = new FlavorAssortmentDef(config["defaultFlavors"]);
-    } else {
-        this.defaultFlavors = null;
     }
 
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
@@ -410,6 +412,35 @@ ComponentDef.prototype.hasFlavorableChild = function() {
  */
 ComponentDef.prototype.getDefaultFlavors = function() {
     return this.defaultFlavors;
+};
+
+/**
+ * Returns true if this or a super component is dynamically flavorable.
+ * Performs a faster check than #getDynamicallyFlavorable.
+ * @returns {Boolean}
+ * @private
+ */
+ComponentDef.prototype.isDynamicallyFlavorable = function() {
+    return this.dynamicallyFlavorable || (this.superDef && this.superDef.isDynamicallyFlavorable());
+};
+
+/**
+ * Returns a list of component defs from the inheritance hierarchy that are
+ * marked dynamically flavorable, including this one if applicable.
+ *
+ * To simply perform a boolean check, use #isDynamicallyFlavorable instead.
+ * @returns {Array}
+ * @private
+ */
+ComponentDef.prototype.getDynamicallyFlavorable = function() {
+    var ret = [];
+    if (this.dynamicallyFlavorable) {
+        ret.push(this);
+    }
+    if (this.superDef) {
+        ret = ret.concat(this.superDef.getDynamicallyFlavorable());
+    }
+    return ret;
 };
 
 /**

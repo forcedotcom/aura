@@ -204,12 +204,19 @@ public class ComponentDefTest extends BaseComponentDefTest<ComponentDef> {
 
     /**
      * The implicit default flavor is "default", but only when an explicit default isn't specified, the component has a
-     * flavorable child, a flavor file exists, and the flavor file defines a flavor named "default".
+     * flavorable child (or is marked dynamicallyFlavorable), a flavor file exists, and the flavor file defines a flavor named "default".
      */
 
     public void testImplicitDefaultFlavor() throws Exception {
         DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(getDefClass(),
                 String.format(baseTag, "", "<div aura:flavorable='true'></div>"));
+        addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--default{}");
+        assertEquals("default", desc.getDef().getDefaultFlavorOrImplicit());
+    }
+
+    public void testImplicitDefaultFlavorDynamicallyFlavored() throws Exception {
+        DefDescriptor<ComponentDef> desc = addSourceAutoCleanup(getDefClass(),
+                String.format(baseTag, "dynamicallyFlavorable='true'", "<div></div>"));
         addSourceAutoCleanup(Flavors.standardFlavorDescriptor(desc), ".THIS--default{}");
         assertEquals("default", desc.getDef().getDefaultFlavorOrImplicit());
     }

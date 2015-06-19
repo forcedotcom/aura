@@ -15,8 +15,7 @@
  */
 package org.auraframework.throwable.quickfix;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.system.Location;
@@ -26,17 +25,19 @@ import org.auraframework.system.Location;
  */
 public class FlavorNameNotFoundException extends AuraValidationException {
     private static final String MSG = "The flavor named \"%s\" was not found on the %s %s";
+    private static final String CMP_MSG = "A flavor named \"%s\" was not found for %s %s or its super components";
     private static final long serialVersionUID = -2571041901012359701L;
 
-    public FlavorNameNotFoundException(String name, DefDescriptor<FlavoredStyleDef> descriptor) {
-        this(name, descriptor, null);
+    public FlavorNameNotFoundException(String message, Location location) {
+        super(message, location);
     }
 
-    public FlavorNameNotFoundException(String name, DefDescriptor<FlavoredStyleDef> descriptor, Location location) {
-        super(getMessage(checkNotNull(name), descriptor), location); // todo -- add quickfixes
+    public static FlavorNameNotFoundException onFlavoredStyleDef(String flavor, DefDescriptor<FlavoredStyleDef> descriptor) {
+        return new FlavorNameNotFoundException(
+                String.format(MSG, flavor, descriptor.getDefType(), descriptor.getQualifiedName()), null);
     }
 
-    private static String getMessage(String variable, DefDescriptor<FlavoredStyleDef> descriptor) {
-        return String.format(MSG, variable, descriptor.getDefType(), descriptor.getQualifiedName());
+    public static FlavorNameNotFoundException forComponentDef(String flavor, DefDescriptor<? extends BaseComponentDef> descriptor) {
+        return new FlavorNameNotFoundException(String.format(CMP_MSG, flavor, descriptor.getDefType(), descriptor.getQualifiedName()), null);
     }
 }

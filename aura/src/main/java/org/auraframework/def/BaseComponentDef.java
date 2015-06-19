@@ -196,6 +196,13 @@ public interface BaseComponentDef extends RootDefinition {
     Set<String> getAllFlavorNames() throws QuickFixException;
 
     /**
+     * Returns true if this component or any super component has the dynamicallyFlavorable attribute set as true.
+     *
+     * @throws QuickFixException If there is a problem loading the parent def.
+     */
+    boolean isDynamicallyFlavorable() throws QuickFixException;
+
+    /**
      * Get the generated JavaScript class for this component.
      * This class includes setting up its inheritance, its render methods and its helper methods.
      * The rest of the definition of the class comes back as meta data in a JSON object.

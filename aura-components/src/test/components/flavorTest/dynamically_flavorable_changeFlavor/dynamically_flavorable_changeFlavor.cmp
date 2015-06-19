@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:dynamically_flavorable_x_parent" defaultFlavor="alt">
+    <div aura:id="target">Dynamically Flavorable</div>
+</aura:component>

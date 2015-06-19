@@ -167,11 +167,9 @@ Test.Aura.LoggerTest = function() {
             });
 
             Assert.Equal(expectedLevel, level);
-            Assert.Equal(expectedMsg, message);
+            Assert.Equal(0, message.indexOf(expectedMsg));
             Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
             Assert.Equal(undefined, error);
-            Assert.True(messageCalled);
-            messageCalled = false; // reset
         }
 
         [Fact]
@@ -185,7 +183,7 @@ Test.Aura.LoggerTest = function() {
             });
 
             Assert.Equal(expectedLevel, level);
-            Assert.Equal(expectedMsg, message);
+            Assert.Equal(0, message.indexOf(expectedMsg));
             Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
             Assert.Equal(undefined, error);
             Assert.False(messageCalled);

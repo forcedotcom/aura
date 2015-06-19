@@ -84,7 +84,6 @@ Logger.prototype.assert = function(condition, assertMessage) {
  */
 Logger.prototype.error = function(msg, e){
     var logMsg = msg || "";
-    var dispMsg;
     if (e && e instanceof $A.auraError) {
         this.auraErrorHelper(e);
         // Give the component test error logging handler a more useful message so it can better track if the error
@@ -117,7 +116,7 @@ Logger.prototype.error = function(msg, e){
         if (e && !$A.util.isUndefinedOrNull(e.message)) {
             logMsg = logMsg + " : " + e.message;
         }
-        dispMsg = logMsg;
+
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         //
         // Error objects in older versions of IE are represented as maps with multiple entries containing the error message
@@ -130,12 +129,12 @@ Logger.prototype.error = function(msg, e){
                     var val = e[k];
 
                     if ($A.util.isString(val)) {
-                        if (dispMsg === "Unknown Error") {
-                            dispMsg = val;
+                        if (logMsg === "Unknown Error") {
+                            logMsg = val;
                         } else {
-                            dispMsg = dispMsg + '\n' + val;
+                            logMsg = logMsg + '\n' + val;
                         }
-                        msg = dispMsg;
+                        msg = logMsg;
                     }
                 } catch (e2) {
                     // Ignore serialization errors
@@ -145,13 +144,10 @@ Logger.prototype.error = function(msg, e){
         }
         var stack = this.getStackTrace(e);
         if (stack) {
-            dispMsg = dispMsg + "\n" + stack.join("\n");
+            logMsg = logMsg + "\n" + stack.join("\n");
         }
         //#end
-        
-        if ($A.showErrors()) {
-            $A.message(dispMsg);
-        }
+
         if (!$A.initialized) {
             $A["hasErrors"] = true;
         }
@@ -168,7 +164,9 @@ Logger.prototype.error = function(msg, e){
  * @param {Action} [action] the responsible action, if there is one.
  */
 Logger.prototype.auraErrorHelper = function(e, action){
-    this.handleError(e);
+    if (e["handled"]) {
+        return;
+    }
     var actionName = undefined;
     var actionId = undefined;
     if (action) {
@@ -180,23 +178,6 @@ Logger.prototype.auraErrorHelper = function(e, action){
         }
     }
     this.reportError(e, actionName, actionId);
-};
-
-/**
- * @private
- * @memberOf Aura.Utils.Logger
- *
- * @param {String} msg error message
- * @param {AuraError} [e] error
- */
-Logger.prototype.handleError = function(e){
-    if (e["handled"]) {
-        return;
-    }
-
-    if (e instanceof $A.auraFriendlyError) {
-        $A.getEvt("aura:systemError").fire({"message":e["message"],"error":e["name"],"auraError":e});
-    }
 };
 
 Logger.prototype.reportError = function(e, action, id){

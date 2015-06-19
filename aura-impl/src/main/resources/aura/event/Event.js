@@ -167,8 +167,13 @@ Event.prototype.dispatchNonComponentEventHandlers = function () {
                         handlers[k](this);
                     }
                 } else {
+                    var cmpHandlersArray = [];
                     for (var key in handlers) {
-                        var cmpHandlers = handlers[key];
+                        cmpHandlersArray.push(handlers[key]);
+                    }
+
+                    for (var i = cmpHandlersArray.length; i > 0; i--) {
+                        var cmpHandlers = cmpHandlersArray[i-1];
                         for (var j = 0; j < cmpHandlers.length; j++) {
                             var handler = cmpHandlers[j];
                             handler(this);

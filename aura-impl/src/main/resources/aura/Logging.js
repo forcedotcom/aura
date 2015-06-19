@@ -114,14 +114,40 @@
     //#end
 
     $A.logger.subscribe("ERROR", function(level, message, e) {
-        if (e && e instanceof $A.auraError && !e["handled"]) {
-            var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
-            var displayMessage = e.message || e.name;
-            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            displayMessage += "\n" + e.stackTrace;
-            //#end
-            $A.message($A.util.format(format, displayMessage, e.errorCode+""));
-            e["handled"] = true;
+        var dispMsg = message;
+        var evtArgs = {"message":dispMsg,"error":null,"auraError":null};
+
+        if (e) {
+            if (e["handled"]) {
+                return;
+            } else {
+                e["handled"] = true;
+            }
+
+            if (e instanceof $A.auraError) {
+                var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
+                var displayMessage = e.message || e.name;
+                //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+                displayMessage += "\n" + e.stackTrace;
+                //#end
+                dispMsg = $A.util.format(format, displayMessage, e.errorCode+"");
+            }
+
+            if (e instanceof $A.auraFriendlyError) {
+                evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
+            }
+            else {
+                // use null error string to specify non auraFriendlyError type.
+                evtArgs = {"message":dispMsg,"error":null,"auraError":e};
+            }
+        }
+
+        if ($A.initialized) {
+            $A.getEvt("aura:systemError").fire(evtArgs);
+        } else {
+            if ($A.showErrors()) {
+                $A.message(dispMsg);
+            }
         }
     });
 })();

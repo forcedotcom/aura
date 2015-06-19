@@ -124,20 +124,28 @@
         delete config.flavor;
         $A.util.apply(mergedDef.attributes.values, config); // merge panel config with DefRef
         var panel = $A.newCmp(mergedDef, cmp),/*cmp:AVP*/
-            header  = panel.get('v.header')[0],
-            body  = panel.get('v.body')[0],
-            footer  = panel.get('v.footer')[0];
+            header  = panel.get('v.header'),
+            body  = panel.get('v.body'),
+            footer  = panel.get('v.footer'),
+            avp;
 
-        if (body) {
-            //set body as value provider so that body component can handle events that are fired in header and body
-            header &&  header.setAttributeValueProvider(body);
-            footer &&  footer.setAttributeValueProvider(body);
-            body.setAttributeValueProvider(panel);
+        if (!$A.util.isEmpty(body)) {
+            body[0].setAttributeValueProvider(panel);
+            avp = body[0];
         } else {
-            header &&  header.setAttributeValueProvider(panel);
-            footer &&  footer.setAttributeValueProvider(panel);
+            avp = panel;
         }
-
+        if (!$A.util.isEmpty(header)) {
+            for (var i = 0, length = header.length; i < length; i++) {
+                header[i].setAttributeValueProvider(avp);
+            }
+        }
+        if (!$A.util.isEmpty(footer)) {
+            for (var i = 0, length = footer.length; i < length; i++) {
+                footer[i].setAttributeValueProvider(avp);
+            }
+        }
+        
         return panel;
     },
 

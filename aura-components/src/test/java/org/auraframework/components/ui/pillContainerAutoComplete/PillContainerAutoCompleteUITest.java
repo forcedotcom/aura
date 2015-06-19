@@ -15,33 +15,46 @@
  */
 package org.auraframework.components.ui.pillContainerAutoComplete;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX })
 public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
 
     public static final String CMP_URL = "/uitest/pillContainer_WithAutoComplete.cmp";
+    public static final String INPUT = ".uiInputTextForAutocomplete";
+    public static final String LISTCONTENT_LOCATOR = ".visible";
+    
 
     public PillContainerAutoCompleteUITest(String name) {
         super(name);
     }
 
     /*
-     * ui:pillContainer dropdown expands on focus
-     * Need to revisit Bug: W-2628705
+     * ui:pillContainer dropdown continues to focus after clicking on any of the pill
+     * Bug: W-2628705
      */
-    public void testAutoCompleteListContentVisible() {
-        /* FIXME kwtan: Temp comment out this failed test
-    throws MalformedURLException, URISyntaxException
+    public void testAutoCompleteListContentVisible() throws MalformedURLException, URISyntaxException, InterruptedException {
         open(CMP_URL);
-        WebDriver driver = this.getDriver();
-        String uiInput = ".uiInput";
-        WebElement input = driver.findElement(By.className(uiInput));
+        WebElement input = findDomElement(By.cssSelector(INPUT));
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
         auraUITestingUtil.pressEnter(input);
+        assertFalse("Auto complete List Content should not be visible", isListContentVisible());
         input.sendKeys("test");
-         */
+        assertNotNull("Auto complete List Content should be visible", isListContentVisible());
+        WebElement pill = findDomElement(By.cssSelector(".pill"));
+        pill.click();
+        assertTrue("Auto complete List Content should be still visible after clicking on pill", isListContentVisible());
     }
+
+	private boolean isListContentVisible() throws InterruptedException {
+		waitFor(3);
+        return isElementPresent(By.cssSelector(LISTCONTENT_LOCATOR));
+	}
 }

@@ -19,6 +19,7 @@
     },
 
     update: function(component, event, helper) {
-        helper.setEventHandlersOnChildren(component);
+    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+        _helper.setEventHandlersOnChildren(component);
     }
 })

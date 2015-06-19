@@ -183,21 +183,65 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 	/**
      * Test multiple modal one above another, should close top panel when we press ESC on the newest panel
      */
-    public void testMultipleModalPressEscKey() throws Exception{
-    	open(APP);
+    public void testMultipleModalPressEscKeyWithAutoFocusSet() throws Exception{
+    	verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, true);
+    }
+    
+    /*Enable test once W-2650232 is fixed
+    public void testMultipleModalPressEscKeyWithAutoFocusNotSet() throws Exception{
+    	verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, false);
+    }*/
+    
+    public void testMultiplePanelPressEscKeyWithAutoFocusSet() throws Exception{
+    	verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, true);
+    }
+    
+    /*Enable test once W-2650232 is fixed
+    public void testMultiplePanelPressEscKeyWithAutoFocusNotSet() throws Exception{
+    	verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, false);
+    }*/
+    
+    private void verifyPressingEscOnMultipleModalDestorysModal(String locator, boolean autoFocus) throws MalformedURLException, URISyntaxException, InterruptedException {
+    	String url = APP;
+    	boolean isPanel = locator.contains(PANEL_DIALOG);
+    	if(isPanel){
+			url += "?" + PARAM_PANEL_TYPE + "panel";
+		}
+    	
+    	open(url);
+    	
+    	//disable autoFocus for modal 1
+    	if(!autoFocus){
+    		WebElement autoFocusElement = findDomElement(By.cssSelector(INPUT_AUTOFOCUS));
+    		autoFocusElement.click();
+    	}
+    	
     	openPanel();
-    	waitForModalOpen();
+    	if(locator.contains(PANEL_MODAL)){
+    		waitForModalOpen();
+    	}
+    	else{
+    		waitForPanelDialogOpen();
+    		WebElement fistInputElement = findDomElements(By.cssSelector(INPUT_PANELTYPE)).get(1);
+    		fistInputElement.clear();
+    		fistInputElement.click();
+        	fistInputElement.sendKeys("panel");
+    	}
     	
     	//open second modal
     	openPanel(2);
-    	waitForNumberOfPanels(PANEL_MODAL, 2);
+    	waitForNumberOfPanels(locator, 2);
     	
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
     	activeElement.sendKeys(Keys.ESCAPE);
-    	waitForNumberOfPanels(PANEL_MODAL, 1);
+    	waitForNumberOfPanels(locator, 1);
+    	
+    	activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+    	activeElement.sendKeys(Keys.ESCAPE);
+    	waitForNumberOfPanels(locator, 0);
     }
-    
-    /**
+
+	/**
      * [Accessibility] panel dialog should not close when closeOnClickOut is not set to true
      */
     public void testPanelDialogWithCloseOnClickOutNotSet() throws Exception{
@@ -368,7 +412,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     
     private void waitForPanel(String panelType, boolean isOpen) throws InterruptedException {
     	By locator = By.cssSelector(panelType);
-    	pause(1000);
+    	waitFor(3);
     	if (isOpen) {
     		List<WebElement> panels = findDomElements(locator);
     		assertNotNull(String.format("Panel %s is not open",panelType), panels);
@@ -377,12 +421,8 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     	}
     }
     
-    private void pause(long timeout) throws InterruptedException{
-		Thread.sleep(timeout);
-	}
-    
     private void waitForNumberOfPanels(String panelType, int numPanels) throws InterruptedException {
-    	pause(1000);
+    	waitFor(3);
     	By locator = By.cssSelector(panelType);
     	if(numPanels!=0){
 	    	List<WebElement> elements = findDomElements(locator);

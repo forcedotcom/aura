@@ -31,16 +31,16 @@
     },
     notify: function (cmp, event, helper) {
         cmp.get('e.notify').setParams({
-            action: 'test'
+            action: 'incrementCounter'
         }).fire();
     },
     notifyAll: function (cmp, event, helper) {
         cmp.get('e.notify').setParams({
-            action: 'test',
+            action: 'incrementCounter',
             scope: 'all'
         }).fire();
     },
-    test: function (cmp, event, helper) {
+    incrementCounter: function (cmp, event, helper) {
         cmp.set('v.counter', cmp.get('v.counter') + 1);
     }
 })

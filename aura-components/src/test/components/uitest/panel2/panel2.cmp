@@ -16,6 +16,7 @@
 
 -->
 <aura:component extensible="true" implements="ui:panelType" description="Panel2">
+	<aura:attribute name="instanceId" type="Integer" default="-1"/>
     <aura:attribute name="alias" type="String"    default="panel2"/>
     <aura:attribute name="title" type="String"    default="Default Title"/>
     <aura:attribute name="visible" type="Boolean" default="false"/>
@@ -24,13 +25,13 @@
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>
     <aura:registerEvent name="notify" type="ui:notify"/>
 
-    <section class="{!(v.visible ? 'visible' : '') + (v.active ? ' active' : '')}">
+    <section class="{!(v.visible ? 'visible' : '') + (v.active ? ' active' : '') + (' ' + v.title)}">
         <p>{!v.title}</p>
         {!v.body}
         <div class="close">
-            <a alt="Hide"  onclick="{!c.hide}">Hide</a> | 
-            <a alt="Show"  onclick="{!c.show}">Show</a> | 
-            <a alt="Close" onclick="{!c.close}">Close</a>
+            <a aura:id="hideLink" alt="Hide"  onclick="{!c.hide}">Hide</a> | 
+            <a aura:id="showLink" alt="Show"  onclick="{!c.show}">Show</a> | 
+            <a aura:id="closeLink" alt="Close" onclick="{!c.close}">Close</a>
         </div>
     </section>
 </aura:component>

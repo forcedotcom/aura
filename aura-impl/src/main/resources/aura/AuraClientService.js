@@ -610,7 +610,7 @@ AuraClientService.prototype.countAvailableXHRs = function(/*isBackground*/) {
  */
 AuraClientService.prototype.getAvailableXHR = function(isBackground) {
     //FIXME : this needs to abort XHRs.
-    //FIXME : fhe foreground check will go away.
+    //FIXME : the foreground check will go away.
     if (!isBackground && this.foregroundXHR) {
         return null;
                 }

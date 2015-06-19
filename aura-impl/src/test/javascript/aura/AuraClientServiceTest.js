@@ -63,7 +63,7 @@ Test.Aura.AuraClientServiceTest = function() {
         },
         window:{},
         document:{},
-       Aura: Aura
+        Aura: Aura
     });
 
     [Fixture]
@@ -108,6 +108,18 @@ Test.Aura.AuraClientServiceTest = function() {
     		Assert.Equal(newAction, target.getAction(1));
     		// Assert
     		Assert.Equal(undefined, target.actions[1]);//after the getAction above, this become undefined
+    	}
+    	
+    	[Fact]
+    	function countAvailableXHRs() {
+    		// Arrange
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            
+            // Assert
+            Assert.Equal(4, target.countAvailableXHRs());
     	}
     };
     

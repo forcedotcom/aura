@@ -73,5 +73,11 @@
                 $A.util.removeOn(window, "resize", f);
             }
         }
+    },
+
+    unrender: function(component, helper) {
+        if(component.positionConstraint) {
+            component.positionConstraint.destroy();
+        }
     }
 })

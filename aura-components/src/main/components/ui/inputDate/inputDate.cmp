@@ -18,6 +18,7 @@
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateComponent" extensible="true" description="An input field for entering a date.">
     <aura:attribute name="placeholder" type="String" description="The hint for the date input format. Set during init based on the 'format' value."/>
     <aura:attribute name="loadDatePicker" type="Boolean" default="true" description="Set to true to load the date picker. Defaults to 'true'."/>
+    <aura:attribute name="datePickerDimension" default="large" type="String" description="Set the dimension for the datePicker component"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>
@@ -40,6 +41,6 @@
     </a>
 
     <aura:if isTrue="{! v.loadDatePicker }">
-        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+        <ui:datePicker dimension="{!v.datePickerDimension}" aura:id="datePicker" selectDate="{!c.setValue}"/>
    </aura:if>
 </aura:component>

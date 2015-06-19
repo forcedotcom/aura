@@ -16,6 +16,7 @@
 
 -->
 <aura:component extensible="true" implements="ui:visible" description="Represents a date picker, which can be used in input components such as ui:inputDate and ui:inputDateTime.">
+    <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="hasTime" type="Boolean" default="false" description="Indicate if the parent datePicker component supports time picker."/>
     <aura:attribute name="hours" type="Integer" description="The hour value of a date object, which is always in 24 hour format."/>
     <aura:attribute name="is24HourFormat" type="Boolean" default="true" description="Indicate if it is set to 24 hour or 12-hour with am/pm."/>

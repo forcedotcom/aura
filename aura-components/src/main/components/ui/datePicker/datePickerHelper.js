@@ -274,6 +274,7 @@
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
         var viewPort = $A.util.getWindowSize();
+        var referenceElem = component.getConcreteComponent().get("v.referenceElement");
 
         if (elem && visible) {
             var isPhone = $A.get("$Browser.isPhone");
@@ -290,8 +291,20 @@
                         scrollerElem.style.height = viewPort.height + "px";
                     }
                 }
+
+            // Scoping this to desktop to prevent regressions
+            } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") == "DESKTOP") {
+                component.positionConstraint = this.lib.panelPositioning.createRelationship({
+                    element:elem,
+                    target:referenceElem,
+                    align: 'left top',
+                    targetAlign: 'left bottom'
+                });
+                this.lib.panelPositioning.reposition();
+                                    
+                //attaching to the body causes the date to lose focus so we need to add the focus back
+                this.focusDate(component);
             } else {
-                var referenceElem = component.getConcreteComponent().get("v.referenceElement");
                 if (!$A.util.isUndefinedOrNull(referenceElem)) {
                     $A.util.attachToDocumentBody(component.getElement());
                     var elemRect = elem.getBoundingClientRect();

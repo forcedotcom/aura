@@ -605,11 +605,14 @@ function AuraInstance () {
     services["cmp"] = services.cmp;
     services["e"] = services.e;
     services["c"] = {
-			            get: function(name) {
-			                var path = (name||'').split('.');
-			                return services.cmp.getControllerDef(path.shift()).get(path.shift());
-			            }
-    				};
+        get: function(name) {
+            var path = (name||'').split('.');
+            var controllerDef = path.shift();
+            var action = path.shift();
+
+            return services.component.getControllerDef(controllerDef).get(action);
+        }
+    };
     
 
     this.eventService.addHandler({

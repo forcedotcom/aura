@@ -54,8 +54,8 @@ public class InvalidSessionException extends ClientSideEventException {
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(),
-                "try{$A.clientService.hardRefresh();}catch(e){$L.clientService.hardRefresh();}");
+        return new JsFunction(ImmutableList.of("token"),
+                "try{$A.clientService.invalidSession(token);}catch(e){window.location.reload(true);}");
     }
 
     @Override

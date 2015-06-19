@@ -381,6 +381,7 @@ AuraClientService.prototype.decode = function(response, noStrip) {
 AuraClientService.prototype.throwExceptionEvent = function(resp) {
     var evtObj = resp["event"];
     var descriptor = evtObj["descriptor"];
+    var values = evtObj["attributes"] && evtObj["attributes"]["values"];
 
     if (evtObj["eventDef"]) {
         // register the event with the EventDefRegistry
@@ -390,13 +391,13 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
     if ($A.eventService.hasHandlers(descriptor)) {
         var evt = $A.getEvt(descriptor);
         if (evtObj["attributes"]) {
-            evt.setParams(evtObj["attributes"]["values"]);
+            evt.setParams(values);
         }
 
         evt.fire();
     } else {
         try {
-            $A.util.json.decodeString(resp["defaultHandler"])();
+            $A.util.json.decodeString(resp["defaultHandler"])(values);
         } catch (e) {
             $A.error("Error in defaultHandler for event: " + descriptor, e);
             throw e;
@@ -854,19 +855,25 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 
 /**
  * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
+ * @returns {Promise} Promise with current value of csrf token
  */
 AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
     var storage = Action.prototype.getStorage();
+    var promise = Promise["resolve"](this._token);
     if (storage && this._token) {
         // certain storage adapters require token object be wrapped in "value" object for indexing
         var value = { "value": { "token": this._token } };
-        storage.adapter.setItem(this._tokenStorageKey, value).then(
-            this.NOOP,
-            function(err){ $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err); }
+        return storage.adapter.setItem(this._tokenStorageKey, value).then(
+            function() { return promise; },
+            function(err) {
+                $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
+                return promise;
+            }
         );
     }
+    return promise;
 };
 
 /**
@@ -2413,6 +2420,24 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
         }
     }
     return false;
+};
+
+/**
+ * Handles invalidSession exception from the server when the csrf token is invalid.
+ * Saves new token to storage then refreshes page.
+ *
+ * @export
+ */
+AuraClientService.prototype.invalidSession = function(token) {
+    var refresh = function() {
+        $A.clientService.hardRefresh();
+    };
+    if (token && token["newToken"]) {
+        this._token = token["newToken"];
+        this.saveTokenToStorage().then(refresh);
+    } else {
+        refresh();
+    }
 };
 
 Aura.Services.AuraClientService = AuraClientService;

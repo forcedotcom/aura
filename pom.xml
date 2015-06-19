@@ -390,6 +390,11 @@
                 <artifactId>bnd</artifactId>
                 <version>1.50.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>3.0.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

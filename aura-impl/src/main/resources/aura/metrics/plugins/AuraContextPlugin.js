@@ -17,6 +17,7 @@
 /**
  * @description AuraContextPlugin
  * @constructor
+ * @export
  */
 var AuraContextPlugin = function AuraContextPlugin(config) {
     this.config = config;
@@ -24,89 +25,87 @@ var AuraContextPlugin = function AuraContextPlugin(config) {
 };
 
 AuraContextPlugin.NAME = "defRegistry";
-AuraContextPlugin.prototype = {
-    initialize: function (metricsService) {
-        this.collector = metricsService;
 
-        if (this["enabled"]) {
-            this.bind(metricsService);
-        }
-    },
-    enable: function () {
-        if (!this["enabled"]) {
-            this["enabled"] = true;
-            this.bind(this.collector);
-        }
-    },
-    disable: function () {
-        if (this["enabled"]) {
-            this["enabled"] = false;
-            this.unbind(this.collector);
-        }
-    },
-    bind: function (metricsService) {
-        var method  = 'merge',
-            defIter = function (b) {
-                var a = [];
-                for (var i = 0; i < b.length; i++) {
-                    var def = b[i];
-                    if (def['descriptor']) {
-                        a.push(def['descriptor']);
-                    }
-                }
-                return a;
-            },
-            hook = function (original, config) {
-                var ret     = original.apply(this, Array.prototype.slice.call(arguments, 1)),
-                    cmpDefs = config['componentDefs'],
-                    evtDefs = config['eventDefs'],
-                    payload =  {},
-                    hasDefs = cmpDefs || evtDefs;
+/** @export */
+AuraContextPlugin.prototype.initialize = function (metricsService) {
+    this.collector = metricsService;
 
-                if (cmpDefs) {
-                    payload['componentDefs'] = defIter(cmpDefs);
-                }
-
-                if (evtDefs) {
-                    payload['eventDefs'] = defIter(evtDefs);
-                }
-
-                if (hasDefs) {
-                    metricsService['transaction']('AURAPERF', 'newDefs', {"context": payload});
-                }
-                
-                return ret;
-            };
-
-        metricsService.instrument(
-            Aura.Context.AuraContext.prototype,
-            method,
-            AuraContextPlugin.NAME,
-            false/*async*/,
-            null,
-            null,
-            hook
-        );
-    },
-    //#if {"excludeModes" : ["PRODUCTION"]}
-    postProcess: function (transportMarks) {
-        return transportMarks;
-    },
-    // #end
-    unbind: function (metricsService) {
-        metricsService["unInstrument"](Aura.Context.AuraContext.prototype, 'merge');
+    if (this["enabled"]) {
+        this.bind(metricsService);
     }
 };
 
-// Exposing symbols/methods for Google Closure
-var p = AuraContextPlugin.prototype;
+/** @export */
+AuraContextPlugin.prototype.enable = function () {
+    if (!this["enabled"]) {
+        this["enabled"] = true;
+        this.bind(this.collector);
+    }
+};
 
-exp(p,
-    "initialize",  p.initialize,
-    "enable",      p.enable,
-    "disable",     p.disable,
-    "postProcess", p.postProcess
-);
+/** @export */
+AuraContextPlugin.prototype.disable = function () {
+    if (this["enabled"]) {
+        this["enabled"] = false;
+        this.unbind(this.collector);
+    }
+};
+
+AuraContextPlugin.prototype.bind = function (metricsService) {
+    var method  = 'merge',
+    defIter = function (b) {
+        var a = [];
+        for (var i = 0; i < b.length; i++) {
+            var def = b[i];
+            if (def['descriptor']) {
+                a.push(def['descriptor']);
+            }
+        }
+        return a;
+    },
+    hook = function (original, config) {
+        var ret     = original.apply(this, Array.prototype.slice.call(arguments, 1)),
+            cmpDefs = config['componentDefs'],
+            evtDefs = config['eventDefs'],
+            payload =  {},
+            hasDefs = cmpDefs || evtDefs;
+
+        if (cmpDefs) {
+            payload['componentDefs'] = defIter(cmpDefs);
+        }
+
+        if (evtDefs) {
+            payload['eventDefs'] = defIter(evtDefs);
+        }
+
+        if (hasDefs) {
+            metricsService['transaction']('AURAPERF', 'newDefs', {"context": payload});
+        }
+        
+        return ret;
+    };
+
+	metricsService.instrument(
+	    Aura.Context.AuraContext.prototype,
+	    method,
+	    AuraContextPlugin.NAME,
+	    false/*async*/,
+	    null,
+	    null,
+	    hook
+	);
+};
+
+//#if {"excludeModes" : ["PRODUCTION"]}
+/** @export */
+AuraContextPlugin.prototype.postProcess = function (transportMarks) {
+    return transportMarks;
+};
+//#end
+
+AuraContextPlugin.prototype.unbind = function (metricsService) {
+    metricsService["unInstrument"](Aura.Context.AuraContext.prototype, 'merge');
+};
 
 $A.metricsService.registerPlugin({
     "name"   : AuraContextPlugin.NAME,

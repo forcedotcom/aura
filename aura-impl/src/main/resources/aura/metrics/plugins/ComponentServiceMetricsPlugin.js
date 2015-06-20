@@ -17,6 +17,7 @@
 /**
  * @description ComponentServiceMetricsPlugin
  * @constructor
+ * @export
  */
 var ComponentServiceMetricsPlugin = function ComponentServiceMetricsPlugin(config) {
     this.config = config;
@@ -24,67 +25,65 @@ var ComponentServiceMetricsPlugin = function ComponentServiceMetricsPlugin(confi
 };
 
 ComponentServiceMetricsPlugin.NAME = "componentService";
-ComponentServiceMetricsPlugin.prototype = {
-    initialize: function (metricsService) {
-        this.collector = metricsService;
 
-        if (this["enabled"]) {
-            this.bind(metricsService);
-        }
-    },
-    enable: function () {
-        if (!this["enabled"]) {
-            this["enabled"] = true;
-            this.bind(this.collector);
-        }
-    },
-    disable: function () {
-        if (this["enabled"]) {
-            this["enabled"] = false;
-            this.unbind(this.collector);
-        }
-    },
-    bind: function (metricsService) {
-        var method      = 'newComponentDeprecated',
-            beforeHook  = function (startMark, config) {
-                var descriptor;
-                if ($A.util.isString(config)) {
-                    descriptor = config;
-                } else {
-                    descriptor = (config["componentDef"]["descriptor"] || config["componentDef"]) + '';
-                }
-                startMark["context"] = {
-                    "descriptor": descriptor
-                };
-            };
+/** @export */
+ComponentServiceMetricsPlugin.prototype.initialize = function (metricsService) {
+    this.collector = metricsService;
 
-        metricsService.instrument(
-            $A.componentService,
-            method,
-            ComponentServiceMetricsPlugin.NAME,
-            false/*async*/,
-            beforeHook
-        );
-    },
-    //#if {"excludeModes" : ["PRODUCTION"]}
-    postProcess: function () {
-        return [];
-    },
-    // #end
-    unbind: function (metricsService) {
-        metricsService["unInstrument"]($A.componentService, 'newComponentDeprecated');
+    if (this["enabled"]) {
+        this.bind(metricsService);
     }
 };
 
-// Exposing symbols/methods for Google Closure
-var p = ComponentServiceMetricsPlugin.prototype;
+/** @export */
+ComponentServiceMetricsPlugin.prototype.enable = function () {
+    if (!this["enabled"]) {
+        this["enabled"] = true;
+        this.bind(this.collector);
+    }
+};
 
-exp(p,
-    "initialize",  p.initialize,
-    "enable",      p.enable,
-    "disable",     p.disable,
-    "postProcess", p.postProcess
-);
+/** @export */
+ComponentServiceMetricsPlugin.prototype.disable = function () {
+    if (this["enabled"]) {
+        this["enabled"] = false;
+        this.unbind(this.collector);
+    }
+};
+
+ComponentServiceMetricsPlugin.prototype.bind = function (metricsService) {
+    var method      = 'newComponentDeprecated',
+	    beforeHook  = function (startMark, config) {
+	        var descriptor;
+	        if ($A.util.isString(config)) {
+	            descriptor = config;
+	        } else {
+	            descriptor = (config["componentDef"]["descriptor"] || config["componentDef"]) + '';
+	        }
+	        startMark["context"] = {
+	            "descriptor": descriptor
+	        };
+	    };
+
+	metricsService.instrument(
+	    $A.componentService,
+	    method,
+	    ComponentServiceMetricsPlugin.NAME,
+	    false/*async*/,
+	    beforeHook
+	);
+};
+
+//#if {"excludeModes" : ["PRODUCTION"]}
+/** @export */
+ComponentServiceMetricsPlugin.prototype.postProcess = function () {
+    return [];
+};
+//#end	
+
+ComponentServiceMetricsPlugin.prototype.unbind = function (metricsService) {
+    metricsService["unInstrument"]($A.componentService, 'newComponentDeprecated');
+};
 
 $A.metricsService.registerPlugin({
     "name"   : ComponentServiceMetricsPlugin.NAME,

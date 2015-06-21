@@ -40,6 +40,30 @@ TestInstance = function() {
     this.sentXHRCount = 0;
     
     this.prePostSendConfigs = [];
+
+    //vars to store initial and whitelisted variables exposed on window object
+    var _initialGlobalState = Object.keys(window);
+    // NIHAR: TODO: FIXME: THIS IS A TEMPORARY SOLUTION UNTIL AURA GETS IT'S STUFF NESTED IN A SINGLE VAR
+    //THEN WE WILL NOT NEED THIS LIST. FLAG EVERYTHING THAT'S NOT AURA
+    var _whitelistedPollutants = ["fewActions", "actionSucceeeded", "animate", "yTime", "yLabels",
+        "xNumbers", "PreviewPageLoader", "PreviewPage", "EclairNG", "_", "Scroller", "__S",
+        "FORCE", "attachFastClick", "dismissError", "IndexedDBStorageAdapter", "aura", "PerfLogLevel",
+        "PerfConstants", "PerfShim", "AuraEventService", "AuraHistoryService", "AuraExpressionService",
+        "AuraComponentService", "AuraClientService", "AuraStorage", "AttributeDefSet", "AttributeDef",
+        "ControllerDef", "Action", "ActionDef", "Event", "EventDef", "HelperDef", "GlobalValueProviders",
+        "ProviderDef", "ComponentDef", "InvalidComponent", "ModelDef", "PassthroughValue",
+        "ActionReferenceValue", "FunctionCallValue", "PropertyReferenceValue", "DefDescriptor", "AuraError",
+        "Logger", "$A", "Aura", "CKEDITOR", "moment", "FastClick", "ES6Promise", "WallTime", "Sfdc", "org",
+        "Sizzle", "LC", "SfdcFramework", "RecordGlobalValueProvider", "LoadingScreen", "UserContext",
+        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery", "MouseWatcher"];
+
+    this.getInitialGlobalState = function() {
+        return _initialGlobalState;
+    };
+
+    this.getWhitelistedVariables = function() {
+        return _whitelistedPollutants;
+    };
 };
 
 // #include aura.test.Test_private
@@ -1923,6 +1947,30 @@ TestInstance.prototype.createHttpRequest = function() {
     } else {
         throw new Error("Test.createHttpRequest: Unable to find an appropriate XHR");
     }
+};
+
+/**
+ * Performs a check if global namespace is polluted with new
+ * variables apart from whitelisted ones
+ *
+ * @export
+ */
+TestInstance.prototype.checkGlobalPollution = function() {
+    var that = this,
+        pollutants = [],
+        initialGlobalState = that.getInitialGlobalState();
+    if(!window || !initialGlobalState.length) {
+        return pollutants;
+    }
+    var knownPollutants = initialGlobalState.concat(that.getWhitelistedVariables());
+    var currentGlobalState = Object.keys(window);
+    for (var i = currentGlobalState.length - 1; i >= 0; i--) {
+        var key = currentGlobalState[i];
+        if (-1 === knownPollutants.indexOf(key)) {
+            pollutants.push(key);
+        }
+    }
+    return (pollutants.length ? "New global variables found: " + pollutants.join(",") + "." : "");
 };
 
 /**

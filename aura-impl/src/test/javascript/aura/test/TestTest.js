@@ -34,6 +34,10 @@ Test.Aura.TestTest = function() {
         [Import("aura-impl/src/main/resources/aura/test/Test_private.js")]
     });
 
+    var getWindowMock = function() {
+        return Mocks.GetMock(Object.Global(), "window", Stubs.GetObject());
+    };
+
     [Fixture]
     function clearExpected() {
 
@@ -42,10 +46,12 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal([undefined, "Mammoth", undefined], preArray);
-            Assert.Equal([undefined, undefined], expectedArray);
+                Assert.Equal([undefined, "Mammoth", undefined], preArray);
+                Assert.Equal([undefined, undefined], expectedArray);
+            });
         }
 
         [Fact]
@@ -53,10 +59,12 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth", "Mammoth"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal([undefined, undefined], preArray);
-            Assert.Equal([undefined, undefined, "Mammoth"], expectedArray);
+                Assert.Equal([undefined, undefined], preArray);
+                Assert.Equal([undefined, undefined, "Mammoth"], expectedArray);
+            });
         }
 
         [Fact]
@@ -67,9 +75,11 @@ Test.Aura.TestTest = function() {
             var preArray = ["undefined something", "something undefined"];
             var expectedArray = ["undefined something", "don't clear me"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal([undefined, "don't clear me"], expectedArray);
+                Assert.Equal([undefined, "don't clear me"], expectedArray);
+            });
         }
 
         [Fact]
@@ -78,10 +88,12 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
             var expectedArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal(expected, preArray);
-            Assert.Equal(expected, expectedArray);
+                Assert.Equal(expected, preArray);
+                Assert.Equal(expected, expectedArray);
+            });
         }
 
         [Fact]
@@ -90,10 +102,12 @@ Test.Aura.TestTest = function() {
             var preArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
             var expectedArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal(expected, preArray);
-            Assert.Equal(expected, expectedArray);
+                Assert.Equal(expected, preArray);
+                Assert.Equal(expected, expectedArray);
+            });
         }
 
         [Fact]
@@ -101,10 +115,12 @@ Test.Aura.TestTest = function() {
             var preArray = [];
             var expectedArray = ["Yosemite", "Lake Tahoe"];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal([], preArray);
-            Assert.Equal(["Yosemite", "Lake Tahoe"], expectedArray);
+                Assert.Equal([], preArray);
+                Assert.Equal(["Yosemite", "Lake Tahoe"], expectedArray);
+            });
         }
 
         [Fact]
@@ -112,10 +128,12 @@ Test.Aura.TestTest = function() {
             var preArray = ["Yosemite", "Lake Tahoe"];
             var expectedArray = [];
 
-            new Aura.Test.Test().clearExpected(preArray, expectedArray);
+            getWindowMock(function() {
+                new Aura.Test.Test().clearExpected(preArray, expectedArray);
 
-            Assert.Equal(["Yosemite", "Lake Tahoe"], preArray);
-            Assert.Equal([], expectedArray);
+                Assert.Equal(["Yosemite", "Lake Tahoe"], preArray);
+                Assert.Equal([], expectedArray);
+            });
         }
     }
 }

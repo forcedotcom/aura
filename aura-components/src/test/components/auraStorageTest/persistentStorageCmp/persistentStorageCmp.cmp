@@ -1,4 +1,5 @@
 <aura:component>
+    <aura:attribute name="secure" type="Boolean" default="false" />
     <aura:attribute name="key" type="String" default="default key"/>
     <aura:attribute name="value" type="String" default="default value" />
     <aura:attribute name="return" type="String" default="No value"/>

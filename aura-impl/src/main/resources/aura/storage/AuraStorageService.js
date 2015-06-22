@@ -118,9 +118,7 @@ AuraStorageService.prototype.registerAdapter = function(config) {
  *
  * @param {String} adapter name of the adapter
  * @memberOf AuraStorageService
- //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	@export
- //#end
+ * @export
  */
 AuraStorageService.prototype.getAdapterConfig = function(adapter) {
     return this.adapters[adapter];

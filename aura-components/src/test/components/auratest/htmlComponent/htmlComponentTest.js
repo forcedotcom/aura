@@ -105,28 +105,5 @@
                     $A.test.assertStartsWith("Undefined tag attribute for "+component.find("undefinedTag").getGlobalId(),
                                              $A.test.getText($A.util.getElement("auraErrorMessage")));
             }
-	},
-	
-	/*
-	 * TODO : @auraframework - uncomment after bug W-1538581
-	 */
-	/**
-	 * Dynamically change tag attribute to something else. 
-	 */
-	_testDynamicallyChangeTag: {
-		test: function(component){
-			var tagCmp = component.find('atag')
-			var tag = tagCmp.getElement();
-			
-			$A.test.assertNotNull(tag, "Dynamic change test component not found");
-			$A.test.assertEquals("a", tag.tagName.toLowerCase(), "Tag name of dynamic change test is incorrect");
-			
-			tagCmp.set("v.tag", "p");
-			$A.rerender(component);
-			
-			var pTag = component.find('atag').getElement();
-			$A.test.assertNotNull(pTag, "Modified tag not found");
-			$A.test.assertEquals("p", pTag.tagName.toLowerCase(), "Tag name modified tag is incorrect");
-		}
 	}
 })

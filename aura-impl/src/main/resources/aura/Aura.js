@@ -1079,6 +1079,7 @@ window['aura'] = window['$A'];
 // -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
+// #include aura.storage.adapters.CryptoAdapter
 
 // -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin

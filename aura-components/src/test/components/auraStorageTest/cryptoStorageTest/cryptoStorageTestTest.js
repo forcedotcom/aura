@@ -1,15 +1,21 @@
 ({
     // IndexedDb not supported in IE < 10
-    // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
-    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+    browsers:["-IE7", "-IE8", "-IE9"],
 
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
 
     setUp : function(cmp) {
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function(){ return "indexeddb"; });
-        this.storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
-        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
+        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
+        this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
+        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
+
+        // provide an encryption key
+        var config = $A.storageService.getAdapterConfig('crypto');
+        var buffer = new ArrayBuffer(32);
+        var view = new Uint8Array(buffer);
+        view.set(new Array(32).join("1")); // the actual key
+        config.adapterClass.setKey(buffer);
     },
 
     testSizeInitial: {
@@ -20,70 +26,11 @@
 
     testGetName : {
         test : function(cmp) {
-            cmp.helper.lib.storageTest.testGetName(cmp, this.storage, "indexeddb");
+            cmp.helper.lib.storageTest.testGetName(cmp, this.storage, "crypto");
         }
     },
 
-    testGetSize:{
-        test:[function (cmp) {
-            cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    true, false, 32768, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
-            cmp._die = function(error) { cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { cmp.helper.lib.storageTest.appendLine(cmp, string); }.bind(this);
-        }, function(cmp){
-            var completed = false;
-
-            cmp._storage.put("testGetSize.key1", new Array(1024).join("x"))  // 1kb
-                .then(function() { return cmp._storage.get("testGetSize.key1"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "Fail item."); })
-                .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
-                .then(function(result) { cmp._append("result length = "+result.length); return cmp._storage.getSize(); })
-                .then(function(size) {
-                    $A.test.assertTrue(size >= 2 && size < 2.2, "testGetSize: Expected size of 2, but got " + size);
-                    completed = true;
-                }, cmp._die);
-
-            // Allow this promise chain to complete before starting the next test.
-            // If we don't wait, the chains are interleaved.
-            $A.test.addWaitFor(true, function() { return completed; });
-
-        }, function(cmp){
-            var completed = false;
-
-            //Two value to see that size is recalculated
-            cmp._storage.put("testGetSize.key2" , new Array(3072).join("y")) //5kb
-                .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value, "testGetSize: Fail - item undefined."); })
-                .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
-                .then(function() { return cmp._storage.getSize(); })
-                .then(function(size) {
-                    $A.test.assertTrue(size >= 8 && size < 8.3, "testGetSize: Expected size of 8, but got " + size);
-                    completed = true;
-                }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
-
-        }, function(cmp){
-            var completed = false;
-
-            // Overwrite previous key2
-            // Careful... this does not calculate size correctly.
-            cmp._storage.put("testGetSize.key2" , new Array(1024).join("z")) //1kb
-                .then(function() { return cmp._storage.get("testGetSize.key2"); })
-                .then(function(item) { $A.test.assertDefined(item.value); })
-                .then(function() { return cmp._storage.getAll(); /* fake out the size calculation */ })
-                .then(function(results) { return cmp._storage.getSize(); })
-                .then(function(size) {
-                    $A.test.assertTrue(size >= 4 && size < 4.3, "testGetSize: Expected size of 4, but got " + size);
-                    completed = true;
-                }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
-        } ]
-    },
-
-    testGetMaxSize:{
+   testGetMaxSize:{
         test:function(cmp){
             cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 32);
         }
@@ -173,19 +120,7 @@
         }
     },
 
-    // TODO(W-2701448): There are inconsistencies between Adapters on what can be stored. Formal evaluation needed.
-    _testGetFunctionValue: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
-        }
-    },
-
-    testCacheMiss: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
-        }
-    },
-
+    // TODO: fails because of bad size calculation
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
@@ -195,6 +130,8 @@
         }]
     },
 
+    // TODO: "TypeError: Converting circular structure to JSON {stack: (...), message: "Converting circular structure to JSON"}"
+    //       in CryptoAdapter.objectToArrayBuffer --> JSON.stringify
     testTwistedObject:{
         test:function(cmp){
             cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
@@ -213,13 +150,46 @@
         }
     },
 
+    // TODO: fails because of bad size calculation
+    testValueTooLarge: {
+        test:[ function(cmp) {
+                var completed = false;
+                var storage = $A.storageService.getStorage("crypto-store");
+                storage.remove("valueTooLarge")
+                    .then(function () {
+                        return storage.put("valueTooLarge", new Array(32768).join("x"));
+                    }).then(function() {
+                        $A.test.fail("Successfully stored value that is too large");
+                        completed = true;
+                    }, function() {
+                        completed = true;
+                    });
+                    $A.test.addWaitFor(true, function() { return completed; });
+            }, function(cmp) {
+                var storage = $A.storageService.getStorage("crypto-store");
+                var die = function(error) { completed=true; cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
+                var completed = false;
+                storage.get("valueTooLarge")
+                    .then(function (item) {
+                        completed = true;
+                        $A.test.assertUndefinedOrNull(item, "value too large should not be stored.");
+                    })['catch'](die);
+                $A.test.addWaitFor(true, function() { return completed; });
+            }]
+    },
+
+    //
+    // Overflow has some interesting problems, among them, we have a problem with
+    // races, because everything is done asynchronously. To avoid this, we use getAll to
+    // try to ensure that we are very likely to win any races by being the slowest one
+    // there. However, there is a chance that we will lose...
+    //
     testOverflow: {
         test:[function(cmp) {
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
-            cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
-                    true, false, 5000, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
+            cmp._storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
 
             cmp.helper.lib.storageTest.testOverflow_stage1(cmp, cmp._storage);
         }, function(cmp) {
@@ -233,6 +203,7 @@
         }
     },
 
+    // TODO: fails because of bad size calculation
     testClear:{
         test:[function(cmp){
             cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
@@ -244,47 +215,22 @@
 
     testStorageInfo: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, false);
+            cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, true);
         }
-    },
-
-    /**
-     * Verify indexedDB is scoped per app
-     */
-    testIndexedDBScopedByApp: {
-        test: [
-            function(cmp) {
-                var completed = false;
-                var request = indexedDB.open('browserdb');
-                request.onsuccess = function(event) {
-                    var objectStoreNames = event.target.result.objectStoreNames;
-                    $A.test.assertEquals(1, objectStoreNames.length);
-
-                    // We use app/cmp name work as table name. An app should only get items from its own table.
-                    var descriptor = cmp.getDef().getDescriptor();
-                    var expected = descriptor.getNamespace() + ":" + descriptor.getName();
-                    $A.test.assertEquals(expected, objectStoreNames[0]);
-                    completed = true;
-                };
-                request.onerror = function(event) {
-                    $A.test.fail("Failed to connect to 'browserdb': " + event.target.error);
-                };
-
-                $A.test.addWaitFor(true, function() { return completed; });
-            }
-        ]
     },
 
     /**
      * Store an item in the database and reload the page (iframe) to verify data is persisted.
      */
+    // TODO: fails because reload uses different key so storage is wiped out (should get key from server)
     testReloadPage: {
         test: [
         function loadComponentInIframe(cmp) {
+            $A.test.setTestTimeout(60000);
             cmp._frameLoaded = false;
             cmp._expected = "expected value";
             var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/persistentStorageCmp.cmp?secure=false&value="+cmp._expected;
+            frame.src = "/auraStorageTest/persistentStorageCmp.cmp?secure=true&value="+cmp._expected;
             frame.scrolling = "auto";
             frame.id = "myFrame";
             $A.util.on(frame, "load", function(){
@@ -334,13 +280,29 @@
         }]
     },
 
+    waitForIframeLoad: function(cmp) {
+        $A.test.addWaitFor(true, function() {
+            return cmp._frameLoaded
+                   && document.getElementById("myFrame").contentWindow.$A
+                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
+        });
+    },
+
     testDeleteDatabase: {
-        // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
+            var completed = false;
+
+            $A.storageService.getStorage("crypto-store").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
         function deleteDatabase(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-            var dbName = "browserdb";
+            var dbName = "crypto-store";
             var completed = false;
             var results;
 
@@ -356,7 +318,7 @@
                     } else {
                         completed = true;
                     }
-                })["catch"](die);
+                })['catch'](cmp._die);
 
             $A.test.addWaitFor(
                     true,
@@ -373,13 +335,21 @@
     },
 
     testDeleteDatabaseTwice: {
-        // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
-        function deleteDatabaseTwice(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
-            var dbName = "browserdb";
+
+            $A.storageService.getStorage("crypto-store").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
+        function deleteDatabaseTwice(cmp) {
+            var completed = false;
+            var dbName = "crypto-store";
 
             $A.storageService.deleteStorage(dbName)
                 .then(function() {
@@ -389,30 +359,38 @@
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(dbName));
                     completed = true;
-                })["catch"](die);
+                })['catch'](cmp._die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }]
     },
 
     testDeleteAndRecreateDatabase: {
-        // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
-        function deleteAndRecreateDatabase(cmp) {
-            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
+        function waitForDatabaseInitialize(cmp) {
+            // Wait for an arbritrary command to complete so we know DB is initialized
+            // This is necessary only on slower browsers when the first command we run is a delete
+            cmp._die = function(error) { completed=true; cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
-            cmp._dbName = "browserdb";
 
+            $A.storageService.getStorage("crypto-store").getSize()
+                .then(function() { completed = true; }, cmp._die);
+
+            $A.test.addWaitFor(true, function(){ return completed;});
+        },
+        function deleteAndRecreateDatabase(cmp) {
+            var completed = false;
+            cmp._dbName = "crypto-store";
+            var that = this;
             $A.storageService.deleteStorage(cmp._dbName)
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(cmp._dbName));
-                    $A.storageService.initStorage(cmp._dbName, true, false, 32768, 2000, 3000, true, true);
+                    that.createStorage(cmp._dbName, 32768, 2000, 3000);
                 })
                 .then(function() {
                     $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
                     completed = true;
-                })["catch"](die);
+                })['catch'](cmp._die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
         },
@@ -433,27 +411,54 @@
         }]
     },
 
-    testReplaceExistingWithEntryTooLarge: {
+
+    // TODO(W-2599085): Storages should clear existing entry after trying to put an item above the max size
+    _testReplaceExistingWithEntryTooLarge: {
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
-            var maxSize = 5120;
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb"; });
-            cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
-                    true, false, maxSize, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });
+            var maxSize = 5000;
+            cmp._storage = this.createStorage("crypto-store-testReplaceTooLarge", maxSize, 2000, 3000);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-testReplaceTooLarge"); });
+            cmp._die = function(error) { cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
+            var itemTooLarge = new Array(2560).join("x");
+            var completed = false;
 
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
+            cmp._storage.put("testReplaceExistingWithEntryTooLarge", "ORIGINAL")
+                .then(function() { return cmp._storage.get("testReplaceExistingWithEntryTooLarge"); })
+                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
+                .then(function() { return cmp._storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
+                .then(function(){
+                        $A.test.fail("Should not be able to save an item above the maxSize");
+                     },
+                     function(error){
+                         var expectedMsg = "IndexedDBStorageAdapter.setItem(): Item larger than size limit of " + maxSize*0.25;
+                         $A.test.assertEqual(expectedMsg, error, "Unexpected error message trying to save item too large");
+                     })
+                 .then(function() { completed = true; })['catch'](cmp._die);
+
+            $A.test.addWaitFor(true, function() { return completed; });
         },
         function getItem(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
+            var completed = false;
+
+            cmp._storage.get("testReplaceExistingWithEntryTooLarge")
+                .then(function(item) { $A.test.assertEquals("", item.value, "Entry should be empty after attemping to put item too large"); })
+                .then(function(){ completed = true;})['catch'](cmp._die);
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }]
     },
 
-    waitForIframeLoad: function(cmp) {
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                   && document.getElementById("myFrame").contentWindow.$A
-                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
-        });
+
+    createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {
+        return $A.storageService.initStorage(
+                name,
+                true,   // secure
+                true,   // persistent
+                maxSize,
+                defaultExpiration,
+                defaultAutoRefreshInterval,
+                true,   // debug logging
+                true);  // clear on init
     }
 })

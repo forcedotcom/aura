@@ -1,10 +1,12 @@
 ({
     init: function(cmp) {
-        cmp._storage = $A.storageService.initStorage("indexedDBCmp", true, false, 32768, 2000, 3000, true, false);
+        var secure = cmp.get("v.secure");
+        cmp._storage = $A.storageService.initStorage("persistentStorageCmp", true, secure, 32768, 2000, 3000, true, false);
     },
 
     resetStorage: function(cmp) {
         cmp.set("v.status", "Resetting");
+        debugger;
         cmp._storage.clear()
             .then(function() {
                 cmp.set("v.status", "Done Resetting");
@@ -18,7 +20,11 @@
         var key = cmp.get("v.key");
         cmp._storage.get(key)
             .then(function(item) {
-                cmp.set("v.return", item.value);
+                if (item === undefined) {
+                    cmp.set("v.return", "undefined");
+                } else {
+                    cmp.set("v.return", item.value);
+                }
                 cmp.set("v.status", "Done Getting");
             }, function(error) {
                 cmp.set("v.status", "Error during get: " + error);
@@ -29,7 +35,7 @@
         cmp.set("v.status", "Adding");
         var key = cmp.get("v.key");
         var value = cmp.get("v.value");
-        return cmp._storage.put(key, value)
+        cmp._storage.put(key, value)
             .then(function(){
                 cmp.set("v.status", "Done Adding");
             }, function(error) {
@@ -39,7 +45,7 @@
 
     deleteStorage: function(cmp) {
         cmp.set("v.status", "Deleting storage");
-        $A.storageService.deleteStorage("indexedDBCmp")
+        $A.storageService.deleteStorage("persistentStorageCmp")
             .then(function() {
                 cmp.set("v.status", "Done Deleting");
             }, function(error) {

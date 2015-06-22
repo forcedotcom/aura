@@ -59,11 +59,12 @@
 
     testSizeOneObject : {
         test : function(cmp) {
+            debugger;
             var that = this;
             var completed = false;
             that.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
-            .then(function() { return that.storage.getSize(); })
-            .then(function(size) { that.assertSimilarSize(50, size*1024); })
+                .then(function() { return that.storage.getSize(); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
             .then( function() { completed = true; })
             ["catch"](function(error) { $A.test.fail(error.toString()); });
 
@@ -93,7 +94,7 @@
 
                         // add another object to trigger a recalculation of size
                         // size should be the original + key2's object
-                        that.assertSimilarSize(size1*1024 + 10, size3*1024);
+                        cmp.helper.lib.storageTest.assertSimilarSize(size1*1024 + 10, size3*1024);
 
                         completed = true;
                     }
@@ -130,10 +131,10 @@
             var completed = false;
             this.storage.put("key1", {"value" : {"alpha":"beta", "gamma":"delta" } })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(50, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
                 .then(function() { return that.storage.put("key1", {"value" : {"alpha":"epsilon", "gamma":"zeta", "now" : true }}); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(63, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(63, size*1024); })
                 .then(function() { completed = true; })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
 
@@ -172,7 +173,7 @@
                     })
                 ])
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(201, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(201, size*1024); })
                 .then(function() { completed = true; })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
 
@@ -189,15 +190,15 @@
                 that.storage.put("key2", {"value" : {"alpha" : "iota","gamma" : "kappa"}})
             ])
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(100, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(100, size*1024); })
                 // remove one item from storage
                 .then(function() { return that.storage.remove("key1"); } )
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(50, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(50, size*1024); })
                 // put a new item with same key, different object
                 .then(function() { return that.storage.put("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(102, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(102, size*1024); })
                 .then(function() { completed = true; })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
 
@@ -226,13 +227,13 @@
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(":key1", mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(283, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(283, size*1024); })
 
                 .then(function() { return that.storage.put("key2", { "value" : { "bar" : new Array(512).join("y")}}); })
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key2"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(283+539, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(283+539, size*1024); })
 
                 // touch key1 to move it up to the top of the MRU
                 .then(function() {return that.storage.get("key1"); })
@@ -247,7 +248,7 @@
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key3"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(283+3327, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(283+3327, size*1024); })
 
                 // complete eviction
                 // add a new key which would require all the current entries to be evicted
@@ -255,7 +256,7 @@
                 .then(function() { return that.adapter.getMRU(); })
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key4"]), mru.toString()); } )
                 .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(4027, size*1024); })
+                .then(function(size) { cmp.helper.lib.storageTest.assertSimilarSize(4027, size*1024); })
                 .then(function() { completed = true; })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
 
@@ -463,18 +464,5 @@
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }
-    },
-
-    /**
-     * Asserts that sizes are within an acceptable range of one another.
-     * @param {Number} expected - the expected size (in bytes)
-     * @param {Number} actual - the actual size (in bytes)
-     */
-    assertSimilarSize: function(expected, actual) {
-        // range is arbitrarily picked to deal with javascript floating point calculations
-        var range = 10;
-        var delta = Math.abs(expected-actual);
-        var acceptable = -range <= delta && delta <= range;
-        $A.test.assertTrue(acceptable, "expected (" + expected + ") and actual (" + actual + ") not within acceptable range (" + range + ")");
     }
 })

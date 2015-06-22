@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 ({    
-    afterRender: function(component, helper) {
-        var ret = this.superAfterRender();
-        
-        // Listen to drag and drop events
-        var draggable = component.getElement();
-        draggable.addEventListener("dragstart", function(event) {
-        	helper.handleDragStart(component, event);
-        }, false);
-        
-        draggable.addEventListener("dragend", function(event) {
-        	helper.handleDragEnd(component, event);
-        }, false);
-        
-        draggable.addEventListener("keypress", function(event) {
-        	helper.handleKeyPress(component, event);
-        }, false);
-        
+    render: function(component, helper) {
+        var ret = this.superRender();
+                
         // Component registration
         $A.dragAndDropService.register([component.get("v.type")], component);
+        
+        return ret;
     },
     
     unrender: function(component, helper) {

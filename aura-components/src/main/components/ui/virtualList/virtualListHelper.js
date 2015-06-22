@@ -17,7 +17,12 @@
     DELEGATED_EVENTS: [
         'click',
         'mouseover',
-        'mouseout'
+        'mouseout',
+        'keypress',
+        'dragstart',
+        'dragend',
+        'dragenter',
+        'dragleave'
     ],
     initialize: function (cmp) {
         // Internal variables we use
@@ -193,11 +198,11 @@
     },
     _getActionHandler: function (htmlCmp, eventType) {
         var eventTypeAttribute = 'on' + eventType,
-            htmlAttr = htmlCmp.get('v.HTMLAttributes');
+            htmlAttr = htmlCmp.isInstanceOf('aura:html') && htmlCmp.get('v.HTMLAttributes');
         return htmlAttr && htmlAttr[eventTypeAttribute];
     },
     _eventDelegator: function (cmp, e) {
-         var type     = e.type,
+        var type     = e.type,
             target    = e.target,
             ref       = cmp.get('v.itemVar'),
             handlers  = [],
@@ -222,6 +227,10 @@
             target = target.parentElement;
         }
 
+        if (!handlers.length > 0) {
+        	return;
+        }
+        
         if (item) {
             // Seting up the event with some custom properties
             e.templateItem = item;
@@ -230,10 +239,9 @@
 
             // Setting up the component with the current item
             ptv.sync  = true;
-            ptv.set(ref, item);
+            ptv.set(ref, item, true);
             ptv.ignoreChanges = false;
             ptv.dirty = false;
-            
 
             // Execute the collected handlers in order
             while ((actionHandler = handlers.shift())) {

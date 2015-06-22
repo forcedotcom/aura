@@ -50,7 +50,8 @@
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
-	<div aria-dropeffect="{!v.ariaDropEffect}" class="{!v.class}">
+	<div aria-dropeffect="{!v.ariaDropEffect}" class="{!v.class}"
+		 ondragenter="{!c.handleDragEnter}" ondragover="{!c.handleDragOver}" ondragleave="{!c.handleDragLeave}" ondrop="{!c.handleDrop}">
 		{!v.body}
 	</div>
 	

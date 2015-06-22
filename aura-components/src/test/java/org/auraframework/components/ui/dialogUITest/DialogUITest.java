@@ -139,25 +139,25 @@ public class DialogUITest extends WebDriverTestCase {
         assertTrue("The Modal Dialog box was closed by clicking outside of it", dialogStillUp);
     }
 
-    @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testFocusElementsInDialog() throws MalformedURLException, URISyntaxException, InterruptedException {
-        open(URL_MODAL_TABINDEX);
-        WebDriver driver = getDriver();
+    // @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    // public void testFocusElementsInDialog() throws MalformedURLException, URISyntaxException, InterruptedException {
+    //     open(URL_MODAL_TABINDEX);
+    //     WebDriver driver = getDriver();
 
-        openDialogBox(driver);
+    //     openDialogBox(driver);
 
-        WebElement activeElement = getActiveElement();
-        if (activeElement.getTagName().contains("button")) {
-            // switch to the dialog if button still has focus
-            auraUITestingUtil.pressTab(activeElement);
-        }
+    //     WebElement activeElement = getActiveElement();
+    //     if (activeElement.getTagName().contains("button")) {
+    //         // switch to the dialog if button still has focus
+    //         auraUITestingUtil.pressTab(activeElement);
+    //     }
 
-        assertEquals("list item with tabindex=0 should be active element", "coffee", auraUITestingUtil.getEval(CLASSNAME));
+    //     assertEquals("list item with tabindex=0 should be active element", "coffee", auraUITestingUtil.getEval(CLASSNAME));
 
-        auraUITestingUtil.pressTab(getActiveElement());
-        // active element should be anchor
-        waitForCondition("return $A.test.getActiveElement().className == 'anchor'");
-    }
+    //     auraUITestingUtil.pressTab(getActiveElement());
+    //     // active element should be anchor
+    //     waitForCondition("return $A.test.getActiveElement().className == 'anchor'");
+    // }
 
 
     /***********************************************************************************************

@@ -16,7 +16,8 @@
 
 -->
 <aura:component extends="ui:dragAndDropAccessibility" support="PROTO" description="A drag and drop accessibility component.">
-
+	<aura:import library="ui:panelPositioningLib" property="positioningLib" description="Library to help position accessibility menu" />
+	
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
 	<aura:attribute name="draggables" type="Aura.Component[]" access="private" description="Currently active draggable components."/>	
 	<aura:attribute name="dropzoneMenu" type="List" access="private" description="Dropzone components to be rendered as menuItem."/>

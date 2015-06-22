@@ -49,7 +49,7 @@
 	handleDragEnter: function(component, event) {
 		var isValid = this.setDropEffect(component, event);
 		if (isValid) {
-			this.fireDragEnter(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+			this.fireDragEnter(component, event.target, false);
 		}
 	},
 	
@@ -111,7 +111,7 @@
 				setTimeout(function() {
 					component.$dragOperation$.$dragOverTimeout$ = false;
 				}, dragOverInterval);
-				this.fireDragOver(component, $A.componentService.getRenderingComponentForElement(event.target));
+				this.fireDragOver(component, event.target);
 			}
 			
 			// Prevent default behavior in certain browser such as
@@ -138,7 +138,7 @@
 	 * @param {Event} event - HTML DOM Event for dragleave
 	 */
 	handleDragLeave: function(component, event) {
-		this.fireDragLeave(component, $A.componentService.getRenderingComponentForElement(event.target), false);
+		this.fireDragLeave(component, event.target, false);
 	},
 	
 	fireDragLeave: function(component, targetComponent, isInAccessibilityMode) {
@@ -189,7 +189,7 @@
 			// Get draggable component
 			var dragComponent = auraId === null ? null : $A.getCmp(auraId);
 			
-			this.fireDrop(component, operationType, dataTransfer, dragComponent, $A.componentService.getRenderingComponentForElement(event.target), false);
+			this.fireDrop(component, operationType, dataTransfer, dragComponent, event.target, false);
 		}
 		
 		// Prevent default browser action, such as redirecting

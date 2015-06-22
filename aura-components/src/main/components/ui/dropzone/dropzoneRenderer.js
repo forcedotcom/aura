@@ -14,26 +14,8 @@
  * limitations under the License.
  */
 ({    
-    afterRender: function(component, helper) {
-        var ret = this.superAfterRender();
-        
-        // Listen to drag and drop events
-        var dropzone = component.getElement();
-        dropzone.addEventListener("dragenter", function(event) {
-        	helper.handleDragEnter(component, event);
-        }, false);
-        
-        dropzone.addEventListener("dragover", function(event) {
-        	helper.handleDragOver(component, event);
-        }, false);
-        
-        dropzone.addEventListener("dragleave", function(event) {
-        	helper.handleDragLeave(component, event);
-        }, false);
-        
-        dropzone.addEventListener("drop", function(event) {
-        	helper.handleDrop(component, event);
-        }, false);
+    render: function(component, helper) {
+        var ret = this.superRender();
         
         // Component registration
         $A.dragAndDropService.register(component.get("v.types"), component);

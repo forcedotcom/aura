@@ -13,7 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({	
+({
+    handleDragEnter: function (component, event, helper) {
+    	helper.handleDragEnter(component, event);
+    },
+    
+    handleDragOver: function (component, event, helper) {
+    	helper.handleDragOver(component, event);
+    },
+    
+    handleDragLeave: function (component, event, helper) {
+    	helper.handleDragLeave(component, event);
+    },
+    
+    handleDrop: function (component, event, helper) {
+    	helper.handleDrop(component, event);
+    },
+    
 	enterDragOperation: function (component, event, helper) {
 		helper.enterDragOperation(component);
 	},
@@ -24,19 +40,19 @@
 	
 	fireDragEnter: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragEnter(component, component, params.isInAccessibilityMode);
+		helper.fireDragEnter(component, component.getElement(), params.isInAccessibilityMode);
 	},
 	
 	fireDragLeave: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragLeave(component, component, params.isInAccessibilityMode);
+		helper.fireDragLeave(component, component.getElement(), params.isInAccessibilityMode);
 	},
 	
 	fireDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
 		$A.util.forEach(params.dragComponents, function(dragComponent) {
 			if (dragComponent.isValid()) {
-				helper.fireDrop(component, dragComponent.get("v.type"), dragComponent.get("v.dataTransfer"), dragComponent, component, params.isInAccessibilityMode);
+				helper.fireDrop(component, dragComponent.get("v.type"), dragComponent.get("v.dataTransfer"), dragComponent, component.getElement(), params.isInAccessibilityMode);
 			}	
 		});
 	}

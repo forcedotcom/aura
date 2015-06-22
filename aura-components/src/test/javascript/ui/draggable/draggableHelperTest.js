@@ -28,35 +28,56 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 	[Fixture]
 	function dragStartTests(){
 		var expectedType = "move";
-		var expectedDataTransfer = null;
+		var expectedDataTransfer = "someData";
+		var expectedGlobalId = "someId";
+		var expectedDragImageClass = "someDragImageClass";
 		var fired;
 		var actual;
 		var dragEvent = {
 			setParams : function(arg){actual = arg;},
 			fire : function(){fired = true;}
 		};
+		var setDragImageFired;
 		var targetEvent = {
 			dataTransfer : {
+				data : {},
 				effectAllowed : null,
-				setData : function(key, value){}
+				setData : function(key, value){
+					this.data[key] = value;
+				},
+				getData : function(key) {
+					return this.data[key];
+				},
+				setDragImage : function() {setDragImageFired = true;}
 			}
 		};	
 		var targetComponent = {
 			get : function(expression){
 				if(expression == "v.type"){return expectedType;}
 				if(expression == "v.dataTransfer"){return expectedDataTransfer;}	
+				if(expression == "v.dragImageClass") {return expectedDragImageClass;}
 			},
 			set : function(attribute, value){},
 			getEvent : function(expression){
 				if(expression == "dragStart"){return dragEvent;}
 			},
-			getGlobalId : function(){}
+			getGlobalId : function(){return expectedGlobalId;}
 		};
 		var enterDragOperationMock = Mocks.GetMock(targetHelper, "enterDragOperation", function(targetComponent) {});
 		var mock$A = Mocks.GetMock(Object.Global(),"$A",{
 			util : {
-				isUndefinedOrNull : function(value) {return true;},
-				isEmpty: function(value) {return true;}
+				isUndefinedOrNull : function(value) {return expectedDataTransfer === null;},
+				isString : function(value) {return (typeof expectedDataTransfer) === "string";},
+				isEmpty: function(value) {return true;},
+				isIE : true
+			}
+		});
+		var expectedStringified = "stringified";
+		var actualDataTransfer;
+		var mockJSON = Mocks.GetMock(Object.Global(),"JSON",{
+			stringify : function(value) {
+				actualDataTransfer = value;
+				return expectedStringified;
 			}
 		});
 
@@ -71,13 +92,101 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			};		
 			//Act
 			mock$A(function() {
-				enterDragOperationMock(function() {
-					targetHelper.handleDragStart(targetComponent, targetEvent);
+				mockJSON(function() {
+					enterDragOperationMock(function() {
+						targetHelper.handleDragStart(targetComponent, targetEvent);
+					});
 				});
 			});
 			//Assert
 			Assert.Equal(expected, actual);
 			Assert.True(fired);
+		}
+		
+		[Fact]
+        function testIESerialization(){	
+			//Arrange
+			targetEvent.dataTransfer.data = {};
+			//Act
+			mock$A(function() {
+				mockJSON(function() {
+					enterDragOperationMock(function() {
+						targetHelper.handleDragStart(targetComponent, targetEvent);
+					});
+				});
+			});
+			//Assert
+			Assert.Equal(targetEvent.dataTransfer.getData("Text"), expectedStringified);
+		}
+		
+		[Fact]
+        function testIEDataTransfer(){
+			//Arrange
+			var expected = {
+				"text/plain": expectedDataTransfer,
+				"aura/id" : expectedGlobalId
+			};
+			targetEvent.dataTransfer.data = {};
+			//Act
+			mock$A(function() {
+				mockJSON(function() {
+					enterDragOperationMock(function() {
+						targetHelper.handleDragStart(targetComponent, targetEvent);
+					});
+				});
+			});
+			//Assert
+			Assert.Equal(expected, actualDataTransfer);
+		}
+		
+		[Fact]
+        function testNonIEDataTransfer(){	
+			//Arrange
+			var expected = {
+				"text/plain": expectedDataTransfer,
+				"aura/id" : expectedGlobalId
+			};
+			var mock$ANonIE = Mocks.GetMock(Object.Global(),"$A",{
+				util : {
+					isUndefinedOrNull : function(value) {return expectedDataTransfer === null;},
+					isString : function(value) {return (typeof expectedDataTransfer) === "string";},
+					isEmpty: function(value) {return true;},
+					isIE : false
+				}
+			});
+			targetEvent.dataTransfer.data = {};
+			//Act
+			mock$ANonIE(function() {
+				enterDragOperationMock(function() {
+					targetHelper.handleDragStart(targetComponent, targetEvent);
+				});
+			});
+			//Assert
+			Assert.Equal(expected, targetEvent.dataTransfer.data);
+		}
+		
+		[Fact]
+		function testSetDragImage() {
+			//Arranges
+			var createDragImageMock = Mocks.GetMock(targetHelper, "createDragImage", function(component, pageX, pageY, offsetX, offsetY) {});
+			var mock$AIsEmpty = Mocks.GetMock(Object.Global(),"$A",{
+				util : {
+					isUndefinedOrNull : function(value) {return expectedDataTransfer === null;},
+					isString : function(value) {return (typeof expectedDataTransfer) === "string";},
+					isEmpty: function(value) {return expectedDragImageClass == "";},
+					isIE : true
+				}
+			});
+			//Act
+			mock$AIsEmpty(function() {
+				createDragImageMock(function(){
+					enterDragOperationMock(function() {
+						targetHelper.handleDragStart(targetComponent, targetEvent);
+					});
+				});
+			});
+			//Assert
+			Assert.True(setDragImageFired);
 		}
 	}
 	
@@ -261,6 +370,78 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			//Assert
 			Assert.Equal(expected, actual);
 			Assert.True(fired);
+		}
+	}
+	
+	[Fixture]
+	function isDropSuccessfulTests() {
+		var getDropStatusFired;
+		var targetComponent = {
+			get : function(expression) {
+				if(expression == "v.type") {return "move"};
+			},
+			isValid : function() {return true;},
+			$dragOperation$ : {
+				$dropOperationStatus$: {
+					getDropStatus : function() {
+						getDropStatusFired = true; 
+						return true;
+					}
+				}
+			}
+		};
+		var targetEvent = {
+			dataTransfer : {
+				dropEffect : "move"
+			}
+		};
+		var auraMock$A = Mocks.GetMock(Object.Global(), "$A", {
+			util : {
+				isIE : true
+			}
+		});
+		
+		[Fact]
+		function testIEAndDropEffectNone(){
+			//Arrange
+			var targetEvent = {
+				dataTransfer : {
+					dropEffect : "none"
+				}
+			};
+			var result;
+			//Act
+			auraMock$A(function(){
+				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
+			});			
+			//Assert
+			Assert.True(result);
+			Assert.True(getDropStatusFired);
+		}
+		
+		[Fact]
+		function testInvalidComponent(){
+			//Arrange
+			var targetComponent = {
+				isValid : function() {return false;}
+			};
+			var result;
+			//Act
+			auraMock$A(function(){
+				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
+			});			
+			//Assert
+			Assert.False(result);
+		}
+		
+		[Fact]
+		function testNonIEDropEventWithTypeMove(){
+			//Act
+			auraMock$A(function(){
+				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
+			});			
+			//Assert
+			Assert.True(result);
 		}
 	}
 }

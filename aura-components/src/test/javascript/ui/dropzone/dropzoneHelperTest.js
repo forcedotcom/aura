@@ -51,15 +51,10 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				}
 			};
 			var targetEvent = {
-				target : null,
+				target : expectedRenderingComponent,
 				dataTransfer : {effectAllowed : "move", dropEffect : null}
 			};
 			var auraMock = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({},{
-				 componentService : {
-					 getRenderingComponentForElement : function(value){
-						 return expectedRenderingComponent;
-					 }
-				 },
 				util : {
 					isEmpty : function(value) {return true;}
 				}
@@ -210,14 +205,9 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				}
 			};
 			var targetEvent = {
-				target : null
+				target : expectedRenderingComponent
 			};
 			var auraMock = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({},{
-				componentService : {
-					getRenderingComponentForElement:function(value){
-						return expectedRenderingComponent;
-					}
-				},
 				util : {
 					isEmpty : function(value) {return true;}
 				}
@@ -263,15 +253,18 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				if(expression == "drop"){return dragEvent;}
 			}
 		};
+		var parsedText;
 		var targetEvent = {
 			stopPropagation : true,
 			stopPropagation : function(){propagationStopped = true;},
 			dataTransfer : {
-				getData : function(expression){},
+				getData : function(expression){
+					if(expression == "Text") {parsedText = true;}
+				},
 				types : [],
 				effectAllowed : expectedOperationType
 			},
-			target : null
+			target : expectedRenderingComponent
 		};
 		var dragComponent = {
 			get : function(expression){
@@ -288,11 +281,6 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		var auraMock = Mocks.GetMock(Object.Global(), "$A", {
 			getCmp : function(value){
 				return dragComponent;},
-			componentService : {
-				getRenderingComponentForElement:function(value){
-					return expectedRenderingComponent;
-				}
-			},
 			util : {
 				forEach : function(value, func){},
 				isUndefinedOrNull : function(expression) {return true;},
@@ -321,6 +309,43 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			});
 			//Assert
 			Assert.False(result);
+		}
+		
+		[Fact]
+		function testSupportedTypeWithIE(){
+			//Arrange
+			supportTypes = expectedOperationType;
+			var auraMock = Mocks.GetMock(Object.Global(), "$A", {
+				getCmp : function(value){
+					return dragComponent;},
+				componentService : {
+					getRenderingComponentForElement:function(value){
+						return expectedRenderingComponent;
+					}
+				},
+				util : {
+					forEach : function(value, func){},
+					isUndefinedOrNull : function(expression) {return true;},
+					isEmpty : function(value) {return true;},
+					isIE : true
+				}
+			});
+			var parseFired;
+			var mockJSON = Mocks.GetMock(Object.Global(), "JSON", {
+				parse : function(expression){
+					parseFired = true;
+					return {"aura/id" : "someId"}
+				}
+			});
+			//Act
+			auraMock(function(){
+				mockJSON(function(){
+					targetHelper.handleDrop(targetComponent, targetEvent);
+				});
+			});
+			//Assert
+			Assert.True(parseFired);
+			Assert.True(parsedText);
 		}
 		
 		[Fact]

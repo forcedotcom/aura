@@ -412,5 +412,89 @@
             $A.test.fireDomEvent(dropzoneCmp.getElement(), "drop");
          	$A.test.assertTrue(handleDropCalled);
     	}
-    }
+    },
+    fireDragAndDropViaKeyboard: function(dragCmp, callback){
+    	var event = {
+				keyCode : 32, //space
+				which: 32,
+				preventDefault : function(){}
+		};
+		var helper = dragCmp.helper;
+		helper.handleKeyPress(dragCmp, event);
+		$A.test.addWaitForWithFailureMessage(true, 
+			function(){
+				var uiMenu = $A.test.getElementByClass("uiMenuList");
+				return window.getComputedStyle(uiMenu[0]).display != "none"; 
+			}, "dropzonMenu doesn't show up", callback);
+    },
+    /**
+     * Test fireDragstart is fired when drag is initialed by keyboard
+     */
+    // testInitialDragViaKeyboard : {
+    // 	test : function(cmp){
+    // 		var dragCmp = cmp.find("draggableMove");
+    // 		var helper = dragCmp.helper;
+    // 		var fireDragStartCalled = false;
+    //      	$A.test.overrideFunction(helper, "fireDragStart",
+    //      		function (component, event) {
+    //      			fireDragStartCalled = true;
+    //      	});  
+    //      	//action
+    // 		this.fireDragAndDropViaKeyboard(dragCmp);
+    //      	//assert
+    //      	$A.test.assertTrue(fireDragStartCalled);
+    // 	}
+    // },
+    
+    /**
+     * Test dropzoneMenu shows dropzones with the same types, and the draggable cmp apply the dragClass
+     * The current dropzone and other type of dropzone should not show in the dropzoneMenu
+     */
+   //  testDropzoneMenuViaKeyboard : {
+   //  	test : function(cmp){
+   //  		var dragCmp = cmp.find("draggableMove2");
+   //  		var expected = ["Dropzone Type: Move"];
+   //  		//action
+   //  		this.fireDragAndDropViaKeyboard(dragCmp, 
+			// 	function(){
+   //  				//assert
+   //  				var dropzoneMenu = cmp.find("accessibilityComponent").get("v.dropzoneMenu");
+			// 		$A.test.assertEquals(expected.length, dropzoneMenu.length);
+		 //    		$A.test.assertTrue($A.test.contains($A.util.getElementAttributeValue(dragCmp.getElement(), "class"), "dragging"));
+			// });
+   //  	}
+   //  },
+    
+   //  testDropViaKeyboard :{
+   //  	browsers : [ "firefox" ],
+   //  	test : function(cmp){
+			// var dragCmp = cmp.find("draggableCopy");
+			// var dragText = $A.test.getText(dragCmp.getElement());
+			// var helper = dragCmp.helper;
+			// var dropzoneCmp = cmp.find("dropzoneCopy");
+			// //action
+			// this.fireDragAndDropViaKeyboard(dragCmp,
+			// 	function(){
+			// 		var space = {
+		 //    		          keyCode: 32, //Space key
+		 //    		          which: 32
+		 //    		        };
+		 //    		var keyboardEvent = new KeyboardEvent('keydown', space);
+			// 		var dropzoneMenu = $A.test.getElementByClass("uiMenuItem");
+			// 		dropzoneMenu[0].dispatchEvent(keyboardEvent);
+			// 		//assert
+			// 		this.waitForDragEnd(dropzoneCmp.getElement(), function(){
+			// 			var found = false;
+		 //             	var itemsInDropzone = dropzoneCmp.getElement().getElementsByClassName("uiDraggable");
+		 //             	for(var i = 0; i < itemsInDropzone.length; i++) {         		
+		 //             		var dragTextByIndex = $A.test.getText(itemsInDropzone[i]);
+		 //             		if(dragText === dragTextByIndex) {
+		 //             			found = true;
+		 //             		}
+		 //             	}
+		 //             	$A.test.assertTrue(found);
+			// 		});
+			// });
+   //  	}
+   //  },
 })

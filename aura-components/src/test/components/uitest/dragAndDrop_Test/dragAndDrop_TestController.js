@@ -19,9 +19,12 @@
 		component.set("v._dropzoneContext1", draggableContext[0]);
 		component.set("v._dropzoneContext2", draggableContext[1]);
 		component.set("v._dropzoneContext3", draggableContext[2]);
+		component.set("v._dropzoneContext4", draggableContext[3]);
 		component.set("v._draggableContext1", draggableContext[0]);
 		component.set("v._draggableContext2", draggableContext[1]);
 		component.set("v._draggableContext3", draggableContext[2]);
+		component.set("v._draggableContext4", draggableContext[3]);
+		component.set("v._accessibilityComponent", component.find("accessibilityComponent").getGlobalId());
 	},
 	
 	handleDrop: function(component, event, helper) {	

@@ -18,6 +18,11 @@
 <aura:documentation> 
 	<aura:description>
 		<p>
+			Date pickers provide date and time selection using a <code>ui:datePickerGrid</code> component, which provides a calendar view. It's also available on a date or date and time input field. If using an input field, the field automatically populates with the selected date and time.
+			To customize selection behavior when not using an input field, handle the <code>selectDate</code> event. Three sizes are available via the <code>dimension</code> attribute.
+			By default, a <code>Today</code> button is displayed at the bottom of the calendar view and can be removed by setting <code>showToday="false"</code>.
+		</p>
+		<p>
 			Date pickers in a component can be managed or unmanaged. By default, date pickers are unmanaged, which means that each input field is rendered with its own date picker.
 			To improve loading time if you have multiple date pickers in a component, you can render only one date picker in the DOM. To do this, include one instance of <code>ui:datePickerManager</code> in the component.
 			This sets the <code>managed</code> attribute on the date picker to <code>true</code>. When using managed date pickers, set <code>displayDatePicker</code> to <code>true</code> and <code>loadDatePicker</code> to <code>false</code>
@@ -30,10 +35,11 @@
 &lt;/aura:component>
 </pre>
 		
-	</aura:description>	
-		<aura:example name="datePicker" ref="uiExamples:datePicker" label="Using the Date Picker">
-    	<p>This example shows managed date pickers. Only one instance of <code>ui:datePickerManager</code> is required to manage date pickers on a component.</p>
-    	
+	</aura:description>
+			
+	<aura:example name="datePicker" ref="uiExamples:datePicker" label="Using the Date Picker">
+	<p>This example shows a date picker that's visible by default, followed by a group of managed date pickers. Only one instance of <code>ui:datePickerManager</code> is required to manage date pickers on a component.</p>
+	
 	</aura:example>
 	
 </aura:documentation>

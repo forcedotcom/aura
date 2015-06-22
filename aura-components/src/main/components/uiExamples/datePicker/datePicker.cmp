@@ -16,6 +16,11 @@
 
 -->
 <aura:component>
+	<aura:attribute name="selectedDate" type="Date" />
+	<ui:datePicker aura:id="datePicker" dimension="medium" visible="true" selectDate="{!c.handleSelectedDate}" />	
+	
+	<p>selected date = {!v.selectedDate}</p>
+	 
     <ul>
         <li><ui:inputDateTrigger/></li>
         <li><ui:inputDateTrigger/></li>

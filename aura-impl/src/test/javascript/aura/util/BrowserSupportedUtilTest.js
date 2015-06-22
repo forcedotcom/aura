@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.BrowserSupportedUtilTest");
+Function.RegisterNamespace("Test.Aura.Util");
 
 /**
  * This test shows that when the browser is mocked to have native utilities in place, they are used instead of

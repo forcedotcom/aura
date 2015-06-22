@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputPercent");
+Function.RegisterNamespace("Test.Components.Ui.OutputPercent");
 
 [Fixture]
 Test.Ui.OutputPercent.RendererTest = function(){

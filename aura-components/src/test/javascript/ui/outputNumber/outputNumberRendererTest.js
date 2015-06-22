@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputNumber");
+Function.RegisterNamespace("Test.Components.Ui.OutputNumber");
 
 [Fixture]
 Test.Ui.OutputNumber.RendererTest = function(){

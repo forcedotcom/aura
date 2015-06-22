@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputText");
+Function.RegisterNamespace("Test.Components.Ui.OutputText");
 
 [Fixture]
 Test.Ui.OutputText.HelperTest = function(){

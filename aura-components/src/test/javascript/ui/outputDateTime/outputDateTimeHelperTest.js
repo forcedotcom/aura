@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputDateTime");
+Function.RegisterNamespace("Test.Components.Ui.OutputDateTime");
 
 [Fixture]
 Test.Ui.OutputDateTime.HelperTest = function(){

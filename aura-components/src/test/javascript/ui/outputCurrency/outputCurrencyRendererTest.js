@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputCurrency");
+Function.RegisterNamespace("Test.Components.Ui.OutputCurrency");
 
 [Fixture]
 Test.Ui.OutputCurrency.RendererTest = function(){

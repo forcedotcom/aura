@@ -96,7 +96,6 @@
 			cmp.set('v.items', filteredItems);
 			//show apply button only when item is not empty
 			$A.util.removeClass(cmp.find("set").getElement(), "hidden", "visible");
-			this.refreshMenu(cmp);
 		}
 	},
 

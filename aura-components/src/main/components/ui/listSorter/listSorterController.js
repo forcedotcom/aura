@@ -17,7 +17,7 @@
 	init : function(cmp, evt, helper) {
 		helper.doInit(cmp);
 	},
-	
+
 	handleDataChange : function(cmp, evt, helper) {
 		cmp._dataProvided = true;
 		var data = evt.getParam('data');
@@ -30,7 +30,7 @@
         	}
 		}
 	},
-	
+
 	handleDataError: function(cmp, evt, helper) {
 	    //still needs to show the cancel button when dataprovider failed to retrive data
 	    helper.handleOnOpen(cmp, true);
@@ -47,45 +47,50 @@
 			helper.handleOnOpen(cmp, true);
 		}
 	},
-	
+
 	onCancel: function(cmp, evt, helper) {
 		helper.handleOnCancel(cmp);
 	},
-	
+
 	onMenuExpand: function(cmp, evt, helper) {
 		var action = cmp.get('v.onOpen');
         if (action) {
         	action.runDeprecated();
         }
 	},
-	
+
 	onMenuCollapse: function(cmp, evt, helper) {
 		var action = cmp.get('v.onCancel');
         if (action) {
         	action.runDeprecated();
         }
 	},
-	
+
 	onMenuSelected : function(cmp, evt, helper) {
 		helper.setSelectedItems(cmp, helper.getSelectedMenuItems(cmp));
 		helper.updateSortOrder(cmp);
 	},
-	
+
 	onApply : function(cmp, evt, helper) {
 		helper.handleApply(cmp);
 	},
-	
+
 	onVisible : function(cmp, evt, helper) {
 		var visible = evt.getParam('value');
 		if (visible) {
-			helper.attachEventHandler(cmp);    
+			helper.attachEventHandler(cmp);
 		} else {
 			helper.removeEventHandler(cmp);
 		}
-		helper.setVisible(cmp, visible);		
+		helper.setVisible(cmp, visible);
 	},
 	
 	refresh: function(cmp, evt, helper) {
 		cmp._needUpdate = true;
+	},
+
+	// Refresh after iteration complete to handle items that need to be fetched from the server
+	iterationComplete: function(cmp, evt, helper) {
+		helper.refreshMenu(cmp);
 	}
 })

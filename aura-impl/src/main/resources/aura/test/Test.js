@@ -43,7 +43,7 @@ TestInstance = function() {
 
     //vars to store initial and whitelisted variables exposed on window object
     var _initialGlobalState = Object.keys(window);
-    // NIHAR: TODO: FIXME: THIS IS A TEMPORARY SOLUTION UNTIL AURA GETS IT'S STUFF NESTED IN A SINGLE VAR
+    //NIHAR: TODO: FIXME: THIS IS A TEMPORARY SOLUTION UNTIL AURA GETS IT'S STUFF NESTED IN A SINGLE VAR
     //THEN WE WILL NOT NEED THIS LIST. FLAG EVERYTHING THAT'S NOT AURA
     var _whitelistedPollutants = ["fewActions", "actionSucceeeded", "animate", "yTime", "yLabels",
         "xNumbers", "PreviewPageLoader", "PreviewPage", "EclairNG", "_", "Scroller", "__S",

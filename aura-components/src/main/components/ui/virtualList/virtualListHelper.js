@@ -198,7 +198,7 @@
     },
     _getActionHandler: function (htmlCmp, eventType) {
         var eventTypeAttribute = 'on' + eventType,
-            htmlAttr = htmlCmp.get('v.HTMLAttributes');
+            htmlAttr = htmlCmp.isInstanceOf('aura:html') && htmlCmp.get('v.HTMLAttributes');
         return htmlAttr && htmlAttr[eventTypeAttribute];
     },
     _eventDelegator: function (cmp, e) {
@@ -239,10 +239,9 @@
 
             // Setting up the component with the current item
             ptv.sync  = true;
-            ptv.set(ref, item);
+            ptv.set(ref, item, true);
             ptv.ignoreChanges = false;
             ptv.dirty = false;
-            
 
             // Execute the collected handlers in order
             while ((actionHandler = handlers.shift())) {

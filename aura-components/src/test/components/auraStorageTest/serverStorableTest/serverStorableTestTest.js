@@ -316,33 +316,37 @@
      */
     //W-1554641 - Original action's callback is not called
     _testMarkingOriginalActionAsStorable:{
-    	test:[function(cmp){
-            //Run the action that sets up other actions to be storable
-            var a = cmp.get("c.setStorable");
-            a.setCallback(cmp, function(a){
-    			cmp._callBackMarker = a.getReturnValue();
-    		});
-            $A.run(function() { $A.enqueueAction(a); });
-            $A.test.addWaitFor(false, $A.test.isActionPending,
-                    function(){
-            			$A.test.assertTruthy(cmp._callBackMarker, "Action call back was never called.");
-            			$A.test.assertEquals("Marking my self as storable",cmp._callBackMarker);
-            		});
-    	},function(cmp){
-    		var storedAction = cmp.get("c.setStorable");
-			var storageKey = storedAction.getStorageKey();
-			//Check if storage service has the expected action
-			$A.storageService.getStorage("actions").get(storageKey).then(function(response){
-				if(response){
-					//If the action was stored, make sure it succeeded and return value is correct
-					$A.test.assertEquals("SUCCESS", response.value.state);
-					$A.test.assertEquals("Marking my self as storable", response.value.returnValue);
-				}else{
-					//If the action was not stored, fail
-					$A.test.fail("Originating action's response was not stored.");
-				}
-			});
-		}]
+        test:[
+            function(cmp){
+                var returnValue;
+                //Run the action that sets up other actions to be storable
+                var a = cmp.get("c.markingSelfAsStorable");
+                a.setCallback(cmp, function(a){
+                    returnValue = a.getReturnValue();
+                });
+                $A.enqueueAction(a);
+
+                $A.test.addWaitFor(false, $A.test.isActionPending, function(){
+                            $A.test.assertTruthy(returnValue, "Action call back was never called.");
+                            $A.test.assertEquals("Marking my self as storable", returnValue);
+                    });
+            },
+            function(cmp){
+                var storedAction = cmp.get("c.markingSelfAsStorable");
+                var storageKey = storedAction.getStorageKey();
+                //Check if storage service has the expected action
+                $A.storageService.getStorage("actions").get(storageKey).then(function(response){
+                    if(response){
+                        //If the action was stored, make sure it succeeded and return value is correct
+                        $A.test.assertEquals("SUCCESS", response.value.state);
+                        $A.test.assertEquals("Marking my self as storable", response.value.returnValue);
+                    }else{
+                        //If the action was not stored, fail
+                        $A.test.fail("Originating action's response was not stored.");
+                    }
+                });
+            }
+        ]
     },
     /**
      * Verify that new action defs can be introduced at client on the fly.
@@ -356,7 +360,7 @@
             this.resetCounter(cmp, "testNewStorableActionDefsInResponse");
     	}, function(cmp){
             //Run the action that sets up other actions to be storable
-            this.initiateServerAction(cmp, "testNewStorableActionDefsInResponse", 
+            this.initiateServerAction(cmp, "testNewStorableActionDefsInResponse",
                             ["java://org.auraframework.components.test.java.controller.TestController/ACTION$getString"] );
             $A.test.addWaitFor(false, $A.test.isActionPending,
                 function(){

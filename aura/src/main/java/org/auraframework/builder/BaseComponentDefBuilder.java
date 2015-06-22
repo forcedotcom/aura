@@ -21,13 +21,13 @@ import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
-import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.design.DesignDef;
 
 /**
  */
@@ -76,4 +76,9 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
      * @see FlavoredStyleDef
      */
     BaseComponentDefBuilder<T> setDefaultFlavor(String defaultFlavor);
+
+    /**
+     * Specifies whether this component is dynamically flavorable.
+     */
+    BaseComponentDefBuilder<T> setDynamicallyFlavorable(boolean dynamicallyFlavorable);
 }

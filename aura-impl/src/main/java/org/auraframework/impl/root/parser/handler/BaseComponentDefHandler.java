@@ -32,7 +32,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.DocumentationDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.HelperDef;
@@ -46,6 +45,7 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -86,6 +86,7 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     private static final String ATTRIBUTE_CONTROLLER = "controller";
     private static final String ATTRIBUTE_WHITESPACE = "whitespace";
     private static final String ATTRIBUTE_DEFAULT_FLAVOR = "defaultFlavor";
+    private static final String ATTRIBUTE_DYNAMICALLY_FLAVORABLE = "dynamicallyFlavorable";
 
     protected static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
             .add(ATTRIBUTE_IMPLEMENTS, ATTRIBUTE_ACCESS, ATTRIBUTE_MODEL, ATTRIBUTE_CONTROLLER, ATTRIBUTE_EXTENDS,
@@ -95,7 +96,8 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
     protected static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_RENDER, ATTRIBUTE_TEMPLATE, ATTRIBUTE_PROVIDER,
             ATTRIBUTE_STYLE, ATTRIBUTE_HELPER, ATTRIBUTE_RENDERER,
-            ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR).addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            ATTRIBUTE_WHITESPACE, ATTRIBUTE_DEFAULT_FLAVOR, ATTRIBUTE_DYNAMICALLY_FLAVORABLE)
+            .addAll(ALLOWED_ATTRIBUTES).addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();
 
     private int innerCount = 0;
@@ -399,10 +401,14 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                 builder.flavorDescriptor = flavorDesc;
             }
 
-            // default flavor attribute
             String defaultFlavor = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVOR);
             if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavor)) {
                 builder.setDefaultFlavor(defaultFlavor);
+            }
+
+            boolean dynamicallyFlavorable = getBooleanAttributeValue(ATTRIBUTE_DYNAMICALLY_FLAVORABLE);
+            if (dynamicallyFlavorable) {
+                builder.setDynamicallyFlavorable(true);
             }
 
             String extendsName = getAttributeValue(ATTRIBUTE_EXTENDS);

@@ -1,0 +1,3 @@
+<aura:component extends="flavorTest:dynamically_flavorable_x_parent">
+    Text Only
+</aura:component>

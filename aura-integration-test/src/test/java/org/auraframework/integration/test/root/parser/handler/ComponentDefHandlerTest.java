@@ -200,4 +200,19 @@ public class ComponentDefHandlerTest extends AuraImplTestCase {
         ComponentDef cd = parser.parse(descriptor, source);
         assertEquals("test", cd.getDefaultFlavor());
     }
+
+    public void testIsDynamicallyFlavorable() throws Exception {
+        DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
+        StringSource<ComponentDef> source = new StringSource<>(descriptor,
+                "<aura:component dynamicallyFlavorable='true'></aura:component>", "myID", Format.XML);
+        ComponentDef cd = parser.parse(descriptor, source);
+        assertTrue(cd.isDynamicallyFlavorable());
+    }
+
+    public void testIsDynamicallyFlavorableInherited() throws Exception {
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class, "<aura:component extensible='true' dynamicallyFlavorable='true'>{!v.body}</aura:component>");
+        DefDescriptor<ComponentDef> parent2 = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s' extensible='true'>{!v.body}</aura:component>", parent.getDescriptorName()));
+        DefDescriptor<ComponentDef> cmp = addSourceAutoCleanup(ComponentDef.class, String.format("<aura:component extends='%s'>zell</aura:component>", parent2.getDescriptorName()));
+        assertTrue(cmp.getDef().isDynamicallyFlavorable());
+    }
 }

@@ -1,0 +1,8 @@
+<aura:component extends="flavorTest:dynamically_flavorable_x_parent">
+    <aura:attribute name="count" type="String" required="true" default="0"/>
+
+    <div aura:id="target" class="{!'count_' + v.count}">
+        <span aura:id="span" class="count">Count: {!v.count} </span>
+        <button aura:id="btn" class="{!'btncount_' + v.count}" onclick="{!c.click}">Clicked {!v.count} time(s)</button>
+    </div>
+</aura:component>

@@ -772,26 +772,58 @@ AuraRenderingService.prototype.insertElements = function(elements, refNode, asSi
     }
 };
 
-AuraRenderingService.prototype.addAuraClass = function(cmp, element){
-    var concrete = cmp.getConcreteComponent();
-    var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
-    var flavorClassName = null; // instance-specific, flavor class name applied to flavorable elements if applicable
+/**
+ * Calculates the flavor css class name for a component instance and element.
+ * @private
+ */
+AuraRenderingService.prototype.getFlavorClass = function(cmp, element) {
+    var flavor = null;
+    var staticFlavorable = cmp.isFlavorable(); // aura:flavorable="true" on html elements
+    var dynamicFlavorable = cmp.getDef().isDynamicallyFlavorable(); // dynamicallyFlavorable="true" on cmp def
+    var valueProvider = cmp.getComponentValueProvider();
 
-    if (concrete.isFlavorable()) {
-        var flavorName;
-        var vp = concrete.getComponentValueProvider();
-        if (vp && vp.getConcreteComponent()) { // check if flavor for parent cmp was set on child cmp
-            flavorName = vp.getConcreteComponent().get("style.flavor");
+    if (valueProvider && (staticFlavorable || dynamicFlavorable)) {
+        if (valueProvider.getConcreteComponent()) { // check if flavor of an extensible cmp was set on child cmp instance
+            flavor = valueProvider.getConcreteComponent().getFlavor();
         }
-        if (vp && !flavorName) {
-            flavorName = vp.get("style.flavor");
+
+        if (!flavor) {
+            flavor = valueProvider.getFlavor();
         }
-        if (flavorName) {
-            flavorClassName = $A.util.buildFlavorClass(vp, flavorName);
+
+        if (flavor && flavor.indexOf("!" > -1)) { // deal with expressions
+            flavor = valueFactory.create(flavor, null, valueProvider.getComponentValueProvider());
+            flavor = $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
+        }
+
+        if (staticFlavorable && flavor) {
+            return $A.util.buildFlavorClass(valueProvider, flavor);
+        } else if (dynamicFlavorable) {
+            var flavorClasses = [];
+            var dynamicallyFlavorableDefs = cmp.getDef().getDynamicallyFlavorable();
+            for (var i = 0, len = dynamicallyFlavorableDefs.length; i < len; i++) {
+                var def = dynamicallyFlavorableDefs[i];
+                var defFlavor = flavor || def.getDefaultFlavor();
+                if (defFlavor) {
+                    flavorClasses.push($A.util.buildFlavorClass(def, defFlavor));
+                }
+            }
+            var combined = flavorClasses.join(" ");
+            $A.log(combined);
+            return combined;
         }
     }
 
+    return null;
+};
+
+AuraRenderingService.prototype.addAuraClass = function(cmp, element){
+    var concrete = cmp.getConcreteComponent();
+    var className = concrete.getDef().getStyleClassName(); // the generic class name applied to all instances of this component
+    var flavorClassName;
+
     if (className) {
+        flavorClassName = this.getFlavorClass(concrete, element);
         if (flavorClassName) {
             className = className + flavorClassName;
         }
@@ -800,10 +832,14 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
         if (element["tagName"]) {
             element["auraClass"] = $A.util.buildClass(element["auraClass"],className);
         }
-    } else if (flavorClassName) {
-        $A.util.addClass(element, flavorClassName);
-        if (element["tagName"]) {
-            element["auraClass"] = $A.util.buildClass(element["auraClass"],flavorClassName);
+    } else if (concrete.isInstanceOf("aura:html")) { // only check html cmps (presuming this is faster) TODONM find a better way to short-circuit here
+        // this is for nested flavorable elements (not at top level of cmp).
+        flavorClassName = this.getFlavorClass(concrete, element);
+        if (flavorClassName) {
+            $A.util.addClass(element, flavorClassName);
+            if (element["tagName"]) {
+                element["auraClass"] = $A.util.buildClass(element["auraClass"],flavorClassName);
+            }
         }
     }
 };

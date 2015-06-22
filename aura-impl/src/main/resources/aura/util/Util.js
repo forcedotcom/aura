@@ -509,13 +509,17 @@ Aura.Utils.Util.prototype.buildClass=function(oldClass, newClass, remove){
  * @export
  */
 Aura.Utils.Util.prototype.buildFlavorClass = function(cmp, flavor) {
-    $A.assert(!this.isUndefinedOrNull(cmp.getDef().getStyleDef()), "Missing StyleDef for component " + cmp.getDef().getDescriptor() + " (required for flavors)");
+    if ($A.util.isFunction(cmp.getDef)) {
+        cmp = cmp.getDef();
+    }
+
+    $A.assert(!this.isUndefinedOrNull(cmp.getStyleDef()), "Missing StyleDef for component " + cmp.getDescriptor() + " (required for flavors)");
 
     if (this.isEmpty(flavor)) {
         return "";
     }
 
-    var base = cmp.getDef().getStyleDef().getClassName();
+    var base = cmp.getStyleDef().getClassName();
     var split = flavor.split(",");
     var clz = "";
     for (var i = 0, len = split.length; i < len; i++) {

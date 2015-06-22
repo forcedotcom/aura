@@ -262,14 +262,6 @@ var ComponentPriv = (function() { // Scoping priv
                 if (key === "name") {
                     var styleDef = cmp.getDef().getStyleDef();
                     return !$A.util.isUndefinedOrNull(styleDef) ? styleDef.getClassName() : null;
-                } else if (key === "flavor") {
-                    var flavor = cmp.getFlavor();
-                    // todo-- nathan: this is probably wrong
-                    if (!$A.util.isUndefinedOrNull(flavor)) {
-                       flavor = valueFactory.create(flavor, null, cmp.getComponentValueProvider());
-                       return $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
-                    }
-                    return null;
                 }
             }
         };

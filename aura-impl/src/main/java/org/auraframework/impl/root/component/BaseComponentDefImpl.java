@@ -122,6 +122,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final List<ClientLibraryDef> clientLibraries;
     private final boolean hasFlavorableChild;
     private final String defaultFlavor;
+    private final boolean dynamicallyFlavorable;
 
     private String clientComponentClass;
 
@@ -168,6 +169,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.svgDefDescriptor = builder.svgDefDescriptor;
         this.hasFlavorableChild = builder.hasFlavorableChild;
         this.defaultFlavor = builder.defaultFlavor;
+        this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
         if (getDescriptor() != null) {
@@ -263,7 +265,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         if (defaultFlavor != null) {
             // component must be flavorable
-            if (!hasFlavorableChild() && !inheritsFlavorableChild()) {
+            if (!hasFlavorableChild() && !inheritsFlavorableChild() && !isDynamicallyFlavorable()) {
                 throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
                         + "specified on a component with no flavorable children", location);
             }
@@ -480,7 +482,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             // check that each flavor name exists on this component or a parent
             for (String f : Splitter.on(",").trimResults().split(defaultFlavor)) {
                 if (!allFlavorNames.contains(f)) {
-                    throw new FlavorNameNotFoundException(f, flavorDescriptor);
+                    throw FlavorNameNotFoundException.forComponentDef(f, getDescriptor());
                 }
             }
         }
@@ -1066,6 +1068,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("hasFlavorableChild", true);
                 }
 
+                if (dynamicallyFlavorable) {
+                    json.writeMapEntry("dynamicallyFlavorable", dynamicallyFlavorable);
+                }
+
                 if(!context.getDefRegistry().getComponentClassLoaded(descriptor)) {
                     // KRIS:
                     // This needs to be conditional. We can't just return the component class each time.
@@ -1236,13 +1242,12 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         if (defaultFlavor == null
                 && flavorDescriptor != null
                 && flavorDescriptor.getDef().getFlavorNames().contains("default")
-                && hasFlavorableChild()) {
+                && (hasFlavorableChild() || isDynamicallyFlavorable())) {
             return "default";
         }
 
         return defaultFlavor;
     }
-
 
     @Override
     public Set<String> getAllFlavorNames() throws QuickFixException {
@@ -1256,6 +1261,16 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return allFlavorNames;
     }
 
+    @Override
+    public boolean isDynamicallyFlavorable() throws QuickFixException {
+        if (dynamicallyFlavorable) {
+            return true;
+        }
+        if (extendsDescriptor != null) {
+            return extendsDescriptor.getDef().isDynamicallyFlavorable();
+        }
+        return false;
+    }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
     RootDefinitionImpl.Builder<T> implements BaseComponentDefBuilder<T> {
@@ -1296,6 +1311,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         private RenderType renderType;
         private boolean hasFlavorableChild;
         private String defaultFlavor;
+        private boolean dynamicallyFlavorable;
 
         @Override
         public Builder<T> setFacet(String key, Object value) {
@@ -1444,6 +1460,12 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         @Override
         public Builder<T> setDefaultFlavor(String defaultFlavor) {
             this.defaultFlavor = defaultFlavor;
+            return this;
+        }
+
+        @Override
+        public Builder<T> setDynamicallyFlavorable(boolean dynamicallyFlavorable) {
+            this.dynamicallyFlavorable = dynamicallyFlavorable;
             return this;
         }
 

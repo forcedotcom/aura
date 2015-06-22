@@ -17,6 +17,7 @@ package org.auraframework.components.ui.pillContainerAutoComplete;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
@@ -30,8 +31,6 @@ public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
     public static final String CMP_URL = "/uitest/pillContainer_WithAutoComplete.cmp";
     public static final String INPUT = ".uiInputTextForAutocomplete";
     public static final String LISTCONTENT_LOCATOR = ".visible";
-    
-
     public PillContainerAutoCompleteUITest(String name) {
         super(name);
     }
@@ -52,6 +51,30 @@ public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
         pill.click();
         assertTrue("Auto complete List Content should be still visible after clicking on pill", isListContentVisible());
     }
+    
+    /*
+     * Test to prevent loss of focus from the auto complete input when clicking
+     * on the option in autocomplete list
+     * Bug: W-2641156
+     */
+    public void testLossOfFocusVerification() throws MalformedURLException, URISyntaxException, InterruptedException {
+        open(CMP_URL);
+        WebElement input = findDomElement(By.cssSelector(INPUT));
+        input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
+        auraUITestingUtil.pressEnter(input);
+        assertFalse("Auto complete List Content should not be visible", isListContentVisible());
+        input.sendKeys("test");
+        assertNotNull("Auto complete List Content should be visible", isListContentVisible());
+        int listItem = 2;
+        WebElement listItem2 = getAutoCompleteListOptions(listItem);
+        listItem2.click();
+        assertFalse("Auto complete List Content should not be visible after click on pill 3", isListContentVisible());
+    }
+
+	private WebElement getAutoCompleteListOptions(int optionNumber) {
+		List<WebElement> listOfOptions = findDomElements(By.cssSelector("ul[class*='visible'] li"));
+		return listOfOptions.get(optionNumber);
+	}
 
 	private boolean isListContentVisible() throws InterruptedException {
 		waitFor(3);

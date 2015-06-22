@@ -30,8 +30,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.AuraValueProviderType;
+import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -107,7 +107,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         } catch (QuickFixException qfe) {
             // Ignore
         }
-        
+
         builder.put(FIRST_DAY_OF_WEEK, Calendar.getInstance(al.getTimeZone(), userLocale).getFirstDayOfWeek());
 
         // using java DateFormat because the year pattern "MMM d, y" (although valid) isn't understood by moment.js
@@ -199,7 +199,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         DateFormatSymbols monthSymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] months = monthSymbols.getMonths();
         String[] shortMonths = monthSymbols.getShortMonths();
-        ArrayList<LocalizedLabel> monthList = new ArrayList<LocalizedLabel>(months.length);    
+        ArrayList<LocalizedLabel> monthList = new ArrayList<>(months.length);
         for (int i = 0; i < months.length; i++) {
             monthList.add(new LocalizedLabel(months[i], shortMonths[i]));
         }
@@ -218,7 +218,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
         DateFormatSymbols weekdaySymbols = DateFormatSymbols.getInstance(locale.getLanguageLocale());
         String[] weekdays = weekdaySymbols.getWeekdays();
         String[] shortWeekdays = weekdaySymbols.getShortWeekdays();
-        ArrayList<LocalizedLabel> weekdayList = new ArrayList<LocalizedLabel>(7);
+        ArrayList<LocalizedLabel> weekdayList = new ArrayList<>(7);
         for (int i = 1; i < weekdays.length; i++) {
             weekdayList.add(new LocalizedLabel(weekdays[i], shortWeekdays[i].toUpperCase(locale.getLanguageLocale())));
         }

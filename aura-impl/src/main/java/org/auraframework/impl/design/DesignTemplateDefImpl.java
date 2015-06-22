@@ -71,9 +71,9 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<DesignTemplateDef> implements
-            DesignTemplateDefBuilder {
+    DesignTemplateDefBuilder {
         private String name;
-        private final LinkedHashMap<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> designTemplateRegions = new LinkedHashMap<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef>();
+        private final LinkedHashMap<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> designTemplateRegions = new LinkedHashMap<>();
 
         public Builder() {
             super(DesignTemplateDef.class);

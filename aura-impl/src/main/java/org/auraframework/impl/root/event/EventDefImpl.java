@@ -94,7 +94,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             }
             json.writeMapEntry("attributes", getAttributeDefs());
             if(requiredVersionDefs != null && requiredVersionDefs.size() > 0) {
-            	json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
+                json.writeMapEntry("requiredVersionDefs", requiredVersionDefs);
             }
             json.writeMapEnd();
         } catch (QuickFixException e) {
@@ -110,6 +110,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         return ret;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
@@ -134,18 +135,18 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
             }
-            
+
             if (extended.getEventType() != getEventType()) {
                 throw new InvalidDefinitionException(String.format("Event %s cannot extend %s", getDescriptor(),
                         getExtendsDescriptor()), getLocation());
             }
-            
+
             MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
             registry.assertAccess(descriptor, extended);
 
             // need to resolve duplicated attributes from supers
         }
-        
+
         for (AttributeDef att : this.attributeDefs.values()) {
             att.validateReferences();
         }
@@ -161,7 +162,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
 
     @Override
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> map = new HashMap<DefDescriptor<AttributeDef>, AttributeDef>();
+        Map<DefDescriptor<AttributeDef>, AttributeDef> map = new HashMap<>();
         if (extendsDescriptor != null) {
             map.putAll(getSuperDef().getAttributeDefs());
         }
@@ -173,7 +174,7 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
             return Collections.unmodifiableMap(map);
         }
     }
-    
+
     @Override
     public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
         return requiredVersionDefs;

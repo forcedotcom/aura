@@ -34,7 +34,7 @@ public class ArrayListToDateArrayConverter implements Converter<ArrayList, Date[
     @Override
     public Date[] convert(ArrayList value) {
 
-        ArrayList<Date> convertedValues = new ArrayList<Date>(value.size());
+        ArrayList<Date> convertedValues = new ArrayList<>(value.size());
 
         for (String s : ((ArrayList<String>) value)) {
             convertedValues.add(new Date(Long.valueOf(s)));

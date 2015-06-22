@@ -135,7 +135,7 @@ public final class MethodDefImpl extends RootDefinitionImpl<MethodDef> implement
 
     @Override
     public List<DefDescriptor<?>> getBundle() {
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     @Override

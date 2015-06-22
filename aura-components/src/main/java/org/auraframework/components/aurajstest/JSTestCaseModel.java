@@ -18,7 +18,6 @@ package org.auraframework.components.aurajstest;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -45,7 +44,7 @@ public class JSTestCaseModel {
         BaseComponent<?, ?> component = context.getCurrentComponent();
 
         TestCaseDef caseDef = (TestCaseDef) component.getAttributes().getValue("case");
-        
+
         String baseUrl = component.getAttributes().getValue("url").toString();
         Map<String, Object> attributes = caseDef.getAttributeValues();
         List<NameValuePair> newParams = Lists.newArrayList();
@@ -55,9 +54,9 @@ public class JSTestCaseModel {
                 String key = entry.getKey();
                 String value;
                 if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
-                	value = Json.serialize(entry.getValue());
+                    value = Json.serialize(entry.getValue());
                 } else {
-                	value = entry.getValue().toString();
+                    value = entry.getValue().toString();
                 }
                 if (key.equals("__layout")) {
                     hash = value;

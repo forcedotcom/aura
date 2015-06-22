@@ -38,9 +38,20 @@
  */
 
 package org.auraframework.util.phobos.script.javascript;
-import org.mozilla.javascript.*;
-import javax.script.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeJavaClass;
+import org.mozilla.javascript.ScriptRuntime;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Wrapper;
 
 /**
  * ExternalScriptable is an implementation of Scriptable
@@ -65,7 +76,7 @@ final class ExternalScriptable implements Scriptable {
      * to store such variables of this scope. This map is not exposed to
      * JSR 223 API. We can just script objects "as is" and need not convert.
      */
-    private Map indexedProps;
+    private Map<Object, Object> indexedProps;
 
     // my prototype
     private Scriptable prototype;
@@ -73,10 +84,10 @@ final class ExternalScriptable implements Scriptable {
     private Scriptable parent;
 
     ExternalScriptable(ScriptContext context) {
-        this(context, new HashMap());
+        this(context, new HashMap<>());
     }
 
-    ExternalScriptable(ScriptContext context, Map indexedProps) {
+    ExternalScriptable(ScriptContext context, Map<Object, Object> indexedProps) {
         if (context == null) {
             throw new NullPointerException("context is null");
         }
@@ -88,9 +99,11 @@ final class ExternalScriptable implements Scriptable {
         return context;
     }
 
+    /*
     private boolean isInIndexedProps(Object key) {
         return indexedProps != null && indexedProps.containsKey(key);
     }
+     */
 
     private boolean isEmpty(String name) {
         return name.equals("");
@@ -298,7 +311,7 @@ final class ExternalScriptable implements Scriptable {
         this.parent = parent;
     }
 
-     /**
+    /**
      * Get an array of property ids.
      *
      * Not all property ids need be returned. Those properties
@@ -335,7 +348,7 @@ final class ExternalScriptable implements Scriptable {
      * @return the default value
      */
     @Override
-    public Object getDefaultValue(Class typeHint) {
+    public Object getDefaultValue(Class<?> typeHint) {
         for (int i=0; i < 2; i++) {
             boolean tryToString;
             if (typeHint == ScriptRuntime.StringClass) {
@@ -362,26 +375,26 @@ final class ExternalScriptable implements Scriptable {
                 } else if (typeHint == ScriptRuntime.FunctionClass) {
                     hint = "function";
                 } else if (typeHint == ScriptRuntime.BooleanClass
-                           || typeHint == Boolean.TYPE)
+                        || typeHint == Boolean.TYPE)
                 {
                     hint = "boolean";
                 } else if (typeHint == ScriptRuntime.NumberClass ||
-                         typeHint == ScriptRuntime.ByteClass ||
-                         typeHint == Byte.TYPE ||
-                         typeHint == ScriptRuntime.ShortClass ||
-                         typeHint == Short.TYPE ||
-                         typeHint == ScriptRuntime.IntegerClass ||
-                         typeHint == Integer.TYPE ||
-                         typeHint == ScriptRuntime.FloatClass ||
-                         typeHint == Float.TYPE ||
-                         typeHint == ScriptRuntime.DoubleClass ||
-                         typeHint == Double.TYPE)
+                        typeHint == ScriptRuntime.ByteClass ||
+                        typeHint == Byte.TYPE ||
+                        typeHint == ScriptRuntime.ShortClass ||
+                        typeHint == Short.TYPE ||
+                        typeHint == ScriptRuntime.IntegerClass ||
+                        typeHint == Integer.TYPE ||
+                        typeHint == ScriptRuntime.FloatClass ||
+                        typeHint == Float.TYPE ||
+                        typeHint == ScriptRuntime.DoubleClass ||
+                        typeHint == Double.TYPE)
                 {
                     hint = "number";
                 } else {
                     throw Context.reportRuntimeError(
-                        "Invalid JavaScript value of type " +
-                        typeHint.toString());
+                            "Invalid JavaScript value of type " +
+                                    typeHint.toString());
                 }
                 args[0] = hint;
             }
@@ -393,14 +406,14 @@ final class ExternalScriptable implements Scriptable {
             try {
                 v = fun.call(cx, fun.getParentScope(), this, args);
             } finally {
-                cx.exit();
+                Context.exit();
             }
             if (v != null) {
                 if (!(v instanceof Scriptable)) {
                     return v;
                 }
                 if (typeHint == ScriptRuntime.ScriptableClass
-                    || typeHint == ScriptRuntime.FunctionClass)
+                        || typeHint == ScriptRuntime.FunctionClass)
                 {
                     return v;
                 }
@@ -416,7 +429,7 @@ final class ExternalScriptable implements Scriptable {
         // fall through to error
         String arg = (typeHint == null) ? "undefined" : typeHint.getName();
         throw Context.reportRuntimeError(
-                  "Cannot find default value for object " + arg);
+                "Cannot find default value for object " + arg);
     }
 
     /**
@@ -440,7 +453,7 @@ final class ExternalScriptable implements Scriptable {
     }
 
     private String[] getAllKeys() {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         synchronized (context) {
             for (int scope : context.getScopes()) {
                 Bindings bindings = context.getBindings(scope);
@@ -457,13 +470,13 @@ final class ExternalScriptable implements Scriptable {
         return res;
     }
 
-   /**
-    * We convert script values to the nearest Java value.
-    * We unwrap wrapped Java objects so that access from
-    * Bindings.get() would return "workable" value for Java.
-    * But, at the same time, we need to make few special cases
-    * and hence the following function is used.
-    */
+    /**
+     * We convert script values to the nearest Java value.
+     * We unwrap wrapped Java objects so that access from
+     * Bindings.get() would return "workable" value for Java.
+     * But, at the same time, we need to make few special cases
+     * and hence the following function is used.
+     */
     private Object jsToJava(Object jsObj) {
         if (jsObj instanceof Wrapper) {
             Wrapper njb = (Wrapper) jsObj;
@@ -486,7 +499,7 @@ final class ExternalScriptable implements Scriptable {
              */
             Object obj = njb.unwrap();
             if (obj instanceof Number || obj instanceof String ||
-                obj instanceof Boolean || obj instanceof Character) {
+                    obj instanceof Boolean || obj instanceof Character) {
                 // special type wrapped -- we just leave it as is.
                 return njb;
             } else {

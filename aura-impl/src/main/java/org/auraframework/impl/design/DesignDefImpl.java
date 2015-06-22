@@ -15,9 +15,14 @@
  */
 package org.auraframework.impl.design;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.auraframework.Aura;
 import org.auraframework.builder.design.DesignDefBuilder;
 import org.auraframework.def.AttributeDef;
@@ -45,12 +50,9 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements DesignDef {
     private static final long serialVersionUID = -8621907027705407577L;
@@ -103,7 +105,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
                 for (DesignSectionDef section : layout.getSections()) {
                     for (DesignItemsDef itemsdef : section.getItems()) {
                         for (DesignLayoutItemDef item : itemsdef.getItems()) {
-                            DefDescriptor descriptor;
+                            DefDescriptor<DesignAttributeDef> descriptor;
                             if (item.isAttribute()) {
                                 String name = item.getAttribute().getName();
                                 if (!items.add(name)) {
@@ -159,7 +161,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException {
         throw new UnsupportedOperationException("DesignDef cannot contain AttributeDefs.");
     }
-    
+
     @Override
     public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
         throw new UnsupportedOperationException("DesignDef cannot contain RequiredVersionDefs.");
@@ -216,7 +218,7 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     public static class Builder extends RootDefinitionImpl.Builder<DesignDef> implements DesignDefBuilder {
-        private final LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignMap = new LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef>();
+        private final LinkedHashMap<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> attributeDesignMap = new LinkedHashMap<>();
         private final LinkedHashMap<String, DesignLayoutDef> layoutDesignMap = Maps.newLinkedHashMap();
         private DesignTemplateDef template;
         private Map<String, List<DesignOptionDef>> options = Maps.newHashMap();

@@ -28,7 +28,6 @@ import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.root.event.EventHandlerDefImpl;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -64,7 +63,7 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     @Override
     public EventHandlerDefImpl getElement() throws XMLStreamException, QuickFixException {
         DefDescriptor<? extends RootDefinition> defDescriptor = parentHandler.getDefDescriptor();
-		builder.setParentDescriptor(defDescriptor);
+        builder.setParentDescriptor(defDescriptor);
         builder.setLocation(getLocation());
 
         String event = getAttributeValue(ATTRIBUTE_EVENT);

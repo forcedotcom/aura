@@ -39,8 +39,13 @@
 
 package org.auraframework.util.phobos.script.javascript;
 
-import org.mozilla.javascript.*;
-import java.util.*;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJavaArray;
+import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * JSAdapter is java.lang.reflect.Proxy equivalent for JavaScript. JSAdapter
@@ -91,7 +96,7 @@ public final class JSAdapter implements Scriptable, Function {
 
     // initializer to setup JSAdapter prototype in the given scope
     public static void init(Context cx, Scriptable scope, boolean sealed)
-    throws RhinoException {
+            throws RhinoException {
         JSAdapter obj = new JSAdapter(cx.newObject(scope));
         obj.setParentScope(scope);
         obj.setPrototype(getFunctionPrototype(scope));
@@ -273,14 +278,14 @@ public final class JSAdapter implements Scriptable, Function {
     }
 
     @Override
-    public Object getDefaultValue(Class hint) {
+    public Object getDefaultValue(Class<?> hint) {
         return getAdaptee().getDefaultValue(hint);
     }
 
     @Override
     public Object call(Context cx, Scriptable scope, Scriptable thisObj,
             Object[] args)
-            throws RhinoException {
+                    throws RhinoException {
         if (isPrototype) {
             return construct(cx, scope, args);
         } else {
@@ -295,7 +300,7 @@ public final class JSAdapter implements Scriptable, Function {
 
     @Override
     public Scriptable construct(Context cx, Scriptable scope, Object[] args)
-    throws RhinoException {
+            throws RhinoException {
         if (isPrototype) {
             Scriptable topLevel = ScriptableObject.getTopLevelScope(scope);
             JSAdapter newObj;

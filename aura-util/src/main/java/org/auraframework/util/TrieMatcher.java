@@ -29,19 +29,19 @@ import javax.annotation.concurrent.Immutable;
  * of words and replacements are populated at initialization, and the data
  * structure creation is not the cheapest of operations, so it is best used when
  * the object will be used multiple times.
- * 
+ *
  * @see TrieMatcher#replaceMultiple(String, TrieMatcher)
  */
 @Immutable
 public class TrieMatcher {
 
     private static final int DEFAULT_CAPACITY = 1; // trading initialization
-                                                   // time for a small memory
-                                                   // footprint
+    // time for a small memory
+    // footprint
 
     /**
      * This is not the cheapest of operations.
-     * 
+     *
      * @param strings this is the list of words that make up the Trie. It is
      *            assumed that the lists are not modified once passed into the
      *            Trie
@@ -55,7 +55,7 @@ public class TrieMatcher {
 
     /**
      * This is not the cheapest of operations.
-     * 
+     *
      * @param strings this is the list of words that make up the Trie. It is
      *            assumed that the lists are not modified once passed into the
      *            Trie
@@ -79,7 +79,7 @@ public class TrieMatcher {
      * <p>
      * Note, regexes aren't supported by this, see
      * {@link AuraTextUtil#replaceSimple(String, String[], String[])}.
-     * 
+     *
      * @param s the text you are searching in
      * @param trieMatcher the trie representing the words to search and replace
      *            for
@@ -147,7 +147,7 @@ public class TrieMatcher {
 
     /**
      * Find the next match in <code>s</code>.
-     * 
+     *
      * @param s the term to search for the terms of the trie in
      * @param start the 0-based position to start the search from.
      * @return null if no match found
@@ -192,7 +192,7 @@ public class TrieMatcher {
         }
 
         this.words = Collections.unmodifiableList(strings);
-        this.root = new HashMap<Integer, TrieData>(DEFAULT_CAPACITY);
+        this.root = new HashMap<>(DEFAULT_CAPACITY);
 
         int minWordLen = Integer.MAX_VALUE;
         int wordIndex = 0;
@@ -224,7 +224,7 @@ public class TrieMatcher {
 
     /**
      * See if the given string matches any of the given words in the Trie
-     * 
+     *
      * @return null if none are found.
      */
     TrieMatch match(String s) {
@@ -233,7 +233,7 @@ public class TrieMatcher {
 
     /**
      * See if the given string matches any of the given words in the Trie
-     * 
+     *
      * @param offset where to start looking inside of the given String.
      * @return null if none are found.
      */
@@ -287,7 +287,7 @@ public class TrieMatcher {
                     firstMatch = nextData;
                 } else {
                     if (matches == null) {
-                        matches = new LinkedList<TrieData>();
+                        matches = new LinkedList<>();
                         matches.add(firstMatch);
                     }
                     matches.add(nextData);

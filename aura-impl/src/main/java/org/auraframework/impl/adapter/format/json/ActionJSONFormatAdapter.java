@@ -76,7 +76,7 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
     @Override
     public void writeCollection(Collection<? extends Action> values, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
-        Map<String, Object> m = new HashMap<String, Object>();
+        Map<String, Object> m = new HashMap<>();
         m.put("actions", values);
         m.put("context", c);
         Json.serialize(m, out, c.getJsonSerializationContext());

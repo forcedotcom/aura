@@ -25,18 +25,18 @@ import com.google.common.collect.Lists;
  * This class provides functionality for building Content Security Policy 1.0
  * (CSP) HTTP response headers as described in <a href="http://www.w3.org/TR/CSP/">
  * the W3C Content Security Policy 1.0 spec</a>.
- * 
+ *
  * Use PolicyBuilder to build a header value to attach to an HTTP response.
- * 
+ *
  * Example Usage:
- * 
+ *
  * To set a header that <em>only reports</em> all resource loading:
  * <code>
    PolicyBuilder p = new PolicyBuilder();
    p
    .default_src(CSP.NONE)
    .report_uri(CSPReporterServlet.URL);
-   
+
    response.setHeader(CSP.Header.REPORT_ONLY, p.build());
  * </code>
  *
@@ -52,7 +52,7 @@ import com.google.common.collect.Lists;
        "https://plusone.google.com",
        "https://facebook.com",
        "https://platform.twitter.com");
-       
+
    response.setHeader(CSP.Header.SECURE, p.build());
  * </code>
  */
@@ -61,7 +61,7 @@ public class CSP {
         public static final String SECURE = "Content-Security-Policy";
         public static final String REPORT_ONLY = "Content-Security-Policy-Report-Only";
     }
-    
+
     public static enum Directive {
         DEFAULT("default-src"),
         SCRIPT("script-src"),
@@ -107,27 +107,27 @@ public class CSP {
     /**
      * Special value for allowing inline resource inclusion (such as
      * &lt;style&gt; or &lt;script&gt;).
-     * 
-     * Not recommended. 
+     *
+     * Not recommended.
      */
     public static final String UNSAFE_INLINE = "'unsafe-inline'";
 
     /**
      * Special value for allowing <code>eval()</code> of JavaScript.
-     * 
-     * Not recommended. 
+     *
+     * Not recommended.
      */
     public static final String UNSAFE_EVAL = "'unsafe-eval'";
 
     /**
      * Fluent interface for building Content Security Policy headers.
-     * 
+     *
      * See {@link CSP} for example usage.
      */
     public static class PolicyBuilder {
         public PolicyBuilder() {}
 
-        private EnumMap<Directive, List<String>> directives = new EnumMap<Directive, List<String>>(Directive.class);
+        private EnumMap<Directive, List<String>> directives = new EnumMap<>(Directive.class);
 
         public PolicyBuilder default_src(String... sources) {
             return extend(Directive.DEFAULT, sources);
@@ -160,11 +160,11 @@ public class CSP {
         public PolicyBuilder frame_ancestor(String... sources) {
             return extend(Directive.FRAME_ANCESTOR, sources);
         }
-        
+
         public PolicyBuilder font_src(String... sources) {
             return extend(Directive.FONT, sources);
         }
-        
+
         public PolicyBuilder connect_src(String... sources) {
             return extend(Directive.CONNECT, sources);
         }
@@ -193,9 +193,9 @@ public class CSP {
 
         public String build() {
             StringBuilder sb = new StringBuilder();
-            
+
             Iterator<Directive> keys = directives.keySet().iterator();
-            
+
             while(keys.hasNext()) {
                 Directive dir = keys.next();
                 List<String> values = directives.get(dir);
@@ -203,9 +203,9 @@ public class CSP {
                     if (sb.length() > 0) {
                         sb.append("; ");
                     }
-                    
+
                     sb.append(dir);
-                    
+
                     for (String value : values) {
                         sb.append(" ").append(value);
                     }

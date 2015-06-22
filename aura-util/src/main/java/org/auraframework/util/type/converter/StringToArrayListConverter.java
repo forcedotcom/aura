@@ -18,16 +18,16 @@ package org.auraframework.util.type.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import aQute.bnd.annotation.component.Component;
-
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonStreamReader;
 import org.auraframework.util.type.Converter;
 
+import aQute.bnd.annotation.component.Component;
+
 /**
  * Convert strings to array lists.
- * 
+ *
  * The suppress warnings here is because of the broken Java handling of
  * parameterized types. it is not possible to properly type things here (syntax
  * errors result).
@@ -38,10 +38,10 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
 
     /**
      * Convert an incoming string value to an arraylist of strings.
-     * 
+     *
      * A couple of oddities here. Inputs of null will return null, and empty
      * strings will return an empty list.
-     * 
+     *
      * @param value the incoming value.
      */
     @Override
@@ -49,15 +49,15 @@ public class StringToArrayListConverter implements Converter<String, ArrayList> 
         if (value == null) {
             return null;
         } else if (value.length() == 0) {
-            return new ArrayList<Object>();
+            return new ArrayList<>();
         } else if(value.startsWith("[") && value.endsWith("]")) {
-             try {
-                 final JsonStreamReader reader = new JsonStreamReader(value);
-                 reader.next();
-                 return (ArrayList<?>)reader.getList();
-             } catch (Exception e) {
-                 // Didn't parse, fall back to splitSimple down below.
-             }
+            try {
+                final JsonStreamReader reader = new JsonStreamReader(value);
+                reader.next();
+                return (ArrayList<?>)reader.getList();
+            } catch (Exception e) {
+                // Didn't parse, fall back to splitSimple down below.
+            }
         }
         List<String> splitList = AuraTextUtil.splitSimple(",", value);
         return (ArrayList<String>) splitList;

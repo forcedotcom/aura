@@ -42,13 +42,13 @@ import org.auraframework.impl.root.AttributeSetImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.AttributeSet;
+import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.instance.Model;
 import org.auraframework.instance.ValueProvider;
-import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
@@ -64,11 +64,11 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends BaseComponent<D, I>> implements
-        BaseComponent<D, I> {
+BaseComponent<D, I> {
     /**
      * Top level component instance with attributes passed in. Builds out the tree recursively, but only after the
      * attribute values are all set.
-     * 
+     *
      * @param descriptor
      * @param attributes
      * @throws QuickFixException
@@ -103,7 +103,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     /**
      * Constructor used to create instances for all ComponentDefRefs, which come from both the children and the facets
      * (attributes). Builds out the tree recursively, but only after all the attribute values, including facets are set.
-     * 
+     *
      * @throws QuickFixException
      */
     public BaseComponentImpl(DefDescriptor<D> descriptor, Collection<AttributeDefRef> attributeDefRefs,
@@ -123,7 +123,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     /**
      * For creating supers
-     * 
+     *
      * @throws QuickFixException
      */
     protected BaseComponentImpl(DefDescriptor<D> descriptor, I extender, BaseComponent<?, ?> attributeValueProvider,
@@ -144,7 +144,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     /**
      * The base constructor that the other 2 use to initialize the object, but not he attributes. Sets all defaults for
      * attributes. Does not build out the tree recursively.
-     * 
+     *
      * @param descriptor The descriptor for this component's definition
      * @param def TODO
      * @throws QuickFixException
@@ -167,7 +167,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                 def = descriptor.getDef();
                 if (extender == null && def.isAbstract() && def.getProviderDescriptor() == null) {
                     throw new InvalidDefinitionException(String.format("%s cannot be instantiated directly.",
-                        descriptor), def.getLocation());
+                            descriptor), def.getLocation());
                 }
                 if (extender == null && (def.isAbstract() || def.getLocalProviderDef() != null)) {
                     this.intfDescriptor = def.getDescriptor();
@@ -308,8 +308,8 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     public AttributeSet getAttributes() {
         return attributeSet;
     }
-    
-    
+
+
     /**
      * this is only to serialize the general shape and ids, to ensure that we generate the same stuff in the client
      */
@@ -320,7 +320,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
         try {
             BaseComponentDef def = getComponentDef();
-            
+
             json.writeMapBegin();
             //
             // Be very careful here. descriptor != def.getDescriptor().
@@ -354,12 +354,12 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
             // KRIS: COMPONENT CLASSES
             // We need to return the definitions here since the client doesn't have them.
-            // Do we know if it doesn't have them? This can be a getComponent action call, but is it just 
-            // wanting the instance and not the def? 
+            // Do we know if it doesn't have them? This can be a getComponent action call, but is it just
+            // wanting the instance and not the def?
             // I know it does not have it in some instances, but now that I think about it, it probably
             // also has the def sometimes too so this will be redundant.
             //json.writeMapEntry("componentClass", def.getComponentClass());
-            
+
             json.writeMapEnd();
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
@@ -378,7 +378,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
 
     /**
      * instantiates the model
-     * 
+     *
      * @throws QuickFixException
      */
     private void createModel() throws QuickFixException {
@@ -510,9 +510,9 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
         if (componentArrType == null) {
             componentArrType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.Component[]", TypeDef.class);
         }
-        
+
         if(componentDefRefArrayType == null) {
-        	componentDefRefArrayType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.ComponentDefRef[]", TypeDef.class);
+            componentDefRefArrayType = Aura.getDefinitionService().getDefDescriptor("aura://Aura.ComponentDefRef[]", TypeDef.class);
         }
 
         createModel();
@@ -543,20 +543,20 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
                         c.reinitializeModel();
                     }
                 }
-            } 
+            }
             else if (componentDefRefArrayType.equals(typeDesc)) {
-            	ComponentDefRefArray val = getAttributes().getValue(foo.getKey().getName(), ComponentDefRefArray.class);
+                ComponentDefRefArray val = getAttributes().getValue(foo.getKey().getName(), ComponentDefRefArray.class);
                 if (val != null) {
                     //@SuppressWarnings("unchecked")
                     //List<BaseComponent<?, ?>> facet = (List<BaseComponent<?, ?>>) val;
                     for (Object c : val.getList()) {
-                    	if(c instanceof BaseComponent) {
-                    		((BaseComponent<?, ?>)c).reinitializeModel();                    		
-                    	}
+                        if(c instanceof BaseComponent) {
+                            ((BaseComponent<?, ?>)c).reinitializeModel();
+                        }
                     }
                 }
             }
-            
+
         }
     }
 
@@ -573,7 +573,7 @@ public abstract class BaseComponentImpl<D extends BaseComponentDef, I extends Ba
     protected boolean remoteProvider = false;
     private final Map<String, List<String>> index = Maps.newLinkedHashMap();
     // FIXME - the values should be ValueProviders, but first we need to wrap non-m/v/c providers.
-    protected final Map<String, Object> valueProviders = new LinkedHashMap<String, Object>();
+    protected final Map<String, Object> valueProviders = new LinkedHashMap<>();
     protected boolean hasLocalDependencies = false;
     protected boolean hasProvidedAttributes;
 }

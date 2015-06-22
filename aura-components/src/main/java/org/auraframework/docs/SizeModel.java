@@ -27,10 +27,10 @@ import org.auraframework.system.Annotations.Model;
  */
 @Model
 public class SizeModel {
-    
+
     @AuraEnabled
     public List<InputOption> getSizes() {
-        ArrayList<InputOption> a = new ArrayList<InputOption>(4);
+        ArrayList<InputOption> a = new ArrayList<>(4);
         InputOption m1 = new InputOption("X-Small", "xs", false, "X-Small");
         a.add(m1);
         InputOption m2 = new InputOption("Small", "s", false, "Small");
@@ -44,5 +44,5 @@ public class SizeModel {
         return a;
     }
 
- 
+
 }

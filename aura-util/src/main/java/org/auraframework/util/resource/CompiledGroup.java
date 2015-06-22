@@ -86,7 +86,7 @@ public class CompiledGroup implements JavascriptGroup {
 
     @Override
     public Set<File> getFiles() {
-        return new HashSet<File>();
+        return new HashSet<>();
     }
 
     /** A resource group can't change, so it's never stale. */

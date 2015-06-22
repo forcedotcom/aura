@@ -41,7 +41,7 @@ public final class ValidationFileSourceLoader extends FileSourceLoader {
      * found.
      */
     public Set<DefDescriptor<?>> findIn(File path) {
-        Set<DefDescriptor<?>> ret = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> ret = new HashSet<>();
         AnyTypeFilter af = new FindInFilter(ret, path);
         for (String ns : getNamespaces()) {
             af.setNamespace(ns);

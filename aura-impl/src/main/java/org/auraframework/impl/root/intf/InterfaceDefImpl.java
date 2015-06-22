@@ -64,6 +64,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptors, events);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
@@ -147,7 +148,7 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
     @Override
     public Map<String, RegisterEventDef> getRegisterEventDefs()
             throws org.auraframework.throwable.quickfix.QuickFixException {
-        Map<String, RegisterEventDef> ret = new LinkedHashMap<String, RegisterEventDef>();
+        Map<String, RegisterEventDef> ret = new LinkedHashMap<>();
         for (DefDescriptor<InterfaceDef> extendsDescriptor : extendsDescriptors) {
             InterfaceDef extendsDef = extendsDescriptor.getDef();
             ret.putAll(extendsDef.getRegisterEventDefs());

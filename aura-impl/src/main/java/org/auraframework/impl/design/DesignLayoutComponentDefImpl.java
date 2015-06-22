@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.design;
 
+import java.io.IOException;
+
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignLayoutComponentDef;
@@ -22,9 +24,9 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-
 public class DesignLayoutComponentDefImpl extends DefinitionImpl<DesignLayoutComponentDef> implements DesignLayoutComponentDef {
+
+    private static final long serialVersionUID = 1323281135124425825L;
     private final DefDescriptor<ComponentDef> cmp;
     protected DesignLayoutComponentDefImpl(Builder builder) {
         super(builder);

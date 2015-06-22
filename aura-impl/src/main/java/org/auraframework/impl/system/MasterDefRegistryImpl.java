@@ -103,15 +103,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final Cache<String, String> stringsCache;
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     private final Cache<String, String> accessCheckCache;
-    
-    private final Map<String, Boolean> componentClassesLoaded; 
-    
+
+    private final Map<String, Boolean> componentClassesLoaded;
+
     /**
      * A local dependencies cache.
-     * 
+     *
      * We store both by descriptor and by uid. The descriptor keys must include the type, as the qualified name is not
      * sufficient to distinguish it. In the case of the UID, we presume that we are safe.
-     * 
+     *
      * The two keys stored in the local cache are:
      * <ul>
      * <li>The UID, which should be sufficiently unique for a single request.</li>
@@ -159,11 +159,11 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Build a system def registry that is meant to be used as a shadowing registry.
-     * 
+     *
      * This builds a registry that will not add new defs to the def set, and will allow any access (the access checks
      * MUST have been done before this is instantiated). Note that none of the defs built off of this will be sent to
      * the client, so it should be safe to allow this access.
-     * 
+     *
      * @param original the registry that is the 'public' registry.
      */
     public MasterDefRegistryImpl(@NonNull MasterDefRegistryImpl original) {
@@ -172,9 +172,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Build a master def registry with a set of registries.
-     * 
+     *
      * This is the normal constructor for a master def registry.
-     * 
+     *
      * @param registries the registries to use in the mdr.
      */
     public MasterDefRegistryImpl(@NonNull DefRegistry<?>... registries) {
@@ -363,7 +363,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 for (String namespace : delegateRegistries.getAllNamespaces()) {
                     String qualifiedName = String.format(qualifiedNamePattern,
                             matcher.getPrefix() != null ? matcher.getPrefix() : "*", namespace,
-                            matcher.getName() != null ? matcher.getName() : "*");
+                                    matcher.getName() != null ? matcher.getName() : "*");
                     @SuppressWarnings("unchecked")
                     DefDescriptor<D> namespacedMatcher = (DefDescriptor<D>) DefDescriptorImpl.getInstance(
                             qualifiedName,
@@ -399,7 +399,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * A compiling definition.
-     * 
+     *
      * This embodies a definition that is in the process of being compiled. It stores the descriptor, definition, and
      * the registry to which it belongs to avoid repeated lookups.
      */
@@ -416,14 +416,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         /**
          * The compiled def.
-         * 
+         *
          * Should be non-null by the end of compile.
          */
         public T def;
 
         /**
          * Did we build this definition?.
-         * 
+         *
          * If this is true, we need to do the validation steps after finishing.
          */
         public boolean built = false;
@@ -477,7 +477,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * The compile context.
-     * 
+     *
      * This class holds the local information necessary for compilation.
      */
     private static class CompileContext {
@@ -554,10 +554,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Fill a compiling def for a descriptor.
-     * 
+     *
      * This makes sure that we can get a registry for a given def, then tries to get the def from the global cache, if
      * that fails, it retrieves from the registry, and marks the def as locally built.
-     * 
+     *
      * @param compiling the current compiling def (if there is one).
      * @throws QuickFixException if validateDefinition caused a quickfix.
      */
@@ -655,7 +655,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * A private helper routine to make the compiler code more sane.
-     * 
+     *
      * @param descriptor the descriptor that we are currently handling, must not be in the compiling defs.
      * @param cc the compile context to allow us to accumulate information.
      * @param stack the incoming stack (linked hash set, so order is preserved).
@@ -721,7 +721,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * finish up the validation of a set of compiling defs.
-     * 
+     *
      * @param context only needed to do setCurrentNamspace.
      */
     private void finishValidation() throws QuickFixException {
@@ -781,7 +781,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Compile a single definition, finding all of the static dependencies.
-     * 
+     *
      * This is the primary entry point for compiling a single definition. The basic guarantees enforced here are:
      * <ol>
      * <li>Each definition has 'validateDefinition()' called on it exactly once.</li>
@@ -791,15 +791,15 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * <li>All definitions are marked valid by the DefRegistry after the validation is complete</li>
      * <li>No definition should be available to other threads until it is marked valid</li>
      * <ol>
-     * 
+     *
      * In order to do all of this, we keep a set of 'compiling' definitions locally, and use that to calculate
      * dependencies and walk the tree. Circular dependencies are handled gracefully, and no other thread can interfere
      * because everything is local.
-     * 
+     *
      * FIXME: this should really cache invalid definitions and make sure that we don't bother re-compiling until there
      * is some change of state. However, that is rather more complex than it sounds.... and shouldn't really manifest
      * much in a released system.
-     * 
+     *
      * @param descriptor the descriptor that we wish to compile.
      */
     @CheckForNull
@@ -853,12 +853,12 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Internal routine to compile and return a DependencyEntry.
-     * 
+     *
      * This routine always compiles the definition, even if it is in the caches. If the incoming descriptor does not
      * correspond to a definition, it will return null, otherwise, on failure it will throw a QuickFixException.
-     * 
+     *
      * Please look at {@link #localDependencies} if you are mucking in here.
-     * 
+     *
      * Side Effects:
      * <ul>
      * <li>All definitions that were encountered during the compile will be put in the local def cache, even if a QFE is
@@ -867,7 +867,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * <li>a dependency entry is cached locally in any case</li>
      * <li>a dependency entry is cached globally if the definition compiled</li>
      * </ul>
-     * 
+     *
      * @param descriptor the incoming descriptor to compile
      * @return the definition compiled from the descriptor, or null if not found.currentCC
      * @throws QuickFixException if the definition failed to compile.
@@ -960,16 +960,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a dependency entry for a given uid.
-     * 
+     *
      * This is a convenience routine to check both the local and global cache for a value.
-     * 
+     *
      * Please look at {@link #localDependencies} if you are mucking in here.
-     * 
+     *
      * Side Effects:
      * <ul>
      * <li>If a dependency is found in the global cache, it is populated into the local cache.</li>
      * </ul>
-     * 
+     *
      * @param uid the uid may be null, if so, it only checks the local cache.
      * @param descriptor the descriptor, used for both global and local cache lookups.
      * @return the DependencyEntry or null if none present.
@@ -1027,14 +1027,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Typesafe helper for getDef.
-     * 
+     *
      * This adds new definitions (unvalidated) to the list passed in. Definitions that were previously built are simply
      * added to the local cache.
-     * 
+     *
      * The quick fix exception case is actually a race condition where we previously had a set of depenendencies, and
      * something changed, making our set inconsistent. There are no guarantees that during a change all MDRs will have a
      * correct set of definitions.
-     * 
+     *
      * @param descriptor the descriptor for which we need a definition.
      * @return A compilingDef for the definition, or null if not needed.
      * @throws QuickFixException if something has gone terribly wrong.
@@ -1072,10 +1072,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a definition.
-     * 
+     *
      * This does a scan of the loaded dependency entries to check if there is something to pull, otherwise, it just
      * compiles the entry. This should log a warning somewhere, as it is a dependency that was not noted.
-     * 
+     *
      * @param descriptor the descriptor to find.
      * @return the corresponding definition, or null if it doesn't exist.
      * @throws QuickFixException if there is a compile time error.
@@ -1162,10 +1162,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get a definition.
-     * 
+     *
      * This does a scan of the loaded dependency entries to check if there is something to pull, otherwise, it just
      * compiles the entry. This should log a warning somewhere, as it is a dependency that was not noted.
-     * 
+     *
      * @param descriptor the descriptor to find.
      * @return the corresponding definition, or null if it doesn't exist.
      * @throws QuickFixException if there is a compile time error.
@@ -1280,7 +1280,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * This figures out based on prefix what registry this component is for, it could return null if the prefix is not
      * found.
-     * 
+     *
      * Note: The generic typing here is incorrect, as in not true.
      */
     private <T extends Definition> DefRegistry<T> getRegistryFor(@NonNull DefDescriptor<T> descriptor) {
@@ -1330,21 +1330,22 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             DefDescriptor<? extends Definition> descriptor = def.getDescriptor();
             String message = Aura.getConfigAdapter().isProduction() ? DefinitionNotFoundException.getMessage(
                     descriptor.getDefType(), descriptor.getName()) : status;
-            throw new NoAccessException(message);
+                    throw new NoAccessException(message);
         }
     }
-    
+
     @Override
     public <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def) {
         return hasAccess(referencingDescriptor, def, accessCheckCache);
     }
 
+    @SuppressWarnings("deprecation")
     <D extends Definition> String hasAccess(DefDescriptor<?> referencingDescriptor, D def,
             Cache<String, String> accessCheckCache) {
-    	if (def == null) {
-    		return null;
-    	}
-    	
+        if (def == null) {
+            return null;
+        }
+
         // If the def is access="global" or does not require authentication then anyone can see it
         DefinitionAccess access = def.getAccess();
         if (access.isGlobal() || !access.requiresAuthentication()) {
@@ -1429,7 +1430,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Filter the entire set of current definitions by a set of preloads.
-     * 
+     *
      * This filtering is very simple, it just looks for local definitions that are not included in the preload set.
      */
     @Override
@@ -1493,16 +1494,16 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Get the UID.
-     * 
+     *
      * This uses some trickery to try to be efficient, including using a dual keyed local cache to avoid looking up
      * values more than once even in the absense of remembered context.
-     * 
+     *
      * Note: there is no guarantee that the definitions have been fetched from cache here, so there is a very subtle
      * race condition.
-     * 
+     *
      * Also note that this _MUST NOT_ be called inside of a compile, or things may get out of wack. We probably should
      * be asserting this somewhere.
-     * 
+     *
      * @param uid the uid for cache lookup (null means unknown).
      * @param descriptor the descriptor to fetch.
      * @return the correct uid for the definition, or null if there is none.
@@ -1559,7 +1560,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     /**
      * Creates a key for the global {@link #depsCache}, using only descriptor (and Mode internally).
-     * 
+     *
      * @param descriptor - the descriptor use for the key
      */
     private String makeNonUidGlobalKey(@NonNull DefDescriptor<?> descriptor) {
@@ -1618,7 +1619,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public void setComponentClassLoaded(DefDescriptor<?> componentClass, Boolean isLoaded) {
-    	componentClassesLoaded.put(componentClass.getQualifiedName(), isLoaded);
+        componentClassesLoaded.put(componentClass.getQualifiedName(), isLoaded);
     }
 
     /**
@@ -1626,10 +1627,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      */
     @Override
     public Boolean getComponentClassLoaded(DefDescriptor<?> componentClass) {
-    	if(componentClassesLoaded.containsKey(componentClass.getQualifiedName())) {
-    		return componentClassesLoaded.get(componentClass.getQualifiedName());
-    	}
-    	return false;
+        if(componentClassesLoaded.containsKey(componentClass.getQualifiedName())) {
+            return componentClassesLoaded.get(componentClass.getQualifiedName());
+        }
+        return false;
     }
 
 

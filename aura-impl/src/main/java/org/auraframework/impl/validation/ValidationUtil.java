@@ -112,10 +112,10 @@ public final class ValidationUtil {
     public static Set<DefDescriptor<?>> getAllKnownDescriptors() throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
         Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("*://*:*"));
-        Set<DefDescriptor<?>> includedDescriptors = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> includedDescriptors = new HashSet<>();
 
         // add bundle ones from RootDefinition elements
-        Set<DefDescriptor<?>> bundlesDescriptors = new HashSet<DefDescriptor<?>>();
+        Set<DefDescriptor<?>> bundlesDescriptors = new HashSet<>();
         for (DefDescriptor<?> descriptor : descriptors) {
             Definition definition = null;
             try {

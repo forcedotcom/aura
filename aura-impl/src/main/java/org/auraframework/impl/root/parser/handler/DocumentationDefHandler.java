@@ -82,7 +82,7 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
             builder.addDescription(name, desc);
 
         } else if (ExampleDefHandler.TAG.equalsIgnoreCase(tag)) {
-            ExampleDef ex = new ExampleDefHandler<DocumentationDef>(this, xmlReader, source).getElement();
+            ExampleDef ex = new ExampleDefHandler<>(this, xmlReader, source).getElement();
             String name = ex.getName();
             builder.addExample(name, ex);
 

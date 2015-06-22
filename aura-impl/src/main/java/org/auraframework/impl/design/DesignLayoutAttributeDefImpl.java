@@ -15,14 +15,16 @@
  */
 package org.auraframework.impl.design;
 
+import java.io.IOException;
+
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-
 public class DesignLayoutAttributeDefImpl extends DefinitionImpl<DesignLayoutAttributeDef> implements DesignLayoutAttributeDef {
+
+    private static final long serialVersionUID = 5394555836660607465L;
     private final String name;
 
     protected DesignLayoutAttributeDefImpl(Builder builder) {

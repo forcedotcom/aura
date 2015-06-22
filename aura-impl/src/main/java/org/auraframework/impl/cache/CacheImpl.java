@@ -52,7 +52,7 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
         /** Log the entire stats once a day, regardless of evictions. */
         private long lastFull = System.currentTimeMillis();
- 
+
         EvictionListener(String name) {
             this.name = name == null ? UNNAMED : name;
         }
@@ -63,140 +63,140 @@ public class CacheImpl<K, T> implements Cache<K, T> {
 
         @Override
         public void onRemoval(RemovalNotification<K, T> notification) {
-        	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
-        	boolean dayHasPassed = (System.currentTimeMillis() >= lastFull + ONE_DAY);
-        	
+            LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
+            boolean dayHasPassed = (System.currentTimeMillis() >= lastFull + ONE_DAY);
+
             if (notification.getCause() == RemovalCause.SIZE) {
-            	// If there is size pressure, log about it occasionally, more often in dev envs
-            	// (where numbers are "small") and less often in production (where they are "large").
+                // If there is size pressure, log about it occasionally, more often in dev envs
+                // (where numbers are "small") and less often in production (where they are "large").
                 evictions++;
                 boolean emit = dayHasPassed;
                 if (evictions >= nextLogThreshold) {
-                	emit = true;
-            		// We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
-            		if (nextLogThreshold == 1) {
-            			nextLogThreshold = 10;
-            		} else if (nextLogThreshold < 100) {
-            			nextLogThreshold += 10;
-            		} else if (nextLogThreshold < 1000) {
-            			nextLogThreshold += 100;
-            		} else {
-            			nextLogThreshold += 1000;
-            		}
+                    emit = true;
+                    // We want to log every 10 until 100, every 100 until 1000, every 1000 thereafter
+                    if (nextLogThreshold == 1) {
+                        nextLogThreshold = 10;
+                    } else if (nextLogThreshold < 100) {
+                        nextLogThreshold += 10;
+                    } else if (nextLogThreshold < 1000) {
+                        nextLogThreshold += 100;
+                    } else {
+                        nextLogThreshold += 1000;
+                    }
                 }
                 if (emit && adapter != null && adapter.isEstablished()) {
-                	LoggingContext loggingCtx = adapter.getLoggingContext();
+                    LoggingContext loggingCtx = adapter.getLoggingContext();
                     CacheStats stats = cache.stats();
                     loggingCtx.logCacheInfo(name,
-                    		String.format("evicted %d entries for size pressure, hit rate=%.3f", 
-                    				evictions, stats.hitRate()),
-                    		cache.size(), stats);
+                            String.format("evicted %d entries for size pressure, hit rate=%.3f",
+                                    evictions, stats.hitRate()),
+                                    cache.size(), stats);
                     lastFull = System.currentTimeMillis();
                 }
             } else if (dayHasPassed) {
-            	// Even without size pressure, we want to 
-        		LoggingContext loggingCtx = adapter.getLoggingContext();
+                // Even without size pressure, we want to
+                LoggingContext loggingCtx = adapter.getLoggingContext();
                 CacheStats stats = cache.stats();
                 loggingCtx.logCacheInfo(name,
-                		String.format("cache has little size pressure, hit rate=%.3f", stats.hitRate()),
-                	    cache.size(), stats);
+                        String.format("cache has little size pressure, hit rate=%.3f", stats.hitRate()),
+                        cache.size(), stats);
                 lastFull = System.currentTimeMillis();
             }
         }
     };
 
-	private com.google.common.cache.Cache<K, T> cache;
+    private com.google.common.cache.Cache<K, T> cache;
 
-	CacheImpl(com.google.common.cache.Cache<K, T> cache) {
-		this.cache = cache;
-	}
+    CacheImpl(com.google.common.cache.Cache<K, T> cache) {
+        this.cache = cache;
+    }
 
-	public CacheImpl(Builder<K, T> builder) {
-		// if builder.useSecondaryStorage is true, we should try to use a
-		// non-quava secondary-storage cache with streaming ability
+    public CacheImpl(Builder<K, T> builder) {
+        // if builder.useSecondaryStorage is true, we should try to use a
+        // non-quava secondary-storage cache with streaming ability
 
-		com.google.common.cache.CacheBuilder<Object, Object> cb = com.google.common.cache.CacheBuilder
-				.newBuilder().initialCapacity(builder.initialCapacity)
-				.maximumSize(builder.maximumSize)
-				.concurrencyLevel(builder.concurrencyLevel);
+        com.google.common.cache.CacheBuilder<Object, Object> cb = com.google.common.cache.CacheBuilder
+                .newBuilder().initialCapacity(builder.initialCapacity)
+                .maximumSize(builder.maximumSize)
+                .concurrencyLevel(builder.concurrencyLevel);
 
-		if (builder.recordStats) {
-			cb = cb.recordStats();
-		}
+        if (builder.recordStats) {
+            cb = cb.recordStats();
+        }
 
-		if (builder.softValues) {
-			cb = cb.softValues();
-		}
+        if (builder.softValues) {
+            cb = cb.softValues();
+        }
 
-        EvictionListener<K, T> listener = new EvictionListener<K, T>(builder.name);
-		cb.removalListener(listener);
-		cache = cb.build();
-		listener.setCache(cache);
-	}
+        EvictionListener<K, T> listener = new EvictionListener<>(builder.name);
+        cb.removalListener(listener);
+        cache = cb.build();
+        listener.setCache(cache);
+    }
 
-	@Override
-	public T getIfPresent(K key) {
-		return cache.getIfPresent(key);
-	}
+    @Override
+    public T getIfPresent(K key) {
+        return cache.getIfPresent(key);
+    }
 
-	@Override
-	public void put(K key, T data) {
-		cache.put(key, data);
+    @Override
+    public void put(K key, T data) {
+        cache.put(key, data);
 
-	}
+    }
 
-	@Override
-	public void invalidate(K key) {
-		cache.invalidate(key);
+    @Override
+    public void invalidate(K key) {
+        cache.invalidate(key);
 
-	}
+    }
 
-	@Override
-	public void invalidate(Iterable<K> keys) {
-		cache.invalidate(keys);
-	}
+    @Override
+    public void invalidate(Iterable<K> keys) {
+        cache.invalidate(keys);
+    }
 
-	@Override
-	public void invalidateAll() {
-		cache.invalidateAll();
-	}
+    @Override
+    public void invalidateAll() {
+        cache.invalidateAll();
+    }
 
-	@Override
-	public Set<K> getKeySet() {
-		return cache.asMap().keySet();
-	}
+    @Override
+    public Set<K> getKeySet() {
+        return cache.asMap().keySet();
+    }
 
-	@Override
-	public void invalidatePartial(String keyBeginsWith) {
-		// everything is a match if the match length is zero
-		if (keyBeginsWith == null || keyBeginsWith.length() == 0) {
-			invalidateAll();
-			return;
-		}
+    @Override
+    public void invalidatePartial(String keyBeginsWith) {
+        // everything is a match if the match length is zero
+        if (keyBeginsWith == null || keyBeginsWith.length() == 0) {
+            invalidateAll();
+            return;
+        }
 
-		// add beginsWith matches to invalidItems
-		Set<K> set = getKeySet();
-		ArrayList<K> invalidItems = new ArrayList<K>();
-		for (K key : set) {
-			if (key.toString().startsWith(keyBeginsWith)) {
-				invalidItems.add(key);
-			}
-		}
+        // add beginsWith matches to invalidItems
+        Set<K> set = getKeySet();
+        ArrayList<K> invalidItems = new ArrayList<>();
+        for (K key : set) {
+            if (key.toString().startsWith(keyBeginsWith)) {
+                invalidItems.add(key);
+            }
+        }
 
-		// invalidate collected items
-		if (!invalidItems.isEmpty()) {
-			cache.invalidate(invalidItems);
-		}
-	}
+        // invalidate collected items
+        if (!invalidItems.isEmpty()) {
+            cache.invalidate(invalidItems);
+        }
+    }
 
-	@Override
-	public Object getPrivateUnderlyingCache() {
-		return cache;
-	}
+    @Override
+    public Object getPrivateUnderlyingCache() {
+        return cache;
+    }
 
-	public static class Builder<K, T> implements
-			org.auraframework.builder.CacheBuilder<K, T> {
-		// builder defaults
+    public static class Builder<K, T> implements
+    org.auraframework.builder.CacheBuilder<K, T> {
+        // builder defaults
         int initialCapacity = 128;
         int concurrencyLevel = 4;
         long maximumSize = 1024;
@@ -205,45 +205,45 @@ public class CacheImpl<K, T> implements Cache<K, T> {
         boolean useSecondaryStorage = false;
         String name;
 
-		public Builder() {
+        public Builder() {
 
-		}
+        }
 
-		@Override
-		public Builder<K, T> setInitialSize(int initialCapacity) {
-			this.initialCapacity = initialCapacity;
-			return this;
-		};
+        @Override
+        public Builder<K, T> setInitialSize(int initialCapacity) {
+            this.initialCapacity = initialCapacity;
+            return this;
+        };
 
-		@Override
-		public Builder<K, T> setMaximumSize(long maximumSize) {
-			this.maximumSize = maximumSize;
-			return this;
-		};
+        @Override
+        public Builder<K, T> setMaximumSize(long maximumSize) {
+            this.maximumSize = maximumSize;
+            return this;
+        };
 
-		@Override
-		public Builder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage) {
-			this.useSecondaryStorage = useSecondaryStorage;
-			return this;
-		}
+        @Override
+        public Builder<K, T> setUseSecondaryStorage(boolean useSecondaryStorage) {
+            this.useSecondaryStorage = useSecondaryStorage;
+            return this;
+        }
 
-		@Override
-		public Builder<K, T> setRecordStats(boolean recordStats) {
-			this.recordStats = recordStats;
-			return this;
-		}
+        @Override
+        public Builder<K, T> setRecordStats(boolean recordStats) {
+            this.recordStats = recordStats;
+            return this;
+        }
 
-		@Override
-		public Builder<K, T> setSoftValues(boolean softValues) {
-			this.softValues = softValues;
-			return this;
-		}
+        @Override
+        public Builder<K, T> setSoftValues(boolean softValues) {
+            this.softValues = softValues;
+            return this;
+        }
 
-		@Override
-		public Builder<K, T> setConcurrencyLevel(int concurrencyLevel) {
-			this.concurrencyLevel = concurrencyLevel;
-			return this;
-		}
+        @Override
+        public Builder<K, T> setConcurrencyLevel(int concurrencyLevel) {
+            this.concurrencyLevel = concurrencyLevel;
+            return this;
+        }
 
         @Override
         public Builder<K, T> setName(String name) {
@@ -251,11 +251,11 @@ public class CacheImpl<K, T> implements Cache<K, T> {
             return this;
         }
 
-		@Override
-		public CacheImpl<K, T> build() {
-			return new CacheImpl<K, T>(this);
-		}
+        @Override
+        public CacheImpl<K, T> build() {
+            return new CacheImpl<>(this);
+        }
 
-	}
+    }
 
 }

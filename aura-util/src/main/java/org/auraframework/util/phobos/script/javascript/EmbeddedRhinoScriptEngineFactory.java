@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- /*
+/*
  * Copyright (C) 2006 Sun Microsystems, Inc. All rights reserved.
  * Use is subject to license terms.
  *
@@ -38,10 +38,13 @@
  */
 
 package org.auraframework.util.phobos.script.javascript;
-import javax.script.*;
-import java.util.*;
-import org.mozilla.javascript.*;
-import org.auraframework.util.phobos.script.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.script.ScriptEngine;
+
+import org.auraframework.util.phobos.script.util.ScriptEngineFactoryBase;
 
 /**
  * Factory to create EmbeddedRhinoScriptEngine
@@ -49,8 +52,8 @@ import org.auraframework.util.phobos.script.util.*;
  */
 public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
 
-    private Properties properties;
-    private boolean initialized;
+    //private Properties properties;
+    //private boolean initialized;
 
     public EmbeddedRhinoScriptEngineFactory() {
     }
@@ -89,9 +92,11 @@ public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
         }
     }
 
+    /*
     public void setProperties(Properties properties) {
         this.properties = properties;
     }
+     */
 
     @Override
     public ScriptEngine getScriptEngine() {
@@ -147,18 +152,18 @@ public class EmbeddedRhinoScriptEngineFactory extends ScriptEngineFactoryBase {
     private static List<String> extensions;
 
     static {
-        names = new ArrayList<String>(6);
+        names = new ArrayList<>(6);
         names.add("ejs");
         names.add("EmbeddedJavaScript");
         names.add("embeddedjavascript");
         names = Collections.unmodifiableList(names);
 
-        mimeTypes = new ArrayList<String>(4);
+        mimeTypes = new ArrayList<>(4);
         mimeTypes.add("application/embeddedjavascript");
         mimeTypes.add("text/embeddedjavascript");
         mimeTypes = Collections.unmodifiableList(mimeTypes);
 
-        extensions = new ArrayList<String>(1);
+        extensions = new ArrayList<>(1);
         extensions.add("ejs");
         extensions = Collections.unmodifiableList(extensions);
     }

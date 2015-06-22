@@ -75,9 +75,9 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     @Override
     public Object valueOf(Object stringRep) {
-    	if(stringRep instanceof String && AuraTextUtil.isNullEmptyOrWhitespace(stringRep.toString())) {
-    		stringRep = new ArrayList<ComponentDefRef>();
-    	}
+        if(stringRep instanceof String && AuraTextUtil.isNullEmptyOrWhitespace(stringRep.toString())) {
+            stringRep = new ArrayList<ComponentDefRef>();
+        }
         return stringRep;
     }
 
@@ -92,7 +92,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
             return config;
         }
 
-        List<BaseComponent<?, ?>> components = new ArrayList<BaseComponent<?, ?>>();
+        List<BaseComponent<?, ?>> components = new ArrayList<>();
         List<?> list = (List<?>) config;
         AuraContext context = Aura.getContextService().getCurrentContext();
 
@@ -117,7 +117,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
 
     /**
      * Expects instance to be a List<ComponentDefRef>
-     * 
+     *
      * @throws QuickFixException
      */
     @SuppressWarnings("unchecked")

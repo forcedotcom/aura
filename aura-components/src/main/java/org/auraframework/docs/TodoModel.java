@@ -27,11 +27,11 @@ import org.auraframework.system.Annotations.Model;
  */
 @Model
 public class TodoModel {
-    
+
     private List<InputOption> items;
-    
+
     public TodoModel(){
-        items = new ArrayList<InputOption>();
+        items = new ArrayList<>();
         InputOption m1 = new InputOption("Download Aura source code", "first", false, "X-Small");
         items.add(m1);
         InputOption m2 = new InputOption("Make sure you have JDK 1.6 and Maven", "second", false, "Small");
@@ -47,6 +47,6 @@ public class TodoModel {
     public List<InputOption> getItems() {
         return items;
     }
-    
+
 
 }

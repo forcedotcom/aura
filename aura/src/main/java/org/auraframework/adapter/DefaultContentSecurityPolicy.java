@@ -36,7 +36,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
 
     private static String inlineHeader = null;
     private static String defaultHeader = null;
-    
+
     private static List<String> sameOrigin = null;
 
     private boolean inlineStyle;
@@ -79,7 +79,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     /** We allow script from same origin and chrome extensions.  And sometimes, sadly, inline and eval. */
     @Override
     public Collection<String> getScriptSources() {
-        List<String> list = new ArrayList<String>(inlineStyle ? 4 : 2);
+        List<String> list = new ArrayList<>(inlineStyle ? 4 : 2);
         list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {
@@ -92,7 +92,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     /** We allow style from same origin and chrome extensions.  And sometimes, sadly, inline. */
     @Override
     public Collection<String> getStyleSources() {
-        List<String> list = new ArrayList<String>(inlineStyle ? 3 : 2);
+        List<String> list = new ArrayList<>(inlineStyle ? 3 : 2);
         list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {
@@ -121,7 +121,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     public Collection<String> getObjectSources() {
         return getSameOrigin();
     }
- 
+
     @Override
     public Collection<String> getMediaSources() {
         return null;
@@ -136,7 +136,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
     /** Creates a shared, immutable list for same-origin-only */
     private List<String> getSameOrigin() {
         if (sameOrigin == null) {
-            sameOrigin = new ArrayList<String>(1);
+            sameOrigin = new ArrayList<>(1);
             sameOrigin.add(null);
         }
         return sameOrigin;

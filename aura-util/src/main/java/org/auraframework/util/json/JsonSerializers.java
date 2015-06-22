@@ -37,8 +37,8 @@ import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
 import org.auraframework.util.json.Json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Json.Serialization.ReferenceType;
 import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 import com.google.common.collect.Maps;
@@ -64,7 +64,7 @@ public class JsonSerializers {
     public static final Map<String, JsonSerializer<?>> MAPPY_FASTY;
     public static final Map<Class<?>, JsonSerializer<?>> MAPPY_SLOWY;
     static {
-        Map<Class<?>, JsonSerializer<?>> m = new LinkedHashMap<Class<?>, JsonSerializer<?>>();
+        Map<Class<?>, JsonSerializer<?>> m = new LinkedHashMap<>();
         m.put(ArrayList.class, COLLECTION);
         m.put(LinkedList.class, COLLECTION);
         m.put(HashSet.class, COLLECTION);
@@ -91,7 +91,7 @@ public class JsonSerializers {
         }
         MAPPY_FASTY = Collections.unmodifiableMap(mFast);
 
-        m = new LinkedHashMap<Class<?>, JsonSerializer<?>>();
+        m = new LinkedHashMap<>();
         m.put(Collection.class, COLLECTION); // maybe iterable
         m.put(Map.class, MAP);
         m.put(Number.class, LITERAL);
@@ -235,7 +235,7 @@ public class JsonSerializers {
      */
     public static class BigDecimalSerializer extends NoneSerializer<BigDecimal> {
         public static int MAX_PRECISION = 15;
-        
+
         @Override
         public void serialize(Json json, BigDecimal bd) throws IOException {
             if (bd.precision() > MAX_PRECISION) {

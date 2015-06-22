@@ -47,6 +47,7 @@ import javax.script.ScriptException;
  */
 public class ExtendedScriptException extends ScriptException {
 
+    private static final long serialVersionUID = -1387752024989144919L;
     private Throwable cause;
 
     public ExtendedScriptException(
@@ -84,7 +85,7 @@ public class ExtendedScriptException extends ScriptException {
     }
 
     @Override
-    public Throwable getCause() {
+    public synchronized Throwable getCause() {
         return cause;
     }
 }

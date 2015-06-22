@@ -58,8 +58,8 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
     protected AuraStaticControllerDefRegistry() {
         super(defTypes, prefixes, null, getDefs());
 
-       ImmutableMap.Builder<DefDescriptor<?>, Definition> builder = new ImmutableMap.Builder<DefDescriptor<?>, Definition>();
-       for (Map.Entry<DefDescriptor<ControllerDef>, ControllerDef> entry : defs.entrySet()) {
+        ImmutableMap.Builder<DefDescriptor<?>, Definition> builder = new ImmutableMap.Builder<>();
+        for (Map.Entry<DefDescriptor<ControllerDef>, ControllerDef> entry : defs.entrySet()) {
             builder.put(entry.getKey(), entry.getValue());
         }
         allMap = builder.build();

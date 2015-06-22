@@ -26,7 +26,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.RootDefinition.SupportLevel;
-import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.RequiredVersionDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
@@ -61,10 +60,10 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
         return isInPrivilegedNamespace ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-	/**
+    /**
      * Determines whether HTML parsing will allow script tags to be embedded.
      * False by default, so must be overridden to allow embedded script tag.
-     * 
+     *
      * @return - return true if your instance should allow embedded script tags in HTML
      */
     public boolean getAllowsScript() {
@@ -93,36 +92,36 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
                         this.getLocation());
             }
         }
-        
+
         builder.setAPIVersion(getAttributeValue(ATTRIBUTE_API_VERSION));
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
-   
+
     }
 
     protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs(DefDescriptor<?> desc) {
-    	Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
-    	Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions(desc);
-    	if (requiredVersions != null) {
-    		requiredVersionDefs = Maps.newHashMap();
-    		for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {
-    			RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
-    			builder.setDescriptor(DefDescriptorImpl.getInstance(entry.getKey(), RequiredVersionDef.class));
-    			builder.setVersion(entry.getValue());
-    			RequiredVersionDefImpl requiredVersionDef = builder.build();
-    			
-    			requiredVersionDefs.put(requiredVersionDef.getDescriptor(), requiredVersionDef);
-    		}
-    	}
-    	
-    	return requiredVersionDefs;
+        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
+        Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions(desc);
+        if (requiredVersions != null) {
+            requiredVersionDefs = Maps.newHashMap();
+            for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {
+                RequiredVersionDefImpl.Builder builder = new RequiredVersionDefImpl.Builder();
+                builder.setDescriptor(DefDescriptorImpl.getInstance(entry.getKey(), RequiredVersionDef.class));
+                builder.setVersion(entry.getValue());
+                RequiredVersionDefImpl requiredVersionDef = builder.build();
+
+                requiredVersionDefs.put(requiredVersionDef.getDescriptor(), requiredVersionDef);
+            }
+        }
+
+        return requiredVersionDefs;
     }
 
-    protected void tagError(String message, DefDescriptor descriptor, Object... args) {
+    protected void tagError(String message, DefDescriptor<?> descriptor, Object... args) {
         error(String.format(
                 String.format(message,args),
                 descriptor.getDefType().toString().toLowerCase(),
                 descriptor.getDescriptorName()
-        ));
+                ));
     }
 
 }

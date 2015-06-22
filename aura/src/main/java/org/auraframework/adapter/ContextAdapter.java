@@ -21,7 +21,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -74,7 +73,7 @@ public interface ContextAdapter extends AuraAdapter {
             Map<String, GlobalValueProvider> globalProviders,
             DefDescriptor<? extends BaseComponentDef> appDesc,
             boolean isDebugToolEnabled);
-    
+
     /**
      * is a context established in this thread?.
      *

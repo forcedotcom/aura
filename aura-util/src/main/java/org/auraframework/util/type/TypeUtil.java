@@ -77,25 +77,25 @@ public class TypeUtil {
                         paramToMap.put(to, paramMap);
                     }
                     if (paramMap.containsKey(toParamNames.toString())) {
-                        converter = new ConverterInitError<Object, Object>(String.format(
+                        converter = new ConverterInitError<>(String.format(
                                 "More than one converter registered for %s to %s<%s>.  Using %s.", from, to,
                                 toParamNames.toString(), paramMap.get(toParamNames.toString())));
                     }
                     paramMap.put(toParamNames.toString(), converter);
                 } else {
                     if (toMap.containsKey(to)) {
-                        converter = new ConverterInitError<Object, Object>(String.format(
+                        converter = new ConverterInitError<>(String.format(
                                 "More than one converter registered for %s to %s.  Using %s.", from, to, toMap.get(to)));
                     }
                     toMap.put(to, converter);
                 }
             }
         }
-        
+
         for (MultiConverter<?> multiConverter : ServiceLocator.get().getAll(MultiConverter.class)) {
             Class<?> fromClass = multiConverter.getFrom();
             Set<Class<?>> toClasses = multiConverter.getTo();
-            
+
             if (fromClass == null || toClasses == null) {
                 System.err.println("Invalid multiconverter not registered : " + multiConverter);
             } else {
@@ -106,9 +106,9 @@ public class TypeUtil {
                     toMap = Maps.newHashMap();
                     multiConverters.put(from, toMap);
                 }
-               
+
                 for (Class<?> toClass : toClasses) {
-                	final String to = toClass.getName();
+                    final String to = toClass.getName();
                     if (toMap.containsKey(to)) {
                         multiConverter = new MultiConverterInitError(String.format(
                                 "More than one multiconverter registered for %s to %s.", from, to));
@@ -142,7 +142,7 @@ public class TypeUtil {
     /**
      * Attempts to convert value to the type specified by 'to'. If 'of' is not
      * null, it indicates that 'to' is a container of 'of' types.
-     * 
+     *
      * To add supported Conversions, drop a new implementation of Converter into
      * the aura.util.type.converter directory.
      */
@@ -164,19 +164,19 @@ public class TypeUtil {
 
         Converter<F, T> converter = getConverter(from, to, of);
         if (converter != null) {
-        	return converter.convert(value);	
+            return converter.convert(value);
         }
-        
+
         MultiConverter<T> multiConverter = null;
         if (of == null) {
-	        multiConverter = getMultiConverter(from, to);
+            multiConverter = getMultiConverter(from, to);
         }
-        
+
         if (multiConverter == null) {
             throw new ConversionException(String.format("No Converter or MultiConverter found for %s to %s<%s>", from, to, of));
         }
-        
-	    return multiConverter.convert(to, value);
+
+        return multiConverter.convert(to, value);
     }
 
     @SuppressWarnings("unchecked")
@@ -219,14 +219,14 @@ public class TypeUtil {
      * @param clz Class to find
      * @return class name
      */
-    private static String getAssignableHashMapClassName(Class clz) {
+    private static String getAssignableHashMapClassName(Class<?> clz) {
         String className = clz.getName();
         if (HashMap.class.isAssignableFrom(clz)) {
             className = HashMap.class.getName();
         }
         return className;
     }
-    
+
     public static boolean hasConverter(Class<?> from, Class<?> to, String of) {
         return getConverter(from, to, of) != null || (of == null && getMultiConverter(from, to) != null);
     }
@@ -271,25 +271,25 @@ public class TypeUtil {
     }
 
     private static class MultiConverterInitError implements MultiConverter<Object> {
-    	 private final String error;
+        private final String error;
 
-         private MultiConverterInitError(String error) {
-             this.error = error;
-         }
+        private MultiConverterInitError(String error) {
+            this.error = error;
+        }
 
-		@Override
-		public Object convert(Class<? extends Object> toClass, Object fromValue) {
-			throw new ConversionException(error);
-		}
+        @Override
+        public Object convert(Class<? extends Object> toClass, Object fromValue) {
+            throw new ConversionException(error);
+        }
 
-		@Override
-		public Class<?> getFrom() {
-			throw new ConversionException(error);
-		}
+        @Override
+        public Class<?> getFrom() {
+            throw new ConversionException(error);
+        }
 
-		@Override
-		public Set<Class<?>> getTo() {
-			throw new ConversionException(error);
-		}
+        @Override
+        public Set<Class<?>> getTo() {
+            throw new ConversionException(error);
+        }
     }
 }

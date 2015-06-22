@@ -36,7 +36,7 @@ import org.auraframework.util.validation.ValidationError;
 
 @Model
 public class LintModel {
-    List<Map<String, String>> errors = new ArrayList<Map<String, String>>();
+    List<Map<String, String>> errors = new ArrayList<>();
     String message;
 
     public LintModel() throws Exception {
@@ -67,7 +67,7 @@ public class LintModel {
                                         List<ValidationError> ret = validationEngine.validate(dep);
                                         ValidationUtil.trimFilenames(ret);
                                         for (ValidationError error : ret) {
-                                            Map<String, String> m = new TreeMap<String, String>();
+                                            Map<String, String> m = new TreeMap<>();
                                             String comp = descriptor.getNamespace() + ':' + descriptor.getName();
                                             m.put("CompName", comp);
                                             m.put("ErrorMessage", error.toString());
@@ -77,7 +77,7 @@ public class LintModel {
                                 }
                             }
                         } catch (Exception e) {
-                            Map<String, String> m = new TreeMap<String, String>();
+                            Map<String, String> m = new TreeMap<>();
                             m.put("CompName", descriptor.getQualifiedName());
                             m.put("ErrorMessage", "Exception while loading Definition: " + e.getMessage());
                             errors.add(m);

@@ -16,7 +16,6 @@
 package org.auraframework.util.type.converter;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -32,9 +31,9 @@ public class StringToHashMapConverter implements Converter<String, HashMap> {
 
     @Override
     public HashMap<String, Object> convert(String value) {
-    	if(AuraTextUtil.isNullEmptyOrWhitespace(value)) {
-    		return new HashMap<String, Object>();
-    	}
+        if(AuraTextUtil.isNullEmptyOrWhitespace(value)) {
+            return new HashMap<>();
+        }
         JsonStreamReader reader = new JsonStreamReader(value);
         try {
             reader.next();

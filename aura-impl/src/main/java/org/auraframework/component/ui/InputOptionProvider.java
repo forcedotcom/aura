@@ -32,8 +32,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * Render inputCheckbox, inputRadio and inputSelectOption based on "type"
  * attribute.
- * 
- * 
+ *
+ *
  * @since Touch.174.3
  */
 @Provider
@@ -54,7 +54,7 @@ public class InputOptionProvider implements ComponentConfigProvider {
         } else if (TYPE_UI_INPUTSELECTOPTION.equalsIgnoreCase(type)) {
             defDescriptor = DefDescriptorImpl.getInstance(COMPONENT_UI_INPUTSELECTOPTION, ComponentDef.class);
         } else {
-            Map<String, Object> passingAttrs = new HashMap<String, Object>();
+            Map<String, Object> passingAttrs = new HashMap<>();
             passingAttrs.put(VALUE_ATTRIBUTE_NAME, "Error in " + component.getDescriptor().getQualifiedName()
                     + ": invalid type " + type);
             componentConfig.setAttributes(passingAttrs);

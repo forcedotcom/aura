@@ -110,22 +110,22 @@ public enum JavascriptGeneratorMode {
     /**
      * There may be more than 1 mode used in production, this value should control whether the file is even generated in
      * production environment (but it doesn't yet)
-     * 
+     *
      * @return true if the mode is used in production
      */
     public boolean allowedInProduction() {
         return prod;
     }
-    
+
     public static Set<String> getSuffixes() {
         JavascriptGeneratorMode[] enums = JavascriptGeneratorMode.values();
-        
-        Set<String> ret = new HashSet<String>(enums.length);
-        
+
+        Set<String> ret = new HashSet<>(enums.length);
+
         for (JavascriptGeneratorMode mode : enums) {
             ret.add(mode.getSuffix());
         }
-        
+
         return ret;
     }
 }

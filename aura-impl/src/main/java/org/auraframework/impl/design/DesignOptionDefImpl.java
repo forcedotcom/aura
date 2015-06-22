@@ -15,14 +15,16 @@
  */
 package org.auraframework.impl.design;
 
+import java.io.IOException;
+
 import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
-import java.io.IOException;
-
 public class DesignOptionDefImpl extends DefinitionImpl<DesignOptionDef> implements DesignOptionDef {
+
+    private static final long serialVersionUID = -990356785176000885L;
     private final String key, value, access;
     protected DesignOptionDefImpl(Builder builder) {
         super(builder);

@@ -145,7 +145,7 @@ public class SubDefDescriptorImpl<T extends Definition, P extends Definition> im
 
     public static <Sub extends Definition, Par extends Definition> SubDefDescriptor<Sub, Par> getInstance(String name,
             DefDescriptor<Par> pDesc, Class<Sub> defClass) {
-        return new SubDefDescriptorImpl<Sub, Par>(pDesc, name, defClass);
+        return new SubDefDescriptorImpl<>(pDesc, name, defClass);
     }
 
     public static <Sub extends Definition, Par extends Definition> SubDefDescriptor<Sub, Par> getInstance(

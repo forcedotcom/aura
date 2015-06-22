@@ -225,7 +225,7 @@ implements ExpressionContainerHandler {
             if (!parentHandler.getAllowsScript() && SCRIPT_TAG.equals(tag.toLowerCase())) {
                 throw new AuraRuntimeException("script tags only allowed in templates", getLocation());
             }
-            return new HTMLComponentDefRefHandler<P>(parentHandler, tag, xmlReader, source);
+            return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source);
         } else {
             String loadString = getSystemAttributeValue("load");
             if (loadString != null) {
@@ -237,11 +237,11 @@ implements ExpressionContainerHandler {
                             "Invalid value '%s' specified for 'aura:load' attribute", loadString), getLocation());
                 }
                 if (load == Load.LAZY || load == Load.EXCLUSIVE) {
-                    return new LazyComponentDefRefHandler<P>(parentHandler, tag, xmlReader, source);
+                    return new LazyComponentDefRefHandler<>(parentHandler, tag, xmlReader, source);
                 }
             }
 
-            return new ComponentDefRefHandler<P>(parentHandler, xmlReader, source);
+            return new ComponentDefRefHandler<>(parentHandler, xmlReader, source);
         }
     }
 

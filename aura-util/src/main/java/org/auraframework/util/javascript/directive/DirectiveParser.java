@@ -49,9 +49,9 @@ public class DirectiveParser {
     public DirectiveParser(DirectiveBasedJavascriptGroup group, File startFile) {
         this.group = group;
         this.file = startFile;
-        directives = new LinkedList<Directive>();
+        directives = new LinkedList<>();
         content = new StringBuilder(1000);
-        parseErrors = new LinkedList<JavascriptProcessingError>();
+        parseErrors = new LinkedList<>();
     }
 
     public List<DirectiveType<?>> getDirectiveTypes() {
@@ -60,7 +60,7 @@ public class DirectiveParser {
 
     public void parseFile() throws IOException {
         BufferedReader reader = null;
-        Map<String, DirectiveType<?>> byString = new HashMap<String, DirectiveType<?>>();
+        Map<String, DirectiveType<?>> byString = new HashMap<>();
         for (DirectiveType<?> type : getDirectiveTypes()) {
             String label = type.getLabel();
             if (byString.containsKey(label)) {
@@ -147,7 +147,7 @@ public class DirectiveParser {
     }
 
     public List<JavascriptProcessingError> validate(JavascriptValidator validator) {
-        List<JavascriptProcessingError> errors = new LinkedList<JavascriptProcessingError>(parseErrors);
+        List<JavascriptProcessingError> errors = new LinkedList<>(parseErrors);
         errors.addAll(validator.validate(file.getName(), content.toString(), false, true));
         for (Directive d : directives) {
             List<JavascriptProcessingError> dErrors = d.validate(validator);

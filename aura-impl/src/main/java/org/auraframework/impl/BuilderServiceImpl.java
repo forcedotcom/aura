@@ -76,6 +76,6 @@ public class BuilderServiceImpl implements BuilderService {
 
     @Override
     public <K, V> CacheBuilder<K, V> getCacheBuilder() throws QuickFixException {
-        return new CacheImpl.Builder<K, V>();
+        return new CacheImpl.Builder<>();
     }
 }

@@ -52,7 +52,7 @@ public abstract class CommonFileGroup implements FileGroup {
 
         public StateBundle() {
             bundleLock = new ReentrantReadWriteLock();
-            files = new TreeSet<File>();
+            files = new TreeSet<>();
             groupHash = null;
             lastMod = -1;
         }
@@ -73,7 +73,7 @@ public abstract class CommonFileGroup implements FileGroup {
         public Set<File> getFiles() {
             try {
                 bundleLock.readLock().lock();
-                return new TreeSet<File>(files);
+                return new TreeSet<>(files);
             } finally {
                 bundleLock.readLock().unlock();
             }
@@ -228,7 +228,7 @@ public abstract class CommonFileGroup implements FileGroup {
      * @throws IOException
      */
     protected static Hash computeGroupHash(Set<File> files) throws IOException {
-        Set<URL> urls = new TreeSet<URL>(compareUrls);
+        Set<URL> urls = new TreeSet<>(compareUrls);
         for (File file : files) {
             urls.add(file.toURI().toURL());
         }

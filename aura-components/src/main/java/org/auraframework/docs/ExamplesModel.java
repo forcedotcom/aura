@@ -34,7 +34,7 @@ import org.auraframework.system.Annotations.Model;
 
 @Model
 public class ExamplesModel {
-    List<Map<String, String>> examples = new ArrayList<Map<String, String>>();
+    List<Map<String, String>> examples = new ArrayList<>();
     String message;
 
     public ExamplesModel() throws Exception {
@@ -60,7 +60,7 @@ public class ExamplesModel {
 
 
                             for (ExampleDef example : exampleDefs) {
-                                m = new TreeMap<String, String>();
+                                m = new TreeMap<>();
 
                                 m.put("label", example.getLabel());
                                 m.put("description", example.getDescription());
@@ -71,7 +71,7 @@ public class ExamplesModel {
                         } catch (Exception e) {
                             // only display errors in loading DocDefs in dev mode
                             if (Aura.getContextService().getCurrentContext().isDevMode()) {
-                                m = new TreeMap<String, String>();
+                                m = new TreeMap<>();
                                 m.put("error", e.toString());
                                 m.put("descriptor", descriptor.getDescriptorName());
                                 examples.add(m);

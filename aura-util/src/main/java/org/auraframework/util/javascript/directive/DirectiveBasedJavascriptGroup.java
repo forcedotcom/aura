@@ -142,7 +142,7 @@ public class DirectiveBasedJavascriptGroup extends CommonJavascriptGroupImpl {
         }
 
         counter = new CountDownLatch(modes.size());
-        errors = new HashMap<String, Throwable>();
+        errors = new HashMap<>();
         for (JavascriptGeneratorMode mode : modes) {
             generateForMode(destRoot, mode);
         }

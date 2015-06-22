@@ -30,9 +30,9 @@ import org.auraframework.system.Annotations.Model;
 public class LabelTestModel {
     @AuraEnabled
     public List<Object> getIterationItems() {
-        List<Object> menuItem = new LinkedList<Object>();
+        List<Object> menuItem = new LinkedList<>();
         for (int i = 0; i < 4; i++) {
-            Map<String, Object> theMap = new HashMap<String, Object>();
+            Map<String, Object> theMap = new HashMap<>();
             theMap.put("label","label" + i );
             theMap.put("value", "value" + i);
             menuItem.add(theMap);

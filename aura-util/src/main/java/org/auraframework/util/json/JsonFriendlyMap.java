@@ -44,9 +44,9 @@ public class JsonFriendlyMap extends LinkedHashMap<Object, Object> {
 
         List<T> valueList = null;
         if (oldValue == null) {
-            valueList = new ArrayList<T>();
+            valueList = new ArrayList<>();
         } else if (oldValue.getClass().equals(value.getClass())) {
-            valueList = new ArrayList<T>();
+            valueList = new ArrayList<>();
             valueList.add((T) oldValue);
         } else {
             valueList = (List<T>) oldValue;

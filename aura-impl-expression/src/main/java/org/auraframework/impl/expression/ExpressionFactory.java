@@ -27,11 +27,11 @@ import static org.auraframework.impl.expression.functions.MathFunctions.NEGATE;
 import static org.auraframework.impl.expression.functions.MathFunctions.SUBTRACT;
 import static org.auraframework.impl.expression.functions.MultiFunctions.ADD;
 import static org.auraframework.impl.expression.functions.MultiFunctions.EQUALS;
-import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
+import static org.auraframework.impl.expression.functions.MultiFunctions.NOTEQUALS;
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 
 import java.util.LinkedList;
@@ -56,7 +56,7 @@ public class ExpressionFactory {
     private static final Map<String, Function> functionsByName;
 
     static {
-        List<Function> l = new LinkedList<Function>();
+        List<Function> l = new LinkedList<>();
         l.add(ADD);
         l.add(SUBTRACT);
         l.add(MULTIPLY);

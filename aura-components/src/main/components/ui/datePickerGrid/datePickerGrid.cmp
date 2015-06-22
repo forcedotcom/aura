@@ -22,7 +22,7 @@
     <aura:attribute name="month" type="Integer" description="The currently rendered month."/>
     <aura:attribute name="year" type="Integer" description="The currently rendered year."/>
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
-    <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. We support large/medium/small for now."/>
+    <aura:attribute name="dimension" type="String" default="large" description="The size of the date picker. Valid values: large, medium, small"/>
     
     <!-- private attributes -->
     <aura:attribute name="_setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>

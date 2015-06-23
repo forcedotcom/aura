@@ -759,8 +759,8 @@ Action.prototype.updateFromResponse = function(response) {
         this.error = newErrors;
     } else if (this.originalResponse && this.state === "SUCCESS") {
         // Compare the refresh response with the original response and return false if they are equal (no update)
-        var originalValue = $A.util.json.encode(this.originalResponse["returnValue"]);
-        var refreshedValue = $A.util.json.encode(response["returnValue"]);
+        var originalValue = $A.util.json.orderedEncode(this.originalResponse["returnValue"]);
+        var refreshedValue = $A.util.json.orderedEncode(response["returnValue"]);
         if (refreshedValue === originalValue) {
             var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
             var refreshedComponents = $A.util.json.encode(response["components"]);

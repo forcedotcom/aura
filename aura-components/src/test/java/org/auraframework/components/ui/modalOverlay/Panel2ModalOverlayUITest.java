@@ -204,8 +204,10 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private void verifyPressingEscOnMultipleModalDestorysModal(String locator, boolean autoFocus) throws MalformedURLException, URISyntaxException, InterruptedException {
     	String url = APP;
     	boolean isPanel = locator.contains(PANEL_DIALOG);
+    	String errorMessage = "modal";
     	if(isPanel){
 			url += "?" + PARAM_PANEL_TYPE + "panel";
+			errorMessage = "panel";
 		}
     	
     	open(url);
@@ -228,13 +230,21 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         	fistInputElement.sendKeys("panel");
     	}
     	
+    	WebElement firstModalPanel = findDomElements(By.cssSelector(locator)).get(0);
+    	assertTrue(String.format("First %s should have class active", errorMessage), firstModalPanel.getAttribute("class").contains("active"));
     	//open second modal
     	openPanel(2);
     	waitForNumberOfPanels(locator, 2);
     	
+    	WebElement secondModalPanel = findDomElements(By.cssSelector(locator)).get(1);
+    	assertFalse(String.format("First %s should have not have class active", errorMessage), firstModalPanel.getAttribute("class").contains("active"));
+    	assertTrue(String.format("Second %s should have class active", errorMessage), secondModalPanel.getAttribute("class").contains("active"));
+    	
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
     	activeElement.sendKeys(Keys.ESCAPE);
     	waitForNumberOfPanels(locator, 1);
+    	
+    	assertTrue(String.format("First %s should have class active after press ESC on 2nd %s", errorMessage, errorMessage), firstModalPanel.getAttribute("class").contains("active"));
     	
     	activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
     	activeElement.sendKeys(Keys.ESCAPE);

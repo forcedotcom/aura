@@ -24,7 +24,7 @@
     		this.createPanel(cmp);
         }, function(cmp) {
         	$A.test.addWaitForWithFailureMessage(true, function() {
-                var activeElement = $A.test.getActiveElement();
+        		var activeElement = $A.test.getActiveElement();
                 return $A.util.hasClass(activeElement, "inputPanelTypeClass");
             }, "First input element should be focused.");
         }]
@@ -43,6 +43,37 @@
                 var activeElement = $A.test.getActiveElement();
                 return $A.util.hasClass(activeElement, "inputPanelTypeClass");
             }, "First input element should be focused.");
+        }]
+    },
+    
+    /**
+     * Active class set correctly on panel/modal
+     * Bug: W-2647558
+     */
+    testActiveClassSetCorrectlyOnModal: {
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+        }, function(cmp) {
+        	$A.test.addWaitForWithFailureMessage(true, function() {
+        		var modalElement = $A.test.select(".uiModal")[0];
+                return $A.util.hasClass(modalElement, "active");
+            }, "Modal should have class active");
+        }]
+    },
+    
+    /**
+     * Active class set correctly on panel/modal
+     * Bug: W-2647558
+     */
+    testActiveClassSetCorrectlyOnPanel: {
+    	attributes : {"testPanelType" : "panel"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+        }, function(cmp) {
+        	$A.test.addWaitForWithFailureMessage(true, function() {
+        		var panelElement = $A.test.select(".uiPanel")[0];
+                return $A.util.hasClass(panelElement, "active");
+            }, "Panel should have class active");
         }]
     },
   
@@ -147,7 +178,7 @@
     		var testerCmp = this.getPanelTesterComponent(cmp.find("tester"));
     		modal1GlobalId = this.getGlobalIdForPanelModal(1);
 			$A.test.addWaitForWithFailureMessage(true, function(){return $A.getCmp(modal1GlobalId).get("v.visible");}, "Visible Attribute should be set for new modal opened");
-    		testerCmp.set("v.useHeader","true");
+			testerCmp.set("v.useHeader","true");
     		testerCmp.set("v.useFooter","true");
     		testerCmp.find("createPanelBtn").get("e.press").fire();
     	}, function(cmp) {
@@ -231,6 +262,10 @@
     		this.waitForModalOpen();
     	}, function(cmp) {
     		// second panel
+    		$A.test.addWaitForWithFailureMessage(true, function() {
+        		var element = $A.test.select(".uiModal")[0];
+                return $A.util.hasClass(element, "active");
+            }, "Modal should have class active");
     		var panelTesterCmp = this.getPanelTesterComponent(cmp.find("tester"));
     		panelTesterCmp.set("v.panelType","panel");
     		panelTesterCmp.set("v.flavor","full-screen");
@@ -238,7 +273,11 @@
     	}, function(cmp) {
     		this.waitForNumberOfPanels("panel", 1);
     		this.waitForNumberOfPanels("modal", 1);
-        }, function(cmp) {
+    		$A.test.addWaitForWithFailureMessage(true, function() {
+        		var element = $A.test.select(".uiPanel")[0];
+                return $A.util.hasClass(element, "active");
+            }, "Panel should have class active");
+    	}, function(cmp) {
     		this.closePanel(cmp);
     	}, function(cmp) {
     		this.waitForModalClose();

@@ -794,4 +794,41 @@ Test.Aura.Util.UtilTest = function() {
             });
         }
     }
+
+    [Fixture]
+    function urlDecode() {
+
+        [Fact]
+        function parsesKeyValuePairs() {
+            var data = "key=value&key2=value2";
+            var expected = { "key": "value", "key2": "value2" };
+            var actual;
+
+            actual = targetUtil.urlDecode(data);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function parsesKeyValueValuePairs() {
+            var data = "key=value=valid&key2=value2";
+            var expected = { "key": "value=valid", "key2": "value2" };
+            var actual;
+
+            actual = targetUtil.urlDecode(data);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function parsesKeyValueKeyPairs() {
+            var data = "key=value&key2";
+            var expected = { "key": "value", "key2": undefined };
+            var actual;
+
+            actual = targetUtil.urlDecode(data);
+
+            Assert.Equal(expected, actual);
+        }
+    }
 };

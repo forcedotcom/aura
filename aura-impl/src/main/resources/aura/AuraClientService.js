@@ -1799,13 +1799,14 @@ AuraClientService.prototype.buildParams = function(map) {
  * @private
  */
 AuraClientService.prototype.receive = function(auraXHR) {
+    var responseMessage, noAbort;
     this.auraStack.push("AuraClientService$receive");
     if (auraXHR.transactionId) {
         this.setCurrentTransactionId(auraXHR.transactionId);
     }
     try {
-        var responseMessage = this.decode(auraXHR.request);
-        var noAbort = (auraXHR.transactionId === this.lastTransactionId);
+        responseMessage = this.decode(auraXHR.request);
+        noAbort = auraXHR.transactionId === this.lastTransactionId;
 
         if (responseMessage) {
             this.processResponses(auraXHR, responseMessage, noAbort);
@@ -1821,6 +1822,8 @@ AuraClientService.prototype.receive = function(auraXHR) {
         this.process();
         this.setCurrentTransactionId(undefined);
     }
+
+    return responseMessage;
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage, noAbort) {

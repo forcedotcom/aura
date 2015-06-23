@@ -20,6 +20,7 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
+import org.auraframework.util.json.Json;
 
 /**
  * <p>
@@ -165,4 +166,6 @@ public interface LoggingService extends AuraService {
      * @param report a deserialized JSON map
      */
     void logCSPReport(Map<String, Object> report);
+    
+	void serializeActions(Json json);
 }

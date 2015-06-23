@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.FlavorMapping;
@@ -128,14 +129,17 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         DefDescriptor<? extends BaseComponentDef> top = context.getApplicationDescriptor();
         if (top != null && top.getDefType() == DefType.APPLICATION) {
             String uid = context.getUid(top);
-            for (DefDescriptor<?> dep : mdr.getDependencies(uid)) {
-                if (Flavors.isStandardFlavor(dep)) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<FlavoredStyleDef> style = (DefDescriptor<FlavoredStyleDef>) dep;
-                    DefDescriptor<ComponentDef> cmp = Flavors.getBundledComponent(style);
-                    if (componentFilter.matchDescriptor(cmp) && !map.containsKey(cmp)
-                            && style.getDef().getFlavorNames().contains(flavor)) {
-                        map.put(cmp, flavor);
+            Set<DefDescriptor<?>> dependencies = mdr.getDependencies(uid);
+            if (dependencies != null) {
+                for (DefDescriptor<?> dep : dependencies) {
+                    if (Flavors.isStandardFlavor(dep)) {
+                        @SuppressWarnings("unchecked")
+                        DefDescriptor<FlavoredStyleDef> style = (DefDescriptor<FlavoredStyleDef>) dep;
+                        DefDescriptor<ComponentDef> cmp = Flavors.getBundledComponent(style);
+                        if (componentFilter.matchDescriptor(cmp) && !map.containsKey(cmp)
+                                && style.getDef().getFlavorNames().contains(flavor)) {
+                            map.put(cmp, flavor);
+                        }
                     }
                 }
             }

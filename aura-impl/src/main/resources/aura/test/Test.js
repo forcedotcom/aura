@@ -46,16 +46,15 @@ TestInstance = function() {
     //NIHAR: TODO: FIXME: THIS IS A TEMPORARY SOLUTION UNTIL AURA GETS IT'S STUFF NESTED IN A SINGLE VAR
     //THEN WE WILL NOT NEED THIS LIST. FLAG EVERYTHING THAT'S NOT AURA
     var _whitelistedPollutants = ["fewActions", "actionSucceeeded", "animate", "yTime", "yLabels",
-        "xNumbers", "PreviewPageLoader", "PreviewPage", "EclairNG", "_", "Scroller", "__S",
-        "FORCE", "attachFastClick", "dismissError", "IndexedDBStorageAdapter", "aura", "PerfLogLevel",
-        "PerfConstants", "PerfShim", "AuraEventService", "AuraHistoryService", "AuraExpressionService",
-        "AuraComponentService", "AuraClientService", "AuraStorage", "AttributeDefSet", "AttributeDef",
-        "ControllerDef", "Action", "ActionDef", "Event", "EventDef", "HelperDef", "GlobalValueProviders",
-        "ProviderDef", "ComponentDef", "InvalidComponent", "ModelDef", "PassthroughValue",
+        "xNumbers", "EclairNG", "_", "Scroller", "__S", "FORCE", "attachFastClick", "dismissError",
+        "IndexedDBStorageAdapter", "aura", "PerfLogLevel", "PerfConstants", "PerfShim", "AuraEventService",
+        "AuraHistoryService", "AuraExpressionService", "AuraComponentService", "AuraClientService", "AuraStorage",
+        "AttributeDefSet", "AttributeDef", "ControllerDef", "Action", "ActionDef", "Event", "EventDef", "HelperDef",
+        "GlobalValueProviders", "ProviderDef", "ComponentDef", "InvalidComponent", "ModelDef", "PassthroughValue",
         "ActionReferenceValue", "FunctionCallValue", "PropertyReferenceValue", "DefDescriptor", "AuraError",
         "Logger", "$A", "Aura", "CKEDITOR", "moment", "FastClick", "ES6Promise", "WallTime", "Sfdc", "org",
         "Sizzle", "LC", "SfdcFramework", "RecordGlobalValueProvider", "LoadingScreen", "UserContext",
-        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery", "MouseWatcher"];
+        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery"];
 
     this.getInitialGlobalState = function() {
         return _initialGlobalState;
@@ -1955,7 +1954,7 @@ TestInstance.prototype.createHttpRequest = function() {
  *
  * @export
  */
-TestInstance.prototype.checkGlobalPollution = function() {
+TestInstance.prototype.checkGlobalNamespacePollution = function() {
     var that = this,
         pollutants = [],
         initialGlobalState = that.getInitialGlobalState();

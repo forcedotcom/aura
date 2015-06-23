@@ -147,8 +147,9 @@
                 cellCmp.set("v.label", d.getDate());
                 cellCmp.set("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
 
-                var setFocus = component.get("v._setFocus");
-                if (this.dateEquals(d, date) && setFocus === true) {
+                var setFocus = component.get("v.setFocus");
+                var _setFocus = component.get("v._setFocus");
+                if (this.dateEquals(d, date) && setFocus === true && _setFocus === true) {
                     cellCmp.getElement().focus();
                 } else {
                     cellCmp.set("v.ariaSelected", false);

@@ -1250,5 +1250,35 @@
                 this.addWaitForLog(cmp, 2, "child: child");
             }
         ]
+    },
+    /**
+     * Test to ensure that if we enqueue an action from a rerender, we have current transaction set correctly.
+     *
+     * If this test fails because 'second' is aborted, we have lost the transaction id.
+     */
+    testNoAbortIfDoubleChained : {
+        test : [
+            function(cmp) {
+                var that = this;
+                var initial, second, third;
+                second = that.getActionAndLog(cmp, "c.execute", "APPEND second; READ;", "second: ", false, true);
+                third = that.getActionAndLog(cmp, "c.execute", "APPEND third; READ;", "third: ", false, true);
+                initial = this.getAction(cmp, "c.execute", "APPEND initial; READ;",
+                    function(a) {
+                        that.log(cmp, "initial: "+a.getReturnValue());
+                        $A.enqueueAction(second);
+                        cmp._afterRenderCalls = [function() { $A.enqueueAction(third); }];
+                        $A.enqueueAction(cmp.get("c.client"));
+                    },
+                    false, true);
+                $A.enqueueAction(initial);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([initial, second, third]); },
+                    function () {
+                        $A.test.assertEquals("SUCCESS", initial.getState());
+                        $A.test.assertEquals("SUCCESS", second.getState());
+                        $A.test.assertEquals("SUCCESS", third.getState());
+                    });
+            }
+        ]
     }
 })

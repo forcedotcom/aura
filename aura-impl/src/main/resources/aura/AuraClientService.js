@@ -1817,9 +1817,9 @@ AuraClientService.prototype.receive = function(auraXHR) {
         $A.error("AuraClientService.receive action callback failed", e);
     } finally {
         this.auraStack.pop();
-        this.setCurrentTransactionId(undefined);
         this.releaseXHR(auraXHR);
         this.process();
+        this.setCurrentTransactionId(undefined);
     }
 };
 

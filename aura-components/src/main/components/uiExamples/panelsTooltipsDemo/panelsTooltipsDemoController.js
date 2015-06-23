@@ -20,13 +20,13 @@
     },
 
     openNotification: function(cmp){
-        var refEl = '.positioned-target';
+        var refEl = cmp.getElement().querySelector('.positioned-target');
         var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
             panelConfig : {
-                referenceElementSelector: refEl,
+                referenceElement: refEl,
                 showCloseButton: false,
                 closeOnClickOut: true,
                 useTransition: true,

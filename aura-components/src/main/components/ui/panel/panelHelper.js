@@ -27,9 +27,13 @@
         var panelEl = cmp.getElement();
         //move the dialog to the right position
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
+        var referenceEl = cmp.get('v.referenceElement');
         
         cmp.set('v.visible', true);
-        var referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
+        if(!referenceEl) {
+            referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
+        }
+
         var self = this;
 
         var conf = {

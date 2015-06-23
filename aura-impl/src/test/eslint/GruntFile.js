@@ -7,7 +7,10 @@ module.exports = function (grunt) {
                 outputFile: '${project.build.directory}/eslint-output'
             },
             target: [
-                '${basedir}/src/main/resources/'
+                '${basedir}/src/main/resources/aura/*.js',
+                '!${basedir}/src/main/resources/aura/*_export.js',
+                '${basedir}/src/main/resources/aura/*/*.js',
+                '!${basedir}/src/main/resources/aura/*/*_export.js'
             ]
         }
     });

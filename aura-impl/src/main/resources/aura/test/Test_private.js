@@ -227,7 +227,7 @@ TestInstance.prototype.continueWhenReady = function() {
             if (this.waits.length > 0) {
                 var texp = this.waits[0].expected;
                 if ($A.util.isFunction(texp)) {
-                	if(text()) {
+                	if(texp()) {
                 		texp = texp().toString();
                 	}
                 }

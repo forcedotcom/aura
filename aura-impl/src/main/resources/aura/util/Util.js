@@ -734,9 +734,16 @@ Aura.Utils.Util.prototype.removeElement = function(element) {
 Aura.Utils.Util.prototype.urlDecode = function(url){
     var ret = {};
     var pairs = url.split("&");
+    var position;
+    var pair;
     for (var i = 0; i < pairs.length; i++) {
-        var split = pairs[i].split("=");
-        ret[split[0]] = decodeURIComponent(split[1]);
+        pair = pairs[i];
+        position = pair.indexOf("=");
+        if(position === -1) {
+            ret[pair] = undefined;
+        } else {
+            ret[pair.substring(0, position)] = decodeURIComponent(pair.substring(position+1));
+        }
     }
     return ret;
 };

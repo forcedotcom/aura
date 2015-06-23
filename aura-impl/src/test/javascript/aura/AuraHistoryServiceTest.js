@@ -17,11 +17,10 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraHistoryServiceTest = function(){
-    var $A = { ns : {} };
+    var $A = {};
     var Aura = { Services:{} };
 
     Mocks.GetMocks(Object.Global(), {
-        "exp": function(){}, 
         "$A":$A, 
         Aura: Aura})
     (function(){
@@ -336,5 +335,67 @@ Test.Aura.AuraHistoryServiceTest = function(){
             Assert.Equal(expected, actual);
             Assert.Equal(expectedHistory, historyService.history); // verify history array is reset
         }
+    }
+
+    [Fixture]
+    function parseLocation() {
+
+        var mockUrlDecode = Mocks.GetMock(Object.Global(), "$A", {
+            "util": {
+                urlDecode: function(url) {
+                    var ret = {};
+                    var pairs = url.split("&");
+                    var position;
+                    var pair;
+                    for (var i = 0; i < pairs.length; i++) {
+                        pair = pairs[i];
+                        position = pair.indexOf("=");
+                        if(position === -1) {
+                            ret[pair] = undefined;
+                        } else {
+                            ret[pair.substring(0, position)] = decodeURIComponent(pair.substring(position+1));
+                        }
+                    }
+                    return ret;
+                }
+            }
+        });
+
+        [Fact]
+        function ParsesHashWithPoundSignIncluded() {
+            var location = "#key=value";
+            var historyService = new Aura.Services.AuraHistoryService();
+            var expected = { "token": "key=value", "querystring": "" };
+
+            var actual = historyService.parseLocation(location);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ParsesHashWithoutPoundSignIncluded() {
+            var location = "key=value";
+            var historyService = new Aura.Services.AuraHistoryService();
+            var expected = { "token": "key=value", "querystring": "" };
+
+            var actual = historyService.parseLocation(location);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ParsesMultipleQuestionMarks() {
+            var location = "#hash?key=value?key2=value2&key3=value3";
+            var historyService = new Aura.Services.AuraHistoryService();
+            var expected = { "key":"value?key2=value2", "key3":"value3", "token": "hash", "querystring": "key=value?key2=value2&key3=value3" };
+            var actual;
+
+            mockUrlDecode(function() {
+                actual = historyService.parseLocation(location);    
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
     }
 }

@@ -260,26 +260,25 @@ AuraHistoryService.prototype.changeHandler = function(){
 
 /**
  * @private
+ * @param {String} location the hash portion of the URL
  */
 AuraHistoryService.prototype.parseLocation = function(location) {
-    if (location["indexOf"]("#") === 0) {
-        location = location["substring"](1);
+    if (location.indexOf("#") === 0) {
+        location = location.substring(1);
     }
 
-    if (location["indexOf"]('=') > -1) {
-        var split = location["split"]('?');
-        if(split.length == 1){
-            return { "token": split[0], "querystring": "" };
+    if (location.indexOf('=') > -1) {
+        var position = location.indexOf("?");
+        if(position === -1) {
+            return { "token": location, "querystring": ""};
         }
 
-        if (split.length == 2) {
-            var ret = $A.util.urlDecode(split[1]);
-            ret["token"] = split[0];
-            ret["querystring"] = split[1];
-            return ret;
-        }
-
-        throw new Error("Invalid location");
+        var token = location.substring(0, position);
+        var querystring = location.substring(position+1);
+        var decoded = $A.util.urlDecode(querystring);
+            decoded["token"] = token;
+            decoded["querystring"] = querystring;
+        return decoded;
     } else {
         return {"token" : location, "querystring": "" };
     }

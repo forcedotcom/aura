@@ -2,18 +2,16 @@
     testTransactionChainingInCallback : {
         test: [
             function(cmp) {
-                var tid1, tid2, tid3;
+                var tid2, tid3;
                 var hlp = cmp.getDef().getHelper();
 
-                tid1 = $A.getCurrentTransactionId();
                 hlp.sendAction(cmp, true, undefined, function(a) {
                         $A.test.assertEquals("SUCCESS", a.getState());
                         tid2 = $A.getCurrentTransactionId();
-                        $A.test.assertEquals(tid1, tid2);
                         hlp.sendAction(cmp, true, undefined, function (b) {
                                 $A.test.assertEquals("SUCCESS", b.getState());
                                 tid3 = $A.getCurrentTransactionId();
-                                $A.test.assertEquals(tid1, tid3);
+                                $A.test.assertEquals(tid2, tid3);
                             });
                     });
                 $A.test.addWaitFor(true, function() { return tid3 !== undefined; });

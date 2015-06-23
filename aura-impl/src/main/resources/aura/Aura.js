@@ -857,10 +857,31 @@ AuraInstance.prototype.message = function(msg) {
 AuraInstance.prototype.getCallback = function(callback) {
     $A.assert($A.util.isFunction(callback),"$A.getCallback(): 'callback' must be a valid Function");
     var context=$A.getContext().getCurrentAccess();
+    var transactionId = $A.getCurrentTransactionId();
     return function(){
+        var nested = $A.clientService.inAuraLoop();
         $A.getContext().setCurrentAccess(context);
-        callback.apply(null,Array.prototype.slice.call(arguments));
-        $A.getContext().releaseCurrentAccess();
+        $A.clientService.pushStack(name);
+        var savedTid = $A.getCurrentTransactionId();
+        if (transactionId) {
+            $A.setCurrentTransactionId(transactionId);
+        }
+        try {
+            return callback.apply(null,Array.prototype.slice.call(arguments));
+        } catch (e) {
+            // Should we even allow 'nested'?
+            if (nested) {
+                throw e;
+            } else {
+                $A.error("Uncaught error in "+name, e);
+            }
+        } finally {
+            $A.clientService.popStack(name);
+            $A.getContext().releaseCurrentAccess();
+            if (nested) {
+                $A.setCurrentTransactionId(savedTid);
+            }
+        }
     };
 };
 

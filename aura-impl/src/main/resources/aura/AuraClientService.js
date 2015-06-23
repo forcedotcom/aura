@@ -99,7 +99,7 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
 
 /**
  * @description The Aura Client Service.
- * 
+ *
  * There be dragons here.
  *
  * Manage the queue of actions sent to the server.
@@ -450,10 +450,7 @@ AuraClientService.prototype.getCurrentTransactionId = function() {
         $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
         return;
     }
-    if (this.currentTransactionId !== undefined) {
         return this.currentTransactionId;
-    }
-    return this.nextTransactionId;
 };
 
 /**
@@ -473,7 +470,7 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
             return;
         }
         tid = parseInt(abortableId, 10);
-        
+
         if (!(tid <= this.nextTransactionId)) {
             $A.error("AuraClientService.setCurrentTransactionId(): invalid transaction id: "+tid);
             return;
@@ -580,9 +577,9 @@ AuraClientService.prototype.isManifestPresent = function() {
 AuraClientService.prototype.maybeAbortAction = function(action) {
     if (action.isAbortable() && action.getAbortableId() !== this.lastTransactionId) {
         // whoops, action is already aborted.
-        action.abort();
+                action.abort();
         return true;
-    }
+            }
     return false;
 };
 
@@ -608,11 +605,11 @@ AuraClientService.prototype.getAvailableXHR = function(isBackground) {
     if (isBackground && this.availableXHRs.length === 1) {
         // FIXME: this is bogus and will change.
         return null;
-    }
+                }
     var auraXHR = this.availableXHRs.pop();
     if (auraXHR) {
         auraXHR.mark();
-    }
+        }
     return auraXHR;
 };
 
@@ -960,7 +957,7 @@ AuraClientService.prototype.idle = function() {
 /**
  * Initialize definitions.
  *
- * FIXME: why is this exported 
+ * FIXME: why is this exported
  *
  * This should never be called by client code. It is exposed, but deleted after
  * first use.
@@ -972,7 +969,7 @@ AuraClientService.prototype.idle = function() {
 AuraClientService.prototype.initDefs = function(config) {
 
     var i,
-    evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
+        evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
@@ -1151,7 +1148,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                     }
                     $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
                 }, "SUCCESS");
-                    //
+            //
             // INCOMPLETE: If we did not initialize from storage, flag an error, otherwise it is a no-op.
             //
             action.setCallback(acs,
@@ -1173,7 +1170,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                         errorStr = errors[0].message;
                     }
                     $A.log("$A.loadComponent(): Refresh failed:\n" + errorStr);
-                $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
+                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
                     failCallback(!stored, errorStr);
                 }, "ERROR");
 
@@ -1792,7 +1789,7 @@ AuraClientService.prototype.createXHR = function() {
 
 /**
  * Create an encoded string of parameters.
- * 
+ *
  * @param {Map} map A map of parameter names and values
  * @returns {String} The encoded parameters
  * @private
@@ -2286,22 +2283,19 @@ AuraClientService.prototype.clearPreviousAbortableActions = function() {
 AuraClientService.prototype.enqueueAction = function(action, background) {
 
     $A.assert(!$A.util.isUndefinedOrNull(action), "EnqueueAction() cannot be called on an undefined or null action.");
-    $A.assert($A.util.isAction(action),
-            "Cannot call EnqueueAction() with a non Action parameter.");
+    $A.assert($A.util.isAction(action), "Cannot call EnqueueAction() with a non Action parameter.");
 
     if (background) {
         $A.warning("Do not use the deprecated background parameter");
     }
     if (action.isAbortable()) {
         if (action.getAbortableId() === undefined) {
-            // need a ququeId
-            action.setAbortableId(this.getCurrentTransactionId());
-            if (action.getAbortableId() === this.nextTransactionId
-                    && this.lastTransactionId !== this.nextTransactionId) {
-                // FIXME: this is where we need to add queue iDs.
+            if (!this.currentTransactionId && this.nextTransactionId !== this.lastTransactionId) {
                 this.lastTransactionId = this.nextTransactionId;
                 this.actions = this.clearPreviousAbortableActions();
-            } else if (this.currentTransactionId !== undefined && this.currentTransactionId != this.lastTransactionId) {
+            }
+            action.setAbortableId(this.currentTransactionId || this.nextTransactionId);
+            if (this.currentTransactionId && this.currentTransactionId !== this.lastTransactionId) {
                 action.abort();
                 return;
             }

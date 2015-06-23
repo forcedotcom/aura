@@ -101,6 +101,13 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 $A.clientService.receive = orig;
             }),
+        "ClientService.processResponses":new Aura.Utils.Override($A.clientService, $A.clientService.processResponses, false,
+            function(bound) {
+                $A.clientService.processResponses = bound;
+            },
+            function(orig) {
+                $A.clientService.processResponses = orig;
+            }),
         "ClientService.getAvailableXHR":new Aura.Utils.Override($A.clientService, $A.clientService.getAvailableXHR,
             false,
             function(bound) {

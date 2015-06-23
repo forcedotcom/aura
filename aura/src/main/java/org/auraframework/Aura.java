@@ -39,6 +39,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
+import org.auraframework.service.MetricsService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
@@ -89,6 +90,13 @@ public class Aura {
      */
     public static LoggingService getLoggingService() {
         return Aura.get(LoggingService.class);
+    }
+    
+    /**
+     * Get the Logging Service: Provides Aura with a top-level Logging handler from the host environments
+     */
+    public static MetricsService getMetricsService() {
+        return Aura.get(MetricsService.class);
     }
 
     /**

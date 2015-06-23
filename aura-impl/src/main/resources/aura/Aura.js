@@ -1151,6 +1151,7 @@ window['aura'] = window['$A'];
 
 // -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin
+// #include aura.metrics.plugins.PerfMetricsPlugin
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin

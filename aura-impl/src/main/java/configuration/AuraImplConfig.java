@@ -95,6 +95,7 @@ import org.auraframework.impl.java.type.converter.LocalizedStringToDateOnlyConve
 import org.auraframework.impl.java.type.converter.LocalizedStringToDoubleConverter;
 import org.auraframework.impl.java.type.converter.LocalizedStringToIntegerConverter;
 import org.auraframework.impl.java.type.converter.LocalizedStringToLongConverter;
+import org.auraframework.impl.metricsservice.MetricsServiceImpl;
 import org.auraframework.service.BuilderService;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.ClientService;
@@ -104,6 +105,7 @@ import org.auraframework.service.InstanceService;
 import org.auraframework.service.IntegrationService;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.service.LoggingService;
+import org.auraframework.service.MetricsService;
 import org.auraframework.service.RenderingService;
 import org.auraframework.service.SerializationService;
 import org.auraframework.service.ServerService;
@@ -144,6 +146,11 @@ public class AuraImplConfig {
     @PrimaryImpl
     public static BuilderService builderService() {
         return new BuilderServiceImpl();
+    }
+    
+    @Impl
+    public static MetricsService metricsService() {
+        return new MetricsServiceImpl();
     }
 
     @Impl

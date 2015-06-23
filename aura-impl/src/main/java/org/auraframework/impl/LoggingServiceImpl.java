@@ -22,6 +22,7 @@ import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
+import org.auraframework.util.json.Json;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -39,6 +40,11 @@ public class LoggingServiceImpl implements LoggingService {
         AuraImpl.getLoggingAdapter().establish();
         startTimer(LoggingService.TIMER_TOTAL);
         startTimer(LoggingService.TIMER_AURA);
+        
+        setNum(LoggingService.CMP_COUNT, 0L);
+        setNum(LoggingService.DEF_COUNT, 0L);
+        setNum(LoggingService.DEF_DESCRIPTOR_COUNT, 0L);
+
         return this;
     }
 
@@ -189,4 +195,10 @@ public class LoggingServiceImpl implements LoggingService {
             lc.logCSPReport(report);
         }
     }
+
+	@Override
+	public void serializeActions(Json json) {
+		getLoggingContext().serializeActions(json);
+		
+	}
 }

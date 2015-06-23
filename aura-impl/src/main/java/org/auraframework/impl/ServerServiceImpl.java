@@ -40,6 +40,7 @@ import org.auraframework.impl.root.component.ClientComponentClass;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.LoggingService;
+import org.auraframework.service.MetricsService;
 import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
@@ -66,6 +67,7 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
+        MetricsService metricsService = Aura.getMetricsService();
         if (message == null) {
             return;
         }
@@ -91,12 +93,21 @@ public class ServerServiceImpl implements ServerService {
                 if (clientEvents != null && !clientEvents.isEmpty()) {
                     json.writeMapEntry("events", clientEvents);
                 }
-                json.writeMapEnd();
             } finally {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
             }
+            
+            if (context.getMode() != Mode.PROD) {
+		        try {
+		        	metricsService.serializeMetrics(json);
+		        	metricsService.clearMetrics();
+		        } catch (Exception e) {
+		        	System.out.println("Errror parsing MetricsService");
+		        }
+            }
         } finally {
+        	json.writeMapEnd();
             json.close();
         }
     }

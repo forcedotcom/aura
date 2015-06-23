@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
+import org.auraframework.util.json.Json;
 
 import com.google.common.cache.CacheStats;
 import com.google.common.collect.Maps;
@@ -185,7 +186,7 @@ public class LoggingContextImpl implements LoggingContext {
     public KeyValueLogger getKeyValueLogger(StringBuffer log) {
         return new KVLogger(log);
     }
-    
+
     /**
      * do the logging.
      */
@@ -380,5 +381,28 @@ public class LoggingContextImpl implements LoggingContext {
 	@Override
 	public void logCacheInfo(String name, String message, long size, CacheStats stats) {
 		logger.info(String.format("Cache %s: %s (size=%s, %s)", name, message, size, stats.toString()));
+	}
+
+	@Override
+	public void serializeActions(Json json) {
+		for (Map.Entry<String, Map<String, Long>> actionStat : actionStats.entrySet()) {
+            String actionName = actionStat.getKey();
+            Map<String, Long> actionMap = actionStat.getValue();
+            try {
+            	json.writeComma();
+	            json.writeMapBegin();
+	            json.writeMapEntry("name", actionName);
+	            
+	            for (Map.Entry<String, Long> entry : actionMap.entrySet()) {
+	                if (!entry.getKey().contains("action_") && entry.getValue() != null) {
+	                	json.writeMapEntry(entry.getKey(), String.valueOf(entry.getValue()));
+	                }
+	            }
+	            json.writeMapEnd();
+
+            }catch (Exception e) {
+            	e.printStackTrace();
+            }
+        }
 	}
 }

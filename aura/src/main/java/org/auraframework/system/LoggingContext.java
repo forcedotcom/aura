@@ -17,6 +17,8 @@ package org.auraframework.system;
 
 import java.util.Map;
 
+import org.auraframework.util.json.Json;
+
 import com.google.common.cache.CacheStats;
 
 /**
@@ -102,4 +104,6 @@ public interface LoggingContext {
      * wrong.
      */
     void error(String message, Throwable cause);
+
+	void serializeActions(Json json);
 }

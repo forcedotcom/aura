@@ -312,7 +312,6 @@
         		});
         	}
         });
-        
     },
     _bridgeScrollerAction: function (component, scrollerInstance, actionName) {
         var attrActionName = 'on' + actionName.charAt(0).toUpperCase() + actionName.slice(1),
@@ -328,6 +327,7 @@
         e.preventDefault();
     },
     _attachAuraEvents: function (component, scrollerInstance) {
+        var nativeScroller = component.get('v.useNativeScroller');
         var events = [
                 'beforeScrollStart',
                 'scrollStart',
@@ -340,9 +340,11 @@
             wrapper.addEventListener('touchmove', this._preventDefault, false);
         }
 
-        if (component.get('v.useNativeScroller')) {
-            this._attachNativeScrollerEvents(component, scrollerInstance);
-        } else {
+        if (nativeScroller && component.get('v.preventNestedScroll')) {
+            this.scopedScroll.scroll.scope(this._getScrollerWrapper(component));
+        }
+
+        if (!nativeScroller) {
             this._stopNativeDragging(component);
         }
 
@@ -351,19 +353,7 @@
         }
     },
     /*
-    * If we use native scrolling pullToShowMore and pullToRefresh will render as part of the scroller
-    * We need to attach the click events so we can trigger the same funcionality
-    */
-    _attachNativeScrollerEvents: function (cmp, scrollerInstance) {
-        var self             = this,
-            wrapper          = scrollerInstance.wrapper,
-            pullToRefresh    = wrapper.getElementsByClassName('pullToRefresh')[0],
-            pullToLoadMore   = wrapper.getElementsByClassName('pullToLoadMore')[0];
-    },
-
-    /*
-    * @_stopNativeDraggin
-    * Preventsthe native dragging functionality of for desktop browsers.
+    * Prevents he native dragging functionality
     * Removes the undesired dragging effect if click happens within an anchor or li elements.
     */
     _stopNativeDragging: function (component) {

@@ -22,7 +22,6 @@
 	<aura:include name="browserSupport"/>
 	<aura:include name="browserStyles"/>
 	<aura:include name="helpers"/>
-	<aura:include name="polyfillRaf"/>
 	<aura:include name="polyfillClassList"/>
 	<aura:include name="CubicBezier"/>
 

@@ -19,12 +19,14 @@
 
     <!-- Library which holds the vanillaJS ScrollerJS and its plugins -->
     <aura:import library="ui:scrollerLib" property="lib" />
+    <aura:import library="ui:scopedScroll" property="scopedScroll" />
 
     <!-- Exposed attributes -->
     <aura:attribute name="scroll"                type="String"  default="vertical" description="Defines the scroll direction. The string values can be either horizontal, vertical or bidirectional"/>
     <aura:attribute name="enabled"               type="Boolean" default="true"     description="Sets the default state of the scroller"/>
     <aura:attribute name="useCSSTransition"      type="Boolean"                    description="Denotes whether to use css transitions. By default scroller will decide depending on the platform"/>
     <aura:attribute name="useNativeScroller"     type="Boolean" default="false"    description="Leverage native scrolling"/>
+    <aura:attribute name="preventNestedScroll"   type="Boolean" default="false"    description="(If useNative: true) Prevents any parent nested scroller to scroll by default"/>
     <aura:attribute name="preventDefaultOnMove"  type="Boolean" default="false"    description="preventDefault native events on mouse move"/>
     <aura:attribute name="debounce"              type="Boolean" default="false"    description="Separate the gesture move from the animation"/>
     <aura:attribute name="snap"                  type="Boolean" default="false"    description="Enable snap behaviour on the scroller (adds the Snap plugins to the scroller)"/>

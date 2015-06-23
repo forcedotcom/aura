@@ -17,7 +17,7 @@
 Function.RegisterNamespace("Test.Components.Ui.OutputRichText");
 
 [Fixture]
-Test.Ui.OutputRichText.HelperTest = function(){
+Test.Components.Ui.OutputRichText.HelperTest = function(){
 
 	var targetHelper;	
 	

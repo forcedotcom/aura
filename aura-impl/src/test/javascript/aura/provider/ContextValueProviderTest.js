@@ -16,7 +16,7 @@
 Function.RegisterNamespace("Test.Aura.Provider");
 
 [ Fixture ]
-Test.Aura.ContextValueProviderTest = function() {
+Test.Aura.Provider.ContextValueProviderTest = function() {
     var $A = {ns : {}};
     var Aura = {Provider: {}};
     

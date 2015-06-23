@@ -16,7 +16,7 @@
 Function.RegisterNamespace("Test.Aura.Util");
 
 [Fixture]
-Test.Aura.UtilTest = function() {
+Test.Aura.Util.UtilTest = function() {
     var Aura = {Utils:{
         Json:function() {},
             Style:function() {},

@@ -21,7 +21,7 @@ Function.RegisterNamespace("Test.Aura.Util");
  */
 
 [Fixture]
-Test.Aura.BrowserUnsupportedUtilTest=function() {
+Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
     
     [Fixture]
     function browserUnsupportedTests() {

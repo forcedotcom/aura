@@ -17,7 +17,7 @@
 Function.RegisterNamespace("Test.Components.Ui.OutputDateTime");
 
 [Fixture]
-Test.Ui.OutputDateTime.HelperTest = function(){
+Test.Components.Ui.OutputDateTime.HelperTest = function(){
 	var targetHelper;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain

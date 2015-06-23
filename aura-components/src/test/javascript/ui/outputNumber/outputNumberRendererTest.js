@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputNumber");
+Function.RegisterNamespace("Test.Components.Ui.OutputNumber");
 
 [Fixture]
-Test.Ui.OutputNumber.RendererTest = function(){
+Test.Components.Ui.OutputNumber.RendererTest = function(){
 	var targetRenderer;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain

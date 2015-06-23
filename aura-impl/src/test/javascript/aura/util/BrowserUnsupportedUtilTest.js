@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.BrowserUnsupportedUtilTest");
+Function.RegisterNamespace("Test.Aura.Util");
 
 /**
  * This test shows that when the browser is mocked to be missing native utilities, the fallbacks implementation in
@@ -21,7 +21,7 @@ Function.RegisterNamespace("Test.Aura.BrowserUnsupportedUtilTest");
  */
 
 [Fixture]
-Test.Aura.BrowserUnsupportedUtilTest=function() {
+Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
     
     [Fixture]
     function browserUnsupportedTests() {

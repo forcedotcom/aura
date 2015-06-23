@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura");
+Function.RegisterNamespace("Test.Aura.Provider");
 
 [ Fixture ]
-Test.Aura.ContextValueProviderTest = function() {
+Test.Aura.Provider.ContextValueProviderTest = function() {
     var $A = {ns : {}};
     var Aura = {Provider: {}};
     

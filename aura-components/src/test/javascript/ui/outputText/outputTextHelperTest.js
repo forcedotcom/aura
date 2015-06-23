@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputText");
+Function.RegisterNamespace("Test.Components.Ui.OutputText");
 
 [Fixture]
-Test.Ui.OutputText.HelperTest = function(){
+Test.Components.Ui.OutputText.HelperTest = function(){
 	var targetHelper;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain

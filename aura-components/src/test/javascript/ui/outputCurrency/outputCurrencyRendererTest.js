@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputCurrency");
+Function.RegisterNamespace("Test.Components.Ui.OutputCurrency");
 
 [Fixture]
-Test.Ui.OutputCurrency.RendererTest = function(){
+Test.Components.Ui.OutputCurrency.RendererTest = function(){
 	var targetRenderer;	
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain

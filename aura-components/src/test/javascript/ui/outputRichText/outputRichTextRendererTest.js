@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-Function.RegisterNamespace("Test.Ui.OutputRichText");
+Function.RegisterNamespace("Test.Components.Ui.OutputRichText");
 
 [Fixture]
-Test.Ui.OutputRichText.RendererTest = function(){
+Test.Components.Ui.OutputRichText.RendererTest = function(){
 
 	var targetRenderer;	
 	

@@ -82,21 +82,32 @@
                 tabSet = cmp.find(self.SELECTOR.tabsetcmp);
 
                 //verify that the title attribute is set
-                $A.test.assertEqualsIgnoreWhitespace(
-                    'tab 0 title', 
-                    $A.util.getElementAttributeValue(
-                        $A.test.select(self.SELECTOR.tabitem_anchor)[0],
-                        'title'
-                    ), 
-                    'Tab 0 title attribute should be populated'
-                );
-                $A.test.assertEqualsIgnoreWhitespace(
-                    'tab 1 title', 
-                    $A.util.getElementAttributeValue(
-                        $A.test.select(self.SELECTOR.tabitem_anchor)[1],
-                        'title'
-                    ), 
-                    'Tab 1 title attribute should be populated'
+                $A.test.addWaitForWithFailureMessage(
+                    2,
+                    function(){
+                        return $A.test.select(self.SELECTOR.tabitem_anchor).length;
+                    },
+                    'Total tab count should be 3 after adding a tab',
+                    function(){
+                        cmp.set('v._tabTitle', self.getTabTitlesString());
+
+                        $A.test.assertEqualsIgnoreWhitespace(
+                            'tab 0 title', 
+                            $A.util.getElementAttributeValue(
+                                $A.test.select(self.SELECTOR.tabitem_anchor)[0],
+                                'title'
+                            ), 
+                            '"Tab 0 title" attribute should be populated'
+                        );
+                        $A.test.assertEqualsIgnoreWhitespace(
+                            'tab 1 title', 
+                            $A.util.getElementAttributeValue(
+                                $A.test.select(self.SELECTOR.tabitem_anchor)[1],
+                                'title'
+                            ), 
+                            '"Tab 1 title" attribute should be populated'
+                        );
+                    }
                 );
             },
             function(cmp){
@@ -119,31 +130,281 @@
                     },
                     'Total tab count should be 3 after adding a tab',
                     function(){
+                        cmp.set('v._tabTitle', self.getTabTitlesString());
+
                         $A.test.assertEqualsIgnoreWhitespace(
                             'dynamictab<b>dummy html</b>', 
                             $A.util.getElementAttributeValue(
                                 $A.test.select(self.SELECTOR.tabitem_anchor)[2],
                                 'title'
                             ), 
-                            'dynamictab<b>dummy html</b>'
-                        );
-
-                        var arrayTabTitle = [];
-                        for (var i = 0; i < 3; i++){
-                            arrayTabTitle.push(
-                                $A.util.getElementAttributeValue(
-                                    $A.test.select(self.SELECTOR.tabitem_anchor)[i],
-                                    'title'
-                                )
-                            );
-                        }
-                        cmp.set('v._extra', arrayTabTitle.join(' | '))
+                            '"dynamictab<b>dummy html</b>" special tab title with HTML encoded'
+                        );                        
                     }
                 );
             }
         ]
     },
 
+
+    /**
+     * test after tabset render container width and height clipping rectangle.
+     * first tab selected
+     */
+    testAfterRenderStateTab0Active: {
+        attributes: {
+            "renderItem": "testAfterRenderStateTab0Active"
+        },
+        test: [
+            function(cmp) {
+                var self = this;
+
+                //the entire tabset
+                var tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+                var afterRenderWidth = tabSet.get('v._afterRenderWidth');
+                var afterRenderHeight = tabSet.get('v._afterRenderHeight');
+
+                cmp.set(
+                    'v._tabSet',
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, 'Entire Tabset: afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, 'Entire Tabset: afterRenderHeight');
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab0';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth');
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight');
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertTruthy(
+                    isDomPresent, 
+                    curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
+                );
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab1';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth') || 0;
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight') || 0;
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                
+                //assert that tab 1 is of zero width and zero height
+                self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertFalse(
+                    isDomPresent, 
+                    curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
+                );
+            }
+        ]
+    },
+
+
+
+    /**
+     * test after tabset render container width and height clipping rectangle.
+     * second tab selected
+     */
+    testAfterRenderStateTab1Active: {
+        attributes: {
+            "renderItem": "testAfterRenderStateTab1Active"
+        },
+        test: [
+            function(cmp) {
+                var self = this;
+
+                //the entire tabset
+                var tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+                var afterRenderWidth = tabSet.get('v._afterRenderWidth');
+                var afterRenderHeight = tabSet.get('v._afterRenderHeight');
+
+                cmp.set(
+                    'v._tabSet',
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, 'Entire Tabset: afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, 'Entire Tabset: afterRenderHeight');
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab1';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth');
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight');
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertTruthy(
+                    isDomPresent, 
+                    curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
+                );
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab0';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth') || 0;
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight') || 0;
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                
+                //assert that tab 1 is of zero width and zero height
+                self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertFalse(
+                    isDomPresent, 
+                    curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
+                );
+            }
+        ]
+    },
+
+
+    
+    /**
+     * test after tabset render container width and height clipping rectangle.
+     * no selected tab on page init
+     */
+    testAfterRenderStateNoActiveTab: {
+        attributes: {
+            "renderItem": "testAfterRenderStateNoActiveTab"
+        },
+        test: [
+            function(cmp) {
+                var self = this;
+
+                //the entire tabset
+                var tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+                var afterRenderWidth = tabSet.get('v._afterRenderWidth');
+                var afterRenderHeight = tabSet.get('v._afterRenderHeight');
+
+                cmp.set(
+                    'v._tabSet',
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, 'Entire Tabset: afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, 'Entire Tabset: afterRenderHeight');
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab0';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth');
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight');
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                self.verifyAfterRenderSizePostive(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizePostive(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertTruthy(
+                    isDomPresent, 
+                    curtabitemId + ': should be present in the dom: isDomPresent="' + isDomPresent + '"'
+                );
+            },
+            function(cmp){
+                var self = this;
+                var curtabitemId = 'tab1';
+                var curtabitem = cmp.find(curtabitemId);
+                var afterRenderWidth = curtabitem.get('v._afterRenderWidth') || 0;
+                var afterRenderHeight = curtabitem.get('v._afterRenderHeight') || 0;
+                var isDomPresent = $A.util.getBooleanValue( curtabitem.get('v._isDomPresent') );
+
+                cmp.set(
+                    'v._' + curtabitemId,
+                    {
+                        width: afterRenderWidth,
+                        height: afterRenderHeight,
+                        isDomPresent: isDomPresent
+                    }
+                );
+
+                
+                //assert that tab 1 is of zero width and zero height
+                self.verifyAfterRenderSizeZero(afterRenderWidth, curtabitemId + ': afterRenderWidth:');
+                self.verifyAfterRenderSizeZero(afterRenderHeight, curtabitemId + ': afterRenderHeight:');
+
+                //assert dom presence
+                $A.test.assertFalse(
+                    isDomPresent, 
+                    curtabitemId + ': should NOT BE present in the dom (because tab0 is currently selected): isDomPresent="' + isDomPresent + '"'
+                );
+            }
+        ]
+    },
 
 
     //helper
@@ -213,5 +474,52 @@
             }
         });
         e.fire();
+    },
+    
+    /**
+     * @return tab titles separated by " | "
+     */
+    getTabTitlesString: function(){
+        var self = this;
+        var arrayTabTitle = [];
+        var elTabItemAnchor = $A.test.select(self.SELECTOR.tabitem_anchor);
+        for (var i = 0; i < elTabItemAnchor.length; i++){
+            arrayTabTitle.push(
+                $A.util.getElementAttributeValue(
+                    elTabItemAnchor[i],
+                    'title'
+                ) || '"undefined"'
+            );
+        }
+
+        return arrayTabTitle.join(' | ');
+    },
+
+
+    /**
+     * verify after render width and height both POSTIVE (> 0)
+     */
+    verifyAfterRenderSizePostive: function(size, optionalMessage){
+        optionalMessage = optionalMessage || '';
+        size = parseInt(size);
+
+        $A.test.assertTruthy(
+            size > 0,
+            optionalMessage + ' size="' + size + '" should be > 0'
+        );
+    },
+
+
+
+    /**
+     * verify after render width and height both EQUALS 0
+     */
+    verifyAfterRenderSizeZero: function(size, optionalMessage){
+        optionalMessage = optionalMessage || '';
+        size = parseInt(size);
+        $A.test.assertTruthy(
+            size === 0,
+            optionalMessage + ' size="' + size + '" should be === 0'
+        );
     }
 });

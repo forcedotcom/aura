@@ -36,6 +36,12 @@
 	border:1px solid black;
 }
 
+.THIS.block .subtitle{
+	font-weight:bold;
+	margin-bottom:15px;
+	color:red;
+}
+
 .THIS.extraFooter{
 	padding:20px;
 	margin-top:20px;

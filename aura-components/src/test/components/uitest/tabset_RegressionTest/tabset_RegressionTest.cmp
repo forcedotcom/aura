@@ -12,7 +12,6 @@
 -->
 <aura:component>
 	<aura:attribute name="renderItem" type="String" default="none" />
-	<aura:attribute name="_extra" type="String" default="none" />
 
 	<aura:if isTrue="{! v.renderItem == 'testAddTab'}">
 	<div class="block">
@@ -31,6 +30,9 @@
 	    <div>
 	        <h1>Tab Item Alt Text ("title" attribute)</h1>
 	    </div>
+	    <div class="subtitle">
+	    	<div>_tabTitle = {!v._tabTitle}</div>
+		</div>
 	    <div>
 	        <ui:tabset class="tabset" aura:id="tabSet">
 	        	<ui:tab title="tab 0 title">tab 0 content</ui:tab>
@@ -40,7 +42,66 @@
 	</div>
 	</aura:if>
 
+	<aura:if isTrue="{! v.renderItem == 'testAfterRenderStateTab0Active'}">
+	<div class="block">
+	    <div>
+	        <h1>testAfterRenderStateTab0Active - ui:tab afterRender State - first tab selected</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>TabSet: w={!v._tabSet.width}  h={!v._tabSet.height}</div>
+	    	<div>Tab0: w={!v._tab0.width}  h={!v._tab0.height} isDomPresent={!v._tab0.isDomPresent}</div>
+	    	<div>Tab1: w={!v._tab1.width}  h={!v._tab1.height} isDomPresent={!v._tab1.isDomPresent}</div>
+	    </div>
+	    <div>
+	        <uitest:tabset_extendsTest class="tabset" aura:id="tabSet">
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab0" title="tab 0" active="true">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</uitest:tab_afterRenderCustomTab>
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab1" title="tab 1">tab 1 content</uitest:tab_afterRenderCustomTab>
+	        </uitest:tabset_extendsTest>
+	    </div>
+	</div>
+	</aura:if>
 
+
+	<aura:if isTrue="{! v.renderItem == 'testAfterRenderStateTab1Active'}">
+	<div class="block">
+	    <div>
+	        <h1>testAfterRenderStateTab1Active - ui:tab afterRender State - second tab selected</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>TabSet: w={!v._tabSet.width}  h={!v._tabSet.height}</div>
+	    	<div>Tab0: w={!v._tab0.width}  h={!v._tab0.height} isDomPresent={!v._tab0.isDomPresent}</div>
+	    	<div>Tab1: w={!v._tab1.width}  h={!v._tab1.height} isDomPresent={!v._tab1.isDomPresent}</div>
+	    </div>
+	    <div>
+	        <uitest:tabset_extendsTest class="tabset" aura:id="tabSet">
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab0" title="tab 0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</uitest:tab_afterRenderCustomTab>
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab1" title="tab 1" active="true">tab 1 content</uitest:tab_afterRenderCustomTab>
+	        </uitest:tabset_extendsTest>
+	    </div>
+	</div>
+	</aura:if>
+
+
+	<aura:if isTrue="{! v.renderItem == 'testAfterRenderStateNoActiveTab'}">
+	<div class="block">
+	    <div>
+	        <h1>testAfterRenderStateNoActiveTab - ui:tab afterRender State - no tab selected</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>TabSet: w={!v._tabSet.width}  h={!v._tabSet.height}</div>
+	    	<div>Tab0: w={!v._tab0.width}  h={!v._tab0.height} isDomPresent={!v._tab0.isDomPresent}</div>
+	    	<div>Tab1: w={!v._tab1.width}  h={!v._tab1.height} isDomPresent={!v._tab1.isDomPresent}</div>
+	    </div>
+	    <div>
+	        <uitest:tabset_extendsTest class="tabset" aura:id="tabSet">
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab0" title="tab 0">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</uitest:tab_afterRenderCustomTab>
+	        	<uitest:tab_afterRenderCustomTab aura:id="tab1" title="tab 1">tab 1 content</uitest:tab_afterRenderCustomTab>
+	        </uitest:tabset_extendsTest>
+	    </div>
+	</div>
+	</aura:if>
+
+	<!---extra data-->
 	<div class="extraFooter">
 	    <div>
 	        <h2>Test Variables</h2>
@@ -61,7 +122,22 @@
                 		</a>
                 	</li>
                 	<li>
-                		<a href="/uitest/tabset_RegressionTest.cmp?renderItem=testTabItemAltText" target="_top">Tab Item Alt Text ("title" attribute)
+                		<a href="/uitest/tabset_RegressionTest.cmp?renderItem=testTabItemAltText" target="_top">Tab 	Item Alt Text ("title" attribute)
+	        			</a>
+                	</li>
+                	<li>
+                		<a href="/uitest/tabset_RegressionTest.cmp?renderItem=testAfterRenderTabItemState1" target="_top">
+                			testAfterRenderStateTab0Active - ui:tab afterRender State - first tab selected
+	        			</a>
+                	</li>
+                	<li>
+                		<a href="/uitest/tabset_RegressionTest.cmp?renderItem=testAfterRenderStateTab1Active" target="_top">
+							testAfterRenderStateTab1Active - ui:tab afterRender State - second tab selected
+	        			</a>
+                	</li>
+                	<li>
+                		<a href="/uitest/tabset_RegressionTest.cmp?renderItem=testAfterRenderStateNoActiveTab" target="_top">
+							testAfterRenderStateNoActiveTab - ui:tab afterRender State - no tab selected
 	        			</a>
                 	</li>
 	            </ul>

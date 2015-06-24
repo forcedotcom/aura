@@ -18,6 +18,16 @@
         component.set("v.visible", false);
     },
 
+    highlightRange: function(component, event) {
+        var params = event.getParam('arguments');
+        if (params) {
+            var grid = component.find("grid");
+            grid.set("v.rangeStart", params.rangeStart);
+            grid.set("v.rangeEnd", params.rangeEnd);
+            grid.set("v.rangeClass", params.rangeClass)
+        }
+    },
+
     closeOnTab: function(component, event, helper) {
         helper.handleESCKey(component, event);
         var keyCode = event.keyCode;
@@ -138,7 +148,9 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": selectedDate});
         selectDateEvent.fire();
-        component.set("v.visible", false);
+        if (component.get("v.hideOnSelect")) {
+            component.set("v.visible", false);
+        }
     },
 
     selectToday: function(component, event, helper) {
@@ -146,7 +158,9 @@
         var selectDateEvent = component.getEvent("selectDate");
         selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
         selectDateEvent.fire();
-        component.set("v.visible", false);
+        if (component.get("v.hideOnSelect")) {
+            component.set("v.visible", false);
+        }
     },
 
     set: function(component, event, helper) {

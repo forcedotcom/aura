@@ -30,13 +30,21 @@
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
     <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. Valid values: large, medium, small"/>
     <aura:attribute name="showToday" type="Boolean" default="true" description="Indicates whether a Today link should display at the bottom. If there is a time portion, the Today link wouldn't show up even this is set to true."/>
+    <aura:attribute name="hideOnSelect" type="Boolean" default="true" description="Close the datePicker after a date is selected"/>
     <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
+
+    <aura:method name="highlightRange" action="{!c.highlightRange}" access="PUBLIC"
+                 description="highlight the dates between rangeStart and rangeEnd inclusive">
+        <aura:attribute name="rangeStart" type="String" description="Start date of the range in the format yyyy-mm-dd"/>
+        <aura:attribute name="rangeEnd" type="String" description="End date of the range in the format yyyy-mm-dd"/>
+        <aura:attribute name="rangeClass" type="String" description="A CSS class to be applied when a range is selected"/>
+    </aura:method>
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible' : '') + 
-                                                 ($Browser.isPhone == true ? ' phone' : '') + 
+    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible' : '') +
+                                                 ($Browser.isPhone == true ? ' phone' : '') +
                                                  (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">
@@ -79,11 +87,11 @@
                     </aura:set>
                 </aura:if>
             </div>
-            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}" 
+            <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}"
                                               dimension="{!v.dimension}"
                                               setFocus="{!v.setFocus}"
-                                              hide="{!c.hide}" 
-                                              selectDate="{!c.selectDate}" 
+                                              hide="{!c.hide}"
+                                              selectDate="{!c.selectDate}"
                                               updateCalendarTitle="{!c.updateCalendarTitle}"/>
             <aura:if isTrue="{!v.hasTime}">
                 <div class="timeBar">
@@ -98,5 +106,5 @@
                 </aura:set>
             </aura:if>
         </div><!-- scroller -->
-    </div><!-- datePicker --> 
+    </div><!-- datePicker -->
 </aura:component>

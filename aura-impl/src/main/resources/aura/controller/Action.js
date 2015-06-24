@@ -762,8 +762,8 @@ Action.prototype.updateFromResponse = function(response) {
         var originalValue = $A.util.json.orderedEncode(this.originalResponse["returnValue"]);
         var refreshedValue = $A.util.json.orderedEncode(response["returnValue"]);
         if (refreshedValue === originalValue) {
-            var originalComponents = $A.util.json.encode(this.originalResponse["components"]);
-            var refreshedComponents = $A.util.json.encode(response["components"]);
+            var originalComponents = $A.util.json.orderedEncode(this.originalResponse["components"]);
+            var refreshedComponents = $A.util.json.orderedEncode(response["components"]);
             if (refreshedComponents === originalComponents) {
                 $A.log("Action.updateFromResponse(): skipping duplicate response: " + this.getStorageKey() + ", " + this.getId());
                 return false;

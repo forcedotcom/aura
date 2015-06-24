@@ -65,7 +65,7 @@
             var outputTextClasses = cmp.find('outputText').getElement().auraClass;
             var pClasses = cmp.find('p').getElement().auraClass;
 
-            $A.test.assertEquals("uiInput uiInputText clientApiTestCssStyleTest", $A.util.trim(inputTextClasses),
+            $A.test.assertEquals("uiInput uiInputText uiInput--default uiInput--input clientApiTestCssStyleTest", $A.util.trim(inputTextClasses),
                     "Incorrect class names present on inputText.");
             $A.test.assertEquals("uiOutputText clientApiTestCssStyleTest", $A.util.trim(outputTextClasses),
                     "Incorrect class names present on outputText.");

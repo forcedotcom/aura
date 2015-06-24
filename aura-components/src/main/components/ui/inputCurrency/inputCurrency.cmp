@@ -15,11 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" description="An input field for entering a currency.">
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true"
+                defaultFlavor="default, input" description="An input field for entering a currency.">
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
     <input type="{!v.type}"
            id="{!v.domId}"
-           class="{!v.class}"
+           class="{!v.class + ' input'}"
            value="{!v.value}"
            max="{!v.max}"
            min="{!v.min}"

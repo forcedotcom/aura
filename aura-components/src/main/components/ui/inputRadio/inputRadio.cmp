@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputBaseOption" extensible="true" description="The radio button used in the input.">
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputBaseOption" extensible="true" defaultflavor="default, radio"
+                description="The radio button used in the input.">
 
     <aura:attribute access="GLOBAL" name="disabled" type="Boolean" default="false" description="Specifies whether this radio button should be displayed in a disabled state. Disabled radio buttons can't be clicked. Default value is &quot;false&quot;."/>
      

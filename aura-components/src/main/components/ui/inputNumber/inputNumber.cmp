@@ -15,11 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
+<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL" defaultFlavor="default,input"
+                description="An input field for entering a number, taking advantage of client input assistance and validation when available.">
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
     <input type="{!v.type}"
        		  id="{!v.domId}"
-       		  class="{!v.class}"
+              class="{!v.class + ' input'}"
        		  value="{!v.value}"
        		  max="{!v.max}"
        		  min="{!v.min}"

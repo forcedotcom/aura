@@ -13,5 +13,55 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.uiInput{
+.THIS{
+}
+
+.THIS.has_error {
+    border-color: red;
+    background-color: rgba(255, 0, 0, .025);
+}
+
+.THIS.errorMsg {
+    display: block;
+    color: red;
+    font-size: 0.75em;
+}
+
+.THIS.hide {
+    display: none;
+}
+
+.THIS:invalid {
+  box-shadow: none;
+}
+ 
+.THIS:-moz-submit-invalid {
+  box-shadow: none;
+}
+ 
+.THIS:-moz-ui-invalid {
+  box-shadow:none;
+}
+
+.THIS::-ms-clear {
+  width : 0;
+  height: 0;
+}
+
+
+/* Flavors */
+
+.THIS--checkbox {
+}
+.THIS--text {
+}
+.THIS--input {
+}
+.THIS--radio {
+}
+.THIS--textarea {
+}
+.THIS--select {
+}
+.THIS--compound {
 }

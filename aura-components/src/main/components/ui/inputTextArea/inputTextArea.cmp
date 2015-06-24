@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true" defaultFlavor="default, textarea"
     description="An HTML textarea element that can be editable or read-only. Scroll bars may not appear on Chrome browsers in Android devices, but you can select focus in the textarea to activate scrolling.">
 
     <aura:attribute access="GLOBAL" name="rows" type="Integer" default="2" description="The height of the text area, which is defined by the number of rows to display at a time. Default value is &#8220;2&#8221;." />
@@ -29,7 +29,7 @@
 
     <textarea aura:id="textAreaElem"
               id="{!v.domId}"
-              class="{!v.class+(v.resizable?'':' noresize')}"
+              class="{!v.class + ' textarea' + (v.resizable?'':' noresize')}"
               cols="{!v.cols}"
               rows="{!v.rows}"
               disabled="{!v.disabled}"

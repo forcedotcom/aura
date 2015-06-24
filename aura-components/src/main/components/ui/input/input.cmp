@@ -16,7 +16,7 @@
 
 -->
 <aura:component extensible="true" abstract="true" implements="ui:visible, ui:uiEvents"
-    description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA">
+    description="An abstract class that is extended by input components such as ui:inputCheckbox and ui:inputText." support="GA" dynamicallyFlavorable="true">
 
     <!-- Library which holds the Aura events registration -->
     <aura:import library="ui:eventLib" property="lib"/>

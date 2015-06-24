@@ -17,6 +17,7 @@
 
 /**
  * @private
+ * @function Test#putMessage
  */
 TestInstance.prototype.putMessage = function(pre, expected, msg) {
     if (typeof msg !== "string") {
@@ -40,6 +41,7 @@ TestInstance.prototype.putMessage = function(pre, expected, msg) {
 
 /**
  * @private
+ * @function Test#expectMessage
  */
 TestInstance.prototype.expectMessage = function(pre, expected, msg) {
     if (pre !== null) {
@@ -63,6 +65,7 @@ TestInstance.prototype.expectMessage = function(pre, expected, msg) {
  * expected errors not received (in the expected array).
  * 
  * @private
+ * @function Test#clearExpected
  */
 TestInstance.prototype.clearExpected = function(pre, expected) {
     for (var i = 0; i < pre.length; i++) {
@@ -110,6 +113,7 @@ window.onerror = (function() {
  * Used to keep track of errors happening in test modes.
  * 
  * @private
+ * @function Test#logError
  */
 TestInstance.prototype.logError = function(msg, e) {
     var errors = TestInstance.prototype.errors;
@@ -148,6 +152,7 @@ TestInstance.prototype.logError = function(msg, e) {
  * Tear down a test.
  * 
  * @private
+ * @function Test#doTearDown
  */
 TestInstance.prototype.doTearDown = function() {
     var i;
@@ -187,6 +192,7 @@ TestInstance.prototype.doTearDown = function() {
 
 /**
  * @private
+ * @function Test#logErrors
  */
 TestInstance.prototype.logErrors = function(error, label, errorArray) {
     var i;
@@ -208,6 +214,7 @@ TestInstance.prototype.logErrors = function(error, label, errorArray) {
  * Periodic callback to handle continuing operations.
  * 
  * @private
+ * @function Test#continueWhenReady
  */
 TestInstance.prototype.continueWhenReady = function() {
     var that = this;
@@ -315,6 +322,7 @@ TestInstance.prototype.continueWhenReady = function() {
  * This is used by webdriver to get information to display.
  * 
  * @export
+ * @function Test#getDump
  */
 TestInstance.prototype.getDump = function() {
     var status = "";
@@ -345,6 +353,7 @@ TestInstance.prototype.getDump = function() {
  * Set up AppCache event listeners. Not a complete set of events, but all the ones we care about in our current tests.
  * 
  * @private
+ * @function Test#appCacheEvents
  */
 TestInstance.prototype.appCacheEvents = (function() {
     var appCacheEvents = [];

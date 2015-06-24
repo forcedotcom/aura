@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new RequiredVersionDef instance, including the descriptor.
+ * Creates a new RequiredVersionDef instance, including the descriptor.
  * @constructor
  * @param {Object} config
  */

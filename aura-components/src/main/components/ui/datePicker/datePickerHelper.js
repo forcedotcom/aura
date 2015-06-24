@@ -395,6 +395,17 @@
             }
         }
     },
+    
+    setTitleTag: function(component) {
+    	var headingLevel = component.get("v.titleHeadingLevel");
+    	if ($A.util.isEmpty(headingLevel)) {
+    		return;
+    	}
+        var calTitle = component.find("calTitle");
+        if (calTitle) {
+        	calTitle.set("v.tag", headingLevel);
+        }
+    },
 
     updateGlobalEventListeners: function(component) {
         var concreteCmp = component.getConcreteComponent();

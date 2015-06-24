@@ -39,6 +39,7 @@
 
     doInit: function(component, event, helper) {
         helper.localizeToday(component);
+        helper.setTitleTag(component);
         component._windowSize = $A.util.getWindowSize();
     },
 

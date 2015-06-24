@@ -1,0 +1,3 @@
+<aura:component>
+    <flavorTest:dynamically_flavorable_x_childChangeFlavor aura:id="target"/> <!-- important to test this as a component instance that isn't at the top level -->
+</aura:component>

@@ -572,13 +572,18 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function NewInstance() {
+        var mockAuraContext = Mocks.GetMock(Object.Global(), "$A", { getContext : function() {return null;} });
+
 		[ Fact ]
 		function ReturnsActionWithDef() {
 			// Arrange
 			var target = new ActionDef({});
 
 			// Act
-			var actual = target.newInstance().def;
+			var actual;
+			mockAuraContext(function() {
+			    actual = target.newInstance().def;
+			});
 
 			// Assert
 			Assert.Equal(target, actual);
@@ -592,7 +597,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			target.meth = expected;
 
 			// Act
-			var actual = target.newInstance().meth;
+			var actual;
+			mockAuraContext(function() {
+			    actual = target.newInstance().meth;
+			});
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -606,7 +614,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			target.paramDefs = expected;
 
 			// Act
-			var actual = target.newInstance().paramDefs;
+			var actual;
+			mockAuraContext(function() {
+			    actual = target.newInstance().paramDefs;
+			});
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -620,7 +631,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var target = new ActionDef({});
                         target.background = expected;
 
-			var actual = target.newInstance().background;
+			var actual;
+			mockAuraContext(function() {
+			    actual = target.newInstance().background;
+			});
 
 			Assert.Equal(expected, actual);
 		}
@@ -632,7 +646,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var target = new ActionDef({});
 
 			// Act
-			var actual = target.newInstance(expected).cmp;
+			var actual;
+			mockAuraContext(function() {
+			    actual = target.newInstance(expected).cmp;
+			});
 
 			// Assert
 			Assert.Equal(expected, actual);

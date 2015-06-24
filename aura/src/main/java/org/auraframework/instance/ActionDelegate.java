@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
@@ -113,6 +114,16 @@ public abstract class ActionDelegate implements Action {
     @Override
     public String getPath() {
         return original.getPath();
+    }
+
+    @Override
+    public DefDescriptor<ComponentDef> getCallingDescriptor() {
+        return original.getCallingDescriptor();
+    }
+
+    @Override
+    public void setCallingDescriptor(String caller) {
+        original.setCallingDescriptor(caller);
     }
 
     private Action original;

@@ -33,6 +33,7 @@ import org.auraframework.css.MutableThemeList;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
@@ -875,6 +876,10 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getAccessVersion() throws QuickFixException {
+        if (this.currentAction == null) {
+            return null;
+        }
+
         // only valid for component retrieving actions
         DefDescriptor<?> desc = this.getCurrentCallingDescriptor();
         if (desc == null) {
@@ -888,8 +893,13 @@ public class AuraContextImpl implements AuraContext {
 
         if (desc.getDefType() == DefType.COMPONENT) {
             BaseComponentDef def = (BaseComponentDef) Aura.getDefinitionService().getDefinition(desc);
+            DefDescriptor<ComponentDef> d = this.currentAction.getCallingDescriptor();
+            if (d == null) {
+                return null;
+            }
+
             for (RequiredVersionDef rvd : def.getRequiredVersionDefs().values()) {
-                if (rvd.getName().equals(desc.getNamespace())) {
+                if (rvd.getName().equals(d.getNamespace())) {
                     return rvd.getVersion();
                 }
             }

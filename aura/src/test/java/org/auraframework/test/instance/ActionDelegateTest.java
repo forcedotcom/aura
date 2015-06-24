@@ -83,6 +83,9 @@ public class ActionDelegateTest extends UnitTestCase {
         oneCall(methodMap, calledMap, "getParams");
 
         oneCall(methodMap, calledMap, "getInstanceStack");
+
+        oneCall(methodMap, calledMap, "getCallingDescriptor");
+        oneCall(methodMap, calledMap, "setCallingDescriptor", new String("descriptor"));
         for (Method m : Action.class.getMethods()) {
             assertTrue(m.getName()+"was not called", calledMap.get(m.getName()));
         }

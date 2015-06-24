@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.controller.ComponentController.AuraClientException;
 import org.auraframework.instance.Action;
@@ -132,5 +133,15 @@ public class JavascriptPseudoAction implements Action {
     @Override
     public InstanceStack getInstanceStack() {
         return null;
+    }
+
+    @Override
+    public DefDescriptor<ComponentDef> getCallingDescriptor() {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have get calling descriptor");
+    }
+
+    @Override
+    public void setCallingDescriptor(String caller) {
+        throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
     }
 }

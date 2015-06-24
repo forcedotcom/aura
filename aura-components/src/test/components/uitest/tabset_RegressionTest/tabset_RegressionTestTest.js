@@ -17,6 +17,8 @@
     SELECTOR: {
         tabsetcmp : 'tabSet',
         tabitem: '.tabItem.uiTabItem',
+        tabitem_anchor : '.tabItem.uiTabItem .tabHeader',
+        tabitem_active: '.tabItem.uiTabItem.active',
         tabbody: '.tabBody.uiTab.active',
         tabbody_active: '.tabBody.uiTab.active'
     },
@@ -67,6 +69,82 @@
     },
 
 
+    /**
+     * Test alt text on tabitem
+     */
+    testTabItemAltText: {
+        attributes: {
+            "renderItem": "testTabItemAltText"
+        },
+        test: [
+            function(cmp) {
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+
+                //verify that the title attribute is set
+                $A.test.assertEqualsIgnoreWhitespace(
+                    'tab 0 title', 
+                    $A.util.getElementAttributeValue(
+                        $A.test.select(self.SELECTOR.tabitem_anchor)[0],
+                        'title'
+                    ), 
+                    'Tab 0 title attribute should be populated'
+                );
+                $A.test.assertEqualsIgnoreWhitespace(
+                    'tab 1 title', 
+                    $A.util.getElementAttributeValue(
+                        $A.test.select(self.SELECTOR.tabitem_anchor)[1],
+                        'title'
+                    ), 
+                    'Tab 1 title attribute should be populated'
+                );
+            },
+            function(cmp){
+                var self = this,
+                tabSet = cmp.find(self.SELECTOR.tabsetcmp);
+
+                //this shall work with dynamic tab
+                self.addDynamicTab(
+                    tabSet,
+                    "dynamictab<b>dummy html</b>",//tab title
+                    "dynamictab content ",//tab content
+                    "dynamictab"//tab name
+                );
+
+                //verify
+                $A.test.addWaitForWithFailureMessage(
+                    3,
+                    function(){
+                        return $A.test.select(self.SELECTOR.tabitem_anchor).length;
+                    },
+                    'Total tab count should be 3 after adding a tab',
+                    function(){
+                        $A.test.assertEqualsIgnoreWhitespace(
+                            'dynamictab<b>dummy html</b>', 
+                            $A.util.getElementAttributeValue(
+                                $A.test.select(self.SELECTOR.tabitem_anchor)[2],
+                                'title'
+                            ), 
+                            'dynamictab<b>dummy html</b>'
+                        );
+
+                        var arrayTabTitle = [];
+                        for (var i = 0; i < 3; i++){
+                            arrayTabTitle.push(
+                                $A.util.getElementAttributeValue(
+                                    $A.test.select(self.SELECTOR.tabitem_anchor)[i],
+                                    'title'
+                                )
+                            );
+                        }
+                        cmp.set('v._extra', arrayTabTitle.join(' | '))
+                    }
+                );
+            }
+        ]
+    },
+
+
 
     //helper
     /**
@@ -93,7 +171,7 @@
                         )
                     ),
                     'Selected tab content should be "' + expectedActiveTabBody + '"'
-                )
+                );
             }
         );
     },

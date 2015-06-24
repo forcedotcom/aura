@@ -24,21 +24,25 @@
     <aura:attribute name="selectedDate" type="Date" description="The selected date."/>
     <aura:attribute name="dimension" type="String" default="large" description="The size of the date picker. Valid values: large, medium, small"/>
     <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
-    
+
+    <aura:attribute name="rangeStart" type="String" description="Start date of a range to be highlighted"/>
+    <aura:attribute name="rangeEnd" type="String" description="End date of a range to be highlighted"/>
+    <aura:attribute name="rangeClass" type="String" default="highlight" description="A CSS class to be applied when a range is selected"/>
+
     <!-- private attributes -->
     <aura:attribute name="_setFocus" type="Boolean" default="true" description="The internal state of setFocus."/>
     <aura:attribute name="_namesOfWeekdays" type="List" description="The names of the week days based on locale."/>
-    
+
     <aura:registerevent name="hide" type="ui:change" description="The event fired when the date picker is hidden from view."/>
     <aura:registerevent name="focus" type="ui:focus" description="The event fired when a date is focused."/>
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:registerevent name="updateCalendar" type="ui:updateCalendar" description="The event fired when the calendar is updated."/>
     <aura:registerevent name="updateCalendarTitle" type="ui:updateCalendarTitle" description="The event fired when the calendar month and year are updated."/>
-    
+
     <aura:handler name="focus" action="{!c.focus}"/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="updateCalendar" action="{!c.updateCalendar}"/>
-    
+
     <div aura:flavorable="true" class="{!v.class + (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}">
     <table class="calGrid" aura:id="datePickerGrid">
         <thead>

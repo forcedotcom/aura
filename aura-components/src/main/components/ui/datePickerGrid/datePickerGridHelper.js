@@ -77,6 +77,11 @@
         return date1 && date2 && this.dateCompare(date1, date2) === 0;
     },
 
+    dateInRange: function(date, rangeStart, rangeEnd) {
+        return date && rangeStart && rangeEnd &&
+            this.dateCompare(date, rangeStart) >= 0 && this.dateCompare(date, rangeEnd) <= 0;
+    },
+
     /**
      * Find the cell component for a specific date in a month.
      * @date - Date object
@@ -97,10 +102,13 @@
         var month = component.get("v.month");
         var year = component.get("v.year");
         var date = new Date(year, month, dayOfMonth);
-        var selectedDate;
-        var mDate = moment(component.get("v.selectedDate"), "YYYY-MM-DD");
-        if (mDate.isValid()) {
-            selectedDate = mDate.toDate();
+
+        var selectedDate = this.getDateFromString(component.get("v.selectedDate")),
+            rangeStart = this.getDateFromString(component.get("v.rangeStart")),
+            rangeEnd = this.getDateFromString(component.get("v.rangeEnd")),
+            rangeClass = component.get("v.rangeClass");
+        if ($A.util.isEmpty(rangeClass)) {
+            rangeClass = 'highlight'
         }
         var today = new Date();
 
@@ -117,12 +125,17 @@
         while (startDay != firstDayOfWeek) {
             d.setDate(d.getDate() - 1);
             startDay = d.getDay();
-        }   
+        }
         for (var i = 0; i < 42; i++) {
             var cellCmp = component.find(i);
             if (cellCmp) {
                 var dayOfWeek = d.getDay();
                 var className;
+
+                // These are used to match SFX styles
+                var tdClassName = "",
+                    trClassName = "";
+
                 if (dayOfWeek == 0 || dayOfWeek == 6) {
                     className = "weekend";
                 } else {
@@ -130,19 +143,48 @@
                 }
                 if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
                     className += " prevMonth";
+                    tdClassName = "disabled-text";
                 } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
+                    tdClassName = "disabled-text";
                     className += " nextMonth";
                 }
 
                 if (this.dateEquals(d, today)) {
                     className += " todayDate";
+                    tdClassName += " is-today";
                 }
                 if (this.dateEquals(d, selectedDate)) {
+                    tdClassName += " is-selected";
                     className += " selectedDate";
                     cellCmp.set("v.tabIndex", 0);
                 } else {
                     cellCmp.set("v.tabIndex", -1);
                 }
+                if (this.dateInRange(d, rangeStart, rangeEnd)) {
+                    className += " " + rangeClass;
+                    if (tdClassName.indexOf("is-selected") < 0) {
+                        // only add if it hasn't been added above
+                        tdClassName += " is-selected";
+                    }
+                    tdClassName += " is-selected-multi";
+                    trClassName = "has-multi-row-selection";
+                }
+                if (this.dateEquals(d, rangeStart)) {
+                    className += " start-date";
+                } else if (this.dateEquals(d, rangeEnd)) {
+                    className += " end-date";
+                }
+
+                var tdNode = cellCmp.getElement().parentElement,
+                    trNode = tdNode.parentElement;
+
+                // remove the old styles so we don't add them twice on rerender
+                this.clearSelectStyles(tdNode, dayOfWeek);
+                $A.util.addClass(tdNode, tdClassName);
+                if (!$A.util.isEmpty(trClassName)) {
+                    $A.util.addClass(trNode, trClassName);
+                }
+
                 cellCmp.set("v.class", className);
                 cellCmp.set("v.label", d.getDate());
                 cellCmp.set("v.value", d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate());
@@ -316,6 +358,29 @@
         var updateTitleEvent = component.get("e.updateCalendarTitle");
         updateTitleEvent.setParams({month: month, year: year});
         updateTitleEvent.fire();
+    },
+
+    getDateFromString: function(date) {
+        if (!$A.util.isEmpty(date)) {
+            var mDate = moment(date, "YYYY-MM-DD");
+            if (mDate.isValid()) {
+                return mDate.toDate();
+            }
+        }
+        return null;
+    },
+
+    clearSelectStyles: function(tdNode, dayOfWeek) {
+        $A.util.removeClass(tdNode, "is-selected");
+        $A.util.removeClass(tdNode, "is-today");
+        $A.util.removeClass(tdNode, "disabled-text");
+        $A.util.removeClass(tdNode, "is-selected-multi");
+
+
+        // remove the row class only before styling the first day of that week
+        if (dayOfWeek == 0) {
+            $A.util.removeClass(tdNode.parentElement, "has-multi-row-selection");
+        }
     },
 
     updateNameOfWeekDays: function(component){

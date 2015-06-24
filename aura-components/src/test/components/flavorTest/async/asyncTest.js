@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 ({
+    browsers: ["-IE7", "-IE8"],
+
     /** load a component that has a flavor, that isn't in dependencies (and thus not in app.css) */
     testAsyncLoaded: {
         test: function(cmp) {
@@ -42,7 +44,7 @@
                 $A.test.assertTrue($A.util.hasClass(toTest, expected));
 
                 var color = $A.util.style.getCSSProperty(toTest, "color");
-                expected = color.indexOf("rgb") > -1 ? "rgb(119, 119, 119)" :"#777777";
+                expected = color.indexOf("rgb") > -1 ? "rgb(119, 119, 119)" :"#777";
                 $A.test.assertEquals(expected, $A.util.style.getCSSProperty(toTest, "color"));
             });
         }
@@ -77,7 +79,7 @@
                 $A.test.assertTrue($A.util.hasClass(toTest, expected));
 
                 var color = $A.util.style.getCSSProperty(toTest, "color");
-                expected = color.indexOf("rgb") > -1 ? "rgb(255, 0, 0)" :"#ff0000";
+                expected = color.indexOf("rgb") > -1 ? "rgb(255, 0, 0)" :"red";
                 $A.test.assertEquals(expected, $A.util.style.getCSSProperty(toTest, "color"));
             });
         }

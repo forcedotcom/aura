@@ -46,7 +46,7 @@ PerfMetricsPlugin.prototype = {
     processResponsesOverride : function (/* config, auraXHR, responseObject, noAbort */) {
         var config         = Array.prototype.shift.apply(arguments),
             responseObject = arguments[1],
-            perfData       = responseObject["perf"];
+            perfData       = responseObject["perf"],
             stampMark      = this.collector["mark"](PerfMetricsPlugin.NAME, 'perf');
 
         if (perfData) {

@@ -787,40 +787,39 @@ AuraRenderingService.prototype.insertElements = function(elements, refNode, asSi
  * @private
  */
 AuraRenderingService.prototype.getFlavorClass = function(cmp, element) {
-    var flavor = null;
+    var flavor = null; // keep in mind here, flavor may get set to "" if it was given a value of {!remove}
     var staticFlavorable = cmp.isFlavorable(); // aura:flavorable="true" on html elements
     var dynamicFlavorable = cmp.getDef().isDynamicallyFlavorable(); // dynamicallyFlavorable="true" on cmp def
-    var valueProvider = cmp.getComponentValueProvider();
+    var valueProvider = dynamicFlavorable ? cmp : cmp.getComponentValueProvider();
 
     if (valueProvider && (staticFlavorable || dynamicFlavorable)) {
         if (valueProvider.getConcreteComponent()) { // check if flavor of an extensible cmp was set on child cmp instance
             flavor = valueProvider.getConcreteComponent().getFlavor();
         }
 
-        if (!flavor) {
+        if ($A.util.isUndefinedOrNull(flavor)) {
             flavor = valueProvider.getFlavor();
         }
 
-        if (flavor && flavor.indexOf("!" > -1)) { // deal with expressions
+        if (!$A.util.isUndefinedOrNull(flavor) && flavor.indexOf("{") == 0) { // deal with expressions
             flavor = valueFactory.create(flavor, null, valueProvider.getComponentValueProvider());
             flavor = $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
         }
 
-        if (staticFlavorable && flavor) {
+        if (staticFlavorable && !$A.util.isUndefinedOrNull(flavor)) {
             return $A.util.buildFlavorClass(valueProvider, flavor);
         } else if (dynamicFlavorable) {
             var flavorClasses = [];
             var dynamicallyFlavorableDefs = cmp.getDef().getDynamicallyFlavorable();
             for (var i = 0, len = dynamicallyFlavorableDefs.length; i < len; i++) {
                 var def = dynamicallyFlavorableDefs[i];
-                var defFlavor = flavor || def.getDefaultFlavor();
-                if (defFlavor) {
+                var defFlavor = !$A.util.isUndefinedOrNull(flavor) ? flavor : def.getDefaultFlavor();
+                if (!$A.util.isUndefinedOrNull(defFlavor)) {
                     flavorClasses.push($A.util.buildFlavorClass(def, defFlavor));
                 }
             }
-            var combined = flavorClasses.join(" ");
-            $A.log(combined);
-            return combined;
+
+            return flavorClasses.join(" ");
         }
     }
 

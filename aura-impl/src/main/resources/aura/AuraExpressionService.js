@@ -45,14 +45,18 @@ AuraExpressionService.prototype.normalize = function(expression) {
             expression = expression.slice(2, -1).trim();
         }
 
-        // Convert array notation from "attribute[index]" to "attribute.index"
+        // Convert array notation from "attribute[index]" to "attribute.index".
         var startBrace = expression.indexOf('[');
-        while(startBrace >= 0){
+        while(startBrace > -1) {
             var endBrace = expression.indexOf(']', startBrace + 1);
-            expression = expression.substring(0, startBrace) +
-                '.' + expression.substring(startBrace + 1, endBrace) +
-                expression.substring(endBrace + 1);
-            startBrace = expression.indexOf('[', endBrace - 1);
+            if (endBrace > -1) {
+                expression = expression.substring(0, startBrace) +
+                    '.' + expression.substring(startBrace + 1, endBrace) +
+                    expression.substring(endBrace + 1);
+                startBrace = expression.indexOf('[', endBrace - 1);
+            } else {
+                startBrace = -1;
+            }
         }
     }
 

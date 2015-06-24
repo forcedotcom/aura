@@ -13,17 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
- // Old Symbol exposure
-function exp() {
-    var obj = arguments[0];
-    for ( var i = 1; i < arguments.length; i++) {
-        var name = arguments[i];
-        i++;
-        var val = arguments[i];
-        obj[name] = val;
-    }
-}
 
 var goog = {};
 

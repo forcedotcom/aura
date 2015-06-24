@@ -1110,6 +1110,7 @@ if(!this.concreteComponentId) {
  *            [localCreation] - local creation
  * @param {Boolean} [creatingPrototype] - creating a prototype only
  * @platform
+ * @export
  */
 function Component(config, localCreation, creatingPrototype) {
     if(creatingPrototype) {
@@ -1126,6 +1127,7 @@ function Component(config, localCreation, creatingPrototype) {
  * Gets the ComponentDef Shorthand: <code>get("def")</code>
  *
  * @public
+ * @export
  */
 Component.prototype.getDef = function() {
     return this.priv.componentDef;
@@ -1141,6 +1143,7 @@ Component.prototype.getDef = function() {
  * @param {String}
  *            globalId The globally unique id which is generated on pageload.
  * @protected
+ * @export
  */
 Component.prototype.index = function(localId, globalId) {
     var priv = this.priv;
@@ -1178,6 +1181,7 @@ Component.prototype.index = function(localId, globalId) {
  * @param {String}
  *            globalId The globally unique id which is generated on pageload.
  * @protected
+ * @export
  */
 Component.prototype.deIndex = function(localId, globalId) {
     var priv = this.priv;
@@ -1234,6 +1238,7 @@ Component.prototype.deIndex = function(localId, globalId) {
  *            finds a component using its index.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.find = function(name) {
     //JBUCH: HALO: TODO: I WANT TO SEPARATE THESE CONCEPTS, AND EXPOSE cmp.findInstances("foo:bar","foo:baz");
@@ -1335,6 +1340,7 @@ Component.prototype.findInstanceOf = function(type) {
  *            <code>namespace:componentName</code>.
  * @returns {Boolean} true if the component is an instance, or false otherwise.
  * @platform
+ * @export
  */
 Component.prototype.isInstanceOf = function(name) {
     return this.getDef().isInstanceOf(name);
@@ -1369,6 +1375,7 @@ Component.prototype.implementsDirectly = function(type) {
  *            beginning instead of the end of handlers array.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.addHandler = function(eventName, valueProvider, actionExpression, insert) {
     var dispatcher = this.priv.getEventDispatcher(this);
@@ -1393,6 +1400,7 @@ Component.prototype.addHandler = function(eventName, valueProvider, actionExpres
  *            config Passes in the value, event (e.g. "change"), and action
  *            (e.g. "c.myAction").
  * @public
+ * @export
  */
 Component.prototype.addValueHandler = function(config) {
     var value = config["value"];
@@ -1407,6 +1415,9 @@ Component.prototype.addValueHandler = function(config) {
     this.priv.addValueHandler(this,config);
 };
 
+/**
+ * @export
+ */
 Component.prototype.removeValueHandler = function(config) {
     this.priv.removeValueHandler(this,config);
 };
@@ -1426,6 +1437,7 @@ Component.prototype.removeValueHandler = function(config) {
  * @param {Boolean}
  *            autoEnable (truthy) enable the handler when created.
  * @return {Object} an object with a single visible call of setEnabled(Boolean)
+ * @export
  */
 Component.prototype.addDocumentLevelHandler = function(eventName, callback, autoEnable) {
     var dlh = new Aura.Utils.DocLevelHandler(eventName, callback, this);
@@ -1447,6 +1459,7 @@ Component.prototype.addDocumentLevelHandler = function(eventName, callback, auto
  * @public
  * @param {Object}
  *            the object returned by addDocumentHandler.
+ * @export
  */
 Component.prototype.removeDocumentLevelHandler = function(dlh) {
     if (dlh && dlh.setEnabled) {
@@ -1484,6 +1497,7 @@ Component.prototype.finishDestroy = function() {
  *            The default value is false.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.destroy = function(async) {
     var concrete = this.getConcreteComponent();
@@ -1660,6 +1674,7 @@ Component.prototype.isRenderedAndValid = function() {
 /**
  * Execute the super components render method.
  * @protected
+ * @export
  */
 Component.prototype.superRender = function() {
     return this.getSuper()["render"]();
@@ -1668,6 +1683,7 @@ Component.prototype.superRender = function() {
 /**
  * Execute the super components rerender method.
  * @protected
+ * @export
  */
 Component.prototype.superRerender = function() {
     return this.getSuper()["rerender"]();
@@ -1676,6 +1692,7 @@ Component.prototype.superRerender = function() {
 /**
  * Execute the super components afterRender method.
  * @protected
+ * @export
  */
 Component.prototype.superAfterRender = function() {
     return this.getSuper()["afterRender"]();
@@ -1684,6 +1701,7 @@ Component.prototype.superAfterRender = function() {
 /**
  * Execute the super components superUnrender method.
  * @protected
+ * @export
  */
 Component.prototype.superUnrender = function() {
     return this.getSuper()["unrender"]();
@@ -1695,6 +1713,7 @@ Component.prototype.superUnrender = function() {
  *
  * @protected
  * @platform
+ * @export
  */
 Component.prototype.isRendered = function() {
     return this.priv.rendered;
@@ -1743,6 +1762,7 @@ Component.prototype.getRenderer = function() {
 /**
  * Returns the renderable instance for this component.
  * @protected
+ * @export
  */
 Component.prototype.getRenderable = function() {
     return this.priv.renderer.renderable;
@@ -1755,6 +1775,7 @@ Component.prototype.getRenderable = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getGlobalId = function() {
     return this.priv.concreteComponentId || this.priv.globalId;
@@ -1766,6 +1787,7 @@ Component.prototype.getGlobalId = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getLocalId = function() {
     return this.priv.localId;
@@ -1775,6 +1797,7 @@ Component.prototype.getLocalId = function() {
  * If the server provided a rendering of this component, return it.
  *
  * @public
+ * @export
  */
 Component.prototype.getRendering = function() {
     var concrete = this.getConcreteComponent();
@@ -1791,6 +1814,7 @@ Component.prototype.getRendering = function() {
  *
  * @protected
  * @platform
+ * @export
  */
 Component.prototype.getSuper = function() {
     return this.priv.superComponent;
@@ -1805,6 +1829,7 @@ Component.prototype.getSuper = function() {
  * @param {Object}
  *            config
  * @protected
+ * @export
  */
 Component.prototype.associateElement = function(element) {
     if (!this.isConcrete()) {
@@ -1828,6 +1853,7 @@ Component.prototype.associateElement = function(element) {
  * @param {Object}
  *            config
  * @protected
+ * @export
  */
 Component.prototype.disassociateElements = function() {
     if (!this.isConcrete()) {
@@ -1845,6 +1871,7 @@ Component.prototype.disassociateElements = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getElements = function() {
     if (!this.isConcrete()) {
@@ -1861,6 +1888,7 @@ Component.prototype.getElements = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getElement = function() {
     var elements = this.getElements();
@@ -1882,6 +1910,7 @@ Component.prototype.getElement = function() {
  * @return {PropertyReferenceValue}
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getReference = function(key) {
     key = $A.expressionService.normalize(key);
@@ -1898,6 +1927,7 @@ Component.prototype.getReference = function(key) {
  *            key The data key for which to clear the reference.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.clearReference = function(key) {
     key = $A.expressionService.normalize(key);
@@ -1920,6 +1950,7 @@ Component.prototype.clearReference = function(key) {
  *            key The data key to look up on the Component.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.get = function(key) {
     key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.priv.globalId);
@@ -1966,6 +1997,7 @@ Component.prototype.getShadowAttribute = function(key) {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.set = function(key, value, ignoreChanges) {
     key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.priv.globalId);
@@ -2024,10 +2056,16 @@ Component.prototype.setShadowAttribute = function(key,value) {
 };
 
 
+/**
+ * @export
+ */
 Component.prototype.markDirty=function(reason){
     $A.renderingService.addDirtyValue(reason||"Component.markDirty()",this);
 };
 
+/**
+ * @export
+ */
 Component.prototype.markClean=function(value) {
     $A.renderingService.removeDirtyValue(value, this);
 };
@@ -2048,6 +2086,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.autoDestroy = function(destroy) {
     if(!$A.util.isUndefinedOrNull(destroy)) {
@@ -2064,6 +2103,7 @@ Component.prototype.autoDestroy = function(destroy) {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getConcreteComponent = function() {
     var priv = this.priv;
@@ -2075,6 +2115,7 @@ Component.prototype.getConcreteComponent = function() {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.isConcrete = function() {
     return !this.priv.concreteComponentId;
@@ -2085,11 +2126,15 @@ Component.prototype.isConcrete = function() {
  *
  * @return {Object} value provider
  * @public
+ * @export
  */
 Component.prototype.getAttributeValueProvider = function() {
     return this.priv.attributeValueProvider||this;
 };
 
+/**
+ * @export
+ */
 Component.prototype.setAttributeValueProvider = function (avp) {
     this.priv.attributeValueProvider = avp;
 };
@@ -2099,6 +2144,7 @@ Component.prototype.setAttributeValueProvider = function (avp) {
  *
  * @return {Object} component or value provider
  * @public
+ * @export
  */
 Component.prototype.getComponentValueProvider = function() {
     var valueProvider = this.priv.attributeValueProvider||this.priv.facetValueProvider;
@@ -2111,6 +2157,7 @@ Component.prototype.getComponentValueProvider = function() {
  * @param {Object} valueProvider the object to request data from. Must implement .get(expression), can implement .set(key,value).
  * @public
  * @platform
+ * @export
  */
 Component.prototype.addValueProvider=function(key,valueProvider){
     $A.assert($A.util.isString(key),"Component.addValueProvider(): 'key' must be a valid String.");
@@ -2134,6 +2181,7 @@ Component.prototype.removeValueProvider=function(key){
  * Gets the event dispatcher.
  *
  * @public
+ * @export
  */
 Component.prototype.getEventDispatcher = function() {
     return this.priv.getEventDispatcher();
@@ -2144,6 +2192,7 @@ Component.prototype.getEventDispatcher = function() {
  * <code>get("m")</code>
  *
  * @public
+ * @export
  */
 Component.prototype.getModel = function() {
     return this.priv.model;
@@ -2157,6 +2206,7 @@ Component.prototype.getModel = function() {
  *            name The name of the Event.
  * @public
  * @platform
+ * @export
  */
 Component.prototype.getEvent = function(name) {
     var eventDef = this.getDef().getEventDef(name);
@@ -2227,6 +2277,7 @@ Component.prototype.fire = function(name) {
  *          exist.
  * @public
  * @deprecated TEMPORARY WORKAROUND
+ * @export
  */
 Component.prototype.isDirty = function(expression) {
     if(!expression){
@@ -2240,6 +2291,7 @@ Component.prototype.isDirty = function(expression) {
  *
  * @public
  * @platform
+ * @export
  */
 Component.prototype.isValid = function() {
     return !this._scheduledForAsyncDestruction && !this._destroying && this.priv !== undefined
@@ -2251,6 +2303,7 @@ Component.prototype.isValid = function() {
  * Returns a string representation of the component for logging.
  *
  * @public
+ * @export
  */
 Component.prototype.toString = function() {
     if(!this._description){
@@ -2281,6 +2334,7 @@ Component.prototype.toJSON = function() {
 /**
  * Returns an object whose keys are the lower-case names of Aura events for
  * which this component currently has handlers.
+ * @export
  */
 Component.prototype.getHandledEvents = function() {
     var ret = {};
@@ -2302,6 +2356,7 @@ Component.prototype.getHandledEvents = function() {
  *
  * @param {String}
  *            eventName The event name associated with this component.
+ * @export
  */
 Component.prototype.hasEventHandler = function(eventName) {
     if (eventName) {
@@ -2314,6 +2369,7 @@ Component.prototype.hasEventHandler = function(eventName) {
 /**
  * Returns an array of this component's facets, i.e., attributes of type
  * <code>aura://Aura.Component[]</code>
+ * @export
  */
 Component.prototype.getFacets = function() {
     if (!this.getFacets.cachedFacetNames) {
@@ -2346,6 +2402,7 @@ Component.prototype.getFacets = function() {
 
 /**
  * Returns true if this is a flavorable html element.
+ * @export
  */
 Component.prototype.isFlavorable = function() {
 	return this.priv.flavorable;
@@ -2357,6 +2414,7 @@ Component.prototype.isFlavorable = function() {
  * component, if a default (or app override) exists.
  *
  * @returns {String} The flavor, e.g., "default" or "xyz.flavors.default", etc...
+ * @export
  */
 Component.prototype.getFlavor = function() {
 	return this.priv.flavor || this.getDef().getDefaultFlavor();
@@ -2366,6 +2424,7 @@ Component.prototype.getFlavor = function() {
  * Render logic is output as part of the component class.
  * This method is used when no render method was specified, thus bubbling up
  * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ * @export
  */
 Component.prototype.render = function() {
     var superComponent = this.getSuper();
@@ -2376,6 +2435,7 @@ Component.prototype.render = function() {
  * Render logic is output as part of the component class.
  * This method is used when no rerender method was specified, thus bubbling up
  * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ * @export
  */
 Component.prototype.rerender = function() {
     var superComponent = this.getSuper();
@@ -2386,6 +2446,7 @@ Component.prototype.rerender = function() {
  * Render logic is output as part of the component class.
  * This method is used when no afterRender method was specified, thus bubbling up
  * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ * @export
  */
 Component.prototype.afterRender = function() {
     var superComponent = this.getSuper();
@@ -2396,6 +2457,7 @@ Component.prototype.afterRender = function() {
  * Render logic is output as part of the component class.
  * This method is used when no unrender method was specified, thus bubbling up
  * to the super to do the logic till it reaches aura:component which does the heavy lifting.
+ * @export
  */
 Component.prototype.unrender = function() {
     var superComponent = this.getSuper();
@@ -2404,6 +2466,7 @@ Component.prototype.unrender = function() {
 
 /**
  * Get the expected version number of a component based on its caller's requiredVersionDefs
+ * @export
  */
 Component.prototype.getVersion = function() {
     if (!this.isValid()) {
@@ -2422,5 +2485,3 @@ Component.prototype.getVersion = function() {
 
 Aura.Component.ComponentPriv = ComponentPriv;
 Aura.Component.Component = Component;
-
-// #include aura.component.Component_export

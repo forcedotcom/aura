@@ -88,14 +88,11 @@ PerfMetricsPlugin.prototype = {
 };
 
 // Exposing symbols/methods for Google Closure
-var p = PerfMetricsPlugin.prototype;
 
-exp(p,
-    "initialize",  p.initialize,
-    "enable",      p.enable,
-    "disable",     p.disable,
-    "postProcess", p.postProcess
-);
+PerfMetricsPlugin.prototype["initialize"] = PerfMetricsPlugin.prototype.initialize;
+PerfMetricsPlugin.prototype["enable"] = PerfMetricsPlugin.prototype.enable;
+PerfMetricsPlugin.prototype["disable"] = PerfMetricsPlugin.prototype.disable;
+PerfMetricsPlugin.prototype["postProcess"] = PerfMetricsPlugin.prototype.postProcess;
 
 $A.metricsService.registerPlugin({
     "name"   : PerfMetricsPlugin.NAME,

@@ -17,6 +17,7 @@
 /**
  * @description Client Service metrics plugin
  * @constructor
+ * @export
  */
 var ClientServiceMetricsPlugin = function ClientServiceMetricsPlugin(config) {
     this.config = config;
@@ -24,63 +25,62 @@ var ClientServiceMetricsPlugin = function ClientServiceMetricsPlugin(config) {
 };
 
 ClientServiceMetricsPlugin.NAME = "clientService";
-ClientServiceMetricsPlugin.prototype = {
-    initialize: function (metricsService) {
-        this.collector = metricsService;
-        if (this["enabled"]) {
-            this.bind(metricsService);
-        }
-    },
-    enable: function () {
-        if (!this["enabled"]) {
-            this["enabled"] = true;
-            this.bind(this.collector);
-        }
-    },
-    disable: function () {
-        if (this["enabled"]) {
-            this["enabled"] = false;
-            this.unbind(this.collector);
-        }
-    },
-    bind: function (metricsService) {
-        var method     = 'init',
-            startTime  = 0;
 
-        function beforeHook (markStart) {
-            startTime = markStart["ts"];
-        }
-
-        function afterHook(markEnd) {
-            metricsService.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
-        }
-
-        metricsService.instrument(
-            $A["clientService"],
-            method, 
-            ClientServiceMetricsPlugin.NAME,
-            false,
-            beforeHook,
-            afterHook
-        );
-    },
-    unbind: function (metricsService) {
-        metricsService["unInstrument"]($A["clientService"], 'init');
-    },
-    postProcess: function () {
-        // Remove them all since we already got the appCreation metrics
-        return [];
+/** @export */
+ClientServiceMetricsPlugin.prototype.initialize = function (metricsService) {
+    this.collector = metricsService;
+    if (this["enabled"]) {
+        this.bind(metricsService);
     }
 };
 
-// Exposing symbols/methods for Google Closure
-var p = ClientServiceMetricsPlugin.prototype;
-exp(p,
-   "initialize",   p.initialize,
-    "enable",      p.enable,
-    "disable",     p.disable,
-    "postProcess", p.postProcess
-);
+/** @export */
+ClientServiceMetricsPlugin.prototype.enable = function () {
+    if (!this["enabled"]) {
+        this["enabled"] = true;
+        this.bind(this.collector);
+    }
+};
+
+/** @export */
+ClientServiceMetricsPlugin.prototype.disable = function () {
+    if (this["enabled"]) {
+        this["enabled"] = false;
+        this.unbind(this.collector);
+    }
+};
+
+ClientServiceMetricsPlugin.prototype.bind = function (metricsService) {
+    var method     = 'init',
+    startTime  = 0;
+
+	function beforeHook (markStart) {
+	    startTime = markStart["ts"];
+	}
+	
+	function afterHook(markEnd) {
+	    metricsService.bootstrapMark("appCreationTime", markEnd["ts"] - startTime);
+	}
+	
+	metricsService.instrument(
+	    $A["clientService"],
+	    method, 
+	    ClientServiceMetricsPlugin.NAME,
+	    false,
+	    beforeHook,
+	    afterHook
+	);
+};
+
+ClientServiceMetricsPlugin.prototype.unbind = function (metricsService) {
+    metricsService["unInstrument"]($A["clientService"], 'init');
+};
+
+/** @export */
+ClientServiceMetricsPlugin.prototype.postProcess = function () {
+    // Remove them all since we already got the appCreation metrics
+    return [];
+};
 
 // Register the plugin
 $A.metricsService.registerPlugin({

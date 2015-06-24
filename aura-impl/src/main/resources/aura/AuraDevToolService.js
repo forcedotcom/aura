@@ -1436,6 +1436,17 @@ var AuraDevToolService = function() {
     s.defaultFilter = s["filters"]["noop"];
     s.defaultGroupBy = undefined;
 
-    //#include aura.AuraDevToolService_export
+    ResultSet.prototype["diff"] = ResultSet.prototype.diff;
+    	
+    Statement.prototype["from"] = Statement.prototype.from;
+    Statement.prototype["query"] = Statement.prototype.query;
+    Statement.prototype["field"] = Statement.prototype.field;
+    Statement.prototype["fields"] = Statement.prototype.fields;
+    Statement.prototype["where"] = Statement.prototype.where;
+    Statement.prototype["groupBy"] = Statement.prototype.groupBy;
+    
+    s["output"] = s.output;
+    s["checkAccessibility"] = s.checkAccessibility;
+    	
     return s;
 };

@@ -19,6 +19,7 @@
  *        Renders components. The default behaviors can be customized in a
  *        client-side renderer.
  * @constructor
+ * @export
  */
 function AuraRenderingService() {
     this.visited = undefined;
@@ -42,6 +43,7 @@ function AuraRenderingService() {
  *            parent Optional. The component's parent
  * @memberOf AuraRenderingService
  * @public
+ * @export
  */
 AuraRenderingService.prototype.render = function(components, parent) {
     //#if {"modes" : ["STATS"]}
@@ -99,6 +101,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
  *            components The component or component array to be rerendered
  * @memberOf AuraRenderingService
  * @public
+ * @export
  */
 AuraRenderingService.prototype.rerender = function(components) {
     //#if {"modes" : ["STATS"]}
@@ -176,6 +179,7 @@ AuraRenderingService.prototype.rerender = function(components) {
  *            components The component or component array that has finished rendering
  * @memberOf AuraRenderingService
  * @public
+ * @export
  */
 AuraRenderingService.prototype.afterRender = function(components) {
     //#if {"modes" : ["STATS"]}
@@ -220,6 +224,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
  *            components The component or component array to be unrendered
  * @memberOf AuraRenderingService
  * @public
+ * @export
  */
 AuraRenderingService.prototype.unrender = function(components) {
     if (!components) {
@@ -355,6 +360,7 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
  * @param {Component} component the component for which we are rendering the facet.
  * @param {Component} facet the facet to render.
  * @param {Component} parent (optional) the parent for the facet.
+ * @export
  */
 AuraRenderingService.prototype.renderFacet = function(component, facet, parent) {
     this.storeFacetInfo(component, facet);
@@ -372,6 +378,7 @@ AuraRenderingService.prototype.renderFacet = function(component, facet, parent) 
  * @param {Component} component the component for which we are rendering the facet.
  * @param {Component} facet the facet to render.
  * @param {HTMLElement} referenceNode the reference node for insertion
+ * @export
  */
 AuraRenderingService.prototype.rerenderFacet = function(component, facet, referenceNode) {
     var updatedFacet=this.getUpdatedFacetInfo(component,facet);
@@ -477,6 +484,7 @@ AuraRenderingService.prototype.rerenderFacet = function(component, facet, refere
  * @public
  * @param {Component} cmp the component for which we are unrendering the facet.
  * @param {Component} facet the facet to unrender.
+ * @export
  */
 AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
     if (cmp._facetInfo) {
@@ -501,6 +509,7 @@ AuraRenderingService.prototype.unrenderFacet = function(cmp,facet){
  * @public
  * @param {Component} cmp the component for which we want a marker.
  * @return the marker.
+ * @export
  */
 AuraRenderingService.prototype.getMarker = function(cmp){
     return cmp && cmp._marker;
@@ -559,6 +568,7 @@ AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
  * Called from ClientService when we reach the top of stack.
  *
  * @protected
+ * @export
  */
 AuraRenderingService.prototype.rerenderDirty = function(stackName) {
     if (this.needsCleaning) {
@@ -878,15 +888,3 @@ AuraRenderingService.prototype.isMarker = function(node){
 };
 
 Aura.Services.AuraRenderingService = AuraRenderingService;
-
-exp(AuraRenderingService.prototype,
-    "render", AuraRenderingService.prototype.render,
-    "afterRender", AuraRenderingService.prototype.afterRender,
-    "rerender", AuraRenderingService.prototype.rerender,
-    "rerenderDirty", AuraRenderingService.prototype.rerenderDirty,
-    "unrender", AuraRenderingService.prototype.unrender,
-    "renderFacet", AuraRenderingService.prototype.renderFacet,
-    "rerenderFacet", AuraRenderingService.prototype.rerenderFacet,
-    "unrenderFacet", AuraRenderingService.prototype.unrenderFacet,
-    "getMarker", AuraRenderingService.prototype.getMarker
-);

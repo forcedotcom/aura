@@ -23,6 +23,7 @@
  *
  * @enum {{name: !string, value: !number}}
  * @expose
+ * @export
  */
 var PerfLogLevel = {
     /** @expose */
@@ -52,6 +53,7 @@ var PerfLogLevel = {
  *
  * @enum {!string}
  * @expose
+ * @export
  */
 var PerfConstants = {
     /** @expose */
@@ -298,9 +300,3 @@ PerfShim = {
      */
     enabled: false
 };
-
-exp(window,
-    "PerfConstants" , PerfConstants,
-    "PerfLogLevel"  , PerfLogLevel
-);
-

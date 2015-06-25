@@ -18,11 +18,14 @@
 <aura:component render="client">
     <aura:attribute name="clickCount" type="Integer" default="0" />
     <aura:attribute name="classValue" type="String"/>
+    <aura:attribute name="mouseOverEvent" type="Boolean" default="false" />
+    <aura:attribute name="mouseOutEvent" type="Boolean" default="true" />
     
     {!v.clickCount}<br/>
     <a aura:id="nohash" href="http://www.salesforce.com/">salesforce</a>
     <a aura:id="hashString" href="#layout">layout</a>
     <a aura:id="hash" href="#">hash</a>
+    <a aura:id="testAnchorA" href="javascript:void(0);" onmouseover="{!c.handleOnMouseOver}" onmouseout="{!c.handleOnMouseOut}">Anchor A</a>
     <area aura:id="noHashArea" href="http://www.salesforce.com/" />
     <area aura:id="hashStringArea" href="#layout" />
     <area aura:id="hashArea" href="#" />

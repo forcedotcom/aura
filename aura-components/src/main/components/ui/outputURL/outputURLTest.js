@@ -111,12 +111,21 @@
         attributes: {label: 'link', value: '#top'},
         test: [function (component) {
             var href = component.find("link").getElement().getAttribute('href');
-            // prod mode doesn't have comment within void
-            aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#top*/);", "href attribute not correct");
+            if ($A.util.supportsTouchEvents()) {
+                // prod mode doesn't have comment within void
+                $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#top*/);", "href attribute not correct");
+            } else {
+                $A.test.assertEquals("#top", href, "href attribute not correct");
+            }
             component.set("v.value", "#bottom");
         }, function (component) {
             href = component.find("link").getElement().getAttribute('href');
-            aura.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#bottom*/);", "href attribute not updated");
+            if ($A.util.supportsTouchEvents()) {
+                // prod mode doesn't have comment within void
+                $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#bottom*/);", "href attribute not correct");
+            } else {
+                $A.test.assertEquals("#bottom", href, "href attribute not correct");
+            }
         }]
     },
 

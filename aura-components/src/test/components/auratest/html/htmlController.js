@@ -28,5 +28,13 @@
     
     throwAnError : function(cmp, evt){
         throw new Error("This should have been expected");
+    },
+
+    handleOnMouseOver: function(cmp, evt, helper) {
+        cmp.set("v.mouseOverEvent", "true");
+    },
+
+    handleOnMouseOut: function(cmp, evt, helper) {
+        cmp.set("v.mouseOutEvent", "false");
     }
 })

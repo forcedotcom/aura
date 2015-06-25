@@ -67,11 +67,15 @@
 
              }, function(cmp) {
                 var peachElement = cmp.find('hashLinkP').getElement();
-                href = peachElement.getAttribute('href');
+                var href = peachElement.getAttribute('href');
                 var locationChangeCountPeach = cmp.get("v.locationChangeCountPeach");
-                $A.test.assertTrue(
-                   href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCountPeach +"*/);",
-                   "href attribute not correct: " + href);
+                if ($A.util.supportsTouchEvents()) {
+                    // prod mode doesn't have comment within void
+                    $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCountPeach +"*/);",
+                            "href attribute not correct, got <" + href + ">");
+                } else {
+                    $A.test.assertEquals("#" + locationChangeCountPeach, href, "href attribute not correct");
+                }
             }, function(cmp) {
                 // Click Peach second time, location change event is fired again
                 // if multiple duplicate location change handlers were applied,
@@ -185,6 +189,9 @@
     },
 
     testBrokenHashValue : {
+        // htmlHelper.js only wraps the href in javascript:void on mobile browsers. On desktop the href will be valid
+        // and the locationChange event will be valid.
+        browsers: ["ANDROID_PHONE", "ANDROID_TABLET", "IPAD", "IPHONE"],
         test : [
             function(cmp){
                  //Click Banana,its url has value="{!'#' + BANANA}", location change event doesn't fire

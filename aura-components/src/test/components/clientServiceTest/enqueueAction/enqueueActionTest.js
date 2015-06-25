@@ -750,9 +750,9 @@
         test : [ function(cmp) {
             // keep abortable in-flight
             var a = this.getAction(cmp, "c.execute", "APPEND first; READ");
-            cmp._tid = $A.getCurrentTransactionId();
             a.setAbortable();
             $A.enqueueAction(a);
+            cmp._tid = $A.getCurrentTransactionId();
             $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([a]) }, function() {
                     $A.test.assertEquals("SUCCESS", a.getState());
                 });
@@ -932,6 +932,34 @@
                         $A.test.assertEquals("SUCCESS", initial.getState());
                         $A.test.assertEquals("SUCCESS", second.getState());
                         $A.test.assertEquals("SUCCESS", third.getState());
+                    });
+            }
+        ]
+    },
+    testGetCallbackMaintainsTransaction : {
+        test : [
+            function(cmp) {
+                var that = this;
+                var initial = this.getActionAndLog(cmp, "c.execute", "APPEND initial; READ;", "initial: ", false, true);
+                var second = this.getActionAndLog(cmp, "c.execute", "APPEND second; READ;", "second: ", false, true);
+                $A.enqueueAction(initial);
+                var callback = $A.getCallback(function() {
+                    $A.enqueueAction(second);
+                });
+                cmp._second = second;
+                cmp._callback = callback;
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([initial]); },
+                    function() { $A.test.assertEquals("SUCCESS", initial.getState()); });
+            },
+            function(cmp) {
+                var third = this.getActionAndLog(cmp, "c.execute", "APPEND third; READ;", "third: ", false, true);
+                $A.enqueueAction(third);
+                // Run the callback randomly, later.
+                setTimeout(cmp._callback, 0);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([cmp._second, third]); },
+                    function() {
+                        $A.test.assertEquals("SUCCESS", third.getState());
+                        $A.test.assertEquals("ABORTED", cmp._second.getState());
                     });
             }
         ]

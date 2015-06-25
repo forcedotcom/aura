@@ -24,22 +24,30 @@
 
     throwFriendlyError: function(cmp) {
         var afe = new $A.auraFriendlyError("Friendly Error Test");
-        afe.data = {"friendlyMessage": "Friendly Error Message"};
+        afe.data = {"friendlyMessage": "Friendly Error Message from data"};
         throw afe;
     },
 
     handleSystemError: function(cmp, event) {
-        if (event["handled"]) {
+        if(!cmp.get("v.handleSystemErrorEvent")) {
+             return;
+        }
+
+        var message = event.getParam("message");
+        cmp.set("v.systemErrorHandled", true);
+        var afe = event.getParam('auraError');
+        if(!afe) {
             return;
         }
 
-        $A.message(event.getParam("message"));
-        cmp.set("v.systemErrorHandled", true);
-        var afe = event.getParam('auraError');
-        if (afe && cmp.get("v.setFriendlyErrorHandled")) {
-            afe["handled"] = true;
+        if(cmp.get("v.useFriendlyErrorMessageFromData") && afe.data) {
+            message = afe.data["friendlyMessage"];
         }
 
+        if (cmp.get("v.setFriendlyErrorHandled")) {
+            afe["handled"] = true;
+        }
+        $A.message("[Message from customized handler]: " + message);
         event["handled"] = true;
     },
 

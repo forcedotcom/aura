@@ -86,7 +86,7 @@
 	initEditor : function(cmp) {
 		if ($A.util.getBooleanValue(cmp.get('v.isRichText'))) {
 			if (!this.isLibraryLoaded(cmp)) {
-				$A.warn("Richtext editor library is not loaded");
+				$A.warning("Richtext editor library is not loaded");
 				return;
 			}
 			var editorInstance = this.getEditorInstance(cmp);

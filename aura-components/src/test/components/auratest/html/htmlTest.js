@@ -30,9 +30,16 @@
      */
     testAnchorFragment: {
         test: function(component){
+            var expected;
+            if ($A.util.supportsTouchEvents()) {
+                // Wrap href in javascript:void on mobile browsers
+                expected = "javascript:void(0/*#*/);";
+            } else {
+                expected = window.location.href + "#";
+            }
             var tag = component.find("hash").getElement();
             $A.test.assertEquals("hash", $A.test.getText(tag), "textContent not expected");
-            $A.test.assertEquals("javascript:void(0/*#*/);", tag.href, "href not expected");
+            $A.test.assertEquals(expected, tag.href, "href not expected");
         }
     },
 
@@ -41,9 +48,28 @@
      */
     testAnchorFragmentString: {
         test: function(component){
+            var expected;
+            if ($A.util.supportsTouchEvents()) {
+                // Wrap href in javascript:void on mobile browsers
+                expected = "javascript:void(0/*#layout*/);";
+            } else {
+                expected = window.location.href + "#layout";
+            }
             var tag = component.find("hashString").getElement();
             $A.test.assertEquals("layout", $A.test.getText(tag), "textContent not expected");
-            $A.test.assertEquals("javascript:void(0/*#layout*/);", tag.href, "href not expected");
+            $A.test.assertEquals(expected, tag.href, "href not expected");
+        }
+    },
+
+    testOnMouseOverMouseOutEventFiring: {
+        test: function(component){
+            var anchorA = component.find("testAnchorA");
+
+            $A.test.fireDomEvent(anchorA.getElement(), "mouseover");
+            $A.test.assertEquals("true", component.get("v.mouseOverEvent"), "onmouseover event did not get fired.");
+
+            $A.test.fireDomEvent(anchorA.getElement(), "mouseout");
+            $A.test.assertEquals("false", component.get("v.mouseOutEvent"), "onmouseout event did not get fired.");
         }
     },
 

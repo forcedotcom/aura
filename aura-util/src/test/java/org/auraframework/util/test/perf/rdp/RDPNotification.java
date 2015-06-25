@@ -16,12 +16,8 @@
 package org.auraframework.util.test.perf.rdp;
 
 import org.auraframework.util.test.perf.rdp.RDP.Domain;
-import java.util.Map;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.google.common.collect.Maps;
 
 /**
  * Represents a Remote Debug Protocol (RDP), raw intrumentation notification
@@ -95,7 +91,7 @@ public final class RDPNotification {
     public boolean isTimelineEvent() {
         return RDP.Timeline.eventRecorded.equals(getMethod());
     }
-    
+
     // Trace event
     public JSONObject getTraceEvent() {
         try {
@@ -106,13 +102,13 @@ public final class RDPNotification {
     }
 
     public boolean isTraceEvent() {
-    	try {
-			return RDP.Tracing.dataCollected.equals(getMethod()) && 
-					getTraceEvent().getString("cat").equals("disabled-by-default-devtools.timeline");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	return false;
+        try {
+            return RDP.Tracing.dataCollected.equals(getMethod()) &&
+                    getTraceEvent().getString("cat").equals("disabled-by-default-devtools.timeline");
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return false;
     }
 }

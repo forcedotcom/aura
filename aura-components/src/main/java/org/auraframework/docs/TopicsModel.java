@@ -22,14 +22,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.def.TestSuiteDef;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
@@ -54,25 +50,24 @@ public class TopicsModel {
 
     public TopicsModel() throws QuickFixException {
 
-        applications = makeNodes("markup", ApplicationDef.class);
-        components = makeNodes("markup", ComponentDef.class);
-        interfaces = makeNodes("markup", InterfaceDef.class);
-        events = makeNodes("markup", EventDef.class);
-        librariesList = makeNodes("markup", LibraryDef.class);
-        tests = makeNodes("js", TestSuiteDef.class);
+        applications = makeNodes("markup", DefType.APPLICATION);
+        components = makeNodes("markup", DefType.COMPONENT);
+        interfaces = makeNodes("markup", DefType.INTERFACE);
+        events = makeNodes("markup", DefType.EVENT);
+        librariesList = makeNodes("markup", DefType.LIBRARY);
+        tests = makeNodes("js", DefType.TESTSUITE);
     }
 
-    private <E extends Definition> List<Node> makeNodes(String prefix, Class<E> type) throws QuickFixException {
+    private <E extends Definition> List<Node> makeNodes(String prefix, DefType type) throws QuickFixException {
         // if (!Config.isProduction()) {
-        String sep = prefix.equals("markup") ? ":" : ".";
         DefinitionService definitionService = Aura.getDefinitionService();
 
         List<Node> ret = Lists.newArrayList();
 
         Map<String, Node> namespaceNodes = Maps.newHashMap();
-        DefDescriptor<E> matcher = definitionService.getDefDescriptor(String.format("%s://*%s*", prefix, sep), type);
-        Set<DefDescriptor<E>> descriptors = definitionService.find(matcher);
-        for (DefDescriptor<E> desc : descriptors) {
+        DescriptorFilter matcher = new DescriptorFilter(String.format("%s://*:*", prefix), type);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
+        for (DefDescriptor<?> desc : descriptors) {
             String namespace = desc.getNamespace();
             Node namespaceNode = namespaceNodes.get(desc.getNamespace());
             if (namespaceNode == null) {
@@ -80,8 +75,8 @@ public class TopicsModel {
                 namespaceNodes.put(namespace, namespaceNode);
                 ret.add(namespaceNode);
             }
-            namespaceNode.addChild(new Node(String.format("%s%s%s", prefix.equals("markup") ? namespace : prefix
-                    + "://" + namespace, sep, desc.getName())));
+            namespaceNode.addChild(new Node(String.format("%s:%s", prefix.equals("markup") ? namespace : prefix
+                    + "://" + namespace, desc.getName())));
         }
         Collections.sort(ret);
         return ret;
@@ -104,7 +99,7 @@ public class TopicsModel {
     public List<Node> getEvents() {
         return this.events;
     }
-    
+
     @AuraEnabled
     public List<Node> getLibraries() {
         return this.librariesList;

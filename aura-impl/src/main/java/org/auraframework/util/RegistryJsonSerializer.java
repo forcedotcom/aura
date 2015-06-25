@@ -28,6 +28,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.service.DefinitionService;
@@ -75,15 +77,15 @@ public class RegistryJsonSerializer {
             throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://*:*", ComponentDef.class);
-        Set<DefDescriptor<ComponentDef>> descriptors = definitionService.find(matcher);
+        DescriptorFilter matcher = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
         Map<String, Map<String, Map<String, String>>> component;
         Map<String, Map<String, String>> componentDetails;
 
-        for (DefDescriptor<ComponentDef> descriptor : descriptors) {
+        for (DefDescriptor<?> descriptor : descriptors) {
             component = new TreeMap<>();
             try {
-                ComponentDef compDef = descriptor.getDef();
+                ComponentDef compDef = (ComponentDef) descriptor.getDef();
                 String compName = descriptor.getNamespace() + ":" + compDef.getName();
                 if (components.containsKey(compName)) {
                     continue;

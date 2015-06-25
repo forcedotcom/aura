@@ -24,6 +24,8 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -41,14 +43,14 @@ public class CatalogModel {
     public CatalogModel() throws QuickFixException {
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://*:*", ComponentDef.class);
-        Set<DefDescriptor<ComponentDef>> descriptors = definitionService.find(matcher);
+        DescriptorFilter matcher = new DescriptorFilter("markup://*:*", DefType.COMPONENT);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
 
-        for (DefDescriptor<ComponentDef> desc : descriptors) {
+        for (DefDescriptor<?> desc : descriptors) {
             Map<String, String> values = Maps.newHashMap();
             values.put("name", desc.getDescriptorName());
             try {
-                ComponentDef def = desc.getDef();
+                ComponentDef def = (ComponentDef) desc.getDef();
                 values.put("support", def.getSupport().name());
             } catch (Throwable t) {
                 values.put("support", "ERROR");

@@ -30,35 +30,36 @@ import org.auraframework.util.json.Json;
 @Component(provide=AuraServiceProvider.class)
 public class MetricsServiceImpl implements MetricsService  {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 2207073608997955461L;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 2207073608997955461L;
 
-	public void serializeMetrics(Json json) {
-		LoggingService loggingService = Aura.getLoggingService();
-		
-		try {
-			json.writeMapKey("perf");
-			
-			// actions
-			json.writeMapBegin();
-			json.writeMapKey("actions");
+    @Override
+    public void serializeMetrics(Json json) {
+        LoggingService loggingService = Aura.getLoggingService();
+
+        try {
+            json.writeMapKey("perf");
+
+            // actions
+            json.writeMapBegin();
+            json.writeMapKey("actions");
             json.writeArrayBegin();
-			loggingService.serializeActions(json);
-			json.writeArrayEnd();
-			json.writeMapEnd();
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+            loggingService.serializeActions(json);
+            json.writeArrayEnd();
+            json.writeMapEnd();
 
-	@Override
-	public void clearMetrics() {
-		// TODO Auto-generated method stub 
-	}
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void clearMetrics() {
+        // TODO Auto-generated method stub
+    }
 
 
 }

@@ -18,7 +18,6 @@ package org.auraframework.util.test.perf.rdp;
 import java.util.Map;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 //Immutable Java bean to serialize/deserialize trace event params json object
 //This must exactly match the json keyset
@@ -41,76 +40,77 @@ import org.json.JSONObject;
 			"ts": 1019120543129.0,
 			"tts": 103016
 }
-*/
+ */
 
 public class TraceEvent {
-	Map<String, Object> args;
-	String cat;
-	private String name;
-	String ph;
-	Long dur;
-	Integer tdur;
-	Integer pid;
-	String s;
-	Integer tid;
-	Long ts;
-	Long tts;
-	
-	public enum Type {
-		Duration, Complete, Instant, Unsupported
-	}
-	
-	public String getName(){
-		return name;
-	}
-	
-	public String getPhase(){
-		return ph;
-	}
-	
-	public Long getDuration(){
-		return dur;
-	}
-	
-	public Long getTimeStamp(){
-		return ts;
-	}
-	
-	public Map<String, Object> getArgs(){
-		return args;
-	}
-	
-	public Map<String, Object> getData() throws JSONException{
-		return (Map<String, Object>) getArgs().get("data");
-	}
-	
-	/*public Long getJsHeapSizeUsed() throws JSONException{
+    Map<String, Object> args;
+    String cat;
+    private String name;
+    String ph;
+    Long dur;
+    Integer tdur;
+    Integer pid;
+    String s;
+    Integer tid;
+    Long ts;
+    Long tts;
+
+    public enum Type {
+        Duration, Complete, Instant, Unsupported
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public String getPhase(){
+        return ph;
+    }
+
+    public Long getDuration(){
+        return dur;
+    }
+
+    public Long getTimeStamp(){
+        return ts;
+    }
+
+    public Map<String, Object> getArgs(){
+        return args;
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> getData() throws JSONException{
+        return (Map<String, Object>) getArgs().get("data");
+    }
+
+    /*public Long getJsHeapSizeUsed() throws JSONException{
 		return getData().get("jsHeapSizeUsed");
 	}
-	
+
 	public long getJsEventListeners() throws JSONException{
 		return getData().get("jsEventListeners");
 	}
-	
+
 	public long getDocuments() throws JSONException{
 		return getData().getLong("documents");
 	}
-	
+
 	public long getNodes() throws JSONException{
 		return getData().getLong("nodes");
 	}*/
-	
-	public Type getType(){
-		String phase = getPhase();
-		
-		if(phase.equals("B") || phase.equals("E"))
-			return Type.Duration;
-		else if(phase.equals("X"))
-			return Type.Complete;
-		else if(phase.equals("I"))
-			return Type.Instant;
-		else
-			return Type.Unsupported;
-		
-	}
+
+    public Type getType(){
+        String phase = getPhase();
+
+        if(phase.equals("B") || phase.equals("E"))
+            return Type.Duration;
+        else if(phase.equals("X"))
+            return Type.Complete;
+        else if(phase.equals("I"))
+            return Type.Instant;
+        else
+            return Type.Unsupported;
+
+    }
 }

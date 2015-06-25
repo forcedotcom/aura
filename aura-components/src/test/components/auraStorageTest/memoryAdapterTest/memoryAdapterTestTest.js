@@ -23,7 +23,7 @@
     // maintaining its performance these tests will have to be updated.
 
     setUp : function(cmp) {
-        this.adapter = new $A.storageService.createAdapter("memory", "test", 4096, true);
+        this.adapter = $A.storageService.createAdapter("memory", "test", 4096, true);
     },
 
     testSizeInitial : {

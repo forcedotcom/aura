@@ -1,0 +1,470 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+div.THIS {
+    background-color: #FFF;
+    border-radius: 8px 8px 0 0;
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+div.THIS.PHONE {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+div.THIS.PHONE .scroller {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overflow: scroll;
+}
+
+@if (IE7){
+    div.THIS {
+        border: 1px solid #CCC;
+        width: 358px;
+    }
+}
+
+.THIS .headerBar {
+    background-color: #6495ED;
+    background: -webkit-linear-gradient(#2a93d5,#107abb);
+    background: linear-gradient(#2a93d5,#107abb);
+    box-shadow: 0 1px 3px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.21);
+    border-radius: 8px 8px 0 0;
+    font-size: 13px;
+    font-family: 'ProximaNovaSoft-Regular';
+    height: 42px;
+}
+
+.THIS .headerBar a {
+    color: #FFFFFE;
+    margin-top: 7px;
+    padding: 0 14px;
+}
+
+.THIS .headerBar .calCancel {
+    display: inline-block;
+    float: left;
+    margin-left: 10px;
+    text-align: left;
+    height: 26px;
+    line-height: 24px !important;
+}
+
+.THIS .headerBar .calSet {
+    display: inline-block;
+    float: right;
+    margin-right: 10px;
+    text-align: right;
+    height: 26px;
+    line-height: 24px !important;
+}
+
+.THIS .headerBar a.button {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05), inset 0 1px rgba(255, 255, 255, 0.21);
+    border: 1px solid #0c72b2;
+    border-radius: 5px;
+    background-color: #2891d3;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#2891d3), to(#1983c5));
+    background-image: -webkit-linear-gradient(top, #2891d3, #1983c5);
+    background-image: -moz-linear-gradient(top, #2891d3, #1983c5);
+    background-image: -ms-linear-gradient(top, #2891d3, #1983c5);
+    background-image: -o-linear-gradient(top, #2891d3, #1983c5);
+}
+
+.THIS .dateBar {
+    background-color: #f0f1f2;
+    text-align: center;
+    padding: 14px 14px 7px 14px;
+}
+
+.THIS a {
+    text-decoration: none;
+}
+
+.THIS .dateBar .prevLinks {
+    float: left;
+    text-align: left;
+}
+
+.THIS .dateBar .nextLinks {
+    float: right;
+    text-align: right;
+}
+
+.THIS .dateBar .navLink {
+    background: url('/auraFW/resources/aura/images/bg-arrows.png') no-repeat 0 7px;
+    border: 1px solid transparent;
+    display: inline-block;
+    height: 20px;
+    width: 23px;
+}
+
+.THIS .navLink:hover {
+    background-color: #E1E1E1;
+    border-color: #AEAEAE;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 2px rgba(0, 0, 0, .25);
+    outline:none;
+}
+
+.THIS .dateBar .prevYear {
+    background-position: 6px 7px;
+    margin-left: 5px;
+}
+
+.THIS .dateBar .navLink.prevYear:hover,
+.THIS .dateBar .navLink.prevYear:focus {
+    background-position: 6px -23px;
+}
+
+.THIS .dateBar .prevMonth {
+    background-position: -26px 7px;
+}
+
+.THIS .dateBar .navLink.prevMonth:hover,
+.THIS .dateBar .navLink.prevMonth:focus {
+    background-position: -26px -23px;
+}
+
+.THIS .dateBar .nextMonth {
+    background-position: -66px 7px;
+}
+
+.THIS .dateBar .navLink.nextMonth:hover,
+.THIS .dateBar .navLink.nextMonth:focus {
+    background-position: -66px -23px;
+}
+
+.THIS .dateBar .nextYear {
+    background-position: -98px 7px;
+    margin-right: 5px;
+}
+
+.THIS .dateBar .navLink.nextYear:hover,
+.THIS .dateBar .navLink.nextYear:focus {
+    background-position: -98px -23px;
+}
+
+.THIS .dateBar .monthYear, .THIS .dateBar .monthYear span {
+    font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
+    font-size: 18px;
+    color: #3c3d3e;
+    line-height: 24px !important;
+}
+
+.THIS.DESKTOP .datepicker__filter--month {
+    float: left;
+    width: 75%;
+}
+
+.THIS .dateBar select {
+	color: #006EB3;
+	font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
+	font-size: 18px;
+	line-height: 24px !important;
+	padding: 0 0 0 5px;
+	margin: 0;
+	width: auto;
+	border: 0;
+	vertical-align: baseline;
+	background-color: #f0f1f2;
+	background-image: none;
+	box-shadow: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	-ms-appearance: none;
+	appearance: none;
+}
+
+.THIS .dateBar .monthYear {
+	font-family: ProximaNovaSoft-Bold, Arial, sans-serif;
+    font-size: 18px;
+    color: #3c3d3e;
+    line-height: 24px !important;
+}
+
+.THIS .buttonBar {
+    text-align: center;
+    padding: 7px;
+}
+
+.THIS .buttonBar .calToday {
+    color: #0085C7;
+    font-size: 18px;
+	line-height: 24px !important;
+	border:0px solid #fff;
+	background:transparent;
+	cursor:pointer;
+}
+
+.THIS .buttonBar .calToday:hover,
+.THIS .buttonBar .calToday:focus {
+    text-decoration:underline;
+}
+
+.THIS .timeBar {
+	display:inline-block;
+	width: 100%;
+	text-align: center;
+    background-color: #f0f1f2;
+}
+
+@media only screen and (max-width: 999px) and (orientation: portrait) {
+    .THIS .dateBar .navLink.prevMonth {
+	    background: url('/auraFW/resources/aura/images/arrow-left.png') no-repeat;
+	    background-size: 12px 14px;
+	    background-position: center;
+	}
+
+	.THIS .dateBar .navLink.nextMonth {
+	    background: url('/auraFW/resources/aura/images/arrow-right.png') no-repeat;
+	    background-size: 12px 14px;
+	    background-position: center;
+	}
+
+	.THIS .dateBar .navLink {
+		padding: 3px;
+	}
+
+	.THIS .dateBar .navLink.prevMonth:hover,
+	.THIS .dateBar .navLink.prevMonth:focus,
+	.THIS .dateBar .navLink.nextMonth:hover,
+	.THIS .dateBar .navLink.nextMonth:focus {
+		background-position: center;
+	}
+
+	.THIS .navLink:hover {
+		border-color: transparent;
+	    box-shadow: none;
+	}
+
+    .THIS .headerBar .calCancel {
+        display: inline-block;
+        float: left;
+        margin-left: 7px;
+        text-align: left;
+        line-height: 28px !important;
+    }
+    .THIS .headerBar .calSet {
+        display: inline-block;
+        float: right;
+        margin-right: 7px;
+        text-align: right;
+    }
+}
+
+/* medium size on desktop */
+div.THIS.medium {
+	max-width: 300px;
+}
+
+.THIS.medium .headerBar {
+    box-shadow: 0 1px 2px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.21);
+    border-radius: 6px 6px 0 0;
+    font-size: 10px;
+    height: 30px;
+}
+
+.THIS.medium .headerBar a {
+    margin-top: 5px;
+    padding: 0 10px;
+}
+
+.THIS.medium .headerBar .calCancel {
+    margin-left: 8px;
+    height: 20px;
+    line-height: 22px !important;
+}
+
+.THIS.medium .headerBar .calSet {
+    margin-right: 8px;
+    height: 20px;
+    line-height: 22px !important;
+}
+
+.THIS.medium .headerBar a.button {
+	border-radius: 4px;
+}
+
+.THIS.medium .dateBar .navLink {
+    height: 15px;
+    width: 19px;
+}
+
+.THIS.medium .dateBar {
+    padding: 10px 10px 5px 10px;
+}
+
+.THIS.medium .dateBar .prevYear {
+    background-position: 4px 4px;
+    margin-left: 4px;
+}
+
+.THIS.medium .dateBar .navLink.prevYear:hover,
+.THIS.medium .dateBar .navLink.prevYear:focus {
+    background-position: 4px -26px;
+}
+
+.THIS.medium .dateBar .navLink.prevMonth:hover,
+.THIS.medium .dateBar .navLink.prevMonth:focus {
+    background-position: -29px -26px;
+}
+
+.THIS.medium .dateBar .prevMonth {
+    background-position: -29px 4px;
+}
+
+.THIS.medium .dateBar .nextMonth {
+    background-position: -66px 4px;
+}
+
+.THIS.medium .dateBar .navLink.nextMonth:hover,
+.THIS.medium .dateBar .navLink.nextMonth:focus {
+    background-position: -66px -26px;
+}
+
+.THIS.medium .dateBar .navLink.nextYear:hover,
+.THIS.medium .dateBar .navLink.nextYear:focus {
+    background-position: -98px -26px;
+}
+
+.THIS.medium .dateBar .nextYear {
+	background-position: -98px 4px;
+    margin-right: 4px;
+}
+
+.THIS.medium .dateBar .monthYear, .THIS .dateBar .monthYear span {
+    font-size: 13px;
+    line-height: 18px !important;
+}
+
+.THIS.medium .dateBar select {
+	font-size: 13px;
+	line-height: 18px !important;
+	padding: 0 0 0 4x;
+}
+
+.THIS.medium .buttonBar {
+    padding: 5px;
+}
+
+.THIS.medium .buttonBar .calToday {
+    font-size: 13px;
+	line-height: 18px !important;
+}
+
+/* small size on desktop */
+div.THIS.small {
+	max-width: 200px;
+}
+
+.THIS.small .headerBar {
+    box-shadow: 0 1px 1px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.21);
+    border-radius: 4px 4px 0 0;
+    font-size: 8px;
+    height: 20px;
+}
+
+.THIS.small .headerBar a {
+    margin-top: 3px;
+    padding: 0 8px;
+}
+
+.THIS.small .headerBar .calCancel {
+    margin-left: 6px;
+    height: 13px;
+    line-height: 15px !important;
+}
+
+.THIS.small .headerBar .calSet {
+    margin-right: 6px;
+    height: 13px;
+    line-height: 15px !important;
+}
+
+.THIS.small .headerBar a.button {
+	border-radius: 2px;
+}
+
+.THIS.small .dateBar .navLink {
+    height: 12px;
+    width: 16px;
+}
+
+.THIS.small .dateBar {
+    padding: 6px 6px 3px 6px;
+}
+
+.THIS.small .dateBar .prevYear {
+    background-position: 3px 2px;
+    margin-left: 2px;
+}
+
+.THIS.small .dateBar .navLink.prevYear:hover,
+.THIS.small .dateBar .navLink.prevYear:focus {
+    background-position: 3px -28px;
+}
+
+.THIS.small .dateBar .prevMonth {
+    background-position: -30px 2px;
+}
+
+.THIS.small .dateBar .navLink.prevMonth:hover,
+.THIS.small .dateBar .navLink.prevMonth:focus {
+    background-position: -30px -27px;
+}
+
+.THIS.small .dateBar .nextMonth {
+    background-position: -69px 2px;
+}
+
+.THIS.small .dateBar .navLink.nextMonth:hover,
+.THIS.small .dateBar .navLink.nextMonth:focus {
+    background-position: -69px -28px;
+}
+
+.THIS.small .dateBar .nextYear {
+	background-position: -100px 2px;
+    margin-right: 2px;
+}
+
+.THIS.small .dateBar .navLink.nextYear:hover,
+.THIS.small .dateBar .navLink.nextYear:focus {
+    background-position: -100px -28px;
+}
+
+.THIS.small .dateBar .monthYear, .THIS .dateBar .monthYear span {
+    font-size: 10px;
+    line-height: 15px !important;
+}
+
+.THIS.small .dateBar select {
+	font-size: 10px;
+	line-height: 15px !important;
+	padding: 0 0 0 3x;
+}
+
+.THIS.small .buttonBar {
+    padding: 3px;
+}
+
+.THIS.small .buttonBar .calToday {
+    font-size: 10px;
+	line-height: 15px !important;
+}

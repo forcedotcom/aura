@@ -44,8 +44,7 @@
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible' : '') +
-                                                 ($Browser.isPhone == true ? ' phone' : '') +
+    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor +
                                                  (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">
@@ -55,37 +54,37 @@
                 </div>
             </aura:if>
             <div class="dateBar">
-                <div class="prevLinks">
-                    <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
-                        <a aura:id="prevYear" class="navLink prevYear" title="Go to previous year" onclick="{!c.goToPrevYear}" onkeydown="{!c.closeOnTab}">
-                            <span class="assistiveText">Go to previous year</span>
+                <div class="datepicker__filter--month">
+                    <div class="prevLinks">
+                        <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
+                            <span class="assistiveText">Go to previous month</span>
                         </a>
-                    </aura:if>
-                    <a aura:id="prevMonth" class="navLink prevMonth" title="Go to previous month" onclick="{!c.goToPrevMonth}" onkeydown="{!c.handleKeydown}">
-                        <span class="assistiveText">Go to previous month</span>
-                    </a>
-                </div>
-                <div class="nextLinks">
-                    <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
-                        <span class="assistiveText">Go to next month</span>
-                    </a>
-                    <aura:if isTrue="{!!$Browser.isPhone &amp;&amp; !$Browser.isTablet}">
-                        <a aura:id="nextYear" class="navLink nextYear" title="Go to next year" onclick="{!c.goToNextYear}" onkeydown="{!c.focusDateOnTab}">
-                            <span class="assistiveText">Go to next year</span>
+                    </div>
+                    <div class="nextLinks">
+                        <a aura:id="nextMonth" class="navLink nextMonth" title="Go to next month" onclick="{!c.goToNextMonth}" onkeydown="{!c.handleKeydown}">
+                            <span class="assistiveText">Go to next month</span>
                         </a>
+                    </div>
+                    <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
+                        <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
+                            <ui:outputText aura:id="monthTitle" value=""/>
+                            <label>
+                                <span class="assistiveText">year</span>
+                                <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                            </label>
+                        </h2>
+                        <aura:set attribute="else">
+                            <span aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+                        </aura:set>
                     </aura:if>
                 </div>
-                <aura:if isTrue="{!$Browser.formFactor != 'DESKTOP'}">
-                    <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle">
-                        <ui:outputText aura:id="monthTitle" value=""/>
+                <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
+                    <div class="picklist datepicker__filter--year">
                         <label>
                             <span class="assistiveText">year</span>
-                            <select aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                            <select class="picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}"/>
                         </label>
-                    </h2>
-                    <aura:set attribute="else">
-                        <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
-                    </aura:set>
+                    </div>
                 </aura:if>
             </div>
             <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}"

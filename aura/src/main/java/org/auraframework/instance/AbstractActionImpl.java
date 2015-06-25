@@ -90,7 +90,10 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public void setStorable() {
         storable = true;
-        setId("s");
+        if (actionId == null) {
+            // Only set the ID if it was not previously set.
+            setId("s");
+        }
     }
 
     @Override

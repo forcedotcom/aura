@@ -1898,7 +1898,11 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         try {
             response = actionResponses[r];
             action = auraXHR.getAction(response["id"]);
-            if (action == null) {
+            if (action) {
+                if (response["storable"] && !action.isStorable()) {
+                    action.setStorable();
+                }
+            } else {
                 action = this.buildFakeAction(response);
             }
             if (action == null) {
@@ -1935,6 +1939,10 @@ AuraClientService.prototype.buildFakeAction = function(response) {
         //
         var descriptor = response["action"];
         var actionDef = $A.services.component.getActionDef(descriptor);
+        if (!actionDef) {
+            // No action.
+            throw new $A.auraError("Missing action definition for "+descriptor);
+        }
         action = actionDef.newInstance();
         action.setStorable();
         action.setParams(response["params"]);

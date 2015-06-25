@@ -140,7 +140,7 @@ public class AbstractActionImplTest extends UnitTestCase {
         test.setId("x");
         test.setStorable();
         assertEquals("isStorable should not change on second setStorable", true, test.isStorable());
-        assertEquals("id should change on second setStorable", "s", test.getId());
+        assertEquals("id should not change on second setStorable", "x", test.getId());
     }
 
     public void testDescriptor() {

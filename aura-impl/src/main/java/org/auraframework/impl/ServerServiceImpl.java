@@ -99,16 +99,20 @@ public class ServerServiceImpl implements ServerService {
             }
             
             if (context.getMode() != Mode.PROD) {
-		        try {
-		        	metricsService.serializeMetrics(json);
-		        	metricsService.clearMetrics();
-		        } catch (Exception e) {
-		        	System.out.println("Errror parsing MetricsService");
-		        }
+                try {
+                    metricsService.serializeMetrics(json);
+                    metricsService.clearMetrics();
+                } catch (Exception e) {
+                    loggingService.error("Error parsing MetricsService", e);
+                }
             }
+            json.writeMapEnd();
         } finally {
-        	json.writeMapEnd();
-            json.close();
+            try {
+                json.close();
+            } catch (Throwable ignored) {
+                loggingService.error("Error closing json", ignored);
+            }
         }
     }
 

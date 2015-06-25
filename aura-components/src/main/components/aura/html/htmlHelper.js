@@ -165,15 +165,16 @@
                 value = $A.getContext().getContextPath() + value;
             }
 
-            var isHash = isString && value.indexOf("#") === 0;
-            if (lowerName === "href" && element.tagName === "A" && value && (isHash || $A.util.supportsTouchEvents())) {
+            if (lowerName === "href" && element.tagName === "A" && value && $A.util.supportsTouchEvents()) {
                 var HTMLAttributes = component.get("v.HTMLAttributes");
                 var target = HTMLAttributes["target"];
+
                 if ($A.util.isExpression(target)) {
                     target = target.evaluate();
                 }
+
                 this.addNamedClickHandler(element, function () {
-                    if (isHash) {
+                    if (isString && value.indexOf("#") === 0) {
                         $A.run(function () {
                             $A.historyService.set(value.substring(1));
                         })
@@ -228,9 +229,10 @@
                 // Also, you can't change the type after the element has been added to the DOM.
                 // Honestly, I can't see how this wasn't blowing up Pre-halo
                 if ($A.util.isIE && element.tagName === "INPUT" && lowerName === "type") {
-                    try { element.setAttribute("type", value); }
-                    catch(e){
-                    	return undefined;	
+                    try { 
+                        element.setAttribute("type", value); 
+                    } catch (e) {
+                        return undefined;   
                     }
                 }
                 // as long as we have a valid value at this point, set

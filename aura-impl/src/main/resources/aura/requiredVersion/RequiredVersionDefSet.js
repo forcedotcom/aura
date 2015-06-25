@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @namespace Creates a new RequiredVersionDefSet instance.
+ * Creates a new RequiredVersionDefSet instance.
  * @param {Object} configs For each configs object provided, a new RequiredVersionDef instance is added
  * @constructor
  * @protected

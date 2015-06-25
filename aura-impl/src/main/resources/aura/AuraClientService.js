@@ -17,7 +17,7 @@
 /**
  * AuraXHR: struct used to represent a connection.
  *
- * @constructor
+ * @private
  */
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.iteration = 0;
@@ -77,7 +77,7 @@ Aura.Services.AuraClientService$AuraXHR.prototype.getAction = function(id) {
 /**
  * A handy structure to hold data.
  *
- * @constructor
+ * @private
  */
 Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollector() {
     // Collected client actions for execution.

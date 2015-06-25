@@ -27,9 +27,4 @@
     &lt;b>Aura&lt;/b>, &lt;span style="color:red">input rich text demo&lt;/span>
 &lt;/div></pre>
 	</aura:description>	
-		<aura:example name="richtext" ref="auradocs:demoInputRT" label="Using ui:outputRichText">
-    	<p>This example shows how you can bind data from a <code>ui:inputRichText</code> component.</p>
-	   </aura:example>
-	   
-	
 </aura:documentation>

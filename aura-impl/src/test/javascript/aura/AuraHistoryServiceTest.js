@@ -397,5 +397,19 @@ Test.Aura.AuraHistoryServiceTest = function(){
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        function ParsesEmptyValues() {
+            var location = "#hash?key=&key2";
+            var historyService = new Aura.Services.AuraHistoryService();
+            var expected = { "token":"hash", "querystring":"key=&key2", "key":"", "key2":undefined };
+            var actual;
+
+            mockUrlDecode(function() {
+                actual = historyService.parseLocation(location);    
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
     }
 }

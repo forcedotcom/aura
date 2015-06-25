@@ -126,9 +126,7 @@
 	        <ui:inputTextArea aura:id="inputTabContent"  class="inputTabContent" placeholder="content" />
 	    </div>
      </aura:if>  
-
-
-
+     
 	<aura:if isTrue="{! v.renderItem == 'tab_lazyCustomTab'}">
 		<div class="block">
 			<h1>tab_lazyCustomTab</h1>

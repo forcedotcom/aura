@@ -52,5 +52,31 @@
     activateTabByIndex: function(cmp) {
         var e = cmp.find('tabset2').get("e.activateTab");
         e.setParams({"index": 6}).fire();
+    },
+    
+    addTab_OverflowTabset: function(cmp, evt) {
+        if (!cmp._counter) cmp._counter = 0;
+
+        var title = "Dynamic " + cmp._counter;
+        var content = "Dynamic Content " + cmp._counter;
+        var closable = true;
+        var active = true;
+        var e = cmp.find('tabsetOverflow').get("e.addTab");
+
+        e.setParams({tab: {
+            "title": title,
+            "closable": closable,
+            "active": active,
+            "body": [{
+                "componentDef": { descriptor:"markup://aura:text" },
+                "attributes": {
+                    "values": {
+                        "value": content
+                    }
+                }
+            }],
+            }, index: -1});
+        e.fire();
+        cmp._counter++;
     }
 })

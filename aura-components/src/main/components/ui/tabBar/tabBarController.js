@@ -45,6 +45,26 @@
 		    callback(succeed);
 		}
 	},
+	
+	/**
+	 * This action is invoked from the overflow menu tab when an overflow item is focused or selected
+	 */
+	onOverflowSelection: function(cmp, evt, helper) {
+		var overflowData = helper.getOverflowData(cmp),
+			index = evt.getParam("index"),
+			oldTab = cmp._activeTab && cmp._activeTab.isValid() ? cmp._activeTab : null,
+			e = cmp.get('e.onTabActivated');
+		
+		// If an index is provided by the event, use it. -1 is treated as the last tab currently visible.
+		// Otherwise, obtain the index from the tab cache using the provided name.
+		if ($A.util.isUndefinedOrNull(index)) {
+			index = overflowData.tabCache[evt.getParam("name").toLowerCase()];
+		} else if (index === -1) {
+			index = overflowData.overflowTabIndex;
+		}
+		
+		e.setParams({"index": index, "oldTab": oldTab, "focus": evt.getParam("focus")}).fire();
+	},
 
 	onKeyDown: function(cmp, evt, helper) {
 		helper.onKeyDown(cmp, evt);

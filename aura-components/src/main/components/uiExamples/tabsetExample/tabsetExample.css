@@ -61,3 +61,12 @@
 .THIS .clear {
 	clear: both;
 }
+
+.THIS .overflowTabset {
+	width: 600px;
+}
+
+.THIS .overflowTabset li {
+	width: 197px;
+	text-align: center;
+}

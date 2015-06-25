@@ -389,11 +389,20 @@
         component.set("v._namesOfWeekdays", namesOfWeekDays);
         var days = [];
         if ($A.util.isNumber(firstDayOfWeek) && $A.util.isArray(namesOfWeekDays)) {
+            var isDesktop = $A.get('$Browser.isDesktop');
             for (var i = firstDayOfWeek; i < namesOfWeekDays.length; i++) {
-                days.push(namesOfWeekDays[i]);
+                var dayObj = namesOfWeekDays[i];
+                if (isDesktop) {
+                    dayObj.shortName = dayObj.shortName.substring(0,1);
+                }
+                days.push(dayObj);
             }
             for (var j = 0; j < firstDayOfWeek; j++) {
-                days.push(namesOfWeekDays[j]);
+                var dayObj = namesOfWeekDays[j];
+                if (isDesktop) {
+                    dayObj.shortName = dayObj.shortName.substring(0,1);
+                }
+                days.push(dayObj);
             }
             component.set("v._namesOfWeekdays", days);
         }

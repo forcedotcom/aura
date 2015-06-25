@@ -429,16 +429,21 @@
         }
         var grid = component.find("grid");
         if (grid) {
+            var m = grid.get("v.month");
+            var y = grid.get("v.year");
             var titleCmp = component.find("calTitle");
             if (titleCmp) {
                 var elem = titleCmp.getElement();
                 if (elem) {
-                    var m = grid.get("v.month");
-                    var y = grid.get("v.year");
                     var monthLabels = $A.get("$Locale.nameOfMonths");
                     var title = monthLabels ? monthLabels[m].fullName + " " + y : this.MonthLabels[m].fullName + " " + y;
                     elem.textContent = elem.innerText = title;
                 }
+            }
+            var yearTitleCmp = component.find("yearTitle");
+            var selectElem = yearTitleCmp ? yearTitleCmp.getElement() : null;
+            if (selectElem) {
+                selectElem.value = y + "";
             }
         }
     },

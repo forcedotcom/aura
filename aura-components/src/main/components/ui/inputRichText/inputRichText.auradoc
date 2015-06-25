@@ -28,7 +28,4 @@
 			A list of supported HTML tags is available in the JavaScript helper of the <code>ui:outputRichText</code> component.
     	</p>
 	</aura:description>	
-		<aura:example name="inputRichText" ref="auradocs:demoInputRT" label="Using ui:inputRichText">
-    	<p>This example retrieves the value of a <code>ui:inputRichText</code> component and displays it using <code>ui:outputRichText</code>.</p>
-	   </aura:example>	
 </aura:documentation>

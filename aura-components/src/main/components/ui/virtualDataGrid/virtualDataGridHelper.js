@@ -156,9 +156,12 @@
     _eventDelegator: function (cmp, e) {
          var type     = e.type,
             target    = e.target,
+            child     = e.target,
             ref       = cmp.get('v.itemVar'),
+            templates = cmp._templates,
             handlers  = [],
             ptv       = cmp._ptv,
+            position,
             item;
 
         while (target) {
@@ -173,15 +176,27 @@
             }
 
             if ((item = this._getItemAttached(target))) {
+                position = Array.prototype.indexOf.call(target.childNodes, child);
                 break;
             }
+
+            child  = target;
             target = target.parentElement;
+        }
+
+        if (!handlers.length > 0) {
+            return;
         }
 
          if (item) {
             // Seting up the event with some custom properties
             e.templateItem = item;
             e.templateElement = target;
+            if (child && position !== -1) {
+                // we try to put the right html on the virtual component
+                templates[position].getElement = function () { return child.firstChild; };
+            }
+
 
             // Setting up the component with the current item
             ptv.set(ref, item);

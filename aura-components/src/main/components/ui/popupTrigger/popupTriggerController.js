@@ -31,6 +31,13 @@
         _helper.handleClick(component, event);
     },
 
+    // TODO: Refactor this trigger
+    // 1. Add interface for trigger
+    // 2. Dont call directly the helper method instead of proxyfy to onClick
+    triggerInteraction: function (cmp, event, helper) {
+         cmp.get('c.onClick').run();
+    },
+
     /*
      * popupToggle.evt is an event that custom trigger events can broadcast
      * which is caught by popup and responded to accordingly

@@ -26,6 +26,7 @@
     <aura:registerEvent name="popupKeyboardEvent" type="ui:popupKeyboardEvent" description="The event fired when a user interacts with a popup via the keyboard."/>
 
     <aura:handler event="ui:popupTargetToggle" action="{!c.onPopupToggle}"/>
+    <aura:method name="triggerInteraction"/>
 
     <div id="{!globalId}" aura:id="popupTrigger" aria-haspopup="true">
 	    <aura:if isTrue="{!v.trigger.length > 0}">

@@ -82,12 +82,18 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(containerCmp);
     }
 
+    /**
+     * WARNING: This test currently asserts no access but the desired behavior is for there to be access. Should be able
+     * to pass provided facet to other global cmp
+     * 
+     * Update assert statement when W-2520914 is fixed.
+     */
     public void testAccessToNonGlobalAsFacetOfOtherGlobal() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(DEFAULT, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(OTHER, "holder", "access='GLOBAL'", "{!v.body}");
         DefDescriptor<ComponentDef> containerCmp = buildCmp(DEFAULT, "container", "",
                 String.format("<%s><%s/></%1$s>", holderCmp.getDescriptorName(), facetCmp.getDescriptorName()));
-        assertNoAccess(containerCmp);  // should be able to pass provided facet to other global cmp
+        assertNoAccess(containerCmp); // FIXME(W-2520914): Change to assertAccess(containerCmp) when bug fixed
     }
 
     public void testNoAccessToOtherNonGlobalAsFacetOfOtherGlobal() throws Exception {
@@ -98,12 +104,18 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertNoAccess(containerCmp);
     }
 
+    /**
+     * WARNING: This test currently asserts access but the desired behavior is for there to be no access. Should not be
+     * able to access other non-global cmp, even if facet of other global cmp
+     * 
+     * Update assert statement when W-2520914 is fixed.
+     */
     public void testNoAccessToOtherNonGlobalAsFacetOfOtherGlobalInOtherGlobal() throws Exception {
         DefDescriptor<ComponentDef> facetCmp = buildCmp(OTHER, "cmp", "", "");
         DefDescriptor<ComponentDef> holderCmp = buildCmp(OTHER, "holder", "access='GLOBAL'", "{!v.body}");
         DefDescriptor<ComponentDef> containerCmp = buildCmp(OTHER, "container", "access='GLOBAL'",
                 String.format("<%s><%s/></%1$s>", holderCmp.getDescriptorName(), facetCmp.getDescriptorName()));
-        assertAccess(containerCmp);  // should not be able to access other non-global cmp, even if facet of other global cmp
+        assertAccess(containerCmp); // FIXME(W-2520914): Change to assertNoAccess(containerCmp) when bug fixed
     }
 
     public void testNoAccessToOtherNonGlobalAsFacetOfGlobalInSameNS() throws Exception {
@@ -136,7 +148,6 @@ public class InstanceAccessTest extends AuraImplTestCase {
         assertAccess(relativeCmp);
     }
 
-    
     private DefDescriptor<ComponentDef> buildCmp(String namespace, String namePrefix, String attributes, String body) {
         return getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, attributes, body), namespace + ":" + namePrefix + "_" + getName(),

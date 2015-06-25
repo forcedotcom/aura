@@ -195,10 +195,66 @@ public class LoggingServiceImpl implements LoggingService {
             lc.logCSPReport(report);
         }
     }
+    
+    /**
+     * Logs an informational message, independent of context such as action or
+     * timers, for which context-sensitive methods can be provided via other
+     * methods.  Use this method to report "important" stuff (i.e. worth cluttering
+     * the logs with) that arises during normal, successful operation.
+     */
+    @Override
+    public void info(String message) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.info(message);
+        }
+    }
+    
+    /**
+     * Logs a warning message, independent of context such as action or
+     * timers, for which context-sensitive methods can be provided via other
+     * methods.  Use this method to report suspicious, but perhaps not wrong,
+     * situations, or minor problems for which a clear workaround is available and
+     * will be followed.
+     */
+    @Override
+    public void warn(String message) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.warn(message);
+        }
+    }
+    
+    /**
+     * Logs an error message, independent of context such as action or timers,
+     * for which context-sensitive methods can be provided via other methods.
+     * Use this method to report serious problems where something is definitely
+     * wrong.
+     */
+    @Override
+    public void error(String message) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.error(message);
+        }
+    }
 
-	@Override
-	public void serializeActions(Json json) {
-		getLoggingContext().serializeActions(json);
-		
-	}
+    /**
+     * Logs an error message, independent of context such as action or timers,
+     * for which context-sensitive methods can be provided via other methods.
+     * Use this method to report serious problems where something is definitely
+     * wrong.
+     */
+    @Override
+    public void error(String message, Throwable cause) {
+        LoggingContext lc = getLoggingContext();
+        if (lc != null) {
+            lc.error(message, cause);
+        }
+    }
+
+    @Override
+    public void serializeActions(Json json) {
+        getLoggingContext().serializeActions(json);
+    }
 }

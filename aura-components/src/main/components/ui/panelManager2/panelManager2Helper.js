@@ -100,11 +100,14 @@
     * This function should be called before stacking a new panel
     */
     setPanelOwner: function (panel, givenOwner) {
-        var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1],
-            owner = givenOwner || previousPanel && previousPanel.get('v.body')[0].getGlobalId();
-
+        var owner = givenOwner;
+        if (!owner) {
+            var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1],
+                previousBody = previousPanel && previousPanel.get('v.body');
+            
+            owner = !$A.util.isEmpty(previousBody) ? previousBody[0].getGlobalId() : null;
+        }
         this.PANELS_OWNER[panel.getGlobalId()] = owner;
-        
     },
 
     /*

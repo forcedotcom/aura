@@ -50,7 +50,6 @@ PerfMetricsPlugin.prototype = {
             stampMark      = this.collector["mark"](PerfMetricsPlugin.NAME, 'perf');
 
         if (perfData) {
-            console.log(perfData);
             stampMark["context"] = perfData;
         }
 

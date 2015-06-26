@@ -172,6 +172,37 @@
     	             $A.test.assertFalse($A.util.isUndefinedOrNull(yearTitle), "year input select not found");
     	}
     },
+    
+    /**
+     * Test if entering invalid inputs does not cause crash
+     */
+    testInvalidInputs : {
+    	test : function(cmp) {
+    		var datePickerTestCmp = null;
+    		var openDatePickerEvt = null;
+    		var datePicker = null;
+    		var inputs = ["abc",
+    					  "ab/cd/efgh",
+    					  "abcd/1a/s2",
+    					  "201a/01/02",
+    					  "1/6/2015",
+    					  "-2013/-06/-2",    			
+    					  "201.5/.1/2",
+    					  "@#∂ß/7Y/12",
+    					  "",
+    					  " ",
+    					  "    / / "];  		
+    		for(var i = 0; i < inputs.length; i++) {
+    			datePickerTestCmp = cmp.find("datePickerTestCmp");
+        		openDatePickerEvt = datePickerTestCmp.getEvent("openPicker");
+    			datePickerTestCmp.set('v.value',inputs[i]);
+        		openDatePickerEvt.fire();
+        		datePicker = datePickerTestCmp.find("datePicker").getElement();
+        		$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.hasClass(datePicker, "visible")}, "Error in opening date picker");
+    		}
+    		
+    	}
+    },
 
     /**
      * On mobile incrementing month past December increments year selector to next year.

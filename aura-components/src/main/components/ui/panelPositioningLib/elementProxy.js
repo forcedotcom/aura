@@ -87,28 +87,36 @@ function (w) {
      */
     ElementProxy.prototype.refresh = function() {
 
-
         if(this.isDirty()) {
             return;
         }
-        var box, x;
+        var box, x, scrollTop, scrollLeft;
+
+        if(w.pageYOffset) {
+            scrollTop = pageYOffset;
+            scrollLeft = pageXOffset;
+        } else {
+            scrollTop = w.scrollY;
+            scrollLeft = w.scrollX;
+        }
+        
         
         if(this._node !== w) {
             box = this._node.getBoundingClientRect();
             for(x in box) {
                 this[x] = box[x];
             }
-            this.top = this.top + w.scrollY;
+            this.top = this.top + scrollTop;
             this.bottom = this.top + box.height;
-            this.left = this.left + w.scrollX;
+            this.left = this.left + scrollLeft;
             this.right = this.left + box.width;
         } else {
             box = {};
             this.width = w.innerWidth;
             this.height = w.innerHeight;
-            this.left = w.scrollX;
-            this.top = w.scrollY;
-            this.right = w.innerWidth + w.scrollX;
+            this.left = scrollLeft;
+            this.top = scrollTop;
+            this.right = w.innerWidth + scrollLeft;
             this.bottom = w.innerHeight;
         }
 
@@ -137,11 +145,20 @@ function (w) {
      * Computes and applies the positioning changes to the DOM
      */
     ElementProxy.prototype.bake = function() {
-
         var absPos = this._node.getBoundingClientRect();
         this._node.style.position = 'absolute';
         var style = w.getComputedStyle(this._node);
         var originalLeft, originalTop;
+        var scrollTop, scrollLeft;
+
+        if(w.pageYOffset) {
+            scrollTop = w.pageYOffset;
+            scrollLeft = w.pageXOffset;
+        } else {
+            scrollTop = w.scrollY;
+            scrollLeft = w.scrollX;
+        }
+
         if(style.left.match(/auto|fixed/)) {
             originalLeft = '0';
         } else {
@@ -156,8 +173,8 @@ function (w) {
         originalLeft = parseInt(originalLeft.replace('px', ''), 10);
         originalTop = parseInt(originalTop.replace('px', ''), 10);
         
-        var leftDif = this.left - (absPos.left + w.scrollX);
-        var topDif = this.top - (absPos.top + w.scrollY);
+        var leftDif = this.left - (absPos.left + scrollLeft);
+        var topDif = this.top - (absPos.top + scrollTop);
         
         this._node.style.left = (originalLeft + leftDif) + 'px';
         this._node.style.top = (originalTop+ topDif) + 'px';

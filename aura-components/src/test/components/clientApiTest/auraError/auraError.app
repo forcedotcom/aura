@@ -17,7 +17,9 @@
 -->
 <aura:application access="unauthenticated">
     <aura:attribute name="systemErrorHandled" type="Boolean" default="false"/>
-    <aura:attribute name="setFriendlyErrorHandled" type="Boolean" default="true" />
+    <aura:attribute name="setFriendlyErrorHandled" type="Boolean" default="true"/>
+    <aura:attribute name="useFriendlyErrorMessageFromData" type="Boolean" default="false"/>
+    <aura:attribute name="handleSystemErrorEvent" type="Boolean" default="true"/>
     <aura:attribute name="errorCode" type="String" default="8675309" />
 
     <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>

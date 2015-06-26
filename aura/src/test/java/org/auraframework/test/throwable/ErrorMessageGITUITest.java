@@ -19,6 +19,10 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.IsNot.not;
+
 /**
  * Automation for error message displayed in auraErrorMask div.
  */
@@ -62,6 +66,8 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
         open("/clientApiTest/auraError.app?setFriendlyErrorHandled=false", Mode.DEV);
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         assertDisplayedErrorMessage("Friendly Error Test");
+        // the error message is overridden in customized handler
+        assertNoStacktracePresent();
     }
 
     public void testFriendlyErrorDisplaysErrorIfNotHandled_ProdMode() throws Exception {
@@ -69,6 +75,22 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
         assertDisplayedErrorMessage("Friendly Error Test");
         assertNoStacktracePresent();
+    }
+
+    public void testFriendlyErrorHandledByDefaultHandler() throws Exception {
+        open("/clientApiTest/auraError.app?handleSystemErrorEvent=false", Mode.DEV);
+        findDomElement(By.cssSelector(".friendlyErrorButton")).click();
+        assertNotDisplayedErrorMessage("[Message from customized handler]");
+        assertDisplayedErrorMessage("Friendly Error Test");
+        // the original error is overridden by message in friendly error
+        assertNoStacktracePresent();
+    }
+
+    public void testFriendlyErrorMessageFromData() throws Exception {
+        open("/clientApiTest/auraError.app?useFriendlyErrorMessageFromData=true", Mode.PROD);
+        findDomElement(By.cssSelector(".friendlyErrorButton")).click();
+        assertDisplayedErrorMessage("[Message from customized handler]");
+        assertDisplayedErrorMessage("Friendly Error Message from data");
     }
 
     public void testAuraError_DevMode() throws Exception {
@@ -81,8 +103,17 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
     public void testAuraError_ProdMode() throws Exception {
         open("/clientApiTest/auraError.app", Mode.PROD);
         findDomElement(By.cssSelector(".auraErrorButton")).click();
+        assertDisplayedErrorMessage("[Message from customized handler]");
         assertDisplayedErrorMessage("Controller Error Test");
         assertNoStacktracePresent();
+    }
+
+    public void testAuraErrorHandledByDefaultHandler() throws Exception {
+        open("/clientApiTest/auraError.app?handleSystemErrorEvent=false", Mode.DEV);
+        findDomElement(By.cssSelector(".auraErrorButton")).click();
+        assertNotDisplayedErrorMessage("[Message from customized handler]");
+        assertDisplayedErrorMessage("Controller Error Test");
+        assertStacktracePresent();
     }
 
     public void testAuraAssert_DevMode() throws Exception {
@@ -107,27 +138,36 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
         assertDisplayedErrorMessage(errorCode);
     }
 
+    private String findErrorMessage() {
+        waitForElement("Error mask should be visible when there is an error.", findDomElement(ERROR_MASK_LOCATOR), true);
+        return getText(ERROR_MSG_LOCATOR);
+    }
+
+    private void assertNotDisplayedErrorMessage(String message) {
+        String actualMessage = findErrorMessage();
+        assertThat("Unexpected message in error message element： " + message, actualMessage, not(containsString(message)));
+    }
+
+    private void assertDisplayedErrorMessage(String message) {
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(message));
+    }
+
     /**
      * Stacktraces vary greatly across browsers so just verify there's more characters than the normal error message and
      * assume it's the stacktrace.
      */
     private void assertStacktracePresent() {
-        String actualMessage = getText(ERROR_MSG_LOCATOR);
-        assertTrue("Stacktrace not present on displayed error.", actualMessage.length() > 100);
+        String actualMessage = findErrorMessage();
+        assertTrue("Stacktrace not present on displayed error.", actualMessage.length() > 150);
     }
 
     /**
      * Only the standard error message plus message on Error should be displayed.
      */
     private void assertNoStacktracePresent() {
-        String actualMessage = getText(ERROR_MSG_LOCATOR);
-        assertTrue("Stacktrace should not be present on displayed error.", actualMessage.length() < 100);
+        String actualMessage = findErrorMessage();
+        assertTrue("Stacktrace should not be present on displayed error.", actualMessage.length() < 150);
     }
 
-    private void assertDisplayedErrorMessage(String message) {
-        waitForElement("Error mask should be visible when there is an error.", findDomElement(ERROR_MASK_LOCATOR), true);
-        String actualMessage = getText(ERROR_MSG_LOCATOR);
-        assertTrue("Did not find expected error in error message element. Expected <" + message + "> but got <"
-                + actualMessage + ">.", actualMessage.contains(message));
-    }
 }

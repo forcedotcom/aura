@@ -14,6 +14,16 @@
  * limitations under the License.
  */
 ({
+    onClick: function(component, event, helper) {
+        if ($A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
+            $A.util.squash(event);
+        }
+        var concreteCmp = component.getConcreteComponent();
+        var concreteHelper = concreteCmp.helper;
+        concreteHelper.handleTriggerPress(concreteCmp);
+        helper.fireMenuTriggerPress(component);
+    },
+
     focus: function(component, event, helper) {
         var concreteCmp = component.getConcreteComponent();
         //var concreteHelper = concreteCmp.helper || concreteCmp.getDef().getHelper();

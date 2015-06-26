@@ -38,7 +38,7 @@
     <li aura:id="li" class="{!v.class + 'tabItem'}" role="presentation">
 	    <ui:menu aura:id="menu">
 	    	<ui:menuTrigger aura:id="trigger">
-	    		<a class="tabHeader" onclick="{!c.activateMenu}" aura:id="tabItem"
+	    		<a class="tabHeader" aura:id="tabItem"
            			onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onblur="{!c.onTabUnhover}"
             		aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" tabindex="-1" role="tab">
             		<span>{!v.title}</span>

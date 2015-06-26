@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 ({
+	clickTrigger: function (trigger) {
+		//this.clickTrigger(trigger);
+		// We need to figure out a better way to access the clickable part of the trigger
+		trigger.getElement().firstChild.firstChild.click();
+	},
 	/**
 	 * Test to verify action menu works when interacting with the menu items 
 	 * which has attachToBody attribute set
@@ -35,7 +40,7 @@
 	        	//check menu is default to hidden by using DOM API
 	        	$A.test.assertTrue($A.util.hasClass(actionMenu.getElement(),"uiMenuList"), "Class name should be just uiMenuList");
 	        	$A.test.assertFalse($A.util.hasClass(actionMenu.getElement(),"visible"), "Class name should not contain visible");
-	        	menuLabel.get("e.click").fire();
+	        	this.clickTrigger(menuLabel);
 
 	            //Check if secondItem in the menu is disabled
 	            $A.test.addWaitForWithFailureMessage(true, function(){return cmp.find(item2).get("v.disabled");}, "Check if Item2 in the menu is disabled");
@@ -80,7 +85,7 @@
     	browsers: ["-IE7","-IE8"],
     	test: function(cmp){
     		trigger = cmp.find("triggerAttachToBody");
-			trigger.get("e.click").fire();
+			this.clickTrigger(trigger);
 			var menuItem1 = cmp.find("actionItemAttachToBody1");
 			$A.test.addWaitForWithFailureMessage(menuItem1.get('v.label'), function(){return $A.test.getActiveElementText()}, "Focus should be on item 1");
 		}

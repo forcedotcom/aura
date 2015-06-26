@@ -1,11 +1,9 @@
 ({
     /**
      * Verify version value provider can be used in equals comparison with number expression,
-     * e.g {!version==2.0}
-     *
-     * TODO: W-2643528
+     * e.g {!version=='2.0'}
      */
-    _testVerionInExpressionWithEqualsComparison: {
+    testVersionInExpressionWithEqualsComparison: {
         test: function(cmp) {
             var targetComponent = cmp.find("auratestCmp");
             targetComponent.updateWithEqualsComponentExist();
@@ -16,9 +14,9 @@
 
     /**
      * Verify version value provider can be used in inequality comparsion expression,
-     * e.g. {!version>2.0}.
+     * e.g. {!version>1}.
      */
-    testVerionInExpressionWithInequalityComparison: {
+    testVersionInExpressionWithInequalityComparison: {
         test: function(cmp) {
             var targetComponent = cmp.find("auratestCmp");
             targetComponent.updateWithInequalityComparisonComponentExist();
@@ -37,7 +35,7 @@
             targetComponent.udpateWithBoundVersionExpression();
 
             var actual = targetComponent.get("v.version");
-            $A.test.assertEquals('2.0', actual);
+            $A.test.assertEquals("2.0", actual);
         }
     },
 
@@ -50,61 +48,49 @@
             targetComponent.udpateWithUnboundVersionExpression();
 
             var actual = targetComponent.get("v.version");
-            $A.test.assertEquals('2.0', actual);
+            $A.test.assertEquals("2.0", actual);
         }
     },
 
     testVersionInInitHandler: {
         test: function(cmp) {
-            $A.test.assertEquals('2.0', cmp.find("auratestCmp").get("v.version"));
+            $A.test.assertEquals("2.0", cmp.find("auratestCmp").get("v.version"));
         }
     },
 
-    /**
-     * TODO: W-2643371
-     */
-    _testVersionInRender: {
+    testVersionInRender: {
         test: function(cmp) {
             // render(), afterRender(), rerender() get called before
             // running test case.
             var targetComponent = cmp.find("auratestCmp");
             targetComponent.udpateWithUnboundVersionExpression();
 
-            var actual = targetComponent.get("v.version");
-            $A.test.assertEquals('2.0', actual);
+            var actual = targetComponent.get("v.versionInRender");
+            $A.test.assertEquals("2.0", actual);
         }
     },
 
-    /**
-     * TODO: W-2643371
-     */
-    _testVersionInRerender: {
+    testVersionInRerender: {
         test: function(cmp) {
             // render(), afterRender(), rerender() get called before
             // running test case.
             var targetComponent = cmp.find("auratestCmp");
-            var actual = targetComponent.get("v.versionInRender");
-
-            $A.test.assertEquals('2.0', actual);
-        }
-    },
-
-    /**
-     * TODO: W-2643371
-     */
-    _testVersionInAfterRender: {
-        test: function(cmp) {
-            var targetComponent = cmp.find("auratestCmp");
             var actual = targetComponent.get("v.versionInRerender");
 
-            $A.test.assertEquals('2.0', actual);
+            $A.test.assertEquals("2.0", actual);
         }
     },
 
-    /**
-     * TODO: W-2643371
-     */
-    _testVersionInUnrender: {
+    testVersionInAfterRender: {
+        test: function(cmp) {
+            var targetComponent = cmp.find("auratestCmp");
+            var actual = targetComponent.get("v.versionInAfterRender");
+
+            $A.test.assertEquals("2.0", actual);
+        }
+    },
+
+    testVersionInUnrender: {
         test: [
             function(cmp) {
                 var action = cmp.get("c.updateWithVersionInAuraTestCmpUnrender");

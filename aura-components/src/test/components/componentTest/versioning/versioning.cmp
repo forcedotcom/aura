@@ -26,7 +26,7 @@
     <auratest:requireConsumer aura:id="requireConsumerInAuraTest"/>
     <test:requireConsumer aura:id="requireConsumerInTest"/>
 
-    <aura:require namespace ="auratest" version="2.0"/>
+    <aura:require namespace="auratest" version="2.0"/>
 
     Requested Version: {!v.version}<br/><br/>
 

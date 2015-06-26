@@ -15,5 +15,43 @@
  */
 
 .THIS--flat {
-    background: red;
+    font: 500 100%/1.5 "Salesforce Sans",Arial,sans-serif;
+    background: #fff;
+    box-shadow: none;
+    text-align: center;
+    vertical-align: middle;
+    border-radius:4px;
+    border: 1px solid #d8dde6;
+    background-color: #fff;
+    margin: 2px 3px;
+    padding: 4px 6px;
+}
+
+.THIS--flat .label {
+	color: #16325c;
+    font-size: 0.875rem;
+}
+
+
+.THIS--flat:hover,
+.THIS--flat:focus,  
+.THIS--flat.is-selected {
+    background: #fff;
+    box-shadow: none;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid #d8dde6;
+    background-color: #f4f6f9;
+    text-shadow: none;
+    color: #0070d2;
+}
+
+.THIS--flat {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.THIS--flat:hover .label,
+.THIS--flat:focus .label {
+    color: #0070d2;
 }

@@ -136,50 +136,6 @@
 	cursor: pointer;
 }
 
-.THIS .flat-btn {
-    font: 500 100%/1.5 "Salesforce Sans",Arial,sans-serif;
-    background: #fff;
-    box-shadow: none;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid #d8dde6;
-    background-color: #fff;
-    color: #0070d2;
-}
-
-.THIS .flat-btn:hover,
-.THIS .flat-btn:focus  {
-    background: #fff;
-    box-shadow: none;
-    text-align: center;
-    vertical-align: middle;
-    border: 1px solid #d8dde6;
-    background-color: #f4f6f9;
-    text-shadow: none;
-    color: #0070d2;
-}
-/*
-    padding-left: 1rem;
-    padding-right: 1rem;
- */
-
-.THIS .container .flat-btn {
-    padding-left: 1rem;
-    padding-right: 1rem;
-}
-
-.THIS .flat-btn:hover .label,
-.THIS .flat-btn:focus .label {
-    color: #0070d2;
-}
-
-.THIS .flat-btn.closeBtn:focus,
-.THIS .flat-btn.closeBtn:focus .label{
-    border: none;
-    background: none;
-    color: #fff;
-}
-
 .THIS.manager {
     position: absolute;
     width: 100%;

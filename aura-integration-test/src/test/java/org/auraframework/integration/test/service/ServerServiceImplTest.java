@@ -17,6 +17,8 @@ package org.auraframework.integration.test.service;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +56,8 @@ import org.auraframework.util.json.JsonReader;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
+import static org.mockito.Mockito.*;
 
 public class ServerServiceImplTest extends AuraImplTestCase {
     public ServerServiceImplTest(String name) {
@@ -712,6 +716,27 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         assertNull(
                 "Duplicate component class entires for aura:html in application javascript",
                 componentClass);
+    }
+
+    /**
+     * This is verification for W-2657282. The bug was when an IOException is thrown in try block,
+     * a new exception may be thrown in finally block, so the new exception will hide the original
+     * exception.
+     * Verify the original (real) IO exception is thrown from method run.
+     */
+    public void testThrowsOriginalIOExceptionFromRun() throws Exception {
+        String exceptionMessage = "Test exception";
+        Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        Writer writer = mock(Writer.class);
+        when(writer.append('{')).thenThrow(new IOException(exceptionMessage));
+        Message message = new Message(new ArrayList<Action>());
+        ServerService ss = Aura.getServerService();
+        try {
+            ss.run(message, Aura.getContextService().getCurrentContext(), writer, null);
+            fail("Exception should be thrown from method run().");
+        } catch(IOException e) {
+            assertEquals(exceptionMessage, e.getMessage());
+        }
     }
 
     private String getDefinitionsOutput(String source, AuraContext.Mode mode)

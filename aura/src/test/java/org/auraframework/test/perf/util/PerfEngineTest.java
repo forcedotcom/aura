@@ -34,8 +34,6 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
-import org.json.JSONArray;
-
 
 @UnAdaptableTest
 @PerfTestSuite
@@ -67,11 +65,11 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
 
     @Override
     public void runTests(Map<DefDescriptor<ComponentDef>, PerfConfig> tests) throws Exception {
-    	// Map component def to component config options.
-    	for(Map.Entry<DefDescriptor<ComponentDef>, PerfConfig> entry: tests.entrySet()){
-    		addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
-    	}
-    	
+        // Map component def to component config options.
+        for (Map.Entry<DefDescriptor<ComponentDef>, PerfConfig> entry : tests.entrySet()) {
+            addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
+        }
+
     }
 
     @Override
@@ -79,13 +77,13 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         return perfConfigUtil.getComponentTestsToRun();
     }
 
-    public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap){
-    	List<DefDescriptor<ComponentDef>> defs = new ArrayList<>();
-    	for(DefDescriptor<ComponentDef> def: configMap.keySet())
-    		defs.add(def);
-    	return defs;
+    public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap) {
+        List<DefDescriptor<ComponentDef>> defs = new ArrayList<>();
+        for (DefDescriptor<ComponentDef> def : configMap.keySet())
+            defs.add(def);
+        return defs;
     }
-    
+
     private class ComponentSuiteTest extends TestSuite {
         ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor, final PerfConfig config) {
             super(descriptor.getName());
@@ -94,11 +92,13 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
 
             for (Class<? extends Test> testClass : testClasses) {
                 try {
-                    Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class, PerfConfig.class);
-                    PerfExecutorTest test = (PerfExecutorTest)constructor.newInstance(descriptor, config);
+                    Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class,
+                            PerfConfig.class);
+                    PerfExecutorTest test = (PerfExecutorTest) constructor.newInstance(descriptor, config);
                     test.setPerfMetricsComparator(new PerfMetricsComparator() {
-                    	protected int getAllowedVariability(String metricName) {
-                            if (config.getVariability(metricName)!=null) {
+                        @Override
+                        protected int getAllowedVariability(String metricName) {
+                            if (config.getVariability(metricName) != null) {
                                 return config.getVariability(metricName);
                             }
                             // Use default variability, if variability is not set in config

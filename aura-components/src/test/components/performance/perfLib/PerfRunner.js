@@ -99,20 +99,26 @@ function PerfRunner(COQL, Memory) {
                 
                 if (perfIntf) {
                     // Create and render the wrapper
-                    this.component = $A.newCmp(cmpConfig, this.containerComponent)
-                    $A.render(this.component, this.getContainerDOM()); 
+                    $A.newCmpAsync(this, function (component) {
+                        this.component = component;
+                        $A.render(component, this.getContainerDOM()); 
 
-                    this.component.setup({
-                        async: function () {
-                            asyncSetup = true;
-                            return function done() {
-                                setupDone();
-                            };
+                        if (component.setup) {
+                            component.setup({
+                                async: function () {
+                                    asyncSetup = true;
+                                    return function done() {
+                                        setupDone();
+                                    };
+                                }
+                            });
                         }
-                    });
-                }
 
-                if (!asyncSetup) {
+                        if (!asyncSetup) {
+                            setupDone();
+                        }
+                    }, cmpConfig, this.containerComponent);
+                } else {
                     setupDone();
                 }
 
@@ -150,8 +156,8 @@ function PerfRunner(COQL, Memory) {
                 this.results.transaction = transaction;
             },
             _runComponentTest: function (cmpConfig, done) {
-                this.component = $A.newCmp(cmpConfig, this.containerComponent)
-                $A.render(this.component, this.getContainerDOM()); 
+                this.component = $A.newCmp(cmpConfig, this.containerComponent);
+                $A.render(this.component, this.getContainerDOM());
                 done.immediate();
             },
             run: function (sandboxRun) {

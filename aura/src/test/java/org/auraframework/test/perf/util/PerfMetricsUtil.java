@@ -15,12 +15,17 @@
  */
 package org.auraframework.test.perf.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
@@ -34,102 +39,108 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 public class PerfMetricsUtil {
-	private static final Logger logger = Logger.getLogger(PerfMetricsUtil.class.getSimpleName());
     private final PerfExecutorTest test;
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
-    private String metricsMode; 
-    private AuraUITestingUtil auraUITestingUtil; 
     private Map<String, Map<String, Map<String, Long>>> auraStats;
-    
+
     public PerfMetricsUtil(PerfExecutorTest test, String metricsMode) {
         this.test = test;
-        this.metricsMode = metricsMode;
-        auraUITestingUtil = new AuraUITestingUtil(test.getWebDriver());
+        new AuraUITestingUtil(test.getWebDriver());
     }
 
     /**
-     * Evaluate the collected perf metrics
-     * //TODO Handle diff for a subset of metrics
-     * @throws Exception 
+     * Evaluate the collected perf metrics //TODO Handle diff for a subset of metrics
+     * 
+     * @throws Exception
      */
-    public void evaluateResults() throws Exception{
-    	// Get the median metrics after all the runs.
-    	PerfMetrics metrics = test.getPerfRunsCollector().getMedianMetrics();
-    	
-    	// Write the results into file
-    	String resultsFileName = writeResults(metrics);
-    	
-    	// Diff the results file against an existing goldfile per component
-    	test.setExplicitGoldResultsFolder(resolveGoldFilePath(resultsFileName));
-    	PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
+    public void evaluateResults() throws Exception {
+        // Get the median metrics after all the runs.
+        PerfMetrics metrics = test.getPerfRunsCollector().getMedianMetrics();
+        metrics.setDevToolsLog(test.getPerfRunsCollector().getMedianRun().getDevToolsLog());
+
+        // Write the results into file
+        String resultsFileName = writeResults(metrics);
+        // TODO this is overwritten for every test, needs to be fixed.
+        PerfResultsUtil.exportToCsv();
+
+        // Diff the results file against an existing goldfile per component
+        test.setExplicitGoldResultsFolder(resolveGoldFilePath(resultsFileName));
+        PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
     }
 
-    
     /**
      * Write the results into json files and db
+     * 
      * @param metrics
      * @return
-     * @throws JSONException 
+     * @throws JSONException
      */
-    private String writeResults(PerfMetrics metrics) throws JSONException{
-    	// Write the metrics into result file
-    	String resultsFileName = test.getComponentDef().getName();
-    	PerfResultsUtil.writeGoldFile(metrics, resultsFileName);
-    	
-    	logger.info("Writing results for component: " + resultsFileName + " into db");
-    	// Write the results to Db
-    	PerfResultsUtil.writeToDb(metrics, resultsFileName);
-    	
-    	// Write the timeline events
-    	PerfResultsUtil.writeDevToolsLog(test.getPerfRunsCollector().getMedianRun().getDevToolsLog(), resultsFileName);
-    	return resultsFileName;
+    private String writeResults(PerfMetrics metrics) throws JSONException {
+        // Write the metrics into result file
+        String resultsFileName = test.getComponentDef().getName();
+        PerfResultsUtil.writeGoldFile(metrics, resultsFileName);
 
+        // Write the timeline events
+        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), resultsFileName);
+
+        // Write the results to Db
+        try {
+            InputStream is = new FileInputStream(traceLog);
+            String traceJson = IOUtils.toString(is);
+            PerfResultsUtil.writeToDb(metrics, resultsFileName, traceJson);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return resultsFileName;
     }
-    
-    private String resolveGoldFilePath(String resultsFileName){
-    	String path =  AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
-    	String componentPath = test.getComponentDef().getNamespace() + "/" + resultsFileName;
-    	String fullPath = path + componentPath;
-		Path resourcesSourceDir = Paths.get(fullPath);
-		return resourcesSourceDir.toString();
+
+    private String resolveGoldFilePath(String resultsFileName) {
+        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
+        String componentPath = test.getComponentDef().getNamespace() + "/" + resultsFileName;
+        String fullPath = path + componentPath;
+        Path resourcesSourceDir = Paths.get(fullPath);
+        return resourcesSourceDir.toString();
     }
-    
-    private void prepareNetworkMetrics(PerfMetrics metrics){
-    	for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {
+
+    private void prepareNetworkMetrics(PerfMetrics metrics) {
+        for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {
             metrics.setMetric(metric);
         }
     }
-    
-    private void prepareTimelineMetrics(PerfMetrics metrics){
-    	Map<String, TraceEventStats> traceEventsStats = rdpAnalyzer.analyzeTraceDomain();
-    	for (TraceEventStats stats : traceEventsStats.values()) {
+
+    @SuppressWarnings("unchecked")
+    private void prepareTimelineMetrics(PerfMetrics metrics) {
+        Map<String, TraceEventStats> traceEventsStats = rdpAnalyzer.analyzeTraceDomain();
+        for (TraceEventStats stats : traceEventsStats.values()) {
             PerfMetric metric = new PerfMetric();
             String statName = stats.getName();
             Object statValue = stats.getValue();
-            
+
             // TODO Better way to handle this is to abstract this in TraceEventStats
-            if(statName.equals("UpdateCounters")) {
-            	Map<String, Object> memoryCounters = (Map<String, Object>) statValue;
-            	 for(Map.Entry<String, Object> entry: memoryCounters.entrySet()){
-            		 metric.setName(TraceEventUtil.toMetricName(entry.getKey()));
-            		 metric.setValue(entry.getValue());
-            		 metrics.setMetric(metric);
-            		 metric = new PerfMetric();
-            	 }
+            if (statName.equals("UpdateCounters")) {
+                Map<String, Object> memoryCounters = (Map<String, Object>) statValue;
+                for (Map.Entry<String, Object> entry : memoryCounters.entrySet()) {
+                    metric.setName(TraceEventUtil.toMetricName(entry.getKey()));
+                    metric.setValue(entry.getValue());
+                    metrics.setMetric(metric);
+                    metric = new PerfMetric();
+                }
             }
             else {
-	            metric.setName(TraceEventUtil.toMetricName(statName));
-	            metric.setValue(statValue);
-	            metrics.setMetric(metric);
+                metric.setName(TraceEventUtil.toMetricName(statName));
+                metric.setValue(statValue);
+                metrics.setMetric(metric);
             }
-    	}
-    	// keep the corresponding Dev Tools Log for the metrics
+        }
+        // keep the corresponding Dev Tools Log for the metrics
         metrics.setDevToolsLog(rdpAnalyzer.getDevToolsLog());
     }
-    
-    private void handleCoqlMetrics(PerfMetrics metrics, String name){
-    	Map<String, Map<String, Long>> nameValue = auraStats.get(name);
+
+    private void handleCoqlMetrics(PerfMetrics metrics, String name) {
+        Map<String, Map<String, Long>> nameValue = auraStats.get(name);
         for (String method : nameValue.keySet()) {
             Map<String, Long> methodValue = nameValue.get(method);
             for (String what : methodValue.keySet()) {
@@ -138,40 +149,42 @@ public class PerfMetricsUtil {
             }
         }
     }
-    
-    private void prepareAuraMetrics(PerfMetrics metrics){
-    	if (auraStats != null) {   		
+
+    private void prepareAuraMetrics(PerfMetrics metrics) {
+        if (auraStats != null) {
             for (String name : auraStats.keySet()) {
-            	//TODO Handle resultsets other than coql
-            	if(!name.equals("coql")) break;
+                // TODO Handle resultsets other than coql
+                if (!name.equals("coql"))
+                    break;
                 handleCoqlMetrics(metrics, name);
             }
         }
     }
-    
-    private void prepareAllMetrics(PerfMetrics metrics){
-    	rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
+
+    private void prepareAllMetrics(PerfMetrics metrics) {
+        rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
         prepareNetworkMetrics(metrics);
         prepareTimelineMetrics(metrics);
         prepareAuraMetrics(metrics);
     }
-    
+
     public PerfMetrics prepareResults() {
-    	PerfMetrics metrics = new PerfMetrics();
-    	prepareAllMetrics(metrics);
+        PerfMetrics metrics = new PerfMetrics();
+        prepareAllMetrics(metrics);
         return metrics;
     }
-    
+
     public void startCollecting() {
-    	// Start recording
-    	test.getRDPNotifications();
+        // Start recording
+        test.getRDPNotifications();
     }
-    
+
+    @SuppressWarnings("unchecked")
     public void stopCollecting() {
-    	WebDriver driver = test.getWebDriver();   	
-    	notifications = test.getRDPNotifications();
-    	//TODO auraUITestingUtil unable to execute the js correctly
-		Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.results");
-		auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;   
+        WebDriver driver = test.getWebDriver();
+        notifications = test.getRDPNotifications();
+        // TODO auraUITestingUtil unable to execute the js correctly
+        Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.results");
+        auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;
     }
 }

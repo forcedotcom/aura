@@ -29,12 +29,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class PerfFilesUtil {   
+public class PerfFilesUtil {
     private static final Logger LOG = Logger.getLogger(PerfFilesUtil.class.getSimpleName());
     private static File perfResultsDir;
-    
-	public enum PerfFileDirs {
-		GOLDFILES("goldfiles"),
+
+    public enum PerfFileDirs {
+        GOLDFILES("goldfiles"),
+        DB("db", ".csv"),
         TIMELINES("timelines");
 
         private final String value;
@@ -54,9 +55,9 @@ public class PerfFilesUtil {
             return new File(dir, fileName + fileExtension);
         }
     }
-	
-	private static final String getResultsDirPath(){
-		// use aura.perf.results.dir if set
+
+    private static final String getResultsDirPath() {
+        // use aura.perf.results.dir if set
         String resultsPath = System.getProperty("aura.perf.results.dir", null);
 
         // else use aura-integration-test/target/perf/results if running in aura
@@ -74,27 +75,31 @@ public class PerfFilesUtil {
             resultsPath = "target/perf/results";
         }
         return resultsPath;
-	}
-	
-	public static final File getPerfResultsDir() {
-		if(perfResultsDir!=null) {
-			return perfResultsDir;
-		}
+    }
+
+    public static final File getPerfResultsDir() {
+        if (perfResultsDir != null) {
+            return perfResultsDir;
+        }
         perfResultsDir = new File(getResultsDirPath());
         LOG.info("perf results dir: " + perfResultsDir.getAbsolutePath());
         perfResultsDir.mkdirs();
         return perfResultsDir;
     }
-	
-	public static final File getTimelineResultsDir(String fileName){
-		return PerfFileDirs.TIMELINES.getFile(fileName);
-	}
 
-	public static final File getGoldfilesResultsDir(String fileName){
-		return PerfFileDirs.GOLDFILES.getFile(fileName);
-	}
-	
-	/**
+    public static final File getTimelineResultsDir(String fileName) {
+        return PerfFileDirs.TIMELINES.getFile(fileName);
+    }
+
+    public static final File getGoldfilesResultsDir(String fileName) {
+        return PerfFileDirs.GOLDFILES.getFile(fileName);
+    }
+
+    public static final File getDbResultsDir(String fileName) {
+        return PerfFileDirs.DB.getFile(fileName);
+    }
+
+    /**
      * @param addDetails if true adds the metric details to the gold file
      * @return text describing the metrics in a format convenient for the gold file
      */

@@ -44,27 +44,29 @@ AuraEventService.prototype.qualifyEventName = function(event) {
  * fires the <code>app:navError</code> event. Set parameters on the new event
  * by using <code>event.setParams()</code>.
  *
- * @param {String} name The event object in the format namespace:component
+ * @param {String} eventDef The event object in the format namespace:component
+ * @param {String=} eventName The event name if the event is a "COMPONENT" type event
+ * @param {sourceCmp=} eventName The component source if the event is a "COMPONENT" type event
  * @return {Event} new Event
  * @memberOf AuraEventService
  * @public
  * @export
  */
-AuraEventService.prototype.newEvent = function(name){
-    $A.assert(name, "Event name is required");
+AuraEventService.prototype.newEvent = function(eventDef, eventName, sourceCmp) {
+    $A.assert(eventDef, "EventDef is required");
+    eventDef = this.getEventDef(this.qualifyEventName(eventDef));
 
-    name = this.qualifyEventName(name);
-    var eventDef = this.getEventDef(name);
-    if (!eventDef) {
-        return null;
+    if (eventDef) {
+        var config = {};
+        config["eventDef"] = eventDef;
+        if (eventDef.getEventType() === 'COMPONENT') {
+            config["name"]      = eventName;
+            config["component"] = sourceCmp && sourceCmp.getConcreteComponent();
+        } else {
+            config["eventDispatcher"] = this.eventDispatcher;
+        }
+        return new Event(config);
     }
-
-    var config = {};
-    config["eventDef"] = eventDef;
-    config["eventDispatcher"] = this.eventDispatcher;
-
-    return new Event(config);
-
 };
 
 /**

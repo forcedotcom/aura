@@ -32,6 +32,8 @@ import java.util.logging.Logger;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -113,7 +115,7 @@ public final class PerfConfigUtil {
      * TODO get sfdc core namespaces
      */
     private List<String> getNamespaces() {
-        return ImmutableList.of("performanceTest");
+        return ImmutableList.of("PerformanceTest");
     }
 
     private ContextService establishAuraContext() {
@@ -143,16 +145,15 @@ public final class PerfConfigUtil {
     private Set<DefDescriptor<ComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
     	Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
         DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor(
-                String.format("markup://%s:*", namespace), ComponentDef.class);
 
-        Set<DefDescriptor<ComponentDef>> descriptors;
-
-        descriptors = definitionService.find(matcher);
-        for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-            if (!isBlackListedComponent(descriptor) && namespace.equals(descriptor.getNamespace())) { 
-            	defs.add(descriptor); 
-            }
+        Set<DefDescriptor<?>> descriptors;
+        descriptors = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
+        
+        for (DefDescriptor<?> descriptor : descriptors) {
+        	if (descriptor.getDefType().equals(DefType.COMPONENT)) {
+        		defs.add(((DefDescriptor<ComponentDef>) descriptor));
+        	}
+        	 
         }
         return defs;
     }  

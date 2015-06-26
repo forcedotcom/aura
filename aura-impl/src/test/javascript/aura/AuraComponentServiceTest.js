@@ -32,12 +32,12 @@ Test.Aura.AuraComponentServiceTest = function(){
         }
     };
     var NS = {Component: {}, Services: {}};
-    
+
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
-    Mocks.GetMocks(Object.Global(), { 
-        "exp": function(){}, 
+    Mocks.GetMocks(Object.Global(), {
+        "exp": function(){},
         "$A": $A,
-        "window": function(){}, 
+        "window": function(){},
         "Components": function(){},
         Aura: NS
     })(function(){
@@ -129,7 +129,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function ThrowsIfNoDefAndLayoutDescriptor() {
             var desc = "layout://blah";
-            var expected="Missing " + desc + " definition.";
+            var expected="Missing definition: " + desc;
             targetService.getComponentConfigs = function(config) {
                 return {
                     "definition": null,
@@ -165,12 +165,12 @@ Test.Aura.AuraComponentServiceTest = function(){
                 $Amock(function(){
                     targetService.createComponent("test",null,function(){});
                 });
-            } catch(e){} 
+            } catch(e){}
             actual = targetService.registry.dynamicNamespaces;
 
             Assert.Equal(expected,actual);
         }
-        
+
         [Fact]
         function GetsComponentFromServerWhenNoDef() {
             var actual = false;
@@ -192,7 +192,7 @@ Test.Aura.AuraComponentServiceTest = function(){
 
             Assert.True(actual);
         }
-        
+
         [Fact]
         function GetsComponentFromServerWhenDefHasRemoteDependencies() {
             var actual = false;
@@ -251,7 +251,7 @@ Test.Aura.AuraComponentServiceTest = function(){
         [Fact]
         function ThrowsIfComponentsToCreateIsNotArray() {
             var expected = "ComponentService.createComponents(): 'components' must be a valid Array.";
-            
+
             var actual = Record.Exception(function() {
                 $Amock(function() {
                     targetService.createComponents("ui:button",function(){});

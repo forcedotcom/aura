@@ -159,7 +159,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
         // clear dynamic namespaces so that the server can send it back.
         this.registry.dynamicNamespaces = [];
         // throw error instead of trying to requestComponent from server which is prohibited
-        throw new Error("Missing " + desc + " definition.");
+        throw new Error("Missing definition: " + desc);
     }
 
 
@@ -192,7 +192,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
             message = e.message;
         }
         callback(component, status, message);
-        
+
     }
     return null;
 };
@@ -322,7 +322,7 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
 };
 
 /**
- * Takes a config for a component, and creates an instance of the component using the component class of that component. 
+ * Takes a config for a component, and creates an instance of the component using the component class of that component.
  * @param {Object} config Config is the same object you would pass to the constructor $A.Component to create a component. This method will use that information to further configure the component class that is created.
  * @param {Boolean} localCreation See documentation on Component.js constructor for documentation on the localCreation property.
  */
@@ -392,14 +392,16 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     }
 
     var classConstructor = this.getComponentClass(desc);
-
+    if (!classConstructor) {
+        throw new Error("Component class not found: " + desc);
+    }
     return new classConstructor(config, localCreation);
 };
 
 /**
- * Use the specified constructor as the definition of the class descriptor. 
+ * Use the specified constructor as the definition of the class descriptor.
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
- * @param {String} descriptor Uses the pattern of namespace:componentName.  
+ * @param {String} descriptor Uses the pattern of namespace:componentName.
  * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
  * @export
  */
@@ -412,7 +414,7 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, classCon
 };
 
 /**
- * Get the class constructor for the specified component. 
+ * Get the class constructor for the specified component.
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
  * @returns Either the class that defines the component you are requesting, or null if not found.
  * @export
@@ -437,7 +439,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
  * Detects of the component class has been already defined without actually defining it.
  * hasComponentClass is more performant that running getComponentClass() since if the class
  * hasn't been built yet, we don't want it to be forcably built if not requested.
- * 
+ *
  * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
  */
 AuraComponentService.prototype.hasComponentClass = function(descriptor) {
@@ -512,7 +514,7 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 // clear dynamic namespaces so that the server can send it back.
                 $A.componentService.registry.dynamicNamespaces = [];
                 // throw error instead of trying to requestComponent from server which is prohibited
-                throw new Error("Missing " + desc + " definition.");
+                throw new Error("Missing definition: " + desc);
             }
 
             if ( !forceClient && (!def || (def && def.hasRemoteDependencies()) || forceServer )) {
@@ -636,15 +638,15 @@ AuraComponentService.prototype.computeValue = function(valueObj, valueProvider) 
  * @return {Object} {{configuration: {}, definition: ComponentDef, descriptor: String}}
  */
 AuraComponentService.prototype.getComponentConfigs = function(config, attributeValueProvider) {
-    var configuration, configAttributes, def, desc, configKey, attributeKey; 
-    
+    var configuration, configAttributes, def, desc, configKey, attributeKey;
+
     // Given a string input, expand the config to be an object.
     if (config && $A.util.isString(config)) {
         config = { "componentDef" : config };
     }
-    
-    // When a valueProvider is specified, perform a shallow 
-    // clone of the config to preserve the original attributes. 
+
+    // When a valueProvider is specified, perform a shallow
+    // clone of the config to preserve the original attributes.
     if (attributeValueProvider) {
         configuration = {};
 
@@ -654,12 +656,12 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
                 configuration[configKey] = config[configKey];
             }
         }
-        
+
         // Prepare new 'attributes' object.
         configAttributes = config['attributes'];
         configuration['attributes'] = {};
-        
-        // Copy attributes to prevent 'valueProvider' from mutating the original config. 
+
+        // Copy attributes to prevent 'valueProvider' from mutating the original config.
         if (configAttributes) {
             for (attributeKey in configAttributes) {
                 if (configAttributes.hasOwnProperty(attributeKey)) {
@@ -667,13 +669,13 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
                 }
             }
         }
-        
+
         // Safe to attach valueProvider reference onto new object.
         configuration['attributes']['valueProvider'] = attributeValueProvider;
     } else {
         configuration = config;
     }
-    
+
     // Resolve the definition and descriptor.
     var componentDef = configuration["componentDef"];
     def = this.getDef(componentDef);
@@ -688,7 +690,7 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
     } else {
         desc = componentDef["descriptor"] ? componentDef["descriptor"] : componentDef;
     }
-    
+
     return {
         "configuration" : configuration,
         "definition"    : def,

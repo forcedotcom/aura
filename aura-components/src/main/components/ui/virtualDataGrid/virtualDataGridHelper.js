@@ -199,7 +199,7 @@
 
 
             // Setting up the component with the current item
-            ptv.set(ref, item);
+            ptv.set(ref, item, true);
 
             ptv.ignoreChanges = false;
             ptv.dirty = false;

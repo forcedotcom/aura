@@ -194,7 +194,7 @@ function AuraInstance () {
     
     this.auraError            = Aura.Errors.AuraError;
     this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
-    this.localizationService  = Aura.Services.AuraLocalizationService();
+    this.localizationService  = new Aura.Services.AuraLocalizationService();
     
     this.clientService        = new Aura.Services.AuraClientService();
     this.componentService     = new Aura.Services.AuraComponentService();

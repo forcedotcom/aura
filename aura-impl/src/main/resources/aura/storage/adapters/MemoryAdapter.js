@@ -43,6 +43,7 @@ MemoryStorageValue.prototype.getSize = function() {
 /**
  * @description The Memory adapter for storage service implementation
  * @constructor
+ * @export
  */
 var MemoryStorageAdapter = function MemoryStorageAdapter(config) {
     this.backingStore = {};
@@ -65,6 +66,9 @@ MemoryStorageAdapter.prototype.getName = function() {
 /**
  * Return adapter size used
  * @returns {Promise} Promise with size used in adapter
+ //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+	@export
+ //#end
  */
 MemoryStorageAdapter.prototype.getSize = function() {
     var that = this;
@@ -100,6 +104,9 @@ MemoryStorageAdapter.prototype.getItem = function(key) {
 /**
  * Get all items in storage
  * @returns {Promise} Promise with array of all items
+ //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+	@export
+ //#end
  */
 MemoryStorageAdapter.prototype.getAll = function() {
     var that = this;
@@ -288,6 +295,7 @@ MemoryStorageAdapter.prototype.evict = function(spaceNeeded) {
 /**
  * Asynchronously gets the most-recently-used list.
  * @returns {Promise} Returns a Promise that will retrieve the mru.
+ * @export
  */
 MemoryStorageAdapter.prototype.getMRU = function() {
     var that = this;
@@ -298,14 +306,6 @@ MemoryStorageAdapter.prototype.getMRU = function() {
 // #end
 
 Aura.Storage.MemoryStorageAdapter = MemoryStorageAdapter;
-
-
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-MemoryStorageAdapter.prototype["getSize"] = MemoryStorageAdapter.prototype.getSize;
-MemoryStorageAdapter.prototype["getMRU"] = MemoryStorageAdapter.prototype.getMRU;
-MemoryStorageAdapter.prototype["getAll"] = MemoryStorageAdapter.prototype.getAll;
-//#end
-
 
 $A.storageService.registerAdapter({
     "name": MemoryStorageAdapter.NAME,

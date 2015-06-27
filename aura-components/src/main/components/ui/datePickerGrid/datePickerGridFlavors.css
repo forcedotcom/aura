@@ -41,15 +41,3 @@
         height: 100%;
     }
 }
-
-/* medium size on desktop */
-.THIS.medium .calGrid th {
-    font-size: 9px;
-    padding: 3px;
-}
-
-/* small size on desktop */
-.THIS.small .calGrid th {
-    font-size: 7px;
-    padding: 2px;
-}

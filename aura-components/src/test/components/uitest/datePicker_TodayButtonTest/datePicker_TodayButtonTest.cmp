@@ -28,7 +28,7 @@
 			{!v.showToday}
 		</div>
 		<div>
-			<ui:datePicker aura:id="datePicker" dimension="medium" showToday="{!v.showToday}" selectDate="{!c.handleSelectedDate}" visible="true"/>
+			<ui:datePicker aura:id="datePicker" showToday="{!v.showToday}" selectDate="{!c.handleSelectedDate}" visible="true"/>
 		</div>
 	</div>
 </aura:component>

@@ -56,11 +56,8 @@ public class MetricsServiceImpl implements MetricsService  {
         }
     }
 
-
     @Override
     public void clearMetrics() {
         // TODO Auto-generated method stub
     }
-
-
 }

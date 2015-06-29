@@ -53,6 +53,8 @@
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
 			
+			this.fireDragStart(component, true);
+			
 			// Delegate drag and drop operation to accessibility component
 			var accessibilityComponent = component.get("v.accessibilityComponent");
 			if (accessibilityComponent) {
@@ -61,9 +63,7 @@
 					concreteCmp.startDragAndDrop([component], event.target);
 				}
 			}
-			
-			this.fireDragStart(component, true);
-    	}
+		}
 	},
 	
 	/**

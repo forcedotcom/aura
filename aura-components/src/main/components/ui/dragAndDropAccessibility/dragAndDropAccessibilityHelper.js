@@ -20,7 +20,14 @@
 	 * @return {Aura.Component[]} the dropzones of associated operation type
 	 */
 	getDropzoneComponents: function(type) {
-		return $A.dragAndDropService.getDropzoneComponents(type);
+		var components = $A.dragAndDropService.getDropzoneComponents(type);
+		var dropZones = [];
+		$A.util.forEach(components,function(component) {
+			if(window.getComputedStyle(component.getElement()).visibility !== "hidden" ) {
+				dropZones.push(component);
+			}
+		});
+		return dropZones;
 	},
 	
 	/**

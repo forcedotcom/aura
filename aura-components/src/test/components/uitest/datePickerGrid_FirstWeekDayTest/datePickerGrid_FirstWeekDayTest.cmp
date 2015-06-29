@@ -39,8 +39,7 @@
                 selectedDate="2015-4-15"
                 date="15"
                 month="4"
-                year="2015"
-                dimension="medium"  />
+                year="2015"/>
         </div>
     </div>
 </aura:component>

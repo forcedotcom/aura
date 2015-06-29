@@ -21,7 +21,6 @@
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
-    <aura:attribute name="datePickerDimension" default="large" type="String" description="Set the dimension for the datePicker component"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>
@@ -42,5 +41,5 @@
     <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
         <span class="assistiveText">Clear Button</span>
     </a>
-    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" dimension="{!v.datePickerDimension}" hasTime="true"/>
+    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" hasTime="true"/>
 </aura:component>

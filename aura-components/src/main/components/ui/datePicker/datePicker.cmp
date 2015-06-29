@@ -28,7 +28,6 @@
     <aura:attribute name="_yearListInitialized" type="Boolean" default="false" description="Indicates if the year list is initialized or not."/>
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
-    <aura:attribute name="dimension" type="String" default="large" description="The size of date picker. Valid values: large, medium, small"/>
     <aura:attribute name="showToday" type="Boolean" default="true" description="Indicates whether a Today link should display at the bottom. If there is a time portion, the Today link wouldn't show up even this is set to true."/>
     <aura:attribute name="hideOnSelect" type="Boolean" default="true" description="Close the datePicker after a date is selected"/>
     <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
@@ -44,8 +43,7 @@
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
-    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor +
-                                                 (or(v.dimension == 'medium', v.dimension == 'small') ? ' ' + v.dimension : '')}">
+    <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">
                 <div class="headerBar">
@@ -88,14 +86,13 @@
                 </aura:if>
             </div>
             <ui:datePickerGrid aura:id="grid" hasTime ="{!v.hasTime}"
-                                              dimension="{!v.dimension}"
                                               setFocus="{!v.setFocus}"
                                               hide="{!c.hide}"
                                               selectDate="{!c.selectDate}"
                                               updateCalendarTitle="{!c.updateCalendarTitle}"/>
             <aura:if isTrue="{!v.hasTime}">
                 <div class="timeBar">
-                    <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}" dimension="{!v.dimension}"/>
+                    <ui:timePicker aura:id="time" is24HourFormat="{!v.is24HourFormat}"/>
                 </div>
                 <aura:set attribute="else">
                     <aura:if isTrue="{!v.showToday}">

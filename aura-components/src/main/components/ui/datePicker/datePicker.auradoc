@@ -19,7 +19,7 @@
 	<aura:description>
 		<p>
 			Date pickers provide date and time selection using a <code>ui:datePickerGrid</code> component, which provides a calendar view. It's also available on a date or date and time input field. If using an input field, the field automatically populates with the selected date and time.
-			To customize selection behavior when not using an input field, handle the <code>selectDate</code> event. Three sizes are available via the <code>dimension</code> attribute.
+			To customize selection behavior when not using an input field, handle the <code>selectDate</code> event.
 			By default, a <code>Today</code> button is displayed at the bottom of the calendar view and can be removed by setting <code>showToday="false"</code>.
 		</p>
 		<p>

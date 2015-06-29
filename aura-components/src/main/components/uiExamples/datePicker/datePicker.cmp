@@ -17,7 +17,7 @@
 -->
 <aura:component>
 	<aura:attribute name="selectedDate" type="Date" />
-	<ui:datePicker aura:id="datePicker" dimension="medium" visible="true" selectDate="{!c.handleSelectedDate}" />	
+	<ui:datePicker aura:id="datePicker" visible="true" selectDate="{!c.handleSelectedDate}" />	
 	
 	<p>selected date = {!v.selectedDate}</p>
 	 

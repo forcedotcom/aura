@@ -28,6 +28,58 @@
 			}
         }
     },
+
+    /**
+     * Verify that null params don't affect the storage of actions (indirectly via storage key).
+     */
+    testStorageOfServerActionWithNullParams : {
+        attributes : {
+            defaultAutoRefreshInterval : 0 // refresh every action
+        },
+        test : [function(cmp) {
+            this.resetCounter(cmp, "testStorageOfServerActionWithNullParams");
+        }, function(cmp) {
+            var a = cmp.get("c.simpleValuesAsParams");
+            a.setParams({
+                testName : "testStorageOfServerActionWithNullParams",
+                year : 1,
+                mvp : null
+            });
+            a.setStorable();
+            a.setCallback(cmp, function(action) {
+                cmp._value = action.getReturnValue();
+            });
+            $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
+                return cmp._value;
+            }, function() {
+                cmp._value = "";
+            });
+            $A.enqueueAction(a);
+        }, function(cmp) {
+            var a = cmp.get("c.simpleValuesAsParams");
+            a.setParams({
+                testName : "testStorageOfServerActionWithNullParams",
+                year : 1,
+                mvp : null
+            });
+            a.setStorable();
+            a.setCallback(cmp, function(action) {
+                cmp._value = cmp._value + action.getReturnValue();
+            });
+            // check stored value
+            $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
+                return cmp._value;
+            }, function() {
+                cmp._value = "";
+            });
+            // check refresh value
+            $A.test.addWaitFor("Message 2 : null was the MVP in 1", function() {
+                return cmp._value;
+            });
+            $A.enqueueAction(a);
+        } ]
+    },
+
     /**
      * Verify that an action which accepts simple values as parameters can be marked as storable at the server.
      * Also verify that the same action can be fetched from auraStorage at the client.

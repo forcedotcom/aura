@@ -45,7 +45,7 @@ public interface DefinitionService extends AuraService, SourceListener {
      * <p>
      * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
-     * 
+     *
      * @param qualifiedName the name of the Definition
      * @param defClass The Interface of the type of definition you are trying to
      *            describe.
@@ -60,7 +60,7 @@ public interface DefinitionService extends AuraService, SourceListener {
      * <p>
      * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
-     * 
+     *
      * @param qualifiedName the name of the Definition
      * @param defClass The Interface of the type of definition you are trying to
      *            describe.
@@ -77,7 +77,7 @@ public interface DefinitionService extends AuraService, SourceListener {
      * <p>
      * The class must be retrieved from DefDescriptor.DefType.getPrimaryInterface()
      * </p>
-     * 
+     *
      * @param desc the descriptor of the Definition
      * @param defClass The Interface of the type of definition you are trying to
      *            describe.
@@ -88,44 +88,44 @@ public interface DefinitionService extends AuraService, SourceListener {
     /**
      * Get the Definition associated with the descriptor passed in, compiling if
      * necessary.
-     * 
+     *
      * @param descriptor the descriptor to get/compile
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      * @throws QuickFixException
      */
     <T extends Definition> T getDefinition(DefDescriptor<T> descriptor) throws DefinitionNotFoundException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
      * retrieves the named Definition and then returns it.
      *
      * FIXME: some callers use a descriptorName instead of a qualifiedName here!
-     * 
+     *
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      * @throws QuickFixException
      */
     <T extends Definition> T getDefinition(String qualifiedName, Class<T> defType) throws DefinitionNotFoundException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * Creates a {@link DefDescriptor} from the qualified name passed in,
      * retrieves the named Definition and then returns it. This method should
      * only be used if the caller doesn't know or care what type is returned.
-     * 
+     *
      * @param defTypes a list of DefTypes to check
      * @return The named definition
      * @throws DefinitionNotFoundException if definition does not exist
      * @throws QuickFixException
      */
     Definition getDefinition(String qualifiedName, DefType... defTypes) throws DefinitionNotFoundException,
-            QuickFixException;
+    QuickFixException;
 
     /**
      * Get the master def registry.
-     * 
+     *
      * @return the master def registry.
      */
     MasterDefRegistry getDefRegistry();
@@ -135,9 +135,11 @@ public interface DefinitionService extends AuraService, SourceListener {
      * return a set of Descriptors for all existing Definitions who have source
      * that exists. Does not compile the definitions if they were not already
      * compiled, and does not guarantee that they can compile.
-     * 
+     *
+     * @deprecated Replaced by {@link #find(DescriptorFilter)}
      * @throws QuickFixException
      */
+    @Deprecated
     <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) throws QuickFixException;
 
     /**
@@ -145,21 +147,21 @@ public interface DefinitionService extends AuraService, SourceListener {
      * of Descriptors for all existing Definitions who have source that exists.
      * Does not compile the definitions if they were not already compiled, and
      * does not guarantee that they can compile.
-     * 
+     *
      * @throws QuickFixException
      */
     Set<DefDescriptor<?>> find(DescriptorFilter matcher) throws QuickFixException;
 
     /**
      * Save the given Definition back to source code.
-     * 
+     *
      * @throws QuickFixException
      */
     void save(Definition def) throws QuickFixException;
 
     /**
      * update the set of loaded descriptors, and validate.
-     * 
+     *
      * @param loading the descriptor that we are loading if any.
      * @throws ClientOutOfSyncException if one of the defs is out of date.
      * @throws QuickFixException if a definition can't be compiled.
@@ -168,14 +170,14 @@ public interface DefinitionService extends AuraService, SourceListener {
 
     /**
      * Register interest in real-time changes to source, if available
-     * 
+     *
      * @param listener - which listener to register
      */
     void subscribeToChangeNotification(SourceListener listener);
 
     /**
      * Unregister interest in real-time changes to source
-     * 
+     *
      * @param listener - which listener to unregister
      */
     void unsubscribeToChangeNotification(SourceListener listener);

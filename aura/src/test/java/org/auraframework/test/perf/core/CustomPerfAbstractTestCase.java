@@ -17,7 +17,6 @@ package org.auraframework.test.perf.core;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.util.test.annotation.PerfCustomTest;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -88,11 +87,11 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
 
     protected final <V> V waitUntil(final Function<? super WebDriver, V> function) {
         return new WebDriverWait(currentDriver, timeoutInSecs)
-                .until(new Function<WebDriver, V>() {
-                    @Override
-                    public V apply(WebDriver d) {
-                        return function.apply(d);
-                    }
-                });
+        .until(new Function<WebDriver, V>() {
+            @Override
+            public V apply(WebDriver d) {
+                return function.apply(d);
+            }
+        });
     }
 }

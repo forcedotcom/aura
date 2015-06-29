@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,10 +27,10 @@ import com.google.common.collect.Maps;
 
 public class TraceEventUtil {
 
-	protected static final Logger LOG = Logger.getLogger(TraceEventUtil.class.getSimpleName());
+    protected static final Logger LOG = Logger.getLogger(TraceEventUtil.class.getSimpleName());
 
-	// Event Category
-	// Refer https://code.google.com/p/chromium/codesearch#chromium/src/third_party/WebKit/Source/devtools/front_end/timeline/TimelineUIUtils.js&type=cs&sq=package:chromium
+    // Event Category
+    // Refer https://code.google.com/p/chromium/codesearch#chromium/src/third_party/WebKit/Source/devtools/front_end/timeline/TimelineUIUtils.js&type=cs&sq=package:chromium
     public enum Category {
         Loading, Scripting, Rendering, Painting, Memory, Other;
     }
@@ -41,33 +40,33 @@ public class TraceEventUtil {
     public enum Type {
         Duration, Complete, Instant;
     }
-    
+
     // Event name to type mapping
     private static final Map<String, Category> nameToCategory = Maps.newHashMap();
 
     static {
-    	// Loading
-    	nameToCategory.put("ParseHTML", Category.Loading);
-    	
-    	// Painting
-    	nameToCategory.put("Paint", Category.Painting);
-    	nameToCategory.put("CompositeLayers", Category.Painting);
+        // Loading
+        nameToCategory.put("ParseHTML", Category.Loading);
+
+        // Painting
+        nameToCategory.put("Paint", Category.Painting);
+        nameToCategory.put("CompositeLayers", Category.Painting);
 
         // Rendering
-    	nameToCategory.put("Layout", Category.Rendering);
-    	nameToCategory.put("ScheduleStyleRecalculation", Category.Rendering);
-    	nameToCategory.put("RecalculateStyles", Category.Rendering);
-    	nameToCategory.put("InvalidateLayout", Category.Rendering);
-    	nameToCategory.put("UpdateLayerTree", Category.Rendering);
-        
+        nameToCategory.put("Layout", Category.Rendering);
+        nameToCategory.put("ScheduleStyleRecalculation", Category.Rendering);
+        nameToCategory.put("RecalculateStyles", Category.Rendering);
+        nameToCategory.put("InvalidateLayout", Category.Rendering);
+        nameToCategory.put("UpdateLayerTree", Category.Rendering);
+
         // Memory
-    	//nameToCategory.put("UpdateCounters", Category.Memory);
-    	nameToCategory.put("jsHeapSizeUsed", Category.Memory);
-    	nameToCategory.put("documents", Category.Memory);
-    	nameToCategory.put("nodes", Category.Memory);
-    	nameToCategory.put("jsEventListeners", Category.Memory);
+        //nameToCategory.put("UpdateCounters", Category.Memory);
+        nameToCategory.put("jsHeapSizeUsed", Category.Memory);
+        nameToCategory.put("documents", Category.Memory);
+        nameToCategory.put("nodes", Category.Memory);
+        nameToCategory.put("jsEventListeners", Category.Memory);
     }
-    
+
     /**
      * @param name trace event name
      * @return trace event category
@@ -81,14 +80,14 @@ public class TraceEventUtil {
     }
 
     /**
-     * 
+     *
      * @return the full metric name, i.e. Tracing.EventType.EventName
      * eg: "Tracing.Painting.Paint"
      */
     public static String toMetricName(String name) {
         return "Tracing." + toCategory(name) + '.' + name;
     }
-    
+
 
     /**
      * @return all the trace event names for the type
@@ -97,7 +96,7 @@ public class TraceEventUtil {
         List<String> names = Lists.newArrayList();
         for (String name : nameToCategory.keySet()) {
             if (toCategory(name) == category) {
-            	names.add(name);
+                names.add(name);
             }
         }
         return names;
@@ -110,12 +109,12 @@ public class TraceEventUtil {
         List<String> metricNames = Lists.newArrayList();
         for (String eventName : nameToCategory.keySet()) {
             if (toCategory(eventName) == category) {
-            	metricNames.add(toMetricName(eventName));
+                metricNames.add(toMetricName(eventName));
             }
         }
         return metricNames;
     }
-    
+
     /**
      * @return null if it is not a time stamp, else the message in the time stamp
      */
@@ -125,12 +124,12 @@ public class TraceEventUtil {
                 return null;
             }
             return traceEvent.getJSONObject("args").getJSONObject("data").getString("message");
-            
+
         } catch (JSONException e) {
             throw new RuntimeException(traceEvent.toString(), e);
         }
     }
-    
+
     /**
      * @return true if the timelineEvent is a time stamp with the given message
      */
@@ -140,7 +139,7 @@ public class TraceEventUtil {
         }
         return message.equals(isTimelineTimeStamp(traceEvent));
     }
-    
+
     /**
      * @return true if the timelineEvent or one of its descendants is a time stamp with the given message
      */

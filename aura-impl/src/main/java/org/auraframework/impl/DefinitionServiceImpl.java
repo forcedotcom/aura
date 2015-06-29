@@ -47,7 +47,7 @@ import aQute.bnd.annotation.component.Component;
 
 /**
  * The public access to definitions inside Aura.
- * 
+ *
  * This class manages all of the permissions checking and fetching of implementations
  * for consumers of aura definitions.
  */
@@ -85,15 +85,15 @@ public class DefinitionServiceImpl implements DefinitionService {
         AuraContext context = Aura.getContextService().getCurrentContext();
         T def = context.getDefRegistry().getDef(descriptor);
 
-        if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() && 
-        		context.getAccess() != Authentication.AUTHENTICATED) {
+        if (def != null && descriptor.getDefType() == DefType.APPLICATION && def.getAccess().requiresAuthentication() &&
+                context.getAccess() != Authentication.AUTHENTICATED) {
             def = null;
         }
-        
+
         if (def == null) {
             throw new DefinitionNotFoundException(descriptor);
         }
-        
+
         return def;
     }
 
@@ -129,7 +129,7 @@ public class DefinitionServiceImpl implements DefinitionService {
 
     /**
      * Get the def registry currently in use.
-     * 
+     *
      * @return the master def registry.
      * @throws RuntimeException if the context has not been initialized.
      */
@@ -142,6 +142,7 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
+    @Deprecated
     public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
         Aura.getContextService().assertEstablished();
 
@@ -163,32 +164,32 @@ public class DefinitionServiceImpl implements DefinitionService {
 
         ContextService contextService = Aura.getContextService();
         contextService.assertEstablished();
-        
+
         def.validateDefinition();
-        
-		defRegistry.save(def);
+
+        defRegistry.save(def);
     }
 
     /**
      * Take in the information off the context and sanitize, populating dependencies.
-     * 
+     *
      * This routine takes in the current descriptor, It then expands out dependencies and
      * cleans up the set of explicitly loaded descriptors by removing descriptors that are
      * implicitly loaded by others in the set.
-     * 
+     *
      * Note that the client out of sync exception has higher 'precedence' than
      * the quick fix exception. This allows the servlet to correctly refresh a
      * client before presenting the quick fix (which would otherwise hide the
      * fact that the server side code changed). This is because quick fix exceptions
      * are thrown and swallowed during posts to avoid circular qfes, which cause
      * the server to not process the quick fix.
-     * 
+     *
      * Once this routine has completed, the master def registiry should have a
      * valid set of dependencies for the descriptor on the context.
-     * 
+     *
      * Note that removing things from the 'loaded' set should send them back to
      * the client, and allow our future requests to be smaller.
-     * 
+     *
      * @param loading The descriptor we think we are loading.
      * @throws ClientOutOfSyncException if the uid on something is a mismatch
      * @throws QuickFixException if a definition can't be compiled.

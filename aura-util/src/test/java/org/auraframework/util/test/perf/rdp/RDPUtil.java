@@ -17,7 +17,6 @@ package org.auraframework.util.test.perf.rdp;
 
 import java.util.List;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -78,7 +77,7 @@ public final class RDPUtil {
             }
         }*/
     }
-    
+
     /**
      * @return flattened list of all timeline events (i.e. including children events)
      */

@@ -30,6 +30,8 @@ import junit.framework.TestSuite;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -37,7 +39,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
@@ -47,16 +48,15 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
 @UnAdaptableTest
-//@PerfTestSuite
+// @PerfTestSuite
 public class ComponentPerfSuiteTest extends TestSuite {
     // List components that we can't able to instantiate from client side.
     // The reason could be a dependency to a server side model. Eg. ui:inputDate
     // ui:action cmp shold be abstract?
-    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of(
-            "markup://ui:inputDate" // server side dependency
+    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of("markup://ui:inputDate" // server side
+            // dependency
             , "markup://ui:action" // this should be abstract
-            , "markup://perfTest:dummyPerf"
-            );
+            , "markup://perfTest:dummyPerf");
 
     private static final Logger LOG = Logger.getLogger(ComponentPerfSuiteTest.class.getSimpleName());
 
@@ -117,6 +117,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
 
     @UnAdaptableTest
     public final class NamespacePerfTestSuite extends TestSuite {
+        @SuppressWarnings("unchecked")
         public NamespacePerfTestSuite(String namespace) throws Exception {
             super(namespace);
             ContextService contextService = Aura.getContextService();
@@ -131,20 +132,20 @@ public class ComponentPerfSuiteTest extends TestSuite {
             Map<String, TestSuite> subSuites = Maps.newHashMap();
 
             try {
-                DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor(
-                        String.format("markup://%s:*", namespace), ComponentDef.class);
+                DescriptorFilter matcher = new DescriptorFilter(String.format("markup://%s:*", namespace),
+                        DefType.COMPONENT);
 
-                Set<DefDescriptor<ComponentDef>> descriptors = definitionService.find(matcher);
+                Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
 
-                for (DefDescriptor<ComponentDef> descriptor : descriptors) {
-                    if (descriptor.getDef().isAbstract()
+                for (DefDescriptor<?> descriptor : descriptors) {
+                    if (((ComponentDef)descriptor.getDef()).isAbstract()
                             || getBlacklistedComponents().contains(descriptor.getQualifiedName())) {
                         continue;
                     }
 
                     Test test;
                     try {
-                        test = new ComponentSuiteTest(descriptor);
+                        test = new ComponentSuiteTest((DefDescriptor<ComponentDef>)descriptor);
                     } catch (Throwable t) {
                         test = new FailTestCase(descriptor, t);
                     }
@@ -182,7 +183,7 @@ public class ComponentPerfSuiteTest extends TestSuite {
                 try {
                     Constructor<? extends Test> constructor = testClass.getConstructor(String.class,
                             DefDescriptor.class);
-                    ComponentPerfAbstractTestCase test = (ComponentPerfAbstractTestCase) constructor.newInstance(
+                    ComponentPerfAbstractTestCase test = (ComponentPerfAbstractTestCase)constructor.newInstance(
                             "testRun", descriptor);
                     addTest(patchPerfComponentTestCase(test, descriptor));
                 } catch (Exception e) {

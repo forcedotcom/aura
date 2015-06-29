@@ -26,6 +26,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.service.DefinitionService;
@@ -65,12 +67,11 @@ public class OutputComponentsTest extends AuraTestCase {
 
     private Set<ComponentDef> getUiOutputComponents() throws Exception {
         DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<ComponentDef> matcher = definitionService.getDefDescriptor("markup://ui:output*",
-                ComponentDef.class);
+        DescriptorFilter matcher = new DescriptorFilter("markup://ui:output*", DefType.COMPONENT);
         Set<ComponentDef> ret = Sets.newHashSet();
-        for (DefDescriptor<ComponentDef> def : definitionService.find(matcher)) {
+        for (DefDescriptor<?> def : definitionService.find(matcher)) {
             if (def.getName().startsWith("output")) {
-                ret.add(def.getDef());
+                ret.add((ComponentDef) def.getDef());
             }
         }
         return ret;
@@ -86,7 +87,7 @@ public class OutputComponentsTest extends AuraTestCase {
      * Verify that ui:output is registered to throw all the expected events.
      * Also verify that these events are component events. Very important that
      * these events be component events and not application event.
-     * 
+     *
      * @throws Exception
      */
     public void testDomEventsAreOutputComponentEvents() throws Exception {

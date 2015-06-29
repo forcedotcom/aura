@@ -23,11 +23,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -48,8 +47,8 @@ public class UnusedModel {
         Map<DefDescriptor<?>, Map<String, String>> unused = Maps.newHashMap();
         Set<DefDescriptor<?>> used = Sets.newHashSet();
 
-        populate(unused, used, ComponentDef.class);
-        populate(unused, used, ApplicationDef.class);
+        populate(unused, used, DefType.COMPONENT);
+        populate(unused, used, DefType.APPLICATION);
 
         for (DefDescriptor<?> desc : used) {
             unused.remove(desc);
@@ -71,13 +70,13 @@ public class UnusedModel {
     }
 
     private <T extends Definition> void populate(Map<DefDescriptor<?>, Map<String, String>> unused,
-            Set<DefDescriptor<?>> used, Class<T> type) throws QuickFixException {
+            Set<DefDescriptor<?>> used, DefType type) throws QuickFixException {
 
         DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<T> matcher = definitionService.getDefDescriptor("markup://*:*", type);
-        Set<DefDescriptor<T>> descriptors = definitionService.find(matcher);
+        DescriptorFilter matcher = new DescriptorFilter("markup://*:*", type);
+        Set<DefDescriptor<?>> descriptors = definitionService.find(matcher);
 
-        for (DefDescriptor<T> desc : descriptors) {
+        for (DefDescriptor<?> desc : descriptors) {
             Map<String, String> values = Maps.newHashMap();
             values.put("name", desc.getDescriptorName());
 
@@ -91,7 +90,8 @@ public class UnusedModel {
             }
 
             try {
-                T def = desc.getDef();
+                @SuppressWarnings("unchecked")
+                T def = (T) desc.getDef();
                 def.appendDependencies(used);
             } catch (Throwable t) {
                 // it can't use something if it can't compile

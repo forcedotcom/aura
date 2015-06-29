@@ -28,6 +28,7 @@ import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -68,7 +69,11 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
         String resource = getAttributeValue(ATTRIBUTE_RESOURCE);
         Type tag = TypeParser.parseTag(resource);
         if (tag != null && isDefaultNamespaceUsed(tag.namespace)) {
-            resource = String.format("%s://%s:%s", tag.prefix, source.getDescriptor().getNamespace(), tag.name);
+            if (AuraTextUtil.isNullEmptyOrWhitespace(tag.prefix)) {
+                resource = String.format("%s:%s", source.getDescriptor().getNamespace(), tag.name);
+            } else {
+                resource = String.format("%s://%s:%s", tag.prefix, source.getDescriptor().getNamespace(), tag.name);
+            }
         }
 
         builder.setResource(resource);

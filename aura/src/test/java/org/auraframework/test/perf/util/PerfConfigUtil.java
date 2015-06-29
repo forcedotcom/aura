@@ -129,12 +129,8 @@ public final class PerfConfigUtil {
         Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
         DefinitionService definitionService = Aura.getDefinitionService();
 
-<<<<<<< HEAD
         Set<DefDescriptor<?>> descriptors;
         descriptors = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
-=======
-        Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
->>>>>>> Change usage of DefinitionService.find(DefDescriptor) to find(DescriptorFilter) @bug W-2655593@ @rev gtorres, goliver@
 
         for (DefDescriptor<?> descriptor : descriptors) {
             if (descriptor.getDefType().equals(DefType.COMPONENT)) {

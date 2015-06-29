@@ -62,7 +62,7 @@ public class DefOverviewModel {
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
 
-        def.appendDependencies(deps);
+        def.appendDependencies(deps, true);
 
         for (DefDescriptor<?> dep : deps) {
             DefType type = dep.getDefType();

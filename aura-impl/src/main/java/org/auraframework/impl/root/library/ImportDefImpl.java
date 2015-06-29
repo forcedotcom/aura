@@ -46,7 +46,7 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         if (descriptor != null) {
             dependencies.add(descriptor);
         }

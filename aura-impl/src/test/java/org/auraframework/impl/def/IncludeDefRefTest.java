@@ -31,7 +31,7 @@ import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableList;
 
-public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
+public class IncludeDefRefTest extends DefinitionTest {
 
     Builder builder = new IncludeDefRefImpl.Builder();
 

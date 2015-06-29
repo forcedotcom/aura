@@ -43,7 +43,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-public class LibraryDefTest extends DefinitionTest<LibraryDef> {
+public class LibraryDefTest extends DefinitionTest {
 
     public LibraryDefTest(String name) {
         super(name);

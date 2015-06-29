@@ -29,8 +29,8 @@ import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.util.Flavors;
+import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -44,7 +44,7 @@ import com.google.common.collect.Lists;
 /**
  * for testing stuff that needs StyleDef, ThemeDef sources.
  */
-public abstract class StyleTestCase extends AuraImplTestCase {
+public abstract class StyleTestCase extends DefinitionTest {
     private static AtomicLong counter = new AtomicLong();
     private String ns1;
     private String ns2;

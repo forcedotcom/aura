@@ -768,8 +768,17 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
             }
 
+            /**
+             * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
+             */
             @Override
+            @Deprecated
             public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+                appendDependencies(dependencies, true);
+            }
+
+            @Override
+            public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barA", TypeDef.class));
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barB", TypeDef.class));
                 dependencies.add(Aura.getDefinitionService().getDefDescriptor("test://foo.barC", TypeDef.class));

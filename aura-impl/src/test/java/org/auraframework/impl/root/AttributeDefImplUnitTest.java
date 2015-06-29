@@ -59,15 +59,15 @@ DefinitionImplUnitTest<AttributeDefImpl, AttributeDef, AttributeDef, Builder> {
     public void _testAppendDependenciesNullDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
         this.defaultValue = null;
-        buildDefinition().appendDependencies(dependencies);
+        buildDefinition().appendDependencies(dependencies, true);
         Mockito.verifyNoMoreInteractions(dependencies);
         assertTrue(dependencies.isEmpty());
     }
 
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
-        buildDefinition().appendDependencies(dependencies);
-        Mockito.verify(this.defaultValue).appendDependencies(dependencies);
+        buildDefinition().appendDependencies(dependencies, true);
+        Mockito.verify(this.defaultValue).appendDependencies(dependencies, true);
     }
 
     public void testGetSerializeToNull() throws Exception {

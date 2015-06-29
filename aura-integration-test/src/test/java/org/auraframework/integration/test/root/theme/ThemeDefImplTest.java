@@ -537,9 +537,13 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> child = addSeparateTheme(theme().parent(parent));
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
 
-        child.getDef().appendDependencies(dependencies);
+        ThemeDef def = child.getDef();
+        def.appendDependencies(dependencies, true);
+        def.appendDependencies(dependenciesFalse, false);
         assertTrue(dependencies.contains(parent));
+        assertEquals("includeExtends should not affect dependencies", dependencies, dependenciesFalse);
     }
 
     public void testAddsImportsToDependencies() throws Exception {
@@ -547,11 +551,15 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> import2 = addSeparateTheme(theme().var("imported", "imported"));
 
         DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().imported(import1).imported(import2));
+        ThemeDef def = theme.getDef();
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        theme.getDef().appendDependencies(dependencies);
+        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
+        def.appendDependencies(dependencies, true);
+        def.appendDependencies(dependenciesFalse, false);
         assertTrue(dependencies.contains(import1));
         assertTrue(dependencies.contains(import2));
+        assertEquals("includeExtends should not affect dependencies", dependencies, dependenciesFalse);
     }
 
     /** if a cmp theme cross-refs a global var value, a dependency on the namespace default theme should be added */
@@ -560,9 +568,12 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> localTheme = addThemeAndStyle(theme().var("color", "{!globalColor}"), ".THIS{}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
+        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
 
-        localTheme.getDef().appendDependencies(dependencies);
+        localTheme.getDef().appendDependencies(dependencies, true);
         assertTrue(dependencies.contains(nsTheme));
+        localTheme.getDef().appendDependencies(dependenciesFalse, false);
+        assertEquals("includeExtends should not affect dependencies", dependencies, dependenciesFalse);
     }
 
     public void testGetDescriptorProviderAbsent() throws Exception {
@@ -578,7 +589,7 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().descriptorProvider(TestThemeDescriptorProvider.REF));
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        theme.getDef().appendDependencies(dependencies);
+        theme.getDef().appendDependencies(dependencies, true);
 
         DefDescriptor<ThemeDescriptorProviderDef> def = DefDescriptorImpl.getInstance(TestThemeDescriptorProvider.REF,
                 ThemeDescriptorProviderDef.class);
@@ -659,7 +670,7 @@ public class ThemeDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> theme = addSeparateTheme(theme().mapProvider(TestThemeMapProvider.REF));
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        theme.getDef().appendDependencies(dependencies);
+        theme.getDef().appendDependencies(dependencies, true);
 
         DefDescriptor<ThemeMapProviderDef> def = DefDescriptorImpl.getInstance(TestThemeMapProvider.REF,
                 ThemeMapProviderDef.class);

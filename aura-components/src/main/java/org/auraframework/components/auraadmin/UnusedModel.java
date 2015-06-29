@@ -92,7 +92,7 @@ public class UnusedModel {
             try {
                 @SuppressWarnings("unchecked")
                 T def = (T) desc.getDef();
-                def.appendDependencies(used);
+                def.appendDependencies(used, true);
             } catch (Throwable t) {
                 // it can't use something if it can't compile
             }

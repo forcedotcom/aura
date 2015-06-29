@@ -349,8 +349,8 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+        super.appendDependencies(dependencies, true);
 
         if (descriptorProvider != null) {
             dependencies.add(descriptorProvider);
@@ -365,7 +365,7 @@ public final class ThemeDefImpl extends RootDefinitionImpl<ThemeDef> implements 
         }
 
         for (VarDef def : vars.values()) {
-            def.appendDependencies(dependencies);
+            def.appendDependencies(dependencies, true);
         }
 
         dependencies.addAll(imports);

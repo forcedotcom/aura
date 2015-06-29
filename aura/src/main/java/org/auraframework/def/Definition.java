@@ -54,6 +54,20 @@ public interface Definition extends JsonSerializable, Serializable {
     void validateDefinition() throws QuickFixException;
 
     /**
+	 * Adds all the descriptors for all definitions this depends on to the set.
+	 *
+	 * This function MUST append descriptors for any dependencies that will be
+	 * fetched in validateReferences(). If they are not appended here, an exception
+	 * will be thrown during the compile.
+	 *
+	 * This is always called before validateReferences.
+	 *
+	 * @param dependencies the set to which we should append.
+	 * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
+	 */
+	void appendDependencies(Set<DefDescriptor<?>> dependencies);
+
+	/**
      * Adds all the descriptors for all definitions this depends on to the set.
      *
      * This function MUST append descriptors for any dependencies that will be
@@ -63,8 +77,9 @@ public interface Definition extends JsonSerializable, Serializable {
      * This is always called before validateReferences.
      *
      * @param dependencies the set to which we should append.
+     * @param includeExtends TODO
      */
-    void appendDependencies(Set<DefDescriptor<?>> dependencies);
+    void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends);
 
     /**
      * Second pass validation, which validates any references to other
@@ -168,4 +183,28 @@ public interface Definition extends JsonSerializable, Serializable {
      * Adds supers of this definition to the list.
      */
     void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException;
+
+    /**
+     * does this definition have local (server side) dependencies.
+     */
+    boolean hasServerDependencies();
+
+    /**
+     * does this definition have local (server side) dependencies that pass through by extension.
+     *
+     * This is only relevant for BaseComponentDef and subclasses.
+     *
+     * @return true if something extending this will have server dependencies.
+     */
+    boolean hasServerPassthroughDependencies();
+
+    /**
+     * set hasServerDependencies for this definition.
+     */
+    void setHasServerDependencies(boolean hasServerDependencies);
+
+    /**
+     * set hasServerPassthroughDependencies for this definition.
+     */
+    void setHasServerPassthroughDependencies(boolean hasServerDependencies);
 }

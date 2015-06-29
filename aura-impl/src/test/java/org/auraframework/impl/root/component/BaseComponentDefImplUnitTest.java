@@ -107,7 +107,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
 
     public void testAppendDependenciesDefaultValue() throws Exception {
         Set<DefDescriptor<?>> dependencies = Mockito.spy(Sets.<DefDescriptor<?>> newHashSet());
-        buildDefinition().appendDependencies(dependencies);
+        buildDefinition().appendDependencies(dependencies, true);
     }
 
     @Override

@@ -42,11 +42,11 @@ public class DesignTemplateDefImpl extends DefinitionImpl<DesignTemplateDef> imp
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        super.appendDependencies(dependencies);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+        super.appendDependencies(dependencies, true);
         if (!designTemplateRegions.isEmpty()) {
             for (DesignTemplateRegionDef region : designTemplateRegions.values()) {
-                region.appendDependencies(dependencies);
+                region.appendDependencies(dependencies, true);
             }
         }
     }

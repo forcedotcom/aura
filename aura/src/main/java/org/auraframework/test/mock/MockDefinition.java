@@ -81,8 +81,16 @@ public abstract class MockDefinition<D extends Definition> implements Definition
     public void markValid() {
     }
 
-    @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies){
+    /**
+	 * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
+	 */
+	@Override
+	public void appendDependencies(Set<DefDescriptor<?>> dependencies){
+		appendDependencies(dependencies, true);
+	}
+
+	@Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends){
     }
 
     @Override

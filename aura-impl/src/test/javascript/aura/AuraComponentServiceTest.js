@@ -306,6 +306,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             // Arrange
             var expected = "ComponentService.newComponentAsync(): 'config' must be a valid Object.";
             var target;
+            var actual;
             mockOnLoadUtil(function(){
                 target = new Aura.Services.AuraComponentService();
             });
@@ -326,6 +327,7 @@ Test.Aura.AuraComponentServiceTest = function(){
             // Arrange
             var expected = "ComponentService.newComponentAsync(): 'callback' must be a Function pointer.";
             var target;
+            var actual;
             mockOnLoadUtil(function(){
                 target = new Aura.Services.AuraComponentService();
             });
@@ -334,6 +336,54 @@ Test.Aura.AuraComponentServiceTest = function(){
             mockOnLoadUtil(function(){
                 actual = Record.Exception(function(){
                     target.newComponentAsync(null, undefined, {});
+                });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function newComponent() {
+
+        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
+            assert:function(condition,message){
+                if(!condition)throw message;
+            },
+            util:{
+                isString:function(obj){
+                    return typeof obj === 'string';
+                },
+                isArray:function(obj){
+                    return false;
+                }
+            },
+            clientService:{
+                allowAccess:function(){return true;}
+            }
+        });
+
+        [Fact]
+        function ThrowsComponentClassNotFound(){
+            var component = "markup://bla:notExist";
+            var expected = "Component class not found: " + component;
+            var targetService;
+            mockOnLoadUtil(function(){
+                targetService = new Aura.Services.AuraComponentService();
+            });
+            targetService.registry.getDef = function(){
+                return null;
+            }
+
+            // Act
+            var actual = Record.Exception(function() {
+                $Amock(function() {
+                    targetService.newComponent({
+                            componentDef:component,
+                            "skipCreationPath": true
+                        },
+                        null, true, true);
                 });
             });
 

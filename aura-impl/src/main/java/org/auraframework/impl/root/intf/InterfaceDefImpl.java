@@ -137,11 +137,11 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         dependencies.addAll(extendsDescriptors);
         for (RegisterEventDef register : this.events.values()) {
-            register.appendDependencies(dependencies, true);
+            register.appendDependencies(dependencies);
         }
     }
 

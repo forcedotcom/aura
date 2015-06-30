@@ -70,8 +70,8 @@ public class ThemeDefRefImpl extends DefinitionImpl<ThemeDefRef> implements Them
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         dependencies.add(themeDescriptor);
     }
 

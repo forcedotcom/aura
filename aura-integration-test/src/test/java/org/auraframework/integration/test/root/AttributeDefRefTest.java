@@ -142,19 +142,19 @@ public class AttributeDefRefTest extends AuraImplTestCase {
     public void testAppendDependenciesChainsToValue() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, value, null);
-        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any(), Mockito.anyBoolean());
+        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        adr.appendDependencies(dependencies, true);
-        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any(), Mockito.anyBoolean());
+        adr.appendDependencies(dependencies);
+        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
     }
 
     public void testAppendDependenciesChainsThroughCollection() throws Exception {
         Definition value = Mockito.mock(Definition.class);
         AttributeDefRefImpl adr = vendor.makeAttributeDefRef(testAttributeDescriptorName, Sets.newHashSet(value), null);
-        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any(), Mockito.anyBoolean());
+        Mockito.verify(value, Mockito.times(0)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        adr.appendDependencies(dependencies, true);
-        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any(), Mockito.anyBoolean());
+        adr.appendDependencies(dependencies);
+        Mockito.verify(value, Mockito.times(1)).appendDependencies(Mockito.<Set<DefDescriptor<?>>> any());
     }
 
     /**

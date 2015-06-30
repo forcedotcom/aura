@@ -127,7 +127,7 @@ public class ComponentArrayTypeDef extends DefinitionImpl<TypeDef> implements Ty
         List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
 
         for (ComponentDefRef componentDefRef : value) {
-            componentDefRef.appendDependencies(deps, true);
+            componentDefRef.appendDependencies(deps);
         }
     }
 }

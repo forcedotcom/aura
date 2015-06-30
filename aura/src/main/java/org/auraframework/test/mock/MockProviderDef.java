@@ -26,8 +26,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * A simple ProviderDef.
  */
 public class MockProviderDef extends MockDefinition<ProviderDef> implements ProviderDef {
-    private static final long serialVersionUID = -8841310282805891659L;
-    private final ComponentConfig config;
+	private static final long serialVersionUID = -8841310282805891659L;
+	private final ComponentConfig config;
 
     public MockProviderDef(DefDescriptor<ProviderDef> descriptor, ComponentConfig componentConfig) {
         super(descriptor);
@@ -61,23 +61,5 @@ public class MockProviderDef extends MockDefinition<ProviderDef> implements Prov
     @Override
     public boolean supportsRefProvide() {
         return true;
-    }
-
-    @Override
-    public boolean hasServerDependencies() {
-        return false;
-    }
-
-    @Override
-    public boolean hasServerPassthroughDependencies() {
-        return false;
-    }
-
-    @Override
-    public void setHasServerDependencies(boolean hasServerDependencies) {
-    }
-
-    @Override
-    public void setHasServerPassthroughDependencies(boolean hasServerDependencies) {
     }
 }

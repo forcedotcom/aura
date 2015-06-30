@@ -42,8 +42,8 @@ public class DesignTemplateRegionDefImpl extends DefinitionImpl<DesignTemplateRe
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         if (!allowedInterfaces.isEmpty()) {
             dependencies.addAll(allowedInterfaces);
         }

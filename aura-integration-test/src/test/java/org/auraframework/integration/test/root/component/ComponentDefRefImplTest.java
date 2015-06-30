@@ -17,6 +17,7 @@ package org.auraframework.integration.test.root.component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +37,6 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 
 public class ComponentDefRefImplTest extends AuraImplTestCase {
     private ComponentDefRef testComponentDefRef;
@@ -74,26 +74,16 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
     }
 
     public void testAppendDependencies() throws Exception {
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-
-        testComponentDefRef.appendDependencies(dependencies, true);
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        testComponentDefRef.appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("test:text")));
 
-        testComponentDefRef.appendDependencies(dependenciesFalse, false);
-        assertEquals("includeExtends should not effect dependencies", dependencies, dependenciesFalse);
-
-        ComponentDefRef defref = vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
+        dependencies = new HashSet<>();
+        vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("test:text"),
                 new HashMap<DefDescriptor<AttributeDef>, AttributeDefRef>(),
-                vendor.makeLocation("fakefilename", 10, 10, 0));
-
-        dependencies = Sets.newHashSet();
-        dependenciesFalse = Sets.newHashSet();
-        defref.appendDependencies(dependencies, true);
+                vendor.makeLocation("fakefilename", 10, 10, 0)).appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
-        defref.appendDependencies(dependenciesFalse, false);
-        assertEquals("includeExtends should not effect dependencies", dependencies, dependenciesFalse);
 
         List<ComponentDefRef> children = new ArrayList<>();
         // children.add(vendor.makeComponentDefRef(vendor.makeComponentDefDescriptor("aura:text"),
@@ -109,14 +99,10 @@ public class ComponentDefRefImplTest extends AuraImplTestCase {
         testComponentDefRef = vendor.makeComponentDefRef(
                 DefDescriptorImpl.getInstance("test:text", ComponentDef.class), attributes,
                 vendor.makeLocation("filename", 5, 5, 0));
-        
-        dependencies = Sets.newHashSet();
-        dependenciesFalse = Sets.newHashSet();
-        testComponentDefRef.appendDependencies(dependencies, true);
-        testComponentDefRef.appendDependencies(dependenciesFalse, false);
+        dependencies = new HashSet<>();
+        testComponentDefRef.appendDependencies(dependencies);
         assertEquals(1, dependencies.size());
         assertTrue(dependencies.contains(DefDescriptorImpl.getInstance("test:text", ComponentDef.class)));
-        assertEquals("includeExtends should not effect dependencies", dependencies, dependenciesFalse);
         // assertTrue(dependencies.contains(vendor.makeComponentDefDescriptor("aura:text")));
     }
 

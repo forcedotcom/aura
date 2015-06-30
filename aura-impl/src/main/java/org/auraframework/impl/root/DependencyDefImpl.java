@@ -86,7 +86,7 @@ public final class DependencyDefImpl extends DefinitionImpl<DependencyDef> imple
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         MasterDefRegistry mdf = Aura.getContextService().getCurrentContext().getDefRegistry();
         Set<DefDescriptor<?>> found = mdf.find(this.dependency);
         if (found.size() == 0) {

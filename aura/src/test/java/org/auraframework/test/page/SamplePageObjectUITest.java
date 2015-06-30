@@ -27,7 +27,7 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
         super(name);
     }
 
-    public void testButtunUIWithPageObject() throws Exception {
+    public void testButtonUi() throws Exception {
         //create the PageObject
         SampleAuraPageObject sapo = new SampleAuraPageObject(this.getName(), true, "uiExamples:buttonExample", this);
         //PageObject is in charge of load itself, clicking , typing , etc

@@ -189,15 +189,8 @@
         }
     },
     _getInfiniteLoadingConfig: function (component) {
-        var self               = this,
-            auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
-            dataProviderBridge = $A.getCallback(function (callback) {
-                if (auraDataProvider) {
-                    auraDataProvider.run(callback);
-                } else {
-                    callback({error:'Invalid Provider'});
-                }
-            });
+        var auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
+            dataProviderBridge = auraDataProvider && this._bind(this._bridgeScrollerCallback, component, auraDataProvider);
 
         return {
             threshold    : component.get('v.infiniteLoadingThreshold'),

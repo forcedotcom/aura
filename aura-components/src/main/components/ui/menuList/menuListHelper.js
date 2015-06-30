@@ -216,6 +216,7 @@
         component._keyBuffer.push(letter);
 
         // Try to select
+        var srcComponent = this.getComponentForElement(event.target || event.srcElement);
         var matchText = component._keyBuffer.join("").toLowerCase();
         var menuItems = component.get("v.childMenuItems");
         for(var i = 0; i < menuItems.length; i++) {
@@ -224,7 +225,7 @@
             if(text.toLowerCase().indexOf(matchText) === 0) {
                 var action = c.get("c.setFocus");
                 action.runDeprecated();
-                this.fireMenuFocusChangeEvent(component, null, c);
+                this.fireMenuFocusChangeEvent(component, srcComponent, c);
                 break;
             }
         }

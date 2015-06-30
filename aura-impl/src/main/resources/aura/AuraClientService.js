@@ -577,9 +577,9 @@ AuraClientService.prototype.isManifestPresent = function() {
 AuraClientService.prototype.maybeAbortAction = function(action) {
     if (action.isAbortable() && action.getAbortableId() !== this.lastTransactionId) {
         // whoops, action is already aborted.
-                action.abort();
+        action.abort();
         return true;
-            }
+    }
     return false;
 };
 

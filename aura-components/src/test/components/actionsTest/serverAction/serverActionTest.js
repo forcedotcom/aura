@@ -221,9 +221,359 @@
             );
         }]
     },
-
+    
     isAuraErrorDivVisible: function() {
         var element = $A.util.getElement("auraErrorMessage");
         return element.offsetWidth > 0 && element.offsetHeight > 0;
+    },
+    
+    /************************************ Test for Concurrent Server Action starts ***********************************/
+    
+    
+    getTwoActionsWithSameSignature : function(cmp, actionName, parames, storable1, storable2, carboose1, carboose2) {
+    	//create two actions with same signature
+		var a1Return = undefined;
+		var a2Return = undefined;
+		var recordObjCounterFromA1 = undefined;
+        var a1 = $A.test.getAction(cmp, actionName, parames);
+        var a2 = $A.test.getAction(cmp, actionName, parames);
+        //just fyi, Storable actions will be abortable
+        if(storable1) { a1.setStorable(); } 
+        if(storable2) { a2.setStorable(); }
+        if(carboose1) { a1.setCaboose(); }
+        if(carboose2) { a2.setCaboose(); }
+        return [a1,a2];
+    },
+    
+    /*
+     * enqueue two actions with same signature, go offline, verify both of them return with INCOMPLETE 
+     */
+    testConcurrentServerActionsBothIncomplete : {
+        test : [ function (cmp) {
+            var currentTransactionId = $A.getCurrentTransactionId();
+    		//create two actions with same signature
+            //also set current transcationId to be the same as first abortable action
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
+    				{i:2}, true, true);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //do some sanity check callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2st action should get response from 1st action");
+            });
+            //let's cut the server so we don't get any response
+            $A.test.setServerReachable(false);
+            //make sure both actions get schedule to send in a same XHR box
+            $A.run(
+            		function() { 
+            			$A.enqueueAction(a1); 
+            			$A.enqueueAction(a2); 
+            		}
+            );
+            //need to make sure both actions return as INCOMPLETE
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1.state==="INCOMPLETE")&&(a2.state==="INCOMPLETE"); },
+            		"fail waiting for both actions return with state=INCOMPLETE",
+            		function() {
+            			$A.test.setServerReachable(true);//reconnect the server
+            		}
+            );
+        }]
+    },
+    
+    
+    /*
+     * ALERT : Complex test setup.
+     * 
+     * Test for Two concurrent server actions with same signature get aborted during receive() when server is offline
+     * I'm doing this using two caboose actions
+     * 
+     * This is what we need: two abortable identical actions(a1 and a2 in test), we want them enqueued. 
+     * a2 is recognized as a 'dupe' of a1, so actually only a1 get pushed to action queue, a2 is stored.
+     * 
+     * we enqueue a background action (a0) along with a1&a2, so we can have some control over when to go offline etc
+     * Note: a0 needs to be background so a1&a2 don't actually get send.
+     * 
+     * then we enqueue a foreground action (a3) , this will trigger sending of caboose actions(a1&a2). 
+     * Note: a3 cannot be abortable, or a1&a2 will get aborted without being send at all. 
+     * 
+     * BUT before a1 get send out, another abortable action(a4 in test) get enqueued, push currentTransactionId forward.
+     * when we deal with a1 & a3 in receive(), server is offline, we abort a1 because it belong to the 
+     * previous 'patch' of abortable actions, then abort a2 because its a1's 'dupe'.
+     * Note: we need server to be "unReachable" because we don't abort actions if we get response
+     */
+    testConcurrentCabooseServerActionsBothAborted : {
+        test : [ 
+            function enqueueThreeActionsThenGoOffline(cmp) { 
+            	//$A.test.setTestTimeout(60000000);
+            	var a0 = $A.test.getAction(cmp, "c.executeInBackground", null,
+						function(action) {
+							$A.test.assertTrue(action.isAbortable(), "what? we did just set a0 to be abortable");
+						}
+				);
+            	a0.setStorable();//this will also make a0 abortable
+            	var a4enqueued = false;
+            	$A.test.addWaitForWithFailureMessage(true, 
+	            		function() { return (a0.state === "SUCCESS"); },
+	            		"fail waiting for a0 to finish ",
+	            		function() {//we go offline and enqueue a4 when a0 come back SUCCESS
+	            			 var preSendCallback = function(actions) {
+	     		                $A.test.setServerReachable(false);
+		     		            var a4 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:4},
+		     								function(action) {
+		     			            			$A.test.assertTrue(action.getState() === "INCOMPLETE", "a4 shouldn't get send to server");
+		     			            			//a1 and a2 are aborted after we enqueue a4
+		     			            			$A.test.assertTrue(a1.getState() === "ABORTED", "a1 should get aborted");
+		     			            			$A.test.assertTrue(a2.getState() === "ABORTED", "a2 should get aborted");
+		     								}
+		     					);
+		     			        a4.setAbortable();
+		     			        $A.run( 
+		     			            		function() { 	$A.enqueueAction(a4);  }
+		     			        );
+		     			        //we only need to do this once, once we are done, remove it
+		     			        $A.test.removePrePostSendCallback(cb_handle);
+	     					}
+	     					var cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback, undefined );
+	            	}
+	            );
+				
+				//now enqueue two storable&abortable server actions with same signature
+				var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
+	    				{i:2}, true, true, true, true);
+	            var a1 = actionlst[0], a2 = actionlst[1];
+	            
+	            //enqueue a0,a1 and a2, we will only send out a0, keep a1 in the actionsDeferred queue, a2 is stored
+	            //as a1's dupe.
+	            $A.run(
+	            		function() { 
+	            			$A.enqueueAction(a0);
+	            			$A.enqueueAction(a1); 
+	            			$A.enqueueAction(a2); 
+	            		}
+	            );
+            }, function enqueueAnotherAbortableAction(cmp) {
+				//now we enqueue another server action a3, this will send previous caboose actions: a1 and a2 
+	            var a3 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:3},
+						function(action) {
+							$A.test.assertTrue(action.getState() === "INCOMPLETE", "a3 shouldn't get send to server");
+						}
+				);
+	            $A.enqueueAction(a3); 
+	            
+			}
+		]
+    },
+    
+    
+    /*
+     * W-2659878 : This is having issues where 2nd action get to run twice. because it's a background action, we 
+     * defer it, but it's also a dupe of 1st action, when first action's response come back, we also process it.
+     */
+    _testConcurrentBackgroundServerActionsBothStorable : {
+    	test : [ function(cmp) {
+    		var a1Return = undefined, a2Return = undefined;
+    		var recordObjCounterFromA1 = undefined;
+    		//create two actions with same signature
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInBackgroundWithReturn",
+    				{i : 1}, true, true);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	a1Return = action.getReturnValue();
+            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	recordObjCounterFromA1 = a1Return.recordObjCounter;
+            	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from 1st, but not from storage");
+            	a2Return = action.getReturnValue();
+            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertTrue(a2Return.recordObjCounter===recordObjCounterFromA1, "2nd action should get a copy response from 1st action");
+            });
+            //make sure both ations get schedule to send in a same XHR box
+            $A.enqueueAction(a1); 
+            $A.enqueueAction(a2); 
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
+            		"fail waiting for both action returns something"
+            );
+        } 
+        ]
+    },
+    
+    /*
+     * we enqueue two server frontend action with identical action signature
+     * 1st action get send to server then return with ERROR state
+     * 2nd will copy the error response from 1st one.
+     */
+    testConcurrentServerActionsBothStorable1stActionErrorOut : {
+        test : [ function(cmp) {
+    		//create two actions with same signature
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.errorInForeground",
+    				null, true, true);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	$A.test.assertTrue(action.state === "ERROR", "we expect 1st action to error out on server");
+            	$A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
+            			"expect error message from 1st action");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2st action should get response from 1st action");
+            	$A.test.assertTrue(action.state === "ERROR", "we expect 2nd action to get error response like 1st action");
+            	$A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
+            			"expect error message from 2nd action");
+            });
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+            		function() { 
+            			$A.enqueueAction(a1); 
+            			$A.enqueueAction(a2); 
+            		}
+            );
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1.state==="ERROR")&&(a2.state==="ERROR"); },
+            		"fail waiting for both action return ERROR"
+            );
+        	
+        }]
+    },
+    
+    /*
+     * test server actions with same signature get schedule to send in a same XHR 
+     * both are storable 
+     * only the first action get to send to the server. second one get response from the 1st one
+     */
+    testConcurrentServerActionsBothStorable : {
+    	test : [ function(cmp) {
+    		var a1Return = undefined, a2Return = undefined;
+    		var recordObjCounterFromA1 = undefined;
+    		//create two actions with same signature
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
+    				{i : 1}, true, true);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	a1Return = action.getReturnValue();
+            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	recordObjCounterFromA1 = a1Return.recordObjCounter;
+            	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from 1st, but not from storage");
+            	a2Return = action.getReturnValue();
+            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertTrue(a2Return.recordObjCounter===recordObjCounterFromA1, "2nd action should get a copy response from 1st action");
+            });
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+            		function() { 
+            			$A.enqueueAction(a1); 
+            			$A.enqueueAction(a2); 
+            		}
+            );
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
+            		"fail waiting for both action returns something"
+            );
+        } 
+        ]
+    },
+    
+    /*
+     * test server actions with same signature get schedule to send in a same XHR 
+     * only 2nd are storable 
+     * both actions get to send to the server
+     */
+    testConcurrentServerActions1stNonstorable : {
+    	test : [ function(cmp) {
+    		var a1Return = undefined, a2Return = undefined;
+    		var recordObjCounterFromA1 = undefined;
+    		//create two actions with same signature
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
+    				{i : 1}, false, true);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	a1Return = action.getReturnValue();
+            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	recordObjCounterFromA1 = a1Return.recordObjCounter;
+            	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from server, as 1st isn't storable");
+            	a2Return = action.getReturnValue();
+            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should get response from server, after 1st");
+            });
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+            		function() { 
+            			$A.enqueueAction(a1); 
+            			$A.enqueueAction(a2); 
+            		}
+            );
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
+            		"fail waiting for both action returns something"
+            );
+        } 
+        ]
+    },
+    
+    /*
+     * test server actions with same signature get schedule to send in a same XHR 
+     * only 1st is storable 
+     * both action get the send to server 
+     */
+    testConcurrentServerActions2ndNonstorable : {
+    	test : [ function(cmp) {
+    		var a1Return = undefined, a2Return = undefined;
+    		var recordObjCounterFromA1 = undefined;
+    		//create two actions with same signature
+    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
+    				{i : 1}, true, false);
+            var a1 = actionlst[0], a2 = actionlst[1];
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	a1Return = action.getReturnValue();
+            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	recordObjCounterFromA1 = a1Return.recordObjCounter;
+            	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
+            });
+            a2.setCallback(cmp, function(action) {
+            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should send to server");
+            	a2Return = action.getReturnValue();
+            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should send to server, after 1st");
+            });
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+            		function() { 
+            			$A.enqueueAction(a1); 
+            			$A.enqueueAction(a2); 
+            		}
+            );
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
+            		"fail waiting for both action returns something"
+            );
+        } 
+        ]
     }
+    
+   
 })

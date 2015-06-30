@@ -19,6 +19,9 @@
     
     <ui:button label="Reset all counter" press="{!c.resetCounters}"/>
     <p/>
-    Results:<div aura:id="Team"></div><div aura:id="Players"></div>
+    Results:
+    <div aura:id="Team"></div>
+    <div aura:id="Team2"></div>
+    <div aura:id="Players"></div>
     <div aura:id="Actions"></div>  
 </aura:component>

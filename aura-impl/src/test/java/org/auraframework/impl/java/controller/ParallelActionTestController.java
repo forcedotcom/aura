@@ -27,6 +27,7 @@ import org.auraframework.util.json.JsonSerializable;
 @Controller
 public class ParallelActionTestController {
 
+	private static int recordObjCounter = 0;
 	
 	@AuraEnabled
 	public static void executeInForeground() {
@@ -65,6 +66,7 @@ public class ParallelActionTestController {
         Integer counterValue;
 
         Record(Integer counter) {
+        	recordObjCounter ++;
             this.counterValue = counter;
         }
 
@@ -76,6 +78,7 @@ public class ParallelActionTestController {
         public void serialize(Json json) throws IOException {
             json.writeMapBegin();
             json.writeMapEntry("Counter", getCounterValue());
+            json.writeMapEntry("recordObjCounter", recordObjCounter);
             json.writeMapEnd();
         }
     }

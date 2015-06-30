@@ -92,7 +92,7 @@ public class ComponentDefRefArrayTypeDef extends DefinitionImpl<TypeDef> impleme
         @SuppressWarnings("unchecked")
         List<ComponentDefRef> value = (List<ComponentDefRef>) instance;
         for (ComponentDefRef componentDefRef : value) {
-            componentDefRef.appendDependencies(deps, true);
+            componentDefRef.appendDependencies(deps);
         }
     }
 

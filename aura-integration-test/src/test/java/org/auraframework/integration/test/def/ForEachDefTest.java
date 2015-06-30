@@ -22,7 +22,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.def.DefinitionTest;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 
-public class ForEachDefTest extends DefinitionTest {
+public class ForEachDefTest extends DefinitionTest<ComponentDef> {
     /**
      * @param name
      */

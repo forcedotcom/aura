@@ -127,10 +127,10 @@ public class LibraryDefImpl extends RootDefinitionImpl<LibraryDef> implements Li
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(java.util.Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         for (IncludeDefRef includeRef : includeRefs) {
-            includeRef.appendDependencies(dependencies, true);
+            includeRef.appendDependencies(dependencies);
         }
     };
 

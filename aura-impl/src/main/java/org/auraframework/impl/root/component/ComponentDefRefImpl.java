@@ -111,15 +111,15 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * @throws QuickFixException
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         if (intfDescriptor != null) {
             dependencies.add(intfDescriptor);
         } else {
             dependencies.add(descriptor);
         }
         for (AttributeDefRef attributeDefRef : attributeValues.values()) {
-            attributeDefRef.appendDependencies(dependencies, true);
+            attributeDefRef.appendDependencies(dependencies);
         }
     }
 

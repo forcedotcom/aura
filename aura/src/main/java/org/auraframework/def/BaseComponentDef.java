@@ -119,6 +119,8 @@ public interface BaseComponentDef extends RootDefinition {
 
     Set<DefDescriptor<InterfaceDef>> getInterfaces();
 
+    boolean hasLocalDependencies() throws QuickFixException;
+
     public static enum WhitespaceBehavior {
         /**
          * < keep or eliminate insignificant whitespace as the framework determines is best

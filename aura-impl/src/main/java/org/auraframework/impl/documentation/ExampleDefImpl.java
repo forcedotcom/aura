@@ -61,8 +61,8 @@ public class ExampleDefImpl extends DefinitionImpl<ExampleDef> implements Exampl
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         dependencies.add(ref);
     }
 

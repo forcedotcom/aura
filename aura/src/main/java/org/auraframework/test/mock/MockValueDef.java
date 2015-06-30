@@ -25,8 +25,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 public class MockValueDef extends MockDefinition<ValueDef> implements ValueDef {
-    private static final long serialVersionUID = -5833396673469713690L;
-    private final String name;
+	private static final long serialVersionUID = -5833396673469713690L;
+	private final String name;
     private final DefDescriptor<TypeDef> typeDescriptor;
 
     public MockValueDef(String name, Class<?> type) {
@@ -55,23 +55,5 @@ public class MockValueDef extends MockDefinition<ValueDef> implements ValueDef {
         json.writeMapEntry("name", getName());
         json.writeMapEntry("type", typeDescriptor);
         json.writeMapEnd();
-    }
-
-    @Override
-    public boolean hasServerDependencies() {
-        return false;
-    }
-
-    @Override
-    public boolean hasServerPassthroughDependencies() {
-        return false;
-    }
-
-    @Override
-    public void setHasServerDependencies(boolean hasServerDependencies) {
-    }
-
-    @Override
-    public void setHasServerPassthroughDependencies(boolean hasServerDependencies) {
     }
 }

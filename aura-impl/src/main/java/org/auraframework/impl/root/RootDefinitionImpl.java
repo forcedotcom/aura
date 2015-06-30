@@ -42,14 +42,14 @@ import com.google.common.collect.Maps;
  */
 public abstract class RootDefinitionImpl<T extends RootDefinition> extends DefinitionImpl<T> implements RootDefinition {
 
-	private static final long serialVersionUID = 2885495270950386878L;
-	protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
+    private static final long serialVersionUID = 2885495270950386878L;
+    protected final Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
     protected final Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
     protected final List<DefDescriptor<ProviderDef>> providerDescriptors;
     protected final DefDescriptor<DocumentationDef> documentationDescriptor;
     private final int hashCode;
     private final SupportLevel support;
-    
+
     protected RootDefinitionImpl(Builder<T> builder) {
         super(builder);
         if (builder.attributeDefs == null || builder.attributeDefs.size() == 0) {
@@ -73,23 +73,23 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         }
 
         this.documentationDescriptor = builder.documentationDescriptor;
-        
+
         this.hashCode = AuraUtil.hashCode(descriptor, location, attributeDefs, requiredVersionDefs);
     }
 
     @Override
-	public RequiredVersionDef getRequiredVersion(String namespace) {
-    	return requiredVersionDefs.get(DefDescriptorImpl.getInstance(namespace, RequiredVersionDef.class));
-	}
+    public RequiredVersionDef getRequiredVersion(String namespace) {
+        return requiredVersionDefs.get(DefDescriptorImpl.getInstance(namespace, RequiredVersionDef.class));
+    }
 
-	@Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         if (providerDescriptors != null) {
             dependencies.addAll(providerDescriptors);
         }
         for (AttributeDef attr : attributeDefs.values()) {
-            attr.appendDependencies(dependencies, true);
+            attr.appendDependencies(dependencies);
         }
     }
 
@@ -100,7 +100,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     @Override
     public abstract Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() throws QuickFixException;
-    
+
     @Override
     public abstract Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs();
 
@@ -115,7 +115,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
     }
 
     public abstract static class Builder<T extends RootDefinition> extends DefinitionImpl.BuilderImpl<T> implements
-            RootDefinitionBuilder<T> {
+    RootDefinitionBuilder<T> {
 
         public Map<DefDescriptor<AttributeDef>, AttributeDef> attributeDefs;
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs;
@@ -143,7 +143,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
         /**
          * Gets the attributeDefs for this instance.
-         * 
+         *
          * @return The attributeDefs.
          */
         public Map<DefDescriptor<AttributeDef>, AttributeDef> getAttributeDefs() {
@@ -156,20 +156,20 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
         public void addAttributeDef(DefDescriptor<AttributeDef> defDescriptor, AttributeDef attributeDef) {
             this.attributeDefs.put(defDescriptor, attributeDef);
         }
-        
+
         /**
          * Sets the requiredVersionDefs for this instance.
          */
         public void setRequiredVersionDefs(Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs) {
-        	if(requiredVersionDefs == null) {
-        		requiredVersionDefs = Maps.newLinkedHashMap();
-        	}
+            if(requiredVersionDefs == null) {
+                requiredVersionDefs = Maps.newLinkedHashMap();
+            }
             this.requiredVersionDefs = requiredVersionDefs;
         }
-        
+
         /**
          * Gets the requiredVersionDefs for this instance.
-         * 
+         *
          * @return The requiredVersionDefs.
          */
         public Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> getRequiredVersionDefs() {
@@ -250,7 +250,7 @@ public abstract class RootDefinitionImpl<T extends RootDefinition> extends Defin
 
     /**
      * Method to check if this is a Definition of an Interface/Abstract Component and if it has a local provider.
-     * 
+     *
      * @return True if there are no providers or there is a local provider False if there is only a remtre provider and
      *         no local provider
      * @throws QuickFixException

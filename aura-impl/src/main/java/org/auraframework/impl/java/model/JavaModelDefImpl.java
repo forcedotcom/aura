@@ -68,8 +68,8 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
      * Add our dependencies to the set.
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         // FIXME: put all of our method dependencies in here...
     }
 

@@ -35,8 +35,6 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-import com.google.common.collect.Sets;
-
 /**
  * TODO: test extends
  */
@@ -135,12 +133,9 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<EventDef> desc = DefDescriptorImpl.getInstance("fake:event", EventDef.class);
         DefDescriptor<EventDef> ext = DefDescriptorImpl.getInstance("fake:extendevent", EventDef.class);
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, null, null, ext);
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        def.appendDependencies(dependencies, true);
-        def.appendDependencies(dependenciesFalse, false);
+        Set<DefDescriptor<?>> dependencies = new HashSet<>();
+        def.appendDependencies(dependencies);
         assertTrue("dependencies don't contain the superclass: "+dependencies, dependencies.contains(ext));
-        assertEquals("includeExtends should not affect the dependencies", dependencies, dependenciesFalse);
     }
 
     public void testSerialize() throws Exception {

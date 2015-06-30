@@ -88,17 +88,17 @@ public class AttributeDefRefImpl extends DefinitionImpl<AttributeDef> implements
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         Object v = this.getValue();
         if (v instanceof Definition) {
             Definition def = (Definition) v;
-            def.appendDependencies(dependencies, true);
+            def.appendDependencies(dependencies);
         } else if (v instanceof Collection) {
             Collection<?> col = (Collection<?>) v;
             for (Object obj : col) {
                 if (obj instanceof Definition) {
                     Definition def = (Definition) obj;
-                    def.appendDependencies(dependencies, true);
+                    def.appendDependencies(dependencies);
                 }
             }
         }

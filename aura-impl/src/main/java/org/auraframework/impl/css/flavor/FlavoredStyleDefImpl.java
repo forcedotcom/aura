@@ -87,7 +87,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
             DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(descriptor);
             if (namespaceTheme.exists()) {

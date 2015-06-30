@@ -153,8 +153,8 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         if (extendsDescriptor != null) {
             dependencies.add(extendsDescriptor);
         }

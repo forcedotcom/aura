@@ -128,8 +128,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     private final int hashCode;
 
-    private Boolean hasServerDependencies = null;
-    private Boolean hasServerPassthroughDependencies = null;
+    private transient Boolean localDeps = null;
 
     protected BaseComponentDefImpl(Builder<T> builder) {
         super(builder);
@@ -270,6 +269,82 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 throw new InvalidDefinitionException("The defaultFlavor attribute cannot be "
                         + "specified on a component with no flavorable children", location);
             }
+        }
+    }
+
+    @Override
+    public boolean hasLocalDependencies() throws QuickFixException {
+        if (localDeps == null) {
+            computeLocalDependencies();
+        }
+
+        return localDeps == Boolean.TRUE;
+    }
+
+    /**
+     * Computes the local (server) dependencies.
+     *
+     * Terminology: "remote" - a JavaScript provider or renderer "local" - a Java/Apex/server provider, renderer, or
+     * model
+     */
+    private synchronized void computeLocalDependencies() throws QuickFixException {
+        if (localDeps != null) {
+            return;
+        }
+
+        if (modelDefDescriptor != null) {
+            localDeps = Boolean.TRUE;
+            return;
+        }
+
+        if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
+            boolean hasRemote = false;
+
+            for (DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors) {
+                if (!rendererDescriptor.getDef().isLocal()) {
+                    hasRemote = true;
+                    break;
+                }
+            }
+
+            if (!hasRemote) {
+                localDeps = Boolean.TRUE;
+                return;
+            }
+        }
+
+        if (providerDescriptors != null) {
+            boolean hasRemote = providerDescriptors.isEmpty();
+
+            for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {
+                if (!providerDescriptor.getDef().isLocal()) {
+                    hasRemote = true;
+                    break;
+                }
+            }
+
+            if (!hasRemote) {
+                localDeps = Boolean.TRUE;
+                return;
+            }
+        }
+
+        // Walk the super component tree applying slightly different dependency rules.
+        T superDef = getSuperDef();
+
+        if (superDef != null && superDef.hasLocalDependencies() &&
+                // super has model
+                (superDef.getModelDef() != null ||
+                // or has renderer that's local
+                (superDef.getRendererDescriptor() != null && superDef.getRendererDescriptor().getDef().isLocal()))) {
+            // Only local/server models and renderers on the super/parent are considered local dependencies for the
+            // child.
+            localDeps = Boolean.TRUE;
+            return;
+        }
+
+        if (localDeps == null) {
+            localDeps = Boolean.FALSE;
         }
     }
 
@@ -467,18 +542,23 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     /**
-     * Gets the direct dependencies of this component.
+     * Recursively adds the ComponentDescriptors of all components in this ComponentDef's children to the provided set.
+     * The set may then be used to analyze freshness of all of those types to see if any of them should be recompiled
+     * from source.
+     *
+     * @param dependencies A Set that this method will append RootDescriptors to for every RootDef that this
+     *            ComponentDef imports
      */
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
-
-        if (includeExtends && extendsDescriptor != null) {
-            dependencies.add(extendsDescriptor);
-        }
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
 
         for (AttributeDefRef facet : this.facets) {
-            facet.appendDependencies(dependencies, true);
+            facet.appendDependencies(dependencies);
+        }
+
+        if (extendsDescriptor != null) {
+            dependencies.add(extendsDescriptor);
         }
 
         for (DefDescriptor<InterfaceDef> intf : interfaces) {
@@ -486,11 +566,11 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         for (RegisterEventDef register : events.values()) {
-            register.appendDependencies(dependencies, true);
+            register.appendDependencies(dependencies);
         }
 
         for (EventHandlerDef handler : eventHandlers) {
-            handler.appendDependencies(dependencies, true);
+            handler.appendDependencies(dependencies);
         }
 
         if (controllerDescriptors != null) {
@@ -544,7 +624,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         for (DependencyDef dep : this.dependencies) {
-            dep.appendDependencies(dependencies, true);
+            dep.appendDependencies(dependencies);
         }
     }
 
@@ -960,7 +1040,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("facets", facets);
                 }
 
-                if (hasServerDependencies()) {
+                boolean local = hasLocalDependencies();
+
+                if (local) {
                     json.writeMapEntry("hasServerDeps", true);
                 }
 
@@ -1545,7 +1627,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         if (ret) {
             Set<DefDescriptor<?>> deps = Sets.newLinkedHashSet();
 
-            appendDependencies(deps, true);
+            appendDependencies(deps);
             for (DefDescriptor<?> dep : deps) {
                 if (!already.contains(dep)) {
                     already.add(dep);
@@ -1583,108 +1665,4 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     @Override
     public abstract DefDescriptor<T> getDefaultExtendsDescriptor();
 
-    @Override
-    public void setHasServerDependencies(boolean hasServerDependencies) {
-        this.hasServerDependencies = Boolean.valueOf(hasServerDependencies);
-    }
-
-    @Override
-    public void setHasServerPassthroughDependencies(boolean hasServerDependencies) {
-        this.hasServerPassthroughDependencies = Boolean.valueOf(hasServerDependencies);
-    }
-
-    /**
-     * Does this component have  a provider dependency on the server?
-     *
-     * @return true if there is only a server side provider.
-     */
-    private boolean hasProviderDependency() {
-        if (providerDescriptors != null) {
-            boolean hasRemote = providerDescriptors.isEmpty();
-
-            for (DefDescriptor<ProviderDef> providerDescriptor : providerDescriptors) {
-                try {
-                    if (!providerDescriptor.getDef().isLocal()) {
-                        hasRemote = true;
-                        break;
-                    }
-                } catch (QuickFixException qfe) {
-                    // ignore we should never hit this.
-                }
-            }
-
-            if (!hasRemote) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Does this component have a renderer dependency?
-     */
-    private boolean hasRendererDependency() {
-        if (rendererDescriptors != null && !rendererDescriptors.isEmpty()) {
-            boolean hasRemote = false;
-
-            for (DefDescriptor<RendererDef> rendererDescriptor : rendererDescriptors) {
-                try {
-                    if (!rendererDescriptor.getDef().isLocal()) {
-                        hasRemote = true;
-                        break;
-                    }
-                } catch (QuickFixException qfe) {
-                    // ignore we should never hit this.
-                }
-            }
-
-            if (!hasRemote) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    /**
-     * Does this component have a server dependency?.
-     *
-     * This function has the property of being mutable over time. The result of the function is the
-     * 'direct' server dependency until setHasServerDependencies is called, at which point that value is
-     * returned. This allows us to compute the server side requirement for the entire tree of dependencies
-     * for the component, and then force the value to reflect the tree.
-     *
-     * We could use two separate functions for that, but it would not help the code much, and would further
-     * polute the API with specialized compilation calls.
-     *
-     * The proper fix is much more complicated...  FIXME: W-2646425
-     *
-     * @return true if this component must be created on the server.
-     */
-    @Override
-    public boolean hasServerDependencies() {
-        if (hasServerDependencies != null) {
-            return hasServerDependencies.booleanValue();
-        } else {
-            return modelDefDescriptor != null || hasRendererDependency() || hasProviderDependency();
-        }
-    }
-    
-    /**
-     * Does this component have a passthrough server dependency?.
-     *
-     * This is a special case because when a component is the 'extends' of another component, the provider
-     * is never invoked (it has already been 'provided'). This strange behaviour requires this extra layer
-     * of logic so that we don't false positive on a server side dependency. The better way to do this is to
-     * branch the component to provide it. Have to document this in a roadmap.
-     *
-     * @return true if this component must be created on the server as a superclass.
-     */
-    @Override
-    public boolean hasServerPassthroughDependencies() {
-        if (hasServerPassthroughDependencies != null) {
-            return hasServerPassthroughDependencies.booleanValue();
-        } else {
-            return modelDefDescriptor != null || hasRendererDependency();
-        }
-    }
 }

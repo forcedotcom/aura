@@ -46,11 +46,8 @@ public class StyleDefImplTest extends StyleTestCase {
         DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies, true);
-        style.getDef().appendDependencies(dependenciesFalse, false);
+        style.getDef().appendDependencies(dependencies);
         assertTrue(dependencies.contains(theme));
-        assertEquals("styles do not use includeExtends", dependencies, dependenciesFalse);
     }
 
     public void testThemeDependenciesCmpThemeOnly() throws QuickFixException {
@@ -60,11 +57,8 @@ public class StyleDefImplTest extends StyleTestCase {
         assertTrue("expected theme to be a cmpTheme", theme.getDef().isCmpTheme());
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies, true);
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        style.getDef().appendDependencies(dependenciesFalse, false);
+        style.getDef().appendDependencies(dependencies);
         assertTrue(dependencies.contains(theme));
-        assertEquals("styles do not use includeExtends", dependencies, dependenciesFalse);
     }
 
     public void testThemeDependenciesBothThemes() throws QuickFixException {
@@ -73,12 +67,9 @@ public class StyleDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies, true);
-        style.getDef().appendDependencies(dependenciesFalse, false);
+        style.getDef().appendDependencies(dependencies);
         assertTrue("expected dependencies to contain namespace theme", dependencies.contains(nsTheme));
         assertTrue("expected dependencies to contain cmp theme", dependencies.contains(cmpTheme));
-        assertEquals("styles do not use includeExtends", dependencies, dependenciesFalse);
     }
 
     public void testThemeDependenciesDoesntHaveThemeDef() throws QuickFixException {
@@ -87,12 +78,9 @@ public class StyleDefImplTest extends StyleTestCase {
         DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies, true);
-        style.getDef().appendDependencies(dependenciesFalse, false);
+        style.getDef().appendDependencies(dependencies);
         assertFalse(dependencies.contains(nsTheme));
         assertFalse(dependencies.contains(cmpTheme));
-        assertEquals("themes do not use includeExtends", dependencies, dependenciesFalse);
     }
 
     public void testInvalidRef() throws QuickFixException {

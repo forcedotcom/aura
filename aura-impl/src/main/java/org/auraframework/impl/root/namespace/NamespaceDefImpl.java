@@ -46,10 +46,10 @@ public class NamespaceDefImpl extends RootDefinitionImpl<NamespaceDef> implement
     }
     
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         DefinitionService ds = Aura.getDefinitionService();
         
-        super.appendDependencies(dependencies, true);
+        super.appendDependencies(dependencies);
         dependencies.add(ds.getDefDescriptor("String", TypeDef.class));
         dependencies.add(ds.getDefDescriptor("Map", TypeDef.class));
     }

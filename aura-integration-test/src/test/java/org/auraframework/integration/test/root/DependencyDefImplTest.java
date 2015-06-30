@@ -86,20 +86,20 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         // Check for a couple dependencies present in a namespace
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"), "aura", "INTERFACE",
                 vendor.makeLocation("f1", 5, 5, 0));
-        testDependencyDef.appendDependencies(deps, true);
+        testDependencyDef.appendDependencies(deps);
         assertTrue("Dependency not found", containsDependency(deps, "markup://aura:rootComponent"));
 
         // Check dependency that exists but is wrong type
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "aura", "PROVIDER", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
-        testDependencyDef.appendDependencies(deps, true);
+        testDependencyDef.appendDependencies(deps);
 
         // Get dependency of specific component
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:application", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
-        testDependencyDef.appendDependencies(deps, true);
+        testDependencyDef.appendDependencies(deps);
         assertTrue("Failed to find dependency when searching using format <type>://<namespace>:<name>",
                 containsDependency(deps, "markup://aura:application"));
 
@@ -107,7 +107,7 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:iDontExist*", "APPLICATION", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
-        testDependencyDef.appendDependencies(deps, true);
+        testDependencyDef.appendDependencies(deps);
         try {
             testDependencyDef.validateReferences();
             fail("Exception not thrown when looking for dependency that does not exist");
@@ -120,7 +120,7 @@ public class DependencyDefImplTest extends AuraImplTestCase {
         testDependencyDef = vendor.makeDependencyDef(vendor.makeComponentDefDescriptor("hi"),
                 "markup://aura:applicatio*", "COMPONENT", vendor.makeLocation("f1", 5, 5, 0));
         deps.clear();
-        testDependencyDef.appendDependencies(deps, true);
+        testDependencyDef.appendDependencies(deps);
         try {
             testDependencyDef.validateReferences();
             fail("Exception not thrown when dependency resource is valid but is of wrong type");

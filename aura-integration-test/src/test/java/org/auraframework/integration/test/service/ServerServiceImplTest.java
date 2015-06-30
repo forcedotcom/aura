@@ -81,16 +81,8 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         public void validateDefinition() throws QuickFixException {
         }
 
-        /**
-         * @deprecated Use {@link #appendDependencies(Set<DefDescriptor<?>>,boolean)} instead
-         */
         @Override
         public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-            appendDependencies(dependencies, true);
-        }
-
-        @Override
-        public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
         }
 
         @Override
@@ -182,24 +174,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         @Override
         public List<String> getLoggableParams() {
             return Lists.newArrayList();
-        }
-
-        @Override
-        public boolean hasServerDependencies() {
-            return false;
-        }
-
-        @Override
-        public boolean hasServerPassthroughDependencies() {
-            return false;
-        }
-
-        @Override
-        public void setHasServerDependencies(boolean hasServerDependencies) {
-        }
-
-        @Override
-        public void setHasServerPassthroughDependencies( boolean hasServerDependencies) {
         }
     }
 

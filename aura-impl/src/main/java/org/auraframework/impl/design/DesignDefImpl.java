@@ -141,14 +141,14 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
-        super.appendDependencies(dependencies, true);
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
         DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(this.descriptor.getQualifiedName(),
                 ComponentDef.class);
         dependencies.add(cmpDesc);
 
         if (template != null) {
-            template.appendDependencies(dependencies, true);
+            template.appendDependencies(dependencies);
         }
     }
 

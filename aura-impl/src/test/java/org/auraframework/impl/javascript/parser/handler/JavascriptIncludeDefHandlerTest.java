@@ -22,7 +22,7 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mock;
 
-public class JavascriptIncludeDefHandlerTest extends DefinitionTest {
+public class JavascriptIncludeDefHandlerTest extends DefinitionTest<IncludeDef> {
 
     public JavascriptIncludeDefHandlerTest(String name) {
         super(name);

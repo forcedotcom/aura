@@ -102,12 +102,8 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, ".THIS--test {color:t(color);}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        FlavoredStyleDef def = flavor.getDef();
-        def.appendDependencies(dependencies, true);
+        flavor.getDef().appendDependencies(dependencies);
         assertTrue(dependencies.contains(theme));
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        def.appendDependencies(dependenciesFalse, false);
-        assertEquals("includeExtends does not apply to themes", dependencies, dependenciesFalse);
     }
 
     /** custom flavors have a dependency on the component, standard flavors do not */
@@ -116,22 +112,14 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> standard = addStandardFlavor(cmp, ".THIS--test {color:red}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        Set<DefDescriptor<?>> dependenciesFalse = Sets.newHashSet();
-        FlavoredStyleDef fsd = standard.getDef();
-        fsd.appendDependencies(dependencies, true);
+        standard.getDef().appendDependencies(dependencies);
         assertTrue("did not expect standard flavor to have dependencies", dependencies.isEmpty());
-        fsd.appendDependencies(dependenciesFalse, false);
-        assertTrue("did not expect standard flavor to have dependencies", dependenciesFalse.isEmpty());
 
         DefDescriptor<FlavoredStyleDef> custom = addCustomFlavor(cmp, ".THIS--test{}");
         dependencies = Sets.newHashSet();
-        dependenciesFalse = Sets.newHashSet();
-        fsd = custom.getDef();
-        fsd.appendDependencies(dependencies, true);
-        fsd.appendDependencies(dependenciesFalse, false);
+        custom.getDef().appendDependencies(dependencies);
         assertEquals("didn't get expected dependencies for custom flavor", 1, dependencies.size());
         assertTrue(dependencies.contains(cmp));
-        assertEquals("includeExtends does not apply to flavors", dependencies, dependenciesFalse);
     }
 
     /** keeps track of var names */

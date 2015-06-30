@@ -116,7 +116,7 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         dependencies.addAll(getDefs());
     }
 

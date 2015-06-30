@@ -43,7 +43,7 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
             // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
             // only a dependency on the component theme, only on the namespace-default, or both (however if the

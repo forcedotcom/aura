@@ -208,13 +208,8 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        ApplicationDef def = desc.getDef();
-        def.appendDependencies(deps, true);
+        desc.getDef().appendDependencies(deps);
         assertTrue(deps.contains(theme));
-
-        Set<DefDescriptor<?>> depsFalse = Sets.newHashSet();
-        def.appendDependencies(depsFalse, false);
-        assertEquals("includeExtends should change the set", deps.size()-1, depsFalse.size());
     }
 
     /** verify theme descriptor ref is validated */

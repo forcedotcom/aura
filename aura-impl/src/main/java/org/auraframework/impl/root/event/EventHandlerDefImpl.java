@@ -56,7 +56,7 @@ public class EventHandlerDefImpl extends DefinitionImpl<EventDef> implements Eve
     }
 
     @Override
-    public void appendDependencies(Set<DefDescriptor<?>> dependencies, boolean includeExtends) {
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (descriptor != null) {
             dependencies.add(descriptor);
         }

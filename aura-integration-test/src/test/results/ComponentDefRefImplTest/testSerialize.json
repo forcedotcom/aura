@@ -245,7 +245,6 @@
                       ]
                     }
                   ],
-                  "hasServerDeps":true,
                   "componentClass":"function(){\n$A.componentService.addComponentClass(\"markup://test:parent\", function() {\n    \n    var aura$component = $A.componentService.getComponentClass(\"markup://aura:component\");\n    \n    var test$parent = function test$parent(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$parent.prototype = new aura$component(null, null, true);\n    test$parent.prototype.constructor = test$parent;\n\n    test$parent.Helper = aura$component.Helper;\n            test$parent.prototype.helper = new test$parent.Helper();\n\n    \n    return test$parent;\n});\n\n\n}"
                 }
               }
@@ -306,7 +305,6 @@
           ]
         }
       ],
-      "hasServerDeps":true,
       "componentClass":"function(){\n$A.componentService.addComponentClass(\"markup://test:text\", function() {\n    \n    var aura$component = $A.componentService.getComponentClass(\"markup://aura:component\");\n    \n    var test$text = function test$text(config, localCreation, creatingPrototype) {\n        aura$component.call(this, config, localCreation, creatingPrototype); \n    };\n    test$text.prototype = new aura$component(null, null, true);\n    test$text.prototype.constructor = test$text;\n\n    test$text.Helper = aura$component.Helper;\n            test$text.prototype.helper = new test$text.Helper();\n\n    \n    return test$text;\n});\n\n\n}"
     }
   },

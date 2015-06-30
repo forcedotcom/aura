@@ -46,7 +46,8 @@ import com.google.common.base.Function;
 /**
  * Tests to verify that the client gets updated when we want it to get updated.
  */
-@ExcludeBrowsers({ BrowserType.IPAD }) //W-2572170: exclude from IPAD for now, there are issues in autobuild
+@ExcludeBrowsers({ BrowserType.IPAD })
+// W-2572170: exclude from IPAD for now, there are issues in autobuild
 public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     public ClientOutOfSyncUITest(String name) {
@@ -115,7 +116,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
                 }
                 return false;
             }
-        }, timeoutInSecs, "Page failed to refresh after server action triggered.");
+        }, "Page failed to refresh after server action triggered.");
         auraUITestingUtil.waitForDocumentReady();
         waitForAuraFrameworkReady();
     }
@@ -278,10 +279,9 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
     }
 
-    
     @ThreadHostileTest("LayoutsDef modification affects namespace")
     @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
-    //known issue with IE11 and layout : W-2375142
+    // known issue with IE11 and layout : W-2375142
     public void testGetClientRenderingAfterLayoutChange() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
                 String.format(baseApplicationTag, "", "<div aura:id='xspot'/>"));

@@ -322,6 +322,6 @@ public class CarouselUITest extends WebDriverTestCase {
                 String cssClass = page.getAttribute("class");
                 return cssClass.contains("carousel-page-selected");
             }
-        }, timeoutInSecs);
+        });
     }
 }

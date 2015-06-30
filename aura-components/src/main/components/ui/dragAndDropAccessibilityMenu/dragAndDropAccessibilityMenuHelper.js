@@ -34,23 +34,28 @@
 					"value": dropzone,
 					"label": $A.util.isEmpty(label) ? "Dropzone " + index : label
 				});
-			}
-		});
-		component.set("v.dropzoneMenu", dropzoneMenu);
+			}			
+		});		
+		component.set("v.dropzoneMenu", dropzoneMenu);		
 		
-		// Refresh accessibility menu
-		var menu = component.find("menu");
-		menu.getEvent("refresh").fire();
-		
-		// Set referenceElement
-		var menuList = component.find("menuList");
-		menuList.set("v.referenceElement", draggables[0]);
-		
-		// open accessibility menu
-		menu.getEvent("popupTriggerPress").fire();
-		
-		// position accessibility menu
-		this.position(menu, target);
+		if(dropzoneMenu.length > 0) {
+
+			// Refresh accessibility menu
+			var menu = component.find("menu");
+			menu.getEvent("refresh").fire();		
+			
+			// Set referenceElement
+			var menuList = component.find("menuList");
+			menuList.set("v.referenceElement", draggables[0]);
+			
+			// open accessibility menu
+			menu.getEvent("popupTriggerPress").fire();
+			
+			// position accessibility menu
+			this.position(menu, target);
+		} else {
+			this.fireDragEnd(draggables,false);
+		} 			
 	},
 
 	position: function(targetComponent, referenceEl) {
@@ -117,7 +122,7 @@
 			
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
-		}
+		}	
 		
 		
 	},

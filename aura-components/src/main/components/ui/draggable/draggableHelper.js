@@ -53,6 +53,8 @@
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
 			
+			this.fireDragStart(component, true);
+			
 			// Delegate drag and drop operation to accessibility component
 			var accessibilityComponent = component.get("v.accessibilityComponent");
 			if (accessibilityComponent) {
@@ -61,9 +63,7 @@
 					concreteCmp.startDragAndDrop([component], event.target);
 				}
 			}
-			
-			this.fireDragStart(component, true);
-    	}
+		}
 	},
 	
 	/**
@@ -80,7 +80,7 @@
 		var auraId = component.getGlobalId();
 		
 		// Set data to be transferred between drag component and drop component
-		var dataTransfer = component.get("v.dataTransfer");
+		var dataTransfer = this.getDataTransfer(component, event);
 		if (!$A.util.isUndefinedOrNull(dataTransfer)) {
 			if($A.util.isString(dataTransfer)) {
 				dataTransfer = { "text/plain": dataTransfer};
@@ -111,6 +111,14 @@
 		}
 		
 		this.fireDragStart(component, false);
+	},
+	
+	/**
+	 * Override this method to provide your own custom logic.
+	 * @return Map<String, String> the data transfer
+	 */
+	getDataTransfer: function(component, event) {
+		return component.get("v.dataTransfer");
 	},
 	
 	fireDragStart: function(component, isInAccessibilityMode) {
@@ -176,7 +184,7 @@
 			// returns "none" even though the drop has been performed
 			// successfully. This is not the right way to check
 			// whether or not drop has been performed since this
-			// doesn't handle drag and draop cross different context, 
+			// doesn't handle drag and drop cross different context, 
 			// e.g. dropping on different browser windows.
 			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();		
 		}

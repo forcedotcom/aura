@@ -34,7 +34,9 @@
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
     
     <aura:attribute name="closeButton" type="Aura.Component[]" />
-
+    
+    <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
+    
     <div aura:flavorable="true" class="{!v.class}">
 
         <div aura:id='modal-glass' class="modal-glass hidden"  tabindex="-1"></div>

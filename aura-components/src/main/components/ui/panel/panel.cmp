@@ -39,7 +39,10 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
-
+    <aura:attribute name="closeButton" type="Aura.Component[]" />
+    
+    <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
+    
     <div aura:id='panel'
          tabindex="-1"
          class="{!v.class}"
@@ -54,20 +57,11 @@
                 <aura:If isTrue="{!!empty(v.title)}">
                     <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                 </aura:If>
-
                  {!v.header}
-
-                <aura:if isTrue="{!v.showCloseButton}">
-                    <ui:button class="closeBtn"
-                               press="{!c.onCloseBtnPressed}"
-                               label="{!v.closeDialogLabel}"
-                               buttonTitle="{!v.closeDialogLabel}"
-                               labelDisplay="false">&times;
-                    </ui:button>
-                </aura:if>
+                 {!v.closeButton}
             </header>
                 
-            <div aura:id="body" class="panel-content">
+            <div aura:id="body" class="panel-content scrollable">
                {!v.body}
             </div>
             

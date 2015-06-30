@@ -19,7 +19,20 @@
         //handler for closeOnEsc and closeOnTabOut
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
         //handler for closeOnClickOut
-        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: true}, closeAction);
+        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
+      //create default close button
+        if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
+            $A.componentService.createComponent('ui:button', {
+                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
+                'class': "closeBtn",
+                'press': cmp.getReference("c.onCloseBtnPressed"),
+                'label': cmp.get('v.closeDialogLabel'),
+                'buttonTitle': cmp.get('v.closeDialogLabel'),
+                'labelDisplay': "false"
+            }, function(button){
+                cmp.set('v.closeButton', button);
+            });
+        }
     },
 
     show: function (cmp, callback) {

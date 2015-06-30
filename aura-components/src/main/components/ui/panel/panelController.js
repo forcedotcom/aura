@@ -54,6 +54,10 @@
     },
 
     onCloseBtnPressed: function(cmp, evt, helper) {
-        helper.close(cmp);
+        if ($A.util.isFunction(cmp.get('v.closeAction'))) {
+            closeAction(cmp, "closeOnButtonClick");
+        } else {
+            helper.close(cmp);
+        }
     }
 })

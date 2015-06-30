@@ -39,15 +39,6 @@
     transition: opacity 2s;
 }
 
-.THIS.positioned .panel-header {
-    border: none;
-}
-
-.THIS.positioned .panel-content {
-    padding:0.5rem 1rem 1rem 1rem;
-}
-
-
 .THIS .pointer {
     width: calc(1.25rem + .0625rem);
     height: calc(1.25rem + .0625rem);
@@ -103,6 +94,10 @@
 
 .THIS .panel-header {
     position: relative;
+}
+
+.THIS .panel-content {
+    overflow: auto;
 }
 
 /* ===== ANIMATION AND TRANSFORMS ======= */

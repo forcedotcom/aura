@@ -32,15 +32,64 @@
         a.setExclusive();
         $A.enqueueAction(a);
     },
-    getTeamAndPlayers:function(cmp, storable){
+    /*
+     * we enqueue two actions, though they have same signature, we enqueue the second in first one's callback
+     * we don't store response of the 1st one, so 2nd one get to send to server and get its own resposne
+     */
+    getTeamAndPlayers: function(cmp, storable) {
+    	var _testName = cmp._testName;
+    	
+    	//Second Action
+        var aPlayer = cmp.get("c.getBaseball");
+        aPlayer.setCallback(cmp, function(action) {
+        	var body = [];
+        	for(var i = 0; i< action.getReturnValue().length; i++) {
+        		var aPlayerFacet = $A.newCmpDeprecated(action.getReturnValue()[i]);
+        		body.push(aPlayerFacet);
+        	}
+            cmp.find("Players").set("v.body", body);
+            
+            //Update the page with action number
+            cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aPlayer.getId() +",")
+        });
+        aPlayer.setParams({
+            testName: (!_testName?"baseBall":_testName)
+        });
+        if(storable) {
+        	aPlayer.setStorable();
+        }
+        
+        //First Action
+        var aTeam = cmp.get("c.getBaseball");
+        aTeam.setCallback(cmp, function(action) {
+            var aTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+            //Clear the old facet in team div & insert newly fetched components
+            cmp.find("Team").set("v.body", [aTeamFacet]);
+            //Update the page with action number
+            cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aTeam.getId() +",");
+            $A.enqueueAction(aPlayer);
+        });
+        aTeam.setParams({
+            testName: (!_testName?"baseBall":_testName)
+        });
+        
+        $A.enqueueAction(aTeam);
+    },
+    
+    /*
+     * we enqueue two actions with same signature(def and params), in a $A.run(), which makes them concurrent. 
+     * in this case, we actually only send first action to server
+     * the second action will get first one's response.
+     */
+    getTeamAndTeam:function(cmp, storable){
         $A.run(function() {
                 var _testName = cmp._testName;
                 //First Action
                 var aTeam = cmp.get("c.getBaseball");
                 aTeam.setCallback(cmp, function(action) {
-                    var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+                    var aTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
                     //Clear the old facet in team div & insert newly fetched components
-                    cmp.find("Team").set("v.body", [teamFacet]);
+                    cmp.find("Team").set("v.body", [aTeamFacet]);
                     //Update the page with action number
                     cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aTeam.getId() +",");
                 });
@@ -53,28 +102,21 @@
                 $A.enqueueAction(aTeam);
                 
                 //Second Action
-                var aPlayers = cmp.get("c.getBaseball");
-                aPlayers.setCallback(cmp, function(action) {
-                    var ret = action.getReturnValue();
-                    //Clear the old facet in players div
-                    var newBody = [];
-                    for(var i=0;i<ret.length;i++){
-                        var playerFacet = $A.newCmpDeprecated(ret[i]);
-                        newBody.push(playerFacet);
-                    }
-                    //Insert newly fetched components
-                    cmp.find("Players").set("v.body", newBody);
+                var bTeam = cmp.get("c.getBaseball");
+                bTeam.setCallback(cmp, function(action) {
+                    var bTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+                    cmp.find("Team2").set("v.body", [bTeamFacet]);
                     
                     //Update the page with action number
-                    cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", aPlayers.getId() +",")
+                    cmp.getDef().getHelper().findAndAppendText(cmp, "Actions", bTeam.getId() +",")
                 });
-                aPlayers.setParams({
+                bTeam.setParams({
                     testName: (!_testName?"baseBall":_testName)
                 });
                 if(storable) {
-                    aPlayers.setStorable();
+                	bTeam.setStorable();
                 }
-                $A.enqueueAction(aPlayers);
+                $A.enqueueAction(bTeam);
             });
     },
     getTeamOnly:function(cmp,storable){

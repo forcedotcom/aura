@@ -67,6 +67,53 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     [Fixture]
+    function testDupes() {
+    	[Fact]
+    	function getAndClearDupesNoKey() {
+    		// Arrange
+            var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+            });
+            // Act
+            var actual;
+            mockGlobal(function() {
+                actual = target.getAndClearDupes();
+            });
+            // Assert : we return undefined when calling getAndClearDupes without key
+            Assert.Equal(undefined, actual);
+    	}
+    	
+    	[Fact]
+    	function deDupeNewEntry() {
+    		// This just test the case where we add the action for the first time
+    		// there is no record in actionStoreMap for this action
+    		// Arrange
+            var target;
+            var newAction = new MockAction("server", true);
+            var actionId = newAction.getId();
+            var expect1;
+            expect1 = { "action":newAction };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.deDupe(newAction);
+            });
+           
+            // Act
+            var actual1;
+            mockGlobal(function() {
+                actual1 = target.actionStoreMap["fakeKey"];
+                actual2 = target.actionStoreMap[actionId]
+            });
+            // Assert : we add two entry to the actionStoreMap, 
+            // actionId --> actionKey, actionKey --> { 'action':action, 'dupes':[dup-action1, dup-action2,....] }
+            Assert.Equal(expect1, actual1);
+            Assert.Equal("fakeKey", actual2);
+    	}
+    
+    }
+    
+    [Fixture]
     function testAuraXHR() {
     	[Fact]
     	function CreateNewAuraXHR() {
@@ -102,12 +149,11 @@ Test.Aura.AuraClientServiceTest = function() {
     		target.addAction(newAction);
     		
     		// Assert
-    		Assert.Equal(1, newAction.id);
-    		Assert.Equal(newAction, target.actions[1]);
+    		Assert.Equal(newAction, target.actions[newAction.id]);
     		// Act and Assert
-    		Assert.Equal(newAction, target.getAction(1));
+    		Assert.Equal(newAction, target.getAction(newAction.id));
     		// Assert
-    		Assert.Equal(undefined, target.actions[1]);//after the getAction above, this become undefined
+    		Assert.Equal(undefined, target.actions[newAction.id]);//after the getAction above, this become undefined
     	}
     	
     	[Fact]
@@ -172,13 +218,23 @@ Test.Aura.AuraClientServiceTest = function() {
 
     var id = 0;
 
-    var MockAction = function(type) {
+    var MockAction = function(type, isStorable) {
         this.setBackground = Stubs.GetMethod();
-        this.id = ++id;
+        id = id + 1;
+        this.id = id;
         this.getId = function() { return this.id; } ;
+        this.resetId = function() {
+        	id = 1; this.id = 1;
+        }
         if (type === undefined) {
             type = "server";
         }
+        if (isStorable === undefined) {
+        	isStorable = false;
+        }
+        this.storable = isStorable;
+        this.getStorageKey = function() { return "fakeKey"; };
+        this.isStorable = function() { return this.storable; };
         this.isAbortable = Stubs.GetMethod(false);
         this.isCaboose = Stubs.GetMethod(false);
         this.isBackground = Stubs.GetMethod(false);

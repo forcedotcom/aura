@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 ({
+	getTeamFromServerAndTeam2AsDupOfTeam:function(cmp, evt, helper) {
+		//Two action requests with the same action signature, send concurrently
+		helper.getTeamAndTeam(cmp, true);
+	},
 	getRosterFromStorage:function(cmp, evt, helper){
-		//Two action requests with the same action signature.
-		helper.getTeamAndPlayers(cmp,true);;
+		//Two action requests with the same action signature, 2nd send in 1st's callback
+		helper.getTeamAndPlayers(cmp,true);
 	},
 	getTeamFromStorage:function(cmp, evt, helper){
 		helper.getTeamOnly(cmp,true);

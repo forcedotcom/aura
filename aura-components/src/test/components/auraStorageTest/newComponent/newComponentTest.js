@@ -150,7 +150,7 @@
             /**
              * Group of actions, store them.
              */
-            var a = cmp.get("c.getRosterFromStorage");
+            var a = cmp.get("c.getTeamFromServerAndTeam2AsDupOfTeam");
             a.runDeprecated();
             var that = this;
             $A.test.addWaitFor(false, $A.test.isActionPending,
@@ -159,11 +159,11 @@
                     var teamActionNum =  that.getActionNumberFromPage(cmp)[0];
                     that.verifyTeamFacet(cmp, teamActionNum);
                     //Verify result of second action
-                    var playerActionNum = that.getActionNumberFromPage(cmp)[1];
+                    var team2ActionNum = that.getActionNumberFromPage(cmp)[1];
                     //
                     // This is because we only execute the action once on the server.
                     // 
-                    that.verifyTeamFacet(cmp, playerActionNum, "Players");
+                    that.verifyTeamFacet(cmp, team2ActionNum, "Team2");
                 });
         },function(cmp){
             /**Individual action to get players, should be from storage. 

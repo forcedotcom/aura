@@ -577,9 +577,9 @@ AuraClientService.prototype.isManifestPresent = function() {
 AuraClientService.prototype.maybeAbortAction = function(action) {
     if (action.isAbortable() && action.getAbortableId() !== this.lastTransactionId) {
         // whoops, action is already aborted.
-                action.abort();
+        action.abort();
         return true;
-            }
+    }
     return false;
 };
 
@@ -1616,7 +1616,7 @@ AuraClientService.prototype.deDupe = function(action) {
     entry = this.actionStoreMap[key];
     if (entry && !(entry.action.getState() === 'NEW' || entry.action.getState() === 'RUNNING')) {
         dupes = entry.dupes;
-        $A.warning("Unfinished handling of action for key "+key);
+        $A.warning("Unfinished handling of action for key "+key);//need test
         entry = undefined;
     }
     if (!entry) {

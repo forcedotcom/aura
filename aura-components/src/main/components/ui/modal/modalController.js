@@ -56,7 +56,9 @@
             params.payload = {
                 panelInstance: cmp.getGlobalId()
             }
+        } else if (params && params.action === 'closePanel') {
+        	event.stopPropagation();
+        	helper.close(cmp, params.payload ? params.payload.callback : null);
         }
     }
 })
-

@@ -42,7 +42,7 @@
         helper.lib.panelLibCore.setActive(cmp, event.getParam('arguments').active);
     },
 
-    onNotify: function(cmp, event) {
+    onNotify: function(cmp, event, helper) {
         var params = event.getParams();
         if (params && params.action === 'destroyPanel' && params.typeOf === 'ui:destroyPanel' && !params.payload) {
             //contained component tries to close the panel but doesn't have access to this panelInstance
@@ -50,6 +50,9 @@
             params.payload = {
                 panelInstance: cmp.getGlobalId()
             }
+        } else if (params && params.action === 'closePanel') {
+        	event.stopPropagation();
+        	helper.close(cmp, params.payload ? params.payload.callback : null);
         }
     },
 

@@ -132,6 +132,9 @@
                 typeOf: 'ui:destroyPanel',
                 payload: {panelInstance: cmp.getGlobalId()}
             }).fire();
+            if ($A.util.isFunction(callback)) {
+            	callback();
+            }
         });
     },
 

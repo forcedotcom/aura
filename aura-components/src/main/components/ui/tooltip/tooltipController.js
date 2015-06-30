@@ -20,5 +20,11 @@
 
     hide: function(component, event, helper) {
     	helper.hide(component);
+    },
+
+    handleKeyPress: function(component, event, helper) {
+    	if(event.keyCode === 13) {
+    		helper.toggle(component);
+    	}
     }
 })

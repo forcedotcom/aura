@@ -40,7 +40,7 @@
     <aura:method name="show" access="INTERNAL"/>
     <aura:method name="hide" access="INTERNAL"/>
     <aura:if isTrue="{!v.advanced}">
-        <div class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger'}" aria-describedby="{!v.domId}" tabindex="{!v.tabIndex}">
+        <div class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger'}" aria-describedby="{!v.domId}" tabindex="{!v.tabIndex}" onkeypress="{!c.handleKeyPress}">
             {!v.body}
             <div class="uiTooltip advanced-wrapper" aura:flavorable="true" aura:id="tooltip" aria-hidden="{!!v.isVisible}">
                 <div class="{!v.classList}">

@@ -332,6 +332,7 @@ function (scrollUtil) {
                     this.setFocus(cmp);
                 }
             } else if ($A.util.hasClass(panel, 'active')) {
+                cmp.returnFocus = document.activeElement;
                 $A.util.removeClass(panel, 'active');
                 panel.setAttribute('aria-hidden', 'true');
             }
@@ -388,8 +389,13 @@ function (scrollUtil) {
          * @private
          */
         setFocus: function(cmp) {
-            var focusables = this.getFocusables(cmp.getElement());
-            focusables.initial && focusables.initial.focus();
+            if(cmp.returnFocus) {
+                cmp.returnFocus.focus();
+            } else {
+                var focusables = this.getFocusables(cmp.getElement());
+                focusables.initial && focusables.initial.focus();
+            }
+            
         },
         scopeScroll: function (dom) {
             scrollUtil.scope(dom);

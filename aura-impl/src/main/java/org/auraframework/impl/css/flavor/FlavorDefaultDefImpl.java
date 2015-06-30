@@ -151,7 +151,8 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
     @Override
     public void validateReferences() throws QuickFixException {
         if (singleComponent != null) {
-            if (!singleComponent.getDef().hasFlavorableChild() && !singleComponent.getDef().isDynamicallyFlavorable()) {
+            ComponentDef def = singleComponent.getDef();
+            if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
                 throw new InvalidDefinitionException(String.format("%s must contain at least one aura:flavorable element",
                         singleComponent), getLocation());
             }

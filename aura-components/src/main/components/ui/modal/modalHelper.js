@@ -121,24 +121,31 @@
                  mask.style.opacity = '0';
             }, 50);
         }
-        
-        // mask.classList.remove('fadein');
+
         if(closeAnimation) {
             animationName = closeAnimation;
         }
+
+        var timeout;
+        var onFinish = function() {
+            clearTimeout(timeout);
+            $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
+            if(callback) { //give time for all transitions to complete
+                setTimeout(callback, 2);
+            }
+        };
 
 
         var config = {
             useTransition: useTransition,
             animationName: 'moveto' + animationName,
             animationEl: panel,
-            onFinish: function() {
-                $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
-                if(callback) { //give time for all transitions to complete
-                    setTimeout(callback, 2);
-                }
-            }
+            onFinish: onFinish
         };
+
+        // This makes sure cleanup happens in case onTransitionEnd
+        // does not fire.
+        timeout = setTimeout(onFinish, 600);
 
         if(closeAnimation) {
             config.animationName = 'moveto' + closeAnimation;

@@ -41,7 +41,7 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                 <p><ui:tooltip tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
                     <p>
-                        <ui:tooltip disabled="true" fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="Please?">
+                        <ui:tooltip fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="Please?">
                             <span>Fade out only</span>
                         </ui:tooltip>
                     </p>

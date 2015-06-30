@@ -39,7 +39,13 @@
     transition: opacity 2s;
 }
 
+.THIS .container {
+    position: relative;
+    z-index: 2;
+}
+
 .THIS .pointer {
+    z-index: 1;
     width: calc(1.25rem + .0625rem);
     height: calc(1.25rem + .0625rem);
     -webkit-transform: rotate(45deg);

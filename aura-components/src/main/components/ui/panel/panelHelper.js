@@ -90,15 +90,17 @@
             panelEl.style.opacity = '0';
             panelEl.style.display = 'block';
             this.position(cmp, referenceEl, function() {
-                panelEl.style.opacity = '1';
-                self.lib.panelLibCore.show(cmp, conf);
+                self.positioningLib.panelPositioning.reposition();
+                
+                requestAnimationFrame(function() {
+                    panelEl.style.opacity = '1';
+                    self.lib.panelLibCore.show(cmp, conf);
+                });
+                
             });
         } else {
             this.lib.panelLibCore.show(cmp, conf);
         }
-
-       
-
         
     },
 
@@ -252,8 +254,6 @@
                     pad: 5
                 }));
             }
-            
-
             this.positioningLib.panelPositioning.reposition(callback);
         } else {
             this.positioningLib.panelPositioning.reposition(callback);

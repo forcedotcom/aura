@@ -39,13 +39,13 @@ import com.google.common.collect.Lists;
 
 @ThreadHostileTest("TestLoggingAdapter not thread-safe")
 @TargetBrowsers(BrowserType.GOOGLECHROME)
-public class CSPReportLoggingTest extends WebDriverTestCase {
+public class CSPReportLoggingUITest extends WebDriverTestCase {
 
     private static final String STATUS_OK = "200";
     private static final String SOURCE_SUFFIX = "aura_auto.js";
     private static final String APP_SOURCE_SUFFIX = "app.js";
 
-    public CSPReportLoggingTest(String name) {
+    public CSPReportLoggingUITest(String name) {
         super(name);
     }
 

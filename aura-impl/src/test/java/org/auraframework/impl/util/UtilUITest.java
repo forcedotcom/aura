@@ -20,9 +20,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
 
-public class UtilUiTest extends WebDriverTestCase {
+public class UtilUITest extends WebDriverTestCase {
 
-	public UtilUiTest(String name) {
+	public UtilUITest(String name) {
 		super(name);
 	}
 

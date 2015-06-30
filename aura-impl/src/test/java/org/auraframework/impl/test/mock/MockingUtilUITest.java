@@ -42,11 +42,11 @@ import com.google.common.collect.Lists;
 
 @UnAdaptableTest("W-2329849: Failing on SFDC but passing on standalone ios-driver builds. Needs investigation")
 @Controller
-public class MockingUtilTest extends WebDriverTestCase {
+public class MockingUtilUITest extends WebDriverTestCase {
 
     private MockingUtil mockingUtil;
 
-    public MockingUtilTest(String name) {
+    public MockingUtilUITest(String name) {
         super(name);
     }
 

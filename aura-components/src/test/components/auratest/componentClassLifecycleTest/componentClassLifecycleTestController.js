@@ -17,7 +17,6 @@
 	createCmp : function(cmp, event, helper) {
 		
 		var cmpDef = cmp.get("v.cmpDef");
-		debugger;
 		var errorOutFrom = cmp.get("v.errorOutFrom");
         //componentDef : "markup://auratest:componentClassParent",
 		var componentConfig = {

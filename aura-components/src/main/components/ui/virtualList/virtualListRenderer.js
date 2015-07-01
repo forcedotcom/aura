@@ -35,7 +35,6 @@
         this.superAfterRender();
 	},
     rerender: function (cmp, helper) {
-        debugger;
         this.superRerender();
 
         var container = helper.getListBody(cmp),

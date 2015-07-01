@@ -113,7 +113,6 @@
 				var pointer = tt._tooltip.querySelector('.pointer');
 				var bb = content.getBoundingClientRect();
 				var pbb = pointer.getBoundingClientRect();
-				debugger;
 				$A.test.assertTrue(bb.left < 0, 'The content can leave the view port');
 				$A.test.assertTrue(pbb.left-5 > bb.left, 'The poiner should stay inside the box');
 				tt.hide(tt);

@@ -1472,6 +1472,7 @@ Component.prototype.removeDocumentLevelHandler = function(dlh) {
  * Forces the final destroy of a component (after async).
  */
 Component.prototype.finishDestroy = function() {
+    this._scheduledForAsyncDestruction = false;
     this.destroy(false);
 };
 

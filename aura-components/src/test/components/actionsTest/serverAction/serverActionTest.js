@@ -228,23 +228,6 @@
     },
     
     /************************************ Test for Concurrent Server Action starts ***********************************/
-    
-    
-    getTwoActionsWithSameSignature : function(cmp, actionName, parames, storable1, storable2, carboose1, carboose2) {
-    	//create two actions with same signature
-		var a1Return = undefined;
-		var a2Return = undefined;
-		var recordObjCounterFromA1 = undefined;
-        var a1 = $A.test.getAction(cmp, actionName, parames);
-        var a2 = $A.test.getAction(cmp, actionName, parames);
-        //just fyi, Storable actions will be abortable
-        if(storable1) { a1.setStorable(); } 
-        if(storable2) { a2.setStorable(); }
-        if(carboose1) { a1.setCaboose(); }
-        if(carboose2) { a2.setCaboose(); }
-        return [a1,a2];
-    },
-    
     /*
      * enqueue two actions with same signature, go offline, verify both of them return with INCOMPLETE 
      */
@@ -253,9 +236,10 @@
             var currentTransactionId = $A.getCurrentTransactionId();
     		//create two actions with same signature
             //also set current transcationId to be the same as first abortable action
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
-    				{i:2}, true, true);
-            var a1 = actionlst[0], a2 = actionlst[1];
+            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+            a1.setStorable();
+            a2.setStorable();
             //do some sanity check callbacks
             a1.setCallback(cmp, function(action) {
             	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
@@ -314,7 +298,6 @@
 						}
 				);
             	a0.setStorable();//this will also make a0 abortable
-            	var a4enqueued = false;
             	$A.test.addWaitForWithFailureMessage(true, 
 	            		function() { return (a0.state === "SUCCESS"); },
 	            		"fail waiting for a0 to finish ",
@@ -323,10 +306,10 @@
 	     		                $A.test.setServerReachable(false);
 		     		            var a4 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:4},
 		     								function(action) {
-		     			            			$A.test.assertTrue(action.getState() === "INCOMPLETE", "a4 shouldn't get send to server");
+		     			            			$A.test.assertEquals("INCOMPLETE", action.getState(), "a4 shouldn't get send to server");
 		     			            			//a1 and a2 are aborted after we enqueue a4
-		     			            			$A.test.assertTrue(a1.getState() === "ABORTED", "a1 should get aborted");
-		     			            			$A.test.assertTrue(a2.getState() === "ABORTED", "a2 should get aborted");
+		     			            			$A.test.assertEquals("ABORTED", a1.getState(), "a1 should get aborted");
+		     			            			$A.test.assertEquals("ABORTED", a2.getState(), "a2 should get aborted");
 		     								}
 		     					);
 		     			        a4.setAbortable();
@@ -341,10 +324,10 @@
 	            );
 				
 				//now enqueue two storable&abortable server actions with same signature
-				var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
-	    				{i:2}, true, true, true, true);
-	            var a1 = actionlst[0], a2 = actionlst[1];
-	            
+            	var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+                var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:2});
+                a1.setStorable(); a1.setCaboose();
+                a2.setStorable(); a2.setCaboose();
 	            //enqueue a0,a1 and a2, we will only send out a0, keep a1 in the actionsDeferred queue, a2 is stored
 	            //as a1's dupe.
 	            $A.run(
@@ -358,7 +341,7 @@
 				//now we enqueue another server action a3, this will send previous caboose actions: a1 and a2 
 	            var a3 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:3},
 						function(action) {
-							$A.test.assertTrue(action.getState() === "INCOMPLETE", "a3 shouldn't get send to server");
+							$A.test.assertEquals("INCOMPLETE", action.getState(), "a3 shouldn't get send to server");
 						}
 				);
 	            $A.enqueueAction(a3); 
@@ -377,22 +360,23 @@
     		var a1Return = undefined, a2Return = undefined;
     		var recordObjCounterFromA1 = undefined;
     		//create two actions with same signature
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInBackgroundWithReturn",
-    				{i : 1}, true, true);
-            var a1 = actionlst[0], a2 = actionlst[1];
+    		var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
+            a1.setStorable(); 
+            a2.setStorable(); 
             //we check response in callbacks
             a1.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	$A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
             	a1Return = action.getReturnValue();
-            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	$A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
             	recordObjCounterFromA1 = a1Return.recordObjCounter;
             	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
             });
             a2.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from 1st, but not from storage");
+            	$A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
             	a2Return = action.getReturnValue();
-            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
-            	$A.test.assertTrue(a2Return.recordObjCounter===recordObjCounterFromA1, "2nd action should get a copy response from 1st action");
+            	$A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+            	$A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
             });
             //make sure both ations get schedule to send in a same XHR box
             $A.enqueueAction(a1); 
@@ -414,19 +398,20 @@
     testConcurrentServerActionsBothStorable1stActionErrorOut : {
         test : [ function(cmp) {
     		//create two actions with same signature
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.errorInForeground",
-    				null, true, true);
-            var a1 = actionlst[0], a2 = actionlst[1];
+        	var a1 = $A.test.getAction(cmp, "c.errorInForeground", null);
+            var a2 = $A.test.getAction(cmp, "c.errorInForeground", null);
+            a1.setStorable(); 
+            a2.setStorable(); 
             //we check response in callbacks
             a1.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
-            	$A.test.assertTrue(action.state === "ERROR", "we expect 1st action to error out on server");
+            	$A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
+            	$A.test.assertEquals("ERROR", action.state, "we expect 1st action to error out on server");
             	$A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
             			"expect error message from 1st action");
             });
             a2.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "2st action should get response from 1st action");
-            	$A.test.assertTrue(action.state === "ERROR", "we expect 2nd action to get error response like 1st action");
+            	$A.test.assertFalse(action.isFromStorage(), "2st action should get response from 1st action");
+            	$A.test.assertEquals("ERROR", action.state, "we expect 2nd action to get error response like 1st action");
             	$A.test.assertTrue(action.error[0].message.indexOf("ArrayIndexOutOfBoundsException: 42") > 0,
             			"expect error message from 2nd action");
             });
@@ -456,22 +441,23 @@
     		var a1Return = undefined, a2Return = undefined;
     		var recordObjCounterFromA1 = undefined;
     		//create two actions with same signature
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
-    				{i : 1}, true, true);
-            var a1 = actionlst[0], a2 = actionlst[1];
+    		var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a1.setStorable(); 
+            a2.setStorable(); 
             //we check response in callbacks
             a1.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	$A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
             	a1Return = action.getReturnValue();
-            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	$A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
             	recordObjCounterFromA1 = a1Return.recordObjCounter;
             	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
             });
             a2.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from 1st, but not from storage");
+            	$A.test.assertFalse(action.isFromStorage(), "2nd action should get response from 1st, but not from storage");
             	a2Return = action.getReturnValue();
-            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
-            	$A.test.assertTrue(a2Return.recordObjCounter===recordObjCounterFromA1, "2nd action should get a copy response from 1st action");
+            	$A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+            	$A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
             });
             //make sure both ations get schedule to send in a same XHR box
             $A.run(
@@ -482,8 +468,12 @@
             );
             //just need to make sure both actions get some return
             $A.test.addWaitForWithFailureMessage(true, 
-            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
-            		"fail waiting for both action returns something"
+            		function() { return (a1Return!==undefined); },
+            		"fail waiting for action 1 returns something"
+            );
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a2Return!==undefined); },
+            		"fail waiting for action 2 returns something"
             );
         } 
         ]
@@ -499,21 +489,21 @@
     		var a1Return = undefined, a2Return = undefined;
     		var recordObjCounterFromA1 = undefined;
     		//create two actions with same signature
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
-    				{i : 1}, false, true);
-            var a1 = actionlst[0], a2 = actionlst[1];
+    		var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a2.setStorable();
             //we check response in callbacks
             a1.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	$A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
             	a1Return = action.getReturnValue();
-            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	$A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
             	recordObjCounterFromA1 = a1Return.recordObjCounter;
             	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
             });
             a2.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should get response from server, as 1st isn't storable");
+            	$A.test.assertFalse(action.isFromStorage(), "2nd action should get response from server, as 1st isn't storable");
             	a2Return = action.getReturnValue();
-            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
             	$A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should get response from server, after 1st");
             });
             //make sure both ations get schedule to send in a same XHR box
@@ -525,8 +515,12 @@
             );
             //just need to make sure both actions get some return
             $A.test.addWaitForWithFailureMessage(true, 
-            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
-            		"fail waiting for both action returns something"
+            		function() { return (a1Return!==undefined); },
+            		"fail waiting for action 1 returns something"
+            );
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a2Return!==undefined); },
+            		"fail waiting for action 2 returns something"
             );
         } 
         ]
@@ -542,21 +536,21 @@
     		var a1Return = undefined, a2Return = undefined;
     		var recordObjCounterFromA1 = undefined;
     		//create two actions with same signature
-    		var actionlst = this.getTwoActionsWithSameSignature(cmp, "c.executeInForegroundWithReturn",
-    				{i : 1}, true, false);
-            var a1 = actionlst[0], a2 = actionlst[1];
+    		var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a2.setStorable();
             //we check response in callbacks
             a1.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "1st action should get response from server");
+            	$A.test.assertFalse(action.isFromStorage(), "1st action should get response from server");
             	a1Return = action.getReturnValue();
-            	$A.test.assertTrue(a1Return.Counter===1, "counter of 1nd action should be 1");
+            	$A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
             	recordObjCounterFromA1 = a1Return.recordObjCounter;
             	$A.test.assertTrue(recordObjCounterFromA1!==undefined, "expect to get recordObjCounter from 1st action");
             });
             a2.setCallback(cmp, function(action) {
-            	$A.test.assertTrue(action.isFromStorage() === false, "2nd action should send to server");
+            	$A.test.assertFalse(action.isFromStorage(), "2nd action should send to server");
             	a2Return = action.getReturnValue();
-            	$A.test.assertTrue(a2Return.Counter===1, "counter of 2nd action should be 1");
+            	$A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
             	$A.test.assertTrue(a2Return.recordObjCounter > recordObjCounterFromA1, "2nd action should send to server, after 1st");
             });
             //make sure both ations get schedule to send in a same XHR box
@@ -568,8 +562,12 @@
             );
             //just need to make sure both actions get some return
             $A.test.addWaitForWithFailureMessage(true, 
-            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
-            		"fail waiting for both action returns something"
+            		function() { return (a1Return!==undefined); },
+            		"fail waiting for action1 returns something"
+            );
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a2Return!==undefined); },
+            		"fail waiting for action2 returns something"
             );
         } 
         ]

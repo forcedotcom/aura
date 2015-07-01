@@ -69,7 +69,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
             "aura.num"      : auraXHR.marker,
             "requestLength" : auraXHR.length,
             "actionDefs"    : actionDefs,
-            "requestId"     : options && options["requestId"]
+            "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
         };
     }
     return ret;

@@ -42,6 +42,10 @@
         helper.lib.panelLibCore.setActive(cmp, event.getParam('arguments').active);
     },
 
+    onRefChange: function(cmp, event, helper) {
+        helper.reposition(cmp);
+    },
+
     onNotify: function(cmp, event, helper) {
         var params = event.getParams();
         if (params && params.action === 'destroyPanel' && params.typeOf === 'ui:destroyPanel' && !params.payload) {

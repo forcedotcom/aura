@@ -40,7 +40,12 @@
     },
 
     onCloseBtnPressed: function(cmp, evt, helper) {
-        helper.close(cmp);
+        var closeAction = cmp.get('v.closeAction');
+        if ($A.util.isFunction(closeAction)) {
+            closeAction(cmp);
+        } else {
+            helper.close(cmp);
+        }
     },
 
     update: function(cmp, event, helper){

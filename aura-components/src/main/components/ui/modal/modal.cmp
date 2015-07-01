@@ -24,6 +24,8 @@
     <aura:attribute name="class" type="String" description="CSS class" />
     <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>
+    <aura:attribute name="closeButton" type="Aura.Component[]" />
+    <aura:attribute name="closeAction" type="Object" description="Overrides default close action (which is destroy) when close button is clicked." />
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
     <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel." />
     <aura:attribute name="animation" type="String" default="center" description="Adds animation to the dialog"/>
@@ -32,8 +34,6 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
-    
-    <aura:attribute name="closeButton" type="Aura.Component[]" />
     
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
     

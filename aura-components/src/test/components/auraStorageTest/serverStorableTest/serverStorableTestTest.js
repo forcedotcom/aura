@@ -401,6 +401,7 @@
      * Verify that new action defs can be introduced at client on the fly.
      * Chaining an action whose definition is not known to client.
      */
+    _testNewStorableActionDefsInResponse:{
         test:[function(cmp){
             //
             $A.test.setTestTimeout(30000);

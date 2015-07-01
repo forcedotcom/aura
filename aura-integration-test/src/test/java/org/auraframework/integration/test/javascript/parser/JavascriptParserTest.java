@@ -48,6 +48,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.instance.Action.State;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.ServiceLocator;
@@ -509,17 +510,15 @@ public class JavascriptParserTest extends AuraImplTestCase {
                 "testWithObjectFunction 'test' must be a function or an array of functions");
     }
 
-    private void assertInvalidTestCase(String suiteContent,
-            String expectedMessageStartsWith) throws Exception {
-        DefDescriptor<TestSuiteDef> desc = addSourceAutoCleanup(
-                TestSuiteDef.class, suiteContent);
+    private void assertInvalidTestCase(String suiteContent, String expectedMessageStartsWith) throws Exception {
+        DefDescriptor<TestSuiteDef> desc = addSourceAutoCleanup(TestSuiteDef.class, suiteContent);
         Source<TestSuiteDef> source = getSource(desc);
+        TestSuiteDef d = parser.parse(desc, source);
         try {
-            parser.parse(desc, source);
+            d.validateDefinition();
             fail("Invalid testsuite: Every test case should have a function assigned to it");
-        } catch (AuraRuntimeException expected) {
-            assertTrue(expected.getMessage().startsWith(
-                    expectedMessageStartsWith));
+        } catch (QuickFixException expected) {
+            assertTrue(expected.getMessage().startsWith(expectedMessageStartsWith));
         }
     }
 

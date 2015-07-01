@@ -82,7 +82,8 @@
             self.setDatepickerAttribute(cmp, 'v.titleHeadingLevel', 'h3')
             dpCmp.getDef().getHelper().setTitleTag(dpCmp);
 
-            //get the titleHeadingLevel
+
+            //initial attribute assertion
             var datepicker_v_titleHeadingLevel = self.getDatepickerAttribute(cmp, 'v.titleHeadingLevel');
             var datepicker_calTitle_v_tag = self.getDatepickerAttribute(cmp, 'v.tag', 'calTitle').toUpperCase();
             var datepicker_calTitle_TagName = self.getDatepickerCalTitleTagName();
@@ -95,23 +96,6 @@
                 datepicker_calTitle_v_tag
             );
 
-            //assertion of title tag name
-            $A.test.assertEquals(
-                'H2',
-                datepicker_calTitle_TagName,
-                'calTitle tag name should be an "H2"'
-            )
-
-            //TODO: currently the datepicker code doesn't care about the 
-            // calTitle.v.tag
-            // calTitle tag name will always be H2
-            // 
-            // $A.test.assertEquals(
-            //     'H3',
-            //     datepicker_calTitle_TagName,
-            //     'calTitle tag name should be an "H3"'
-            // )
-
             $A.test.assertEquals(
                 'H3',
                 datepicker_calTitle_v_tag,
@@ -122,7 +106,214 @@
             $A.test.assertEquals(
                 'H3',
                 datepicker_v_titleHeadingLevel.toUpperCase(),
-                'datepicker_v_titleHeadingLevel  should be H3'
+                'datepicker_v_titleHeadingLevel should be "H3"'
+            );
+            
+            // TODO: fix the re-rendered block
+            // //rerender
+            // $A.rerender(cmp);
+
+            // //set tag
+            // $A.test.addWaitForWithFailureMessage(
+            //     'H3',
+            //     function(){//testFunction
+            //         return self.getDatepickerCalTitleTagName();
+            //     },
+            //     'Custom tag should be re-rendered as H3',
+            //     function(){//callback
+            //         //get the titleHeadingLevel
+            //         var datepicker_calTitle_TagName = self.getDatepickerCalTitleTagName();
+
+            //         //set for view purposes
+            //         self.setDatepickerTitleAttributes(
+            //             cmp,
+            //             datepicker_calTitle_TagName,
+            //             self.getDatepickerAttribute(cmp, 'v.titleHeadingLevel'),
+            //             self.getDatepickerAttribute(cmp, 'v.tag', 'calTitle').toUpperCase()
+            //         );
+
+            //         $A.test.assertEquals(
+            //             'H3',
+            //             datepicker_calTitle_TagName,
+            //             'calTitle tag name should be an "H3"'
+            //         )
+            //     }
+            // );
+        }]
+    },
+
+    //test the default value of setFocus in datepicker
+    testSetFocusOnDatepickerGridDefaultVal: {
+        attributes : {"renderItem" : "testSetFocusOnDatepickerGridDefaultVal"},
+        test: [function(cmp) {
+            var self = this;
+            var setFocusBool = $A.util.getBooleanValue(
+                self.getDatepickerAttribute(cmp, 'v.setFocus')
+            );
+
+            var setFocusBool_dpGrid = $A.util.getBooleanValue(
+                self.getDatepickerGridCmp(cmp).get('v._setFocus')
+            );
+
+            //set this for view in the ui
+            self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
+            self.setDebugCmpAttribute(cmp, 'v.dpGrid_v_setFocus', setFocusBool_dpGrid);
+
+            //assertion 
+            $A.test.assertTrue(
+                setFocusBool,
+                'datePicker.setFocus should be true'
+            )
+
+            $A.test.assertTrue(
+                setFocusBool_dpGrid,
+                'datePickergrid._setFocus should be true'
+            )
+        }]
+    },
+
+    //test how datepicker behaves when setFocus=true
+    testSetFocusOnDatepickerGridTrue: {
+        attributes : {"renderItem" : "testDatepickerSetFocus"},
+        test: [function(cmp) {
+            var self = this;
+
+            //set date value
+            self.setDateValue(
+                cmp,
+                2015,//year
+                7,//month
+                1//day
+            );
+
+
+            //set setFocus=true
+            self.setDatepickerAttribute(cmp, 'v.setFocus', true);
+        }, function(cmp){
+            var self = this;
+
+            //get value and assertion
+            //get values
+            var setFocusBool = $A.util.getBooleanValue(
+                self.getDatepickerAttribute(cmp, 'v.setFocus')
+            );
+
+            //set this for view in the ui
+            self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
+
+            //assertion 
+            $A.test.assertTrue(
+                setFocusBool,
+                'dp_v_setFocus should be true'
+            )
+        }, function(cmp){
+            //assert focus state (expected null)
+            var self = this;
+
+            //show datepicker
+            self.showDatepicker();
+
+            //wait for datepicker to pop
+            $A.test.addWaitForWithFailureMessage(
+                1,
+                function(){// testFunction
+                    return $A.test.select('.visible.uiDatePicker').length;
+                },
+                'datepicker grid is not shown',
+                function(){// callback
+                    //attribute showing active element class list
+                    var activeElm = $A.test.getActiveElement();
+                    var tagName = self.getTagName(activeElm);
+
+                    cmp.set('v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
+                    cmp.set('v.activeElm_tagName', tagName);
+
+                    //assert focus state
+                    $A.test.assertTrue(
+                        $A.util.hasClass(activeElm, 'uiDayInMonthCell'),
+                        'with SetFocus=true, focused elm should have a class named "uiDayInMonthCell"'
+                    );
+
+                    $A.test.assertEquals(
+                        'A',
+                        tagName,
+                        'with SetFocus=true, focused elm should be an "A" tag'
+                    );
+                }
+            );
+        }]
+    },
+
+    //test how datepicker behaves when setFocus=false
+    testSetFocusOnDatepickerGridFalse: {
+        attributes : {"renderItem" : "testDatepickerSetFocus"},
+        test: [function(cmp) {
+            var self = this;
+
+            //set date value
+            self.setDateValue(
+                cmp,
+                2015,//year
+                7,//month
+                1//day
+            );
+
+            //set setFocus=false
+            self.setDatepickerAttribute(cmp, 'v.setFocus', false);
+        }, function(cmp){
+            var self = this;
+
+            //get value and assertion
+            //get values
+            var setFocusBool = $A.util.getBooleanValue(
+                self.getDatepickerAttribute(cmp, 'v.setFocus')
+            );
+
+            //set this for view in the ui
+            self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
+
+            //show datepicker
+            self.showDatepicker();
+
+            //assertion 
+            $A.test.assertFalse(
+                setFocusBool,
+                'dp_v_setFocus should be false'
+            )
+        }, function(cmp){
+            //assert focus state (expected null)
+            var self = this;
+
+            //show datepicker
+            self.showDatepicker();
+
+            //wait for datepicker to pop
+            $A.test.addWaitForWithFailureMessage(
+                1,
+                function(){// testFunction
+                    return $A.test.select('.visible.uiDatePicker').length;
+                },
+                'datepicker grid is not shown',
+                function(){// callback
+                    //attribute showing active element class list
+                    var activeElm = $A.test.getActiveElement();
+                    var tagName = self.getTagName(activeElm);
+
+                    cmp.set('v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
+                    cmp.set('v.activeElm_tagName', tagName);
+
+                    //assert focus state
+                    $A.test.assertFalse(
+                        $A.util.hasClass(activeElm, 'uiDayInMonthCell'),
+                        'with SetFocus=true, focused elm should NOT have a class named "uiDayInMonthCell"'
+                    );
+
+                    $A.test.assertEquals(
+                        'BODY',
+                        tagName,
+                        'with SetFocus=true, focused elm should be an "BODY" tag'
+                    );
+                }
             );
         }]
     },
@@ -200,5 +391,12 @@
     showDatepicker: function(){
         // clicking on the datepicker open icon
         $A.test.clickOrTouch( $A.test.select('.datePicker-openIcon')[0]);
+    },
+    setDateValue: function(cmp, date, month, year){
+        var self = this;
+        var dpGrid = self.getDatepickerGridCmp(cmp);
+        dpGrid.set("v.date", date);
+        dpGrid.set("v.month", month);
+        dpGrid.set("v.year", year);
     }
 })

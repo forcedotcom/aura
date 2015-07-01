@@ -155,9 +155,12 @@
     },
 
     selectToday: function(component, event, helper) {
-        var mDate = moment();
+        var value = component.get("v._today");
+        if (!value) {
+        	value = moment().format("YYYY-MM-DD");
+        }
         var selectDateEvent = component.getEvent("selectDate");
-        selectDateEvent.setParams({"value": mDate.format("YYYY-MM-DD")});
+        selectDateEvent.setParams({"value": value});
         selectDateEvent.fire();
         if (component.get("v.hideOnSelect")) {
             component.set("v.visible", false);

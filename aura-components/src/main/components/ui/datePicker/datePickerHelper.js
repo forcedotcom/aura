@@ -211,7 +211,13 @@
     },
 
     localizeToday: function(component) {
-        var todayCmp = component.find("today");
+    	// Get today's date based on the time zone
+        $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
+    		component.set("v._today", dateString);
+        });
+        
+        // Get the localized "Today" label
+    	var todayCmp = component.find("today");
         if (!todayCmp) {
             return;
         }
@@ -368,13 +374,18 @@
             }
         }
     },
-
+    
     setGridInitialValue: function(component) {
         var initialDate = new Date();
+        var initialDateStr = component.get("v._today");
         var value = component.get("v.value");
         if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
             var d = moment(value, "YYYY-MM-DD");
             initialDate = d.toDate();
+        } else {
+        	if (initialDateStr) {
+        		initialDate = (moment(initialDateStr, "YYYY-MM-DD")).toDate();
+        	}
         }
         var grid = component.find("grid");
         if (grid) {
@@ -382,6 +393,7 @@
             grid.set("v.date", initialDate.getDate());
             grid.set("v.month", initialDate.getMonth());
             grid.set("v.year", initialDate.getFullYear());
+            grid.set("v._today", initialDateStr);
         }
 
         // set initial value to time picker if hasTime is true
@@ -395,6 +407,41 @@
             }
         }
     },
+
+    /*
+    setGridInitialValue: function(component) {
+        var initialDateStr = component.get("v._today");
+        var initialDate = initialDateStr ? (moment(initialDateStr, "YYYY-MM-DD")).toDate() : new Date();
+        var value = component.get("v.value");
+        if (!$A.util.isUndefinedOrNull(value) && !$A.util.isEmpty(value)) {
+            var d = moment(value, "YYYY-MM-DD");
+            initialDate = d.toDate();
+        }
+        this.setGridValues(component, initialDate, initialDateStr);
+    },
+    
+    setGridValues: function(component, initialDate, todayStr) {
+    	var grid = component.find("grid");
+        if (grid) {
+            grid.set("v.selectedDate", initialDate.getFullYear() + "-" + (initialDate.getMonth() + 1) + "-" + initialDate.getDate());
+            grid.set("v.date", initialDate.getDate());
+            grid.set("v.month", initialDate.getMonth());
+            grid.set("v.year", initialDate.getFullYear());
+            grid.set("v._today", todayStr);
+        }
+
+        // set initial value to time picker if hasTime is true
+        var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
+        if (hasTime) {
+            var timePickerCmp = component.find("time");
+            if (timePickerCmp) {
+                timePickerCmp.set("v.hours", component.get("v.hours"));
+                timePickerCmp.set("v.is24HourFormat", component.get("v.is24HourFormat"));
+                timePickerCmp.set("v.minutes", component.get("v.minutes"));
+            }
+        }
+    },
+    */
     
     setTitleTag: function(component) {
     	var headingLevel = component.get("v.titleHeadingLevel");

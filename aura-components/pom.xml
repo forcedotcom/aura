@@ -62,6 +62,80 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>clean-registries</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <phase>clean</phase>
+                        <configuration>
+                        	<filesets>
+                        		<fileset>
+                        			<directory>src/main/components</directory>
+                        			<includes>
+                        				<include>.registries</include>
+                        			</includes>
+                        		</fileset>
+                        	</filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>compile-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>runtime</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/main/components</argument>
+                                <argument>${project.build.outputDirectory}/${component.dir}</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-test-components</id>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <phase>${component.test.compile.phase}</phase>
+                        <configuration>
+                            <executable>${java.home}/bin/java</executable>
+                            <classpathScope>test</classpathScope>
+                            <arguments>
+                                <argument>-Daura.home=${basedir}/..</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
+                                <argument>${basedir}/src/test/components</argument>
+                                <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
+                                <argument>auratest</argument>
+                                <argument>themeProviderTest</argument>
+                                <argument>flavorTest</argument>
+                                <argument>lintTest</argument>
+                                <argument>handleEventTest</argument>
+                                <argument>validationTest</argument>
+                                <argument>test</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
@@ -116,6 +190,25 @@
                                 </resource>
                             </resources>
                             <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+	                    <!-- copy back .registries to source tree -->
+                        <id>copy-registries</id>
+                        <phase>${component.compile.phase}</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.outputDirectory}/${component.dir}</directory>
+                                    <includes>
+                                        <include>.registries</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                            <outputDirectory>src/main/components</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -179,57 +272,6 @@
                         <goals>
                             <goal>run</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>compile-components</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>${component.compile.phase}</phase>
-                        <configuration>
-                            <executable>${java.home}/bin/java</executable>
-                            <classpathScope>runtime</classpathScope>
-                            <arguments>
-                                <argument>-Daura.home=${basedir}/..</argument>
-                                <argument>-classpath</argument>
-                                <classpath />
-                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
-                                <argument>${basedir}/src/main/components</argument>
-                                <argument>${project.build.outputDirectory}/${component.dir}</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile-test-components</id>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <phase>${component.test.compile.phase}</phase>
-                        <configuration>
-                            <executable>${java.home}/bin/java</executable>
-                            <classpathScope>test</classpathScope>
-                            <arguments>
-                                <argument>-Daura.home=${basedir}/..</argument>
-                                <argument>-classpath</argument>
-                                <classpath />
-                                <argument>org.auraframework.tools.definition.AuraCompiler</argument>
-                                <argument>${basedir}/src/test/components</argument>
-                                <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
-                                <argument>auratest</argument>
-                                <argument>themeProviderTest</argument>
-                                <argument>flavorTest</argument>
-                                <argument>lintTest</argument>
-                                <argument>handleEventTest</argument>
-                                <argument>validationTest</argument>
-                                <argument>test</argument>
-                            </arguments>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>

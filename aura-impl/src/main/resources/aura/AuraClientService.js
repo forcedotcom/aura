@@ -511,22 +511,22 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
             action.abort();
         }
         if (store) {
-        storage = action.getStorage();
+            storage = action.getStorage();
         }
         if (storage) {
             errorHandler = action.getStorageErrorHandler();
 
             if (!key) {
-            try {
-                key = action.getStorageKey();
-            } catch (e) {
-                if (errorHandler && $A.util.isFunction(errorHandler)) {
-                    errorHandler(e);
-                } else {
-                    $A.logger.auraErrorHelper(e, action);
+                try {
+                    key = action.getStorageKey();
+                } catch (e) {
+                    if (errorHandler && $A.util.isFunction(errorHandler)) {
+                        errorHandler(e);
+                    } else {
+                        $A.logger.auraErrorHelper(e, action);
+                    }
+                    return;
                 }
-                return;
-            }
             }
 
             toStore = action.getStored();
@@ -1466,8 +1466,7 @@ AuraClientService.prototype.finishCollection = function() {
         return;
     }
     if (this.actionsDeferred.length) {
-        // optionSend_v33
-        this.sendActionXHRsv33();
+        this.sendActionXHRs();
     }
 
     //
@@ -1484,9 +1483,10 @@ AuraClientService.prototype.finishCollection = function() {
 };
 
 /**
- * Send actions, mimicking v.33 behaviour.
+ * Send actions.
+ *
  */
-AuraClientService.prototype.sendActionXHRsv33 = function() {
+AuraClientService.prototype.sendActionXHRs = function() {
     var processing;
     var foreground = [];
     var background = [];
@@ -1530,13 +1530,11 @@ AuraClientService.prototype.sendActionXHRsv33 = function() {
             auraXHR.transactionId = transactionId;
             if (!this.send(auraXHR, foreground, "POST")) {
                 this.releaseXHR(auraXHR);
-                auraXHR = null;
             }
         }
-        if (!auraXHR) {
-            this.actionsDeferred = this.actionsDeferred.concat(foreground);
-        }
-    } else {
+    }
+    // If we don't have an XHR, that means we need to try to send later.
+    if (!auraXHR) {
         this.actionsDeferred = this.actionsDeferred.concat(foreground);
     }
 
@@ -1548,10 +1546,8 @@ AuraClientService.prototype.sendActionXHRsv33 = function() {
                 auraXHR.transactionId = transactionId;
                 if (!this.send(auraXHR, [ action ], "POST")) {
                     this.releaseXHR(auraXHR);
-                    auraXHR = null;
                 }
-            }
-            if (!auraXHR) {
+            } else {
                 this.actionsDeferred.push(action);
             }
         }
@@ -1667,7 +1663,7 @@ AuraClientService.prototype.getAndClearDupes = function(key) {
  * @param actions the set of actions to send.
  * @param method GET or POST
  * @param options extra options for the send, allows callers to set headers.
- * @return true if the actions were sent, otherwise false.
+ * @return true if the XHR was sent, otherwise false.
  */
 AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var actionsToSend = [];
@@ -1704,7 +1700,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             }),
             "aura.token" : this._token,
             "aura.context" : context.encodeForServer(), 
-        	"sid" : this._sid
+            "sid" : this._sid
         });
     } catch (e) {
         for (i = 0; i < actions.length; i++) {

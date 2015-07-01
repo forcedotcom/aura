@@ -269,7 +269,7 @@
     
     
     /*
-     * ALERT : Complex test setup.
+     * ALERT : ream test setup plz
      * 
      * Test for Two concurrent server actions with same signature get aborted during receive() when server is offline
      * I'm doing this using two caboose actions
@@ -292,31 +292,41 @@
         test : [ 
             function enqueueThreeActionsThenGoOffline(cmp) { 
             	//$A.test.setTestTimeout(60000000);
+            	var testCompleted = false;
             	var a0 = $A.test.getAction(cmp, "c.executeInBackground", null,
 						function(action) {
 							$A.test.assertTrue(action.isAbortable(), "what? we did just set a0 to be abortable");
 						}
 				);
             	a0.setStorable();//this will also make a0 abortable
+            	//we go offline and enqueue a4 when a0 come back with SUCCESS
             	$A.test.addWaitForWithFailureMessage(true, 
 	            		function() { return (a0.state === "SUCCESS"); },
 	            		"fail waiting for a0 to finish ",
-	            		function() {//we go offline and enqueue a4 when a0 come back SUCCESS
+	            		function() {
+	            			 //sanity check: make sure a1&a2 are not aborted yet
+	            			 $A.test.assertEquals("NEW", a1.getState(), "a1 should still be in New state");
+	            			 $A.test.assertEquals("NEW", a2.getState(), "a2 should still be in New state");
+	            			 //now let's hook our callback before send(), where we go offline and enqueue a4
 	            			 var preSendCallback = function(actions) {
-	     		                $A.test.setServerReachable(false);
+	     		                $A.test.setServerReachable(false);//go offline
+	     		                //make sure a4's callback get run
+		            			$A.test.addWaitForWithFailureMessage(true, function() { return testCompleted; }, "callback of a4 didn't get to run");
 		     		            var a4 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:4},
 		     								function(action) {
 		     			            			$A.test.assertEquals("INCOMPLETE", action.getState(), "a4 shouldn't get send to server");
-		     			            			//a1 and a2 are aborted after we enqueue a4
+		     			            			//we abort a1 and a2 in receive() after we enqueue a4
 		     			            			$A.test.assertEquals("ABORTED", a1.getState(), "a1 should get aborted");
 		     			            			$A.test.assertEquals("ABORTED", a2.getState(), "a2 should get aborted");
+		     			            			testCompleted = true;
+		     			            			$A.test.setServerReachable(true);//go back online
 		     								}
 		     					);
 		     			        a4.setAbortable();
 		     			        $A.run( 
 		     			            		function() { 	$A.enqueueAction(a4);  }
 		     			        );
-		     			        //we only need to do this once, once we are done, remove it
+		     			        //we only need to do this callback once, once we are done, remove it
 		     			        $A.test.removePrePostSendCallback(cb_handle);
 	     					}
 	     					var cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback, undefined );
@@ -346,6 +356,8 @@
 				);
 	            $A.enqueueAction(a3); 
 	            
+			}, function assertTestFinish(cmp) {
+				
 			}
 		]
     },

@@ -24,7 +24,7 @@
     implements="auraStorage:refreshObserver">
 
     <aura:dependency resource="auradocs:*" />
-    <aura:dependency resource="aurastorage:*" />
+    <aura:dependency resource="auraStorage:*" />
 
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>

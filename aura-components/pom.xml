@@ -88,7 +88,7 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>target/classes/components_aura_components</outputDirectory>
+                            <outputDirectory>${project.build.outputDirectory}/${component.dir}</outputDirectory>
                         </configuration>
                     </execution>
                     <execution>
@@ -115,7 +115,7 @@
                                     </includes>
                                 </resource>
                             </resources>
-                            <outputDirectory>target/classes/components_aura_components_test</outputDirectory>
+                            <outputDirectory>${project.build.testOutputDirectory}/${component.test.dir}</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -201,7 +201,7 @@
                                 <classpath />
                                 <argument>org.auraframework.tools.definition.AuraCompiler</argument>
                                 <argument>${basedir}/src/main/components</argument>
-                                <argument>${project.build.directory}/${component.dir}</argument>
+                                <argument>${project.build.outputDirectory}/${component.dir}</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -220,7 +220,7 @@
                                 <classpath />
                                 <argument>org.auraframework.tools.definition.AuraCompiler</argument>
                                 <argument>${basedir}/src/test/components</argument>
-                                <argument>${project.build.directory}/${component.test.dir}</argument>
+                                <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
                                 <argument>auratest</argument>
                                 <argument>themeProviderTest</argument>
                                 <argument>flavorTest</argument>

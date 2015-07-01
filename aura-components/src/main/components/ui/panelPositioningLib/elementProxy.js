@@ -92,9 +92,9 @@ function (w) {
         }
         var box, x, scrollTop, scrollLeft;
 
-        if(w.pageYOffset) {
-            scrollTop = pageYOffset;
-            scrollLeft = pageXOffset;
+        if(typeof w.pageYOffset !== 'undefined') {
+            scrollTop = w.pageYOffset;
+            scrollLeft = w.pageXOffset;
         } else {
             scrollTop = w.scrollY;
             scrollLeft = w.scrollX;
@@ -145,13 +145,14 @@ function (w) {
      * Computes and applies the positioning changes to the DOM
      */
     ElementProxy.prototype.bake = function() {
+
         var absPos = this._node.getBoundingClientRect();
         this._node.style.position = 'absolute';
         var style = w.getComputedStyle(this._node);
         var originalLeft, originalTop;
         var scrollTop, scrollLeft;
 
-        if(w.pageYOffset) {
+        if(typeof w.pageYOffset !== 'undefined') {
             scrollTop = w.pageYOffset;
             scrollLeft = w.pageXOffset;
         } else {
@@ -178,7 +179,6 @@ function (w) {
         
         this._node.style.left = (originalLeft + leftDif) + 'px';
         this._node.style.top = (originalTop+ topDif) + 'px';
-        
         this._dirty = false;
     };
 

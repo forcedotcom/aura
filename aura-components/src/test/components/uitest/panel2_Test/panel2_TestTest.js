@@ -431,8 +431,8 @@
     	}, function(cmp) {
     		this.waitForModalClose();
     	}, function(cmp) {
-    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
-    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		var ModalIdcreated = cmp.find("tester").find("idCreated").get("v.value");
+    		var ModalIdDestroyed = cmp.find("tester").find("idDestroyed").get("v.value");
     		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Modal is not destroyed correctly");
     	}]
     },
@@ -451,8 +451,8 @@
     	}, function(cmp) {
     		this.waitForPanelDialogClose();
     	}, function(cmp) {
-    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
-    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		var ModalIdcreated = cmp.find("tester").find("idCreated").get("v.value");
+    		var ModalIdDestroyed = cmp.find("tester").find("idDestroyed").get("v.value");
     		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Panel is not destroyed correctly");
     	}]
     },
@@ -472,8 +472,8 @@
     	}, function(cmp) {
     		this.waitForModalClose();
     	}, function(cmp) {
-    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
-    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		var ModalIdcreated = cmp.find("tester").find("idCreated").get("v.value");
+    		var ModalIdDestroyed = cmp.find("tester").find("idDestroyed").get("v.value");
     		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Modal is not destroyed correctly");
     	}]
     },
@@ -493,8 +493,8 @@
     	}, function(cmp) {
     		this.waitForPanelDialogClose();
     	}, function(cmp) {
-    		var ModalIdcreated = $A.test.select(".IdCreated")[0];
-    		var ModalIdDestroyed = $A.test.select(".IdDestroyed")[0];
+    		var ModalIdcreated = cmp.find("tester").find("idCreated").get("v.value");
+    		var ModalIdDestroyed = cmp.find("tester").find("idDestroyed").get("v.value");
     		$A.test.assertEquals($A.test.getText(ModalIdcreated), $A.test.getText(ModalIdDestroyed), "Panel is not destroyed correctly");
     	}]
     },
@@ -512,6 +512,117 @@
     		this.closePanel(cmp, "CloseLabel");
     	}, function(cmp) {
     		this.waitForPanelDialogClose();
+    	}]
+    },
+    
+    /**
+     * Test panel with reference element set
+     */
+    testPanelWithReferenceElementSet: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElement" : true, 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var expectedRefElId = cmp.find("appInput").getGlobalId() + ",";
+    		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
+    		$A.test.assertEquals(expectedRefElId, actualRefElId, "ReferenceElement's id is incorrect")
+    	}]
+    },
+    
+    /**
+     * Test panel with referenece element selector set
+     */
+    testPanelWithReferenceElementSelectorSet: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElementSelector" : true, 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    		// note: when using referenceElementSelector the referenceElement attribute is not set,
+    		// so we can not grab the id of the reference element in the test. We just verify the
+    		// panel displays without errors.
+    	}]
+    },
+    
+    /**
+     * Test panel with referece element and selector set
+     */
+    testPanelWithBothReferenceElementAttributesSet: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElement" : true, 
+    		"testUseReferenceElementSelector" : true,
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var expectedRefElId = cmp.find("appInput").getGlobalId() + ",";
+    		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
+    		$A.test.assertEquals(expectedRefElId, actualRefElId, "ReferenceElement's id is incorrect")
+    	}]
+    },
+    
+    /**
+     * Test panel with invalid reference element.
+     */
+    testPanelWithInvalidReferenceElement: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElement" : true, 
+    		"testReferenceElementSelector" : ".xyz",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
+    		$A.test.assertEquals("", actualRefElId, "ReferenceElement's id is incorrect")
+    	}]
+    },
+    
+    /**
+     * Test panel with empty reference element.
+     */
+    testPanelWithEmptyReferenceElement: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElement" : true, 
+    		"testReferenceElementSelector" : "empty",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
+    		$A.test.assertEquals("", actualRefElId, "ReferenceElement's id is incorrect")
+    	}]
+    },
+    
+    /**
+     * Test panel with null refernece element
+     */
+    testPanelWithNullReferenceElement: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testUseReferenceElement" : true, 
+    		"testReferenceElementSelector" : "null",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
+    		$A.test.assertEquals("", actualRefElId, "ReferenceElement's id is incorrect")
     	}]
     },
     
@@ -587,6 +698,6 @@
     },
     
     getGlobalIdForPanelModal : function(panelNumber){
-    	return $A.test.getText($A.test.select(".IdCreated")[panelNumber-1]);
+    	return $A.test.getText($A.test.select(".info .idCreated")[panelNumber-1]);
     }
 })

@@ -31,7 +31,7 @@
 	<aura:attribute name="autoFocus"    type="Boolean" default="true"/>
 	<aura:attribute name="direction"    type="String"  default="north"/>
 	<aura:attribute name="showPointer"  type="Boolean" default="false"/>
-	<aura:attribute name="referenceElement"         type="Object"/>
+	<aura:attribute name="useReferenceElementSelector" type="Boolean" default="false"/>
 	<aura:attribute name="useReferenceElement"      type="Boolean" default="false"/>
 	<aura:attribute name="referenceElementSelector" type="String"/>
 	<aura:attribute name="useHeader"    type="Boolean" default="false"/>
@@ -48,10 +48,12 @@
 	<aura:handler name="init" value="{!this}" action="{!c.init}"></aura:handler> 
 	
 	<div class="info">
-		<ui:outputText value="Create a panel to your liking"/>
+		<ui:outputText value="Create a panel to your liking"/> <br/><br/>
+		ID of NEW Panel/Modal created: <ui:outputText class="idCreated" aura:id="idCreated" value=""/> <br/>
+		ID of Destroyed Panel/Modal: <ui:outputText class="idDestroyed" aura:id="idDestroyed" value=""/> <br/>
+		ID of Reference Element: <ui:outputText class="idRefEl" aura:id="idRefEl" value=""/> <br/>
 	</div>
-	ID of NEW Panel/Modal created: <ui:outputText class="IdCreated" aura:id="IdCreated" value=""/> <br/><br/>
-	ID of Destroyed Panel/Modal: <ui:outputText class="IdDestroyed" aura:id="IdDestroyed" value=""/> <br/><br/>
+	
 	<div class="container">
 		<div class="testPanelModal">
 			<ui:inputText     aura:id="inputPanelType"          label="Panel Type"       value="{!v.panelType}"      class="inputPanelTypeClass"/>
@@ -69,6 +71,7 @@
 			<ui:inputCheckbox aura:id="inputAutoFocus"          label="Auto Focus"       value="{!v.autoFocus}"      class="inputAutoFocusClass"/>
 			<ui:inputText     aura:id="inputDirection"          label="Direction"        value="{!v.direction}"      class="inputDirectionClass"/>
 			<ui:inputCheckbox aura:id="inputShowPointer"        label="Show Pointer"     value="{!v.showPointer}"    class="inputShowPointerClass"/>
+			<ui:inputCheckbox aura:id="inputUseReferenceElementSelector" label="Use Reference Element Selector" value="{!v.useReferenceElementSelector}" class="inputUseReferenceElementSelector"/>
 			<ui:inputCheckbox aura:id="inputUseReferenceElement"      label="Use Reference Element"          value="{!v.useReferenceElement}"         class="inputUseReferenceElement"/>
 			<ui:inputText     aura:id="inputReferenceElementSelector" label="Reference Element Selector"     value="{!v.referenceElementSelector}"    class="inputReferenceElementSelector"/>
 			<ui:inputCheckbox aura:id="inputUseHeader"          label="Use Header"       value="{!v.useHeader}"      class="inputUseHeaderClass"/>
@@ -77,7 +80,8 @@
 			<ui:inputCheckbox aura:id="inputNonScrollable"     label="Non Scrollable Modal"  value="{!v.nonScrollable}" class="inputNonScrollableClass"/>
 			<ui:inputCheckbox aura:id="inputCustomizeCloseAction"     label="Customize CloseAction"  value="{!v.customizeCloseAction}" class="inputCustomizeCloseAction"/>
 			<ui:button aura:id="createPanelBtn" label="Create Panel" press="{!c.createPanel}" class="createPanelBtnClass"/>
-		</div>		
+		</div>
+		{!v.body}		
 	</div>
 		
 </aura:component>

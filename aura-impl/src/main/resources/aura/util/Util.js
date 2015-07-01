@@ -36,7 +36,7 @@ Aura.Utils.Util = function Util() {
     this.trashedComponentQueue = [];
     this.dataAttributeCache = {};
     this.debugToolWindow = undefined;
-    this.sizeEstimator = new SizeEstimator();
+    this.sizeEstimator = new Aura.Utils.SizeEstimator();
 };
 
 /**

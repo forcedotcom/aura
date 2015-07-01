@@ -27,26 +27,27 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
             Json:function() {},
             Style:function() {},
             Bitset:{},
-            NumberFormat:{}
+            NumberFormat:{},
+            SizeEstimator:function() {}
         }
     };
-    
+
     [Fixture]
     function browserSupportedTests() {
         var MockObject = {};
         for (var key in Object) { MockObject[key] = Object[key]; }
         MockObject.prototype = Object.create(Object.prototype);
-        
+
         MockObject.keys = function() {throw "KEYS";};
-        
+
         var MockFunction = function MockFunction() {};
         MockFunction.prototype = Object.create(Function.prototype);
-        
+
         MockFunction.prototype.bind = function() {throw "BIND";};
-        
+
         var MockArray = function MockArray() {};
         MockArray.prototype = Object.create(Array.prototype);
-        
+
         MockArray.prototype.forEach = function() {throw "FOREACH";};
         MockArray.prototype.map = function() {throw "MAP";};
         MockArray.prototype.reduce = function() {throw "REDUCE";};
@@ -56,7 +57,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
         MockArray.isArray = function(obj) {
             return obj instanceof [].constructor;
         };
-        
+
         var utilMock = function(override, delegate) {
             Mocks.GetMocks(Object.Global(),{
                 exp:function() {},
@@ -66,7 +67,6 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 Style:function() {},
                 Bitset:{},
                 NumberFormat:{},
-                SizeEstimator:function(){},
                 $A:{ns:{}},
                 Aura: Aura,
                 navigator:{userAgent:''},
@@ -83,7 +83,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         };
-        
+
         [Fact]
         function testForEach() {
             utilMock(MockArray, function(util){
@@ -97,7 +97,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testMap() {
             utilMock(MockArray, function(util){
@@ -111,7 +111,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testReduce() {
             utilMock(MockArray, function(util){
@@ -125,7 +125,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testFilter() {
             utilMock(MockArray, function(util){
@@ -139,7 +139,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testEvery() {
             utilMock(MockArray, function(util){
@@ -153,7 +153,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testSome() {
             utilMock(MockArray, function(util){
@@ -167,7 +167,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testBind() {
             utilMock(MockFunction, function(util){
@@ -179,7 +179,7 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                 }
             });
         }
-        
+
         [Fact]
         function testKeys() {
             utilMock(MockObject, function(util){
@@ -193,4 +193,4 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
         }
     }
 }
- 
+

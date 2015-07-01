@@ -1,26 +1,20 @@
 ({
+    // TODO(tbliss): Remove this if possible. Or call through to library so not duplicating functionality
     "appendLine" : function(cmp, text) {
         var content = cmp.find("content");
         var body;
-        $A.createComponent("aura:text", { "value": text }, function(newCmp, error) {
-            if (error) {
-                console.log(error);
-            }
-            if (content.isValid() && newCmp) {
-                body = content.get("v.body");
-                body.push(newCmp);
-                content.set("v.body", body);
-            }
-            $A.createComponent("aura:html", { "tag": "br" }, function(newCmp, error) {
-                if (error) {
-                    console.log(error);
-                }
-                if (content.isValid() && newCmp) {
+        var configs = [];
+        configs[0] = ["aura:text", { "value": text }];
+        configs[1] = ["aura:html", { "tag": "br" }];
+        $A.createComponents(configs,
+            function(newCmps, overallStatus) {
+                if (content.isValid() && newCmps) {
                     body = content.get("v.body");
-                    body.push(newCmp);
+                    for (var i = 0; i < newCmps.length; i++) {
+                        body.push(newCmps[i]);
+                    }
                     content.set("v.body", body);
                 }
-            });
         });
     }
 })

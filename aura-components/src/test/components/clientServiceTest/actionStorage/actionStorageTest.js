@@ -121,8 +121,8 @@
                 "error handler didn't get called",
                 function() {
                     $A.test.assertEquals(
-                    "MemoryStorageAdapter.setItem() cannot store an item over the maxSize",
-                    errorHandled);
+                    "MemoryAdapter.setItem() cannot store an item over the maxSize",
+                    errorHandled.message);
                 }
             );
          },

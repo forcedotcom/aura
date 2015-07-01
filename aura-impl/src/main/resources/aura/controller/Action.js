@@ -65,7 +65,7 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     // FIXME: only for runActions - deprecated
     this.completion = undefined;
-    
+
     // FIXME: creation path
     this.pathStack = [];
     this.canCreate = true;
@@ -120,7 +120,7 @@ Action.prototype.getNextGlobalId = function() {
 
 /**
  *  If a component is replacing the same-named component at the same level (e.g. provider),
- *  this reactivates the path's error detection, so that is can request it's location again without
+ *  this reactivates the path's error detection, so that is can request its location again without
  *  reporting an error.
  *
  *  @private
@@ -130,7 +130,7 @@ Action.prototype.reactivatePath = function() {
 };
 
 /**
- * force the creation path to match a given value.
+ * Forces the creation path to match a given value.
  *
  * This checks to see if the path matches, otherwise, it forces the path
  * to the one supplied. A warning is emitted if the path mismatches but only
@@ -169,7 +169,7 @@ Action.prototype.forceCreationPath = function(path) {
 };
 
 /**
- * release a creation path that was previously forced.
+ * Releases a creation path that was previously forced.
  *
  * This is the mirrored call to 'forceCreationPath' that releases the 'force'.
  * The path must match the call to forceCreationPath, and the path must have
@@ -194,7 +194,7 @@ Action.prototype.releaseCreationPath = function(path) {
 };
 
 /**
- * push a new part on the creation path.
+ * Pushes a new part on the creation path.
  *
  * @param {string} pathPart the new path part to insert.
  * @private
@@ -214,7 +214,7 @@ Action.prototype.pushCreationPath = function(pathPart) {
 };
 
 /**
- * pop off the path part that was previously pushed.
+ * Pops off the path part that was previously pushed.
  *
  * @param {string} pathPart the path part previously pushed.
  * @private
@@ -236,7 +236,7 @@ Action.prototype.popCreationPath = function(pathPart) {
 };
 
 /**
- * get the path for the top entry of the path stack.
+ * Gets the path for the top entry of the path stack.
  *
  * @return {string} the top level path.
  * @private
@@ -250,7 +250,7 @@ Action.prototype.topPath = function() {
 };
 
 /**
- * set the path index.
+ * Sets the path index.
  *
  * @param {number} the index to set.
  * @private
@@ -275,7 +275,7 @@ Action.prototype.setCreationPathIndex = function(idx) {
 };
 
 /**
- * Set the completion function.
+ * Sets the completion function.
  *
  * @private
  */
@@ -285,7 +285,7 @@ Action.prototype.setCompletion = function(fn) {
 };
 
 /**
- * Call the completion function if any.
+ * Calls the completion function if any.
  *
  * @private
  */
@@ -408,7 +408,7 @@ Action.prototype.getComponent = function() {
  * client-side controller using <code>callback</code>.
  *
  * Note that you can register a callback for an explicit state, or you can use 'ALL' which registers callbacks for
- * "SUCCESS", "ERROR", and "INCOMPLETE" (but not "ABORT" for historical compatibility. It is recommended that you
+ * "SUCCESS", "ERROR", and "INCOMPLETE" (but not "ABORTED" for historical compatibility). It is recommended that you
  * use an explicit name, and not the default 'undefined' to signify 'ALL'.
  *
  * The valid names are:
@@ -462,10 +462,10 @@ Action.prototype.setCallback = function(scope, callback, name) {
 
 
 /**
- * Get current callback for a give action Type
+ * Gets current callback for a give action Type
  *
- * @public
- * @returns {string} the abortable id that was set for this action.
+ * @private
+ * @returns {Object} the callback scope and function that was set for this action.
  * @platform
  * @export
  */
@@ -478,7 +478,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  *
  * This can be used in conjunction with 'caboose' to implement a log+flush pattern.
  * Intended to be called as the 'train' leaves the 'station'. Note that setParam should
- * be used to set aditional parameters at this point.
+ * be used to set additional parameters at this point.
  *
  * @public
  * @param {Object}
@@ -698,7 +698,7 @@ Action.prototype.runAfter = function(action) {
 };
 
 /**
- * Update the fields from a response.
+ * Updates the fields from a response.
  *
  * @param {Object}
  *            response The response from the server.
@@ -773,6 +773,12 @@ Action.prototype.updateFromResponse = function(response) {
             }
         }
     }
+
+    // INCOMPLETE refresh does not have a changed response so should not invoke the callback
+    if (this.originalResponse && this.state === "INCOMPLETE") {
+        return false;
+    }
+
     return true;
 };
 

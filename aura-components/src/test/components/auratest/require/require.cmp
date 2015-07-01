@@ -22,7 +22,7 @@
     <aura:attribute type="String" name="versionInAfterRender"/>
     <aura:attribute type="String" name="versionInRerender"/>
 
-    <aura:if isTrue="{!2.0 == version}">
+    <aura:if isTrue="{!'2.0' == version}">
         <div aura:id="equals"></div>
     </aura:if>
 

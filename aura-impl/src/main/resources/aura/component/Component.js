@@ -228,7 +228,7 @@ var ComponentPriv = (function() { // Scoping priv
         vp["style"]=this.createStyleValueProvider(cmp);
         vp["super"]=this.superComponent;
         vp["null"]=null;
-        vp["version"] = cmp.getVersion();
+        vp["version"] = cmp.getVersionInternal();
 
         for (var key in customValueProviders) {
             cmp.addValueProvider(key,customValueProviders[key]);
@@ -2467,9 +2467,21 @@ Component.prototype.unrender = function() {
 
 /**
  * Get the expected version number of a component based on its caller's requiredVersionDefs
+ * Note that for various rendering methods, we cannot rely on access stack.
+ * We use creation version instead.
  * @export
  */
 Component.prototype.getVersion = function() {
+    var ret = this.getVersionInternal();
+    return ret ? ret : this.get("version");
+};
+
+/**
+ * get version from context access stack
+ * 
+ * @private
+ */
+Component.prototype.getVersionInternal = function() {
     if (!this.isValid()) {
         return null;
     }

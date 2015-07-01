@@ -27,9 +27,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * ComponentClassErrorTest is mainly for verifying error message when we error out from component's helper/renderer
  */
-public class ComponentClassErrorTest extends WebDriverTestCase {
+public class ComponentClassErrorUITest extends WebDriverTestCase {
 
-	public ComponentClassErrorTest(String name) {
+	public ComponentClassErrorUITest(String name) {
 		super(name);
 	}
 	

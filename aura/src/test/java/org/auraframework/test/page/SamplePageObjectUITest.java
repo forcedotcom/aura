@@ -21,13 +21,13 @@ import java.net.URISyntaxException;
  * this is an example for testing UI with PageObject pattern.
  * for more info about the PageObject 'idea': https://code.google.com/p/selenium/wiki/PageObjects
  */
-public class SampleUIWithPageObjectTest extends PageObjectTestCase<SampleAuraPageObject> {
+public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObject> {
 
-    public SampleUIWithPageObjectTest(String name) throws MalformedURLException, URISyntaxException {
+    public SamplePageObjectUITest(String name) throws MalformedURLException, URISyntaxException {
         super(name);
     }
 
-    public void testButtunUIWithPageObject() throws Exception {
+    public void testButtonUi() throws Exception {
         //create the PageObject
         SampleAuraPageObject sapo = new SampleAuraPageObject(this.getName(), true, "uiExamples:buttonExample", this);
         //PageObject is in charge of load itself, clicking , typing , etc

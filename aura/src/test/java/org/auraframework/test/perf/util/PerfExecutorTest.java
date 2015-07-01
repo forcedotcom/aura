@@ -53,11 +53,11 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private PerfConfig config;
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
-   
+
     public PerfExecutorTest(DefDescriptor<ComponentDef> def, PerfConfig config) {
         super("runTests");
         this.def = def;
-        this.config = config; 
+        this.config = config;
         init();
     }
 
@@ -65,23 +65,23 @@ public class PerfExecutorTest extends WebDriverTestCase {
         perfMetricsUtil = new PerfMetricsUtil(this, config.getOptions().get("metricsMode"));
         runsCollector = new PerfRunsCollector();
     }
-    
+
     public void runTests() {
         try {
-        	int numberOfRuns = config.getNumberOfRuns();        	
-        	while(numberOfRuns-- > 0)
-        		runWithPerfApp(def, config);
-        	//Evaluate results after all the runs are done.
-        	perfMetricsUtil.evaluateResults();
+            int numberOfRuns = config.getNumberOfRuns();
+            while(numberOfRuns-- > 0)
+                runWithPerfApp(def, config);
+            //Evaluate results after all the runs are done.
+            perfMetricsUtil.evaluateResults();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void loadComponent(String url, DefDescriptor<ComponentDef> descriptor) throws MalformedURLException,
-            URISyntaxException {
-    	   	
-    	openTotallyRaw(url);
+    URISyntaxException {
+
+        openTotallyRaw(url);
 
         // wait for component loaded or aura error message
         final By componentRendered = By.cssSelector("div[class*='container performanceRunner testFinish']");
@@ -102,9 +102,9 @@ public class PerfExecutorTest extends WebDriverTestCase {
             }
         }
     }
-    
+
     private ExpectedCondition<By> prepareCondition(final By componentRendered, final By auraErrorMessage){
-    	ExpectedCondition<By> condition = new ExpectedCondition<By>() {
+        ExpectedCondition<By> condition = new ExpectedCondition<By>() {
             @Override
             public By apply(WebDriver d) {
                 if (d.findElement(auraErrorMessage).isDisplayed()) { return auraErrorMessage; }
@@ -118,23 +118,23 @@ public class PerfExecutorTest extends WebDriverTestCase {
         };
         return condition;
     }
-    
+
     private String generateUrl (DefDescriptor<ComponentDef> descriptor, PerfConfig config, Mode mode) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-    	String relativeUrl = "/performance/runner.app?";
+        String relativeUrl = "/performance/runner.app?";
         Map<String, String> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName());
 
         relativeUrl += "aura.mode=" + mode;
-        relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");            
+        relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
-    	return url;
+        return url;
     }
-    
+
     public String generateUrl(){
-    	try {
-    		return generateUrl(def, config, Mode.STATS);
-    	}catch (Exception e) {
-    		return "";
-    	}
+        try {
+            return generateUrl(def, config, Mode.STATS);
+        }catch (Exception e) {
+            return "";
+        }
     }
 
     private void runWithPerfApp(DefDescriptor<ComponentDef> descriptor, PerfConfig config) throws Exception {
@@ -142,18 +142,18 @@ public class PerfExecutorTest extends WebDriverTestCase {
             Mode mode = Mode.STATS;
             setupContext(mode, AuraContext.Format.JSON, descriptor);
             String url = generateUrl(descriptor, config, mode);
-            
+
             logger.info("invoking runner.app: " + url);
             Gson gson = new Gson();
             String json = gson.toJson(config);
             logger.info("component config:" + json);
-            
-            try {            	
-            	perfMetricsUtil.startCollecting();
+
+            try {
+                perfMetricsUtil.startCollecting();
                 loadComponent(url, descriptor);
                 perfMetricsUtil.stopCollecting(); //TODO handle case when component fails to load
                 PerfMetrics metrics = perfMetricsUtil.prepareResults();
-                runsCollector.addRun(metrics);    
+                runsCollector.addRun(metrics);
             } catch (ThreadDeath td) {
                 throw td;
             } catch (Throwable th) {
@@ -169,39 +169,43 @@ public class PerfExecutorTest extends WebDriverTestCase {
             Aura.getContextService().endContext();
         }
     }
-    
+
+    @Override
     public JSONArray getLastCollectedMetrics () {
-    	try {
-			return getPerfRunsCollector().getMedianMetrics().toJSONArrayWithoutDetails();
-		} catch (JSONException e) {
-			return new JSONArray(); 
-		}
+        try {
+            return getPerfRunsCollector().getMedianMetrics().toJSONArrayWithoutDetails();
+        } catch (JSONException e) {
+            return new JSONArray();
+        }
     }
-    
+
     public DefDescriptor<ComponentDef> getComponentDef(){
-    	return def;
+        return def;
     }
-    
+
     public WebDriver getWebDriver(){
-    	return currentDriver;
+        return currentDriver;
     }
-    
+
+    @Override
     public BrowserType getBrowserType(){
-    	return super.getBrowserType();
+        return super.getBrowserType();
     }
 
     public PerfRunsCollector getPerfRunsCollector(){
-    	return runsCollector;
+        return runsCollector;
     }
-    
-    public String getPerfStartMarker(){
-    	return "perfRunner:start";
+
+    @Override
+    public String getPerfStartMarker() {
+        return "perfRunner:start";
     }
-    
-    public String getPerfEndMarker(){
-    	return "perfRunner:end";
+
+    @Override
+    public String getPerfEndMarker() {
+        return "perfRunner:end";
     }
-    
+
     @Override
     public String toString() {
         return def.getNamespace() + ":" + def.getName() + "(perfExecutor)";

@@ -2158,15 +2158,17 @@ AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
  * Used within async callback for AIS.
  *
  * @param {Component} component - component
- * @param {String} locatorDomId - element id
+ * @param {String} locator - parent element or the id of the parent element where to inject component
  * @param {Object} [actionEventHandlers] - event handlers
  */
-AuraClientService.prototype.renderInjection = function(component, locatorDomId, actionEventHandlers) {
-    var error = null,
-        hostEl = document.getElementById(locatorDomId);
+AuraClientService.prototype.renderInjection = function(component, locator, actionEventHandlers) {
+    var error = null;
+    
+    var stringLocator = $A.util.isString(locator);
+    var hostEl = stringLocator ? document.getElementById(locator) : locator;
 
     if (!hostEl) {
-        error = "Invalid locatorDomId specified - no element found in the DOM with id=" + locatorDomId;
+        error = "Invalid locator specified - " + (stringLocator ? "no element found in the DOM with id=" + locator : "locator element not provided");
         hostEl = document.body;
     }
 
@@ -2191,14 +2193,14 @@ AuraClientService.prototype.renderInjection = function(component, locatorDomId, 
  * Use async created component for integration service
  *
  * @param {Object} config - component def config
- * @param {String} locatorDomId - id of element to inject component
+ * @param {String} locator - parent element or the id of the parent element where to inject component
  * @param {Object} [eventHandlers] - handlers of registered event
  * @export
  */
-AuraClientService.prototype.injectComponentAsync = function(config, locatorDomId, eventHandlers) {
+AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers) {
     var acs = this;
     $A.componentService.newComponentAsync(undefined, function(component) {
-        acs.renderInjection(component, locatorDomId, eventHandlers);
+        acs.renderInjection(component, locator, eventHandlers);
     }, config, $A.getRoot(), false, false, true);
     //
     // Now we go ahead and stick a label load on the request.

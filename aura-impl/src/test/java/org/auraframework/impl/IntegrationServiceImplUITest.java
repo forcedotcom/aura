@@ -551,7 +551,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
                         true, true, true)
                 );
-        verifyMissingPlaceholder(stub);
+        verifyMissingPlaceholder(stub, "locatorDomId");
     }
 
     /**
@@ -564,22 +564,22 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                         "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
                         true, true, true, true)
                 );
-        verifyMissingPlaceholder(stub);
+        verifyMissingPlaceholder(stub, "locator");
     }
 
-    private void verifyMissingPlaceholder(DefDescriptor<ComponentDef> stub) throws Exception {
+    private void verifyMissingPlaceholder(DefDescriptor<ComponentDef> stub, String locatorName) throws Exception {
         DefDescriptor<ComponentDef> cmpToInject = addSourceAutoCleanup(ComponentDef.class,
                 String.format(AuraImplTestCase.baseComponentTag, "", ""));
 
         String badPlaceholder = "fooBared";
         String expectedErrorMessage = String.format(
-                "Invalid locatorDomId specified - no element found in the DOM with id=%s", badPlaceholder);
+                "Invalid " + locatorName + " specified - no element found in the DOM with id=%s", badPlaceholder);
 
         openIntegrationStub(stub, cmpToInject, null, badPlaceholder);
 
         boolean isErrorPresent = findDomElement(By.cssSelector("span[class='uiOutputText']")).getText().contains(
                 expectedErrorMessage);
-        assertTrue("IntegrationService failed to display error message when invalid locatorDomId was specified",
+        assertTrue("IntegrationService failed to display error message when invalid locator was specified",
                 isErrorPresent);
     }
 

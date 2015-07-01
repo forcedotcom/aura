@@ -106,4 +106,6 @@ public interface LoggingContext {
     void error(String message, Throwable cause);
 
 	void serializeActions(Json json);
+
+    void serialize(Json json);
 }

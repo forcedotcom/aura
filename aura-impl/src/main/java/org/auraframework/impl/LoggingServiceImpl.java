@@ -257,4 +257,9 @@ public class LoggingServiceImpl implements LoggingService {
     public void serializeActions(Json json) {
         getLoggingContext().serializeActions(json);
     }
+
+    @Override
+    public void serialize(Json json) {
+        getLoggingContext().serialize(json);
+    }
 }

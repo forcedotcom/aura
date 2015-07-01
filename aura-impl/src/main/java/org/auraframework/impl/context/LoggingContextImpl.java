@@ -59,6 +59,10 @@ public class LoggingContextImpl implements LoggingContext {
         startTimer(LoggingService.TIMER_ACTION + actionName);
     }
     
+    protected Map<String, Map<String, Long>> getActionStats() {
+        return actionStats;
+    } 
+    
     @Override
     public void stopAction(String actionName) {
         stopActionTimer(actionName);
@@ -180,6 +184,18 @@ public class LoggingContextImpl implements LoggingContext {
         loggingValues.putAll(values);
         logRequestValuesMap(loggingValues);
         logActions(loggingValues);
+    }
+    
+    protected Map<String, Object> getRequestValues () {
+        Map<String, Object> requestLoggingValues = Maps.newHashMap();
+        for (Map.Entry<String, Timer> entry : timers.entrySet()) {
+            requestLoggingValues.put(entry.getKey(), entry.getValue().getTime());
+        }
+        for (Map.Entry<String, Counter> entry : counters.entrySet()) {
+            requestLoggingValues.put(entry.getKey(), entry.getValue().get());
+        }
+        
+        return requestLoggingValues;
     }
 
     @Override
@@ -405,4 +421,9 @@ public class LoggingContextImpl implements LoggingContext {
             }
         }
 	}
+
+    @Override
+    public void serialize(Json json) { 
+        // Implement on override
+    }
 }

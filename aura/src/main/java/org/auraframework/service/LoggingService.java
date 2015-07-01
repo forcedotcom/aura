@@ -46,7 +46,7 @@ public interface LoggingService extends AuraService {
     public static final String TIMER_COMPONENT_CREATION = "componentCreation";
     public static final String TIMER_DEF_DESCRIPTOR_CREATION = "defDescriptorCreation";
     public static final String TIMER_DEFINITION_CREATION = "definitionCreation";
-    public static final String TIMER_AURA = "aura";
+    public static final String TIMER_AURA = "auraTimer";
     public static final String TIMER_TOTAL = "totalTime";
     public static final String TIMER_SERIALIZATION = "serialization";
     public static final String TIMER_SERIALIZATION_AURA = "serializationAura";
@@ -201,4 +201,6 @@ public interface LoggingService extends AuraService {
     void error(String message, Throwable cause);
     
 	void serializeActions(Json json);
+    
+    void serialize(Json json);
 }

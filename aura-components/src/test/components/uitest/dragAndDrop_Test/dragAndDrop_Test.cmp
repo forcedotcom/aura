@@ -99,7 +99,7 @@
 		<h1>Dropzone Type: Move2</h1>
 			<ui:infinitelist aura:id="list" itemVar="item">
 				<aura:set attribute="dataProvider">
-					<uiExamples:dragAndDropProvider prefix="Draggable Type: Move3" count="1"/>
+					<uiExamples:dragAndDropProvider prefix="Draggable Type: Move2" count="1"/>
 				</aura:set>
 				<aura:set attribute="itemTemplate">
 					<ui:draggable inContextOf="{!v._draggableContext4}" 

@@ -22,23 +22,23 @@
 		// This assumes homogeneous operation type
 		var type = draggables[0].get("v.type");
 		var dropzones = this.getDropzoneComponents(type);
-		this.enterDragOperation(dropzones);
 		
-		// calculate dropzoneMenu
-		var dropzoneMenu = [];
-		var self = this;
-		$A.util.forEach(dropzones, function(dropzone, index) {
-			if (!self.areInSameContext(draggables, dropzone)) {
-				var label = dropzone.get("v.label");
-				dropzoneMenu.push({
-					"value": dropzone,
-					"label": $A.util.isEmpty(label) ? "Dropzone " + index : label
-				});
-			}			
-		});		
-		component.set("v.dropzoneMenu", dropzoneMenu);		
-		
-		if(dropzoneMenu.length > 0) {
+		if(dropzones.length > 0) {
+			this.enterDragOperation(dropzones);
+			
+			// calculate dropzoneMenu
+			var dropzoneMenu = [];
+			var self = this;
+			$A.util.forEach(dropzones, function(dropzone, index) {
+				if (!self.areInSameContext(draggables, dropzone)) {
+					var label = dropzone.get("v.label");
+					dropzoneMenu.push({
+						"value": dropzone,
+						"label": $A.util.isEmpty(label) ? "Dropzone " + index : label
+					});
+				}			
+			});		
+			component.set("v.dropzoneMenu", dropzoneMenu);	
 
 			// Refresh accessibility menu
 			var menu = component.find("menu");
@@ -54,6 +54,7 @@
 			// position accessibility menu
 			this.position(menu, target);
 		} else {
+			component.set("v.dropzoneMenu", []);
 			this.fireDragEnd(draggables,false);
 		} 			
 	},
@@ -122,9 +123,7 @@
 			
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
-		}	
-		
-		
+		}
 	},
 	
 	handleMenuFocusChange: function(previousItem, currentItem) {

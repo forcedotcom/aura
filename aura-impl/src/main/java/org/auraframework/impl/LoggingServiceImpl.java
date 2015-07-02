@@ -38,8 +38,6 @@ public class LoggingServiceImpl implements LoggingService {
     @Override
     public LoggingService establish() {
         AuraImpl.getLoggingAdapter().establish();
-        startTimer(LoggingService.TIMER_TOTAL);
-        startTimer(LoggingService.TIMER_AURA);
         
         setNum(LoggingService.CMP_COUNT, 0L);
         setNum(LoggingService.DEF_COUNT, 0L);
@@ -162,8 +160,6 @@ public class LoggingServiceImpl implements LoggingService {
     public void flush() {
         LoggingContext lc = getLoggingContext();
         if (lc != null) {
-            stopTimer(LoggingService.TIMER_AURA);
-            stopTimer(LoggingService.TIMER_TOTAL);
             lc.logRequestValues();
         }
     }

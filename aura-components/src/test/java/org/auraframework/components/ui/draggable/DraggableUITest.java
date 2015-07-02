@@ -61,20 +61,20 @@ public class DraggableUITest extends WebDriverTestCase{
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    // public void testDragAndDropWithNullTypes() throws MalformedURLException, URISyntaxException {
-    //     helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: None 1", "Dropzone Type: None");
-    //     verifyDragAndDropResults("Dropzone Type: None", "Draggable Type: None 1", false);
-    // }
+     public void testDragAndDropWithNullTypes() throws MalformedURLException, URISyntaxException {
+         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: None 1", "Dropzone Type: None");
+         verifyDragAndDropResults("Dropzone Type: None", "Draggable Type: None 1", false);
+     }
 
     /**
      * Tests unsuccessful drag and drop to dropzone that has null type.
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    // public void testDragAndDropToDropzoneWithNullTypes() throws MalformedURLException, URISyntaxException {
-    //     helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move2 1", "Dropzone Type: None");
-    //     verifyDragAndDropResults("Dropzone Type: None", "Draggable Type: Move2 1", false);
-    // }
+     public void testDragAndDropToDropzoneWithNullTypes() throws MalformedURLException, URISyntaxException {
+         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move2 1", "Dropzone Type: None");
+         verifyDragAndDropResults("Dropzone Type: None", "Draggable Type: Move2 1", false);
+     }
 
     /**
      * Tests unsuccessful drag and drop with draggable that has null type.
@@ -91,11 +91,10 @@ public class DraggableUITest extends WebDriverTestCase{
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    
-    // public void testDragAndDropToDropzoneOrigin() throws MalformedURLException, URISyntaxException {
-    //     helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move2 1", "Dropzone Type: Move2");
-    //     verifyDragAndDropResults("Dropzone Type: Move2", "Draggable Type: Move2 1", true);
-    // }
+     public void testDragAndDropToDropzoneOrigin() throws MalformedURLException, URISyntaxException {
+         helpTestDragAndDrop(DRAGANDDROPTEST_APP, "Draggable Type: Move2 1", "Dropzone Type: Move2");
+         verifyDragAndDropResults("Dropzone Type: Move2", "Draggable Type: Move2 1", true);
+     }
 
     /**
      * Verifies drag and drop results.

@@ -81,9 +81,6 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 	targetHelper.enterDragOperation = function(dropzones){
 		dropzones[0].enterDragOperation = true;
 	};
-	targetHelper.getDropzoneComponents = function(){
-		return [dropzoneCmp];
-	};
 	targetHelper.positioningLib ={panelPositioning:{ createRelationship: function(){}, reposition:function(){}}};
 	
 	[Fixture]
@@ -111,6 +108,9 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 						};
 					}
 			};
+			targetHelper.getDropzoneComponents = function(type){
+				return [dropzoneCmp];
+			};
 			//action
 			mock$Window(function(){mock$A(function(){
 				targetHelper.startDragAndDrop(cmp, [draggable]);
@@ -118,13 +118,28 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 			//assert
 			Assert.True(dropzoneCmp.enterDragOperation);
 		}
+		
+		[Fact]
+		function testStartDragEventWithNoDropzones(){
+			//arrange
+			var cmp = {
+				set: function(){}
+			};
+			targetHelper.getDropzoneComponents = function(){
+				return [];
+			};
+			//action
+			targetHelper.startDragAndDrop(cmp, [draggable]);
+			//assert
+			Assert.True(draggable.fireDragEnd);
+		}
 	}
 	
 	[Fixture]
 	function testDropContext(){
 		[Fact]
 		function testAreInSameContext(){
-			//arrang
+			//arrange
 			dropzoneCmp.getGlobalId = function(){return "1234"};
 			draggable.getGlobalId = function(){return "1234"};
 			//action
@@ -138,7 +153,7 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		
 		[Fact]
 		function testAreInDifferentContext(){
-			//arrang
+			//arrange
 			dropzoneCmp.getGlobalId = function(){return "1234"};
 			draggable.getGlobalId = function(){return "4321"};
 			//action
@@ -184,25 +199,13 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 				get: function(){ return [draggable];},
 				set: function(){}
 			};
-			//action
-			targetHelper.handleMenuCollapse(cmp);
-			//assert
-			Assert.True(draggable.fireDragEnd && dropzoneCmp.exitDragOperation);
-		}
-		
-		[Fact, Skip("Known bug: W-2618692")]
-		function testHandleMenuCollapseWithNoDraggable(){
-			//arrange
-			dropzoneCmp.exitDragOperation = false;
-			var cmp = {
-				find: function(){ return { getElement: function(){ return { style:{ top : "", left : ""} } } } },
-				get: function(){ return [];},
-				set: function(){}
+			targetHelper.getDropzoneComponents = function(type){
+				return [dropzoneCmp];
 			};
 			//action
 			targetHelper.handleMenuCollapse(cmp);
 			//assert
-			Assert.True(dropzoneCmp.exitDragOperation);
+			Assert.True(draggable.fireDragEnd && dropzoneCmp.exitDragOperation);
 		}
 	}
 }

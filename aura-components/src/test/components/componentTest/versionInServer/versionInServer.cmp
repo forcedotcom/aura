@@ -23,6 +23,7 @@
     <auratest:requireConsumer aura:id="auratest_requireConsumer"/>
 
     <aura:require namespace ="auratest" version="2.0"/>
+    <aura:require namespace ="test" version="5.0"/>
 
     Requested Version: {!v.version}<br/>
 

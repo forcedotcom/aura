@@ -12,10 +12,6 @@
         $A.enqueueAction(a);
     },
 
-    updateVersionFromServerModel: function(cmp, evt, helper) {
-        helper.updateVersion(cmp, cmp.find("versionFromModel").get("v.value"));
-    },
-
     updateVersionFromClientController: function(cmp, evt, helper) {
         helper.updateVersion(cmp, cmp.getVersion());
     },

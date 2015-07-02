@@ -26,7 +26,7 @@ import com.google.common.base.Function;
 /**
  * Base class for Aura WebDriver tests.
  */
-//@PerfCustomTest
+// @PerfCustomTest
 public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
 
     private static final String PERF_START_MARKER_SUFFIX = ":start";
@@ -86,12 +86,12 @@ public abstract class CustomPerfAbstractTestCase extends AbstractPerfTestCase {
     };
 
     protected final <V> V waitUntil(final Function<? super WebDriver, V> function) {
-        return new WebDriverWait(currentDriver, timeoutInSecs)
-        .until(new Function<WebDriver, V>() {
-            @Override
-            public V apply(WebDriver d) {
-                return function.apply(d);
-            }
-        });
+        return new WebDriverWait(currentDriver, auraUITestingUtil.getTimeout())
+                .until(new Function<WebDriver, V>() {
+                    @Override
+                    public V apply(WebDriver d) {
+                        return function.apply(d);
+                    }
+                });
     }
 }

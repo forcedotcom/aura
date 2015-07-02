@@ -46,8 +46,9 @@ public interface LoggingService extends AuraService {
     public static final String TIMER_COMPONENT_CREATION = "componentCreation";
     public static final String TIMER_DEF_DESCRIPTOR_CREATION = "defDescriptorCreation";
     public static final String TIMER_DEFINITION_CREATION = "definitionCreation";
-    public static final String TIMER_AURA = "auraTimer";
+    public static final String TIMER_AURA = "auraInternalTimer";
     public static final String TIMER_TOTAL = "totalTime";
+    public static final String TIMER_AURA_RUN = "auraRunTime";
     public static final String TIMER_SERIALIZATION = "serialization";
     public static final String TIMER_SERIALIZATION_AURA = "serializationAura";
     public static final String USER_AGENT = "userAgent";

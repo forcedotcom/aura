@@ -53,7 +53,7 @@
         helper.lib.panelLibCore.updatePanel(cmp, args.facets, args.callback);
     },
 
-    onNotify: function(cmp, event) {
+    onNotify: function(cmp, event, helper) {
         var params = event.getParams();
         if (params && params.action === 'destroyPanel' && params.typeOf === 'ui:destroyPanel' && !params.payload) {
             //contained component tries to close the panel but doesn't have access to this panelInstance

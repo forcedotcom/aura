@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.javascript.Literal;
@@ -129,4 +131,8 @@ public interface Action extends Instance<ActionDef> {
      * Get the instance stack for this action.
      */
     public InstanceStack getInstanceStack();
+
+    public DefDescriptor<ComponentDef> getCallingDescriptor();
+
+    public void setCallingDescriptor(String caller);
 }

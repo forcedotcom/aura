@@ -407,7 +407,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
             public Boolean apply(WebDriver d) {
                 return hasCssClass(o, "highlighted");
             }
-        }, timeoutInSecs, "fail on waiting for option to be highlighted");
+        }, "fail on waiting for option to be highlighted");
     }
 
     private void waitForInputValue(final WebElement input, final String expectedOption) {
@@ -416,7 +416,7 @@ public class AutocompleteUITest extends WebDriverTestCase {
             public Boolean apply(WebDriver d) {
                 return expectedOption.equals(input.getAttribute("value"));
             }
-        }, timeoutInSecs, "fail on waiting for option '" + expectedOption + "' to be selected");
+        }, "fail on waiting for option '" + expectedOption + "' to be selected");
     }
 
     private void doTestMatch(int autoCompleteCmpNum, String searchString, String target, int expectedMatched,

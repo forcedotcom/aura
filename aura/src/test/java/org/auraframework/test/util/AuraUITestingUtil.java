@@ -47,20 +47,29 @@ import com.google.common.collect.Lists;
 
 public class AuraUITestingUtil {
     private final WebDriver driver;
-    private long timeoutInSecs = 30;
+    private int timeoutInSecs;
     private int rerunCount = 0;
     protected static final Random RAND = new Random(System.currentTimeMillis());
 
     public AuraUITestingUtil(WebDriver driver) {
+        this(driver, 30);
+    }
+
+    public AuraUITestingUtil(WebDriver driver, int timeoutInSecs) {
         this.driver = driver;
+        setTimeoutInSecs(timeoutInSecs);
+    }
+
+    public void setTimeoutInSecs(int timeoutInSecs) {
+        this.timeoutInSecs = timeoutInSecs;
         if (SauceUtil.areTestsRunningOnSauce()) {
             // things are slower in SauceLabs
-            timeoutInSecs = 240;
+            this.timeoutInSecs *= 6;
         }
     }
 
-    public void setTimeoutInSecs(long timeoutInSecs) {
-        this.timeoutInSecs = timeoutInSecs;
+    public int getTimeout() {
+        return timeoutInSecs;
     }
 
     /**
@@ -125,14 +134,15 @@ public class AuraUITestingUtil {
         String msg = "Element with locator \'" + locator.toString() + "\' never appeared";
         return waitForElement(msg, locator);
     }
-    
+
     /**
      * Waits for element to be not present
+     * 
      * @param locator By of element waiting to disapear
-     * @return 
+     * @return
      */
     public boolean waitForElementNotPresent(String msg, final By locator) {
-    	WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
+        WebDriverWait wait = new WebDriverWait(driver, timeoutInSecs);
         return wait.withMessage(msg)
                 .ignoring(StaleElementReferenceException.class).until(new ExpectedCondition<Boolean>() {
 
@@ -899,16 +909,18 @@ public class AuraUITestingUtil {
             throw new RuntimeException(ex);
         }
     }
-    
+
     /**
      * Return true if div has scrollBar
+     * 
      * @param elementClassName
      * @return
      */
-	public boolean hasScrollBar(String elementClassName) {
-		String js = "var elementBody = $A.test.getElementByClass('"+elementClassName+"')[0];return (elementBody.scrollHeight !== elementBody.offsetHeight);";
-		boolean hasScroll = this.getBooleanEval(js);
-		return hasScroll;
-	}
+    public boolean hasScrollBar(String elementClassName) {
+        String js = "var elementBody = $A.test.getElementByClass('" + elementClassName
+                + "')[0];return (elementBody.scrollHeight !== elementBody.offsetHeight);";
+        boolean hasScroll = this.getBooleanEval(js);
+        return hasScroll;
+    }
 
 }

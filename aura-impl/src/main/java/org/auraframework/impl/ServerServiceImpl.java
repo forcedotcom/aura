@@ -67,6 +67,8 @@ public class ServerServiceImpl implements ServerService {
     @Override
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
+        loggingService.startTimer(LoggingService.TIMER_AURA_RUN);
+        
         MetricsService metricsService = Aura.getMetricsService();
         if (message == null) {
             return;
@@ -98,6 +100,9 @@ public class ServerServiceImpl implements ServerService {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
             }
             
+            loggingService.stopTimer(LoggingService.TIMER_AURA_RUN);
+            
+            // MetricsService for Non PROD environments
             if (context.getMode() != Mode.PROD) {
                 try {
                     metricsService.serializeMetrics(json);
@@ -106,6 +111,7 @@ public class ServerServiceImpl implements ServerService {
                     loggingService.error("Error parsing MetricsService", e);
                 }
             }
+            
             json.writeMapEnd();
         } finally {
             try {

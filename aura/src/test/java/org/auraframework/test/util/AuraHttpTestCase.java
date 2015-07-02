@@ -47,6 +47,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
@@ -738,6 +739,15 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         @Override
         public String getPath() {
             return getId();
+        }
+
+        @Override
+        public DefDescriptor<ComponentDef> getCallingDescriptor() {
+            return null;
+        }
+
+        @Override
+        public void setCallingDescriptor(String caller) {
         }
     }
 }

@@ -15,8 +15,17 @@
     /**
      * Verify version value provider can be used in inequality comparsion expression,
      * e.g. {!version>1}.
+     *
+     * Disable the test for now, althought the test is passing by coincidence.
+     * Currently getVersion() returns a string to support minor version like
+     * '1.0.0' or '4.*'. Because aura doesn't check type in inequality comparison,
+     * JS convert the string into number to compare. But aura does check type in
+     * equalty comparison, so we need come up with a solution to make the version
+     * comparison more consistent, like util function.
+     * The test may need to be updated if we use util function to compare.
+     * The comparison expression is declared in auratest:require.cmp
      */
-    testVersionInExpressionWithInequalityComparison: {
+    _testVersionInExpressionWithInequalityComparison: {
         test: function(cmp) {
             var targetComponent = cmp.find("auratestCmp");
             targetComponent.updateWithInequalityComparisonComponentExist();

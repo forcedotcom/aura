@@ -20,7 +20,7 @@
      * Each level of facet evaluating v.body in its markup.
      */
     testDestroyOnChainedFacet:{
-        test:[ 
+        test:[
             function(cmp){
                 //Before Destroy
                 $A.test.assertDefined(cmp.find("outerFacet"));
@@ -39,7 +39,7 @@
             },
             function(cmp){
                 //After Destroy
-                this.verifyComponentDestroyed(cmp);
+                this.verifyOuterFacetComponentDestroyed(cmp);
             }
         ]
     },
@@ -95,12 +95,10 @@
         }
     },
 
-    // TODO: Re-enable when we stop forcing destroy to be synchronous in test modes. This is done in the destroy
-    //       functions of Component.js and ArrayValue.js.
-    // W-1928349: When we destroy asynchronously we leave a reference node behind, but not when we destroy
-    //            synchronously. If the reference node only for async is expected then logic in 
-    //            verifyComponentDestroyed will need to change.
-    _testDestroyAsync: {
+    /**
+     * Verify asynchronously destroy a component.
+     */
+    testAsyncDestroyComponent: {
         test: function(cmp) {
             $A.test.assertDefined(cmp.find("outerFacet"));
             $A.test.assertDefined(cmp.find("players"));
@@ -123,7 +121,37 @@
             $A.test.addWaitFor(
                 true,
                 function() { return $A.util.isUndefinedOrNull(component.find("outerFacet")); },
-                function() { this.verifyComponentDestroyed(cmp); }
+                function() { this.verifyOuterFacetComponentDestroyed(cmp); }
+            );
+        }
+    },
+
+    /**
+     * Verify asynchronously destroy a html element by destroy its
+     * containing component.
+     * There was a bug that the elements' child nodes are removed from
+     * dom, the element itself is not.
+     */
+    testAsyncDestroyHtmlElement: {
+        test: function(cmp) {
+            var element = document.getElementsByClassName("team")[0];
+            $A.test.assertDefined(element);
+            // 'team' should not contain display property
+            $A.test.assertEquals("", element.style.display);
+
+            try{
+                $A.getComponent(element).destroy(true);
+            }catch(e){
+                $A.test.fail("Component.destroy(true) failed: " + e);
+            }
+
+            $A.test.assertDefined(element);
+            // set display property first during destroying
+            $A.test.assertEquals("none", element.style.display);
+            $A.test.addWaitFor(
+                true,
+                function() {return document.getElementsByClassName("team").length===0;},
+                function() {this.verifyTeamDivDestroyed(cmp);}
             );
         }
     },
@@ -132,12 +160,12 @@
         test: function(cmp) {
             var outerFacet = cmp.find("outerFacet");
             outerFacet.destroy();
-            this.verifyComponentDestroyed(cmp);
+            this.verifyOuterFacetComponentDestroyed(cmp);
 
             // Already destroyed components will call destroy on InvalidComponent, which is a no-op
             $A.test.assertTrue(outerFacet.toString().indexOf("InvalidComponent") === 0);
             outerFacet.destroy();
-            this.verifyComponentDestroyed(cmp);
+            this.verifyOuterFacetComponentDestroyed(cmp);
         }
     },
 
@@ -251,7 +279,17 @@
         }
     },
 
-    verifyComponentDestroyed : function(cmp) {
+    verifyOuterFacetComponentDestroyed : function(cmp) {
+        this.verifyChildComponentsDestroyed(cmp);
+        $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);
+    },
+
+    verifyTeamDivDestroyed : function(cmp) {
+        this.verifyChildComponentsDestroyed(cmp);
+        $A.test.assertUndefinedOrNull(cmp.find("team"));
+    },
+
+    verifyChildComponentsDestroyed : function(cmp) {
         $A.test.assertUndefinedOrNull(cmp.find("outerFacet"));
         $A.test.assertUndefinedOrNull(cmp.find("textInOuterFacet"));
         $A.test.assertUndefinedOrNull(cmp.find("bullPen"));
@@ -262,8 +300,6 @@
 
         $A.test.assertUndefinedOrNull(cmp.find("innerFacet2"));
         $A.test.assertUndefinedOrNull(cmp.find("coach"));
-
-        $A.test.assertEquals(0, cmp.find("team").getElement().childNodes.length);
     },
 
     createComponent : function(qualifyedName) {

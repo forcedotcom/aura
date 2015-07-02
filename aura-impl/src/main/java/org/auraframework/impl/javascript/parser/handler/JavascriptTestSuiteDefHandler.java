@@ -34,8 +34,8 @@ import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef;
 import org.auraframework.impl.javascript.testsuite.JavascriptTestSuiteDef.Builder;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.JsFunction;
 
 import com.google.common.base.Strings;
@@ -93,20 +93,27 @@ public class JavascriptTestSuiteDefHandler extends JavascriptHandler<TestSuiteDe
         for (Entry<String, Object> entry : map.entrySet()) {
             String key = entry.getKey();
             if (key.startsWith("test")) {
-                Map<String, Object> value = (Map<String, Object>) entry.getValue();
+                Map<String, Object> value;
+                try {
+                    value = (Map<String, Object>) entry.getValue();
+                } catch (ClassCastException cce) {
+                    throw new InvalidDefinitionException(key + " must be an object", getLocation());
+                }
                 Object t = value.get("test");
                 if (!(t instanceof JsFunction)) {
                     if (t instanceof List) {
                         List<Object> functions = (List<Object>) t;
                         for (Object i : functions) {
                             if (!(i instanceof JsFunction)) {
-                                throw new AuraRuntimeException(
-                                        key + " 'test' must be a function or an array of functions");
+                                throw new InvalidDefinitionException(
+                                        key + " 'test' must be a function or an array of functions",
+                                        getLocation());
                             }
                         }
                     } else {
-                        throw new AuraRuntimeException(
-                                key + " 'test' must be a function or an array of functions");
+                        throw new InvalidDefinitionException(
+                                key + " 'test' must be a function or an array of functions",
+                                getLocation());
                     }
                 }
 

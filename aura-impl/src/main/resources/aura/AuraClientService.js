@@ -283,19 +283,19 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     // Of course, we also have the problem that we might not have valid JSON at all, in which case
     // we have further problems...
     //
-    if ((response["status"] != 200) || (text.length > 9 && text.charAt(text.length - 9) == "/" //
-        && text.charAt(text.length - 8) == "*" //
-        && text.charAt(text.length - 7) == "E" //
-        && text.charAt(text.length - 6) == "R" //
-        && text.charAt(text.length - 5) == "R" //
-        && text.charAt(text.length - 4) == "O" //
-        && text.charAt(text.length - 3) == "R" //
-        && text.charAt(text.length - 2) == "*" && text.charAt(text.length - 1) == "/")) {
-        if (response["status"] == 200) {
+    if ((response["status"] != 200) || (text.length > 9 && text.charAt(text.length - 9) === "/" //
+        && text.charAt(text.length - 8) === "*" //
+        && text.charAt(text.length - 7) === "E" //
+        && text.charAt(text.length - 6) === "R" //
+        && text.charAt(text.length - 5) === "R" //
+        && text.charAt(text.length - 4) === "O" //
+        && text.charAt(text.length - 3) === "R" //
+        && text.charAt(text.length - 2) === "*" && text.charAt(text.length - 1) === "/")) {
+        if (response["status"] === 200) {
             // if we encountered an exception once the response was committed
             // ignore the malformed JSON
             text = "/*" + text;
-        } else if (!noStrip === true && text.charAt(0) == "w") {
+        } else if (!noStrip === true && text.charAt(0) === "w") {
             //
             // strip off the while(1) at the beginning
             //
@@ -344,7 +344,7 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     //
     // strip off the while(1) at the beginning
     //
-    if (!noStrip === true && text.charAt(0) == "w") {
+    if (!noStrip === true && text.charAt(0) === "w") {
         text = "//" + text;
     }
 
@@ -1898,10 +1898,14 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         try {
             response = actionResponses[r];
             action = auraXHR.getAction(response["id"]);
-            if (action == null) {
+            if (action) {
+                if (response["storable"] && !action.isStorable()) {
+                    action.setStorable();
+                }
+            } else {
                 action = this.buildFakeAction(response);
             }
-            if (action == null) {
+            if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
             } else {
                 var key = this.actionStoreMap[action.getId()];
@@ -1935,6 +1939,10 @@ AuraClientService.prototype.buildFakeAction = function(response) {
         //
         var descriptor = response["action"];
         var actionDef = $A.services.component.getActionDef(descriptor);
+        if (!actionDef) {
+            // No action.
+            throw new $A.auraError("Missing action definition for "+descriptor);
+        }
         action = actionDef.newInstance();
         action.setStorable();
         action.setParams(response["params"]);
@@ -2031,7 +2039,7 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
     var count = actions.length;
     var completion = function() {
         count -= 1;
-        if (count == 0) {
+        if (count === 0) {
             callback.call(scope);
         }
     };

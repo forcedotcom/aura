@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
@@ -46,7 +45,6 @@ public class PerfMetricsUtil {
 
     public PerfMetricsUtil(PerfExecutorTest test, String metricsMode) {
         this.test = test;
-        new AuraUITestingUtil(test.getWebDriver());
     }
 
     /**

@@ -80,7 +80,12 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     public AppCacheResourcesUITest(String name) {
         super(name);
-        timeoutInSecs = 60;
+    }
+
+    @Override
+    public void perBrowserSetUp() {
+        super.perBrowserSetUp();
+        auraUITestingUtil.setTimeoutInSecs(60);
     }
 
     @Override
@@ -98,7 +103,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         + "</aura:component>");
 
         createDef(
-                ControllerDef.class, String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
+                ControllerDef.class,
+                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX, namespace, cmpName),
                 "{ cssalert:function(c){"
                         + "function getStyle(elem, style){"
                         + "var val = '';"
@@ -125,8 +131,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app will only query server for the manifest and the component load.
-     * BrowserType.SAFARI is disabled : W-2367702
+     * Opening cached app will only query server for the manifest and the component load. BrowserType.SAFARI is disabled
+     * : W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
@@ -142,10 +148,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app that had a prior cache error will reload the app.
-     * BrowserType.SAFARI is disabled : W-2367702
+     * Opening cached app that had a prior cache error will reload the app. BrowserType.SAFARI is disabled : W-2367702
      */
-    @TargetBrowsers({ BrowserType.GOOGLECHROME,  BrowserType.IPAD, BrowserType.IPHONE})
+    @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
@@ -178,8 +183,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening uncached app that had a prior cache error will have limited caching.
-     * BrowserType.SAFARI is disabled : W-2367702
+     * Opening uncached app that had a prior cache error will have limited caching. BrowserType.SAFARI is disabled :
+     * W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
@@ -196,10 +201,10 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         expectedChange.add(new Request("/auraResource", "js", 200));
         switch (getBrowserType()) {
         case GOOGLECHROME:
-        	expectedChange.add(new Request(1, getUrl(), null, 200));
-        	break;
+            expectedChange.add(new Request(1, getUrl(), null, 200));
+            break;
         default:
-        	expectedChange.add(new Request(getUrl(), null, 200));
+            expectedChange.add(new Request(getUrl(), null, 200));
         }
         assertRequests(expectedChange, logs);
         assertAppCacheStatus(Status.UNCACHED);
@@ -209,8 +214,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Manifest request limit exceeded for the time period should result in reset.
-     * BrowserType.SAFARI is disabled : W-2367702
+     * Manifest request limit exceeded for the time period should result in reset. BrowserType.SAFARI is disabled :
+     * W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testManifestRequestLimitExceeded() throws Exception {
@@ -444,17 +449,17 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         params.put("aura.mode", getAuraModeForCurrentBrowser().toString());
         url = addUrlParams(url, params);
         getDriver().get(getAbsoluteURI(url).toString());
-        
+
         auraUITestingUtil.waitUntilWithCallback(
-        		new Function<WebDriver, Integer>() {
+                new Function<WebDriver, Integer>() {
                     @Override
                     public Integer apply(WebDriver input) {
-                    	Integer appCacheStatus = Integer.parseInt(auraUITestingUtil.getEval(
-                    	"return window.applicationCache.status;").toString());
-                        if(appCacheStatus != 3 && appCacheStatus != 2 ) {
-                        	return appCacheStatus;
+                        Integer appCacheStatus = Integer.parseInt(auraUITestingUtil.getEval(
+                                "return window.applicationCache.status;").toString());
+                        if (appCacheStatus != 3 && appCacheStatus != 2) {
+                            return appCacheStatus;
                         } else {
-                        	return null;
+                            return null;
                         }
                     }
                 },
@@ -462,21 +467,21 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                     @Override
                     public String apply(WebDriver d) {
                         Object ret = auraUITestingUtil.getRawEval("return window.applicationCache.status");
-                        return "Current AppCache status is " 
-                        		+ auraUITestingUtil.appCacheStatusIntToString(((Long) ret).intValue());
+                        return "Current AppCache status is "
+                                + auraUITestingUtil.appCacheStatusIntToString(((Long) ret).intValue());
                     }
                 },
-        		10, 
-        		"fail waiting on application cache not to be Downloading or Checking before clicking on 'clickableme'");
+                10,
+                "fail waiting on application cache not to be Downloading or Checking before clicking on 'clickableme'");
 
         auraUITestingUtil
                 .waitUntil(
                         new Function<WebDriver, WebElement>() {
                             @Override
                             public WebElement apply(WebDriver input) {
-                            	try {
-                            		WebElement find = findDomElement(By
-                                        .cssSelector(".clickableme"));
+                                try {
+                                    WebElement find = findDomElement(By
+                                            .cssSelector(".clickableme"));
                                     if (markupToken.equals(find.getText())) {
                                         return find;
                                     }
@@ -496,8 +501,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                     @Override
                     public String apply(WebDriver input) {
                         try {
-                        	WebElement find = findDomElement(By
-                                .cssSelector(".clickableme"));
+                            WebElement find = findDomElement(By
+                                    .cssSelector(".clickableme"));
                             find.click();
                             WebElement output = findDomElement(By
                                     .cssSelector("div.attroutput"));
@@ -584,8 +589,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              */
             return ImmutableList.of(
                     // The manifest change causes the correct fetch, eliminating our 302 and 404
-                    //new Request(getUrl(), null, 302), // hard refresh
-                    //new Request("/auraResource", "manifest", 404), // manifest out of date
+                    // new Request(getUrl(), null, 302), // hard refresh
+                    // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request(3, "/auraResource", "manifest", 200),
                     new Request(2, getUrl(), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
@@ -600,8 +605,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
              */
             return ImmutableList.of(
                     // The manifest change causes the correct fetch, eliminating our 302
-                    //new Request(getUrl(), null, 302), // hard refresh
-                    //new Request("/auraResource", "manifest", 404), // manifest out of date
+                    // new Request(getUrl(), null, 302), // hard refresh
+                    // new Request("/auraResource", "manifest", 404), // manifest out of date
                     new Request("/auraResource", "manifest", 200),
                     new Request(2, getUrl(), null, 200), // rest are cache updates
                     new Request(2, "/auraResource", "css", 200),
@@ -737,7 +742,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         SimpleDateFormat sd = new SimpleDateFormat();
         sd.setTimeZone(TimeZone.getTimeZone("GMT"));
         String expiryFormatted = sd.format(expiry);
-        String command = "document.cookie = '" + name + "="+value+"; expires=" + expiryFormatted + "; path=" + path + "';";
+        String command = "document.cookie = '" + name + "=" + value + "; expires=" + expiryFormatted + "; path=" + path
+                + "';";
         auraUITestingUtil.getEval(command);
     }
 }

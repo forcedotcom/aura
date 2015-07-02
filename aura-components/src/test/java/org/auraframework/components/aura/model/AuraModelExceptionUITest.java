@@ -23,7 +23,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * aura:interation UI tests.
@@ -51,8 +50,8 @@ public class AuraModelExceptionUITest extends WebDriverTestCase {
         auraUITestingUtil.waitForDocumentReady();
         List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
         assertEquals("Renderer element found", 0, errorBoxes.size());
-        WebDriverWait wait = new WebDriverWait(getDriver(), timeoutInSecs);
-        errorBoxes = wait.until(new ExpectedCondition<List<WebElement>>() {
+
+        errorBoxes = auraUITestingUtil.waitUntil(new ExpectedCondition<List<WebElement>>() {
             @Override
             public List<WebElement> apply(WebDriver d) {
                 List<WebElement> errors = getDriver().findElements(By.cssSelector(".auraErrorBox"));

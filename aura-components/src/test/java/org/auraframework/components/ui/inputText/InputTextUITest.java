@@ -279,7 +279,7 @@ public class InputTextUITest extends WebDriverTestCase {
                         return null;
                     }
                 }
-            }, (timeoutInSecs * 3));
+            }, (auraUITestingUtil.getTimeout() * 3));
         } catch (TimeoutException e) {
             assertEquals(errorMsg, expectedValue, getCurrentModelValue());
             return getCurrentModelValue();

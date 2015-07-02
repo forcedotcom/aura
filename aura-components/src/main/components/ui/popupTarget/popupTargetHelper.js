@@ -204,6 +204,9 @@
 	    // or else CSS transitions will not work when the target is appended to the body
 	    // at the same time the visible property is changed
 	    setTimeout(function() {
+	        if (!elements.target.isValid()) {
+	            return;
+	        }
 		    if (visible === true) {
 	        	$A.util.removeClass(elements.targetElement, component.get('v.preTransitionClass'));
 	        	$A.util.addClass(elements.targetElement, "visible");

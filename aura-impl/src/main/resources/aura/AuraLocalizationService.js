@@ -459,7 +459,7 @@ AuraLocalizationService.prototype.getHoursInDuration = function(d) {
 AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
     var langLocale = $A.get("$Locale.langLocale");
     var l = this.getNormalizedLangLocale(langLocale);
-    return moment["langData"](l);
+    return moment["localeData"](l);
 };
 
 /**
@@ -881,7 +881,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
  */
 AuraLocalizationService.prototype.displayDateTime = function(mDate, format, locale) {
     if (locale) { // set locale locally
-        mDate["lang"](this.getNormalizedLangLocale(locale));
+        mDate["locale"](that.getNormalizedLangLocale(locale));
     }
     return mDate["format"](this.getNormalizedFormat(format));
 };
@@ -932,12 +932,11 @@ AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale)
         var ret = lang[0];
         if (lang[1]) {
             var langAndCountry = lang[0] + "-" + lang[1];
-
-            if (moment["langData"](langAndCountry)) {
+            if (moment["localeData"](langAndCountry)) {
                 ret = langAndCountry;
             }
         }
-        if (!moment["langData"](ret)) {
+        if (!moment["localeData"](ret)) {
             ret = "en";
         }
         this.cache.langLocale[langLocale] = ret;
@@ -1024,7 +1023,7 @@ AuraLocalizationService.prototype.init = function() {
     // Set global default language locale
     var defaultLangLocale = $A.get("$Locale.langLocale");
     if (defaultLangLocale) {
-        moment.lang(this.getNormalizedLangLocale(defaultLangLocale));
+        moment.locale(that.getNormalizedLangLocale(defaultLangLocale));
     }
 };
 

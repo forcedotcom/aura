@@ -26,9 +26,11 @@
         <div aura:id="equals"></div>
     </aura:if>
 
+    <!-- the test is disable, see detail in componentTest/versioning.js
     <aura:if isTrue="{!version > 1}">
         <div aura:id="inequality"></div>
     </aura:if>
+    -->
 
     Version In Bound Expression: <aura:text aura:id="boundVersionExpression" value="{!version}"/><br/>
     Version In Unbound Expression: <aura:text aura:id="unboundVersionExpression" value="{#version}"/>

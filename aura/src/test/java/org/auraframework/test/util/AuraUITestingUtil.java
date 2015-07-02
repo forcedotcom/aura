@@ -15,6 +15,8 @@
  */
 package org.auraframework.test.util;
 
+
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -508,24 +510,6 @@ public class AuraUITestingUtil {
                         return null;
                     }
                 });
-    }
-
-    /**
-     * Get an error message from the error div.
-     * 
-     * FIXME: this is _not_ a quick fix message. This is the error box that is used by $A.error. Also note that this
-     * does not check if the box is visible. This box should always be present, and may contain old text that is no
-     * longer relevant. Please don't use this!
-     * 
-     * @return the error message.
-     */
-    @Deprecated
-    public String getQuickFixMessage() {
-        WebElement errorBox = driver.findElement(By.id("auraErrorMessage"));
-        if (errorBox == null) {
-            Assert.fail("Aura errorBox not found.");
-        }
-        return errorBox.getText();
     }
 
     /**

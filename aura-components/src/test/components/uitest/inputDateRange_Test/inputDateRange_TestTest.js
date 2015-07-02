@@ -249,12 +249,12 @@
     },
 
     selectDate : function(datePicker, dateStr) {
-        var date = new Date(dateStr);
+        var date = new Date(dateStr.replace(/-/g, '/'));
         var year = date.getFullYear(),
             month = date.getMonth(),
             day = date.getDate();
 
-        var currentDate = new Date(datePicker.get("v.value"));
+        var currentDate = new Date(datePicker.get("v.value").replace(/-/g, '/'));
         var currentYear = currentDate.getFullYear(),
             currentMonth = currentDate.getMonth();
         //changing year
@@ -281,7 +281,7 @@
             $A.run(function () {
                 var firstDate = new Date(year, month, 1);
                 var initialPos = firstDate.getDay();
-                var pos = initialPos + day;
+                var pos = initialPos + day - 1;
                 datePicker.find("grid").find(pos).getEvent("click").fire({});
             })
         }, 0);

@@ -118,7 +118,7 @@ PassthroughValue.prototype.fireChangeEvent = function(key, oldValue, value, inde
         var eventDef = $A.get("e").getEventDef("aura:valueChange");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
-        var changeEvent = new Event({
+        var changeEvent = new Aura.Event.Event({
             "eventDef" : eventDef,
             "eventDispatcher" : dispatcher
         });

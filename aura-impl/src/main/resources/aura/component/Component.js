@@ -553,7 +553,7 @@ if(!this.concreteComponentId) {
             var eventDef = $A.get("e").getEventDef("aura:methodCall");
             var dispatcher = {};
             dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
-            var methodEvent = new Event({
+            var methodEvent = new Aura.Event.Event({
                 "eventDef" : eventDef,
                 "eventDispatcher" : dispatcher
             });
@@ -779,7 +779,7 @@ if(!this.concreteComponentId) {
             var eventDef = $A.get("e").getEventDef("aura:valueChange");
             var dispatcher = {};
             dispatcher[eventDef.getDescriptor().getQualifiedName()] = observers;
-            var changeEvent = new Event({
+            var changeEvent = new Aura.Event.Event({
                 "eventDef" : eventDef,
                 "eventDispatcher" : dispatcher
             });
@@ -2226,7 +2226,7 @@ Component.prototype.getEvent = function(name) {
         // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
         // return null;
     }
-    return new Event({
+    return new Aura.Event.Event({
         "name" : name,
         "eventDef" : eventDef,
         "component" : this.getConcreteComponent()
@@ -2264,7 +2264,7 @@ Component.prototype.fire = function(name) {
     var eventQName = eventDef.getDescriptor().getQualifiedName();
     var handlers = dispatcher[eventQName];
     if(handlers){
-        var event = new Event({
+        var event = new Aura.Event.Event({
             "eventDef" : eventDef,
             "eventDispatcher" : dispatcher
         });

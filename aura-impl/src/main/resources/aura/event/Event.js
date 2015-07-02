@@ -21,7 +21,7 @@
  * @platform
  * @export
  */
-function Event(config) {
+Aura.Event.Event = function(config) {
     this.source = config["component"];
     this.eventDef = config["eventDef"];
     this.eventDispatcher = config["eventDispatcher"];
@@ -30,7 +30,7 @@ function Event(config) {
     this.fired = false;
     this.eventStopPropagation = false;
     this.componentEvent = false;
-}
+};
 
 /**
  * Gets the source component that fired this component event.
@@ -40,7 +40,7 @@ function Event(config) {
  * @platform
  * @export
  */
-Event.prototype.getSource = function() {
+Aura.Event.Event.prototype.getSource = function() {
     return this.source;
 };
 
@@ -49,7 +49,7 @@ Event.prototype.getSource = function() {
  * Returns an EventDef object.
  * @export
  */
-Event.prototype.getDef = function(){
+Aura.Event.Event.prototype.getDef = function(){
     return this.eventDef;
 };
 
@@ -59,7 +59,7 @@ Event.prototype.getDef = function(){
  * The default is false
  * @export
  */
-Event.prototype.stopPropagation = function() {
+Aura.Event.Event.prototype.stopPropagation = function() {
     this.eventStopPropagation = true;
 };
 
@@ -70,7 +70,7 @@ Event.prototype.stopPropagation = function() {
  * NOTE: Calling events on a child is discouraged and will be deprecated
  * @export
  */
-Event.prototype.setComponentEvent = function(){
+Aura.Event.Event.prototype.setComponentEvent = function(){
     this.componentEvent = true;
     return this;
 };
@@ -81,7 +81,7 @@ Event.prototype.setComponentEvent = function(){
  * @platform
  * @export
  */
-Event.prototype.getName = function(){
+Aura.Event.Event.prototype.getName = function(){
     return this.eventName;
 };
 
@@ -92,7 +92,7 @@ Event.prototype.getName = function(){
  * @platform
  * @export
  */
-Event.prototype.setParams = function(config) {
+Aura.Event.Event.prototype.setParams = function(config) {
     if (this.fired) {
         $A.assert(false, "Event.setParams(): cannot modify all params in an event that has already been fired.");
     }
@@ -119,7 +119,7 @@ Event.prototype.setParams = function(config) {
  * @platform
  * @export
  */
-Event.prototype.setParam = function(key, value) {
+Aura.Event.Event.prototype.setParam = function(key, value) {
     if (this.fired && this.componentEvent) {
         $A.assert(false, "Event.setParam(): cannot modify a component event that has already been fired.");
     }
@@ -136,7 +136,7 @@ Event.prototype.setParam = function(key, value) {
  * @platform
  * @export
  */
-Event.prototype.getParam = function(name){
+Aura.Event.Event.prototype.getParam = function(name){
     return this.params[name];
 };
 
@@ -145,15 +145,15 @@ Event.prototype.getParam = function(name){
  * @platform
  * @export
  */
-Event.prototype.getParams = function(){
+Aura.Event.Event.prototype.getParams = function(){
     return this.params;
 };
 
 //#if {"modes" : ["STATS"]}
-Event.prototype.statsIndex = [];
+Aura.Event.Event.prototype.statsIndex = [];
 //#end
 
-Event.prototype.dispatchNonComponentEventHandlers = function () {
+Aura.Event.Event.prototype.dispatchNonComponentEventHandlers = function () {
     if (this.eventDispatcher) {
         var def = this.eventDef;
         while (def) {
@@ -181,7 +181,7 @@ Event.prototype.dispatchNonComponentEventHandlers = function () {
     }
 };
 
-Event.prototype.dispatchComponentEventHandlers = function () {
+Aura.Event.Event.prototype.dispatchComponentEventHandlers = function () {
     var cmp = this.source;
     while (cmp && cmp.getDef().getEventDef(this.eventName)) {
         var dispatcher = cmp.getEventDispatcher();
@@ -209,7 +209,7 @@ Event.prototype.dispatchComponentEventHandlers = function () {
  * @platform
  * @export
  */
-Event.prototype.fire = function(params) {
+Aura.Event.Event.prototype.fire = function(params) {
     var self = this;
 
     if (this.fired) {
@@ -239,8 +239,6 @@ Event.prototype.fire = function(params) {
     }, this.eventDef.getDescriptor().getQualifiedName()/*name for the stack*/);
 
     //#if {"modes" : ["STATS"]}
-    Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+    Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
     //#end
 };
-
-Aura.Event.Event = Event;

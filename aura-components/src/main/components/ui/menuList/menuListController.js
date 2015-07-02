@@ -18,8 +18,11 @@
     	helper.onMenuItemSelected(component, event);
     },
 
+    // TODO: This should be moved to a method
     update: function(component, event, helper) {
     	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
         _helper.setEventHandlersOnChildren(component);
+        
+        event.stopPropagation();
     }
 })

@@ -62,7 +62,7 @@
 
     setMenuItemFocus: function(component, index) {
         var menuItem = this.getMenuItem(component, index);
-        if (menuItem) {
+        if (menuItem && menuItem.isValid()) {
             var action = menuItem.get("c.setFocus");
             if (action) {
                 action.runDeprecated();

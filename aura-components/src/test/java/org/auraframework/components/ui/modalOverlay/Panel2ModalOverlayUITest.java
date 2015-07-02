@@ -24,7 +24,9 @@ import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD, BrowserType.IE7, BrowserType.IE8})
 public class Panel2ModalOverlayUITest extends WebDriverTestCase {
@@ -140,7 +142,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
     
     private void verifyCustomCloseActionMethodCalled(String actionType) {
-    	String panelGlobalId = findDomElements(By.cssSelector(".IdCreated")).get(0).getText();
+    	String panelGlobalId = findDomElements(By.cssSelector(".info .idCreated")).get(0).getText();
     	String attrValueExp = auraUITestingUtil.getValueFromCmpExpression(panelGlobalId, "v.closeActionCalled");
         
     	String attrValueText = (String) auraUITestingUtil.getEval(attrValueExp);
@@ -361,7 +363,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     	firstInput.get(1).click();
     	WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
     	//assertEquals("Focus should be on first element", panelType, auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-    	int numElements = 23;
+    	int numElements = 24;
     	// cycle through input elements on panel
     	for (int i=1; i<numElements; i++) {
     		activeElement.sendKeys(Keys.TAB);
@@ -420,7 +422,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     	waitForPanel(PANEL_DIALOG, false);
     }
     
-    private void waitForPanel(String panelType, boolean isOpen) throws InterruptedException {
+    private void waitForPanel(final String panelType, final boolean isOpen) throws InterruptedException {
     	By locator = By.cssSelector(panelType);
     	waitFor(3);
     	if (isOpen) {

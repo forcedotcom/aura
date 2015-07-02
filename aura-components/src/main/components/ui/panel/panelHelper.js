@@ -39,12 +39,18 @@
         var autoFocus = cmp.get('v.autoFocus');
         var panelEl = cmp.getElement();
         //move the dialog to the right position
-        var referenceElementSelector = cmp.get("v.referenceElementSelector");
+        var referenceElementSelector = cmp.get('v.referenceElementSelector');
         var referenceEl = cmp.get('v.referenceElement');
         
         cmp.set('v.visible', true);
+        
         if(!referenceEl) {
             referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
+        }
+        
+        // refereceElement is an array or NodeList, grabbing first element 
+        if (referenceEl && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') )) {
+        		referenceEl = referenceEl.length > 0 ? referenceEl[0] : null;
         }
 
         var self = this;
@@ -192,7 +198,7 @@
                 };
                 break;
         }
-
+        
         if(!cmp.constraints) {
             cmp.constraints = [];
             cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({

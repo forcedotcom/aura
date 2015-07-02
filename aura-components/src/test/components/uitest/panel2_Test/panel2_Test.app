@@ -31,7 +31,7 @@
 	<aura:attribute name="testAutoFocus"    type="Boolean" default="true"/>
 	<aura:attribute name="testDirection"    type="String"  default="north"/>
 	<aura:attribute name="testShowPointer"  type="Boolean" default="false"/>
-	<aura:attribute name="testReferenceElement"         type="Object"/>
+	<aura:attribute name="testUseReferenceElementSelector" type="Boolean" default="false"/>
 	<aura:attribute name="testUseReferenceElement"      type="Boolean" default="false"/>
 	<aura:attribute name="testReferenceElementSelector" type="String"/>
 	<aura:attribute name="testUseHeader"    type="Boolean" default="false"/>
@@ -70,7 +70,7 @@
 		autoFocus="{!v.testAutoFocus}"  
 		direction="{!v.testDirection}"  
 		showPointer="{!v.testShowPointer}"
-		referenceElement="{!v.testReferenceElement}"
+		useReferenceElementSelector="{!v.testUseReferenceElementSelector}"
 		useReferenceElement="{!v.testUseReferenceElement}"
 		referenceElementSelector="{!v.testReferenceElementSelector}"
 		useHeader="{!v.testUseHeader}"  

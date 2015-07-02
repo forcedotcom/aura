@@ -39,6 +39,7 @@
         test : [function(cmp) {
             this.resetCounter(cmp, "testStorageOfServerActionWithNullParams");
         }, function(cmp) {
+            cmp._value = [];
             var a = cmp.get("c.simpleValuesAsParams");
             a.setParams({
                 testName : "testStorageOfServerActionWithNullParams",
@@ -47,15 +48,14 @@
             });
             a.setStorable();
             a.setCallback(cmp, function(action) {
-                cmp._value = action.getReturnValue();
+                cmp._value.push(action.getReturnValue());
             });
             $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
-                return cmp._value;
-            }, function() {
-                cmp._value = "";
+                return cmp._value[0];
             });
             $A.enqueueAction(a);
         }, function(cmp) {
+            cmp._value = [];
             var a = cmp.get("c.simpleValuesAsParams");
             a.setParams({
                 testName : "testStorageOfServerActionWithNullParams",
@@ -64,20 +64,20 @@
             });
             a.setStorable();
             a.setCallback(cmp, function(action) {
-                cmp._value = cmp._value + action.getReturnValue();
+                cmp._value.push(action.getReturnValue());
             });
             // check stored value
             $A.test.addWaitFor("Message 1 : null was the MVP in 1", function() {
-                return cmp._value;
-            }, function() {
-                cmp._value = "";
+                return cmp._value[0];
             });
             // check refresh value
             $A.test.addWaitFor("Message 2 : null was the MVP in 1", function() {
-                return cmp._value;
+                return cmp._value[1];
+            }, function() {
+                $A.test.assertEquals(2, cmp._value.length, "Action callback called too many times");
             });
             $A.enqueueAction(a);
-        } ]
+        }]
     },
 
     /**

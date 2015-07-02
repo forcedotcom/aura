@@ -22,23 +22,22 @@ Function.RegisterNamespace("Test.Aura.Util");
 
 [Fixture]
 Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
-    
     [Fixture]
     function browserUnsupportedTests() {
         var MockObject = {};
         for (var key in Object) { MockObject[key] = Object[key]; }
         MockObject.prototype = Object.create(Object.prototype);
-        
+
         MockObject.keys = undefined;
 
         var MockFunction = function MockFunction() {};
         MockFunction.prototype = Object.create(Function.prototype);
-        
+
         MockFunction.prototype.bind = undefined;
-        
+
         var MockArray = function() {};
         MockArray.prototype = Object.create(Array.prototype);
-        
+
         MockArray.prototype.forEach = undefined;
         MockArray.prototype.map = undefined;
         MockArray.prototype.reduce = undefined;
@@ -48,7 +47,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
         MockArray.isArray = function(obj) {
             return (obj instanceof [].constructor);
         };
-        
+
         var utilMock = function(override, delegate) {
             Mocks.GetMocks(Object.Global(),{
                 exp:function() {},
@@ -57,12 +56,13 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 Json:function() {},
                 Style:function() {},
                 Bitset:{},
-                NumberFormat:{},            
+                NumberFormat:{},
                 Aura: {Utils: {
                     Json:function() {},
                     Style:function() {},
                     Bitset:{},
-                    NumberFormat:{}
+                    NumberFormat:{},
+                    SizeEstimator:function() {}
                 }},
                 navigator:{userAgent:''},
                 Array: override === MockArray ? override : Array,
@@ -78,7 +78,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 }
             });
         };
-            
+
         function doArrayErrorTest(methodName, isPredicate) {
             utilMock(MockArray, function(util){
                 try {
@@ -88,7 +88,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     Assert.True(e instanceof TypeError);
                     Assert.Equal("$A.util." + methodName + " called on non-array.",  e.message);
                 }
-                
+
                 try {
                     util[methodName]([], {});
                     Assert.False(true, "Method should throw an error.");
@@ -101,7 +101,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 }
             });
         }
-            
+
         [Fact]
         function testForEach() {
             utilMock(MockArray, function(util){
@@ -109,36 +109,36 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 util.forEach(["A", "B", "C"], function(letter, index) {
                     actual.push(this + letter + index);
                 }, "THIS_OBJECT");
-                
+
                 Assert.Equal(actual[0], "THIS_OBJECTA0");
                 Assert.Equal(actual[1], "THIS_OBJECTB1");
                 Assert.Equal(actual[2], "THIS_OBJECTC2");
             });
         }
-        
+
         [Fact]
         function testForEachError() {
             doArrayErrorTest("forEach");
         }
-        
+
         [Fact]
         function testMap() {
             utilMock(MockArray, function(util){
                 var actual = util.map(["A", "B", "C"], function(letter, index) {
                     return this + letter + index;
                 }, "THIS_OBJECT");
-                
+
                 Assert.Equal(actual[0], "THIS_OBJECTA0");
                 Assert.Equal(actual[1], "THIS_OBJECTB1");
                 Assert.Equal(actual[2], "THIS_OBJECTC2");
             });
         }
-        
+
         [Fact]
         function testMapError() {
             doArrayErrorTest("map");
         }
-        
+
         [Fact]
         function testReduce() {
             utilMock(MockArray, function(util){
@@ -146,18 +146,18 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     current.push(letter + index);
                     return current;
                 }, []);
-                
+
                 Assert.Equal(actual[0], "A0");
                 Assert.Equal(actual[1], "B1");
                 Assert.Equal(actual[2], "C2");
             });
         }
-        
+
         [Fact]
         function testReduceError() {
             doArrayErrorTest("reduce");
         }
-        
+
         [Fact]
         function testFilter() {
             utilMock(MockArray, function(util) {
@@ -165,94 +165,94 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     [0, 2],
                     util.filter([0, 2, 3], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "Result should only contain even numbers."
                 );
-                
+
                 Assert.Equal(
             		[],
                     util.every([1, 3, 5], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "All numbers were odd, result should be empty."
                 );
             });
         }
-        
+
         [Fact]
         function testFilterError() {
             doArrayErrorTest("filter", true);
         }
-        
+
         [Fact]
         function testEvery() {
             utilMock(MockArray, function(util){
                 Assert.True(
                     util.every([0, 2, 4], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "All elements + 1 should be odd."
                 );
-                
+
                 Assert.False(
                     util.every([1, 2, 4], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "First elements + 1 should not be odd."
                 );
             });
         }
-        
+
         [Fact]
         function testEveryError() {
             doArrayErrorTest("every", true);
         }
-        
+
         [Fact]
         function testSome() {
             utilMock(MockArray, function(util) {
                 Assert.True(
                     util.some([1, 3, 4], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "Last element + 2 should be odd."
                 );
-                
+
                 Assert.False(
                     util.some([1, 3, 5], function(element, index) {
                         return (this + element) % 2 === 1;
-                    }, 1), 
+                    }, 1),
                     "No element + 1 should be odd."
                 );
             });
         }
-        
+
         [Fact]
         function testSomeError() {
             doArrayErrorTest("some", true);
         }
-            
+
         [Fact]
         function testBind() {
             function multiplyBPlusCByA(a, b, c) {
                 return a * (b + c);
             }
-            
+
             utilMock(MockFunction, function(util) {
                 var bPlusCTimes5 = util.bind(multiplyBPlusCByA, null, 5);
                 Assert.Equal(20, bPlusCTimes5(1, 3));
                 Assert.Equal(50, bPlusCTimes5(7, 3));
-                
+
                 var cPlus1Times5 = util.bind(bPlusCTimes5, null, 1);
                 Assert.Equal(20, cPlus1Times5(3));
                 Assert.Equal(25, cPlus1Times5(4));
-                
+
                 var bPlusCTime5Called = util.bind.call(null, multiplyBPlusCByA, null, 5);
                 Assert.Equal(20, bPlusCTimes5(1, 3));
                 Assert.Equal(50, bPlusCTimes5(7, 3));
             });
         }
-        
+
         [Fact]
         function testBindError() {
             utilMock(MockFunction, function(util) {
@@ -265,7 +265,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 }
             });
         }
-        
+
         [Fact]
         function testKeys() {
             utilMock(MockObject, function(util) {
@@ -274,7 +274,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     testObjects[i]["hello"] = "world";
                     testObjects[i]["goodbye"] = "cruel world";
                 }
-                
+
                 for (i = 0; i < testObjects.length; i++) {
                     var keys = util.keys(testObjects[i]);
                     Assert.Equal(2, keys.length);
@@ -283,7 +283,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 }
             });
         }
-        
+
         [Fact]
         function testKeysError() {
             utilMock(MockObject, function(util) {
@@ -298,4 +298,4 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
         }
     }
 }
- 
+

@@ -6,19 +6,14 @@
     labels : [ "threadHostile" ],
 
     setUp : function(cmp) {
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
-        var storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
-        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb")});
-    },
-
-    resetCounters:function(cmp){
-        cmp._storageModified = false;
-        cmp._storageModifiedCounter = 0;
+        $A.test.overrideFunction($A.storageService, "selectAdapter", function(){ return "indexeddb"; });
+        this.storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
+        $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
     },
 
     append:function(cmp, string) {
         var helper = cmp.getDef().getHelper();
-        $A.run(function() {helper.appendLine(cmp, string);});
+        $A.run(function() { helper.appendLine(cmp, string); });
     },
 
     dieDieDie:function(cmp, thing) {
@@ -32,26 +27,23 @@
         $A.test.fail(string);
     },
 
-    assertAfterStorageChange:function(cmp, callback){
-        $A.test.addWaitFor(2, function() {
-            return cmp._storageModified?cmp._storageModifiedCounter:0;
-        }, callback);
+    testSizeInitial: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testSizeInitial(this.storage);
+        }
     },
 
     testGetName : {
         test : function(cmp) {
-            var storage = $A.storageService.getStorage("browserdb");
-            this.append(cmp, "Name "+storage.getName());
-            $A.test.assertEquals("indexeddb", storage.getName());
+            cmp.helper.lib.storageTest.testGetName(cmp, this.storage, "indexeddb");
         }
     },
 
     testGetSize:{
         test:[function (cmp) {
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
                     true, false, 32768, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow")});
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
             cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
             cmp._append = function(string) { this.append(cmp, string); }.bind(this);
         }, function(cmp){
@@ -108,380 +100,153 @@
 
     testGetMaxSize:{
         test:function(cmp){
-            var storage = $A.storageService.getStorage("browserdb");
-            $A.test.assertEquals(32, storage.getMaxSize(), "testGetMaxSize: Failed to configure max size of storage");
+            cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 32);
         }
     },
 
-    runUnsureKey : function(cmp, key) {
-        var completed = false;
-        var die = function(error) { completed = true; this.dieDieDie(cmp, error); }.bind(this);
-        var storage = $A.storageService.getStorage("browserdb");
-        var append = function(string) { this.append(cmp, string); }.bind(this);
-        append("put("+key+",value);");
-        storage.put(key, "value")
-            .then(function() {
-                append("get("+key+");");
-                return storage.get(key);
-            }).then(function(item) {
-                append("value="+item);
-                if (item) {
-                    $A.test.assertEquals("value", item.value, "Failed initial get for "+key);
-                }
-                append("remove("+key+");");
-                return storage.remove(key);
-            }).then(function() {
-                append("get("+key+");");
-                return storage.get(key);
-            }).then(function(item) {
-                append("value="+item);
-                completed = true;
-                $A.test.assertUndefinedOrNull(item, "remove failed");
-            }, die)
-        $A.test.addWaitFor(true, function() { return completed; });
+    testNullKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testNullKey(cmp, this.storage);
+        }
     },
 
-    testGetNoValues:{
-        test: [ function(cmp){
-            this.runUnsureKey(cmp, null);
+    testUndefinedKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testUndefinedKey(cmp, this.storage);
+        }
+    },
+
+    testEmptyStringKey: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
+        }
+    },
+
+    testGetNullValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+        }
+    },
+    
+    testGetUndefinedValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
+        }
+    },
+    
+    testGetBooleanTrueValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
+        }
+    },
+    
+    testGetZeroValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
+        }
+    },
+    
+    testGetSimpleStringValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
+        }
+    },
+    
+    testGetEmptyObjectValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
+        }
+    },
+    
+    testGetBasicObjectValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
+        }
+    },
+    
+    testGetEmptyArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
+        }
+    },
+    
+    testGetBasicArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
+        }
+    },
+    
+    testGetBigArrayValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
+        }
+    },
+    
+    testGetMultiByteStringValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
+        }
+    },
+
+    testSetItemOverMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
         },
         function(cmp) {
-            this.runUnsureKey(cmp, undefined);
-        },
-        function(cmp) {
-            this.runUnsureKey(cmp, "");
+            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
         }]
-    },
-
-    runFullCycle : function(cmp, key, value) {
-        var completed = false;
-        var append = function(string) { this.append(cmp, string); }.bind(this);
-        var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-        var storage = $A.storageService.getStorage("browserdb");
-        append("put("+key+","+value+");");
-        storage.put(key, value)
-            .then(function() {
-                append("get("+key+");");
-                return storage.get(key);
-            }).then(function(item) {
-                if ($A.util.isObject(value)) {
-                    for (var x in value) {
-                        if (value.hasOwnProperty(x)) {
-                            $A.test.assertEquals(value[x], item.value[x], "Failed object match on property "+x);
-                        }
-                    }
-                } else if ($A.util.isArray(value)) {
-                    $A.test.assertEquals(value.length, item.value.length, "Failed match on array length");
-                    for (var i =0; i < value.length; i++) {
-                        $A.test.assertEquals(value[i], item.value[i], "Failed match on array index "+i);
-                    }
-                } else {
-                    $A.test.assertEquals(value, item.value, "Failed initial get for "+value);
-                }
-                append("remove("+key+");");
-                return storage.remove(key);
-            }).then(function() {
-                append("get("+key+");");
-                return storage.get(key);
-            }).then(function(item) {
-                append("value="+item);
-                completed = true;
-                $A.test.assertUndefinedOrNull(item, "remove failed");
-            }, die);
-        $A.test.addWaitFor(true, function() { return completed; });
-    },
-
-    testValues:{
-        test:[
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", null);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", undefined);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", true);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", 0);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", "a");
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", {});
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", {"a": "b"});
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", []);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", ["a", "b"]);
-            },
-            function(cmp) {
-                this.runFullCycle(cmp, "testValues", new Array(1024).join("x"));
-            }
-        ]
-    },
-
-    testValueTooLarge: {
-        "test":[ function(cmp) {
-                var completed = false;
-                var storage = $A.storageService.getStorage("browserdb");
-                storage.remove("valueTooLarge")
-                    .then(function () {
-                        return storage.put("valueTooLarge", new Array(32768).join("x"))
-                    }).then(function() {
-                        $A.test.fail("Successfully stored value that is too large");
-                        completed = true;
-                    }, function() {
-                        completed = true;
-                    });
-                    $A.test.addWaitFor(true, function() { return completed; });
-            }, function(cmp) {
-                var storage = $A.storageService.getStorage("browserdb");
-                var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-                var completed = false;
-                storage.get("valueTooLarge")
-                    .then(function (item) {
-                        completed = true;
-                        $A.test.assertUndefinedOrNull(item, "value too large should not be stored.");
-                    }, die);
-                $A.test.addWaitFor(true, function() { return completed; });
-            }]
     },
 
     testTwistedObject:{
         test:function(cmp){
-                var storage = $A.storageService.getStorage("browserdb");
-                var die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-                var completed = false;
-                var stuff = { "a": 2 };
-                stuff["b"] = stuff;
-
-                storage.put("testTwistedObject", stuff)
-                    .then(function() { return storage.get("testTwistedObject"); })
-                    .then(function(item) {
-                        $A.test.assertEquals(item.value["a"], 2, "testTwistedObject: constant is wrong");
-                        $A.test.assertEquals(item.value["b"], item.value, "testTwistedObject: looped value is wrong");
-                        completed = true;
-                    }, die);
-                $A.test.addWaitFor(true, function() { return completed; });
-            }
+            cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
+        }
     },
 
     testModifyObject:{
         test:function(cmp){
-                var storage = $A.storageService.getStorage("browserdb");
-                var die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-                var completed = false;
-                var stuff = { "changeling": 2 };
-                storage.put("testModifyObject", stuff)
-                    .then(function() { stuff["changeling"] = 3; return storage.get("testModifyObject"); })
-                    .then(function(item) {
-                        $A.test.assertEquals(item.value["changeling"], 2,
-                            "testModifyObject: Object changed while stored");
-                        completed = true;
-                    }, die);
-                $A.test.addWaitFor(true, function() { return completed; });
-            }
+            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
+        }
     },
 
     testUpdate: {
         test:function(cmp){
-            var storage = $A.storageService.getStorage("browserdb");
-            var die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            var append = function(string) { this.append(cmp, string); }.bind(this);
-            var completed = false;
-
-            storage.put("testUpdate", "ORIGINAL")
-                .then(function() { return storage.get("testUpdate"); })
-                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
-                .then(function() { return storage.put("testUpdate", "DUPLICATE"); })
-                .then(function() { return storage.get("testUpdate"); })
-                .then(function(item) {
-                    $A.test.assertEquals("DUPLICATE", item.value);
-                    return storage.remove("testUpdate");
-                }).then(function() {
-                    completed = true;
-                }, die);
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
         }
     },
 
-    //
-    // Overflow has some interesting problems, among them, we have a problem with
-    // races, because everything is done asynchronously. To avoid this, we use getAll to
-    // try to ensure that we are very likely to win any races by being the slowest one
-    // there. However, there is a chance that we will lose...
-    //
     testOverflow: {
-        test:[function (cmp) {
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
+        test:[function(cmp) {
+            // Due to differences in size calculation between adapters, pass in a storage with the correct size to
+            // fill up the storage after 5 entries of a 512 character string.
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
                     true, false, 5000, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow")});
-            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { this.append(cmp, string); }.bind(this);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
+
+            cmp.helper.lib.storageTest.testOverflow_stage1(cmp, cmp._storage);
         }, function(cmp) {
-            var completed = false;
-            var chunk = new Array(512).join("x");
-
-            cmp._storage.put("testOverflow.1", chunk)
-                .then(function() {
-                    return cmp._storage.put("testOverflow.2", chunk);
-                }).then(function() {
-                    return cmp._storage.put("testOverflow.3", chunk);
-                }).then(function() {
-                    return cmp._storage.put("testOverflow.4", chunk);
-                }).then(function() {
-                    return cmp._storage.put("testOverflow.5", chunk);
-                }).then(function() {
-                    return cmp._storage.getSize();
-                }).then(function(size) {
-                    cmp._append("finished add, size = "+size);
-                    return cmp._storage.getAll();
-                }).then(function(result) {
-                    cmp._append("get all finished, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        cmp._append(result[i]);
-                    }
-                    return cmp._storage.getSize();
-                }).then(function(size) {
-                    cmp._append("post getAll size = "+size);
-                    completed = true;
-                }, cmp._die);
-            $A.test.addWaitFor(true, function() { return completed; });
-        }, function(cmp) {
-            var completed = false;
-            cmp._storage.getAll()
-                .then(function(result) {
-                    cmp._append("Race 1, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        cmp._append(result[i]);
-                    }
-                    return cmp._storage.getAll();
-                }).then(function(result) {
-                    cmp._append("Race 2, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        cmp._append(result[i]);
-                    }
-                    return cmp._storage.getSize();
-                }).then(function(size) {
-                    cmp._append("post getAll size = "+size);
-                    $A.assert(size < 5.3, "Size is too large");
-                    completed = true;
-                }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
-        }
-        ]
-    },
-
-    testGetAll: {
-        test:[function (cmp) {
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
-            cmp._storage = $A.storageService.initStorage("browserdb-testGetAll",
-                    true, false, 32768, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testGetAll")});
-            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { this.append(cmp, string); }.bind(this);
-        }, function(cmp) {
-            var completed = false;
-
-            cmp._storage.clear()
-                .then(function() {
-                    return Promise.all([
-                        cmp._storage.put("2", { "a" : 5, "b" : 6 }),
-                        cmp._storage.put("0", { "a" : 1, "b" : 2 }),
-                        cmp._storage.put("3", { "a" : 7, "b" : 8 }),
-                        cmp._storage.put("1", { "a" : 3, "b" : 4 })
-                    ]);
-                })
-            .then(function() {
-                    cmp._append("finished add");
-                    return cmp._storage.getAll();
-                })
-            .then(function(results) {
-                    cmp._append("get all returned");
-                    var resultsLength = results.length;
-                    $A.test.assertEquals(4, resultsLength, "There should be 4 items");
-                    for (var i = 0; i < resultsLength; i++) {
-
-                        var val = results[i].value,
-                            key = results[i].key,
-                            keyNum = +key,
-                            expected = (keyNum * 2) + 1;
-                        $A.test.assertEquals(i + "", key, "Should be ordered by key asc: " + expected);
-                        $A.test.assertEquals(expected, val["a"], "Item 'a' value should be " + expected);
-                    }
-                })
-            .then(function() { return cmp._storage.clear(); })
-            .then(function() { completed = true; }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp.helper.lib.storageTest.testOverflow_stage2(cmp, cmp._storage);
         }]
     },
 
+    testGetAll: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+        }
+    },
+
     testClear:{
-        test:[function (cmp) {
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
-            cmp._storage = $A.storageService.initStorage("browserdb-testClear-",
-                    true, false, 32768, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testClear-")});
-            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { this.append(cmp, string); }.bind(this);
+        test:[function(cmp){
+            cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
         },
         function(cmp){
-            var completed = false;
-            this.resetCounters(cmp);
-
-            cmp._storage.clear()
-                .then(function() {
-                        cmp._append("finished clear");
-                        return cmp._storage.getSize();
-                    })
-                .then(function(size) {
-                        cmp._append("size = "+size);
-                        $A.test.assertTrue(size >= 0 && size <= 0.1,
-                            "testClear: Expected size of 0, but got " + size);
-                        cmp._append("complete");
-                        completed = true;
-                    }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
-        },
-        function(cmp){
-            var completed = false;
-            this.resetCounters(cmp);
-
-            cmp._storage.put("key1" , new Array(1024).join("x"))
-                .then(function() {
-                    cmp._append("added item");
-                    return cmp._storage.getSize();
-                })
-                .then(function(size) {
-                    cmp._append("size = "+size);
-                    $A.test.assertTrue(size >= 1 && size <= 1.1, "testClear: Expected size of 1, but got " + size);
-                })
-                .then(function() { return cmp._storage.clear(); })
-                .then(function() { return cmp._storage.getSize(); })
-                .then(function(size) {
-                    cmp._append("size = "+size);
-                    $A.test.assertTrue(size >= 0 && size <= 0.1, "testClear: Expected size of 0, but got " + size);
-                    completed = true;
-                }, cmp._die);
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp.helper.lib.storageTest.testClear_stage2(cmp, this.storage);
         }]
     },
 
     testStorageInfo: {
         test: function(cmp) {
-            var storage = $A.storageService.getStorage("browserdb");
-            $A.test.assertTrue(storage.isPersistent(), "indexeddb is a persistent storage");
-            $A.test.assertFalse(storage.isSecure(), "indexeddb is not a secure storage");
+            cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, false);
         }
     },
 
@@ -492,11 +257,9 @@
         test: [
             function(cmp) {
                 var completed = false;
-                var storage = $A.storageService.getStorage("browserdb");
-
                 var request = indexedDB.open('browserdb');
                 request.onsuccess = function(event) {
-                    objectStoreNames = event.target.result.objectStoreNames;
+                    var objectStoreNames = event.target.result.objectStoreNames;
                     $A.test.assertEquals(1, objectStoreNames.length);
 
                     // We use app/cmp name work as table name. An app should only get items from its own table.
@@ -507,7 +270,7 @@
                 };
                 request.onerror = function(event) {
                     $A.test.fail("Failed to connect to 'browserdb': " + event.target.error);
-                }
+                };
 
                 $A.test.addWaitFor(true, function() { return completed; });
             }
@@ -581,6 +344,7 @@
         });
     },
 
+    // TODO(tbliss): Apply changes that should have been made long ago https://code-collab.soma.salesforce.com/go?page=ReviewDisplay&reviewid=772296 
     testDeleteDatabase: {
         test: [
         function waitForDatabaseInitialize(cmp) {
@@ -592,7 +356,7 @@
             $A.storageService.getStorage("browserdb").getSize()
                 .then(function() { completed = true; }, cmp._die);
 
-            $A.test.addWaitFor(true, function(){ return completed;});
+            $A.test.addWaitFor(true, function(){ return completed; });
         },
         function deleteDatabase(cmp) {
             var dbName = "browserdb";
@@ -607,7 +371,7 @@
                         window.indexedDB.webkitGetDatabaseNames().onsuccess = function(event) {
                             results = event.target.result;
                             completed = true;
-                        }
+                        };
                     } else {
                         completed = true;
                     }
@@ -638,7 +402,7 @@
             $A.storageService.getStorage("browserdb").getSize()
                 .then(function() { completed = true; }, cmp._die);
 
-            $A.test.addWaitFor(true, function(){ return completed;});
+            $A.test.addWaitFor(true, function(){ return completed; });
         },
         function deleteDatabaseTwice(cmp) {
             var completed = false;
@@ -669,7 +433,7 @@
             $A.storageService.getStorage("browserdb").getSize()
                 .then(function() { completed = true; }, cmp._die);
 
-            $A.test.addWaitFor(true, function(){ return completed;});
+            $A.test.addWaitFor(true, function(){ return completed; });
         },
         function deleteAndRecreateDatabase(cmp) {
             var completed = false;
@@ -697,7 +461,7 @@
                         if (event.target.result.contains(cmp._dbName)){
                             completed = true;
                         }
-                    }
+                    };
                     return completed;
                 });
             }
@@ -708,38 +472,17 @@
     _testReplaceExistingWithEntryTooLarge: {
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
-            var maxSize = 5000;
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
+            var maxSize = 5120;
+            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb"; });
             cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
                     true, false, maxSize, 2000, 3000, true, true);
-            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge")});
-            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            var itemTooLarge = new Array(2560).join("x");
-            var completed = false;
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });
+            var expectedError = "IndexedDBAdapter.setItem(): Item larger than size limit of " + maxSize*0.25;
 
-            cmp._storage.put("testReplaceExistingWithEntryTooLarge", "ORIGINAL")
-                .then(function() { return cmp._storage.get("testReplaceExistingWithEntryTooLarge"); })
-                .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
-                .then(function() { return cmp._storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
-                .then(function(){
-                        $A.test.fail("Should not be able to save an item above the maxSize")
-                     },
-                     function(error){
-                         var expectedMsg = "IndexedDBStorageAdapter.setItem(): Item larger than size limit of " + maxSize*0.25;
-                         $A.test.assertEqual(expectedMsg, error, "Unexpected error message trying to save item too large");
-                     })
-                 .then(function() { completed = true; }, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage, expectedError);
         },
         function getItem(cmp) {
-            var completed = false;
-
-            cmp._storage.get("testReplaceExistingWithEntryTooLarge")
-                .then(function(item) { $A.test.assertEquals("", item.value, "Entry should be empty after attemping to put item too large")})
-                .then(function(){ completed = true;}, cmp._die);
-
-            $A.test.addWaitFor(true, function() { return completed; });
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
         }]
     }
 })

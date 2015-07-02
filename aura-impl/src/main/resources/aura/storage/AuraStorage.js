@@ -15,7 +15,7 @@
  */
 /*jslint sub: true */
 /**
- * @description The storage service implementation
+ * @description The storage service implementation.
  * @constructor
  * @param {Object} config The configuration describing the characteristics of the storage to be created.
  * @export
@@ -110,8 +110,10 @@ AuraStorage.prototype.clear = function() {
 
 /**
  * Asynchronously gets an item from storage corresponding to the specified key.
- * @param {String} key The item key. This is the key used when the item was added to storage using put().
- * @returns {Promise} A Promise that will fetch an item from storage.
+ * @param {String} key The item key. This is the key used when the item was added to storage using <code>put()</code>.
+ * @returns {Promise} A Promise that resolves to an object in storage or undefined if the key is not found.
+ *      The object consists of {value: *, isExpired: Boolean}.
+
  * @export
  */
 AuraStorage.prototype.get = function(key) {
@@ -122,7 +124,7 @@ AuraStorage.prototype.get = function(key) {
         if (!item) {
             return undefined;
         }
-        return { "value" : item.value, "isExpired" : (new Date().getTime() > item["expires"]) };
+        return { "value" : item["value"], "isExpired" : (new Date().getTime() > item["expires"]) };
     });
 
     this.sweep();
@@ -131,8 +133,9 @@ AuraStorage.prototype.get = function(key) {
 };
 
 /**
- * Asynchronously gets all items from storage
- * @returns {Promise} A Promise that will fetch all items from storage.
+ * Asynchronously gets all items from storage.
+ * @returns {Promise} A Promise that resolves to an array of objects in storage. Each
+ *      object consists of {key: String, value: *, isExpired: Boolean}.
  * @export
  */
 AuraStorage.prototype.getAll = function() {
@@ -155,7 +158,7 @@ AuraStorage.prototype.getAll = function() {
 /**
  * Asynchronously stores the value in storage using the specified key.
  * @param {String} key The key of the item to store.
- * @param {Object} value The value of the item to store.
+ * @param {*} value The value of the item to store.
  * @returns {Promise} A Promise that will put the value in storage.
  * @export
  */

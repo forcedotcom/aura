@@ -21,7 +21,7 @@ if (typeof Aura !== 'undefined') {
     Aura._Aura = Aura;
 }
 var Aura = {};
-window["Aura"] = Aura; 
+window["Aura"] = Aura;
 
 // -- Namespaces ------------------------------------------------------------
 Aura.Utils      = {};
@@ -46,7 +46,7 @@ Aura.Services   = {};
 Aura.Storage    = {};
 
 /**
- * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. 
+ * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.
  * Everything else in Aura is attached to it.
  * @platform
  */
@@ -66,7 +66,7 @@ window['$A'] = {};
 // #include aura.util.Bitset
 // #include aura.util.NumberFormat
 // #include aura.util.DocLevelHandler
-// #include aura.storage.adapters.SizeEstimator
+// #include aura.util.SizeEstimator
 // #include aura.util.Util
 // #include aura.Logger
 // #include aura.util.Override
@@ -159,7 +159,7 @@ window['$A'] = {};
 
 // -- Storage -------------------------------------------------------------
 // #include aura.storage.AuraStorageService
-// #include aura.storage.Storage
+// #include aura.storage.AuraStorage
 
 // -- Services -----------------------------------------------------------
 // #include aura.AuraClientService
@@ -191,11 +191,11 @@ function AuraInstance () {
     this.logger               = new Aura.Utils.Logger();
     this.util                 = new Aura.Utils.Util();
     this["util"]              = this.util; //Move this? (check prod mangling)
-    
+
     this.auraError            = Aura.Errors.AuraError;
     this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
     this.localizationService  = new Aura.Services.AuraLocalizationService();
-    
+
     this.clientService        = new Aura.Services.AuraClientService();
     this.componentService     = new Aura.Services.AuraComponentService();
     this.serializationService = new Aura.Services.AuraSerializationService();
@@ -587,12 +587,12 @@ function AuraInstance () {
 
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
-    
-    
+
+
     var services = this.services;
 
     // TODO: convert to //#exportSymbols when available
-    
+
 
     services["rendering"] = services.rendering;
     services["event"] = services.event;
@@ -605,6 +605,7 @@ function AuraInstance () {
     services["cmp"] = services.cmp;
     services["e"] = services.e;
     services["c"] = {
+
         get: function(name) {
             var path = (name||'').split('.');
             var controllerDef = path.shift();
@@ -613,7 +614,6 @@ function AuraInstance () {
             return services.component.getControllerDef(controllerDef).get(action);
         }
     };
-    
 
     this.eventService.addHandler({
         event : 'aura:clientRedirect',
@@ -1169,6 +1169,7 @@ window['aura'] = window['$A'];
 // -- Storage Adapters -------------------------------------------------
 // #include aura.storage.adapters.MemoryAdapter
 // #include aura.storage.adapters.IndexedDBAdapter
+
 
 // -- Metrics Plugins --------------------------------------------------
 // #include aura.metrics.plugins.TransportMetricsPlugin

@@ -14,38 +14,35 @@
  * limitations under the License.
  */
 ({
-	getStorage: function(cmp) {
-		return $A.storageService.getStorage(cmp.get("v.name"));
-	},
+    getStorage: function(cmp) {
+        return $A.storageService.getStorage(cmp.get("v.name"));
+    },
 
-	init : function(cmp) {
-		var debugLoggingEnabled = $A.util.getBooleanValue(cmp.get("v.debugLoggingEnabled"));
+    init : function(cmp) {
+        var debugLoggingEnabled = $A.util.getBooleanValue(cmp.get("v.debugLoggingEnabled"));
 
-		// Temporary query param support to allow one extra level of switch so I
-		// can turn on storage
-		// w/out enabling it for the world right now
-		var onlyUseStorageIfRequested = $A.util.getBooleanValue(cmp.get("v.requireUseStorageQueryParam"));
-		if (onlyUseStorageIfRequested) {
-			var useStorage = window.location.href.toLowerCase().indexOf(
-					"aura.usestorage=true") > 0;
-			if (!useStorage) {
-				if (debugLoggingEnabled) {
-					$A.log("Not enabling Aura Storage because the requireUseStorageQueryParam was specified and aura.useStorage=true was not present in the initial app url request");
-				}
+        // Temporary query param support to allow one extra level of switch so I
+        // can turn on storage without enabling it for the world right now
+        var onlyUseStorageIfRequested = $A.util.getBooleanValue(cmp.get("v.requireUseStorageQueryParam"));
+        if (onlyUseStorageIfRequested) {
+            var useStorage = window.location.href.toLowerCase().indexOf("aura.usestorage=true") > 0;
+            if (!useStorage) {
+                if (debugLoggingEnabled) {
+                    $A.log("Not enabling Aura Storage because the requireUseStorageQueryParam was specified and aura.useStorage=true was not present in the URL query string");
+                }
+                return;
+            }
+        }
 
-				return;
-			}
-		}
-
-		var name = cmp.get("v.name");
-		var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"),10);
-		var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"),10);
-		var maxSize = cmp.get("v.maxSize") * 1024.0;
-		var clearStorageOnInit = $A.util.getBooleanValue(cmp.get("v.clearStorageOnInit"));
-		var persistent = $A.util.getBooleanValue(cmp.get("v.persistent"));
-		var secure = $A.util.getBooleanValue(cmp.get("v.secure"));
+        var name = cmp.get("v.name");
+        var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"),10);
+        var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"),10);
+        var maxSize = cmp.get("v.maxSize") * 1024.0; // convert to bytes because that's what the API requires. can't change that now.
+        var clearStorageOnInit = $A.util.getBooleanValue(cmp.get("v.clearStorageOnInit"));
+        var persistent = $A.util.getBooleanValue(cmp.get("v.persistent"));
+        var secure = $A.util.getBooleanValue(cmp.get("v.secure"));
         var version = cmp.get("v.version");
 
-		$A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version);
-	}
+        $A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version);
+    }
 })

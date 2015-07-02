@@ -17,12 +17,11 @@
 
 
 /**
- * @description The storage service implementation
+ * @description The metrics service implementation
  * @constructor
- * @param {Object} config The configuration describing the characteristics of the storage to be created.
  * @export
 **/
-Aura.Services.MetricsService = function MetricsService(config) {
+Aura.Services.MetricsService = function MetricsService() {
     this.collector                 = {"default": []};
     this.globalHandlers            = {"transactionEnd": []};
     this.bootstrap                 = {};
@@ -64,10 +63,10 @@ Aura.Services.MetricsService.prototype.initialize = function () {
  * @param {Object} instance Object that holds the method to hook
  * @param {string} method Method name
  * @param {string} ns Namespace
- * @param {boolean} async 
+ * @param {boolean} async
  * @param {function(Object)} before
  * @param {function} after
- * @param {function} override  
+ * @param {function} override
  * @export
 **/
 Aura.Services.MetricsService.prototype.instrument = function (instance, method, ns, async, before, after, override) {
@@ -171,7 +170,7 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
         this.disablePlugins();
         this.clearMarks();
     }
-    // #end        
+    // #end
 };
 /**
  * Add a callback everytime a transaction ends.
@@ -487,7 +486,7 @@ Aura.Services.MetricsService.prototype.createTransaction = function (ns, name, c
 Aura.Services.MetricsService.prototype.mark = function (ns, name, context) {
     if (!name) {name = ns; ns = Aura.Services.MetricsService.DEFAULT;}
     var mark        = this.createMarkNode(ns, name, Aura.Services.MetricsService.STAMP, context),
-        nsCollector = this.collector[ns], 
+        nsCollector = this.collector[ns],
         collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
 
     collector.push(mark);
@@ -505,7 +504,7 @@ Aura.Services.MetricsService.prototype.mark = function (ns, name, context) {
 Aura.Services.MetricsService.prototype.markStart = function (ns, name, context) {
     if (!name) {name = ns; ns = Aura.Services.MetricsService.DEFAULT;}
     var mark        = this.createMarkNode(ns, name, Aura.Services.MetricsService.START, context),
-        nsCollector = this.collector[ns], 
+        nsCollector = this.collector[ns],
         collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
 
     collector.push(mark);
@@ -538,7 +537,7 @@ Aura.Services.MetricsService.prototype.markEnd = function (ns, name, context) {
 Aura.Services.MetricsService.prototype.createMarkNode = function (ns, name, eventType, options) {
     var context = options ? (options.context || options) : null;
     return {
-        "ns"      : ns, 
+        "ns"      : ns,
         "name"    : name,
         "phase"   : eventType,
         "ts"      : Aura.Services.MetricsService.TIMER(),
@@ -686,7 +685,7 @@ Aura.Services.MetricsService.prototype.registerBeacon = function (beacon) {
 Aura.Services.MetricsService.prototype.getBootstrapMetrics = function () {
     var bootstrap     = this.bootstrap,
         pageStartTime = bootstrap["pageStartTime"];
-    
+
     // We cache it after the first call
     if (!pageStartTime) {
         pageStartTime = this.getPageStartTime();

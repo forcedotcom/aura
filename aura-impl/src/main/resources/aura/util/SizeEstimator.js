@@ -18,7 +18,7 @@
  * @description Provides operations to estimate size of JSON objects in memory.
  * @constructor
  */
-function SizeEstimator() {}
+var SizeEstimator = function SizeEstimator() {};
 
 /*
  * Note on sizing.  The following values are taken from the ECMAScript specification, where available.

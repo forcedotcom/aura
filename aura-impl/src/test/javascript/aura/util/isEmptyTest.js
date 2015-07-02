@@ -18,7 +18,8 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.isEmpty = function(){
     var Aura = {Utils:{
-        Style: function() {}
+        Style: function() {},
+        SizeEstimator: function() {}
     }};
 
     var targetUtil;
@@ -27,8 +28,7 @@ Test.Aura.isEmpty = function(){
         navigator:{userAgent:''},
         window:Object.Global(),
         document:{createDocumentFragment:function() {}},
-        Json:function() {},
-        SizeEstimator: function() {}
+        Json:function() {}
     })(function () {
         [Import("aura-impl/src/main/resources/aura/util/Util.js")]
         targetUtil = new Aura.Utils.Util();

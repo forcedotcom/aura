@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Function.RegisterNamespace("Test.Aura.Storage.Adapters");
+Function.RegisterNamespace("Test.Aura.Util");
 
 [ Fixture ]
-Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
+Test.Aura.Util.SizeEstimatorTest = function() {
     var auraMock=function(delegate){
         Mocks.GetMocks(Object.Global(),{
             exp: function() {},
@@ -38,7 +38,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
             },
             navigator: { userAgent:'' }
         })(function(){
-            [Import("aura-impl/src/main/resources/aura/storage/adapters/SizeEstimator.js")]
+            [Import("aura-impl/src/main/resources/aura/util/SizeEstimator.js")]
             delegate();
         });
     }
@@ -47,7 +47,7 @@ Test.Aura.Storage.Adapters.SizeEstimatorTest = function() {
         var result;
 
         auraMock(function() {
-            var target = new SizeEstimator();
+            var target = new Aura.Utils.SizeEstimator();
             result = target.estimateSize(value);
         });
 

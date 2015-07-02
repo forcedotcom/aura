@@ -1,7 +1,8 @@
 <aura:application render="client">
+    <aura:import library="auraStorageTest:storageTestLib" property="lib" />
+
     <aura:dependency resource="markup://auraStorageTest:indexedDBCmp"/>
-    <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
     <div aura:id="content" />
-    
+
     <div aura:id="iframeContainer" />
 </aura:application>

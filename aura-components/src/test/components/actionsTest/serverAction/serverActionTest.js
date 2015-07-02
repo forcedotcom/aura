@@ -269,7 +269,7 @@
     
     
     /*
-     * ALERT : ream test setup plz
+     * ALERT : read test setup please
      * 
      * Test for Two concurrent server actions with same signature get aborted during receive() when server is offline
      * I'm doing this using two caboose actions

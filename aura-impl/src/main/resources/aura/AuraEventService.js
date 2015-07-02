@@ -65,7 +65,7 @@ AuraEventService.prototype.newEvent = function(eventDef, eventName, sourceCmp) {
         } else {
             config["eventDispatcher"] = this.eventDispatcher;
         }
-        return new Event(config);
+        return new Aura.Event.Event(config);
     }
 };
 

@@ -19,10 +19,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
-
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 import com.google.common.collect.Lists;
@@ -124,6 +125,16 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
         return actionId;
     }
 
+    @Override
+    public DefDescriptor<ComponentDef> getCallingDescriptor() {
+        return this.callingDescriptor;
+    }
+
+    @Override
+    public void setCallingDescriptor(String desc) { 
+        this.callingDescriptor = Aura.getDefinitionService().getDefDescriptor(desc, ComponentDef.class);
+    }
+    
     private String actionId;
     private List<Action> actions = null;
     private boolean storable;
@@ -133,4 +144,5 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     protected final DefDescriptor<ControllerDef> controllerDescriptor;
     protected final T actionDef;
     protected State state;
+    protected DefDescriptor<ComponentDef> callingDescriptor;
 }

@@ -1,11 +1,8 @@
 ({
     /**
-     * TODO: W-2612157
-     * This is disabled since calling component needs to be added into server action request.
-     *
      * Verify version in component's server controller is same as required version.
      */
-    _testVersionFromServerController: {
+    testVersionFromServerController: {
         test: [
             function(cmp) {
                 var targetComponent = cmp.find("auratest_requireWithModel");
@@ -20,23 +17,6 @@
             }
         ]
     },
-
-    /**
-     * TODO: W-2612157
-     *
-     * Verify version in component'server model is same as required version.
-     */
-    _testVersionFromServerModel: {
-        test: function(cmp) {
-            var targetComponent = cmp.find("auratest_requireWithModel");
-            targetComponent.updateVersionFromServerModel();
-
-            var actual = targetComponent.get("v.version");
-            this.updateVersion(cmp, actual);
-            $A.test.assertEquals("2.0", actual);
-        }
-    },
-
 
     /**
      * Verify version is always default when request is from same namespace component.
@@ -57,12 +37,10 @@
      },
 
     /**
-     * TODO: W-2612157
-     *
      * Verify version in server controller of multi layer nested component is same as required version of
      * its container component.
      */
-     _testVersionFromGrandchildComponentServerController: {
+     testVersionFromGrandchildComponentServerController: {
         test: [
             function(cmp) {
                 var component = cmp.find("auratest_requireConsumer");
@@ -73,18 +51,16 @@
             function(cmp) {
                 var actual = cmp.find("auratest_requireConsumer").get("v.versionInConsumedCmp");
                 this.updateVersion(cmp, actual);
-                $A.test.assertEquals("123456.0", actual);
+                $A.test.assertEquals("5.0", actual);
             }
         ]
      },
 
      /**
-     * TODO: W-2612157
-     *
      * Verify version in server controller function is same as required version of when the function
      * is triggered by a self fired event.
      */
-     _testVersionFromEventHandlerWithSelfFiredEvent: {
+     testVersionFromEventHandlerWithSelfFiredEvent: {
         test: [
             function(cmp) {
                 var targetComponent = cmp.find("auratest_requireWithModel");
@@ -102,8 +78,6 @@
 
 
     /**
-     * TODO: W-2645880
-     *
      * This test has same behavior with test (it's passing):
      * componentTest.versioningTest.testVersionInDynamicallyCreatedComponent
      * The only difference is the created component in this test is associated with a model.
@@ -111,7 +85,7 @@
      * controller, when cmp.getVersion() gets called, this test component doesn't exist in
      * accessStack.
      */
-    _testVersionFromClientControllerOfCreatedCmpWithServerModel: {
+    testVersionFromClientControllerOfCreatedCmpWithServerModel: {
         test:[
             function(cmp) {
                 var action = cmp.get("c.updateVersionFromCreatedComponent");

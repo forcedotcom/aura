@@ -238,7 +238,9 @@ var ComponentPriv = (function() { // Scoping priv
     ComponentPrivInner.prototype.createActionValueProvider = function(cmp) {
         var controllerDef = this.componentDef.getControllerDef();
         if (controllerDef) {
-            return {
+            var ctx = $A.getContext();
+            ctx.setCurrentAccess(cmp);
+            var returnObj = {
                 actions:{},
                 get : function(key) {
                     var ret = this.actions[key];
@@ -253,6 +255,8 @@ var ComponentPriv = (function() { // Scoping priv
                     return ret.getAction();
                 }
             };
+            ctx.releaseCurrentAccess();
+            return returnObj;
         }
     };
 

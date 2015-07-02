@@ -40,7 +40,7 @@ import aQute.bnd.annotation.component.Component;
 /**
  */
 @ThreadSafe
-@Component (provide=AuraServiceProvider.class)
+@Component(provide = AuraServiceProvider.class)
 public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
 
     @Override
@@ -65,6 +65,10 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
                 Action instance = (Action) Aura.getInstanceService().getInstance((String) map.get("descriptor"),
                         ActionDef.class, params);
                 instance.setId((String) map.get("id"));
+                String cd = (String) map.get("callingDescriptor");
+                if (cd != null && !cd.equals("UNKNOWN")) {
+                    instance.setCallingDescriptor(cd);
+                }
 
                 actionList.add(instance);
             }

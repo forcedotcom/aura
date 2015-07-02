@@ -75,6 +75,9 @@ function Action(def, suffix, method, paramDefs, background, cmp, caboose) {
 
     // FIXME: need to expose for plugins
     this.refreshAction = undefined;
+
+    var ctx = $A.getContext();
+    this.callingCmp = ctx ? ctx.getCurrentAccess() : null;
 }
 
 // Static methods:
@@ -1142,6 +1145,7 @@ Action.prototype.toJSON = function() {
     return {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
+        "callingDescriptor" : (this.callingCmp ? (this.callingCmp.getDef() ? this.callingCmp.getDef().getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN"),
         "params" : this.params
     };
 };

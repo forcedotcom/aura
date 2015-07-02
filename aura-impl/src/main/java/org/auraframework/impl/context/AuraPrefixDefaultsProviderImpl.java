@@ -33,6 +33,7 @@ public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
 
     static {
         defaults.put(DefType.ACTION, DefDescriptor.JAVA_PREFIX);
+        defaults.put(DefType.APPLICATION, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.COMPONENT, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.CONTROLLER, DefDescriptor.JAVA_PREFIX);
         defaults.put(DefType.MODEL, DefDescriptor.JAVA_PREFIX);

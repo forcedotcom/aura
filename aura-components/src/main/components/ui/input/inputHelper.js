@@ -58,7 +58,7 @@
         }
         var errorCmp = component.get("v.errorComponent")[0];
         if ($A.util.isComponent(errorCmp)) {
-            this.addAriaDescribedBy(component, errorCmp.getGlobalId());
+            this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
         }
     },
 
@@ -251,6 +251,7 @@
         if (errorCmp) {
             // Update error component.
             errorCmp.set("v.errors", errors);
+            this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
         } else {
             // Do nothing if no error component AND no error.
             if ($A.util.isEmpty(errors)) {
@@ -262,7 +263,7 @@
                 this,
                 function(errorCmp) {
                     component.set("v.errorComponent", errorCmp);
-                    this.addAriaDescribedBy(component, errorCmp.getGlobalId());
+                    this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
                 },
                 {
                     "componentDef": "markup://ui:inputDefaultError",
@@ -276,9 +277,14 @@
         }
     },
 
-    addAriaDescribedBy : function(component, errorCmpId) {
+    updateAriaDescribedBy : function(component, errorCmpId) {
         var ariaDesc = component.get("v.ariaDescribedBy");
-        ariaDesc = this.addTokenToString(ariaDesc, errorCmpId);
+        var errors = component.get("v.errors");
+        if (!$A.util.isEmpty(errors)) {
+            ariaDesc = this.addTokenToString(ariaDesc, errorCmpId);
+        } else {
+            ariaDesc = this.removeTokenFromString(ariaDesc, errorCmpId);
+        }
         component.set("v.ariaDescribedBy", ariaDesc);
     },
 
@@ -348,12 +354,24 @@
     addTokenToString: function(str, token) {
         token = $A.util.trim(token);
         str = $A.util.trim(str);
-        if (str) {
+        if (str > '') {
             if ((' ' + str + ' ').indexOf(' ' + token + ' ') === -1) {
                 str += ' ' + token;
             }
         } else {
             str = token;
+        }
+        return str;
+    },
+
+    removeTokenFromString: function(str, token) {
+        token = $A.util.trim(token);
+        str = $A.util.trim(str);
+        if (str > '') {
+            var start = (' ' + str + ' ').indexOf(' ' + token + ' ');
+            if (start > -1) {
+                str = str.substr(0, start) + str.substr(start + token.length + 1);
+            }
         }
         return str;
     },

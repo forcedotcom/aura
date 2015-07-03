@@ -35,14 +35,10 @@
         }
     },
 
-    show: function (cmp, callback) {
-        var autoFocus = cmp.get('v.autoFocus');
-        var panelEl = cmp.getElement();
-        //move the dialog to the right position
-        var referenceElementSelector = cmp.get('v.referenceElementSelector');
+    _getReferenceElement: function(cmp) {
+
+        var referenceElementSelector = cmp.get("v.referenceElementSelector");
         var referenceEl = cmp.get('v.referenceElement');
-        
-        cmp.set('v.visible', true);
         
         if(!referenceEl) {
             referenceEl = referenceElementSelector ? document.querySelector(referenceElementSelector) : null;
@@ -52,6 +48,17 @@
         if (referenceEl && ($A.util.isArray(referenceEl) || referenceEl.hasOwnProperty('length') )) {
         		referenceEl = referenceEl.length > 0 ? referenceEl[0] : null;
         }
+
+        return referenceEl;
+    },
+
+
+    show: function (cmp, callback) {
+        var autoFocus = cmp.get('v.autoFocus');
+        var panelEl = cmp.getElement();
+        var referenceEl = this._getReferenceElement(cmp);
+        
+        cmp.set('v.visible', true);
 
         var self = this;
 
@@ -90,14 +97,14 @@
             
                 callback && callback();
             }
-        }
+        };
 
         if (referenceEl) {
             panelEl.style.opacity = '0';
             panelEl.style.display = 'block';
             this.position(cmp, referenceEl, function() {
                 self.positioningLib.panelPositioning.reposition();
-                
+                cmp.positioned = true;
                 requestAnimationFrame(function() {
                     panelEl.style.opacity = '1';
                     self.lib.panelLibCore.show(cmp, conf);
@@ -108,6 +115,17 @@
             this.lib.panelLibCore.show(cmp, conf);
         }
         
+    },
+
+    reposition: function(cmp, callback) {
+        if(cmp.positioned) { // reposition will blow up
+                             // if you call it before positioning
+            var referenceEl = this._getReferenceElement(cmp);
+            this.cleanPositioning(cmp);
+            if(referenceEl) {
+                this.position(cmp, referenceEl, callback);
+            }
+        }
     },
 
     hide: function (cmp, callback) {
@@ -126,15 +144,14 @@
     },
 
     close: function (cmp, callback) {
+        var self = this;
         cmp.hide(function () {
             if (!cmp.isValid()) {
                 return;
             }
-            if(cmp.constraints) {
-                cmp.constraints.forEach(function(constraint) {
-                    constraint.destroy();
-                });
-            }
+
+            self.cleanPositioning(cmp);
+
             cmp.getEvent('notify').setParams({
                 action: 'destroyPanel',
                 typeOf: 'ui:destroyPanel',
@@ -144,6 +161,16 @@
             	callback();
             }
         });
+    },
+
+    cleanPositioning: function(cmp) {
+        if(cmp.constraints) {
+            cmp.constraints.forEach(function(constraint) {
+                constraint.destroy();
+            });
+
+            cmp.constraints = null;
+        }
     },
 
     position: function(cmp, referenceEl, callback) {

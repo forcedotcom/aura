@@ -39,6 +39,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
+    <aura:handler name="change" value="{!v.referenceElement}" action="{!c.onRefChange}" />
     <aura:attribute name="closeButton" type="Aura.Component[]" />
     
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>

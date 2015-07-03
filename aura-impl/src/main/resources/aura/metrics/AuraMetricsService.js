@@ -521,8 +521,11 @@ Aura.Services.MetricsService.prototype.markStart = function (ns, name, context) 
 **/
 Aura.Services.MetricsService.prototype.markEnd = function (ns, name, context) {
     if (!name) {name = ns; ns = Aura.Services.MetricsService.DEFAULT;}
-    var mark = this.createMarkNode(ns, name, Aura.Services.MetricsService.END, context);
-    this.collector[ns].push(mark);
+    var mark        = this.createMarkNode(ns, name, Aura.Services.MetricsService.END, context),
+        nsCollector = this.collector[ns],
+        collector   = nsCollector ? nsCollector : (this.collector[ns] = []);
+
+    collector.push(mark);
     return mark;
 };
 

@@ -28,8 +28,9 @@ import org.auraframework.util.ServiceLocator.ServiceLocatorException;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.scanners.TypesScanner;
+import org.reflections.scanners.TypeElementsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
@@ -73,7 +74,7 @@ public class ServiceLoaderImpl implements ServiceLoader {
 
         reflections = new Reflections(new ConfigurationBuilder().filterInputsBy(filter)
                 .setUrls(ClasspathHelper.forPackage("configuration"))
-                .setScanners(new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new TypesScanner()));
+                .setScanners(new SubTypesScanner(), new TypeAnnotationsScanner(), new MethodAnnotationsScanner(), new TypeElementsScanner()));
 
     }
 

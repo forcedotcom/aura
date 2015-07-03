@@ -25,21 +25,21 @@ function AuraLocalizationService() {
     this.percentFormat = undefined;
     this.currencyFormat = undefined;
     // moment.js and walltime-js must be loaded before we can use date/time related APIs
-    
+
     this.ZERO = "0";
-    
+
     this.cache = {
         format : {},
         langLocale : {}
     };
 }
-        
+
 /**
  * Formats a number with the default number format.
  * <p>Example:</p>
  * <pre>
- * //Returns 0.146 
- * $A.localizationService.formatNumber(0.14566); 
+ * //Returns 0.146
+ * $A.localizationService.formatNumber(0.14566);
  * </pre>
  * @param {Number} number The number to be formatted.
  * @return {Number} The formatted number
@@ -94,10 +94,10 @@ AuraLocalizationService.prototype.formatCurrency = function(number) {
  * var nf = $A.localizationService.getNumberFormat(f);
  * var formatted = nf.format(num);
  * //If format is not provided, the default locale is used
- * var formatted = $A.localizationService.formatNumber(num); 
+ * var formatted = $A.localizationService.formatNumber(num);
  * </pre>
- * @param {String} format The number format. <code>format=".00"</code> displays the number followed by two decimal places. 
- * @param {String} symbols 
+ * @param {String} format The number format. <code>format=".00"</code> displays the number followed by two decimal places.
+ * @param {String} symbols
  * @return {Number} The number format
  * @memberOf AuraLocalizationService
  * @public
@@ -623,13 +623,11 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
  * @export
  */
 AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, targetFormat, locale) {
-	var that = this;
-	
     if (!dateTimeString) {
         return null;
     }
 
-    var mDate = moment(dateTimeString, that.getNormalizedFormat(targetFormat), that.getNormalizedLangLocale(locale));
+    var mDate = moment(dateTimeString, this.getNormalizedFormat(targetFormat), this.getNormalizedLangLocale(locale));
     if (mDate && mDate["isValid"]()) {
         return mDate["toDate"]();
     }
@@ -667,13 +665,11 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
  * @export
  */
 AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, targetFormat, locale) {
-	var that = this;
-	
     if (!dateTimeString) {
         return null;
     }
 
-    var mDate = moment["utc"](dateTimeString, that.getNormalizedFormat(targetFormat), that.getNormalizedLangLocale(locale));
+    var mDate = moment["utc"](dateTimeString, this.getNormalizedFormat(targetFormat), this.getNormalizedLangLocale(locale));
     if (mDate && mDate["isValid"]()) {
         return mDate["toDate"]();
     }
@@ -822,8 +818,6 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * @export
  */
 AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callback) {
-	var that = this;
-	
     if (typeof callback === 'function') {
         if (!timezone) {
             timezone = $A.get("$Locale.timezone");
@@ -836,11 +830,12 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
 
         if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
             // retrieve timezone data from server
+            var that = this;
             this.getTimeZoneInfo(timezone, function() {
                 callback(that.getWallTimeFromUTC(date, timezone));
             });
         } else {
-            callback(that.getWallTimeFromUTC(date, timezone));
+            callback(this.getWallTimeFromUTC(date, timezone));
         }
     }
 };
@@ -855,8 +850,6 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @export
  */
 AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callback) {
-	var that = this;
-	
     if (typeof callback === 'function') {
         if (!timezone) {
             timezone = $A.get("$Locale.timezone");
@@ -869,11 +862,12 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
 
         if (!WallTime["zones"] || !WallTime["zones"][timezone]) {
             // retrieve timezone data from server
+            var that = this;
             this.getTimeZoneInfo(timezone, function() {
                 callback(that.getUTCFromWallTime(date, timezone));
             });
         } else {
-            callback(that.getUTCFromWallTime(date, timezone));
+            callback(this.getUTCFromWallTime(date, timezone));
         }
     }
 };
@@ -886,12 +880,10 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
  * @private
  */
 AuraLocalizationService.prototype.displayDateTime = function(mDate, format, locale) {
-	var that = this;
-	
     if (locale) { // set locale locally
-        mDate["lang"](that.getNormalizedLangLocale(locale));
+        mDate["lang"](this.getNormalizedLangLocale(locale));
     }
-    return mDate["format"](that.getNormalizedFormat(format));
+    return mDate["format"](this.getNormalizedFormat(format));
 };
 
 /**
@@ -940,7 +932,7 @@ AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale)
         var ret = lang[0];
         if (lang[1]) {
             var langAndCountry = lang[0] + "-" + lang[1];
-            
+
             if (moment["langData"](langAndCountry)) {
                 ret = langAndCountry;
             }
@@ -959,13 +951,11 @@ AuraLocalizationService.prototype.getNormalizedLangLocale = function(langLocale)
  * @private
  */
 AuraLocalizationService.prototype.getTimeZoneInfo = function(timezone, callback) {
-	var that = this;
-	
     var a = $A.get("c.aura://TimeZoneInfoController.getTimeZoneInfo");
     a.setParams({
         "timezoneId": timezone
     });
-    a.setCallback(that, function(action){
+    a.setCallback(this, function(action){
         var state = action.getState();
         if(state === "SUCCESS"){
             var ret = action.returnValue;
@@ -1031,11 +1021,10 @@ AuraLocalizationService.prototype.getWallTimeFromUTC = function(d, timezone) {
  * @private
  */
 AuraLocalizationService.prototype.init = function() {
-	var that = this;
     // Set global default language locale
     var defaultLangLocale = $A.get("$Locale.langLocale");
     if (defaultLangLocale) {
-        moment.lang(that.getNormalizedLangLocale(defaultLangLocale));
+        moment.lang(this.getNormalizedLangLocale(defaultLangLocale));
     }
 };
 

@@ -387,7 +387,7 @@ public class AuraFrameworkServletHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         checkExpired(httpResponse, "text/javascript");
         assertDefaultAntiClickjacking(httpResponse, true, false);
-        assertTrue(response.contains("(function(e){"));
+        assertTrue(response.contains("!function(a,b){"));
 
         get.releaseConnection();
     }

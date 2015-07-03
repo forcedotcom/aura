@@ -881,7 +881,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
  */
 AuraLocalizationService.prototype.displayDateTime = function(mDate, format, locale) {
     if (locale) { // set locale locally
-        mDate["locale"](that.getNormalizedLangLocale(locale));
+        mDate["locale"](this.getNormalizedLangLocale(locale));
     }
     return mDate["format"](this.getNormalizedFormat(format));
 };
@@ -1023,7 +1023,7 @@ AuraLocalizationService.prototype.init = function() {
     // Set global default language locale
     var defaultLangLocale = $A.get("$Locale.langLocale");
     if (defaultLangLocale) {
-        moment.locale(that.getNormalizedLangLocale(defaultLangLocale));
+        moment.locale(this.getNormalizedLangLocale(defaultLangLocale));
     }
 };
 

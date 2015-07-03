@@ -463,6 +463,24 @@ AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
 };
 
 /**
+ * Get the today's date based on a time zone.
+ * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Function} callback A function to be called after the "today" value is obtained
+ * @return {String} the ISO8601 date string (yyyy-MM-dd).
+ * @memberOf AuraLocalizationService
+ * @public
+ * @export
+ */
+AuraLocalizationService.prototype.getToday = function(timezone, callback) {
+	var localToday = new Date(); // time in local timezone
+	localToday.setTime(localToday.getTime() + localToday.getTimezoneOffset() * 60 * 1000); // time in UTC
+	var tz = timezone ? timezone : $A.get("$Locale.timezone");
+	this.UTCToWallTime(localToday, tz, function(date) {
+        callback(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate());
+    });
+};
+
+/**
  * Gets the number of milliseconds in a duration.
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The number of milliseconds in d.

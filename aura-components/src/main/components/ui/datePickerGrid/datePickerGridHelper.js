@@ -110,7 +110,12 @@
         if ($A.util.isEmpty(rangeClass)) {
             rangeClass = 'highlight'
         }
+        
         var today = new Date();
+        var _today = component.get("v._today");
+        if (_today) {
+        	today = moment(_today, "YYYY-MM-DD").toDate();
+        }
 
         var d = new Date();
         d.setDate(1);

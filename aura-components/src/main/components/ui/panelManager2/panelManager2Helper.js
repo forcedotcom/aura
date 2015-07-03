@@ -161,6 +161,12 @@
             panelObj   = this.PANELS_INSTANCE[panelId],
             panel      = panelObj.panel;
 
+        var activeElement = document.activeElement;
+
+        if(activeElement) {
+            cmp.returnFocus = activeElement;
+        }
+
         $A.assert(panelObj, 'Couldnt find instance to show');
         //de-active all other panels except the one currently shown
         this.deactivateAllPanelInstances(cmp, panel);
@@ -191,6 +197,9 @@
         container.set('v.body', children, true);
         panel.destroy();
 
+        if(cmp.returnFocus) {
+            cmp.returnFocus.focus();
+        }
         // Notify the destroy
         config.onDestroy && config.onDestroy();
         if (panelObj.destroyCallback) {

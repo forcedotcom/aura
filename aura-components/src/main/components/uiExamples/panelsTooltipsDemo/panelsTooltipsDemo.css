@@ -77,7 +77,7 @@
 }
 
 .THIS *:focus {
-    outline: none;
+    /*outline: none;*/
 }
 
 .THIS h4 {

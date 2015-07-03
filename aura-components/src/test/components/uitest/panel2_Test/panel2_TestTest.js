@@ -655,8 +655,7 @@
     		totalPanels = 1;
     	}
     	var closeBtn = $A.test.getElementByClass("closeBtn")[totalPanels-1];
-    	var actualLabel = $A.test.getElementAttributeValue(closeBtn,"title");
-    	$A.test.assertEquals(closeDialogLabel, actualLabel, "Close Dialog Label is incorrect");
+
     	$A.test.clickOrTouch(closeBtn);
     },
     

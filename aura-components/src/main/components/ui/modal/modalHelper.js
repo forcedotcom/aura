@@ -24,7 +24,6 @@
                 'class': "closeBtn",
                 'press': cmp.getReference("c.onCloseBtnPressed"),
                 'label': cmp.get('v.closeDialogLabel'),
-                'buttonTitle': cmp.get('v.closeDialogLabel'),
                 'labelDisplay': "false"
             }, function(button){
                 cmp.set('v.closeButton', button);

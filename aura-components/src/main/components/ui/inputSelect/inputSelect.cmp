@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true" description="Represents a drop-down list with options.">
+<aura:component access="GLOBAL" support="GA" extends="ui:input" extensible="true" description="Represents a drop-down list with options." defaultFlavor="default, select">
 
     <!-- A list of aura.components.ui.InputOption -->
     <aura:attribute access="GLOBAL" name="options" type="List" description="A list of aura.components.ui.InputOption."/>
@@ -35,7 +35,7 @@
     
     <select aura:id="select"
     	    id="{!v.domId}"
-    	    class="{!v.class}"
+    	    class="{!v.class + ' select'}"
     	    name="{!v.name}"
     	    size="{!v.size}"
     	    disabled="{!v.disabled}"

@@ -29,7 +29,7 @@ public class InputErrorUITest extends WebDriverTestCase {
     WebElement status;
     final String INPUT_CMP_LOCATOR = "uiInput";
     final String STATUS_CMP_LOCATOR = "uiOutputText";
-    final String ERR_CSS = "inputError";
+    final String ERR_CSS = "has-error";
     final String STATUS_ERROR = "Got Error";
     final String STATUS_CLEAR = "Cleared error";
     final String URL = "/uitest/inputError_Test.cmp";

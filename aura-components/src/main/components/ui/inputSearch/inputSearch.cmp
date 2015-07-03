@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="GA"
+<aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="GA" defaultFlavor="default, input"
     description="This component displays an input field suitable for entering a search string.">
     <aura:attribute name="updateOn" type="String" default="search,change" description="Updates the component's value binding if the updateOn attribute is set to the handled event. Default value for ui:inputSearch is &quot;search&quot;."/>
     <aura:attribute name="type" type="String" default="search" description="The input type of the string. Default value is &quot;search&quot;."/>
@@ -25,7 +25,7 @@
 
     <input aura:id="search"
            id="{!v.domId}"
-           class="{!v.class}"
+           class="{!v.class + ' input'}"
            type="{!v.type}"
            value="{!v.value}"
            placeholder="{!v.placeholder}"

@@ -16,10 +16,10 @@
 
 -->
 <aura:component extends="ui:input" implements="ui:inputTextComponent" extensible="true" support="GA" access="GLOBAL"
-    description="Represents an input field suitable for entering a single line of free-form text.">
+    description="Represents an input field suitable for entering a single line of free-form text." defaultFlavor="default, input">
     <input aura:id="txt"
        		  id="{!v.domId}"
-			  class="{!v.class}"
+              class="{!v.class + ' input'}"
 			  type="{!v.type}"
 			  value="{!v.value}"
 			  placeholder="{!v.placeholder}"

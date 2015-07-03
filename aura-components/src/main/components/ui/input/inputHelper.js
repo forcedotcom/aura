@@ -24,7 +24,7 @@
                 domId = component.getConcreteComponent().getGlobalId();
             }
             var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
-            var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute;
+            var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";
             var labelDisplay = labelPositionAttribute != "hidden";
             var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
             var labelComponent = $A.newCmp({
@@ -38,7 +38,6 @@
                         title: component.get("v.labelTitle"),
                         requiredIndicator: requiredIndicator}}},
                     component );
-
             if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
                 innerBody.unshift(labelComponent);
             } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
@@ -48,8 +47,11 @@
                     componentDef: {descriptor: 'markup://aura:html'},
                     attributes: {values: {
                         body: innerBody,
-                        tag: 'div'}}}
+                        tag: 'div',
+                        "class": "form-element"
+                    }}}
             );
+
             var body = [];
             body.push(divComponent);
             component.set("v.body", body);
@@ -59,6 +61,44 @@
             this.addAriaDescribedBy(component, errorCmp.getGlobalId());
         }
     },
+
+    resetLabelPosition : function (component) {
+        var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
+        if (labelPositionAttribute == 'hidden') {
+            var labelComponent = component.find("inputLabel");
+            if (!$A.util.isUndefinedOrNull(labelComponent)) {
+                labelComponent.set("v.labelDisplay", labelPositionAttribute != "hidden");
+            }
+            return;
+        }
+
+        var body = component.get("v.body");
+        if ($A.util.isArray(body) && body[0].isInstanceOf("aura:html")) {
+            var htmlBody = body[0].get("v.body");
+
+            //remove label
+            var label;
+            if ($A.util.isArray(htmlBody)) {
+                for (var i=0; i<htmlBody.length; i++) {
+                    if (htmlBody[i].isInstanceOf("ui:label")) {
+                        label = htmlBody[i]
+                        htmlBody.splice(i,1);
+                    }
+                }
+            }
+
+            if (label) {
+                label.set("v.labelDisplay", labelPositionAttribute != "hidden");
+                if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
+                    htmlBody.unshift(label);
+                } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom') {
+                    htmlBody.push(label);
+                }
+                body[0].set("v.body", htmlBody)
+            }
+        }
+    },
+
     /**
      * Helper method that will check to make sure that we are looking at a valid position.
      * Otherwise it defaults to left
@@ -244,7 +284,7 @@
 
     updateErrorElement : function(component) {
         var errors = component.get("v.errors");
-        $A.util.toggleClass(component, "inputError", !$A.util.isEmpty(errors));
+        $A.util.toggleClass(component, "has-error", !$A.util.isEmpty(errors));
     },
 
     addClass: function(component, className) {

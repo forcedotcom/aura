@@ -15,11 +15,12 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA" description="An input field for entering a percentage.">
+<aura:component extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true" support="GA"
+                defaultFlavor="default, input" description="An input field for entering a percentage.">
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
     <input type="{!v.type}"
            id="{!v.domId}"
-           class="{!v.class}"
+           class="{!v.class + ' input'}"
            value="{!v.value}"
            max="{!v.max}"
            min="{!v.min}"

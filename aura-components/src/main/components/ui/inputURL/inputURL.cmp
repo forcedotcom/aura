@@ -15,10 +15,10 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputTextComponent" extensible="true" description="An input field for entering a URL.">
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputTextComponent" extensible="true" defaultFlavor="default, input" description="An input field for entering a URL.">
     <input aura:id="txt"
            id="{!v.domId}"
-           class="{!v.class}"
+           class="{!v.class + ' input'}"
            type="url"
            value="{!v.value}"
            placeholder="{!v.placeholder}"

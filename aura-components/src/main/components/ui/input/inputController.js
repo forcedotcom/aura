@@ -50,7 +50,7 @@
         // Currently only handle labelDisplay to avoid rearranging the DOM
         var labelComponent = cmp.find("inputLabel");
         if (!$A.util.isUndefinedOrNull(labelComponent)) {
-            labelComponent.set("v.labelDisplay", helper.checkValidPosition(cmp.get("v.labelPosition")) != "hidden");
+            helper.resetLabelPosition(cmp);
         }
     }
 })

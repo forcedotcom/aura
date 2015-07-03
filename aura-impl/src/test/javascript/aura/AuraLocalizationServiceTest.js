@@ -113,7 +113,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
 			if(value == mockTime) return mockTime;
 			return mockInvalidDate;
 		},
-		langData:function(value){
+		localeData:function(value){
 			if(value == targetLocale || value == "zh-cn") return true;
 			return false;
 		}
@@ -1431,7 +1431,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
     	var targetDateTimeObj={
     		l:'',
     		f:'',
-			lang:function(lang){
+			locale:function(lang){
 				if(lang == targetLang) this.l = lang;
 			},
 			format:function(format){
@@ -2174,7 +2174,7 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             });
 
         	var mockMoment = Mocks.GetMock(Object.Global(), "moment", {
-        		lang:function(value){
+        		locale:function(value){
         			if(value == targetLocale)actual = value;
         		}
         	});

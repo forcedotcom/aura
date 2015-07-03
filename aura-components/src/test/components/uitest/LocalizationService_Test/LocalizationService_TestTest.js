@@ -55,14 +55,6 @@
         }
     },
 
-	testDisplayDurationInMonths:{
-        test:function(component){
-			var num = 1095957000000;//Sep 23, 2004 4:30:00 PM
-			var duration = $A.localizationService.duration(num, 'milliseconds');
-    		$A.test.assertEquals(422.8229166666667, $A.localizationService.displayDurationInMonths(duration), "Both values should be same.");
-        }
-    },
-
 	testDisplayDurationInSeconds:{
         test:function(component){
 			var num = 1095957000000;//Sep 23, 2004 4:30:00 PM
@@ -73,9 +65,17 @@
 
 	testDisplayDurationInYears:{
         test:function(component){
-			var num = 1095957000000;//Sep 23, 2004 4:30:00 PM
-			var duration = $A.localizationService.duration(num, 'milliseconds');
-    		$A.test.assertEquals(34.75256849315068, $A.localizationService.displayDurationInYears(duration), "Both values should be same.");
+			var num = 24;
+			var duration = $A.localizationService.duration(num, 'months');
+    		$A.test.assertEquals(2, $A.localizationService.displayDurationInYears(duration), "Both values should be same.");
+        }
+    },
+
+    testDisplayDurationInMonths:{
+        test:function(component){
+            var num = 5;
+            var duration = $A.localizationService.duration(num, 'years');
+            $A.test.assertEquals(60, $A.localizationService.displayDurationInMonths(duration), "Both values should be same.");
         }
     },
 

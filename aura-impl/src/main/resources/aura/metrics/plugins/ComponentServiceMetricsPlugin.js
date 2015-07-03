@@ -52,32 +52,54 @@ ComponentServiceMetricsPlugin.prototype.disable = function () {
 };
 
 ComponentServiceMetricsPlugin.prototype.bind = function (metricsService) {
-    var method      = 'newComponentDeprecated',
-	    beforeHook  = function (startMark, config) {
+    var method = 'newComponentDeprecated',
+	    hook  = function () {
+            var original = Array.prototype.shift.apply(arguments);
+            var config   = arguments[0];
+
 	        var descriptor;
 	        if ($A.util.isString(config)) {
 	            descriptor = config;
 	        } else {
 	            descriptor = (config["componentDef"]["descriptor"] || config["componentDef"]) + '';
 	        }
-	        startMark["context"] = {
-	            "descriptor": descriptor
-	        };
+            
+            metricsService.markStart(ComponentServiceMetricsPlugin.NAME, 'newCmp', {context: {descriptor : descriptor}});
+            var ret = original.apply(this, arguments);
+            metricsService.markEnd(ComponentServiceMetricsPlugin.NAME, 'newCmp', {context: {descriptor : descriptor}});
+            return ret;
 	    };
 
 	metricsService.instrument(
 	    $A.componentService,
 	    method,
 	    ComponentServiceMetricsPlugin.NAME,
-	    false/*async*/,
-	    beforeHook
+	    false,/*async*/
+	    null,
+        null,
+        hook
 	);
 };
 
 //#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
-ComponentServiceMetricsPlugin.prototype.postProcess = function () {
-    return [];
+ComponentServiceMetricsPlugin.prototype.postProcess = function (componentMarks) {
+    var procesedMarks = [];
+    var stack = [];
+    for (var i = 0; i < componentMarks.length; i++) {
+        var id = componentMarks[i]["context"]["descriptor"];
+        var phase = componentMarks[i]["phase"];
+        if (phase === 'start') {
+            stack.push(componentMarks[i]);
+        } else if (phase === 'end') {
+            var mark = $A.util.apply({}, stack.pop(), true, true);
+            mark["context"]  = $A.util.apply(mark["context"], componentMarks[i]["context"]);
+            mark["duration"] = componentMarks[i]["ts"] - mark["ts"];
+            procesedMarks.push(mark);
+            
+        }
+    }
+    return procesedMarks;
 };
 //#end	
 

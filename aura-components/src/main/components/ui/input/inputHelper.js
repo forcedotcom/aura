@@ -56,10 +56,6 @@
             body.push(divComponent);
             component.set("v.body", body);
         }
-        var errorCmp = component.get("v.errorComponent")[0];
-        if ($A.util.isComponent(errorCmp)) {
-            this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
-        }
     },
 
     resetLabelPosition : function (component) {
@@ -251,7 +247,8 @@
         if (errorCmp) {
             // Update error component.
             errorCmp.set("v.errors", errors);
-            this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
+            var concreteHelper = component.getConcreteComponent().getDef().getHelper();
+            concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
         } else {
             // Do nothing if no error component AND no error.
             if ($A.util.isEmpty(errors)) {
@@ -263,7 +260,8 @@
                 this,
                 function(errorCmp) {
                     component.set("v.errorComponent", errorCmp);
-                    this.updateAriaDescribedBy(component, errorCmp.getGlobalId());
+                    var concreteHelper = component.getConcreteComponent().getDef().getHelper();
+                    concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
                 },
                 {
                     "componentDef": "markup://ui:inputDefaultError",

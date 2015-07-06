@@ -23,7 +23,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;

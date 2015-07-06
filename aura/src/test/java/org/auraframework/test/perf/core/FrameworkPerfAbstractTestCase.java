@@ -15,8 +15,6 @@
  */
 package org.auraframework.test.perf.core;
 
-import org.auraframework.util.test.annotation.PerfFrameworkTest;
-
 /**
  * Base class for Aura WebDriver tests.
  */

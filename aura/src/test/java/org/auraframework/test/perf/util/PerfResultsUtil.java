@@ -66,6 +66,7 @@ public final class PerfResultsUtil {
         return MONGO_CLIENT;
     }
 
+    @SuppressWarnings("null")
     public static void writeToDb(PerfMetrics metrics, String test, String traceLog) {
         try {
             MongoClient mongo = getMongoClient();
@@ -96,8 +97,8 @@ public final class PerfResultsUtil {
                 MongoCursor<Document> cur = docList.iterator();
                 StringBuilder sb = new StringBuilder();
                 sb.append("id").append(",").append("testName").append(",")
-                        .append("runTime").append(",").append("metricName")
-                        .append(",").append("metricValue").append("\n");
+                .append("runTime").append(",").append("metricName")
+                .append(",").append("metricValue").append("\n");
 
                 while (cur.hasNext()) {
                     Document doc = cur.next();
@@ -128,7 +129,7 @@ public final class PerfResultsUtil {
     /**
      * Writes the dev tools log for a perf test run to
      * System.getProperty("aura.perf.results.dir")/timelines/testName_timeline.json
-     * 
+     *
      * @return the written file
      */
     public static File writeDevToolsLog(List<JSONObject> timeline, String fileName) {

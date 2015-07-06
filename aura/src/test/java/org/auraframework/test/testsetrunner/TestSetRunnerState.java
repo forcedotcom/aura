@@ -28,8 +28,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.auraframework.system.AuraContext;
 import org.auraframework.test.ComponentJSTest.ComponentTestCase;
-import org.auraframework.test.perf.core.AbstractPerfTestCase;
 import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.ServiceLocator;
@@ -43,14 +43,14 @@ import com.google.common.collect.Maps;
  * This state is not kept in the model itself because it is currently impossible
  * to create lazy singleton objects that adhere to the contract of {@link Model}
  * .
- * 
+ *
  * FIXME: This setup is not scoped to a user or page state. Two users can stomp
  * on each other's test results.
- * 
+ *
  * FIXME: There is no stickiness to ensure that client side polls are reaching
  * the server that is running tests on its behalf if the deploy has multiple
  * appServers.
- * 
+ *
  * FIXME: Individual tests are tracked with just a bag of properties rather than
  * as a strongly typed client-visible model.
  */
@@ -63,7 +63,7 @@ public class TestSetRunnerState {
     private static class SingletonHolder {
         private static TestSetRunnerState INSTANCE = new TestSetRunnerState();
     }
-    
+
     private static class PerfSingletonHolder {
         private static TestSetRunnerState PERF_INSTANCE = new TestSetRunnerState(TestInventory.PERF_TESTS);
     }
@@ -86,17 +86,17 @@ public class TestSetRunnerState {
     public static TestSetRunnerState getInstance() {
         return SingletonHolder.INSTANCE;
     }
-    
+
     public static TestSetRunnerState getPerfInstance() {
-    	return PerfSingletonHolder.PERF_INSTANCE;
+        return PerfSingletonHolder.PERF_INSTANCE;
     }
 
     private TestSetRunnerState(EnumSet<TestInventory.Type> scope) {
-    	populateInventory(scope);
+        populateInventory(scope);
     }
-    
+
     private TestSetRunnerState() {
-    	this(TestInventory.CONTAINERLESS_TYPE_TESTS);
+        this(TestInventory.CONTAINERLESS_TYPE_TESTS);
     }
 
     /**
@@ -116,7 +116,7 @@ public class TestSetRunnerState {
     /**
      * Populates the model by querying for all implementations of
      * {@link TestInventory}.
-     * @param scope 
+     * @param scope
      */
     private synchronized void populateInventory(EnumSet<Type> scope) {
         // Load the inventory in a separate thread.
@@ -140,11 +140,11 @@ public class TestSetRunnerState {
     private class InventoryPopulator implements Runnable {
         private EnumSet<Type> scope;
 
-		public InventoryPopulator(EnumSet<Type> scope) {
-			this.scope = scope;
-		}
+        public InventoryPopulator(EnumSet<Type> scope) {
+            this.scope = scope;
+        }
 
-		@Override
+        @Override
         public void run() {
             Collection<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
             for (TestInventory i : inventories) {
@@ -166,14 +166,14 @@ public class TestSetRunnerState {
                 testWithProps.put("isInteg", t instanceof IntegrationTestCase);
                 testWithProps.put("isPerf", t instanceof PerfExecutorTest);
                 testWithProps.put("perfInfo", "");
-                
+
                 String url = "";
                 if (t instanceof ComponentTestCase) {
                     url = ((ComponentTestCase) t).getTestUrlForManualRun();
                 }
-                
+
                 if (t instanceof PerfExecutorTest) {
-                	url = ((PerfExecutorTest) t).generateUrl();
+                    url = ((PerfExecutorTest) t).generateUrl();
                 }
 
                 testWithProps.put("jsConsole", url);
@@ -198,7 +198,7 @@ public class TestSetRunnerState {
 
     /**
      * Modify a property of a test
-     * 
+     *
      * @param test identifies the test
      * @param key the key of the property
      * @param value the new value

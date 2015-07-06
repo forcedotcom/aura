@@ -30,22 +30,23 @@ import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.junit.Assert;
 
 public class PerfDiffUtil implements DiffUtil<PerfMetrics>{
-	
-	private final PerfExecutorTest test;
-	private URL srcUrl;
-	private URL destUrl;
-	    
-	public PerfDiffUtil(PerfExecutorTest test, String goldName) throws Exception {
-		this.test = test;    
+
+    private final PerfExecutorTest test;
+    private URL srcUrl;
+    private URL destUrl;
+
+    public PerfDiffUtil(PerfExecutorTest test, String goldName) throws Exception {
+        this.test = test;
         String explicitResultsFolder = test.getExplicitGoldResultsFolder();
         if (explicitResultsFolder != null) {
-            srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + goldName);       	
+            srcUrl = destUrl = new URL("file://" + explicitResultsFolder + '/' + goldName);
             return;
         }
     }
 
-	public void assertDiff(PerfMetrics actual) throws Exception {
-		StringBuilder message = new StringBuilder();
+    @Override
+    public void assertDiff(PerfMetrics actual) throws Exception {
+        StringBuilder message = new StringBuilder();
         PerfMetrics expected = readGoldFile();
 
         String differentMessage = test.getPerfMetricsComparator().compare(expected, actual);
@@ -53,16 +54,18 @@ public class PerfDiffUtil implements DiffUtil<PerfMetrics>{
             message.append(differentMessage);
             Assert.fail(message.toString());
         }
-	}
+    }
 
-	public PerfMetrics readGoldFile() throws IOException {
+    @Override
+    public PerfMetrics readGoldFile() throws IOException {
         return PerfFilesUtil.fromGoldFileText(readGoldFileContent());
     }
-	
-	public void writeGoldFile(PerfMetrics testResults) throws IOException {
-		writeGoldFileContent(PerfFilesUtil.toGoldFileText((PerfMetrics) testResults, getTest().storeDetailsInGoldFile()));
-	}
-	
+
+    @Override
+    public void writeGoldFile(PerfMetrics testResults) throws IOException {
+        writeGoldFileContent(PerfFilesUtil.toGoldFileText(testResults, getTest().storeDetailsInGoldFile()));
+    }
+
     protected final void writeGoldFileContent(String content) {
         URL url = getDestUrl();
         SourceControlAdapter sca = AuraUtil.getSourceControlAdapter();
@@ -100,11 +103,12 @@ public class PerfDiffUtil implements DiffUtil<PerfMetrics>{
         br.close();
         return sb.toString();
     }
-    
+
     protected String getResultsFolder() {
         return "/results/perf/";
     }
 
+    @Override
     public URL getUrl() {
         return srcUrl;
     }
@@ -113,9 +117,9 @@ public class PerfDiffUtil implements DiffUtil<PerfMetrics>{
         return destUrl;
     }
 
-	@Override
-	public PerfExecutorTest getTest() {
-		return test;
-	}
-    
+    @Override
+    public PerfExecutorTest getTest() {
+        return test;
+    }
+
 }

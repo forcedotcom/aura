@@ -57,9 +57,10 @@ import edu.umd.cs.findbugs.annotations.NonNull;
  * Note that the output file is a binary object file that is a set of registries,
  * one per namespace, that contain all of the defs that are in the namespaces.
  */
+@SuppressWarnings("deprecation")
 public class RegistrySerializer {
     private static final Log log =
-        LogFactory.getLog(RegistrySerializer.class);
+            LogFactory.getLog(RegistrySerializer.class);
 
     /**
      * An exception during serialization.
@@ -150,7 +151,7 @@ public class RegistrySerializer {
         public void debug(Throwable cause) {
         }
     };
-    
+
     @NonNull
     private final DefaultLogger DEFAULT_LOGGER = new DefaultLogger();
 
@@ -319,7 +320,7 @@ public class RegistrySerializer {
         }
         if (!outputDirectory.isDirectory()) {
             throw new RegistrySerializerException("Output directory is not a directory: "+outputDirectory);
-        } 
+        }
         if (!outputDirectory.canWrite()) {
             throw new RegistrySerializerException("Output directory is not writable: "+outputDirectory);
         }

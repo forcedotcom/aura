@@ -471,6 +471,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         // add app theme to the context. we do this here so that when the context is serialized below it includes the
         // app themes. This ensures ALL applicable themes are part of the url, making client-side caching more
         // predictable
+        // TODONM remove this, as we don't need to have themes specified via AuraContext anymore, just the app
         context.addAppThemeDescriptors();
 
         defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Theme));

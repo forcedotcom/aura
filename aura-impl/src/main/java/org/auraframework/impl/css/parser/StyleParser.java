@@ -36,15 +36,15 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 /**
  */
 public final class StyleParser implements Parser {
+    private static final StyleParser INSTANCE = new StyleParser(true);
+    private static final StyleParser NON_VALIDATING_INSTANCE = new StyleParser(false);
+    public static final Set<String> ALLOWED_CONDITIONS;
 
-    private static final StyleParser instance = new StyleParser(true);
-    private static final StyleParser nonValidatingInstance = new StyleParser(false);
-
-    public static final Set<String> allowedConditions;
     private final boolean doValidation;
 
     // build list of conditional permutations and allowed conditionals
@@ -53,15 +53,15 @@ public final class StyleParser implements Parser {
         for (Client.Type type : Client.Type.values()) {
             acBuilder.add(type.toString());
         }
-        allowedConditions = acBuilder.build();
+        ALLOWED_CONDITIONS = acBuilder.build();
     }
 
     public static StyleParser getInstance() {
-        return Aura.getConfigAdapter().validateCss() ? instance : nonValidatingInstance;
+        return Aura.getConfigAdapter().validateCss() ? INSTANCE : NON_VALIDATING_INSTANCE;
     }
 
     public static StyleParser getNonValidatingInstance() {
-        return nonValidatingInstance;
+        return NON_VALIDATING_INSTANCE;
     }
 
     protected StyleParser(boolean doValidation) {
@@ -79,7 +79,7 @@ public final class StyleParser implements Parser {
                 .initial()
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
-                .allowedConditions(allowedConditions);
+                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()));
 
         if (descriptor.getDefType() == DefType.STYLE) {
             DefDescriptor<StyleDef> styleDescriptor = (DefDescriptor<StyleDef>) descriptor;

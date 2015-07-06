@@ -41,7 +41,7 @@
     /**
      * Wait for a line to appear at a specific location.
      */
-    addWaitForLog : function(cmp, index, content, cb) {
+    addWaitForLog : function(cmp, index, content, cb, partialMatch) {
         var actual;
         $A.test.addWaitForWithFailureMessage(false,
             function() {
@@ -50,7 +50,11 @@
             },
             "Never received log message '" + content + "' at index " + index,
             function() {
-                $A.test.assertEquals(content, actual, "mismatch on log entry "+index);
+            	if(partialMatch === true) {
+            		$A.test.assertTrue(actual.contains(content), "mismatch on log entry "+index);
+            	} else {
+            		$A.test.assertEquals(content, actual, "mismatch on log entry "+index);
+            	}
                 if (cb) {
                     cb();
                 }
@@ -61,7 +65,7 @@
     /**
      * Wait for a log entry that will fall in a range due to race conditions.
      */
-    addWaitForLogRace : function(cmp, index1, index2, content) {
+    addWaitForLogRace : function(cmp, index1, index2, content, partialMatch) {
         var actual;
         $A.test.addWaitForWithFailureMessage(true,
                 function() {
@@ -74,9 +78,15 @@
                     var logs = cmp.get("v.log");
                     var acc = '';
                     for (i = index1; i <= index2; i++) {
-                        if (logs[i] === content) {
-                            return;
-                        }
+                    	if(partialMatch === true) {
+                    		if(logs[i].indexOf(content) >= 0) {
+                    			return;
+                    		}
+                    	} else {
+	                        if (logs[i] === content) {
+	                            return;
+	                        }
+                    	}
                         acc = acc + '\n' + logs[i];
                     }
                     $A.test.fail("mismatch in log range "+index1+','+index2+
@@ -485,42 +495,21 @@
             a1.setStorable();
             
             var a2 = that.getAction(cmp, "c.execute", "STAMP;READ;", function(a) {
-                // can't guarantee ordering of response handling without a little help
-                setTimeout(function() {
                     that.log(cmp, "background:" + a.isFromStorage() + ":" + a.getReturnValue());
-                }, 500);
             });
             a2.setStorable();
             a2.setBackground();
-            
             $A.run ( function() {
             	$A.enqueueAction(a1);
             	$A.enqueueAction(a2);
             })
             
             // both callbacks with stored value executed
-            this.addWaitForLog(cmp, 1, "foreground:true:" + cmp._initialValue);
-            this.addWaitForLog(cmp, 2, "background:true:" + cmp._initialValue);
-
-            // then we update the storage by a1 & a2's reponse
-            // both callbacks with refreshed value executed ordering is not guaranteed
-            $A.test.addWaitFor(true, function() {
-                var logs = cmp.get("v.log");
-                var val1 = logs[3];
-                var val2 = logs[4];
-                if (!val1 || !val2) {
-                    return false;
-                }
-
-                var expected1 = "foreground:false:";
-                var expected2 = "background:false:";
-                var len = expected1.length; // ensure same length for both
-
-                val1 = val1.substring(0, len);
-                val2 = val2.substring(0, len);
-
-                return ((val1 == expected1 && val2 == expected2) || (val1 == expected2 && val2 == expected1));
-            });
+            this.addWaitForLogRace(cmp, 1, 4, "foreground:true:" + cmp._initialValue);
+            this.addWaitForLogRace(cmp, 1, 4, "background:true:" + cmp._initialValue);
+            
+            this.addWaitForLogRace(cmp, 1, 4, "foreground:false:", true);//last param=true:we only check partial match
+            this.addWaitForLogRace(cmp, 1, 4, "background:false:", true);
         } ]
     },
 

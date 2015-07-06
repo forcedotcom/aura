@@ -17,8 +17,6 @@
 package org.auraframework.impl.root.component;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -94,117 +92,154 @@ public class ClientComponentClass {
         private final Object value;
     }
 
-    public void writeComponentClass(Appendable out) throws QuickFixException, IOException {
-        writeComponentClass(this.componentDef, out);
-    }
-
     private static final String escapeStringForScript(final String namespace) {
-        if(namespace == null) { return ""; }
+        if (namespace == null) {
+            return "";
+        }
 
         return namespace.replaceAll("-", "_");
     }
 
-    private void writeComponentClass(BaseComponentDef def, Appendable out) throws IOException, QuickFixException {
-    	final DefDescriptor<? extends BaseComponentDef> descriptor = def.getDescriptor();
-    	final DefDescriptor<? extends BaseComponentDef> extendsDescriptor = def.getExtendsDescriptor();
-		final String className = escapeStringForScript(String.format("%s$%s", descriptor.getNamespace(), descriptor.getName()));
-		BaseComponentDef superDef = null;
-		
-		if(extendsDescriptor != null) {
-			superDef = extendsDescriptor.getDef();
-		} else if(!def.getDescriptor().getQualifiedName().equals("markup://aura:component")) {
-			superDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
-		}
-		
-    	DefDescriptor<? extends BaseComponentDef> superDescriptor = superDef != null ? superDef.getDescriptor() : null;
-		final String superClassName = superDescriptor != null ? escapeStringForScript(String.format("%s$%s", superDescriptor.getNamespace(), superDescriptor.getName())) : "$A.Component";
-		final String superFullyQualifiedDescriptor = superDescriptor != null ? superDescriptor.getQualifiedName() : "markup://aura:component";
-		// DCHASMAN TODO Find the closest non-empty implementation of each method and jump directly to that to reduce call stack depth 
+    public void writeComponentClass(Appendable out) throws QuickFixException,
+            IOException {
+        new ClientComponentClassWriter(this.componentDef).write(out);
+    }
 
-        final String[] methodNames = new String[] { "render", "rerender", "afterRender", "unrender" };
-        final List<JsFunction> renderMethods = Lists.newArrayList();
-        final List<String> renderMethodStubs;
-        DefDescriptor<RendererDef> rendererDescriptor = def.getRendererDescriptor();
-        if (rendererDescriptor != null) {
-            renderMethodStubs = Lists.newArrayList();
-            RendererDef rendererDef = rendererDescriptor.getDef();
-            if (rendererDef != null && !rendererDef.isLocal()) {
-                String defInJson = Json.serialize(rendererDef, false, true);
+    private class ClientComponentClassWriter {
+        final BaseComponentDef def;
+        final DefDescriptor<? extends BaseComponentDef> descriptor;
+        final String fullyQualifiedDescriptor;
+        final String className;
+
+        final DefDescriptor<? extends BaseComponentDef> extendsDescriptor;
+
+        final BaseComponentDef superDef;
+        final DefDescriptor<? extends BaseComponentDef> superDescriptor;
+        final String superClassName;
+        final String superFullyQualifiedDescriptor;
+
+        final String[] renderMethodNames = new String[] { "render", "rerender", "afterRender", "unrender" };
+
+        public ClientComponentClassWriter(BaseComponentDef def)
+                throws QuickFixException {
+            this.def = def;
+
+            descriptor = componentDef.getDescriptor();
+            fullyQualifiedDescriptor = descriptor.getQualifiedName();
+            className = toClassName(descriptor);
+
+            extendsDescriptor = def.getExtendsDescriptor();
+            if (extendsDescriptor != null) {
+                superDef = extendsDescriptor.getDef();
+            } else if (!fullyQualifiedDescriptor
+                    .equals("markup://aura:component")) {
+                superDef = Aura.getDefinitionService().getDefinition(
+                        "aura:component", ComponentDef.class);
+            } else {
+                superDef = null;
+            }
+
+            superDescriptor = superDef != null ? superDef.getDescriptor()
+                    : null;
+            superFullyQualifiedDescriptor = superDescriptor != null ? superDescriptor
+                    .getQualifiedName() : "markup://aura:component";
+            superClassName = superDescriptor != null ? toClassName(superDescriptor)
+                    : null;
+        }
+
+        private String toClassName(
+                DefDescriptor<? extends BaseComponentDef> descriptor) {
+            return escapeStringForScript(descriptor.getNamespace() + "$"
+                    + descriptor.getName());
+        }
+
+        private List<HelperInfo2> getHelperProperties()
+                throws QuickFixException {
+            List<HelperInfo2> helperProperties = Lists.newArrayList();
+
+            HelperDef helperDef = def.getHelperDef();
+            if (helperDef != null) {
+                String defInJson = Json.serialize(helperDef, false, true);
 
                 try {
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> defObj = (Map<String, Object>) new JsonReader().read(defInJson);
+                    Map<String, Object> defObj = (Map<String, Object>) new JsonReader()
+                            .read(defInJson);
                     @SuppressWarnings("unchecked")
-                    Map<String, Object> value = (Map<String, Object>) defObj.get(Json.ApplicationKey.VALUE.toString());
+                    Map<String, Object> value = (Map<String, Object>) defObj
+                            .get(Json.ApplicationKey.VALUE.toString());
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> properties = (Map<String, Object>) value
+                            .get("functions");
 
-                    for (String methodName : methodNames) {
-                        JsFunction renderMethod = (JsFunction) value.get(methodName);
-                        if (renderMethod != null) {
-                            renderMethod.setName(methodName);
-                            renderMethods.add(renderMethod);
-                        } else {
-                            renderMethodStubs.add(methodName);
-                        }
+                    for (Entry<String, Object> entry : properties.entrySet()) {
+                        helperProperties.add(new HelperInfo2(entry.getKey(),
+                                Json.serialize(entry.getValue(), false, true)));
                     }
+
                 } catch (JsonParseException x) {
                     // Ignore these
                 }
             }
-        } else {
-            // If they don't have a renderer, specify all stubs.
-            renderMethodStubs = Lists.newArrayList(methodNames);
+            return helperProperties;
         }
 
-        // Emit the helper
-        HelperDef helperDef = def.getHelperDef();
-        List<HelperInfo2> helperProperties = Lists.newArrayList();
-        if (helperDef != null) {
-            String defInJson = Json.serialize(helperDef, false, true);
+        private Map<String, JsFunction> getRenderMethods() throws QuickFixException {
+            final Map<String, JsFunction> renderMethods = Maps.newHashMap();
 
-            try {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> defObj = (Map<String, Object>) new JsonReader().read(defInJson);
-                @SuppressWarnings("unchecked")
-                Map<String, Object> value = (Map<String, Object>) defObj.get(Json.ApplicationKey.VALUE.toString());
-                @SuppressWarnings("unchecked")
-                Map<String, Object> properties = (Map<String, Object>) value.get("functions");
+            // DCHASMAN TODO Find the closest non-empty implementation of each
+            // method and jump directly to that to reduce call stack depth
 
-                for (Entry<String, Object> entry : properties.entrySet()) {
-                    helperProperties.add(new HelperInfo2(entry.getKey(), Json.serialize(entry.getValue(), false, true)));
+            DefDescriptor<RendererDef> rendererDescriptor = def.getRendererDescriptor();
+            if (rendererDescriptor != null) {
+                RendererDef rendererDef = rendererDescriptor.getDef();
+                if (rendererDef != null && !rendererDef.isLocal()) {
+                    String defInJson = Json.serialize(rendererDef, false, true);
+
+                    try {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> defObj = (Map<String, Object>) new JsonReader().read(defInJson);
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> value = (Map<String, Object>) defObj.get(Json.ApplicationKey.VALUE.toString());
+
+                        for (String methodName : renderMethodNames) {
+                            JsFunction renderMethod = (JsFunction) value.get(methodName);
+                            if (renderMethod != null) {
+                                renderMethod.setName(methodName);
+                                renderMethods.put(methodName, renderMethod);
+                            }
+                        }
+                    } catch (JsonParseException x) {
+                        // Ignore these
+                    }
                 }
-
-            } catch (JsonParseException x) {
-                // Ignore these
             }
 
-            if (superDescriptor != null) {
-                // Now wire up the component helper's superclass
-            }
+            return renderMethods;
         }
 
-        // Emit the component specific js classes
-        DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradev:componentClass", ComponentDef.class);
-        Map<String, Object> attributes = Maps.newHashMap();
-        attributes.put("fullyQualifiedName", descriptor.getQualifiedName());
-        attributes.put("superFullyQualifiedName", superFullyQualifiedDescriptor);
-        attributes.put("className", className);
-        attributes.put("superClassName", superClassName);
-        attributes.put("helperProperties", !helperProperties.isEmpty() ? helperProperties : null);
-        attributes.put("renderMethods", renderMethods);
-        attributes.put("renderMethodStubs", renderMethodStubs);
-        attributes.put("superRenderMethodNames", superDef != null ? SUPER_INFOS : Collections.emptyList());
-        attributes.put("rootComponent", def.getInterfaces().contains(org.auraframework.impl.root.component.BaseComponentDefImpl.ROOT_MARKER));
+        public void write(Appendable out) throws QuickFixException, IOException {
 
+            final Map<String, JsFunction> renderMethods = getRenderMethods();
 
-        org.auraframework.instance.Component component = Aura.getInstanceService().getInstance(desc, attributes);
+            final Map<String, Object> attributes = Maps.newHashMap();
+            attributes.put("fullyQualifiedName", fullyQualifiedDescriptor);
+            attributes.put("superFullyQualifiedName", superFullyQualifiedDescriptor);
+            attributes.put("className", className);
+            attributes.put("superClassName", superClassName != null ? superClassName : "$A.Component");
 
-        StringWriter test = new StringWriter();
-        Aura.getRenderingService().render(component, test);
+            attributes.put("helperProperties", getHelperProperties());
+            attributes.put("renderMethods", renderMethods.values());
 
-        out.append(test.toString());
+            attributes.put("isRootComponent", def.getInterfaces().contains(org.auraframework.impl.root.component.BaseComponentDefImpl.ROOT_MARKER));
+            attributes.put("hasSuperClass", superClassName != null);
+            attributes.put("hasUnrenderMethod", renderMethods.containsKey("unrender"));
+
+            DefinitionService definitionService = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor("auradev:componentClass", ComponentDef.class);
+            org.auraframework.instance.Component component = Aura.getInstanceService().getInstance(desc, attributes);
+            Aura.getRenderingService().render(component, out);
+        }
     }
 
-
 }
-

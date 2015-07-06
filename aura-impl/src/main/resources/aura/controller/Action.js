@@ -977,6 +977,7 @@ Action.prototype.setParentAction = function(action) {
  *
  * @public
  * @returns {string} the abortable id that was set for this action.
+ * @export
  */
 Action.prototype.getAbortableId = function() {
     return this.abortableId;

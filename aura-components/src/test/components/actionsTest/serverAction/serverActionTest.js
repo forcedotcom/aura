@@ -232,7 +232,7 @@
      * enqueue two actions with same signature, go offline, verify both of them return with INCOMPLETE 
      */
     testConcurrentServerActionsBothIncomplete : {
-        test : [ function (cmp) {
+        test : [ function doTest(cmp) {
             var currentTransactionId = $A.getCurrentTransactionId();
     		//create two actions with same signature
             //also set current transcationId to be the same as first abortable action
@@ -258,35 +258,43 @@
             );
             //need to make sure both actions return as INCOMPLETE
             $A.test.addWaitForWithFailureMessage(true, 
-            		function() { return (a1.state==="INCOMPLETE")&&(a2.state==="INCOMPLETE"); },
-            		"fail waiting for both actions return with state=INCOMPLETE",
-            		function() {
-            			$A.test.setServerReachable(true);//reconnect the server
-            		}
+            		function() { return (a1.state==="INCOMPLETE")},
+            		"fail waiting for action 1 return with state=INCOMPLETE"
             );
+            
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a2.state==="INCOMPLETE"); },
+            		"fail waiting for action 2 return with state=INCOMPLETE"
+            );
+        }, function reconnectTheServer(cmp) {
+        	$A.test.setServerReachable(true);
         }]
     },
     
     
-    /*
-     * ALERT : read test setup please
+    /**
+     * ALERT : Complex test setup.
      * 
-     * Test for Two concurrent server actions with same signature get aborted during receive() when server is offline
+     * Test for Two concurrent server actions with same signature get aborted during receive() when server is OFFLINE
      * I'm doing this using two caboose actions
      * 
      * This is what we need: two abortable identical actions(a1 and a2 in test), we want them enqueued. 
      * a2 is recognized as a 'dupe' of a1, so actually only a1 get pushed to action queue, a2 is stored.
      * 
      * we enqueue a background action (a0) along with a1&a2, so we can have some control over when to go offline etc
-     * Note: a0 needs to be background so a1&a2 don't actually get send.
+     * Note: a0 needs to be background so a1&a2 don't actually get send, we go OFFLINE when a0 comeback with SUCCESS
      * 
      * then we enqueue a foreground action (a3) , this will trigger sending of caboose actions(a1&a2). 
      * Note: a3 cannot be abortable, or a1&a2 will get aborted without being send at all. 
      * 
-     * BUT before a1 get send out, another abortable action(a4 in test) get enqueued, push currentTransactionId forward.
+     * BUT when sending out a1, another abortable action(a4 in test) get enqueued, push currentTransactionId forward.
      * when we deal with a1 & a3 in receive(), server is offline, we abort a1 because it belong to the 
      * previous 'patch' of abortable actions, then abort a2 because its a1's 'dupe'.
      * Note: we need server to be "unReachable" because we don't abort actions if we get response
+     * 
+     * Four places we do action.abort() on AuraClientSrevice: this test 3rd place in AuraClientService.processIncompletes(). 
+     * 1st is test in testAbortQueuedAbortable, 2nd by testAbortInFlightAbortable , 4th by testAbortStorable, 
+     * all in enqueueActionTest.js
      */
     testConcurrentCabooseServerActionsBothAborted : {
         test : [ 
@@ -356,24 +364,21 @@
 				);
 	            $A.enqueueAction(a3); 
 	            
-			}, function assertTestFinish(cmp) {
-				
 			}
 		]
     },
     
     
     /*
-     * W-2659878 : This is having issues where 2nd action get to run twice. because it's a background action, we 
-     * defer it, but it's also a dupe of 1st action, when first action's response come back, we also process it.
+     * two concurrent background actions, 2nd action get copy of 1st's response 
      */
-    _testConcurrentBackgroundServerActionsBothStorable : {
+    testConcurrentBackgroundServerActionsBothStorable : {
     	test : [ function(cmp) {
     		var a1Return = undefined, a2Return = undefined;
     		var recordObjCounterFromA1 = undefined;
     		//create two actions with same signature
-    		var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
-            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i:1});
+    		var a1 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
+            var a2 = $A.test.getAction(cmp, "c.executeInBackgroundWithReturn", {i:1});
             a1.setStorable(); 
             a2.setStorable(); 
             //we check response in callbacks
@@ -391,12 +396,20 @@
             	$A.test.assertEquals(recordObjCounterFromA1, a2Return.recordObjCounter, "2nd action should get a copy response from 1st action");
             });
             //make sure both ations get schedule to send in a same XHR box
-            $A.enqueueAction(a1); 
-            $A.enqueueAction(a2); 
+            $A.run ( function() { 
+            	$A.enqueueAction(a1); 
+            	$A.enqueueAction(a2); 
+            	}
+            );
+            
             //just need to make sure both actions get some return
             $A.test.addWaitForWithFailureMessage(true, 
-            		function() { return (a1Return!==undefined)&&(a2Return!==undefined); },
-            		"fail waiting for both action returns something"
+            		function() { return (a1Return!==undefined); },
+            		"fail waiting for action1 returns something"
+            );
+            $A.test.addWaitForWithFailureMessage(true, 
+            		function() { return (a2Return!==undefined); },
+            		"fail waiting for action2 returns something"
             );
         } 
         ]

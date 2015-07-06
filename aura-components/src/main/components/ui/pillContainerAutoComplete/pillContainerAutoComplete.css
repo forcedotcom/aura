@@ -33,8 +33,17 @@ div.THIS {
     text-decoration: none;
 }
 
-.THIS li a img {
-    vertical-align: -8px;
-    margin: -12px 8px 4px -4px;
+.THIS .pillIcon {
+    vertical-align: middle;
+    margin-right:8px;
+    display: inline-block;
+}
+
+.THIS .pillIcon, .THIS .pillIcon .uiImage {
+    height: 20px;
+    width: 20px;
+}
+
+.THIS .pillIcon, .THIS .pillIcon img {
     border-radius:2px;
 }

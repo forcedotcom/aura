@@ -16,47 +16,53 @@
 
 -->
 <aura:component description="Renders the concrete javascript class for a component." isTemplate="true">
-	<aura:attribute name="fullyQualifiedName" type="String" required="true"/>
-	<aura:attribute name="superFullyQualifiedName" type="String" required="true"/>
+
+    <aura:attribute name="fullyQualifiedName" type="String" required="true"/>
+    <aura:attribute name="superFullyQualifiedName" type="String" required="true"/>
     <aura:attribute name="className" type="String" required="true"/>
     <aura:attribute name="superClassName" type="String" required="true"/>
+
     <aura:attribute name="helperProperties" type="java://List&lt;org.auraframework.impl.ServerServiceImpl.HelperInfo&gt;" required="true"/>
     <aura:attribute name="renderMethods" type="java://List&lt;org.auraframework.util.json.JsFunction&gt;" required="true"/>
-    <aura:attribute name="renderMethodStubs" type="String[]" required="true"/>
-    <aura:attribute name="superRenderMethodNames" type="java://List&lt;org.auraframework.impl.ServerServiceImpl.RerenderInfo&gt;" required="true"/>
-    <aura:attribute name="rootComponent" type="Boolean" required="true"/>
+
+    <aura:attribute name="isRootComponent" type="Boolean" required="true"/>
+    <aura:attribute name="hasSuperClass" type="Boolean" required="true"/>
+    <aura:attribute name="hasUnrenderMethod" type="Boolean" required="true"/>
 
 <!-- Emit the component class -->
 $A.componentService.addComponentClass("{!v.fullyQualifiedName}", function() {
-    <aura:if isTrue="{!v.superClassName != '$A.Component'}">
+
+    <aura:if isTrue="{!v.hasSuperClass}">
     var {!v.superClassName} = $A.componentService.getComponentClass("{!v.superFullyQualifiedName}");
     </aura:if>
+
     var {!v.className} = function {!v.className}(config, localCreation, creatingPrototype) {
-        {!v.superClassName}.call(this, config, localCreation, creatingPrototype); 
+        {!v.superClassName}.call(this, config, localCreation, creatingPrototype);
     };
     {!v.className}.prototype = new {!v.superClassName}(null, null, true);
     {!v.className}.prototype.constructor = {!v.className};
 
     <!-- Emit the helper -->
     <aura:if isTrue="{!empty(v.helperProperties)}">
-        <aura:if isTrue="{!v.superClassName != '$A.Component'}">
-            {!v.className}.Helper = {!v.superClassName}.Helper;
-            <aura:set attribute="else">
-            {!v.className}.Helper = function(){};
-            </aura:set>
-        </aura:if>
-        <aura:set attribute="else">
-        {!v.className}.Helper = function() {};
-        <aura:if isTrue="{!v.superClassName != '$A.Component'}">
-        {!v.className}.Helper.prototype = new {!v.superClassName}.Helper();
-        {!v.className}.Helper.prototype.constructor = {!v.className}.Helper;
-        </aura:if>
 
-        <aura:iteration items="{!v.helperProperties}" var="property">
-        {!v.className}.Helper.prototype.{!property.name} = {!property.value};
+    <aura:if isTrue="{!v.hasSuperClass}">
+    {!v.className}.Helper = {!v.superClassName}.Helper;
+    <aura:set attribute="else">
+    {!v.className}.Helper = function(){};
+    </aura:set>
+    </aura:if>
 
-        </aura:iteration>
-        </aura:set>
+    <aura:set attribute="else">
+    {!v.className}.Helper = function() {};
+    <aura:if isTrue="{!v.hasSuperClass}">
+    {!v.className}.Helper.prototype = new {!v.superClassName}.Helper();
+    {!v.className}.Helper.prototype.constructor = {!v.className}.Helper;
+    </aura:if>
+
+    <aura:iteration items="{!v.helperProperties}" var="property">
+    {!v.className}.Helper.prototype.{!property.name} = {!property.value};
+    </aura:iteration>
+    </aura:set>
     </aura:if>
 
     {!v.className}.prototype.helper = new {!v.className}.Helper();
@@ -64,29 +70,26 @@ $A.componentService.addComponentClass("{!v.fullyQualifiedName}", function() {
     <!-- Emit the render methods -->
     <aura:iteration items="{!v.renderMethods}" var="method">
     {!v.className}.prototype.{!method.name} = function() {
-        var renderable = this.getRenderable();
-        <aura:if isTrue="{!method.arguments.length > 0}">var {!method.arguments[0]} = renderable;
+        <aura:if isTrue="{!method.arguments.length > 0}">var {!method.arguments[0]} = this.getRenderable();
         </aura:if>
-        <aura:if isTrue="{!method.arguments.length > 1}">var {!method.arguments[1]} = renderable.helper;
+        <aura:if isTrue="{!method.arguments.length > 1}">var {!method.arguments[1]} = {!method.arguments[0]}.helper;
         </aura:if>
-        
         {!method.body}
     };
+    </aura:iteration>
 
-    </aura:iteration>
-    <aura:iteration items="{!v.renderMethodStubs}" var="name">
-        <aura:if isTrue="{!v.rootComponent == true &amp;&amp; name == 'unrender'}">
-        {!v.className}.prototype.unrender = function() {
-            var elements = this.getElements();
-            if(elements) {
-                while(elements.length){
-                    $A.util.removeElement(elements.pop());
-                }
+    <aura:if isTrue="{!v.isRootComponent &amp;&amp; !v.hasUnrenderMethod}">
+    {!v.className}.prototype.unrender = function() {
+        var elements = this.getElements();
+        if(elements) {
+            while(elements.length){
+                $A.util.removeElement(elements.pop());
             }
-            this.disassociateElements();
-        };
-        </aura:if>
-    </aura:iteration>
+        }
+        this.disassociateElements();
+    };
+    </aura:if>
+
     return {!v.className};
 });
 

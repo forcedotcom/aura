@@ -1,8 +1,6 @@
-<aura:component extends="ui:tabset">
+<aura:component extends="ui:tab">
 	<aura:attribute name="_afterRenderWidth" type="String" default="" description="after render tab content width" />
 	<aura:attribute name="_afterRenderHeight" type="String" default="" description="after render tab content height" />
 	<aura:attribute name="_isDomPresent" type="Boolean" default="false" description="whether or not the dom is present" />
+	<div style="background-color:yellow">{!v.body}</div>
 </aura:component>
-
-
-

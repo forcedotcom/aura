@@ -1,0 +1,84 @@
+<!--
+    Copyright (C) 2013 salesforce.com, inc.
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+            http://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<aura:component>
+	<aura:attribute name="value" type="String" default="2015-07-01"/>
+	<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
+	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
+	<div class="block">
+	    <div>
+	        <h1>Test Default Header Tag (h2)</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>dp_v_titleHeadingLevel = {!v.dp_v_titleHeadingLevel}</div>
+	    	<div>datepicker_calTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
+	    	<div>dp_CalTitle_TagName = {!v.dp_CalTitle_TagName}</div>
+		</div>
+	    <div>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
+	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	    </div>
+	</div>
+	</aura:if>
+
+
+	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyCustomHeaderTag'}">	
+	<div class="block">
+	    <div>
+	        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>dp_v_titleHeadingLevel = {!v.dp_v_titleHeadingLevel}</div>
+	    	<div>dp_CalTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
+	    	<div>dp_CalTitle_TagName = {!v.dp_CalTitle_TagName}</div>
+		</div>
+	    <div>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
+	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	    </div>
+	</div>
+	</aura:if>
+
+
+
+	<aura:if isTrue="{! v.renderItem == 'testSetFocusOnDatepickerGridDefaultVal'}">	
+	<div class="block">
+	    <div>
+	        <h1>Test Set Focus Default Value</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>dp_v_setFocus (Default Value) = {!v.dp_v_setFocus}</div>
+		</div>
+	    <div>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
+	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	    </div>
+	</div>
+	</aura:if>
+
+	<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">	
+	<div class="block">
+	    <div>
+	        <h1>Test Set Focus Attribute</h1>
+	    </div>
+	    <div class="subtitle">
+	    	<div>dp_v_setFocus = {!v.dp_v_setFocus}</div>
+	    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
+	    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
+		</div>
+	    <div>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
+	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	    </div>
+	</div>
+	</aura:if>
+</aura:component>

@@ -120,10 +120,25 @@ public final class SourceFactory {
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<>();
 
-        for (Map.Entry<LoaderKey, SourceLoader> entry : this.loaders.entrySet()) {
-            if (matcher.matchPrefix(entry.getKey().getPrefix())
-                    && matcher.matchNamespace(entry.getKey().getNamespace())) {
-                ret.addAll(entry.getValue().find(matcher));
+        String namespace = matcher.getNamespaceMatch().toString();
+        if (WILD.equals(namespace)) {
+            for (String ns : namespaces) {
+                String qualifiedName = String.format("%s://%s:%s",
+                        matcher.getPrefixMatch(), ns, matcher.getNameMatch());
+                DescriptorFilter namespacedMatcher;
+                if (matcher.getDefTypes() == null) {
+                    namespacedMatcher = new DescriptorFilter(qualifiedName);
+                } else {
+                    namespacedMatcher = new DescriptorFilter(qualifiedName, matcher.getDefTypes().get(0));
+                }
+                ret.addAll(find(namespacedMatcher));
+            }
+        } else {
+            for (Map.Entry<LoaderKey, SourceLoader> entry : this.loaders.entrySet()) {
+                if (matcher.matchPrefix(entry.getKey().getPrefix())
+                        && matcher.matchNamespace(entry.getKey().getNamespace())) {
+                    ret.addAll(entry.getValue().find(matcher));
+                }
             }
         }
         return ret;

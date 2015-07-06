@@ -16,6 +16,7 @@
 package org.auraframework.adapter;
 
 import java.util.List;
+import java.util.Set;
 
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.ThemeList;
@@ -65,7 +66,8 @@ public interface StyleAdapter extends AuraAdapter {
      * @param strategy An indication of how this provider is going to be used.
      * @param overrides The {@link ThemeList} containing the override themes.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy, ThemeList overrides);
+    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
+            ThemeList overrides);
 
     /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.
@@ -145,4 +147,34 @@ public interface StyleAdapter extends AuraAdapter {
      * @return The list of plugins.
      */
     List<Plugin> getContextualRuntimePlugins();
+
+    /**
+     * Returns any extra conditions to be allowed in CSS {@code @}if blocks.
+     * <p>
+     * This is in addition to the conditions enabled by the framework by default, such as certain browser types. Note
+     * that this is used for validation purposes only. To specify which conditions are actually true for the current
+     * context see {@link #getExtraTrueConditions()} instead.
+     * <p>
+     * <b>IMPORTANT!!!</b> Do not enable additional conditions without first understanding the potential perf impact!
+     * Each additional condition may have an exponential effect on the number CSS permutations. This may impact the
+     * number of CSS files that must be generated and cached server side.
+     *
+     * @return The set of extra conditions.
+     */
+    Set<String> getExtraAllowedConditions();
+
+    /**
+     * Gets the set of extra CSS conditions that are "true" for the current context. Any condition returned here must
+     * also be specified in {@link #getExtraTrueConditions()}. Do not specify any conditions that are automatically
+     * handled by the framework, such as certain browser types.
+     * <p>
+     * It's important that the return value is consistent and idempotent.
+     * <p>
+     * <b>IMPORTANT!!!</b> Do not enable additional conditions without first understanding the potential perf impact!
+     * Each additional condition may have an exponential effect on the number CSS permutations. This may impact the
+     * number of CSS files that must be generated and cached server side.
+     *
+     * @return The of conditions that are true.
+     */
+    Set<String> getExtraTrueConditions();
 }

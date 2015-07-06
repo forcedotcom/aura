@@ -66,6 +66,8 @@ import org.auraframework.util.json.JsonSerializer.NoneSerializer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -281,6 +283,8 @@ public class AuraContextImpl implements AuraContext {
     private InstanceStack fakeInstanceStack;
 
     private MutableThemeList themes = new ThemeListImpl();
+
+    private Set<String> styleContext = Sets.newHashSet();
 
     private Deque<DefDescriptor<?>> callingDescriptorStack = Lists.newLinkedList();
 
@@ -687,6 +691,21 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
+    public void setStyleContext(Set<String> styleContext) {
+        if (styleContext == null) {
+            this.styleContext = ImmutableSet.of();
+        } else {
+           // iteration order is important for serialization in app.css url and also generation of server css cache key
+            this.styleContext = ImmutableSortedSet.copyOf(styleContext);
+        }
+    }
+
+    @Override
+    public Set<String> getStyleContext() {
+        return this.styleContext;
+    }
+
+    @Override
     public DefDescriptor<?> getCurrentDescriptor() {
         DefDescriptor<?> caller = getCurrentCallingDescriptor();
         if (caller == null) {
@@ -822,6 +841,7 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             if (style == EncodingStyle.Theme) {
+                // TODONM remove this
                 ThemeList themes = getThemeList();
                 if (!themes.isEmpty()) {
                     List<String> stringed = Lists.newArrayList();
@@ -831,9 +851,22 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("themes", stringed);
                 }
 
+                // add a unique id for map-provided tokens, for client-side cache-busting
                 Optional<String> dynamicVarsUid = themes.getActiveDynamicVarsUid();
                 if (dynamicVarsUid.isPresent()) {
                     json.writeMapEntry("dynamicVarsUid", dynamicVarsUid.get());
+                }
+
+                // add any extra true conditions (for CSS conditionals). It would make sense to handle client.type
+                // (browser) here as well, but this hasn't been required due to the fact that clients only receive and
+                // cache for the exact same client.type value. Different values of arbitrary conditionals can be
+                // served to the same client, however, hence an explicit cache-buster in the url is required.
+                // This doubly serves the purpose of consistency for client-caching-- it's best that the second request
+                // that actually generates/returns the CSS code doesn't recheck this method directly and potentially end
+                // up with a different value, but instead just depends on what was in the url.
+                Set<String> trueConditions = ImmutableSortedSet.copyOf(Aura.getStyleAdapter().getExtraTrueConditions());
+                if (trueConditions != null && !trueConditions.isEmpty()) {
+                    json.writeMapEntry("styleContext", trueConditions);
                 }
             }
 

@@ -15,6 +15,8 @@
  */
 package org.auraframework.impl.css.parser;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.List;
 import java.util.Set;
 
@@ -80,6 +82,7 @@ public final class CssPreprocessor {
         private String resourceName;
         private final boolean runtime;
         private final Set<Plugin> plugins = Sets.newLinkedHashSet();
+        private Conditionals conditionals;
 
         public ParserConfiguration() {
             this.runtime = false;
@@ -137,7 +140,7 @@ public final class CssPreprocessor {
         }
 
         /** allowed conditionals (e.g., set of allowed browsers) */
-        public ParserConfiguration allowedConditions(Set<String> allowedConditions) {
+        public ParserConfiguration allowedConditions(Iterable<String> allowedConditions) {
             plugins.add(new ConditionalsValidator(allowedConditions));
             return this;
         }
@@ -146,9 +149,19 @@ public final class CssPreprocessor {
         public ParserConfiguration clientType(Client.Type client) {
             Conditionals conditionals = new Conditionals();
             if (client != null) {
-                conditionals.manager().addTrueConditions(client.name().toLowerCase());
+                conditionals.config().addTrueConditions(client.name().toLowerCase());
             }
             plugins.add(conditionals);
+            this.conditionals = conditionals;
+            return this;
+        }
+
+        /** specify additional conditions that are true */
+        public ParserConfiguration extraTrueConditions(Set<String> trueConditions) {
+            if (trueConditions != null && !trueConditions.isEmpty()) {
+                checkState(conditionals != null, "conditionals plugin is not configured");
+                conditionals.config().addTrueConditions(trueConditions);
+            }
             return this;
         }
 

@@ -474,6 +474,7 @@ public interface AuraContext {
     void serializeAsPart(Json json) throws IOException;
 
     /**
+     * TODONM remove
      * Prepends all app-specified themes to this context.
      * <p>
      * The themes will be prepended <em>before</em> all themes added with {@link #appendThemeDescriptor(DefDescriptor)}.
@@ -485,15 +486,17 @@ public interface AuraContext {
     void addAppThemeDescriptors();
 
     /**
+     * TODONM remove
      * Explicitly appends a theme override after other currently specified themes. This will also be after any themes on
      * the current application.
-     * 
+     *
      * @param themeDescriptor The override theme.
      * @throws QuickFixException If there was a problem loading/validating/etc... the theme descriptor.
      */
     void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException;
 
     /**
+     * TODONM move to appdef
      * Gets the list of override themes explicitly specified to this context. These are the themes that are used to
      * "override" the default var values.
      * <p>
@@ -508,10 +511,24 @@ public interface AuraContext {
     ThemeList getThemeList();
 
     /**
+     * Specifies the style context, in terms of which CSS conditions are true.
+     *
+     * @param styleContext The set of true conditions.
+     */
+    void setStyleContext(Set<String> styleContext);
+
+    /**
+     * Gets the style context, in terms of which CSS conditions are true.
+     *
+     * @return The set of true conditions (does not return null).
+     */
+    Set<String> getStyleContext();
+
+    /**
      * Get a location stack for the current context at the current moment.
      */
     List<String> createComponentStack();
-    
+
     /**
      * @return state of context Globals
      */

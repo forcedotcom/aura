@@ -15,14 +15,13 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import aQute.bnd.annotation.component.Component;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
-import org.auraframework.css.ResolveStrategy;
-import org.auraframework.css.ThemeList;
-import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.css.*;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -30,9 +29,8 @@ import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.theme.ThemeValueProviderImpl;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.salesforce.omakase.plugin.Plugin;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component(provide = AuraServiceProvider.class)
 public class StyleAdapterImpl implements StyleAdapter {
@@ -80,5 +78,15 @@ public class StyleAdapterImpl implements StyleAdapter {
         plugins.add(new DuplicateFontFacePlugin());
 
         return plugins;
+    }
+
+    @Override
+    public Set<String> getExtraAllowedConditions() {
+        return ImmutableSet.<String>of();
+    }
+
+    @Override
+    public Set<String> getExtraTrueConditions() {
+        return ImmutableSet.<String>of();
     }
 }

@@ -54,6 +54,7 @@ import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.json.Json;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
@@ -68,7 +69,7 @@ public class ServerServiceImpl implements ServerService {
     public void run(Message message, AuraContext context, Writer out, Map<?,?> extras) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.startTimer(LoggingService.TIMER_AURA_RUN);
-        
+
         MetricsService metricsService = Aura.getMetricsService();
         if (message == null) {
             return;
@@ -99,9 +100,9 @@ public class ServerServiceImpl implements ServerService {
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
                 loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
             }
-            
+
             loggingService.stopTimer(LoggingService.TIMER_AURA_RUN);
-            
+
             // MetricsService for Non PROD environments
             if (context.getMode() != Mode.PROD) {
                 try {
@@ -111,7 +112,7 @@ public class ServerServiceImpl implements ServerService {
                     loggingService.error("Error parsing MetricsService", e);
                 }
             }
-            
+
             json.writeMapEnd();
         } finally {
             try {
@@ -180,6 +181,13 @@ public class ServerServiceImpl implements ServerService {
 
         // browser type
         keyBuilder.append(context.getClient().getType());
+
+        // other "true" conditions from style adapter (e.g., isDesktop). For more info see comments in AuraContext serialization
+        String trueConditionsKey = Joiner.on("-").skipNulls().join(context.getStyleContext());
+        if (!trueConditionsKey.isEmpty()) {
+            keyBuilder.append("-");
+            keyBuilder.append(trueConditionsKey);
+        }
 
         keyBuilder.append("$");
 

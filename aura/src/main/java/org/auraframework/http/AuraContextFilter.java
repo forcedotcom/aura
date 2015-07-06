@@ -57,6 +57,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 
 public class AuraContextFilter implements Filter {
@@ -83,7 +84,7 @@ public class AuraContextFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraContextFilter.class);
 
     protected static final AuraTestFilter testFilter = new AuraTestFilter();
-    
+
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
     IOException {
@@ -185,6 +186,12 @@ public class AuraContextFilter implements Filter {
                 } catch (QuickFixException e) {
                     throw new AuraRuntimeException(e);
                 }
+            }
+
+            @SuppressWarnings("unchecked")
+            List<String> styleContextList = (List<String>) configMap.get("styleContext");
+            if (styleContextList != null) {
+                context.setStyleContext(ImmutableSortedSet.copyOf(styleContextList));
             }
 
             @SuppressWarnings("unchecked")

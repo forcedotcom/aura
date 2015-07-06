@@ -100,6 +100,12 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 		function instantiationWithWindow() {
 			var el = windowMock;
 			windowMock.innerWidth = 415;
+			windowMock.document = {
+				documentElement : {
+					clientWidth: 415,
+					clientHeight: 200
+				}
+			}
 			var proxy = new positioningNS.ElementProxy(el, "foo");
 			Assert.Equal(el, proxy.getNode());
 			Assert.Equal(415, proxy.width);

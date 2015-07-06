@@ -38,7 +38,7 @@
 	    </div>
 	    <div class="subtitle">
 	    	<div>dp_v_titleHeadingLevel = {!v.dp_v_titleHeadingLevel}</div>
-	    	<div>datepicker_calTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
+	    	<div>dp_CalTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
 	    	<div>dp_CalTitle_TagName = {!v.dp_CalTitle_TagName}</div>
 		</div>
 	    <div>
@@ -59,7 +59,7 @@
 	    	<div>dp_v_setFocus (Default Value) = {!v.dp_v_setFocus}</div>
 		</div>
 	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd"/><br/>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
 	    	<ui:datePickerManager aura:id="datepickerManager"/>
 	    </div>
 	</div>
@@ -76,7 +76,7 @@
 	    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
 		</div>
 	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd"/><br/>
+	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
 	    	<ui:datePickerManager aura:id="datepickerManager"/>
 	    </div>
 	</div>

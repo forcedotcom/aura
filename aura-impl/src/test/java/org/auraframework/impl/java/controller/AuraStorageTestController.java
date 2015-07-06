@@ -50,7 +50,7 @@ public class AuraStorageTestController {
     private static Map<String, Semaphore> executorLocks = new ConcurrentHashMap<>();
 
     private enum Command {
-        RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP;
+        RESET, WAIT, RESUME, APPEND, READ, STAMP, SLEEP, COPY;
     }
 
     @AuraEnabled
@@ -87,11 +87,11 @@ public class AuraStorageTestController {
                     }
                     buffer.remove(testName);
                     break;
-                case WAIT:
+                case WAIT://let current action wait on cmdArg
                     Semaphore sem = getSemaphore(testName, cmdArg, true);
                     releaseExecutorLock(testName);
                     try {
-                        if (!sem.tryAcquire(30, TimeUnit.SECONDS)) {
+                        if (!sem.tryAcquire(240, TimeUnit.SECONDS)) {
                             throw new AuraRuntimeException("Timed out waiting to acquire " + testName + ":" + cmdArg);
                         }
                     } finally {
@@ -101,16 +101,22 @@ public class AuraStorageTestController {
                         }
                     }
                     break;
-                case RESUME:
+                case RESUME://signal action that wait on cmdArg to continue
                     getSemaphore(testName, cmdArg, true).release();
                     break;
-                case APPEND:
+                case APPEND://add cmdArg to buffer
                     getBuffer(testName).add(cmdArg);
                     break;
-                case READ:
+                case READ: //get and remove info from buffer 
                     List<Object> temp = buffer.remove(testName);
                     if (temp != null) {
                         result.addAll(temp);
+                    }
+                    break;
+                case COPY://get info from buffer
+                	List<Object> temp2 = buffer.get(testName);
+                    if (temp2 != null) {
+                        result.addAll(temp2);
                     }
                     break;
                 case STAMP:

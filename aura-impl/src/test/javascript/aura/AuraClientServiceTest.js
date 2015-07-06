@@ -122,7 +122,7 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert
             Assert.Equal(2, target.iteration);//because we call reset() in the constructor
             Assert.Equal(0, target.length);
-            Assert.Equal(false, target.foreground);// FIXME: this will go away in iteration 2.
+            Assert.Undefined(target.foreground);//we no longer have restrictions on how many foreground actions we have
     	}
     	
     	[Fact, Skip("Lin : figure out how to mock Date()")]

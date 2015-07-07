@@ -30,6 +30,15 @@
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
         }
     },
+
+    testFocus: {
+        test: function (cmp) {
+            this._getInput(cmp).getElement().blur();
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.focus();
+            $A.test.assertEquals(document.activeElement, this._getInput(cmp).getElement(), "input should be focused");
+        }
+    },
     
     testCreatesPillUsingComma: {
         test: function (cmp) {

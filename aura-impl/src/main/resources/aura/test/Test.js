@@ -2019,7 +2019,7 @@ TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
  * @function Test#getCreationPath
  */
 TestInstance.prototype.getCreationPath = function(cmp) {
-    return cmp.priv.creationPath;
+    return cmp.creationPath;
 };
 
 /**

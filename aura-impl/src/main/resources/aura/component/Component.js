@@ -350,8 +350,6 @@ Component.prototype.find = function(name) {
             }
         }
     }
-
-    return null;
 };
 
 /**
@@ -2408,7 +2406,7 @@ Component.prototype.outputComponent = function(cmp, serialized, depth) {
         //var values = cmp.get("v").values;
         //if(cmp.isConcrete()) {
         ret.attributes = {};
-        var values = cmp.attributes.values;
+        var values = cmp.attributeSet.values;
 
 
         attributeDefs.each(function ComponentPriv$outputComponent$forEachAttribute(attributeDef) {

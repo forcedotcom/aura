@@ -53,7 +53,7 @@
                 {!v.pillInput}
             </li>
         </ul>
-        <a aura:id="showMore" class="showMore" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
+        <a aura:id="showMore" class="showMore invisible" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
     </div>
 
 </aura:component>

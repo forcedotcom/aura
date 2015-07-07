@@ -16,13 +16,17 @@
 
 -->
 <aura:component extends="auradocs:topicPanel" model="java://org.auraframework.docs.ApiTopicModel">
-    <aura:set attribute="title" value="{!m.title}"/>
-    <aura:set attribute="subtitle">type</aura:set>
+    <aura:set attribute="title" value="{#m.title}"/>
+    <aura:set attribute="subtitle">{#m.symbol.kind}</aura:set>
     <aura:set attribute="example">
-    	<p>{!m.symbol.classdesc}</p>
-    	<p>{!m.symbol.desc}</p>
+    	<p>{#m.symbol.classdesc}</p>
+    	<p>{#m.symbol.desc}</p>
     </aura:set>
 
-    <auradocs:apiSymbols title="Methods" symbols="{!m.symbol.methods}"/>
-    <auradocs:apiSymbols title="Fields" symbols="{!m.symbol.properties}"/>
+    <aura:if isTrue="{# empty(m.symbol.methods) == false}">
+        <auradocs:apiSymbols title="Methods" symbols="{#m.symbol.methods}"/>
+    </aura:if>
+    <aura:if isTrue="{# empty(m.symbol.properties) == false}">
+        <auradocs:apiSymbols title="Fields" symbols="{#m.symbol.properties}"/>
+    </aura:if>
 </aura:component>

@@ -80,6 +80,9 @@
 
     pillIterationComplete: function(cmp, event, helper) {
         setTimeout(function(){helper.adjustHeight(cmp)},0);
-    }
+    },
 
+    focus: function(cmp, event, helper) {
+        helper.focusOnInputBox(cmp);
+    }
 })

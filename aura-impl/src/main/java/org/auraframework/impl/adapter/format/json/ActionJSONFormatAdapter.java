@@ -28,7 +28,7 @@ import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Lists;
@@ -79,7 +79,7 @@ public class ActionJSONFormatAdapter extends JSONFormatAdapter<Action> {
         Map<String, Object> m = new HashMap<>();
         m.put("actions", values);
         m.put("context", c);
-        Json.serialize(m, out, c.getJsonSerializationContext());
+        JsonEncoder.serialize(m, out, c.getJsonSerializationContext());
     }
 
 }

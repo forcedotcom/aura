@@ -42,7 +42,7 @@ import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -352,7 +352,7 @@ public class AuraTestingUtil {
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
             String fwuid, Map<DefDescriptor<?>,String> extraLoaded, List<String> dn) throws QuickFixException {
         StringBuffer sb = new StringBuffer();
-        Json json = new Json(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false, false);
         Map<String,String> loaded = Maps.newHashMap();
 
         if (appUid == null) {

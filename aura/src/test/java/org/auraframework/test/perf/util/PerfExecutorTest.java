@@ -35,8 +35,8 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.AuraFiles;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.PerfCmpTest;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.metrics.PerfRunsCollector;
@@ -179,7 +179,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
         Map<String, String> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName());
 
         relativeUrl += "aura.mode=" + mode;
-        relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
+        relativeUrl += "#" + URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8");
         String url = getAbsoluteURI(relativeUrl).toString();
         return url;
     }

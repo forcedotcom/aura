@@ -28,7 +28,7 @@ import org.auraframework.instance.Component;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 /**
  * Test class to verify implementation of Java (server side) renderers for component.
@@ -71,7 +71,7 @@ public class JavaRendererDefTest extends AuraImplTestCase {
      */
     public void testSerializedFormat() throws Exception {
         JavaRendererDef def = createRenderer("java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer");
-        assertTrue(Json.serialize(def, false, false).isEmpty());
+        assertTrue(JsonEncoder.serialize(def, false, false).isEmpty());
     }
 
     /**

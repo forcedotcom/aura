@@ -34,7 +34,7 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 /**
  * Serialize Aura Component Registry to json for consumption by tools like
@@ -69,7 +69,7 @@ public class RegistryJsonSerializer {
             String file) throws IOException {
         FileWriter f = new FileWriter(file, false);
         BufferedWriter bf = new BufferedWriter(f);
-        Json.serialize(components, bf, shouldPrettyPrint, false);
+        JsonEncoder.serialize(components, bf, shouldPrettyPrint, false);
         bf.close();
     }
 

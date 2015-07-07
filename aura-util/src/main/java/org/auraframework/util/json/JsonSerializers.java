@@ -36,10 +36,8 @@ import org.auraframework.util.date.DateOnly;
 import org.auraframework.util.date.DateService;
 import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.javascript.Literal;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceScope;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.collect.Maps;
 
@@ -99,10 +97,35 @@ public class JsonSerializers {
         MAPPY_SLOWY = Collections.unmodifiableMap(m);
     }
 
+    public static abstract class IdentitySerializer<T> implements JsonSerializer<T> {
+        @Override
+        public final ReferenceType getReferenceType(T value) {
+            return ReferenceType.IDENTITY;
+        }
+
+        @Override
+        public final ReferenceScope getReferenceScope(T value) {
+            return ReferenceScope.ACTION;
+        }
+    }
+
+    public static abstract class NoneSerializer<T> implements JsonSerializer<T> {
+        @Override
+        public final ReferenceType getReferenceType(T value) {
+            return ReferenceType.NONE;
+        }
+
+        @Override
+        public final ReferenceScope getReferenceScope(T value) {
+            return ReferenceScope.ACTION;
+        }
+    }
+
     /**
      * temp class until all the json serializable stuff moves out of the defs
      */
     public static class OldSerializer implements JsonSerializer<JsonSerializable> {
+
         @Override
         public final ReferenceType getReferenceType(JsonSerializable value) {
             Serialization serialization = value.getClass().getAnnotation(Serialization.class);

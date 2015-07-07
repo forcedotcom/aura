@@ -34,7 +34,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.mockito.Mockito;
 
 import com.google.common.base.Charsets;
@@ -169,7 +169,7 @@ public class LibraryDefTest extends DefinitionTest<LibraryDef> {
         assertNotNull(libDef);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        Json json = Json.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         libDef.serialize(json);
         json.close();
 

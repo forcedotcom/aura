@@ -24,7 +24,7 @@ import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -42,7 +42,7 @@ public class AuraContextHTMLFormatAdapter extends HTMLFormatAdapter<AuraContext>
     @Override
     public void write(AuraContext value, Map<String, Object> attributes, Appendable out) throws IOException {
         try {
-            Json.serialize(value, out);
+            JsonEncoder.serialize(value, out);
         } catch (AuraRuntimeException e) {
             AuraExceptionUtil.passQuickFix(e);
         }

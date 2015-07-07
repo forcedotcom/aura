@@ -24,8 +24,9 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 
 /**
  * Public interface for retrieving aura definitions.
@@ -60,8 +61,8 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * exists. Does not compile the definitions if they were not already
      * compiled, and does not guarantee that they can compile.
      */
-    @NonNull
-    Set<DefDescriptor<T>> find(@NonNull DefDescriptor<T> matcher);
+    @Nonnull
+    Set<DefDescriptor<T>> find(@Nonnull DefDescriptor<T> matcher);
 
     /**
      * Given a string that contains search patterns or wildcards, return a set
@@ -69,8 +70,8 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * Does not compile the definitions if they were not already compiled, and
      * does not guarantee that they can compile.
      */
-    @NonNull
-    Set<DefDescriptor<?>> find(@NonNull DescriptorFilter matcher);
+    @Nonnull
+    Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter matcher);
 
     /**
      * Save the given definition back to appropriate source location.
@@ -87,13 +88,13 @@ public interface DefRegistry<T extends Definition> extends Serializable {
     /**
      * The DefTypes that this registry handles (returns)
      */
-    @NonNull
+    @Nonnull
     Set<DefType> getDefTypes();
 
     /**
      * The Prefixes that this registry handles
      */
-    @NonNull
+    @Nonnull
     Set<String> getPrefixes();
 
     /**
@@ -101,7 +102,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      * indicates that the registry should be used when no other registry has
      * registered for a namespace.
      */
-    @NonNull
+    @Nonnull
     Set<String> getNamespaces();
 
     /**

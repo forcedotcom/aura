@@ -35,8 +35,8 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 /**
  * The real runtime component thing that sits in the tree. The Component

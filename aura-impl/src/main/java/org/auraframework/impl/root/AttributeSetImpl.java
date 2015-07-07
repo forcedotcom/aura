@@ -55,8 +55,8 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.MissingRequiredAttributeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.collect.Maps;
 

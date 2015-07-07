@@ -25,6 +25,7 @@ import org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer;
 import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 /**
@@ -54,7 +55,7 @@ public class RendererDefTest extends AuraImplTestCase {
                 ComponentDef.class);
         ComponentDef def = d.getDef();
         // Convert the definition to a format that is used by the client
-        String defInJson = Json.serialize(def, false, true);
+        String defInJson = JsonEncoder.serialize(def, false, true);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);
@@ -73,7 +74,7 @@ public class RendererDefTest extends AuraImplTestCase {
         Component component = Aura.getInstanceService().getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
                 null);
         // Convert the instance to a format that is used by the client
-        String defInJson = Json.serialize(component, false, true);
+        String defInJson = JsonEncoder.serialize(component, false, true);
         // Convert back to the object, just like the client does in javascript
         Object defObj = new JsonReader().read(defInJson);
         assertTrue(defObj instanceof Map);

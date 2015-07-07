@@ -24,8 +24,8 @@ import org.auraframework.impl.root.component.BaseComponentImpl;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 /**
  */

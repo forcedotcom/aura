@@ -57,8 +57,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -166,7 +166,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * @param original the registry that is the 'public' registry.
      */
-    public MasterDefRegistryImpl(@NonNull MasterDefRegistryImpl original) {
+    public MasterDefRegistryImpl(@Nonnull MasterDefRegistryImpl original) {
         this(original.delegateRegistries, original);
     }
 
@@ -177,7 +177,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * @param registries the registries to use in the mdr.
      */
-    public MasterDefRegistryImpl(@NonNull DefRegistry<?>... registries) {
+    public MasterDefRegistryImpl(@Nonnull DefRegistry<?>... registries) {
         this(new RegistryTrie(registries), null);
     }
 
@@ -201,8 +201,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    @NonNull
-    public Set<DefDescriptor<?>> find(@NonNull DescriptorFilter matcher) {
+    @Nonnull
+    public Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter matcher) {
         final String filterKey = matcher.toString();
         Set<DefDescriptor<?>> matched = Sets.newHashSet();
         GlobMatcher namespaceMatcher = matcher.getNamespaceMatch();
@@ -301,8 +301,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     @Override
-    @NonNull
-    public <D extends Definition> Set<DefDescriptor<D>> find(@NonNull DefDescriptor<D> matcher) {
+    @Nonnull
+    public <D extends Definition> Set<DefDescriptor<D>> find(@Nonnull DefDescriptor<D> matcher) {
         Set<DefDescriptor<D>> matched;
         if (matcher.getNamespace().equals("*")) {
             matched = new LinkedHashSet<>();
@@ -406,14 +406,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * the registry to which it belongs to avoid repeated lookups.
      */
     private static class CompilingDef<T extends Definition> implements Comparable<CompilingDef<?>> {
-        public CompilingDef(@NonNull DefDescriptor<T> descriptor) {
+        public CompilingDef(@Nonnull DefDescriptor<T> descriptor) {
             this.descriptor = descriptor;
         }
 
         /**
          * The descriptor we are compiling.
          */
-        @NonNull
+        @Nonnull
         public DefDescriptor<T> descriptor;
 
         /**
@@ -664,8 +664,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param parent the direct parent of the definition we are looking up.
      * @throws QuickFixException if the definition is not found, or validateDefinition() throws one.
      */
-    private <D extends Definition> D getHelper(@NonNull DefDescriptor<D> descriptor,
-            @NonNull CompileContext cc, @NonNull Set<DefDescriptor<?>> stack,
+    private <D extends Definition> D getHelper(@Nonnull DefDescriptor<D> descriptor,
+            @Nonnull CompileContext cc, @Nonnull Set<DefDescriptor<?>> stack,
             @CheckForNull Definition parent) throws QuickFixException {
         currentCC.loggingService.incrementNum(LoggingService.DEF_VISIT_COUNT);
         if (stack.contains(descriptor)) {
@@ -724,7 +724,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * finish up the validation of a set of compiling defs.
      *
-     * @param context only needed to do setCurrentNamspace.
      */
     private void finishValidation() throws QuickFixException {
         int iteration = 0;
@@ -805,7 +804,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor the descriptor that we wish to compile.
      */
     @CheckForNull
-    private <D extends Definition> D compileDef(@NonNull DefDescriptor<D> descriptor, @NonNull CompileContext cc)
+    private <D extends Definition> D compileDef(@Nonnull DefDescriptor<D> descriptor, @Nonnull CompileContext cc)
             throws QuickFixException {
         D def;
         boolean nested = (cc == currentCC);
@@ -875,7 +874,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @throws QuickFixException if the definition failed to compile.
      */
     @CheckForNull
-    protected <T extends Definition> DependencyEntry compileDE(@NonNull DefDescriptor<T> descriptor)
+    protected <T extends Definition> DependencyEntry compileDE(@Nonnull DefDescriptor<T> descriptor)
             throws QuickFixException {
         // See localDependencies commentcurrentCC
         String key = makeLocalKey(descriptor);
@@ -976,7 +975,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @param descriptor the descriptor, used for both global and local cache lookups.
      * @return the DependencyEntry or null if none present.
      */
-    private DependencyEntry getDE(@CheckForNull String uid, @NonNull DefDescriptor<?> descriptor) {
+    private DependencyEntry getDE(@CheckForNull String uid, @Nonnull DefDescriptor<?> descriptor) {
         // See localDependencies comment
         String key = makeLocalKey(descriptor);
         DependencyEntry de;
@@ -1041,7 +1040,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      * @return A compilingDef for the definition, or null if not needed.
      * @throws QuickFixException if something has gone terribly wrong.
      */
-    private <D extends Definition> void validateHelper(@NonNull DefDescriptor<D> descriptor) throws QuickFixException {
+    private <D extends Definition> void validateHelper(@Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
     }
@@ -1049,7 +1048,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     /**
      * Build a DE 'in place' with no tree traversal.
      */
-    private <D extends Definition> void buildDE(@NonNull DependencyEntry de, @NonNull DefDescriptor<?> descriptor)
+    private <D extends Definition> void buildDE(@Nonnull DependencyEntry de, @Nonnull DefDescriptor<?> descriptor)
             throws QuickFixException {
         if (currentCC != null) {
             throw new AuraRuntimeException("Ugh, nested compileDE/buildDE on " + currentCC.topLevel
@@ -1215,7 +1214,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> void save(@NonNull D def) {
+    public <D extends Definition> void save(@Nonnull D def) {
         wLock.lock();
         try {
             getRegistryFor((DefDescriptor<D>) def.getDescriptor()).save(def);
@@ -1285,7 +1284,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * Note: The generic typing here is incorrect, as in not true.
      */
-    private <T extends Definition> DefRegistry<T> getRegistryFor(@NonNull DefDescriptor<T> descriptor) {
+    private <T extends Definition> DefRegistry<T> getRegistryFor(@Nonnull DefDescriptor<T> descriptor) {
         @SuppressWarnings("unchecked")
         DefRegistry<T> reg = (DefRegistry<T>) delegateRegistries.getRegistryFor(descriptor);
         return reg;
@@ -1549,14 +1548,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     /** Creates a key for the localDependencies, using DefType and FQN. */
-    private String makeLocalKey(@NonNull DefDescriptor<?> descriptor) {
+    private String makeLocalKey(@Nonnull DefDescriptor<?> descriptor) {
         return descriptor.getDefType().toString() + ":" + descriptor.getQualifiedName().toLowerCase();
     }
 
     /**
      * Creates a key for the global {@link #depsCache}, using UID, type, and FQN.
      */
-    private String makeGlobalKey(String uid, @NonNull DefDescriptor<?> descriptor) {
+    private String makeGlobalKey(String uid, @Nonnull DefDescriptor<?> descriptor) {
         return uid + "/" + makeLocalKey(descriptor);
     }
 
@@ -1565,7 +1564,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
      *
      * @param descriptor - the descriptor use for the key
      */
-    private String makeNonUidGlobalKey(@NonNull DefDescriptor<?> descriptor) {
+    private String makeNonUidGlobalKey(@Nonnull DefDescriptor<?> descriptor) {
         return makeLocalKey(descriptor);
     }
 

@@ -35,9 +35,9 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceScope;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceType;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.collect.Maps;

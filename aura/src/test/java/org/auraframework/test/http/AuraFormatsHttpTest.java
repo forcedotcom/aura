@@ -29,7 +29,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 /**
  * Test class to perform sanity tests on AuraServlet with all possible modes.
@@ -43,7 +43,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
     private final String quickFixComponentTag = "&aura.tag=foo:bar";
     private static Map<Format, String> FORMAT_CONTENTTYPE = new HashMap<>();
     static {
-        FORMAT_CONTENTTYPE.put(Format.JSON, Json.MIME_TYPE + ";charset=" + AuraBaseServlet.UTF_ENCODING);
+        FORMAT_CONTENTTYPE.put(Format.JSON, JsonEncoder.MIME_TYPE + ";charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.JS, "text/javascript;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.HTML, "text/html;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.CSS, "text/css;charset=" + AuraBaseServlet.UTF_ENCODING);
@@ -81,7 +81,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString");
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
-        String jsonMessage = Json.serialize(message);
+        String jsonMessage = JsonEncoder.serialize(message);
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);
         if (!causeException) {

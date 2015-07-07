@@ -46,7 +46,7 @@ import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 
@@ -83,7 +83,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.setClientLoaded(clientLoaded);
         ds.updateLoaded(null);
 
-        assertEquals("\"markup://preloadTest:dependenciesApp\"", Json.serialize(appDef));
+        assertEquals("\"markup://preloadTest:dependenciesApp\"", JsonEncoder.serialize(appDef));
     }
 
     /**
@@ -123,7 +123,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
                 desc);
         ctx.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
 
@@ -140,7 +140,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
                 desc);
         String expected = Aura.getConfigAdapter().getAuraFrameworkNonce();
         ctx.setFrameworkUID(null);
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(ctx, ctx.getJsonSerializationContext());
         // can't be the first character....
         assertTrue("should find the framework nonce in the serialized context", res.indexOf(expected) > 0);
     }
@@ -156,7 +156,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED,
                 desc);
         ctx.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
 
@@ -167,7 +167,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testSerializeWithoutApp() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
 
@@ -289,7 +289,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<?> added = DefDescriptorImpl.getInstance("auratest:iwasadded", EventDef.class);
         context.addLoaded(added, "somegenerateduid");
         context.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(context, context.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }
 
@@ -311,7 +311,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         EventDefImpl eventDef = vendor.makeEventDef(eventDesc, EventType.COMPONENT, atts, null, null);
 
         context.getDefRegistry().addLocalDef(eventDef);
-        String res = Json.serialize(context, context.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(context, context.getJsonSerializationContext());
         assertTrue(res.contains("markup://fake:event"));
     }
 
@@ -327,7 +327,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<?> dropped = DefDescriptorImpl.getInstance("auratest:iwasdropped", EventDef.class);
         context.dropLoaded(dropped);
         context.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(context, context.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(context, context.getJsonSerializationContext());
         goldFileJson(res);
     }
 
@@ -462,7 +462,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setFrameworkUID("#FAKEUID#");
-        String res = Json.serialize(ctx, ctx.getJsonSerializationContext());
+        String res = JsonEncoder.serialize(ctx, ctx.getJsonSerializationContext());
         goldFileJson(res);
     }
 

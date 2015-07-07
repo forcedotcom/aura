@@ -35,7 +35,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -106,7 +106,7 @@ public abstract class AbstractPerfTestCase extends WebDriverTestCase {
                     ImmutableMap.of("values", attributeValues));
 
             relativeUrl += "aura.mode=" + mode;
-            relativeUrl += "#" + URLEncoder.encode(Json.serialize(hash), "UTF-8");
+            relativeUrl += "#" + URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8");
             String url = getAbsoluteURI(relativeUrl).toString();
 
             logger.info("invoking perf.app: " + url);

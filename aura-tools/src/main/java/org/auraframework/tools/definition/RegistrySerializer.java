@@ -45,8 +45,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 /**
  * Compile components into a set of static registries and write them to a file.
@@ -151,8 +151,8 @@ public class RegistrySerializer {
         public void debug(Throwable cause) {
         }
     };
-
-    @NonNull
+    
+    @Nonnull
     private final DefaultLogger DEFAULT_LOGGER = new DefaultLogger();
 
     /**
@@ -163,19 +163,19 @@ public class RegistrySerializer {
     /**
      * outputDirectory: The directory in which to put out the .registries file.
      */
-    @NonNull
+    @Nonnull
     private final File outputDirectory;
 
     /**
      * excluded: Namespaces to exclude.
      */
-    @NonNull
+    @Nonnull
     private final String[] excluded;
 
     /**
      * A logger for logging information to the user.
      */
-    @NonNull
+    @Nonnull
     private final RegistrySerializerLogger logger;
 
     /**
@@ -192,8 +192,8 @@ public class RegistrySerializer {
      * @param outputDirectory the output directory where we should write the compiled component '.registry' file.
      * @param excluded a set of excluded namespaces.
      */
-    public RegistrySerializer(@NonNull File componentDirectory, @NonNull File outputDirectory,
-            @NonNull String[] excluded, @CheckForNull RegistrySerializerLogger logger) {
+    public RegistrySerializer(@Nonnull File componentDirectory, @Nonnull File outputDirectory,
+            @Nonnull String[] excluded, @CheckForNull RegistrySerializerLogger logger) {
         this.componentDirectory = componentDirectory;
         this.outputDirectory = outputDirectory;
         this.excluded = excluded;
@@ -210,7 +210,7 @@ public class RegistrySerializer {
      * @param out the output stream to write into.
      * @throws RegistrySerializerException if there is an error.
      */
-    public void write(@NonNull Set<String> namespaces, @NonNull OutputStream out) {
+    public void write(@Nonnull Set<String> namespaces, @Nonnull OutputStream out) {
         List<DefRegistry<Definition>> regs = Lists.newArrayList();
         for (String name : namespaces) {
             regs.add(getRegistry(name));
@@ -238,7 +238,7 @@ public class RegistrySerializer {
      *
      * @param namespace the namespace for which we want to retrieve a static registry.
      */
-    private DefRegistry<Definition> getRegistry(@NonNull String namespace) {
+    private DefRegistry<Definition> getRegistry(@Nonnull String namespace) {
         Set<String> prefixes = Sets.newHashSet();
         Set<DefType> types = Sets.newHashSet();
         Set<DefDescriptor<?>> descriptors;

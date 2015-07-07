@@ -26,7 +26,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 /**
  * a literal number, string, boolean, or null

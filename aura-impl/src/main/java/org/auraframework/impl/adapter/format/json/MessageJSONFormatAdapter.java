@@ -30,7 +30,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Message;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Lists;
@@ -90,6 +90,6 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
 
         m.put("actions", value.getActions());
         m.put("context", c);
-        Json.serialize(m, out, c.getJsonSerializationContext());
+        JsonEncoder.serialize(m, out, c.getJsonSerializationContext());
     }
 }

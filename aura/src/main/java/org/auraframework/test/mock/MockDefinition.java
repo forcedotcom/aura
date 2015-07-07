@@ -26,9 +26,9 @@ import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceScope;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 /**
  * A simple Definition.

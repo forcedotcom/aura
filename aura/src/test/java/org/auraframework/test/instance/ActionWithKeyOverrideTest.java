@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionWithKeyOverride;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.util.UnitTestCase;
 
 public class ActionWithKeyOverrideTest extends UnitTestCase {
@@ -116,7 +116,7 @@ public class ActionWithKeyOverrideTest extends UnitTestCase {
         verify(actionToExecute, times(1)).getReturnValue();
         verify(actionToExecute, times(1)).getState();
         verify(actionToExecute, times(1)).getErrors();
-        verify(actionToExecute, times(1)).serialize(any(Json.class));
+        verify(actionToExecute, times(1)).serialize(any(JsonEncoder.class));
 
         verifyNoMoreInteractions(actionAsKey);
         verifyNoMoreInteractions(actionToExecute);

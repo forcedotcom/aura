@@ -11,6 +11,10 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>org.auraframework</groupId>
+            <artifactId>aura-interfaces</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
         </dependency>
@@ -57,10 +61,6 @@
             <artifactId>icu4j</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <exclusions>
@@ -82,17 +82,13 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-osgi-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>biz.aQute</groupId>
             <artifactId>bnd</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
-        	<groupId>com.google.code.gson</groupId>
-        	<artifactId>gson</artifactId>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
         </dependency>
     </dependencies>
     <properties>

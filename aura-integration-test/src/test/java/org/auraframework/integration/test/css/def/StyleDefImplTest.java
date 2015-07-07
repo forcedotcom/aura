@@ -26,7 +26,7 @@ import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.Sets;
@@ -146,7 +146,7 @@ public class StyleDefImplTest extends StyleTestCase {
 
     @SuppressWarnings("unchecked")
     private void verifyStyleDefSerialization(DefDescriptor<StyleDef> styleDesc, Boolean expectCode) throws Exception {
-        String serialized = Json.serialize(styleDesc.getDef());
+        String serialized = JsonEncoder.serialize(styleDesc.getDef());
         Object o = new JsonReader().read(serialized);
         assertTrue(o instanceof Map);
         Map<String, Object> outerMap = (Map<String, Object>) o;

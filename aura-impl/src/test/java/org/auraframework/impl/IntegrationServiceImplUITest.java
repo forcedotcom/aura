@@ -31,7 +31,7 @@ import org.auraframework.test.util.AuraTestingMarkupUtil;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.junit.Ignore;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -678,7 +678,7 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
                     + String.format("<%s:%s desc='%s:%s' attrMap='%s' placeholder='%s' localId='%s'/>",
                             defaultStubCmp.getNamespace(),
                             defaultStubCmp.getName(), cmpToInject.getNamespace(), cmpToInject.getName(),
-                            Json.serialize(attributes), "Animal" + facet, facet);
+                            JsonEncoder.serialize(attributes), "Animal" + facet, facet);
 
         }
 
@@ -812,9 +812,9 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
         String url = String.format("/%s/%s.cmp", stub.getNamespace(), stub.getName());
         url = url + "?desc=" + String.format("%s:%s", toInject.getNamespace(), toInject.getName());
         if (attributeMap != null) {
-            url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(Json.serialize(attributeMap));
+            url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(JsonEncoder.serialize(attributeMap));
         } else {
-            url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(Json.serialize(Maps.newHashMap()));
+            url = url + "&" + "attrMap=" + AuraTextUtil.urlencode(JsonEncoder.serialize(Maps.newHashMap()));
         }
         if (placeholder != null) {
             url = url + "&placeholder=" + placeholder;

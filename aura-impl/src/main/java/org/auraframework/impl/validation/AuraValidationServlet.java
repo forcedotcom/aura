@@ -30,7 +30,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.validation.ValidationError;
 
 import com.google.common.base.Charsets;
@@ -97,7 +97,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
                 content.append('\n');
             }
             byte[] data = content.toString().getBytes(charset);
-            response.setContentType(Json.MIME_TYPE);
+            response.setContentType(JsonEncoder.MIME_TYPE);
             response.setContentLength(data.length);
             response.getOutputStream().write(data);
         }

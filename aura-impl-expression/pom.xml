@@ -73,9 +73,6 @@
                             <goal>antlr</goal>
                         </goals>
                         <configuration>
-                            <goals>
-                                <goal>antlr</goal>
-                            </goals>
                             <conversionTimeout>10000</conversionTimeout>
                             <debug>false</debug>
                             <dfa>false</dfa>

@@ -22,7 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -39,7 +39,7 @@ public class TestSuiteDefJSONFormatAdapter extends JSONFormatAdapter<TestSuiteDe
     @Override
     public void write(TestSuiteDef value, Map<String, Object> attributes, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
-        Json.serialize(value, out, c.getJsonSerializationContext());
+        JsonEncoder.serialize(value, out, c.getJsonSerializationContext());
     }
 
 }

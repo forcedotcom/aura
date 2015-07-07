@@ -26,7 +26,7 @@ import org.auraframework.Aura;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.instance.Component;
 import org.auraframework.system.AuraContext;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 /**
  */
@@ -42,7 +42,7 @@ public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
     @Override
     public void write(Component value, Map<String, Object> attributes, Appendable out) throws IOException {
         AuraContext c = Aura.getContextService().getCurrentContext();
-        Json.serialize(value, out, c.getJsonSerializationContext());
+        JsonEncoder.serialize(value, out, c.getJsonSerializationContext());
     }
 
     @Override
@@ -51,6 +51,6 @@ public class ComponentJSONFormatAdapter extends JSONFormatAdapter<Component> {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("components", values);
         m.put("context", c);
-        Json.serialize(m, out, c.getJsonSerializationContext());
+        JsonEncoder.serialize(m, out, c.getJsonSerializationContext());
     }
 }

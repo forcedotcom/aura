@@ -46,7 +46,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.IOUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -150,7 +150,7 @@ public class ApplicationDefOfflineHTMLFormatAdapter extends OfflineHTMLFormatAda
                 contextService.startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, value.getDescriptor());
                 auraInit.put("context", contextService.getCurrentContext());
                 jsWriter.append("\n$A.initConfig($A.util.json.resolveRefs(");
-                Json.serialize(auraInit, jsWriter, context.getJsonSerializationContext());
+                JsonEncoder.serialize(auraInit, jsWriter, context.getJsonSerializationContext());
                 jsWriter.append("));\n");
             } finally {
                 jsWriter.close();

@@ -30,7 +30,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 
@@ -54,7 +54,7 @@ public class JSTestCaseModel {
                 String key = entry.getKey();
                 String value;
                 if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
-                    value = Json.serialize(entry.getValue());
+                    value = JsonEncoder.serialize(entry.getValue());
                 } else {
                     value = entry.getValue().toString();
                 }

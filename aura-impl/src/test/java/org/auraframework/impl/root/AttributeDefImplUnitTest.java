@@ -29,7 +29,7 @@ import org.auraframework.impl.system.DefinitionImplUnitTest;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -87,7 +87,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     }
 
     public void testSerializeDescriptor() throws Exception {
-        Json json = Mockito.mock(Json.class);
+        JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
         inOrder.verify(json).writeMapBegin();
@@ -96,7 +96,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     }
 
     public void testSerializeTypeDefDescriptor() throws Exception {
-        Json json = Mockito.mock(Json.class);
+        JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
         inOrder.verify(json).writeMapBegin();
@@ -105,8 +105,8 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     }
 
     public void testSerializeDefaultValue() throws Exception {
-    	this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
-        Json json = Mockito.mock(Json.class);
+        this.defaultValue = new AttributeDefRefImpl.Builder().setValue("Hello").build();
+        JsonEncoder json = Mockito.mock(JsonEncoder.class);
         AttributeDef def = buildDefinition();
 		def.serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
@@ -118,7 +118,7 @@ public class AttributeDefImplUnitTest extends DefinitionImplUnitTest<AttributeDe
     public void testSerializeRequired() throws Exception {
         this.required = true;
 
-        Json json = Mockito.mock(Json.class);
+        JsonEncoder json = Mockito.mock(JsonEncoder.class);
         buildDefinition().serialize(json);
         InOrder inOrder = Mockito.inOrder(json);
         inOrder.verify(json).writeMapBegin();

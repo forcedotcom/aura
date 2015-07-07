@@ -52,7 +52,7 @@ public class ApplicationKeyDirective extends DirectiveImpl {
     @Override
     public String generateOutput(JavascriptGeneratorMode mode) {
         StringBuilder sb=new StringBuilder();
-        for(Json.ApplicationKey key:Json.ApplicationKey.values()){
+        for(Json.ApplicationKey key: Json.ApplicationKey.values()){
             sb.append(String.format("%s:\"%s\",",key.name(),key));
         }
         sb.deleteCharAt(sb.length()-1);

@@ -57,7 +57,7 @@ import org.auraframework.util.json.JsonHandler.JsonValidationException;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * Reads a stream of json-formatted objects. Call next() to parse the next thing
@@ -671,8 +671,8 @@ public class JsonStreamReader {
         return handler.getValue();
     }
 
-    @NonNull
-    private JsonConstant readComma(@NonNull JsonConstant alternate) throws IOException {
+    @Nonnull
+    private JsonConstant readComma(@Nonnull JsonConstant alternate) throws IOException {
         JsonConstant token;
 
         try {

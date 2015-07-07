@@ -31,7 +31,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraHttpTestCase;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -110,7 +110,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         Map[] actions = { actionInstance };
         message.put("actions", actions);
 
-        String jsonMessage = Json.serialize(message);
+        String jsonMessage = JsonEncoder.serialize(message);
 
         Map<String, String> params = new HashMap<>();
         params.put("message", jsonMessage);

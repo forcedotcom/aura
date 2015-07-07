@@ -28,7 +28,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraFiles;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.validation.ValidationError;
 import org.auraframework.util.validation.ValidationTestUtil;
@@ -67,7 +67,7 @@ public final class AuraValidationServletHttpTest extends AuraHttpTestCase {
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
         assertDefaultAntiClickjacking(response, true, false);
         String contentType = response.getFirstHeader(HttpHeaders.CONTENT_TYPE).getValue();
-        assertTrue(contentType, contentType.contains(Json.MIME_TYPE));
+        assertTrue(contentType, contentType.contains(JsonEncoder.MIME_TYPE));
         assertTrue(contentType, contentType.contains(Charsets.UTF_8.toString()));
 
         String content = getResponseBody(response);

@@ -11,6 +11,10 @@
     <dependencies>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-interfaces</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
         </dependency>
         <dependency>
@@ -69,10 +73,6 @@
         <dependency>
             <groupId>com.salesforce</groupId>
             <artifactId>omakase</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.auraframework</groupId>
-            <artifactId>aura-osgi-api</artifactId>
         </dependency>
         <dependency>
             <groupId>biz.aQute</groupId>

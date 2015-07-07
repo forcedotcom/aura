@@ -20,11 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
@@ -42,8 +37,8 @@ import javax.annotation.Nonnull;
 
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.UncloseableOutputStream;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
-import org.auraframework.util.json.Json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceScope;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
@@ -77,7 +72,7 @@ import com.google.common.io.CountingOutputStream;
  *      json documentation</a>
  * @since 144
  */
-public class Json {
+public class JsonEncoder implements Json {
     @SuppressWarnings("serial")
     public static class JsonException extends RuntimeException {
         public JsonException(String message) {
@@ -86,121 +81,6 @@ public class Json {
     }
 
     public static final String MIME_TYPE = "application/json";
-
-    /*
-    * JBUCH: HALO: TODO:
-    *
-    * ApplicationKey Enum to provide key based minification while serializing json
-    * Ideally, we will replace all uses of pure strings on the Server and Client; and be able to use
-    * the shortName in non-dev scenarios (resulting in 10-40% app.js size reduction).
-    *
-    * *sigh* I had it mostly working, but had to abandon branch due to large code change conflicts
-    * with other team members. Because of that, I can only afford to change these four right now,
-    * since they are used directly in this file for the structure of the frame, or net new:
-    * ACCESS (access), SERIAL_ID (serId), SERIAL_REFID (serRefId), VALUE (value)
-    *
-    * While these three don't buy us much, my current hope is only to offset the additional cost
-    * of access="G|P" values in the definitions.
-    *
-    * */
-    public enum ApplicationKey {
-        ABSTRACT("isAbstract","ab"),
-        ACCESS("xs" /*"access"*/,"xs"),
-        ACTION("action","x"),
-        ACTIONS("action","xx"),
-        ACTIONDEFS("actionDefs","ac"),
-        ACTIONTYPE("actionType","at"),
-        ATTRIBUTES("attributes","a"),
-        ATTRIBUTEDEFS("attributeDefs","ad"),
-        COMPONENTDEF("componentDef","c"),
-        CONTROLLERDEF("controllerDef","cd"),
-        CREATIONPATH("creationPath","cp"),
-        CSSPRELOADED("isCSSPreloaded","css"),
-        DEFAULT("default","d"),
-        DEFTYPE("defType","dt"),
-        DESCRIPTOR("descriptor","de"),
-        EVENTDEF("eventDef","ed"),
-        EVENTS("events","e"),
-        FACETS("facets","fa"),
-        FUNCTIONS("functions","f"),
-        HANDLERS("handlers","eh"),
-        HASSERVERDEPENDENCIES("hasServerDeps","hs"),
-        HELPERDEF("helperDef","h"),
-        INCLUDES("includes","ic"),
-        INTERFACES("interfaces","i"),
-        LOCALID("localId","lid"),
-        MEMBERS("members","mm"),
-        MODEL("model","m"),
-        MODELDEF("modelDef","md"),
-        METHODS("methods","me"),
-        NAME("name","n"),
-        ORIGINAL("original","o"),
-        PARAMS("params","pa"),
-        PROVIDE("provide","p"),
-        PROVIDERDEF("providerDef","pd"),
-        REGISTEREVENTDEFS("registerEventDefs","re"),
-        RENDERERDEF("rendererDef","rd"),
-        REQUIRED("required","rq"),
-        REQUIREDVERSIONDEFS("requiredVersionDefs","rv"),
-        RETURNTYPE("returnType","rt"),
-        SERIAL_ID("s"/*"serId"*/,"sid"),
-        SERIAL_REFID("r"/*"serRefId"*/,"rid"),
-        STYLEDEF("styleDef","st"),
-        SUBDEFS("subDefs","sb"),
-        SUPERDEF("superDef","su"),
-        TYPE("type","t"),
-        VALUE("v"/*"value"*/,"v"),
-        VALUES("values","vv"),
-        VALUEPROVIDER("valueProvider","vp");
-
-        private String name;
-        private String shortName;
-
-        private ApplicationKey(String name, String shortName){
-            this.name=name;
-            this.shortName=shortName;
-        }
-
-        @Override
-        public String toString(){
-            return useShortName?this.shortName:this.name;
-        }
-
-        private static Boolean useShortName=false;
-        public static void useShortKey(Boolean useShortKey){
-            useShortName=useShortKey;
-        }
-    }
-
-    public enum IndentType {
-        BRACE(true, "  "), SQUARE(true, "  "), PARAM(true, ""), COMMENT(false, " * ");
-
-        private boolean separated;
-        private String indent;
-
-        private IndentType(boolean separated, String indent) {
-            this.separated = separated;
-            this.indent = indent;
-        }
-
-        /**
-         * Determines if this instance is separated.
-         * 
-         * @return The separated.
-         */
-        public boolean isSeparated() {
-            return this.separated;
-        }
-
-        /**
-         * Gets the indent for this instance.
-         * 
-         * @return The indent.
-         */
-        public String getIndent() {
-            return this.indent;
-        }
-    }
 
     /**
      * A class to track indents when formatting json.
@@ -257,11 +137,11 @@ public class Json {
      * @param refSupport If true, any objects annotated with &#64;Serialization
      *            will be serialized using serRefIds
      */
-    public Json(Appendable out, boolean format, boolean refSupport) {
+    public JsonEncoder(Appendable out, boolean format, boolean refSupport) {
         this(out, null, new DefaultJsonSerializationContext(format, refSupport, false));
     }
 
-    protected Json(Appendable out, OutputStream binaryOutput, JsonSerializationContext context) {
+    protected JsonEncoder(Appendable out, OutputStream binaryOutput, JsonSerializationContext context) {
         this.out = out;
         this.serializationContext = context;
 
@@ -278,43 +158,6 @@ public class Json {
         this.binaryOutput = binaryOutput == null ? null
                 : (binaryOutput instanceof DataOutputStream ? (DataOutputStream) binaryOutput : new DataOutputStream(
                         binaryOutput));
-    }
-
-    // This annotations is only looked for on classes that implement
-    // JsonSerializable
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.TYPE)
-    @Inherited
-    public @interface Serialization {
-
-        public enum ReferenceType {
-            /**
-             * This is the default. Just do normal json serialization
-             */
-            NONE,
-
-            /**
-             * If a == b, just output serRefId=<the refId of the object> after
-             * the first time it's output
-             */
-            IDENTITY
-        }
-
-        ReferenceType referenceType() default ReferenceType.NONE;
-
-        public enum ReferenceScope {
-            /**
-             * the reference is available for the entire request.
-             */
-            REQUEST,
-
-            /**
-             * The reference is only internal tothe current action.
-             */
-            ACTION
-        }
-
-        ReferenceScope referenceScope() default ReferenceScope.ACTION;
     }
 
     /**
@@ -336,7 +179,7 @@ public class Json {
      */
     public static void serialize(Object obj, Appendable out, boolean format, boolean refSupport) {
         try {
-            new Json(out, format, refSupport).writeValue(obj);
+            new JsonEncoder(out, format, refSupport).writeValue(obj);
         } catch (IOException e) {
             throw new JsonSerializationException(e);
         }
@@ -350,7 +193,7 @@ public class Json {
 
     public static void serialize(Object obj, Appendable out) {
         try {
-            new Json(out, false, false).writeValue(obj);
+            new JsonEncoder(out, false, false).writeValue(obj);
         } catch (IOException e) {
             throw new JsonSerializationException(e);
         }
@@ -358,7 +201,7 @@ public class Json {
 
     public static void serialize(Object obj, Appendable out, JsonSerializationContext context) {
         try {
-            new Json(out, null, context).writeValue(obj);
+            new JsonEncoder(out, null, context).writeValue(obj);
         } catch (IOException e) {
             throw new JsonSerializationException(e);
         }
@@ -367,7 +210,7 @@ public class Json {
     public static String serialize(Object obj, JsonSerializationContext context) {
         try {
             StringBuilder sb = new StringBuilder(16);
-            new Json(sb, null, context).writeValue(obj);
+            new JsonEncoder(sb, null, context).writeValue(obj);
             return sb.toString();
         } catch (IOException e) {
             throw new JsonSerializationException(e);
@@ -414,7 +257,7 @@ public class Json {
      * @return A new Json instance that you can use for streaming to the given
      *         OutputStream
      */
-    public static Json createJsonStream(@Nonnull OutputStream out, boolean format, boolean refSupport,
+    public static JsonEncoder createJsonStream(@Nonnull OutputStream out, boolean format, boolean refSupport,
             boolean nullValues) {
         return createJsonStream(out, new DefaultJsonSerializationContext(format, refSupport, nullValues));
     }
@@ -435,12 +278,12 @@ public class Json {
      * @return A new Json instance that you can use for streaming to the given
      *         OutputStream
      */
-    public static Json createJsonStream(@Nonnull OutputStream out, JsonSerializationContext context) {
+    public static JsonEncoder createJsonStream(@Nonnull OutputStream out, JsonSerializationContext context) {
         if (out == null) {
             throw new IllegalArgumentException("out must not be null");
         }
         final Writer writer = new OutputStreamWriter(out, Charsets.UTF_8);
-        return new Json(writer, out, context);
+        return new JsonEncoder(writer, out, context);
     }
 
     /*
@@ -453,8 +296,8 @@ public class Json {
      * @param context The JSON serialization context to use for output
      * @return A new Json instance that you can use for streaming to the given appendable
      */
-    public static Json createJsonStream(@Nonnull Appendable out, JsonSerializationContext context) {
-        return new Json(out, null, context);
+    public static JsonEncoder createJsonStream(@Nonnull Appendable out, JsonSerializationContext context) {
+        return new JsonEncoder(out, null, context);
     }
 
     /**
@@ -488,6 +331,7 @@ public class Json {
      * If refSupport is on, clear a set of objects from the references.
      * 
      */
+    @Override
     public void clearReferences() {
         if (!serializationContext.refSupport()) {
             return;
@@ -500,7 +344,8 @@ public class Json {
      * @param value the value for which we want a reference.
      * @return The refId previously assigned to the value, or null if none has been assigned yet.
      */
-    protected Integer getRefId(ReferenceScope rs, Object value) {
+    @Override
+    public Integer getRefId(ReferenceScope rs, Object value) {
         switch (rs) {
         case ACTION:
             return actionMap.get(value);
@@ -521,6 +366,7 @@ public class Json {
      * 
      * @param type the type of indent to push.
      */
+    @Override
     public void pushIndent(IndentType type) {
         if (this.indentStack.isEmpty()) {
             this.indentStack.push(new IndentEntry(type, ""));
@@ -537,6 +383,7 @@ public class Json {
      * @param type the type of indent that should be on the stack.
      * @param message the message for the throwable if it is wrong.
      */
+    @Override
     public void checkIndent(IndentType type, String message) {
         if (this.indentStack.isEmpty() || !type.equals(this.indentStack.peek().getType())) {
             throw new JsonException(message);
@@ -549,6 +396,7 @@ public class Json {
      * This both checks the type on the stack, and pulls it off. See the notes
      * on performance on the class above.
      */
+    @Override
     public void popIndent(IndentType type, String message) {
         if (this.indentStack.isEmpty()) {
             throw new JsonException("Empty indent stack: " + message);
@@ -563,6 +411,7 @@ public class Json {
      * 
      * See the notes on performance on the class above.
      */
+    @Override
     public String getIndent() {
         if (this.indentStack.isEmpty()) {
             return "";
@@ -576,6 +425,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeIndent() throws IOException {
         if (isFormatting()) {
             out.append(getIndent());
@@ -587,6 +437,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeMapBegin() throws IOException {
         out.append('{');
         writeBreak();
@@ -598,6 +449,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeMapEnd() throws IOException {
         writeBreak();
         popIndent(IndentType.BRACE, "Json.writeMapBegin must be called before calling Json.writeMapEnd");
@@ -613,6 +465,7 @@ public class Json {
      * to {@link #writeCommentBody(String)} followed by a call to
      * {@link #writeCommentEnd()}
      */
+    @Override
     public void writeCommentBegin() throws IOException {
         if (isFormatting()) {
             writeBreak();
@@ -625,6 +478,7 @@ public class Json {
     /**
      * Write out a comment end.
      */
+    @Override
     public void writeCommentEnd() throws IOException {
         popIndent(IndentType.COMMENT, "Json.writeCommentEnd must be preceded by Json.writeCommentBegin");
         if (isFormatting()) {
@@ -641,6 +495,7 @@ public class Json {
      * 
      * @param body the comment to write.
      */
+    @Override
     public void writeCommentBody(String body) throws IOException {
         checkIndent(IndentType.COMMENT, "Json.writeCommentBody must be preceded by Json.writeCommentBegin");
         if (isFormatting()) {
@@ -663,6 +518,7 @@ public class Json {
      * 
      * @param body the body of the comment.
      */
+    @Override
     public void writeComment(String body) throws IOException {
         writeCommentBegin();
         writeCommentBody(body);
@@ -675,6 +531,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeArrayBegin() throws IOException {
         out.append('[');
         writeBreak();
@@ -686,6 +543,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeArrayEnd() throws IOException {
         writeBreak();
         popIndent(IndentType.SQUARE, "Json.writeArrayBegin must be called before calling Json.writeArrayEnd");
@@ -700,6 +558,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeComma() throws IOException {
         if (!this.indentStack.isEmpty()) {
             if (this.indentStack.peek().needSeparator()) {
@@ -712,6 +571,7 @@ public class Json {
         }
     }
 
+    @Override
     public void writeMapSeparator() throws IOException {
         out.append(':');
     }
@@ -721,6 +581,7 @@ public class Json {
      * seialization that outputs extra information in the stream so that
      * references can be established by the JSON reader
      */
+    @Override
     public void writeValue(Object value) throws IOException {
         JsonSerializer<Object> serializer = serializationContext.getSerializer(value);
         if (serializer == null) {
@@ -754,6 +615,7 @@ public class Json {
      * @param value
      * @throws IOException
      */
+    @Override
     public void writeLiteral(Object value) throws IOException {
         out.append(value.toString());
     }
@@ -764,6 +626,7 @@ public class Json {
      * @param value
      * @throws IOException
      */
+    @Override
     public void writeString(Object value) throws IOException {
         out.append('"');
         out.append(AuraTextUtil.escapeForJSONString(value.toString()));
@@ -777,6 +640,7 @@ public class Json {
      * @param value
      * @throws IOException
      */
+    @Override
     public void writeDate(Date value) throws IOException {
         out.append('"');
         // Use the ISO DateTime format to write the date.
@@ -798,6 +662,7 @@ public class Json {
      * @param map
      * @throws IOException
      */
+    @Override
     public void writeMap(Map<?, ?> map) throws IOException {
         writeMapBegin();
         for (Object o : map.entrySet()) {
@@ -814,6 +679,7 @@ public class Json {
      * @param array
      * @throws IOException
      */
+    @Override
     public void writeArray(Object[] array) throws IOException {
         writeArrayBegin();
         for (Object o : array) {
@@ -828,6 +694,7 @@ public class Json {
      * @param array
      * @throws IOException
      */
+    @Override
     public void writeArray(Collection<?> array) throws IOException {
         writeArrayBegin();
         for (Object o : array) {
@@ -843,6 +710,7 @@ public class Json {
      * @param value
      * @throws IOException
      */
+    @Override
     public void writeArrayEntry(Object value) throws IOException {
         if (value != null || serializationContext.isNullValueEnabled()) {
             writeComma();
@@ -859,6 +727,7 @@ public class Json {
      * @param value
      * @throws IOException
      */
+    @Override
     public void writeMapEntry(Object key, Object value) throws IOException {
         writeMapEntry(key, value, null);
     }
@@ -873,10 +742,11 @@ public class Json {
      * @param type
      * @throws IOException
      */
+    @Override
     public void writeMapEntry(Object key, Object value, String type) throws IOException {
         if (value == null && type != null) {
             try {
-                Class<?> valueClass = Json.class.getClassLoader().loadClass(type.substring("java://".length()));
+                Class<?> valueClass = JsonEncoder.class.getClassLoader().loadClass(type.substring("java://".length()));
                 if (Iterable.class.isAssignableFrom(valueClass)) {
                     value = new ArrayList<Boolean>(0);
                 } else if (Map.class.isAssignableFrom(valueClass)) {
@@ -900,6 +770,7 @@ public class Json {
      * @throws IOException
      * @throws JsonSerializerNotFoundException if a serializer is not found for the key
      */
+    @Override
     public void writeMapKey(Object key) throws IOException {
         writeComma();
         writeIndent();
@@ -916,6 +787,7 @@ public class Json {
      * 
      * @throws IOException
      */
+    @Override
     public void writeBreak() throws IOException {
         if (isFormatting()) {
             out.append('\n');
@@ -933,6 +805,7 @@ public class Json {
      * @param streamLength The number of bytes that will exist in the output before the ending backtick
      * @return The OutputStream that the caller can write its output to
      */
+    @Override
     public OutputStream writeBinaryStreamBegin(long streamLength) throws IOException {
 
         // If we are in the middle of another binary stream, then complain
@@ -970,6 +843,7 @@ public class Json {
      * bytes were written. If a discrepancy exists, then an
      * IllegalStateException gets thrown.
      */
+    @Override
     public void writeBinaryStreamEnd() throws IOException {
 
         // Ensure that we are in a binary stream, and validate the length
@@ -996,6 +870,7 @@ public class Json {
      * OutputStream, such as via
      * {@link #createJsonStream(OutputStream, boolean, boolean, boolean)}.
      */
+    @Override
     public void close() throws IOException {
         if (binaryOutput != null) {
             if (out instanceof Writer) {
@@ -1015,6 +890,7 @@ public class Json {
      * @return the appendable for this run in case you want to write something
      *         special to it.
      */
+    @Override
     public Appendable getAppendable() {
         return out;
     }
@@ -1023,6 +899,7 @@ public class Json {
         return serializationContext.format();
     }
 
+    @Override
     public JsonSerializationContext getSerializationContext() {
         return this.serializationContext;
     }

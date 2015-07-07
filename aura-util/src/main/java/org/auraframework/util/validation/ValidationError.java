@@ -49,7 +49,7 @@ public class ValidationError implements JsonSerializable {
     private String rule;
 
     /**
-     * @param validationTool tool used to generate the errors (i.e. jslint)
+     * @param tool tool used to generate the errors (i.e. jslint)
      */
     public ValidationError(String tool) {
         setValidatingTool(tool);

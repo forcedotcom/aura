@@ -703,7 +703,7 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
  * @private
  */
 AuraComponentService.prototype.index = function(component){
-    this.indexes.globalId[component.priv.globalId] = component;
+    this.indexes.globalId[component.globalId] = component;
 };
 
 /**

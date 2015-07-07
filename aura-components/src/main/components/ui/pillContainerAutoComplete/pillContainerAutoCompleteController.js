@@ -49,9 +49,10 @@
     },
 
     focus: function(component, event, helper) {
-        var inputElement = component.getSuper().find('input');
-        if (inputElement) {
-            var element = inputElement.getElement();
+        var inputComponent = component.getSuper().find('input');
+        if (inputComponent) {
+            var inputHelper = inputComponent.getDef().getHelper();
+            var element = inputHelper.getInputElement(inputComponent);
             if (element) {
                 element.focus();
             }

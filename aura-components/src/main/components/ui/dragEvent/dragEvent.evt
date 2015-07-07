@@ -18,6 +18,7 @@
 <aura:event type="COMPONENT" description="Event fired during drag and drop operation.">
 	<aura:attribute name="type" type="String" description="Drag and drop operation type: can be either copy, link, move, or none."/>
 	<aura:attribute name="dragComponent" type="Aura.Component[]" description="The dragged component."/>
+	<aura:attribute name="dragComponentTarget" type="Object" description="Target event component of draggrable element."/>
 	<aura:attribute name="dropComponent" type="Aura.Component[]" description="The dropzone component."/>
 	<aura:attribute name="dropComponentTarget" type="Object" description="Target event component receiving drop."/>
 	<aura:attribute name="data" type="Object" description="Data that is being transferred during a drag and drop operation."/>

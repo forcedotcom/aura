@@ -55,7 +55,7 @@
 			this.position(menu, target);
 		} else {
 			component.set("v.dropzoneMenu", []);
-			this.fireDragEnd(draggables,false);
+			this.fireDragEnd(draggables, target, false);
 		} 			
 	},
 
@@ -116,7 +116,8 @@
 		
 		var draggables = component.get("v.draggables");
 		if (draggables.length > 0) {
-			this.fireDragEnd(draggables, this.$isDropPerformed$);
+			var referenceElement = component.find("menuList").get("v.referenceElement");
+			this.fireDragEnd(draggables, referenceElement, this.$isDropPerformed$);
 			
 			component.set("v.draggables", []);
 			this.$isDropPerformed$ = false;
@@ -124,7 +125,7 @@
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
 			
-			component.find("menuList").get("v.referenceElement").focus();
+			referenceElement.focus();
 		}
 	},
 	

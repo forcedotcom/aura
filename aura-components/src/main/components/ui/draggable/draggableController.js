@@ -39,6 +39,7 @@
 	
 	fireDragEnd: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragEnd(component, params.isValid, params.isInAccessibilityMode);
+		var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;
+		helper.fireDragEnd(component, target, params.isValid, params.isInAccessibilityMode);
 	}
 })

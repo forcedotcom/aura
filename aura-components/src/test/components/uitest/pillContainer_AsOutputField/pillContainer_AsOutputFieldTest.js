@@ -235,7 +235,7 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [{id:'pill01',label:"Test Pill 01",icon: {url:'notfound.gif'}}] );
-            var icon = $A.test.select(".pillIcon")[0].parentElement;
+            var icon = $A.test.select(".pillIcon img")[0].parentElement;
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return that._isDisplayNone( icon);
@@ -253,7 +253,7 @@
     
     _validateIconURLIsPresent: function(cmp, expectedPillsCount) {
     	var that = this;
-    	var pillIcons = $A.test.select(".pillIcon");
+    	var pillIcons = $A.test.select(".pillIcon img");
     	for (i = 0; i < expectedPillsCount; i++) {
     		var expectedURL = that.PILLS[i].icon.url;
     		$A.test.assertEquals(expectedURL,$A.test.getElementAttributeValue(pillIcons[i], "src"),"Icon Url for pill " + i + " is not correct");

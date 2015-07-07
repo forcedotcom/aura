@@ -168,7 +168,7 @@
     testIconExistsInPill: {
         test: function (cmp) {
             this._createPillByAutoComplete(cmp);
-            $A.test.assertEquals(1, $A.test.select(".pillIcon").length, "Pill icon is not present");
+            $A.test.assertEquals(1, $A.test.select(".pill .pillIcon").length, "Pill icon is not present");
         }
     },
 

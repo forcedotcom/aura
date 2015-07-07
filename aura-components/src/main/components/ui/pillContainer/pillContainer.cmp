@@ -46,7 +46,7 @@
         <ul aura:id="list" class="orderedList">
             <aura:iteration items="{!v.items}" var="item" iterationComplete="{!c.pillIterationComplete}" aura:id="pills">
                 <li aura:id="listitem" class="pillContainerListItem">
-                    <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}" iconUrl="{!item.icon.url}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" maxCharacters="{!v.maxCharactersInPill}" onHandledEvent="{!c.handlePillEvent}"/>
+                    <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}" iconUrl="{!item.icon.url}" iconBackgroundColor="{!item.icon.backgroundColor}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" maxCharacters="{!v.maxCharactersInPill}" onHandledEvent="{!c.handlePillEvent}"/>
                 </li>
             </aura:iteration>
             <li role="presentation" class="pillContainerListItem">

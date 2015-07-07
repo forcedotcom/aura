@@ -115,5 +115,11 @@
     
     updateAriaAttributes: function(component, event, helper) {
         helper.updateAriaAttributes(component, event);
+    },
+
+    handleListExpand: function(component, event, helper) {
+        var concrete = component.getConcreteComponent();
+        var concreteHelper = concrete.getDef().getHelper();
+        concreteHelper.handleListExpand(component, event)
     }
 })

@@ -768,7 +768,7 @@ Component.prototype.destroy = function(async) {
         this.actionRefs = null;
         this.handlers=null;
         this.eventDispatcher = null;
-        this.index = null;
+        this.localIndex = null;
         this.componentDef = null;
 
         this.destroyed = true;

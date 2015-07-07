@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-div.THIS {
+div.THIS.uiAutocompleteList, div.THIS .uiAutocompleteList {
     width: 100%;
     box-shadow: none;
     left: 0px;

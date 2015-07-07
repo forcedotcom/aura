@@ -26,48 +26,10 @@
 	height: 10%;
 	overflow: auto;
 }
- 
-.THIS table{
-	border-radius: 7px;
-	margin-bottom: 20px;
-	background-color: #fff;
-	text-align: left;
-	height: 80%;
+
+.THIS table {
+	height: 500px;
 	display: block;
-}
-
-.THIS table tr {
-	cursor: pointer;
-}
-
-.THIS table tr.error {
-	outline:5px solid #427BD6;
-}
-
-.THIS table tr.disabled {
-	color: #CCC;
-}
-
-.THIS table tbody tr:hover {
-	background-color: #f0f1f2;
-}
-
-.THIS table td,
-.THIS table th {
-	padding: 16px;
-}
-
-.THIS table th {
-	font-size: 12px;
-	font-weight: 700;
-	text-transform: uppercase;
-	text-align: left;
-	vertical-align: middle;
-}
-
-.THIS table td {
-	font-size: 14px;
-	border-collapse: collapse;
 }
 
 .THIS button.kitchenButton {
@@ -78,15 +40,25 @@
 	font-size: inherit;
 }
 
-.THIS a.disabled {
-	color: gray;
+.THIS tr td:nth-child(1),
+.THIS tr th:nth-child(1) {
+	width: 64px;
 }
 
-.THIS table th.descending a{
-	color: red;
+.THIS tr td:nth-child(2),
+.THIS tr th:nth-child(2) {
+	width: 96px;
 }
 
-.THIS table th.ascending a{
-	color: green;
+.THIS tr td:nth-child(3),
+.THIS tr th:nth-child(3) {
+	width: 320px;
+}
+
+.THIS tr td:nth-child(4),
+.THIS tr th:nth-child(4),
+.THIS tr td:nth-child(5),
+.THIS tr th:nth-child(5){
+	width: 128px;
 }
 

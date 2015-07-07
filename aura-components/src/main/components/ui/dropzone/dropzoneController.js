@@ -52,7 +52,8 @@
 		var params = event.getParam("arguments");
 		$A.util.forEach(params.dragComponents, function(dragComponent) {
 			if (dragComponent.isValid()) {
-				helper.fireDrop(component, dragComponent.get("v.type"), dragComponent.get("v.dataTransfer"), dragComponent, component.getElement(), params.isInAccessibilityMode);
+				var dataTransfer = dragComponent.getConcreteComponent().getDef().getHelper().getDataTransfer(dragComponent, event);
+				helper.fireDrop(component, dragComponent.get("v.type"), dataTransfer, dragComponent, component.getElement(), params.isInAccessibilityMode);
 			}	
 		});
 	}

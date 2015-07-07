@@ -46,7 +46,7 @@
 			
 			// Set referenceElement
 			var menuList = component.find("menuList");
-			menuList.set("v.referenceElement", draggables[0]);
+			menuList.set("v.referenceElement", target);
 			
 			// open accessibility menu
 			menu.getEvent("popupTriggerPress").fire();
@@ -123,6 +123,8 @@
 			
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
+			
+			component.find("menuList").get("v.referenceElement").focus();
 		}
 	},
 	

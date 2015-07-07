@@ -19,7 +19,7 @@
     <aura:attribute type="Boolean" name="actionDone" default="false"/>
     <aura:attribute type="String" name="version"/>
 
-    <auratest:requireWithModel aura:id="auratest_requireWithModel"/>
+    <auratest:requireWithServerAction aura:id="auratest_requireWithServerAction"/>
     <auratest:requireConsumer aura:id="auratest_requireConsumer"/>
 
     <aura:require namespace ="auratest" version="2.0"/>

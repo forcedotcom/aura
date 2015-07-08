@@ -894,6 +894,10 @@ AuraInstance.prototype.getCallback = function(callback) {
  * @platform
  */
 AuraInstance.prototype.get = function(key, callback) {
+// JBUCH: TODO: FIXME
+//    if(callback){
+//        throw new Error("Remove Me!");
+//    }
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
@@ -930,7 +934,24 @@ AuraInstance.prototype.set = function(key, value) {
     if(!valueProvider["set"]){
         $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
     }
-    return valueProvider["set"](path.join('.'), value);
+    var oldValue=$A.get(key);
+    var result=valueProvider["set"](path.join('.'), value);
+    $A.expressionService.updateGlobalReference(key,oldValue,value);
+    return result;
+};
+
+
+/**
+ * Returns a live reference to the global value indicated using property syntax.
+ *
+ * @param {String} key The data key for which to return a reference.
+ * @return {PropertyReferenceValue}
+ * @public
+ * @platform
+ * @export
+ */
+AuraInstance.prototype.getReference = function(key) {
+    return $A.expressionService.getReference(key);
 };
 
 Aura.OverrideMap$Instance = undefined;

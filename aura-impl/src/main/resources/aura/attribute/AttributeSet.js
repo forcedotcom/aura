@@ -185,7 +185,7 @@ AttributeSet.prototype.set = function(key, value, component) {
         key = step;
     }
 
-    if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal()) {
+    if (target[key] instanceof PropertyReferenceValue) {
         target[key].set(value);
     } else if (!(target[key] instanceof FunctionCallValue)) {
         // HALO: TODO: JBUCH: I DON'T LIKE THIS...

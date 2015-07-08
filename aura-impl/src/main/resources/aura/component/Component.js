@@ -1637,15 +1637,6 @@ Component.prototype.getVersionInternal = function() {
     return ret ? ret.getVersion() : null;
 };
 
-
-
-
-
-//////// PRIV COMPONENT CRAP
-
-
-
-
 Component.prototype.getValueProvider = function(key) {
     if (!$A.util.isString(key)) {
         $A.error("Component.getValueProvider(): 'key' must be a valid String.");
@@ -2456,8 +2447,5 @@ Component.prototype.outputComponent = function(cmp, serialized, depth) {
     }
     return null;
 };
-
-
-//////// END PRIV COMPONENT CRAP
 
 Aura.Component.Component = Component;

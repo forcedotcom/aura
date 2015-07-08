@@ -85,6 +85,7 @@ GlobalValueProviders.prototype.merge = function(gvps, doNotPersist) {
         }else{
             $A.util.apply(valueProvider,newGvp["values"],true);
         }
+        $A.expressionService.updateGlobalReferences(type,newGvp["values"]);
     }
     if (doNotPersist) {
         return;

@@ -136,7 +136,7 @@ AuraRenderingService.prototype.rerender = function(components) {
                         // we fall through here, and put whatever the component gives us in the set.
                         // This may not be ideal, but it is not clear what we should do.
                     }
-                    if(rerenderedElements!=undefined){
+                    if(rerenderedElements!==undefined){
                         renderedElements=renderedElements.concat(rerenderedElements);
                     }else{
                         addExistingElements=true;
@@ -327,7 +327,7 @@ AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) 
                     if (child === component._facetInfo[j]) {
                         updatedFacet.components.push({action:"rerender",component: child, oldIndex: j, newIndex: i});
                         // If the child is in a different position AND the order is different
-                        if((j!=(i-renderCount)) && (j < jmax)){
+                        if((j!==(i-renderCount)) && (j < jmax)){
                             updatedFacet.useFragment=true;
                         }
                         jmax = j;
@@ -801,7 +801,7 @@ AuraRenderingService.prototype.getFlavorClass = function(cmp, element) {
             flavor = valueProvider.getFlavor();
         }
 
-        if (!$A.util.isUndefinedOrNull(flavor) && flavor.indexOf("{") == 0) { // deal with expressions
+        if (!$A.util.isUndefinedOrNull(flavor) && flavor.indexOf("{") === 0) { // deal with expressions
             flavor = valueFactory.create(flavor, null, valueProvider.getComponentValueProvider());
             flavor = $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
         }

@@ -32,7 +32,7 @@ function AuraEventService () {
  * @returns {String} qualified event name
  */
 AuraEventService.prototype.qualifyEventName = function(event) {
-    if(event.indexOf("://") == -1){
+    if(event.indexOf("://") === -1){
         event = "markup://"+event;
     }
     return event;
@@ -230,7 +230,7 @@ AuraEventService.prototype.removeHandler = function(config) {
  */
 AuraEventService.prototype.getEventDef = function(descriptor) {
     $A.assert(descriptor, "No EventDef descriptor specified");
-    if(descriptor.indexOf("://") == -1){
+    if(descriptor.indexOf("://") === -1){
         descriptor = "markup://" + descriptor;
     }
     var def = this.registry.getDef(descriptor),

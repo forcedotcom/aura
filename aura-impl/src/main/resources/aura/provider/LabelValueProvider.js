@@ -142,7 +142,7 @@ LabelValueProvider.prototype.get = function(expression, callback) {
     var value;
     var path=expression.split('.');
 
-    if(path.length == 2) {
+    if(path.length === 2) {
         var section=path[0];
         var name=path[1];
         value = this.values[section]&&this.values[section][name];

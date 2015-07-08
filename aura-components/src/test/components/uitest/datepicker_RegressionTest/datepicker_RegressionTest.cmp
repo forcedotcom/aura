@@ -37,13 +37,10 @@
 	        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
 	    </div>
 	    <div class="subtitle">
-	    	<div>dp_v_titleHeadingLevel = {!v.dp_v_titleHeadingLevel}</div>
-	    	<div>dp_CalTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
-	    	<div>dp_CalTitle_TagName = {!v.dp_CalTitle_TagName}</div>
+	    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
 		</div>
 	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	        <ui:datePicker aura:id="standAloneDatepicker" visible="true" titleHeadingLevel="h3"></ui:datePicker>
 	    </div>
 	</div>
 	</aura:if>

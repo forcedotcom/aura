@@ -472,13 +472,29 @@ AuraLocalizationService.prototype.getLocalizedDateTimeLabels = function() {
  * @export
  */
 AuraLocalizationService.prototype.getToday = function(timezone, callback) {
-	var localToday = new Date(); // time in local timezone
-	localToday.setTime(localToday.getTime() + localToday.getTimezoneOffset() * 60 * 1000); // time in UTC
-	var tz = timezone ? timezone : $A.get("$Locale.timezone");
-	this.UTCToWallTime(localToday, tz, function(date) {
+    this.getDateStringBasedOnTimezone(timezone, new Date(), callback);
+};
+
+
+/**
+ * Get the date's date string based on a time zone.
+ * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
+ * @param {Date} dateObj a date object 
+ * @param {Function} callback A function to be called after the "today" value is obtained
+ * @return {String} the ISO8601 date string (yyyy-MM-dd).
+ * @memberOf AuraLocalizationService
+ * @public
+ * @export
+ */
+AuraLocalizationService.prototype.getDateStringBasedOnTimezone = function(timezone, dateObj, callback) {
+    dateObj.setTime(dateObj.getTime() + dateObj.getTimezoneOffset() * 60 * 1000); // time in UTC
+    var tz = timezone ? timezone : $A.get("$Locale.timezone");
+    this.UTCToWallTime(dateObj, tz, function(date) {
         callback(date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate());
     });
 };
+
+
 
 /**
  * Gets the number of milliseconds in a duration.

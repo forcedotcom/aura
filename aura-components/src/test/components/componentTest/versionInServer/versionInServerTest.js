@@ -105,6 +105,28 @@
         ]
     },
 
+    testVersionFromServerControllerOfCreatedCmp: {
+        test:[
+            function(cmp) {
+                var action = cmp.get("c.updateVersionFromCreatedComponentServerController");
+                $A.enqueueAction(action);
+
+                $A.test.addWaitFor(false, function(){return $A.util.isUndefinedOrNull(cmp.get("v.newComponent"))});
+            },
+            function(cmp) {
+                var targetComponent = cmp.get("v.newComponent");
+                $A.test.addWaitFor(true,
+                    function(){return targetComponent.get("v.actionDone")},
+                    function(){
+                        var actual = targetComponent.get("v.version");
+                        this.updateVersion(cmp, actual);
+                        $A.test.assertEquals("2.0", actual);
+                    });
+
+            }
+        ]
+    },
+
     updateVersion: function(cmp, version) {
         cmp.set("v.version", version);
     }

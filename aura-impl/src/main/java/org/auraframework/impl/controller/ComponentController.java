@@ -21,6 +21,7 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
@@ -28,6 +29,7 @@ import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Application;
+import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
@@ -103,22 +105,37 @@ public class ComponentController {
         return Boolean.TRUE;
     }
 
-    @AuraEnabled
-    public static Component getComponent(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
-            throws QuickFixException {
+    private static <D extends BaseComponentDef, T extends BaseComponent<D, T>>
+        T getBaseComponent(Class<T> type, Class<D> defType, String name,
+                Map<String, Object> attributes, Boolean loadLabels) throws QuickFixException {
+
         DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<ComponentDef> desc = definitionService.getDefDescriptor(name, ComponentDef.class);
+        DefDescriptor<D> desc = definitionService.getDefDescriptor(name, defType);
         definitionService.updateLoaded(desc);
-        return Aura.getInstanceService().getInstance(desc, attributes);
+        T component =  Aura.getInstanceService().getInstance(desc, attributes);
+        if (Boolean.TRUE.equals(loadLabels)) {
+            ComponentController.loadLabels();
+        }
+        return component;
+    }
+
+    // Not aura enabled, but called from code. This is probably bad practice.
+    public static Component getComponent(String name, Map<String, Object> attributes) throws QuickFixException {
+        return  getBaseComponent(Component.class, ComponentDef.class, name, attributes, false);
     }
 
     @AuraEnabled
-    public static Application getApplication(@Key(value = "name", loggable = true) String name, @Key("attributes") Map<String, Object> attributes)
-            throws QuickFixException {
-        DefinitionService definitionService = Aura.getDefinitionService();
-        DefDescriptor<ApplicationDef> desc = definitionService.getDefDescriptor(name, ApplicationDef.class);
-        definitionService.updateLoaded(desc);
-        return Aura.getInstanceService().getInstance(desc, attributes);
+    public static Component getComponent(@Key(value = "name", loggable = true) String name,
+            @Key("attributes") Map<String, Object> attributes,
+            @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
+        return  getBaseComponent(Component.class, ComponentDef.class, name, attributes, loadLabels);
+    }
+
+    @AuraEnabled
+    public static Application getApplication(@Key(value = "name", loggable = true) String name,
+            @Key("attributes") Map<String, Object> attributes,
+            @Key(value = "chainLoadLabels", loggable = true) Boolean loadLabels) throws QuickFixException {
+        return getBaseComponent(Application.class, ApplicationDef.class, name, attributes, loadLabels);
     }
 
     /**
@@ -152,14 +169,16 @@ public class ComponentController {
         return Aura.getDefinitionService().getDefinition(desc);
     }
 
-    @SuppressWarnings("unchecked")
     @AuraEnabled
     public static List<Component> getComponents(@Key("components") List<Map<String, Object>> components)
             throws QuickFixException {
         List<Component> ret = Lists.newArrayList();
         for (int i = 0; i < components.size(); i++) {
             Map<String, Object> cmp = components.get(i);
-            ret.add(getComponent((String) cmp.get("descriptor"), (Map<String, Object>) cmp.get("attributes")));
+            String descriptor = (String)cmp.get("descriptor");
+            @SuppressWarnings("unchecked")
+            Map<String, Object> attributes = (Map<String, Object>) cmp.get("attributes");
+            ret.add(getBaseComponent(Component.class, ComponentDef.class, descriptor, attributes, Boolean.FALSE));
         }
         return ret;
     }

@@ -175,17 +175,25 @@ Aura.Context.AuraContext.prototype.getGlobalValueProvider = function(type) {
  * @return {String} json representation
  * @private
  */
-Aura.Context.AuraContext.prototype.encodeForServer = function() {
-    return aura.util.json.encode({
+Aura.Context.AuraContext.prototype.encodeForServer = function(includeDynamic) {
+    var contextToSend = {
         "mode" : this.mode,
-        "loaded" : this.loaded,
-        "dn" : $A.services.component.getDynamicNamespaces(),
-        "app" : this.app,
-        "cmp" : this.cmp,
-        "fwuid" : this.fwuid,
-        "globals" : this.globalValueProviders.getValueProvider("$Global").serializeForServer(),
-        "test" : this.test
-    });
+        "fwuid" : this.fwuid
+    };
+    if (this.app) {
+        contextToSend["app"] = this.app;
+    } else {
+        contextToSend["cmp"] = this.cmp;
+    }
+    if (this.test) {
+        contextToSend["test"] = this.test;
+    }
+    if (includeDynamic) {
+        contextToSend["loaded"] = this.loaded;
+        contextToSend["dn"] = $A.services.component.getDynamicNamespaces();
+        contextToSend["globals"] = this.globalValueProviders.getValueProvider("$Global").serializeForServer();
+    }
+    return $A.util.json.encode(contextToSend);
 };
 
 /**

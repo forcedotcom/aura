@@ -1,6 +1,6 @@
 ({
     tearDown: function() {
-        $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:applicationTest"}');
+        $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"chainLoadLabels":true,"name":"auraStorageTest:applicationTest"}');
     },
 
     testApplicationRefreshedEvent: {

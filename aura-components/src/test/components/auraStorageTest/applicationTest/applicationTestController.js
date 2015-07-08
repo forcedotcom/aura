@@ -1,6 +1,7 @@
 ({
     init: function(cmp) {
         cmp._storage = $A.storageService.getStorage('actions');
+        cmp._key = 'aura://ComponentController/ACTION$getApplication:{"chainLoadLabels":true,"name":"auraStorageTest:applicationTest"}';
     },
 
     handleRefreshed: function(cmp) {
@@ -9,8 +10,7 @@
 
     addToStorage: function(cmp) {
         cmp.set("v.status", "Adding");
-        cmp._storage.put(
-            'aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:applicationTest"}',
+        cmp._storage.put(cmp._key,
             {
                 'components': [], // components is undefined instead is real response
                 'returnValue': {

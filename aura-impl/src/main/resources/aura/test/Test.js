@@ -18,6 +18,7 @@
 /**
  * @class Test
  * @classdesc Utility functions for component testing, accessible using $A.test.
+ * @constructor
  */
 TestInstance = function() {
     this.waits = [];

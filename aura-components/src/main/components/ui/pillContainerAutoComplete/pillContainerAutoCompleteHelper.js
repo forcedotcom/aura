@@ -87,7 +87,6 @@
     },
 
     handleListExpand: function(component, event) {
-        debugger;
         var pillListElement = this._getPillContainerListElement(component);
         if (pillListElement) {
             var autocompleteList = component.find("list");

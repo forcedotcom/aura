@@ -745,8 +745,9 @@ AuraClientService.prototype.handleAppCache = function() {
         }
 
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
-            // No one should get here.
+            // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");
+            window.location.reload(true);
         }
     }
 
@@ -801,10 +802,8 @@ AuraClientService.prototype.handleAppCache = function() {
 AuraClientService.prototype.setOutdated = function() {
     this.isOutdated = true;
     var appCache = window.applicationCache;
-    if (!appCache || (appCache && appCache.status === appCache.UNCACHED)) {
-        location["reload"](true);
-    } else if (appCache.status === appCache.OBSOLETE) {
-        location.reload(true);
+    if (!appCache || (appCache && (appCache.status === appCache.UNCACHED || appCache.status === appCache.OBSOLETE))) {
+        window.location.reload(true);
     } else if (appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
         appCache.update();
     }

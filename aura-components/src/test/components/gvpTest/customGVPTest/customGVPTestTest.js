@@ -16,7 +16,7 @@
 ({
     testAddValueProviderAndGetWithCallback: {
         test: [function(component){
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Custom', cgvp);
             $A.test.addWaitForWithFailureMessage("[task_mode_today]",
         			function() { 
@@ -40,7 +40,7 @@
     
     testAddDuplicateValueProvider: {
     	test: [function(component){
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Custom', cgvp);
             $A.test.expectAuraError("$A.addValueProvider(): '$Custom' has already been registered. : false");
         	$A.addValueProvider('$Custom', cgvp);
@@ -50,7 +50,7 @@
     testAddValueProvider_InvalidType: {
     	test: [function(component){
     		$A.test.expectAuraError("$A.addValueProvider(): 'type' must be a valid String.");
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider({}, cgvp);
         }]
     },
@@ -58,7 +58,7 @@
     testAddValueProvider_InvalidName: {
     	test: [function(component){
     		$A.test.expectAuraError("$A.addValueProvider(): 'type' must start with '$'.");
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('Something', cgvp);
         }]
     },
@@ -66,7 +66,7 @@
     testAddValueProvider_AuraReserved: {
     	test: [function(component){
     		$A.test.expectAuraError("$A.addValueProvider(): '$Browser' is a reserved valueProvider.");
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Browser', cgvp);
         }]
     },
@@ -80,13 +80,13 @@
     
     testSetSupported : {
     	test: [function(component){
-        	var cgvp = new CustomGlobalVaueProvider();
+        	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Custom', cgvp);
         	$A.set("$Custom.task_mode_today","Tomorrow");
         	var res = $A.get("$Custom.task_mode_today");
         	$A.test.assertEquals("Tomorrow", res, 
     		"fail to set the value in Custom Global Value Provider");
         }]
-    },
+    }
     
 })

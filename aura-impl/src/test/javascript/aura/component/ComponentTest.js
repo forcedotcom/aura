@@ -74,6 +74,7 @@ Test.Aura.Component.ComponentTest=function(){
                 deIndex:function(){}
             },
             expressionService:{
+                clearReferences:function(){},
                 normalize:function(target){return target}
             },
             renderingService:{

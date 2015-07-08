@@ -19,21 +19,35 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
+import org.auraframework.system.AuraContext.Authentication;
+import org.auraframework.system.AuraContext.Format;
+import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.perf.metrics.PerfMetricsComparator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 @UnAdaptableTest
 @PerfTestSuite
@@ -74,7 +88,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
 
     @Override
     public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests() {
-        return perfConfigUtil.getComponentTestsToRun();
+        return perfConfigUtil.getComponentTestsToRun(getNamespaces());
     }
 
     public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap) {
@@ -105,13 +119,27 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
                             return super.getAllowedVariability(metricName);
                         }
                     });
-                    // addTest(patchPerfComponentTestCase(test, descriptor));
-                    addTest(test);
+                    addTest(patchPerfComponentTestCase(test, descriptor));
+                    //addTest(test);
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
                 }
             }
         }
     }
+
+    /**
+     * @return the list of namespaces to create tests for
+     * TODO get sfdc core namespaces
+     */
+    public List<String> getNamespaces() {
+        return ImmutableList.of("PerformanceTest");
+    }
+
+	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
+			DefDescriptor<ComponentDef> descriptor) throws Exception {
+		// TODO Auto-generated method stub
+		return test;
+	}
 
 }

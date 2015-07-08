@@ -902,7 +902,7 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
 AuraClientService.prototype.initHost = function(host, sid) {
     this._host = host || "";
     this._sid = sid || "";
-    
+
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     delete AuraClientService.prototype.initHost;
     delete AuraClientService.prototype["initHost"];
@@ -1063,7 +1063,7 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  * @param {Object} attributes The configuration data to use. If specified, attributes are used as a key value pair.
  * @param {function} callback The callback function to run
  * @param {String} defType Sets the defType to "COMPONENT"
- * 
+ *
  * @memberOf AuraClientService
  * @private
  */
@@ -1939,6 +1939,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (action) {
                 if (response["storable"] && !action.isStorable()) {
                     action.setStorable();
+                    // the action started as non-abortable on the client
+                    if(action.getAbortableId() === undefined) {
+                        action.setAbortable(false);
+                    }
                 }
             } else {
                 action = this.buildFakeAction(response);
@@ -2209,7 +2213,7 @@ AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
  */
 AuraClientService.prototype.renderInjection = function(component, locator, actionEventHandlers) {
     var error = null;
-    
+
     var stringLocator = $A.util.isString(locator);
     var hostEl = stringLocator ? document.getElementById(locator) : locator;
 

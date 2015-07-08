@@ -17,6 +17,6 @@
     },
 
     fireVersionEvent: function(cmp) {
-        cmp.getEvent("versionEvt").fire();
+        cmp.get("e.versionEvt").fire();
     }
 })

@@ -24,7 +24,7 @@
         a.setCallback(this, function(response){
             var state = response.getState();
             if(state === "SUCCESS") {
-                var e = cmp.getEvent("versionEvt");
+                var e = cmp.get("e.versionEvt");
                 e.setParams({
                     "att1": response.returnValue
                 });

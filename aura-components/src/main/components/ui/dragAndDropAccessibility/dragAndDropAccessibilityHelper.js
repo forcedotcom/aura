@@ -53,10 +53,10 @@
 	/**
 	 * Make draggables fire dragEnd event.
 	 * @param {Aura.Component[]} draggables - the ui:draggable's
-	 * @param {HTMLElement} target - the event target for dragend event
 	 * @param {boolean} isValid - true if drag operation is successful or false if it's aborted
+	 * @param {HTMLElement} target - the event target for dragend event
 	 */
-	fireDragEnd: function(draggables, target, isValid) {
+	fireDragEnd: function(draggables, isValid, target) {
 		if (isValid === undefined) {
 			isValid = false;
 		}

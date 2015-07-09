@@ -55,13 +55,13 @@
 			this.position(menu, target);
 		} else {
 			component.set("v.dropzoneMenu", []);
-			this.fireDragEnd(draggables, target, false);
+			this.fireDragEnd(draggables, false, target);
 		} 			
 	},
-
+	
 	position: function(targetComponent, referenceEl) {
 		targetComponent.constraints = [];
-
+		
 		// This is for positioning on the center right of the target component
 		targetComponent.constraints.push(this.positioningLib.panelPositioning.createRelationship({
 			align:'right center', 
@@ -117,7 +117,7 @@
 		var draggables = component.get("v.draggables");
 		if (draggables.length > 0) {
 			var referenceElement = component.find("menuList").get("v.referenceElement");
-			this.fireDragEnd(draggables, referenceElement, this.$isDropPerformed$);
+			this.fireDragEnd(draggables, this.$isDropPerformed$, referenceElement);
 			
 			component.set("v.draggables", []);
 			this.$isDropPerformed$ = false;

@@ -52,7 +52,7 @@
 		if (code === 32) {
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
-			if (!component.get("v.disable")) {
+			if (!$A.util.getBooleanValue(component.get("v.disable"))) {
 				this.fireDragStart(component, event.target, true);
 				
 				// Delegate drag and drop operation to accessibility component

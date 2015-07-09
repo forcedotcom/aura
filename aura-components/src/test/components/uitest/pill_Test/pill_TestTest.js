@@ -18,7 +18,6 @@
 
     //test icon background
 	testIconBackgroundColorWithIcon: {
-		attributes : {"renderItem" : "testIconBackgroundColorWithIcon"},
         test: [function(cmp) {
         	var pillIcons = $A.test.select('.pillIcon');
 

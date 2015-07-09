@@ -11,7 +11,6 @@
     limitations under the License.
 -->
 <aura:component>
-<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
 <div style='padding:10px;'>
     <div>
         <h1>

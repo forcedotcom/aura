@@ -49,7 +49,7 @@
                     <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}" iconUrl="{!item.icon.url}" iconBackgroundColor="{!item.icon.backgroundColor}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" maxCharacters="{!v.maxCharactersInPill}" onHandledEvent="{!c.handlePillEvent}"/>
                 </li>
             </aura:iteration>
-            <li role="presentation" class="pillContainerListItem">
+            <li aura:id="inputListItem" role="presentation" class="pillContainerListItem">
                 {!v.pillInput}
             </li>
         </ul>

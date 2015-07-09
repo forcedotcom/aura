@@ -119,6 +119,14 @@
                return concreteComponent;
             }
         }
+    },
+
+    getInputElement: function(component) {
+        var inputComponent = component.getSuper().find('input');
+        if (inputComponent) {
+            var inputHelper = inputComponent.getDef().getHelper();
+            return inputHelper.getInputElement(inputComponent);
+        }
         return null;
     }
 })

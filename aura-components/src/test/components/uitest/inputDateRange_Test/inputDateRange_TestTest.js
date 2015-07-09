@@ -57,10 +57,10 @@
             $A.test.assertEquals(END_DATE, rangeComponent.get("v.endDate"), "End Date should be updated");
 
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId), "start-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
 
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId), "end-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
 
             this.assertRangeHighlightedInMonth(grid, startId + 1, endId - 1);
         }]
@@ -90,10 +90,10 @@
             $A.test.assertEquals(END_DATE, rangeComponent.get("v.endDate"), "End Date should be updated");
 
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId), "start-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
 
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId), "end-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
 
             this.assertRangeHighlightedInMonth(grid, startId + 1, endId - 1);
         }]
@@ -124,12 +124,12 @@
             this.openStartDatePicker(cmp);
         }, function(cmp) {
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId), "start-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
             this.assertRangeHighlightedInMonth(grid, startId + 1, 41);
             this.openEndDatePicker(cmp);
         }, function(cmp) {
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId), "end-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
 
             this.assertRangeHighlightedInMonth(grid, 0, endId - 1);
         }]
@@ -165,10 +165,10 @@
             $A.test.assertEquals(END_DATE, rangeComponent.get("v.endDate"), "End Date should be updated");
 
             var startId = this.findDatePosition(NEW_START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId), "start-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
 
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId), "end-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
 
             this.assertRangeHighlightedInMonth(grid, startId + 1, endId - 1);
 
@@ -205,10 +205,10 @@
             $A.test.assertEquals(NEW_END_DATE, rangeComponent.get("v.endDate"), "End Date should be updated");
 
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId), "start-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
 
             var endId = this.findDatePosition(NEW_END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId), "end-date"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
 
             this.assertRangeHighlightedInMonth(grid, startId + 1, endId - 1);
 
@@ -217,7 +217,7 @@
 
     assertRangeHighlightedInMonth : function(grid, startId, endId) {
         for (i = startId; i <= endId; i++) {
-            $A.test.assertTrue($A.util.hasClass(grid.find(i), "highlight"));
+            $A.test.assertTrue($A.util.hasClass(grid.find(i).getElement(), "highlight"), "elements in the range should have 'highlight' class");
         }
     },
 

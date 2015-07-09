@@ -234,10 +234,15 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
 
 /**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
+ * 
+ * @returns {Object} An object with properties 'status', which represents the status of the response, and potentially
+ *          'message', which contains the decoded server response or an error message.
  */
 AuraClientService.prototype.decode = function(response, noStrip) {
+    var ret = {};
     if (this.isUnloading) {
-        return null;
+        ret["status"] = "UNLOADING";
+        return ret;
     }
 
     var e;
@@ -245,7 +250,8 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     // failure to communicate with server
     if (this.isDisconnectedOrCancelled(response)) {
         this.setConnected(false);
-        return null;
+        ret["status"] = "INCOMPLETE";
+        return ret;
     }
 
     //
@@ -270,7 +276,8 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         // so just flag an error, and carry on.
         //
         $A.error(text);
-        return null;
+        ret["status"] = "ERROR";
+        ret["message"] = text;
     }
 
     //
@@ -304,14 +311,19 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         if ($A.util.isUndefinedOrNull(resp)) {
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             $A.error("Communication error, invalid JSON: " + text);
+            ret["message"] = "Communication error, invalid JSON: " + text;
             // #end
             // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             $A.error("Communication error, please retry or reload the page");
+            ret["message"] = "Communication error, please retry or reload the page";
             // #end
-            return null;
+            ret["status"] = "ERROR";
+            return ret;
         } else if (resp["exceptionEvent"] === true) {
             this.throwExceptionEvent(resp);
-            return null;
+            ret["status"] = "ERROR";
+            ret["message"] = "Received exception event from server";
+            return ret;
         } else {
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!
             // The server side actually returns a response with 'message' and 'stack' defined
@@ -323,18 +335,23 @@ AuraClientService.prototype.decode = function(response, noStrip) {
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             if (resp["message"] && resp["stack"]) {
                 $A.error(resp["message"] + "\n" + resp["stack"]);
+                ret["message"] = resp["message"] + "\n" + resp["stack"];
             } else {
                 $A.error("Communication error, invalid JSON: " + text);
+                ret["message"] = "Communication error, invalid JSON: " + text;
             }
             // #end
             // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             if (resp["message"]) {
                 $A.error(resp["message"]);
+                ret["message"] = resp["message"];
             } else {
                 $A.error("Communication error, please retry or reload the page");
+                ret["message"] = "Communication error, please retry or reload the page";
             }
             // #end
-            return null;
+            ret["status"] = "ERROR";
+            return ret;
         }
     }
     //
@@ -348,13 +365,18 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     if ($A.util.isUndefinedOrNull(responseMessage)) {
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         $A.error("Communication error, invalid JSON: " + text);
+        ret["message"] = "Communication error, invalid JSON: " + text;
         // #end
         // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         $A.error("Communication error, please retry or reload the page");
+        ret["message"] = "Communication error, please retry or reload the page";
         // #end
-        return null;
+        ret["status"] = "ERROR";
+        return ret;
     }
-    return responseMessage;
+    ret["status"] = "SUCCESS";
+    ret["message"] = responseMessage;
+    return ret;
 };
 
 /**
@@ -1835,10 +1857,12 @@ AuraClientService.prototype.receive = function(auraXHR) {
     try {
         responseMessage = this.decode(auraXHR.request);
 
-        if (responseMessage) {
-            this.processResponses(auraXHR, responseMessage);
-        } else if (!this.isUnloading) {
+        if (responseMessage["status"] === "SUCCESS") {
+            this.processResponses(auraXHR, responseMessage["message"]);
+        } else if (responseMessage["status"] === "INCOMPLETE") {
             this.processIncompletes(auraXHR);
+        } else if (responseMessage["status"] === "ERROR") {
+            this.processErrors(auraXHR, responseMessage["message"]);
         }
         this.fireDoneWaiting();
     } catch (e) {
@@ -1851,6 +1875,25 @@ AuraClientService.prototype.receive = function(auraXHR) {
     }
 
     return responseMessage;
+};
+
+/**
+ * Mark actions from an XHR response as being in the error state and set the error on the actions.
+ * 
+ * @param {AuraXHR} auraXHR The xhr container.
+ * @param {String} errorMessage The error message to associate with the actions.
+ * @private
+ */
+AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
+    var action;
+    var actions = auraXHR.actions;
+    for (var id in actions) {
+        if (actions.hasOwnProperty(id)) {
+            action = actions[id];
+            var error = new Error(errorMessage);
+            action.markError($A.getContext(), [error]);
+        }
+    }
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {

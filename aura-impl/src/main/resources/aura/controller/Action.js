@@ -1172,6 +1172,19 @@ Action.prototype.markException = function(e) {
 };
 
 /**
+ * Mark the current action as having an error and finish the Action.
+ * 
+ * @param context The current context.
+ * @param e The error with which we want to mark the action.
+ * @private
+ */
+Action.prototype.markError = function(context, e) {
+    this.state = "ERROR";
+    this.error = e;
+    this.finishAction(context);
+};
+
+/**
  * Mark the current action as incomplete.
  *
  * @private

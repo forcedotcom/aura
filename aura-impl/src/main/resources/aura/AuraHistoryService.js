@@ -168,7 +168,7 @@ AuraHistoryService.prototype.usePushState = function() {
             // browser has pushState
             !!window.history.pushState &&
             // NOT native Android browser
-            !(ua.indexOf("Android ") > -1 && ua.indexOf("Mozilla/5.0") > -1 && ua.indexOf("AppleWebKit") > -1 && ua.indexOf("Chrome") == -1) &&
+            !(ua.indexOf("Android ") > -1 && ua.indexOf("Mozilla/5.0") > -1 && ua.indexOf("AppleWebKit") > -1 && ua.indexOf("Chrome") === -1) &&
             // NOT IOS7 UIWebView (native app webview)
             !$A.util.isIOSWebView();
     }

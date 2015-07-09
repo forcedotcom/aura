@@ -92,17 +92,17 @@ Aura.Utils.Style.prototype.include = function(href) {
 Aura.Utils.Style.prototype.getCSSProperty = function(el, cssprop) {
     var elcsIE = el.currentStyle;
     if (elcsIE){ //IE
-        if(elcsIE[cssprop]!=undefined) {//IE8
+        if(elcsIE[cssprop]!==undefined) {//IE8
             return elcsIE[cssprop];
         }
-        else if(elcsIE.getPropertyValue!=undefined){//IE9 or up
+        else if(elcsIE.getPropertyValue!==undefined){//IE9 or up
             return elcsIE.getPropertyValue(cssprop);
         }
     }else if (document.defaultView && document.defaultView.getComputedStyle){ //Firefox
         var elcsFF = document.defaultView.getComputedStyle(el, "");
-        if(elcsFF[cssprop]!=undefined) {
+        if(elcsFF[cssprop]!==undefined) {
             return elcsFF[cssprop];
-        }else if(elcsFF.getPropertyValue(cssprop)!=undefined){
+        }else if(elcsFF.getPropertyValue(cssprop)!==undefined){
             return elcsFF.getPropertyValue(cssprop);
         }
     }else{ //try and get inline style

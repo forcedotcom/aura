@@ -96,7 +96,7 @@ var AuraLayoutService = function() {
         handleLocationChange : function(event) {
             // Always having a hash means that the page won't reload when we go
             // back this point.
-            if (window.location.toString()["indexOf"]("#") == -1) {
+            if (window.location.toString()["indexOf"]("#") === -1) {
                 window.location.replace(window.location + "#");
                 // layoutService.changeLocation("");
                 return;

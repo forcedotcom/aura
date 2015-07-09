@@ -36,7 +36,7 @@ function AuraError() {
             var funcStr = method.toString();
             var name = null;
             var matches = funcStr.match(/\bfunction\s?([^(]*)\(/);
-            if (matches && matches.length == 2) {
+            if (matches && matches.length === 2) {
                 name = matches[1];
             }
             return name || "[anonymous]";

@@ -195,14 +195,15 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		function testHandleMenuCollapse(){
 			//arrange
 			dropzoneCmp.exitDragOperation = false;
+
 			var cmp = {
 				find: function(selector){ 
 					if (selector === "menuList") {
 						return { 
-							get: function(){ return draggable.getElement(); }
+							get: function(){ return draggable.getElement(); },
+							getElement: function(){ return { style:{top : "", left : ""} }; } 
 						} 
 					}
-					return { getElement: function(){ return { style:{top : "", left : ""} }; } } 
 				},
 				get: function(){ return [draggable];},
 				set: function(){}

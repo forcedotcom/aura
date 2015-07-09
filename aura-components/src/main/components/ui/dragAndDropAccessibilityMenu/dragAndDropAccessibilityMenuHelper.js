@@ -42,7 +42,7 @@
 
 			// Refresh accessibility menu
 			var menu = component.find("menu");
-			menu.getEvent("refresh").fire();		
+			menu.getEvent("refresh").fire();
 			
 			// Set referenceElement
 			var menuList = component.find("menuList");
@@ -52,7 +52,7 @@
 			menu.getEvent("popupTriggerPress").fire();
 			
 			// position accessibility menu
-			this.position(menu, target);
+			this.position(menuList, target);
 		} else {
 			component.set("v.dropzoneMenu", []);
 			this.fireDragEnd(draggables, false, target);
@@ -79,7 +79,7 @@
 			boxDirections: {
 				top:false,
 				bottom:true,
-				left:false,
+				left:true,
 				right:true
 			},
 			enable: true,
@@ -103,13 +103,13 @@
 	},
 	
 	handleMenuCollapse: function(component) {
-		var menu = component.find("menu");
-		var menuElement = menu.getElement();
+		var menuList = component.find("menuList");
+		var menuElement = menuList.getElement();
 		menuElement.style.top = "0px";
 		menuElement.style.left = "0px";
 		
-		if(menu.constraints) {
-			menu.constraints.forEach(function(constraint) {
+		if(menuList.constraints) {
+			menuList.constraints.forEach(function(constraint) {
 				constraint.destroy();
 			});
 		}

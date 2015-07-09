@@ -195,5 +195,8 @@
         		}
         	}
         }
+    },
+
+    handleListExpand: function(component, event) {
     }
 })

@@ -26,6 +26,7 @@
     <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
     <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button"/>
     <aura:attribute name="pillFlavor" type="String" default="default"/>
+    <aura:attribute name="expanded" type="Boolean" default="false" access="private"/>
 
     <!-- events -->
     <aura:registerevent name="pillInserted"

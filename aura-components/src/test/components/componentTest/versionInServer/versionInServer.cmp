@@ -16,6 +16,7 @@
 
 -->
 <aura:component controller="java://org.auraframework.components.test.java.controller.VersionTestController">
+    <aura:attribute type="Aura.Component" name="newComponent"/>
     <aura:attribute type="Boolean" name="actionDone" default="false"/>
     <aura:attribute type="String" name="version"/>
 

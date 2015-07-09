@@ -7,6 +7,13 @@
             });
     },
 
+    updateVersionFromCreatedComponentServerController: function(cmp, evt, helper) {
+        $A.createComponent("auratest:requireWithServerAction", null, function(newCmp) {
+                cmp.set("v.newComponent", newCmp);
+                newCmp.updateVersionFromServerController();
+            });
+    },
+
     updateVersionFromSameNamespaceServerController: function(cmp, evt, helper) {
         var action = cmp.get("c.getContextAccessVersion");
         action.setCallback(this, function(action){

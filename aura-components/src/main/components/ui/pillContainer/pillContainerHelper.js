@@ -27,12 +27,14 @@
             if (itemsLength >= maxAllowed) {
                 window.setTimeout(function () {
                     $A.run(function () {
-                        var pillItems = cmp.find('pill');
-                        if (!$A.util.isEmpty(pillItems)) {
-                            if ($A.util.isArray(pillItems)) {
-                                pillItems[pillItems.length - 1].focus();
-                            } else {
-                                pillItems.focus();
+                        if (cmp.isValid()) {
+                            var pillItems = cmp.find('pill');
+                            if (!$A.util.isEmpty(pillItems)) {
+                                if ($A.util.isArray(pillItems)) {
+                                    pillItems[pillItems.length - 1].focus();
+                                } else {
+                                    pillItems.focus();
+                                }
                             }
                         }
                     })
@@ -92,7 +94,9 @@
             var that = this;
             window.setTimeout(function () {
                 $A.run(function () {
-                    that._deleteItem(cmp, data);
+                    if (cmp.isValid()) {
+                        that._deleteItem(cmp, data);
+                    }
                 })
             }, 0);
         }

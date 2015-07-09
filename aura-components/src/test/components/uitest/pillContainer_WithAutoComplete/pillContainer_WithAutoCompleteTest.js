@@ -212,6 +212,36 @@
         }
     },
 
+    testShowMoreHiddenAfterAddingOnBlur: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithThreePills(cmp);
+            $A.test.select(".showMore")[0].click();
+
+            //add a pill after clicking show more
+            pillContainer.insertItems([this.PILLS[3]]);
+            this._getInput(cmp).getElement().blur();
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
+    testShowMoreHiddenAfterDeletingOnBlur: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            $A.test.select(".showMore")[0].click();
+
+            //delete a pill after clicking show more
+            var lastPill = pillContainer.find("pill")[3];
+            this._fireKeydownEvent(lastPill, this.BACKSPACE_KEY);
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
     testFocusOnPillAfterMaxReached: {
         attributes: {
             maxAllowed: 2

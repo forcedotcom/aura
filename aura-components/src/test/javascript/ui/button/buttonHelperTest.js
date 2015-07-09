@@ -17,17 +17,20 @@
 Function.RegisterNamespace("Test.Components.Ui.Button");
 
 [Fixture]
-Test.Components.Ui.Button.ButtonControllerTest=function(){
-	var targetController = null;
+Test.Components.Ui.Button.ButtonHelperTest=function(){
+	var targetHelper = null;
 
-	ImportJson("aura-components/src/main/components/ui/button/buttonController.js",function(path,result){
-		targetController=result;
+	ImportJson("aura-components/src/main/components/ui/button/buttonHelper.js",function(path,result){
+		targetHelper=result;
 	});
 
     var mockAura=Mocks.GetMock(Object.Global(),"$A",{
         util:{
             getBooleanValue:function(value){
                 return value;
+            },
+            squash:function(event){
+            	return;
             }
         }
     });
@@ -63,7 +66,7 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 
 			// Act
 			mockAura(function(){
-                targetController.press(stubComponent, stubEvent);
+                targetHelper.catchAndFireEvent(stubComponent, stubEvent, 'press');
             });
 
 			// Assert
@@ -97,7 +100,7 @@ Test.Components.Ui.Button.ButtonControllerTest=function(){
 
 			// Act
 			mockAura(function(){
-                targetController.press(stubComponent, stubEvent);
+                targetHelper.catchAndFireEvent(stubComponent, stubEvent, 'press');
             });
 
 			// Assert

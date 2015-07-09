@@ -17,15 +17,16 @@
     afterRender: function (component, helper) {
         helper.lib.interactive.addDomEvents(component);
 
-        //handle ellipsis
+        //add title when there's ellipsis
         var label = component.get("v.label");
         if (label) {
-            if (label.length > component.get("v.maxCharacters")) {
-                label = label.substring(0, component.get("v.maxCharacters")) + "…";
-                component.getElement().title = component.get("v.label");
+            var innerLabel = component.find("label");
+            if (innerLabel) {
+                var innerLabelElement = innerLabel.getElement();
+                if (innerLabelElement && innerLabelElement.offsetWidth < innerLabelElement.scrollWidth) {
+                    component.getElement().title = label;
+                }
             }
-            var labelComponent = component.find("label");
-            $A.util.setText(labelComponent.getElement(), label);
         }
         return this.superAfterRender();
     }

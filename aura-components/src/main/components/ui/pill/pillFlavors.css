@@ -39,6 +39,15 @@
     width: 20px;
 }
 
+.THIS .pillText {
+    max-width: 215px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .THIS .pillIcon img, .THIS .pillIcon{
     border-radius:2px;
 }

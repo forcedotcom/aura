@@ -15,17 +15,11 @@
  */
 .THIS {
     position: absolute;
-    border: 1px solid #CCC;
-    border-radius: 4px;
-    background-color: #FFF;
-    box-shadow: 0 0 8px rgba(0, 0, 0, .25);
     z-index: 1;
 }
 
 .THIS ul {
     display: none;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .THIS ul.visible {
@@ -34,6 +28,6 @@
 
 .THIS .listContent ul {
     list-style: none;
-    margin: 0px; 
+    margin: 0px;
     padding: 0px;
 }

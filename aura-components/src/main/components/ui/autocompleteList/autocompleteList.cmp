@@ -40,7 +40,7 @@
     <aura:handler name="matchText" action="{!c.matchText}"/>
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
-    <ul aura:id="list" class="{!v.class + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
+    <ul aura:id="list" class="{!'lookup__list ' + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 

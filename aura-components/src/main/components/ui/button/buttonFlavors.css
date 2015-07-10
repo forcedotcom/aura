@@ -34,11 +34,13 @@
     }
 }
 .THIS:hover,
-.THIS:focus{
+.THIS:focus,
+.THIS.is-selected{
     background:#757D8A;
     background:#757D8A linear-gradient(#7F8792,#535B68);
     text-shadow:0 -1px 1px rgba(0, 0, 0, 0.5);
 }
+
 .THIS .label{
     white-space:nowrap;
     color: #3A3D42;

@@ -56,7 +56,7 @@ public class DialogUITest extends WebDriverTestCase {
     private final String SUBMITTED = "Data Submited";
     private final String NOT_SUBMITTED = "Data Not Submitted";
     private final String RESULT_LABEL = "input[class*='resultLabel']";
-    private final String LAUNCH_DIALOG = "launchDialogButton uiBlock uiButton";
+    private final String LAUNCH_DIALOG = "launchDialogButton uiButton";
 
     public DialogUITest(String name) {
         super(name);

@@ -49,13 +49,9 @@
     },
 
     focus: function(component, event, helper) {
-        var inputComponent = component.getSuper().find('input');
-        if (inputComponent) {
-            var inputHelper = inputComponent.getDef().getHelper();
-            var element = inputHelper.getInputElement(inputComponent);
-            if (element) {
-                element.focus();
-            }
+        var inputElement = helper.getInputElement(component);
+        if (inputElement) {
+            inputElement.focus();
         }
     },
 
@@ -63,6 +59,14 @@
         var parameters = event.getParam('arguments').parameters;
         if (parameters) {
             helper.handleParameterChange(component, parameters);
+        }
+    },
+
+    setAvailableWidth: function (component, event, helper) {
+        var width = event.getParam('arguments').width;
+        var inputElement = helper.getInputElement(component);
+        if (inputElement) {
+            inputElement.style.width = width+"px";
         }
     }
 

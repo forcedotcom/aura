@@ -241,7 +241,7 @@ AttributeSet.prototype.isValueValidForAttribute = function(attributeName, value)
 	if(attributeName.indexOf(".")>=0){
 		var path = attributeName.split(".");
 		attributeName=path[0];
-		if(attributeName!=="body"&&path.length > 1) {
+		if(attributeName!="body"&&path.length > 1) {
 			// We don't validate setting a value 2 levels deep. (v.prop.subprop)
 			return true;
 		}
@@ -274,7 +274,7 @@ AttributeSet.prototype.isTypeOfArray = function(attributeName) {
 	if(attributeName.indexOf(".")>=0){
 		var path = attributeName.split(".");
 		attributeName=path[0];
-		if(attributeName!=="body"&&path.length > 1) {
+		if(attributeName!="body"&&path.length > 1) {
 			// We don't validate setting a value 2 levels deep. (v.prop.subprop)
 			return false;
 		}

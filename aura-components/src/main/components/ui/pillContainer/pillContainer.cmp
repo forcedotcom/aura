@@ -19,7 +19,6 @@
 
     <aura:attribute name="items" type="List"/>
     <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
-    <aura:attribute name="maxCharactersInPill" type="Integer" default="30" description="The maximum number of characters displayed in a pill."/>
     <aura:attribute name="maxLines" type="Integer" default="0" description="Maximum lines to show. Hidden lines can be expanded. Use 0 to disable."/>
     <aura:attribute name="focusOnInput" type="Boolean" default="true" description="Focus on input box when the component is created."/>
     <aura:attribute name="allowRemove" type="Boolean" default="true" description="Allows deleting pills from container."/>

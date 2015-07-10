@@ -565,7 +565,7 @@ AuraLocalizationService.prototype.getYearsInDuration = function(d) {
  * @export
  */
 AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
-    if (!pattern || typeof pattern  !== 'string') {
+    if (!pattern || typeof pattern  != 'string') {
         return false;
     }
     var shouldEscape = false;
@@ -839,7 +839,7 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
             timezone = $A.get("$Locale.timezone");
         }
 
-        if (timezone === "GMT" || timezone === "UTC") {
+        if (timezone == "GMT" || timezone == "UTC") {
             callback(date);
             return;
         }
@@ -871,7 +871,7 @@ AuraLocalizationService.prototype.WallTimeToUTC = function(date, timezone, callb
             timezone = $A.get("$Locale.timezone");
         }
 
-        if (timezone === "GMT" || timezone === "UTC") {
+        if (timezone == "GMT" || timezone == "UTC") {
             callback(date);
             return;
         }
@@ -1000,7 +1000,7 @@ AuraLocalizationService.prototype.getUTCFromWallTime = function(d, timezone) {
         // The timezone id is invalid or for some reason, we can't get timezone info.
         // use default timezone
         timezone = $A.get("$Locale.timezone");
-        if (timezone === "GMT" || timezone === "UTC") {
+        if (timezone == "GMT" || timezone == "UTC") {
             return d;
         }
         try {
@@ -1021,7 +1021,7 @@ AuraLocalizationService.prototype.getWallTimeFromUTC = function(d, timezone) {
         // The timezone id is invalid or for some reason, we can't get timezone info.
         // use default timezone
         timezone = $A.get("$Locale.timezone");
-        if (timezone === "GMT" || timezone === "UTC") {
+        if (timezone == "GMT" || timezone == "UTC") {
             return d;
         }
         try {

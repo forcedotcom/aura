@@ -74,33 +74,51 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         open(URL);
 
         // initial load
-        WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputDateTime']"));
+        WebElement elementInputDate = findDomElement(By.cssSelector(".uiInputDateTime .dateTime-inputDate input"));
+        WebElement elementInputTime = findDomElement(By.cssSelector(".uiInputDateTime .dateTime-inputTime input"));
         WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputDateTime']"));
-        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2004 4:30:00 PM",
-                elementInput.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2004",
+                elementInputDate.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "4:30 PM",
+                elementInputTime.getAttribute("value"));
         assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2004 4:30:00 PM",
                 elementoutput.getText());
 
         // Tab out
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("Oct 23, 2005 9:30:00 AM");
-        auraUITestingUtil.pressTab(elementInput);
+        elementInputDate.click();
+        elementInputDate.clear();
+        elementInputTime.clear();
+        elementInputDate.sendKeys("Oct 23, 2005");
+        auraUITestingUtil.pressTab(elementInputDate);
+        elementInputTime.click();
+        elementInputTime.clear();
+        elementInputTime.sendKeys("9:30 AM");
+        auraUITestingUtil.pressTab(elementInputTime);
 
-        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2005 9:30:00 AM",
-                elementInput.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2005",
+                elementInputDate.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "9:30 AM",
+                elementInputTime.getAttribute("value"));
         assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2005 9:30:00 AM",
                 elementoutput.getText());
 
         // Submit click
-        elementInput.click();
-        elementInput.clear();
-        elementInput.sendKeys("Oct 23, 2006 9:30:00 AM");
+        elementInputDate.click();
+        elementInputDate.clear();
+        elementInputTime.clear();
+        elementInputDate.sendKeys("Oct 23, 2006");
+        auraUITestingUtil.pressTab(elementInputDate);
+        elementInputTime.click();
+        elementInputTime.clear();
+        elementInputTime.sendKeys("9:30 AM");
+        auraUITestingUtil.pressTab(elementInputTime);
         WebElement elementButton = findDomElement(By.cssSelector("button[title~='DateTime']"));
         elementButton.click();
 
-        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2006 9:30:00 AM",
-                elementInput.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "Oct 23, 2006",
+                elementInputDate.getAttribute("value"));
+        assertEquals("InputDateTime component rendered with wrong value", "9:30 AM",
+                elementInputTime.getAttribute("value"));
         assertEquals("outputDateTime component rendered with wrong value", "Oct 23, 2006 9:30:00 AM",
                 elementoutput.getText());
     }

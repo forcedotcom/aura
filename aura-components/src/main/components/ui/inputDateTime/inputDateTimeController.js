@@ -17,7 +17,7 @@
 	clearValue: function(component, event, helper) {
 		component.set("v.value", "");
 	},
-	
+
 	click: function(component, event, helper) {
         event.preventDefault();
         var concreteCmp = component.getConcreteComponent();
@@ -26,57 +26,91 @@
     },
 
     doInit: function(component, event, helper) {
-        // Set placeholder
-        var format = component.get("v.format");
-        if (!format) {
-            format = $A.get("$Locale.datetimeFormat");
+        if ($A.get("$Browser.formFactor") == "DESKTOP") {
+            helper.updateTimeFormat(component);
+            var dateFormat = component.get("v.dateFormat"),
+                timeFormat = component.get("v.timeFormat");
+            dateFormat = $A.util.isEmpty(dateFormat) ? $A.get("$Locale.dateFormat") : dateFormat;
+            timeFormat = $A.util.isEmpty(timeFormat) ? $A.get("$Locale.timeFormat") : timeFormat;
+
+            if ($A.util.isEmpty(component.get("v.placeholder"))) {
+                component.set("v.placeholder", dateFormat);
+            }
+            if ($A.util.isEmpty(component.get("v.timePlaceholder"))) {
+                component.set("v.timePlaceholder", timeFormat);
+            }
+        } else {
+            // Set placeholder
+            var format = component.get("v.format");
+            if (!format) {
+                format = $A.get("$Locale.datetimeFormat");
+            }
+            component.set("v.placeholder", format);
         }
-        component.set("v.placeholder", format);
     },
 
     openDatePicker: function(component, event, helper) {
-        var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
-        helper.displayDatePicker(concreteCmp);
+        helper.displayDatePicker(component);
+    },
+
+    openTimePicker: function(component, event, helper) {
+        event.stopPropagation();
+        helper.displayTimePicker(component);
     },
 
     setValue: function(component, event, helper) {
-        var outputCmp = component.find("inputText");
-        var elem = outputCmp ? outputCmp.getElement() : null;
-        var value = elem ? elem.value : null;
-        var format = component.get("v.format");
-        if (!format) { // use default format
-            format = $A.get("$Locale.datetimeFormat");
-        }
-        var langLocale = component.get("v.langLocale");
-        var secs = 0;
-        var ms = 0;
-        if (value) {
-            var currDate = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
-            // if invalid text is entered in the inputText, currentDate will be null
-            if (!$A.util.isUndefinedOrNull(currDate)) {
-                secs = currDate.getUTCSeconds();
-                ms = currDate.getUTCMilliseconds();
+        if ($A.get("$Browser.formFactor") == "DESKTOP") {
+            var dateValue = event.getParam("value"),
+                selectedHours = event.getParam("hours"),
+                selectedMinutes = event.getParam("minutes");
+
+            var hasNewDate = !$A.util.isUndefinedOrNull(dateValue),
+                hasNewTime = !$A.util.isUndefinedOrNull(selectedHours) && !$A.util.isUndefinedOrNull(selectedMinutes);
+
+            if (hasNewDate) {
+                helper.setDateValue(component, dateValue);
+            } else if (hasNewTime) {
+                helper.setTimeValue(component, selectedHours, selectedMinutes);
             }
+
+        } else {
+            var outputCmp = component.find("inputDate");
+            var elem = outputCmp ? outputCmp.getElement() : null;
+            var value = elem ? elem.value : null;
+            var format = component.get("v.format");
+            if (!format) { // use default format
+                format = $A.get("$Locale.datetimeFormat");
+            }
+            var langLocale = component.get("v.langLocale");
+            var secs = 0;
+            var ms = 0;
+            if (value) {
+                var currDate = $A.localizationService.parseDateTimeUTC(value, format, langLocale);
+                // if invalid text is entered in the inputDate, currentDate will be null
+                if (!$A.util.isUndefinedOrNull(currDate)) {
+                    secs = currDate.getUTCSeconds();
+                    ms = currDate.getUTCMilliseconds();
+                }
+            }
+
+            var dateValue = event.getParam("value");
+            var selectedHours = event.getParam("hours");
+            var selectedMinutes = event.getParam("minutes");
+            var newDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale);
+
+            var targetTime = Date.UTC(newDate.getUTCFullYear(),
+                                      newDate.getUTCMonth(),
+                                      newDate.getUTCDate(),
+                                      selectedHours,
+                                      selectedMinutes,
+                                      secs,
+                                      ms);
+            var d = new Date(targetTime);
+
+            var timezone = component.get("v.timezone");
+            $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
+                component.set("v.value", $A.localizationService.toISOString(utcDate));
+            });
         }
-
-        var dateValue = event.getParam("value");
-        var selectedHours = event.getParam("hours");
-        var selectedMinutes = event.getParam("minutes");
-        var newDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale);
-
-        var targetTime = Date.UTC(newDate.getUTCFullYear(),
-                                  newDate.getUTCMonth(),
-                                  newDate.getUTCDate(),
-                                  selectedHours,
-                                  selectedMinutes,
-                                  secs,
-                                  ms);
-        var d = new Date(targetTime);
-
-        var timezone = component.get("v.timezone");
-        $A.localizationService.WallTimeToUTC(d, timezone, function(utcDate) {
-            component.set("v.value", $A.localizationService.toISOString(utcDate));
-        });
     }
 })

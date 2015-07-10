@@ -18,5 +18,15 @@
 <aura:component>
     <aura:attribute name="value" type="String"/>
     <aura:attribute name="format" type="String"/>
-    <ui:inputDateTime aura:id="dateTimePickerTest" label="label" displayDatePicker="true" class="date_input_box" value="{!v.value}" format="{!v.format}"/>
+    <aura:attribute name="dateFormat" type="String"/>
+    <aura:attribute name="timeFormat" type="String"/>
+
+    <ui:inputDateTime aura:id="dateTimePickerTest"
+                      label="label"
+                      displayDatePicker="true"
+                      class="date_input_box"
+                      value="{!v.value}"
+                      format="{!v.format}"
+                      dateFormat="{!v.dateFormat}"
+                      timeFormat="{!v.timeFormat}"/>
 </aura:component>

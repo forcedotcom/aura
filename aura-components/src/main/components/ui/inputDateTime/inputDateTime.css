@@ -21,7 +21,9 @@ div.THIS {
 }
 
 .THIS + .datePicker-openIcon,
-.THIS .datePicker-openIcon {
+.THIS .datePicker-openIcon,
+.THIS + .timePicker-openIcon,
+.THIS .timePicker-openIcon {
     position: relative;
     vertical-align: middle;
     left: -22px;
@@ -48,4 +50,33 @@ div.THIS {
 .THIS + .hide,
 .THIS .hide {
     display: none;
+}
+
+.THIS.wrapper,
+.THIS .wrapper {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.THIS .dateTime-inputDate {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    width: 50%;
+}
+
+.THIS .dateTime-inputDate > a.datePicker-openIcon {
+    right: 50%;
+    padding-right: 0px;
+    margin-right: 16px;
+}
+
+.THIS .form--stacked {
+    width: 50%;
+    margin-left: 8px;
 }

@@ -21,7 +21,7 @@
  */
 var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
     this.config = config;
-    this.counter = 1;
+    this.counter = 0;
     this["enabled"] = true;
 };
 
@@ -56,6 +56,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
     var auraXHR = arguments[0];
     var options = arguments[4];
     var ret = config["fn"].apply(config["scope"], arguments);
+
     if (ret) {
         var startMark = this.collector["markStart"](TransportMetricsPlugin.NAME, 'request');
         var actionDefs = [];
@@ -64,7 +65,9 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
                 actionDefs.push(auraXHR.actions[id].getDef() + '[' + id + ']');
             }
         }
+
         auraXHR.marker = this.counter++;
+
         startMark["context"] = {
             "aura.num"      : auraXHR.marker,
             "requestLength" : auraXHR.length,
@@ -76,7 +79,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
 };
 
 TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR */) {
-    var config = Array.prototype.shift.apply(arguments);
+    var config  = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
     var endMark = this.collector["markEnd"](TransportMetricsPlugin.NAME, "request");
     endMark["context"] = {
@@ -85,6 +88,7 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
         "statusText"     : auraXHR.request.statusText,
         "responseLength" : auraXHR.request.responseText.length
     };
+
     return config["fn"].apply(config["scope"], arguments);
 };
 
@@ -95,7 +99,7 @@ TransportMetricsPlugin.prototype.bind = function (metricsService) {
 
 //#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
-TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
+TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transactionConfig) {
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
@@ -114,6 +118,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
             delete queue[id];
         }
     }
+
     return procesedMarks;
 };
 //#end

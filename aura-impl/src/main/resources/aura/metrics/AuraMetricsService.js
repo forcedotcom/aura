@@ -271,27 +271,28 @@ Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, co
  * @public
  * @export
 **/
-Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config) {
-    config = config || {};
+Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config, postProcess) {
     var id             = (ns || Aura.Services.MetricsService.DEFAULT) + ':' + name,
         transaction    = this.transactions[id],
-        transactionCfg = (transaction && transaction["config"]) || {},
-        beacon         = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[Aura.Services.MetricsService.DEFAULT],
-        postProcess    = typeof config === 'function' ? config : (config["postProcess"] || transactionCfg["postProcess"]);
+        transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
+        beacon         = this.beaconProviders[ns] ? this.beaconProviders[ns] : this.beaconProviders[Aura.Services.MetricsService.DEFAULT];
+
+    postProcess = typeof config === 'function' ? config : postProcess || transactionCfg["postProcess"];
 
     if (transaction && (beacon || postProcess || !this.clearCompleteTransactions)) {
-        var skipPluginPostProcessing = config["skipPluginPostProcessing"] || transactionCfg["skipPluginPostProcessing"],
-            context = transactionCfg["context"] || {},
+        var skipPluginPostProcessing = transactionCfg["skipPluginPostProcessing"],
             parsedTransaction = {
                 "id"            : id,
                 "ts"            : transaction["ts"],
                 "duration"      : this.time() - transaction["ts"],
                 "pageStartTime" : this.pageStartTime,
                 "marks"         : {},
-                "unixTS"        : !Aura.Services.MetricsService.PERFTIME, // If the browser does not support performance API, all transactions will be Unix Timestamps
-                "context"       : $A.util.apply(context, config["context"], true, true)
+                "context"       : transactionCfg["context"] || {},
+                "unixTS"        : !Aura.Services.MetricsService.PERFTIME // If the browser does not support performance API, all transactions will be Unix Timestamps
             };
-
+        
+        // Walk over the collected marks to scope the ones relevant for this transaction 
+        // (Between time tart and end)
         for (var plugin in this.collector) {
             var instance = this.pluginInstances[plugin];
 
@@ -300,10 +301,10 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
                     initialOffset     = transaction["offsets"] && (transaction["offsets"][plugin] || 0),
                     tMarks            = pluginCollector.slice(initialOffset),
                     pluginPostProcess = instance && instance.postProcess,
-                    parsedMarks       = !skipPluginPostProcessing && pluginPostProcess ? instance.postProcess(tMarks) : tMarks;
+                    parsedMarks       = !skipPluginPostProcessing && pluginPostProcess ? instance.postProcess(tMarks, transactionCfg) : tMarks;
 
                 //#if {"excludeModes" : ["PRODUCTION"]}
-                if (!skipPluginPostProcessing && !pluginPostProcess && this.defaultPostProcessing) {
+                if (!skipPluginPostProcessing && !pluginPostProcess) {
                     parsedMarks = this.defaultPostProcessing(tMarks);
                 }
                 //#end
@@ -336,6 +337,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
         if (!this.inTransaction()) {
             this.clearMarks();
         }
+
     } else {
         // If there is nobody to process the transaction, we just need to clean it up.
         delete this.transactions[id];
@@ -593,6 +595,15 @@ Aura.Services.MetricsService.prototype.getPageStartTime = function () {
 **/
 Aura.Services.MetricsService.prototype.time = function () {
     return Aura.Services.MetricsService.TIMER();
+};
+
+/**
+ * Returns if the resolution is microseconds (using the performance API if supported)
+ * @public
+ * @export
+**/
+Aura.Services.MetricsService.prototype.microsecondsResolution = function () {
+    return Aura.Services.MetricsService.PERFTIME;
 };
 
 /**

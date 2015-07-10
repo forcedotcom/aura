@@ -88,7 +88,7 @@ public final class ValidationUtilTest extends AuraValidationTestCase {
         assertTrue(controllerDefFileName, controllerDefFileName.endsWith("/ui/button/buttonController.js"));
         // we can use getBundle to get all descriptors in the bundle
         List<DefDescriptor<?>> bundleDescs = componentDef.getBundle();
-        assertEquals(3, bundleDescs.size());
+        assertEquals(5, bundleDescs.size());
         assertTrue(bundleDescs.contains(controllerDesc));
 
         // finding java definitions

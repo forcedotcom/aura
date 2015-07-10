@@ -22,7 +22,8 @@
         'dragstart',
         'dragend',
         'dragenter',
-        'dragleave'
+        'dragleave',
+        'focus'
     ],
     initialize: function (cmp) {
         // Internal variables we use

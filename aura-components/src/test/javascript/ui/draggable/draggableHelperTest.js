@@ -49,7 +49,8 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 					return this.data[key];
 				},
 				setDragImage : function() {setDragImageFired = true;}
-			}
+			}, 
+			target : "targetEvent"
 		};	
 		var targetComponent = {
 			get : function(expression){
@@ -87,6 +88,7 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			var expected = {
 				type : expectedType,				
 				dragComponent : targetComponent,
+				dragComponentTarget : "targetEvent",
 				data : expectedDataTransfer,
 				isInAccessibilityMode : false
 			};		
@@ -218,12 +220,14 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			//Arrange
 			var expected = {
 				type : "move",
-				dragComponent : targetComponent
+				dragComponent : targetComponent,
+				dragComponentTarget : "targetEvent"
 			};
 			var targetEvent = {
 				dataTransfer : {
 					dropEffect : "copy"
-				}
+				},
+				target: "targetEvent"
 			};
 			var auraMock = Mocks.GetMock(targetHelper, "exitDragOperation", function(targetComponent) {fired = true;});
 			//Act

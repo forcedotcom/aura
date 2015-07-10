@@ -40,19 +40,23 @@
 	
 	fireDragEnter: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragEnter(component, component.getElement(), params.isInAccessibilityMode);
+		var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;
+		helper.fireDragEnter(component, target, params.isInAccessibilityMode);
 	},
 	
 	fireDragLeave: function (component, event, helper) {
 		var params = event.getParam("arguments");
-		helper.fireDragLeave(component, component.getElement(), params.isInAccessibilityMode);
+		var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;
+		helper.fireDragLeave(component, target, params.isInAccessibilityMode);
 	},
 	
 	fireDrop: function (component, event, helper) {
 		var params = event.getParam("arguments");
 		$A.util.forEach(params.dragComponents, function(dragComponent) {
 			if (dragComponent.isValid()) {
-				helper.fireDrop(component, dragComponent.get("v.type"), dragComponent.get("v.dataTransfer"), dragComponent, component.getElement(), params.isInAccessibilityMode);
+				var dataTransfer = dragComponent.getConcreteComponent().getDef().getHelper().getDataTransfer(dragComponent, event);
+				var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;
+				helper.fireDrop(component, dragComponent.get("v.type"), dataTransfer, dragComponent, target, params.isInAccessibilityMode);
 			}	
 		});
 	}

@@ -18,8 +18,9 @@
 <aura:event type="COMPONENT" description="Event fired during drag and drop operation.">
 	<aura:attribute name="type" type="String" description="Drag and drop operation type: can be either copy, link, move, or none."/>
 	<aura:attribute name="dragComponent" type="Aura.Component[]" description="The dragged component."/>
+	<aura:attribute name="dragComponentTarget" type="Object" description="event.target of a draggable element received drag events."/>
 	<aura:attribute name="dropComponent" type="Aura.Component[]" description="The dropzone component."/>
-	<aura:attribute name="dropComponentTarget" type="Object" description="Target event component receiving drop."/>
+	<aura:attribute name="dropComponentTarget" type="Object" description="event.target of a dropzone element received drag events."/>
 	<aura:attribute name="data" type="Object" description="Data that is being transferred during a drag and drop operation."/>
 	<aura:attribute name="dropComplete" type="Boolean" description="Set to true if drop operation has been completed or false otherwise. The value should only be set when drop operation is performed."/>
 	<aura:attribute name="isInAccessibilityMode" type="Boolean" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>

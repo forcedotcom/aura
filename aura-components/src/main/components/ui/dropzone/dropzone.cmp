@@ -38,14 +38,17 @@
 	<aura:method name="exitDragOperation" action="{!c.exitDragOperation}" access="public"/>
 	
 	<aura:method name="fireDragEnter" action="{!c.fireDragEnter}" access="public">
+		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
 	<aura:method name="fireDragLeave" action="{!c.fireDragLeave}" access="public">
+		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>
 	
 	<aura:method name="fireDrop" action="{!c.fireDrop}" access="public">
+		<aura:attribute name="target" type="Object" description="The event target for dragend."/>
 		<aura:attribute name="dragComponents" type="Aura.Component[]" required="true" description="The drag components that are dropped."/>
 		<aura:attribute name="isInAccessibilityMode" type="Boolean" default="true" description="Set to true if drag and drop operation is initiated in accessibility mode, i.e. through keyboard interaction."/>
 	</aura:method>

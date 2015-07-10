@@ -42,26 +42,26 @@
 
 			// Refresh accessibility menu
 			var menu = component.find("menu");
-			menu.getEvent("refresh").fire();		
+			menu.getEvent("refresh").fire();
 			
 			// Set referenceElement
 			var menuList = component.find("menuList");
-			menuList.set("v.referenceElement", draggables[0]);
+			menuList.set("v.referenceElement", target);
 			
 			// open accessibility menu
 			menu.getEvent("popupTriggerPress").fire();
 			
 			// position accessibility menu
-			this.position(menu, target);
+			this.position(menuList, target);
 		} else {
 			component.set("v.dropzoneMenu", []);
-			this.fireDragEnd(draggables,false);
+			this.fireDragEnd(draggables, false, target);
 		} 			
 	},
-
+	
 	position: function(targetComponent, referenceEl) {
 		targetComponent.constraints = [];
-
+		
 		// This is for positioning on the center right of the target component
 		targetComponent.constraints.push(this.positioningLib.panelPositioning.createRelationship({
 			align:'right center', 
@@ -79,7 +79,7 @@
 			boxDirections: {
 				top:false,
 				bottom:true,
-				left:false,
+				left:true,
 				right:true
 			},
 			enable: true,
@@ -103,26 +103,29 @@
 	},
 	
 	handleMenuCollapse: function(component) {
-		var menu = component.find("menu");
-		var menuElement = menu.getElement();
+		var menuList = component.find("menuList");
+		var menuElement = menuList.getElement();
 		menuElement.style.top = "0px";
 		menuElement.style.left = "0px";
 		
-		if(menu.constraints) {
-			menu.constraints.forEach(function(constraint) {
+		if(menuList.constraints) {
+			menuList.constraints.forEach(function(constraint) {
 				constraint.destroy();
 			});
 		}
 		
 		var draggables = component.get("v.draggables");
 		if (draggables.length > 0) {
-			this.fireDragEnd(draggables, this.$isDropPerformed$);
+			var referenceElement = component.find("menuList").get("v.referenceElement");
+			this.fireDragEnd(draggables, this.$isDropPerformed$, referenceElement);
 			
 			component.set("v.draggables", []);
 			this.$isDropPerformed$ = false;
 			
 			var type = draggables[0].get("v.type");
 			this.exitDragOperation(this.getDropzoneComponents(type));
+			
+			referenceElement.focus();
 		}
 	},
 	

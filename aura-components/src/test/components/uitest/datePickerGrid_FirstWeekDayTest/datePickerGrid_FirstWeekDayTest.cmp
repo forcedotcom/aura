@@ -11,35 +11,34 @@
     limitations under the License.
 -->
 <aura:component>
-    <!--attributes-->
-    <aura:attribute name="firstDayOfWeek" type="String" default="" />
-    <aura:attribute name="namesOfWeekdaysStr" type="String" default="" />
-    <aura:attribute name="totalWeekdays" type="String" default="" />
-
-    <!--dom-->
-    <div style="padding:15px;">
-        <div>
-            <h1>Datepicker Grid: First weekday</h1>
-            <hr />
-        </div>
+<!--attributes-->
+<aura:attribute name="firstDayOfWeek" type="String" default="" />
+<aura:attribute name="namesOfWeekdaysStr" type="String" default="" />
+<aura:attribute name="totalWeekdays" type="String" default="" />
+<!--dom-->
+<div style="padding:15px;">
+    <div>
+        <h1>Datepicker Grid: First weekday</h1>
+        <hr />
+    </div>
+    <div>
+        <div style="color:blue;margin-bottom:5px;"><b><u>Runtime Attributes</u></b></div>
         <div class="attributeValues">
             <b>v.firstDayOfWeek</b>
             <i>{!v.firstDayOfWeek}</i>
         </div>
         <div class="attributeValues">
             <b>v.namesOfWeekdaysStr</b>
-            <i>{!v.namesOfWeekdaysStr}</i>
-        </div>
-        <div class="attributeValues">
-            <b>v.totalWeekdays</b>
-            <i>{!v.totalWeekdays}</i>
-        </div>
-        <div class="datepickerWrap">
-           <ui:datePickerGrid aura:id="grid" 
-                selectedDate="2015-4-15"
-                date="15"
-                month="4"
-                year="2015"/>
+            <i>{!v.namesOfWeekdaysStr} (Count={!v.totalWeekdays})</i>
         </div>
     </div>
+
+    <div class="datepickerWrap">
+        <ui:datePickerGrid aura:id="grid"
+        selectedDate="2015-4-15"
+        date="15"
+        month="4"
+        year="2015"/>
+    </div>
+</div>
 </aura:component>

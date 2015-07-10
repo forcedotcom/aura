@@ -466,7 +466,7 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
 AuraClientService.prototype.getCurrentTransactionId = function() {
     if (!this.inAuraLoop()) {
         $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
-        return;
+        return null;
     }
         return this.currentTransactionId;
 };
@@ -1618,12 +1618,11 @@ AuraClientService.prototype.deDupe = function(action) {
     var key, entry, dupes;
 
     if (!action.isStorable()) {
-        return;
+        return false;
     }
     try {
         key = action.getStorageKey();
     } catch (e) {
-        // whoops, well, shit... no key. abort.
         return false;
     }
     entry = this.actionStoreMap[key];

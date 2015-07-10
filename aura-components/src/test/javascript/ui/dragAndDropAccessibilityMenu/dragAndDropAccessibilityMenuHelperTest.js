@@ -38,12 +38,13 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		get: function(expression){ return expression},
 		getGlobalId : function(){},
 		getElement : function(){
-			return{
+			return {
 				offsetHeight: 1,
 				offsetWidth: 1,
-				getBoundingClientRect : function(){
+				getBoundingClientRect: function(){
 					return {top:0, left:0};
-				}
+				},
+				focus: function(){}
 			}
 		}
 	};
@@ -95,7 +96,7 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 					},
 					find : function(key){
 						return {
-							getEvent : function(name){ return {fire: function(){return name}}},
+							getEvent : function(name){ return {fire: function(){return name;}} },
 							getElement: function(){
 								return {
 									style :{top:0, left:0},
@@ -140,8 +141,8 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		[Fact]
 		function testAreInSameContext(){
 			//arrange
-			dropzoneCmp.getGlobalId = function(){return "1234"};
-			draggable.getGlobalId = function(){return "1234"};
+			dropzoneCmp.getGlobalId = function(){return "1234";};
+			draggable.getGlobalId = function(){return "1234";};
 			//action
 			var result;
 			mock$A(function(){
@@ -154,8 +155,8 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		[Fact]
 		function testAreInDifferentContext(){
 			//arrange
-			dropzoneCmp.getGlobalId = function(){return "1234"};
-			draggable.getGlobalId = function(){return "4321"};
+			dropzoneCmp.getGlobalId = function(){return "1234";};
+			draggable.getGlobalId = function(){return "4321";};
 			//action
 			var result;
 			mock$A(function(){
@@ -194,8 +195,16 @@ Test.Components.Ui.dragAndDropAccessibilityMenu.HelperTest = function(){
 		function testHandleMenuCollapse(){
 			//arrange
 			dropzoneCmp.exitDragOperation = false;
+
 			var cmp = {
-				find: function(){ return { getElement: function(){ return { style:{ top : "", left : ""} } } } },
+				find: function(selector){ 
+					if (selector === "menuList") {
+						return { 
+							get: function(){ return draggable.getElement(); },
+							getElement: function(){ return { style:{top : "", left : ""} }; } 
+						} 
+					}
+				},
 				get: function(){ return [draggable];},
 				set: function(){}
 			};

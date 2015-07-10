@@ -103,6 +103,12 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
 PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     var valueProvider=this.valueProvider;
     var expression = this.expression;
+    
+    if(this.isGlobal){
+        $A.expressionService.removeListener(this,key,cmp);
+        return;
+    }
+
     while(valueProvider instanceof PassthroughValue){
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();

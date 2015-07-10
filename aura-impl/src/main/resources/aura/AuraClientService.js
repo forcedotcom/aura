@@ -20,15 +20,12 @@
  * @private
  */
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
-    this.iteration = 0;
     this.length = 0;
     this.marker = 0;
     this.request = undefined;
     this.actions = {};
     this.time = undefined;
-    this.iteration += 1;
     this.transactionId = undefined;
-    this.reset();
 };
 
 /**
@@ -38,7 +35,6 @@ Aura.Services.AuraClientService$AuraXHR.prototype.reset = function() {
     this.request = undefined;
     this.actions = {};
     this.time = undefined;
-    this.iteration += 1;
 };
 
 /**
@@ -1694,13 +1690,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var qs;
     try {
         qs = this.buildParams({
-            "message" : $A.util.json.encode({
-                "actions" : actionsToSend
-            }),
-            "aura.token" : this._token,
+            "message"      : $A.util.json.encode({ "actions" : actionsToSend }),
+            "aura.token"   : this._token,
             "aura.context" : context.encodeForServer(), 
-            "sid" : this._sid
+            "sid"          : this._sid
         });
+
     } catch (e) {
         for (i = 0; i < actions.length; i++) {
             action = actions[i];
@@ -1718,7 +1713,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.request = this.createXHR();
     auraXHR.request["open"](method, url, true);
     auraXHR.request["onreadystatechange"] = function() {
-        // Ordering is important. auraXHR will no longer be valid after processed.
+    // Ordering is important. auraXHR will no longer be valid after processed.
+
         if (processed === false && auraXHR.request["readyState"] === 4) {
             processed = true;
 

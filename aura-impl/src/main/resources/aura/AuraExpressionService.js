@@ -157,7 +157,7 @@ AuraExpressionService.prototype.removeListener = function (reference, expression
     var globalId = valueProvider.getGlobalId();
     if (consumers.hasOwnProperty(globalId)) {
         delete consumers[globalId][expression];
-        if(!Object.keys(consumers[globalId].length)){
+        if(!Object.keys(consumers[globalId]).length){
             delete consumers[globalId];
         }
     }

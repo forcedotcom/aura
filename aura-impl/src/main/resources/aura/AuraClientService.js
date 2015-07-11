@@ -2278,8 +2278,10 @@ AuraClientService.prototype.clearPreviousAbortableActions = function() {
  * This function must be called from within an event loop.
  *
  * @param {Action} action the action to enqueue
- * @memberOf AuraClientService
+ * @param {Boolean} background Set to true to run the action in the background, otherwise the value of action.isBackground() is used.
  * @export
+ * @public
+ * @platform
  */
 AuraClientService.prototype.enqueueAction = function(action, background) {
 

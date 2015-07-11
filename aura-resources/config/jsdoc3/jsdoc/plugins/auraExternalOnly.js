@@ -27,7 +27,8 @@ function isFilteredByExternal(value) {
     var importantKinds = {
         "member": true,
         "function": true, 
-        "class": true
+        "class": true,
+        "namespace": true
     };
 
     return importantKinds[value.kind]===true;

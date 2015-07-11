@@ -31,3 +31,21 @@
 .THIS .paramType {
 	color: cornflowerblue;
 }
+
+.THIS .examples-list {
+	list-style: none;
+	padding: 0;
+
+}
+
+.THIS .examples-list li {
+	margin-bottom: 15px;
+}
+
+.THIS .examples-list li:last-child {
+	margin-bottom: 0;
+}
+
+.THIS .examples-list code {
+	padding: 10px;
+}

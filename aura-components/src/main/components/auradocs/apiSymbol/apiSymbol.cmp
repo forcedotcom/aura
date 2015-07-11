@@ -21,34 +21,41 @@
     <td><a name="{!v.symbol.name}"/>
         <h4>
             {!v.symbol.name}
-            <small class="params">
-                (<aura:iteration items="{!v.symbol.params}" var="param">
-                    <span class="param">
-                    	<aura:iteration items="{!param.type.names}" var="name" indexVar="index">
-                       		<aura:if isTrue="{!name != ''}">
-                       			<span class="paramType">{!name}&nbsp;</span>
-                       			<aura:if isTrue="{!index != (param.type.names.length - 1)}">
-                            		<span class="paramType">{!'|'}&nbsp;</span>
+            <aura:if isTrue="{!v.symbol.kind == 'function'}">
+                <small class="params">
+                    (<aura:iteration items="{!v.symbol.params}" var="param">
+                        <span class="param">
+                        	<aura:iteration items="{!param.type.names}" var="name" indexVar="index">
+                           		<aura:if isTrue="{!name != ''}">
+                           			<span class="paramType">{!name}&nbsp;</span>
+                           			<aura:if isTrue="{!index != (param.type.names.length - 1)}">
+                                		<span class="paramType">{!'|'}&nbsp;</span>
+                                	</aura:if>
                             	</aura:if>
-                        	</aura:if>
-                        </aura:iteration>
-                        {!param.name}
-                    </span>
-                </aura:iteration>)
-            </small>
-			<small>
-		        <aura:if isTrue="{!v.symbol.returns &amp;&amp; v.symbol.returns.length>0}">
-		        	<aura:iteration items="{!v.symbol.returns[0].type.names}" var="name" indexVar="index">
-		        		:&nbsp;<span class="params paramType">{!name}</span>
-		        		<aura:if isTrue="{!index != (v.symbol.returns[0].type.names.length - 1)}">
-		            		:&nbsp;<span class="params paramType">{!'|'}</span>
-		            	</aura:if>
-		            </aura:iteration>
-		        </aura:if>
-			</small>
+                            </aura:iteration>
+                            {!param.name}
+                        </span>
+                    </aura:iteration>)
+                </small>
+    			<small>
+    		        <aura:if isTrue="{!v.symbol.returns &amp;&amp; v.symbol.returns.length>0}">
+    		        	<aura:iteration items="{!v.symbol.returns[0].type.names}" var="name" indexVar="index">
+    		        		:&nbsp;<span class="params paramType">{!name}</span>
+    		        		<aura:if isTrue="{!index != (v.symbol.returns[0].type.names.length - 1)}">
+    		            		:&nbsp;<span class="params paramType">{!'|'}</span>
+    		            	</aura:if>
+    		            </aura:iteration>
+    		        </aura:if>
+    			</small>
+            </aura:if>
         </h4>
         
         <p><aura:unescapedHtml value="{!v.symbol.classDesc + v.symbol.description}"/></p>
+        <aura:if isTrue="{! !empty(v.symbol.deprecated)}">
+            <p>
+                <ui:stamp severity="inverse">DEPRECATED</ui:stamp>&nbsp;<aura:unescapedHtml value="{!v.symbol.deprecated}"/>
+            </p>
+        </aura:if>
         <aura:if isTrue="{!v.symbol.params.length > 0}">
             <p><auradocs:apiParams params="{!v.symbol.params}"/></p>
         </aura:if>
@@ -88,10 +95,10 @@
         
         <aura:if isTrue="{!v.symbol.examples &amp;&amp; v.symbol.examples.length>0}">
             <h6 class="nav-header">Examples</h6>
-            <ul class="nav nav-list">
+            <ul class="nav nav-list examples-list">
                 <aura:iteration items="{!v.symbol.examples}" var="ex">
                     <li>
-                        <aura:unescapedHtml value="{!ex}"/>
+                        <code><aura:unescapedHtml value="{!ex}"/></code>
                     </li>
                 </aura:iteration>
             </ul>

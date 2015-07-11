@@ -26,8 +26,8 @@
             <ui:block>
                 <aura:set attribute="right">{!v.status}</aura:set>
                 <h2>
-                    {!v.title}&nbsp;
-                    <small>{!v.subtitle}&nbsp;</small>
+                    {!v.title}
+                    <small>{!v.subtitle}</small>
                     {!v.labels}
                 </h2>
                 <p>{!v.description}</p>

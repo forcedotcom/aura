@@ -1,0 +1,15 @@
+.flavorTestSample_extends--default, .flavorTestSample_extends--foo, .flavorTestSample_extends--baz {color:red}
+.flavorTestSample_extends--default .child, .flavorTestSample_extends--foo .child, .flavorTestSample_extends--baz .child {text-decoration:underline}
+.flavorTestSample_extends--default.active .child, .flavorTestSample_extends--foo.active .child, .flavorTestSample_extends--baz.active .child, .flavorTestSample_extends--default:active>a.first:child, .flavorTestSample_extends--foo:active>a.first:child, .flavorTestSample_extends--baz:active>a.first:child, .flavorTestSample_extends--juz:active {text-decoration:none}
+.flavorTestSample_extends__element {margin-left:12px}
+.flavorTestSample_extends-faker {margin-right:3px}
+.flavorTestSample_extends-faker__default {vertical-align:middle}
+.flavorTestSample_extends-faker--default {vertical-align:middle}
+.flavorTestSample_extends---default {background:blue}
+.flavorTestSample_extends--foo {background:black; padding:20px}
+.flavorTestSample_extends--foo .child {font-weight:bold}
+.flavorTestSample_extends--bar, .flavorTestSample_extends--baz {font-size:30px}
+.flavorTestSample_extends--lux .flavorTestSample_extends__icon, .flavorTestSample_extends--lax .flavorTestSample_extends__icon {color:blue}
+.flavorTestSample_extends--lux, .flavorTestSample_extends--lax, .flavorTestSample_extends--lux.input, .flavorTestSample_extends--lax.input, .flavorTestSample_extends--lux input, .flavorTestSample_extends--lax input {padding:2px}
+.flavorTestSample_extends--lax {padding:3px}
+.flavorTestSample_extends--default, .flavorTestSample_extends--foo, .flavorTestSample_extends--baz {background:black}

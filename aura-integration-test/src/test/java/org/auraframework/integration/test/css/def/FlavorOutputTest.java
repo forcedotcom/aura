@@ -15,12 +15,17 @@
  */
 package org.auraframework.integration.test.css.def;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
+import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.throwable.quickfix.StyleParserException;
+
+import com.salesforce.omakase.broadcast.emitter.SubscriptionException;
 
 /**
  * General unit tests for expected flavor parsed output.
@@ -133,4 +138,67 @@ public class FlavorOutputTest extends StyleTestCase {
         }
     }
 
+    /** flavor extends */
+    public void testFlavorExtendsSimple() throws Exception {
+        DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
+
+        String src = ".THIS--default{color:red} \n"
+                + "   /*@flavor foo, extends default */ \n"
+                + "   .THIS--foo{color:black} \n";
+
+        String fmt = ".%1$s--default, .%1$s--foo {color:red}\n"
+                + ".%1$s--foo {color:black}";
+
+        FlavoredStyleDef def = addStandardFlavor(cmp, src).getDef();
+        String addedClass = Styles.buildClassName(cmp);
+
+        assertEquals(String.format(fmt, addedClass), def.getCode());
+    }
+
+    public void testFlavorExtendsComplex() throws Exception {
+        DefinitionService ds = Aura.getDefinitionService();
+        DefDescriptor<ComponentDef> cmp = ds.getDefDescriptor("markup://flavorTest:sample_extends", ComponentDef.class);
+        DefDescriptor<FlavoredStyleDef> dd = Flavors.standardFlavorDescriptor(cmp);
+        goldFileText(dd.getDef().getCode(), ".css");
+    }
+
+    public void testFlavorExtendsMultiple() throws Exception {
+        try {
+            String src = ".THIS--default{color:red} \n"
+                    + "   .THIS--bar{color:black} \n"
+                    + "   /*@flavor foo, extends default */ \n"
+                    + "   /*@flavor foo, extends bar */ \n"
+                    + "   .THIS--foo{color: green}";
+            addStandardFlavor(addFlavorableComponentDef(), src).getDef();
+            fail("parser should have thrown exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, SubscriptionException.class, "it was already specified to extend");
+        }
+    }
+
+    public void testExtendsUnknownFlavor() throws Exception {
+        try {
+            String src = ".THIS--default{color:red} \n"
+                    + "    /*@flavor foo, extends bar */ \n"
+                    + "   .THIS--foo{color: green}";
+            addStandardFlavor(addFlavorableComponentDef(), src).getDef();
+            fail("parser should have thrown exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, SubscriptionException.class, "unknown flavor");
+        }
+    }
+
+    public void testExtendsMultiLevel() throws Exception {
+        try {
+            String src = ".THIS--default{color:red} \n"
+                    + "   /*@flavor foo, extends default */ \n"
+                    + "   .THIS--foo{color:black} \n"
+                    + "   /*@flavor bar, extends foo */ \n"
+                    + "   .THIS--bar{color: green}";
+            addStandardFlavor(addFlavorableComponentDef(), src).getDef();
+            fail("parser should have thrown exception.");
+        } catch (Exception e) {
+            checkExceptionContains(e, SubscriptionException.class, "multi-level extension not allowed");
+        }
+    }
 }

@@ -24,7 +24,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.impl.css.parser.plugin.AuraFlavorPlugin;
+import org.auraframework.impl.css.parser.plugin.FlavorCollectorPlugin;
+import org.auraframework.impl.css.parser.plugin.FlavorPlugin;
 import org.auraframework.impl.css.parser.plugin.SelectorScopingPlugin;
 import org.auraframework.impl.css.parser.plugin.ThemeFunctionPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
@@ -53,8 +54,7 @@ import com.salesforce.omakase.writer.StyleWriter;
  */
 public final class CssPreprocessor {
     /** Use one of the constructor methods instead */
-    private CssPreprocessor() {
-    }
+    private CssPreprocessor() {}
 
     /** For the initial preprocessing of css, this includes all syntax validations and static rework */
     public static ParserConfiguration initial() {
@@ -135,7 +135,7 @@ public final class CssPreprocessor {
 
         /** enables aura flavors processing */
         public ParserConfiguration flavors(DefDescriptor<FlavoredStyleDef> flavor) {
-            plugins.add(new AuraFlavorPlugin(flavor));
+            plugins.add(new FlavorPlugin(flavor));
             return this;
         }
 
@@ -208,9 +208,9 @@ public final class CssPreprocessor {
                 result.themeExpressions = themeFunctionPlugin.get().parsedExpressions();
             }
 
-            Optional<AuraFlavorPlugin> auraFlavorPlugin = registry.retrieve(AuraFlavorPlugin.class);
-            if (auraFlavorPlugin.isPresent()) {
-                result.flavorNames = auraFlavorPlugin.get().getFlavorNames();
+            Optional<FlavorCollectorPlugin> flavorCollector = registry.retrieve(FlavorCollectorPlugin.class);
+            if (flavorCollector.isPresent()) {
+                result.flavorNames = flavorCollector.get().getFlavorNames();
             }
 
             return result;

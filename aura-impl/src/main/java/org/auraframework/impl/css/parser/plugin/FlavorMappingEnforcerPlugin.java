@@ -32,7 +32,7 @@ import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.Plugin;
 
 /**
- * Handles removing flavor styles that have been overridden.
+ * Enables removing flavor styles that have been overridden via an app's {@link FlavorAssortmentDef}.
  * <p>
  * More specifically, this takes a {@link FlavorMapping} that specifies which {@link FlavoredStyleDef} contains the
  * styling for a particular named flavor and component. If the given {@link FlavoredStyleDef} doesn't match then the
@@ -40,14 +40,15 @@ import com.salesforce.omakase.plugin.Plugin;
  *
  * @see FlavorMapping
  * @see FlavorAssortmentDef
+ * @see FlavorPlugin
  */
-public final class FlavorMappingEnforcer implements Plugin {
+public final class FlavorMappingEnforcerPlugin implements Plugin {
     private final DefDescriptor<FlavoredStyleDef> style;
     private final DefDescriptor<ComponentDef> component;
     private final FlavorMapping mapping;
     private boolean addComment;
 
-    public FlavorMappingEnforcer(DefDescriptor<FlavoredStyleDef> style, FlavorMapping mapping, boolean addComment) {
+    public FlavorMappingEnforcerPlugin(DefDescriptor<FlavoredStyleDef> style, FlavorMapping mapping, boolean addComment) {
         this.mapping = checkNotNull(mapping, "mapping cannot be null");
         this.style = checkNotNull(style, "style cannot be null");
         this.component = Flavors.toComponentDescriptor(this.style);
@@ -56,14 +57,14 @@ public final class FlavorMappingEnforcer implements Plugin {
 
     @Rework
     public void refine(Selector selector) {
-        if (selector.raw().isPresent() && selector.raw().get().content().contains("--")) {
+        if (selector.raw().isPresent() && selector.raw().get().content().contains(FlavorPluginUtil.DELIMITER)) {
             selector.refine();
         }
     }
 
     @Rework
     public void check(ClassSelector classSelector) {
-        Optional<String> flavor = extractFlavor(classSelector.name());
+        Optional<String> flavor = FlavorPluginUtil.extractFlavor(classSelector, Styles.buildClassName(component));
         if (flavor.isPresent()) {
             Optional<DefDescriptor<FlavoredStyleDef>> override = mapping.getLocation(component, flavor.get());
             if (override.isPresent() && !override.get().equals(style)) {
@@ -73,13 +74,5 @@ public final class FlavorMappingEnforcer implements Plugin {
                 classSelector.parent().destroy();
             }
         }
-    }
-
-    private Optional<String> extractFlavor(String className) {
-        String cn = Styles.buildClassName(component) + "--";
-        if (className.startsWith(cn)) {
-            return Optional.of(className.substring(cn.length()));
-        }
-        return Optional.absent();
     }
 }

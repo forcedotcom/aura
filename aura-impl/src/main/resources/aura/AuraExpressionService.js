@@ -110,9 +110,11 @@ AuraExpressionService.prototype.updateGlobalReference = function (expression, ol
     if(reference&&reference.consumers){
         for(var consumer in reference.consumers){
             var component=$A.getComponent(consumer);
-            for(var targetExpression in reference.consumers[consumer]){
-                component.markDirty(targetExpression);
-                component.fireChangeEvent(targetExpression,oldValue,value);
+            if (component) {
+                for(var targetExpression in reference.consumers[consumer]){
+                    component.markDirty(targetExpression);
+                    component.fireChangeEvent(targetExpression,oldValue,value);
+                }
             }
         }
     }

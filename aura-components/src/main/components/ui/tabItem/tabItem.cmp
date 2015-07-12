@@ -36,10 +36,11 @@
      
     <aura:handler name="activateTab" action="{!c.activateTab}" />
     
-    <li aura:id="li" class="{!v.class + ' tabItem' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}" role="presentation">
+    <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}" role="presentation">
 	    <a class="tabHeader" onclick="{!c.onTabActivated}" href="javascript:void(0);" aura:id="tabItem"
            onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onfocus="{!c.onTabHover}" onblur="{!c.onTabUnhover}"
            aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" title="{!v.title}" tabindex="{!v.active ? 0: -1}" role="tab">
+
             <span class="{!v.iconClass}">{!v.icon}</span>
             <span>{!v.title}</span>
 	        <aura:renderIf isTrue="{!v.closable}">

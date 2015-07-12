@@ -252,6 +252,11 @@
             tabItemConfigs.push(this.getTabItemConfig(cmp, tab));
             tabs[id] = tab;
         }
+
+        if (tabCmps && tabCmps[activeTab]) {
+            tabCmps[activeTab].set("v.active", true);
+        }
+
         this.finishInit(cmp, {
             "tabs": tabs,
             "tabIds": tabIds,
@@ -264,6 +269,8 @@
      * @private
      */
     createTabComponent: function (cmp, tabConfig, callback, async) {
+        // TODO: Use createComponent in here instead
+
         var cd, config;
         if (!$A.util.isObject(tabConfig)) {
             return;

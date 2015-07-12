@@ -32,7 +32,7 @@
 
     <aura:handler name="setActive" action="{!c.setActive}" />
  
-    <section class="{!v.class + ' tabBody' + (v.scroll ? ' scrolling' : '') + (v.active ? ' active' : '')}" area-expanded="{!v.active ? 'true' : 'false'}" aura:id="tabBody" role="tabpanel">
+    <section class="{!v.class + ' tabs__content' + (v.scroll ? ' scrolling' : '') + (v.active ? ' active' : '')}" area-expanded="{!v.active ? 'true' : 'false'}" aura:id="tabBody" role="tabpanel">
         {!v.body}
     </section>
        

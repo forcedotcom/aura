@@ -15,18 +15,11 @@
  */
  
 .THIS {
-    background: #eee;
-    list-style: none;
-    border-radius: 5px 5px 0 0;
-    margin-right: 2px;
     list-style: none;
     white-space: nowrap;
 }
 
-.THIS .tabHeader {
-    margin: 0px;
-    color: #363c40;
-    padding: 5px 10px;  
+.THIS a {
     display: block;
     text-decoration: none;
 }
@@ -38,10 +31,6 @@
 	position: relative;
 	text-align: center;
 	margin-left: 10px;
-}
-
-.THIS.active {
-	background: #dc595c;
 }
 
 .THIS.hidden {

@@ -16,11 +16,11 @@
 ({
     SELECTOR: {
         tabsetcmp : 'tabSet',
-        tabitem: '.tabItem.uiTabItem',
-        tabitem_anchor : '.tabItem.uiTabItem .tabHeader',
-        tabitem_active: '.tabItem.uiTabItem.active',
-        tabbody: '.tabBody.uiTab.active',
-        tabbody_active: '.tabBody.uiTab.active'
+        tabitem: '.uiTabItem',
+        tabitem_anchor : '.uiTabItem .tabHeader',
+        tabitem_active: '.uiTabItem.active',
+        tabbody: '.uiTab.active',
+        tabbody_active: '.uiTab.active'
     },
 
     owner: 'sle',

@@ -134,7 +134,7 @@ var AuraDevToolService = function() {
             },
 
             "event": function() {
-                return Event.prototype.statsIndex;
+                return Aura.Event.Event.prototype.statsIndex;
             }
 //#end
         },

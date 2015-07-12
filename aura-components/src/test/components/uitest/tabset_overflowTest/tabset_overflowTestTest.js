@@ -15,11 +15,11 @@
  */
 ({
     CSS_SELECTOR:{
-        tabItems: '.tabItem',
-        visibleTabHeaders: '.tabItem.uiTabItem:not(.hidden) .tabHeader',
-        moreTabHeader: '.tabItem:not(.hidden):not(.uiTabItem) .tabHeader',
-        selectedTabItem : '.tabItem.active',
-        selectedTabBody : '.tabBody.active',
+        tabItems: '.tabs__item',
+        visibleTabHeaders: '.tabs__item.uiTabItem:not(.hidden) .tabHeader',
+        moreTabHeader: '.tabs__item:not(.hidden):not(.uiTabItem) .tabHeader',
+        selectedTabItem : '.tabs__item.active',
+        selectedTabBody : '.tabs__content.active',
         overflowItemsContainer: '.popupTargetContainer.visible',
         overflowItems: '.popupTargetContainer .selectable',
         tabHeaders : '.tabHeader'
@@ -551,7 +551,7 @@
     _verifySelectedTabBody: function(elCmp, expectedText) {
         //trim expected text
         expectedText = $A.util.trim(expectedText || '');
-        
+
         var self = this;
         $A.test.addWaitForWithFailureMessage(
             expectedText,
@@ -578,7 +578,7 @@
         this._verifyOverflowItems(
             elCmp,
             overflowData
-        );     
+        );
     },
     _verifyVisibleItems: function(elCmp, visibleItems){
         var self = this;
@@ -678,7 +678,7 @@
     },
 
     /**
-     * @param  Array elArray Array of dom 
+     * @param  Array elArray Array of dom
      * <a>11</a>
      * <a>22</a>
      * <a>33</a>
@@ -771,7 +771,7 @@
 
 
     verifyOnlyOneTabSelected: function(elCmp){
-        var elArray = elCmp.querySelectorAll('.tabItem.active');
+        var elArray = elCmp.querySelectorAll('.tabs__item.active');
         $A.test.assertEquals(true, elArray.length === 1, 'Only one tab can be selected at a time. Found ' + elArray.length + ' in selected state');
     },
 
@@ -779,7 +779,7 @@
     openOverflowMenu: function(cmp, expectedTabContent){
         var self = this;
         var elCmp = self._getTabOverflowAuraControl(cmp);
-        
+
         self._openOverflowMenu(elCmp);
         self._verifyOverflowMenuOpen(cmp, expectedTabContent);
     },
@@ -800,7 +800,7 @@
     },
 
     fireKeyDown: function (cmp, key, curIdx){
-        var el = cmp.querySelector('.tabList .tabItem.active:not(.hidden) .tabHeader');
+        var el = cmp.querySelector('.tabs__nav .tabs__item.active:not(.hidden) .tabHeader');
         if (el === null){
             // el = document.activeElement;
             el = document.querySelectorAll('.popupTargetContainer.uiPopupTarget.visible .selectable')[curIdx];

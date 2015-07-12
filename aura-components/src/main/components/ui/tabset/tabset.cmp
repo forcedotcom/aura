@@ -26,6 +26,19 @@
     <aura:attribute name="tabItemWidth" type="Integer" description=""/>
     <aura:attribute name="overflowLabel" type="String" default="More" description=""/>
 
+<!--
+    <aura:method name="addTab" description="Add new tab.">
+        <aura:attribute name="index" type="Integer"/>
+    </aura:method>
+    <aura:method name="removeTab" description="Remove a tab.">
+        <aura:attribute name="index" type="Integer"/>
+    </aura:method>
+    <aura:method name="activateTab" description="Activate a tab.">
+        <aura:attribute name="index" type="Integer"/>
+    </aura:method>
+    <aura:method name="getActiveTab" description="Get the currently active tab."/>
+-->
+
     <!-- These should be aura methods instead -->
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
     <aura:registerevent name="removeTab" type="ui:tabsetEvent" description="Remove a tab from the component." />
@@ -45,7 +58,7 @@
     <aura:dependency resource="markup://ui:tab" type="COMPONENT"/>
     <aura:dependency resource="markup://ui:tabItem" type="COMPONENT"/>
 
-    <div class="{!v.class}" aura:id="tabContainer">
+    <div class="{!v.class}" aura:id="tabContainer" aura:flavorable="true">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
            onTabActivated="{!c.onTabActivated}" onTabClosed="{!c.onTabClosed}"
            useOverflowMenu="{!v.useOverflowMenu}" barWidth="{!v.barWidth}"

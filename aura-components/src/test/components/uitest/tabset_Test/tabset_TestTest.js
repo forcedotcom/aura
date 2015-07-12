@@ -190,7 +190,7 @@
 	    	cmp.find("activateBy"+activateBy).get("e.press").fire({});
 	    	var tmpFunc = this.getElement;
 	    	$A.test.addWaitFor(true, function(){
-	    		return ($A.util.getText(tmpFunc("li", "tabItem uiTabItem active")[0]).indexOf("Chatter") < 0);
+	    		return ($A.util.getText(tmpFunc("li", "tabs__item uiTabItem active")[0]).indexOf("Chatter") < 0);
 	    	});
 	 },
 	 /**
@@ -198,7 +198,7 @@
 	  */
 	 verifyNewlyActivatedElement : function (activateBy, text){
         	//Get newly activated tab
-	    	var element = this.getElement("li", "tabItem uiTabItem active");
+	    	var element = this.getElement("li", "tabs__item uiTabItem active");
 	    	//Verify that there is only one tab active
 	    	$A.test.assertEquals(element.length, 1, "There should only be one active tab");
 	    	$A.test.assertNotUndefinedOrNull(element[0], "Finding an active element should not be null");
@@ -212,8 +212,8 @@
 	 matchSectionAndAnchor : function(tabText, bodyText){
 
 		 //Get Element in three different ways (1 way for ie7, 1 way for ie 8 and another way for all other browsers)
-         var activeLi = this.getElement("li", "tabItem uiTabItem active");
-		 var activeSection = this.getElement("section", "tabBody uiTab active");
+         var activeLi = this.getElement("li", "tabs__item uiTabItem active");
+		 var activeSection = this.getElement("section", "tabs__content uiTab active");
 
 		 $A.test.assertEquals(1, activeLi.length, "There should only be one active list element");		 
 		 $A.test.assertEquals(1, activeSection.length, "There should only be one active section element");

@@ -35,7 +35,7 @@
     <aura:handler name="activateTab" action="{!c.activateMenu}" />
     <aura:handler name="change" value="{!v.menuItems}" action="{!c.updateMenuItems}"/>
     
-    <li aura:id="li" class="{!v.class + 'tabItem'}" role="presentation">
+    <li aura:id="li" class="{!v.class + ' tabs__item'}" role="presentation">
 	    <ui:menu aura:id="menu">
 	    	<ui:menuTrigger aura:id="trigger">
 	    		<a class="tabHeader" aura:id="tabItem"

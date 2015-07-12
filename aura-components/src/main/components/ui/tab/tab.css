@@ -14,33 +14,15 @@
  * limitations under the License.
  */
 
-.THIS > .icon{
-	width:16px;
-	height:16px;
-	float:left;
-	padding:0;
-	margin-right:4px;
-	margin-left:-4px;
-}
-
+/** [IC] Is this still in any way relevant? **/
 .THIS.scrolling {
 	overflow: auto;
 }
 
-.THIS.active > a.tabHeader {
-	cursor: default;
-	color: #fff;
-}
-
-.THIS.tabBody {	
+.THIS.tabs__content {
 	display: none;
 }
 
-.THIS.top.active.tabBody, .THIS.bottom.active.tabBody, .THIS.active {
+.THIS.active {
 	display: block;
-}
-
-.THIS.left.active.tabBody, .THIS.right.active.tabBody {
-    display: inline-block;
-    vertical-align: top;
 }

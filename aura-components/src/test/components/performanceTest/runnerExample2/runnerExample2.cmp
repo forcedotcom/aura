@@ -1,4 +1,4 @@
-<aura:component implements="performance:test">
+<aura:component extends="performance:perfTest">
     <aura:attribute name="loaded" type="Boolean"/>
     <section>
         <div style="margin: 10px; padding:10px; border: 1px solid black">

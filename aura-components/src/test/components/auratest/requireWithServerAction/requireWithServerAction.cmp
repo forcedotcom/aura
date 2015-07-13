@@ -1,5 +1,5 @@
 <aura:component controller="java://org.auraframework.components.test.java.controller.VersionTestController"
-model="org.auraframework.components.test.java.model.TestModel">
+model="java://org.auraframework.components.test.java.model.TestModel">
 
     <aura:attribute type="Boolean" name="actionDone" default="false"/>
     <aura:attribute type="String" name="version"/>

@@ -24,7 +24,7 @@ import org.auraframework.util.AuraTextUtil;
  * Util to handle parsing of tags and classes
  */
 public class TypeParser {
-	
+
     /**
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
      * 3 = name = bar prefix = null
@@ -57,6 +57,8 @@ public class TypeParser {
             }
             
             type = new Type(prefix, namespace, name, null);
+        } else {
+            return parseClass(qualifiedName);
         }
     	
     	return type;

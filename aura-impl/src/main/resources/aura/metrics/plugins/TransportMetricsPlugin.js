@@ -56,7 +56,7 @@ TransportMetricsPlugin.prototype.disable = function () {
 TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, actions, method, options */) {
     var config = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
-    var options = arguments[4];
+    var options = arguments[3];
     var ret = config["fn"].apply(config["scope"], arguments);
 
     if (ret) {
@@ -115,9 +115,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transac
     for (var i = 0; i < transportMarks.length; i++) {
         var id = transportMarks[i]["context"]["aura.num"];
         var phase = transportMarks[i]["phase"];
-        if (phase === 'stamp') {
-            procesedMarks.push(transportMarks[i]);
-        } else if (phase === 'start') {
+        if (phase === 'start') {
             queue[id] = transportMarks[i];
         } else if (phase === 'end' && queue[id]){
             var mark = $A.util.apply({}, queue[id], true, true);

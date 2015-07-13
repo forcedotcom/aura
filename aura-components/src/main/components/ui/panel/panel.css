@@ -22,7 +22,8 @@
     background-color: #FFFFFF;
     overflow: visible;
     opacity: 0;
-    /*transition: opacity .2s;*/
+    top: 0;
+    left: 0;
 
 }
 

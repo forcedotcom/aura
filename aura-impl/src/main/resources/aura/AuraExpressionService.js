@@ -107,30 +107,39 @@ AuraExpressionService.prototype.clearReferences=function(valueProvider){
 AuraExpressionService.prototype.updateGlobalReference = function (expression, oldValue, value) {
     expression = $A.expressionService.normalize(expression);
     var reference=this.references[expression];
-    if(reference&&reference.consumers){
-        for(var consumer in reference.consumers){
-            var component=$A.getComponent(consumer);
-            if (component) {
-                for(var targetExpression in reference.consumers[consumer]){
-                    component.markDirty(targetExpression);
-                    component.fireChangeEvent(targetExpression,oldValue,value);
+    if(oldValue !== value) {
+        if(reference&&reference.consumers){
+            for(var consumer in reference.consumers){
+                var component=$A.getComponent(consumer);
+                if (component) {
+                    for(var targetExpression in reference.consumers[consumer]){
+                        component.markDirty(targetExpression);
+                        component.fireChangeEvent(targetExpression,oldValue,value);
+                    }
                 }
             }
         }
     }
 };
 
-AuraExpressionService.prototype.updateGlobalReferences = function (type, values) {
-    function updateNestedValue(expression,values){
-        for(var value in values){
+AuraExpressionService.prototype.updateGlobalReferences = function (type, newValues) {
+    var gvpValues = $A.get(type);
+
+    function updateNestedValue(expression, values, newValues){
+        if(!values) {
+            values = {};
+        }
+
+        for(var value in newValues){
             var targetExpression=expression+'.'+value;
-            $A.expressionService.updateGlobalReference(targetExpression,null,values[value]);
-            if($A.util.isObject(values[value])){
-                updateNestedValue(targetExpression,values[value]);
+            $A.expressionService.updateGlobalReference(targetExpression,values[value],newValues[value]);
+            if($A.util.isObject(newValues[value])){
+                updateNestedValue(targetExpression, values[value], newValues[value]);
             }
         }
     }
-    updateNestedValue(type,values);
+
+    updateNestedValue(type, gvpValues, newValues);
 };
 
 AuraExpressionService.prototype.addListener = function (reference, expression, valueProvider) {

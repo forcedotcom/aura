@@ -1,4 +1,58 @@
 ({
+    testIncompleteActionRefreshDoesNotInvokeCallback: {
+        test: [
+        function primeActionStorage(cmp) {
+            var action = cmp.get("c.executeInForeground");
+            action.setStorable();
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+        },
+        function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
+            // Disconnect from server to force INCOMPLETE state on action
+            $A.test.setServerReachable(false);
+            $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
+            var action = cmp.get("c.executeInForeground");
+            action.setCallback(this, function(a) {
+                $A.test.fail("INCOMPLETE callback should not be called on refresh actions");
+            }, "INCOMPLETE");
+            action.setStorable({
+                "refresh": 0
+            });
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function(){ 
+                return $A.test.areActionsComplete([action]) && !$A.test.isActionPending();
+            });
+        }]
+    },
+
+    testStoredActionInvokesCallbackWhenOffline: {
+        test: [
+        function primeActionStorage(cmp) {
+            var action = cmp.get("c.executeInForeground");
+            action.setStorable();
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+        },
+        function runRefreshActionAndVerifyNoIncompleteCallback(cmp) {
+            var callbackCalled = false;
+            $A.test.setServerReachable(false);
+            $A.test.addCleanup(function() { $A.test.setServerReachable(true)});
+            var action = cmp.get("c.executeInForeground");
+            action.setCallback(this, function(a) {
+                callbackCalled = true;
+            }, "SUCCESS");
+            action.setStorable({
+                "refresh": 0
+            });
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function(){ 
+                return $A.test.areActionsComplete([action]);
+            }, function() {
+                $A.test.assertTrue(callbackCalled, "SUCCESS callback never called for stored action when offline");
+            });
+        }]
+    },
+
     /**
      * Test the server side action is a background action
      */
@@ -313,7 +367,6 @@
     testConcurrentCabooseServerActionsBothAborted : {
         test : [
             function enqueueThreeActionsThenGoOffline(cmp) {
-                //$A.test.setTestTimeout(60000000);
                 var testCompleted = false;
                 var a0 = $A.test.getAction(cmp, "c.executeInBackground", null,
                         function(action) {

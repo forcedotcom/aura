@@ -1373,7 +1373,7 @@ AuraClientService.prototype.enqueueStoredAction = function(action, response) {
 /**
  * Execute a single stored action.
  *
- * This is done in situ when we get a result from the storage service. We also queue up a refresh
+ * This is done in situations when we get a result from the storage service. We also queue up a refresh
  * action if we are due a refresh or we have trouble running the action.
  */
 AuraClientService.prototype.executeStoredAction = function(action, response, collected, index) {

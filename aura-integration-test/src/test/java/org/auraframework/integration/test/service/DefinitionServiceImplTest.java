@@ -56,7 +56,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
- * 
+ *
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class DefinitionServiceImplTest extends AuraImplTestCase {
@@ -159,6 +159,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    public void testFindNonExistingComponentByFilter() throws Exception {
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
+
+        Set<DefDescriptor<?>> set = definitionService.find(new DescriptorFilter("markup://notExists:blah", DefType.COMPONENT));
+        assertEquals(0, set.size());
+    }
+
     /**
      * Client loaded set is still preloaded for null input
      */
@@ -194,7 +201,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
     /**
      * Uid mismatch will trigger ClientOutOfSyncException.
-     * 
+     *
      * Update test according what I learned from W-2176923. ApexPagesAuraContext.java doesn't have the source for app,
      * but it go ahead and create app definition with its own (fake) builder, then add it to localDef: ComponentDef
      * cmpDef = (ComponentDef) Aura.getDefinitionService().getDefinition(cmpDesc);

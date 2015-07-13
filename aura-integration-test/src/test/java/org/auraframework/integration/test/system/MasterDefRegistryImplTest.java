@@ -1342,9 +1342,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * (3) It should contain the def descriptor.
      * (4) There should be no cache.
      */
-    public void testDescriptorFilterConstant() throws Exception {
-        DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
-        DefDescriptor<?> dd = DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
+    @SuppressWarnings("unchecked")
+    public <D extends Definition> void testDescriptorFilterConstant() throws Exception {
+        DefRegistry<D> mockedRegistry = Mockito.mock(DefRegistry.class);
+        DefDescriptor<D> dd = (DefDescriptor<D>) DefDescriptorImpl.getInstance("markup", "aura", "mocked", DefType.COMPONENT);
         Set<DefDescriptor<?>> findable = Sets.newHashSet();
         findable.add(dd);
 
@@ -1353,6 +1354,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
         Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
+        Mockito.when(mockedRegistry.exists(dd)).thenReturn(true);
         MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
 
         DescriptorFilter df = new DescriptorFilter("aura:mocked", DefType.COMPONENT);

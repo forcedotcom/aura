@@ -1476,8 +1476,18 @@ AuraClientService.prototype.finishCollection = function() {
     if (this.collector.actionsCompleted) {
         this.fireDoneWaiting();
     }
-    this.actionsDeferred = this.actionsDeferred.concat(this.collector.collected);
+    //
+    // Carefully walk actions here, since we may have undefined actions in our collected set.
+    // This way we filter them out, and don't try to process too many things. It also avoids
+    // other problems processing the deferred queue.
+    //
+    var collected = this.collector.collected;
     this.collector.collected = [];
+    for (var i = 0, length = collected.length; i < length; i++) {
+        if (collected[i]) {
+            this.actionsDeferred.push(collected[i]);
+        }
+    }
     if (this.actionsQueued.length) {
         this.continueProcessing();
         return;
@@ -1519,9 +1529,6 @@ AuraClientService.prototype.sendActionXHRs = function() {
     this.actionsDeferred = [];
     for (i = 0; i < processing.length; i++) {
         action = processing[i];
-        if (!action) {
-            continue;
-        }
         if (this.maybeAbortAction(action)) {
             continue;
         }

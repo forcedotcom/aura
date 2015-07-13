@@ -92,7 +92,7 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
         "responseLength" : auraXHR.request.responseText.length
     };
 
-    if (this.metricsService.microsecondsResolution()/*timing API is supported*/) {
+    if (this.metricsService.microsecondsResolution()/*timing API is supported*/ && window.performance.getEntriesByName) {
         var resource = window.performance.getEntriesByName(TransportMetricsPlugin.AURA_URL)[auraXHR.marker];
         if (resource) {
             endMark["context"]["latency"] = resource.responseEnd - resource.fetchStart;

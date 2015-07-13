@@ -14,25 +14,6 @@
  * limitations under the License.
  */
 
-div.THIS.uiAutocompleteList, div.THIS .uiAutocompleteList {
-    width: 100%;
-    box-shadow: none;
-    left: 0px;
-    margin-top: 12px;
-}
-
-.THIS li a {
-    color: #000;
-    padding: 4px 8px 8px 8px;
-    text-decoration: none;
-}
-
-.THIS li.highlighted a {
-    color: #FFF;
-    padding: 4px 8px 8px 8px;
-    text-decoration: none;
-}
-
 .THIS .pillIcon {
     vertical-align: middle;
     margin-right:8px;

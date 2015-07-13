@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extends="ui:input" support="proto" extensible="true" description="Represents an input field that suggests a list of values from the data provider as you type.">
+<aura:component extends="ui:input" support="proto" extensible="true" defaultFlavor="default, lookup" description="Represents an input field that suggests a list of values from the data provider as you type.">
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
     <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty"/>
     <aura:attribute name="loadingIndicator" type="Aura.Component[]" description="Content to be shown while the list is loading"/>
@@ -67,7 +67,7 @@
         </aura:set>
     </aura:if>
     
-    <ui:autocompleteList aura:id="list" class="{!v.class}" 
+    <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
         dataProvider="{!v.dataProvider}" 
         itemVar="{!v.optionVar}" 
         itemTemplate="{!v.listOption}"

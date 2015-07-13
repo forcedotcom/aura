@@ -365,6 +365,7 @@ Aura.Utils.Util.prototype.compareValues = function(expected, actual){
  * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.hasClass = function(element, className){
     var oldClass='';
@@ -389,6 +390,7 @@ Aura.Utils.Util.prototype.hasClass = function(element, className){
  * @param {Object} element The element to apply the class on.
  * @param {String} newClass The CSS class to be applied on the element.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.addClass = function(element, newClass){
     this.setClass(element,newClass,false);
@@ -400,6 +402,7 @@ Aura.Utils.Util.prototype.addClass = function(element, newClass){
  * @param {Object} element The element to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
@@ -411,6 +414,7 @@ Aura.Utils.Util.prototype.removeClass = function(element, newClass){
  * @param {Object} element The element to add or remove the class from.
  * @param {String} className The CSS class to be added or removed from the class.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){

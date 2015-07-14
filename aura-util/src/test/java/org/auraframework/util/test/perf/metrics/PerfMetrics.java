@@ -42,6 +42,8 @@ public final class PerfMetrics {
         List<JSONObject> devToolsLog = null;
         Map<String, ?> jsProfilerData = null;
         Map<String, ?> heapSnapshot = null;
+        Map<String, ?> metricsServiceTransaction = null;
+        
         for (PerfMetrics metrics : metricsList) {
             if (metrics != null) {
                 if (devToolsLog == null) {
@@ -78,6 +80,7 @@ public final class PerfMetrics {
     private List<JSONObject> devToolsLog;
     private Map<String, ?> jsProfilerData;
     private Map<String, ?> heapSnapshot;
+    private JSONObject metricsServiceTransaction;
 
     public PerfMetrics() {
     }
@@ -104,6 +107,17 @@ public final class PerfMetrics {
 
     public void setDevToolsLog(List<JSONObject> devToolsLog) {
         this.devToolsLog = devToolsLog;
+    }
+    
+    public void setMetricsServiceTransaction(JSONObject transaction) {
+    	this.metricsServiceTransaction = transaction;
+    }
+    public void setMetricsServiceTransaction(Map<String, ?> transaction) {
+    	this.metricsServiceTransaction = new JSONObject(transaction);
+    }
+    
+    public JSONObject getMetricsServiceTransaction() {
+    	return this.metricsServiceTransaction;
     }
 
     public Map<String, ?> getJSProfilerData() {

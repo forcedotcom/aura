@@ -43,7 +43,7 @@ function PerfRunner(COQL, Memory) {
                 if (dom) {
                     $A.util.removeClass(dom, classFinishTest);
                 }
-                this.results   = {};
+                this.results   = { customMetrics : {} };
                 return this;
             },
             loadComponent: function () {

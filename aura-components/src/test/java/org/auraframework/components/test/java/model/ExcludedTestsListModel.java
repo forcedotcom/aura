@@ -76,7 +76,7 @@ public class ExcludedTestsListModel {
     private void processTestSuite(TestSuite suite) {
         for (int i = 0; i < suite.testCount(); i++) {
             TestSuite ts = (TestSuite) suite.testAt(i);
-            if (!ts.getName().equals("JS component tests")) {
+            if (!ts.getName().equals("JS Component Tests")) {
                 for (int j = 0; j < ts.testCount(); j++) {
                     try {
                         WebDriverTestCase test = (WebDriverTestCase) ts.testAt(j);

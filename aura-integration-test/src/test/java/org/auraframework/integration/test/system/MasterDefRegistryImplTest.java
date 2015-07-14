@@ -1670,12 +1670,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             return null;
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        public Visibility getVisibility() {
-            return Visibility.PRIVATE;
-        }
-
         @Override
         public DefinitionAccess getAccess() {
             return null;

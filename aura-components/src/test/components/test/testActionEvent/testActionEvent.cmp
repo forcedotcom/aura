@@ -20,8 +20,8 @@
     <aura:attribute name="eventParamName" type="String" description="Parameter to set on the exception"/>
     <aura:attribute name="eventParamValue" type="String"/>
     <aura:attribute name="response" type="Aura.Action"/>
-    <aura:attribute name="data" type="String" visibility="private" />
-    <aura:attribute name="event" type="String" visibility="private" />
+    <aura:attribute name="data" type="String" />
+    <aura:attribute name="event" type="String" />
     
     <aura:registerEvent name="local" type="test:testActionEventEvent"/>
     <aura:handler name="local" action="{!c.showLocalEvent}"/>

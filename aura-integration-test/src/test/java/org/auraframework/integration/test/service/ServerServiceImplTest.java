@@ -103,12 +103,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             return null;
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        public Visibility getVisibility() {
-            return null;
-        }
-
         @Override
         public DefinitionAccess getAccess() {
             return null;

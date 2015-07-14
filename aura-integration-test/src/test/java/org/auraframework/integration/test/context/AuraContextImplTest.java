@@ -307,7 +307,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
-                AttributeDef.SerializeToType.BOTH, null, null));
+                AttributeDef.SerializeToType.BOTH, null));
         EventDefImpl eventDef = vendor.makeEventDef(eventDesc, EventType.COMPONENT, atts, null, null);
 
         context.getDefRegistry().addLocalDef(eventDef);

@@ -107,12 +107,6 @@ public abstract class MockDefinition<D extends Definition> implements Definition
         return null;
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public Visibility getVisibility() {
-        return Visibility.PUBLIC;
-    }
-
     public class MockDefinitionAccess implements DefinitionAccess {
         private static final long serialVersionUID = 5004058964564727486L;
 

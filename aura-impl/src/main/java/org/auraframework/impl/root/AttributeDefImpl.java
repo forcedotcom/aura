@@ -51,15 +51,15 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      */
     @SuppressWarnings("deprecation")
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
-            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location , Visibility visibility) {
-        super(descriptor, location, visibility);
-        this.parentDescriptor = parentDescriptor;
-        this.typeDefDescriptor = typeDefDescriptor;
-        this.defaultValue = defaultValue;
-        this.required = required;
-        this.serializeTo = serializeTo;
-    }
+				            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+                            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+        super(descriptor, location);
+		this.parentDescriptor = parentDescriptor;
+		this.typeDefDescriptor = typeDefDescriptor;
+		this.defaultValue = defaultValue;
+		this.required = required;
+		this.serializeTo = serializeTo;
+	}
 
     protected AttributeDefImpl(Builder builder) {
         super(builder);
@@ -153,10 +153,6 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
 
         if (this.serializeTo == SerializeToType.INVALID) {
             throw new InvalidDefinitionException("Invalid serializeTo value", getLocation());
-        }
-
-        if (this.visibility == Visibility.PRIVATE && this.required == true) {
-            throw new InvalidDefinitionException("Cannot set an attribute as required and private", getLocation());
         }
     }
 
@@ -265,5 +261,5 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     private final AttributeDefRef defaultValue;
     private final boolean required;
     private final SerializeToType serializeTo;
-
+    
 }

@@ -1194,7 +1194,10 @@ Action.prototype.incomplete = function(context) {
     if (!this.error || !(this.error instanceof Array)) {
         this.error = [ { message : "Disconnected or Canceled" } ];
     }
-    this.finishAction(context);
+    // Do not invoke callback on refresh action since response will not have changed
+    if (!this.isRefreshAction()) {
+        this.finishAction(context);
+    }
 };
 
 /**

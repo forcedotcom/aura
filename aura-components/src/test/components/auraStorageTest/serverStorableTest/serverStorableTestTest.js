@@ -363,21 +363,29 @@
         }]
     },
     /**
-     * Verify that original action cannot get marked as storable.
-     * Access the original action going from the client by accessing it from context.
+     * Verify mark original server action as storable on server side.
      */
     testMarkingOriginalActionAsStorable:{
         test:[
             function(cmp){
                 //Run the action that sets up other actions to be storable
                 var primingAction = cmp.get("c.markingSelfAsStorable");
+                var returnValue;
                 primingAction.setCallback(cmp, function(result){
                     $A.test.assertEquals("SUCCESS", primingAction.getState());
-                    $A.test.assertEquals("Marking my self as storable", result.getReturnValue());
                     $A.test.assertEquals(true, result.isStorable());
+                    returnValue = result.getReturnValue();
                 });
+                $A.test.assertFalse(primingAction.isAbortable(), "The action should start as non-abortable.");
                 $A.enqueueAction(primingAction);
-                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([primingAction]); });
+                $A.test.addWaitFor(true,
+                    function() { return $A.test.areActionsComplete([primingAction]); },
+                    function() {
+                        // Verify action's callback gets called.
+                        $A.test.assertEquals("SUCCESS", primingAction.getState());
+                        $A.test.assertEquals("Marking my self as storable", returnValue);
+                        $A.test.assertFalse(primingAction.isAbortable(), "The action should be still non-abortable.");
+                    });
             },
             function(cmp){
                 var storedAction = cmp.get("c.markingSelfAsStorable");

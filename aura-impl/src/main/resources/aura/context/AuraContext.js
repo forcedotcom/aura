@@ -182,7 +182,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     var i, defs;
 
     if (otherContext["mode"] !== this.getMode()) {
-        throw new Error("Mode mismatch");
+        throw new Error("[Mode mismatch] Expected '" + this.getMode() + "' instead tried to merge mode '" + otherContext["mode"] + "'");
     }
     if ($A.util.isUndefinedOrNull(this.fwuid)) {
         this.fwuid = otherContext["fwuid"];

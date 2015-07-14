@@ -188,19 +188,17 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, true);
     }
 
-    /*Enable test once W-2650232 is fixed
     public void testMultipleModalPressEscKeyWithAutoFocusNotSet() throws Exception{
     	verifyPressingEscOnMultipleModalDestorysModal(PANEL_MODAL, false);
-    }*/
+    }
 
     public void testMultiplePanelPressEscKeyWithAutoFocusSet() throws Exception{
         verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, true);
     }
 
-    /*Enable test once W-2650232 is fixed
     public void testMultiplePanelPressEscKeyWithAutoFocusNotSet() throws Exception{
     	verifyPressingEscOnMultipleModalDestorysModal(PANEL_DIALOG, false);
-    }*/
+    }
 
     private void verifyPressingEscOnMultipleModalDestorysModal(String locator, boolean autoFocus) throws MalformedURLException, URISyntaxException, InterruptedException {
         String url = APP;

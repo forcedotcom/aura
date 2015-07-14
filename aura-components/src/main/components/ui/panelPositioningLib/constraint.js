@@ -149,6 +149,32 @@ function(w) {
                 };
                 break;
 
+            case 'inverse bounding box':
+
+                this._exp = function(targetBox, elementBox) {
+                    var retBox = {};
+
+                    if(boxDirs.left && targetBox.left - pad < (elementBox.left)) {
+                        retBox.left =  targetBox.left - pad;
+                    }
+
+                    if(boxDirs.right && elementBox.left + elementBox.width < (targetBox.left+ targetBox.width + pad)) {
+                        retBox.left = targetBox.width + pad - elementBox.width + targetBox.left;
+                    }
+
+                    if(boxDirs.top && targetBox.top < elementBox.top + pad) {
+                        retBox.top = targetBox.top - pad;
+                    }
+
+                    if(boxDirs.bottom && elementBox.top + elementBox.height < targetBox.top + targetBox.height + pad) {
+                        retBox.top = targetBox.height + pad - elementBox.height + targetBox.top;
+                    }
+
+                    return retBox;
+
+                };
+                break;
+
             default:
                 this._exp = function() {
                     console.error('no constraint expression for', type);

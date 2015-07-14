@@ -27,7 +27,7 @@
     </ui:tabset>
 
     <section class="suiteCode">
-        <h1>JS Test Suite <span onclick="{!c.toggleCode}">Display</span></h1>
-        <pre aura:id="test-suite-code" class="hidden">{!m.testSuite.code}</pre>
+        <h1 onclick="{!c.toggleCode}">Sources (tap to view)</h1>
+        <div><pre aura:id="test-suite-code" class="hidden">{!m.testSuite.code}</pre></div>
     </section>
 </aura:application>

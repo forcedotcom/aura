@@ -21,7 +21,7 @@
     <aura:attribute name="url" type="String"/>
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
-    <aura:attribute name="status" type="String" default="spin"/>
+    <aura:attribute name="status" type="String" default=""/>
 
     <aura:set attribute="scroll" value="false"/>
     <aura:set attribute="title" value="{!v.case.name}"/>
@@ -34,13 +34,13 @@
     <aura:handler name="onActivated" action="{!c.onActivate}" />
     
     <aura:set attribute="body">
+        <section class="results">
+            <h1>Result</h1>
+            <div aura:id="results"></div>
+        </section>
         <section class="content">
             <h1>Content</h1>
             <div aura:id="content" class="testContent"></div>
-        </section>
-        <section class="results">
-            <h1>Results</h1>
-            <div aura:id="results"></div>
         </section>
     </aura:set>
 

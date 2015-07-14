@@ -13,40 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- @-webkit-keyframes jstestCaseThrob {
-  from,to {
-    box-shadow: inset 4px 4px 16px #FFFF0F;
-  }
-  50% {
-    box-shadow: inset 4px 4px 4px #FF800F;
-  }
+
+.THIS {
+    margin-top: 15px;
 }
+
 .THIS.jstestTabset {
 	display: table;
+    width: 100%;
 }
-.THIS.jstestTabset .tabBody.active {
+.THIS.jstestTabset .tab__content.active {
 	display: table-cell;
-	width: 100%;
 }
 
 .THIS .rerun.fail{
     background-color: #FF0F0F;
-    box-shadow: inset 4px 4px 8px #FFFF0F;
-    -webkit-animation-iteration-count:infinite;
-    -webkit-animation-name: jstestCaseThrob;
-    -webkit-animation-duration:1s;
-    -webkit-animation-timing-function:linear;
 }
 .THIS .rerun.pass{
     background-color: #0FFF0F;
-    background-color: green;
-    box-shadow: inset 4px 4px 4px #10FF10;
 }
 
 .THIS .rerun{
     background-color: #FFFF0F;
-    box-shadow: inset 1px 2px 2px #000000;
-    border-radius : 10px;
     display:inline-block;
     width:16px;
     height:16px;
@@ -57,10 +45,11 @@
 @-webkit-keyframes jstestCaseSpin {
   from {
     -webkit-transform: rotate(0deg);
-    
+    transform: rotate(0deg);
   }
   to {
     -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 } 
 .THIS .spin{
@@ -70,25 +59,31 @@
     -webkit-animation-timing-function:linear;
 }
  
-.aurajstestJstest.uiTabset {
+.THIS.uiTabset {
     height: auto;
 }
-.aurajstestJstest.uiTabset .tabLabels {
+.THIS.uiTabset .tabLabels {
     min-height: 750px;
 }
-.aurajstestJstest {
+.THIS {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 13px;
 }
 
-.aurajstestJstest ul {
+.THIS .tabs__content {
+    margin-top: 15px;
+    padding: 10px;
+}
+
+.THIS ul {
     height: auto;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.aurajstestJstest ul li.uiTabItem {
+.THIS ul li.uiTabItem {
+    background: none;
     width: 220px;
     float: none;
     border: 0;
@@ -97,30 +92,18 @@
     display: block;
 }
 
-.aurajstestJstest ul li.uiTabItem > a.tabHeader {
+.THIS ul li.uiTabItem > a.tabHeader {
     background-color: #616975;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(114, 122, 134)),to(rgb(80, 88, 100)));
-    background-image: -webkit-linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
-    background-image: -moz-linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
-    background-image: -o-linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
-    background-image: -ms-linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
-    background-image: linear-gradient(top, rgb(114, 122, 134), rgb(80, 88, 100));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#727a86', EndColorStr='#505864');
-    border-bottom: 1px solid #33373d;
-    border-right: 1px solid #33373d;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #878e98;
-    -moz-box-shadow: inset 0px 1px 0px 0px #878e98;
-    box-shadow: inset 0px 1px 0px 0px #878e98;
+    margin: 3px;
+    border-radius: 4px;
     display: block;
     font-weight: 600;
     color: #fff;
-    text-shadow: 0px 1px 0px rgba(0,0,0,.5);
-    margin: 0;
 }
 
-.aurajstestJstest ul li a {
-    background: #fff;
-    border-bottom: 1px solid #efeff0;
+.THIS ul li a {
+    overflow: hidden;
+    text-overflow: ellipsis;
     height: 2em;
     line-height: 2em;
     display: block;
@@ -128,115 +111,68 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 0.923em;
     font-weight: 400;
-    color: #878d95;
-    overflow: hidden;
     white-space: nowrap;
 }
 
-.aurajstestJstest h1, .aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
-    background-color: #35afe3;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(69, 199, 235)),to(rgb(38, 152, 219)));
-    background-image: -webkit-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -moz-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -o-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -ms-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#45c7eb', EndColorStr='#2698db');
-    border-bottom: 1px solid #103c56;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    -moz-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    box-shadow: inset 0px 1px 0px 0px #6ad2ef;
+.THIS ul li.uiTabItem.active > a.tabHeader {
+    background: #f78717; /* Old browsers */
 }
 
-.aurajstestJstest ul li.uiTabItem.active > a.tabHeader {
-    color: #333;
-    background: #ffa84c; /* Old browsers */
-    background: -moz-linear-gradient(top, #ffa84c 0%, #ff7b0d 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffa84c), color-stop(100%,#ff7b0d)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* IE10+ */
-    background: linear-gradient(to bottom, #ffa84c 0%,#ff7b0d 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
-}
-
-.aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
-    overflow: visible;
-    color: #333;
+.THIS ul li.uiTabItem > a.tabHeader:hover {
+    opacity: 0.8;
     z-index: 100;
 }
 
-.aurajstestJstest h1 {
-    height: 2em;
-    line-height: 2em;
-    color: #fff;
-    padding-left: 10px;
-    font-weight: 400;
-    font-size: 0.923em;
+.THIS h1 {
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+    font-size: 2em;
+    padding: 8px;
+    border-bottom: 4px solid #f78717;
+    font-weight: 100;
     position: relative;
 }
 
-.aurajstestJstest li.uiTabItem div.tabBody {
-    top: 0;
-    left: 241px;
-    height: auto;
+.THIS h1 + div {
+    padding: 20px 0;
+    font-size: 0.923rem;
 }
 
-.aurajstestJstest section div.testContent {
+.THIS section div.testContent {
     height: 500px;
 }
 
-.aurajstestJstest iframe {
+.THIS iframe {
 	height:100%;
 	width:100%;
 	border:0;
 }
 
-.aurajstestJstest section {
+.THIS section {
 	margin:0;
 	padding:0;
 }
 
-.aurajstestJstest section.content {
+.THIS section.content {
 	width: 100%;
 	resize: vertical;
 }
-.aurajstestJstest section.results {
+.THIS section.results {
 	overflow: auto;
-	height: 220px;
+	height: auto;
 }
 
-.aurajstestJstest h1 span{
-    cursor: pointer;
-    font-size: 0.857em;
-    display: inline-block;
-    position: absolute;
-    right: 1em;
-    background: #48515c;
-    line-height: 1em;
-    height: 1em;
-    padding: .4em .6em .4em;
-    margin: .3em 0 0 0;
-    color: #fff;
-    text-indent: 0;
-    text-align: center;
-    -webkit-border-radius: .769em;
-    -moz-border-radius: .769em;
-    border-radius: .769em;
-    -webkit-box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    -moz-box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, .26), 0px 1px 0px 0px rgba(255, 255, 255, .15);
-    text-shadow: 0px 1px 0px rgba(0,0,0,.5);
-    font-weight: 500;
-    background: #2173a1;
+.THIS section.results > div {
+    font-size: 1.25rem;
+    font-weight: 200;
 }
 
-.aurajstestJstest section.results div {
+.THIS section.results div {
     display: block;
 }
 
-.aurajstestJstest pre {
-    font-family: "Courier New", Courier, monospace, sans-serif;
+.THIS pre {
+    font-family: "Consolas", "Courier New", Courier, monospace, sans-serif;
     text-align: left;
     background: #EFEFEF;
     padding: 0.1em 0.5em 0.3em 0.7em;
@@ -247,6 +183,11 @@
     line-height: 1.6em;
     font-size: 12px;
     display: block;
+}
+
+.THIS.suiteCode {
+    margin-top: 20px;
+    padding: 10px;
 }
 
 .aurajstestJstest pre.hidden {

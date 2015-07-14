@@ -30,6 +30,7 @@ import org.openqa.selenium.WebElement;
 public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String APP = "/uitest/panel2_Test.app";
     private final String PARAM_PANEL_TYPE = "&testPanelType=";
+    private final String PARAM_DIRECTION = "&testDirection=";
     private final String FLAVOR = "&testFlavor=";
     private final String CREATE_PANEL_BUTTON = ".createPanelBtnClass";
     private final String PANEL_DIALOG = ".uiPanel";
@@ -41,10 +42,10 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String ENABLE_CUSTOM_CLOSEACTION = ".inputCustomizeCloseAction";
     private final String INPUT_PANELTYPE = ".inputPanelTypeClass";
     private final String INPUT_AUTOFOCUS = ".inputAutoFocusClass";
-
-
+   
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
     private final String APP_INPUT = ".appInput";
+    private final String APP_INPUT2 = ".appInput2";
 
     public Panel2ModalOverlayUITest(String name) {
         super(name);
@@ -158,10 +159,9 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
 
     /**
      * Test modal does have scrollbar when content is not so long
-     * Disabled test becasue it was failing locally with no changes.
      * Test case: W-2615146
      */
-    public void _testModalWithoutScrollBar() throws Exception{
+    public void testModalWithoutScrollBar() throws Exception{
         verifyScrollbarPresent(false, MAKE_NONSCROLLABLE);
     }
 
@@ -347,6 +347,31 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType + FLAVOR + flavor;
         open(url);
         cycleThroughPanelInputElements(url, "panel", true);
+    }
+    
+    /**
+     * Tab out closes panel and sets focus back on element that called it.
+     * Test panel focuses on reference element after its been closed.
+     */
+    public void testPanelTabOutFocus() throws Exception{
+        String url = APP + "?" + PARAM_PANEL_TYPE + "panel" + 
+        		PARAM_DIRECTION + "south";
+        
+        open(url);
+        
+        // open panel
+        WebElement input = findDomElement(By.cssSelector(APP_INPUT2));
+        input.click();
+        waitForPanelDialogOpen();
+        
+        // tab out to close
+        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        activeElement.sendKeys(Keys.TAB);
+        waitForPanelDialogClose();
+        
+        // check focus
+        activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        assertTrue("Active element is not app input", activeElement.getAttribute("class").contains("appInput2"));
     }
 
     private void cycleThroughPanelInputElements(String url, String panelType, boolean doesPanelClose) throws Exception{

@@ -24,52 +24,51 @@
 	
 	<section class="content">
 		<div class="menu">
-			<p class="search-bar">
+			<div class="search-wrapper">
 				<span>Search:</span>
 				<select class="search-ops">
 					<option>AND</option>
 					<option>OR</option>
 				</select>
 				<input class="search" type="text" placeholder="Type to filter tests (multiple searches: keyword1, keyword2)" value="{!v.keyword}" />
+				<button class="run" title="Run Selected Tests">
+					<span>Run!</span>
+				</button>
+			</div>
+			<div class="option-wrapper">
+            	<aura:if isTrue="{!v.scope != 'perf'}">
+					<button class="toggle_test_type" title="Show/Hide Integration and Unit tests">
+						<input type="checkbox" id="test_integ" class="test_integ" checked="true" />
+						<label for="test_integ">Integ</label>
+						<input type="checkbox" id="test_unit" class="test_unit" checked="true" />
+						<label for="test_unit">Unit</label>
+						<input type="checkbox" id="test_jstest" class="test_jstest" checked="true" />
+						<label for="test_jstest">JSTest</label>													
+						<input type="checkbox" id="test_webdriver" class="test_webdriver" checked="true" />
+						<label for="test_webdriver">WebDriver</label>
+					</button>
+				</aura:if>
+
 				<button class="search-case-sensitive" title="Case Sensitive">
-					<input type="checkbox" name="select" />
-					<span title="Case sensitive">Sensitive</span>
+					<input type="checkbox" id="case_sensitive" />
+					<label title="Case sensitive" for="case_sensitive">Sensitive</label>
 				</button>
-			</p>
-			<button class="run" title="Run Selected Tests">
-				<span>Run <span id="count_selected"></span></span>
-			</button>
-		</div>
-		<div class="menu">
-			<button class="toggle_select_all" title="Select all visible tests">
-				<input type="checkbox" name="toggle_select_all"/>
-				<span>Select all</span>
-			</button>
-		    <aura:if isTrue="{!v.scope != 'perf'}">
-				<button class="toggle_test_type" title="Show/Hide Type of Tests">
-					<input type="checkbox" name="select" class="test_unit" checked="true" />
-					<span for="test_unit">Unit</span>					
-					<input type="checkbox" name="select" class="test_integ" checked="true" />
-					<span for="test_integ">Integ</span>
-					<input type="checkbox" name="select" class="test_jstest" checked="true" />
-					<span for="test_jstest">JSTest</span>													
-					<input type="checkbox" name="select" class="test_webdriver" checked="true" />
-					<span for="test_webdriver">WebDriver</span>				
+				<button class="toggle_failed" title="Show only test failure">
+					<input type="checkbox" id="show_fail_only"/>
+					<label for="show_fail_only">Only Failures</label>
 				</button>
-            </aura:if>		
-			<button class="toggle_failed" title="Show only test failure">
-				<input disabled="true" type="checkbox" name="show_fail_only"/>
-				<span>Show only failed</span>
-			</button>
-			
-			
-			<button class="scroll_to_top" title="Scroll To Top">
-				<span>^</span>
-			</button>
+
+				<button class="move_sel_top" title="Moved Selected Items To Top and Scroll To Top of Container">
+					Move Selected Item To Top
+					<span>&#9650;</span>
+				</button>
+			</div>
 		</div>
 		<div class="container_header_row">
+			<div class="chk">
+				<input type="checkbox" id="toggle_select_all" title="Select all visible tests"/>
+			</div>
 			<div class="test_type">Type</div>
-			<div class="chk"></div>
 			<div class="test_name">Test Name</div>
 		</div>
 	</section>

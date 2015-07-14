@@ -30,6 +30,7 @@
 				    <a href="?scope=perf">Perf</a>
 				</aura:set>	
 				</aura:if>
+                <span id="pageState">Loading, First load might be slow...</span>
 			</span>
 		</header>
 		<section class="center">
@@ -37,6 +38,7 @@
     	</section>
     	<footer>
     		<span class="status-bar"></span>
+            <span id="count_test_selected"></span>
     	</footer>
     </div>
 </aura:application>

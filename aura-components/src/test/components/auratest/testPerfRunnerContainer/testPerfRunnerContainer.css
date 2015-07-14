@@ -14,68 +14,76 @@
  * limitations under the License.
  */
 .THIS {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+
 }
 .THIS *, .THIS *:before, .THIS *:after {
-  -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+  box-sizing: border-box;
 }
 
-.THIS .menu {
+
+.THIS .menu{
     font-weight: 300;
     background: #344A5F;
-    display: flex;
-    align-items: center;
-    padding: 0.3em 0.5em;
+    padding: 0.3em 1em;
     color: #fff;
     font-size: 18px;
-
-}   
-
-.THIS .menu .search-bar {
-    flex: 1;
 }
-.THIS .menu input.search {
+
+.THIS .menu .search-wrapper {
+    overflow:hidden;
+}
+
+.THIS .menu .option-wrapper {
+    margin-top:5px;
+    overflow:hidden;
+}
+
+
+.THIS .menu input.search, .THIS .menu select.search-ops, .THIS button{
+    border: 1px solid transparent;
     border-radius: 5px;
     border-width: 1px;
     border-style: solid;
-    padding: 0.5em;
+    padding:  5px;
     font-size: 15px;
-    width: 450px;
+    margin-right:10px;
+}
+
+.THIS .menu input.search {    
+    width: calc(100% - 250px);
     margin: 0 20px 0 10px;
 }
 
 
 .THIS .menu select.search-ops{
-	border-radius: 5px;
-    border-width: 1px;
-    border-style: solid;
-    padding: 0.5em;
-    font-size: 15px;
 }
 
+.THIS .menu .search-case-sensitive{
+    color:black;
+}
+
+.THIS input[type=checkbox] {
+    cursor:pointer;
+}
 
 .THIS button {
-    border: none;
-    border-radius: 5px;
     color: #FFF;
-    padding: 0.5em;
     line-height: 20px;
 }
 
-.THIS button > span {
-    font-size: 18px;
+.THIS button > label {
     font-weight: 300;
     padding: 0 5px;
+    cursor:pointer;
 }
 
 .THIS button.run {
     background: #CF5C60;
-    font-size: 20px;
-    width:200px;
+    float:right;
+    cursor:pointer;
+    padding: 5px;
+    font-size:20px;
+    text-transform: uppercase;
 }
 
 .THIS button.toggle_select_all {
@@ -83,32 +91,48 @@
     margin-right: 10px;
 }
 
-
-.THIS button.toggle_failed {
-    background: #339933;
-    margin-right: 10px;
-}
-
 .THIS button.toggle_test_type{
-	background: #717ECD;
-    margin-right:10px;
-	
-}
-
-.THIS button.toggle_failed[data-selected="true"] {
-    opacity: .5;
+    background: #717ECD;
+    margin-right:10px;   
 }
 
 
 
+/*container header row*/
+.THIS .container_header_row{
+    height:30px;
+    background-color: tomato;
+    color:white;
+    font-weight:bold;
+    overflow:hidden;
+}
+
+.THIS .container_header_row div{
+    height:30px;
+    vertical-align:middle;
+    padding-top:5px;
+    padding-bottom:5px;
+    float:left;
+}
+
+.THIS .container_header_row .chk{
+    width:40px;
+    text-align:center;
+}
+
+.THIS .container_header_row .test_name{
+
+}
+
+/*test row*/
 .THIS .test-container {
-    flex: 1;
-    overflow: scroll;
-    height: 100%;
-}
-
-.THIS ul.list-hidden { 
-    display: none;
+    background-color:white;
+    height: calc( 100% - 105px );
+    width:100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    position:absolute;
+    z-index:1;
 }
 
 .THIS ul {
@@ -117,19 +141,27 @@
     list-style: none;
 }
 
+.THIS ul li{
+    overflow:hidden;
+    border-bottom: 1px solid #ddd;
+    padding-top:0.5em;
+    padding-bottom:0.5em;
+}
+
+.THIS .list-test-item:hover{
+    background-color:#eee;
+}
+
 .THIS li[data-visible="hidden"] {
     display: none;
 }
 
-
-.THIS li {
-    background: #F0F1F2;
-    border-bottom:1px solid #ddd;
+.THIS li .parts {
+    overflow:hidden;
 }
 
-.THIS li .parts {
-    height: 50px;
-    display: flex;
+.THIS li .parts > *{
+    float:left;
 }
 
 .THIS li .icon {
@@ -137,17 +169,26 @@
 }
 
 .THIS li:not([data-jsc]) .jsConsole {
-    display: none;
+    vibility: hidden;
 }
 
-.THIS .jsConsole {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.THIS li .parts > .test{
+    width:calc(100% - 235px);
+}
+
+.THIS li .parts > .status{
+    width: 60px;
+}
+
+.THIS li .parts > .jsConsole{
     width: 30px;
 }
 
-.THIS li[data-integ] .parts:after {
+.THIS li .parts > .jsConsole {
+    /*float:right;*/
+}
+
+.THIS li[data-integ] .testResult {
     content: "";
     border-style: solid;
     border-width: 0 15px 15px 0;
@@ -210,124 +251,87 @@
 
 
 .THIS li .checkbox {
-    width: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.THIS li .checkbox > input {
-    width: 25px;
-    height: 25px;
-}
-
-.THIS li .test {
-    padding: 10px 0;
-    flex: 4;
-    overflow: hidden;
-}
-
-.THIS li .name {
-
+    width: 40px;
+    text-align: center;
 }
 
 .THIS li .ns {
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 10px;
-}
-
-.THIS .status {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-size: 12px;
 }
 
 
-.THIS li .test-type{
-	width:50px;
-	display: flex;
-    justify-content: center;
-    align-items: center;
-    color:green;
-    text-shadow: 1px 1px 1px #000;
+
+/*MISC CSS*/
+.THIS button.toggle_failed {
+    background: #339933;
+    margin-right: 10px;
 }
 
-
-.THIS li[test-type='integration'] .test-type{
-	color:yellow;
-}
-
-.THIS li[test-type='unit'] .test-type{
-	color:orange;
-}
-
-.THIS li[test-type='jstest'] .test-type{
-	color:blue;
-}
-
-.THIS li[test-type='webdriver'] .test-type{
-	color:red;
-}
-
-.THIS li[test-type='unit'] .test-type:before{
-	content:'Unit';
-}
-
-
-.THIS li[test-type='integration'] .test-type:before{
-	content:'Integ';
-}
-
-.THIS li[test-type='jstest'] .test-type:before{
-	content:'JSTest';
-}
-
-.THIS li[test-type='webdriver'] .test-type:before{
-	content:'Web';
-}
-
-.THIS li[test-type*='perf'] .test-type:before{
-	content:'Perf';
-}
-
-
-.THIS .container_header_row{
-	display:flex;
-	height:30px;
-	flex-direction: row;
-	background-color: #fff;
-	color:tomato;
-	font-weight:bold;
-}
-
-.THIS .container_header_row div{
-	height:30px;
-	vertical-align:middle;
-	display:flex;
-    align-items: center;
-    padding-top:5px;
-    padding-bottom:5px;
-}
-
-.THIS .container_header_row .test_type{
-	width:60px;
-	padding-left:5px;
-}
-
-.THIS .container_header_row .chk{
-	width:40px;
-}
-
-.THIS .container_header_row .test_name{
-
+.THIS button.toggle_failed[data-selected="true"] {
+    
 }
 
 .THIS .hl-row{
-	background-color:#ace;
+    background-color:#ace;
 }
 
-.THIS .scroll_to_top{
-	margin-left:auto;
-	background-color:#000;
+.THIS .move_sel_top{
+    background-color:#000;
+    float:right;
+    color:white;
+    cursor:pointer;
+}
+
+
+.THIS .container_header_row .test_type, .THIS li .test-type{
+    width:90px;
+    text-align:center;
+}
+
+.THIS li .test-type{
+    text-shadow: 1px 1px 1px #999;
+}
+
+
+
+.THIS li[test-type='unit'] .test-type{
+    color:#EEBA4C;
+}
+
+.THIS li[test-type='unit'] .test-type:before{
+    content:'unit';
+}
+
+.THIS li[test-type='jstest'] .test-type{
+    color:#23B5AF;
+}
+
+.THIS li[test-type='jstest'] .test-type:before{
+    content:'jstest';
+}
+
+.THIS li[test-type='webdriver'] .test-type{
+    color:tomato;
+}
+
+.THIS li[test-type='webdriver'] .test-type:before{
+    content:'webdriver';
+}
+
+.THIS li[test-type='unit'] .test-type{
+    color:purple;
+}
+
+.THIS li[test-type='unit'] .test-type:before{
+    content:'unit';
+}
+
+.THIS li[test-type='integration'] .test-type{
+    color:blue;
+}
+
+.THIS li[test-type='integration'] .test-type:before{
+    content:'integration';
 }

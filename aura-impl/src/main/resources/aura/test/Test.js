@@ -1772,7 +1772,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
  */
 TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     if (this.disconnected) {
-        return null;
+        return { "status": "INCOMPLETE" };
     }
     return config["fn"].call(config["scope"], response, noStrip);
 };

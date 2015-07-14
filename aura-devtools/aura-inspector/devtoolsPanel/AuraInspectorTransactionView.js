@@ -93,7 +93,7 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		var counter = 0;
         var queue = {};
         for (var i = 0; i < transportMarks.length; i++) {
-            var id = transportMarks[i].context["aura.num"];
+            var id = transportMarks[i].context["auraXHRId"];
             var phase = transportMarks[i].phase;
             if (phase === 'processed') {
                 ++counter;

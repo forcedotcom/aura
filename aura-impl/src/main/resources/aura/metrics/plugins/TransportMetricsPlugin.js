@@ -71,7 +71,7 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
         auraXHR.marker = this.counter++;
 
         startMark["context"] = {
-            "aura.num"      : auraXHR.marker,
+            "auraXHRId"     : auraXHR.marker,
             "requestLength" : auraXHR.length,
             "actionDefs"    : actionDefs,
             "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
@@ -86,7 +86,7 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
     var endMark = this.metricsService["markEnd"](TransportMetricsPlugin.NAME, "request");
      
     endMark["context"] = {
-        "aura.num"       : auraXHR.marker,
+        "auraXHRId"      : auraXHR.marker,
         "status"         : auraXHR.request.status,
         "statusText"     : auraXHR.request.statusText,
         "responseLength" : auraXHR.request.responseText.length
@@ -113,7 +113,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transac
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
-        var id = transportMarks[i]["context"]["aura.num"];
+        var id = transportMarks[i]["context"]["auraXHRId"];
         var phase = transportMarks[i]["phase"];
         if (phase === 'start') {
             queue[id] = transportMarks[i];

@@ -78,6 +78,7 @@ public final class PerfResultsUtil {
                 Document doc = Document.parse(json.toString());
                 doc.append("timeline", traceLog);
                 doc.append("testName", test);
+                doc.append("transaction", Document.parse((metrics.getMetricsServiceTransaction()).toString()));
                 doc.append("run", RUN_TIME);
                 runs.insertOne(doc);
             }

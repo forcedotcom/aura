@@ -131,7 +131,8 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 }
             }
         }
-        MasterDefRegistryImplOverride registry = new MasterDefRegistryImplOverride(mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
+        MasterDefRegistryImplOverride registry = new MasterDefRegistryImplOverride(
+                mdrregs.toArray(new DefRegistry<?>[mdrregs.size()]));
         return asMocks ? Mockito.spy(registry) : registry;
     }
 
@@ -232,6 +233,29 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 masterDefReg.find(new DescriptorFilter(String.format("markup://%s:*notherecaptain", namespace))).size());
     }
 
+    /**
+     * TODO: remove try block when find can handle DefType without a default prefix
+     */
+    public void testFindDefTypeWithoutDefaultPrefix() throws Exception {
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
+        try {
+            assertEquals("find() not expecting any matches", 0,
+                    masterDefReg.find(new DescriptorFilter("*://doesnt:exist", DefType.TESTCASE)).size());
+            fail("If you have fixed this bug, please update the expected results (remove the try block)");
+        } catch (NullPointerException npe) {
+            // this shouldn't happen and should be fixed
+        }
+    }
+
+    public void testFindDefTypeWithDefaultPrefix() throws Exception {
+        MasterDefRegistryImplOverride masterDefReg = getDefRegistry(false);
+        DefDescriptor<ApplicationDef> target = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", ""));
+        assertEquals("unexpected matches found", 1,
+                masterDefReg.find(new DescriptorFilter("*://" + target.getDescriptorName(), DefType.APPLICATION))
+                        .size());
+    }
+
     private static class AddableDef<T extends Definition> {
         private final Class<T> defClass;
         private final String format;
@@ -257,25 +281,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private static AddableDef<?> addable[] = new AddableDef[] {
-        // Ignoring top level bundle defs.
-        // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
-        new AddableDef<>(ControllerDef.class, "js://%s.%s",
-                "({method: function(cmp) {}})"),
-                new AddableDef<>(HelperDef.class, "js://%s.%s",
-                        "({method: function(cmp) {}})"),
-                        // new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
-                        //        "({provide: function(cmp) {}})"),
-                        new AddableDef<>(RendererDef.class, "js://%s.%s",
-                                "({render: function(cmp) {}})"),
-                                new AddableDef<>(StyleDef.class, "css://%s.%s",
-                                        ".THIS {display:block;}"),
-                                        // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
-                                        // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+            // Ignoring top level bundle defs.
+            // APPLICATION(ApplicationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // COMPONENT(ComponentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+            // NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
+            new AddableDef<>(ControllerDef.class, "js://%s.%s",
+                    "({method: function(cmp) {}})"),
+            new AddableDef<>(HelperDef.class, "js://%s.%s",
+                    "({method: function(cmp) {}})"),
+            // new AddableDef<ProviderDef>(ProviderDef.class, "js://%s.%s",
+            // "({provide: function(cmp) {}})"),
+            new AddableDef<>(RendererDef.class, "js://%s.%s",
+                    "({render: function(cmp) {}})"),
+            new AddableDef<>(StyleDef.class, "css://%s.%s",
+                    ".THIS {display:block;}"),
+            // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
+            // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
     };
 
     private MasterDefRegistry resetDefRegistry() {
@@ -404,10 +428,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify UID values and dependencies against a gold file.
-     *
+     * 
      * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
      * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
-     *
+     * 
      * The format of the file is:
      * <ul>
      * <li>Top level descriptor ':' global UID.
@@ -761,7 +785,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // Manually add dependency to inner component
         DefDescriptor<ComponentDef> cmpDesc2 = addSourceAutoCleanup(ComponentDef.class,
                 "<aura:component><aura:dependency resource=\"" + depCmpDesc1.getQualifiedName()
-                + "\"/></aura:component>");
+                        + "\"/></aura:component>");
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(
@@ -829,7 +853,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // Make sure we actually have something to clear from the cache before verifying it's not in there.
         // if (!isInDefsCache(cmpDesc, mdr)) {
-        //    fail("Test setup failure: def not added to MasterDefRegistry cache");
+        // fail("Test setup failure: def not added to MasterDefRegistry cache");
         // }
         assertNotCached(cmpDesc, mdr, uid);
     }
@@ -930,7 +954,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
-     *
+     * 
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
     private Map<DefType, DefDescriptor<?>> addDefsToCaches(MasterDefRegistryImpl mdr) throws Exception {
@@ -1011,7 +1035,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     private <D extends Definition> void callAssertAccess(MasterDefRegistryImpl mdr,
             DefDescriptor<?> referencingDescriptor, D def, Cache<String, String> accessCheckCache)
-                    throws Exception {
+            throws Exception {
         Method assertAccess = mdr.getClass().getMethod("assertAccess", DefDescriptor.class,
                 Definition.class, Cache.class);
         assertAccess.setAccessible(true);
@@ -1021,7 +1045,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Verify basic functionality of MasterDefRegistryImpl.getClientLibraries. The same methods are test in
      * ClientLibraryServiceImplTest, where we use ClientLibraryService.getUrls()
-     *
+     * 
      * @throws Exception
      */
     public void testGetClientLibraries() throws Exception {
@@ -1065,7 +1089,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache has a reason to block access, then MDR throws NoAccessException.
-     *
+     * 
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_BlockAccess() throws Exception {
@@ -1090,7 +1114,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache doesn't have any message to block access, then access checks passes through.
-     *
+     * 
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_AllowAccess() throws Exception {
@@ -1331,16 +1355,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a constant Descriptor filter.
-     *
-     * Preconditions:
-     * (1) Cacheable registry.
-     * (2) DescriptorFilter.isConstant() should be true.
-     *
-     * PostConditions:
-     * (1) registry.find() should _not_ be called.
-     * (2) We should get exactly one descriptor.
-     * (3) It should contain the def descriptor.
-     * (4) There should be no cache.
+     * 
+     * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
+     * 
+     * PostConditions: (1) registry.find() should _not_ be called. (2) We should get exactly one descriptor. (3) It
+     * should contain the def descriptor. (4) There should be no cache.
      */
     @SuppressWarnings("unchecked")
     public <D extends Definition> void testDescriptorFilterConstant() throws Exception {
@@ -1352,7 +1371,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
         Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
         Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
-        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.find((DescriptorFilter) Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.exists(dd)).thenReturn(true);
         MasterDefRegistryImpl mdr = new MasterDefRegistryImpl(mockedRegistry);
@@ -1361,22 +1380,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Set<DefDescriptor<?>> result = mdr.find(df);
         assertEquals("Resulting set should contain exactly 1 item", 1, result.size());
         assertTrue("Resulting set should contain our descriptor", result.contains(dd));
-        Mockito.verify(mockedRegistry, Mockito.never()).find((DescriptorFilter)Mockito.any());
+        Mockito.verify(mockedRegistry, Mockito.never()).find((DescriptorFilter) Mockito.any());
         assertTrue("No caching for constant filters", notInDescriptorFilterCache(df, mdr));
     }
 
     /**
      * Test a wildcard name Descriptor filter (cacheable).
-     *
-     * Preconditions:
-     * (1) Cacheable registry.
-     * (2) DescriptorFilter.isConstant() should be true.
-     *
-     * PostConditions:
-     * (1) registry.find() should be called.
-     * (2) We should get exactly one descriptor.
-     * (3) It should contain the def descriptor.
-     * (4) There should be a cache.
+     * 
+     * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
+     * 
+     * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
+     * contain the def descriptor. (4) There should be a cache.
      */
     public void testDescriptorFilterNameWildcardWithCache() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
@@ -1387,7 +1401,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
         Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
         Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
-        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.find((DescriptorFilter) Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
 
@@ -1403,16 +1417,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a wildcard name Descriptor filter (not cacheable).
-     *
-     * Preconditions:
-     * (1) Non-Cacheable registry.
-     * (2) DescriptorFilter.isConstant() should be true.
-     *
-     * PostConditions:
-     * (1) registry.find() should be called.
-     * (2) We should get exactly one descriptor.
-     * (3) It should contain the def descriptor.
-     * (4) There should be no cache.
+     * 
+     * Preconditions: (1) Non-Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
+     * 
+     * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
+     * contain the def descriptor. (4) There should be no cache.
      */
     public void testDescriptorFilterNameWildcardWithoutCache() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
@@ -1423,7 +1432,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
         Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
         Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
-        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.find((DescriptorFilter) Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(false);
 
@@ -1439,16 +1448,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a wildcard namespace Descriptor filter (cacheable).
-     *
-     * Preconditions:
-     * (1) Cacheable registry.
-     * (2) DescriptorFilter.isConstant() should be true.
-     *
-     * PostConditions:
-     * (1) registry.find() should be called.
-     * (2) We should get exactly one descriptor.
-     * (3) It should contain the def descriptor.
-     * (4) There should be no cache.
+     * 
+     * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
+     * 
+     * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
+     * contain the def descriptor. (4) There should be no cache.
      */
     public void testDescriptorFilterNamespaceWildcard() throws Exception {
         DefRegistry<?> mockedRegistry = Mockito.mock(DefRegistry.class);
@@ -1459,7 +1463,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Mockito.when(mockedRegistry.getNamespaces()).thenReturn(Sets.newHashSet("aura"));
         Mockito.when(mockedRegistry.getPrefixes()).thenReturn(Sets.newHashSet("markup"));
         Mockito.when(mockedRegistry.getDefTypes()).thenReturn(Sets.newHashSet(DefType.COMPONENT));
-        Mockito.when(mockedRegistry.find((DescriptorFilter)Mockito.any())).thenReturn(findable);
+        Mockito.when(mockedRegistry.find((DescriptorFilter) Mockito.any())).thenReturn(findable);
         Mockito.when(mockedRegistry.hasFind()).thenReturn(true);
         Mockito.when(mockedRegistry.isCacheable()).thenReturn(true);
 
@@ -1483,16 +1487,16 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> unprivilegedCmp = getAuraTestingUtil().addSourceAutoCleanup(
                 DefDescriptorImpl.getInstance(String.format("markup://%s:cmp", unprivilegedNamespace),
                         ComponentDef.class),
-                        String.format(baseComponentTag, "access='global'",
-                                String.format("<%s/>", privilegedCmp.getDescriptorName())),
-                                false);
+                String.format(baseComponentTag, "access='global'",
+                        String.format("<%s/>", privilegedCmp.getDescriptorName())),
+                false);
 
         // in privileged namespace depending on unprivileged cmp
         DefDescriptor<ComponentDef> privilegedRoot = getAuraTestingUtil().addSourceAutoCleanup(
                 ComponentDef.class,
                 String.format(baseComponentTag, "access='global'",
                         String.format("<%s/>", unprivilegedCmp.getDescriptorName())),
-                        null, true);
+                null, true);
 
         ConfigAdapter configAdapter = Aura.getConfigAdapter();
         assertTrue(configAdapter.isPrivilegedNamespace(privilegedCmp.getNamespace()));
@@ -1557,7 +1561,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
-     *
+     * 
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
     private Map<DefType, DefDescriptor<?>> addNonPriveledgedDefsToMDR(MasterDefRegistryImpl mdr) throws Exception {
@@ -1590,7 +1594,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                                 + "tmt = $A.get('$Label.Related_Lists.task_mode_today', cmp);"
                                 + "return this.superRender();"
                                 + "}})",
-                                "cstring1.labelProvider", false);
+                        "cstring1.labelProvider", false);
         DefDescriptor<ApplicationDef> appInLayoutsBundleDef = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
                 "<aura:application>    before    <div aura:id='content'/>    after</aura:application>",
@@ -1848,7 +1852,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * A private class to hold all the info for a lock test.
-     *
+     * 
      * This sets up the mocks so that we can test locking, if it is instantiated, you _must_ call clear() in a finally
      * block. The locking is not real here, so have a care.
      */
@@ -1877,7 +1881,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test getDef to ensure locking is minimized.
-     *
+     * 
      * This asserts that within an MDR we only lock once for any number of getDef calls for a single def.
      */
     public void testGetDefLocking() throws Exception {
@@ -1900,7 +1904,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test save to ensure locking is minimized.
-     *
+     * 
      * This asserts that within an MDR we lock with a write lock for a save.
      */
     public void testSaveLocking() throws Exception {
@@ -1920,7 +1924,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test find(desc) to ensure locking is minimized.
-     *
+     * 
      * This asserts that within an MDR we only lock once for a call to find.
      */
     public void testFindDescLocking() throws Exception {
@@ -1940,7 +1944,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test find(matcher) to ensure locking is minimized.
-     *
+     * 
      * This asserts that within an MDR we only lock once for a call to find.
      */
     public void testFindMatcherLocking() throws Exception {
@@ -1964,7 +1968,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test exists to ensure locking is minimized.
-     *
+     * 
      * This asserts that within an MDR we only lock once for any number of calls to exists.
      */
     public void testExistsLocking() throws Exception {
@@ -1987,7 +1991,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test getUid for locking.
-     *
+     * 
      * getUid always takes the lock, maybe we should avoid this?
      */
     public void testGetUidLocking() throws Exception {

@@ -15,7 +15,7 @@
  */
 ({
     items: [
-        {id:'1',label:"Test Pill 01", icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF'}},
+        {id:'1',label:"Test Pill 01", icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF', backgroundColor: 'FF0000'}},
         {id:'2',label:"Test Pill 02", icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}},
         {id:'3',label:"Test Pill 03", icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=3&f=FFFFFF'}},
         {id:'4',label:"Test Pill 04", icon: {url:'https://ipsumimage.appspot.com/20x20,FFCC88?l=4&f=FFFFFF'}}],

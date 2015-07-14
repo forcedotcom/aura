@@ -225,7 +225,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             DefDescriptor<?> singleMatch = DefDescriptorImpl.getInstance(
                     prefix, matcher.getNamespaceMatch().toString(), matcher.getNameMatch().toString(),
                     matcher.getDefTypes().get(0));
-            matched.add(singleMatch);
+            if (exists(singleMatch)) {
+                matched.add(singleMatch);
+            }
             return matched;
         } else {
             //

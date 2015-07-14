@@ -22,6 +22,12 @@
     openNotification: function(cmp){
         var refEl = cmp.getElement().querySelector('.positioned-target');
         var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        
+        // toggling selected on the button
+        // so the button is stateful
+        // 
+        var btn = cmp.find('southbutton');
+        btn.set('v.selected', true);
         $A.get('e.ui:createPanel').setParams({
             panelType   :'panel',
             visible: true,
@@ -35,8 +41,8 @@
                 showPointer: true,
                 animation: 'pop'
             },
-            onCreate: function (panel) {
-                console.log('createPanel ' + panel);
+            onDestroy: function (panel) {
+                btn.set('v.selected', false);
             }
 
         }).fire();

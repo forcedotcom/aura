@@ -32,6 +32,7 @@
     <aura:registerEvent name="pressOnHighlighted" type="ui:press" description="The event fired when a highlighted option is pressed."/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is selected."/>
     <aura:registerEvent name="updateAriaAttributes" type="ui:updateAriaAttributes" description="The event fired when a new option is highlighted."/>
+    <aura:registerEvent name="listExpand" type="ui:autocompleteListExpand" description="The event fired when the list is made visible"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>
@@ -39,7 +40,7 @@
     <aura:handler name="matchText" action="{!c.matchText}"/>
     <aura:handler name="pressOnHighlighted" action="{!c.handlePressOnHighlighted}"/>
 
-    <ul aura:id="list" class="{!v.class + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
+    <ul aura:id="list" class="{!'lookup__list ' + (v.visible ? ' visible' : '')}" role="presentation" onclick="{!c.handleClick}" onmousedown="{!c.handleMouseDown}">
         <aura:iteration aura:id="iter" items="{!v.items}" var="{!v.itemVar}" body="{!v.itemTemplate}"/>
     </ul>
 

@@ -39,6 +39,10 @@
     margin-bottom: 5px;
 }
 
+.THIS .pillContainerListItem:last-child {
+    margin-right: 0px;
+}
+
 .THIS input {
     border: none;
     outline: none;

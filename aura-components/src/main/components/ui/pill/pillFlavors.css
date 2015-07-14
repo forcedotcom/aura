@@ -19,8 +19,8 @@
 .THIS.pill {
     border:1px solid #CCCCCC;
     border-radius:5px;
-    padding: 4px 8px 0px 8px;
-    line-height: 27px;
+    padding: 4px;
+    line-height: 1;
     display: block;
 }
 
@@ -29,8 +29,26 @@
 }
 
 .THIS .pillIcon {
-    vertical-align: -8px;
-    margin: -12px 8px 4px -4px;
+    margin-right: 8px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.THIS .pillIcon, .THIS .pillIcon .uiImage {
+    height: 20px;
+    width: 20px;
+}
+
+.THIS .pillText {
+    max-width: 215px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.THIS .pillIcon img, .THIS .pillIcon{
     border-radius:2px;
 }
 

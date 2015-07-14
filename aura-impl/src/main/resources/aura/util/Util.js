@@ -16,7 +16,7 @@
 /*jslint evil:true, sub: true */
 
 /**
- * @description The top-level namespace/object for all SFDC Util code.
+ * @description 
  * Util methods provide utility functions for browsers in addition to
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
@@ -78,6 +78,8 @@ Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is an array, or false otherwise.
+ * @function
+ * @platform
  * @export
  */
 Aura.Utils.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
@@ -91,6 +93,8 @@ Aura.Utils.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is a valid object, or false otherwise.
+ * @function
+ * @platform
  * @export
  */
 Aura.Utils.Util.prototype.isObject = function(obj){
@@ -182,6 +186,7 @@ Aura.Utils.Util.prototype.isBoolean = function(obj){
 /**
  * Checks if the object is undefined.
  *
+ * @platform
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object type is undefined, or false otherwise.
  * @export
@@ -208,6 +213,7 @@ Aura.Utils.Util.prototype.isUndefinedOrNull = function(obj){
  *
  * @param {Object} obj The object to check for.
  * @returns {Boolean} True if the object is empty, or false otherwise.
+ * @platform
  * @export
  */
 Aura.Utils.Util.prototype.isEmpty = function(obj){
@@ -219,6 +225,8 @@ Aura.Utils.Util.prototype.isEmpty = function(obj){
  *
  * @param {Object} val The object to check.
  * @returns {Boolean} True if the object is truthy, or false otherwise.
+ * @platform
+ * @function
  * @export
  */
 Aura.Utils.Util.prototype.getBooleanValue = function (val) {
@@ -357,6 +365,7 @@ Aura.Utils.Util.prototype.compareValues = function(expected, actual){
  * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.hasClass = function(element, className){
     var oldClass='';
@@ -379,8 +388,9 @@ Aura.Utils.Util.prototype.hasClass = function(element, className){
  * Adds the specified class to the element, depending on whether it already existed on that element.
  *
  * @param {Object} element The element to apply the class on.
- * @param {String} clz The CSS class to be applied on the element.
+ * @param {String} newClass The CSS class to be applied on the element.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.addClass = function(element, newClass){
     this.setClass(element,newClass,false);
@@ -392,6 +402,7 @@ Aura.Utils.Util.prototype.addClass = function(element, newClass){
  * @param {Object} element The element to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
@@ -403,6 +414,7 @@ Aura.Utils.Util.prototype.removeClass = function(element, newClass){
  * @param {Object} element The element to add or remove the class from.
  * @param {String} className The CSS class to be added or removed from the class.
  * @export
+ * @platform
  */
 Aura.Utils.Util.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){
@@ -1152,13 +1164,19 @@ Aura.Utils.Util.prototype.isSubDef = function(def, qname) {
  * @description Takes the methods, and properties from one object and assigns them to another.
  * Returns the base object with the members from the child object.
  * This is commonly used to apply a set of configurations to a default set, to get a single set of configuration properties.
+ *
  * @example
- * <ul>
- *  <li><code>util.apply(Child.prototype, Parent); // Returns a new object inheriting all the methods and properties from Parent.</code></li>
- *  <li><code>util.apply(Child.prototype, { isCool: true }); // Parent would then have a property of child.</code></li>
- *  <li><code>util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, true); //== {foo:'bar', diameter: 20, bat: 'man'}</code></li>
- *  <li><code>util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}</code></li>
- *  </ul>
+ * $A.util.apply(Child.prototype, Parent); // Returns a new object inheriting all the methods and properties from Parent.
+ *
+ * @example
+ * $A.util.apply(Child.prototype, { isCool: true }); // Parent would then have a property of child.
+ * 
+ * @example
+ * $A.util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, true); //== {foo:'bar', diameter: 20, bat: 'man'}
+ * 
+ * @example
+ * $A.util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}
+ *
  * @param {Object|Function} baseObject The object that will receive the methods, and properties.
  * @param {Object|Function} members The methods and properties to assign to the baseObject.
  * @param {Boolean} [forceCopy] If the property already exists, should we still copy the member? false by default

@@ -18,5 +18,10 @@
 <aura:component extends="ui:autocompleteOption"
                 description="Auto complete component for use in a ui:pillContainer" extensible="true" support="PROTO">
     <aura:attribute name="iconUrl" type="String" default="true"/>
-    <ui:image src="{!v.iconUrl}" class="optionIcon" imageType="decorative"/>{!v.label}
+    <aura:attribute name="iconBackgroundColor" type="String" default="true"/>
+    <span class="pillIcon" style="{!'background-color: ' + ( empty(v.iconBackgroundColor) ? 'transparent': '#' + v.iconBackgroundColor ) }">
+        <ui:image src="{!v.iconUrl}" class="optionIcon" imageType="decorative"/>
+     </span>
+    {!v.label}
+
 </aura:component>

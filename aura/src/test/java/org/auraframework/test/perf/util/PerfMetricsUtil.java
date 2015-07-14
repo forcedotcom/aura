@@ -55,7 +55,9 @@ public class PerfMetricsUtil {
     public void evaluateResults() throws Exception {
         // Get the median metrics after all the runs.
         PerfMetrics metrics = test.getPerfRunsCollector().getMedianMetrics();
-        metrics.setDevToolsLog(test.getPerfRunsCollector().getMedianRun().getDevToolsLog());
+        PerfMetrics median = test.getPerfRunsCollector().getMedianRun();
+        metrics.setDevToolsLog(median.getDevToolsLog());
+        metrics.setMetricsServiceTransaction(median.getMetricsServiceTransaction());
 
         // Write the results into file
         String resultsFileName = writeResults(metrics);
@@ -147,15 +149,15 @@ public class PerfMetricsUtil {
             }
         }
     }
+    private void handleMetricsServiceTransaction(PerfMetrics metrics, String name) {
+    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
+    	metrics.setMetricsServiceTransaction(transactionMap);
+	}
 
     private void prepareAuraMetrics(PerfMetrics metrics) {
         if (auraStats != null) {
-            for (String name : auraStats.keySet()) {
-                // TODO Handle resultsets other than coql
-                if (!name.equals("coql"))
-                    break;
-                handleCoqlMetrics(metrics, name);
-            }
+        	handleCoqlMetrics(metrics, "coql");
+        	handleMetricsServiceTransaction(metrics, "transaction");
         }
     }
 
@@ -166,7 +168,9 @@ public class PerfMetricsUtil {
         prepareAuraMetrics(metrics);
     }
 
-    public PerfMetrics prepareResults() {
+   
+
+	public PerfMetrics prepareResults() {
         PerfMetrics metrics = new PerfMetrics();
         prepareAllMetrics(metrics);
         return metrics;
@@ -182,7 +186,7 @@ public class PerfMetricsUtil {
         WebDriver driver = test.getWebDriver();
         notifications = test.getRDPNotifications();
         // TODO auraUITestingUtil unable to execute the js correctly
-        Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.results");
+        Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.getResults()");
         auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;
     }
 }

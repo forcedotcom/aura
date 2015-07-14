@@ -76,38 +76,47 @@
         test: [function(cmp) {
             var self = this;
 
-            var dpCmp = self.getDatepickerCmp(cmp);
+            var dpCmp = cmp.find('standAloneDatepicker');
+            var calTitleCmp = dpCmp.find('calTitle');
+
+            var datepicker_calTitle_TagName = self.getTagName(calTitleCmp.getElement());
+            cmp.set('v.activeElm_tagName', datepicker_calTitle_TagName)
+
+
+
+
+            // var dpCmp = self.getDatepickerCmp(cmp);
 
             //set custom title headering
-            self.setDatepickerAttribute(cmp, 'v.titleHeadingLevel', 'h3')
-            dpCmp.getDef().getHelper().setTitleTag(dpCmp);
+            // self.setDatepickerAttribute(cmp, 'v.titleHeadingLevel', 'h3')
+            // dpCmp.getDef().getHelper().setTitleTag(dpCmp);
 
 
-            //initial attribute assertion
-            var datepicker_v_titleHeadingLevel = self.getDatepickerAttribute(cmp, 'v.titleHeadingLevel');
-            var datepicker_calTitle_v_tag = self.getDatepickerAttribute(cmp, 'v.tag', 'calTitle').toUpperCase();
-            var datepicker_calTitle_TagName = self.getDatepickerCalTitleTagName();
+            // //initial attribute assertion
+            // var datepicker_v_titleHeadingLevel = self.getDatepickerAttribute(cmp, 'v.titleHeadingLevel');
+            // var datepicker_calTitle_v_tag = self.getDatepickerAttribute(cmp, 'v.tag', 'calTitle').toUpperCase();
+            
 
-            //set for view purposes
-            self.setDatepickerTitleAttributes(
-                cmp,
-                datepicker_calTitle_TagName,
-                datepicker_v_titleHeadingLevel,
-                datepicker_calTitle_v_tag
-            );
+            // //set for view purposes
+            // self.setDatepickerTitleAttributes(
+            //     cmp,
+            //     datepicker_calTitle_TagName,
+            //     datepicker_v_titleHeadingLevel,
+            //     datepicker_calTitle_v_tag
+            // );
 
-            $A.test.assertEquals(
-                'H3',
-                datepicker_calTitle_v_tag,
-                'datepicker_calTitle_v_tag should be "H3"'
-            );
+            // $A.test.assertEquals(
+            //     'H3',
+            //     datepicker_calTitle_v_tag,
+            //     'datepicker_calTitle_v_tag should be "H3"'
+            // );
 
-            //assertion of the title heading attributes
-            $A.test.assertEquals(
-                'H3',
-                datepicker_v_titleHeadingLevel.toUpperCase(),
-                'datepicker_v_titleHeadingLevel should be "H3"'
-            );
+            // //assertion of the title heading attributes
+            // $A.test.assertEquals(
+            //     'H3',
+            //     datepicker_v_titleHeadingLevel.toUpperCase(),
+            //     'datepicker_v_titleHeadingLevel should be "H3"'
+            // );
             
             // TODO: fix the re-rendered block
             // //rerender

@@ -30,7 +30,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.css.parser.plugin.FlavorMappingEnforcer;
+import org.auraframework.impl.css.parser.plugin.FlavorMappingEnforcerPlugin;
 import org.auraframework.impl.css.style.AbstractStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Themes;
@@ -75,7 +75,7 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
                     FlavorMapping mapping = flavors.getDef().computeOverrides();
                     if (!mapping.isEmpty()) {
                         boolean devMode = Aura.getContextService().getCurrentContext().isDevMode();
-                        augmented.add(new FlavorMappingEnforcer(getDescriptor(), mapping, devMode));
+                        augmented.add(new FlavorMappingEnforcerPlugin(getDescriptor(), mapping, devMode));
                     }
                 }
             }

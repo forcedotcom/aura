@@ -21,15 +21,17 @@
  */
 var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
     this.config = config;
-    this.counter = 1;
+    this.counter = -1;
     this["enabled"] = true;
 };
 
 TransportMetricsPlugin.NAME = "transport";
+TransportMetricsPlugin.ORIGIN = window.location && window.location.origin;
+TransportMetricsPlugin.AURA_URL = TransportMetricsPlugin.ORIGIN + '/aura';
 
 /** @export */
 TransportMetricsPlugin.prototype.initialize = function (metricsService) {
-    this.collector = metricsService;
+    this.metricsService = metricsService;
     if (this["enabled"]) {
         this.bind(metricsService);
     }
@@ -39,7 +41,7 @@ TransportMetricsPlugin.prototype.initialize = function (metricsService) {
 TransportMetricsPlugin.prototype.enable = function () {
     if (!this["enabled"]) {
         this["enabled"] = true;
-        this.bind(this.collector);
+        this.bind(this.metricsService);
     }
 };
 
@@ -47,26 +49,29 @@ TransportMetricsPlugin.prototype.enable = function () {
 TransportMetricsPlugin.prototype.disable = function () {
     if (this["enabled"]) {
         this["enabled"] = false;
-        this.unbind(this.collector);
+        this.unbind(this.metricsService);
     }
 };
 
 TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, actions, method, options */) {
     var config = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
-    var options = arguments[4];
+    var options = arguments[3];
     var ret = config["fn"].apply(config["scope"], arguments);
+
     if (ret) {
-        var startMark = this.collector["markStart"](TransportMetricsPlugin.NAME, 'request');
+        var startMark = this.metricsService["markStart"](TransportMetricsPlugin.NAME, 'request');
         var actionDefs = [];
         for (var id in auraXHR.actions) {
             if (auraXHR.actions.hasOwnProperty(id)) {
                 actionDefs.push(auraXHR.actions[id].getDef() + '[' + id + ']');
             }
         }
+
         auraXHR.marker = this.counter++;
+
         startMark["context"] = {
-            "aura.num"      : auraXHR.marker,
+            "auraXHRId"     : auraXHR.marker,
             "requestLength" : auraXHR.length,
             "actionDefs"    : actionDefs,
             "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
@@ -76,15 +81,24 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
 };
 
 TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR */) {
-    var config = Array.prototype.shift.apply(arguments);
+    var config  = Array.prototype.shift.apply(arguments);
     var auraXHR = arguments[0];
-    var endMark = this.collector["markEnd"](TransportMetricsPlugin.NAME, "request");
+    var endMark = this.metricsService["markEnd"](TransportMetricsPlugin.NAME, "request");
+     
     endMark["context"] = {
-        "aura.num"       : auraXHR.marker,
+        "auraXHRId"      : auraXHR.marker,
         "status"         : auraXHR.request.status,
         "statusText"     : auraXHR.request.statusText,
         "responseLength" : auraXHR.request.responseText.length
     };
+
+    if (this.metricsService.microsecondsResolution()/*timing API is supported*/ && window.performance.getEntriesByName) {
+        var resource = window.performance.getEntriesByName(TransportMetricsPlugin.AURA_URL)[auraXHR.marker];
+        if (resource) {
+            endMark["context"]["latency"] = resource.responseEnd - resource.fetchStart;
+        }
+    }
+
     return config["fn"].apply(config["scope"], arguments);
 };
 
@@ -95,15 +109,13 @@ TransportMetricsPlugin.prototype.bind = function (metricsService) {
 
 //#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
-TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
+TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transactionConfig) {
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
-        var id = transportMarks[i]["context"]["aura.num"];
+        var id = transportMarks[i]["context"]["auraXHRId"];
         var phase = transportMarks[i]["phase"];
-        if (phase === 'stamp') {
-            procesedMarks.push(transportMarks[i]);
-        } else if (phase === 'start') {
+        if (phase === 'start') {
             queue[id] = transportMarks[i];
         } else if (phase === 'end' && queue[id]){
             var mark = $A.util.apply({}, queue[id], true, true);
@@ -114,6 +126,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
             delete queue[id];
         }
     }
+
     return procesedMarks;
 };
 //#end

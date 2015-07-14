@@ -59,26 +59,8 @@ PerfMetricsPlugin.prototype = {
         $A.installOverride("ClientService.processResponses", this.processResponsesOverride, this);
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
-    postProcess: function (transportMarks) {
-        var procesedMarks = [];
-        var queue = {};
-        for (var i = 0; i < transportMarks.length; i++) {
-            var id = transportMarks[i]["context"]["aura.num"];
-            var phase = transportMarks[i]["phase"];
-            if (phase === 'stamp') {
-                procesedMarks.push(transportMarks[i]);
-            } else if (phase === 'start') {
-                queue[id] = transportMarks[i];
-            } else if (phase === 'end' && queue[id]){
-                var mark = $A.util.apply({}, queue[id], true, true);
-                mark["context"]  = $A.util.apply(mark["context"], transportMarks[i]["context"]);
-                mark["duration"] = transportMarks[i]["ts"] - mark["ts"];
-                mark["phase"]    = 'processed';
-                procesedMarks.push(mark);
-                delete queue[id];
-            }
-        }
-        return procesedMarks;
+    postProcess: function (markList) {
+        return markList;
     },
     // #end
     unbind: function (metricsService) {

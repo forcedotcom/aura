@@ -67,10 +67,11 @@ AuraComponentService.prototype.get =  function(globalId) {
 };
 
 /**
- * Gets an instance of a component.
+ * Gets an instance of a component from either a GlobalId or a DOM element that was created via a Component Render.
  * @param {Object} identifier that is either a globalId or an element.
  *
  * @public
+ * @platform
  * @export
  */
 AuraComponentService.prototype.getComponent = function(identifier) {
@@ -124,14 +125,23 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
 };
 
 /**
- * createComponent is used to create components in javascript. It accepts the name of a type of component, a map of attributes,
+ * Create a component from a type and a set of attributes. 
+ * It accepts the name of a type of component, a map of attributes,
  * and a callback to notify callers.
+ *
  * @param {String} type The type of component to create, e.g. "ui:button".
  * @param {Object} attributes A map of attributes to send to the component. These take the same form as on the markup,
- * including events </code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
+ * including events <code>{"press":component.getReference("c.handlePress")}</code>, and id <code>{"aura:id":"myComponentId"}</code>.
  * @param {Function} callback The method to call, to which it returns the newly created component.
  *
+ * @example
+ * $A.createComponent("aura:text",{value:'Hello World'}, function(auraTextComponent, status, statusMessagesList){
+ *      // auraTextComponent is an instance of aura:text containing the value Hello World
+ * });
+ * 
  * @public
+ * @platform
+ * @function
  * @export
  */
 AuraComponentService.prototype.createComponent = function(type, attributes, callback){
@@ -198,12 +208,27 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
 };
 
 /**
- * createComponents is used to create an array of components. It accepts a list of component names and attribute maps, and a callback
+ * Create an array of components from a list of types and attributes.
+ * It accepts a list of component names and attribute maps, and a callback
  * to notify callers.
- * @param {Array} components The list of components to create, e.g. ["ui:button",{"press":component.getReference("c.handlePress")}]
+ * 
+ * @param {Array} components The list of components to create, e.g. <code>["ui:button",{"press":component.getReference("c.handlePress")}]</code>
  * @param {Function} callback The method to call, to which it returns the newly created components.
- *
+ * 
+ * @example $A.createComponents([
+ *      ["aura:text",{value:'Hello'}],
+ *      ["ui:button",{label:'Button'}],
+ *      ["aura:text",{value:'World'}]
+ *  ],function(components,status,statusMessagesList){
+ *      // Components is an array of 3 components
+ *      // 0 - Text Component containing Hello
+ *      // 1 - Button Component with label Button
+ *      // 2 - Text component containing World
+ *  });
+ * 
  * @public
+ * @platform
+ * @function
  * @export
  */
 AuraComponentService.prototype.createComponents = function(components, callback) {
@@ -252,7 +277,9 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  * creates a <code>ui:inputText</code> component.
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
- *
+ * 
+ * @platform
+ * @function
  * @deprecated use createComponent instead
  * @export
  */
@@ -460,7 +487,8 @@ AuraComponentService.prototype.hasComponentClass = function(descriptor) {
  * @param {Boolean} [doForce] Whether to force client side creation
  * @param {Boolean} [forceServer] Whether to force server side creation
  *
- * @deprecated use createComponent instead
+ * @deprecated Use <code>$A.createComponent(String type, Object attributes, function callback)</code> instead.
+ * @platform
  * @export
  */
 AuraComponentService.prototype.newComponentAsync = function(callbackScope, callback, config, attributeValueProvider, localCreation, doForce, forceServer) {
@@ -703,7 +731,7 @@ AuraComponentService.prototype.getComponentConfigs = function(config, attributeV
  * @private
  */
 AuraComponentService.prototype.index = function(component){
-    this.indexes.globalId[component.priv.globalId] = component;
+    this.indexes.globalId[component.globalId] = component;
 };
 
 /**

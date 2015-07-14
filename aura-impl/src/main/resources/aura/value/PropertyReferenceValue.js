@@ -24,6 +24,7 @@ function PropertyReferenceValue(path, valueProvider) {
     var isArray=$A.util.isArray(path);
     this.path = isArray?path:path.split('.');
     this.expression = isArray?path.join('.'):path;
+    this.isGlobal=this.expression.charAt(0) === '$';
     this.valueProvider = valueProvider;
     this.context=$A.getContext().getCurrentAccess();
 
@@ -36,20 +37,26 @@ function PropertyReferenceValue(path, valueProvider) {
  * Returns the dereferenced value indicated by the path supplied.
  */
 PropertyReferenceValue.prototype.evaluate = function(valueProvider) {
-    if (this.isGlobal()) {
+    if (this.isGlobal) {
         return aura.get(this.expression);
     }
     $A.getContext().setCurrentAccess(this.context);
-    var value=(valueProvider || this.valueProvider).get(this.expression);
+    var result=(valueProvider || this.valueProvider).get(this.expression);
     $A.getContext().releaseCurrentAccess();
-    return value;
+    return result;
 };
 
 /**
  * Sets the value indicated by the path
  */
 PropertyReferenceValue.prototype.set = function(value) {
-    this.valueProvider.set(this.expression,value);
+    if(this.isGlobal) {
+        return aura.set(this.expression, value);
+    }
+    $A.getContext().setCurrentAccess(this.context);
+    var result=this.valueProvider.set(this.expression, value);
+    $A.getContext().releaseCurrentAccess();
+    return result;
 };
 
 /**
@@ -62,6 +69,10 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
     //  expression = valueProvider.getExpression(expression);
     //     valueProvider=valueProvider.getComponent();
     // }
+    if(this.isGlobal){
+        $A.expressionService.addListener(this,key,cmp);
+        return;
+    }
     if(valueProvider.addValueHandler&&(valueProvider!==cmp||expression!==key)) {
         if(!method){
             method=function PropertyReferenceValue$changeHandler(event) {
@@ -92,6 +103,12 @@ PropertyReferenceValue.prototype.addChangeHandler=function(cmp, key, method, reb
 PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     var valueProvider=this.valueProvider;
     var expression = this.expression;
+    
+    if(this.isGlobal){
+        $A.expressionService.removeListener(this,key,cmp);
+        return;
+    }
+
     while(valueProvider instanceof PassthroughValue){
         expression = valueProvider.getExpression(expression);
         valueProvider=valueProvider.getComponent();
@@ -99,14 +116,6 @@ PropertyReferenceValue.prototype.removeChangeHandler=function(cmp, key){
     if(this.valueProvider.removeValueHandler&&(valueProvider!==cmp||this.expression!==key)) {
         this.valueProvider.removeValueHandler({"event": "change", "value": this.expression, "id":cmp.getGlobalId(),"key":key});
     }
-};
-
-/**
- * Returns true if the property reference starts with '$'.
- * @export
- */
-PropertyReferenceValue.prototype.isGlobal = function() {
-    return this.path && this.path[0] && this.path[0].charAt(0) === '$';
 };
 
 /**

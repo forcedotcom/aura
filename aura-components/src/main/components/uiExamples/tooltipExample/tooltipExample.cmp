@@ -17,6 +17,7 @@
 -->
 <aura:component>    
     <div class="container">
+        <p><ui:tooltip advanced="true" triggerClass="my-trigger-class" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
         <div class="section content">
             <h1>This is a test of the tooltip warning system</h1>
             <p>Hæc semper proportionalis est suo corpori, neq; differt quicquam ab inertia
@@ -33,7 +34,7 @@ quies, uti vulgo concipiuntur, respectu solo distinguuntur ab invicem, neq;
 semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         <p>This tooltip trigger can be...</p>
         <p><ui:tooltip advanced="true" triggerClass="my-trigger-class" tooltipBody="You have to use the advanced mode in this case. Also it is very, very large and could never fit on screen in some cases. Wow, this is a lot of text! It just goes on and on and on. It is a whole entire paragraph.">At the edge of the viewport</ui:tooltip></p>
-        <p style="text-align: right">The other <ui:tooltip advanced="true" tooltipBody="This is another one">edge</ui:tooltip></p>
+        <p style="text-align: right">The other <ui:tooltip advanced="true" direction="west" tooltipBody="This is another one">edge</ui:tooltip></p>
         </div>
         <div class="section form">
             <div class="formwrap">
@@ -46,19 +47,19 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip fadeInDuration="500" triggerClass="my-trigger-class" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
+                        <ui:tooltip fadeInDuration="2000" triggerClass="my-trigger-class" tooltipBody="We PROMISE we will never, ever spam you. Never, ever.">
                             <span>Fade in only</span>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip delay="500" fadeInDuration="500" fadeOutDuration="500" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
+                        <ui:tooltip delay="3000" fadeInDuration="500" advanced="false" fadeOutDuration="500" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
                         <span>Fade in/out with delay</span>
                     </p>
                     <p>
                         <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this"><ui:inputText placeholder="Show tooltip on focus" type="text" aura:id="mrfocus"/></ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip advanced="true" disabled="true" trigger="focus" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
+                        <ui:tooltip advanced="true" direction="east" disabled="true" trigger="click" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
                     </p>
                 </form>
             </div>

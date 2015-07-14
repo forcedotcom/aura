@@ -52,15 +52,16 @@
 		if (code === 32) {
 			// Stop default scroll to bottom behavior
 			event.preventDefault();
-			
-			this.fireDragStart(component, true);
-			
-			// Delegate drag and drop operation to accessibility component
-			var accessibilityComponent = component.get("v.accessibilityComponent");
-			if (accessibilityComponent) {
-				var concreteCmp = $A.componentService.get(accessibilityComponent);
-				if (concreteCmp.isInstanceOf("ui:dragAndDropAccessibility")) {
-					concreteCmp.startDragAndDrop([component], event.target);
+			if (!$A.util.getBooleanValue(component.get("v.disable"))) {
+				this.fireDragStart(component, event.target, true);
+				
+				// Delegate drag and drop operation to accessibility component
+				var accessibilityComponent = component.get("v.accessibilityComponent");
+				if (accessibilityComponent) {
+					var concreteCmp = $A.componentService.get(accessibilityComponent);
+					if (concreteCmp.isInstanceOf("ui:dragAndDropAccessibility")) {
+						concreteCmp.startDragAndDrop([component], event.target);
+					}
 				}
 			}
 		}
@@ -110,7 +111,7 @@
 			}
 		}
 		
-		this.fireDragStart(component, false);
+		this.fireDragStart(component, event.target, false);
 	},
 	
 	/**
@@ -121,7 +122,7 @@
 		return component.get("v.dataTransfer");
 	},
 	
-	fireDragStart: function(component, isInAccessibilityMode) {
+	fireDragStart: function(component, target, isInAccessibilityMode) {
 		// Enter drag operation
 		this.enterDragOperation(component, isInAccessibilityMode);
 		
@@ -130,6 +131,7 @@
 		dragEvent.setParams({
 			"type": component.get("v.type"),
 			"dragComponent": component,
+			"dragComponentTarget": target,
 			"data": component.get("v.dataTransfer"),
 			"isInAccessibilityMode": isInAccessibilityMode
 		});
@@ -199,10 +201,10 @@
 	 */
 	handleDragEnd: function(component, event) {
 		var isSuccess = this.isDropEventSuccessful(component, event);
-		this.fireDragEnd(component, isSuccess, false);
+		this.fireDragEnd(component, event.target, isSuccess, false);
 	},
 	
-	fireDragEnd: function(component, isValid, isInAccessibilityMode) {
+	fireDragEnd: function(component, target, isValid, isInAccessibilityMode) {
 		if (component.isValid()) {
 			this.exitDragOperation(component, isInAccessibilityMode);
 			if (isValid) {
@@ -214,6 +216,7 @@
 				dragEvent.setParams({
 					"type": component.get("v.type"),
 					"dragComponent": component,
+					"dragComponentTarget": target
 					
 				});
 				dragEvent.fire();

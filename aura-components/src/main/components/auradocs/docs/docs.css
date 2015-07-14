@@ -83,15 +83,23 @@ footer.THIS {
 	margin: 2px;
 }
 
-.THIS code {
-	color: #D14;
-}
-
 .THIS pre {
 	display: block;
 	margin: 15px 0;
 	padding: 20px;
 }
+
+.THIS pre code {
+	border: 0px none;
+	padding: 0;
+	margin: 0;
+}
+
+.THIS code {
+	color: #D14;
+	white-space: pre;
+}
+
 
 /*tabset overrides */
 .THIS .uiTabset {

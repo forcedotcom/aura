@@ -120,7 +120,6 @@ Test.Aura.AuraClientServiceTest = function() {
     		// Arrange
             var target = new Aura.Services.AuraClientService$AuraXHR();
             // Assert
-            Assert.Equal(2, target.iteration);//because we call reset() in the constructor
             Assert.Equal(0, target.length);
             Assert.Undefined(target.foreground);//we no longer have restrictions on how many foreground actions we have
     	}

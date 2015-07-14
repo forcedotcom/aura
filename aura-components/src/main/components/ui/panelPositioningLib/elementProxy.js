@@ -112,12 +112,12 @@ function (w) {
             this.right = this.left + box.width;
         } else {
             box = {};
-            this.width = w.innerWidth;
-            this.height = w.innerHeight;
+            this.width = w.document.documentElement.clientWidth;
+            this.height = w.document.documentElement.clientHeight;
             this.left = scrollLeft;
             this.top = scrollTop;
-            this.right = w.innerWidth + scrollLeft;
-            this.bottom = w.innerHeight;
+            this.right = w.document.documentElement.clientWidth + scrollLeft;
+            this.bottom = w.document.documentElement.clientHeight;
         }
 
         this._dirty = false;

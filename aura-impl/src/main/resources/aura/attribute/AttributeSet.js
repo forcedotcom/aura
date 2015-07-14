@@ -185,7 +185,10 @@ AttributeSet.prototype.set = function(key, value, component) {
         key = step;
     }
 
-    if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal()) {
+    // We don't want to update the GVP from a component.
+    // We do that from inside the GVP using $A.set()
+    // So clear the reference and change 
+    if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal ) {
         target[key].set(value);
     } else if (!(target[key] instanceof FunctionCallValue)) {
         // HALO: TODO: JBUCH: I DON'T LIKE THIS...

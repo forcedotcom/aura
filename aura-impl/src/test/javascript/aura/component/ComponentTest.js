@@ -23,8 +23,79 @@ Function.RegisterNamespace("Aura.Component");
 
 [Import("aura-impl/src/main/resources/aura/component/Component.js")]
 [Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
+[Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js")]
 [Fixture]
 Test.Aura.Component.ComponentTest=function(){
+    function mockFramework(during){
+        return Mocks.GetMock(Object.Global(),"$A",{
+            assert:function(condition,message){if(!condition)throw new Error(message)},
+            error:function(message){throw new Error(message)},
+            getContext:function(){return {
+                getAccessVersion:function(){},
+                getCurrentAction:function(){return null}                
+            }},
+            componentService:{
+                get:function(){},
+                getDef:function(){
+                    // JBUCH: TODO: ADD COMPONENTDEF STUB
+                    return {
+                        attributeDefs:{
+                            getDef:function(){},
+                            getNames:function(){return []},
+                            getValues:function(){return null}
+                        },
+                        getAllEvents:function(){
+                            return []
+                        },
+                        getAppHandlerDefs:function(){},
+                        getCmpHandlerDefs:function(){},
+                        getControllerDef:function(){},
+                        getDescriptor:function(){
+                            return {
+                                getNamespace:function(){}
+                            }
+                        },
+                        getEventDef:function(){
+                            return {getDescriptor:function(){
+                                return {
+                                    getQualifiedName:function(){}
+                                }
+                            }}
+                        },
+                        getModelDef:function(){},
+                        getProviderDef:function(){},
+                        getRenderingDetails:function(){return {}},
+                        getSuperDef:function(){},
+                        getValueHandlerDefs:function(){},
+                        isAbstract:function(){}
+                    };
+                },
+                index:function(){},
+                deIndex:function(){}
+            },
+            expressionService:{
+                clearReferences:function(){},
+                normalize:function(target){return target}
+            },
+            renderingService:{
+                unrender:function(){}
+            },
+            util:{
+                apply:function(){
+
+                },
+                isArray:function(target){
+                    return target instanceof Array;
+                },
+                isFunction:function(target){
+                    return target instanceof Function;
+                },
+                isString:function(target){
+                    return typeof(target) == "string";
+                }
+            }
+        })(during);
+    }
     [Fixture]
     function DeIndex() {
         //this cover when component is invalid
@@ -32,9 +103,8 @@ Test.Aura.Component.ComponentTest=function(){
         function ReturnsNullForInvalidComponent() {
             //Arrange
             var target = null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function() {return false};
             });
             //Act
@@ -43,7 +113,7 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.Null(actual);
         }
 
-        //this cover when priv.index does not exist
+        //this cover when localIndex does not exist
         [Fact]
         function ReturnsNullForNullIndex() {
             //Arrange
@@ -51,11 +121,10 @@ Test.Aura.Component.ComponentTest=function(){
             var actual=null;
             var localid = "testLocalId";
             var globalid = "testGlobalId";
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function(){return true};
-                target.priv.index = null;
+                target.localIndex = null;
             });
             //Act
             actual = target.deIndex(localid,globalid);
@@ -63,7 +132,7 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.Null(actual);
         }
 
-        //this cover when passing in globalid, and priv.index[localid]=globalid, note index[localid] here is not an array
+        //this cover when passing in globalid, and localIndex[localid]=globalid, note index[localid] here is not an array
         [Fact]
         function RemoveLocalIdFromIndexWhenPassingInGlobalId() {
             //Arrange
@@ -71,24 +140,16 @@ Test.Aura.Component.ComponentTest=function(){
             var globalid = "testGlobalId";
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return false;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = globalid;
+                target.localIndex = [];
+                target.localIndex[localid] = globalid;
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.deIndex(localid,globalid);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Undefined(actual);
@@ -102,24 +163,15 @@ Test.Aura.Component.ComponentTest=function(){
             var globalid = "testGlobalId";
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return true;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
-                target.isValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = [globalid];
+            mockFramework(function(){
+                target = new Component({},true);
+                target.localIndex = [];
+                target.localIndex[localid] = [globalid];
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.deIndex(localid,globalid);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Undefined(actual);
@@ -135,24 +187,16 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual= null;
             var expected= [globalid2];
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return true;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = [globalid1,globalid2];
+                target.localIndex = [];
+                target.localIndex[localid] = [globalid1,globalid2];
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.deIndex(localid,globalid1);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Equal(expected, actual);
@@ -168,30 +212,22 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual = null;
             var expected=[globalid2];
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return true;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = [globalid1,globalid1,globalid2,globalid1,globalid1];
+                target.localIndex = [];
+                target.localIndex[localid] = [globalid1,globalid1,globalid2,globalid1,globalid1];
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.deIndex(localid,globalid1);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Equal(expected, actual);
         }
 
-        //this cover when NOT passing in globalid, priv.index exist, what priv.index[localid] has doesn't matter
+        //this cover when NOT passing in globalid, localIndex exist, what localIndex[localid] has doesn't matter
         [Fact]
         function RemoveLocalIdFromIndexWhenNotPassingInGlobalId() {
             //Arrange
@@ -199,20 +235,15 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             var expected=null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.isValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = "something";
+                target.localIndex = [];
+                target.localIndex[localid] = "something";
             });
             //Act
-            mockPriv(function(){
-                target.deIndex(localid);
-                actual = target.priv.index[localid];
-            });
+            target.deIndex(localid);
+            actual = target.localIndex[localid];
             //Assert
             Assert.Undefined(actual);
         }
@@ -225,9 +256,8 @@ Test.Aura.Component.ComponentTest=function(){
         function ReturnsNullForInvalidComponent() {
             //Arrange
             var target = null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.assertValid = function(){return false};
             });
             //Act
@@ -245,15 +275,13 @@ Test.Aura.Component.ComponentTest=function(){
             var expected = globalid;
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv" , function(){this.getEventDispatcher=function(){return null}});
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.assertValid = function(){return true};
-                target.priv.index = null;
             });
             //Act
             target.index(localid,globalid);
-            actual = target.priv.index[localid];
+            actual = target.localIndex[localid];
             //Assert
             Assert.Equal(expected, actual);
         }
@@ -268,24 +296,16 @@ Test.Aura.Component.ComponentTest=function(){
             var expected = [original_globalid,globalid];
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return false;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.assertValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = original_globalid;
+                target.localIndex = [];
+                target.localIndex[localid] = original_globalid;
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.index(localid,globalid);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Equal(expected, actual);
@@ -301,24 +321,16 @@ Test.Aura.Component.ComponentTest=function(){
             var expected = ["testGlobalId1",globalid];
             var target = null;
             var actual=null;
-            var mockPriv = Mocks.GetMocks(Object.Global(), {
-                "$A" : {
-                    util : {
-                        isArray : function() {return true;}
-                    }
-                },
-                "ComponentPriv" : function(){this.getEventDispatcher=function(){return null}}
-            });
-            mockPriv(function(){
-                target = new Component();
+            mockFramework(function(){
+                target = new Component({},true);
                 target.assertValid = function(){return true};
-                target.priv.index = [];
-                target.priv.index[localid] = original_globalid_array;
+                target.localIndex = [];
+                target.localIndex[localid] = original_globalid_array;
             });
             //Act
-            mockPriv(function(){
+            mockFramework(function(){
                 target.index(localid,globalid);
-                actual = target.priv.index[localid];
+                actual = target.localIndex[localid];
             });
             //Assert
             Assert.Equal(expected, actual);
@@ -331,51 +343,9 @@ Test.Aura.Component.ComponentTest=function(){
         function ReturnsNullForInvalidComponent() {
             // Arrange
             var target = null;
-
-            var renderingServiceMock = Mocks.GetMock(Object.Global(), "$A",
-                Stubs.GetObject({}, {
-                    componentService : {
-                        deIndex : function() {
-                        }
-                    },
-
-                    expressionService: {
-                        normalize:function(target){
-                            return target;
-                        }
-                    },
-
-                    renderingService : {
-                        unrender : function() {
-                        }
-                    },
-
-                    util : {
-                        apply : function(baseObject, members) {
-                            for (var prop in members) {
-                                baseObject[prop] = members[prop];
-                            }
-                        }
-                    }
-                }));
-
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv",
-                function() {
-                    this.getEventDispatcher=function(){return null};
-                    this.getValueProvider=function(){return null};
-                });
-
-            renderingServiceMock(function() {
-                mockPriv(function() {
-                    ComponentPriv.prototype.deIndex = function() {
-                    };
-
-                    ComponentPriv.prototype.getEventDispatcher = function() {
-                    };
-
-                    target = new Component();
-                    target.destroy(false);
-                });
+            mockFramework(function() {
+                target = new Component({},true);
+                target.destroy(false);
             });
 
             // Act
@@ -390,13 +360,9 @@ Test.Aura.Component.ComponentTest=function(){
             // Arrange
             var expected = "Expected ComponentDef";
             var target = null;
-            var mockPriv = Mocks.GetMock(Object.Global(), "ComponentPriv",
-                function() {
-                    this.getEventDispatcher=function(){return null}
-                });
-            mockPriv(function() {
-                target = new Component();
-                target.priv.componentDef = expected;
+            mockFramework(function() {
+                target = new Component({},true);
+                target.componentDef = expected;
             });
 
             // Act

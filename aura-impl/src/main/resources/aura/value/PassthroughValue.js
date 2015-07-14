@@ -32,7 +32,7 @@ function PassthroughValue(primaryProviders, component) {
  * Since PassthroughValue can have its own set of values that can be listen for changes,
  * it needs it's own value change handler logic. Essentially you should be able to treat
  * it like a component for change events. It does not mark dirty though, since a passthrough
- * does have anything to rerender, marking dirty is the responsibilithy of the referencing components.
+ * does have anything to rerender, marking dirty is the responsibility of the referencing components.
  * @export
  */
 PassthroughValue.prototype.addValueHandler = function(config) {

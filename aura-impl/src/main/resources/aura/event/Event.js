@@ -239,6 +239,6 @@ Aura.Event.Event.prototype.fire = function(params) {
     }, this.eventDef.getDescriptor().getQualifiedName()/*name for the stack*/);
 
     //#if {"modes" : ["STATS"]}
-    Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
+        Aura.Event.Event.prototype.statsIndex.push({'event': this, 'startTime': startTime, 'endTime': (new Date()).getTime()});
     //#end
 };

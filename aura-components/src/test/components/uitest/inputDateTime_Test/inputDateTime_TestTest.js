@@ -16,13 +16,15 @@
  ({
     /**
       *  Test cancel link closes datePicker and does not perform any selection of date/time.
+	  *  This only exists in non desktop devices
       */
     testCancelLink : {
-    	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
+		browsers: [ '-GOOGLECHROME', '-IE11', '-IE10', '-IE9', '-IE8', '-IE7', '-FIREFOX', '-SAFARI'],
+		attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
     	test : [function(cmp) {
-    		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
+    		var input = cmp.find("dateTimePickerTest").find("inputDate").getElement();
     		$A.test.assertNotNull(input, "input not visible");
-    		
+
     		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals("2012-09-10 11:23", value, "Initial value incorrect");
 
@@ -30,83 +32,87 @@
     	}, function(cmp) {
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var cancelLink = datePicker.find("cancel").getElement();
-    		
+
     		$A.test.clickOrTouch(cancelLink);
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
-    		
+
     		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals("2012-09-10 11:23", value, "Cancel was pressed value should not have changed");
     	}]
     },
-    
+
     /**
       *  Test set link sets the appropriate date/time.
+	  *  This only exists in non desktop devices
       */
-    testSetLink : {
-    	attributes : {format: "MM/dd/yyyy hh:mm"},
+	 testSetLink : {
+		browsers: [ '-GOOGLECHROME', '-IE11', '-IE10', '-IE9', '-IE8', '-IE7', '-FIREFOX', '-SAFARI'],
+		attributes : {format: "MM/dd/yyyy hh:mm"},
     	test : [function(cmp) {
-    		var input = cmp.find("dateTimePickerTest").find("inputText").getElement();
+    		var input = cmp.find("dateTimePickerTest").find("inputDate").getElement();
     		$A.test.assertNotNull(input, "input not visible");
-    		
+
     		var value = cmp.find("dateTimePickerTest").get("v.value");
     		$A.test.assertEquals(undefined, value, "Initial value incorrect");
-    		
+
     		this.openDatePicker(cmp);
     	}, function(cmp) {
     	    var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var setLink = datePicker.find("set").getElement();
     		$A.test.clickOrTouch(setLink);
-    	}, function(cmp) {  		
+    	}, function(cmp) {
     		var datePicker = cmp.find("dateTimePickerTest").find("datePicker");
     		$A.test.addWaitFor(false, function(){return $A.util.hasClass(datePicker.getElement(), "visible")});
-    		
+
     		var expectedDate = this.getCleanDate(null, true);
     		var value = cmp.find("dateTimePickerTest").get("v.value");
-    		var setDate = cmp.find("dateTimePickerTest").find("inputText").getElement().value;
+    		var setDate = cmp.find("dateTimePickerTest").find("inputDate").getElement().value;
 
     		$A.test.assertEquals(expectedDate, setDate, "Incorrect datetime was set.");
     	}]
     },
-    
+
     /**
      * Acessibility test, making sure that any functionality added is still accessible
-     * 
+     *
      */
     testAccessibile : {
     	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
     	        test : [function(cmp) {
     	  			this.openDatePicker(cmp);
-    	    	}, function(cmp) {	
+    	    	}, function(cmp) {
     	    		$A.test.assertAccessible();
     	}]
      },
-     
+
     /**
       *  If value is set for date/time when opening up dateTimePicker it opens to the date of set value.
       */
-    testCalendarWithTimeValuePreSet : {
-    	attributes : {value: '09-10-2012T11:23Z', format: 'MM/dd/yyyy HH:mm', timezone: 'GMT'},
+    _testCalendarWithTimeValuePreSet : {
+    	attributes : {value: '2012-09-10T11:23Z', format: 'MM/dd/yyyy HH:mm', dateFormat: 'MM/dd/yyyy', timeFormat: 'HH:mm', timezone: 'GMT'},
     	test : [function(cmp) {
     		 this.openDatePicker(cmp);
-    	}, function(cmp) {		   
+    	}, function(cmp) {
     		var expected = "September 2012";
     		var datepicker = cmp.find("dateTimePickerTest").find("datePicker");
     		var actual = this.getTextFromElm(datepicker);
-    		
+
     		$A.test.assertEquals(expected, actual, "Month year of datePicker is not valid");
     		actual = $A.util.getText($A.test.getElementByClass("selectedDate")[0]);
     		$A.test.assertEquals("10", actual, "Day of month that is not correct");
-		
-    		//Grabbing timepicker values to make sure that everything is set correctly
-    		var timePicker = datepicker.find("time");
-    		var hours = timePicker.find("hours").getElement().value;
-    		var minutes = timePicker.find("minutes").getElement().value;
-    		
-    		actual = hours +":"+minutes;
-    		$A.test.assertEquals("11:23", actual, "The default value put in the inputText box, is not the value in the timePicker");
+
+			if (!this.isViewDesktop()) {
+				//Grabbing timepicker values to make sure that everything is set correctly
+				var timePicker = datepicker.find("time");
+				var hours = timePicker.find("hours").getElement().value;
+				var minutes = timePicker.find("minutes").getElement().value;
+
+				actual = hours +":"+minutes;
+				$A.test.assertEquals("11:23", actual, "The default value put in the inputDate box, is not the value in the timePicker");
+			}
     	}]
     },
-    
+
  	/**
  	 * Firing the openPicker component event should open the date picker.
  	 */
@@ -122,32 +128,32 @@
  	},
 
     /**
-     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
-     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 
+     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because
+     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText
      * and a select value
-     * 
-     */ 
+     *
+     */
     isViewDesktop : function(){
     	return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
     },
-    
+
     /**
-     * We have to ways that we need to get elements. Either from a output/select combo or from a header tag  
+     * We have to ways that we need to get elements. Either from a output/select combo or from a header tag
      */
     getTextFromElm: function(cmp){
     	if(this.isViewDesktop()){
         	return $A.util.getText(cmp.find("calTitle").getElement());
         }
-	
+
     	var year = cmp.find("yearTitle").getElement().value;
     	var month = $A.util.getText(cmp.find("monthTitle").getElement());
-		
+
     	return month +" "+year;
     },
-    
+
     openDatePicker : function(cmp) {
     	var opener = cmp.find("dateTimePickerTest").find("datePickerOpener").getElement();
-    	var inputBox = cmp.find("dateTimePickerTest").find("inputText").getElement();
+    	var inputBox = cmp.find("dateTimePickerTest").find("inputDate").getElement();
 	var datePicker = cmp.find("dateTimePickerTest").find("datePicker").getElement();
 	if($A.util.isUndefinedOrNull(opener)) {
             $A.test.clickOrTouch(inputBox);
@@ -156,19 +162,19 @@
 	}
 	$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },
-    
+
     /*
-     *  Checking for numbers that are less than 10, if it is adding in a 0 to the front 
+     *  Checking for numbers that are less than 10, if it is adding in a 0 to the front
      */
     twoDigitFormat : function(num){
 	num = "" + num;
 	if(num.length < 2){
 	    return "0" + num;
 	}
-	
+
 	return "" + num;
     },
-    
+
     getCleanDate : function(dateValue, hasTime) {
     	var dateSep = "/";
     	var timeSep = ":";
@@ -178,11 +184,11 @@
     		someDate.getFullYear();
     	if (hasTime) {
     	        var mod = someDate.getHours()%12;
-    	        
+
     	        if(mod == 0){
     	            mod = 12;
     	        }
-		retDate += " " + this.twoDigitFormat(mod) + timeSep + this.twoDigitFormat(someDate.getMinutes());	
+		retDate += " " + this.twoDigitFormat(mod) + timeSep + this.twoDigitFormat(someDate.getMinutes());
     	}
     	return retDate;
     }

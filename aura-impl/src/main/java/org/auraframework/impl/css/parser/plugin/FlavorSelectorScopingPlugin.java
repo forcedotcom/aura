@@ -19,8 +19,6 @@ import java.util.Set;
 
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.css.util.Styles;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
@@ -37,24 +35,19 @@ import com.salesforce.omakase.plugin.basic.AutoRefiner;
 import com.salesforce.omakase.util.Selectors;
 
 /**
- * Enables handling of {@code @flavor} custom at-rules.
+ * Enables validating that each selector is scoped by a proper flavor class name. Also takes care of renaming .THIS to
+ * the resolved name, e.g., uiButton.
+ *
+ * @see FlavorPlugin
  */
-public final class AuraFlavorPlugin implements DependentPlugin {
+public final class FlavorSelectorScopingPlugin implements DependentPlugin {
     private static final String MSG = "CSS selectors must begin with a class selector of the proper format e.g., .THIS, .THIS-foo, .THIS--flavorName, .THIS__element";
-    private static final String THIS = "THIS";
-    private static final String FLAVORED_THIS = "THIS--";
-    private static final String DEFAULT_RENAME = FLAVORED_THIS + "default";
 
-    private final Set<String> scopedClassNames = Sets.newHashSet();
-    private final Set<String> knownFlavors = Sets.newHashSet();
     private final String componentClass;
+    private final Set<String> scopedClassNames = Sets.newHashSet();
 
-    public AuraFlavorPlugin(DefDescriptor<FlavoredStyleDef> flavoredStyle) {
-        if (flavoredStyle.getPrefix().equals(DefDescriptor.CUSTOM_FLAVOR_PREFIX)) {
-            this.componentClass = Flavors.toComponentClassName(flavoredStyle);
-        } else {
-            this.componentClass = Styles.buildClassName(flavoredStyle);
-        }
+    public FlavorSelectorScopingPlugin(DefDescriptor<FlavoredStyleDef> flavoredStyle) {
+        this.componentClass = FlavorPluginUtil.getComponentClass(flavoredStyle);
     }
 
     @Override
@@ -64,20 +57,8 @@ public final class AuraFlavorPlugin implements DependentPlugin {
 
     @Rework
     public void process(ClassSelector selector) {
-        if (selector.name().equals(THIS)) {
-            selector.name(DEFAULT_RENAME); // rename to THIS--default
-        }
-
-        if (selector.name().startsWith(THIS)) {
-            if (selector.name().startsWith(FLAVORED_THIS)) {
-                // don't include flavor (modifier) elements, e.g., THIS--flavor__element
-                // this matches the pattern fastest, but isn't the most robust way to check
-                if (!selector.name().contains("_")) {
-                    knownFlavors.add(selector.name().substring(FLAVORED_THIS.length()));
-                }
-            }
-
-            String replacement = selector.name().replaceFirst(THIS, componentClass);
+        if (selector.name().startsWith(FlavorPluginUtil.THIS)) {
+            String replacement = selector.name().replaceFirst(FlavorPluginUtil.THIS, componentClass);
             selector.name(replacement);
             scopedClassNames.add(selector.name());
         }
@@ -102,9 +83,5 @@ public final class AuraFlavorPlugin implements DependentPlugin {
 
             em.report(ErrorLevel.FATAL, selector, MSG);
         }
-    }
-
-    public Set<String> getFlavorNames() {
-        return knownFlavors;
     }
 }

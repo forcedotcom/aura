@@ -80,24 +80,53 @@
 
 
     addParentListElementAsInput: function(component) {
+        var listElement = this._getPillContainerListElement(component);
+        if (listElement) {
+            this.addIgnoredElement(component.getSuper(), listElement);
+        }
+    },
 
+    handleListExpand: function(component, event) {
+        var pillListElement = this._getPillContainerListElement(component);
+        if (pillListElement) {
+            var autocompleteList = component.find("list");
+            if (autocompleteList) {
+                autocompleteList.getElement().style.top = pillListElement.offsetHeight+"px";
+            }
+        }
+    },
+
+    _getPillContainerListElement: function(component) {
+        var pillContainer = this._getPillContainer(component);
+        if (pillContainer) {
+            //add pill container list element as an input element
+            var listComponent = pillContainer.find("list");
+            if (listComponent) {
+                return listComponent.getElement();
+            }
+        }
+        return null;
+    },
+
+    // pillContainer should really be the child of pillContainerAutoComplete rather than this nonsense
+    _getPillContainer: function(component) {
         //get parent pill container
         var element = component.getElement().parentElement;
         var htmlComponent = $A.componentService.getRenderingComponentForElement(element);
         if (!$A.util.isUndefinedOrNull(htmlComponent)) {
             var concreteComponent = htmlComponent.getComponentValueProvider().getConcreteComponent();
             if (concreteComponent.isInstanceOf("ui:pillContainer")) {
-
-                //add pill container list element as an input element
-                var listComponent = concreteComponent.find("list");
-                if (listComponent) {
-                    var listElement = listComponent.getElement();
-                    if (listElement) {
-                        this.addIgnoredElement(component.getSuper(), listElement);
-                    }
-                }
+               return concreteComponent;
             }
-
         }
+    },
+
+    getInputElement: function(component) {
+        var inputComponent = component.getSuper().find('input');
+        if (inputComponent) {
+            var inputHelper = inputComponent.getDef().getHelper();
+            return inputHelper.getInputElement(inputComponent);
+        }
+        return null;
     }
 })

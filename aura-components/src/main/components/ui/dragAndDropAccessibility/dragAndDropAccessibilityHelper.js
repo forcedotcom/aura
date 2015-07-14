@@ -54,34 +54,37 @@
 	 * Make draggables fire dragEnd event.
 	 * @param {Aura.Component[]} draggables - the ui:draggable's
 	 * @param {boolean} isValid - true if drag operation is successful or false if it's aborted
+	 * @param {HTMLElement} target - the event target for dragend event
 	 */
-	fireDragEnd: function(draggables, isValid) {
+	fireDragEnd: function(draggables, isValid, target) {
 		if (isValid === undefined) {
 			isValid = false;
 		}
 		
 		$A.util.forEach(draggables, function(draggable) {
-			draggable.fireDragEnd(isValid, true);
+			draggable.fireDragEnd(target, isValid, true);
 		});
 	},
 	
 	/**
 	 * Make dropzones fire dragEnter event.
 	 * @param {Aura.Component[]} dropzones - the ui:dropzone's
+	 * @param {HTMLElement} target - the event target for dragenter event
 	 */
-	fireDragEnter: function(dropzones) {
+	fireDragEnter: function(dropzones, target) {
 		$A.util.forEach(dropzones, function(dropzone) {
-			dropzone.fireDragEnter(true);
+			dropzone.fireDragEnter(target, true);
 		});
 	},
 	
 	/**
 	 * Make dropzones fire dragLeave event.
 	 * @param {Aura.Component[]} dropzones - the ui:dropzone's
+	 * @param {HTMLElement} target - the event target for dragleave event
 	 */
-	fireDragLeave: function(dropzones) {
+	fireDragLeave: function(dropzones, target) {
 		$A.util.forEach(dropzones, function(dropzone) {
-			dropzone.fireDragLeave(true);
+			dropzone.fireDragLeave(target, true);
 		});
 	},
 	
@@ -89,10 +92,11 @@
 	 * Make dropzones fire drop event.
 	 * @param {Aura.Component[]} dropzones - the ui:dropzone's
 	 * @param {Aura.Component[]} draggables - the ui:draggable's
+	 * @param {HTMLElement} target - the event target for drop event
 	 */
-	fireDrop: function(dropzones, draggables) {
+	fireDrop: function(dropzones, draggables, target) {
 		$A.util.forEach(dropzones, function(dropzone) {
-			dropzone.fireDrop(draggables, true);
+			dropzone.fireDrop(target, draggables, true);
 		});
 	}
 })

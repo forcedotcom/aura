@@ -32,6 +32,10 @@ div.THIS {
 	color: #2F3438;
 }
 
+.THIS header h2 small {
+	padding-left: .3em;
+}
+
 .THIS p {
 	line-height: 1.4;
 	margin-bottom: 1.1em;

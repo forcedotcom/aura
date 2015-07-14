@@ -1,0 +1,7 @@
+<aura:component
+    abstract="true" 
+    extensible="true" 
+    implements="performance:test" 
+    description="Abstract component for performance tests">
+    {!v.body}
+</aura:component>

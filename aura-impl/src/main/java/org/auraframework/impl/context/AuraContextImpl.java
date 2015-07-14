@@ -924,7 +924,7 @@ public class AuraContextImpl implements AuraContext {
             desc = this.getApplicationDescriptor();
         }
 
-        if (desc.getDefType() == DefType.COMPONENT) {
+        if (desc != null && desc.getDefType() == DefType.COMPONENT) {
             BaseComponentDef def = (BaseComponentDef) Aura.getDefinitionService().getDefinition(desc);
             DefDescriptor<ComponentDef> d = this.currentAction.getCallingDescriptor();
             if (d == null) {

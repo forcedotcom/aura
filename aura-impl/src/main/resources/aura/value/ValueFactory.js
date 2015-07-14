@@ -46,11 +46,13 @@ var valueFactory = {
                     return (isGlobal?$A:component).get(expression);
                 // By Reference
                 case '!':
-                    //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                    if(!isGlobal&&$A.util.isComponent(component)){
+//                  //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
+                    if(isGlobal) {
+                        return $A.expressionService.getReference(valueConfig,component);
+                    }else if($A.util.isComponent(component)){
                         return component.getReference(valueConfig);
                     }
-                    return new PropertyReferenceValue(expression.split("."), isGlobal?$A:component);
+                    return new PropertyReferenceValue(expression.split("."), component);
             }
         }
         return valueConfig;

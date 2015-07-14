@@ -13,20 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS tbody, .THIS thead, .THIS tr, .THIS th, .THIS td  {
-	vertical-align: middle;
-}
-
-.THIS.fixedHeaderTable thead tr {
-	display: block;
-	position: relative;
-}
-
 .THIS.fixedHeaderTable tbody {
 	display: block;
 	overflow: auto;
-}
-
-.THIS.fixedHeaderTable tbody::-webkit-scrollbar {
-	display:none;
 }

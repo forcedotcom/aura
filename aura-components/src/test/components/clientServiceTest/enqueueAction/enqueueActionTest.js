@@ -723,6 +723,7 @@
     /**
      * If parented action is enqueued, but parent is aborted by a subsequent action, the parented action should be
      * aborted.
+     * setParentAction is marked with [Deprecated - Never AOTP], remove this test when the api is gone
      */
     testAbortAfterEnqueueIfParentAborted : {
         test : [ function(cmp) {

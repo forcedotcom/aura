@@ -10,7 +10,7 @@
                     <uitest:pillContainerAutoCompleteDataProvider/>
                 </aura:set>
                 <aura:set attribute="listOption">
-                    <ui:pillContainerAutoCompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row}" visible="{!row.visible}" iconUrl="{!row.icon.url}"/>
+                    <ui:pillContainerAutoCompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row}" visible="{!row.visible}" iconUrl="{!row.icon.url}" iconBackgroundColor="{!row.icon.backgroundColor}"/>
                 </aura:set>
             </ui:pillContainerAutoComplete>
         </aura:set>

@@ -45,10 +45,9 @@ Aura.L10n       = {};
 Aura.Services   = {};
 Aura.Storage    = {};
 
-/**
+/*
  * @description This, $A, is supposed to be our ONLY window-polluting top-level variable.
  * Everything else in Aura is attached to it.
- * @platform
  */
 window['$A'] = {};
 
@@ -182,18 +181,50 @@ window['$A'] = {};
  * @class Aura
  * @classdesc The Aura framework. Default global instance name is $A.
  * @constructor
- * @platform
+ * 
+ * @borrows Aura.Services.AuraClientService#enqueueAction as enqueueAction
+ * @borrows Aura.Services.AuraClientService#deferAction as deferAction
+ * @borrows Aura.Services.AuraRenderingService#render as render
+ * @borrows Aura.Services.AuraRenderingService#rerender as rerender
+ * @borrows Aura.Services.AuraRenderingService#unrender as unrender
+ * @borrows Aura.Services.AuraRenderingService#afterRender as afterRender
+ * @borrows Aura.Services.AuraComponentService#get as getCmp
+ * @borrows Aura.Services.AuraComponentService#createComponent as createComponent
+ * @borrows Aura.Services.AuraComponentService#createComponents as createComponents
+ * @borrows Aura.Services.AuraComponentService#getComponent as getComponent
+ * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmp
+ * @borrows Aura.Services.AuraComponentService#newComponentDeprecated as newCmpDeprecated
+ * @borrows Aura.Services.AuraComponentService#newComponentAsync as newCmpAsync
+ * @borrows Aura.Services.AuraEventService.newEvent as getEvt
+ * @borrows Aura.Services.AuraClientService#getCurrentTransactionId as getCurrentTransactionId
+ * @borrows Aura.Services.AuraClientService#setCurrentTransactionId as setCurrentTransactionId
  */
 function AuraInstance () {
     this.globalValueProviders = {};
     this.displayErrors        = true;
 
     this.logger               = new Aura.Utils.Logger();
+    
+    /** 
+     * Collection of basic utility methods to operate on the DOM and Aura Components. <br/>
+     * See the documentation for <a href="#reference?topic=api:Util">Util</a> for the members.
+     *
+     * @type $A.ns.Util
+     * @platform 
+     */
     this.util                 = new Aura.Utils.Util();
     this["util"]              = this.util; //Move this? (check prod mangling)
 
     this.auraError            = Aura.Errors.AuraError;
     this.auraFriendlyError    = Aura.Errors.AuraFriendlyError;
+    
+    /**
+     * Instance of the AuraLocalizationService which provides utility methods for localizing data or getting formatters for numbers, currencies, dates, etc.<br/>
+     * See the documentation for <a href="#reference?topic=api:AuraLocalizationService">AuraLocalizationService</a> for the members.
+     * 
+     * @type AuraLocalizationService
+     * @platform
+     */
     this.localizationService  = new Aura.Services.AuraLocalizationService();
 
     this.clientService        = new Aura.Services.AuraClientService();
@@ -211,6 +242,7 @@ function AuraInstance () {
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
     //#end
+
 
     /** @field */
     this.services = {
@@ -330,138 +362,25 @@ function AuraInstance () {
         }
     };
 
-    /**
-     * Equivalent to <code>$A.clientService.enqueueAction()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraClientService">AuraClientService</a></p>
-     * @public
-     * @function
-     * @param {Action} action
-     * @borrows AuraClientService.enqueueAction
-     * @platform
-     */
+
+    // Doced at the source by the @borrows statements on the Aura class
     this.enqueueAction = this.clientService.enqueueAction.bind(this.clientService);
-
-    /**
-     * Equivalent to <code>$A.clientService.deferAction()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraClientService">AuraClientService</a></p>
-     * @public
-     * @function
-     * @param {Action} action
-     * @borrows AuraClientService.deferAction
-     */
     this.deferAction = this.clientService.deferAction.bind(this.clientService);
-
-    /**
-     * Equivalent to <code>$A.renderingService.render()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraRenderingService.render
-     */
     this.render = this.renderingService.render.bind(this.renderingService);
-
-    /**
-     * Equivalent to <code>$A.renderingService.rerender()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraRenderingService.rerender
-     */
     this.rerender = this.renderingService.rerender.bind(this.renderingService);
-
-    /**
-     * Equivalent to <code>$A.renderingService.unrender()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a></p>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraRenderingService.unrender
-     */
     this.unrender = this.renderingService.unrender.bind(this.renderingService);
-
-    /**
-     * Equivalent to <code>$A.renderingService.afterRender()</code>.
-     * <p>See Also: <a href="#reference?topic=api:AuraRenderingService">AuraRenderingService</a>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraRenderingService.afterRender
-     */
     this.afterRender = this.renderingService.afterRender.bind(this.renderingService);
-
-    /**
-     * Equivalent to <code>$A.componentService.get()</code>.
-     * <p>See Also: <a href="#reference?topic="AuraComponentService">AuraComponentService</a></p>
-     * @public
-     * @deprecated use getComponent instead
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraComponentService.get
-     */
     this.getCmp = this.componentService.get.bind(this.componentService);
-
-    /**
-     * Equivalent to <code>$A.componentService.getComponent()</code>.
-     * <p>See Also: <a href="#reference?topic="AuraComponentService">AuraComponentService</a></p>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraComponentService.getComponent
-     * @platform
-     */
     this.getComponent = this.componentService.getComponent.bind(this.componentService);
-
-    /**
-     * Create a component from a type and a set of attributes.
-     * @borrows AuraComponentService.createComponent
-     * @platform
-     */
     this.createComponent = this.componentService["createComponent"].bind(this.componentService);
-
-    /**
-     * Create an array of components from a list of types and attributes.
-     * @borrows AuraComponentService.createComponents
-     * @platform
-     */
     this.createComponents = this.componentService["createComponents"].bind(this.componentService);
-
-    /**
-     * Client-side component creation. This method is replaced by newCmpAsync().
-     * @param {Object} config
-     * @param {Object} attributeValueProvider
-     * @param {Boolean} localCreation
-     * @deprecated Use createComponent instead.
-     * @platform
-     */
     this.newCmp = this.componentService["newComponentDeprecated"].bind(this.componentService);
-
-    /**
-     * Previously known as newComponent(). This method is replaced by newCmpAsync().
-     * @param {Object} config
-     * @param {Object} attributeValueProvider
-     * @param {Boolean} localCreation
-     * @param {Boolean} doForce
-     * @deprecated Use createComponent instead.
-     */
     this.newCmpDeprecated = this.componentService["newComponentDeprecated"].bind(this.componentService);
-
-    /**
-     * Creates components from a client-side controller or helper. Equivalent to <code>$A.newCmpAsync()</code>.
-     * If no server-side dependencies are found, this method runs synchronously.
-     * @param {Object} callbackScope The callback scope
-     * @param {Function} callback The callback function, required for returning the newly created component
-     * @param {Object} config Provides the component descriptor and attributes. Example:
-     * <p><code>"componentDef": "markup://ui:button", "attributes": { "values": {label: "Submit"}}</code></p>
-     * @param {Object} attributeValueProvider The value provider for the attribute.
-     * @param {Boolean} localCreation For internal use only. localCreation determines if the global id is used and defaults to false.
-     * @param {Boolean} doForce For internal use only. doForce enforces client-side creation and defaults to false.
-     * @param {Boolean} forceServer For internal use only. forceServer enforces server-side creation and defaults to false.
-     * @deprecated Use createComponent instead.
-     */
-
     this.newCmpAsync = this.componentService["newComponentAsync"].bind(this.componentService);
+    this.getEvt = this.eventService.newEvent.bind(this.eventService);
+    this.Component = Component;
+    this.getCurrentTransactionId = this.clientService.getCurrentTransactionId.bind(this.clientService);
+    this.setCurrentTransactionId = this.clientService.setCurrentTransactionId.bind(this.clientService);
 
     /**
      * Pushes current portion of attribute's creationPath onto stack
@@ -481,19 +400,6 @@ function AuraInstance () {
     	act.pushCreationPath(creationPath);
     };
 
-    /**
-     * Get the current abortable transaction ID.
-     *
-     * @public
-     */
-    this.getCurrentTransactionId = this.clientService.getCurrentTransactionId.bind(this.clientService);
-
-    /**
-     * Set the current abortable transaction ID.
-     *
-     * @public
-     */
-    this.setCurrentTransactionId = this.clientService.setCurrentTransactionId.bind(this.clientService);
 
     /**
      * pops current portion of attribute's creationPath from stack
@@ -530,19 +436,6 @@ function AuraInstance () {
     	}
     	act.setCreationPathIndex(idx);
     };
-
-
-    /**
-     * Equivalent to <code>$A.eventService.newEvent()</code>.
-     * <p>See Also: <a href="#reference?topic="AuraEventService">AuraEventService</a></p>
-     * @public
-     * @function
-     * @param {Component|Array} cmp
-     * @borrows AuraEventService.newEvent
-     */
-    this.getEvt = this.eventService.newEvent.bind(this.eventService);
-
-    this.Component = Component;
 
     //	Google Closure Compiler Symbol Exports
 	this["getCurrentTransactionId"] = this.getCurrentTransactionId;
@@ -776,23 +669,11 @@ AuraInstance.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
  * each error that occurs. <code>auraErrorsExpectedDuringInit</code> allows server side errors to not stop the
  * test as well.
  *
- *@example
- * <pre>
- * testDuplicate : {
-   auraErrorsExpectedDuringInit : ["Duplicate found!"],
-     attributes : {
- *     dupCmp : true
- *   },
- *    //more tests
- * }
- * </pre>
- *
- * <p>This code tries to separate a "display message" (with limited information for users in production
- * modes) from a "log message" (always complete).</p>
  *
  * @public
  * @param {String} msg The error message to be displayed to the user.
  * @param {Error} [e] The error object to be displayed to the user.
+ * @platform
  */
 AuraInstance.prototype.error = function(msg, e){
     this.logger.error(msg, e);
@@ -822,6 +703,7 @@ AuraInstance.prototype.showErrors = function(toggle){
  * @public
  * @param {String} w The message to display.
  * @param {Error} e an error, if any.
+ * @platform
  */
 AuraInstance.prototype.warning = function(w, e) {
     this.logger.warning(w, e);
@@ -894,6 +776,10 @@ AuraInstance.prototype.getCallback = function(callback) {
  * @platform
  */
 AuraInstance.prototype.get = function(key, callback) {
+// JBUCH: TODO: FIXME
+//    if(callback){
+//        throw new Error("Remove Me!");
+//    }
     key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
@@ -930,7 +816,24 @@ AuraInstance.prototype.set = function(key, value) {
     if(!valueProvider["set"]){
         $A.assert(false, "Unable to set value for key '" + key + "'. Value provider does not implement 'set(key, value)'.");
     }
-    return valueProvider["set"](path.join('.'), value);
+    var oldValue=$A.get(key);
+    var result=valueProvider["set"](path.join('.'), value);
+    $A.expressionService.updateGlobalReference(key,oldValue,value);
+    return result;
+};
+
+
+/**
+ * Returns a live reference to the global value indicated using property syntax.
+ *
+ * @param {String} key The data key for which to return a reference.
+ * @return {PropertyReferenceValue}
+ * @public
+ * @platform
+ * @export
+ */
+AuraInstance.prototype.getReference = function(key) {
+    return $A.expressionService.getReference(key);
 };
 
 Aura.OverrideMap$Instance = undefined;
@@ -1014,6 +917,7 @@ AuraInstance.prototype.getContext = function() {
  * @param {Function} func The function to run.
  * @param {String} name an optional name for the stack.
  * @public
+ * @platform
  */
 AuraInstance.prototype.run = function(func, name) {
     $A.assert(func && $A.util.isFunction(func), "The parameter 'func' for $A.run() must be a function!");
@@ -1074,9 +978,11 @@ AuraInstance.prototype.userAssert = function(condition, msg) {
  *  If both value and error are passed in, value shows up in the console as a group with value logged within the group.
  *  If only value is passed in, value is logged without grouping.
  *  <p>For example, <code>$A.log(action.getError());</code> logs the error from an action.</p>
+ *
  * @public
  * @param {Object} value The first object to log.
  * @param {Object} error The error messages to be logged in the stack trace.
+ * @platform
  */
 AuraInstance.prototype.log = function(value, error) {
     this.logger.info(value, error);
@@ -1159,8 +1065,33 @@ AuraInstance.prototype.Perf = window['Perf'] || PerfShim;
 // is just a placeholder. Use this function to preserve Aura while populating
 // $A, without making a new top-level name:
 (function bootstrap() {
+    /**
+     * @description This, $A, is supposed to be our ONLY window-polluting top-level variable. Everything else in Aura is
+     *            attached to it.
+     * 
+     * @platform
+     * @namespace
+     * @alias $A
+     *
+     * @borrows AuraComponentService#createComponent as $A.createComponent
+     * @borrows AuraComponentService#createComponents as $A.createComponents
+     * @borrows AuraComponentService#getComponent as $A.getComponent
+     * @borrows AuraClientService#enqueueAction as $A.enqueueAction
+     * @borrows AuraInstance#getRoot as $A.getRoot
+     * @borrows AuraInstance#get as $A.get
+     * @borrows AuraInstance#set as $A.set
+     * @borrows AuraInstance#error as $A.error
+     * @borrows AuraInstance#log as $A.log
+     * @borrows AuraInstance#warning as $A.warning
+     * @borrows AuraInstance#run as $A.run
+     * @borrows AuraComponentService#newComponentDeprecated as $A.newCmp
+     * @borrows AuraComponentService#newComponentAsync as $A.newCmpAsync
+     * @borrows AuraInstance#localizationService as localizationService
+     * @borrows AuraInstance#util as util
+     */
     window['$A'] = new AuraInstance();
     $A.metricsService.bootstrapMark("frameworkReady");
+
 })();
 
 // TODO: Remove the legacy 'aura' top-level name.

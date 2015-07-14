@@ -106,7 +106,8 @@
 	/**
      * Verify behavior of Today() with default 'format' value.
      */
-	testToday:{
+    // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
+	_testToday:{
 	    attributes : {displayDatePicker:'true', format:'MMM dd, yyyy'},
 	    test: [function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
@@ -120,7 +121,8 @@
 	/**
      * Verify behavior of Today() when 'format' is assigned a valid value.
      */
-	testTodayDifferentFormat:{
+    // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
+	_testTodayDifferentFormat:{
 	    attributes : {displayDatePicker:'true', format: 'DD/MM/YYYY'},
 	    test: [function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();

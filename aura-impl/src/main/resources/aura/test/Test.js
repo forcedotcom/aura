@@ -84,8 +84,10 @@ TestInstance.prototype.errors = [];
  * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
  *              condition is checked after the current test stage is completed but before the next stage is started.
  *
- * @example <code>$A.test.addWaitFor("i was updated", function(){<br/>
- * return element.textContent;}, function(){alert("the wait is over"});</code>
+ * @example
+ * $A.test.addWaitFor("I was updated.", function(){
+ *   return element.textContent;
+ *  }, function(){alert("the wait is over"});
  *
  * @param {Object}
  *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
@@ -105,7 +107,8 @@ TestInstance.prototype.addWaitFor = function(expected, testFunction, callback) {
  *              The wait condition is checked after the current test stage is completed but before the next stage is
  *              started.
  *
- * @example <code>$A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});</code>
+ * @example
+ * $A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});
  *
  * @param {Object}
  *            success true if the action should succeed.
@@ -139,8 +142,9 @@ TestInstance.prototype.addWaitForAction = function(success, actionName, callback
  * @description Asynchronously wait for a condition before continuing with the next stage of the test case. The wait
  *              condition is checked after the current test stage is completed but before the next stage is started.
  *
- * @example <code>$A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
- *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});</code>
+ *  @example
+ *  $A.test.addWaitForWithFailureMessage("i was updated", function(){<br/>
+ *   return element.textContent;},"Failure Message", function(){alert("the wait is over"});
  *
  * @param {Object}
  *            expected The value to compare against. If expected is a function, it will evaluate it before comparison.
@@ -361,21 +365,22 @@ TestInstance.prototype.enqueueAction = function(action, background) {
 /**
  *
  * @description Get an instance of a server action that is not available to the component.
- *
- * @example <code>$A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",<br/>
- *          {name:"aura:text", attributes:{value:"valuable"}},<br/>
- *          function(action){alert(action.getReturnValue().attributes.values.value)})</code>
- *
- * @param {Component}
- *            component The scope to run the action with, even if the action is not visible to it
- * @param {String}
- *            descriptor The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
- * @param {Object}
- *            params The parameters to pass to the action, as a Map (name:value)
- * @param {Object}
- *            returnType The return type descriptor for the action, e.g. java://java.lang.String
- * @param {Function}
- *            callback An optional callback to execute with the component as the scope
+ * 
+ * @example
+ * $A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",
+ * 			{name:"aura:text", attributes:{value:"valuable"}},
+ * 			function(action){alert(action.getReturnValue().attributes.values.value)})
+ * 
+ * @param {Component} component
+ *            The scope to run the action with, even if the action is not visible to it
+ * @param {String} descriptor
+ *            The descriptor for the action - e.g. java://my.own.Controller/ACTION$doIt
+ * @param {Object} params
+ *            The parameters to pass to the action, as a Map (name:value)
+ * @param {Object} returnType
+ *            The return type descriptor for the action, e.g. java://java.lang.String
+ * @param {Function} callback
+ *            An optional callback to execute with the component as the scope
  * @returns {Action} an instance of the action
  * @export
  * @function Test#getExternalAction
@@ -675,18 +680,17 @@ TestInstance.prototype.assertAccessible = function() {
 };
 
 /**
- *
- * @description Assert that if(condition) check evaluates to true. A truthy value refers to an Object, a string, a
- *              non-zero number, a non-empty array, or true.
- *
- * @example Positive: <code>assertTruthy("helloWorld")</code>, Negative: <code>assertTruthy(null)</code>
- *
- * @param {Object}
- *            condition The condition to evaluate
- * @param {String}
- *            assertMessage The message that is returned if the condition is not true
+ * 
+ * @description Assert that if(condition) check evaluates to true.
+ * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
+ * 
+ * @example
+ * assertTruthy("helloWorld"); // Positive
+ * assertTruthy(null); // Negative
+ * 
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not true
  * @export
- * @function Test#assertTruthy
  */
 TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
     if (!condition) {
@@ -695,15 +699,16 @@ TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
 };
 
 /**
+ * @description A falsey value refers to zero, an empty string, null, undefined, or false.
  * Assert that the if(condition) check evaluates to false.
  *
- * @param {Object}
- *            condition The condition to evaluate
- * @param {String}
- *            assertMessage The message that is returned if the condition is not false
- * @description A falsey value refers to zero, an empty string, null, undefined, or false.
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not false
+ * 
+ * @example
+ * assertFalsy("helloWorld"); // Negative
+ * assertFalsy(null); // Positive
  *
- * @example Negative: <code>assertFalsy("helloWorld")</code>, Postive: <code>assertFalsy(null)</code>
  * @export
  * @function Test#assertFalsy
  */
@@ -714,15 +719,16 @@ TestInstance.prototype.assertFalsy = function(condition, assertMessage) {
 };
 
 /**
- * Assert that if(condition) check evaluates to true.
- *
- * @param {Object}
- *            condition The condition to evaluate
- * @param {String}
- *            assertMessage The message that is returned if the condition is not true
- * @description Positive: assert("helloWorld"), Negative: assert(null)
+ * @description Assert that if(condition) check evaluates to true.
+ * 
+ * @param {Object} condition The condition to evaluate
+ * @param {String} assertMessage The message that is returned if the condition is not true
+ * 
+ * 
+ * @example
+ * assert("helloWorld"); // Positive
+ * assert(null); // Negative
  * @export
- * @function Test#assert
  */
 TestInstance.prototype.assert = function(condition, assertMessage) {
     this.assertTruthy(condition, assertMessage);
@@ -1766,7 +1772,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
  */
 TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     if (this.disconnected) {
-        return null;
+        return { "status": "INCOMPLETE" };
     }
     return config["fn"].call(config["scope"], response, noStrip);
 };
@@ -2019,7 +2025,7 @@ TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
  * @function Test#getCreationPath
  */
 TestInstance.prototype.getCreationPath = function(cmp) {
-    return cmp.priv.creationPath;
+    return cmp.creationPath;
 };
 
 /**

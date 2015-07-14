@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 ({
+
+    INPUT_MIN_WIDTH_PX: 100,
+    SCROLL_BAR_MARGIN_PX: 20,
+
     handleItemSelected: function(cmp, newItemList) {
         if (!$A.util.isEmpty(newItemList) && $A.util.isArray(newItemList)) {
             this.insertItems(cmp, newItemList);
@@ -27,12 +31,14 @@
             if (itemsLength >= maxAllowed) {
                 window.setTimeout(function () {
                     $A.run(function () {
-                        var pillItems = cmp.find('pill');
-                        if (!$A.util.isEmpty(pillItems)) {
-                            if ($A.util.isArray(pillItems)) {
-                                pillItems[pillItems.length - 1].focus();
-                            } else {
-                                pillItems.focus();
+                        if (cmp.isValid()) {
+                            var pillItems = cmp.find('pill');
+                            if (!$A.util.isEmpty(pillItems)) {
+                                if ($A.util.isArray(pillItems)) {
+                                    pillItems[pillItems.length - 1].focus();
+                                } else {
+                                    pillItems.focus();
+                                }
                             }
                         }
                     })
@@ -92,7 +98,9 @@
             var that = this;
             window.setTimeout(function () {
                 $A.run(function () {
-                    that._deleteItem(cmp, data);
+                    if (cmp.isValid()) {
+                        that._deleteItem(cmp, data);
+                    }
                 })
             }, 0);
         }
@@ -152,49 +160,78 @@
         var maxAllowed = cmp.get("v.maxAllowed");
         if (!$A.util.isEmpty(pillInput) && itemsLength < maxAllowed) {
             $A.util.removeClass(cmp.getElement(), 'noinput');
+
+            //set the input to min width so it doesn't wrap due to bigger size
+            pillInput[0].setAvailableWidth(this.INPUT_MIN_WIDTH_PX);
+
+            //after everything is rendered calculate the real width
+            var self = this;
+            window.setTimeout(function () {
+                if (cmp.isValid()) {
+                    var list = cmp.find("list");
+                    var listElement = list.getElement();
+                    if (list && listElement) {
+                        var listBoundingRect = listElement.getBoundingClientRect();
+                        var availableWidth = listBoundingRect.right - listBoundingRect.left;
+                        var inputListItem = cmp.find("inputListItem");
+                        var inputlistItemElement = inputListItem.getElement();
+                        if (inputlistItemElement) {
+                            var inputListItemBoundingRect = inputlistItemElement.getBoundingClientRect();
+                            availableWidth = listBoundingRect.right - inputListItemBoundingRect.left - self.SCROLL_BAR_MARGIN_PX;
+                        }
+                        pillInput[0].setAvailableWidth(availableWidth);
+                    }
+                }
+            }, 0);
+
             pillInput[0].focus();
         } else {
            $A.util.addClass(cmp.getElement(), 'noinput');
+           if (!$A.util.isEmpty(pillInput)) {
+               pillInput[0].setAvailableWidth(0);
+           }
         }
 
     },
 
     adjustHeight: function(cmp) {
-        var hideShowMore = true;
-        var maxLines = cmp.get("v.maxLines");
-        if (maxLines > 0) {
-            var listItems = cmp.find("listitem");
-            if (!$A.util.isEmpty(listItems)) {
+        if (!cmp.get("v.expanded")) {
+            var hideShowMore = true;
+            var maxLines = cmp.get("v.maxLines");
+            if (maxLines > 0) {
+                var listItems = cmp.find("listitem");
+                if (!$A.util.isEmpty(listItems)) {
 
-                //find the height of a pill
-                var firstItem;
-                var lastItem;
-                if ($A.util.isArray(listItems)) {
-                    firstItem = listItems[0].getElement();
-                    lastItem = listItems[listItems.length - 1].getElement();
-                } else {
-                    lastItem = firstItem = listItems.getElement()
-                }
-                var pillHeight = this._getActualHeight(firstItem);
+                    //find the height of a pill
+                    var firstItem;
+                    var lastItem;
+                    if ($A.util.isArray(listItems)) {
+                        firstItem = listItems[0].getElement();
+                        lastItem = listItems[listItems.length - 1].getElement();
+                    } else {
+                        lastItem = firstItem = listItems.getElement()
+                    }
+                    var pillHeight = this._getActualHeight(firstItem);
 
-                //set the maximum height of the pill container based on maxLines attribute
-                var list = cmp.find("list");
-                var limitedHeight = pillHeight * maxLines;
-                var scrollHeight = list.getElement().scrollHeight;
-                list.getElement().style.maxHeight = limitedHeight + "px";
+                    //set the maximum height of the pill container based on maxLines attribute
+                    var list = cmp.find("list");
+                    var limitedHeight = pillHeight * maxLines;
+                    var scrollHeight = list.getElement().scrollHeight;
+                    list.getElement().style.maxHeight = limitedHeight + "px";
 
-                //only show the Show More button if there's overflow
-                var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
-                console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight)
-                if (lastItemBottom > limitedHeight) {
-                    hideShowMore = false;
+                    //only show the Show More button if there's overflow
+                    var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
+                    console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight)
+                    if (lastItemBottom > limitedHeight) {
+                        hideShowMore = false;
+                    }
                 }
             }
-        }
-        if (hideShowMore) {
-            $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
-        } else {
-            $A.util.removeClass(cmp.find("showMore").getElement(), 'invisible');
+            if (hideShowMore) {
+                $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+            } else {
+                $A.util.removeClass(cmp.find("showMore").getElement(), 'invisible');
+            }
         }
     },
 
@@ -202,6 +239,7 @@
         var list = cmp.find("list");
         list.getElement().style.maxHeight = "";
         $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
+        cmp.set("v.expanded", true);
 
     },
 

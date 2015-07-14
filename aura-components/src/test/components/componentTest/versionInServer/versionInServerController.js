@@ -1,9 +1,16 @@
 ({
     updateVersionFromCreatedComponent: function(cmp, evt, helper) {
-        $A.createComponent("auratest:requireWithModel", null, function(newCmp) {
+        $A.createComponent("auratest:requireWithServerAction", null, function(newCmp) {
                 newCmp.updateVersionFromClientController();
                 helper.updateVersion(cmp, newCmp.get("v.version"));
                 cmp.set("v.actionDone", true);
+            });
+    },
+
+    updateVersionFromCreatedComponentServerController: function(cmp, evt, helper) {
+        $A.createComponent("auratest:requireWithServerAction", null, function(newCmp) {
+                cmp.set("v.newComponent", newCmp);
+                newCmp.updateVersionFromServerController();
             });
     },
 

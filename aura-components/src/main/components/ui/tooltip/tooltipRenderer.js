@@ -16,75 +16,38 @@
 ({
 
     render: function(component, helper) {
-        var domId = component.get('v.domId');
-
-        if(!domId) {
-            domId = component.getConcreteComponent().getGlobalId();
-        }
-        var fadeInDuration = component.get('v.fadeInDuration');
-        var fadeOutDuration = component.get('v.fadeOutDuration');
-        var triggerClass = component.get('v.triggerClass');
-        var extraClass = component.get('v.class');
-        var delay = component.get('v.delay');
-        var direction = component.get('v.direction');
-        var disabled = component.get('v.disabled');
-        var tabIndex = component.get('v.tabIndexOverride');
-
-
-        if(!fadeInDuration) {
-            fadeInDuration = 0;
-        }
-
-        if(!fadeOutDuration) {
-            fadeOutDuration = 0;
-        }
-
-        
-        var classList = ['tooltip'];
-
-        if(extraClass) {
-            classList.push(extraClass);
-        }
-
-        if(direction) {
-            classList.push(direction);
-        }
-
-        if(fadeInDuration > 0) {
-            classList.push('fade-in');
-        }
-        if(fadeOutDuration > 0) {
-            classList.push('fade-out');
-        }
-
-        if(disabled) {
-            classList.push('disabled');
-        }
-
-        if(fadeInDuration > fadeOutDuration) {
-            fadeOutDuration = fadeInDuration;
-        } else {
-            fadeInDuration = fadeOutDuration;
-        }
-
-        var styleDeclaration = [
-            '-webkit-transtion-duration:' + fadeInDuration + 'ms',
-            'transition-duration:' + fadeInDuration  + 'ms',
-            '-webkit-transition-delay:' + delay  + 'ms', 
-            'transition-delay:' + delay  + 'ms'
-        ];
-
-        if(tabIndex === 0 || Math.abs(tabIndex) > 0) {
-            component.set('v.tabIndex', tabIndex);
-        } else {
-            component.set('v.tabIndex', 0);
-        }
-
-        component.set('v.tooltipStyle', styleDeclaration.join(';'));
-        component.set('v.domId', domId);
-        component.set('v.classList', classList.join(' '));
+        helper.initStyle(component);
 
         return this.superRender();
+    },
+
+    rerender: function(component, helper) {
+        var isDirty = false;
+
+        // any of these attributes being dirty
+        // requires re-calculating classes and styles
+        var attrToCheck = [
+            'v.fadeInDuration',
+            'v.fadeOutDuration',
+            'v.triggerClass',
+            'v.class',
+            'v.delay',
+            'v.direction',
+            'v.tabIndexOverride',
+            'v.trigger',
+            'v.disabled'
+        ];
+        for (var i = 0; i < attrToCheck.length; i++) {
+           if(component.isDirty(attrToCheck[i])){
+                isDirty = true;
+           }
+        }
+
+        if(isDirty) {
+            helper.initStyle(component);
+        }
+        
+        return this.superRerender();
     },
 
     afterRender: function(component, helper) {

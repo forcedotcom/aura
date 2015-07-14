@@ -1,0 +1,66 @@
+/* sample of flavor style def using extends */
+
+.THIS { /* should have selectors appended */
+    color: red;
+}
+
+.THIS .child { /* should have selectors appended */
+    text-decoration: underline;
+}
+
+.THIS.active .child, .THIS:active > a.first:child, .THIS--juz:active { /* should have selectors appended to first two selectors */
+	text-decoration: none;
+}
+
+.THIS__element { /* should not have selectors appended */
+	margin-left: 12px;
+}
+
+.THIS-faker { /* should not have selectors appended */
+	margin-right: 3px;
+}
+
+.THIS-faker__default { /* should not have selectors appended */
+	vertical-align: middle;
+}
+
+.THIS-faker--default { /* should not have selectors appended */
+    vertical-align: middle;
+}
+
+.THIS---default { /* should not have selectors appended */
+    background: blue;
+}
+
+/* @flavor foo, extends default */
+.THIS--foo {
+    background: black;
+    padding: 20px;
+}
+
+.THIS--foo .child {
+    font-weight: bold;
+}
+
+/* @flavor bar */
+/* @flavor baz, extends default */
+.THIS--bar, .THIS--baz {
+    font-size: 30px;
+}
+
+.THIS--lux .THIS__icon {
+	color: blue;
+}
+
+.THIS--lux, .THIS--lux.input, .THIS--lux input {
+	padding: 2px;
+}
+
+/* @flavor lax, extends lux */
+.THIS--lax {
+    padding: 3px;
+}
+
+.THIS--default { /** this comes after but should still get selectors appended */
+	background: black;
+}

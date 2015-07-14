@@ -1013,7 +1013,7 @@
         function(cmp) {
             var oldBody = cmp.get("v.body");
             this.createClientCmp(cmp);
-            $A.test.addWaitFor(false, oldBody[0].isValid);
+            $A.test.addWaitFor(false, function(){return oldBody[0].isValid()});
         },
         function(cmp) {
             $A.test.assertEquals("Doug", cmp.get("v.body")[0].get("v.first"), "Second component creation failure.");
@@ -1022,7 +1022,7 @@
         function(cmp) {
             var oldBody = cmp.get("v.body");
             this.createClientCmp(cmp);
-            $A.test.addWaitFor(false, oldBody[0].isValid);
+            $A.test.addWaitFor(false, function(){return oldBody[0].isValid()});
         },
         function(cmp) {
             $A.test.assertEquals("Doug", cmp.get("v.body")[0].get("v.first"), "Third component creation failure.");

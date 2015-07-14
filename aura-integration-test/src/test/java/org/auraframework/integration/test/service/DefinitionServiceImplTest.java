@@ -56,7 +56,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Tests for DefinitionServiceImpl.
- * 
+ *
  * @see org.auraframework.impl.registry.RootDefFactoryTest
  */
 public class DefinitionServiceImplTest extends AuraImplTestCase {
@@ -159,6 +159,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         }
     }
 
+    public void testFindNonExistingComponentByFilter() throws Exception {
+        Aura.getContextService().startContext(Mode.DEV, Format.HTML, Authentication.UNAUTHENTICATED);
+
+        Set<DefDescriptor<?>> set = definitionService.find(new DescriptorFilter("markup://notExists:blah", DefType.COMPONENT));
+        assertEquals(0, set.size());
+    }
+
     /**
      * Client loaded set is still preloaded for null input
      */
@@ -194,7 +201,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
 
     /**
      * Uid mismatch will trigger ClientOutOfSyncException.
-     * 
+     *
      * Update test according what I learned from W-2176923. ApexPagesAuraContext.java doesn't have the source for app,
      * but it go ahead and create app definition with its own (fake) builder, then add it to localDef: ComponentDef
      * cmpDef = (ComponentDef) Aura.getDefinitionService().getDefinition(cmpDesc);
@@ -270,6 +277,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                     String.format("%s: mismatched UIDs ", cmpDesc.getQualifiedName()));
         }
     }
+
     /**
      * UID, for unloaded descriptor, added to empty loaded set.
      */
@@ -425,6 +433,7 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
             // ok.
         }
     }
+
     /**
      * Loaded dependencies are pruned from preloads
      */
@@ -662,11 +671,13 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("house%sparty", nonce));
         addSourceAutoCleanup(ApplicationDef.class, baseContents, String.format("pants%sparty", nonce));
 
-        // Test wildcards
+        // Test wildcards with ANY type
         assertEquals("find() fails with wildcard as prefix", 1,
                 definitionService.find(new DescriptorFilter("*://" + houseboat.getDescriptorName())).size());
         assertEquals("find() fails with wildcard as namespace", 1,
                 definitionService.find(new DescriptorFilter("markup://*:" + houseboat.getName())).size());
+        assertEquals("find() fails with wildcard in namespace", 1,
+                definitionService.find(new DescriptorFilter("markup://str*:" + houseboat.getName())).size());
         assertEquals("find() fails with wildcard as name", 1,
                 definitionService.find(new DescriptorFilter(houseboat.getQualifiedName())).size());
         assertEquals("find() fails with wildcard at end of name", 2,
@@ -676,9 +687,43 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
                 definitionService.find(new DescriptorFilter("markup://string:*notherecaptain")).size());
 
+        // Test wildcards with specified constant type
+        assertEquals(
+                "find() fails with wildcard as prefix",
+                1,
+                definitionService.find(
+                        new DescriptorFilter("*://" + houseboat.getDescriptorName(), DefType.APPLICATION)).size());
+        assertEquals("find() fails with wildcard as namespace", 1,
+                definitionService.find(new DescriptorFilter("markup://*:" + houseboat.getName(), DefType.APPLICATION))
+                        .size());
+        assertEquals(
+                "find() fails with wildcard in namespace",
+                1,
+                definitionService.find(
+                        new DescriptorFilter("markup://str*:" + houseboat.getName(), DefType.APPLICATION)).size());
+        assertEquals("find() fails with wildcard as name", 1,
+                definitionService.find(new DescriptorFilter(houseboat.getQualifiedName(), DefType.APPLICATION)).size());
+        assertEquals(
+                "find() fails with wildcard at end of name",
+                2,
+                definitionService.find(
+                        new DescriptorFilter(String.format("markup://string:house%s*", nonce), DefType.APPLICATION))
+                        .size());
+        assertEquals(
+                "find() fails with wildcard at beginning of name",
+                2,
+                definitionService.find(
+                        new DescriptorFilter(String.format("markup://string:*%sparty*", nonce), DefType.APPLICATION))
+                        .size());
+        assertEquals("find() should not find nonexistent name with preceeding wildcard", 0,
+                definitionService.find(new DescriptorFilter("markup://string:*notherecaptain", DefType.APPLICATION))
+                        .size());
+
         // Look in NonCachingDefRegistry
         assertTrue("find() should find results for markup://ui:outputNumber",
                 definitionService.find(new DescriptorFilter("markup://ui:outputNumber")).size() > 0);
+        assertTrue("find() should find results for markup://*:outputNumber",
+                definitionService.find(new DescriptorFilter("markup://*:outputNumber")).size() > 0);
         assertTrue("find() fails with wildcard as prefix",
                 definitionService.find(new DescriptorFilter("*://ui:outputNumber")).size() > 2);
         assertEquals("find() is finding non-existent items", 0,

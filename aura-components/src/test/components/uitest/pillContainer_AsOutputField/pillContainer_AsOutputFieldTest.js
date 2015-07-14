@@ -235,7 +235,7 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [{id:'pill01',label:"Test Pill 01",icon: {url:'notfound.gif'}}] );
-            var icon = $A.test.select(".pillIcon")[0].parentElement;
+            var icon = $A.test.select(".pillIcon img")[0].parentElement;
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return that._isDisplayNone( icon);
@@ -253,7 +253,7 @@
     
     _validateIconURLIsPresent: function(cmp, expectedPillsCount) {
     	var that = this;
-    	var pillIcons = $A.test.select(".pillIcon");
+    	var pillIcons = $A.test.select(".pillIcon img");
     	for (i = 0; i < expectedPillsCount; i++) {
     		var expectedURL = that.PILLS[i].icon.url;
     		$A.test.assertEquals(expectedURL,$A.test.getElementAttributeValue(pillIcons[i], "src"),"Icon Url for pill " + i + " is not correct");
@@ -297,8 +297,8 @@
     	else{
     		$A.test.assertTruthy(pillTitle,"Title attribute should be present on the pill")
         	$A.test.assertEquals(label, pillTitle, "Title attribute set is incorrect");
-    		var pillText = $A.test.getText($A.test.select(".pillText")[0]);
-    		$A.test.assertEquals(label.substring(0,30) + "…", pillText, "Pill text should be truncated to 30 characters");
+            var pillTextElement = $A.test.select(".pillText")[0];
+            $A.test.assertTrue(pillTextElement.offsetWidth < pillTextElement.scrollWidth, "Pill text should be truncated");
     	}
     }
 

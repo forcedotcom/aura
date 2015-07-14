@@ -89,7 +89,7 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     private long doComponent(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
         open("/auradocs#reference?descriptor=aura:component&defType=component", mode);
-        WebElement tabset = getAuraUITestingUtil().findDomElement(By.xpath("//ul[contains(@class,'tabList')]"));
+        WebElement tabset = getAuraUITestingUtil().findDomElement(By.xpath("//ul[contains(@class,'tabs__nav')]"));
         assertEquals("We expect 6 tabs in the component help", 6, tabset.findElements(By.xpath("li")).size());
         return System.currentTimeMillis() - start;
     }

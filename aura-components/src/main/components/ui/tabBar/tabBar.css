@@ -14,11 +14,11 @@
  * limitations under the License.
  */
  
-.THIS .tabList {
-    padding:0;
-    margin:0;
+.THIS .tabs__nav {
+    padding: 0;
+    margin: 0;
 }
 
-.THIS .tabList .tabItem {
+.THIS .tabs__nav .tabs__item {
     display: inline-block;
 }

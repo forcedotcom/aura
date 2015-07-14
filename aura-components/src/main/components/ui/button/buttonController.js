@@ -21,26 +21,27 @@
         return true;
     },
 
-    press : function(cmp, event){
-        if ($A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
-            //IE9 & Other Browsers
-            if (event.stopPropagation) {
-              event.stopPropagation();
-            }
-            //IE8 and Lower
-            else {
-              event.cancelBubble = true;
-            }
-        }
+    changeSelected: function (cmp, event, helper) {
+        return helper.updateStatefulClasses(cmp, event);
+    },
 
-        if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
-            event.preventDefault();
-            return false;
-        }
+    mouseover: function (cmp, event, helper) {
+        return helper.catchAndFireEvent(cmp, event, 'mouseover');
+    },
 
-        var pressEvent = cmp.getEvent("press");
-        pressEvent.setParams({"domEvent": event});
-        pressEvent.fire();
-        return true;
+    mouseout: function (cmp, event, helper) {
+        return helper.catchAndFireEvent(cmp, event, 'mouseout');
+    },
+
+    focus: function (cmp, event, helper) {
+        return helper.catchAndFireEvent(cmp, event, 'focus');
+    },
+
+    blur: function (cmp, event, helper) {
+        return helper.catchAndFireEvent(cmp, event, 'blur');
+    },
+
+    press : function(cmp, event, helper){
+        return helper.catchAndFireEvent(cmp, event, 'press');
     }
 })

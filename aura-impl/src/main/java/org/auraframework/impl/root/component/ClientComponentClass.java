@@ -71,9 +71,6 @@ public class ClientComponentClass {
         private final String name;
     }
 
-    private final static List<RerenderInfo> SUPER_INFOS = Lists.newArrayList(new RerenderInfo("render"), new RerenderInfo("rerender"),
-            new RerenderInfo("afterRender"), new RerenderInfo("unrender"));
-
     public static class HelperInfo2 {
         public HelperInfo2(String name, Object value) {
             this.name = name;
@@ -101,7 +98,7 @@ public class ClientComponentClass {
     }
 
     public void writeComponentClass(Appendable out) throws QuickFixException,
-            IOException {
+    IOException {
         new ClientComponentClassWriter(this.componentDef).write(out);
     }
 
@@ -143,8 +140,8 @@ public class ClientComponentClass {
                     : null;
             superFullyQualifiedDescriptor = superDescriptor != null ? superDescriptor
                     .getQualifiedName() : "markup://aura:component";
-            superClassName = superDescriptor != null ? toClassName(superDescriptor)
-                    : null;
+                    superClassName = superDescriptor != null ? toClassName(superDescriptor)
+                            : null;
         }
 
         private String toClassName(
@@ -164,13 +161,13 @@ public class ClientComponentClass {
                 try {
                     @SuppressWarnings("unchecked")
                     Map<String, Object> defObj = (Map<String, Object>) new JsonReader()
-                            .read(defInJson);
+                    .read(defInJson);
                     @SuppressWarnings("unchecked")
                     Map<String, Object> value = (Map<String, Object>) defObj
-                            .get(Json.ApplicationKey.VALUE.toString());
+                    .get(Json.ApplicationKey.VALUE.toString());
                     @SuppressWarnings("unchecked")
                     Map<String, Object> properties = (Map<String, Object>) value
-                            .get("functions");
+                    .get("functions");
 
                     for (Entry<String, Object> entry : properties.entrySet()) {
                         helperProperties.add(new HelperInfo2(entry.getKey(),

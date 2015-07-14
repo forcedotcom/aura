@@ -20,7 +20,174 @@
  * @constructor
  * @export
  */
-function AuraExpressionService() {}
+function AuraExpressionService() {
+    this.references={};
+}
+
+AuraExpressionService.prototype.getReference = function (expression, valueProvider) {
+    expression = $A.expressionService.normalize(expression);
+    var isGlobal=expression.charAt(0)==='$';
+    var target = null;
+    if (isGlobal) {
+        target = this.references;
+    }else{
+        var id = valueProvider.getGlobalId();
+        if (!this.references.hasOwnProperty(id)) {
+            this.references[id] = {};
+        }
+        target = this.references[id];
+    }
+    if (!target.hasOwnProperty(expression)) {
+        target[expression] = {reference:new PropertyReferenceValue(expression, isGlobal?null:valueProvider),consumers:{}};
+    }
+    return target[expression].reference;
+};
+
+AuraExpressionService.prototype.clearReferences=function(valueProvider){
+    if($A.util.isComponent(valueProvider)){
+        var globalId=valueProvider.getGlobalId();
+        var target=this.references[globalId];
+        if(target){
+            for(var expression in target){
+                var reference=target[expression];
+                if(reference&&reference.consumers){
+                    for(var consumer in reference.consumers){
+                        var component=$A.getComponent(consumer);
+                        for(var targetExpression in reference.consumers[consumer]){
+                            component.clearReference(targetExpression);
+                        }
+                    }
+                }
+            }
+        }
+        delete this.references[globalId];
+    }
+};
+
+// JBUCH: TODO: THIS WAS FIRST ATTEMPT AT UNIFYING PRVs
+//AuraExpressionService.prototype.updateReference = function (expression, valueProvider) {
+//    expression = $A.expressionService.normalize(expression);
+//    var reference=null;
+//    if($A.util.isComponent(valueProvider)){
+//        var target=this.references[valueProvider.getGlobalId()];
+//        reference=target&&target[expression];
+//    }else{
+//        reference=this.references[expression];
+//    }
+//    if(reference){
+//        for(var consumer in reference.consumers){
+//            var component=$A.getComponent(consumer);
+//            for(var targetExpression in reference.consumers[consumer]){
+//                component.markDirty(targetExpression);
+//            }
+//        }
+//    }
+//};
+//
+//AuraExpressionService.prototype.updateReferences = function (expression, valueProvider) {
+//    expression = $A.expressionService.normalize(expression);
+//    var reference=null;
+//    if($A.util.isComponent(valueProvider)){
+//        var target=this.references[valueProvider.getGlobalId()];
+//        reference=target&&target[expression];
+//    }else{
+//        reference=this.references[expression];
+//    }
+//    if(reference){
+//        for(var consumer in reference.consumers){
+//            var component=$A.getComponent(consumer);
+//            for(var targetExpression in reference.consumers[consumer]){
+//                component.markDirty(targetExpression);
+//            }
+//        }
+//    }
+//};
+
+//JBUCH: TODO: FIXME: HACK
+AuraExpressionService.prototype.updateGlobalReference = function (expression, oldValue, value) {
+    expression = $A.expressionService.normalize(expression);
+    var reference=this.references[expression];
+    if(oldValue !== value) {
+        if(reference&&reference.consumers){
+            for(var consumer in reference.consumers){
+                var component=$A.getComponent(consumer);
+                if (component) {
+                    for(var targetExpression in reference.consumers[consumer]){
+                        component.markDirty(targetExpression);
+                        component.fireChangeEvent(targetExpression,oldValue,value);
+                    }
+                }
+            }
+        }
+    }
+};
+
+AuraExpressionService.prototype.updateGlobalReferences = function (type, newValues) {
+    var gvpValues = $A.get(type);
+
+    function updateNestedValue(expression, values, newValues){
+        if(!values) {
+            values = {};
+        }
+
+        for(var value in newValues){
+            var targetExpression=expression+'.'+value;
+            $A.expressionService.updateGlobalReference(targetExpression,values[value],newValues[value]);
+            if($A.util.isObject(newValues[value])){
+                updateNestedValue(targetExpression, values[value], newValues[value]);
+            }
+        }
+    }
+
+    updateNestedValue(type, gvpValues, newValues);
+};
+
+AuraExpressionService.prototype.addListener = function (reference, expression, valueProvider) {
+    expression = $A.expressionService.normalize(expression);
+    var consumers=null;
+    if(reference.valueProvider){
+        consumers=this.references[reference.valueProvider.getGlobalId()][reference.expression].consumers;
+    }else{
+        consumers=this.references[reference.expression].consumers;
+    }
+    var globalId=valueProvider.getGlobalId();
+    if(!consumers.hasOwnProperty(globalId)){
+        consumers[globalId]={};
+    }
+    consumers[globalId][expression]=true;
+};
+
+AuraExpressionService.prototype.removeListener = function (reference, expression, valueProvider) {
+    expression = $A.expressionService.normalize(expression);
+    var consumers = null;
+    if (reference.valueProvider) {
+        consumers = this.references[reference.valueProvider.getGlobalId()][reference.expression].consumers;
+    } else {
+        consumers = this.references[reference.expression].consumers;
+    }
+    var globalId = valueProvider.getGlobalId();
+    if (consumers.hasOwnProperty(globalId)) {
+        delete consumers[globalId][expression];
+        if(!Object.keys(consumers[globalId]).length){
+            delete consumers[globalId];
+        }
+    }
+};
+/**
+ * @export
+ */
+AuraExpressionService.prototype.create = function(valueProvider, config) {
+    return valueFactory.create(config, valueProvider);
+};
+
+/**
+ * @export
+ */
+    // TODO: unify with above create method
+AuraExpressionService.prototype.createPassthroughValue = function(primaryProviders, cmp) {
+    return new PassthroughValue(primaryProviders, cmp);
+};
+
 
 /**
  * Trims markup syntax off a given string expression, removing
@@ -47,7 +214,7 @@ AuraExpressionService.prototype.normalize = function(expression) {
 
         // Convert array notation from "attribute[index]" to "attribute.index".
         var startBrace = expression.indexOf('[');
-        while(startBrace > -1) {
+        while(startBrace > -1){
             var endBrace = expression.indexOf(']', startBrace + 1);
             if (endBrace > -1) {
                 expression = expression.substring(0, startBrace) +
@@ -108,19 +275,5 @@ AuraExpressionService.prototype.resolve = function(expression, container, rawVal
     return target;
 };
 
-/**
- * @export
- */
-AuraExpressionService.prototype.create = function(valueProvider, config) {
-    return valueFactory.create(config, null, valueProvider);
-};
-
-/**
- * @export
- */
-// TODO: unify with above create method
-AuraExpressionService.prototype.createPassthroughValue = function(primaryProviders, cmp) {
-    return new PassthroughValue(primaryProviders, cmp);
-};
 
 Aura.Services.AuraExpressionService = AuraExpressionService;

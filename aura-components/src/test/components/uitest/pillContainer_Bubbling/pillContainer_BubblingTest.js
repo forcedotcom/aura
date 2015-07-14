@@ -88,8 +88,8 @@
     	else{
     		$A.test.assertTruthy(pillTitle,"Title attribute should be present on the pill")
         	$A.test.assertEquals(label, pillTitle, "Title attribute set is incorrect");
-    		var pillText = $A.test.getText($A.test.select(".pillText")[0]);
-    		$A.test.assertEquals(label.substring(0,30) + "…", pillText, "Pill text should be truncated to 30 characters");
+    		var pillTextElement = $A.test.select(".pillText")[0];
+    		$A.test.assertTrue(pillTextElement.offsetWidth < pillTextElement.scrollWidth, "Pill text should be truncated");
     	}
     }
 })

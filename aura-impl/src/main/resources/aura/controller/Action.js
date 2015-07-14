@@ -636,8 +636,7 @@ Action.prototype.getReturnValue = function() {
  * describing the execution stack when the error occurred.
  *
  * For example, to log any errors:
- * <pre><code>
- * var errors = a.getError();
+ * <pre><code>var errors = action.getError();
  * if (errors)  {
  *     $A.log("Errors", errors);
  *     if (errors[0] && errors[0].message) {
@@ -645,8 +644,7 @@ Action.prototype.getReturnValue = function() {
  *     }
  * } else {
  *     $A.error("Unknown error");
- * }
- * </code></pre>
+ * }</code></pre>
  *
  * @public
  * @platform
@@ -923,7 +921,8 @@ Action.prototype.abort = function() {
  * equal to false, it will be set to true. I.e. action.setAbortable() sets it to
  * true.
  *
- * @param {Boolean} value : defaults to setting to true, only sets false if === false
+ * @param {Boolean} value defaults to setting to true, only sets false if === false
+ * @platform
  * @export
  */
 Action.prototype.setAbortable = function(value) {
@@ -1173,6 +1172,19 @@ Action.prototype.markException = function(e) {
 };
 
 /**
+ * Mark the current action as having an error and finish the Action.
+ * 
+ * @param context The current context.
+ * @param e The error with which we want to mark the action.
+ * @private
+ */
+Action.prototype.markError = function(context, e) {
+    this.state = "ERROR";
+    this.error = e;
+    this.finishAction(context);
+};
+
+/**
  * Mark the current action as incomplete.
  *
  * @private
@@ -1182,7 +1194,10 @@ Action.prototype.incomplete = function(context) {
     if (!this.error || !(this.error instanceof Array)) {
         this.error = [ { message : "Disconnected or Canceled" } ];
     }
-    this.finishAction(context);
+    // Do not invoke callback on refresh action since response will not have changed
+    if (!this.isRefreshAction()) {
+        this.finishAction(context);
+    }
 };
 
 /**

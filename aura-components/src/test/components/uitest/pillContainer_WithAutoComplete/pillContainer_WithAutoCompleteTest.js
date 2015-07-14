@@ -30,6 +30,15 @@
             $A.test.assertEquals(1, $A.test.select(".pill").length, "Pill was not created");
         }
     },
+
+    testFocus: {
+        test: function (cmp) {
+            this._getInput(cmp).getElement().blur();
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.focus();
+            $A.test.assertEquals(document.activeElement, this._getInput(cmp).getElement(), "input should be focused");
+        }
+    },
     
     testCreatesPillUsingComma: {
         test: function (cmp) {
@@ -168,7 +177,7 @@
     testIconExistsInPill: {
         test: function (cmp) {
             this._createPillByAutoComplete(cmp);
-            $A.test.assertEquals(1, $A.test.select(".pillIcon").length, "Pill icon is not present");
+            $A.test.assertEquals(1, $A.test.select(".pill .pillIcon").length, "Pill icon is not present");
         }
     },
 
@@ -200,6 +209,36 @@
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return !that._isDisplayNone($A.test.select(".showMore")[0]);
             }, "\"show more\" button should exist");
+        }
+    },
+
+    testShowMoreHiddenAfterAddingOnBlur: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithThreePills(cmp);
+            $A.test.select(".showMore")[0].click();
+
+            //add a pill after clicking show more
+            pillContainer.insertItems([this.PILLS[3]]);
+            this._getInput(cmp).getElement().blur();
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
+    testShowMoreHiddenAfterDeletingOnBlur: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            $A.test.select(".showMore")[0].click();
+
+            //delete a pill after clicking show more
+            var lastPill = pillContainer.find("pill")[3];
+            this._fireKeydownEvent(lastPill, this.BACKSPACE_KEY);
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
         }
     },
 

@@ -13,7 +13,7 @@ function PerfRunner(COQL, Memory) {
         return {
             COQL    : COQL,
             Memory  : Memory,
-            results : {},
+            results : {customMetrics: {}},
 
             setContainer: function (container) {
                 var valid = container instanceof HTMLElement || $A.util.isComponent(container);
@@ -43,7 +43,7 @@ function PerfRunner(COQL, Memory) {
                 if (dom) {
                     $A.util.removeClass(dom, classFinishTest);
                 }
-                this.results   = {};
+                this.results   = { customMetrics : {} };
                 return this;
             },
             loadComponent: function () {
@@ -194,9 +194,17 @@ function PerfRunner(COQL, Memory) {
             _finish: function () {
                 runInProgress = false;
                 this.stopMetricsCollection();
+                this.postProcessing();
+
                 var dom = this.getContainerDOM();
                 if (dom) {
                     $A.util.addClass(dom, classFinishTest);
+                }
+            },
+            postProcessing: function () {
+                var wrapperTest = this.component;
+                if (wrapperTest && wrapperTest.postProcessing) {
+                    wrapperTest.postProcessing(this.results);
                 }
             },
             finish: function () {

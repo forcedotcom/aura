@@ -116,18 +116,18 @@ function(w) {
                     if(elementBox.top < targetBox.top + targetBox.height + pad) {
                         return {
                             top: targetBox.top + targetBox.height + pad
-                        }
+                        };
                     }
                     
                 }
                 break;
+
             case 'bounding box':
 
                 this._exp = function(targetBox, elementBox) {
                     var retBox = {};
 
                     if(boxDirs.top &&  elementBox.top  < targetBox.top + pad) {
-                        
                         retBox.top = targetBox.top  + pad;
                     }
 
@@ -141,12 +141,12 @@ function(w) {
                     }
                     
                     if(boxDirs.bottom && elementBox.top + elementBox.height + window.scrollY > targetBox.top + targetBox.height +window.scrollY - pad) {
-                        retBox.top = targetBox.bottom + window.scrollY - elementBox.height - pad; 
+                        retBox.top = targetBox.top + targetBox.height - elementBox.height - window.scrollY - pad; 
                     }
 
                     return retBox;
 
-                }
+                };
                 break;
 
             default:

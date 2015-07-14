@@ -1,3 +1,12 @@
+.THIS .attributeValues{
+	margin-bottom:5px;
+}
+
+.THIS .attributeValues b{
+	width:200px;
+	display:inline-block;
+}
+
 .THIS .attributeValues i{
 	color:red;
 	margin-left:20px;

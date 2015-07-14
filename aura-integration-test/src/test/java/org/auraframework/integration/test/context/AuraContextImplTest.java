@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.ThemeList;
+import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -35,6 +36,7 @@ import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
@@ -54,7 +56,7 @@ import com.google.common.collect.Sets;
 
 /**
  * Unit tests for AuraContextImpl.
- * 
+ *
  * @hierarchy Aura.Basic
  * @priority high
  */
@@ -65,7 +67,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * Verify the serialized format of a ComponentDef when it was 'preloaded'.
-     * 
+     *
      * Components which are 'preloaded' will be serialized as the descriptor. This allows the client to determine that
      * the component should be present easily, and give a more reasonable error message if it is not.
      */
@@ -127,7 +129,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * Find uid in serialized cmp.
-     * 
+     *
      * Don't use a gold file here, the nonce changes often.
      */
     public void testSerializeNonceWithCmp() throws Exception {
@@ -201,7 +203,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
     /**
      * Add events to context. Technique used by controllers to add events and send them down with action response.
-     * 
+     *
      * @throws Exception
      */
     public void testAttachingEvents() throws Exception {
@@ -489,7 +491,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
                     "Attempt to set unknown $Global variable: unknown");
         }
     }
-    
+
     public void testSetGlobalNullName() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -500,7 +502,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
                     "Attempt to set unknown $Global variable: null");
         }
     }
-    
+
     public void testSetGlobal() throws Exception {
         final String name = getName();
         registerGlobal(name, true, "some default value");
@@ -509,7 +511,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         ctx.setGlobal(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
-    
+
     public void testSetGlobalNullValue() throws Exception {
         final String name = getName();
         registerGlobal(name, true, "some default value");
@@ -518,7 +520,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         ctx.setGlobal(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
-    
+
     public void testGetGlobalUnregistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
@@ -576,7 +578,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         ctx.setGlobal(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
-    
+
     public void testGetGlobals() throws Exception {
         String name1 = getName() + "first";
         String name2 = getName() + "second";
@@ -586,7 +588,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         registerGlobal(name2, true, defaultValue);
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         ctx.setGlobal(name2, setValue);
-        
+
         ImmutableMap<String, GlobalValue> globals = ctx.getGlobals();
         assertEquals("missing first registered value", true, globals.containsKey(name1));
         assertEquals("missing second registered value", true, globals.containsKey(name2));
@@ -594,5 +596,17 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals("unexpected second default value", defaultValue, globals.get(name2).defaultValue);
         assertEquals("unexpected first value", null, globals.get(name1).value);
         assertEquals("unexpected second value", setValue, globals.get(name2).value);
+    }
+
+    public void testGetAccessVersion() throws Exception {
+        AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
+        String descr = "java://org.auraframework.components.test.java.controller.VersionTestController/ACTION$getContextAccessVersion";
+        Action action = (Action) Aura.getInstanceService().getInstance(descr,ActionDef.class);
+        action.setCallingDescriptor("markup://auratest:requireWithServerAction");
+        ctx.setCurrentAction(action);
+        ctx.setApplicationDescriptor(Aura.getDefinitionService().getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
+
+        String version = ctx.getAccessVersion();
+        assertEquals("2.0", version);
     }
 }

@@ -23,27 +23,27 @@
          
          <script>
          
-            //define CustomGlobalVaueProvider
+            //define CustomGlobalValueProvider
             $A.log("init custom GVP");
             
-            var CustomGlobalVaueProvider = function CustomGlobalVaueProvider() {
+            function CustomGlobalValueProvider() {
                 this.values = {};
                 this.requested = {};
             };
             
-            CustomGlobalVaueProvider.prototype.getValues = function(values) {
+            CustomGlobalValueProvider.prototype.getValues = function(values) {
                 return this.values;
             };
             
-            CustomGlobalVaueProvider.prototype.merge = function(values) {
+            CustomGlobalValueProvider.prototype.merge = function(values) {
                 $A.util.apply(this.values, values, true, true);
             };
             
-            CustomGlobalVaueProvider.prototype.getRequested = function() {
+            CustomGlobalValueProvider.prototype.getRequested = function() {
                 return this.requested;
             };
             
-            CustomGlobalVaueProvider.prototype.get = function(expression, callback) {
+            CustomGlobalValueProvider.prototype.get = function(expression, callback) {
                 var value = $A.expressionService.resolve(expression,this.values);
                 if (value) {
                     if ($A.util.isFunction(callback)) {
@@ -56,15 +56,15 @@
                 }
             };
             
-            CustomGlobalVaueProvider.prototype.set = function(expression, value, callback) {
+            CustomGlobalValueProvider.prototype.set = function(expression, value, callback) {
                 this.values[expression] = value;
                 if( $A.util.isFunction(callback) ) {
                     callback(value);
                 }
             };
             
-            CustomGlobalVaueProvider.prototype.requestFromServer = function(expression, callback) {
-                //we are actually getting Label value from server side, section is needed for the action
+            CustomGlobalValueProvider.prototype.requestFromServer = function(expression, callback) {
+             //we are actually getting Label value from server side, section is needed for the action
                 var section = "Related_Lists";
                 var name = expression;
                 var requested_before = false;
@@ -98,8 +98,10 @@
                           } else {
                                 $A.log("Error getting value from server: " + section + "." +name);
                           }
-                          callback(returnValue);
-                       });
+                          if(callback){
+                            callback(returnValue);
+                          }
+                        });
                     
                  $A.enqueueAction(action);
                 

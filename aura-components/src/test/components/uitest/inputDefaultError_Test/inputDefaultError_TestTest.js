@@ -474,7 +474,7 @@
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp) {
             var ulArray = $A.test.getElementByClass("uiInputDefaultError");
-            var input = cmp.find("dateTimeInvalid").getElement();
+            var input = cmp.find("dateTimeInvalid").find("inputDate").getElement();
             var ul = [];
 
             for(var i = 0; i< ulArray.length; i++){

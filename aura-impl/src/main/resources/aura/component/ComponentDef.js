@@ -391,7 +391,22 @@ ComponentDef.prototype.getDefaultFlavor = function() {
         this.flavorOverride = $A.util.isUndefinedOrNull(override) ? null : override;
     }
 
-    return !$A.util.isUndefinedOrNull(this.flavorOverride) ? this.flavorOverride : this.defaultFlavor;
+    return !$A.util.isUndefinedOrNull(this.flavorOverride) ? this.flavorOverride : this.getExplicitDefaultFlavor();
+};
+
+/**
+ * Gets the default flavor explicitly set on the component def (or one of its supers).
+ *
+ * @returns {String}
+ */
+ComponentDef.prototype.getExplicitDefaultFlavor = function() {
+    if (!$A.util.isUndefinedOrNull(this.defaultFlavor)) {
+        return this.defaultFlavor;
+    }
+    if (this.superDef) {
+        return this.superDef.getExplicitDefaultFlavor();
+    }
+    return null;
 };
 
 /**

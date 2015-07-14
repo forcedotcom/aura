@@ -22,5 +22,8 @@
     <aura:method name="run">
         <aura:attribute name="done" type="Object"/>
     </aura:method>
+    <aura:method name="postProcessing">
+        <aura:attribute name="results" type="Object"/>
+    </aura:method>
     <aura:registerEvent name="finish" type="performance:testFinish"/>
 </aura:interface>

@@ -5,13 +5,13 @@
     testVersionFromServerController: {
         test: [
             function(cmp) {
-                var targetComponent = cmp.find("auratest_requireWithModel");
+                var targetComponent = cmp.find("auratest_requireWithServerAction");
                 targetComponent.updateVersionFromServerController();
 
                 $A.test.addWaitFor(true, function(){return targetComponent.get("v.actionDone")});
             },
             function(cmp) {
-                var actual = cmp.find("auratest_requireWithModel").get("v.version");
+                var actual = cmp.find("auratest_requireWithServerAction").get("v.version");
                 this.updateVersion(cmp, actual);
                 $A.test.assertEquals("2.0", actual);
             }
@@ -63,13 +63,13 @@
      testVersionFromEventHandlerWithSelfFiredEvent: {
         test: [
             function(cmp) {
-                var targetComponent = cmp.find("auratest_requireWithModel");
+                var targetComponent = cmp.find("auratest_requireWithServerAction");
                 targetComponent.fireVersionEvent();
 
                 $A.test.addWaitFor(true, function() {return targetComponent.get("v.actionDone")});
             },
             function(cmp) {
-                var actual = cmp.find("auratest_requireWithModel").get("v.version");
+                var actual = cmp.find("auratest_requireWithServerAction").get("v.version");
                 this.updateVersion(cmp, actual);
                 $A.test.assertEquals("2.0", actual);
             }
@@ -78,14 +78,20 @@
 
 
     /**
-     * This test has same behavior with test (it's passing):
+     * This test has same behavior with a passing test:
      * componentTest.versioningTest.testVersionInDynamicallyCreatedComponent
      * The only difference is the created component in this test is associated with a model.
-     * If set up break point in updateVersionFromClientController in auratest:requireWithModel's
+     * If set up break point in updateVersionFromClientController in auratest:requireWithServerAction's
      * controller, when cmp.getVersion() gets called, this test component doesn't exist in
      * accessStack.
+     *
+     * TODO: W-2609199
+     * This is caused by access stack issue. Since the component has model, it may have to go to server.
+     * Every time we go to server, we lose the context. So in createComponent callback, it currently push
+     * undefined to access stack. For getVersion, we rely on the component in access stack, so it uses
+     * undefined in this case.
      */
-    testVersionFromClientControllerOfCreatedCmpWithServerModel: {
+    _testVersionFromClientControllerOfCreatedCmpWithModel: {
         test:[
             function(cmp) {
                 var action = cmp.get("c.updateVersionFromCreatedComponent");
@@ -95,6 +101,28 @@
             },
             function(cmp) {
                 $A.test.assertEquals("2.0", cmp.get("v.version"));
+            }
+        ]
+    },
+
+    testVersionFromServerControllerOfCreatedCmp: {
+        test:[
+            function(cmp) {
+                var action = cmp.get("c.updateVersionFromCreatedComponentServerController");
+                $A.enqueueAction(action);
+
+                $A.test.addWaitFor(false, function(){return $A.util.isUndefinedOrNull(cmp.get("v.newComponent"))});
+            },
+            function(cmp) {
+                var targetComponent = cmp.get("v.newComponent");
+                $A.test.addWaitFor(true,
+                    function(){return targetComponent.get("v.actionDone")},
+                    function(){
+                        var actual = targetComponent.get("v.version");
+                        this.updateVersion(cmp, actual);
+                        $A.test.assertEquals("2.0", actual);
+                    });
+
             }
         ]
     },

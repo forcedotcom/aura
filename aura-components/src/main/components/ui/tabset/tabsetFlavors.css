@@ -13,6 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS {
-    max-width: 10em;
+
+/* Navigation/Top bar */
+.THIS--default .tabs__nav {
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual tab title (contains an anchor inside) */
+.THIS--default .tabs__item {
+    background: #eee;
+    border-radius: 5px 5px 0 0;
+    margin-right: 2px;
+    white-space: nowrap;
+}
+
+.THIS--default .tabs__item > a {
+    margin: 0;
+    color: #363c40;
+    padding: 5px 10px;
+}
+
+.THIS--default .tabs__item.active > a {
+    background: #dc595c;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Tab body/content */
+.THIS--default .tabs__content {
 }

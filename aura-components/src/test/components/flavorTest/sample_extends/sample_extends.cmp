@@ -1,0 +1,4 @@
+<!-- sample of flavor style def using extends -->
+<aura:component>
+    <div aura:flavorable="true">{!v.body}</div>
+</aura:component>

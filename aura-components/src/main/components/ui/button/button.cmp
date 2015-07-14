@@ -26,16 +26,43 @@
     <aura:attribute name="labelDisplay" type="Boolean" default="true" description="Specifies whether the label is displayed. If not, we add a hidden text for accessibility purpose."/>
     <aura:attribute name="iconImgSrc" type="String" default="" description="The absolute or relative URL of the icon to display on the button. The image's alt attribute is set to the value of the button’s label attribute."/>
     <aura:attribute name="iconClass" type="String" default="" description="A CSS style to be attached to the button's icon. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="selectedClass" type="String" default="is-selected" description="The class applied when the button is selected"/>
+    <aura:attribute name="notSelectedClass" type="String" default="not-selected" description="The class applied when the button is not selected"/>
+    <aura:attribute name="classList" type="String" access="PRIVATE" default="" description="The list of classes rendered to the element"/>
     <aura:attribute name="disabled" type="Boolean" default="false" access="GLOBAL" description="Specifies whether this button should be displayed in a disabled state. Disabled buttons can't be clicked. Default value is &quot;false&quot;."/>
     <aura:attribute name="accesskey" type="String" default="" access="GLOBAL" description="The keyboard access key that puts the button in focus. When the button is in focus, pressing Enter clicks the button."/>
     <aura:attribute name="labelDir" type="String" default="ltr" description="The direction in which the label should be read. Possible values are &quot;rtl&quot; (right to left) and &quot;ltr&quot; (left to right). Default value is &quot;ltr&quot;."/>
     <aura:attribute name="stopPropagation" type="Boolean" default="false" description="Prevents the click event from bubbling up the DOM tree, preventing any parent handlers from being notified of the event."/>
     <aura:attribute name="tabIndex" type="Integer" description="The tab index of the button element."/>
 
+
+   
+    <aura:attribute name="stateful" type="Boolean" default="false" description="A stateful button can be selected."/>
+
+    <aura:attribute name="selected" type="Boolean" default="false" description="If a button is stateful this value toggles selected"/>
+
     <aura:registerevent name="keydown" type="ui:keydown" description="The controller method that runs when a key is pressed down on the button."/>
     <aura:registerevent name="press" type="ui:press" access="GLOBAL" description="The controller method that runs when the button is clicked. For example, press=&quot;{!c.showMsg}&quot; references the showMsg method in the controller."/>
+    <aura:registerevent name="mouseover" type="ui:mouseover" access="INTERNAL" description="The controller method that runs when the button is hovered."/>
+    <aura:registerevent name="mouseout" type="ui:mouseout" access="INTERNAL" description="The controller method that runs when the button is hovered."/>
+    <aura:registerevent name="focus" type="ui:focus" access="INTERNAL" description="The controller method that runs when the button receives focus."/>
+    <aura:registerevent name="blur" type="ui:blur" access="INTERNAL" description="The controller method that runs when the button loses focus."/>
+    <aura:handler name="change" value="{!v.selected}" action="{!c.changeSelected}"/>
 
-    <button type="{!v.buttonType}" aura:id="button" class="{!v.class +' uiBlock'}" onclick="{!c.press}" onkeydown="{!c.handleKeydown}" disabled="{!v.disabled}" accesskey="{!v.accesskey}" title="{!v.buttonTitle}" tabindex="{!v.tabIndex}" aura:flavorable="true">
+    <button type="{!v.buttonType}" 
+        aura:id="button" 
+        onkeydown="{!c.handleKeydown}"
+        onmouseover="{!c.mouseover}"
+        onmouseout="{!c.mouseout}"
+        onclick="{!c.press}"
+        onfocus="{!c.focus}"
+        onblur="{!c.blur}"
+        class="{!v.classList}"
+        disabled="{!v.disabled}"
+        accesskey="{!v.accesskey}"
+        title="{!v.buttonTitle}"
+        tabindex="{!v.tabIndex}"
+        aura:flavorable="true">
         <aura:if isTrue="{!v.iconImgSrc != '' || v.iconClass != ''}">
             <img src="{!v.iconImgSrc != '' ? v.iconImgSrc : '/auraFW/resources/aura/s.gif'}" class="{!v.iconClass+' icon bLeft'}" alt=""/>
         </aura:if>

@@ -19,27 +19,53 @@
     controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
     description="An input field for entering a date and time.">
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
-    <aura:attribute name="placeholder" type="String" description="The text that is displayed by default. Set during init based on the 'format' value."/>
+    <aura:attribute name="placeholder" type="String" description="The text that is displayed for date input by default. Set during init based on the 'format' value."/>
+    <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
+
+    <aura:attribute name="dateFormat" type="String" description="The java.text.SimpleDateFormat style format for the date."/>
+    <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>
     <aura:handler name="openPicker" action="{!c.openDatePicker}"/>
 
     <aura:if isTrue="{!$Browser.isPhone || $Browser.isTablet}">
-        <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
-        <aura:set attribute="else">
-            <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
-        </aura:set>
-    </aura:if>
-    
-    <aura:if isTrue="{!and(v.displayDatePicker, !v.disabled)}">
-        <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
-            <span class="assistiveText">Date Picker</span>
+        <input aura:id="inputDate" id="{!v.domId}" class="{!v.class + 'input'}" type="text" placeholder="{!v.placeholder}" readonly="true" onclick="{!c.click}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
+        <aura:if isTrue="{!and(v.displayDatePicker, !v.disabled)}">
+            <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
+                <span class="assistiveText">Date Picker</span>
+            </a>
+        </aura:if>
+
+        <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
+            <span class="assistiveText">Clear Button</span>
         </a>
     </aura:if>
-    <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
-        <span class="assistiveText">Clear Button</span>
-    </a>
-    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" hasTime="true"/>
+
+    <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
+        <div aura:id="dateTime" class="wrapper">
+            <div class="dateTime-inputDate">
+                <input aura:id="inputDate" id="{!v.domId}" class="{!v.class + 'input'}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
+                <aura:if isTrue="{!and(v.displayDatePicker, !v.disabled)}">
+                    <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
+                        <span class="assistiveText">Date Picker</span>
+                    </a>
+                </aura:if>
+            </div>
+            <form class="form--stacked">
+                <div class="dateTime-inputTime form-element form-element__control">
+                    <div class="input-has-icon input-has-icon--right">
+                        <label for="{!v.domId+'-time'}"/>
+                        <input aura:id="inputTime" id="{!v.domId+'-time'}" class="{!v.class + 'input'}" type="text" placeholder="{!v.timePlaceholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
+                        <a aura:id="timePickerOpener" class="timePicker-openIcon display" aria-haspopup="true" onclick="{!c.openTimePicker}">
+                            <span class="assistiveText">Time Picker</span>
+                        </a>
+                    </div>
+                </div>
+                <ui:inputTimePicker aura:id="timePicker" selectDate="{!c.setValue}" timeFormat="{!v.timeFormat}"/>
+            </form>
+        </div>
+    </aura:if>
+    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
 </aura:component>

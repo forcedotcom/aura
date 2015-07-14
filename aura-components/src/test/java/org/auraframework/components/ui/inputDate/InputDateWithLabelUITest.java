@@ -50,17 +50,17 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     /**
      * Excluded Browser Reasons:
-     *
+     * 
      * IE7: pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is
      * that it will sometimes stop one short
-     *
+     * 
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
-     *
+     * 
      * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
-     *
+     * 
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
-     *
+     * 
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
@@ -251,7 +251,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Do Not run with Safari. Safari does not handle tabs normally
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    public void testTab() throws Exception {
+    // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
+    public void _testTab() throws Exception {
         open(URL);
 
         // Tab test Begins
@@ -306,7 +307,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
 
         // Moving from the on focus element to the today link
-        //Keys.Enter does not work with chrome v40.0.2214.91
+        // Keys.Enter does not work with chrome v40.0.2214.91
         element.click();
         // make sure value change event got fired
         element = findDomElement(By.cssSelector(OUTPUT_ST));

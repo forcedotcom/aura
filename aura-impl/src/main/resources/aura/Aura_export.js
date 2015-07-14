@@ -24,6 +24,7 @@ AuraInstance.prototype["message"] = AuraInstance.prototype.message;
 AuraInstance.prototype["enqueueAction"] = AuraInstance.prototype.enqueueAction;
 AuraInstance.prototype["deferAction"] = AuraInstance.prototype.deferAction;
 AuraInstance.prototype["get"] = AuraInstance.prototype.get;
+AuraInstance.prototype["getReference"] = AuraInstance.prototype.getReference;
 AuraInstance.prototype["getRoot"] = AuraInstance.prototype.getRoot;
 AuraInstance.prototype["getCallback"] = AuraInstance.prototype.getCallback;
 AuraInstance.prototype["getContext"] = AuraInstance.prototype.getContext;

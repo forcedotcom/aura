@@ -58,6 +58,9 @@ public final class PerfConfigUtil {
             //, "markup://performanceTest:runnerExample2");
     
     public Map<DefDescriptor<ComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
+    	// Establish Aura Context before fetching all component defs
+    	ContextService contextService = establishAuraContext();
+    	
     	// Iterate through each component def and load config from the associated config.json
     	Set<DefDescriptor<ComponentDef>> defs = getComponentDefs(namespaces);
     	Map<DefDescriptor<ComponentDef>, PerfConfig> configMap = new HashMap<>();
@@ -66,6 +69,11 @@ public final class PerfConfigUtil {
     		PerfConfig componentConfig = loadConfigMapping(def);
     		configMap.put(def, componentConfig);
     	}
+    	
+    	if (contextService.isEstablished()) {
+            contextService.endContext();
+        }
+    	
     	return configMap;
     }
 
@@ -73,18 +81,11 @@ public final class PerfConfigUtil {
         if (skipComponentPerfTests()) return null;
 
         Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
-        //List<String> namespaces = getNamespaces();
-        ContextService contextService = establishAuraContext();
-
         for (String namespace : namespaces) {
             try {
                 defs.addAll(getComponentDefsInNamespace(namespace));
             } catch (Throwable t) {
                 LOG.log(Level.WARNING, "Failed to load component tests for namespace: " + namespace, t);
-            } finally {
-                if (contextService.isEstablished()) {
-                    contextService.endContext();
-                }
             }
         }
         return defs;
@@ -101,20 +102,12 @@ public final class PerfConfigUtil {
 		String componentsDir = null;
 		try {
 			fileName = def.getDef().getLocation().getFileName();
-			moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile()
-			        .getParentFile();
+			moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
 			if(fileName.contains("/core/")){
-				componentsDir = new File(new File(new File(moduleDir, "test"), "func"), "components").toString();
+				componentsDir = moduleDir.toString();
 			} else {
 				componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
 			}
-			
-			
-			/*if(moduleDir.toString().contains("aura")){
-				componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
-			} else {
-				componentsDir = new File(new File(new File(moduleDir, "test"), "func"), "components").toString();
-			}*/
 		} catch (QuickFixException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -127,10 +120,8 @@ public final class PerfConfigUtil {
     
     private PerfConfig loadConfigMapping(DefDescriptor<ComponentDef> def) {
     	// TODO, if config params per component is unavailable, use a global config .
-    	ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
     	BufferedReader br = null;
     	try {			
-	    	//String path =  AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
     		String path = resolveComponentDirPath(def) + "/";
 	    	String componentPath = def.getNamespace() + "/" + def.getName();
 	    	String fullPath = path + componentPath;
@@ -143,8 +134,7 @@ public final class PerfConfigUtil {
 		}
         Gson gson = new Gson();
         PerfConfig config = gson.fromJson(br, PerfConfig.class);
-		return config;
-		
+		return config;		
     }
 
     private ContextService establishAuraContext() {

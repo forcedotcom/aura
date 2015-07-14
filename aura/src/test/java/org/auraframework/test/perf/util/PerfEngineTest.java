@@ -83,7 +83,6 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         for (Map.Entry<DefDescriptor<ComponentDef>, PerfConfig> entry : tests.entrySet()) {
             addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
         }
-
     }
 
     @Override
@@ -98,9 +97,18 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         return defs;
     }
 
+    private ContextService establishAuraContext() {
+        ContextService contextService = Aura.getContextService();
+        if (!contextService.isEstablished()) {
+            contextService.startContext(Mode.PTEST, Format.JSON, Authentication.AUTHENTICATED);
+        }
+        return contextService;
+    }
+    
     private class ComponentSuiteTest extends TestSuite {
         ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor, final PerfConfig config) {
             super(descriptor.getName());
+            ContextService contextService = establishAuraContext();
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
             Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
 
@@ -120,9 +128,12 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
                         }
                     });
                     addTest(patchPerfComponentTestCase(test, descriptor));
-                    //addTest(test);
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
+                } finally {
+                	if (contextService.isEstablished()) {
+                        contextService.endContext();
+                    }
                 }
             }
         }
@@ -136,9 +147,15 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         return ImmutableList.of("PerformanceTest");
     }
 
+    /**
+     * Sfdc specific tweaks can be made here to tests running in core.
+     * @param test
+     * @param descriptor
+     * @return return test
+     * @throws Exception
+     */
 	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
 			DefDescriptor<ComponentDef> descriptor) throws Exception {
-		// TODO Auto-generated method stub
 		return test;
 	}
 

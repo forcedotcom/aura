@@ -22,5 +22,28 @@
         for (var i = 0; i < scrollables.length; i++) {
             helper.lib.panelLibCore.scopeScroll(scrollables[i]);
         }
+    },
+    rerender: function (cmp, helper) {
+    	var currentEl =cmp.getElement();
+    	var classes = [];
+
+    	// The things that set these classes
+    	// are async so there is a race condition 
+    	// at re-render time causing these to be erased.
+    	// There is probably a better way, but this works for now
+    	if(currentEl.className.match(/(\s|^)open(\s|$)/)) {
+    		classes.push('open');
+    	}
+    	if(currentEl.className.match(/(\s|^)active(\s|$)/)) {
+    		classes.push('active');
+    	}
+
+    	vClass = cmp.get('v.class');
+    	if(vClass) {
+    		classes.push(vClass);
+    	}
+    	cmp.set('v.class', classes.join(' '));
+    	this.superRerender();
+
     }
 })

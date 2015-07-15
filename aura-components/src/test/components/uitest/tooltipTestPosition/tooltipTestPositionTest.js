@@ -69,7 +69,7 @@
 						$A.test.assertTrue(bodyBoundingRect.right < window.innerWidth, 'Right edge leaving the view port for tooltip ' + ttLabel);
 						$A.test.assertTrue(bodyBoundingRect.left >= 0, 'Left edge leaving the view port for tooltip ' + ttLabel);
 						$A.test.assertTrue(bodyBoundingRect.bottom < window.innerHeight, 'Bottom edge leaving the view port for tooltip ' + ttLabel);
-					//	$A.test.assertTrue(bodyBoundingRect.top >= 0, 'Top edge leaving the view port for tooltip ' + ttLabel);		
+						$A.test.assertTrue(bodyBoundingRect.top >= 0, 'Top edge leaving the view port for tooltip ' + ttLabel);		
 						
 						return ($A.util.hasClass(tt._tooltip,"visible"));
 					}, "'visible' class not attached to tooltip " + ttLabel);
@@ -193,7 +193,7 @@
 						// Check that the tooltip body is within the viewport
 						$A.test.assertTrue(bodyBoundingRect.right < window.innerWidth, 'Right edge leaving the view port for tooltip ' + ttLabel);
 						$A.test.assertTrue(bodyBoundingRect.left >= 0, 'Left edge leaving the view port for tooltip ' + ttLabel);
-					//	$A.test.assertTrue(bodyBoundingRect.bottom < window.innerHeight, 'Bottom edge leaving the view port for tooltip ' + ttLabel);
+						$A.test.assertTrue(bodyBoundingRect.bottom < window.innerHeight, 'Bottom edge leaving the view port for tooltip ' + ttLabel);
 						$A.test.assertTrue(bodyBoundingRect.top >= 0, 'Top edge leaving the view port for tooltip ' + ttLabel);		
 						
 						return ($A.util.hasClass(tt._tooltip,"visible"));

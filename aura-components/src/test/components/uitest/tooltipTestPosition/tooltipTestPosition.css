@@ -14,73 +14,47 @@
  * limitations under the License.
  */
 
-.THIS {
-	
-}
-
-.THIS .block {
-    padding-left: 20px;
-    margin-top: 0px;
-    margin-left: 100px;
-    border-width: 1px 0 0 0;
-    border-color: gray;
-    border-style: solid;
-}
-
-.THIS .block.top-left {
-	margin-left: 10px;
-	padding-left: 0;
-}
-
 .THIS .top-center {	
-	margin-top: -30px;
-	text-align: center;
+	position:fixed;
+	top:0;
+	left:47%;
 }
 
 .THIS .top-right {	
-	margin-top: -30px;
-	text-align: right;
+	position:fixed;
+	top:0;
+	right:0;	
 }
 
-.THIS .block.left-edge {
-	margin-left: 0px;
-	padding-left: 0;
-}
 .THIS .left-center{
-	margin-top: 300px;
-	text-align: left;
+	position:fixed;
+	top:45%;
 }
 
 .THIS .center-center{
-	margin-top:-30px;
-	text-align: center;
+	position:fixed;
+	top:45%;
+	left:47%;
+
 }
 .THIS .right-center{
-	margin-top:-30px;
-	text-align: right;
+	position:fixed;
+	top:45%;
+	right:0;
 }
 .THIS .bottom-right{
-	margin-top: 400px;
-	text-align: right;
+	position: fixed;
+    bottom: 0;
+    right: 0;
 }
 .THIS .bottom-center{
-	margin-top: -30px;
-	text-align: center;
+	position: fixed;
+    bottom: 0;
+	text-align:center;
+	left:47%;
 }
 .THIS .bottom-left{
-	margin-top: -35px;
-	text-align: left;
-}
-.THIS .block.near-right-edge,
-.THIS .block.right-edge{
-	text-align: right;
-}
-
-.THIS .block.near-right-edge {
-	margin-right: 10px;
-}
-
-.THIS .block.top-edge{
-	text-align: right;
-	margin-top: 200px;
+	position: fixed;
+    bottom: 0;
+	left:0;
 }

@@ -30,6 +30,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.PerfCmpTest;
@@ -46,6 +47,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 @PerfCmpTest
+@TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class PerfExecutorTest extends WebDriverTestCase {
 
     private static final Logger logger = Logger.getLogger(PerfExecutorTest.class.getSimpleName());

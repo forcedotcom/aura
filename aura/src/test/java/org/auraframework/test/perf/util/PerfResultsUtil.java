@@ -49,13 +49,18 @@ public final class PerfResultsUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfResultsUtil.class.getSimpleName());
     public static final Date RUN_TIME = new Date();
-    public static final String MONGO_URI = System.getProperty("mongoURI");
+    public static String MONGO_URI = System.getProperty("mongoURI");
+    public static final String DEFAULT_MONGO_URI = "mongodb://localhost:27017";
     public static MongoClient MONGO_CLIENT; // TODO: Abstract this better
 
     private static MongoClient getMongoClient() {
         if (MONGO_CLIENT == null) {
             try {
                 LOG.info("Trying to connect to MongoDB: " + MONGO_URI);
+                // Default Mongo client to connect to default mongo host.
+                if(MONGO_URI == null){
+                	MONGO_URI = DEFAULT_MONGO_URI;
+                }                	
                 MongoClientURI uri = new MongoClientURI(MONGO_URI);
                 MONGO_CLIENT = new MongoClient(uri);
             } catch (Exception e) {
@@ -66,7 +71,6 @@ public final class PerfResultsUtil {
         return MONGO_CLIENT;
     }
 
-    @SuppressWarnings("null")
     public static void writeToDb(PerfMetrics metrics, String test, String traceLog) {
         try {
             MongoClient mongo = getMongoClient();

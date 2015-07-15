@@ -16,6 +16,7 @@
 package org.auraframework.test.perf.util;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,75 +42,99 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
+import org.auraframework.util.resource.ResourceLoader;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 
 public final class PerfConfigUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfConfigUtil.class.getSimpleName());
-
-    // TODO Remove this later, temporarily stopping from running more than one component.
-    // , "markup://performanceTest:runnerExample2");
-
-    public Map<DefDescriptor<ComponentDef>, PerfConfig> getComponentTestsToRun() {
-        // Iterate through each component def and load config from the associated config.json
-        Set<DefDescriptor<ComponentDef>> defs = getComponentDefs();
-        Map<DefDescriptor<ComponentDef>, PerfConfig> configMap = new HashMap<>();
-
-        for (DefDescriptor<ComponentDef> def : defs) {
-            PerfConfig componentConfig = loadConfigMapping(def);
-            configMap.put(def, componentConfig);
+    private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of("markup://ui:inputDate"                                                                                       
+            , "markup://ui:action" 
+            , "markup://perfTest:dummyPerf");
+            //TODO Remove this later, temporarily stopping from running more than one component.
+            //, "markup://performanceTest:runnerExample2");
+    
+    public Map<DefDescriptor<ComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
+    	// Establish Aura Context before fetching all component defs
+    	ContextService contextService = establishAuraContext();
+    	
+    	// Iterate through each component def and load config from the associated config.json
+    	Set<DefDescriptor<ComponentDef>> defs = getComponentDefs(namespaces);
+    	Map<DefDescriptor<ComponentDef>, PerfConfig> configMap = new HashMap<>();
+    	
+    	for(DefDescriptor<ComponentDef> def : defs){
+    		PerfConfig componentConfig = loadConfigMapping(def);
+    		configMap.put(def, componentConfig);
+    	}
+    	
+    	if (contextService.isEstablished()) {
+            contextService.endContext();
         }
-        return configMap;
+    	
+    	return configMap;
     }
 
-    private Set<DefDescriptor<ComponentDef>> getComponentDefs() {
-        if (skipComponentPerfTests())
-            return null;
+    private Set<DefDescriptor<ComponentDef>> getComponentDefs(List<String> namespaces) {
+        if (skipComponentPerfTests()) return null;
 
         Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
-        List<String> namespaces = getNamespaces();
-        ContextService contextService = establishAuraContext();
-
         for (String namespace : namespaces) {
             try {
                 defs.addAll(getComponentDefsInNamespace(namespace));
             } catch (Throwable t) {
                 LOG.log(Level.WARNING, "Failed to load component tests for namespace: " + namespace, t);
-            } finally {
-                if (contextService.isEstablished()) {
-                    contextService.endContext();
-                }
             }
         }
         return defs;
     }
 
+    /**
+     * Required to get component directory in SFDC
+     * @param def
+     * @return
+     */
+    private String resolveComponentDirPath(DefDescriptor<ComponentDef> def) {
+    	String fileName;
+		File moduleDir;
+		String componentsDir = null;
+		try {
+			fileName = def.getDef().getLocation().getFileName();
+			moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
+			if(fileName.contains("/core/")){
+				componentsDir = moduleDir.toString();
+			} else {
+				componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
+			}
+		} catch (QuickFixException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return componentsDir;
+    }
+    
     private PerfConfig loadConfigMapping(DefDescriptor<ComponentDef> def) {
-        Aura.getConfigAdapter().getResourceLoader();
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
-        String componentPath = def.getNamespace() + "/" + def.getName();
-        String fullPath = path + componentPath;
-        Path resourcesSourceDir = Paths.get(fullPath);
-        Path configPath = resourcesSourceDir.resolve("config.json");
-        BufferedReader br = null;
-        try {
-            br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    	// TODO, if config params per component is unavailable, use a global config .
+    	BufferedReader br = null;
+    	try {			
+    		String path = resolveComponentDirPath(def) + "/";
+	    	String componentPath = def.getNamespace() + "/" + def.getName();
+	    	String fullPath = path + componentPath;
+			Path resourcesSourceDir = Paths.get(fullPath);
+	        Path configPath = resourcesSourceDir.resolve("config.json");
+	        br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         Gson gson = new Gson();
         PerfConfig config = gson.fromJson(br, PerfConfig.class);
-        return config;
-
-    }
-
-    /**
-     * @return the list of namespaces to create tests for TODO get sfdc core namespaces
-     */
-    private List<String> getNamespaces() {
-        return ImmutableList.of("PerformanceTest");
+		return config;		
     }
 
     private ContextService establishAuraContext() {
@@ -119,24 +144,36 @@ public final class PerfConfigUtil {
         }
         return contextService;
     }
+    
+    /**
+     * Components that we aren't able to instantiate from client side. The reason could be a dependency to a server side
+     * model. Eg. ui:inputDate ui:action cmp should be abstract?
+     */
+    private Set<String> getBlacklistedComponents() {
+        return BLACKLISTED_COMPONENTS;
+    }
 
     private boolean skipComponentPerfTests() {
         return (System.getProperty("skipCmpPerfTests") != null);
     }
 
-    @SuppressWarnings("unchecked")
+    private boolean isBlackListedComponent(DefDescriptor<ComponentDef> descriptor) throws QuickFixException {
+        return descriptor.getDef().isAbstract() || getBlacklistedComponents().contains(descriptor.getQualifiedName());
+    }
+
     private Set<DefDescriptor<ComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
-        Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
+    	Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
         DefinitionService definitionService = Aura.getDefinitionService();
 
         Set<DefDescriptor<?>> descriptors;
         descriptors = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
-
+        
         for (DefDescriptor<?> descriptor : descriptors) {
-            if (descriptor.getDefType().equals(DefType.COMPONENT)) {
-                defs.add(((DefDescriptor<ComponentDef>) descriptor));
-            }
+        	if (descriptor.getDefType().equals(DefType.COMPONENT)) {
+        		defs.add(((DefDescriptor<ComponentDef>) descriptor));
+        	}
+        	 
         }
         return defs;
-    }
+    }  
 }

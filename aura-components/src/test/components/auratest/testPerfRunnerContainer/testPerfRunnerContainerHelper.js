@@ -17,7 +17,7 @@
     },
     createRow: function (t) {
     	//changes from array join to string concat for performance reason
-        return '<li class="list-test-item" data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : 'data-unit="true" ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
+        return '<li class="list-test-item" data-testid="' + t.name + '" test-type="' + t.type + '"' + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
                 '<div class="parts">' +
                 	'<div class="test-type"></div>' +
                     '<div class="checkbox">'+
@@ -127,13 +127,19 @@
         	
     		//little debounce
 			timeoutDebounce = setTimeout(function(){
+			    var test_unit = toggleTestType != null && toggleTestType.querySelector('input.test_unit');
+			    var test_integ = toggleTestType != null && toggleTestType.querySelector('input.test_integ');
+			    var test_jstest = toggleTestType != null && toggleTestType.querySelector('input.test_jstest');
+			    var test_webdriver = toggleTestType != null && toggleTestType.querySelector('input.test_webdriver');
         		self.filterTests(
     				dom,
     				inputSearch.value,
     				inputOperator.value,
     				inputCaseSensitive.checked,
-    				toggleTestType.querySelector('input.test_integ').checked,
-    				toggleTestType.querySelector('input.test_unit').checked
+    				test_unit && test_unit.checked,
+    				test_integ && test_integ.checked,
+    				test_jstest && test_jstest.checked,
+    				test_webdriver && test_webdriver.checked
 				);
         		testContainer.style.opacity = '';
         	}, totalDebounceTime);
@@ -141,10 +147,12 @@
         inputSearch.addEventListener('input', handlerSearchInputChange);
         inputOperator.addEventListener('input', handlerSearchInputChange);
         inputCaseSensitive.addEventListener('change', handlerSearchInputChange);
-        var testTypeInputs = toggleTestType.querySelectorAll('input');
-        for (var i = 0; i < testTypeInputs.length; i++){
-        	testTypeInputs[i].addEventListener('change', handlerSearchInputChange);
-        }
+        if (toggleTestType != null) {
+            var testTypeInputs = toggleTestType.querySelectorAll('input');
+            for (var i = 0; i < testTypeInputs.length; i++){
+                testTypeInputs[i].addEventListener('change', handlerSearchInputChange);
+            }
+        }    
         
         selectAll.addEventListener('click', function (e) {
             self.toggleSelection(selectAll, dom, e);
@@ -220,7 +228,7 @@
     },
 
     toggleIntegrationTests: function (button, dom, e) {
-        var children   = dom.querySelectorAll('li[data-integ]'),
+        var children   = dom.querySelectorAll('li[test-type="integration"]'),
             selected   = $A.util.getDataAttribute(button, 'selected') !== "true",
             visibility = selected ? 'hidden': 'visible',
             i;
@@ -296,7 +304,7 @@
     	
     	return true;//all matched
     },
-    filterTests: function (dom, query, logicOps, isCaseSensitive, test_integ, test_unit) {   	
+    filterTests: function (dom, query, logicOps, isCaseSensitive, test_unit, test_integ, test_jstest, test_webdriver) {   	
         var children  = dom.getElementsByClassName("list-test-item"),
         	calcOperator = logicOps === 'AND' ? this.calcAndOperators : this.calcOrOperators,
 			hasAtLeastOneVisible = false,
@@ -307,7 +315,7 @@
         query = query || '';
         query = query.trim()
 
-    	if (query.length === 0 && test_integ && test_unit){
+    	if (query.length === 0 && test_unit && test_integ && test_jstest && test_webdriver) {
     		//when it is empty, just show it
         	for (i = 0; i < children.length; i++) {
                 $A.util.setDataAttribute(children[i], 'visible', 'visible');
@@ -339,12 +347,18 @@
                 else{
                 	name = li.getElementsByClassName('ns')[0].textContent;
                 	
-                	if (test_integ === true && $A.util.getDataAttribute(li, 'integ') === 'true'){
+                	if (test_unit === true && $A.util.getElementAttributeValue(li, 'test-type') === 'unit'){
+                        isVisible = true;
+                    }
+                	else if (test_integ === true && $A.util.getElementAttributeValue(li, 'test-type') === 'integration'){
                 		isVisible = true;
                 	}
-                	else if (test_unit === true && $A.util.getDataAttribute(li, 'unit') === 'true'){
-                		isVisible = true;
-                	}
+                    else if (test_jstest === true && $A.util.getElementAttributeValue(li, 'test-type') === 'jstest'){
+                        isVisible = true;
+                    }                	
+                    else if (test_webdriver === true && $A.util.getElementAttributeValue(li, 'test-type') === 'webdriver'){
+                        isVisible = true;
+                    }
                 	
                     //calling the regex match
                 	if (isVisible === true && queries !== undefined){

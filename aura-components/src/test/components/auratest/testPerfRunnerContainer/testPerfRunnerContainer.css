@@ -254,19 +254,42 @@
 }
 
 
-.THIS li[data-integ] .test-type{
+.THIS li[test-type='integration'] .test-type{
 	color:yellow;
 }
 
-.THIS li .test-type:before{
+.THIS li[test-type='unit'] .test-type{
+	color:orange;
+}
+
+.THIS li[test-type='jstest'] .test-type{
+	color:blue;
+}
+
+.THIS li[test-type='webdriver'] .test-type{
+	color:red;
+}
+
+.THIS li[test-type='unit'] .test-type:before{
 	content:'Unit';
 }
 
 
-.THIS li[data-integ] .test-type:before{
+.THIS li[test-type='integration'] .test-type:before{
 	content:'Integ';
 }
 
+.THIS li[test-type='jstest'] .test-type:before{
+	content:'JSTest';
+}
+
+.THIS li[test-type='webdriver'] .test-type:before{
+	content:'Web';
+}
+
+.THIS li[test-type*='perf'] .test-type:before{
+	content:'Perf';
+}
 
 
 .THIS .container_header_row{

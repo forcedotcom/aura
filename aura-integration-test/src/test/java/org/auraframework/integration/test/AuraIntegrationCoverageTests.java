@@ -62,7 +62,7 @@ public class AuraIntegrationCoverageTests extends TestSuite {
         }
         Set<TestInventory> inventories = ServiceLocator.get().getAll(TestInventory.class);
         for (TestInventory inventory : inventories) {
-            for (Type type : new Type[] { Type.INTEGRATION, Type.WEB }) {
+            for (Type type : new Type[] { Type.INTEGRATION, Type.WEBDRIVER, Type.JSTEST }) {
                 TestSuite child = inventory.getTestSuite(type);
                 if (child != null) {
                     addTest(child);

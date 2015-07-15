@@ -63,7 +63,7 @@ public class ExcludedTestsListModel {
         // We only ignore browsers on Web tests, so just grab those
         Set<TestInventory> testInventories = ServiceLocator.get().getAll(TestInventory.class);
         for (TestInventory ti : testInventories) {
-            processTestSuite(ti.getTestSuite(TestInventory.Type.WEB));
+            processTestSuite(ti.getTestSuite(TestInventory.Type.WEBDRIVER));
         }
 
         System.setProperty(WebDriverProvider.BROWSER_TYPE_PROPERTY, origBrowsers);

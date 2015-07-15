@@ -23,9 +23,13 @@
 			<span class="icon-rocket"></span>
 			<span class="title">
 				<aura:if isTrue="{!v.scope == 'perf'}">
-					<span class="perf">Perf </span>
+					<span>Perf Test Runner | </span>
+					<a href="?scope=func">Func</a>
+				<aura:set attribute="else">
+				    <span>Func Test Runner | </span>
+				    <a href="?scope=perf">Perf</a>
+				</aura:set>	
 				</aura:if>
-				<span>Test Runner</span>
 			</span>
 		</header>
 		<section class="center">

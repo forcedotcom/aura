@@ -31,8 +31,8 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 import org.auraframework.test.util.TestExecutor;
-import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.test.util.TestExecutor.TestRun;
+import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.ServiceLocator;
@@ -45,10 +45,10 @@ import com.google.common.collect.Lists;
 
 /**
  * Run all integration tests.
- * 
+ *
  * If the "testNameContains" system property is set, filter tests to run only those tests containing the provided string
  * (case-insensitive).
- * 
+ *
  * If the "runPerfTests" system property is set, it will run the tests that are annotated with @PerfTest
  */
 public class AuraIntegrationTests extends TestSuite {
@@ -102,7 +102,7 @@ public class AuraIntegrationTests extends TestSuite {
         List<Callable<TestResult>> queue = Lists.newLinkedList();
         List<Callable<TestResult>> hostileQueue = Lists.newLinkedList();
         for (TestInventory inventory : inventories) {
-            for (Type type : new Type[] { Type.INTEGRATION, Type.WEB }) {
+            for (Type type : new Type[] { Type.INTEGRATION, Type.WEBDRIVER, Type.JSTEST }) {
                 TestSuite child = inventory.getTestSuite(type);
                 if (child != null) {
                     for (Enumeration<?> tests = child.tests(); tests.hasMoreElements();) {

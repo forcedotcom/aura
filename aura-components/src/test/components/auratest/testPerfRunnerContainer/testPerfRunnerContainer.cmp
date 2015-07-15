@@ -45,12 +45,18 @@
 				<input type="checkbox" name="toggle_select_all"/>
 				<span>Select all</span>
 			</button>
-			<button class="toggle_test_type" title="Show/Hide Integration and Unit tests">
-				<input type="checkbox" name="select" class="test_integ" checked="true" />
-				<span for="test_integ">Integ</span>
-				<input type="checkbox" name="select" class="test_unit" checked="true" />
-				<span for="test_unit">Unit</span>
-			</button>
+		    <aura:if isTrue="{!v.scope != 'perf'}">
+				<button class="toggle_test_type" title="Show/Hide Type of Tests">
+					<input type="checkbox" name="select" class="test_unit" checked="true" />
+					<span for="test_unit">Unit</span>					
+					<input type="checkbox" name="select" class="test_integ" checked="true" />
+					<span for="test_integ">Integ</span>
+					<input type="checkbox" name="select" class="test_jstest" checked="true" />
+					<span for="test_jstest">JSTest</span>													
+					<input type="checkbox" name="select" class="test_webdriver" checked="true" />
+					<span for="test_webdriver">WebDriver</span>				
+				</button>
+            </aura:if>		
 			<button class="toggle_failed" title="Show only test failure">
 				<input disabled="true" type="checkbox" name="show_fail_only"/>
 				<span>Show only failed</span>

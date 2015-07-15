@@ -15,8 +15,9 @@
  */
 ({
     init: function(cmp) {
+    	var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('ui:button', {
@@ -33,7 +34,8 @@
 
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler) {
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true});
+        	var closeAction = cmp.get("v.closeAction");
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
         }
         return cmp._keyHandler;
     },

@@ -1174,7 +1174,9 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                     failCallback(!stored, " : No connection to server");
                 }, "INCOMPLETE");
             //
-            // ERROR: this is generally trouble, but if we already initialized, we won't flag it.
+            // ERROR: this is generally trouble, but if we already initialized, we won't flag it. We also don't flag
+            // errors that are ClientSideEventExceptions sent down from the server, which are identified by a specific
+            // message string on the error.
             //
             action.setCallback(acs,
                 function (a) {
@@ -1188,7 +1190,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                     }
                     $A.log("$A.loadComponent(): Refresh failed:\n" + errorStr);
                     $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-                    failCallback(!stored, errorStr);
+                    var forceError = !stored && (errorStr !== "Received exception event from server");
+                    failCallback(forceError, errorStr);
                 }, "ERROR");
 
             acs.enqueueAction(action);

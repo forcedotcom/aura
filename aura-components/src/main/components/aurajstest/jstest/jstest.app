@@ -27,7 +27,7 @@
     </ui:tabset>
 
     <section class="suiteCode">
-        <h1 onclick="{!c.toggleCode}">Sources (tap to view)</h1>
+        <h1 onclick="{!c.toggleCode}">Sources <sub>click or tap to view</sub></h1>
         <div><pre aura:id="test-suite-code" class="hidden">{!m.testSuite.code}</pre></div>
     </section>
 </aura:application>

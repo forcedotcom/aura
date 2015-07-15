@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 ({
+
+    init: function(cmp) {
+        var testName = cmp.get("v.case.name");
+        if (testName && testName.indexOf("test") === 0) {
+            var shortName = testName.substring(4);
+            cmp.set("v.title", shortName);
+        } else {
+            cmp.set("v.title", testName);
+        }
+    },
+
     runTest : function(cmp, evt, helper){
         helper.runTest(cmp);
     },

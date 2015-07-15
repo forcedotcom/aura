@@ -19,52 +19,57 @@
 }
 
 .THIS.jstestTabset {
-	display: table;
+    display: table;
     width: 100%;
 }
+
 .THIS.jstestTabset .tab__content.active {
-	display: table-cell;
+    display: table-cell;
 }
 
-.THIS .rerun.fail{
+.THIS .rerun.fail {
     background-color: #FF0F0F;
 }
-.THIS .rerun.pass{
+
+.THIS .rerun.pass {
     background-color: #0FFF0F;
 }
 
-.THIS .rerun{
+.THIS .rerun {
     background-color: #FFFF0F;
-    display:inline-block;
-    width:16px;
-    height:16px;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
     margin: 4px 4px 0 0;
-    float:left;
+    float: left;
 }
 
 @-webkit-keyframes jstestCaseSpin {
-  from {
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(360deg);
-    transform: rotate(360deg);
-  }
-} 
-.THIS .spin{
-    -webkit-animation-iteration-count:infinite;
-    -webkit-animation-name: jstestCaseSpin;
-    -webkit-animation-duration:1s;
-    -webkit-animation-timing-function:linear;
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
 }
- 
+
+.THIS .spin {
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-name: jstestCaseSpin;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+}
+
 .THIS.uiTabset {
     height: auto;
 }
+
 .THIS.uiTabset .tabLabels {
     min-height: 750px;
 }
+
 .THIS {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: 13px;
@@ -84,12 +89,24 @@
 
 .THIS ul li.uiTabItem {
     background: none;
-    width: 220px;
     float: none;
     border: 0;
     margin: 0;
     border-radius: 0;
     display: block;
+    width: 150px;
+}
+
+@media screen and (min-width: 500px) {
+    .THIS ul li.uiTabItem {
+        width: 200px;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .THIS ul li.uiTabItem {
+        width: 250px;
+    }
 }
 
 .THIS ul li.uiTabItem > a.tabHeader {
@@ -133,8 +150,16 @@
     position: relative;
 }
 
+.THIS h1 sub {
+    font-size: 1.1rem;
+    text-transform: none;
+    letter-spacing: 0.05em;
+    font-weight: 100;
+}
+
 .THIS h1 + div {
-    padding: 20px 0;
+    padding: 20px 8px;
+    font-weight: 200;
     font-size: 0.923rem;
 }
 
@@ -143,23 +168,24 @@
 }
 
 .THIS iframe {
-	height:100%;
-	width:100%;
-	border:0;
+    height: 100%;
+    width: 100%;
+    border: 0;
 }
 
 .THIS section {
-	margin:0;
-	padding:0;
+    margin: 0;
+    padding: 0;
 }
 
 .THIS section.content {
-	width: 100%;
-	resize: vertical;
+    width: 100%;
+    resize: vertical;
 }
+
 .THIS section.results {
-	overflow: auto;
-	height: auto;
+    overflow: auto;
+    height: auto;
 }
 
 .THIS section.results > div {

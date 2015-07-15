@@ -18,16 +18,18 @@
 <aura:component model="java://org.auraframework.components.aurajstest.JSTestCaseModel" extends="ui:tab">
     <aura:attribute name="case" type="java://org.auraframework.def.TestCaseDef"/>
     <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
+    <aura:attribute name="shortName" type="String"/>
     <aura:attribute name="url" type="String"/>
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
     <aura:attribute name="status" type="String" default=""/>
 
     <aura:set attribute="scroll" value="false"/>
-    <aura:set attribute="title" value="{!v.case.name}"/>
 
     <aura:registerevent name="done" type="aurajstest:testStatus"/>
-    <aura:set attribute="icon">    
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:set attribute="icon">
         <a href="javascript:void(0);" onclick="{!c.rerun}" class="{!'rerun ' + v.status}" aura:id="rerun"></a>
     </aura:set>
 
@@ -35,7 +37,7 @@
     
     <aura:set attribute="body">
         <section class="results">
-            <h1>Result</h1>
+            <h1>Result <sub>{!v.case.name}{!v.runTime}</sub></h1>
             <div aura:id="results"></div>
         </section>
         <section class="content">

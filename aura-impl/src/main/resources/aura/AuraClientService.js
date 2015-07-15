@@ -466,7 +466,7 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
 AuraClientService.prototype.getCurrentTransactionId = function() {
     if (!this.inAuraLoop()) {
         $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
-        return;
+        return null;
     }
         return this.currentTransactionId;
 };
@@ -902,7 +902,7 @@ AuraClientService.prototype.loadTokenFromStorage = function() {
 AuraClientService.prototype.initHost = function(host, sid) {
     this._host = host || "";
     this._sid = sid || "";
-    
+
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     delete AuraClientService.prototype.initHost;
     delete AuraClientService.prototype["initHost"];
@@ -1063,7 +1063,7 @@ AuraClientService.prototype.runAfterInitDefs = function(callback) {
  * @param {Object} attributes The configuration data to use. If specified, attributes are used as a key value pair.
  * @param {function} callback The callback function to run
  * @param {String} defType Sets the defType to "COMPONENT"
- * 
+ *
  * @memberOf AuraClientService
  * @private
  */
@@ -1476,8 +1476,18 @@ AuraClientService.prototype.finishCollection = function() {
     if (this.collector.actionsCompleted) {
         this.fireDoneWaiting();
     }
-    this.actionsDeferred = this.actionsDeferred.concat(this.collector.collected);
+    //
+    // Carefully walk actions here, since we may have undefined actions in our collected set.
+    // This way we filter them out, and don't try to process too many things. It also avoids
+    // other problems processing the deferred queue.
+    //
+    var collected = this.collector.collected;
     this.collector.collected = [];
+    for (var i = 0, length = collected.length; i < length; i++) {
+        if (collected[i]) {
+            this.actionsDeferred.push(collected[i]);
+        }
+    }
     if (this.actionsQueued.length) {
         this.continueProcessing();
         return;
@@ -1519,9 +1529,6 @@ AuraClientService.prototype.sendActionXHRs = function() {
     this.actionsDeferred = [];
     for (i = 0; i < processing.length; i++) {
         action = processing[i];
-        if (!action) {
-            continue;
-        }
         if (this.maybeAbortAction(action)) {
             continue;
         }
@@ -1618,12 +1625,11 @@ AuraClientService.prototype.deDupe = function(action) {
     var key, entry, dupes;
 
     if (!action.isStorable()) {
-        return;
+        return false;
     }
     try {
         key = action.getStorageKey();
     } catch (e) {
-        // whoops, well, shit... no key. abort.
         return false;
     }
     entry = this.actionStoreMap[key];
@@ -1939,6 +1945,10 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             if (action) {
                 if (response["storable"] && !action.isStorable()) {
                     action.setStorable();
+                    // the action started as non-abortable on the client
+                    if(action.getAbortableId() === undefined) {
+                        action.setAbortable(false);
+                    }
                 }
             } else {
                 action = this.buildFakeAction(response);
@@ -2209,7 +2219,7 @@ AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
  */
 AuraClientService.prototype.renderInjection = function(component, locator, actionEventHandlers) {
     var error = null;
-    
+
     var stringLocator = $A.util.isString(locator);
     var hostEl = stringLocator ? document.getElementById(locator) : locator;
 
@@ -2241,11 +2251,16 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
  * @param {Object} config - component def config
  * @param {String} locator - parent element or the id of the parent element where to inject component
  * @param {Object} [eventHandlers] - handlers of registered event
+ * @param {Function} callback The callback to use once the component is successfully created
  * @export
  */
-AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers) {
+AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers, callback) {
     var acs = this;
     $A.componentService.newComponentAsync(undefined, function(component) {
+    	if (callback) {
+    		callback(component);
+    	}
+    	
         acs.renderInjection(component, locator, eventHandlers);
     }, config, $A.getRoot(), false, false, true);
     //

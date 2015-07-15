@@ -18,29 +18,39 @@
 <aura:component model="java://org.auraframework.components.aurajstest.JSTestCaseModel" extends="ui:tab">
     <aura:attribute name="case" type="java://org.auraframework.def.TestCaseDef"/>
     <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
+    <aura:attribute name="shortName" type="String"/>
     <aura:attribute name="url" type="String"/>
 
 	<!-- PRIVATE ATTRIBUTE(S) -->
-    <aura:attribute name="status" type="String" default="spin"/>
+    <aura:attribute name="status" type="String" default=""/>
+    <aura:attribute name="individualTestUrl" type="String" default=""/>
 
     <aura:set attribute="scroll" value="false"/>
-    <aura:set attribute="title" value="{!v.case.name}"/>
 
     <aura:registerevent name="done" type="aurajstest:testStatus"/>
-    <aura:set attribute="icon">    
-        <a href="javascript:void(0);" onclick="{!c.rerun}" class="{!'rerun ' + v.status}" aura:id="rerun"></a>
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+    <aura:set attribute="icon">
+        <a href="javascript:void(0);" class="{!'rerun ' + v.status}" aura:id="rerun"></a>
     </aura:set>
 
     <aura:handler name="onActivated" action="{!c.onActivate}" />
     
     <aura:set attribute="body">
+        <section class="results">
+            <aura:if isTrue="{!v.status == 'pass' || v.status == 'fail'}">
+                <h1>{! v.status == 'pass' ? 'Passed ' : 'Failed '}<sub>{!v.case.name}{!v.runTime}</sub></h1>
+                <div class="action">
+                    <a onclick="{!c.rerun}">Re-run</a>&nbsp;
+                    <a href="{!v.individualTestUrl}" target="_">Run in a new tab</a>
+                </div>
+                <aura:set attribute="else"><h1>Test <sub>{!v.case.name}</sub></h1></aura:set>
+            </aura:if>
+            <div aura:id="results" class="results"></div>
+        </section>
         <section class="content">
             <h1>Content</h1>
             <div aura:id="content" class="testContent"></div>
-        </section>
-        <section class="results">
-            <h1>Results</h1>
-            <div aura:id="results"></div>
         </section>
     </aura:set>
 

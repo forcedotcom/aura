@@ -19,8 +19,8 @@
     <aura:attribute name="cbComplete" type="String" default="No" />
     <aura:attribute name="cbName" type="String" default="SUCCESS" />
     <aura:attribute name="cbExpected" type="String" default="SUCCESS" />
-    <aura:attribute name="cbResult" type="String" default="NONE" visibility="private"/>
-    <aura:attribute name="cbState" type="String" default="NONE" visibility="private"/>
+    <aura:attribute name="cbResult" type="String" default="NONE"/>
+    <aura:attribute name="cbState" type="String" default="NONE"/>
     
     <ui:button aura:id="pass" label="Pass!" press="{!c.firePass}"/><br />
     <ui:button aura:id="fail" label="Fail!" press="{!c.fireFail}"/>

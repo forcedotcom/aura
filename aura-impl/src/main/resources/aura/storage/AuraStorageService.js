@@ -167,7 +167,7 @@ AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
 
     if (candidates.length === 0) {
         $A.error("AuraStorageService.selectAdapter() unable to find a secure adapter implementation!");
-        return;
+        return null;
     }
 
     // Now take the set of candidates and weed out any non-persistent if persistence is requested (not required)

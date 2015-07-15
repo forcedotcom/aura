@@ -53,12 +53,11 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_DESCRIPTION = "description";
     private static final String ATTRIBUTE_SERIALIZE_TO = "serializeTo";
-    private static final String ATTRIBUTE_VISIBILITY = "visibility";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
             ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_SERIALIZE_TO, ATTRIBUTE_VISIBILITY).addAll(ALLOWED_ATTRIBUTES).build();
+			ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -119,17 +118,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
             }
         }
         defaultValue = getAttributeValue(ATTRIBUTE_DEFAULT);
-        String visibility = getAttributeValue(ATTRIBUTE_VISIBILITY);
-        if (visibility != null) {
-            try {
-                builder.setVisibility(AttributeDef.Visibility.valueOf(visibility.trim().toUpperCase()));
-            } catch (IllegalArgumentException iae) {
-                builder.setVisibility(AttributeDef.Visibility.INVALID);
-            }
-        }
-        else {
-            builder.setVisibility(AttributeDef.Visibility.PUBLIC);
-        }
 
         try {
             builder.setAccess(readAccessAttribute());

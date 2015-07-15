@@ -152,7 +152,7 @@
             	</div> 
             	<div class="case">
             		<h1>trigger=click:</h1>
-	                 <ui:tooltip aura:id="triggerclick" advanced="true" trigger="click" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerclick" advanced="true" trigger="click" tooltipBody="Tooltip Message" triggerClass="triggerClick">
 	                 	<ui:label aura:id="triggerclicklabel" for="triggerclick" label="?"/>
 	                 </ui:tooltip> 
             	</div> 

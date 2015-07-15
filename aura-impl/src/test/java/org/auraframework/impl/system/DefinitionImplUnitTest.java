@@ -20,7 +20,6 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.system.DefinitionImpl.RefBuilderImpl;
@@ -49,8 +48,7 @@ extends UnitTestCase {
     protected Location location;
     protected Map<SubDefDescriptor<?, D>, Definition> subDefs;
     protected String description;
-    protected Visibility visibility = Visibility.PUBLIC;
-    protected DefinitionAccess access = null;
+    protected DefinitionAccess access = null; 
     @Mock
     protected Hash sourceHash;
     protected String ownHash;
@@ -133,38 +131,26 @@ extends UnitTestCase {
         assertNull(actual);
     }
 
-    public void testGetVisibilityNull() throws Exception {
-        this.visibility = null;
-        Visibility actual = buildDefinition().getVisibility();
-        assertEquals(Visibility.PUBLIC, actual);
-    }
-
-    public void testGetVisibilityNotNull() throws Exception {
-        this.visibility = Visibility.PRIVATE;
-        Visibility actual = buildDefinition().getVisibility();
-        assertEquals(visibility, actual);
-    }
-
     public void testAccessGlobal() throws Exception {
-        this.access = new DefinitionAccessImpl(null, "global");
-        DefinitionAccess actual = buildDefinition().getAccess();
-        assertTrue(actual.isGlobal());
+    	this.access = new DefinitionAccessImpl(null, "global");
+    	DefinitionAccess actual = buildDefinition().getAccess();
+    	assertTrue(actual.isGlobal());
     }
 
     public void testAccessGlobalDynamic() throws Exception {
         this.access = new DefinitionAccessImpl(null, "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal");
-        DefinitionAccess actual = buildDefinition().getAccess();
-        assertTrue(actual.isGlobal());
+    	DefinitionAccess actual = buildDefinition().getAccess();
+    	assertTrue(actual.isGlobal());
     }
-
+    
     public void testAccessDefault() throws Exception {
-        this.access = DefinitionAccessImpl.defaultAccess(null);
-        DefinitionAccess actual = buildDefinition().getAccess();
-        assertTrue(actual.isPublic());
+    	this.access = DefinitionAccessImpl.defaultAccess(null);
+    	DefinitionAccess actual = buildDefinition().getAccess();
+    	assertTrue(actual.isPublic());
     }
+    
 
-
-    public void testIsValid() throws Exception {
+   public void testIsValid() throws Exception {
         boolean actual = buildDefinition().isValid();
         assertFalse(actual);
     }
@@ -180,9 +166,9 @@ extends UnitTestCase {
         if (testAuraContext != null) {
             Aura.getContextService().endContext();
         }
-
+        
         testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
-
+    	
         buildDefinition().validateDefinition();
     }
 
@@ -196,24 +182,14 @@ extends UnitTestCase {
         }
     }
 
-    public void testValidateDefinitionInvalidVisibility() throws Exception {
-        this.visibility = Visibility.INVALID;
-        try {
-            buildDefinition().validateDefinition();
-            fail("Expected an exception for Visibility.INVALID");
-        } catch (Exception e) {
-            assertExceptionMessage(e, InvalidDefinitionException.class, "Invalid visibility value");
-        }
-    }
-
     // used to setup references to be validated by subclasses
     public void testValidateReferences() throws Exception {
         if (testAuraContext != null) {
             Aura.getContextService().endContext();
         }
-
+        
         testAuraContext = Aura.getContextService().startContext(Mode.PROD, Format.JS, Authentication.AUTHENTICATED);
-
+    	
         setupValidateReferences();
         buildDefinition().validateReferences();
     }
@@ -248,7 +224,6 @@ extends UnitTestCase {
         builder.setLocation(this.location);
         builder.subDefs = this.subDefs;
         builder.setDescription(this.description);
-        builder.setVisibility(this.visibility);
         builder.hash = this.sourceHash;
         builder.ownHash = this.ownHash;
         builder.setAccess(this.access);

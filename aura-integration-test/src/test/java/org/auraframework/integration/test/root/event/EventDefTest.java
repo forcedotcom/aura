@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.TypeDef;
@@ -52,10 +51,10 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
-                AttributeDef.SerializeToType.BOTH, null, null));
+                AttributeDef.SerializeToType.BOTH, null));
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, type2, null,
-                        true, AttributeDef.SerializeToType.BOTH, null, null));
+                        true, AttributeDef.SerializeToType.BOTH, null));
         EventDefImpl def = vendor.makeEventDef(desc, EventType.COMPONENT, atts, null, null);
         def.validateDefinition();
         assertEquals(EventType.COMPONENT, def.getEventType());
@@ -99,21 +98,6 @@ public class EventDefTest extends AuraImplTestCase {
         }
     }
 
-    public void testValidateDefinitionPrivateAttribute() throws Exception {
-        // checks if error is thrown when an attribute is set as private
-        Map<DefDescriptor<AttributeDef>, AttributeDef> att = new HashMap<>();
-        att.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
-                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, null, null,
-                        false, null, null, Visibility.PRIVATE));
-        EventDefImpl eve = vendor.makeEventDef(null, null, att, null, null);
-        try {
-            eve.validateDefinition();
-            fail("Validate should have caught private attributes");
-        } catch (InvalidDefinitionException e) {
-            checkExceptionFull(e, InvalidDefinitionException.class, "Cannot declare an Event attribute as private");
-        }
-    }
-
     public void testValidateReferences() throws Exception {
         FakeRegistry fake = createFakeRegistry();
         EventDefImpl ed = vendor.makeEventDef();
@@ -145,10 +129,10 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         atts.put(DefDescriptorImpl.getInstance("testString", AttributeDef.class), new AttributeDefImpl(
                 DefDescriptorImpl.getInstance("testString", AttributeDef.class), null, type, null, true,
-                AttributeDef.SerializeToType.BOTH, null, null));
+                AttributeDef.SerializeToType.BOTH, null));
         atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
                 new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null, type2, null,
-                        true, AttributeDef.SerializeToType.BOTH, null, null));
+                        true, AttributeDef.SerializeToType.BOTH, null));
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);
         serializeAndGoldFile(def);
     }
@@ -159,9 +143,9 @@ public class EventDefTest extends AuraImplTestCase {
         DefDescriptor<TypeDef> type = DefDescriptorImpl.getInstance("String", TypeDef.class);
         DefDescriptor<TypeDef> type2 = DefDescriptorImpl.getInstance("Integer", TypeDef.class);
         AttributeDefImpl att1 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testString", AttributeDef.class),
-                null, type, null, true, AttributeDef.SerializeToType.BOTH, null, null);
+                null, type, null, true, AttributeDef.SerializeToType.BOTH, null);
         AttributeDefImpl att2 = new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
-                null, type2, null, true, AttributeDef.SerializeToType.BOTH, null, null);
+                null, type2, null, true, AttributeDef.SerializeToType.BOTH, null);
         atts.put(att1.getDescriptor(), att1);
         atts.put(att2.getDescriptor(), att2);
         EventDefImpl def = vendor.makeEventDefWithNulls(desc, EventType.COMPONENT, atts, null, null);

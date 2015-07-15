@@ -46,6 +46,7 @@
 	<ui:block aura:id="overflowHidden">
 		 <aura:set attribute="right">
 		 	<ui:inputText class="appInput" aura:id="appInput" value="TestingCloseOnClickOutFeature" maxlength="10"/> <br/>
+		 	<ui:inputText class="appInput2" aura:id="appInput2" value="this opens a panel" click="{!c.createPanel}"/> <br/>
   		 </aura:set>
 	 	<div id="bodyBlockDiv">This is a Test App to Test Panel</div>
 	</ui:block>

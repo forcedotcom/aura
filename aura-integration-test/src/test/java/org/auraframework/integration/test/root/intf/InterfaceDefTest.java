@@ -22,12 +22,10 @@ import java.util.Set;
 
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition.Visibility;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.FakeRegistry;
 import org.auraframework.impl.root.AttributeDefImpl;
@@ -85,22 +83,6 @@ public class InterfaceDefTest extends AuraImplTestCase {
         }
     }
 
-    public void testValidateDefinitionPrivateAttribute() throws Exception {
-        Map<DefDescriptor<AttributeDef>, AttributeDef> atts = new HashMap<>();
-        atts.put(DefDescriptorImpl.getInstance("testInt", AttributeDef.class),
-                new AttributeDefImpl(DefDescriptorImpl.getInstance("testInt", AttributeDef.class), null,
-                        DefDescriptorImpl.getInstance("Integer", TypeDef.class), null,
-                        false, null, null, Visibility.PRIVATE));
-        InterfaceDefImpl inter = vendor.makeInterfaceDef(null, atts, null, null, null);
-        try {
-            inter.validateDefinition();
-            fail("Should have thrown an error for Private Attributes");
-        } catch (InvalidDefinitionException ide) {
-            checkExceptionFull(ide, InvalidDefinitionException.class,
-                    "Cannot declare an Interface attribute as private");
-        }
-    }
-
     public void testValidateReferences() throws Exception {
         FakeRegistry fake = createFakeRegistry();
         InterfaceDef ed = vendor.makeInterfaceDef();
@@ -117,7 +99,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         eventDefs.put("buckfutter", red);
         AttributeDefImpl testAttributeDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("testattribute",
                 AttributeDef.class), null, vendor.getTypeDef().getDescriptor(), null, false,
-                AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
+                AttributeDef.SerializeToType.BOTH, null);
         Map<DefDescriptor<AttributeDef>, AttributeDef> attDefs = new HashMap<>();
         attDefs.put(DefDescriptorImpl.getInstance("nullAttribute", AttributeDef.class), testAttributeDef);
         InterfaceDefImpl def = vendor.makeInterfaceDefWithNulls(
@@ -159,7 +141,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
     public void testGetAttributeDefsWithoutExtensions() throws Exception {
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
-                null, null, null, false, AttributeDef.SerializeToType.BOTH, null, Visibility.PUBLIC);
+                null, null, null, false, AttributeDef.SerializeToType.BOTH, null);
         attributes.put(attDef.getDescriptor(), attDef);
         InterfaceDefImpl intDef2 = vendor.makeInterfaceDefWithNulls(
                 vendor.makeInterfaceDefDescriptor("aura:testinterfacechild"), attributes, null, null, null, null);
@@ -225,7 +207,7 @@ public class InterfaceDefTest extends AuraImplTestCase {
         extensions.add(vendor.makeInterfaceDefDescriptor("aura:testinterfaceparent"));
         Map<DefDescriptor<AttributeDef>, AttributeDef> attributes = new HashMap<>();
         AttributeDef attDef = new AttributeDefImpl(DefDescriptorImpl.getInstance("Fake Attribute", AttributeDef.class),
-                null, null, null, false, AttributeDef.SerializeToType.BOTH, null, null);
+                null, null, null, false, AttributeDef.SerializeToType.BOTH, null);
         attributes.put(attDef.getDescriptor(), attDef);
         DefDescriptor<EventDef> eventTestDescriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         RegisterEventDef regEventDef = vendor.makeRegisterEventDefWithNulls(eventTestDescriptor, true, null);

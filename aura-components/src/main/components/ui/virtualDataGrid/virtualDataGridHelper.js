@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 ({
+	NS: "UIPERF",
+	NAME: "ui:virtualDataGrid",
+	
     DELEGATED_EVENTS: [
         'click'
     ],
@@ -263,6 +266,7 @@
         dom._data = item;
     },
     appendVirtualRows: function (cmp, items) {
+    	$A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
         var fragment  = document.createDocumentFragment(),
             container = this.getGridBody(cmp);
 
@@ -273,14 +277,17 @@
         }
         container.appendChild(fragment);
         cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
+        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
     },
     createVirtualRows: function (cmp) {
         var items = cmp.get('v.items');
         cmp._virtualItems = [];
         if (items && items.length) {
+        	$A.metricsService.markStart(this.NS, this.NAME + ".createVirtualRows", {auraid : cmp.getGlobalId()});
             for (var i = 0; i < items.length; i++) {
                 cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i]));
             }
+            $A.metricsService.markEnd(this.NS, this.NAME + ".createVirtualRows");
         }        
     },
     

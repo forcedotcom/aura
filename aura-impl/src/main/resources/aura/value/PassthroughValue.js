@@ -43,7 +43,8 @@ PassthroughValue.prototype.addValueHandler = function(config) {
     var path = config.value.split(".");
     if(!this.primaryProviders.hasOwnProperty(path[0])) {
         // not this.component
-        return this.component.addValueHandler(config);
+        this.component.addValueHandler(config);
+        return;
     }
 
     var provider = this.primaryProviders[path[0]];
@@ -245,7 +246,8 @@ PassthroughValue.prototype.removeValueHandler = function(config) {
     // Only value handlers for our values are added, everything else
     // gets passed to the component we are wrapping. So remove it there.
     if(!this.primaryProviders.hasOwnProperty(path[0])) {
-        return this.component.removeValueHandler(config);
+        this.component.removeValueHandler(config);
+        return;
     }
 
     var provider = this.primaryProviders[path[0]];
@@ -297,7 +299,7 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
             var reference = provider.getReference(key);
             if(reference) {
                 reference.set(value);
-                return;
+                return undefined;
             }
         }
 
@@ -307,7 +309,7 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
         }
 
         if (!target) {
-            return; // If the passthrough value is not set with data, return to avoid errors
+            return undefined; // If the passthrough value is not set with data, return to avoid errors
         }
 
         var oldValue=target[key];
@@ -333,7 +335,7 @@ PassthroughValue.prototype.set = function(key, value, ignoreChanges) {
         return value;
     }
 
-   return this.component.set(key,value, ignoreChanges);
+    return this.component.set(key,value, ignoreChanges);
 };
 
 /**

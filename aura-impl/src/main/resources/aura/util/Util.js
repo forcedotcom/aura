@@ -1902,7 +1902,7 @@ Aura.Utils.Util.prototype.squash = function(event, preventDefault) {
  */
 Aura.Utils.Util.prototype.stripTags = function(input, tags) {
     if (this.isUndefinedOrNull(input) || this.isEmpty(input)) {
-        return;
+        return "";
     }
     var div = document.createElement('div');
     div.innerHTML = input;

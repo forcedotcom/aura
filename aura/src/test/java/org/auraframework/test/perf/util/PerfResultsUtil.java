@@ -50,6 +50,7 @@ public final class PerfResultsUtil {
     private static final Logger LOG = Logger.getLogger(PerfResultsUtil.class.getSimpleName());
     public static final Date RUN_TIME = new Date();
     public static String MONGO_URI = System.getProperty("mongoURI");
+    public static final String DEFAULT_MONGO_URI = "mongodb://localhost:27017";
     public static MongoClient MONGO_CLIENT; // TODO: Abstract this better
 
     private static MongoClient getMongoClient() {
@@ -58,7 +59,7 @@ public final class PerfResultsUtil {
                 LOG.info("Trying to connect to MongoDB: " + MONGO_URI);
                 // Default Mongo client to connect to default mongo host.
                 if(MONGO_URI == null){
-                	MONGO_URI = "mongodb://fjunod-wsl4:27017";
+                	MONGO_URI = DEFAULT_MONGO_URI;
                 }                	
                 MongoClientURI uri = new MongoClientURI(MONGO_URI);
                 MONGO_CLIENT = new MongoClient(uri);

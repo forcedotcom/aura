@@ -2244,11 +2244,16 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
  * @param {Object} config - component def config
  * @param {String} locator - parent element or the id of the parent element where to inject component
  * @param {Object} [eventHandlers] - handlers of registered event
+ * @param {Function} callback The callback to use once the component is successfully created
  * @export
  */
-AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers) {
+AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers, callback) {
     var acs = this;
     $A.componentService.newComponentAsync(undefined, function(component) {
+    	if (callback) {
+    		callback(component);
+    	}
+    	
         acs.renderInjection(component, locator, eventHandlers);
     }, config, $A.getRoot(), false, false, true);
     //

@@ -16,4 +16,6 @@
 -->
 
 <aura:component>
+  <aura:attribute name="xxx" type="String" default="none" />
+  <aura:attribute name="attributeLabel" type="String" default="{!$Label.Related_Lists.task_mode_today}"/>
 </aura:component>

@@ -94,18 +94,17 @@
     margin: 0;
     border-radius: 0;
     display: block;
-    width: 150px;
+    width: 200px;
 }
 
-@media screen and (min-width: 500px) {
-    .THIS ul li.uiTabItem {
+@media screen and (min-width: 1300px) {
+    .THIS ul {
+        position: absolute;
         width: 200px;
     }
-}
-
-@media screen and (min-width: 900px) {
-    .THIS ul li.uiTabItem {
-        width: 250px;
+    .THIS .tabs__content, .THIS.suiteCode {
+        margin-top: 0;
+        margin-left: 200px;
     }
 }
 
@@ -147,7 +146,6 @@
     padding: 8px;
     border-bottom: 4px solid #f78717;
     font-weight: 100;
-    position: relative;
 }
 
 .THIS h1 sub {
@@ -157,10 +155,16 @@
     font-weight: 100;
 }
 
-.THIS h1 + div {
-    padding: 20px 8px;
-    font-weight: 200;
-    font-size: 0.923rem;
+.THIS section > div:first-child {
+    padding-top: 20px;
+}
+
+.THIS section > div {
+    padding: 10px;
+}
+
+.THIS section > div:last-child {
+    padding-bottom: 20px;
 }
 
 .THIS section div.testContent {
@@ -191,6 +195,11 @@
 .THIS section.results > div {
     font-size: 1.25rem;
     font-weight: 200;
+}
+
+.THIS section.results a {
+    font-size: 1rem;
+    border-bottom: 2px solid lightskyblue;
 }
 
 .THIS section.results div {

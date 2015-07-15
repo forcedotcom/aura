@@ -68,18 +68,19 @@
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
                 if (error["lastStage"]) {
-                    msg += "<br/><br/><pre>" + error["lastStage"] + "</pre>";
+                    msg += "<br/><pre>" + error["lastStage"] + "</pre>";
                 }
             }
-            cmp.find("results").getElement().innerHTML = "Failed" + msg;
+            cmp.find("results").getElement().innerHTML = msg;
         } else {
             cmp.set("v.status", "pass");
-            cmp.find("results").getElement().innerText = "Passed";
         }
 
         cmp.set("v.runTime", " in " + (new Date().getTime() - cmp._startTime) + "ms");
-
-        //$A.rerender(cmp);
+        var url = cmp.get("m.url");
+        var baseUrl = url.substring(0, url.indexOf('?'));
+        var individualTestUrl = baseUrl + "?aura.mode=JSTESTDEBUG&test=" + cmp.get("v.case.name");
+        cmp.set("v.individualTestUrl", individualTestUrl);
 
         cmp.get("e.done").fire();
     }

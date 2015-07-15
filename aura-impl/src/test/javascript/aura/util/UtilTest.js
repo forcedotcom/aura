@@ -153,7 +153,7 @@ Test.Aura.Util.UtilTest = function() {
 
         [Fact]
         function undefinedValue(){
-            var expected = undefined;
+            var expected = "";
             var actual = targetUtil.stripTags(undefined, tags);
 
             // Assert

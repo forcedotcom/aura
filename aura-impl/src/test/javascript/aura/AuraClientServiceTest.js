@@ -66,7 +66,6 @@ Test.Aura.AuraClientServiceTest = function() {
         Aura: Aura
     });
 
-    
     [Fixture]
     function testDupes() {
     	[Fact]

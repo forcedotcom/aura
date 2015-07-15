@@ -5,7 +5,7 @@
         FAILED : 'failed'
     },
     POLL_TIME : 3000,
-    TOTAL_TEST_COUNT : 0,
+    TOTAL_TEST_COUNT_HASH : {},
     _parseTestName: function (name) {
         //return name.match(/\:?(\w+)\(/)[1];
         return name.match(/([^_$]+\:?\w+)\(/)[1];
@@ -17,6 +17,9 @@
         return status;
     },
     createRow: function (t) {
+        //increase the counter
+        this.TOTAL_TEST_COUNT_HASH[t.type] = this.TOTAL_TEST_COUNT_HASH[t.type] + 1 || 1;
+
     	//changes from array join to string concat for performance reason
         return '<li class="list-test-item" data-testid="' + t.name + '" test-type="' + t.type + '"' + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
                 '<div class="parts">' +
@@ -223,6 +226,16 @@
         //remove the loading state
         self.setPageState('');
         self._updateSelectedTestCount(0);
+
+
+        //update stat
+        var testStatDomArray = [];
+        this.TOTAL_TEST_COUNT_HASH['Total'] = this.TOTAL_TEST_COUNT;
+        for (var testType in this.TOTAL_TEST_COUNT_HASH){
+            var testCount = this.TOTAL_TEST_COUNT_HASH[testType];
+            testStatDomArray.push('<b>' + testType + ':</b><span>' + testCount + '</span>');
+        }
+        document.querySelector('#test-stat').innerHTML = testStatDomArray.join('');
     },
 
     scrollTestContainerToTop: function(){
@@ -292,7 +305,7 @@
     },
     _updateSelectedTestCount: function(count){
         //update the 
-        document.querySelector('#count_test_selected').innerHTML = '<b>' + count + '</b>' + ' out of <b>' + this.TOTAL_TEST_COUNT + '</b> Tests Selected';
+        document.querySelector('#count_test_selected').innerHTML = count > 1 ? '<b>' + count + '</b>' + ' Tests Selected' : count === 1 ? '<b>' + count + '</b>' + ' Test Selected' : '';
     },
     calcOrOperators: function(regexp, name){
     	for (var j = 0; j < regexp.length; j++){

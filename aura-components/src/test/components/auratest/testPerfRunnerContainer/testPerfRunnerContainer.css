@@ -305,7 +305,7 @@
 }
 
 .THIS li[test-type='jstest'] .test-type{
-    color:#23B5AF;
+    color:#666;
 }
 
 .THIS li[test-type='jstest'] .test-type:before{

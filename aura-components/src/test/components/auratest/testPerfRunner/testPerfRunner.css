@@ -108,6 +108,7 @@
     bottom:0px;
     height:20px;
     width:100%;
+    text-align:center;
 }
 
 
@@ -122,9 +123,18 @@
     float:right;
 }
 
+.THIS > footer .status-bar {
+    float:left;
+}
+
 .THIS > footer #count_test_selected{
     float:right;
 }
-.THIS > footer #count_test_selected > b{
+.THIS > footer #count_test_selected > b, .THIS > footer #test-stat > b{
     color:tomato;
+}
+
+.THIS > footer #test-stat > span{
+    margin-left:10px;
+    margin-right:10px;
 }

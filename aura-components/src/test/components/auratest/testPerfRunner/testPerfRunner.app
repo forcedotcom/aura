@@ -38,6 +38,7 @@
     	</section>
     	<footer>
     		<span class="status-bar"></span>
+            <span id="test-stat"></span>
             <span id="count_test_selected"></span>
     	</footer>
     </div>

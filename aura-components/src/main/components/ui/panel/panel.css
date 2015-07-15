@@ -178,12 +178,14 @@
 @keyframes movefromcenter{
     from {
          -webkit-transform:scale3d(.97,.97,1);
+         transform:scale3d(.97,.97,1);
     }
 }
 
 @keyframes movetocenter {
     to { 
         -webkit-transform:scale3d(.97,.97,1);
+        transform:scale3d(.97,.97,1);
     }
 }
 

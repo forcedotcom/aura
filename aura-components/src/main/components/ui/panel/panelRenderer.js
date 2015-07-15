@@ -24,26 +24,27 @@
         }
     },
     rerender: function (cmp, helper) {
+
+        /*
+        This is to prevent losing the "state"
+        classes when the component is re-rendered, because 
+        the component uses class="{!v.class}" to set the class,
+        but the helper adds and removes classes from the DOM,
+
+        I've created W-2679769 to return to this and clean it up,
+        for now this will fix the problem where teams that set 
+        values in the panel after creation cause it to lose
+        the "open" class
+
+         */
     	var currentEl =cmp.getElement();
-    	var classes = [];
-
-    	// The things that set these classes
-    	// are async so there is a race condition 
-    	// at re-render time causing these to be erased.
-    	// There is probably a better way, but this works for now
-    	if(currentEl.className.match(/(\s|^)open(\s|$)/)) {
-    		classes.push('open');
-    	}
-    	if(currentEl.className.match(/(\s|^)active(\s|$)/)) {
-    		classes.push('active');
-    	}
-
-    	vClass = cmp.get('v.class');
-    	if(vClass) {
-    		classes.push(vClass);
-    	}
-    	cmp.set('v.class', classes.join(' '));
+    	var classes = currentEl.className.split(' ');
     	this.superRerender();
+        if(classes) {
+            classes.forEach(function(cl) {
+                currentEl.classList.add(cl);
+            });
+        }
 
     }
 })

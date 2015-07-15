@@ -15,6 +15,7 @@
  */
 ({
 	init : function(cmp, evt, helper) {
+		$A.metricsService.enablePlugins();
 		helper.generateColumnConfigs(cmp);
 	},
 	
@@ -24,13 +25,27 @@
 	},
 	
 	replaceData : function(cmp, evt, helper) {
+		$A.metricsService.transactionStart("vDataGridKitchenSink","replace",{context:{}});
+
 		cmp.find("data").set("v.empty", false);
 		cmp.find("data").getEvent("provide").fire();
+		
+		$A.metricsService.transactionEnd("vDataGridKitchenSink","replace",{
+			postProcess: function (transaction) {
+				return transaction;
+			}
+		});
 	},
 	
 	emptyData : function(cmp, evt, helper) {
+		$A.metricsService.transactionStart("vDataGridKitchenSink","empty",{context:{}});
 		cmp.find("data").set("v.empty", true);
 		cmp.find("data").getEvent("provide").fire();
+		$A.metricsService.transactionEnd("vDataGridKitchenSink","empty",{
+			postProcess: function (transaction) {
+				return transaction;
+			}
+		});
 	},
 	
 	switchColumn : function(cmp, evt, helper) {

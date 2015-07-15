@@ -311,8 +311,8 @@
 
 	unrender : function(cmp) {
 		var editorInstance = this.getEditorInstance(cmp);
-		if (editorInstance) {
+		try {
 			editorInstance.destroy();
-		}
+		} catch (e) {}
 	}
 })

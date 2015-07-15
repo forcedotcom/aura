@@ -29,7 +29,6 @@
     },
 
     runTest: function (cmp) {
-
         var frame = cmp.find("content").getElement().firstChild;
         var win = frame.contentWindow ? frame.contentWindow : frame.contentDocument.window;
         try {
@@ -47,6 +46,7 @@
                 return;
             }
         }
+        cmp._startTime = new Date().getTime();
         win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 10, cmp.get("v.case.quickFixException"));
         cmp.getDef().getHelper().displayResults(cmp, win);
     },
@@ -68,14 +68,16 @@
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
                 if (error["lastStage"]) {
-                    msg += "<br/>Failing Test: " + cmp.get("v.title") + "<br/><pre>" + error["lastStage"] + "</pre>";
+                    msg += "<br/><br/><pre>" + error["lastStage"] + "</pre>";
                 }
             }
-            cmp.find("results").getElement().innerHTML = "Failed.<br/>" + msg;
+            cmp.find("results").getElement().innerHTML = "Failed" + msg;
         } else {
             cmp.set("v.status", "pass");
-            cmp.find("results").getElement().innerHTML = "Passed.";
+            cmp.find("results").getElement().innerText = "Passed";
         }
+
+        cmp.set("v.runTime", " in " + (new Date().getTime() - cmp._startTime) + "ms");
 
         //$A.rerender(cmp);
 

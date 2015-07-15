@@ -27,5 +27,22 @@
     		$A.test.expectAuraError("Unable to set value for key '$Bla.whatever.anything'. No value provider was found for '$Bla'. : false");
     		$A.set("$Bla.whatever.anything","new value");
     	}
+    },
+    
+    /*
+     * v.attributeLabel is initialized with '$Label.Related_Lists.task_mode_today'
+     * This test verify that changing v.attributeLabel won't update $Label
+     * for W-2676281
+     */
+    testNoUpdateGVPFromComponent: {
+    	test: function(cmp) {
+    		var oldValueLabel = $A.get("$Label.Related_Lists.task_mode_today");
+    		//sanity check
+    		$A.test.assertTrue(cmp.getReference('v.attributeLabel') instanceof PropertyReferenceValue, "attributeLabel should be instance of PRV");
+    		//change attribute value
+    		cmp.set("v.attributeLabel", "wowowowowo");
+    		$A.test.assertEquals("wowowowowo", cmp.get('v.attributeLabel'))
+    		$A.test.assertEquals(oldValueLabel, $A.get("$Label.Related_Lists.task_mode_today"), "we don't update GVP from component");
+    	}
     }
 })

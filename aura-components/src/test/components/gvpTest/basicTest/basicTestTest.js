@@ -36,12 +36,13 @@
      */
     testNoUpdateGVPFromComponent: {
     	test: function(cmp) {
+    		var actual, expected;
     		var oldValueLabel = $A.get("$Label.Related_Lists.task_mode_today");
-    		//sanity check
-    		$A.test.assertTrue(cmp.getReference('v.attributeLabel') instanceof PropertyReferenceValue, "attributeLabel should be instance of PRV");
     		//change attribute value
-    		cmp.set("v.attributeLabel", "wowowowowo");
-    		$A.test.assertEquals("wowowowowo", cmp.get('v.attributeLabel'))
+    		expected = "data";
+    		cmp.set("v.attributeLabel", expected);
+    		actual = cmp.get('v.attributeLabel');
+    		$A.test.assertEquals(expected, actual);
     		$A.test.assertEquals(oldValueLabel, $A.get("$Label.Related_Lists.task_mode_today"), "we don't update GVP from component");
     	}
     }

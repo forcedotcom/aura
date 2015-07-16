@@ -22,14 +22,14 @@ import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
-import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Definition;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -68,9 +68,9 @@ public interface BuilderService extends AuraService {
     ComponentDefRefBuilder getComponentDefRefBuilder();
 
     /**
-     * Retrieves a Builder suitable for defining a {@link ThemeDef}.
+     * Retrieves a Builder suitable for defining a {@link TokensDef}.
      */
-    ThemeDefBuilder getThemeDefBuilder();
+    TokensDefBuilder getTokensDefBuilder();
 
     /**
      * Retrieves a Builder suitable for defining a {@link Cache}

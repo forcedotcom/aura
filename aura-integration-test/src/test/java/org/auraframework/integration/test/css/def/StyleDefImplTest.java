@@ -21,10 +21,10 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.throwable.quickfix.ThemeValueNotFoundException;
+import org.auraframework.throwable.quickfix.TokenValueNotFoundException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
@@ -41,57 +41,24 @@ public class StyleDefImplTest extends StyleTestCase {
         super(name);
     }
 
-    public void testThemeDependenciesNsThemeOnly() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addNsTheme(theme().var("color", "red"));
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
+    public void testDependenciesIncludesNsDefault() throws QuickFixException {
+        DefDescriptor<TokensDef> nsDefault = addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(color) }");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         style.getDef().appendDependencies(dependencies);
-        assertTrue(dependencies.contains(theme));
-    }
-
-    public void testThemeDependenciesCmpThemeOnly() throws QuickFixException {
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
-        DefDescriptor<ThemeDef> theme = addCmpTheme(theme().var("color", "red"), style);
-
-        assertTrue("expected theme to be a cmpTheme", theme.getDef().isCmpTheme());
-
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies);
-        assertTrue(dependencies.contains(theme));
-    }
-
-    public void testThemeDependenciesBothThemes() throws QuickFixException {
-        DefDescriptor<ThemeDef> nsTheme = addNsTheme(theme().var("color", "red"));
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color) }");
-        DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
-
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies);
-        assertTrue("expected dependencies to contain namespace theme", dependencies.contains(nsTheme));
-        assertTrue("expected dependencies to contain cmp theme", dependencies.contains(cmpTheme));
-    }
-
-    public void testThemeDependenciesDoesntHaveThemeDef() throws QuickFixException {
-        DefDescriptor<ThemeDef> nsTheme = addNsTheme("<aura:theme><aura:var name='color' value='red'/></aura:theme>");
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: red }");
-        DefDescriptor<ThemeDef> cmpTheme = addCmpTheme(theme().var("color", "red"), style);
-
-        Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
-        style.getDef().appendDependencies(dependencies);
-        assertFalse(dependencies.contains(nsTheme));
-        assertFalse(dependencies.contains(cmpTheme));
+        assertTrue(dependencies.contains(nsDefault));
     }
 
     public void testInvalidRef() throws QuickFixException {
-        addNsTheme("<aura:theme><aura:var name='color' value='red'/></aura:theme>");
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(bam) }");
+        addNsTokens("<aura:tokens><aura:token name='color' value='red'/></aura:tokens>");
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(bam) }");
 
         try {
             style.getDef().validateReferences();
             fail("expected an exception");
         } catch (Exception e) {
-            checkExceptionContains(e, ThemeValueNotFoundException.class, "was not found");
+            checkExceptionContains(e, TokenValueNotFoundException.class, "was not found");
         }
     }
 
@@ -128,20 +95,20 @@ public class StyleDefImplTest extends StyleTestCase {
         verifyStyleDefSerialization(styleDesc, true);
     }
 
-    public void testGetVarNames() throws Exception {
-        addNsTheme(theme()
-                .var("color", "red")
-                .var("margin1", "10px")
-                .var("margin2", "5px")
-                .var("margin3", "15px"));
+    public void testGetTokenNames() throws Exception {
+        addNsTokens(tokens()
+                .token("color", "red")
+                .token("margin1", "10px")
+                .token("margin2", "5px")
+                .token("margin3", "15px"));
 
-        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: theme(color); font-weight: bold; margin: t(margin1 + ' 5px ' + margin2); }");
+        DefDescriptor<StyleDef> style = addStyleDef(".THIS {color: token(color); font-weight: bold; margin: t(margin1 + ' 5px ' + margin2); }");
 
-        Set<String> varNames = style.getDef().getVarNames();
-        assertEquals("didn't have expected size", 3, varNames.size());
-        assertTrue(varNames.contains("color"));
-        assertTrue(varNames.contains("margin1"));
-        assertTrue(varNames.contains("margin2"));
+        Set<String> tokenNames = style.getDef().getTokenNames();
+        assertEquals("didn't have expected size", 3, tokenNames.size());
+        assertTrue(tokenNames.contains("color"));
+        assertTrue(tokenNames.contains("margin1"));
+        assertTrue(tokenNames.contains("margin2"));
     }
 
     @SuppressWarnings("unchecked")

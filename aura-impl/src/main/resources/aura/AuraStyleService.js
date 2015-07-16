@@ -16,7 +16,7 @@
 /*jslint sub: true */
 /**
  * @description The Aura Style Service, accessible using <b><code>$A.styleService</code></b>.
- *              Dynamically loads and applies themed CSS.
+ *              Dynamically loads and applies tokenized CSS.
  * @constructor
  * @export
  */
@@ -26,71 +26,10 @@ function AuraStyleService() {
 }
 
 /**
- * Loads CSS from the server with the given theme applied.
+ * Loads CSS from the server with the given tokens applied.
  * <p>
  * The current application's CSS is loaded from the server and only includes
- * overrides for the CSS that reference theme vars from the specified theme. This
- * CSS is then placed into a new style element and attached to the DOM.
- * <p>
- * In addition to the application's CSS (as determined by the
- * application's dependency graph), this will also include any client
- * loaded StyleDefs (i.e., any dynamically loaded components with
- * styles, that are not in the application's dependency graph). Client
- * loaded StyleDefs will be appended after the standard application CSS.
- * Note that this may not be adequate with certain usages of providers.
- * See the config options for more details.
- * <p>
- * Extra StyleDefs to load may be specified through the config object,
- * which will be appended last.
- * <p>
- * Multiple calls to this method are cumulative, unless
- * <code>config.replaceExisting</code> is specified as true.
- *
- * @public
- * @memberOf AuraStyleService
- *
- * @param {string} theme
- *          The theme descriptor, e.g., <code>"myNamespace:myTheme"</code>.
- * @param {Object=} config
- *          The optional configuration object.
- * @param {boolean} [config.replaceExisting=true]
- *          Specify true to replace all previously applied styles, false to append.
- * @param {string[]} [config.extraStyles]
- *          Specify any extra StyleDef descriptors to include.
- * @param {boolean} [config.storable=true]
- *          Specify whether the server action is storable. If true, the results
- *          may be retrieved from a cache when given the same parameters. You
- *          may want to specify false if applying a <em>MapProvider</em> theme.
- * @param {function} [config.callback]
- *          Callback function to invoke once the style element has been appended to the page.
- * @param {function} [config.customHandler]
- *          Callback function that will be invoked with the themed CSS. If this function is
- *          specified, the CSS will not be automatically appended to the page as usual.
- *          Certain other config options may no longer be applicable. If you place the styles
- *          into the DOM, be aware that subsequent calls to this method that do not specify this
- *          option may not properly override everything depending on where in the DOM you placed
- *          the styles. Also note that the <code>replaceExisting</code> param will not handle
- *          any styles you attach to the DOM manually.
- * @param {boolean} [config.forceClientScan=false]
- *          When false (the default), the server will automatically attempt to discover any client-loaded
- *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
- *          detection on the client and the data sent to the server manually instead. Note that this option
- *          is less performant than the default, however it may be applicable when using providers (and the
- *          provided defs cannot be determined from the server). The default option is sufficient to include
- *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
- *          components from those.
- * @export
- */
-AuraStyleService.prototype.applyTheme = function(theme, config) {
-    $A.assert(!$A.util.isUndefinedOrNull(theme), "applyTheme() cannot be given a null or undefined theme argument");
-    this.applyThemes([theme], config);
-};
-
-/**
- * Loads CSS from the server with the given themes applied.
- * <p>
- * The current application's CSS is loaded from the server and only includes
- * overrides for the CSS that reference theme vars from the specified themes.
+ * overrides for the CSS that reference tokens from the specified tokens def.
  * This CSS is then placed into a new style element and attached to the DOM.
  * <p>
  * In addition to the application's CSS (as determined by the
@@ -110,8 +49,8 @@ AuraStyleService.prototype.applyTheme = function(theme, config) {
  * @public
  * @memberOf AuraStyleService
  *
- * @param {string[]} themes
- *          The theme descriptors, e.g., <code>["myNamespace:myTheme", "myNamespace:myTheme2"]</code>.
+ * @param {string} descriptor
+ *          The TokensDef descriptor, e.g., <code>"myNamespace:myTokens"</code>.
  * @param {Object=} config
  *          The optional configuration object.
  * @param {boolean} [config.replaceExisting=true]
@@ -121,11 +60,11 @@ AuraStyleService.prototype.applyTheme = function(theme, config) {
  * @param {boolean} [config.storable=true]
  *          Specify whether the server action is storable. If true, the results
  *          may be retrieved from a cache when given the same parameters. You
- *          may want to specify false if applying a <em>MapProvider</em> theme.
+ *          may want to specify false if applying a <em>MapProvider</em> def.
  * @param {function} [config.callback]
  *          Callback function to invoke once the style element has been appended to the page.
  * @param {function} [config.customHandler]
- *          Callback function that will be invoked with the themed CSS. If this function is
+ *          Callback function that will be invoked with the returned CSS. If this function is
  *          specified, the CSS will not be automatically appended to the page as usual.
  *          Certain other config options may no longer be applicable. If you place the styles
  *          into the DOM, be aware that subsequent calls to this method that do not specify this
@@ -142,8 +81,69 @@ AuraStyleService.prototype.applyTheme = function(theme, config) {
  *          components from those.
  * @export
  */
-AuraStyleService.prototype.applyThemes = function(themes, config) {
-	$A.assert($A.util.isArray(themes), "applyThemes() expects the 'themes' arg to be an array of strings");
+AuraStyleService.prototype.applyTokens = function(descriptor, config) {
+    $A.assert(!$A.util.isUndefinedOrNull(descriptor), "applyTokens() cannot be given a null or undefined descriptor argument");
+    this.applyAllTokens([descriptor], config);
+};
+
+/**
+ * Loads CSS from the server with the given tokens applied.
+ * <p>
+ * The current application's CSS is loaded from the server and only includes
+ * overrides for the CSS that reference tokens from the specified tokens defs.
+ * This CSS is then placed into a new style element and attached to the DOM.
+ * <p>
+ * In addition to the application's CSS (as determined by the
+ * application's dependency graph), this will also include any client
+ * loaded StyleDefs (i.e., any dynamically loaded components with
+ * styles, that are not in the application's dependency graph). Client
+ * loaded StyleDefs will be appended after the standard application CSS.
+ * Note that this may not be adequate with certain usages of providers.
+ * See the config options for more details.
+ * <p>
+ * Extra StyleDefs to load may be specified through the config object,
+ * which will be appended last.
+ * <p>
+ * Multiple calls to this method are cumulative, unless
+ * <code>config.replaceExisting</code> is specified as true.
+ *
+ * @public
+ * @memberOf AuraStyleService
+ *
+ * @param {string[]} descriptors
+ *          The TokensDef descriptors, e.g., <code>["myNamespace:myTokens", "myNamespace:myTokens2"]</code>.
+ * @param {Object=} config
+ *          The optional configuration object.
+ * @param {boolean} [config.replaceExisting=true]
+ *          Specify true to replace all previously applied styles, false to append.
+ * @param {string[]} [config.extraStyles]
+ *          Specify any extra StyleDef descriptors to include.
+ * @param {boolean} [config.storable=true]
+ *          Specify whether the server action is storable. If true, the results
+ *          may be retrieved from a cache when given the same parameters. You
+ *          may want to specify false if applying a <em>MapProvider</em> def.
+ * @param {function} [config.callback]
+ *          Callback function to invoke once the style element has been appended to the page.
+ * @param {function} [config.customHandler]
+ *          Callback function that will be invoked with the returned CSS. If this function is
+ *          specified, the CSS will not be automatically appended to the page as usual.
+ *          Certain other config options may no longer be applicable. If you place the styles
+ *          into the DOM, be aware that subsequent calls to this method that do not specify this
+ *          option may not properly override everything depending on where in the DOM you placed
+ *          the styles. Also note that the <code>replaceExisting</code> param will not handle
+ *          any styles you attach to the DOM manually.
+ * @param {boolean} [config.forceClientScan=false]
+ *          When false (the default), the server will automatically attempt to discover any client-loaded
+ *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
+ *          detection on the client and the data sent to the server manually instead. Note that this option
+ *          is less performant than the default, however it may be applicable when using providers (and the
+ *          provided defs cannot be determined from the server). The default option is sufficient to include
+ *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
+ *          components from those.
+ * @export
+ */
+AuraStyleService.prototype.applyAllTokens = function(descriptors, config) {
+	$A.assert($A.util.isArray(descriptors), "applyAllTokens() expects the 'descriptors' arg to be an array of strings");
 	var that = this;
     config = config || {};
 
@@ -164,10 +164,10 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
             }
         }
 
-        var action = $A.get("c.aura://DynamicStylingController.applyThemes");
+        var action = $A.get("c.aura://DynamicStylingController.applyTokens");
 
         action.setParams({
-            "themes": themes,
+            "descriptors": descriptors,
             "clientLoaded" : clientLoaded,
             "extraStyles": config["extraStyles"] || []
         });
@@ -191,7 +191,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
 
                 // default is to replace existing unless specified false
                 if ($A.util.isUndefinedOrNull(config["replaceExisting"]) || $A.util.getBooleanValue(config["replaceExisting"]) === true) {
-                    that.removeThemes();
+                    that.removeTokens();
                     that.added = [node];
                 } else {
                     that.added.push(node);
@@ -201,7 +201,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
                 if (errors && errors[0] && errors[0].message) {
                     $A.error(errors[0].message);
                 } else {
-                    $A.error("Unable to apply theme, action state = " + a.getState());
+                    $A.error("Unable to apply tokens, action state = " + a.getState());
                 }
             }
 
@@ -212,7 +212,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
         });
 
         $A.clientService.enqueueAction(action);
-    }, "applyThemes");
+    }, "applyAllTokens");
 };
 
 /**
@@ -222,7 +222,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
  * @memberOf AuraStyleService
  * @export
  */
-AuraStyleService.prototype.removeThemes = function() {
+AuraStyleService.prototype.removeTokens = function() {
     var head = this.style.getHead();
     for (var i = 0, len = this.added.length; i < len; i++) {
         head.removeChild(this.added[i]);

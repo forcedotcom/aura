@@ -24,7 +24,7 @@ import org.auraframework.adapter.ExpressionAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.builder.BaseStyleDefBuilder;
 import org.auraframework.css.ResolveStrategy;
-import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
@@ -65,7 +65,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
             return CssPreprocessor.runtime()
                     .source(content)
                     .resourceName(descriptor.getQualifiedName())
-                    .themes(descriptor)
+                    .tokens(descriptor)
                     .extras(plugins)
                     .parse()
                     .content();
@@ -85,7 +85,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
     }
 
     @Override
-    public Set<String> getVarNames() throws AuraValidationException {
+    public Set<String> getTokenNames() throws AuraValidationException {
         Set<String> set = new HashSet<>();
 
         if (!expressions.isEmpty()) {
@@ -111,7 +111,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
         // validate that expressions reference valid vars
         if (!expressions.isEmpty()) {
             StyleAdapter adapter = Aura.getStyleAdapter();
-            ThemeValueProvider vp = adapter.getThemeValueProvider(descriptor, ResolveStrategy.RESOLVE_DEFAULTS);
+            TokenValueProvider vp = adapter.getTokenValueProvider(descriptor, ResolveStrategy.RESOLVE_DEFAULTS);
             for (String reference : expressions) {
                 vp.getValue(reference, getLocation()); // getValue will validate it's a valid expression/variable
             }
@@ -134,7 +134,7 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
         }
 
         @Override
-        public Builder<D> setThemeExpressions(Set<String> expressions) {
+        public Builder<D> setTokenExpressions(Set<String> expressions) {
             this.expressions = expressions;
             return this;
         }

@@ -21,7 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -43,45 +43,45 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         super(name);
     }
 
-    /** tests that the css url includes themes explicitly added to context */
-    public void testCssUrlContextSpecifiedThemes() throws Exception {
+    /** tests that the css url includes tokens explicitly added to context */
+    public void testCssUrlContextSpecifiedTokens() throws Exception {
         AuraContext ctx = setupContext(null);
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class));
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class));
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens", TokensDef.class));
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens3", TokensDef.class));
         goldFileAppCssUrl();
     }
 
     /**
-     * tests that the css url includes themes from the app and also ones explicitly added to context. The app theme
+     * tests that the css url includes tokens from the app and also ones explicitly added to context. The app tokens
      * should come first.
      */
-    public void testCssUrlContextSpecifiedAndAppSpecifiedThemes() throws Exception {
-        AuraContext ctx = setupContextWithAppReferencingThemes("test:fakeTheme3");
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
+    public void testCssUrlContextSpecifiedAndAppSpecifiedTokens() throws Exception {
+        AuraContext ctx = setupContextWithAppOverrides("test:fakeTokens3");
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
         goldFileAppCssUrl();
     }
 
-    /** test that the css url includes multiple app-specified themes and in the correct order */
-    public void testCssUrlWithMultipleAppThemes() throws Exception {
-        setupContextWithAppReferencingThemes("test:fakeTheme2", "test:fakeTheme", "test:fakeTheme3");
+    /** test that the css url includes multiple app-specified tokens and in the correct order */
+    public void testCssUrlWithMultipleAppTokensDefs() throws Exception {
+        setupContextWithAppOverrides("test:fakeTokens2", "test:fakeTokens", "test:fakeTokens3");
         goldFileAppCssUrl();
     }
 
-    /** test that the css url uses the concrete (provided) theme descriptors */
-    public void testCssUrlWithProvidedTheme() throws Exception {
-        String name = "test:fakeThemeWithDescriptorProvider";
-        DefDescriptor<ThemeDef> theme = DefDescriptorImpl.getInstance(name, ThemeDef.class);
-        setupContextWithAppReferencingThemes(theme.getDescriptorName());
+    /** test that the css url uses the concrete (provided) tokens descriptors */
+    public void testCssUrlWithProvidedTokens() throws Exception {
+        String name = "test:fakeTokensWithDescriptorProvider";
+        DefDescriptor<TokensDef> desc = DefDescriptorImpl.getInstance(name, TokensDef.class);
+        setupContextWithAppOverrides(desc.getDescriptorName());
         goldFileAppCssUrl();
     }
 
-    /** test that the css url includes a hash when a map-provided theme is used */
-    public void testSerializeWithMapProvidedTheme() throws Exception {
-        String name = "test:fakeThemeWithMapProvider";
-        DefDescriptor<ThemeDef> theme = DefDescriptorImpl.getInstance(name, ThemeDef.class);
-        AuraContext ctx = setupContextWithAppReferencingThemes(theme.getDescriptorName());
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme3", ThemeDef.class));
+    /** test that the css url includes a hash when a map-provided tokens is used */
+    public void testSerializeWithMapProvidedTokens() throws Exception {
+        String name = "test:fakeTokensWithMapProvider";
+        DefDescriptor<TokensDef> desc = DefDescriptorImpl.getInstance(name, TokensDef.class);
+        AuraContext ctx = setupContextWithAppOverrides(desc.getDescriptorName());
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens3", TokensDef.class));
         goldFileAppCssUrl();
     }
 
@@ -96,15 +96,15 @@ public class AuraBaseServletUrlTest extends AuraImplTestCase {
         return ctx;
     }
 
-    private AuraContext setupContextWithAppReferencingThemes(String... themeDescriptors) {
-        List<DefDescriptor<ThemeDef>> themes = Lists.newArrayList();
+    private AuraContext setupContextWithAppOverrides(String... descriptors) {
+        List<DefDescriptor<TokensDef>> tokens = Lists.newArrayList();
 
-        for (int i = 0; i < themeDescriptors.length; i++) {
-            themes.add(DefDescriptorImpl.getInstance(themeDescriptors[i], ThemeDef.class));
+        for (int i = 0; i < descriptors.length; i++) {
+            tokens.add(DefDescriptorImpl.getInstance(descriptors[i], TokensDef.class));
         }
 
-        String markup = "<aura:application access='unauthenticated' theme='%s'/>";
-        String src = String.format(markup, Joiner.on(",").join(themes));
+        String markup = "<aura:application access='unauthenticated' tokens='%s'/>";
+        String src = String.format(markup, Joiner.on(",").join(tokens));
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
         return setupContext(app);
     }

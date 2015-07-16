@@ -148,9 +148,9 @@ public class FileSourceListenerTest extends UnitTestCase {
                 "/some/awesome/ui/baseFlavors/baseFlavors.flavors");
     }
 
-    public void testSourceChangedTheme() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "uiTheme", DefDescriptor.DefType.THEME,
-                "/some/awesome/ui/uiTheme/uiTheme.theme");
+    public void testSourceChangedTokens() throws Exception {
+        assertSourceChangedCalled("markup", "ui", "uiNamespace", DefDescriptor.DefType.TOKENS,
+                "/some/awesome/ui/uiNamespace/uiNamespace.tokens");
     }
 
     public void testSourceChangedLayouts() throws Exception {

@@ -20,7 +20,7 @@ import java.util.Set;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -95,15 +95,15 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         assertTrue(flavorNames.contains("flavorD"));
     }
 
-    /** references to a theme var add the namespace theme to the deps */
-    public void testThemeDependencies() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addNsTheme(theme().var("color", "red"));
+    /** references to a token add the namespace-default tokens to the deps */
+    public void testTokenDependencies() throws QuickFixException {
+        DefDescriptor<TokensDef> nsTokens = addNsTokens(tokens().token("color", "red"));
         DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component><div aura:flavorable='true'></div></aura:component>");
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, ".THIS--test {color:t(color);}");
 
         Set<DefDescriptor<?>> dependencies = Sets.newHashSet();
         flavor.getDef().appendDependencies(dependencies);
-        assertTrue(dependencies.contains(theme));
+        assertTrue(dependencies.contains(nsTokens));
     }
 
     /** custom flavors have a dependency on the component, standard flavors do not */
@@ -122,17 +122,17 @@ public class FlavoredStyleDefImplTest extends StyleTestCase {
         assertTrue(dependencies.contains(cmp));
     }
 
-    /** keeps track of var names */
-    public void testGetVarNames() throws Exception {
-        addNsTheme(theme().var("color", "red").var("margin1", "10px"));
+    /** keeps track of token names */
+    public void testGetTokensNames() throws Exception {
+        addNsTokens(tokens().token("color", "red").token("margin1", "10px"));
         DefDescriptor<ComponentDef> cmp = addComponentDef("<aura:component><div aura:flavorable='true'></div></aura:component>");
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp,
-                ".THIS--test {color: theme(color); font-weight: bold; margin: t(margin1); }");
+                ".THIS--test {color: token(color); font-weight: bold; margin: t(margin1); }");
 
-        Set<String> varNames = flavor.getDef().getVarNames();
-        assertEquals("didn't have expected size", 2, varNames.size());
-        assertTrue(varNames.contains("color"));
-        assertTrue(varNames.contains("margin1"));
+        Set<String> tokenNames = flavor.getDef().getTokenNames();
+        assertEquals("didn't have expected size", 2, tokenNames.size());
+        assertTrue(tokenNames.contains("color"));
+        assertTrue(tokenNames.contains("margin1"));
     }
 
     /** test that it throws an error if flavoring something that isn't flavorable */

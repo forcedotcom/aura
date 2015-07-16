@@ -50,12 +50,12 @@ import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.DefinitionAccessImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryDefImpl;
-import org.auraframework.impl.css.theme.ThemeDefImpl;
+import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -149,8 +149,8 @@ public class AuraImplUnitTestingUtil {
                 ComponentDef.class);
     }
 
-    public DefDescriptor<ThemeDef> getThemeDefDescriptor() {
-        return DefDescriptorImpl.getInstance("test:fakeTheme", ThemeDef.class);
+    public DefDescriptor<TokensDef> getTokensDefDescriptor() {
+        return DefDescriptorImpl.getInstance("test:fakeTokens", TokensDef.class);
     }
 
     public DefDescriptor<ComponentDef> getFlavorableComponentDescriptor() {
@@ -940,8 +940,8 @@ public class AuraImplUnitTestingUtil {
         return builder.build();
     }
 
-    public ThemeDef makeThemeDef(Map<String, String> variables) {
-        ThemeDefImpl.Builder builder = new ThemeDefImpl.Builder();
+    public TokensDef makeTokensDef(Map<String, String> variables) {
+        TokensDefImpl.Builder builder = new TokensDefImpl.Builder();
         for (Entry<String, String> entry : variables.entrySet()) {
             AttributeDefRefImpl value = makeAttributeDefRef(entry.getKey(), entry.getValue(), null);
             AttributeDefImpl attr = makeAttributeDef(entry.getKey(),

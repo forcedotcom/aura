@@ -66,7 +66,7 @@
             var loaded = false;
             var colors = component.getElements();
 
-            $A.styleService.applyTheme("styleServiceTest:crossReferenceOverride", {
+            $A.styleService.applyTokens("styleServiceTest:crossReferenceOverride", {
                 callback: function() {loaded = true}
             });
 

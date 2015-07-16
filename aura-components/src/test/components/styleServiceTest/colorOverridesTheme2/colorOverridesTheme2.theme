@@ -1,5 +1,0 @@
-<aura:theme description="changes last three colors to fuchsia">
-    <aura:var name="color3" value="#F012BE" />
-    <aura:var name="color4" value="#F012BE" />
-    <aura:var name="color5" value="#F012BE" />
-</aura:theme>

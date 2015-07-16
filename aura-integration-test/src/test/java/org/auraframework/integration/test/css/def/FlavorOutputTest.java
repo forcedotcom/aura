@@ -35,7 +35,7 @@ public class FlavorOutputTest extends StyleTestCase {
         super(name);
     }
 
-    /** [flavorName] -> [namespace][FlavorName]-f */
+    /** [flavorName] -> [namespace][Component]--[flavorName] */
     public void testRenameFlavorClassNames() throws Exception {
         String src = ".THIS--primary {color:red} \n" +
                 ".THIS--secondary {color:red}";
@@ -91,11 +91,11 @@ public class FlavorOutputTest extends StyleTestCase {
         assertEquals(expected, flavor.getDef().getCode());
     }
 
-    public void testResolvesThemeTokens() throws Exception {
+    public void testResolvesTokens() throws Exception {
         String src = ".THIS--primary {color:t(color)}";
         String fmt = ".%s--primary {color:red}";
 
-        addNsTheme(theme().var("color", "red"));
+        addNsTokens(tokens().token("color", "red"));
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> flavor = addStandardFlavor(cmp, src);
 

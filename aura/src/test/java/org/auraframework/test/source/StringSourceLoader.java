@@ -50,7 +50,7 @@ import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
 import org.auraframework.system.Source;
@@ -438,7 +438,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         FLAVOR_ASSORTMENT(FlavorAssortmentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        TOKENS(TokensDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         DESIGN(DesignDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         SVG(SVGDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INCLUDE(IncludeDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, ".");

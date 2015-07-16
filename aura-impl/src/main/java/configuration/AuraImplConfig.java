@@ -450,7 +450,7 @@ public class AuraImplConfig {
     }
 
     @Impl
-    public static StyleAdapter themeValueAdapter() {
+    public static StyleAdapter styleAdapter() {
         return new StyleAdapterImpl();
     }
 

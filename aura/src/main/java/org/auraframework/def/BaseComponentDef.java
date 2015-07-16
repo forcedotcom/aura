@@ -41,18 +41,18 @@ public interface BaseComponentDef extends RootDefinition {
 
     /**
      * Get the set of dependencies declared on this component.
-     * 
+     *
      * These dependencies must be loaded for the component to be functional, either at the initial load time or before
      * rendering. These dependencies are in the form of DescriptorFilters which can then be used to match the actual
      * descriptors.
-     * 
+     *
      * @return the list of declared dependencies for the component.
      */
     List<DependencyDef> getDependencies();
 
     /**
      * Get the event handlers for the component.
-     * 
+     *
      * @return all the handlers on this component, including those inherited
      * @throws QuickFixException
      */
@@ -60,7 +60,7 @@ public interface BaseComponentDef extends RootDefinition {
 
     /**
      * Get the library import statements for the component.
-     * 
+     *
      * @return all library requirements on this component, including those inherited
      * @throws QuickFixException
      */
@@ -90,7 +90,7 @@ public interface BaseComponentDef extends RootDefinition {
     FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException;
 
     Set<PropertyReference> getExpressionRefs();
-    
+
     List<AttributeDefRef> getFacets();
 
     Map<DefDescriptor<MethodDef>, MethodDef> getMethodDefs() throws QuickFixException;
@@ -138,17 +138,12 @@ public interface BaseComponentDef extends RootDefinition {
 
     /**
      * Adds specified client libraries to definition
-     * 
+     *
      * @param clientLibs list of client libraries
      */
     void addClientLibs(List<ClientLibraryDef> clientLibs);
 
     Set<ResourceDef> getResourceDefs() throws QuickFixException;
-
-    /**
-     * Gets the {@link ThemeDef} that's part of the component (or app) bundle.
-     */
-    DefDescriptor<ThemeDef> getCmpTheme();
 
     /**
      * Returns true if this component has a child component def ref html element that has aura:flavorable. To check

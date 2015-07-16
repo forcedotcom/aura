@@ -28,7 +28,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.service.ContextService;
@@ -42,7 +42,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
- * for testing stuff that needs StyleDef, ThemeDef sources.
+ * for testing stuff that needs StyleDef, TokenDef sources.
  */
 public abstract class StyleTestCase extends AuraImplTestCase {
     private static AtomicLong counter = new AtomicLong();
@@ -121,59 +121,42 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         return styleDesc.getDef().getCode();
     }
 
-    /** gets the parsed output of the given style. This ensures the application explicit theme is registered */
-    public String getParsedCssUseAppTheme(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
-        // ensures app's theme is added to the context
-        Aura.getContextService().getCurrentContext().addAppThemeDescriptors();
+    /** gets the parsed output of the given style. This ensures the application explicit tokens are registered */
+    public String getParsedCssUseAppTokens(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
+        // ensures app's tokens are added to the context
+        Aura.getContextService().getCurrentContext().addAppTokensDescriptors();
         return styleDesc.getDef().getCode();
     }
 
-    /** adds the namespace-default {@link ThemeDef} to the namespace with the given source */
-    public DefDescriptor<ThemeDef> addNsTheme(CharSequence src) {
-        String fmt = String.format("%s:%sTheme", ns1, ns1);
-        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
-        addSourceAutoCleanup(themeDesc, src.toString());
-        return themeDesc;
-    }
-
-    /** adds the namespace-default {@link ThemeDef} to the "other" namespace with the given source */
-    public DefDescriptor<ThemeDef> addNsThemeOtherNamespace(CharSequence src) {
-        String fmt = String.format("%s:%sTheme", ns2, ns2);
-        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
-        addSourceAutoCleanup(themeDesc, src.toString());
-        return themeDesc;
-    }
-
-    /** adds an extra {@link ThemeDef} to the namespace */
-    public DefDescriptor<ThemeDef> addSeparateTheme(CharSequence src) {
-        String fmt = String.format("%s:%s", ns1, getAuraTestingUtil().getNonce("testTheme"));
-        DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
+    /** adds the namespace-default {@link TokensDef} to the namespace with the given source */
+    public DefDescriptor<TokensDef> addNsTokens(CharSequence src) {
+        String fmt = String.format("%s:%sNamespace", ns1, ns1);
+        DefDescriptor<TokensDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
         addSourceAutoCleanup(desc, src.toString());
         return desc;
     }
 
-    /** adds an extra {@link ThemeDef} to the "other" namespace */
-    public DefDescriptor<ThemeDef> addSeparateThemeOtherNamespace(CharSequence src) {
-        String fmt = String.format("%s:%s", ns2, getAuraTestingUtil().getNonce("testTheme"));
-        DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
+    /** adds the namespace-default {@link TokensDef} to the "other" namespace with the given source */
+    public DefDescriptor<TokensDef> addNsTokensOtherNamespace(CharSequence src) {
+        String fmt = String.format("%s:%sNamespace", ns2, ns2);
+        DefDescriptor<TokensDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
         addSourceAutoCleanup(desc, src.toString());
         return desc;
     }
 
-    /** adds a {@link StyleDef} and a {@link ThemeDef} to the same bundle */
-    public DefDescriptor<ThemeDef> addThemeAndStyle(CharSequence themeSrc, CharSequence styleSrc) {
-        DefDescriptor<StyleDef> styleDef = addStyleDef(styleSrc);
-        String fmt = String.format("%s:%s", styleDef.getNamespace(), styleDef.getName());
-        DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
-        addSourceAutoCleanup(desc, themeSrc.toString());
+    /** adds an extra {@link TokensDef} to the namespace */
+    public DefDescriptor<TokensDef> addSeparateTokens(CharSequence src) {
+        String fmt = String.format("%s:%s", ns1, getAuraTestingUtil().getNonce("testTokens"));
+        DefDescriptor<TokensDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
+        addSourceAutoCleanup(desc, src.toString());
         return desc;
     }
 
-    /** adds a {@link ThemeDef} to the same bundle as the given {@link StyleDef}. */
-    public DefDescriptor<ThemeDef> addCmpTheme(CharSequence themeSrc, DefDescriptor<StyleDef> styleDef) {
-        String fmt = String.format("%s:%s", styleDef.getNamespace(), styleDef.getName());
-        DefDescriptor<ThemeDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
-        addSourceAutoCleanup(desc, themeSrc.toString());
+    /** adds an extra {@link TokensDef} to the "other" namespace */
+    public DefDescriptor<TokensDef> addSeparateTokensOtherNamespace(CharSequence src) {
+        String fmt = String.format("%s:%s", ns2, getAuraTestingUtil().getNonce("testTokens"));
+        DefDescriptor<TokensDef> desc = Aura.getDefinitionService().getDefDescriptor(fmt, TokensDef.class);
+        addSourceAutoCleanup(desc, src.toString());
         return desc;
     }
 
@@ -195,13 +178,6 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         ctx.setApplicationDescriptor(appDesc);
         Aura.getDefinitionService().updateLoaded(appDesc);
         return appDesc;
-    }
-
-    /** adds a theme with the given source to the same bundle as the context app */
-    public DefDescriptor<ThemeDef> addContextAppBundleTheme(CharSequence src) {
-        String fmt = String.format("%s:%s", ns1, "testApp");
-        DefDescriptor<ThemeDef> themeDesc = Aura.getDefinitionService().getDefDescriptor(fmt, ThemeDef.class);
-        return addSourceAutoCleanup(themeDesc, src.toString());
     }
 
     /** adds a style with the given source to the same bundle as the context app */
@@ -249,39 +225,39 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         return addSourceAutoCleanup(faDesc, src.toString());
     }
 
-    /** helper for building a theme string source */
-    public ThemeSrcBuilder theme() {
-        return new ThemeSrcBuilder();
+    /** helper for building a tokens def string source */
+    public TokensSrcBuilder tokens() {
+        return new TokensSrcBuilder();
     }
 
-    public static final class ThemeSrcBuilder implements CharSequence {
-        private DefDescriptor<ThemeDef> parent;
+    public static final class TokensSrcBuilder implements CharSequence {
+        private DefDescriptor<TokensDef> parent;
         private final List<String> content = Lists.newArrayList();
         private String descriptorProvider;
         private String mapProvider;
 
-        public ThemeSrcBuilder var(String name, String value) {
-            content.add(String.format("<aura:var name='%s' value='%s'/>", name, value));
+        public TokensSrcBuilder token(String name, String value) {
+            content.add(String.format("<aura:token name='%s' value='%s'/>", name, value));
             return this;
         }
 
-        public ThemeSrcBuilder parent(DefDescriptor<ThemeDef> parent) {
+        public TokensSrcBuilder parent(DefDescriptor<TokensDef> parent) {
             this.parent = checkNotNull(parent, "parent cannot be null");
             return this;
         }
 
-        public ThemeSrcBuilder descriptorProvider(String descriptorProvider) {
+        public TokensSrcBuilder descriptorProvider(String descriptorProvider) {
             this.descriptorProvider = descriptorProvider;
             return this;
         }
 
-        public ThemeSrcBuilder mapProvider(String mapProvider) {
+        public TokensSrcBuilder mapProvider(String mapProvider) {
             this.mapProvider = mapProvider;
             return this;
         }
 
-        public ThemeSrcBuilder imported(DefDescriptor<ThemeDef> imported) {
-            content.add(String.format("<aura:importTheme name='%s'/>", imported.getDescriptorName()));
+        public TokensSrcBuilder imported(DefDescriptor<TokensDef> imported) {
+            content.add(String.format("<aura:import name='%s'/>", imported.getDescriptorName()));
             return this;
         }
 
@@ -289,7 +265,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
         public String toString() {
             StringBuilder builder = new StringBuilder();
 
-            builder.append("<aura:theme");
+            builder.append("<aura:tokens");
 
             if (descriptorProvider != null) {
                 builder.append(" provider='");
@@ -312,7 +288,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
 
             builder.append(Joiner.on("").join(content));
 
-            builder.append("</aura:theme>");
+            builder.append("</aura:tokens>");
             return builder.toString();
         }
 

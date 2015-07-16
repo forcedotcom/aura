@@ -31,7 +31,7 @@ import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -155,22 +155,22 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    public void testGetClientRenderingAfterThemeChange() throws Exception {
+    public void testGetClientRenderingAfterTokensChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", "<div id='out'>hi</div>"));
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                 StyleDef.class);
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-size:t(fsize);}", className));
-        DefDescriptor<?> themeDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s:%sTheme", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
-                        cmpDesc.getNamespace()), ThemeDef.class);
-        addSourceAutoCleanup(themeDesc,
-                "<aura:theme><aura:var name='fsize' value='8px'/></aura:theme>");
+        DefDescriptor<?> tokensDesc = Aura.getDefinitionService().getDefDescriptor(
+                String.format("%s://%s:%sNamespace", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
+                        cmpDesc.getNamespace()), TokensDef.class);
+        addSourceAutoCleanup(tokensDesc,
+                "<aura:tokens><aura:token name='fsize' value='8px'/></aura:tokens>");
         open(cmpDesc);
         assertEquals("8px", auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
-        updateStringSource(themeDesc,
-                "<aura:theme><aura:var name='fsize' value='66px'/></aura:theme>");
+        updateStringSource(tokensDesc,
+                "<aura:tokens><aura:token name='fsize' value='66px'/></aura:tokens>");
         open(cmpDesc);
         assertEquals("66px", auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
     }
@@ -353,7 +353,7 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
 
     /**
      * A routine to do _many_ iterations of a client out of sync test.
-     * 
+     *
      * This test really shouldn't be run unless one of the tests is flapping. It lets you iterate a number of times to
      * force a failure.... No guarantees, but without the _waitingForReload check in the trigger function, this will
      * cause a failure in very few iterations.
@@ -395,21 +395,21 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
     }
 
     @ThreadHostileTest("NamespaceDef modification affects namespace")
-    public void testPostAfterThemeChange() throws Exception {
+    public void testPostAfterTokensChange() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = setupTriggerComponent("", "<div id='out'>hi</div>");
         String className = cmpDesc.getNamespace() + StringUtils.capitalize(cmpDesc.getName());
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                 StyleDef.class);
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-size:t(fsize);}", className));
-        DefDescriptor<?> themeDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s:%sTheme", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
-                        cmpDesc.getNamespace()), ThemeDef.class);
-        addSourceAutoCleanup(themeDesc,
-                "<aura:theme><aura:var name='fsize' value='8px'/></aura:theme>");
+        DefDescriptor<?> tokensDesc = Aura.getDefinitionService().getDefDescriptor(
+                String.format("%s://%s:%sNamespace", DefDescriptor.MARKUP_PREFIX, cmpDesc.getNamespace(),
+                        cmpDesc.getNamespace()), TokensDef.class);
+        addSourceAutoCleanup(tokensDesc,
+                "<aura:tokens><aura:token name='fsize' value='8px'/></aura:tokens>");
         open(cmpDesc);
         assertEquals("8px", auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-size"));
-        updateStringSource(themeDesc,
-                "<aura:theme><aura:var name='fsize' value='66px'/></aura:theme>");
+        updateStringSource(tokensDesc,
+                "<aura:tokens><aura:token name='fsize' value='66px'/></aura:tokens>");
         triggerServerAction();
         auraUITestingUtil.waitForElementFunction(By.cssSelector("." + className), new Function<WebElement, Boolean>() {
             @Override

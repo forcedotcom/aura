@@ -22,8 +22,8 @@ import org.auraframework.Aura;
 import org.auraframework.builder.StyleDefBuilder;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.css.util.Themes;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
@@ -45,17 +45,9 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
-            // we know that any expression means we have a dependency on a theme, but we can't determine here if that is
-            // only a dependency on the component theme, only on the namespace-default, or both (however if the
-            // expression references a var not defined in either then a QFE will be thrown during #validateReferences).
-            DefDescriptor<ThemeDef> cmpTheme = Themes.cmpThemeDescriptor(descriptor);
-            if (cmpTheme.exists()) {
-                dependencies.add(cmpTheme);
-            }
-
-            DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(descriptor);
-            if (namespaceTheme.exists()) {
-                dependencies.add(namespaceTheme);
+            DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(descriptor);
+            if (namespaceTokens.exists()) {
+                dependencies.add(namespaceTokens);
             }
         }
     }
@@ -67,9 +59,9 @@ public class StyleDefImpl extends AbstractStyleDef<StyleDef> implements StyleDef
         json.writeMapEntry("descriptor", descriptor);
 
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
-            // TODONM: revisit this after removing theme from aura context
-            if (context.getThemeList().isEmpty()) {
-                context.addAppThemeDescriptors();
+            // TODONM: revisit this after removing tokens from aura context
+            if (context.getTokenOptimizer().isEmpty()) {
+                context.addAppTokensDescriptors();
             }
 
             // Note that if this starts to depend on anything beside the name of

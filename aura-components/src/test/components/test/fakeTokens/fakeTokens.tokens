@@ -1,0 +1,4 @@
+<aura:tokens>
+    <aura:token name="color" value="#ffcc00" />
+    <aura:token name="margin" value="10px" />
+</aura:tokens>

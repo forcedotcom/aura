@@ -299,7 +299,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             new AddableDef<>(StyleDef.class, "css://%s.%s",
                     ".THIS {display:block;}"),
             // Ignoring TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
-            // Ignoring THEME(ThemeDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
+            // Ignoring TOKENS(TokensDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":");
     };
 
     private MasterDefRegistry resetDefRegistry() {
@@ -428,10 +428,10 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify UID values and dependencies against a gold file.
-     * 
+     *
      * This does a recursive set of dependencies checks to build a gold file with the resulting descriptors and UIDs to
      * ensure that we get both a valid set and can tell what changed (and thus verify that it should have changed).
-     * 
+     *
      * The format of the file is:
      * <ul>
      * <li>Top level descriptor ':' global UID.
@@ -954,7 +954,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
-     * 
+     *
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
     private Map<DefType, DefDescriptor<?>> addDefsToCaches(MasterDefRegistryImpl mdr) throws Exception {
@@ -1045,7 +1045,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     /**
      * Verify basic functionality of MasterDefRegistryImpl.getClientLibraries. The same methods are test in
      * ClientLibraryServiceImplTest, where we use ClientLibraryService.getUrls()
-     * 
+     *
      * @throws Exception
      */
     public void testGetClientLibraries() throws Exception {
@@ -1089,7 +1089,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache has a reason to block access, then MDR throws NoAccessException.
-     * 
+     *
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_BlockAccess() throws Exception {
@@ -1114,7 +1114,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Verify that if access cache doesn't have any message to block access, then access checks passes through.
-     * 
+     *
      * @throws Exception
      */
     public void testAssertAccess_UsesCachedValueIfPresent_AllowAccess() throws Exception {
@@ -1355,9 +1355,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a constant Descriptor filter.
-     * 
+     *
      * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
-     * 
+     *
      * PostConditions: (1) registry.find() should _not_ be called. (2) We should get exactly one descriptor. (3) It
      * should contain the def descriptor. (4) There should be no cache.
      */
@@ -1386,9 +1386,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a wildcard name Descriptor filter (cacheable).
-     * 
+     *
      * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
-     * 
+     *
      * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
      * contain the def descriptor. (4) There should be a cache.
      */
@@ -1417,9 +1417,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a wildcard name Descriptor filter (not cacheable).
-     * 
+     *
      * Preconditions: (1) Non-Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
-     * 
+     *
      * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
      * contain the def descriptor. (4) There should be no cache.
      */
@@ -1448,9 +1448,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test a wildcard namespace Descriptor filter (cacheable).
-     * 
+     *
      * Preconditions: (1) Cacheable registry. (2) DescriptorFilter.isConstant() should be true.
-     * 
+     *
      * PostConditions: (1) registry.find() should be called. (2) We should get exactly one descriptor. (3) It should
      * contain the def descriptor. (4) There should be no cache.
      */
@@ -1561,7 +1561,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
-     * 
+     *
      * @return List of DefDescriptors that have been added to the mdr caches.
      */
     private Map<DefType, DefDescriptor<?>> addNonPriveledgedDefsToMDR(MasterDefRegistryImpl mdr) throws Exception {
@@ -1846,7 +1846,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * A private class to hold all the info for a lock test.
-     * 
+     *
      * This sets up the mocks so that we can test locking, if it is instantiated, you _must_ call clear() in a finally
      * block. The locking is not real here, so have a care.
      */
@@ -1875,7 +1875,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test getDef to ensure locking is minimized.
-     * 
+     *
      * This asserts that within an MDR we only lock once for any number of getDef calls for a single def.
      */
     public void testGetDefLocking() throws Exception {
@@ -1898,7 +1898,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test save to ensure locking is minimized.
-     * 
+     *
      * This asserts that within an MDR we lock with a write lock for a save.
      */
     public void testSaveLocking() throws Exception {
@@ -1918,7 +1918,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test find(desc) to ensure locking is minimized.
-     * 
+     *
      * This asserts that within an MDR we only lock once for a call to find.
      */
     public void testFindDescLocking() throws Exception {
@@ -1938,7 +1938,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test find(matcher) to ensure locking is minimized.
-     * 
+     *
      * This asserts that within an MDR we only lock once for a call to find.
      */
     public void testFindMatcherLocking() throws Exception {
@@ -1962,7 +1962,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test exists to ensure locking is minimized.
-     * 
+     *
      * This asserts that within an MDR we only lock once for any number of calls to exists.
      */
     public void testExistsLocking() throws Exception {
@@ -1985,7 +1985,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
     /**
      * Test getUid for locking.
-     * 
+     *
      * getUid always takes the lock, maybe we should avoid this?
      */
     public void testGetUidLocking() throws Exception {

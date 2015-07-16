@@ -26,7 +26,7 @@ import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
-import org.auraframework.impl.css.theme.ThemeValueProviderImpl;
+import org.auraframework.impl.css.token.TokenValueProviderImpl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -36,27 +36,27 @@ import com.salesforce.omakase.plugin.Plugin;
 public class StyleAdapterImpl implements StyleAdapter {
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
-        return getThemeValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
+    public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
+        return getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy) {
+    public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy) {
         switch (strategy) {
         case RESOLVE_NORMAL:
-            return getThemeValueProvider(style, strategy, Aura.getContextService().getCurrentContext().getThemeList());
+            return getTokenValueProvider(style, strategy, Aura.getContextService().getCurrentContext().getTokenOptimizer());
         case RESOLVE_DEFAULTS:
         case PASSTHROUGH:
-            return getThemeValueProvider(style, strategy, null);
+            return getTokenValueProvider(style, strategy, null);
         }
 
         return null;
     }
 
     @Override
-    public ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
-            ThemeList overrides) {
-        return new ThemeValueProviderImpl(style, overrides, strategy);
+    public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
+            TokenOptimizer overrides) {
+        return new TokenValueProviderImpl(style, overrides, strategy);
     }
 
     @Override

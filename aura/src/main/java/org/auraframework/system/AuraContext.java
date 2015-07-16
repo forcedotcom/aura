@@ -22,11 +22,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.css.StyleContext;
-import org.auraframework.css.ThemeList;
+import org.auraframework.css.TokenOptimizer;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -471,40 +471,43 @@ public interface AuraContext {
 
     /**
      * TODONM remove
-     * Prepends all app-specified themes to this context.
+     *
+     * Prepends all app-specified {@link TokensDef} defs to this context.
      * <p>
-     * The themes will be prepended <em>before</em> all themes added with {@link #appendThemeDescriptor(DefDescriptor)}.
-     * This should only be called at most once per context instance.
+     * The {@link TokensDef}s will be prepended <em>before</em> all {@link TokensDef}s added with
+     * {@link #appendTokensDescriptor(DefDescriptor)}. This should only be called at most once per context instance.
      * <p>
-     * <b>This is usually only called internally by the framework.</b> If you need to specify an override theme, most
-     * like you want {@link #appendThemeDescriptor(DefDescriptor)} instead.
+     * <b>This is usually only called internally by the framework.</b> If you need to specify an override, most like you
+     * want {@link #appendTokensDescriptor(DefDescriptor)} instead.
      */
-    void addAppThemeDescriptors();
+    void addAppTokensDescriptors();
 
     /**
      * TODONM remove
-     * Explicitly appends a theme override after other currently specified themes. This will also be after
-     * any themes on the current application.
-     * 
-     * @param themeDescriptor The override theme.
-     * @throws QuickFixException If there was a problem loading/validating/etc... the theme descriptor.
+     *
+     * Explicitly appends a {@link TokensDef} override after other currently specified {@link TokensDef}s. This will
+     * also be after any {@link TokensDef}s on the current application.
+     *
+     * @param tokenListDescriptor The override tokens.
+     * @throws QuickFixException If there was a problem loading/validating/etc... the descriptor.
      */
-    void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException;
+    void appendTokensDescriptor(DefDescriptor<TokensDef> tokenListDescriptor) throws QuickFixException;
 
     /**
      * TODONM move to appdef
-     * Gets the list of override themes explicitly specified to this context. These are the themes
-     * that are used to "override" the default var values.
+     *
+     * Gets the list of overrides explicitly specified to this context. These are the tokens that are used to "override"
+     * the default token values.
      * <p>
-     * While usually the theme overrides are specified on the application tag itself, in some situations the overrides
+     * While usually the token overrides are specified on the application tag itself, in some situations the overrides
      * may be directly specified to this context, e.g., in some usages of the integration service.
      * <p>
-     * The application's override themes are not implicitly included in this result by default. However, note that the
-     * application's override themes are explicitly added to the context at one point during the request (See
-     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these themes <em>will</em> be included during
-     * the actual CSS request itself. See {@link #addAppThemeDescriptors()}.
+     * The application's overrides are not implicitly included in this result by default. However, note that the
+     * application's overrides are explicitly added to the context at one point during the request (See
+     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these <em>will</em> be included during
+     * the actual CSS request itself. See {@link #addAppTokensDescriptors()}.
      */
-    ThemeList getThemeList();
+    TokenOptimizer getTokenOptimizer();
 
     /**
      * Sets the {@link StyleContext}.
@@ -539,15 +542,13 @@ public interface AuraContext {
     ImmutableMap<String, AuraContext.GlobalValue> getGlobals();
 
     /**
-     * @return state of a context Global
-     * Non-registered names will throw
-     * Registered names will never return null unless that is the defined default.
+     * @return state of a context Global Non-registered names will throw Registered names will never return null unless
+     *         that is the defined default.
      */
     Object getGlobal(String approvedName) throws AuraRuntimeException;
 
     /**
-     * validates the global's existence
-     * Non-registered names will return false
+     * validates the global's existence Non-registered names will return false
      */
     boolean validateGlobal(String approvedName);
 
@@ -562,7 +563,7 @@ public interface AuraContext {
     enum EncodingStyle {
         Bare, // ! Minimal context, no UIDs
         Normal, // ! Standard encoding, include UIDs
-        Theme, // ! Theme UIDs included
+        Css, // ! Token UIDs, Client and StyleContext info included
         Full // ! Everything
     };
 
@@ -583,8 +584,8 @@ public interface AuraContext {
     /**
      * Get the accessible version for a component.
      * 
-     * Use this to toggle logic based on what version of the component is being requested.
-     * This returns null if no requiredVersionDef or no version is found.
+     * Use this to toggle logic based on what version of the component is being requested. This returns null if no
+     * requiredVersionDef or no version is found.
      */
     String getAccessVersion() throws QuickFixException;
 }

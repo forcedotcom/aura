@@ -1,3 +1,0 @@
-<aura:theme>
-    <aura:var name="color1" value="#F012BE" />
-</aura:theme>

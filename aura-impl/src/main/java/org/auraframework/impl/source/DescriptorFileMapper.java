@@ -122,7 +122,7 @@ public class DescriptorFileMapper {
         addExtension(".lib", NameFormat.BUNDLE, "markup", DefType.LIBRARY, Format.XML);
         addExtension(".intf", NameFormat.BUNDLE, "markup", DefType.INTERFACE, Format.XML);
         addExtension(".xml", NameFormat.NAMESPACE, "markup", DefType.NAMESPACE, Format.XML);
-        addExtension(".theme", NameFormat.BUNDLE, "markup", DefType.THEME, Format.XML);
+        addExtension(".tokens", NameFormat.BUNDLE, "markup", DefType.TOKENS, Format.XML);
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);

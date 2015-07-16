@@ -19,7 +19,7 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.auraframework.def.Definition;
-import org.auraframework.impl.css.theme.ThemeDefImpl;
+import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -64,7 +64,7 @@ public class XMLWriter implements org.auraframework.system.SourceWriter {
         handlers.put(LibraryDefImpl.class, new LibraryDefHandler());
         handlers.put(MethodDefImpl.class, new MethodDefHandler());
         handlers.put(RegisterEventDefImpl.class, new RegisterEventHandler());
-        handlers.put(ThemeDefImpl.class, new ThemeDefHandler());
+        handlers.put(TokensDefImpl.class, new TokensDefHandler());
     }
 
     /**

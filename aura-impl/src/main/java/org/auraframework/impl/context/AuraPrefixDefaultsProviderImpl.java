@@ -42,7 +42,7 @@ public class AuraPrefixDefaultsProviderImpl implements PrefixDefaultsAdapter {
         defaults.put(DefType.LIBRARY, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.INCLUDE, DefDescriptor.JAVASCRIPT_PREFIX);
         defaults.put(DefType.INTERFACE, DefDescriptor.MARKUP_PREFIX);
-        defaults.put(DefType.THEME, DefDescriptor.MARKUP_PREFIX);
+        defaults.put(DefType.TOKENS, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.STYLE, DefDescriptor.CSS_PREFIX);
         defaults.put(DefType.FLAVOR_ASSORTMENT, DefDescriptor.MARKUP_PREFIX);
         defaults.put(DefType.TYPE, DefDescriptor.JAVA_PREFIX);

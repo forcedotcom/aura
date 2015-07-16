@@ -16,7 +16,7 @@
 package org.auraframework.integration;
 
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.system.AuraContext;
 
 public interface IntegrationServiceObserver {
@@ -39,7 +39,7 @@ public interface IntegrationServiceObserver {
      * A notification sent just before the application is written out.
      * <p>
      * This is useful for operations that need to run once, before the application is serialized, e.g., setting
-     * {@link ThemeDef} overrides (see {@link AuraContext#appendThemeDescriptor(org.auraframework.def.DefDescriptor)}).
+     * {@link TokensDef} overrides (see {@link AuraContext#appendTokensDescriptor(org.auraframework.def.DefDescriptor)}).
      *
      *
      * @param integration The integration being observed.

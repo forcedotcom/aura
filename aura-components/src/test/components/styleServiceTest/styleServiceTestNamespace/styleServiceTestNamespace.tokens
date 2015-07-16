@@ -1,0 +1,7 @@
+<aura:tokens description="namespace default tokens">
+	<aura:token name="color1" value="#DECC8C" />
+	<aura:token name="color2" value="#DE986D" />
+	<aura:token name="color3" value="#AB6890" />
+	<aura:token name="color4" value="#68AB9F" />
+	<aura:token name="color5" value="#DEC371" />
+</aura:tokens>

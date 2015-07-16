@@ -33,7 +33,7 @@ public interface BaseStyleDef extends Definition {
      * Gets the CSS code for this {@link StyleDef}.
      * <p>
      * The initially preprocessed code may be processed again during this method call for dynamic or contextual
-     * substitutions, changes, and validation (e.g., applying theme tokens or browser conditionals).
+     * substitutions, changes, and validation (e.g., applying tokens or browser conditionals).
      *
      * @return The processed CSS code.
      */
@@ -43,7 +43,7 @@ public interface BaseStyleDef extends Definition {
      * Gets the CSS code for this {@link StyleDef}, using the specified CSS plugins.
      * <p>
      * The initially preprocessed code may be processed again during this method call for dynamic or contextual
-     * substitutions, changes, and validation (e.g., applying theme tokens or browser conditionals), in addition to the
+     * substitutions, changes, and validation (e.g., applying tokens or browser conditionals), in addition to the
      * given {@link Plugin}s.
      *
      * @param plugins The list of {@link Plugin}s to run against the CSS code.
@@ -53,7 +53,7 @@ public interface BaseStyleDef extends Definition {
     String getCode(List<Plugin> plugins);
 
     /**
-     * Gets the CSS code for this {@link StyleDef}, without doing any additional processing (conditionals, themes,
+     * Gets the CSS code for this {@link StyleDef}, without doing any additional processing (conditionals, tokens,
      * etc...)
      * <p>
      * This is <em>not</em> the exact code as from the source, as some preprocessing has already been performed (.THIS
@@ -64,18 +64,18 @@ public interface BaseStyleDef extends Definition {
     String getRawCode();
 
     /**
-     * Gets the set of raw theme function expressions within this {@link StyleDef}.
+     * Gets the set of raw token function expressions within this {@link StyleDef}.
      *
-     * @return The set of theme function expressions.
+     * @return The set of token function expressions.
      */
     Set<String> getExpressions();
 
     /**
-     * Gets the set of theme var names referenced from expressions within this {@link StyleDef}. This performs a
+     * Gets the set of token names referenced from expressions within this {@link StyleDef}. This performs a
      * calculation so cache the result if needed more than once.
      *
-     * @return The set of theme var names.
+     * @return The set of token names.
      * @throws AuraValidationException If there is a problem evaluating an expression.
      */
-    Set<String> getVarNames() throws AuraValidationException;
+    Set<String> getTokenNames() throws AuraValidationException;
 }

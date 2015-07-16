@@ -115,8 +115,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case RESOURCE:
             case TYPE:
             case PROVIDER:
-            case THEME_PROVIDER:
-            case THEME_MAP_PROVIDER:
+            case TOKEN_DESCRIPTOR_PROVIDER:
+            case TOKEN_MAP_PROVIDER:
             case INCLUDE:
                 Type clazz = TypeParser.parseClass(qualifiedName);
                 if (clazz != null) {
@@ -145,8 +145,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LAYOUT:
             case LAYOUT_ITEM:
             case TESTCASE:
-            case VAR:
-            case THEME_DEF_REF:
+            case TOKEN:
+            case TOKENS_IMPORT:
             case ATTRIBUTE_DESIGN:
             case DESIGN_TEMPLATE:
             case DESIGN_TEMPLATE_REGION:
@@ -170,7 +170,7 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case EXAMPLE:
             case LAYOUTS:
             case NAMESPACE:
-            case THEME:
+            case TOKENS:
             case DESIGN:
             case SVG:
             case FLAVORS:

@@ -29,9 +29,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.css.MutableThemeList;
+import org.auraframework.css.MutableTokenOptimizer;
 import org.auraframework.css.StyleContext;
-import org.auraframework.css.ThemeList;
+import org.auraframework.css.TokenOptimizer;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -39,9 +39,9 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.css.theme.StyleContextImpl;
-import org.auraframework.impl.css.theme.ThemeListImpl;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.css.token.StyleContextImpl;
+import org.auraframework.impl.css.token.TokenOptimizerImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -280,7 +280,7 @@ public class AuraContextImpl implements AuraContext {
 
     private InstanceStack fakeInstanceStack;
 
-    private MutableThemeList themes = new ThemeListImpl();
+    private MutableTokenOptimizer tokens = new TokenOptimizerImpl();
 
     private StyleContext styleContext;
 
@@ -660,7 +660,7 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void addAppThemeDescriptors() {
+    public void addAppTokensDescriptors() {
         DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
         if (desc != null && desc.getDefType() == DefType.APPLICATION) {
             @SuppressWarnings("unchecked")
@@ -668,24 +668,24 @@ public class AuraContextImpl implements AuraContext {
             try {
                 ApplicationDef app = Aura.getDefinitionService().getDefinition(appDesc);
                 if (app != null) {
-                    // the app themes conceptually precedes themes explicitly added to the context.
-                    // this is important for the "last declared theme wins" contract
-                    themes.prependAll(app.getThemeDescriptors());
+                    // the app tokens conceptually precedes tokens explicitly added to the context.
+                    // this is important for the "last declared tokens def wins" contract
+                    tokens.prependAll(app.getTokenDescriptors());
                 }
             } catch (QuickFixException qfe) {
-                // either the app or a dependency is invalid, nothing we can do about getting the themes in that case.
+                // either the app or a dependency is invalid, nothing we can do about getting the tokens in that case.
             }
         }
     }
 
     @Override
-    public void appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor) throws QuickFixException {
-        themes.append(themeDescriptor);
+    public void appendTokensDescriptor(DefDescriptor<TokensDef> descriptor) throws QuickFixException {
+        tokens.append(descriptor);
     }
 
     @Override
-    public ThemeList getThemeList() {
-        return themes;
+    public TokenOptimizer getTokenOptimizer() {
+        return tokens;
     }
 
     @Override
@@ -829,28 +829,28 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMap(loadedStrings);
                 }
             }
-            if (style == EncodingStyle.Theme) {
+            if (style == EncodingStyle.Css) {
                 // TODONM remove this
-                ThemeList themes = getThemeList();
-                if (!themes.isEmpty()) {
+                TokenOptimizer tokens = getTokenOptimizer();
+                if (!tokens.isEmpty()) {
                     List<String> stringed = Lists.newArrayList();
-                    for (DefDescriptor<ThemeDef> theme : themes) {
-                        stringed.add(theme.getQualifiedName());
+                    for (DefDescriptor<TokensDef> desc : tokens) {
+                        stringed.add(desc.getQualifiedName());
                     }
-                    json.writeMapEntry("themes", stringed);
+                    json.writeMapEntry("tokens", stringed);
                 }
 
                 // add a unique id for map-provided tokens, for client-side cache-busting
-                Optional<String> dynamicVarsUid = themes.getActiveDynamicVarsUid();
-                if (dynamicVarsUid.isPresent()) {
-                    json.writeMapEntry("dynamicVarsUid", dynamicVarsUid.get());
+                Optional<String> tokensUid = tokens.getActiveDynamicTokensUid();
+                if (tokensUid.isPresent()) {
+                    json.writeMapEntry("tokensUid", tokensUid.get());
                 }
 
                 // add other contextual CSS information
                 json.writeMapEntry("styleContext", getStyleContext());
             }
 
-            // Normal and full get the locales, but not themes
+            // Normal and full get the locales, but not the css stuff
             if (style == EncodingStyle.Normal || style == EncodingStyle.Full) {
                 if (getRequestedLocales() != null) {
                     List<String> locales = new ArrayList<>();

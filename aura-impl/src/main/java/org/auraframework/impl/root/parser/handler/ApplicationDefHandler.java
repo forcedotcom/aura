@@ -29,8 +29,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.impl.css.util.Themes;
+import org.auraframework.def.TokensDef;
+import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -138,20 +138,20 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             builder.isOnePageApp = false;
         }
 
-        String themeNames = getAttributeValue(ATTRIBUTE_THEME);
-        if (themeNames != null) {
-            // an empty string is a valid value, and it means don't use any theme.
+        String tokens = getAttributeValue(ATTRIBUTE_TOKENS);
+        if (tokens != null) {
+            // an empty string is a valid value, and it means don't use any token overrides.
             // this is a way to opt-out of the implicit default (below)
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(themeNames)) {
-                for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(themeNames)) {
-                    builder.appendThemeDescriptor(DefDescriptorImpl.getInstance(name, ThemeDef.class));
+            if (!AuraTextUtil.isNullEmptyOrWhitespace(tokens)) {
+                for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokens)) {
+                    builder.appendTokensDescriptor(DefDescriptorImpl.getInstance(name, TokensDef.class));
                 }
             }
         } else {
-            // the implicit theme override for an app is the namespace-default theme, if it exists
-            DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(defDescriptor);
-            if (namespaceTheme.exists()) {
-                builder.appendThemeDescriptor(namespaceTheme);
+            // the implicit tokens override for an app is the namespace-default tokens, if it exists
+            DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(defDescriptor);
+            if (namespaceTokens.exists()) {
+                builder.appendTokensDescriptor(namespaceTokens);
             }
         }
 
@@ -196,7 +196,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
-    private static final String ATTRIBUTE_THEME = "theme";
+    private static final String ATTRIBUTE_TOKENS = "tokens";
     private static final String ATTRIBUTE_DEFAULT_FLAVORS = "defaultFlavors";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
@@ -205,7 +205,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
 
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
             ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_THEME, ATTRIBUTE_DEFAULT_FLAVORS)
+            ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_TOKENS, ATTRIBUTE_DEFAULT_FLAVORS)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();

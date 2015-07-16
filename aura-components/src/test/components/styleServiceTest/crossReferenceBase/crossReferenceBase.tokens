@@ -1,0 +1,5 @@
+<aura:tokens>
+    <aura:token name="color1" value="#68AB9F" />
+    <aura:token name="color2" value="{!color1}" />
+    <aura:token name="color3" value="#DE986D" />
+</aura:tokens>

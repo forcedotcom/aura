@@ -1,4 +1,0 @@
-<aura:theme>
-    <aura:var name="color" value="#ffcc00" />
-    <aura:var name="margin" value="10px" />
-</aura:theme>

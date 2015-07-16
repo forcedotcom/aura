@@ -319,9 +319,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case TYPE:
             case RESOURCE:
             case PROVIDER:
-            case THEME_PROVIDER:
+            case TOKEN_DESCRIPTOR_PROVIDER:
             case INCLUDE:
-            case THEME_MAP_PROVIDER:
+            case TOKEN_MAP_PROVIDER:
                 qualifiedNamePattern = "%s://%s.%s";
                 break;
             case ATTRIBUTE:
@@ -337,9 +337,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case DOCUMENTATION:
             case LAYOUTS:
             case NAMESPACE:
-            case THEME:
-            case THEME_DEF_REF:
-            case VAR:
+            case TOKENS:
+            case TOKENS_IMPORT:
+            case TOKEN:
             case FLAVORS:
             case FLAVOR_ASSORTMENT:
             case FLAVOR_INCLUDE:

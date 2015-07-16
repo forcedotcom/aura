@@ -245,7 +245,7 @@ public class RegistrySerializer {
         List<Definition> defs = Lists.newArrayList();
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
         DescriptorFilter root_nsf = new DescriptorFilter(namespace,
-                "COMPONENT,APPLICATION,EVENT,INTERFACE,LIBRARY,THEME,DOCUMENTATION,TESTSUITE,NAMESPACE,LAYOUTS,LAYOUT");
+                "COMPONENT,APPLICATION,EVENT,INTERFACE,LIBRARY,TOKENS,DOCUMENTATION,TESTSUITE,NAMESPACE,LAYOUTS,LAYOUT");
         Map<DefDescriptor<?>, Definition> filtered;
         Set<String> namespaces = Sets.newHashSet(namespace);
         //

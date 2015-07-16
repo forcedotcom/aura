@@ -25,10 +25,10 @@ import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.style.AbstractStyleDef;
 import org.auraframework.impl.css.util.Flavors;
-import org.auraframework.impl.css.util.Themes;
+import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -65,9 +65,9 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (!getExpressions().isEmpty()) {
-            DefDescriptor<ThemeDef> namespaceTheme = Themes.namespaceThemeDescriptor(descriptor);
-            if (namespaceTheme.exists()) {
-                dependencies.add(namespaceTheme);
+            DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(descriptor);
+            if (namespaceTokens.exists()) {
+                dependencies.add(namespaceTokens);
             }
         }
 
@@ -93,9 +93,9 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
-            // TODONM: revisit this after removing theme from aura context
-            if (context.getThemeList().isEmpty()) {
-                context.addAppThemeDescriptors();
+            // TODONM: revisit this after removing tokens from aura context
+            if (context.getTokenOptimizer().isEmpty()) {
+                context.addAppTokensDescriptors();
             }
             json.writeMapEntry("code", getCode());
         }

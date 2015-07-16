@@ -52,6 +52,8 @@
 		ID of NEW Panel/Modal created: <ui:outputText class="idCreated" aura:id="idCreated" value=""/> <br/>
 		ID of Destroyed Panel/Modal: <ui:outputText class="idDestroyed" aura:id="idDestroyed" value=""/> <br/>
 		ID of Reference Element: <ui:outputText class="idRefEl" aura:id="idRefEl" value=""/> <br/>
+		Browser Form Factor: <ui:outputText class="formFactorInfo" aura:id="formFactorInfo" value="{!$Browser.formFactor}"/> <br/>
+		Label From GVP: <ui:outputText class="labelFromGVP" aura:id="labelFromGVP" value="{!$Label.Related_Lists.task_mode_today}"/> <br/>
 	</div>
 	
 	<div class="container">

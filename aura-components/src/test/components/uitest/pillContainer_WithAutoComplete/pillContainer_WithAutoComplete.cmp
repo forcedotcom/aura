@@ -5,7 +5,7 @@
     <div style="margin:20px; width:400px;">
     <ui:pillContainer aura:id="pillContainer" maxLines="{!v.maxLines}" aura:flavor="{!v.flavor}" pillFlavor="{!v.flavor}" maxAllowed="{!v.maxAllowed}">
         <aura:set attribute="pillInput">
-            <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row">
+            <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row" label="lookupLabel" labelPosition="hidden">
                 <aura:set attribute="dataProvider">
                     <uitest:pillContainerAutoCompleteDataProvider/>
                 </aura:set>

@@ -29,7 +29,7 @@ import org.openqa.selenium.WebElement;
 public class PillContainerAutoCompleteUITest extends WebDriverTestCase {
 
     public static final String CMP_URL = "/uitest/pillContainer_WithAutoComplete.cmp";
-    public static final String INPUT = ".uiInputTextForAutocomplete";
+    public static final String INPUT = "input[class*='uiInputTextForAutocomplete']";
     public static final String LISTCONTENT_LOCATOR = ".visible";
     public PillContainerAutoCompleteUITest(String name) {
         super(name);

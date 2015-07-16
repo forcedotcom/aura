@@ -119,10 +119,10 @@
 	testTrigger: {
 		
 		test: function(component) {
-			var triggers = ['triggerhoverlabel', 'triggerclicklabel', 'inputadvtrue', 'triggernonelabel', 'triggeremptylabel' ];
-			var tooltips = ['triggerhover', 'triggerclick', 'triggerfocus', 'triggernone', 'triggerempty' ];
-			var domEvents = ['mouseover', 'click', 'focus', 'mouseover', 'mouseover'];
-			var assertions = [true, true, true, false, false];
+			var triggers = ['triggerhoverlabel', 'triggerclicklabel', 'inputadvtrue', 'triggernonelabel', 'triggeremptylabel', 'triggeremptylabel'];
+			var tooltips = ['triggerhover', 'triggerclick', 'triggerfocus', 'triggernone', 'triggerempty', 'triggerempty'];
+			var domEvents = ['mouseover', 'click', 'focus', 'mouseover', 'mouseover', 'click'];
+			var assertions = [true, true, true, false, false, false];
 	
 			for(var i = 0; i < triggers.length; i++) {
 				function checkTrigger(ttLabel, triggerLabel) {

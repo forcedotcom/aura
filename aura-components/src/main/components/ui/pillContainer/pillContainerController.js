@@ -55,6 +55,10 @@
         }
     },
 
+    onItemsChanged: function(cmp, event, helper) {
+        helper.onItemsChanged(cmp);
+    },
+
     onShowMore: function(cmp, event, helper) {
         helper.showMore(cmp);
     },
@@ -88,5 +92,7 @@
 
     focus: function(cmp, event, helper) {
         helper.focusOnInputBox(cmp);
-    }
+    },
+
+
 })

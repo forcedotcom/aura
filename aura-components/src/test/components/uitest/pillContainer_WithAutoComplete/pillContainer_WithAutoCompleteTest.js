@@ -261,7 +261,7 @@
     },
     
     /**
-     * ui:pillContainer should remove noinput class
+     * ui:pillContainer should remove maxAllowed class
      * Bug: W-2622542
      */
     testFocusOnPillAfterDeleteAndAfterMaxReached: {
@@ -279,7 +279,7 @@
                 return document.activeElement===secondPill.getElement();
             }, "second pill should be focused");
         }, function(cmp){
-        	$A.test.assertTrue($A.util.hasClass(pillContainer.getElement(),"noinput"), "Pill Container should have className noinput after reaching max allowed pills");
+        	$A.test.assertTrue($A.util.hasClass(pillContainer.getElement(),"maxAllowed"), "Pill Container should have className maxAllowed after reaching max allowed pills");
         	var secondPill = pillContainer.find("pill")[1];
             this._fireKeydownEvent(secondPill, this.BACKSPACE_KEY);
 
@@ -288,7 +288,21 @@
                 return document.activeElement === firstPill.getElement();
             }, "first pill should be focused");
         }, function(cmp){
-        	$A.test.assertFalse($A.util.hasClass(pillContainer.getElement(),"noinput"), "Pill Container should not have className noinput after deleting a pill");
+        	$A.test.assertFalse($A.util.hasClass(pillContainer.getElement(),"maxAllowed"), "Pill Container should not have className maxAllowed after deleting a pill");
+        }]
+    },
+    /**
+     * ui:pillContainer should remove maxAllowed class when adding via v.items
+     * Bug: W-2663679
+     */
+    testMaxAllowedWhenAddingViaItems: {
+        attributes: {
+            maxAllowed: 1
+        },
+        test: [function (cmp) {
+            pillContainer = cmp.find("pillContainer");
+            pillContainer.set("v.items",[this.PILLS[0]]);
+            $A.test.assertTrue($A.util.hasClass(pillContainer.getElement(),"maxAllowed"), "Pill Container should have className maxAllowed after reaching max allowed pills");
         }]
     },
 

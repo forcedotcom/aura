@@ -62,7 +62,6 @@
             else if (!this._itemExists(curItems, newItems[i])) {
                 itemsIsUpdated = true;
                 curItems.push(newItems[i]);
-                this._processPillInserted(cmp);
                 cmp.get("e.pillInserted").fire();
             }
         }
@@ -71,6 +70,16 @@
             cmp.set('v.items', curItems);
         }
         this.focusOnInputBox(cmp);  // Always focus on the input after adding new pill (W-2529162)
+    },
+
+    onItemsChanged: function(cmp){
+        var itemsLength = cmp.get("v.items").length
+        var maxAllowed = cmp.get("v.maxAllowed");
+        if (itemsLength >= maxAllowed) {
+            $A.util.addClass(cmp.getElement(), 'maxAllowed');
+        } else {
+            $A.util.removeClass(cmp.getElement(), 'maxAllowed');
+        }
     },
 
     handlePillEvent: function(cmp, event) {
@@ -158,9 +167,9 @@
         var pillInput = cmp.get("v.pillInput");
         var itemsLength = cmp.get("v.items").length
         var maxAllowed = cmp.get("v.maxAllowed");
-        if (!$A.util.isEmpty(pillInput) && itemsLength < maxAllowed) {
-            $A.util.removeClass(cmp.getElement(), 'noinput');
-
+        if ($A.util.isEmpty(pillInput)) {
+            $A.util.addClass(cmp.getElement(), 'noinput');
+        } else if (itemsLength<maxAllowed) {
             //set the input to min width so it doesn't wrap due to bigger size
             pillInput[0].setAvailableWidth(this.INPUT_MIN_WIDTH_PX);
 
@@ -185,13 +194,7 @@
             }, 0);
 
             pillInput[0].focus();
-        } else {
-           $A.util.addClass(cmp.getElement(), 'noinput');
-           if (!$A.util.isEmpty(pillInput)) {
-               pillInput[0].setAvailableWidth(0);
-           }
         }
-
     },
 
     adjustHeight: function(cmp) {
@@ -286,7 +289,7 @@
                 // remove found item
                 items.splice(i, 1);
                 cmp.set('v.items', items);
-                this._processPillRemoved(cmp);
+
                 cmp.get("e.pillRemoved").fire();
                 if (items.length <= 0) {
                     this.focusOnInputBox(cmp);
@@ -307,31 +310,6 @@
                 }
                 break;
             }
-        }
-    },
-
-
-    _processPillInserted: function(cmp) {
-        var pillInput = cmp.get("v.pillInput");
-        if (!$A.util.isEmpty(pillInput)) {
-            var element = pillInput[0].getElement();
-            if (this._hasReachedMax(cmp, cmp.get("v.items"))) {
-                $A.util.addClass(element, "invisible");
-            } else {
-                $A.util.removeClass(element, "invisible");
-            }
-        }
-    },
-
-    _processPillRemoved: function(cmp) {
-        var pillInput = cmp.get("v.pillInput");
-        var pillContainer = cmp.getElement();
-        if (!$A.util.isEmpty(pillInput)) {
-            var element = pillInput[0].getElement();
-            $A.util.removeClass(element, "invisible");
-        }
-        if($A.util.hasClass(pillContainer, "noinput")){
-            $A.util.removeClass(pillContainer, 'noinput');
         }
     }
 

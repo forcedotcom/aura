@@ -300,38 +300,29 @@
     color:#EEBA4C;
 }
 
-.THIS li[test-type='unit'] .test-type:before{
-    content:'unit';
-}
-
 .THIS li[test-type='jstest'] .test-type{
     color:#666;
-}
-
-.THIS li[test-type='jstest'] .test-type:before{
-    content:'jstest';
 }
 
 .THIS li[test-type='webdriver'] .test-type{
     color:tomato;
 }
 
-.THIS li[test-type='webdriver'] .test-type:before{
-    content:'webdriver';
-}
-
 .THIS li[test-type='unit'] .test-type{
     color:purple;
-}
-
-.THIS li[test-type='unit'] .test-type:before{
-    content:'unit';
 }
 
 .THIS li[test-type='integration'] .test-type{
     color:blue;
 }
 
-.THIS li[test-type='integration'] .test-type:before{
-    content:'integration';
+
+.THIS li[test-type='perfsuite'] .test-type{
+    color:blue;
 }
+
+
+.THIS li[test-type='perfcmp'] .test-type{
+    color:#666;
+}
+

@@ -33,10 +33,10 @@
 
     testFocus: {
         test: function (cmp) {
-            this._getInput(cmp).getElement().blur();
+        	this._getInputElement(cmp).blur();
             var pillContainer = cmp.find("pillContainer");
             pillContainer.focus();
-            $A.test.assertEquals(document.activeElement, this._getInput(cmp).getElement(), "input should be focused");
+            $A.test.assertEquals(document.activeElement, this._getInputElement(cmp), "input should be focused");
         }
     },
     
@@ -58,7 +58,7 @@
         test: function (cmp) {
             var textInput = this._getInput(cmp);
             this._inputPill(textInput, this.PILLS[0].label);
-            $A.test.assertEquals(0, textInput.getElement().value.length, "input should be empty");
+            $A.test.assertEquals(0, this._getInputElement(cmp).value.length, "input should be empty");
         }
     },
 
@@ -76,7 +76,7 @@
             var textInput = this._getInput(cmp);
             textInput.getElement().focus();
             this._inputPill(textInput, this.PILLS[0].label);
-            $A.test.assertEquals(document.activeElement, textInput.getElement(), "input should be focused");
+            $A.test.assertEquals(document.activeElement, this._getInputElement(cmp), "input should be focused");
         }
     },
 
@@ -98,6 +98,7 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             var textInput = this._getInput(cmp);
+            var textInputElement =  this._getInputElement(cmp);
             this._inputPill(textInput, this.PILLS[0].label);
 
             this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
@@ -106,7 +107,7 @@
             this._fireKeydownEvent(firstPill, this.BACKSPACE_KEY);
 
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return document.activeElement === textInput.getElement();
+                return document.activeElement === textInputElement;
             }, "input should be focused");
         }
     },
@@ -143,7 +144,7 @@
     testEnterOnAutoCompleteItemClearsInput: {
         test: function (cmp) {
             var textInput = this._createPillByAutoComplete(cmp);
-            $A.test.assertEquals(0, textInput.getElement().value.length, "input should be empty");
+            $A.test.assertEquals(0, this._getInputElement(cmp).value.length, "input should be empty");
         }
     },
 
@@ -204,7 +205,7 @@
         },
         test: function (cmp) {
             this._initializeWithFourPills(cmp);
-            this._getInput(cmp).getElement().blur();
+            this._getInputElement(cmp).blur();
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
                 return !that._isDisplayNone($A.test.select(".showMore")[0]);
@@ -311,6 +312,7 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             var textInput = this._getInput(cmp);
+            var textInputElement = this._getInputElement(cmp);
             this._inputPill(textInput, this.PILLS[0].label);
 
             this._fireKeydownEvent(textInput, this.BACKSPACE_KEY);
@@ -319,13 +321,17 @@
             this._fireKeydownEvent(firstPill, this.BACKSPACE_KEY);
 
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return document.activeElement === textInput.getElement();
+                return document.activeElement === textInputElement;
             }, "input should be focused");
         }
     },
 
     _getInput: function(cmp) {
-        return cmp.find("autocomplete").getSuper().find("input");
+    	return cmp.find("autocomplete").getSuper().find("input")
+    },
+    
+    _getInputElement: function(cmp) {
+    	return this._getInput(cmp).getElement().getElementsByTagName("input")[0];
     },
 
     _fireKeydownEvent: function(cmp, keycode) {
@@ -339,7 +345,7 @@
     },
 
     _inputPill: function(textInput, text) {
-        textInput.set("v.value", text);
+    	textInput.set("v.value", text);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
     },
     

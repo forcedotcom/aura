@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 ({
+	/**
+	 * we define custom GVP in customGVPTemplate.cmp, this test component use that template
+	 * Note that we actually create a instance of custom GVP in the template, it's called "CustomInitInTemplate"
+	 * But for tests in this file, we don't want to use that instance, instead, we create new one here (called 'Custom') 
+	 */
     testAddValueProviderAndGetWithCallback: {
         test: [function(component){
         	var cgvp = new CustomGlobalValueProvider();

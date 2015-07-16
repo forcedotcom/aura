@@ -112,9 +112,9 @@
                 
             };
             
-            //now we can add the custom value provider. but for testing, I gonna do this in component Test.
-            //var cgvp = new CustomGlobalVaueProvider();
-            //$A.addValueProvider('$Custom', cgvp);
+            //now we can add the custom value provider. or you can do it in test
+            var cgvp = new CustomGlobalValueProvider();
+            $A.addValueProvider('$CustomInitInTemplate', cgvp);
             
          </script>
          

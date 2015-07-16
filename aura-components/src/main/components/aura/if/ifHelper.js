@@ -16,14 +16,7 @@
 ({
     createBody: function(cmp, isTrue, localCreation) {
         var body = [];
-        var facet;
-        if (isTrue) {
-            facet = cmp.get("v.template");
-            //console.log("truth " + cmp.getGlobalId());
-        } else {
-            facet = cmp.get("v.else");
-            //console.log("fiction " + cmp.getGlobalId());
-        }
+        var facet = isTrue ? cmp.get("v.template") : cmp.get("v.else");
         
         $A.pushCreationPath("body");
         for (var i = 0, length = facet.length; i < length; i++) {

@@ -16,10 +16,12 @@
 ({ 
     fireDataChangeEvent: function (dataProvider, data, currentPage) {
     	var dataChangeEvent = dataProvider.getEvent("onchange");
-    	dataChangeEvent.setParams({
-    		data : data,
-    		currentPage : currentPage
-    	}).fire();
+    	dataChangeEvent
+            .setComponentEvent()
+            .setParams({
+    		  data : data,
+    		  currentPage : currentPage
+    	   }).fire();
     },
 	
     invokeProvide:function(component){

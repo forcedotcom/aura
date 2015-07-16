@@ -67,7 +67,7 @@ public class TestSetRunnerModel {
 		if (scope != null && scope.equalsIgnoreCase("perf")) {
 			return TestSetRunnerState.getPerfInstance();
 		} else {
-			return TestSetRunnerState.getInstance();
+			return TestSetRunnerState.getFuncInstance();
 		}
 		
 	}

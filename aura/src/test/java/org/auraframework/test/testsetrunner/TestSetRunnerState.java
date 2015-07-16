@@ -31,7 +31,6 @@ import junit.framework.TestSuite;
 import org.auraframework.system.AuraContext;
 import org.auraframework.test.ComponentJSTest.ComponentTestCase;
 import org.auraframework.test.perf.util.PerfExecutorTest;
-import org.auraframework.test.util.IntegrationTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
@@ -60,8 +59,8 @@ public class TestSetRunnerState {
      * A helper to allow for lazy initialization of the the
      * {@link TestSetRunnerState}.
      */
-    private static class SingletonHolder {
-        private static TestSetRunnerState INSTANCE = new TestSetRunnerState();
+    private static class FuncSingletonHolder {
+        private static TestSetRunnerState FUNC_INSTANCE = new TestSetRunnerState(TestInventory.FUNC_TESTS);
     }
 
     private static class PerfSingletonHolder {
@@ -74,6 +73,12 @@ public class TestSetRunnerState {
     private Map<String, Test> inventory = Maps.newHashMap();
 
     /**
+     * Tracks all test cases type available for execution.
+     */
+    @GuardedBy("this")
+    private Map<String, Type> testCasesType = Maps.newHashMap();
+
+    /**
      * Parallel to the inventory, this map is used as a data bag to store
      * various properties about tests (e.g. status, exceptions, etc...)
      */
@@ -83,8 +88,8 @@ public class TestSetRunnerState {
     /**
      * @return the singleton instance.
      */
-    public static TestSetRunnerState getInstance() {
-        return SingletonHolder.INSTANCE;
+    public static TestSetRunnerState getFuncInstance() {
+        return FuncSingletonHolder.FUNC_INSTANCE;
     }
 
     public static TestSetRunnerState getPerfInstance() {
@@ -96,7 +101,7 @@ public class TestSetRunnerState {
     }
 
     private TestSetRunnerState() {
-        this(TestInventory.CONTAINERLESS_TYPE_TESTS);
+        this(TestInventory.ALL_TESTS);
     }
 
     /**
@@ -151,7 +156,7 @@ public class TestSetRunnerState {
                 for (Type type : scope) {
                     TestSuite suite = i.getTestSuite(type);
                     if (suite.testCount() > 0) {
-                        addSuite(suite);
+                        addSuite(type, suite);
                     }
                 }
             }
@@ -163,7 +168,7 @@ public class TestSetRunnerState {
                 testWithProps.put("status", "Not Run Yet");
                 testWithProps.put("exception", "");
                 testWithProps.put("isHidden", "");
-                testWithProps.put("isInteg", t instanceof IntegrationTestCase);
+                testWithProps.put("type", testCasesType.get(t.toString()).toString().toLowerCase());
                 testWithProps.put("isPerf", t instanceof PerfExecutorTest);
                 testWithProps.put("perfInfo", "");
 
@@ -184,13 +189,14 @@ public class TestSetRunnerState {
         /**
          * @param suite the suite to add to the model.
          */
-        private void addSuite(TestSuite suite) {
+        private void addSuite(Type type, TestSuite suite) {
             for (Enumeration<Test> e = suite.tests(); e.hasMoreElements();) {
                 Test test = e.nextElement();
                 if (test instanceof TestSuite) {
-                    addSuite((TestSuite) test);
+                    addSuite(type, (TestSuite) test);
                 } else {
                     inventory.put(test.toString(), test);
+                    testCasesType.put(test.toString(), type);
                 }
             }
         }

@@ -46,7 +46,7 @@ public class PerfController {
 
         logger.info(String.format("Loading '%s' Performance metrics for test: %s", metricsType, testName));
 
-        UnitTestCase test = (UnitTestCase) TestSetRunnerState.getInstance().getInventory().get(testName);
+        UnitTestCase test = (UnitTestCase) TestSetRunnerState.getFuncInstance().getInventory().get(testName);
         String goldFileName = test.getGoldFileName();
 
         PerfResultsUtil.PerformanceMetrics type = PerfResultsUtil.PerformanceMetrics

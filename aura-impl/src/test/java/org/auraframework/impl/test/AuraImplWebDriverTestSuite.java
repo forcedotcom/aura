@@ -24,7 +24,7 @@ import org.auraframework.util.test.util.TestInventory.Type;
 public class AuraImplWebDriverTestSuite {
     public static TestSuite suite() throws Exception {
         TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraImplTestInventory");
-        TestSuite suite = inventory.getTestSuite(Type.WEB);
+        TestSuite suite = inventory.getTestSuite(Type.WEBDRIVER);
         suite.setName("aura-impl webdriver tests");
         return suite;
     }

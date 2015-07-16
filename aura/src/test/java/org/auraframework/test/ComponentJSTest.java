@@ -45,8 +45,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
+import org.auraframework.util.test.annotation.JSTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.annotation.WebDriverTest;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -55,7 +55,7 @@ import com.google.common.collect.Sets;
  * TODO(W-1386863): investigate why/fix the thread hostile nature of these tests.
  */
 @UnAdaptableTest
-@WebDriverTest
+@JSTest
 public class ComponentJSTest extends TestSuite {
 
     public static TestSuite suite() throws Exception {

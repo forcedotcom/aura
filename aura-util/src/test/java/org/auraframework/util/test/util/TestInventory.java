@@ -37,6 +37,7 @@ import junit.framework.TestSuite;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.IntegrationTest;
+import org.auraframework.util.test.annotation.JSTest;
 import org.auraframework.util.test.annotation.PerfCmpTest;
 import org.auraframework.util.test.annotation.PerfCustomTest;
 import org.auraframework.util.test.annotation.PerfFrameworkTest;
@@ -47,15 +48,15 @@ import org.auraframework.util.test.annotation.WebDriverTest;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class TestInventory  implements AuraServiceProvider {
+public class TestInventory implements AuraServiceProvider {
     public final static String TEST_CLASS_SUFFIX = "Test";
     private final static String CLASS_SUFFIX = ".class";
-    public static final EnumSet<Type> CONTAINERLESS_TYPE_TESTS = EnumSet.allOf(Type.class);
+    public static final EnumSet<Type> ALL_TESTS = EnumSet.allOf(Type.class);
     public static final EnumSet<Type> PERF_TESTS = EnumSet.of(Type.PERFSUITE, Type.PERFCMP, Type.PERFFRAMEWORK, Type.PERFCUSTOM);
-    
+    public static final EnumSet<Type> FUNC_TESTS = EnumSet.of(Type.UNIT, Type.JSTEST, Type.WEBDRIVER, Type.INTEGRATION);
 
     public enum Type {
-        UNIT, WEB, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
+        UNIT, JSTEST, WEBDRIVER, INTEGRATION, IGNORED, PERFSUITE, PERFCMP, PERFFRAMEWORK, PERFCUSTOM;
     }
 
     private URI rootUri;
@@ -87,25 +88,25 @@ public class TestInventory  implements AuraServiceProvider {
         return suites.get(type);
     }
     public Vector<Class<? extends Test>> getTestClasses(Type type) {
-    	if (classes.isEmpty() || !classes.containsKey(type)) {
-    		loadTestClasses(type);
-    	}
-    	return classes.get(type);
+        if (classes.isEmpty() || !classes.containsKey(type)) {
+            loadTestClasses(type);
+        }
+        return classes.get(type);
     }
-    
+
     public void loadTestClasses(Type type) {
-    	TestFilter filter = ServiceLocator.get().get(TestFilter.class);
-    	Vector<Class<? extends Test>> vector = new Vector<>();
-    	for (String className : getClassNames(rootUri)) {
+        TestFilter filter = ServiceLocator.get().get(TestFilter.class);
+        Vector<Class<? extends Test>> vector = new Vector<>();
+        for (String className : getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
             if (testClass != null) {
-            	Type target = getAnnotationType(testClass);
-            	if (target == type) {
-            		vector.add(testClass);
-            	}
+                Type target = getAnnotationType(testClass);
+                if (target == type) {
+                    vector.add(testClass);
+                }
             }
-    	}
-    	classes.put(type, vector);
+        }
+        classes.put(type, vector);
     }
 
     public void loadTestSuites(Type type) {
@@ -114,35 +115,37 @@ public class TestInventory  implements AuraServiceProvider {
         suites.put(type, suite);
 
         System.out.println(String.format("Loading %s tests from %s", type, rootUri));
-        
+
         for (String className : getClassNames(rootUri)) {
             Class<? extends Test> testClass = filter.applyTo(getTestClass(className));
             if (testClass != null) {
-            	Type target = getAnnotationType(testClass);
-            	if (target == type) {
-            		try {
+                Type target = getAnnotationType(testClass);
+                if (target == type) {
+                    try {
                         addTest(suite, filter, (Test) testClass.getMethod("suite").invoke(null));
                     } catch (Exception e) {}
                     try {
                         addTest(suite, filter, new TestSuite(testClass.asSubclass(TestCase.class)));
                     } catch (ClassCastException cce) {}
-            	}
+                }
             }
         }
     }
-    
+
     private Type getAnnotationType (Class<? extends Test> testClass) {
-    	Type target = null;
+        Type target = null;
         if (testClass.getAnnotation(PerfTestSuite.class) != null) {
-        	target = Type.PERFSUITE;
+            target = Type.PERFSUITE;
         } else if (testClass.getAnnotation(PerfCustomTest.class) != null) {
-        	target = Type.PERFCUSTOM;
+            target = Type.PERFCUSTOM;
         } else if (testClass.getAnnotation(PerfCmpTest.class) != null) {
-        	target = Type.PERFCMP;
+            target = Type.PERFCMP;
         } else if (testClass.getAnnotation(PerfFrameworkTest.class) != null) {
-        	target = Type.PERFFRAMEWORK;
+            target = Type.PERFFRAMEWORK;
+        } else if (testClass.getAnnotation(JSTest.class) != null) {
+            target = Type.JSTEST;
         } else if (testClass.getAnnotation(WebDriverTest.class) != null) {
-            target = Type.WEB;
+            target = Type.WEBDRIVER;
         } else if (testClass.getAnnotation(IntegrationTest.class) != null) {
             target = Type.INTEGRATION;
         } else if (testClass.getAnnotation(UnitTest.class) != null) {

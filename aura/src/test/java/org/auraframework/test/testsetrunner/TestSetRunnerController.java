@@ -58,7 +58,7 @@ public class TestSetRunnerController {
      */
     private static void changeStatus(List<String> tests, String status) throws Exception {
         for (String t : tests) {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstance();
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
             testRunnerState.setTestProp(t, "status", status);
             testRunnerState.setTestProp(t, "exception", "");
         }
@@ -70,7 +70,7 @@ public class TestSetRunnerController {
     @AuraEnabled
     public static Map<String, Object> pollForTestRunStatus() throws Exception {
         Map<String, Object> r = new HashMap<>();
-        Map<String, Map<String, Object>> m = TestSetRunnerState.getInstance().getTestsWithPropertiesMap();
+        Map<String, Map<String, Object>> m = TestSetRunnerState.getFuncInstance().getTestsWithPropertiesMap();
         r.put("testsRunning", TestExecutor.getInstance().isActive());
         r.put("testsWithPropsMap", m);
         return r;
@@ -83,13 +83,13 @@ public class TestSetRunnerController {
         private final String testName;
 
         public StatefulTestRun(String testName) {
-            super(TestSetRunnerState.getInstance().getInventory().get(testName), new TestResult());
+            super(TestSetRunnerState.getFuncInstance().getInventory().get(testName), new TestResult());
             this.testName = testName;
         }
 
         @Override
         public TestResult call() throws Exception {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstance();
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
             boolean finished = false;
             assert (test != null) : "Encountered an unknown test: " + testName;
             testRunnerState.setTestProp(testName, "status", "RUNNING");

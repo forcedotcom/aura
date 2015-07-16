@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.test;
+package org.auraframework.util.test.annotation;
 
-import junit.framework.TestSuite;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.test.util.TestInventory;
-import org.auraframework.util.test.util.TestInventory.Type;
+/**
+ * Annotation used to mark tests for Component JSTest
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
+@Inherited
+public @interface JSTest {
 
-public class AuraComponentsIntegrationTestSuite {
-    public static TestSuite suite() throws Exception {
-        TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraComponentsTestInventory");
-        TestSuite suite = inventory.getTestSuite(Type.INTEGRATION);
-        suite.setName("aura-components integration tests");
-        return suite;
-    }
 }

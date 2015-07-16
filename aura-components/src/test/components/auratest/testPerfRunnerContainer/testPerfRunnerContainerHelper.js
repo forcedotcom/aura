@@ -5,6 +5,7 @@
         FAILED : 'failed'
     },
     POLL_TIME : 3000,
+    TOTAL_TEST_COUNT_HASH : {},
     _parseTestName: function (name) {
         //return name.match(/\:?(\w+)\(/)[1];
         return name.match(/([^_$]+\:?\w+)\(/)[1];
@@ -16,12 +17,15 @@
         return status;
     },
     createRow: function (t) {
+        //increase the counter
+        this.TOTAL_TEST_COUNT_HASH[t.type] = this.TOTAL_TEST_COUNT_HASH[t.type] + 1 || 1;
+
     	//changes from array join to string concat for performance reason
-        return '<li class="list-test-item" data-testid="' + t.name + '"' + (t.isInteg ? ' data-integ="true"' : 'data-unit="true" ') + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
+        return '<li class="list-test-item" data-testid="' + t.name + '" test-type="' + t.type + '"' + (t.jsConsole ? ' data-jsc="true"' : ' ') +'">' +
                 '<div class="parts">' +
-                	'<div class="test-type"></div>' +
                     '<div class="checkbox">'+
                     '<input type="checkbox" class="chk-test" data-testid="' + t.name + '" /></div>' +
+                	'<div class="test-type"></div>' +
                     '<div class="test">' +
                         '<p class="name">' + this._parseTestName(t.name) + '</p>' +
                         '<p class="ns">'+ this._parseTestNameSpace(t.name) + '</p>' +
@@ -32,6 +36,8 @@
                     '</div>' +
                     '<div class="jsConsole">' +
                         '<a href="' + t.jsConsole + '" target="_blank"><span class="icon icon-meter"></span></a>' + 
+                    '</div>' +
+                    '<div class="testResult">' +
                     '</div>' +
                 '</div>' +
                 '<div class="exception"></div>' +
@@ -64,19 +70,19 @@
         
         var length = testArray.length;
         for(var c=0;c<length;c++){
-        	if (list === undefined){
-    			//first ul
-    			list = document.createElement("ul");
+            if (list === undefined){
+                //first ul
+                list = document.createElement("ul");
                 list.className = "list";
                 container.appendChild(list);
-    		}
-        	else if(curTestsPerBlock === 0){
-        		//subsequent ul
-        		curTestsPerBlock = testsPerBlock;
-    			list = document.createElement("ul");
-                list.className = "list list-hidden";
+            }
+            else if(curTestsPerBlock === 0){
+                //subsequent ul
+                curTestsPerBlock = testsPerBlock;
+                list = document.createElement("ul");
+                list.className = "list";
                 container.appendChild(list);
-        	}
+            }
         	
         	//insert to the dom
         	list.insertAdjacentHTML(
@@ -88,31 +94,31 @@
         	curTestsPerBlock--;
         }
 
-        var spacer = document.createElement("div");
-        spacer.className="spacer";
-        spacer.style.height = 5000 * container.childNodes.length + "px";
-        container.appendChild(spacer);
-
+        //append to parent dom
         parent.appendChild(container);
+
+        //update total test count
+        this.TOTAL_TEST_COUNT = testArray.length;
     },
 
     attachEvents: function (cmp, dom) {
         var self        = this,
-        	inputOperator = dom.getElementsByClassName("search-ops")[0],
+        	inputOperator = dom.querySelector(".search-ops"),
         	inputCaseSensitive = dom.querySelector('.search-case-sensitive input'),
-        	labelCountSelected = dom.querySelector('#count_selected'),
-            inputSearch = dom.getElementsByClassName('search')[0],
-            selectAll   = dom.getElementsByClassName('toggle_select_all')[0],
-            scrollToTop   = dom.getElementsByClassName('scroll_to_top')[0],
-            runButton   = dom.getElementsByClassName('run')[0],
-            failButton  = dom.getElementsByClassName('toggle_failed')[0],
-            testContainer = dom.getElementsByClassName("test-container")[0],
+            inputSearch = dom.querySelector('.search'),
+            selectAll   = dom.querySelector('#toggle_select_all'),
+            runButton   = dom.querySelector('.run'),
+            failButton  = dom.querySelector('.toggle_failed'),
+            testContainer = dom.querySelector(".test-container"),
             selectedList = testContainer.querySelector('.selected-list'),
-            toggleTestType = dom.querySelector('.toggle_test_type');
+            toggleTestType = dom.querySelector('.toggle_test_type'),
+            moveSelTop = dom.querySelector('.move_sel_top');
         
         var timeoutDebounce, totalDebounceTime = 1500;
 
         failButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             self.toggleFailTests(cmp, failButton, dom, e);
         });
 
@@ -121,19 +127,32 @@
         	if(timeoutDebounce){
     			clearTimeout(timeoutDebounce);
     		}
+
+            //show loading
+            self.setPageState('Loading...');
     		
     		//doing a little stuff here
         	testContainer.style.opacity = '0.2';
         	
     		//little debounce
 			timeoutDebounce = setTimeout(function(){
+			    var test_unit = toggleTestType != null && toggleTestType.querySelector('input.test_unit');
+			    var test_integ = toggleTestType != null && toggleTestType.querySelector('input.test_integ');
+			    var test_jstest = toggleTestType != null && toggleTestType.querySelector('input.test_jstest');
+			    var test_webdriver = toggleTestType != null && toggleTestType.querySelector('input.test_webdriver');
+
+                //remove the loading
+                self.setPageState('');
+
         		self.filterTests(
     				dom,
     				inputSearch.value,
     				inputOperator.value,
     				inputCaseSensitive.checked,
-    				toggleTestType.querySelector('input.test_integ').checked,
-    				toggleTestType.querySelector('input.test_unit').checked
+    				test_unit && test_unit.checked,
+    				test_integ && test_integ.checked,
+    				test_jstest && test_jstest.checked,
+    				test_webdriver && test_webdriver.checked
 				);
         		testContainer.style.opacity = '';
         	}, totalDebounceTime);
@@ -141,39 +160,22 @@
         inputSearch.addEventListener('input', handlerSearchInputChange);
         inputOperator.addEventListener('input', handlerSearchInputChange);
         inputCaseSensitive.addEventListener('change', handlerSearchInputChange);
-        var testTypeInputs = toggleTestType.querySelectorAll('input');
-        for (var i = 0; i < testTypeInputs.length; i++){
-        	testTypeInputs[i].addEventListener('change', handlerSearchInputChange);
-        }
+        if (toggleTestType != null) {
+            var testTypeInputs = toggleTestType.querySelectorAll('input');
+            for (var i = 0; i < testTypeInputs.length; i++){
+                testTypeInputs[i].addEventListener('change', handlerSearchInputChange);
+            }
+        }    
         
-        selectAll.addEventListener('click', function (e) {
-            self.toggleSelection(selectAll, dom, e);
+        //select all visible tests
+        selectAll.addEventListener('change', function(){
+            self.toggleSelection(selectAll, dom);
         });
 
+
+        //run selected tests
         runButton.addEventListener('click', function (e) {
             self.runTests(cmp, dom, e);
-        });
-        
-
-        testContainer.addEventListener("scroll", function TestContainer_OnScroll(e) {
-            var spacer = testContainer.getElementsByClassName("spacer")[0];
-            var hiddenLists = testContainer.getElementsByClassName("list-hidden");
-
-            // Are we more than half way down the list?
-            while(testContainer.scrollTop > spacer.offsetTop  / 2) {
-                var hidden = hiddenLists[0];
-                if(!hidden) {
-                    spacer.parentNode.removeChild(spacer);
-                    testContainer.removeEventListener("scroll", TestContainer_OnScroll);
-                    return;
-                }
-                $A.util.removeClass(hidden, "list-hidden");
-                spacer.style.height = (5000 * hiddenLists.length) + "px";
-            }
-        });
-        
-        scrollToTop.addEventListener('click', function(){
-        	testContainer.scrollTop = 0;
         });
         
         //delegate for checkbox state
@@ -184,23 +186,32 @@
             	while(targettedRow && targettedRow.nodeName !== "LI"){
             		targettedRow = targettedRow.parentNode;
             	}
-        		
-        		if (e.target.checked === true){
-        			//move to top
-        			selectedList.insertAdjacentElement("AfterBegin", targettedRow);
-            	}
-        		else{
-        			if (targettedRow.parentElement.classList.contains('selected-list')){
-        				//move the stuff back to the end of the list
-        				selectedList.insertAdjacentElement("BeforeEnd", targettedRow);
-        			}
-        		}
-        		targettedRow.classList.toggle("hl-row");
+
+                //toggle hl-row state based on checked state
+        		targettedRow.classList.toggle("hl-row", e.target.checked);
         		
         		//update the selected test count
         		var countSelected = testContainer.querySelectorAll('.chk-test:checked').length;
-        		self._updateSelectedTestCount(dom, countSelected);
+        		self._updateSelectedTestCount(countSelected);
         	}
+        });
+    
+
+        //move selected to top
+        moveSelTop.addEventListener('click', function(e){
+            var selectedRows = dom.querySelectorAll('.hl-row');
+
+            for (var i = 0; i < selectedRows.length; i++){
+                var curRow = selectedRows[i];
+                
+                //only move to top , if the parent is not in selected list
+                if (false === curRow.parentNode.classList.contains('selected-list')){
+                    selectedList.insertAdjacentElement("AfterBegin", curRow);
+                }
+            }
+
+            //scroll conatiner to top
+            self.scrollTestContainerToTop();
         });
         
         
@@ -210,17 +221,33 @@
         if (keyword !== undefined && keyword.length > 0){
         	handlerSearchInputChange();
         }
-    },
-    
-    showAllSections: function() {
-        var lists = document.getElementsByClassName("list-hidden");
-        for(var c=0,length=lists.length;c<length;c++) {
-            lists[0].classList.remove("list-hidden");
+
+
+        //remove the loading state
+        self.setPageState('');
+        self._updateSelectedTestCount(0);
+
+
+        //update stat
+        var testStatDomArray = [];
+        this.TOTAL_TEST_COUNT_HASH['Total'] = this.TOTAL_TEST_COUNT;
+        for (var testType in this.TOTAL_TEST_COUNT_HASH){
+            var testCount = this.TOTAL_TEST_COUNT_HASH[testType];
+            testStatDomArray.push('<b>' + testType + ':</b><span>' + testCount + '</span>');
         }
+        document.querySelector('#test-stat').innerHTML = testStatDomArray.join('');
+    },
+
+    scrollTestContainerToTop: function(){
+        document.querySelector(".test-container").scrollTop = 0;
+    },
+
+    setPageState: function(newText){
+        document.querySelector('#pageState').innerHTML = newText;
     },
 
     toggleIntegrationTests: function (button, dom, e) {
-        var children   = dom.querySelectorAll('li[data-integ]'),
+        var children   = dom.querySelectorAll('li[test-type="integration"]'),
             selected   = $A.util.getDataAttribute(button, 'selected') !== "true",
             visibility = selected ? 'hidden': 'visible',
             i;
@@ -231,16 +258,18 @@
             }
             button.firstChild.checked = selected;
             $A.util.setDataAttribute(button, 'selected', selected);
-            this.showAllSections();
     },
     toggleFailTests: function (cmp, button, dom, e) {
         var children   = dom.querySelectorAll('li:not([data-state="failed"])'),
             selected   = $A.util.getDataAttribute(button, 'selected') !== "true",
             visibility = selected ? 'hidden': 'visible',
             i;
+
             if (!cmp._finishRun) {
+                button.querySelector('input').checked = false;
                 return alert('You need to run tests first!');
             }
+
 
             // we dont do it with CSS because we need to update the state of the li elements
             for (i = 0; i < children.length; i++) {
@@ -248,33 +277,35 @@
             }
             $A.util.setDataAttribute(button, 'selected', selected);
             button.firstChild.checked = false;
-            this.showAllSections();
     },
-    toggleSelection: function (button, dom, e) {
+    toggleSelection: function (select_all_checkbox, dom) {
         var filtered   = dom.querySelectorAll('li:not([data-visible="hidden"]) input[type="checkbox"]'),
-            needsCheck = false, 
-            input, i;
+            isSelectedAll = select_all_checkbox.checked,
+            input,
+            i;
 
-        if ($A.util.getDataAttribute(button, 'selected') !== "true") {
-            $A.util.setDataAttribute(button, 'selected', true);
-            button.firstChild.checked = true;
-            button.lastChild.textContent = 'Unselect all';
-            needsCheck = true;
-        } else {
-            $A.util.setDataAttribute(button, 'selected', false);
-            button.lastChild.textContent = 'Select all';
-            button.firstChild.checked = false;
-        }
 
+        //update selected count
+        this._updateSelectedTestCount(isSelectedAll === true ? filtered.length : 0);
+
+        //checkbox state for only visible items
         for (i = 0; i < filtered.length; i++) {
             input = filtered[i];
-            input.checked = needsCheck;
+            input.checked = isSelectedAll;
         }
         
-    	this._updateSelectedTestCount(dom, needsCheck ? filtered.length : 0);
+        //update selected count
+    	this._updateSelectedTestCount(isSelectedAll ? filtered.length : 0);
+
+        //highlight state
+        var testRowEntries = document.querySelectorAll('li.list-test-item');
+        for (var i = 0; i < testRowEntries.length; i++){
+            testRowEntries[i].classList.toggle('hl-row', isSelectedAll);
+        }
     },
-    _updateSelectedTestCount: function(dom, count){
-    	dom.querySelector('#count_selected').innerHTML = count > 0 ? ' (' + count + ' selected)' : ' !'
+    _updateSelectedTestCount: function(count){
+        //update the 
+        document.querySelector('#count_test_selected').innerHTML = count > 1 ? '<b>' + count + '</b>' + ' Tests Selected' : count === 1 ? '<b>' + count + '</b>' + ' Test Selected' : '';
     },
     calcOrOperators: function(regexp, name){
     	for (var j = 0; j < regexp.length; j++){
@@ -296,18 +327,18 @@
     	
     	return true;//all matched
     },
-    filterTests: function (dom, query, logicOps, isCaseSensitive, test_integ, test_unit) {   	
-        var children  = dom.getElementsByClassName("list-test-item"),
+    filterTests: function (dom, query, logicOps, isCaseSensitive, test_unit, test_integ, test_jstest, test_webdriver) {   	
+        var children  = dom.querySelectorAll(".list-test-item"),
         	calcOperator = logicOps === 'AND' ? this.calcAndOperators : this.calcOrOperators,
 			hasAtLeastOneVisible = false,
             matches   = [],
             regexp = [], li, name, i, queries;
         
-        
+        //setup the query
         query = query || '';
-        query = query.trim()
+        query = query.trim();
 
-    	if (query.length === 0 && test_integ && test_unit){
+    	if (query.length === 0 && test_unit && test_integ && test_jstest && test_webdriver) {
     		//when it is empty, just show it
         	for (i = 0; i < children.length; i++) {
                 $A.util.setDataAttribute(children[i], 'visible', 'visible');
@@ -315,6 +346,7 @@
     	}
     	else {
         	//allow use of , to match multiple item
+            //find the regex array
     		if (query.length > 0){
     			queries = query.split(',');
             	
@@ -339,12 +371,18 @@
                 else{
                 	name = li.getElementsByClassName('ns')[0].textContent;
                 	
-                	if (test_integ === true && $A.util.getDataAttribute(li, 'integ') === 'true'){
+                	if (test_unit === true && $A.util.getElementAttributeValue(li, 'test-type') === 'unit'){
+                        isVisible = true;
+                    }
+                	else if (test_integ === true && $A.util.getElementAttributeValue(li, 'test-type') === 'integration'){
                 		isVisible = true;
                 	}
-                	else if (test_unit === true && $A.util.getDataAttribute(li, 'unit') === 'true'){
-                		isVisible = true;
-                	}
+                    else if (test_jstest === true && $A.util.getElementAttributeValue(li, 'test-type') === 'jstest'){
+                        isVisible = true;
+                    }                	
+                    else if (test_webdriver === true && $A.util.getElementAttributeValue(li, 'test-type') === 'webdriver'){
+                        isVisible = true;
+                    }
                 	
                     //calling the regex match
                 	if (isVisible === true && queries !== undefined){
@@ -362,8 +400,6 @@
             	alert('There is no test matching your filter');
             }
         }
-        
-        this.showAllSections();
     },
     _getLiFromInput: function (input) {
         return input.parentElement.parentElement.parentElement;

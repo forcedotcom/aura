@@ -174,27 +174,31 @@
             pillInput[0].setAvailableWidth(this.INPUT_MIN_WIDTH_PX);
 
             //after everything is rendered calculate the real width
-            var self = this;
-            window.setTimeout(function () {
-                if (cmp.isValid()) {
-                    var list = cmp.find("list");
-                    var listElement = list.getElement();
-                    if (list && listElement) {
-                        var listBoundingRect = listElement.getBoundingClientRect();
-                        var availableWidth = listBoundingRect.right - listBoundingRect.left;
-                        var inputListItem = cmp.find("inputListItem");
-                        var inputlistItemElement = inputListItem.getElement();
-                        if (inputlistItemElement) {
-                            var inputListItemBoundingRect = inputlistItemElement.getBoundingClientRect();
-                            availableWidth = listBoundingRect.right - inputListItemBoundingRect.left - self.SCROLL_BAR_MARGIN_PX;
-                        }
-                        pillInput[0].setAvailableWidth(availableWidth);
-                    }
-                }
-            }, 0);
+            this.setInputWidth(cmp, pillInput);
 
             pillInput[0].focus();
         }
+    },
+
+    setInputWidth: function(cmp, pillInput) {
+        var self = this;
+        window.setTimeout(function () {
+            if (cmp.isValid()) {
+                var list = cmp.find("list");
+                var listElement = list.getElement();
+                if (list && listElement) {
+                    var listBoundingRect = listElement.getBoundingClientRect();
+                    var availableWidth = listBoundingRect.right - listBoundingRect.left;
+                    var inputListItem = cmp.find("inputListItem");
+                    var inputlistItemElement = inputListItem.getElement();
+                    if (inputlistItemElement) {
+                        var inputListItemBoundingRect = inputlistItemElement.getBoundingClientRect();
+                        availableWidth = listBoundingRect.right - inputListItemBoundingRect.left - self.SCROLL_BAR_MARGIN_PX;
+                    }
+                    pillInput[0].setAvailableWidth(availableWidth);
+                }
+            }
+        }, 0);
     },
 
     adjustHeight: function(cmp) {

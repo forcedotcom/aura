@@ -22,6 +22,7 @@
             pillInput[0].addHandler("onBackspacePressedWhenEmpty", cmp, "c.onBackspacePressedWhenEmpty");
             pillInput[0].addHandler("focus", cmp, "c.onInputFocus");
             pillInput[0].addHandler("blur", cmp, "c.onInputBlur");
+            helper.setInputWidth(cmp, pillInput);
         }
     },
 

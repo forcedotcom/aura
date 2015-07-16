@@ -144,6 +144,7 @@ AuraClientService = function AuraClientService () {
     this.isUnloading = false;
     this.initDefsObservers = [];
     this.finishedInitDefs = false;
+    this.protocols={layout:true};
     this.namespaces={};
 
     // token storage key should not be changed because external client may query independently
@@ -234,7 +235,7 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
 
 /**
  * Take a json (hopefully) response and decode it. If the input is invalid JSON, we try to handle it gracefully.
- * 
+ *
  * @returns {Object} An object with properties 'status', which represents the status of the response, and potentially
  *          'message', which contains the decoded server response or an error message.
  */
@@ -1723,7 +1724,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         qs = this.buildParams({
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),
             "aura.token"   : this._token,
-            "aura.context" : context.encodeForServer(), 
+            "aura.context" : context.encodeForServer(),
             "sid"          : this._sid
         });
 
@@ -1888,7 +1889,7 @@ AuraClientService.prototype.receive = function(auraXHR) {
 
 /**
  * Mark actions from an XHR response as being in the error state and set the error on the actions.
- * 
+ *
  * @param {AuraXHR} auraXHR The xhr container.
  * @param {String} errorMessage The error message to associate with the actions.
  * @private
@@ -2263,7 +2264,7 @@ AuraClientService.prototype.injectComponentAsync = function(config, locator, eve
     	if (callback) {
     		callback(component);
     	}
-    	
+
         acs.renderInjection(component, locator, eventHandlers);
     }, config, $A.getRoot(), false, false, true);
     //
@@ -2520,12 +2521,16 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 if(currentAccess && currentAccess.isValid()){
                     var accessFacetValueProvider = currentAccess.getComponentValueProvider();
                     if (accessFacetValueProvider && accessFacetValueProvider.isValid()) {
-                        var accessNamespace=currentAccess.getDef().getDescriptor().getNamespace();
-                        var accessFacetNamespace=accessFacetValueProvider.getDef().getDescriptor().getNamespace();
+                        var accessDescriptor=currentAccess.getDef().getDescriptor();
+                        var accessFacetDescriptor=accessFacetValueProvider.getDef().getDescriptor();
+                        var accessNamespace=accessDescriptor.getNamespace();
+                        var accessFacetNamespace=accessFacetDescriptor.getNamespace();
                         // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
                         // if(definition.access!=="P"){
                         // INTERNAL / DEFAULT
-                        if(this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace)){
+                        var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor.getPrefix());
+                        var allowNamespace=this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace);
+                        if(allowProtocol || allowNamespace){
                             // Privileged Namespace
                             return true;
                         }

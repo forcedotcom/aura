@@ -215,6 +215,187 @@
         }]
     },
 
+    //test to see if datepicker haves correctly
+    //when start Date is set
+    testSetInitialStartDate : { 
+        test : [function(cmp) {
+            self = this;
+            START_DATE = "2020-11-10";
+            rangeComponent = cmp.find("datePickerTestCmpRange");
+            datePicker = rangeComponent.find("datePicker");
+            grid = datePicker.find("grid");
+        }, function(cmp) {
+            rangeComponent.set('v.startDate', START_DATE);
+
+            //this is async, so needs to use addWaitForWithFailureMessage
+            $A.test.addWaitForWithFailureMessage(
+                START_DATE,
+                function(){
+                    return self.getCmpElementValue( rangeComponent, 'inputStartDate' );
+                },
+                'Start Date Value (v.startDate) must match'
+            );
+
+            $A.test.assertEqualsIgnoreWhitespace(
+                '',
+                self.getCmpElementValue( rangeComponent, 'inputEndDate' ),
+                'End Date Value (v.endDate) must match'
+            );
+        }, function(cmp){
+            this.openStartDatePicker(cmp);
+        }, function(cmp){
+            var startId = this.findDatePosition(START_DATE);
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
+        }]
+    },
+
+
+    //test to see if datepicker haves correctly
+    //when end Date is set
+    testSetInitialEndDate : { 
+        test : [function(cmp) {
+            self = this;
+            END_DATE = "2021-02-20";
+            rangeComponent = cmp.find("datePickerTestCmpRange");
+            datePicker = rangeComponent.find("datePicker");
+            grid = datePicker.find("grid");
+        }, function(cmp) {
+            rangeComponent.set('v.endDate', END_DATE);
+
+            $A.test.assertEqualsIgnoreWhitespace(
+                '',
+                self.getCmpElementValue( rangeComponent, 'inputStartDate' ),
+                'Start Date Value (v.startDate) must be empty'
+            );
+
+            //this is async, so needs to use addWaitForWithFailureMessage
+            $A.test.addWaitForWithFailureMessage(
+                END_DATE,
+                function(){
+                    return self.getCmpElementValue( rangeComponent, 'inputEndDate' );
+                },
+                'End Date Value (v.endDate) must match'
+            );
+        }, function(cmp){
+            this.openEndDatePicker(cmp);
+        }, function(cmp){
+            var endId = this.findDatePosition(END_DATE);
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
+        }]
+    },
+
+    //test to see if datepicker haves correctly
+    //when start Date and end Date are set
+    testSetInitialStartAndEndDate : { 
+        test : [function(cmp) {
+            self = this;
+            START_DATE = "2020-11-10";
+            END_DATE = "2021-02-20";
+            rangeComponent = cmp.find("datePickerTestCmpRange");
+            datePicker = rangeComponent.find("datePicker");
+            grid = datePicker.find("grid");
+        }, function(cmp) {
+            rangeComponent.set('v.startDate', START_DATE);
+            rangeComponent.set('v.endDate', END_DATE);
+
+            //this is async, so needs to use addWaitForWithFailureMessage
+            $A.test.addWaitForWithFailureMessage(
+                START_DATE,
+                function(){
+                    return self.getCmpElementValue( rangeComponent, 'inputStartDate' );
+                },
+                'Start Date Value (v.startDate) must match'
+            );
+
+            //this is async, so needs to use addWaitForWithFailureMessage
+            $A.test.addWaitForWithFailureMessage(
+                END_DATE,
+                function(){
+                    return self.getCmpElementValue( rangeComponent, 'inputEndDate' );
+                },
+                'End Date Value (v.startDate) must match'
+            );
+        }, function(cmp){
+            this.openStartDatePicker(cmp);
+        }, function(cmp){
+            var startId = this.findDatePosition(START_DATE);
+            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
+        }, function(cmp){
+            this.selectDate(datePicker, START_DATE);//close the datepicker
+        }, function(cmp){
+            this.openEndDatePicker(cmp);
+        }, function(cmp){
+            var endId = this.findDatePosition(END_DATE);
+            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
+        }]
+    },
+
+    //test datepicker grid window position in start date textbox
+    testDatepickerStartDatePosition: { 
+        test : [function(cmp) {
+            self = this;
+            START_DATE = "2020-11-10";
+            END_DATE = "2021-02-20";
+            rangeComponent = cmp.find("datePickerTestCmpRange");
+            datePicker = rangeComponent.find("datePicker");
+            grid = datePicker.find("grid");
+        }, function(cmp) {
+            this.openStartDatePicker(cmp);
+        }, function(cmp){
+            var gridRect = $A.test.select('.uiDatePicker')[0].getBoundingClientRect();
+            var dateTextbox = self.getCmpElement( rangeComponent, 'inputStartDate' ).getBoundingClientRect();
+
+            // comment out due to an issue with position bug
+            // W-2657509 - datepicker isn't positioned properly on initial rendering
+            // 
+            // $A.test.assertTrue(
+            //     gridRect.top > dateTextbox.top + dateTextbox.height,
+            //     'datepicker grid should not coverred startTextboxRect.'
+            //         + ' Found gridRect.top=' + gridRect.top
+            //         + ' and  gridRect.height=' + gridRect.height
+            //         + ' and  dateTextbox.bottom=' + (dateTextbox.top + dateTextbox.height)
+            // );
+        }]
+    },
+
+    //test datepicker grid window position in end date textbox
+    testDatepickerEndDatePosition: { 
+        test : [function(cmp) {
+            self = this;
+            START_DATE = "2020-11-10";
+            END_DATE = "2021-02-20";
+            rangeComponent = cmp.find("datePickerTestCmpRange");
+            datePicker = rangeComponent.find("datePicker");
+            grid = datePicker.find("grid");
+        }, function(cmp) {
+            this.openEndDatePicker(cmp);
+        }, function(cmp){
+            var gridRect = $A.test.select('.uiDatePicker')[0].getBoundingClientRect();
+            var dateTextbox = self.getCmpElement( rangeComponent, 'inputEndDate' ).getBoundingClientRect();
+
+            // comment out due to an issue with position bug
+            // W-2657509 - datepicker isn't positioned properly on initial rendering
+            // 
+            // $A.test.assertTrue(
+            //     gridRect.top > dateTextbox.top + dateTextbox.height,
+            //     'datepicker grid should not coverred inputEndDate.'
+            //         + ' Found gridRect.top=' + gridRect.top
+            //         + ' and  gridRect.height=' + gridRect.height
+            //         + ' and  dateTextbox.bottom=' + (dateTextbox.top + dateTextbox.height)
+            // );
+        }]
+    },
+
+    //get component element value
+    getCmpElement: function(cmp, id){
+        return cmp.find(id).getElement();
+    },
+
+    //get component element value
+    getCmpElementValue: function(cmp, id){
+        return this.getCmpElement(cmp, id).value;
+    },
+
     assertRangeHighlightedInMonth : function(grid, startId, endId) {
         for (i = startId; i <= endId; i++) {
             $A.test.assertTrue($A.util.hasClass(grid.find(i).getElement(), "highlight"), "elements in the range should have 'highlight' class");

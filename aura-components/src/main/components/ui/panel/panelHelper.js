@@ -241,7 +241,7 @@
                 target:window,
                 type: 'bounding box',
                 enable: true,
-                pad: 5
+                pad: 20
             }));
 
             if(pointer) {
@@ -287,6 +287,33 @@
                     pad: 5
                 }));
             }
+
+            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:cmp.getElement(),
+                    target:window,
+                    type:'bounding box',
+                    enable: true,
+                    boxDirections: {
+                        top: true,
+                        bottom: true
+                    },
+                    pad: 5
+            }));
+
+            if(pointer) {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:cmp.getElement(),
+                    target:pointer,
+                    type:'inverse bounding box',
+                    enable: true,
+                    boxDirections: {
+                        top: true,
+                        bottom: true
+                    },
+                    pad: 5
+                }));
+            }
+            
             this.positioningLib.panelPositioning.reposition(callback);
         } else {
             this.positioningLib.panelPositioning.reposition(callback);

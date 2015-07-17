@@ -88,7 +88,6 @@ function (scrollUtil) {
                 }
                 var event = e || window.event,
                     keyCode = event.keyCode;
-
                 if (keyCode == 27 && config.closeOnEsc) {
                     //escape to close
                     $A.util.squash(e);
@@ -209,13 +208,12 @@ function (scrollUtil) {
 
             panel.setAttribute("aria-hidden", 'false');
             if (useTransition) {
-
                 animEl.addEventListener(animEnd, finishHandler, false);
+
                 setTimeout(function() {
                      $A.util.addClass(panel, 'open');
                  },10);
                 $A.util.addClass(animEl, 'transitioning ' + animName);
-               
 
             } else {
                 $A.util.addClass(panel, 'open');

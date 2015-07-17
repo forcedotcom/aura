@@ -134,7 +134,7 @@ function (constraint, elementProxyFactory) {
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             
-            if(config.type !== 'bounding box' && config.type !== 'below') {
+            if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
                 var constraintDirections = config.align.split(/\s/);
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
                 constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], config));

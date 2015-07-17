@@ -694,7 +694,7 @@ Component.prototype.destroy = function(async) {
         if(vp) {
             for ( var k in vp) {
                 var v = vp[k];
-                if (v&&v!=this) {
+                if (v&&v!==this) {
                     if ($A.util.isFunction(v.destroy)) {
                         v.destroy(async);
                     }
@@ -1197,7 +1197,7 @@ Component.prototype.fireChangeEvent=function(key,oldValue,newValue,index){
         var observers=[];
         var keypath = key+".";
         for(var handler in handlers){
-            if(handler == key || handler.indexOf(keypath)===0 || key.indexOf(handler+".")===0){
+            if(handler === key || handler.indexOf(keypath)===0 || key.indexOf(handler+".")===0){
                 observers=observers.concat(handlers[handler]);
             }
         }
@@ -1303,7 +1303,7 @@ Component.prototype.getComponentValueProvider = function() {
  */
 Component.prototype.addValueProvider=function(key,valueProvider){
     $A.assert($A.util.isString(key),"Component.addValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")==-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")===-1,"Component.addValueProvider(): '"+key+"' is a reserved valueProvider.");
     $A.assert(!$A.util.isUndefinedOrNull(valueProvider),"Component.addValueProvider(): 'valueProvider' is required.");
     this.valueProviders[key]=valueProvider;
 };
@@ -1315,7 +1315,7 @@ Component.prototype.addValueProvider=function(key,valueProvider){
  */
 Component.prototype.removeValueProvider=function(key){
     $A.assert($A.util.isString(key),"Component.removeValueProvider(): 'key' must be a valid String.");
-    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")==-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
+    $A.assert(",v,m,c,e,this,globalid,def,super,null,version,".indexOf(","+key.toLowerCase()+",")===-1,"Component.removeValueProvider(): '"+key+"' is a reserved valueProvider and can not be removed.");
     delete this.valueProviders[key];
 };
 
@@ -1999,7 +1999,7 @@ Component.prototype.getMethodHandler = function(valueProvider,name,action,attrib
             params["arguments"]={};
             var counter=0;
             for (var attribute in attributes){
-                params["arguments"][attribute]=(arguments[counter] == undefined ? attributes[attribute]["default"] : arguments[counter]) ;
+                params["arguments"][attribute]=(arguments[counter] === undefined ? attributes[attribute]["default"] : arguments[counter]) ;
                 counter++;
             }
             for(var i=counter;i<arguments.length;i++){
@@ -2220,7 +2220,7 @@ Component.prototype.injectComponent = function(config, cmp, localCreation) {
 
             // KRIS: IN THE MIDDLE OF THIS FOR PROVIDED COMPONENTS
             var classConstructor =  $A.componentService.getComponentClass(realComponentDef.getDescriptor().getQualifiedName());
-            if (classConstructor && cmp["constructor"] != classConstructor) {
+            if (classConstructor && cmp["constructor"] !== classConstructor) {
                 // Doesn't do a whole lot, but good for debugging, not sure what the stack trace looks like.
                 cmp["constructor"] = classConstructor;
 
@@ -2347,7 +2347,7 @@ Component.prototype.outputMapValue = function(map, avp, serialized, depth) {
     var that = this;
     for(var key in map){
         var value=map[key];
-        if(key == "$serId"){
+        if(key === "$serId"){
             ret[key] = value;
             continue;
         }
@@ -2416,7 +2416,7 @@ Component.prototype.outputComponent = function(cmp, serialized, depth) {
                 // KRIS: This rawValue only works in non prod mode, otherwise you get "PropertyReferenceValue"
                 ret["expressions"][key] = rawValue+"";
             }
-            if(key != "body") {
+            if(key !== "body") {
                 ret.attributes[key] = that.output(val, cmp.getAttributeValueProvider(), serialized, depth);
             } else {
                 ret.attributes[key] = {};

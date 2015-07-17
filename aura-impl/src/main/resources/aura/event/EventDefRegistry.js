@@ -29,7 +29,7 @@ function EventDefRegistry() {
  */
 EventDefRegistry.prototype.getDef = function(name) {
     $A.assert(name, "No EventDef specified");
-    if(name.indexOf("://") == -1){
+    if(name.indexOf("://") === -1){
         name = "markup://" + name;
     }
     return this.eventDefs[name];

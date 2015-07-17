@@ -27,7 +27,7 @@ TestInstance.prototype.putMessage = function(pre, expected, msg) {
         if (expected[i] === undefined) {
             continue;
         }
-        if (msg.indexOf(expected[i]) != -1) {
+        if (msg.indexOf(expected[i]) !== -1) {
             expected[i] = undefined;
             return true;
         }
@@ -125,7 +125,7 @@ TestInstance.prototype.logError = function(msg, e) {
             "message" : msg + ": " + (e.message || e.toString())
         };
         for (p in e) {
-            if (p == "message") {
+            if (p === "message") {
                 continue;
             }
             err[p] = "" + e[p];

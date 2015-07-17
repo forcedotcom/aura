@@ -31,7 +31,7 @@
         }
 
         var trace;
-        if (error || level == "ERROR") {
+        if (error || level === "ERROR") {
             trace = $A.logger.getStackTrace(error);
         }
         var logMsg = level + ": " + (!$A.util.isUndefinedOrNull(message) ? message : "");

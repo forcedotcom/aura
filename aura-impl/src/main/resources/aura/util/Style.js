@@ -92,16 +92,20 @@ Aura.Utils.Style.prototype.include = function(href) {
 Aura.Utils.Style.prototype.getCSSProperty = function(el, cssprop) {
     var elcsIE = el.currentStyle;
     if (elcsIE){ //IE
+    	/*eslint eqeqeq:0*/
         if(elcsIE[cssprop]!=undefined) {//IE8
             return elcsIE[cssprop];
         }
+        /*eslint eqeqeq:0*/
         else if(elcsIE.getPropertyValue!=undefined){//IE9 or up
             return elcsIE.getPropertyValue(cssprop);
         }
     }else if (document.defaultView && document.defaultView.getComputedStyle){ //Firefox
         var elcsFF = document.defaultView.getComputedStyle(el, "");
+        /*eslint eqeqeq:0*/
         if(elcsFF[cssprop]!=undefined) {
             return elcsFF[cssprop];
+        /*eslint eqeqeq:0*/
         }else if(elcsFF.getPropertyValue(cssprop)!=undefined){
             return elcsFF.getPropertyValue(cssprop);
         }

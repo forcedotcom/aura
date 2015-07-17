@@ -22,7 +22,7 @@
  * @export
  */
 Aura.Utils.Bitset = function Bitset(str) {
-    if (typeof str != "string") {
+    if (typeof str !== "string") {
         str = "";
     }
     Aura.Utils.Bitset.init();
@@ -79,7 +79,7 @@ Aura.Utils.Bitset.prototype.toString = function() {
  */
 Aura.Utils.Bitset.prototype.trim = function() {
     for ( var i = this.data.length - 1; i >= 0; i--) {
-        if (this.data[i] != Aura.Utils.Bitset.alphabet[0]) {
+        if (this.data[i] !== Aura.Utils.Bitset.alphabet[0]) {
             break;
         }
     }

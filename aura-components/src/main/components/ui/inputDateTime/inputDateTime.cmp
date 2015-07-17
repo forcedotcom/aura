@@ -37,11 +37,12 @@
         <a aura:id="clear" class="clearIcon hide" onclick="{!c.clearValue}">
             <span class="assistiveText">Clear Button</span>
         </a>
+        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
     </aura:if>
 
     <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
-        <div aura:id="dateTime" class="wrapper">
-            <div class="dateTime-inputDate">
+        <form class="form--stacked">
+            <div class="dateTime-inputDate form-element form-element__control">
                 <input aura:id="inputDate" id="{!v.domId}" class="{!v.class + 'input'}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
                 <aura:if isTrue="{!and(v.displayDatePicker, !v.disabled)}">
                     <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">
@@ -49,19 +50,17 @@
                     </a>
                 </aura:if>
             </div>
-            <form class="form--stacked">
-                <div class="dateTime-inputTime form-element form-element__control">
-                    <div class="input-has-icon input-has-icon--right">
-                        <label for="{!v.domId+'-time'}"/>
-                        <input aura:id="inputTime" id="{!v.domId+'-time'}" class="{!v.class + 'input'}" type="text" placeholder="{!v.timePlaceholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
-                        <a aura:id="timePickerOpener" class="timePicker-openIcon display" aria-haspopup="true" onclick="{!c.openTimePicker}">
-                            <span class="assistiveText">Time Picker</span>
-                        </a>
-                    </div>
+            <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
+            <div class="dateTime-inputTime form-element form-element__control">
+                <div class="input-has-icon input-has-icon--right">
+                    <label for="{!v.domId+'-time'}"/>
+                    <input aura:id="inputTime" id="{!v.domId+'-time'}" class="{!v.class + 'input'}" type="text" placeholder="{!v.timePlaceholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
+                    <a aura:id="timePickerOpener" class="timePicker-openIcon display" aria-haspopup="true" onclick="{!c.openTimePicker}">
+                        <span class="assistiveText">Time Picker</span>
+                    </a>
                 </div>
-                <ui:inputTimePicker aura:id="timePicker" selectDate="{!c.setValue}" timeFormat="{!v.timeFormat}"/>
-            </form>
-        </div>
+            </div>
+            <ui:inputTimePicker aura:id="timePicker" selectDate="{!c.setValue}" timeFormat="{!v.timeFormat}"/>
+        </form>
     </aura:if>
-    <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}"/>
 </aura:component>

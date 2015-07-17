@@ -32,7 +32,7 @@
     <aura:attribute name="hideOnSelect" type="Boolean" default="true" description="Close the datePicker after a date is selected"/>
     <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
     <aura:attribute name="titleHeadingLevel" type="String" description="The heading level for the title. The default is h2."/>
-    
+
     <!-- private attributes -->
     <aura:attribute name="_today" type="String" access="private" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
 
@@ -83,7 +83,7 @@
                     <div class="picklist datepicker__filter--year">
                         <label>
                             <span class="assistiveText">year</span>
-                            <select class="picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                            <select class="select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}"/>
                         </label>
                     </div>
                 </aura:if>

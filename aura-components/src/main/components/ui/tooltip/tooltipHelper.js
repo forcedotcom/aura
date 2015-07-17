@@ -44,12 +44,6 @@
             component.set('v.disabled', true);
         }
 
-        if(fadeInDuration > fadeOutDuration) {
-            fadeOutDuration = fadeInDuration;
-        } else {
-            fadeInDuration = fadeOutDuration;
-        }
-
         if(!fadeInDuration) {
             fadeInDuration = 0;
         }
@@ -78,6 +72,12 @@
 
         if(disabled) {
             classList.push('disabled');
+        }
+
+        if(fadeInDuration > fadeOutDuration) {
+            fadeOutDuration = fadeInDuration;
+        } else {
+            fadeInDuration = fadeOutDuration;
         }
 
         var styleDeclaration = [

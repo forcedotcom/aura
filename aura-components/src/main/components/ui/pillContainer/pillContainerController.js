@@ -22,6 +22,7 @@
             pillInput[0].addHandler("onBackspacePressedWhenEmpty", cmp, "c.onBackspacePressedWhenEmpty");
             pillInput[0].addHandler("focus", cmp, "c.onInputFocus");
             pillInput[0].addHandler("blur", cmp, "c.onInputBlur");
+            helper.setInputWidth(cmp, pillInput);
         }
     },
 
@@ -53,6 +54,10 @@
         if (newItems) {
             helper.insertItems(cmp, newItems);
         }
+    },
+
+    onItemsChanged: function(cmp, event, helper) {
+        helper.onItemsChanged(cmp);
     },
 
     onShowMore: function(cmp, event, helper) {
@@ -88,5 +93,7 @@
 
     focus: function(cmp, event, helper) {
         helper.focusOnInputBox(cmp);
-    }
+    },
+
+
 })

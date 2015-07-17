@@ -36,18 +36,9 @@
 				</button>
 			</div>
 			<div class="option-wrapper">
-            	<aura:if isTrue="{!v.scope != 'perf'}">
-					<button class="toggle_test_type" title="Show/Hide Integration and Unit tests">
-						<input type="checkbox" id="test_integ" class="test_integ" checked="true" />
-						<label for="test_integ">Integ</label>
-						<input type="checkbox" id="test_unit" class="test_unit" checked="true" />
-						<label for="test_unit">Unit</label>
-						<input type="checkbox" id="test_jstest" class="test_jstest" checked="true" />
-						<label for="test_jstest">JSTest</label>													
-						<input type="checkbox" id="test_webdriver" class="test_webdriver" checked="true" />
-						<label for="test_webdriver">WebDriver</label>
-					</button>
-				</aura:if>
+				<button class="toggle_test_type" title="Show/Hide Integration and Unit tests">
+					<!--these will be dynamically populated in js-->
+				</button>
 
 				<button class="search-case-sensitive" title="Case Sensitive">
 					<input type="checkbox" id="case_sensitive" />

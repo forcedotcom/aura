@@ -25,7 +25,7 @@
                 '<div class="parts">' +
                     '<div class="checkbox">'+
                     '<input type="checkbox" class="chk-test" data-testid="' + t.name + '" /></div>' +
-                	'<div class="test-type"></div>' +
+                	'<div class="test-type">' + t.type + '</div>' +
                     '<div class="test">' +
                         '<p class="name">' + this._parseTestName(t.name) + '</p>' +
                         '<p class="ns">'+ this._parseTestNameSpace(t.name) + '</p>' +
@@ -96,9 +96,6 @@
 
         //append to parent dom
         parent.appendChild(container);
-
-        //update total test count
-        this.TOTAL_TEST_COUNT = testArray.length;
     },
 
     attachEvents: function (cmp, dom) {
@@ -136,27 +133,30 @@
         	
     		//little debounce
 			timeoutDebounce = setTimeout(function(){
-			    var test_unit = toggleTestType != null && toggleTestType.querySelector('input.test_unit');
-			    var test_integ = toggleTestType != null && toggleTestType.querySelector('input.test_integ');
-			    var test_jstest = toggleTestType != null && toggleTestType.querySelector('input.test_jstest');
-			    var test_webdriver = toggleTestType != null && toggleTestType.querySelector('input.test_webdriver');
-
                 //remove the loading
                 self.setPageState('');
 
+
+                //filter out the test
         		self.filterTests(
     				dom,
     				inputSearch.value,
     				inputOperator.value,
     				inputCaseSensitive.checked,
-    				test_unit && test_unit.checked,
-    				test_integ && test_integ.checked,
-    				test_jstest && test_jstest.checked,
-    				test_webdriver && test_webdriver.checked
+                    self.getTestTypeArray()
 				);
         		testContainer.style.opacity = '';
         	}, totalDebounceTime);
         };
+
+        //dynamically add all test types here
+        this.createTestTypeFilterControl(
+            toggleTestType,
+            self.getTestTypeArray()
+        );
+
+
+        //hook up filter change events
         inputSearch.addEventListener('input', handlerSearchInputChange);
         inputOperator.addEventListener('input', handlerSearchInputChange);
         inputCaseSensitive.addEventListener('change', handlerSearchInputChange);
@@ -229,13 +229,67 @@
 
 
         //update stat
+        this.updateTestCountStat(this.TOTAL_TEST_COUNT_HASH);
+    },
+
+    //update test count stat
+    updateTestCountStat: function(testCountHash){
+        //count the total first
         var testStatDomArray = [];
-        this.TOTAL_TEST_COUNT_HASH['Total'] = this.TOTAL_TEST_COUNT;
-        for (var testType in this.TOTAL_TEST_COUNT_HASH){
-            var testCount = this.TOTAL_TEST_COUNT_HASH[testType];
+
+        //count the total
+        if (testCountHash['Total'] === undefined){
+            var totalCount = 0;
+
+            for (var testType in testCountHash){
+                totalCount += testCountHash[testType];
+            }
+
+            //update total count
+            testCountHash['Total'] = totalCount;
+        }
+
+
+        //update the dom
+        for (var testType in testCountHash){
+            var testCount = testCountHash[testType];
             testStatDomArray.push('<b>' + testType + ':</b><span>' + testCount + '</span>');
         }
         document.querySelector('#test-stat').innerHTML = testStatDomArray.join('');
+    },
+
+    //this will ignore TOTAL flags
+    getTestTypeArray: function(){
+        var testTypeArray = [];
+        for (var curTestType in this.TOTAL_TEST_COUNT_HASH){
+            if(curTestType === 'Total'){
+                continue; //ignore total flag
+            }
+            testTypeArray.push(curTestType);
+        }
+        return testTypeArray;
+    },
+
+    createTestTypeFilterControl: function(toggleTestType, testTypesArray){
+        var domTestTypes = []
+        for (var i = 0; i < testTypesArray.length; i++){
+            var curTestType = testTypesArray[i];
+            var testTypeControlName = 'test_' + curTestType;
+
+            domTestTypes.push(
+                '<input type="checkbox" id="' + testTypeControlName + '" class="' + testTypeControlName + '" checked="true" />'
+            );
+            domTestTypes.push(
+                '<label for="'+ testTypeControlName+ '">' + curTestType + '</label>'
+            );
+        }
+
+
+        //insert the dom
+        toggleTestType.insertAdjacentHTML(
+            'beforeend',
+            domTestTypes.join('\n')
+        );
     },
 
     scrollTestContainerToTop: function(){
@@ -327,22 +381,47 @@
     	
     	return true;//all matched
     },
-    filterTests: function (dom, query, logicOps, isCaseSensitive, test_unit, test_integ, test_jstest, test_webdriver) {   	
+    filterTests: function (dom, query, logicOps, isCaseSensitive, testTypesArray) {   	
         var children  = dom.querySelectorAll(".list-test-item"),
         	calcOperator = logicOps === 'AND' ? this.calcAndOperators : this.calcOrOperators,
 			hasAtLeastOneVisible = false,
             matches   = [],
-            regexp = [], li, name, i, queries;
+            regexp = [], li, name, i, j, queries, testTypeStr;
         
         //setup the query
         query = query || '';
         query = query.trim();
 
-    	if (query.length === 0 && test_unit && test_integ && test_jstest && test_webdriver) {
+        //visible test count
+        var hashVisibleTestCount = {};
+
+
+        //generate test type check states
+        var allTestTypeSelected = true;
+        var testTypesCheckArray = [];
+        for (i = 0; i < testTypesArray.length; i++){
+            var curTypeCheckState = dom.querySelector('#test_' + testTypesArray[i]).checked;
+
+            //one false will set allTestTypeSelected = false
+            if(curTypeCheckState !== true){
+                allTestTypeSelected = false;
+            }
+
+            testTypesCheckArray[i] = curTypeCheckState;
+
+            //set initial test count = 0
+            hashVisibleTestCount[testTypesArray[i]] = 0;
+        }
+        
+    	if (query.length === 0 && allTestTypeSelected) {
     		//when it is empty, just show it
         	for (i = 0; i < children.length; i++) {
                 $A.util.setDataAttribute(children[i], 'visible', 'visible');
             }
+
+
+            //update original count
+            this.updateTestCountStat(this.TOTAL_TEST_COUNT_HASH);
     	}
     	else {
         	//allow use of , to match multiple item
@@ -364,6 +443,8 @@
             	var isVisible = false;
             	
                 li = children[i];
+                testTypeStr = $A.util.getElementAttributeValue(li, 'test-type');
+
                 if (li.getElementsByTagName("input")[0].checked) {
                 	//if checked, always visible
                     isVisible = true;
@@ -371,18 +452,16 @@
                 else{
                 	name = li.getElementsByClassName('ns')[0].textContent;
                 	
-                	if (test_unit === true && $A.util.getElementAttributeValue(li, 'test-type') === 'unit'){
-                        isVisible = true;
+
+                    //look through the test type state and the test type name match
+                    //then item will be visible
+                    for (j = 0; j < testTypesArray.length; j++){
+                        if(testTypesCheckArray[j] === true && testTypesArray[j] === testTypeStr){
+                            isVisible = true;
+                            break;
+                        }                        
                     }
-                	else if (test_integ === true && $A.util.getElementAttributeValue(li, 'test-type') === 'integration'){
-                		isVisible = true;
-                	}
-                    else if (test_jstest === true && $A.util.getElementAttributeValue(li, 'test-type') === 'jstest'){
-                        isVisible = true;
-                    }                	
-                    else if (test_webdriver === true && $A.util.getElementAttributeValue(li, 'test-type') === 'webdriver'){
-                        isVisible = true;
-                    }
+
                 	
                     //calling the regex match
                 	if (isVisible === true && queries !== undefined){
@@ -392,13 +471,25 @@
                 }
                 
                 hasAtLeastOneVisible = hasAtLeastOneVisible || isVisible;
-                                
-                $A.util.setDataAttribute(children[i], 'visible', isVisible === true ? 'visible' : 'hidden');
+
+
+                //increase the count if the item is visible
+                if(isVisible === true){
+                    hashVisibleTestCount[testTypeStr]++;
+                    $A.util.setDataAttribute(children[i], 'visible', 'visible');
+                }
+                else{
+                    $A.util.setDataAttribute(children[i], 'visible', 'hidden');
+                }
             }
             
             if(hasAtLeastOneVisible === false){
             	alert('There is no test matching your filter');
             }
+
+
+            //update current count
+            this.updateTestCountStat(hashVisibleTestCount);
         }
     },
     _getLiFromInput: function (input) {

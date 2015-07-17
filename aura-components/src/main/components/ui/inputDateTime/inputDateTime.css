@@ -52,8 +52,8 @@ div.THIS:not(.wrapper) {
     display: none;
 }
 
-.THIS.wrapper,
-.THIS .wrapper {
+.THIS.form--stacked,
+.THIS .form--stacked {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
@@ -63,20 +63,16 @@ div.THIS:not(.wrapper) {
 }
 
 .THIS .dateTime-inputDate {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
     width: 50%;
+}
+
+.THIS .dateTime-inputTime {
+    width: 50%;
+    margin-left: 8px;
 }
 
 .THIS .dateTime-inputDate > a.datePicker-openIcon {
     right: 50%;
     padding-right: 0px;
     margin-right: 16px;
-}
-
-.THIS .form--stacked {
-    width: 50%;
-    margin-left: 8px;
 }

@@ -16,7 +16,7 @@
 
 /* The adjacent sibling selector is used for cases when no "label" attribute is passed, which changes the layout
 of the component*/
-div.THIS {
+div.THIS:not(.wrapper) {
 	position: relative;
 }
 

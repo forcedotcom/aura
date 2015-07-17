@@ -62,7 +62,7 @@
     /**
      * Verify displaying Empty spaces.
      */
-    // W-1075402 https://gus.soma.salesforce.com/a07B0000000GCEAIA4
+    // W-1075402
     _testTrimmingSpaces:{
         attributes: {value: '   '},
         test: function(component){
@@ -72,7 +72,7 @@
     /**
      * Verify prefix and suffix trimming of space.
      */
-    // W-1075402 https://gus.soma.salesforce.com/a07B0000000GCEAIA4
+    // W-1075402
     _testTrimmingSpacesAtFrontAndEnd:{
         attributes: {value: '   foo '},
         test: function(component){
@@ -98,8 +98,10 @@
      */
     testCarriageReturn:{
         browsers: ["-IE7", "-IE8"],
+        labels : ["UnAdaptableTest"],
         attributes: {value: '\r\n'},
         test: function(component){
+        	debugger;
         	var tags = component.find("span").getElement().innerHTML;
 			tags = tags.replace(/<!---->/g, '');
             aura.test.assertEquals('<br>', tags, "Failed to convert \r\n\ and \n into <br>");
@@ -124,6 +126,7 @@
      */
     testCarriageReturnLineFeeds:{
         browsers: ["-IE7", "-IE8"],
+        labels : ["UnAdaptableTest"],
         attributes: {value: '\r\na\r\nb\r\n'},
         test: function(component){ 
         	var tags = component.find("span").getElement().innerHTML;

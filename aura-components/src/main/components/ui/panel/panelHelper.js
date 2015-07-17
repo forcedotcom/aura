@@ -300,7 +300,7 @@
                     pad: 5
             }));
 
-            if(pointer) {
+            if(pointer && direction === 'east' || direction === 'west') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:cmp.getElement(),
                     target:pointer,

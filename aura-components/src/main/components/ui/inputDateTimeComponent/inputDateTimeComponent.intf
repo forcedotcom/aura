@@ -1,0 +1,22 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface extends="ui:inputDateComponent" support="PROTO" description="Common interface across input date/time components">
+    <aura:attribute name="timezone" type="String" description="The timezone ID, for example, America/Los_Angeles."/>
+    <aura:attribute name="dateFormat" type="String" description="The java.text.SimpleDateFormat style format for the date."/>
+    <aura:attribute name="timeFormat" type="String" description="The java.text.SimpleDateFormat style format for the time."/>
+</aura:interface>

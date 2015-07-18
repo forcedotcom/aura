@@ -15,7 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup" description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTriggerLink and menuList component.">
+<aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup"
+                description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTriggerLink and menuList component.">
 
-    {!v.body}
+    <div aura:flavorable="true">{!v.body}</div>
+
 </aura:component>

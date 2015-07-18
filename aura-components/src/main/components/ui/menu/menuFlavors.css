@@ -1,0 +1,122 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.THIS .uiTrigger {
+    position: relative;
+    display: inline-block;
+}
+
+.THIS .uiTrigger:hover,
+.THIS .uiTrigger:focus {
+    outline: 0;
+}
+
+.THIS .uiMenuSeparator {
+    border-top: 1px solid #cccccc;
+}
+
+.THIS .uiMenuList {
+    display: none;
+    position: absolute;
+    border-radius: 3px;
+    background-color: #FFF;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, .75);
+    z-index: 1;
+}
+
+.THIS .menu__header {
+    padding: 0.5rem 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.0625em;
+    font-size: 0.9rem;
+    color: #6d6d6d;
+}
+
+.THIS .uiMenuItem > a,
+.THIS .uiMenuItem > span {
+    color: #222;
+    display: block;
+    height: 1.1em;
+    padding: 3px 9px;
+    text-decoration: none;
+}
+
+.THIS .uiMenuItem > a:hover,
+.THIS .uiMenuItem > a:focus,
+.THIS .uiMenuItem > span:hover,
+.THIS .uiMenuItem > span:focus {
+    outline: none;
+    border-radius: 8px;
+    color: #015BA7;
+    text-decoration: underline;
+    background-color: #CFEEF8;
+}
+
+.THIS .uiMenuItem > a:active,
+.THIS .uiMenuItem > span:active {
+    outline: none;
+    color: #222;
+}
+
+.THIS .uiMenuItem > a[aria-disabled="true"],
+.THIS .uiMenuItem > span[aria-disabled="true"] {
+    text-decoration: none;
+    color: lightgray;
+    cursor: default;
+}
+
+.THIS .uiMenuItem > a[aria-disabled="true"]:hover,
+.THIS .uiMenuItem > span[aria-disabled="true"]:hover {
+    background-color: transparent;
+}
+
+.THIS .uiMenuList.menu--nubbin-top {
+    margin-top: 0.5rem;
+}
+
+.THIS .uiMenuList.menu--nubbin-top:before {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    transform: rotate(45deg);
+    content: "";
+    background-color: white;
+    left: 50%;
+    top: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.THIS .uiMenuList.menu--nubbin-top:after {
+    width: 1rem;
+    height: 1rem;
+    position: absolute;
+    transform: rotate(45deg);
+    content: "";
+    background-color: white;
+    left: 50%;
+    top: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.THIS .uiMenuList.menu--nubbin-top:before {
+    background: white;
+}
+
+.THIS .uiMenuList.menu--nubbin-top:after {
+    background: white;
+    box-shadow: -1px -1px 0 0 rgba(0, 0, 0, 0.16);
+    z-index: -1;
+}

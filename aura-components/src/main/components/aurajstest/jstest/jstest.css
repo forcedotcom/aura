@@ -130,35 +130,12 @@
     white-space: nowrap;
 }
 
-.aurajstestJstest h1, .aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
-    background-color: #35afe3;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(69, 199, 235)),to(rgb(38, 152, 219)));
-    background-image: -webkit-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -moz-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -o-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: -ms-linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    background-image: linear-gradient(top, rgb(69, 199, 235), rgb(38, 152, 219));
-    filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0,StartColorStr='#45c7eb', EndColorStr='#2698db');
-    border-bottom: 1px solid #103c56;
-    -webkit-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    -moz-box-shadow: inset 0px 1px 0px 0px #6ad2ef;
-    box-shadow: inset 0px 1px 0px 0px #6ad2ef;
+.THIS ul li.uiTabItem.active > a.tabHeader {
+    background: #f78717; /* Old browsers */
 }
 
-.aurajstestJstest ul li.uiTabItem.active > a.tabHeader {
-    color: #333;
-    background: #ffa84c; /* Old browsers */
-    background: -moz-linear-gradient(top, #ffa84c 0%, #ff7b0d 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffa84c), color-stop(100%,#ff7b0d)); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top, #ffa84c 0%,#ff7b0d 100%); /* IE10+ */
-    background: linear-gradient(to bottom, #ffa84c 0%,#ff7b0d 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa84c', endColorstr='#ff7b0d',GradientType=0 ); /* IE6-9 */
-}
-
-.aurajstestJstest ul li.uiTabItem > a.tabHeader:hover {
-    color: #333;
+.THIS ul li.uiTabItem > a.tabHeader:hover {
+    opacity: 0.8;
     z-index: 100;
 }
 

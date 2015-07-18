@@ -45,7 +45,7 @@ Aura.Utils.Util = function Util() {
  * @returns {Boolean} true if Internet Explorer detected
  * @export
  */
-Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || (navigator.userAgent.indexOf("Trident/") != -1);
+Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") !== -1) || (navigator.userAgent.indexOf("Trident/") !== -1);
 
 /**
  * Whether IOS7 UIWebView
@@ -55,7 +55,7 @@ Aura.Utils.Util.prototype.isIE = (navigator.userAgent.indexOf("MSIE") != -1) || 
 Aura.Utils.Util.prototype.isIOSWebView = function() {
     if (this._isIOSWebView === undefined) {
         var ua = window.navigator.userAgent;
-        this._isIOSWebView = /(iPad|iPhone|iPod);.*CPU.*OS 7_\d.*AppleWebKit/i.test(ua) && ua.indexOf("Safari") == -1;
+        this._isIOSWebView = /(iPad|iPhone|iPod);.*CPU.*OS 7_\d.*AppleWebKit/i.test(ua) && ua.indexOf("Safari") === -1;
     }
     return this._isIOSWebView;
 };
@@ -248,7 +248,7 @@ Aura.Utils.Util.prototype.createHtmlElement = function (tagName, attributes) {
     for (var attributeName in attributes) {
         var value = attributes[attributeName];
         if (!this.isUndefinedOrNull(value)) {
-            if (this.isString(value) && value.indexOf("/auraFW") == 0) {
+            if (this.isString(value) && value.indexOf("/auraFW") === 0) {
                 // prepend any Aura resource urls with servlet context path
                 value = $A.getContext().getContextPath() + value;
             }
@@ -462,6 +462,7 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
         if(attribute){
             var useShadowClass=false;
             var oldClass=element.getShadowAttribute(attribute);
+            /*eslint eqeqeq:0 */
             if(oldClass!=undefined){
                 useShadowClass=true;
             }else{
@@ -479,7 +480,7 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
     }
     if(element && element.tagName){
         constructedClass=this.buildClass(element["className"]||"",newClass,remove);
-        if(element["className"]!=constructedClass) {
+        if(element["className"]!==constructedClass) {
             element["className"]=constructedClass;
         }
     }
@@ -535,7 +536,7 @@ Aura.Utils.Util.prototype.buildFlavorClass = function(cmp, flavor) {
     var split = flavor.split(",");
     var clz = "";
     for (var i = 0, len = split.length; i < len; i++) {
-        if (i != 0) {
+        if (i !== 0) {
             clz += " ";
         }
 
@@ -783,7 +784,7 @@ Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
     return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index){
-        if(formatArguments[index]==undefined){
+        if(formatArguments[index]===undefined){
             //#if {"modes" : ["PRODUCTION"]}
             match='';
             //#end
@@ -1189,6 +1190,7 @@ Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* 
             var setValue=forceCopy||!baseObject.hasOwnProperty(property);
             if(setValue||deepCopy){
                 value=members[property];
+                /*eslint eqeqeq:0 */
                 if(deepCopy&&value!=undefined) {
                     var branchValue = null;
                     switch (value.constructor) {
@@ -2167,7 +2169,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
         var script = cache[url];
 
         if (script) {
-            if (script.state == "LOADED") {
+            if (script.state === "LOADED") {
                 callback.call();
             } else {
                 script.queue.push(callback);

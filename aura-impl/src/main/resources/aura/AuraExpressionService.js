@@ -207,7 +207,7 @@ AuraExpressionService.prototype.normalize = function(expression) {
 
         // Remove leading {! and {# as well as trailing } notation.
         if (expression.charAt(0) === "{" && expression.charAt(expression.length - 1) === "}" &&
-            (expression.charAt(1) === "!" || expression.charAt(1) == "#")) {
+            (expression.charAt(1) === "!" || expression.charAt(1) === "#")) {
 
             expression = expression.slice(2, -1).trim();
         }
@@ -257,7 +257,7 @@ AuraExpressionService.prototype.resolve = function(expression, container, rawVal
         if(!target["hasOwnProperty"](segment)) {
             var searchkey = segment.toLowerCase();
             for(var key in target){
-                if(target.hasOwnProperty(key) && key.toLowerCase() == searchkey) {
+                if(target.hasOwnProperty(key) && key.toLowerCase() === searchkey) {
                     // You can't include container and target in the error, as it will json serialize it and causes a max iteration exception.
                     $A.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
                     return null;

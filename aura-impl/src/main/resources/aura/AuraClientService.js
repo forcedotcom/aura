@@ -287,7 +287,7 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     // Of course, we also have the problem that we might not have valid JSON at all, in which case
     // we have further problems...
     //
-    if ((response["status"] != 200) || (text.length > 9 && text.charAt(text.length - 9) === "/" //
+    if ((response["status"] !== 200) || (text.length > 9 && text.charAt(text.length - 9) === "/" //
         && text.charAt(text.length - 8) === "*" //
         && text.charAt(text.length - 7) === "E" //
         && text.charAt(text.length - 6) === "R" //

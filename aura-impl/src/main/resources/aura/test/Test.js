@@ -595,7 +595,7 @@ TestInstance.prototype.print = function(value) {
         return "undefined";
     } else if (value === null) {
         return "null";
-    } else if ("string" == typeof value) {
+    } else if ("string" === typeof value) {
         return '"' + value + '"';
     } else {
         return value.toString();
@@ -1263,7 +1263,7 @@ TestInstance.prototype.select = function() {
  */
 TestInstance.prototype.contains = function(testString, targetString) {
     if (!$A.util.isUndefinedOrNull(testString)) {
-        return (testString.indexOf(targetString) != -1);
+        return (testString.indexOf(targetString) !== -1);
     }
     return false;
 };
@@ -1461,7 +1461,7 @@ TestInstance.prototype.isInstanceOfText = function(node) {
     if (window.Text) {
         return node instanceof window.Text;
     }
-    return node.nodeType == 3;
+    return node.nodeType === 3;
 };
 
 /**
@@ -1586,7 +1586,7 @@ TestInstance.prototype.isInstanceOf = function(element, elementType, tag) {
     if (elementType) {
         return element instanceof elementType;
     }
-    return element.nodeType == 1 && element.tagName.toLowerCase() == tag;
+    return element.nodeType === 1 && element.tagName.toLowerCase() === tag;
 };
 
 /**
@@ -1733,7 +1733,7 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
 	            cb_config.action = cb_config.action.refreshAction;
 	        }
 	        if (cb_config.action && !( actions.indexOf(cb_config.action) >= 0)) {
-	            if (cb_config.action.getState() == 'NEW') {
+	            if (cb_config.action.getState() === 'NEW') {
 	                this.prePostSendConfigs.push(cb_config);//push it back, we will check in the next send
 	            } else {
 	                // whoops, removing without call, warn the user

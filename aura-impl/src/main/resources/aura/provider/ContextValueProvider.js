@@ -117,7 +117,7 @@ ContextValueProvider.prototype.get = function(key) {
  * @return {Object} the value that was set.
  */
 ContextValueProvider.prototype.set = function(key, value) {
-    $A.assert(key.indexOf('.') == -1, "Unable to set value for key '" + key + "', did you add an extra '.'?");
+    $A.assert(key.indexOf('.') === -1, "Unable to set value for key '" + key + "', did you add an extra '.'?");
     if ($A.util.isExpression(value)) {
         throw new Error("Unable to set global value '"+key+"' to the expression '"+value+"'. Global items must be constants");
     }

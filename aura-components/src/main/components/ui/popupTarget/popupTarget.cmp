@@ -27,6 +27,8 @@
 	<aura:attribute name="closeOnClickInside" type="Boolean" default="false" description="Close target when user clicks or taps inside of the target" />
 	<aura:attribute name="preTransitionClass" type="String" default="" description="This CSS class is initially applied to the target then removed prior to toggling the visible class. This is to allow for CSS transitions." />
 
+    <aura:attribute name="showNubbin" type="Boolean" default="false" description="Shows a little triangle at the top when used in a menu." />
+
     <aura:registerEvent name="popupCollapse" type="ui:collapse" description="The event fired when the popup target list collapses."/>
     <aura:registerEvent name="popupExpand" type="ui:expand" description="The event fired when the popup target list displays."/>
     <aura:registerEvent name="popupKeyboardEvent" type="ui:popupKeyboardEvent" description="The event fired when the user interacts with the popup using the keyboard."/>
@@ -42,7 +44,7 @@
 		</div>
 		
 		<aura:set attribute="else">
-			<div aura:id="popupTarget" class="{!v.class + ' popupTargetContainer ' + v.preTransitionClass}">
+			<div aura:id="popupTarget" class="{!v.class + ' popupTargetContainer ' + v.preTransitionClass + (v.showNubbin == true ? ' menu--nubbin-top' : '')}">
 				{!v.body}
 			</div>
 		</aura:set>

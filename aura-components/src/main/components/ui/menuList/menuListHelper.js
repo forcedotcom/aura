@@ -24,7 +24,6 @@
         if (items && $A.util.isArray(items)) {
             this.setHandlersOnMenuItems(concrete, items, children);
         }
-
         concrete.set("v.childMenuItems", children);
     },
 

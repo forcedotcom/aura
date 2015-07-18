@@ -14,31 +14,5 @@
  * limitations under the License.
  */
 .THIS a {
-    color: #ccc;
     display:block;
-    height: 1.1em;
-    padding:3px 9px;
-    text-decoration:none;
-}
-
-.THIS a.selectable {
-    text-decoration:none;
-    color:#222;
-}
-
-.THIS a:focus,
-.THIS a:active {
-    outline:none;
-    border-radius:8px;
-    background-color:#CFEEF8;
-    padding:3px 9px;
-}
-
-.THIS a.selectable:focus,
-.THIS a.selectable:active {
-    outline:none;
-    border-radius:8px;
-    color:#015BA7;
-    text-decoration:underline;
-    background-color:#CFEEF8;
 }

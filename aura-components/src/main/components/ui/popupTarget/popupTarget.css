@@ -24,7 +24,6 @@ div.THIS {
 	border-radius:3px;
     background-color:#FFF;
     box-shadow:0 1px 5px rgba(0, 0, 0, .75);
-    overflow-x:auto;
 }
 
 .THIS.popupCurtain {

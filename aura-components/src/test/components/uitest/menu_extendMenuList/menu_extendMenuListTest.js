@@ -15,9 +15,8 @@
  */
 ({
 	clickTrigger: function (trigger) {
-		//this.clickTrigger(trigger);
-		// We need to figure out a better way to access the clickable part of the trigger
-		trigger.getElement().firstChild.firstChild.click();
+		var anchor = trigger.getElement().getElementsByTagName("a")[0];
+		anchor.click();
 	},
 	/**
 	 * Test to verify action menu works when interacting with the menu items 

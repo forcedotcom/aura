@@ -42,10 +42,10 @@ public class TestSetRunnerController {
      * @throws Exception
      */
     @AuraEnabled
-    public static void runTestSet(@Key("testSet") List<String> tests) throws Exception {
-        changeStatus(tests, "ENQUEUED");
+    public static void runTestSet(@Key("testSet") List<String> tests, @Key("scope") String scope) throws Exception {
+        changeStatus(tests, "ENQUEUED", scope);
         for (String name : tests) {
-            StatefulTestRun testRunner = new StatefulTestRun(name);
+            StatefulTestRun testRunner = new StatefulTestRun(name, scope);
             TestExecutor.getInstance().submit(testRunner);
         }
     }
@@ -56,9 +56,9 @@ public class TestSetRunnerController {
      * @param tests the tests to update
      * @param status the new status to give to the tests
      */
-    private static void changeStatus(List<String> tests, String status) throws Exception {
+    private static void changeStatus(List<String> tests, String status, String scope) throws Exception {
         for (String t : tests) {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstanceByScope(scope);
             testRunnerState.setTestProp(t, "status", status);
             testRunnerState.setTestProp(t, "exception", "");
         }
@@ -68,9 +68,9 @@ public class TestSetRunnerController {
      * Query the current status of test execution.
      */
     @AuraEnabled
-    public static Map<String, Object> pollForTestRunStatus() throws Exception {
+    public static Map<String, Object> pollForTestRunStatus(@Key("scope") String scope) throws Exception {
         Map<String, Object> r = new HashMap<>();
-        Map<String, Map<String, Object>> m = TestSetRunnerState.getFuncInstance().getTestsWithPropertiesMap();
+        Map<String, Map<String, Object>> m = TestSetRunnerState.getInstanceByScope(scope).getTestsWithPropertiesMap();
         r.put("testsRunning", TestExecutor.getInstance().isActive());
         r.put("testsWithPropsMap", m);
         return r;
@@ -81,15 +81,22 @@ public class TestSetRunnerController {
      */
     private static class StatefulTestRun extends TestRun {
         private final String testName;
+		private String scope;
 
         public StatefulTestRun(String testName) {
             super(TestSetRunnerState.getFuncInstance().getInventory().get(testName), new TestResult());
             this.testName = testName;
         }
+        
+        public StatefulTestRun(String testName, String scope) {
+            super(TestSetRunnerState.getInstanceByScope(scope).getInventory().get(testName), new TestResult());
+            this.testName = testName;
+            this.scope = scope;
+        }
 
         @Override
         public TestResult call() throws Exception {
-            TestSetRunnerState testRunnerState = TestSetRunnerState.getFuncInstance();
+            TestSetRunnerState testRunnerState = TestSetRunnerState.getInstanceByScope(scope);
             boolean finished = false;
             assert (test != null) : "Encountered an unknown test: " + testName;
             testRunnerState.setTestProp(testName, "status", "RUNNING");

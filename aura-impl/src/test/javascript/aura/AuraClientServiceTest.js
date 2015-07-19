@@ -719,11 +719,11 @@ Test.Aura.AuraClientServiceTest = function() {
                     }
                 },
                 location: {
-                    href: "http://localhost:9090/auratest/testPerfRunner.app?foo=bar bar"
+                    href: "http://localhost:9090/test/runner.app?foo=bar bar"
                 }
             });
 
-            expected = "testPerfRunner.app?nocache=http%3A%2F%2Flocalhost%3A9090%2Fauratest%2FtestPerfRunner.app%3Ffoo%3Dbar%2bbar";
+            expected = "runner.app?nocache=http%3A%2F%2Flocalhost%3A9090%2Ftest%2Frunner.app%3Ffoo%3Dbar%2bbar";
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });

@@ -17,51 +17,65 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,900,300italic);
 
 html, body {
-	padding:0;
-	margin: 0;
-	font-family: 'Source Sans Pro', sans-serif;
+    padding:0;
+    margin: 0;
+    font-family: 'Source Sans Pro', sans-serif;
+    text-align: center;
 }
 
 nav {
- 	background-color: #304A62;
- 	width: 100%;
- 	margin-bottom: 25px;
+     background-color: #304A62;
+     width: 100%;
+     margin-bottom: 25px;
  }
  
  header {
- 	font-size: 28px;
- 	font-weight: 400;
- 	padding-left: 20px;
- 	padding-bottom: 50px;
+     font-size: 28px;
+     font-weight: 400;
+     padding: 20px;
  }
  
+ul {
+    padding: 10px;
+    margin: 0;
+}
+
 ul li {
-	border-bottom: 1px solid #e3e3e3;
-	letter-spacing: 0.1em;
-	list-style: none;
-	background-color: #fbf0f0;
-	padding: 15px 20px 15px 20px;
-	border-radius: 4px;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	width: 150px;
-	margin-bottom: 50px;
-		-moz-transition: background-color .25s ease-in-out;
-	-webkit-transition: background-color .25s ease-in-out;
-	-o-transition: background-color .25s ease-in-out;
-	-ms-transition: background-color .25s ease-in-out;
-	transition: background-color .25s ease-in-out;
+    border-bottom: 1px solid #e3e3e3;
+    letter-spacing: 0.1em;
+    list-style: none;
+    border-radius: 4px;
+    margin: 20px 10px;
+
+    -moz-transition: background-color .25s ease-in-out;
+    -webkit-transition: background-color .25s ease-in-out;
+    -o-transition: background-color .25s ease-in-out;
+    -ms-transition: background-color .25s ease-in-out;
+    transition: background-color .25s ease-in-out;
+}
+
+li.docs {
+    background-color: #F0F4FB;
+}
+
+li.docs:hover {
+    background-color: #759ADD;
+}
+
+li.test {
+    background-color: #fbf0f0;
+}
+
+li.test:hover {
+    background-color: #dd757b;
 }
 
 a {
-	text-decoration: none;
-	color: #333;
-	text-transform: uppercase;
-	font-family: 'Arial', sans-serif;
+	display: block;
+    text-decoration: none;
+    color: #333;
+    text-transform: uppercase;
+    font-family: 'Arial', sans-serif;
+    padding: 25px;
 }
 
-ul li:hover {
-	background-color: #dd757b;
-	
-	
-}

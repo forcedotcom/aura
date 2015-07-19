@@ -86,8 +86,17 @@ public class TestSetRunnerState {
     private SortedMap<String, Map<String, Object>> testsWithPropsMap = Maps.newTreeMap();
 
     /**
+     * Return the type of Instance based on scope
      * @return the singleton instance.
      */
+    public static TestSetRunnerState getInstanceByScope (String scope) {
+    	if (scope != null && scope.equalsIgnoreCase("perf")) {
+			return TestSetRunnerState.getPerfInstance();
+		} else {
+			return TestSetRunnerState.getFuncInstance();
+		}
+    }
+    
     public static TestSetRunnerState getFuncInstance() {
         return FuncSingletonHolder.FUNC_INSTANCE;
     }

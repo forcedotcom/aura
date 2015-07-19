@@ -13,8 +13,14 @@ function PerfRunner(COQL, Memory) {
         return {
             COQL    : COQL,
             Memory  : Memory,
-            results : {customMetrics: {}},
+            results : { commonMetrics: {}, customMetrics: {} },
 
+            setCommonMetric: function (key, value) {
+                this.results.commonMetrics[key] = value;
+            },
+            setCustomMetrics: function (key, value) {
+                this.results.customMetrics[key] = value;
+            },
             setContainer: function (container) {
                 var valid = container instanceof HTMLElement || $A.util.isComponent(container);
                 $A.assert(valid, 'Container needs to be an Aura Component or an HTML Element');
@@ -43,7 +49,7 @@ function PerfRunner(COQL, Memory) {
                 if (dom) {
                     $A.util.removeClass(dom, classFinishTest);
                 }
-                this.results   = { customMetrics : {} };
+                this.results = { commonMetrics: {}, customMetrics : {} };
                 return this;
             },
             loadComponent: function () {
@@ -137,6 +143,7 @@ function PerfRunner(COQL, Memory) {
                 }
             },
             startMetricsCollection: function () {
+                this.setCommonMetric('initialComponentCount', $A.componentService.countComponents());
                 $A.metricsService.transactionStart('PERFRUNNER', 'run');
                 COQL.snapshot('start');
                 TIMESTAMP('perfRunner:start');
@@ -149,6 +156,7 @@ function PerfRunner(COQL, Memory) {
                     transaction = t;
                 }); // sync
 
+                this.setCommonMetric('finalComponentCount', $A.componentService.countComponents());
                 if (COQL.enabled) {
                     this.results.coql = COQL.getResults('end', 'start');
                 }

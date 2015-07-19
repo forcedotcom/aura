@@ -15,12 +15,17 @@
  */
 .THIS.myclass {
     border: 1px red solid;
- }
- 
-.aurajstestJstestCase h1{
-	font-size:18px;
+}
+
+.THIS .lastStage {
+    margin-top: 15px;
+}
+
+.aurajstestJstestCase h1 {
+    font-size: 18px;
 }
 
 .aurajstestJstestCase section p pre {
+    padding: 10px;
     display: block;
 }

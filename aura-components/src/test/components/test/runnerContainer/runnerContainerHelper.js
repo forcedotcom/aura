@@ -524,7 +524,7 @@
         }
 
         if (tests.length) {
-            testRunner.setParams({testSet: tests});
+            testRunner.setParams({testSet: tests, scope: cmp.get('v.scope')});
             testRunner.setCallback(this, function(action) {
                    if (action.getState() === "SUCCESS") {
                        setTimeout(function () {
@@ -598,6 +598,8 @@
             dom        = containerDOM || cmp.getElement();
         
         pollAction.setAbortable(true);
+        pollAction.setParams({scope: cmp.get('v.scope')});
+
         pollAction.setCallback(this, function (action) {
             if (action.getState() === "SUCCESS") {
                 var actionResult = action.getReturnValue();
@@ -605,10 +607,10 @@
                 if (actionResult.testsRunning) {
                     setTimeout(function() {
                         self.pollTestResults(cmp, dom, action, testRunnerActionCurrent);
-                                   }, pollTime);
-                            } else {
-                                          self.finishTestRun(cmp, actionResult, dom, true);
-                            }
+                    }, pollTime);
+                } else {
+                    self.finishTestRun(cmp, actionResult, dom, true);
+                }
             } else if (action.getState() == "INCOMPLETE" || action.getState() == "ERROR"){
                    alert("poll Action un-successful (return state = "+action.getState()+"), please check the server");
                    self.finishTestRun(cmp, null, null, false);//we still better to clear cmp._XXX up

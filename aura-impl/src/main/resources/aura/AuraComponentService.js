@@ -79,6 +79,18 @@ AuraComponentService.prototype.getComponent = function(identifier) {
 };
 
 /**
+ * Gets an instance of a component from either a GlobalId or a DOM element that was created via a Component Render.
+ * @param {Object} identifier that is either a globalId or an element.
+ *
+ * @public
+ * @platform
+ * @export
+ */
+AuraComponentService.prototype.countComponents = function() {
+    return Object.keys(this.indexes.globalId).length;
+};
+
+/**
  * Gets the rendering component for the provided element recursively.
  * @param {Object} element The element that is used to find the rendering component
  * @memberOf AuraComponentService

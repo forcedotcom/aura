@@ -1,0 +1,33 @@
+<aura:component 
+    extends="performance:perfTest" 
+    description="Test memory leaks in iteration when setting data multiple times before rendering"
+>
+    <!-- 
+        :: Detailed explanation:
+
+        We set two batches of data (same shape, values, length but different objects !==)
+        before the rendering cycle starts.
+
+        Iteration will create components inmediately after the data is set.
+        Once we set the second batch of data, iteration should correctly destroy
+        the component from the first set and create the news ones withouh any leaks.
+
+        Due to the current implementation of the rendering algorithm, iteration can
+        detect changes and optimize the data change (diffing what changed) once the 
+        components are rendered.
+        
+        But in the case where we set multiple times before the rendering, we need to
+        make sure the state is always consistent and the previously set components
+        are correctly cleaned up.
+
+    -->
+    <aura:attribute name="initialState"    type="Object" />
+    <aura:attribute name="iterationItems"  type="Object" />
+
+    <div class="container">
+        <aura:iteration aura:id="iteration" items="{!v.iterationItems}" var="i">
+            {!i.value}
+        </aura:iteration>
+    </div>
+
+</aura:component>

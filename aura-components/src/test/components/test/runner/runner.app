@@ -24,17 +24,17 @@
 			<span class="title">
 				<aura:if isTrue="{!v.scope == 'perf'}">
 					<span>Perf Test Runner | </span>
-					<a href="?scope=func">Func</a>
+					<a class="pt" href="?scope=func">Func</a>
 				<aura:set attribute="else">
 				    <span>Func Test Runner | </span>
-				    <a href="?scope=perf">Perf</a>
+				    <a class="pt" href="?scope=perf">Perf</a>
 				</aura:set>	
 				</aura:if>
                 <span id="pageState">Loading, First load might be slow...</span>
 			</span>
 		</header>
 		<section class="center">
-    		<auratest:testPerfRunnerContainer aura:id="container" scope="{!v.scope}" keyword="{!v.keyword}" aura:load="lazy"/>
+    		<test:runnerContainer aura:id="container" scope="{!v.scope}" keyword="{!v.keyword}" aura:load="lazy"/>
     	</section>
     	<footer>
     		<span class="status-bar"></span>

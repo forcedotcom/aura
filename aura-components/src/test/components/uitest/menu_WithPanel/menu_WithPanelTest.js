@@ -39,7 +39,8 @@
     },
     
     clickTrigger: function (trigger) {
-    	$A.test.clickOrTouch(trigger.getElement().firstChild.firstChild);
+		var anchor = trigger.getElement().getElementsByTagName("a")[0];
+		anchor.click();
     },
     
     closePanel : function(cmp, closeDialogLabel, totalPanels) {

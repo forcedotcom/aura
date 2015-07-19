@@ -35,5 +35,16 @@
             cmp = cmp.getSuper();
         }
         return retCmp;
+    },
+
+    handleClick: function (component) {
+        var concreteCmp = component.getConcreteComponent();
+        this.handleTriggerPress(concreteCmp);
+        this.fireMenuTriggerPress(concreteCmp);
+    },
+
+    fireMenuTriggerPress: function(component, index) {
+        component.get("e.menuTriggerPress").fire();
     }
+
 })

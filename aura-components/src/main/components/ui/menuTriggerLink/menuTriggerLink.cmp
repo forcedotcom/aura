@@ -15,17 +15,22 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:menuTrigger" description="A link that triggers a dropdown menu.">
+<aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu.">
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
+    <aura:registerevent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
 
-    <a aura:id="link" class="{!v.class}" title="{!v.title}">
-        <aura:if isTrue="{!v.body.length == 0}">
-            {!v.label}
-            <aura:set attribute="else">
-                {!v.body}
-            </aura:set>
-        </aura:if>
-        <span class="assistiveText">{!v.title}</span>
-    </a>
+    <aura:set attribute="trigger">
+        <div aura:id="menuTrigger" aria-haspopup="true">
+            <a aura:id="link" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
+                <aura:if isTrue="{!v.body.length == 0}">
+                    {!v.label}
+                    <aura:set attribute="else">
+                        {!v.body}
+                    </aura:set>
+                </aura:if>
+                <span class="assistiveText">{!v.title}</span>
+            </a>
+        </div>
+    </aura:set>
 
 </aura:component>

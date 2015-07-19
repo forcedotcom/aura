@@ -68,7 +68,7 @@
                 error = errorsInCallbackFunc[i];
                 msg += error.message;
                 if (error["lastStage"]) {
-                    msg += "<br/><pre>" + error["lastStage"] + "</pre>";
+                    msg += "<div class='lastStage'><pre>" + error["lastStage"] + "</pre></div>";
                 }
             }
             cmp.find("results").getElement().innerHTML = msg;

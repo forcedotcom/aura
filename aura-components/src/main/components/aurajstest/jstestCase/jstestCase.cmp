@@ -44,7 +44,7 @@
                     <a onclick="{!c.rerun}">Re-run</a>&nbsp;
                     <a href="{!v.individualTestUrl}" target="_">Run in a new tab</a>
                 </div>
-                <aura:set attribute="else"><h1>Test <sub>{!v.case.name}</sub></h1></aura:set>
+                <aura:set attribute="else"><h1>Running Test <sub>{!v.case.name}</sub></h1></aura:set>
             </aura:if>
             <div aura:id="results" class="results"></div>
         </section>

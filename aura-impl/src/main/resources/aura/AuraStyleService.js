@@ -37,6 +37,9 @@ function AuraStyleService() {
  * loaded StyleDefs (i.e., any dynamically loaded components with
  * styles, that are not in the application's dependency graph). Client
  * loaded StyleDefs will be appended after the standard application CSS.
+ * Note that this may not be adequate with certain usages of providers.
+ * See the config options for more details.
+ * <p>
  * Extra StyleDefs to load may be specified through the config object,
  * which will be appended last.
  * <p>
@@ -68,6 +71,14 @@ function AuraStyleService() {
  *          option may not properly override everything depending on where in the DOM you placed
  *          the styles. Also note that the <code>replaceExisting</code> param will not handle
  *          any styles you attach to the DOM manually.
+ * @param {boolean} [config.forceClientScan=false]
+ *          When false (the default), the server will automatically attempt to discover any client-loaded
+ *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
+ *          detection on the client and the data sent to the server manually instead. Note that this option
+ *          is less performant than the default, however it may be applicable when using providers (and the
+ *          provided defs cannot be determined from the server). The default option is sufficient to include
+ *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
+ *          components from those.
  * @export
  */
 AuraStyleService.prototype.applyTheme = function(theme, config) {
@@ -87,6 +98,9 @@ AuraStyleService.prototype.applyTheme = function(theme, config) {
  * loaded StyleDefs (i.e., any dynamically loaded components with
  * styles, that are not in the application's dependency graph). Client
  * loaded StyleDefs will be appended after the standard application CSS.
+ * Note that this may not be adequate with certain usages of providers.
+ * See the config options for more details.
+ * <p>
  * Extra StyleDefs to load may be specified through the config object,
  * which will be appended last.
  * <p>
@@ -118,6 +132,14 @@ AuraStyleService.prototype.applyTheme = function(theme, config) {
  *          option may not properly override everything depending on where in the DOM you placed
  *          the styles. Also note that the <code>replaceExisting</code> param will not handle
  *          any styles you attach to the DOM manually.
+ * @param {boolean} [config.forceClientScan=false]
+ *          When false (the default), the server will automatically attempt to discover any client-loaded
+ *          StyleDefs (i.e., defs applied individually via server action). Specify true to force this
+ *          detection on the client and the data sent to the server manually instead. Note that this option
+ *          is less performant than the default, however it may be applicable when using providers (and the
+ *          provided defs cannot be determined from the server). The default option is sufficient to include
+ *          any defs loaded through the framework directly (e.g., via getComponent) and any inner/dependent
+ *          components from those.
  * @export
  */
 AuraStyleService.prototype.applyThemes = function(themes, config) {
@@ -128,10 +150,26 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
     $A.run(function() {
         $A.Perf.mark("applyThemes");
 
+        // scan for client-loaded style defs if necessary
+        var clientLoaded = [];
+        if (config["forceClientScan"]) {
+            var allDefs = $A.componentService.getRegisteredComponentDescriptors();
+            for (var i = 0, len = allDefs.length; i < len; i++) {
+                var cmp = $A.componentService.getDef(allDefs[i]);
+                if (!$A.util.isUndefinedOrNull(cmp)) {
+                    var styleDef = cmp.getStyleDef();
+                    if(!$A.util.isUndefinedOrNull(styleDef) && !styleDef.isPreloaded()) {
+                        clientLoaded.push(styleDef.getDescriptor().getQualifiedName());
+                    }
+                }
+            }
+        }
+
         var action = $A.get("c.aura://DynamicStylingController.applyThemes");
 
         action.setParams({
             "themes": themes,
+            "clientLoaded" : clientLoaded,
             "extraStyles": config["extraStyles"] || []
         });
 
@@ -140,8 +178,8 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
             action.setStorable();
         }
 
-        
-        
+
+
         action.setCallback(this, function(a) {
             if (a.getState() === "SUCCESS") {
                 // if custom handler is specified, give it the CSS and do nothing else

@@ -17,7 +17,7 @@ Function.RegisterNamespace("Test.Aura.Test");
 
 [Fixture]
 Test.Aura.TestTest = function() {
-    var $A = { ns : {}, logger : { subscribe : function(){} } };
+    var $A = { ns : {}, logger : { subscribe : function(){} }, installOverride : function() { } };
     var Aura = { Test:{}, Utils:{Transport:function(){}} };
     var window = {};
 

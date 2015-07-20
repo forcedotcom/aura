@@ -64,6 +64,8 @@ TestInstance = function() {
     this.getWhitelistedVariables = function() {
         return _whitelistedPollutants;
     };
+    
+    this.installOverride();
 };
 
 /**
@@ -1853,7 +1855,7 @@ TestInstance.prototype.removePrePostSendCallback = function (handle) {
  * @private
  * @function Test#install
  */
-TestInstance.prototype.install = function() {
+TestInstance.prototype.installOverride = function() {
     // install getAvailableXHR at the end of the chain, since we may not call it.
     $A.installOverride("ClientService.getAvailableXHR", this.getAvailableXHROverride, this, 100);
     $A.installOverride("ClientService.send", this.sendOverride, this, 100);
@@ -1888,8 +1890,6 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
         this.doTearDown();
         return;
     }
-
-    this.install();
 
     if (!timeoutOverride) {
         timeoutOverride = 10;

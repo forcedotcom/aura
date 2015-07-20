@@ -192,7 +192,6 @@
                 )
             }
         )
-        
 
         //check order in weekdays in component levels
         $A.test.assertEquals(
@@ -223,7 +222,6 @@
     updateNameOfWeekDays: function(cmp, mockedFirstWeekday, expectedWeekDays) {
         //mock first date of wecmpek
         this._mockFirstDayOfWeek(mockedFirstWeekday);
-
         //trigger grid update name of weekdays
         var grid = this._getDatepickerGridCmp(cmp);
         var helper = grid.getDef().getHelper();

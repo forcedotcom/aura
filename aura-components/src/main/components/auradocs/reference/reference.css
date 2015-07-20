@@ -100,6 +100,10 @@ footer.THIS {
 	width: 100%;
 }
 
+.THIS .uiTab.active {
+	height: 100%;
+}
+
 /*tables */
 .THIS table {
 	max-width: 100%;

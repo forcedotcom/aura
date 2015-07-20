@@ -21,6 +21,12 @@
         if (component.get("v.allowNew")) {
             var concrete = component.getConcreteComponent();
             this.handleCreatePill(concrete, input);
+
+            //clear keyword
+            var listCmp = component.find("list");
+            if (listCmp) {
+                listCmp.set("v.keyword", "");
+            }
         }
     },
 

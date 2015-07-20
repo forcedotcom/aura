@@ -63,5 +63,5 @@ public interface ComponentDefRef extends Definition {
     /**
      * Gets the flavor.
      */
-    String getFlavor();
+    Object getFlavor();
 }

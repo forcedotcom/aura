@@ -101,7 +101,8 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
 
         String flavor = getSystemAttributeValue("flavor");
         if (!AuraTextUtil.isNullEmptyOrWhitespace(flavor)) {
-            builder.setFlavor(flavor);
+            TextTokenizer tt = TextTokenizer.tokenize(flavor, getLocation());
+            builder.setFlavor(tt.asValue(getParentHandler()));
         }
     }
 

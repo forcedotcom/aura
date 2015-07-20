@@ -802,9 +802,8 @@ AuraRenderingService.prototype.getFlavorClass = function(cmp, element) {
             flavor = valueProvider.getFlavor();
         }
 
-        if (!$A.util.isUndefinedOrNull(flavor) && flavor.indexOf("{") === 0) { // deal with expressions
-            flavor = valueFactory.create(flavor, null, valueProvider.getComponentValueProvider());
-            flavor = $A.util.isExpression(flavor) ? flavor.evaluate() : flavor;
+        if (!$A.util.isUndefinedOrNull(flavor) && $A.util.isExpression(flavor)) { // deal with expressions
+            flavor = flavor.evaluate();
         }
 
         if (staticFlavorable && !$A.util.isUndefinedOrNull(flavor)) {

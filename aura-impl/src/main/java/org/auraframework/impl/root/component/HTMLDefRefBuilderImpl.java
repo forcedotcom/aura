@@ -87,7 +87,7 @@ public class HTMLDefRefBuilderImpl extends ComponentDefRefImpl.Builder implement
     }
 
     @Override
-    public ComponentDefRefBuilder setFlavor(String flavor) {
+    public ComponentDefRefBuilder setFlavor(Object flavor) {
        throw new UnsupportedOperationException("Cannot set flavor on an html tag");
     }
 

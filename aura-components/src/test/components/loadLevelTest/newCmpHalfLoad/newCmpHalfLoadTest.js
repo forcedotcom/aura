@@ -66,7 +66,6 @@
             controllerFuncToCreateCmp: "c.createCmpWithMapValuePropRefValueFromServer"
         },
         test:[ function(cmp) {
-            //$A.test.setTestTimeout(6000000);//for stepping through
             this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){
@@ -126,7 +125,6 @@
             receiverCmpAuraId: "receiverCmp",
         },
         test:[ function(cmp) {
-            //$A.test.setTestTimeout(6000000);//for stepping through
             this.waitForReceiverCmpCreated(cmp);
         },
         function(cmp){

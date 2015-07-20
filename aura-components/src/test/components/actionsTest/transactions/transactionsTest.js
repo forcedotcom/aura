@@ -21,7 +21,6 @@
     testAbortOnOldTransaction : {
         test: [
             function fireFirstAction(cmp) {
-            	//$A.test.setTestTimeout(60000000);
                 var hlp = cmp.getDef().getHelper();
                 cmp.set("v.transactionId", "");
                 hlp.sendAction(cmp, true, undefined,

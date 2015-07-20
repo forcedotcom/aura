@@ -525,7 +525,6 @@
      */
     testAbortStorable : {
         test : [ function(cmp) {
-        	//$A.test.setTestTimeout(60000000);
             var that = this;
             // prime storage -- enqueue action a0 (def:'c.execute' param:'WAIT;READ;' config:{"refresh":0}), wait on server
             var a0 = that.getAction(cmp, "c.execute", "WAIT;READ;", function(a) {

@@ -69,7 +69,10 @@ public class MessageJSONFormatAdapter extends JSONFormatAdapter<Message> {
                 if (cd != null && !cd.equals("UNKNOWN")) {
                     instance.setCallingDescriptor(cd);
                 }
-
+                String v = (String) map.get("version");
+                if (v != null) {
+                    instance.setCallerVersion(v);
+                }
                 actionList.add(instance);
             }
         }

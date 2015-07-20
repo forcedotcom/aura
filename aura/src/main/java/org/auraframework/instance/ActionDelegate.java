@@ -125,6 +125,16 @@ public abstract class ActionDelegate implements Action {
     public void setCallingDescriptor(String caller) {
         original.setCallingDescriptor(caller);
     }
+    
+	@Override
+	public String getCallerVersion() {
+		return original.getCallerVersion();
+	}
+
+	@Override
+	public void setCallerVersion(String callerVersion) {
+		original.setCallerVersion(callerVersion);
+	}
 
     private Action original;
 }

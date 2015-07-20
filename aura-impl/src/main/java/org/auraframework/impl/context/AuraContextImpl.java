@@ -909,35 +909,6 @@ public class AuraContextImpl implements AuraContext {
 
     @Override
     public String getAccessVersion() throws QuickFixException {
-        if (this.currentAction == null) {
-            return null;
-        }
-
-        // only valid for component retrieving actions
-        DefDescriptor<?> desc = this.getCurrentCallingDescriptor();
-        if (desc == null) {
-            desc = this.getCurrentDescriptor();
-        }
-
-        // for non component retrieval action, use appDesc instead
-        if (desc == null) {
-            desc = this.getApplicationDescriptor();
-        }
-
-        if (desc != null && desc.getDefType() == DefType.COMPONENT) {
-            BaseComponentDef def = (BaseComponentDef) Aura.getDefinitionService().getDefinition(desc);
-            DefDescriptor<ComponentDef> d = this.currentAction.getCallingDescriptor();
-            if (d == null) {
-                return null;
-            }
-
-            for (RequiredVersionDef rvd : def.getRequiredVersionDefs().values()) {
-                if (rvd.getName().equals(d.getNamespace())) {
-                    return rvd.getVersion();
-                }
-            }
-        }
-
-        return null;
+        return this.currentAction == null ? null : this.currentAction.getCallerVersion();
     }
 }

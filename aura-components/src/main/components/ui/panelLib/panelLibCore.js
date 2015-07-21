@@ -238,24 +238,34 @@ function (scrollUtil) {
             if(useTransition) {
                 useTransition = this.validateAnimationName(animName);
             }
-            
+
             cmp.set('v.visible', false);
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function (e) {
-                if (config.useTransition) {
-                    panel.removeEventListener(animEl, finishHandler);
+
+                // make sure the compoment is valid befdore  
+                // doining anything with it, because
+                // this is asynchronous
+                if(cmp.isValid()) {
+
+                    if (config.useTransition) {
+                        panel.removeEventListener(animEl, finishHandler);
                     
-                }                
+                    }                
 
                 
+                    config.onFinish && config.onFinish();
+                    setTimeout(function() {
+                        $A.util.removeClass(panel, 'open');
+                        $A.util.removeClass(panel, 'active');
+                        $A.util.removeClass(animEl, 'transitioning ' + animName);
+                    }, 1000); //make sure all transitions are finished
 
-                config.onFinish && config.onFinish();
-                setTimeout(function() {
-                    $A.util.removeClass(panel, 'open');
-                    $A.util.removeClass(panel, 'active');
-                    $A.util.removeClass(animEl, 'transitioning ' + animName);
-                }, 1000); //make sure all transitions are finished
+                } else {
+                    config.onFinish && config.onFinish();
+                }
+
                 
             };
 

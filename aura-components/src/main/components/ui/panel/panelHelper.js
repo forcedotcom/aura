@@ -135,13 +135,19 @@
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
             onFinish: function() {
-                if(cmp.positioned) {
-                    panelEl.style.display = 'none';
+                if(cmp.isValid()) {
+                    if(cmp.positioned) {
+                        panelEl.style.display = 'none';
+                    }
+                    $A.util.removeOn(panelEl, 'keydown', cmp._windowKeyHandler);
+                    $A.util.removeOn(document, 'click', cmp._mouseEventHandler);
+                    cmp.set('v.visible', false);
+                    callback && callback();
+                } else {
+                    // The panel has already been destroyed, 
+                    // possibly by someobody else. Call the callback.
+                    callback && callback();
                 }
-                $A.util.removeOn(panelEl, 'keydown', cmp._windowKeyHandler);
-                $A.util.removeOn(document, 'click', cmp._mouseEventHandler);
-                cmp.set('v.visible', false);
-                callback && callback();
             }
         });
     },

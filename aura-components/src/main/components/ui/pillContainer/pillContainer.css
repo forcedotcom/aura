@@ -59,3 +59,7 @@
 .THIS.maxAllowed input {
     display: none;
 }
+
+.THIS input::-ms-clear {
+    display: none;
+}

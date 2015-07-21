@@ -49,15 +49,6 @@ function Component(config, localCreation, creatingPrototype) {
     this.localIndex = {};
     this.destroyed=false;
 
-    // flavor data
-    if (config["flavorable"]) {
-        this.flavorable = true;
-    }
-
-    if (config["flavor"]) {
-        this.flavor = config["flavor"];
-    }
-
     var context = $A.getContext();
 
     // allows components to skip creation path checks if it's doing something weird
@@ -176,6 +167,9 @@ function Component(config, localCreation, creatingPrototype) {
 
     // starting watching all values for events
     this.setupValueEventHandlers(this);
+
+    // setup flavors
+    this.setupFlavors(config, configAttributes);
 
     // clean up refs to partial config
     this.partialConfig = undefined;
@@ -2162,6 +2156,16 @@ Component.prototype.setupModel = function(config, cmp) {
             config = this.partialConfig["model"];
         }
         this.model = def.newInstance(config || {}, cmp);
+    }
+};
+
+Component.prototype.setupFlavors = function(config, configAttributes) {
+    if (config["flavorable"]) {
+        this.flavorable = true;
+    }
+
+    if (config["flavor"]) {
+        this.flavor = valueFactory.create(config["flavor"], null, configAttributes["valueProvider"]);
     }
 };
 

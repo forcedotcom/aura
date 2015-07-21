@@ -69,7 +69,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     protected final Load load;
     private final boolean isFlavorable;
     private final boolean hasFlavorableChild;
-    private final String flavor;
+    private final Object flavor;
 
     protected ComponentDefRefImpl(Builder builder) {
         super(builder);
@@ -296,7 +296,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
     }
 
     @Override
-    public String getFlavor() {
+    public Object getFlavor() {
         return flavor;
     }
 
@@ -314,7 +314,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         private Load load = Load.DEFAULT;
         private boolean isFlavorable;
         private boolean hasFlavorableChild;
-        private String flavor;
+        private Object flavor;
 
         public Builder() {
             super(ComponentDef.class);
@@ -416,7 +416,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
         }
 
         @Override
-        public ComponentDefRefBuilder setFlavor(String flavor) {
+        public ComponentDefRefBuilder setFlavor(Object flavor) {
             this.flavor = flavor;
             return this;
         }

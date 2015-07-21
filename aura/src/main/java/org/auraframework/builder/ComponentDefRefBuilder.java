@@ -72,5 +72,5 @@ public interface ComponentDefRefBuilder extends DefBuilder<ComponentDef, Compone
      *
      * @see FlavoredStyleDef
      */
-    ComponentDefRefBuilder setFlavor(String flavor);
+    ComponentDefRefBuilder setFlavor(Object flavor);
 }

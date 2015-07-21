@@ -97,7 +97,7 @@
 
                 if (!helper.isElementInComponent(component, event.target)) {
                     // Hide the component
-                    component.set("v.visible", false);
+                    helper.hide(component, false);
 
                     //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
                     var concreteCmp = component.getConcreteComponent();
@@ -189,7 +189,7 @@
     handleESCKey: function(component, event) {
         var keyCode = event.keyCode;
         if (keyCode == 27) { // Esc key is pressed
-            component.setValue("{!v.visible}", false);
+            this.hide(component, true)
         }
     },
 
@@ -215,7 +215,7 @@
         $A.localizationService.getToday($A.get("$Locale.timezone"), function(dateString) {
     		component.set("v._today", dateString);
         });
-        
+
         // Get the localized "Today" label
     	var todayCmp = component.find("today");
         if (!todayCmp) {
@@ -307,7 +307,7 @@
                     targetAlign: 'left bottom'
                 });
                 this.lib.panelPositioning.reposition();
-                                    
+
                 //attaching to the body causes the date to lose focus so we need to add the focus back
                 this.focusDate(component);
             } else {
@@ -374,7 +374,7 @@
             }
         }
     },
-    
+
     setGridInitialValue: function(component) {
         var initialDate = new Date();
         var initialDateStr = component.get("v._today");
@@ -419,7 +419,7 @@
         }
         this.setGridValues(component, initialDate, initialDateStr);
     },
-    
+
     setGridValues: function(component, initialDate, todayStr) {
     	var grid = component.find("grid");
         if (grid) {
@@ -442,7 +442,7 @@
         }
     },
     */
-    
+
     setTitleTag: function(component) {
     	var headingLevel = component.get("v.titleHeadingLevel");
     	if ($A.util.isEmpty(headingLevel)) {
@@ -523,6 +523,16 @@
                 var selectedYear = parseInt(yearCmp.getElement().value,10);
                 e.setParams({monthChange: 0, yearChange: selectedYear - y, setFocus: false});
                 e.fire();
+            }
+        }
+    },
+
+    hide: function(component, shouldFocusReferenceElem) {
+        component.set("v.visible", false);
+        if ($A.get("$Browser.formFactor") == "DESKTOP" && shouldFocusReferenceElem) {
+            var referenceElem = component.get("v.referenceElement");
+            if (!$A.util.isUndefinedOrNull(referenceElem)) {
+                referenceElem.focus();
             }
         }
     }

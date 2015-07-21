@@ -30,7 +30,7 @@
 
     <div aura:flavorable="true" class="{!v.class}">
         <div aura:id="timeDropdown" class="{!(v.visible == true ? 'visible ' : '')  + 'dropdown dropdown--left datepicker datepicker--time scrollable'}" aria-hidden="false" data-selection="time">
-            <ul aura:id="timeList" class="datepicker--time__list" onclick="{!c.selectTime}" onmouseover="{!c.handleMouseover}"/>
+            <ul aura:id="timeList" role="menu" class="datepicker--time__list" onclick="{!c.selectTime}" onmouseover="{!c.handleMouseover}"/>
         </div>
     </div>
 </aura:component>

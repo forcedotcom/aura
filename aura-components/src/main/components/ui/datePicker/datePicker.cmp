@@ -83,7 +83,7 @@
                     <div class="picklist datepicker__filter--year">
                         <label>
                             <span class="assistiveText">year</span>
-                            <select class="select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}"/>
+                            <select class="select picklist__label" aura:id="yearTitle" onchange="{!c.yearChange}" onkeydown="{!c.handleKeydown}"/>
                         </label>
                     </div>
                 </aura:if>

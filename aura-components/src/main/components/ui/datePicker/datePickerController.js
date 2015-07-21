@@ -15,7 +15,7 @@
  */
 ({
     cancel: function(component, event, helper) {
-        component.set("v.visible", false);
+        helper.hide(component, true);
     },
 
     highlightRange: function(component, event) {
@@ -33,7 +33,7 @@
         var keyCode = event.keyCode;
         var shiftKey = event.shiftKey;
         if (keyCode == 9 && shiftKey == true) { // Tab + shift
-            component.set("v.visible", false);
+            helper.hide(component, true);
         }
     },
 
@@ -92,7 +92,7 @@
                     domEvent.preventDefault();
                     helper.focusDate(component);
                 } else { // Tab
-                    component.set("v.visible", false);
+                    helper.hide(component, true);
                 }
             }
         }
@@ -141,7 +141,7 @@
     },
 
     hide: function(component, event, helper) {
-        component.set("v.visible", false);
+        helper.hide(component, true);
     },
 
     selectDate: function(component, event, helper) {
@@ -150,7 +150,7 @@
         selectDateEvent.setParams({"value": selectedDate});
         selectDateEvent.fire();
         if (component.get("v.hideOnSelect")) {
-            component.set("v.visible", false);
+            helper.hide(component, true);
         }
     },
 
@@ -163,7 +163,7 @@
         selectDateEvent.setParams({"value": value});
         selectDateEvent.fire();
         if (component.get("v.hideOnSelect")) {
-            component.set("v.visible", false);
+            helper.hide(component, true);
         }
     },
 
@@ -189,7 +189,7 @@
             });
             setDateTimeEvent.fire();
         }
-        component.set("v.visible", false);
+        helper.hide(component, true);
     },
 
 	updateCalendarTitle: function(component, event, helper) {

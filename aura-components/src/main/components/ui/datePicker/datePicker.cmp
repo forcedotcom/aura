@@ -75,7 +75,7 @@
                             </label>
                         </h2>
                         <aura:set attribute="else">
-                            <span aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
+                            <h2 aria-live="assertive" aria-atomic="true" class="monthYear" aura:id="calTitle"/>
                         </aura:set>
                     </aura:if>
                 </div>

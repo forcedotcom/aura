@@ -507,7 +507,7 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
 /**
  * Get the date's date string based on a time zone.
  * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
- * @param {Date} dateObj a date object 
+ * @param {Date} dateObj a date object
  * @param {Function} callback A function to be called after the "today" value is obtained
  * @return {String} the ISO8601 date string (yyyy-MM-dd).
  * @memberOf AuraLocalizationService
@@ -959,7 +959,8 @@ AuraLocalizationService.prototype.displayDateTime = function(mDate, format, loca
 AuraLocalizationService.prototype.getNormalizedFormat = function(format) {
     if (format) {
         if (!this.cache.format[format]) {
-            var normalizedFormat = format.replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
+            var normalizedFormat = format.replace(/([^yY])[yY](?![yY])/g, "$1YYYY")
+                .replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
             this.cache.format[format] = normalizedFormat;
         }
         return this.cache.format[format];

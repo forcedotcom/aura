@@ -42,6 +42,7 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.items}" action="{!c.onItemsChanged}"/>
+    <aura:handler name="change" value="{!v.maxAllowed}" action="{!c.onItemsChanged}"/>
 
     <div aura:flavorable="true"  onmousedown="{!c.onClickBackground}">
         <ul aura:id="list" class="orderedList">

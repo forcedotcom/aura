@@ -73,9 +73,16 @@
     },
 
     onItemsChanged: function(cmp){
-        var itemsLength = cmp.get("v.items").length
+        var items = cmp.get("v.items");
         var maxAllowed = cmp.get("v.maxAllowed");
-        if (itemsLength >= maxAllowed) {
+
+        //truncate list
+        if (items.length > maxAllowed) {
+            items.splice(maxAllowed-1, items.length - maxAllowed);
+            cmp.set("v.items", items);
+        }
+
+        if (items.length == maxAllowed) {
             $A.util.addClass(cmp.getElement(), 'maxAllowed');
         } else {
             $A.util.removeClass(cmp.getElement(), 'maxAllowed');

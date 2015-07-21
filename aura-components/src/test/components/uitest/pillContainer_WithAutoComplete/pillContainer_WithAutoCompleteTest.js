@@ -291,6 +291,7 @@
         	$A.test.assertFalse($A.util.hasClass(pillContainer.getElement(),"maxAllowed"), "Pill Container should not have className maxAllowed after deleting a pill");
         }]
     },
+
     /**
      * ui:pillContainer should remove maxAllowed class when adding via v.items
      * Bug: W-2663679
@@ -301,8 +302,21 @@
         },
         test: [function (cmp) {
             pillContainer = cmp.find("pillContainer");
-            pillContainer.set("v.items",[this.PILLS[0]]);
+            pillContainer.set("v.items",[this.PILLS[0],this.PILLS[1]]);
             $A.test.assertTrue($A.util.hasClass(pillContainer.getElement(),"maxAllowed"), "Pill Container should have className maxAllowed after reaching max allowed pills");
+            $A.test.assertEquals(1, $A.test.select(".pill").length, "There should only be one pill");
+        }]
+    },
+
+    /**
+     * ui:pillContainer should remove maxAllowed class when adding via v.items
+     * Bug: W-2663679
+     */
+    testChangingMaxAllowed: {
+        test: [function (cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            pillContainer.set("v.maxAllowed",1)
+            $A.test.assertEquals(1, $A.test.select(".pill").length, "There should only be one pill");
         }]
     },
 

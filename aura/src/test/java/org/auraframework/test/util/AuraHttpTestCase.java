@@ -749,5 +749,14 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         @Override
         public void setCallingDescriptor(String caller) {
         }
+
+		@Override
+		public String getCallerVersion() {
+			return null;
+		}
+
+		@Override
+		public void setCallerVersion(String callerVersion) {
+		}
     }
 }

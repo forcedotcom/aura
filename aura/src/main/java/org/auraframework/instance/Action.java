@@ -135,4 +135,8 @@ public interface Action extends Instance<ActionDef> {
     public DefDescriptor<ComponentDef> getCallingDescriptor();
 
     public void setCallingDescriptor(String caller);
+    
+    public String getCallerVersion();
+
+    public void setCallerVersion(String callerVersion);
 }

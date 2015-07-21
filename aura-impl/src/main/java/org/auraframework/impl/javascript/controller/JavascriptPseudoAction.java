@@ -144,4 +144,14 @@ public class JavascriptPseudoAction implements Action {
     public void setCallingDescriptor(String caller) {
         throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
     }
+
+	@Override
+	public String getCallerVersion() {
+		throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
+	}
+
+	@Override
+	public void setCallerVersion(String callerVersion) {
+		throw new UnsupportedOperationException("client-side Javascript actions do not have set calling descriptor");
+	}
 }

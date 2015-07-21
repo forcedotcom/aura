@@ -603,6 +603,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         String descr = "java://org.auraframework.components.test.java.controller.VersionTestController/ACTION$getContextAccessVersion";
         Action action = (Action) Aura.getInstanceService().getInstance(descr,ActionDef.class);
         action.setCallingDescriptor("markup://auratest:requireWithServerAction");
+        action.setCallerVersion("2.0");
         ctx.setCurrentAction(action);
         ctx.setApplicationDescriptor(Aura.getDefinitionService().getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
 

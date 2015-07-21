@@ -51,7 +51,7 @@
             function(cmp) {
                 var actual = cmp.find("auratest_requireConsumer").get("v.versionInConsumedCmp");
                 this.updateVersion(cmp, actual);
-                $A.test.assertEquals("5.0", actual);
+                $A.test.assertEquals("123456.0", actual);
             }
         ]
      },
@@ -105,7 +105,10 @@
         ]
     },
 
-    testVersionFromServerControllerOfCreatedCmp: {
+    /**
+     * TODO: W-2609199
+     */
+    _testVersionFromServerControllerOfCreatedCmp: {
         test:[
             function(cmp) {
                 var action = cmp.get("c.updateVersionFromCreatedComponentServerController");

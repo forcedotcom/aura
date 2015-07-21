@@ -1152,7 +1152,8 @@ Action.prototype.toJSON = function() {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
         "callingDescriptor" : (this.callingCmp ? (this.callingCmp.getDef() ? this.callingCmp.getDef().getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN"),
-        "params" : this.params
+        "params" : this.params,
+        "version" : (this.cmp ? this.cmp.getVersion() : null)
     };
 };
 

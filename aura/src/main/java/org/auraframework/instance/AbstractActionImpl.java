@@ -137,7 +137,17 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     public void setCallingDescriptor(String desc) { 
         this.callingDescriptor = Aura.getDefinitionService().getDefDescriptor(desc, ComponentDef.class);
     }
-    
+
+	@Override
+	public String getCallerVersion() {
+		return this.callerVersion;
+	}
+
+	@Override
+	public void setCallerVersion(String callerVersion) {
+		this.callerVersion = callerVersion;
+	}
+
     private String actionId;
     private List<Action> actions = null;
     private boolean storable;
@@ -148,4 +158,5 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     protected final T actionDef;
     protected State state;
     protected DefDescriptor<ComponentDef> callingDescriptor;
+    protected String callerVersion;
 }

@@ -23,6 +23,7 @@ function StyleDef(config){
     this.code = config["code"];
     this.className = config["className"];
     this.descriptor = new DefDescriptor(config["descriptor"]);
+    this.preloaded = $A.util.isUndefinedOrNull(this.code);
 }
 
 /**
@@ -49,6 +50,24 @@ StyleDef.prototype.remove = function(){
  */
 StyleDef.prototype.getClassName = function(){
     return this.className;
+};
+
+/**
+ * Returns a DefDescriptor object.
+ *
+ * @returns {DefDescriptor} A DefDescriptor object contains a prefix, namespace,
+ *          and name.
+ * @export
+ */
+StyleDef.prototype.getDescriptor = function() {
+    return this.descriptor;
+};
+
+/**
+ * Returns true if this def was preloaded into app.css, false if added via an individual <style> tag.
+ */
+StyleDef.prototype.isPreloaded = function() {
+    return this.preloaded;
 };
 
 Aura.Style.StyleDef = StyleDef;

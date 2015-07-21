@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,33 +53,34 @@ import com.salesforce.omakase.util.Args;
 /**
  * Applies {@link ThemeDef}s to an application's CSS. The CSS is filtered to things that reference vars specified by the
  * given themes. This allows for clients to dynamically apply themed CSS without having to reload the page or reload the
- * entire app.css file.
- *
- * See AuraStyleService.js for more details.
+ * entire app.css file. See AuraStyleService.js for more details.
  */
 @Controller
 public final class DynamicStylingController {
     /**
-     * Main endpoint. This applies the given theme descriptors to the current application's CSS. This also includes any
-     * client loaded styles, as well as any specified extra styles.
+     * Main endpoint. This applies the given theme descriptors to the current application's CSS.
+     * <p>
+     * This includes all styles in the app's dependency graph, and also automatically includes client-loaded styles (or
+     * the explicit list of client-loaded styles if given), as well as any specified extra styles.
      *
      * @param themeDescriptors Apply these theme descriptors.
-     * @param extraStyles Optional extra style defs to include. If not specified, pass an empty list.
+     * @param clientLoaded Optional list of client-loaded style defs to be included. If null or empty, an attempt will
+     *            be made to automatically detect this via the framework. This param might be specified when the usage
+     *            of providers results in the framework alone not being able to determine this server-side (as
+     *            determined by a config option in the AuraStyleService call).
+     * @param extraStyles Optional extra style defs to include. This are applied last.
      * @return The CSS string with the themes applied. Only the CSS that directly references one of the theme vars is
      *         returned.
      */
     @AuraEnabled
-    public static String applyThemes(
-            @Key("themes") List<String> themeDescriptors,
-            @Key("extraStyles") List<String> extraStyles)
+    public static String applyThemes(@Key("themes") List<String> themeDescriptors,
+            @Key("clientLoaded") List<String> clientLoaded, @Key("extraStyles") List<String> extraStyles)
             throws QuickFixException {
 
         checkNotNull(themeDescriptors, "The 'themeDescriptors' argument cannot be null");
-        checkNotNull(extraStyles, "The 'extraStyles' argument cannot be null");
 
         DefinitionService defService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
-        MasterDefRegistry mdr = context.getDefRegistry();
 
         // convert the string theme descriptors to real descriptors
         List<DefDescriptor<ThemeDef>> themes = new ArrayList<>(themeDescriptors.size());
@@ -87,7 +89,7 @@ public final class DynamicStylingController {
         }
 
         // add style def descriptors based on app dependencies
-        List<DefDescriptor<StyleDef>> styles = new ArrayList<>(128);
+        Set<DefDescriptor<StyleDef>> styles = new LinkedHashSet<>(512);
         String uid = context.getUid(context.getLoadingApplicationDescriptor());
 
         for (DefDescriptor<?> dependency : context.getDefRegistry().getDependencies(uid)) {
@@ -98,37 +100,63 @@ public final class DynamicStylingController {
             }
         }
 
-        // add any client-loaded style defs (todo-- check for dupes?)
-        for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
-            // include inner deps
-            String descUid = mdr.getUid(null, desc);
-            if (descUid != null) {
-                for (DefDescriptor<?> dep : mdr.getDependencies(descUid)) {
-                    DefDescriptor<StyleDef> style = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
-                    if (style.exists() && !styles.contains(style)) {
-                        styles.add(style);
-                    }
+        if (clientLoaded == null || clientLoaded.isEmpty()) {
+            // attempt to automatically detect client-loaded styles
+            for (DefDescriptor<?> desc : context.getClientLoaded().keySet()) {
+                // include inner deps
+                styles.addAll(getAllStyleDependencies(desc));
+
+                // add the client loaded style def itself, (purposely done after!)
+                DefDescriptor<StyleDef> style = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                if (style.exists()) {
+                    styles.add(style);
                 }
             }
-
-            DefDescriptor<StyleDef> style = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX, StyleDef.class);
-            if (style.exists() && !styles.contains(style)) {
-                styles.add(style);
+        } else {
+            for (String name : clientLoaded) {
+                styles.add(defService.getDefDescriptor(name, StyleDef.class));
             }
         }
 
         // add extra style def descriptors
-        for (String style : extraStyles) {
-            styles.add(defService.getDefDescriptor(style, StyleDef.class));
+        if (extraStyles != null) {
+            for (String style : extraStyles) {
+                styles.add(defService.getDefDescriptor(style, StyleDef.class));
+            }
         }
 
         return extractThemedStyles(themes, styles);
     }
 
+    /**
+     * Gets all {@link StyleDef} dependencies of the given descriptor (includes inner dependencies recursively).
+     *
+     * @param defDescriptor Find style dependencies of this def.
+     * @return The list of style dependencies.
+     */
+    protected static Set<DefDescriptor<StyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
+            throws QuickFixException {
+        Set<DefDescriptor<StyleDef>> styles = new LinkedHashSet<>();
+
+        DefinitionService defService = Aura.getDefinitionService();
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        MasterDefRegistry mdr = context.getDefRegistry();
+
+        String descUid = mdr.getUid(null, defDescriptor);
+        if (descUid != null) {
+            for (DefDescriptor<?> dep : mdr.getDependencies(descUid)) {
+                DefDescriptor<StyleDef> style = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, StyleDef.class);
+                if (style.exists()) {
+                    styles.add(style);
+                }
+            }
+        }
+
+        return styles;
+    }
+
     /** utility that actual does the css processing */
-    private static String extractThemedStyles(
-            Iterable<DefDescriptor<ThemeDef>> themes,
-            Iterable<DefDescriptor<StyleDef>> styles)
+    private static String extractThemedStyles(Iterable<DefDescriptor<ThemeDef>> themes, Iterable<DefDescriptor<StyleDef>> styles)
             throws QuickFixException {
 
         // give the context all of the themes to apply.
@@ -199,7 +227,6 @@ public final class DynamicStylingController {
 
     /**
      * Custom CSS plugin that handles reducing the CSS to only the stuff that utilizes relevant theme vars.
-     *
      * Specifically, any declaration not using a relevant var is removed. Any at-rule that doesn't contain a declaration
      * using a relevant var is removed, except for media queries using a relevant var in the expression. In the case of
      * the latter, the entire block of the media query is then included irrespective of var usage.

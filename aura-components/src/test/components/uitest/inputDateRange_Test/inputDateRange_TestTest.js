@@ -33,7 +33,8 @@
         ]
     },
 
-    testSelectStartThenEnd : {
+    // TODO(W-2664314)
+    _testSelectStartThenEnd : {
         attributes : {},
         test : [function(cmp) {
             START_DATE = "2020-11-23";
@@ -66,7 +67,8 @@
         }]
     },
 
-    testSelectEndThenStart : {
+    // TODO(W-2664314)
+    _testSelectEndThenStart : {
         attributes : {},
         test : [function(cmp) {
             START_DATE = "2020-11-17";
@@ -99,7 +101,8 @@
         }]
     },
 
-    testSelectRangeDifferentMonths : {
+    // TODO(W-2664314)
+    _testSelectRangeDifferentMonths : {
         attributes : {},
         test : [function(cmp) {
             START_DATE = "2020-11-23";
@@ -135,7 +138,8 @@
         }]
     },
 
-    testSelectEndBeforeStart : {
+    // TODO(W-2664314)
+    _testSelectEndBeforeStart : {
         attributes : {},
         test : [function(cmp) {
             ORIGINAL_START_DATE = "2020-11-23";
@@ -175,7 +179,8 @@
         }]
     },
 
-    testSelectStartAfterEnd : {
+    // TODO(W-2664314)
+    _testSelectStartAfterEnd : {
         attributes : {},
         test : [function(cmp) {
             ORIGINAL_END_DATE = "2020-11-10";
@@ -217,7 +222,7 @@
 
     //test to see if datepicker haves correctly
     //when start Date is set
-    testSetInitialStartDate : { 
+    testSetInitialStartDate : {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";
@@ -252,7 +257,7 @@
 
     //test to see if datepicker haves correctly
     //when end Date is set
-    testSetInitialEndDate : { 
+    testSetInitialEndDate : {
         test : [function(cmp) {
             self = this;
             END_DATE = "2021-02-20";
@@ -286,7 +291,7 @@
 
     //test to see if datepicker haves correctly
     //when start Date and end Date are set
-    testSetInitialStartAndEndDate : { 
+    testSetInitialStartAndEndDate : {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";
@@ -331,7 +336,7 @@
     },
 
     //test datepicker grid window position in start date textbox
-    testDatepickerStartDatePosition: { 
+    testDatepickerStartDatePosition: {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";
@@ -347,7 +352,7 @@
 
             // comment out due to an issue with position bug
             // W-2657509 - datepicker isn't positioned properly on initial rendering
-            // 
+            //
             // $A.test.assertTrue(
             //     gridRect.top > dateTextbox.top + dateTextbox.height,
             //     'datepicker grid should not coverred startTextboxRect.'
@@ -359,7 +364,7 @@
     },
 
     //test datepicker grid window position in end date textbox
-    testDatepickerEndDatePosition: { 
+    testDatepickerEndDatePosition: {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";
@@ -375,7 +380,7 @@
 
             // comment out due to an issue with position bug
             // W-2657509 - datepicker isn't positioned properly on initial rendering
-            // 
+            //
             // $A.test.assertTrue(
             //     gridRect.top > dateTextbox.top + dateTextbox.height,
             //     'datepicker grid should not coverred inputEndDate.'

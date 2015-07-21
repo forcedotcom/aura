@@ -44,11 +44,17 @@
             setDateTimeEvent.fire();
         }
 
-        this.toggleList(component, false);
+        this.hide(component, true);
     },
 
-    toggleList: function(component, visible) {
-        component.set("v.visible", visible);
+    hide: function(component, shouldFocusReferenceElem) {
+        component.set("v.visible", false);
+        if ($A.get("$Browser.formFactor") == "DESKTOP" && shouldFocusReferenceElem) {
+            var referenceElem = component.get("v.referenceElement");
+            if (!$A.util.isUndefinedOrNull(referenceElem)) {
+                referenceElem.focus();
+            }
+        }
     },
 
     renderList: function(component) {
@@ -88,7 +94,7 @@
         var helper = this;
         var f = function(event) {
             if (!helper.isElementInComponent(component, event.target)) {
-                helper.toggleList(component, false);
+                helper.hide(component, false);
             }
         }
         return f;
@@ -117,6 +123,7 @@
             minutes = ("0" + minuteValue).slice(-2);
         entry.setAttribute("data-hours", hours);
         entry.setAttribute("tabindex", 0);
+        entry.setAttribute("role", "menuitem");
         entry.setAttribute("data-minutes", minutes);
         entry.setAttribute("id", hours + minutes)
         listElem.appendChild(entry);
@@ -195,9 +202,9 @@
                         helper.setFocusToPreviousItem(component, event);
                     } else if (event.keyCode === 27) {  // Esc key
                         event.stopPropagation();
-                        helper.toggleList(component, false);
+                        helper.hide(component, true);
                     } else if (event.keyCode === 9) {   // Tab key
-                        helper.toggleList(component, false);
+                        helper.hide(component, true);
                     }else if (event.keyCode == 32 || event.keyCode == 13) {  // space bar or enter
                         event.preventDefault();
                         helper.selectTime(component, event);

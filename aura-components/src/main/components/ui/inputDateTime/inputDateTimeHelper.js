@@ -53,7 +53,9 @@
                 dateTimeString = inputDateValue + " " + inputTimeValue;
             } else {
                 // create a new utc date string, append the inputTime value
-                var utcDate = $A.localizationService.parseDateTimeUTC(this.getDateString(new Date()), "yyyy-MM-dd");
+                var todayDate = new Date();
+                var todayDateString = todayDate.getFullYear() + "-" + (todayDate.getMonth() + 1) + "-" + todayDate.getDate()
+                var utcDate = $A.localizationService.parseDateTimeUTC(todayDateString, "yyyy-MM-dd");
                 if (!$A.util.isUndefinedOrNull(utcDate)) {
                     var dateFormat = component.get("v.dateFormat");
                     dateFormat = !$A.util.isUndefinedOrNull(dateFormat) ? dateFormat : $A.get("$Locale.dateFormat");
@@ -207,10 +209,6 @@
                 _helper.displayDateTime(component, value);
             }
         }
-    },
-
-    getDateString: function(date) {
-        return date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate();
     },
 
     getUTCDateString: function(date) {

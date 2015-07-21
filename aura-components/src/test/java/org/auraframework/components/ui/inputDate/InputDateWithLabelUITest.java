@@ -50,17 +50,17 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     /**
      * Excluded Browser Reasons:
-     * 
+     *
      * IE7: pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is
      * that it will sometimes stop one short
-     * 
+     *
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
-     * 
+     *
      * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
-     * 
+     *
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
-     * 
+     *
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
@@ -151,31 +151,31 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         // Checking January (31 days)
         String inputBoxResult = homeEndButtonHelper("2011-1-31", Keys.HOME);
-        assertEquals("The Home button did not go to the beginning of January", "2011-01-01", inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of January", "2011-01-01", inputBoxResult.trim());
 
         inputBoxResult = homeEndButtonHelper("2011-1-1", Keys.END);
-        assertEquals("The End button did not go to the end of January", "2011-01-31", inputBoxResult);
+        assertEquals("The End button did not go to the end of January", "2011-01-31", inputBoxResult.trim());
 
         // Checking February (28 or 29 days), none Leap year
         inputBoxResult = homeEndButtonHelper("2011-2-28", Keys.HOME);
-        assertEquals("The Home button did not go to the beginning of February", "2011-02-01", inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", "2011-02-01", inputBoxResult.trim());
 
         inputBoxResult = homeEndButtonHelper("2011-2-1", Keys.END);
-        assertEquals("The End button did not go to the end of February", "2011-02-28", inputBoxResult);
+        assertEquals("The End button did not go to the end of February", "2011-02-28", inputBoxResult.trim());
 
         // Checking February (28 or 29 days), Leap year
         inputBoxResult = homeEndButtonHelper("2012-2-29", Keys.HOME);
-        assertEquals("The Home button did not go to the beginning of February", "2012-02-01", inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of February", "2012-02-01", inputBoxResult.trim());
 
         inputBoxResult = homeEndButtonHelper("2012-2-1", Keys.END);
-        assertEquals("The End button did not go to the end of February", "2012-02-29", inputBoxResult);
+        assertEquals("The End button did not go to the end of February", "2012-02-29", inputBoxResult.trim());
 
         // Checking September (30 days)
         inputBoxResult = homeEndButtonHelper("2011-9-30", Keys.HOME);
-        assertEquals("The Home button did not go to the beginning of September", "2011-09-01", inputBoxResult);
+        assertEquals("The Home button did not go to the beginning of September", "2011-09-01", inputBoxResult.trim());
 
         inputBoxResult = homeEndButtonHelper("2011-9-1", Keys.END);
-        assertEquals("The End button did not go to thes end of September", "2011-09-30", inputBoxResult);
+        assertEquals("The End button did not go to thes end of September", "2011-09-30", inputBoxResult.trim());
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
@@ -197,7 +197,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         String fmt = new SimpleDateFormat(DATE_FORMAT_STR).format(cal.getTime());
 
         // Making sure test result and true calendar outcome match
-        assertEquals("Shift + Page up did not go to the correct date", fmt, result);
+        assertEquals("Shift + Page up did not go to the correct date", fmt, result.trim());
 
         // Resetting calendar
         cal = new GregorianCalendar();
@@ -211,7 +211,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         fmt = new SimpleDateFormat(DATE_FORMAT_STR).format(cal.getTime());
 
         // Making sure test result and true calendar outcome match
-        assertEquals("shift + Page Down did not find the correct date", fmt, result);
+        assertEquals("shift + Page Down did not find the correct date", fmt, result.trim());
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
@@ -230,7 +230,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         cal.setTime(formatter.parse(TEST_DATE_TO_USE));
         cal.add(Calendar.MONTH, -4);
         String fmt = new SimpleDateFormat(DATE_FORMAT_STR).format(cal.getTime());
-        assertEquals("Page up id not find the correct date", fmt, result);
+        assertEquals("Page up id not find the correct date", fmt, result.trim());
 
         // Resetting calendar
         cal = new GregorianCalendar();
@@ -244,7 +244,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         fmt = new SimpleDateFormat(DATE_FORMAT_STR).format(cal.getTime());
 
         // Making sure test result and true calendar outcome match
-        assertEquals("Page down id not find the correct date", fmt, result);
+        assertEquals("Page down id not find the correct date", fmt, result.trim());
     }
 
     // Testing functionallity of tab, starting from the InputBox to the today button
@@ -427,7 +427,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.sendKeys(Keys.SPACE);
 
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        assertEquals("Dates do not match up", "2014-03-01", element.getAttribute("value"));
+        assertEquals("Dates do not match up", "2014-03-01", element.getAttribute("value").trim());
     }
 
     // Testing functionality of arrows being used one after the other
@@ -460,7 +460,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         // Focus on the input box and get its value
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        assertEquals("Next day was not correctly found", "2013-04-16", element.getAttribute("value"));
+        assertEquals("Next day was not correctly found", "2013-04-16", element.getAttribute("value").trim());
     }
 
     // Testing functionality of arrows being used one after the other, while going through months
@@ -496,6 +496,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Select the input text box and get its value for comparison
         element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
         assertEquals("Moving dates using arrows has not brought us to todays date", TEST_DATE_TO_USE,
-                element.getAttribute("value"));
+                element.getAttribute("value").trim());
     }
 }

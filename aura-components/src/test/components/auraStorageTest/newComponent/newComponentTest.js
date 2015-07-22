@@ -57,9 +57,11 @@
      */
     testActionScopedGlobalID:{
         test:[function(cmp){
-            $A.test.setTestTimeout(300000);
-            this.resetCounter(cmp, "testActionScopedGlobalID");
             cmp._testName = "testActionScopedGlobalID";
+            var a = cmp.get("c.resetCounter");
+            a.setParams({ testName: "testActionScopedGlobalID" }),
+            $A.test.enqueueAction(a);
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([a]);});
         },function(cmp){
             /**
              * Group of actions.

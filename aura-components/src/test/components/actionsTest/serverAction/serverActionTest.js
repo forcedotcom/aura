@@ -9,6 +9,7 @@
 		},
 		function runRefreshAction(cmp) {
 			cmp._callbackDone = false;
+			
 			var action = cmp.get("c.executeInForeground");
             action.setCallback(this, function(a) {
             	cmp._callbackDone = true;
@@ -16,6 +17,7 @@
             action.setStorable({
                 "refresh": 0
             });
+            
             //set up watch
             var cb_handle; var watch_done = false;
             // watch for the action we gonna enqueue
@@ -611,15 +613,22 @@
      * enqueue two server actions with same signature, the action has response in storage.
      * both of them will read response from storage first. 
      * then we send two refresh actions. 
-     * Note: 2nd one is not 1st one's dupe, they both go to server
+     * Note1: for refresh actions, 2nd one is not 1st one's dupe, they both go to server
+     * Note2: server action we enqueue here go to server, increase recordObjCounter, and bring it back,
+     * that's why we check new counter = old counter+2 at the end of the test, and also why this test is threadHostile
      */
     testConcurrentServerActionsBothStorableWithResponseStored : {
+    	labels : [ "threadHostile" ],
         test : [ function primeActionStorage(cmp) {
         	var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
         	a0.setStorable();
+        	cmp._storageKey = a0.getStorageKey();
         	$A.enqueueAction(a0);
-        	$A.test.addWaitFor(true, function(){ 
+        	$A.test.addWaitForWithFailureMessage(true, function(){ 
                 return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
+            }, "a0 doesn't finish",
+            function() {
+            	cmp._counter = a0.getReturnValue().recordObjCounter;
             });
         }, function enqueueTwoActionWithSameSignature(cmp) {
             var recordObjCounterFromA1 = undefined;
@@ -628,17 +637,12 @@
             var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
             a1.setStorable();
             a2.setStorable();
-            cmp._storageKey = a1.getStorageKey();
             a1.setStorable({  "refresh": 0 });
             a2.setStorable({  "refresh": 0 });
             
-            //make sure both ations get schedule to send in a same XHR box
-            $A.run(
-                    function() {
-                        $A.enqueueAction(a1);
-                        $A.enqueueAction(a2);
-                    }
-            );
+            //both ations get schedule to send in a same XHR box
+            $A.enqueueAction(a1);
+            $A.enqueueAction(a2);
             
             $A.test.addWaitForWithFailureMessage(true,
                     function() { return $A.test.areActionsComplete([a1, a2]) },
@@ -646,7 +650,6 @@
                     function() {
                     	$A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
                     	$A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
-                    	cmp._counter = a1.getReturnValue().recordObjCounter;
                     }
             );
         }, function bothRefreshActionsGoToServer(cmp) {

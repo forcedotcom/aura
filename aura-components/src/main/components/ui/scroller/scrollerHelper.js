@@ -167,7 +167,6 @@
     _getScrollerWrapper: function (component) {
         return component.find('scrollWrapper').getElement();
     },
-    
     _getPullToRefreshConfig: function (component) {
         var nativeScroller = component.get('v.useNativeScroller');
         return {
@@ -194,7 +193,10 @@
 
         return {
             threshold    : component.get('v.infiniteLoadingThreshold'),
-            dataProvider : dataProviderBridge
+            dataProvider : dataProviderBridge,
+            labelNoData  : component.get("v.infiniteLoadingNoDataLabel"),
+            labelIdle    : component.get("v.infiniteLoadingIdleLabel"),
+            labelLoading : component.get("v.infiniteLoadingLoadingLabel")
         }
     },
     _getVoiceOverConfig: function (component) {

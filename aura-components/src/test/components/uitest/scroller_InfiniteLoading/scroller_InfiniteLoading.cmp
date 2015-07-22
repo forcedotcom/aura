@@ -1,0 +1,36 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="A test scroller.">
+
+	<aura:attribute name="initialSize" type="Integer" default="40"/>
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
+
+	<div id="header" class="common">Scroller - Infinite Loading Test</div>
+	<div id="body">	
+		<ui:scroller class="scrollWrapper" 
+			aura:id="test-scroller"
+			useNativeScroller="true"
+			bindEventsToScroller="true"
+			infiniteLoading="true"
+			infiniteLoadingDataProvider="{!c.onLoadMore}"
+			infiniteLoadingLoadingLabel="Test Loading...1234567890">
+			<div aura:id="body"></div>
+		</ui:scroller>
+	</div>
+	<div id="footer" class="common">This is a footer</div>
+</aura:component>

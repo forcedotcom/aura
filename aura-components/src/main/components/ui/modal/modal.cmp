@@ -47,7 +47,7 @@
              role="dialog"
              aria-labelledby="{!'title_' + globalId}">
 
-            <div aura:id="content" role="document" class="modal-container">
+            <div aura:id="content" class="modal-container">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
                 <header class="modal-header">

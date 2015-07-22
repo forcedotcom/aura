@@ -1,4 +1,40 @@
 ({
+	testServerActionWithStoredResponseGetStorageFirst : {
+		test: [
+		function primeActionStorage(cmp) {
+			var action = cmp.get("c.executeInForeground");
+			action.setStorable();
+			$A.enqueueAction(action);
+			$A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+		},
+		function runRefreshAction(cmp) {
+			cmp._callbackDone = false;
+			var action = cmp.get("c.executeInForeground");
+            action.setCallback(this, function(a) {
+            	cmp._callbackDone = true;
+            }, "SUCCESS");
+            action.setStorable({
+                "refresh": 0
+            });
+            //set up watch
+            var cb_handle; var watch_done = false;
+            // watch for the action we gonna enqueue
+            var preSendCallback = function(actions, actionToWatch) {
+                if (actionToWatch) {
+                	$A.test.assertTrue(cmp._callbackDone, 
+                			"we should fetch response from storage first, before sending the action to server")
+                    watch_done = true;
+                }
+            };
+            cb_handle = $A.test.addPrePostSendCallback(action, preSendCallback, undefined);
+            $A.test.addWaitFor(true, function() { return watch_done; });
+            
+            //now enqueue the action
+            $A.enqueueAction(action);
+		}
+		]
+	},
+	
     testIncompleteActionRefreshDoesNotInvokeCallback: {
         test: [
         function primeActionStorage(cmp) {
@@ -567,6 +603,58 @@
                     function() { return (a2Return!==undefined); },
                     "fail waiting for action 2 returns something"
             );
+        }
+        ]
+    },
+    
+    /*
+     * enqueue two server actions with same signature, the action has response in storage.
+     * both of them will read response from storage first. 
+     * then we send two refresh actions. 
+     * Note: 2nd one is not 1st one's dupe, they both go to server
+     */
+    testConcurrentServerActionsBothStorableWithResponseStored : {
+        test : [ function primeActionStorage(cmp) {
+        	var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+        	a0.setStorable();
+        	$A.enqueueAction(a0);
+        	$A.test.addWaitFor(true, function(){ 
+                return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
+            });
+        }, function enqueueTwoActionWithSameSignature(cmp) {
+            var recordObjCounterFromA1 = undefined;
+            //create two actions with same signature
+            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a1.setStorable();
+            a2.setStorable();
+            cmp._storageKey = a1.getStorageKey();
+            a1.setStorable({  "refresh": 0 });
+            a2.setStorable({  "refresh": 0 });
+            
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+                    function() {
+                        $A.enqueueAction(a1);
+                        $A.enqueueAction(a2);
+                    }
+            );
+            
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() { return $A.test.areActionsComplete([a1, a2]) },
+                    "fail waiting for action1 and 2 to finish",
+                    function() {
+                    	$A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
+                    	$A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
+                    	cmp._counter = a1.getReturnValue().recordObjCounter;
+                    }
+            );
+        }, function bothRefreshActionsGoToServer(cmp) {
+        	$A.test.addWaitForWithFailureMessage(true, function() {
+        		var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
+        				function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
+        		return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
+        	}, "fail to update stored response");
         }
         ]
     },

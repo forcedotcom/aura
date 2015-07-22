@@ -570,6 +570,68 @@
         }
         ]
     },
+    
+    testConcurrentServerActionsBothStorableWithResponseStored : {
+        test : [ function primeActionStorage(cmp) {
+        	var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+        	a0.setStorable();
+        	$A.enqueueAction(a0);
+        	$A.test.addWaitFor(true, function(){ 
+                return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
+            });
+        }, function(cmp) {
+        	$A.test.setTestTimeout(60000);
+        	debugger;
+            var recordObjCounterFromA1 = undefined;
+            //create two actions with same signature
+            var a1 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            var a2 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a1.setStorable();
+            a2.setStorable();
+            cmp._storageKey = a1.getStorageKey();
+            //we check response in callbacks
+            a1.setCallback(cmp, function(action) {
+                $A.test.assertTrue(action.isFromStorage(), "1st action should get response from server");
+                a1Return = action.getReturnValue();
+                cmp._counter1 = a1Return.recordObjCounter;
+                debugger;
+                $A.test.assertEquals(1, a1Return.Counter, "counter of 1nd action should be 1");
+            });
+            a1.setStorable({  "refresh": 0 });
+            a2.setCallback(cmp, function(action) {
+                $A.test.assertTrue(action.isFromStorage(), "2nd action should get response from server");
+                a2Return = action.getReturnValue();
+                cmp._counter2 = a2Return.recordObjCounter;
+                debugger;
+                $A.test.assertEquals(1, a2Return.Counter, "counter of 2nd action should be 1");
+            });
+            a2.setStorable({  "refresh": 0 });
+            
+            //make sure both ations get schedule to send in a same XHR box
+            $A.run(
+                    function() {
+                    	debugger;
+                        $A.enqueueAction(a1);
+                        $A.enqueueAction(a2);
+                    }
+            );
+            
+            //just need to make sure both actions get some return
+            $A.test.addWaitForWithFailureMessage(true,
+                    function() { return $A.test.areActionsComplete([a1, a2]) },
+                    "fail waiting for action1 and 2 to finish"
+            );
+            //$A.test.addWaitFor(true, function() { return destroy_done; });
+        }, function(cmp) {
+        	debugger;
+        	$A.storageService.getStorage("actions").get(cmp._storageKey).then(
+                    function(item){
+                        cmp._refreshedCounter = item.value.returnValue.recordObjCounter
+                        debugger;
+                    });
+        }
+        ]
+    },
 
     /*
      * test server actions with same signature get schedule to send in a same XHR

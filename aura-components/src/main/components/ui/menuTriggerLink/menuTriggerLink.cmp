@@ -20,8 +20,8 @@
     <aura:registerevent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
 
     <aura:set attribute="trigger">
-        <div aura:id="menuTrigger" aria-haspopup="true">
-            <a aura:id="link" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
+        <div aura:id="menuTrigger">
+            <a aura:id="link" aria-haspopup="true" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
                 <aura:if isTrue="{!v.body.length == 0}">
                     {!v.label}
                     <aura:set attribute="else">

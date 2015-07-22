@@ -28,14 +28,14 @@
     <aura:handler event="ui:popupTargetToggle" action="{!c.onPopupToggle}"/>
     <aura:method name="triggerInteraction"/>
 
-    <div id="{!globalId}" aura:id="popupTrigger" aria-haspopup="true">
+    <div id="{!globalId}" aura:id="popupTrigger">
 	    <aura:if isTrue="{!v.trigger.length > 0}">
 	    	<div aura:id="popupTriggerElement">
 	    		{!v.trigger}
 	    	</div>
 
 	    	<aura:set attribute="else">
-	    		<a aura:id="popupTriggerElement" title="{!v.title}" class="{!v.class}" onclick="{!c.onClick}">
+	    		<a aura:id="popupTriggerElement" aria-haspopup="true" title="{!v.title}" class="{!v.class}" onclick="{!c.onClick}">
 			    	<aura:if isTrue="{!v.label != null}">
 			    		{!v.label}
 			    		<aura:set attribute="else">

@@ -518,7 +518,8 @@
     /**
      * Test panel with reference element set
      */
-    testPanelWithReferenceElementSet: {
+    // TODO(W-2690094): Tab does not change focus to next element
+    _testPanelWithReferenceElementSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : ".appInput",
@@ -555,7 +556,8 @@
     /**
      * Test panel with referece element and selector set
      */
-    testPanelWithBothReferenceElementAttributesSet: {
+    // TODO(W-2690094): Tab does not change focus to next element
+    _testPanelWithBothReferenceElementAttributesSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testUseReferenceElementSelector" : true,
@@ -575,7 +577,8 @@
     /**
      * Test panel with invalid reference element.
      */
-    testPanelWithInvalidReferenceElement: {
+    // TODO(W-2690094): Tab does not change focus to next element
+    _testPanelWithInvalidReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : ".xyz",
@@ -593,7 +596,8 @@
     /**
      * Test panel with empty reference element.
      */
-    testPanelWithEmptyReferenceElement: {
+    // TODO(W-2690094): Tab does not change focus to next element
+    _testPanelWithEmptyReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : "empty",

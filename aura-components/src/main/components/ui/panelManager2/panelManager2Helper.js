@@ -56,7 +56,9 @@
 
         // Create panel instance
         var panel = this.createPanelInstance(cmp, panelDef, panelConfig);
-        panel.set('v.referenceElement', referenceElement);
+        if(referenceElement) {
+            panel.set('v.referenceElement', referenceElement);
+        }
 
         // Save instance config
         this.PANELS_INSTANCE[panel.getGlobalId()] = {

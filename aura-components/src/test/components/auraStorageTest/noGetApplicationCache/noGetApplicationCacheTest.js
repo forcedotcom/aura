@@ -6,7 +6,6 @@
     testOfflineLaunch: {
         test: [
             function loadIframe(cmp) {
-                $A.test.setTestTimeout(10000);
                 cmp._frameLoaded = false;
                 var frame = document.createElement("iframe");
                 frame.src = "/auraStorageTest/noGetApplicationCache.app";

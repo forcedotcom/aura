@@ -1429,7 +1429,7 @@ Aura.Utils.Util.prototype.stringEndsWith = function(fullstr, substr) {
  * @param {Any} var-args of bound parameters.
  * @returns {Function} a new function that invokes the provided function instance with bound arguments.
  */
-if (!!Function.prototype.bind) {
+if (Function.prototype.bind) {
     Aura.Utils.Util.bind = function(method /*, this, bind arguments*/) {
         var args = Array.prototype.slice.call(arguments, 1);
         return Function.prototype.bind.apply(method, args);
@@ -1464,7 +1464,7 @@ Aura.Utils.Util.prototype.bind = Aura.Utils.Util.bind;
  * @param {Object} map to extract keys from.
  * @returns {Array} of key {String}s.
  */
-if (!!(Object && Object.keys)) {
+if (Object && Object.keys) {
     Aura.Utils.Util.keys = function(object, excludeFunctions) {
         var allKeys = Object.keys(object);
         var keys = [];
@@ -1566,7 +1566,7 @@ Aura.Utils.Util.prototype.merge = function(first /*, var-args of arrays*/) {
 };
 
 /** forEach: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.forEach) {
+if (Array.prototype.forEach) {
     Aura.Utils.Util.forEach = function(array, method, that) {
         array.forEach(method, that);
     };
@@ -1599,7 +1599,7 @@ if (!!Array.prototype.forEach) {
 Aura.Utils.Util.prototype.forEach = Aura.Utils.Util.forEach;
 
 /** map: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.map) {
+if (Array.prototype.map) {
     Aura.Utils.Util.map = function(array, method, that) {
         return array.map(method, that);
     };
@@ -1634,7 +1634,7 @@ if (!!Array.prototype.map) {
 Aura.Utils.Util.prototype.map = Aura.Utils.Util.map;
 
 /** reduce: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.reduce) {
+if (Array.prototype.reduce) {
     Aura.Utils.Util.reduce = function(array, method, initial) {
         return array.reduce(method, initial);
     };
@@ -1671,7 +1671,7 @@ if (!!Array.prototype.reduce) {
 Aura.Utils.Util.prototype.reduce = Aura.Utils.Util.reduce;
 
 /** every: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.every) {
+if (Array.prototype.every) {
     Aura.Utils.Util.every = function(array, predicate, that) {
         return array.every(predicate, that);
     };
@@ -1708,7 +1708,7 @@ if (!!Array.prototype.every) {
 Aura.Utils.Util.prototype.every = Aura.Utils.Util.every;
 
 /** some: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.some) {
+if (Array.prototype.some) {
     Aura.Utils.Util.some = function(array, predicate, that) {
         return array.some(predicate, that);
     };
@@ -1745,7 +1745,7 @@ if (!!Array.prototype.some) {
 Aura.Utils.Util.prototype.some = Aura.Utils.Util.some;
 
 /** filter: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.filter) {
+if (Array.prototype.filter) {
     Aura.Utils.Util.filter = function(array, predicate, that) {
         return array.filter(predicate, that);
     };
@@ -2208,7 +2208,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
                 while(queue.length > 0) {
                     queue.shift().call();
                 }
-            }
+            };
 
             document.head.appendChild( s ).parentNode.removeChild( s );
         }

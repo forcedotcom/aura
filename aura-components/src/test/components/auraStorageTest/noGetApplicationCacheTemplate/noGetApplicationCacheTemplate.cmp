@@ -42,7 +42,7 @@
     <aura:set attribute="auraInitBlock">
         <script>
             var auraInit = {!v.auraInit}
-            if(location.search.indexOf('launchOffline') > 0) {
+            if(location.hash.indexOf('launchOffline') > 0) {
                 auraInit.host = '//offline';
             }
             

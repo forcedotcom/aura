@@ -6,7 +6,7 @@
     testOfflineLaunch: {
         test: [
             function loadIframe(cmp) {
-                $A.test.setTestTimeout(100000);
+                $A.test.setTestTimeout(10000);
                 cmp._frameLoaded = false;
                 var frame = document.createElement("iframe");
                 frame.src = "/auraStorageTest/noGetApplicationCache.app";
@@ -22,7 +22,8 @@
             },
             function reloadIframeOffline(cmp) {
                 cmp._frameLoaded = false;
-                document.getElementById("myFrame").contentWindow.location.href = "/auraStorageTest/noGetApplicationCache.app?launchOffline";
+                document.getElementById("myFrame").contentWindow.location.hash = "launchOffline";
+                document.getElementById("myFrame").contentWindow.location.reload();
                 this.waitForIframeLoad(cmp);
             },
             function verifyApplicationLoaded(cmp) {

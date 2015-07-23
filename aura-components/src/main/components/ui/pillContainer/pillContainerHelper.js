@@ -87,6 +87,7 @@
         } else {
             $A.util.removeClass(cmp.getElement(), 'maxAllowed');
         }
+        this._setActiveItem(cmp, true);
     },
 
     handlePillEvent: function(cmp, event) {
@@ -129,45 +130,47 @@
      * @param {direction} -1 for focusing on prev item, 1 for focusing on next and 0 for focusing on last
      */
     focusItem: function(cmp, data, direction) {
-        // find the index of the component
-        var index = 0;
-        var focusCmp;
-        var items = cmp.find('pill');
-        if ($A.util.isArray(items)) {
-            if ($A.util.isEmpty(items) || isNaN(direction)) {
-                return;
-            }
 
-            if (direction === 0) {
-                index = items.length - 1;
-            } else {
-                for (var i = 0; i < items.length; i++) {
-                    if (this._isEqual(data, {id:items[i].get('v.id'),label:items[i].get('v.label')})) {
-                        index = (i + direction) ;
-                        break;
-                    }
-                }
-
-                // If next is greater then length of list then we wrap around to the beginning of the list
-                if (index >= items.length) {
-                    index = 0;
-                }
-                // If index is < 0 then it means we wrap around to the last item
-                if (index < 0) {
-                    index = items.length - 1;
-                }
-            }
-            focusCmp = items[index];
-        } else if (items > '') {
-            // If there is only one pill item in the pill box,
-            // cmp.find('pillItem') might return a single object instead of an array.
-            // That is why we need that one pill item to be the focusCmp.
-            focusCmp = items;
-        } else {
+        if (isNaN(direction)) {
             return;
         }
 
-        focusCmp.focus();
+        var items = cmp.find('pill');
+        if ($A.util.isUndefinedOrNull(items)) {
+            return;
+        }
+
+        //ensure we have an array
+        var itemsArray = $A.util.isArray(items) ? items : [items];
+        var index = 0;
+
+        //find the current index
+        if (direction === 0) {
+            index = itemsArray.length - 1;
+        } else {
+            for (var i = 0; i < itemsArray.length; i++) {
+                if (this._isEqual(data, {id:itemsArray[i].get('v.id'),label:itemsArray[i].get('v.label')})) {
+                    index = (i + direction) ;
+                    break;
+                }
+            }
+        }
+
+        // If the next item index is greater then length of list then focus on the input
+        // If the input doesn't exist we wrap around to the beginning of the list
+        // If index is < 0 then it means we wrap around to the last item
+        if (index >= itemsArray.length) {
+            var pillInput = cmp.get("v.pillInput");
+            if (!$A.util.isEmpty(pillInput)) {
+                this.focusOnInputBox(cmp);
+            } else {
+                itemsArray[0].focus();
+            }
+        } else if (index < 0) {
+            itemsArray[itemsArray.length - 1].focus();
+        } else {
+            itemsArray[index].focus();
+        }
     },
 
     focusOnInputBox: function(cmp) {
@@ -319,8 +322,19 @@
 
                     pillItems[idxToFocus].focus();
                 }
+                this._setActiveItem(cmp, true);
                 break;
             }
+        }
+    },
+
+    _setActiveItem: function(cmp, firstActive) {
+        var pillItems = cmp.find('pill');
+        if (!$A.util.isArray(pillItems)) {
+            pillItems.set("v.active", true);
+        } else {
+            pillItems[0].set("v.active", firstActive);
+            pillItems[pillItems.length-1].set("v.active", !firstActive);
         }
     }
 

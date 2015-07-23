@@ -37,7 +37,7 @@
         var concrete = component.getConcreteComponent();
         var keyCode = event.getParam("keyCode");
         var domEvent = event.getParam("domEvent");
-        if (keyCode === 8) { // Backspace key
+        if (keyCode === 8 || keyCode === 37) { // Backspace or left key
             var inputText = input.get("v.value");
             if ( $A.util.isEmpty(inputText) ) {
                 var onBackspacePressedWhenEmpty = concrete.getEvent("onBackspacePressedWhenEmpty");

@@ -15,4 +15,5 @@
  */
 .THIS a {
     display:block;
+    overflow: hidden;
 }

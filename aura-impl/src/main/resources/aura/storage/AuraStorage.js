@@ -184,7 +184,7 @@ AuraStorage.prototype.put = function(key, value) {
 };
 
 /**
- * @description Asynchronously removes the item indicated by key.
+ * Asynchronously removes the item indicated by key.
  * @param {String} key The key of the item to remove.
  * @param {Boolean} doNotFireModified A bool indicating whether or not to fire the modified event on item removal.
  * @returns {Promise} A Promise that will remove the item from storage.
@@ -202,7 +202,7 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
 };
 
 /**
- * @description Asynchronously removes all expired items.
+ * Asynchronously removes all expired items.
  * @private
  */
 AuraStorage.prototype.sweep = function() {
@@ -249,8 +249,10 @@ AuraStorage.prototype.sweep = function() {
 };
 
 /**
- * Suspends sweeping. The storage adapter is removed if it is expired but sweeping can be suspended if the
- * connection goes offline.
+ * Suspends sweeping.
+ *
+ * Expired storage entries are proactively removed by sweeping. Sweeping is often suspended
+ * when the connection goes offline so expired items remain accessible.
  * @export
  */
 AuraStorage.prototype.suspendSweeping = function() {
@@ -260,7 +262,7 @@ AuraStorage.prototype.suspendSweeping = function() {
 };
 
 /**
- * Resumes sweeping to remove expired storage adapters.
+ * Resumes sweeping to remove expired storage entries.
  * @export
  */
 AuraStorage.prototype.resumeSweeping = function() {
@@ -281,7 +283,7 @@ AuraStorage.prototype.log = function() {
 };
 
 /**
- * Whether current storage implementation is persistent
+ * Whether current storage implementation is persistent.
  * @returns {boolean} true if persistent
  * @export
  */
@@ -290,7 +292,7 @@ AuraStorage.prototype.isPersistent = function() {
 };
 
 /**
- * Whether current storage implementation is secure
+ * Whether current storage implementation is secure.
  * @returns {boolean} true if secure
  * @export
  */
@@ -299,7 +301,8 @@ AuraStorage.prototype.isSecure = function() {
 };
 
 /**
- * Sets the storage version. Cannot be set unless never set.
+ * Sets the storage version.
+ * @param {String} version storage version.
  * @export
  */
 AuraStorage.prototype.setVersion  = function(version) {

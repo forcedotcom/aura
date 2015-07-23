@@ -807,6 +807,9 @@ AuraClientService.prototype.handleAppCache = function() {
         if (acs.isDevMode()) {
             showProgress(100);
         }
+        if (acs.isOutdated) {
+            window.location.reload(true);
+        }
     }
 
     function handleAppcacheCached() {

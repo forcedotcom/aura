@@ -51,7 +51,7 @@
          aria-labeledby="{!'title_' + globalId}"
          aura:flavorable="true">
          
-        <div aura:id="content" role="document" class="container"> 
+        <div aura:id="content" class="container"> 
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
            	<header class="panel-header">

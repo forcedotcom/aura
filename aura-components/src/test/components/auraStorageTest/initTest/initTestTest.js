@@ -14,6 +14,7 @@
         var a = cmp.get('c.resetCounter');
         a.setParams({ testName: _testName });
         $A.test.enqueueAction(a);
+        $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([a])});
     },
 
     executeAction:function(cmp, actionName, actionParam, additionalProperties, extraCallback){
@@ -273,7 +274,6 @@
         test : [function(cmp) {
             cmp._testName = "testSkipCallbackOnRefresh";
             this.resetCounter(cmp, "testSkipCallbackOnRefresh");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             //First action which fetches the response from server.
             var a = this.executeAction(cmp, "c.fetchDataRecord",
@@ -981,7 +981,6 @@
         test : [function(cmp) {
             cmp._testName = "testSkipReplayOnIdenticalRefresh";
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             var a = this.executeAction(cmp, "c.fetchDataRecord", {testName:cmp._testName}, function(a) { a.setStorable(); });
             $A.test.addWaitFor("1", function() { return $A.test.getText(cmp.find("callbackCounter").getElement()); },
@@ -995,7 +994,6 @@
             // reset so next response will be same as first
             cmp._testName = "testSkipReplayOnIdenticalRefresh";
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefresh");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
             // wait for the timer to tick over
             var now = new Date().getTime();
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
@@ -1029,7 +1027,6 @@
         test : [function(cmp) {
             cmp._testName = "testDontSkipReplayOnNonIdenticalRefresh";
             this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalRefresh");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             var a = this.executeAction(cmp, "c.fetchDataRecord",
                 {testName:cmp._testName}, function(a){a.setStorable();});
@@ -1073,7 +1070,6 @@
             $A.test.setTestTimeout(30000);
             cmp._testName = "testSkipReplayOnIdenticalRefreshWithComponents";
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents", {testName:cmp._testName},
                         function(a){a.setStorable();},
@@ -1089,7 +1085,6 @@
             // reset so next response will be same as first
             cmp._testName = "testSkipReplayOnIdenticalRefreshWithComponents";
             this.resetCounter(cmp, "testSkipReplayOnIdenticalRefreshWithComponents");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
             // wait for the timer to tick over
             var now = new Date().getTime();
             $A.test.addWaitFor(true, function() { return now < new Date().getTime(); }, function(){});
@@ -1126,7 +1121,6 @@
             $A.test.setTestTimeout(30000);
             cmp._testName = "testDontSkipReplayOnNonIdenticalComponentsInRefresh";
             this.resetCounter(cmp, "testDontSkipReplayOnNonIdenticalComponentsInRefresh");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         }, function(cmp) {
             var a = this.executeAction(cmp, "c.fetchDataRecordWithComponents",
                     {testName:cmp._testName, extraComponentsCreated:true}, function(a){a.setStorable();},
@@ -1189,7 +1183,6 @@
         test : [function(cmp) {
         	$A.test.setTestTimeout(300000);
             this.resetCounter(cmp, "testRefreshErrorResponseNotStored");
-            $A.test.addWaitFor(false, $A.test.isActionPending);
         },function(cmp) {
             var a = cmp.get("c.fetchDataRecord");
             var that = this;

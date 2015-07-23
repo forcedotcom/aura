@@ -425,9 +425,14 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
     // config["componentDef"]["componentClass"] - Result of sending component defs back from the server.
     // Always comes back as a function to execute, which defines the component classes.
     var componentClassDef = config["componentClass"] || config["componentDef"]["componentClass"];
-    if(componentClassDef && !$A.componentService.hasComponentClass(desc)) {
+    if(componentClassDef && !this.hasComponentClass(desc)) {
         componentClassDef = $A.util.json.decode(componentClassDef);
         componentClassDef();
+    }
+
+    // create ComponentDef from saved component config if component class has not yet been processed
+    if (!this.hasComponentClass(desc)) {
+        this.createFromSavedComponentConfigs(desc);
     }
 
     var classConstructor = this.getComponentClass(desc);

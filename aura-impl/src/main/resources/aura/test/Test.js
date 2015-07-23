@@ -53,7 +53,10 @@ TestInstance = function() {
         "ActionReferenceValue", "FunctionCallValue", "PropertyReferenceValue", "DefDescriptor", "AuraError",
         "Logger", "$A", "Aura", "CKEDITOR", "moment", "FastClick", "ES6Promise", "WallTime", "Sfdc", "org",
         "Sizzle", "LC", "SfdcFramework", "RecordGlobalValueProvider", "LoadingScreen", "UserContext",
-        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery"];
+        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery", "iconsByType", "walkthrough", 
+        "SfdcApp", "WalkthroughCommandFunctions", "ChainedWTStartUrlHack", "ChainedWTDefinitionMarker",
+        "LocalStorageOnlyDefinitionMarker", "WalkthroughAuthoringHelp", "WalkthroughMessageSeverity", 
+        "SalesforceClouds", "WalkthroughTypes", "WalkthroughStatus", "WalkthroughApp", "WalkthroughCodeVersion"];
 
     /** @private **/
     this.getInitialGlobalState = function() {

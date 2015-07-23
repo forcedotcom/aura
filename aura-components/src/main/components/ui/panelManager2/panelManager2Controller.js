@@ -21,7 +21,7 @@
         helper.createPanel(cmp, event.getParams());
     },
     destroyPanel: function (cmp, event, helper) {
-        helper.scheduleDestroy(cmp, event.getParams());
+        helper.destroyPanelInstance(cmp, event.getParams());
     },
     handleNotify: function (cmp, event, helper) {
         var action = event.getParam('action'),

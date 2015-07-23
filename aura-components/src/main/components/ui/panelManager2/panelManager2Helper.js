@@ -20,8 +20,6 @@
     PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
     PANELS_STACK    : [],  // The Panel Stack ordering
     PANELS_INSTANCE : {},  // Registered instances
-    PANELS_TO_DESTROY: [], // The panels marked for destruction
-    PANELS_TO_DESTROY_MAP: {}, // The ids of panels that are marked for desctuction
 
 
 	initialize: function(cmp) {
@@ -55,7 +53,6 @@
         var referenceElement = panelConfig.referenceElement;
         panelConfig.referenceElement = null;
 
-        this.destroyPendingPanels();
 
         // Create panel instance
         var panel = this.createPanelInstance(cmp, panelDef, panelConfig);
@@ -176,35 +173,6 @@
         this.deactivateAllPanelInstances(cmp, panel);
     },
 
-    destroyPendingPanels: function (cmp, config) {
-        var panelToDestroy;
-        while(this.PANELS_TO_DESTROY.length > 0) {
-            panelToDestroy = this.PANELS_TO_DESTROY.shift();
-            this.destroyPanelInstance(panelToDestroy.cmp, panelToDestroy.config);
-        }
-    },
-
-    /*
-        THIS IS A TEMPORARY SOLUTION,
-        DELETE this and REFACTOR execution compoment
-        This code is to work around the following issue:
-        The problem is: the action is sent by a component that is destroyed when the dialog 
-        is dismissed. The root cause is a conflict between 3 different pieces of code trying to 
-        do the right thing:
-            1. The button wants to control the action (the execution component)
-            2. The dialog wants to destroy the button when it's dismissed
-            3. The Action Service wants to abort the callback because the calling component (button) is not valid anymore.
-
-     */
-    scheduleDestroy: function (cmp, config) {
-        var stack      = this.PANELS_STACK,
-            panelParam = config.panelInstance,
-            panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam;
-
-        this.PANELS_TO_DESTROY_MAP[panelId] = true;
-        this.PANELS_INSTANCE[panelId].destroyPending = true;
-        this.PANELS_TO_DESTROY.push({cmp: cmp, config: config});
-    },
 
      /*
     * Destroy panel instance
@@ -224,8 +192,6 @@
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
         
         delete this.PANELS_OWNER[panelId];
-        delete this.PANELS_INSTANCE[panelId];
-        delete this.PANELS_TO_DESTROY_MAP[panelId];
 
         stack.splice(index, 1);
         children.splice(index, 1);

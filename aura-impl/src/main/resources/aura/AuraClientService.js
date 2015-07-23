@@ -138,6 +138,7 @@ AuraClientService = function AuraClientService () {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
+    this._useBootstrapCache = true;
     this.auraStack = [];
     this.appcacheDownloadingEventFired = false;
     this.isOutdated = false;
@@ -1106,9 +1107,15 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
             var action = $A.get("c.aura://ComponentController." + method);
 
-            action.setStorable({
-                "refresh": 0
-            });
+            if(acs._useBootstrapCache) {
+                action.setStorable({
+                    "refresh": 0
+                });                
+            } else {
+                action.setStorable({
+                    "ignoreExisting": true
+                });
+            }
             //
             // No, really, do not abort this. The setStorable above defaults this
             // to be abortable, but, even though nothing should ever trigger an action
@@ -1190,9 +1197,30 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             // INCOMPLETE: If we did not initialize from storage, flag an error, otherwise it is a no-op.
             //
             action.setCallback(acs,
-                function () {
+                function (a) {
                     $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-                    failCallback(!stored, " : No connection to server");
+                    
+                    // Even if bootstrap cache is disabled we still want to load from cache 
+                    // if action fails as "INCOMPLETE" for offline launch
+                    if (!acs._useBootstrapCache && storage) {
+                        var key = a.getStorageKey();
+                        storage.get(key).then(function(value) {
+                            if (value) {
+                                storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value.value]);
+                                $A.run(function() {
+                                    action.updateFromResponse(value.value);
+                                    action.finishAction($A.getContext());
+                                });
+                            } else {
+                                failCallback(true, " : No connection to server");
+                            }
+                        }, function() {
+                            failCallback(true, " : No connection to server");
+                        });
+                    } else {
+                        failCallback(!stored, " : No connection to server");                        
+                    }
+                    
                 }, "INCOMPLETE");
             //
             // ERROR: this is generally trouble, but if we already initialized, we won't flag it. We also don't flag
@@ -2281,9 +2309,9 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
 AuraClientService.prototype.injectComponentAsync = function(config, locator, eventHandlers, callback) {
     var acs = this;
     $A.componentService.newComponentAsync(undefined, function(component) {
-    	if (callback) {
-    		callback(component);
-    	}
+        if (callback) {
+            callback(component);
+        }
 
         acs.renderInjection(component, locator, eventHandlers);
     }, config, $A.getRoot(), false, false, true);
@@ -2581,6 +2609,18 @@ AuraClientService.prototype.invalidSession = function(token) {
     } else {
         refresh();
     }
+};
+
+/**
+ * Set whether Aura should attempt to load the getApplication action from cache first
+ * (useBootstrapCache = true) or if it should go to the server first (useBootstrapCache = false).
+ * 
+ * The default behavior is to load getApplication from cache 
+ *
+ * @export
+ */
+AuraClientService.prototype.setUseBootstrapCache = function(useBootstrapCache) {
+    this._useBootstrapCache = useBootstrapCache;
 };
 
 Aura.Services.AuraClientService = AuraClientService;

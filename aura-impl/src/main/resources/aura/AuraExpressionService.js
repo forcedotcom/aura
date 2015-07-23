@@ -177,7 +177,7 @@ AuraExpressionService.prototype.removeListener = function (reference, expression
  * @export
  */
 AuraExpressionService.prototype.create = function(valueProvider, config) {
-    return valueFactory.create(config, valueProvider);
+    return valueFactory.create(config, null, valueProvider);
 };
 
 /**

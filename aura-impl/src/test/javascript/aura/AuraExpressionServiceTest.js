@@ -16,7 +16,7 @@
 Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
-Test.Aura.AuraHistoryServiceTest = function(){
+Test.Aura.AuraExpressionServiceTest = function(){
     var $A = { ns : {} };
     var Aura = { Services:{} };
 

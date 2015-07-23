@@ -22,6 +22,7 @@
 function AuraStorageService(){
     this.storages = {};
     this.adapters = {};
+    this.version = "";
 }
 
 /**
@@ -46,7 +47,7 @@ AuraStorageService.prototype.getStorage = function(name) {
  * @param {number} defaultAutoRefreshInterval Specifies the default interval (seconds) after which cached data is to be refreshed.
  * @param {Boolean} debugLoggingEnabled Set to true to enable debug logging in the JavaScript console for the Aura Storage Service.
  * @param {Boolean} clearStorageOnInit Set to true to clear storage when storage is initialized.
- * @param {String} version The version for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
+ * @param {String} version The version of storage. for any item in the storage. This is useful if you want to avoid retrieving stale cached items for a newer version of your application.
  * @memberOf AuraStorageService
  * @returns {AuraStorage} Returns an AuraStorage object for the new storage.
  * @export
@@ -57,6 +58,11 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
     }
 
     var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
+
+    // apply the default version if one is not specified
+    if ($A.util.isUndefinedOrNull(version)) {
+        version = this.version;
+    }
 
     var config = {
         "name": name,
@@ -202,6 +208,25 @@ AuraStorageService.prototype.deleteStorage = function(name) {
     var promise = storage.deleteStorage();
     delete this.storages[name];
     return promise;
+};
+
+/**
+ * Sets the default version for all storages.
+ * @param {String} version default version for storages.
+ * @export
+ */
+AuraStorageService.prototype.setVersion = function(version) {
+    // ensure string
+    this.version = (version || "") + "";
+};
+
+/**
+ * Gets the default version for all storages.
+ * @return {String} the default version for storages.
+ * @export
+ */
+AuraStorageService.prototype.getVersion = function(version) {
+    return this.version;
 };
 
 Aura.Services.AuraStorageService = AuraStorageService;

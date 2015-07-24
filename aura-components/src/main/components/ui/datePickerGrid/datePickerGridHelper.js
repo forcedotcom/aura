@@ -391,7 +391,6 @@
     updateNameOfWeekDays: function(component){
         var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // The week days in Java is 1 - 7
         var namesOfWeekDays = $A.get("$Locale.nameOfWeekdays");
-        component.set("v._namesOfWeekdays", namesOfWeekDays);
         var days = [];
         if ($A.util.isNumber(firstDayOfWeek) && $A.util.isArray(namesOfWeekDays)) {
             for (var i = firstDayOfWeek; i < namesOfWeekDays.length; i++) {
@@ -401,6 +400,8 @@
                 days.push(namesOfWeekDays[j]);
             }
             component.set("v._namesOfWeekdays", days);
+        } else {
+            component.set("v._namesOfWeekdays", namesOfWeekDays);    
         }
     }
 });

@@ -15,7 +15,7 @@
  */
 ({
     createBody: function (component) {
-        component.set("v.loaded",false);
+        component.set("v.loaded", false);
         component._itemInfo = [];
         this.buildBody(component,
             function createBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
@@ -28,16 +28,40 @@
             }
         );
     },
-
+    clearUnrenderedBody: function (component) {
+        var currentBody = component.get('v.body');
+        var cleanedCmps = 0;
+        if (currentBody.length) {
+            for (var i = 0; i < currentBody.length; i++) {
+                if (currentBody[i].isValid() && !currentBody[i].isRendered()) {
+                    currentBody[i].destroy();
+                    component._itemInfo.splice(i - cleanedCmps, 1);
+                    cleanedCmps++;
+                }
+            }
+            if (cleanedCmps) {
+                $A.warning([
+                    'Performance degradation: ',
+                    'Multiple items were set in iteration',
+                     '[id:' + component.getGlobalId() + ']',
+                    'in the same Aura cycle.'
+                ].join(''));
+            }
+        }
+    },
     updateBody: function (component) {
-        if(component.get("v.loaded")===false){
-        	component._queueUpdate=true;
+        if (component.get("v.loaded") === false) {
+        	component._queueUpdate = true;
             return component._queueUpdate;
         }
+
+        this.clearUnrenderedBody(component);
+
         component.set("v.loaded",false);
         var itemInfo = component._itemInfo.slice();
+        var helper = this;
         component._itemInfo.length = 0;
-        var helper=this;
+
         this.buildBody(component,
             function updateBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
                 var found = false;

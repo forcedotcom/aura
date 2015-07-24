@@ -218,8 +218,7 @@
 
     handleDataChange: function(component, event) {
         var concreteCmp = component.getConcreteComponent();
-        concreteCmp.set("v.items", event.getParam("data"));
-        this.matchText(concreteCmp);
+        this.matchText(concreteCmp, event.getParam("data"));
     },
 
     handleEsckeydown: function(component, event) {
@@ -313,10 +312,10 @@
         }
     },
 
-    matchFunc: function(component) {
+    matchFunc: function(component, items) {
+        items = items || component.get('v.items');
         var keyword = component.get("v.keyword");
         var propertyToMatch = component.get("v.propertyToMatch");
-        var items = component.get("v.items");
         var regex;
         try {
             regex = new RegExp(keyword, "i");
@@ -339,8 +338,8 @@
         component.set("v.items", items);
     },
 
-    matchFuncDone: function(component) {
-        var items = component.get("v.items");
+    matchFuncDone: function(component, items) {
+        items = items || component.get('v.items');
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
@@ -353,16 +352,22 @@
         }
     },
 
-    matchText: function(component) {
+    matchText: function(component, items) {
         var action = component.get("v.matchFunc");
         if (action) {
             action.setCallback(this, function(result) {
-                this.matchFuncDone(component);
+                //@dval: Refactor all this nonsense:
+                // - it should not be an action but js function
+                // - it should not have the responsability to set the items directly
+                // - we should not fire yet another stupid event since we are in the callback
+
+                //this.matchFunc(component, items);
+                this.matchFuncDone(component, items);
             });
             $A.enqueueAction(action);
         } else {
-            this.matchFunc(component);
-            this.matchFuncDone(component);
+            this.matchFunc(component, items);
+            this.matchFuncDone(component, items);
         }
     },
 

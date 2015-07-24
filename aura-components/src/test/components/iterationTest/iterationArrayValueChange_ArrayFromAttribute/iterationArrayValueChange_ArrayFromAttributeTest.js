@@ -44,7 +44,7 @@
          	$A.test.assertEquals( expected.length, iterCmpEle.length, "number of element in iteration component is not expected after clear v.items in iteration." );
     		
          	var iter = cmp.find("iterationOnArrayAttribute");
-         	iter.set("v.items",[0,1,2,3,4,5,6,7,8,9]);
+         	iter.set("v.items",[0,1,2,3,4,5,6,7,8,9], true);
 		}, function(cmp) {
 			var expected = [0,1,2,3,4,5,6,7,8,9];
 			var iterCmpEle = cmp.find("iterationOnArrayAttribute").getElements();
@@ -88,7 +88,7 @@
         	var iter = cmp.find("iterationOnArrayAttribute");
             var data = iter.get("v.items");
             data[index] = newValue; 
-            iter.set("v.items", data);
+            iter.set("v.items", data, true);
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnArrayAttribute").getElements();
          	var expected = [0, "999", 2, 3, 4];
@@ -133,7 +133,7 @@
         	var iter = cmp.find("iterationOnArrayAttribute");
             var data = iter.get("v.items");
             data.splice( index, 0, newValue);
-            iter.set("v.items", data);
+            iter.set("v.items", data, true);
         }, function(cmp) {
         	var iterCmpEle = cmp.find("iterationOnArrayAttribute").getElements();
          	var expected = ["0", 0, 1, 2, 3, 4];

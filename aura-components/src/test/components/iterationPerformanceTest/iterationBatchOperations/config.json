@@ -1,10 +1,6 @@
 {
   "browsers":[ "chrome" ],
   "numberOfRuns" : 1,
-  "variability": [
-    { "Network.numRequests" : 20 } 
-  ],
-  "options" : { 
-    "metricsMode" : "foo" 
-  }
+  "variability": [],
+  "options" : {}
 }

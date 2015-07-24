@@ -250,7 +250,14 @@
             this.openStartDatePicker(cmp);
         }, function(cmp){
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
+
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function(){
+                  return $A.util.hasClass(grid.find(startId).getElement(), "start-date");  
+                },
+                "start of range should have start-date class"
+            );
         }]
     },
 
@@ -285,7 +292,14 @@
             this.openEndDatePicker(cmp);
         }, function(cmp){
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
+
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function(){
+                  return $A.util.hasClass(grid.find(endId).getElement(), "end-date");  
+                },
+                "end of range should have end-date class"
+            );
         }]
     },
 
@@ -324,14 +338,28 @@
             this.openStartDatePicker(cmp);
         }, function(cmp){
             var startId = this.findDatePosition(START_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(startId).getElement(), "start-date"), "start of range should have start-date class");
+
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function(){
+                  return $A.util.hasClass(grid.find(startId).getElement(), "start-date");  
+                },
+                "start of range should have start-date class"
+            );
         }, function(cmp){
             this.selectDate(datePicker, START_DATE);//close the datepicker
         }, function(cmp){
             this.openEndDatePicker(cmp);
         }, function(cmp){
             var endId = this.findDatePosition(END_DATE);
-            $A.test.assertTrue($A.util.hasClass(grid.find(endId).getElement(), "end-date"), "end of range should have end-date class");
+
+            $A.test.addWaitForWithFailureMessage(
+                true,
+                function(){
+                  return $A.util.hasClass(grid.find(endId).getElement(), "end-date");  
+                },
+                "end of range should have end-date class"
+            );
         }]
     },
 

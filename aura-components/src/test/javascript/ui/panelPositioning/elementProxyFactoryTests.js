@@ -17,7 +17,7 @@
  */
 Function.RegisterNamespace("Test.Components.Ui.PanelPositioning");	
 
-[Fixture,Skip("There's a disconnect between local and server files causing these to error.")]
+[Fixture]
 Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 
 	var targetHelper,
@@ -26,6 +26,14 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		proxyCount = 0,
 		bakedMap = {},
 		windowMock = {};
+
+	var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
+			assert : function(exp, msg) {
+				if(!exp) {
+					throw msg;
+				}
+			}
+		}));
 
 	
 	var callback = function (path, fn) {fn();};
@@ -64,6 +72,8 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 			};
 		};
 
+	
+
 		var obj = result({ElementProxy:ElementProxy}, windowMock);
 		proxyFactory = obj;
 	})]
@@ -79,24 +89,72 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 
 		[Fact]
 		function getElementReturnsProxy() {
-			var el = {id:'foo'};
-
-			var prox = proxyFactory.getElement(el);
+			var el = {id:'foo', nodeType: 1};
+			var prox;
+			mockAura(function() {
+				prox = proxyFactory.getElement(el);
+			});
 			Assert.NotEmpty(prox);
 		}
 
 		[Fact]
 		function returnsSameElementForId() {
 			proxyFactory.resetFactory();
-			var el = {id:'foo'};
+			var el = {id:'foo', nodeType: 1};
 			proxyCount = 0;
 
-			var prox = proxyFactory.getElement(el);
-			prox = proxyFactory.getElement(el);
+			mockAura(function() {
+				var prox = proxyFactory.getElement(el);
+				prox = proxyFactory.getElement(el);
+			});
 
 			var expected = 1;
 			var actual = proxyCount;
 
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function exceptionForNullElement() {
+			proxyFactory.resetFactory();
+			var el = null;
+			var prox;
+			var actual;
+			proxyCount = 0;
+
+			mockAura(function() {
+				try {
+					prox = proxyFactory.getElement(el);
+				} catch (e) {
+					actual = e.toString();
+				}
+			})
+			//null element should result in null response
+			
+
+			var expected = "Element Proxy requires an element";
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function exceptionForOnNonElement() {
+			proxyFactory.resetFactory();
+			var el = {id:1};
+			var prox, actual;
+			proxyCount = 0;
+			
+			//null element should result in null response
+			//
+			mockAura(function() {
+				try {
+					prox = proxyFactory.getElement(el);
+				} catch (e) {
+					actual = e.toString();
+				}
+				
+			});
+
+			var expected = "Element Proxy requires an element";
 			Assert.Equal(expected, actual);
 		}
 	}
@@ -107,9 +165,13 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function bakeOne() {
 			proxyFactory.resetFactory();
-			var el = {id:'foo1'};
-			var prox = proxyFactory.getElement(el);
-			proxyFactory.bakeOff();
+			var el = {id:'foo1', nodeType: 1};
+			var prox;
+			mockAura(function() {
+				prox = proxyFactory.getElement(el);
+				proxyFactory.bakeOff();
+			});
+			
 			Assert.True(bakedMap.foo1);
 		}
 
@@ -117,13 +179,18 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		function bakeMany() {
 			bakedMap = {};
 			proxyFactory.resetFactory();
-			var el = {id:'foo1'};
-			var el2 = {id:'foo2'};
-			var el3 = {id:'foo3'};
-			var prox = proxyFactory.getElement(el);
-			proxyFactory.getElement(el2);
-			proxyFactory.getElement(el3);
-			proxyFactory.bakeOff();
+			var el = {id:'foo1', nodeType: 1};
+			var el2 = {id:'foo2', nodeType: 1};
+			var el3 = {id:'foo3', nodeType: 1};
+			var prox;
+			
+			mockAura(function() {
+				prox = proxyFactory.getElement(el);
+				proxyFactory.getElement(el2);
+				proxyFactory.getElement(el3);
+				proxyFactory.bakeOff();
+			});
+			
 			Assert.True(bakedMap.foo1);
 			Assert.True(bakedMap.foo2);
 			Assert.True(bakedMap.foo3);
@@ -137,12 +204,16 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function countInc() {
 			proxyFactory.resetFactory();
-			var el = {id:'bas'};
-			var prox = proxyFactory.getElement(el);
-			var prox2 = proxyFactory.getElement(el);
+			var el = {id:'bas', nodeType: 1};
+			var prox, prox2, actual;
 
+			mockAura(function() {
+				prox = proxyFactory.getElement(el);
+				prox2 = proxyFactory.getElement(el);
+				actual = proxyFactory.getReferenceCount(el);
+			})
+			
 			var expected = 2;
-			var actual = proxyFactory.getReferenceCount(el);
 
 			Assert.Equal(expected, actual);
 		}
@@ -150,15 +221,20 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		[Fact]
 		function eviction() {
 			proxyFactory.resetFactory();
-			var el = {id:'bas'};
-			var prox = proxyFactory.getElement(el);
-			var prox2 = proxyFactory.getElement(el);
-			prox.release();
-			prox2.release();
+			var el = {id:'bas', nodeType: 1};
+			var prox, prox2, actual;
+
+			mockAura(function() {
+				prox = proxyFactory.getElement(el);
+				prox2 = proxyFactory.getElement(el);
+				prox.release();
+				prox2.release();
+				actual = proxyFactory.getReferenceCount(el);
+			});
+
+			
 
 			var expected = 0;
-			var actual = proxyFactory.getReferenceCount(el);
-
 
 			Assert.Equal(0, proxyFactory.getReferenceCount(el));
 

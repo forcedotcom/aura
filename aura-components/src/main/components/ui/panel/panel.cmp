@@ -21,26 +21,26 @@
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />
     <aura:attribute name="class" type="String" description="CSS class" />
-    <aura:attribute name="titleDisplay" type="Boolean" default="true" description="The title of the window can be shown/hidden for accessibility" />
+    <aura:attribute name="titleDisplay" type="Boolean" default="true" description="If true, the title of the window can be shown/hidden for accessibility. The default is true." />
     <aura:attribute name="startOfDialogLabel" type="String" default="Start of Dialog" description="Accessibility label that indicates the start of the dialog" />
-    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Adds a listener to close the dialog when a user clicks outside the dialog" />
+    <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="If true, adds a listener to close the dialog when a user clicks outside the dialog. The default is false." />
     <aura:attribute name="closeAction" type="Object" 
                     description="Overrides default close action (which is destroy) on click outside, tab out and Esc key press. The action is called with two parameters: panel component and one of 'closeOnEsc', 'closeOnTabOut' or 'closeOnClickOut'"/>
-    <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog" />
+    <aura:attribute name="showCloseButton" type="Boolean" default="true" description="If true, adds a close button in top right corner of the dialog. The default is true." />
     <aura:attribute name="closeDialogLabel" type="String" default="Close" description="Close dialog button label" />
-    <aura:attribute name="useTransition" type="Boolean" default="true" description="Use css transition when showing or hiding the panel" />
+    <aura:attribute name="useTransition" type="Boolean" default="true" description="If true, uses css transition when showing or hiding the panel. The default is true." />
     <aura:attribute name="animation" type="String" default="bottom" description="Adds animation to the dialog" />
     <aura:attribute name="closeAnimation" type="String" description="Adds a different animation for closing the panel" />
-    <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets the panel as the first focusable element"/>
+    <aura:attribute name="autoFocus" type="Boolean" default="true" description="If true, sets the panel as the first focusable element. The default is true."/>
     <aura:attribute name="referenceElementSelector" type="String" description="A selector representing the reference element to position relative to. If the selector resolves to mutiple elements the first one will be used." />
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned." />
     <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />
-    <aura:attribute name="showPointer" type="Boolean" default="false" description="Show a pointer that points to the referenceElement" />
+    <aura:attribute name="showPointer" type="Boolean" default="false" description="If true, shows a pointer that points to the referenceElement. The default is false." />
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
     <aura:handler name="change" value="{!v.referenceElement}" action="{!c.onRefChange}" />
-    <aura:attribute name="closeButton" type="Aura.Component[]" />
+    <aura:attribute name="closeButton" type="Aura.Component[]" description="Replaces the default close button with a custom one" />
     
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
     

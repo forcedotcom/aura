@@ -29,7 +29,7 @@ public class TypeParser {
      * Pattern for tag descriptors : foo:bar Group 0 = QName = foo:bar Group 1 = prefix Group 2 = namespace = foo Group
      * 3 = name = bar prefix = null
      */
-    private static final Pattern TAG_PATTERN = Pattern.compile("(?:([\\w\\*]+)://)?(?:([\\w\\-\\*]+):)?([\\w\\$\\*]+)");
+    private static final Pattern TAG_PATTERN = Pattern.compile("(?:([\\w\\*]+)://)?(?:([\\w\\-\\*]+)[:.])?([\\w\\$\\*]+)");
 
     /**
      * Pattern for class descriptors: java://foo.bar.baz Group 0 = QName = java://foo.bar.baz Group 1 = prefix = java
@@ -57,8 +57,6 @@ public class TypeParser {
             }
             
             type = new Type(prefix, namespace, name, null);
-        } else {
-            return parseClass(qualifiedName);
         }
     	
     	return type;

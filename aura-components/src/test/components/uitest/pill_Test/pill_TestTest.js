@@ -18,7 +18,7 @@
 
     //test icon background
 	testIconBackgroundColorWithIcon: {
-        test: [function(cmp) {
+        test: function(cmp) {
         	var pillIcons = $A.test.select('.pillIcon');
 
             //there should only be one pill,  because the other two pills doesnt have iconUrl
@@ -31,15 +31,9 @@
             var elPillIcon = pillIcons[0];
 
             //assert background color
-            var stylePillIcon = $A.util.getElementAttributeValue(elPillIcon, 'style');
-
-            $A.test.assertTrue(
-                $A.test.contains(
-                    stylePillIcon.replace(/ /g, '').toLowerCase(),
-                    'background-color:#f0f'
-                ),
-                '.pillIcon should have a background style. Found style: ' + stylePillIcon
-            )
-        }]
-    }
+            var stylePillIcon = $A.test.getStyle(elPillIcon,"background-color");
+ 			var expectedStyle = "rgb(255, 0, 255)";
+            $A.test.assertEquals(expectedStyle, stylePillIcon, '.pillIcon should have a background style. Found style: ' + stylePillIcon)
+        }
+	}
 })

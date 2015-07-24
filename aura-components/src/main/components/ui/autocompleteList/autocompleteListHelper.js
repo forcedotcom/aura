@@ -356,7 +356,12 @@
         var action = component.get("v.matchFunc");
         if (action) {
             action.setCallback(this, function(result) {
-                this.matchFunc(component, items);
+                //@dval: Refactor all this nonsense:
+                // - it should not be an action but js function
+                // - it should not have the responsability to set the items directly
+                // - we should not fire yet another stupid event since we are in the callback
+
+                //this.matchFunc(component, items);
                 this.matchFuncDone(component, items);
             });
             $A.enqueueAction(action);

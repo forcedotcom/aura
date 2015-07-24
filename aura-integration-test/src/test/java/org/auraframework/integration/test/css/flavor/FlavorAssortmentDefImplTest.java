@@ -15,7 +15,7 @@
  */
 package org.auraframework.integration.test.css.flavor;
 
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -80,9 +80,9 @@ public class FlavorAssortmentDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> style = Flavors.customFlavorDescriptor(cmp1, "flavorTestAlt", "flavorsAlt");
 
         DefDescriptor<FlavorAssortmentDef> fa = addFlavorAssortment(fmt);
-        FlavorMapping mapping = fa.getDef().computeOverrides();
+        FlavorOverrideLocator mapping = fa.getDef().computeOverrides();
 
-        assertEquals(style, mapping.getLocation(cmp1, "default").get());
+        assertEquals(style, mapping.getLocation(cmp1, "default").get().getDescriptor());
     }
 
     public void testSerialization() throws Exception {

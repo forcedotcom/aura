@@ -13,19 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.css;
 
-import java.util.Map;
+import java.io.Serializable;
 
-import org.auraframework.css.FlavorAnnotation;
-import org.auraframework.def.FlavoredStyleDef;
+import com.google.common.base.Optional;
 
 /**
- * Builder for flavor css files.
+ * An annotation containing metadata about a particular flavor.
  */
-public interface FlavoredStyleDefBuilder extends BaseStyleDefBuilder<FlavoredStyleDef> {
+public interface FlavorAnnotation extends Serializable {
     /**
-     * Sets the specific flavor metadata defined by the source.
+     * Gets the name of the flavor.
      */
-    FlavoredStyleDefBuilder setFlavorAnnotations(Map<String, FlavorAnnotation> annotations);
+    String getFlavorName();
+
+    /**
+     * Optional <code>extends</code> param.
+     * */
+    Optional<String> getExtends();
+
+    /**
+     * Optional <code>overrides-if</code> param.
+     */
+    Optional<String> getOverridesIf();
 }

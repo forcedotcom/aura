@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.throwable.quickfix.StyleParserException;
@@ -82,7 +83,7 @@ public final class FlavorExtendsPlugin implements Plugin {
         }
 
         for (Comment comment : selector.get().comments()) {
-            Optional<FlavorAnnotation> annotation = FlavorAnnotation.find(comment);
+            Optional<FlavorAnnotation> annotation = FlavorAnnotationImpl.find(comment);
 
             if (annotation.isPresent()) {
                 knownFlavors.add(annotation.get().getFlavorName());

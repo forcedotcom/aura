@@ -22,7 +22,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocation;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -103,7 +104,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
     }
 
     @Override
-    public Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorMapping mapping) throws QuickFixException {
+    public Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorOverrideLocator mapping) throws QuickFixException {
         if (singleComponent != null) {
             return ImmutableMap.of(singleComponent, flavor);
         } else if (removeAllNamespace != null) {
@@ -114,11 +115,11 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         MasterDefRegistry mdr = context.getDefRegistry();
         Map<DefDescriptor<ComponentDef>, String> map = new HashMap<>();
 
-        // first check the components in the mapping
+        // first check the components in the overrides list
         for (DefDescriptor<ComponentDef> entry : mapping.entries()) {
             if (componentFilter.matchDescriptor(entry)) {
-                Optional<DefDescriptor<FlavoredStyleDef>> style = mapping.getLocation(entry, flavor);
-                if (style.isPresent()) {
+                Optional<FlavorOverrideLocation> override = mapping.getLocation(entry, flavor);
+                if (override.isPresent()) {
                     map.put(entry, flavor);
                 }
             }
@@ -166,7 +167,7 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
 
         if (dd != null && dd.getDefType() == DefType.FLAVOR_ASSORTMENT) { // fixme!
             try {
-                FlavorMapping mapping = ((FlavorAssortmentDef) dd.getDef()).computeOverrides();
+                FlavorOverrideLocator mapping = ((FlavorAssortmentDef) dd.getDef()).computeOverrides();
 
                 json.writeMapBegin();
 

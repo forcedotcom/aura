@@ -115,7 +115,7 @@ public final class StyleParser implements Parser {
 
             builder.setContent(result.content());
             builder.setThemeExpressions(result.themeExpressions());
-            builder.setFlavorNames(result.flavorNames());
+            builder.setFlavorAnnotations(result.flavorAnnotations());
             return (D) builder.build();
         } else if (descriptor.getDefType() == DefType.RESOURCE) {
             return (D) new ResourceDefHandler<>((DefDescriptor<ResourceDef>) descriptor,

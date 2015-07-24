@@ -277,4 +277,8 @@ public class DefDescriptorImplTest extends AuraImplTestCase {
                 DefDescriptorImpl.getInstance("aura:bundled", ComponentDef.class, bundle2), -1);
     }
 
+    public void testFunkyDescriptor() {
+        DefDescriptorImpl.getInstance("layout://rl-Case-EDIT-FULL-----_1-0-6c5936744658364d59726d6c6a4d7a31654d697872673d3d.c", ComponentDef.class);
+    }
+
 }

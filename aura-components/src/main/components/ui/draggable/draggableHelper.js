@@ -116,6 +116,8 @@
 	
 	/**
 	 * Override this method to provide your own custom logic.
+	 * @param {Aura.Component} component - this component
+	 * @param {Event} event - HTML DOM event
 	 * @return Map<String, String> the data transfer
 	 */
 	getDataTransfer: function(component, event) {
@@ -209,7 +211,7 @@
 			this.exitDragOperation(component, isInAccessibilityMode);
 			if (isValid) {
 				// drop operation is performed
-				this.updateDropOperationStatus(component, "dragEnd");
+				this.updateDropOperationStatus(component, "dragEnd", { "dragTarget" :  target});
 			} else {
 				// drag operation is ended without performing drop operation.
 				var dragEvent = component.getEvent("dragEnd");
@@ -230,17 +232,18 @@
 	 * @param {Aura.Event} dragEvent - Aura Event for dropComplete. Must be of type ui:dragEvent
 	 */
 	handleDropComplete: function(component, dragEvent) {
-		this.updateDropOperationStatus(component, "dropComplete", dragEvent);
+		this.updateDropOperationStatus(component, "dropComplete", { "dropCompleteEvent" : dragEvent});
 	},
 	
 	/**
 	 * Update drop operation status. Drop operation is considered complete when
 	 * dragEnd HTML event and dropComplete Aura event have been fired. 
+	 * @private
 	 * @param {Aura.Component} component - this component
 	 * @param {String} eventType - "dragEnd" for dragEnd HTML DOM Event or "dropComplete" for dropComplete Aura event
-	 * @param {Aura.Event} [event] - the Aura event for dropComplete
+	 * @param {Object} config - additional config
 	 */
-	updateDropOperationStatus: function(component, eventType, event) {
+	updateDropOperationStatus: function(component, eventType, config) {
 		var dragOperationStatus = null
 		var dragOperation = component.$dragOperation$;
 		if ($A.util.isUndefinedOrNull(dragOperation)) {
@@ -256,13 +259,15 @@
 		
 		if (eventType === "dragEnd") {
 			dragOperationStatus.setDragEndStatus({
-				"type": component.get("v.type")
+				"type": component.get("v.type"),
+				"target": config["dragTarget"]
 			});
 		} else if (eventType === "dropComplete") {
+			var dropCompleteEvent = config["dropCompleteEvent"];
 			dragOperationStatus.setDropStatus(true);
 			dragOperationStatus.setDropCompleteStatus({
-				"dropComponent": event.getParam("dropComponent"),
-				"status": event.getParam("dropComplete")
+				"dropComponent": dropCompleteEvent.getParam("dropComponent"),
+				"status": dropCompleteEvent.getParam("dropComplete")
 			});
 		}
 		
@@ -273,6 +278,7 @@
 			dragEvent.setParams({
 				"type": dragEndStatus["type"],
 				"dragComponent": component,
+				"dragComponentTarget": dragEndStatus["target"],
 				"dropComponent": dragCompleteStatus["dropComponent"],
 				"data": component.get("v.dataTransfer"),
 				"dropComplete": dragCompleteStatus["status"]

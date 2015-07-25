@@ -280,10 +280,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
 
-        if (HttpStatus.SC_OK != statusCode) {
-            fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                    HttpStatus.SC_OK, response));
-        }
+        assertEquals("Status code should be 500", HttpStatus.SC_INTERNAL_SERVER_ERROR, statusCode);
 
         assertTrue("response not wrapped with ERROR marker: " + response,
                 response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));
@@ -359,7 +356,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         HttpGet get = obtainGetMethod("/aura?aura.tag&nocache");
         HttpResponse response = perform(get);
 
-        assertEquals(HttpStatus.SC_OK, getStatusCode(response));
+        assertEquals(HttpStatus.SC_INTERNAL_SERVER_ERROR, getStatusCode(response));
         String responseText = getResponseBody(response);
         assertTrue("Expected tag error in: " + responseText,
                 responseText.contains("Invalid request, tag must not be empty"));
@@ -662,7 +659,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 "<aura:application><aura:attribute name='bah'/></aura:application>");
         HttpGet get = obtainGetMethod(String.format("/%s/%s.app", desc.getNamespace(), desc.getName()));
         HttpResponse httpResponse = perform(get);
-        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        assertEquals(HttpStatus.SC_INTERNAL_SERVER_ERROR, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
         assertTrue("Expected null descriptor error message but got: " + response,
                 response.contains("descriptor is null"));
@@ -677,7 +674,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String url = String.format("/aura?aura.tag=foo:bar:baz");
         HttpGet get = obtainGetMethod(url);
         HttpResponse httpResponse = perform(get);
-        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        assertEquals(HttpStatus.SC_INTERNAL_SERVER_ERROR, getStatusCode(httpResponse));
         String response = getResponseBody(httpResponse);
         assertTrue("Expected 'SystemErrorException: Invalid Descriptor Format' but got: " + response,
                 response.contains("SystemErrorException: Invalid Descriptor Format: foo:bar:baz"));

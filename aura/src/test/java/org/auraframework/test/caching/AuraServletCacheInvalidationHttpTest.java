@@ -62,7 +62,7 @@ public class AuraServletCacheInvalidationHttpTest extends AuraHttpTestCase {
         int statusCode = getStatusCode(httpResponse);
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
-        assertTrue("Aura servlet should return 200.", statusCode == HttpStatus.SC_OK);
+        assertTrue("Aura servlet should return 500.", statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR);
         assertOutdated(response);
     }
 

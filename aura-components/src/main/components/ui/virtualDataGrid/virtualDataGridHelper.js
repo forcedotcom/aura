@@ -18,7 +18,8 @@
 	NAME: "ui:virtualDataGrid",
 	
     DELEGATED_EVENTS: [
-        'click'
+        'click',
+        'keydown'
     ],
     DEFAULT_TEMPLATES : {
         row    : 'tr',

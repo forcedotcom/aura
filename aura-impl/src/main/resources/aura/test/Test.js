@@ -42,30 +42,10 @@ TestInstance = function() {
 
     //vars to store initial and whitelisted variables exposed on window object
     var _initialGlobalState = Object.keys(window);
-    //NIHAR: TODO: FIXME: THIS IS A TEMPORARY SOLUTION UNTIL AURA GETS IT'S STUFF NESTED IN A SINGLE VAR
-    //THEN WE WILL NOT NEED THIS LIST. FLAG EVERYTHING THAT'S NOT AURA
-    var _whitelistedPollutants = ["fewActions", "actionSucceeeded", "animate", "yTime", "yLabels",
-        "xNumbers", "EclairNG", "_", "Scroller", "__S", "FORCE", "attachFastClick", "dismissError",
-        "IndexedDBStorageAdapter", "aura", "PerfLogLevel", "PerfConstants", "PerfShim", "AuraEventService",
-        "AuraHistoryService", "AuraExpressionService", "AuraComponentService", "AuraClientService", "AuraStorage",
-        "AttributeDefSet", "AttributeDef", "ControllerDef", "Action", "ActionDef", "Event", "EventDef", "HelperDef",
-        "GlobalValueProviders", "ProviderDef", "ComponentDef", "InvalidComponent", "ModelDef", "PassthroughValue",
-        "ActionReferenceValue", "FunctionCallValue", "PropertyReferenceValue", "DefDescriptor", "AuraError",
-        "Logger", "$A", "Aura", "CKEDITOR", "moment", "FastClick", "ES6Promise", "WallTime", "Sfdc", "org",
-        "Sizzle", "LC", "SfdcFramework", "RecordGlobalValueProvider", "LoadingScreen", "UserContext",
-        "PreferenceBits", "pageStartTime", "csr", "$", "jQuery", "iconsByType", "walkthrough", 
-        "SfdcApp", "WalkthroughCommandFunctions", "ChainedWTStartUrlHack", "ChainedWTDefinitionMarker",
-        "LocalStorageOnlyDefinitionMarker", "WalkthroughAuthoringHelp", "WalkthroughMessageSeverity", 
-        "SalesforceClouds", "WalkthroughTypes", "WalkthroughStatus", "WalkthroughApp", "WalkthroughCodeVersion"];
 
     /** @private **/
     this.getInitialGlobalState = function() {
         return _initialGlobalState;
-    };
-
-    /** @private **/
-    this.getWhitelistedVariables = function() {
-        return _whitelistedPollutants;
     };
     
     this.installOverride();
@@ -2065,14 +2045,14 @@ TestInstance.prototype.createHttpRequest = function() {
  * @export
  * @function Test#checkGlobalNamespacePollution
  */
-TestInstance.prototype.checkGlobalNamespacePollution = function() {
+TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollutants) {
     var that = this,
         pollutants = [],
         initialGlobalState = that.getInitialGlobalState();
     if(!window || !initialGlobalState.length) {
         return pollutants;
     }
-    var knownPollutants = initialGlobalState.concat(that.getWhitelistedVariables());
+    var knownPollutants = initialGlobalState.concat(whitelistedPollutants);
     var currentGlobalState = Object.keys(window);
     for (var i = currentGlobalState.length - 1; i >= 0; i--) {
         var key = currentGlobalState[i];

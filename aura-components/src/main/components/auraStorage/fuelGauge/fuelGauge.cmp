@@ -22,7 +22,7 @@
 	<aura:attribute name="enabled" type="Boolean"/>
 	<aura:attribute name="implementation" type="String"/>
     <aura:handler event="auraStorage:modified" action="{!c.update}"/>
-    <aura:renderif isTrue="{!v.enabled}">
+    <aura:if isTrue="{!v.enabled}">
     	<ui:stamp aura:id="stamp" severity="success" onclick="{!c.showStats}">{!v.value} K</ui:stamp>
-   	</aura:renderif>
+   	</aura:if>
 </aura:component>

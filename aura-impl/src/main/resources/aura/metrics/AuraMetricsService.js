@@ -22,8 +22,8 @@
  * @export
 **/
 Aura.Services.MetricsService = function MetricsService() {
-    this.collector                 = {"default": []};
-    this.globalHandlers            = {"transactionEnd": []};
+    this.collector                 = { "default": [] };
+    this.globalHandlers            = { "transactionEnd": [], "transactionsKilled": [] };
     this.bootstrap                 = {};
     this.registeredPlugins         = {};
     this.pluginInstances           = {};
@@ -44,6 +44,7 @@ Aura.Services.MetricsService.START    = 'start';
 Aura.Services.MetricsService.END      = 'end';
 Aura.Services.MetricsService.STAMP    = 'stamp';
 Aura.Services.MetricsService.DEFAULT  = 'default';
+Aura.Services.MetricsService.MAXTIME  = 30000; // Max time for a transaction to finish
 
 /**
  * Initialize function
@@ -180,7 +181,6 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
 **/
 Aura.Services.MetricsService.prototype.onTransactionEnd = function (callback) {
     this.globalHandlers["transactionEnd"].push(callback);
-    this.hasGlobalHandlers = true;
 };
 
 /**
@@ -190,17 +190,43 @@ Aura.Services.MetricsService.prototype.onTransactionEnd = function (callback) {
  * @export
 **/
 Aura.Services.MetricsService.prototype.detachOnTransactionEnd = function (callback) {
-    var handlers = this.globalHandlers["transactionEnd"],
-        position = handlers.indexOf(callback);
+    this.detachHandlerOfType(callback, "transactionEnd");
+};
+
+/**
+ * Add a callback everytime a transaction ends.
+ * @param {function} callback Function to execute for every transaction
+ * @public
+ * @export
+**/
+Aura.Services.MetricsService.prototype.onTransactionsKilled = function (callback) {
+    this.globalHandlers["transactionsKilled"].push(callback);
+};
+
+/**
+ * Unbind a callback everytime a transaction ends.
+ * @param {function} callback Function to detach for every transaction
+ * @public
+ * @export
+**/
+Aura.Services.MetricsService.prototype.detachOnKilledTransactions = function (callback) {
+    this.detachHandlerOfType(callback, "transactionsKilled");
+};
+
+/**
+ * Unbind a callback for a give action
+ * @param {function} callback Function to detach for every transaction
+ * @param {name} callback Function to detach for every transaction
+**/
+Aura.Services.MetricsService.prototype.detachHandlerOfType = function (callback, name) {
+    var handlers = this.globalHandlers[name],
+        position = handlers.indexOf(callback); // we don't guard, since we control the input name
 
     if (position > -1) {
         handlers.splice(position, 1);
     }
-
-    if (!handlers.length) {
-        this.hasGlobalHandlers = false;
-    }
 };
+
 
 /**
  * Check if we are in a transcation already
@@ -272,6 +298,7 @@ Aura.Services.MetricsService.prototype.transactionStart = function (ns, name, co
  * @export
 **/
 Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, config, postProcess) {
+    //console.time('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);
     var id             = (ns || Aura.Services.MetricsService.DEFAULT) + ':' + name,
         transaction    = this.transactions[id],
         transactionCfg = $A.util.apply((transaction && transaction["config"]) || {}, config, true, true),
@@ -319,7 +346,7 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
             postProcess(parsedTransaction);
         }
 
-        if (this.hasGlobalHandlers) {
+        if (this.globalHandlers["transactionEnd"].length) {
             this.callHandlers("transactionEnd", parsedTransaction);
         }
 
@@ -336,12 +363,15 @@ Aura.Services.MetricsService.prototype.transactionEnd = function (ns, name, conf
 
         if (!this.inTransaction()) {
             this.clearMarks();
+        } else {
+            this.killLongRunningTransactions(); // it will call its handlers internally
         }
 
     } else {
         // If there is nobody to process the transaction, we just need to clean it up.
         delete this.transactions[id];
     }
+    //console.timeEnd('>>>> TRANSACTIONPROCESSING > ' + ns + ':' + name);
 };
 
 /**
@@ -364,6 +394,28 @@ Aura.Services.MetricsService.prototype.callHandlers = function (type, t) {
         for (var i = 0; i < handlers.length; i++) {
             handlers[i](t);
         }
+    }
+};
+
+/**
+ * Tries to kill transaction than are been in the queue for a long period of time
+ * defined via static param on metricsService
+ * @private
+**/
+Aura.Services.MetricsService.prototype.killLongRunningTransactions = function () {
+    var now = this.time();
+    var transactionsKilled = [];
+
+    for (var i in this.transactions) {
+        var transaction = this.transactions[i];
+        if (now - transaction["ts"] > Aura.Services.MetricsService.MAXTIME) {
+            transactionsKilled.push(transaction);
+            delete this.transactions[i];
+        }
+    }
+
+    if (transactionsKilled.length && this.globalHandlers["transactionsKilled"].length) {
+        this.callHandlers("transactionsKilled", transactionsKilled);
     }
 };
 

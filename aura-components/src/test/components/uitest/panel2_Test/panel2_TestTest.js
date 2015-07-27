@@ -137,6 +137,28 @@
     	}]
     },
     
+    
+    /**
+     * Test to verify positioned panels have display:none added when hiding it. 
+     * Bug: W-2653120
+     */
+    testPositionedPanelHide: {
+    	attributes : {"testPanelType" : "panel", "testDirection" : "east", "testShowPointer" : true, "testReferenceElementSelector" : ".createPanelBtnClass"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		panelGlobalId = this.getGlobalIdForPanelModal(1);
+    		panel = $A.getCmp(panelGlobalId);
+    		panel.hide();
+    	}, function(cmp) {
+    	$A.test.addWaitForWithFailureMessage("none", function () {
+            return $A.test.getStyle(panel.getElement(),'display')
+        }, "Positioned panels should have display:none when hiding it.");
+    	}]
+    },
+    
     /**
      * Test panel dialog takes up full screen
      */

@@ -218,6 +218,12 @@
 
     handleDataChange: function(component, event) {
         var concreteCmp = component.getConcreteComponent();
+
+        // Refactor this component:
+        // We want to update the internal v.items, but without udating iteration just yet
+        // since customer might have thir own matchText function
+        concreteCmp.set("v.items", event.getParam("data"), true/*ignore changes, dont notify*/); 
+
         this.matchText(concreteCmp, event.getParam("data"));
     },
 
@@ -335,7 +341,6 @@
                 items[i].visible = false;
             }
         }
-        component.set("v.items", items);
     },
 
     matchFuncDone: function(component, items) {
@@ -343,6 +348,10 @@
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
         this.showLoading(component, false);
+
+        // Finally we update the v.items so iteration can 
+        // create the final items here.
+        component.set("v.items", items);
         
         //this.updateEmptyListContent(component);
         //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
@@ -350,6 +359,8 @@
         for(var i=0;i<itemCmps.length;i++){
             $A.util.toggleClass(itemCmps[i],"force");
         }
+
+
     },
 
     matchText: function(component, items) {
@@ -364,6 +375,7 @@
                 //this.matchFunc(component, items);
                 this.matchFuncDone(component, items);
             });
+            action.setParams({items: items});
             $A.enqueueAction(action);
         } else {
             this.matchFunc(component, items);

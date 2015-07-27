@@ -271,7 +271,9 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				if(expression == "v.type"){return expectedOperationType;}
 				if(expression == "v.dataTransfer"){return expectedDataTransfer;}
 			},
-			isValid : function(){return true;}
+			isValid : function(){return true;},
+			isInstanceOf : function(exp){return exp === "ui:draggable";},
+			setDropStatus : function() {}
 		};
 		var dragEvent = {
 			setParams : function(arg){actual = arg;},
@@ -283,7 +285,9 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				return dragComponent;},
 			util : {
 				forEach : function(value, func){},
-				isUndefinedOrNull : function(expression) {return true;},
+				isUndefinedOrNull : function(expression) {
+					return expression === undefined || expression === null;
+				},
 				isEmpty : function(value) {return true;}
 			}
 		});

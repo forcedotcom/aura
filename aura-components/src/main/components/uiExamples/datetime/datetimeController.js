@@ -20,8 +20,8 @@
     },
     
     setOutput : function(component, event, helper) {
-    	var el = component.find("msg");
-    	$A.util.removeClass(el.getElement(), 'hide');
+    	var cmpMsg = component.find("msg");
+    	$A.util.removeClass(cmpMsg, 'hide');
     	
         var todayVal = component.find("today").get("v.value");
         var oDateTime = component.find("oDateTime");

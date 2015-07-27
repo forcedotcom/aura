@@ -36,8 +36,7 @@
 
 /** Client-Side Controller **/
 update : function (cmp, event) {
-  var elem = event.getSource().getElement();
-  $A.util.toggleClass(elem, "red");
+  $A.util.toggleClass(event.getSource(), "red");
 }</pre>
 	</aura:description>
 	<aura:example name="checkbox" ref="uiExamples:checkbox" label="Using ui:inputCheckbox">

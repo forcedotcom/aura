@@ -22,9 +22,7 @@
 
     <h2>APIs</h2>
 
-    <p>Click <b>JavaScript API</b> to see the publicly accessible method for each JavaScript object.</p>
-
-    <!-- need publicly available version <p>Click <b>Java API</b> to see the Javadoc for all the Java classes.</p> -->
+    <p>Click <b>JavaScript API</b> to see the publicly accessible methods for each JavaScript object. The <code>$A</code> namespace is the entry point for using the framework in JavaScript code.</p>
 
     <h2>Definitions</h2>
 

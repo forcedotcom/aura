@@ -25,6 +25,7 @@ import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
+import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 
@@ -72,6 +73,11 @@ public class ParallelActionTestController {
             qualifiedName = defDescr.getQualifiedName();;
         }
         return qualifiedName;
+    }
+
+    @AuraEnabled
+    public static void throwsClientOutOfSyncException() {
+        throw new ClientOutOfSyncException("Testing Exception.");
     }
 
     /**

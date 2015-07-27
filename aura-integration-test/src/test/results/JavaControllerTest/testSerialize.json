@@ -98,6 +98,20 @@
             }
           ]
         }
+      },
+      {
+        "s":10,
+        "v":{
+          "name":"throwsClientOutOfSyncException",
+          "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsClientOutOfSyncException",
+          "actionType":"SERVER",
+          "returnType":"java://void",
+          "background":false,
+          "caboose":false,
+          "params":[
+
+          ]
+        }
       }
     ]
   }

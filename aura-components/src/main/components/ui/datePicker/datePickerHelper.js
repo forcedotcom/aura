@@ -52,6 +52,38 @@
         shortName: "Dec"
     }],
 
+    /**
+     * If any parent element is scrollable with the wheel
+     * (overflow-y), return that
+     * @param  {HTMLElement} elem The element to check
+     * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
+     */
+    _getScrollableParent: function(elem) {
+
+        // memoize
+        if(this._scrollableParent) {
+            return this._scrollableParent;
+        }
+
+        // if overflow is auto overflow-y is also auto, 
+        // however in firefox the opposite is not true
+        var overflow = getComputedStyle(elem)['overflow-y'];
+
+        //
+        if(overflow === 'auto') {
+            this._scrollableParent = elem;
+            return elem;
+        }
+
+        if(elem === document.body) {
+            this._scrollableParent = null;
+            return null;
+        }
+
+        return this._getScrollableParent(elem.parentNode);
+
+    },
+
     attachToDocumentBody: function(component) {
         var body = document.getElementsByTagName("body")[0];
         var elem = component.getElement();
@@ -275,11 +307,13 @@
         }
     },
 
+
     position: function(component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
         var viewPort = $A.util.getWindowSize();
+        var self = this;
         var referenceElem = component.getConcreteComponent().get("v.referenceElement");
 
         if (elem && visible) {
@@ -300,9 +334,29 @@
 
             // Scoping this to desktop to prevent regressions
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") == "DESKTOP") {
+                
+                var scrollableParent = this._getScrollableParent(elem);
+                var self = this;
+                
+                // if the target element is inside a 
+                // scrollable element, we need to make sure
+                // scroll events move that element,
+                // not the parent, also we need to reposition on scroll
+                if(scrollableParent) {
+                    scrollableParent.addEventListener('scroll', function(e) {
+                        self.lib.panelPositioning.reposition();
+                    });
+                    elem.addEventListener('wheel', function(e) {
+                        var scrollableParent = self._getScrollableParent();
+                        scrollableParent.scrollTop += e.deltaY;
+                    });
+                }
+
+                
                 component.positionConstraint = this.lib.panelPositioning.createRelationship({
                     element:elem,
                     target:referenceElem,
+                    appendToBody: true,
                     align: 'left top',
                     targetAlign: 'left bottom'
                 });

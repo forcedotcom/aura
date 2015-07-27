@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
@@ -59,12 +59,12 @@ public class FlavorAssortmentDefImpl extends RootDefinitionImpl<FlavorAssortment
     }
 
     @Override
-    public FlavorMapping computeOverrides() throws QuickFixException {
-        FlavorMappingImpl.Builder builder = new FlavorMappingImpl.Builder();
+    public FlavorOverrideLocator computeOverrides() throws QuickFixException {
+        FlavorOverrideLocatorImpl.Builder builder = new FlavorOverrideLocatorImpl.Builder();
 
         // loop in this order so that subsequent entries override the previous where overlapping
         for (FlavorIncludeDef fi : flavorIncludeDefs) {
-            builder.putAll(fi.computeFlavorMapping());
+            builder.putAll(fi.computeOverrides());
         }
 
         return builder.build();

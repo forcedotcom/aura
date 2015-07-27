@@ -18,9 +18,12 @@ package org.auraframework.impl.css.flavor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.FlavorAnnotation;
+import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -100,15 +103,15 @@ public class FlavorIncludeDefImpl extends DefinitionImpl<FlavorIncludeDef> imple
     }
 
     @Override
-    public Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping()
-            throws QuickFixException {
-        Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> table = HashBasedTable.create();
+    public Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> computeOverrides() throws QuickFixException {
+        // component / flavor (might be multiple per cmp) / override location (should only be one per cmp/flavor combo)
+        Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> table = HashBasedTable.create();
 
         for (DefDescriptor<FlavoredStyleDef> style : getDefs()) {
             DefDescriptor<ComponentDef> cmp = Flavors.toComponentDescriptor(style);
-            Set<String> flavorNames = style.getDef().getFlavorNames();
-            for (String name : flavorNames) {
-                table.put(cmp, name, style);
+            Map<String, FlavorAnnotation> annotations = style.getDef().getFlavorAnnotations();
+            for (FlavorAnnotation annotation : annotations.values()) {
+                table.put(cmp, annotation.getFlavorName(), new FlavorOverrideLocationImpl(style, annotation.getOverridesIf().orNull()));
             }
         }
 

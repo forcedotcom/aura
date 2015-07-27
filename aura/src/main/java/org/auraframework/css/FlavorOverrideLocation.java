@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.builder;
+package org.auraframework.css;
 
-import java.util.Map;
-
-import org.auraframework.css.FlavorAnnotation;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
 
+import com.google.common.base.Optional;
+
 /**
- * Builder for flavor css files.
+ * Information about which {@link FlavoredStyleDef} to use as an override for a particular component and flavor name
+ * combination.
  */
-public interface FlavoredStyleDefBuilder extends BaseStyleDefBuilder<FlavoredStyleDef> {
+public interface FlavorOverrideLocation {
     /**
-     * Sets the specific flavor metadata defined by the source.
+     * Gets the {@link FlavoredStyleDef} that contains the override.
      */
-    FlavoredStyleDefBuilder setFlavorAnnotations(Map<String, FlavorAnnotation> annotations);
+    DefDescriptor<FlavoredStyleDef> getDescriptor();
+
+    /**
+     * Some overrides are only applicable in certain conditions, as directed by instructions in the CSS files (see
+     * {@link FlavorAnnotation}).
+     */
+    Optional<String> getCondition();
 }

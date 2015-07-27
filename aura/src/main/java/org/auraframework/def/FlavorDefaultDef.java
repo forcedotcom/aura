@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import java.util.Map;
 
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.expression.Expression;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -39,7 +39,7 @@ public interface FlavorDefaultDef extends Definition {
      * @return The mapping from component to flavor name.
      * @throws QuickFixException If there's a problem loading a {@link FlavoredStyleDef}.
      */
-    Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorMapping mapping) throws QuickFixException;
+    Map<DefDescriptor<ComponentDef>, String> computeFilterMatches(FlavorOverrideLocator mapping) throws QuickFixException;
 
     /**
      * Gets the value of the context attribute if present, or {@link Optional#absent()} if not specified.

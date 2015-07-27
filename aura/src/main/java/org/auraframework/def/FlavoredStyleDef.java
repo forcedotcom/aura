@@ -15,7 +15,12 @@
  */
 package org.auraframework.def;
 
+import java.util.Map;
 import java.util.Set;
+
+import org.auraframework.css.FlavorAnnotation;
+
+import com.google.common.base.Optional;
 
 /**
  * Similar to {@link StyleDef}, except this represents CSS that contains <em>flavors</em>.
@@ -45,4 +50,8 @@ public interface FlavoredStyleDef extends BaseStyleDef {
      * Gets the specific names of the flavors defined in this CSS source.
      */
     Set<String> getFlavorNames();
+
+    Map<String, FlavorAnnotation> getFlavorAnnotations();
+
+    Optional<FlavorAnnotation> getFlavorAnnotation(String name);
 }

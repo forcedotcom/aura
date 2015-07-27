@@ -17,7 +17,7 @@ package org.auraframework.def;
 
 import java.util.List;
 
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -40,14 +40,14 @@ public interface FlavorAssortmentDef extends RootDefinition {
     List<FlavorDefaultDef> getFlavorDefaultDefs();
 
     /**
-     * Computes a {@link FlavorMapping}. This mapping contains info on which flavors should replace the standard ones.
+     * Computes a {@link FlavorOverrideLocator}. This mapping contains info on which flavors should replace the standard ones.
      * <p>
      * If multiple {@link FlavorIncludeDef}s contain entries for the same flavor name and component, only the last one
      * to do so will be utilized.
      *
-     * @return The {@link FlavorMapping} instance.
+     * @return The {@link FlavorOverrideLocator} instance.
      * @throws QuickFixException If there was a problem loading a flavored style def.
      */
-    FlavorMapping computeOverrides() throws QuickFixException;
+    FlavorOverrideLocator computeOverrides() throws QuickFixException;
 
 }

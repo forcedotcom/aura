@@ -36,10 +36,7 @@ function FunctionCallValue(config, valueProvider){
     valueFactory.index(this);
 //#end
 
-
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 	this.key = config["key"];
-//#end
 }
 
 /**
@@ -147,11 +144,7 @@ FunctionCallValue.prototype.destroy = function(){
  * @export
  */
 FunctionCallValue.prototype.toString = function(){
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     return this.args.join(" " + this.key + " ");
-//#end
-
-    return "FunctionCallValue";
 };
 
 Aura.Value.FunctionCallValue = FunctionCallValue;

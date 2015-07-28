@@ -3,7 +3,7 @@
 *, html { font-family: Verdana, Arial, Helvetica, sans-serif; }
 
 body, form, ul, li, p, h1, h2, h3, h4, h5 { margin: 0; padding: 0; }
-body { background-color: #fefefe; color: #111; margin: 0; }
+body { background-color: #fefefe; color: #111; margin: 0; display: flex; flex-direction: column; height: 100%; }
 img { border: none; }
 p { font-size: 1em; margin: 0 0 1em 0; }
 input, select, textarea, th, td { font-size: 1em; }
@@ -14,7 +14,7 @@ header.tabs button { background: #F5F6F7; border: 1px solid #DADEE2; border-bott
 header.tabs button:focus { outline: 1px solid #FF9F05; }
 header.tabs button.selected { background: #fff; }
 section.tab-body.selected { display: block; }
-section.tab-body { display: none; width: 100%; }
+section.tab-body { display: none; width: 100%; overflow: auto;}
 body.sidebar-visible section.tab-body { width: 75%; }
 body .sidebar { display: none; }
 body.sidebar-visible .sidebar { display: block; }
@@ -49,25 +49,9 @@ body.sidebar-visible .sidebar { display: block; }
 /* Component Tree */
 .component-tree { margin: 0 0 0 1em; padding: 0}
 
-
-/* Definitions List Styles */
-.definitions .definitions-list { position: absolute; top:57px; margin: .5em 1em; width: 300px; border-right: 1px solid #F0F1F2;}
-.definitions .definitions-list li { padding:.1em; }
-.definitions .definitions-list li a { color: #000; }
-.definitions .definitions-list li.selected { font-weight: bold; background: #F5F6CE; }
-.definitions .definitions-detail { margin: 0 1em 0 320px; }
-.definitions .definitions-detail h1 { font-size: 2em;}
-.definitions .definitions-detail > header { padding: 0 0 2em 0; }
-.definitions .definitions-detail > section { padding: 0 0 1em 0; }
-.definitions .definitions-detail table { border-collapse: collapse; font-size: 12px; width: 100%; }
-.definitions .definitions-detail table tr th { background: #DFDFDF; font-weight: normal; font-size: 1em; font-family: 'Lucida Grande', 'Consolas', 'sans-serif'; padding: .2em; margin-top: .2em; text-align: left; }
-.definitions .definition-inheritance ul { list-style-position: inside; list-style-type: square; }
-.definitions .definition-inheritance > ul { list-style-type: circle; }
-.definitions .definition-inheritance ul li ul li { padding: 0 0 0 1em; }
-.definitions #component-definition-interfaces ul { list-style: none; }
-.definitions #component-definition-interfaces ul li { display: inline; padding: 0 .5em 0 0;}
-.definitions #component-definition-interfaces ul li:after { content: ','; }
-.definitions #component-definition-interfaces ul li:last-child:after { content: '';}
+/* IFrame Tabs */
+section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
+.auraInspectorIFrameTab iframe { width: 100%; height: 100%; }
 
 /* Event Log */
 .event-log { list-style-type: none; margin: 1em 0 0 1em; padding: 0; }
@@ -128,79 +112,3 @@ body.sidebar-visible .sidebar { display: block; }
     -webkit-transform: rotate(-360deg);
   }
 }
-
-/*	
-
-.label{
-	color : #333399;
-}
-
-LI UL {
-	margin: .1em 0 .1em 1em;
-}
-
-ol.tree
-{
-	padding: 0 0 0 30px;
-	width: 900px;
-	border: 1px dashed #999;
-}
-li 
-{ 
-	position: relative; 
-	margin-left: -15px;
-	list-style: none;
-}
-li.file
-{
-	margin-left: -1px !important;
-}
-li.file a
-{
-	background: url(document.png) 0 0 no-repeat;
-	color: #fff;
-	padding-left: 21px;
-	text-decoration: none;
-	display: block;
-}
-li.file a[href *= '.pdf']	{ background: url(document.png) 0 0 no-repeat; }
-	li.file a[href *= '.html']	{ background: url(document.png) 0 0 no-repeat; }
-	li.file a[href $= '.css']	{ background: url(document.png) 0 0 no-repeat; }
-	li.file a[href $= '.js']		{ background: url(document.png) 0 0 no-repeat; }
-	li input
-{
-	position: absolute;
-	left: 0;
-	margin-left: 0;
-	opacity: 0;
-	z-index: 2;
-	cursor: pointer;
-	height: 1em;
-	width: 1em;
-	top: 0;
-}
-li input + ol
-{
-	background: url(toggle-small-expand.png) 40px 0 no-repeat;
-	margin: -0.938em 0 0 -44px; /* 15px 
-	height: 1em;
-}
-li input + ol > li { display: none; margin-left: -14px !important; padding-left: 1px; }
-li label
-{
-	cursor: pointer;
-	display: block;
-	padding-left: 11px;
-}
-
-li input:checked + ol
-{
-	background: url(toggle-small.png) 40px 5px no-repeat;
-	margin: -1.25em 0 0 -44px; /* 20px 
-	padding: 1.563em 0 0 80px;
-	height: auto;
-}
-li input:checked + ol > li { display: block; margin: 0 0 0.125em;  /* 2px }
-li input:checked + ol > li:last-child { margin: 0 0 0.063em; /* 1px  }
-*/
-

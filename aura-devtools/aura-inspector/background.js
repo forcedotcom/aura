@@ -16,6 +16,8 @@
         this.init = function() {
             chrome.runtime.onConnect.addListener(BackgroundPage_OnConnect.bind(this));
             // onSuspend?
+
+            chrome.runtime.onMessageExternal.addListener(BackgroundPage_OnMessageExternal.bind(this));
         };
 
         function BackgroundPage_OnConnect(port) {
@@ -26,10 +28,6 @@
                 // Chrome Tab
                 var tabId = port.sender.tab.id;
                 createTabInfo(tabId);
-
-                // chrome.tabs.executeScript(port.sender.tab.id,
-                //     { file: "injectedScript.js" }
-                // );
             }
 
             // I feel like this might not want to be added if we've already added it.
@@ -45,14 +43,10 @@
                 ports.delete(port.name);
             }
 
-            // Currently we are not deleting the tracking of the tab. We really should.
-            //  else {
-            //     // Chrome Tab
-            //     tabs.delete(tab.id); 
-            // }
-
             // Don't just build up a bunch of messages for tabs that have been unloaded
             if(tab) {
+                // Chrome Tab
+                tabs.delete(tab.id); 
                 stored.delete(tab.id); 
             }
         }
@@ -60,9 +54,16 @@
         function BackgroundPage_OnMessage(message, event) {
             if(message.subscribe){
                 var port = typeof message.port == "string" ? ports.get(message.port) : message.port;
-                var tabId = message.tabId;
+                var tabId = message.tabId; 
                 var tabInfo = getTabInfo(tabId);
-                    tabInfo.port = port;
+
+                // Tab doesn't exist. 
+                // Can happen when you launch dev tools on dev tools.
+                if(!tabInfo) {
+                    return;
+                }
+                
+                tabInfo.port = port;
 
                 for(var i=0;i<message.subscribe.length;i++){
                     var type = message.subscribe[i];
@@ -91,15 +92,28 @@
                     }
                 }
             }else{
-                passMessageToDevTools(message, event.sender.tab.id)
+                var tabId = event.sender.tab.id;
+                if(tabId !== -1) {
+                    passMessageToDevTools(message, tabId);
+                }
             }
+        }
+
+        function BackgroundPage_OnMessageExternal(message, event) {
+            // Only allow messages from the Sfdc Inspector
+            //if(event.id !== "eihmlihnchelfaplbpcpgelolkommnib") { return; }
+            
+            var tabId = message.tabId;
+            delete message.tabId;
+
+            passMessageToDevTools(message, tabId);
         }
 
         function passMessageToDevTools(message, tabId) {
             var tabInfo = getTabInfo(tabId);
 
             // Dev tools may not be open yet
-            if(!tabInfo.port) {
+            if(!tabInfo || !tabInfo.port) {
                 if(!stored.has(tabId)) {
                     stored.set(tabId, []);
                 }
@@ -117,7 +131,6 @@
                 tabInfo.port.postMessage(message);
             }
         }
-
 
         function getTabInfo(tabId) {
             return tabs.get(tabId);

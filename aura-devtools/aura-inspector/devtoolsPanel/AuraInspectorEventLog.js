@@ -9,7 +9,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         tabBody.appendChild(ol);
 
         // Start listening for events to draw
-        devtoolsPanel.attach("onevent", DevToolsPanel_OnEvent.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:ConsoleLog", AuraInspectorEventLog_OnConsoleLog.bind(this))
     };
 
     this.addLogItem = function(message) {
@@ -32,10 +32,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         devtoolsPanel.hideSidebar();
     };
 
-    function DevToolsPanel_OnEvent(event) {
-        var message = event.data && event.data.message || event.data;
-        if(message) {
-            this.addLogItem(message);
-        }
+    function AuraInspectorEventLog_OnConsoleLog(message) {
+        this.addLogItem(message+"");
     }
 }

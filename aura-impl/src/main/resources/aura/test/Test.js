@@ -444,7 +444,7 @@ TestInstance.prototype.callServerAction = function(action, doImmediate) {
     var actions = $A.util.isArray(action) ? action : [ action ];
     var that = this;
     var i;
-    if (!!doImmediate) {
+    if (doImmediate) {
         // HACK! This needs to get fixed.
         var auraXHR = $A.clientService.getAvailableXHR(true);
         if (!auraXHR) {
@@ -1786,7 +1786,7 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  * @param preSendCallback the hook function for before send.
  * @param postSendCallback the hook function for after send.
  * one of preSendCallback and postSendCallback can be null, but not both of them
- * @return a handle to remove the callback (only needed if the action is empty).
+ * @return a handle to remove the callback (only needed if the first parameter:action is empty).
  * 
  * @export
  * @function Test#addPrePostSendCallback
@@ -1844,7 +1844,6 @@ TestInstance.prototype.installOverride = function() {
     $A.installOverride("ClientService.send", this.sendOverride, this, 100);
     $A.installOverride("ClientService.decode", this.decodeOverride, this, 100);
 };
-
 
 
 /**

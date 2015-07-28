@@ -461,7 +461,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
         }
         
         [Fact]
-        function LocationEmptyHash() {
+        function LocationNoHash() {
             var expected = "";
             var windowMock = {
                 location: {

@@ -173,12 +173,19 @@
                     target = target.evaluate();
                 }
 
-                this.addNamedClickHandler(element, function () {
+                this.addNamedClickHandler(element, function (event) {
                     if (isString && value.indexOf("#") === 0) {
                         $A.run(function () {
                             $A.historyService.set(value.substring(1));
                         })
                     } else {
+                        // prevent default action for anchors on IE11.
+                        if ($A.get("$Browser").isDesktop && 
+                            window.location.indexOf("one.app") !== -1 &&
+                            event.pointerType === "touch") {
+                            return;
+                        }
+
                         // Make sure that non-hash style hrefs work fine even
                         // when fast clicking is engaged
                         window.open(value, target ? target : "_self");

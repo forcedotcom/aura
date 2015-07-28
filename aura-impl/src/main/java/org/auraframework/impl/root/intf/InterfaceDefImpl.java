@@ -64,7 +64,6 @@ public class InterfaceDefImpl extends RootDefinitionImpl<InterfaceDef> implement
         this.hashCode = AuraUtil.hashCode(super.hashCode(), extendsDescriptors, events);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();

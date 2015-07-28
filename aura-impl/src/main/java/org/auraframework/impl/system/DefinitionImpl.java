@@ -45,12 +45,11 @@ import com.google.common.collect.Maps;
 /**
  * The implementation for a definition.
  */
-@SuppressWarnings("deprecation")
 @Serialization(referenceType = ReferenceType.IDENTITY, referenceScope = ReferenceScope.REQUEST)
 public abstract class DefinitionImpl<T extends Definition> implements Definition, Serializable {
 
     private static final long serialVersionUID = 5836732915093913670L;
-    
+
     protected final DefDescriptor<T> descriptor;
     protected final Location location;
     protected final Map<SubDefDescriptor<?, T>, Definition> subDefs;
@@ -103,7 +102,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
 
     @Override
     public DefinitionAccess getAccess() {
-    	return access;
+        return access;
     }
 
     /**
@@ -356,7 +355,7 @@ public abstract class DefinitionImpl<T extends Definition> implements Definition
      */
     protected void retrieveLabels(Collection<PropertyReference> props) throws QuickFixException {
         GlobalValueProvider labelProvider;
-        
+
         labelProvider = Aura.getContextService().getCurrentContext().getGlobalProviders().get(LABEL.getPrefix());
         for (PropertyReference e : props) {
             if (e.getRoot().equals(LABEL.getPrefix())) {

@@ -110,7 +110,6 @@ public class EventDefImpl extends RootDefinitionImpl<EventDef> implements EventD
         return ret;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();

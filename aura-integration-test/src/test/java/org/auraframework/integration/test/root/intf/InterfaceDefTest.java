@@ -37,7 +37,6 @@ import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
-@SuppressWarnings("deprecation")
 public class InterfaceDefTest extends AuraImplTestCase {
 
     public InterfaceDefTest(String name) {

@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 
+.THIS {
+	opacity: 0;
+	display: block;
+	pointer-events: none;
+	position: absolute;
+}
+
 .THIS.visible {
+    opacity: 1;
     display: block;
+	pointer-events: auto;
 }

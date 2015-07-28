@@ -45,7 +45,7 @@
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-
+    <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisible}"/>
     <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor}">
         <div class="scroller" aura:id="scroller">
             <aura:if isTrue="{!v.hasTime}">

@@ -18,6 +18,15 @@
         helper.hide(component, true);
     },
 
+    handleVisible: function(component, event, helper) {
+        component.getElement().style.opacity = 0;
+        setTimeout(function() {
+            helper.position(component);
+            component.getElement().style.opacity = 1;
+        },10)
+        
+    },
+
     highlightRange: function(component, event) {
         var params = event.getParam('arguments');
         if (params) {

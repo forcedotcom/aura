@@ -9,7 +9,7 @@
 		},
 		function runRefreshAction(cmp) {
 			cmp._callbackDone = false;
-			
+
 			var action = cmp.get("c.executeInForeground");
             action.setCallback(this, function(a) {
             	cmp._callbackDone = true;
@@ -17,26 +17,26 @@
             action.setStorable({
                 "refresh": 0
             });
-            
+
             //set up watch
             var cb_handle; var watch_done = false;
             // watch for the action we gonna enqueue
             var preSendCallback = function(actions, actionToWatch) {
                 if (actionToWatch) {
-                	$A.test.assertTrue(cmp._callbackDone, 
+                	$A.test.assertTrue(cmp._callbackDone,
                 			"we should fetch response from storage first, before sending the action to server")
                     watch_done = true;
                 }
             };
             cb_handle = $A.test.addPrePostSendCallback(action, preSendCallback, undefined);
             $A.test.addWaitFor(true, function() { return watch_done; });
-            
+
             //now enqueue the action
             $A.enqueueAction(action);
 		}
 		]
 	},
-	
+
     testIncompleteActionRefreshDoesNotInvokeCallback: {
         test: [
         function primeActionStorage(cmp) {
@@ -57,7 +57,7 @@
                 "refresh": 0
             });
             $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){ 
+            $A.test.addWaitFor(true, function(){
                 return $A.test.areActionsComplete([action]) && !$A.test.isActionPending();
             });
         }]
@@ -83,12 +83,57 @@
                 "refresh": 0
             });
             $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){ 
+            $A.test.addWaitFor(true, function(){
                 return $A.test.areActionsComplete([action]);
             }, function() {
                 $A.test.assertTrue(callbackCalled, "SUCCESS callback never called for stored action when offline");
             });
         }]
+    },
+
+    testActionStatusIsIncompleteWhenOffline : {
+        test: function(cmp) {
+            var callbackCalled = false;
+            $A.test.setServerReachable(false);
+            $A.test.addCleanup(function() {$A.test.setServerReachable(true)});
+            var action = cmp.get("c.executeInForeground");
+            action.setCallback(this, function(a) {
+                callbackCalled = true;
+            }, "INCOMPLETE");
+
+            $A.enqueueAction(action);
+
+            $A.test.addWaitFor(true,
+                function(){ return $A.test.areActionsComplete([action]); },
+                function() {
+                    $A.test.assertEquals("INCOMPLETE", action.getState());
+                    $A.test.assertTrue(callbackCalled,
+                            "INCOMPLETE callback should get called.");
+                });
+        }
+    },
+
+    /**
+     * This test may need to be changed after W-2692868 is done.
+     */
+    testActionWithErrorsIsErrorState: {
+        test: function(cmp) {
+            var callbackCalled = false;
+            var action = cmp.get("c.throwsClientOutOfSyncException");
+            action.setCallback(this, function(a) {
+                callbackCalled = true;
+            }, "ERROR");
+
+            $A.enqueueAction(action);
+
+            $A.test.addWaitFor(true,
+                function(){ return $A.test.areActionsComplete([action]); },
+                function() {
+                    $A.test.assertEquals("ERROR", action.getState());
+                    $A.test.assertTrue(callbackCalled,
+                            "ERROR callback should get called.");
+                });
+        }
     },
 
     /**
@@ -608,11 +653,11 @@
         }
         ]
     },
-    
+
     /*
      * enqueue two server actions with same signature, the action has response in storage.
-     * both of them will read response from storage first. 
-     * then we send two refresh actions. 
+     * both of them will read response from storage first.
+     * then we send two refresh actions.
      * Note1: for refresh actions, 2nd one is not 1st one's dupe, they both go to server
      * Note2: server action we enqueue here go to server, increase recordObjCounter, and bring it back,
      * that's why we check new counter = old counter+2 at the end of the test, and also why this test is threadHostile
@@ -624,7 +669,7 @@
         	a0.setStorable();
         	cmp._storageKey = a0.getStorageKey();
         	$A.enqueueAction(a0);
-        	$A.test.addWaitForWithFailureMessage(true, function(){ 
+        	$A.test.addWaitForWithFailureMessage(true, function(){
                 return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
             }, "a0 doesn't finish",
             function() {
@@ -639,11 +684,11 @@
             a2.setStorable();
             a1.setStorable({  "refresh": 0 });
             a2.setStorable({  "refresh": 0 });
-            
+
             //both ations get schedule to send in a same XHR box
             $A.enqueueAction(a1);
             $A.enqueueAction(a2);
-            
+
             $A.test.addWaitForWithFailureMessage(true,
                     function() { return $A.test.areActionsComplete([a1, a2]) },
                     "fail waiting for action1 and 2 to finish",

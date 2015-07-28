@@ -466,7 +466,7 @@
      },
     
      testDropViaKeyboard : {
-    	 browsers : [ "firefox" ],
+         browsers : [ "FIREFOX" ],
     	 test : function(cmp) {
     		 var dragCmp = cmp.find("draggableCopy");
     		 var dragText = $A.test.getText(dragCmp.getElement());

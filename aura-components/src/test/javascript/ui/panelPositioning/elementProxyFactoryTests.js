@@ -64,6 +64,9 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 		};
 
 		windowMock.$A = {};
+		windowMock.setTimeout = function () {
+
+		}
 		windowMock.$A.getComponent = function() {
 			return {
 				getGlobalId: function() {

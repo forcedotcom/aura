@@ -22,7 +22,7 @@ function (elementProxy, win) {
     
     var proxyCache = {};
 
-    function checkProxy () {
+    function releaseOrphanProxies () {
         for(var proxy in proxyCache) {
             if(!proxyCache[proxy].el.checkNodeIsInDom()) {
                 proxyCache[proxy].el.release();
@@ -91,7 +91,7 @@ function (elementProxy, win) {
         }
 
         // run GC
-        setTimeout(checkProxy, 0);
+        w.setTimeout(releaseOrphanProxies, 0);
         return proxyCache[key].el;
     }
 

@@ -56,5 +56,9 @@
         if (cmp.get("v.fixedHeader")) {
     		helper.updateSizesForFixedHeader(cmp);
     	}
+    },
+    unrender: function (cmp, helper) {
+        helper.destroyTemplates(cmp);
+        this.superUnrender();
     }
 })

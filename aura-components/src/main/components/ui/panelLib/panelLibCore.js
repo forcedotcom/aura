@@ -31,6 +31,13 @@ function (scrollUtil) {
          * @returns {{initial: *, first: *, last: *}}
          */
         getFocusables: function(containerEl) {
+            if(!containerEl) {
+                return {
+                    initial: null,
+                    first: null,
+                    last: null
+                }
+            }
             var els = containerEl.querySelectorAll('input,button,a,textarea,select'),
                 len = els.length,
                 i, el;
@@ -82,6 +89,7 @@ function (scrollUtil) {
             var me = this, config = conf || {};
 
             return function(e) {
+                var el;
                 
                 if (!cmp.isValid()) {
                     return;
@@ -100,9 +108,13 @@ function (scrollUtil) {
                     //close on tab out
                     var shiftPressed = event.shiftKey,
                         current = document.activeElement,
-                        focusables = me.getFocusables(cmp.getElement());
-
-                    if (config.trapFocus) {
+                        el = cmp.getElement(),
+                        focusables;
+                        if(el) {
+                            focusables = me.getFocusables(cmp.getElement());
+                        }
+                        
+                    if (focusables && config.trapFocus) {
                         if (current === focusables.last && !shiftPressed) {
                             $A.util.squash(event, true);
                             focusables.first.focus();
@@ -110,7 +122,7 @@ function (scrollUtil) {
                             $A.util.squash(event, true);
                             focusables.last.focus();
                         }
-                    } else if (config.closeOnTabOut) {
+                    } else if (focusables && config.closeOnTabOut) {
                         if (current === focusables.last && !shiftPressed) {
                             $A.util.squash(event, true);
                             if ($A.util.isFunction(closeAction)) {
@@ -187,6 +199,11 @@ function (scrollUtil) {
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function (e) {
+
+                if(!cmp.isValid()) {
+                    return;
+                }
+                
                 if (animEl) {
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
                     animEl.removeEventListener(animEnd, finishHandler);
@@ -401,11 +418,15 @@ function (scrollUtil) {
          * @private
          */
         setFocus: function(cmp) {
+            
             if(cmp.isValid()) {
+                var focusables, el;
+
+                el = cmp.getElement();
                 if(cmp.returnFocus) {
                     cmp.returnFocus.focus();
-                } else {
-                    var focusables = this.getFocusables(cmp.getElement());
+                } else if(el && el.querySelectorAll) {
+                    var focusables = this.getFocusables(el);
                     focusables.initial && focusables.initial.focus();
                 }
             }

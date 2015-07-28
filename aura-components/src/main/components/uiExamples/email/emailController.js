@@ -15,8 +15,8 @@
  */
 ({
     setOutput : function(component, event, helper) {
-    	var el = component.find("msg");
-    	$A.util.removeClass(el.getElement(), 'hide');
+    	var cmpMsg = component.find("msg");
+    	$A.util.removeClass(cmpMsg, 'hide');
     	
         var email = component.find("email").get("v.value"); 
         var oEmail = component.find("oEmail");

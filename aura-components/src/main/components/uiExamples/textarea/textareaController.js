@@ -15,8 +15,8 @@
  */
 ({
     setOutput : function(component, event, helper) {
-    	var el = component.find("msg");
-    	$A.util.removeClass(el.getElement(), 'hide');
+    	var cmpMsg = component.find("msg");
+    	$A.util.removeClass(cmpMsg, 'hide');
     	
         var comments = component.find("comments").get("v.value");
         var oTextarea = component.find("oTextarea");

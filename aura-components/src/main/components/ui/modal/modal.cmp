@@ -50,21 +50,23 @@
             <div aura:id="content" class="modal-container">
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-                <header class="modal-header">
+                <div class="{!'modal-header' + (and(empty(v.header), empty(v.title)) ? ' empty' : '')}">
                     <aura:If isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                     </aura:If>
                     {!v.header}
                     {!v.closeButton}
-                </header>
+                </div>
 
                 <div aura:id="body" class="modal-body scrollable">
                     {!v.body}
                 </div>
 
-                <footer class="{!'modal-footer' + (empty(v.footer) ? ' empty' : '')}">
-                    {!v.footer}
-                </footer>
+                <aura:if isTrue="{!!empty(v.footer)}">
+	                <div class="modal-footer">
+	                    {!v.footer}
+	                </div>
+	            </aura:if>
             </div>
         </div>
     </div>

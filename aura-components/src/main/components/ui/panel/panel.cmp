@@ -54,21 +54,21 @@
         <div aura:id="content" class="container"> 
             <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
-           	<header class="panel-header">
+           	<div class="panel-header">
                 <aura:If isTrue="{!!empty(v.title)}">
                     <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                 </aura:If>
                  {!v.header}
                  {!v.closeButton}
-            </header>
+            </div>
                 
             <div aura:id="body" class="panel-content scrollable">
                {!v.body}
             </div>
             
-            <footer class="panel-footer">
+            <div class="panel-footer">
                 {!v.footer}
-            </footer>
+            </div>
 
         </div>
         <aura:if isTrue="{!v.showPointer}">

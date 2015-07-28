@@ -59,6 +59,7 @@
             class="carousel-body"
             bindEventsToScroller="{!v.bindEventsToScroller}"
             scroll="horizontal"
+            supportVoiceOver="false"
             enabled="{! (v.pageModels.length > 1 || v.pageComponents.length > 1)}"
             snap="true"
             lockOnDirection="vertical"

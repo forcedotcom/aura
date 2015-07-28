@@ -23,7 +23,8 @@
     ],
     DEFAULT_TEMPLATES : {
         row    : 'tr',
-        column : 'td'
+        column : 'td',
+        header : 'th'
     },
     initialize: function (cmp) {
         // Internal variables we use
@@ -71,7 +72,7 @@
         }
 
         cmp._ptv = ptv;
-        cmp._rowTemplate = this._initializeRowTemplate(templates);
+        cmp._rowTemplate = this._initializeRowTemplate(templates, cmp.get("v.useRowHeaders"));
         ptv.ignoreChanges = true;
         ptv.dirty = false;
 
@@ -114,14 +115,30 @@
         var concreteCmp = cmp.getConcreteComponent();
         concreteCmp.set('v._dirty', ++cmp._dirtyFlag);
     },
-    _initializeRowTemplate: function (templates) {
-        var row = document.createElement(this.DEFAULT_TEMPLATES.row);
-        for (var i = 0; i < templates.length; i++) {
-            var column = document.createElement(this.DEFAULT_TEMPLATES.column);
-            $A.render(templates[i], column);
+    _initializeRowTemplate: function (templates, useRowHeader) {
+        var row = document.createElement(this.DEFAULT_TEMPLATES.row),
+        	startIndex = 0,
+        	column;
+        
+        // Make the first column a header column
+        if (useRowHeader) {
+        	column = this._createColumn(this.DEFAULT_TEMPLATES.header, templates[0]);
+        	column.setAttribute("scope", "row");
+        	row.appendChild(column);
+        	startIndex = 1;
+        }
+        
+        for (var i = startIndex; i < templates.length; i++) {
+        	column = this._createColumn(this.DEFAULT_TEMPLATES.column, templates[i]);
             row.appendChild(column);
         }
         return row;
+    },
+    
+    _createColumn: function (elementTemplate, columnTemplate) {
+    	var column = document.createElement(elementTemplate);
+    	$A.render(columnTemplate, column);
+    	return column;
     },
     _createPassthroughValue: function(cmp, itemVar, item, rowIndex) {
         var rowContext = {

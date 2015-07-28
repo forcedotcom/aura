@@ -220,6 +220,21 @@
 
   /**************************************************HELPER FUNCTIONS END**************************************************/
   
+  testRowHeaders : {
+	  attributes : {"useRowHeaders" : true },
+	  test : function(cmp) {
+		  var tbody = document.getElementsByTagName("tbody")[0],
+		      rowElements = this.getOnlyTrs(tbody.children);
+		  
+		  for (var i = 0; i < rowElements.length; ++i) {
+			  var tagName = rowElements[i].firstChild.tagName.toLowerCase();
+			  $A.test.assertEquals("th", tagName, "Row Header tag is incorrect");
+			  
+			  var scope = rowElements[i].firstChild.getAttribute("scope");
+			  $A.test.assertEquals("row", scope, "Scope attribute on row header tag is incorrect");
+		  }
+	  }
+  },
   
   /*
    * Test sortable headers: mark the appropriate header as sorted and remaining as unsorted

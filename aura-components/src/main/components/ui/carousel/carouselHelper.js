@@ -313,16 +313,17 @@
     },
     setPageVisibility: function(carouselPage, isVisible) {
         var cssClass      = 'hidden',
-            ariaAttribute = 'aria-expanded',
             pageEl        = carouselPage.getElement();
 
         if (isVisible) {
-            pageEl.setAttribute(ariaAttribute, 'true');
+            pageEl.setAttribute('aria-expanded', 'true');
+            pageEl.setAttribute('aria-hidden', 'false');
             if (this.isDesktop) {
             	$A.util.removeClass(pageEl, cssClass);
             }
         } else {
-        	pageEl.setAttribute(ariaAttribute, 'false');
+        	pageEl.setAttribute('aria-expanded', 'false');
+        	pageEl.setAttribute('aria-hidden', 'true');
         	if (this.isDesktop) {
         		$A.util.addClass(pageEl, cssClass);
         	}

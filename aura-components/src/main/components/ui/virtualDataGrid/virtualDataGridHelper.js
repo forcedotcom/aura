@@ -243,19 +243,24 @@
                 return i;
             }
         }
+        return null;
     },
     _replaceDOMElement: function (parent, newChild, oldChild) {
-        parent.replaceChild(newChild, oldChild);
+    	if (parent.hasChildNodes()) {
+    		parent.replaceChild(newChild, oldChild);
+    	}
     },
     _rerenderDirtyElement: function (cmp, item, oldElement) {
         var container = cmp._templateContainer,
             listRoot  = this.getGridBody(cmp),
             items     = cmp._virtualItems,
-            position  = this._findVirtualElementPosition(items, oldElement),
-            rendered  = this._generateVirtualRow(cmp, item);
-
-        items[position] = rendered;
-        this._replaceDOMElement(listRoot, rendered, oldElement);
+            position  = this._findVirtualElementPosition(items, oldElement);
+        
+        if (!$A.util.isUndefinedOrNull(position)) {
+        	var rendered  = this._generateVirtualRow(cmp, item);
+        	items[position] = rendered;
+            this._replaceDOMElement(listRoot, rendered, oldElement);
+        }
     },
     _generateVirtualRow: function (cmp, item) {
         var rowTmpl = cmp._rowTemplate,

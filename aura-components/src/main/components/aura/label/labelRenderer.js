@@ -88,5 +88,12 @@
                 $A.afterRender(child);
             }
         }
+    },
+    unrender: function (component) {
+        var body = component.get("v.body");
+        for (var i = 0; i < body.length; i++) {
+            var child = body[i];
+            $A.unrender(child);
+        }
     }
 })

@@ -198,6 +198,21 @@ function () {
             runFullCycle(cmp, storage, "testValues_MutlibyteString", "I ½ ♥ 💩");
         },
 
+        testGetFunctionValue: function(cmp, storage) {
+            runFullCycle(cmp, storage, "testValues_Function", function(x){});
+        },
+
+        testCacheMiss: function(cmp, storage) {
+            var completed = false;
+            storage.get("iDontExist")
+                .then(function(item){
+                    $A.test.assertUndefined(item, "Expectd to receive undefined on cache miss");
+                    completed = true;
+                },
+                function(err) { dieDieDie(cmp, err); });
+            $A.test.addWaitFor(true, function(){ return completed; });
+        },
+
         testSetItemOverMaxSize_stage1: function(cmp, storage, expected) {
             var completed = false;
             var result = "";
@@ -256,7 +271,7 @@ function () {
                  })
              .then(
                  function() { completed = true; },
-                 function(err) { dieDieDie(err); }
+                 function(err) { dieDieDie(cmp, err); }
              );
 
             $A.test.addWaitFor(true, function() { return completed; });

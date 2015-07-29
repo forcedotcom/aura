@@ -189,6 +189,19 @@
         }
     },
 
+    // TODO(W-2701448): There are inconsistencies between Adapters on what can be stored. Formal evaluation needed.
+    _testGetFunctionValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    testCacheMiss: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+        }
+    },
+
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
@@ -337,29 +350,12 @@
         }]
     },
 
-    waitForIframeLoad: function(cmp) {
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                   && document.getElementById("myFrame").contentWindow.$A
-                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
-        });
-    },
-
-    // TODO(tbliss): Apply changes that should have been made long ago https://code-collab.soma.salesforce.com/go?page=ReviewDisplay&reviewid=772296 
     testDeleteDatabase: {
+        // Safari doesn't like deleting the database immediately after initializing it.
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
         test: [
-        function waitForDatabaseInitialize(cmp) {
-            // Wait for an arbritrary command to complete so we know DB is initialized
-            // This is necessary only on slower browsers when the first command we run is a delete
-            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-            var completed = false;
-
-            $A.storageService.getStorage("browserdb").getSize()
-                .then(function() { completed = true; }, cmp._die);
-
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
         function deleteDatabase(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var dbName = "browserdb";
             var completed = false;
             var results;
@@ -376,7 +372,7 @@
                     } else {
                         completed = true;
                     }
-                }, cmp._die);
+                })["catch"](die);
 
             $A.test.addWaitFor(
                     true,
@@ -393,19 +389,11 @@
     },
 
     testDeleteDatabaseTwice: {
+        // Safari doesn't like deleting the database immediately after initializing it.
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
         test: [
-        function waitForDatabaseInitialize(cmp) {
-            // Wait for an arbritrary command to complete so we know DB is initialized
-            // This is necessary only on slower browsers when the first command we run is a delete
-            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-            var completed = false;
-
-            $A.storageService.getStorage("browserdb").getSize()
-                .then(function() { completed = true; }, cmp._die);
-
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
         function deleteDatabaseTwice(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
             var dbName = "browserdb";
 
@@ -417,26 +405,18 @@
                 .then(function() {
                     $A.test.assertUndefined($A.storageService.getStorage(dbName));
                     completed = true;
-                }, cmp._die);
+                })["catch"](die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
         }]
     },
 
     testDeleteAndRecreateDatabase: {
+        // Safari doesn't like deleting the database immediately after initializing it.
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
         test: [
-        function waitForDatabaseInitialize(cmp) {
-            // Wait for an arbritrary command to complete so we know DB is initialized
-            // This is necessary only on slower browsers when the first command we run is a delete
-            cmp._die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
-            var completed = false;
-
-            $A.storageService.getStorage("browserdb").getSize()
-                .then(function() { completed = true; }, cmp._die);
-
-            $A.test.addWaitFor(true, function(){ return completed; });
-        },
         function deleteAndRecreateDatabase(cmp) {
+            var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
             var completed = false;
             cmp._dbName = "browserdb";
 
@@ -448,7 +428,7 @@
                 .then(function() {
                     $A.test.assertDefined($A.storageService.getStorage(cmp._dbName));
                     completed = true;
-                }, cmp._die);
+                })["catch"](die);
 
             $A.test.addWaitFor(true, function(){ return completed; });
         },
@@ -485,5 +465,13 @@
         function getItem(cmp) {
             cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
         }]
+    },
+
+    waitForIframeLoad: function(cmp) {
+        $A.test.addWaitFor(true, function() {
+            return cmp._frameLoaded
+                   && document.getElementById("myFrame").contentWindow.$A
+                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
+        });
     }
 })

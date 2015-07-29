@@ -268,6 +268,14 @@
                 
                 var highlightedCmp = iters[activeIndex];
                 highlightedCmp.set("v.highlighted", true);
+                var highlightedElement = highlightedCmp.getElement();
+                if (highlightedElement) {
+                    if (highlightedElement.scrollIntoViewIfNeeded) {
+                        highlightedElement.scrollIntoViewIfNeeded();
+                    } else {
+                        highlightedElement.scrollIntoView(false);
+                    }
+                }
                 this.updateAriaAttributes(component, highlightedCmp);
             }
         }

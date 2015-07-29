@@ -4,7 +4,7 @@
 	 * Check to make sure that when the user puts in invalid options (i.e. an option missing the value element)
 	 */
 	testInputSelect_WarningForInvalidOption : {	
-		auraWarningsExpectedDuringInit: ["Option at index 1 in select component"],
+		auraWarningsExpectedDuringInit: ["Option with label 'Option2' in select component"],
 		attributes : { "case" : "badsel"},
 		test : function(cmp) {
 			this.dummyFunc();

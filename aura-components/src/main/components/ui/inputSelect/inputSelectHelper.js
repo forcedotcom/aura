@@ -293,7 +293,7 @@
     },
 
     /**
-     * Render the options directly to the DOM for performance
+     * Render the option elements from the provided option objects
      *
      * Expected option structure:
      * {
@@ -304,49 +304,58 @@
      *     disabled (optional) 	: // whether option should be disabled
      * }
      */
-    renderOptions: function (cmp) {
-        var options = cmp.get("v.options"),
-            select = cmp.find("select").getElement(),
-            optFrag, option, internalText;
-
-        if (!options || ($A.util.isEmpty(options) && (!$A.util.isEmpty(cmp.get("v.body"))))) {
-            return;
-        }
-
-        optFrag = document.createDocumentFragment();
-        for (var i = 0; i < options.length; i++) {
-            option = document.createElement("option");
-            internalText = ($A.util.isEmpty(options[i].label) ? options[i].value : options[i].label) || "";
-
-            option.label = options[i].label || internalText;
-
-            if (!$A.util.isUndefined(options[i].value)) {
-                option.value = options[i].value;
-            } else {
-                $A.warning("Option at index " + i + " in select component " + cmp.getGlobalId() + " has an undefined value.");
-            }
-
-            if (options[i]["class"]) {
-                option.setAttribute("class", options[i]["class"]);
-            }
-
-            if (options[i].selected) {
-                option.selected = "selected";
-            }
-
-            if (options[i].disabled) {
-                option.disabled = "disabled";
-            }
-
-            option.appendChild(document.createTextNode(internalText));
-
-            optFrag.appendChild(option);
-        }
-
-        while (select.firstChild) {
-            select.removeChild(select.firstChild);
-        }
-        select.appendChild(optFrag);
+    renderOptions: function(cmp, options) {
+    	var fragment = document.createDocumentFragment();
+    	
+    	for (var i = 0; i < options.length; ++i) {
+    		var optionElement = document.createElement('option');
+            fragment.appendChild(this.updateOptionElement(cmp, options[i], optionElement));
+    	}
+    	
+    	return fragment;
+    },
+    
+    updateOptionElement: function(cmp, option, optionElement) {
+    	var internalText = this.getInternalText(option);
+    	
+    	// Check/update label
+    	if (optionElement.label != option.label || optionElement.label != internalText) {
+    		optionElement.label = option.label || internalText;
+    	}
+    	
+    	// Check/update value
+    	if (optionElement.value != option.value) {
+    		optionElement.value = option.value;
+    		if ($A.util.isUndefined(option.value)) {
+    			$A.warning("Option with label '" + option.label + "' in select component " + cmp.getGlobalId() + " has an undefined value.");
+    		}
+    	}
+    	
+    	// Check/update class
+    	if (optionElement.getAttribute("class") != option["class"]) {
+    		optionElement.setAttribute("class", option["class"]);
+    	}
+    	
+    	// Check/update selected
+    	if (optionElement.selected != option.selected) {
+	    	optionElement.selected = option.selected ? "selected" : undefined;
+	    }
+    	
+    	// Check/update disabled
+    	if (optionElement.disabled != option.disabled) {
+	    	optionElement.disabled = option.disabled ? "disabled" : undefined;
+	    }
+    	
+    	// Check/update internalText
+    	if (optionElement.textContent != internalText) {
+    		$A.util.setText(optionElement, internalText);
+    	}
+    	
+    	return optionElement
+    },
+    
+    getInternalText: function(option) {
+    	return ($A.util.isEmpty(option.label) ? option.value : option.label) || '';
     }
 
 })

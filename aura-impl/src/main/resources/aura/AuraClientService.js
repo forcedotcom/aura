@@ -733,9 +733,11 @@ AuraClientService.prototype.handleAppCache = function() {
             window.applicationCache.swapCache();
         }
 
-        $A.componentService.registry.clearStorage().then(function() {
-            window.location.reload(true);
-        });
+        // reload even if storage clear fails
+        $A.componentService.registry.clearStorage().then(
+            function() { window.location.reload(true); },
+            function() { window.location.reload(true); }
+        );
     }
 
     function handleAppcacheError(e) {
@@ -876,25 +878,26 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 
 /**
  * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
- * @returns {Promise} Promise with current value of csrf token
+ * @returns {Promise} Promise that resolves with the current CSRF token value.
  */
 AuraClientService.prototype.saveTokenToStorage = function() {
     // update the persisted CSRF token so it's accessible when the app is launched while offline.
     // fire-and-forget style, matching action response persistence.
     var storage = Action.prototype.getStorage();
-    var promise = Promise["resolve"](this._token);
     if (storage && this._token) {
+        var token = this._token;
         // certain storage adapters require token object be wrapped in "value" object for indexing
         var value = { "value": { "token": this._token } };
         return storage.adapter.setItem(this._tokenStorageKey, value).then(
-            function() { return promise; },
+            function() { return token; },
             function(err) {
                 $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);
-                return promise;
+                return token;
             }
         );
     }
-    return promise;
+
+    return Promise["resolve"](this._token);
 };
 
 /**
@@ -1096,9 +1099,11 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             if (value && value.value["token"]) {
                 acs._token = value.value["token"];
             }
-        }, function(err) {
+        },
+        function(err) {
             $A.log("AuraClientService.loadComponent(): failed to load token: " + err);
-        });
+        }
+    );
     this.runAfterInitDefs(function () {
         $A.run(function () {
             var desc = new DefDescriptor(descriptor);
@@ -1110,7 +1115,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             if(acs._useBootstrapCache) {
                 action.setStorable({
                     "refresh": 0
-                });                
+                });
             } else {
                 action.setStorable({
                     "ignoreExisting": true
@@ -1199,28 +1204,31 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             action.setCallback(acs,
                 function (a) {
                     $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-                    
-                    // Even if bootstrap cache is disabled we still want to load from cache 
+
+                    // Even if bootstrap cache is disabled we still want to load from cache
                     // if action fails as "INCOMPLETE" for offline launch
                     if (!acs._useBootstrapCache && storage) {
                         var key = a.getStorageKey();
-                        storage.get(key).then(function(value) {
-                            if (value) {
-                                storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value.value]);
-                                $A.run(function() {
-                                    action.updateFromResponse(value.value);
-                                    action.finishAction($A.getContext());
-                                });
-                            } else {
+                        storage.get(key).then(
+                            function(value) {
+                                if (value) {
+                                    storage.log("AuraClientService.loadComponent(): bootstrap request was INCOMPLETE, using stored action response.", [a, value.value]);
+                                    $A.run(function() {
+                                        action.updateFromResponse(value.value);
+                                        action.finishAction($A.getContext());
+                                    });
+                                } else {
+                                    failCallback(true, " : No connection to server");
+                                }
+                            },
+                            function() {
                                 failCallback(true, " : No connection to server");
                             }
-                        }, function() {
-                            failCallback(true, " : No connection to server");
-                        });
+                        );
                     } else {
-                        failCallback(!stored, " : No connection to server");                        
+                        failCallback(!stored, " : No connection to server");
                     }
-                    
+
                 }, "INCOMPLETE");
             //
             // ERROR: this is generally trouble, but if we already initialized, we won't flag it. We also don't flag
@@ -2478,15 +2486,18 @@ AuraClientService.prototype.isActionInStorage = function(descriptor, params, cal
         return;
     }
 
-    storage.get(Action.getStorageKey(descriptor, params))
-        .then(function(response) {
+    storage.get(Action.getStorageKey(descriptor, params)).then(
+        function(response) {
             $A.run(function() {
-                callback(!!response && !!response.value && !response.isExpired);
+                callback(!!response && !!response.value && !response["isExpired"]);
             });
-        }, function(error) {
-            // FIXME: what to do.
-            $A.error(error);
-        });
+        },
+        function(err) {
+            // storage.get() errored so assume repeating the request will also fail
+            $A.warning("AuraClientService.isActionInStorage(): storage.get() threw " + err);
+            callback(false);
+        }
+    );
 };
 
 /**
@@ -2509,19 +2520,22 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
     }
 
     var actionKey = Action.getStorageKey(descriptor, params);
-    storage.get(actionKey).then(function(response) {
-        if (!!response && !!response.value) {
-            storage.put(actionKey, response.value)
-                .then(function() { callback(true); }, function(/*error*/) {
-                    // FIXME: what to do.
-                });
-        } else {
+    storage.get(actionKey).then(
+        function(response) {
+            if (response && response.value) {
+                storage.put(actionKey, response.value).then(
+                    function() { callback(true); },
+                    function(/*error*/) { callback(false); }
+                );
+            } else {
+                callback(false);
+            }
+        },
+        function(err) {
+            $A.warning("AuraClientService.revalidateAction(): storage.get() threw " + err);
             callback(false);
         }
-    }, function(error) {
-        //FIXME: what to do
-        $A.error(error);
-    });
+    );
 };
 
 /**
@@ -2531,7 +2545,7 @@ AuraClientService.prototype.revalidateAction = function(descriptor, params, call
  * @param params {Object} map of keys to parameter values.
  * @param successCallback {Function} called after the action was invalidated. Called with true if the action was
  * successfully invalidated and false if the action was invalid or was not found in the cache.
- * @param errorCallback {Function} called if an error occured during execution
+ * @param errorCallback {Function} called if an error occurred during execution
  * @export
  */
 AuraClientService.prototype.invalidateAction = function(descriptor, params, successCallback, errorCallback) {
@@ -2544,8 +2558,10 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
         return;
     }
 
-    storage.remove(Action.getStorageKey(descriptor, params))
-        .then(function() { successCallback(true); }, errorCallback );
+    storage.remove(Action.getStorageKey(descriptor, params)).then(
+        function() { successCallback(true); },
+        errorCallback
+    );
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {
@@ -2605,7 +2621,7 @@ AuraClientService.prototype.invalidSession = function(token) {
     };
     if (token && token["newToken"]) {
         this._token = token["newToken"];
-        this.saveTokenToStorage().then(refresh);
+        this.saveTokenToStorage().then(refresh, refresh);
     } else {
         refresh();
     }
@@ -2614,8 +2630,8 @@ AuraClientService.prototype.invalidSession = function(token) {
 /**
  * Set whether Aura should attempt to load the getApplication action from cache first
  * (useBootstrapCache = true) or if it should go to the server first (useBootstrapCache = false).
- * 
- * The default behavior is to load getApplication from cache 
+ *
+ * The default behavior is to load getApplication from cache
  *
  * @export
  */

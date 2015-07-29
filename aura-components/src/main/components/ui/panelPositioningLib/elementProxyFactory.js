@@ -22,6 +22,14 @@ function (elementProxy, win) {
     
     var proxyCache = {};
 
+    function releaseOrphanProxies () {
+        for(var proxy in proxyCache) {
+            if(!proxyCache[proxy].el.checkNodeIsInDom()) {
+                proxyCache[proxy].el.release();
+            }
+        }
+    }
+
     function bakeOff() {
         for(var proxy in proxyCache) {
             if(proxyCache[proxy].el.isDirty()) {
@@ -54,7 +62,13 @@ function (elementProxy, win) {
 
     function elementProxyFactory(el) {
         var key, newProxy;
+
+        if(el !== w) {
+    
+            $A.assert(el && el.nodeType && (el.nodeType !== 1 || el.nodeType !== 11), "Element Proxy requires an element");
+        }
         
+        //validate node
         if(el !== w && !el.id) {
             el.id = w.$A.getComponent(el).getGlobalId();
         } else if (el === w) {
@@ -73,9 +87,11 @@ function (elementProxy, win) {
             proxyCache[key] = {
                 el: newProxy,
                 refCount : 1
-            }
+            };
         }
 
+        // run GC
+        w.setTimeout(releaseOrphanProxies, 0);
         return proxyCache[key].el;
     }
 

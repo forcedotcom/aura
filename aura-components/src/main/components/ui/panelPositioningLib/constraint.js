@@ -34,6 +34,7 @@ function(w) {
         this._el = conf.element; 
         this._targetElement = conf.target;
         this._inputDirection = 'top';
+        this.destoyed = false;
 
         var pad = conf.pad || 0;
 
@@ -236,7 +237,8 @@ function(w) {
         this._el.release();
         this._targetElement.release();
         this._disabled = true;
-    }
+        this.destroyed = true;
+    };
 
 
     return {

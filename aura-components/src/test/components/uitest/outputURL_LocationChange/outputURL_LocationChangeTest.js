@@ -58,19 +58,18 @@
                 urlElPeach = urlCmpPeach.getElement();
                 cmp.set("v.locationToken","Peach");
                 $A.test.clickOrTouch(urlElPeach);
-                $A.test.assertEquals(1, cmp.get("v.clickCount"),
+                $A.test.addWaitForWithFailureMessage(1, function() { return cmp.get("v.clickCount");},
                         "clickCount should in crease after clicking on Peach");
-                $A.test.assertEquals(2, cmp.get("v.locationChangeCount"),
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.locationChangeCount");},
                         "locationChangeCount should increase after clicking on Peach");
-                $A.test.assertEquals(1, cmp.get("v.locationChangeCountPeach"),
+                $A.test.addWaitForWithFailureMessage(1, function() { return cmp.get("v.locationChangeCountPeach"); },
                         "locationChangeCountPeach should increase after clicking on Peach");
 
              }, function(cmp) {
                 var peachElement = cmp.find('hashLinkP').getElement();
                 var href = peachElement.getAttribute('href');
                 var locationChangeCountPeach = cmp.get("v.locationChangeCountPeach");
-                if ($A.util.supportsTouchEvents()) {
-                    // prod mode doesn't have comment within void
+                if ($A.util.supportsTouchEvents() ) {
                     $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#" + locationChangeCountPeach +"*/);",
                             "href attribute not correct, got <" + href + ">");
                 } else {
@@ -86,32 +85,21 @@
                 cmp.set("v.locationToken","Peach");
                 $A.test.clickOrTouch(urlElPeach);
 
-                $A.test.assertEquals(2, cmp.get("v.clickCount"),
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.clickCount");},
                         "clickCount should increase after clicking on Peach again");
-                $A.test.assertEquals(3, cmp.get("v.locationChangeCount"),
+                $A.test.addWaitForWithFailureMessage(3, function() { return cmp.get("v.locationChangeCount"); },
                         "locationChangeCount should increase after clicking on Peach again");
-                $A.test.assertEquals(2, cmp.get("v.locationChangeCountPeach"),
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.locationChangeCountPeach"); },
                         "locationChangeCountPeach should increase after clicking on Peach again");
             }
         ]
     },
 
     /*
-     * this is disabled for : W-2317160
-     *
-     * I think the value of outputURL cannot be changed BEFORE locationChange event is fired, looks like
-     * our handler is attached to the "exact" outputURL, change in value will loose the handler.
-     * that's why if we don't change orange link's value, click after first will trigger locationChange
-     * we do create a new HtmlAttribute everytime value changes, not 'reusing' the old one.
-     *
-     * this test is giving false positive, which has different manner with manual click. With mannual click
-     * the link, the hash never changes and location handler doesn't get called.
-     *
      * Verify locationChange gets called when click handler change the attribute value on which outputURL
      * "value" attribute depends.
-     *
      */
-    _testHashValueChangeInClickHandler:{
+    testHashValueChangeInClickHandler:{
         test : [
             function(cmp) {
                 //Click Orange first time,its url has value="{!'#' + v.locationTokenOrange}"
@@ -121,9 +109,9 @@
                 cmp.set("v.locationToken","Orange");
                 $A.test.clickOrTouch(urlElOrange);
 
-                $A.test.assertEquals(1, cmp.get("v.clickCount"),
+                $A.test.addWaitForWithFailureMessage(1, function() { return cmp.get("v.clickCount");},
                         "clickCount should increase after clicking on Orange at the first time");
-                $A.test.assertEquals(2, cmp.get("v.locationChangeCount"),
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.locationChangeCount"); },
                         "locationChange event doesn't fire at the first time we click Orange");
             },
             function(cmp) {
@@ -133,15 +121,10 @@
                 cmp.set("v.locationToken","Orange");
                 $A.test.clickOrTouch(urlElOrange);
 
-                $A.test.assertEquals(2, cmp.get("v.clickCount"),
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.clickCount");},
                         "clickCount should increase after clicking on Orange again");
-                $A.test.assertEquals(3, cmp.get("v.locationChangeCount"),
+                $A.test.addWaitForWithFailureMessage(3, function() { return cmp.get("v.locationChangeCount");},
                         "locationChange event should fire after clicking Orange again");
-            },
-            function(cmp) {
-                var orangeElement = cmp.find('hashLinkO').getElement();
-                var href = orangeElement.getAttribute('href');
-                $A.test.assertEquals("javascript:void(0/*#EMPTYOrangeOrange*/);", href);
             }
        ]
     },
@@ -160,30 +143,42 @@
                 $A.test.clickOrTouch(urlElApple);
                 $A.test.assertEquals(1, cmp.get("v.clickCount"),
                         "click count should increase after clicking on Apple");
-                $A.test.assertEquals(2, cmp.get("v.locationChangeCount"),
-                        "locationChangeCount should increase after clicking on Apple");
+                $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.locationChangeCount"); },
+                        "locationChangeCount should increase to 2 after clicking on Apple");
             },
             function(cmp) {
-                //Click Apple AGAIN, location doesn't really change,but locationChange event is fired anyway.
+                //Click Apple AGAIN, location doesn't really change,but locationChange event is fired anyway for non-lazy browsers.
                 var urlCmpApple = cmp.find('hashLinkA'),
                 urlElApple = urlCmpApple.getElement();
                 cmp.set("v.locationToken","Apple");
                 $A.test.clickOrTouch(urlElApple);
                 $A.test.assertEquals(2, cmp.get("v.clickCount"),
                         "click count should increase after clicking on Apple again");
-                $A.test.assertEquals(3, cmp.get("v.locationChangeCount"),
-                        "locationChangeCount should increase after clicking on Apple again");
+                if($A.get("$Browser").isFIREFOX) {
+                	 $A.test.addWaitForWithFailureMessage(2, function() { return cmp.get("v.locationChangeCount"); },
+                     "Firefox is lazy, locationChangeCount won't increase after clicking on Apple again");
+                } else {
+                	 $A.test.addWaitForWithFailureMessage(3, function() { return cmp.get("v.locationChangeCount"); },
+                     "locationChangeCount should increase after clicking on Apple again");
+                }
+               
             },
             function(cmp) {
-                //Click Apple AGAIN, location doesn't really change,but locationChange event is fired anyway.
+                //Click Apple AGAIN, location doesn't really change,but locationChange event is fired anyway for non-lazy browsers.
                 var urlCmpApple = cmp.find('hashLinkA'),
                 urlElApple = urlCmpApple.getElement();
                 cmp.set("v.locationToken","Apple");
                 $A.test.clickOrTouch(urlElApple);
+                if($A.get("$Browser").isFIREFOX) {
+                	 $A.test.assertEquals(2, cmp.get("v.locationChangeCount"),
+                     "Firefox is lazy, locationChangeCount won't increase after clicking on Apple 3rd time");
+                } else {
+                	 $A.test.assertEquals(4, cmp.get("v.locationChangeCount"),
+                     "locationChangeCount should increase after clicking on Apple 3rd time");
+                }
                 $A.test.assertEquals(3, cmp.get("v.clickCount"),
                         "click count should increase after clicking on Apple 3rd time");
-                $A.test.assertEquals(4, cmp.get("v.locationChangeCount"),
-                        "locationChangeCount should increase after clicking on Apple 3rd time");
+               
             }
         ]
     },

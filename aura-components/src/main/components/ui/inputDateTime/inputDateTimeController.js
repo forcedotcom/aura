@@ -26,7 +26,7 @@
     },
 
     doInit: function(component, event, helper) {
-        if ($A.get("$Browser.formFactor") == "DESKTOP") {
+        if (helper.isDesktopMode(component)) {
             helper.updateTimeFormat(component);
             var dateFormat = component.get("v.dateFormat"),
                 timeFormat = component.get("v.timeFormat");
@@ -59,7 +59,7 @@
     },
 
     setValue: function(component, event, helper) {
-        if ($A.get("$Browser.formFactor") == "DESKTOP") {
+        if (helper.isDesktopMode(component)) {
             var dateValue = event.getParam("value"),
                 selectedHours = event.getParam("hours"),
                 selectedMinutes = event.getParam("minutes");

@@ -1607,6 +1607,10 @@ Component.prototype.unrender = function() {
  * @export
  */
 Component.prototype.getVersion = function() {
+    if (!this.isValid()) {
+        return null;
+    }
+
     var ret = this.getVersionInternal();
     return ret ? ret : this.get("version");
 };
@@ -1617,10 +1621,6 @@ Component.prototype.getVersion = function() {
  * @private
  */
 Component.prototype.getVersionInternal = function() {
-    if (!this.isValid()) {
-        return null;
-    }
-
     var context = $A.getContext();
     var ns = this.getDef().getDescriptor().getNamespace();
     var ret = null;

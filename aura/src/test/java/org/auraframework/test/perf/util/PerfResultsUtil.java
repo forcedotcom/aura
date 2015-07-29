@@ -59,8 +59,8 @@ public final class PerfResultsUtil {
                 LOG.info("Trying to connect to MongoDB: " + MONGO_URI);
                 // Default Mongo client to connect to default mongo host.
                 if(MONGO_URI == null){
-                	MONGO_URI = DEFAULT_MONGO_URI;
-                }                	
+                    MONGO_URI = DEFAULT_MONGO_URI;
+                }
                 MongoClientURI uri = new MongoClientURI(MONGO_URI);
                 MONGO_CLIENT = new MongoClient(uri);
             } catch (Exception e) {
@@ -71,6 +71,7 @@ public final class PerfResultsUtil {
         return MONGO_CLIENT;
     }
 
+    @SuppressWarnings("null")
     public static void writeToDb(PerfMetrics metrics, String test, String traceLog) {
         try {
             MongoClient mongo = getMongoClient();

@@ -19,7 +19,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,14 +30,10 @@ import junit.framework.TestSuite;
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -47,7 +42,6 @@ import org.auraframework.util.test.util.TestInventory;
 import org.auraframework.util.test.util.TestInventory.Type;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 
 @UnAdaptableTest
 @PerfTestSuite
@@ -104,7 +98,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         }
         return contextService;
     }
-    
+
     private class ComponentSuiteTest extends TestSuite {
         ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor, final PerfConfig config) {
             super(descriptor.getName());
@@ -131,7 +125,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
                 } finally {
-                	if (contextService.isEstablished()) {
+                    if (contextService.isEstablished()) {
                         contextService.endContext();
                     }
                 }
@@ -154,9 +148,9 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
      * @return return test
      * @throws Exception
      */
-	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
-			DefDescriptor<ComponentDef> descriptor) throws Exception {
-		return test;
-	}
+    protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
+            DefDescriptor<ComponentDef> descriptor) throws Exception {
+        return test;
+    }
 
 }

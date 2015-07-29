@@ -49,17 +49,16 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
      *            refer to this AttributeDef
      * @param location The location where this AttributeDef was defined in the markup.
      */
-    @SuppressWarnings("deprecation")
     public AttributeDefImpl(DefDescriptor<AttributeDef> descriptor,
-				            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
-                            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location) {
+            DefDescriptor<? extends RootDefinition> parentDescriptor, DefDescriptor<TypeDef> typeDefDescriptor,
+            AttributeDefRef defaultValue, boolean required, SerializeToType serializeTo, Location location) {
         super(descriptor, location);
-		this.parentDescriptor = parentDescriptor;
-		this.typeDefDescriptor = typeDefDescriptor;
-		this.defaultValue = defaultValue;
-		this.required = required;
-		this.serializeTo = serializeTo;
-	}
+        this.parentDescriptor = parentDescriptor;
+        this.typeDefDescriptor = typeDefDescriptor;
+        this.defaultValue = defaultValue;
+        this.required = required;
+        this.serializeTo = serializeTo;
+    }
 
     protected AttributeDefImpl(Builder builder) {
         super(builder);
@@ -135,7 +134,6 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
         dependencies.add(typeDefDescriptor);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
@@ -261,5 +259,5 @@ public final class AttributeDefImpl extends DefinitionImpl<AttributeDef> impleme
     private final AttributeDefRef defaultValue;
     private final boolean required;
     private final SerializeToType serializeTo;
-    
+
 }

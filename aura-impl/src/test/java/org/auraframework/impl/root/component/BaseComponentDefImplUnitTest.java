@@ -59,7 +59,6 @@ import org.mockito.Mockito;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
-@SuppressWarnings("deprecation")
 public abstract class BaseComponentDefImplUnitTest<I extends BaseComponentDefImpl<D>, D extends BaseComponentDef, B extends Builder<D>>
 extends RootDefinitionImplUnitTest<I, D, B> {
 
@@ -88,17 +87,17 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     protected String render;
     protected WhitespaceBehavior whitespaceBehavior;
     protected List<DependencyDef> dependencies;
-    
+
     protected static DefinitionAccess GLOBAL_ACCESS;
     protected static DefinitionAccess PRIVATE_ACCESS;
-    
+
     static {
         try {
             GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "GLOBAL");
         } catch (InvalidAccessValueException x) {
             throw new AuraRuntimeException(x);
         }
-    	try {
+        try {
             GLOBAL_ACCESS = Aura.getDefinitionParserAdapter().parseAccess(null, "PRIVATE");
         } catch (InvalidAccessValueException x) {
             throw new AuraRuntimeException(x);
@@ -141,7 +140,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         Mockito.doReturn(GLOBAL_ACCESS).when(parentDef).getAccess();
         Mockito.doReturn(parentDef).when(this.extendsDescriptor).getDef();
         Mockito.doReturn(DefType.COMPONENT).when(this.extendsDescriptor).getDefType();
-        
+
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
         this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
@@ -226,7 +225,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         try {
             buildDefinition().validateReferences();
         } catch (NoAccessException expected) {
-        	return;
+            return;
         }
         fail("Should have failed with a no access exception");
     }

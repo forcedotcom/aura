@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +37,6 @@ import org.auraframework.util.resource.ResourceLoader;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 @Model
 public class ApiContentsModel {
@@ -81,14 +79,14 @@ public class ApiContentsModel {
                 JsonStreamReader jsonReader = new JsonStreamReader(reader);
                 jsonReader.disableLengthLimitsBecauseIAmStreamingAndMyMemoryUseIsNotProportionalToTheStreamLength();
                 jsonReader.next();
-                
+
                 List<Object> readSymbols = jsonReader.getList();
-                
+
                 symbols = Maps.newTreeMap();
-                
-                Map<String, Map<String, Object>> documentedClasses = new HashMap<String, Map<String, Object>>();
-                Map<String, Map<String, Object>> queuedClassMembers = new HashMap<String, Map<String, Object>>();
-                
+
+                Map<String, Map<String, Object>> documentedClasses = new HashMap<>();
+                Map<String, Map<String, Object>> queuedClassMembers = new HashMap<>();
+
                 Map<String, Object> map;
                 List<Map<String, Object>> methods;
                 List<Map<String, Object>> properties;
@@ -97,106 +95,106 @@ public class ApiContentsModel {
                 String kind;
                 String access;
                 for (Object symbol : readSymbols) {
-                	map = (Map<String, Object>) symbol;
+                    map = (Map<String, Object>) symbol;
                     kind = (String) map.get("kind");
                     name = (String) map.get("name");
 
-                	if (!map.containsKey("access")) {
+                    if (!map.containsKey("access")) {
                         map.put("access", "public");
                     }
-                	
+
                     access = (String)map.get("access");
-                    
+
                     if ("class".equalsIgnoreCase(kind) || "namespace".equalsIgnoreCase(kind)) {
-                    	String longname = (String)map.get("longname");
+                        String longname = (String)map.get("longname");
                         documentedClasses.put(longname, map);
-                        methods = new ArrayList<Map<String, Object>>();
-                        
+                        methods = new ArrayList<>();
+
                         map.put("methods", methods);
-                        
+
                         if (!map.containsKey("properties")) {
-                        	properties = new ArrayList<Map<String, Object>>();
+                            properties = new ArrayList<>();
                             map.put("properties", properties);
                         } else {
-                        	properties = (List<Map<String, Object>>)map.get("properties");
+                            properties = (List<Map<String, Object>>)map.get("properties");
                         }
 
                         // Populate method and properties from the cache
                         if(queuedClassMembers.containsKey(longname)){
-                        	Map<String, Object> queuedClass = queuedClassMembers.get(longname);
-                        	methods.addAll((List<Map<String, Object>>)queuedClass.get("methods"));
-                        	properties.addAll((List<Map<String, Object>>)queuedClass.get("properties"));
-                        	
-                        	queuedClassMembers.remove(longname);
+                            Map<String, Object> queuedClass = queuedClassMembers.get(longname);
+                            methods.addAll((List<Map<String, Object>>)queuedClass.get("methods"));
+                            properties.addAll((List<Map<String, Object>>)queuedClass.get("properties"));
+
+                            queuedClassMembers.remove(longname);
                         }
-                        
+
                         if (name != null && !map.containsKey("undocumented")) {
                             symbols.put(name, map);
                         }
                     } else {
-                    	memberOf = (String) map.get("memberof");
-                    	// access == public?
-                    	
-                    	// Member of nothing? move along
-                    	// Private methods and properties shouldn't get documented
-                    	if(memberOf==null || !"public".equals(access) /* && !"protected".equals(access) */) {
-                    		continue;
-                    	}
-                    	
-                    	// Members for classes can come in out of order, we need to 
-                    	// see if it's present yet. If not, we'll store the members till the class becomes available.
-                    	if(documentedClasses.containsKey(memberOf)) {
-                    		Map<String, Object> documentedClass = documentedClasses.get(memberOf);
-                    		
-                    		methods = (List<Map<String, Object>>)documentedClass.get("methods");
-                    		properties = (List<Map<String, Object>>)documentedClass.get("properties");                    		
-                    	} 
-                    	// Class hasn't been parsed yet.
-                    	// Have we already started storing members for this class?
-                    	else if (queuedClassMembers.containsKey(memberOf)) {
-                    		Map<String, Object> queuedClass = queuedClassMembers.get(memberOf);
-                    		
-                    		methods = (List<Map<String, Object>>)queuedClass.get("methods");
-                    		properties = (List<Map<String, Object>>)queuedClass.get("properties");
-                    		
-                    	}
-                    	// The class hasn't been parsed yet.
-                    	// Store it's properties and methods for later.
-                    	else {
-                    		methods = new ArrayList<Map<String, Object>>();
-                        	properties = new ArrayList<Map<String, Object>>();
+                        memberOf = (String) map.get("memberof");
+                        // access == public?
 
-                    		Map<String, Object> queuedClass = new HashMap<String, Object>();
-                    		queuedClass.put("methods", methods);
-                    		queuedClass.put("properties", properties);
-                    		
-                    		queuedClassMembers.put(memberOf, queuedClass);
-                    	}
-                    	
-                    	if ("function".equalsIgnoreCase(kind)) {
-                        	methods.add(map);
+                        // Member of nothing? move along
+                        // Private methods and properties shouldn't get documented
+                        if(memberOf==null || !"public".equals(access) /* && !"protected".equals(access) */) {
+                            continue;
+                        }
+
+                        // Members for classes can come in out of order, we need to
+                        // see if it's present yet. If not, we'll store the members till the class becomes available.
+                        if(documentedClasses.containsKey(memberOf)) {
+                            Map<String, Object> documentedClass = documentedClasses.get(memberOf);
+
+                            methods = (List<Map<String, Object>>)documentedClass.get("methods");
+                            properties = (List<Map<String, Object>>)documentedClass.get("properties");
+                        }
+                        // Class hasn't been parsed yet.
+                        // Have we already started storing members for this class?
+                        else if (queuedClassMembers.containsKey(memberOf)) {
+                            Map<String, Object> queuedClass = queuedClassMembers.get(memberOf);
+
+                            methods = (List<Map<String, Object>>)queuedClass.get("methods");
+                            properties = (List<Map<String, Object>>)queuedClass.get("properties");
+
+                        }
+                        // The class hasn't been parsed yet.
+                        // Store it's properties and methods for later.
+                        else {
+                            methods = new ArrayList<>();
+                            properties = new ArrayList<>();
+
+                            Map<String, Object> queuedClass = new HashMap<>();
+                            queuedClass.put("methods", methods);
+                            queuedClass.put("properties", properties);
+
+                            queuedClassMembers.put(memberOf, queuedClass);
+                        }
+
+                        if ("function".equalsIgnoreCase(kind)) {
+                            methods.add(map);
                         } else if ("member".equalsIgnoreCase(kind) && !map.containsKey("undocumented")) {
-                        	properties.add(map);
+                            properties.add(map);
                         }
                     }
-                    
-                    
-                    
+
+
+
                 }
-                
+
                 // Sort the methods and properties collections alphabetically
                 Map<String, Object> symbolMap;
                 for(Map.Entry<String, Map<String, Object>> symbol : symbols.entrySet()) {
-                	symbolMap = symbol.getValue();
-                	if(symbolMap.get("methods") != null) {
-                		Collections.sort((List<Map<String, Object>>)symbolMap.get("methods"), SYMBOL_COMPARATOR);
-                	}
-                	
-                	if(symbolMap.get("properties") != null) {
-                		Collections.sort((List<Map<String, Object>>)symbolMap.get("properties"), SYMBOL_COMPARATOR);
-                	}
+                    symbolMap = symbol.getValue();
+                    if(symbolMap.get("methods") != null) {
+                        Collections.sort((List<Map<String, Object>>)symbolMap.get("methods"), SYMBOL_COMPARATOR);
+                    }
+
+                    if(symbolMap.get("properties") != null) {
+                        Collections.sort((List<Map<String, Object>>)symbolMap.get("properties"), SYMBOL_COMPARATOR);
+                    }
                 }
-                
+
             } finally {
                 if (reader != null) {
                     reader.close();

@@ -40,7 +40,6 @@ import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DependencyDef;
 import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.FlavoredStyleDef;
@@ -492,7 +491,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     /**
      * Does all the validation of the expressions defined in this component
      */
-    @SuppressWarnings("deprecation")
     private void validateExpressionRefs() throws QuickFixException {
         for (PropertyReference e : expressionRefs) {
             String root = e.getRoot();

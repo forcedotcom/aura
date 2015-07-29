@@ -33,13 +33,11 @@ import org.auraframework.css.MutableThemeList;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
-import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ThemeDef;
 import org.auraframework.impl.css.theme.ThemeListImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -695,7 +693,7 @@ public class AuraContextImpl implements AuraContext {
         if (styleContext == null) {
             this.styleContext = ImmutableSet.of();
         } else {
-           // iteration order is important for serialization in app.css url and also generation of server css cache key
+            // iteration order is important for serialization in app.css url and also generation of server css cache key
             this.styleContext = ImmutableSortedSet.copyOf(styleContext);
         }
     }

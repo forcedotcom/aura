@@ -330,11 +330,13 @@
 
     _setActiveItem: function(cmp, firstActive) {
         var pillItems = cmp.find('pill');
-        if (!$A.util.isArray(pillItems)) {
-            pillItems.set("v.active", true);
-        } else {
-            pillItems[0].set("v.active", firstActive);
-            pillItems[pillItems.length-1].set("v.active", !firstActive);
+        if (pillItems) {
+            if (!$A.util.isArray(pillItems)) {
+                pillItems.set("v.active", true);
+            } else {
+                pillItems[0].set("v.active", firstActive);
+                pillItems[pillItems.length - 1].set("v.active", !firstActive);
+            }
         }
     }
 

@@ -129,6 +129,8 @@ function (constraint, elementProxyFactory) {
          *                          the vertical alignment, the second the horizontal alignments.
          *                          acceptable values: right, left, center
          * @property {String} config.targetAlign where on the target to align to.
+         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body 
+         *                                               (removed from current context)
          * 
          * @return {Object} constraintHandle
          * @property {Function} constraintHandle.disable Disable the constraint
@@ -148,6 +150,9 @@ function (constraint, elementProxyFactory) {
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
             $A.assert(config.target && (config.target === window || isDomNode(config.target)), 'Target is undefined or missing');
             
+            if(config.appendToBody) {
+                document.body.appendChild(config.element);
+            }
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             

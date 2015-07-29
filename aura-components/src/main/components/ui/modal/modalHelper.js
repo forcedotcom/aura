@@ -123,6 +123,13 @@
             }, 50);
         }
 
+        // remove overflow changes
+        if(cmp._bodyInlineOverflow) {
+            document.body.style.overflow = cmp._bodyInlineOverflow;
+        } else {
+            document.body.style.overflow = '';
+        }
+        
         if(closeAnimation) {
             animationName = closeAnimation;
         }
@@ -158,6 +165,10 @@
     mask: function(cmp) {
         var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
+        cmp._bodyInlineOverflow = document.body.style.overflow;
+
+        // prevent scrolling of the body when modals are open
+        document.body.style.overflow = 'hidden';
 
         $A.util.removeClass(mask, 'hidden');
         $A.util.addClass(mask, 'fadein');

@@ -131,6 +131,8 @@ function (w) {
         
         
         if(this._node !== w) {
+            //force paint
+            this._node.offsetHeight;
             box = this._node.getBoundingClientRect();
             for(x in box) {
                 this[x] = box[x];

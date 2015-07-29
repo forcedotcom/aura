@@ -108,5 +108,20 @@
                 }
             }
         }
+    },
+    
+    /**
+     * Show/hide open date picker icon based on v.disabled
+     */
+    toggleOpenIconVisibility: function(component) {
+    	var openIconCmp = component.find("datePickerOpener"),
+    	    openIconEl = openIconCmp ? openIconCmp.getElement() : null;
+    	if (openIconEl) {
+    	    if (component.get("v.disabled") === true) {
+    	    	$A.util.swapClass(openIconEl, "display", "hide");
+    	    } else {
+    	    	$A.util.swapClass(openIconEl, "hide", "display");
+    	    }
+    	}
     }
 })

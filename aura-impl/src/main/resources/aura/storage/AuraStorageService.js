@@ -31,10 +31,22 @@ function AuraStorageService(){
  * @param {String} name The name of the requested storage.
  * @memberOf AuraStorageService
  * @returns {AuraStorage} Returns an AuraStorage object corresponding to an existing storage.
-* @export
+ * @export
  */
 AuraStorageService.prototype.getStorage = function(name) {
     return this.storages[name];
+};
+
+
+/**
+ * Returns all existing storages.
+ * <p>See Also: <a href="#reference?topic=api:AuraStorage">AuraStorage</a></p>
+ * @memberOf AuraStorageService
+ * @returns {Object} Returns a map of storage names to AuraStorage objects.
+ * @export
+ */
+AuraStorageService.prototype.getStorages = function() {
+    return $A.util.apply({}, this.storages);
 };
 
 /**

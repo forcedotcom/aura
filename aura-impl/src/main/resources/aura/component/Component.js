@@ -1632,12 +1632,7 @@ Component.prototype.getVersion = function() {
 Component.prototype.getVersionInternal = function() {
     var context = $A.getContext();
     var ns = this.getDef().getDescriptor().getNamespace();
-    var ret = null;
-    if (context) {
-        ret = context.getAccessVersion(ns);
-    }
-
-    return ret ? ret.getVersion() : null;
+    return context ? context.getAccessVersion(ns) : null;
 };
 
 Component.prototype.getValueProvider = function(key) {

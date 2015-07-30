@@ -352,14 +352,15 @@
                     });
                 }
 
-                
-                component.positionConstraint = this.lib.panelPositioning.createRelationship({
-                    element:elem,
-                    target:referenceElem,
-                    appendToBody: true,
-                    align: 'left top',
-                    targetAlign: 'left bottom'
-                });
+                if(!component.positionConstraint) {
+                    component.positionConstraint = this.lib.panelPositioning.createRelationship({
+                        element:elem,
+                        target:referenceElem,
+                        appendToBody: true,
+                        align: 'left top',
+                        targetAlign: 'left bottom'
+                    });
+                }
                 this.lib.panelPositioning.reposition();
 
                 //attaching to the body causes the date to lose focus so we need to add the focus back

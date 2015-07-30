@@ -752,15 +752,14 @@ AuraComponentService.prototype.index = function(component){
 };
 
 /**
- * Gets the component definition from the registry.
+ * Gets the component definition from the registry for internal use, without access checks.
  *
  * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
  * @returns {ComponentDef} The metadata of the component
  *
- * @public
- * @export
+ * @private
  */
-AuraComponentService.prototype.getDef = function(descriptor) {
+AuraComponentService.prototype.getComponentDef = function(descriptor) {
     $A.assert(descriptor, "No ComponentDef descriptor specified");
 
     if (descriptor["descriptor"]) {
@@ -776,6 +775,21 @@ AuraComponentService.prototype.getDef = function(descriptor) {
         // check and create from saved configs
         def = this.createFromSavedComponentConfigs(descriptor);
     }
+
+    return def;
+};
+
+/**
+ * Gets the component definition from the registry.
+ *
+ * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
+ * @returns {ComponentDef} The metadata of the component
+ *
+ * @public
+ * @export
+ */
+AuraComponentService.prototype.getDef = function(descriptor) {
+    var def = this.getComponentDef(descriptor);
 
     if (def && !$A.clientService.allowAccess(def)) {
         // #if {"modes" : ["DEVELOPMENT"]}

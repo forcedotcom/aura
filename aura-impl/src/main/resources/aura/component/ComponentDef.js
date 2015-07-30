@@ -661,7 +661,7 @@ ComponentDef.prototype.initSuperDef = function(config) {
             descriptor = config["descriptor"];
         }
         // config could either be for a new component or for an existing def so we need to check first
-        var sDef = $A.componentService.getDef(descriptor);
+        var sDef = $A.componentService.getComponentDef(descriptor);
         if (!sDef) {
             sDef = $A.componentService.createDef(config);
         }

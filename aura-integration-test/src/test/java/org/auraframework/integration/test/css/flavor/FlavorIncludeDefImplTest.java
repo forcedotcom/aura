@@ -18,6 +18,7 @@ package org.auraframework.integration.test.css.flavor;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
@@ -46,7 +47,7 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
 
     public void testComputeFilterMatches() throws Exception {
         FlavorIncludeDef fi = source("<aura:use source='flavorTestAlt:flavorIncludeDefTestFlavors'/>");
-        Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> mapping = fi.computeFlavorMapping();
+        Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> overrides = fi.computeOverrides();
 
         DefDescriptor<ComponentDef> sample1 = DefDescriptorImpl.getInstance("flavorTest:x_sample", ComponentDef.class);
         DefDescriptor<ComponentDef> sample2 = DefDescriptorImpl.getInstance("flavorTest:x_landmark", ComponentDef.class);
@@ -54,14 +55,14 @@ public class FlavorIncludeDefImplTest extends StyleTestCase {
         DefDescriptor<FlavoredStyleDef> sample1Flavor = Flavors.customFlavorDescriptor(sample1, "flavorTestAlt", "flavorIncludeDefTestFlavors");
         DefDescriptor<FlavoredStyleDef> sample2Flavor = Flavors.customFlavorDescriptor(sample2, "flavorTestAlt", "flavorIncludeDefTestFlavors");
 
-        assertEquals(3, mapping.row(sample1).size());
-        assertEquals(sample1Flavor, mapping.get(sample1, "default"));
-        assertEquals(sample1Flavor, mapping.get(sample1, "default2"));
-        assertEquals(sample1Flavor, mapping.get(sample1, "default3"));
+        assertEquals(3, overrides.row(sample1).size());
+        assertEquals(sample1Flavor, overrides.get(sample1, "default").getDescriptor());
+        assertEquals(sample1Flavor, overrides.get(sample1, "default2").getDescriptor());
+        assertEquals(sample1Flavor, overrides.get(sample1, "default3").getDescriptor());
 
-        assertEquals(1, mapping.row(sample2).size());
-        assertEquals(sample2Flavor, mapping.get(sample2, "neutral"));
-        assertNull(mapping.get(sample2, "default"));
+        assertEquals(1, overrides.row(sample2).size());
+        assertEquals(sample2Flavor, overrides.get(sample2, "neutral").getDescriptor());
+        assertNull(overrides.get(sample2, "default"));
     }
 
     public void testAppendsDependencies() throws Exception {

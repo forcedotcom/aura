@@ -1,0 +1,54 @@
+.THIS.buttons {
+	position:absolute;
+	top:35%;
+	left:46%;
+} 
+.THIS.title {
+	position:absolute;
+	top:25%;
+	left:40%;
+	font-size:25px;
+}
+.THIS.desc {
+	position:absolute;
+	top:30%;
+	left:25%;
+}
+.THIS.pos2{
+	position:absolute;
+	left:48%;
+}
+.THIS.pos3{
+	position:absolute;
+	right:0;
+}
+.THIS.pos4{
+	position:absolute;
+	left:0;
+	top:45%;
+}
+.THIS.pos5{
+	position:absolute;
+	top:45%;
+	left:48%;
+}
+.THIS.pos6{
+	position:absolute;
+	top:45%;
+	right:0;
+}
+.THIS.pos7{
+	position:absolute;
+	left:0;
+	bottom:0;
+}
+.THIS.pos8{
+	position:absolute;
+	bottom:0;
+	left:48%;
+}
+.THIS.pos9{
+	position:absolute;
+	bottom:0;
+	right:0;
+}

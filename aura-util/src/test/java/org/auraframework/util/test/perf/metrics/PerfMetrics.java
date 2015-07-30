@@ -42,8 +42,7 @@ public final class PerfMetrics {
         List<JSONObject> devToolsLog = null;
         Map<String, ?> jsProfilerData = null;
         Map<String, ?> heapSnapshot = null;
-        Map<String, ?> metricsServiceTransaction = null;
-        
+
         for (PerfMetrics metrics : metricsList) {
             if (metrics != null) {
                 if (devToolsLog == null) {
@@ -108,16 +107,16 @@ public final class PerfMetrics {
     public void setDevToolsLog(List<JSONObject> devToolsLog) {
         this.devToolsLog = devToolsLog;
     }
-    
+
     public void setMetricsServiceTransaction(JSONObject transaction) {
-    	this.metricsServiceTransaction = transaction;
+        this.metricsServiceTransaction = transaction;
     }
     public void setMetricsServiceTransaction(Map<String, ?> transaction) {
-    	this.metricsServiceTransaction = new JSONObject(transaction);
+        this.metricsServiceTransaction = new JSONObject(transaction);
     }
-    
+
     public JSONObject getMetricsServiceTransaction() {
-    	return this.metricsServiceTransaction;
+        return this.metricsServiceTransaction;
     }
 
     public Map<String, ?> getJSProfilerData() {
@@ -189,12 +188,12 @@ public final class PerfMetrics {
         }
         return sb.toString();
     }
-    
+
     public JSONObject toJSONObject () throws JSONException {
-    	JSONArray metricsList = toJSONArrayWithoutDetails();
-    	JSONObject metrics = new JSONObject();
-    	metrics.put("metrics", metricsList);
-    	return metrics;
+        JSONArray metricsList = toJSONArrayWithoutDetails();
+        JSONObject metrics = new JSONObject();
+        metrics.put("metrics", metricsList);
+        return metrics;
     }
 
     public JSONArray toJSONArrayWithoutDetails() {

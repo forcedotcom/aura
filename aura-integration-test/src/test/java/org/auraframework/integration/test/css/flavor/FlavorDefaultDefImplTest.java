@@ -18,21 +18,22 @@ package org.auraframework.integration.test.css.flavor;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.auraframework.css.FlavorMapping;
+import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.css.flavor.FlavorMappingImpl;
+import org.auraframework.impl.css.flavor.FlavorOverrideLocationImpl;
+import org.auraframework.impl.css.flavor.FlavorOverrideLocatorImpl;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableMap;
 
 public class FlavorDefaultDefImplTest extends StyleTestCase {
-    private static final FlavorMapping NO_MAPPING = new FlavorMappingImpl.Builder().build();
+    private static final FlavorOverrideLocator NO_OVERRIDES = new FlavorOverrideLocatorImpl.Builder().build();
 
     public FlavorDefaultDefImplTest(String name) {
         super(name);
@@ -58,7 +59,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
     }
 
     /* util: given source results in given cmp => flavor override map */
-    private void checkMatches(String src, Map<DefDescriptor<ComponentDef>, String> expected, FlavorMapping mapping)
+    private void checkMatches(String src, Map<DefDescriptor<ComponentDef>, String> expected, FlavorOverrideLocator mapping)
             throws Exception {
         Map<DefDescriptor<ComponentDef>, String> matches = source(src).computeFilterMatches(mapping);
         assertEquals("didn't get expected number of matches", expected.size(), matches.size());
@@ -72,13 +73,14 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addStandardFlavor(cmp, ".THIS--foo{}");
 
         String fmt = String.format("<aura:flavor component='%s' default='foo'/>", cmp.getDescriptorName());
-        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
     public void testSingleComponentFromMapping() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> style = addCustomFlavor(cmp, "THIS--foo{}");
-        FlavorMapping mapping = new FlavorMappingImpl.Builder().put(cmp, "foo", style).build();
+        FlavorOverrideLocator mapping = new FlavorOverrideLocatorImpl.Builder().put(cmp, "foo",
+                new FlavorOverrideLocationImpl(style)).build();
 
         String fmt = String.format("<aura:flavor component='%s' default='foo'/>", cmp.getDescriptorName());
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
@@ -89,13 +91,14 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addStandardFlavor(cmp, ".THIS{} .THIS--foo{}");
         addApp(cmp);
         String fmt = "<aura:flavor component='*' default='foo'/>";
-        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
     public void testFullGlobMatchFromMapping() throws Exception {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         DefDescriptor<FlavoredStyleDef> style = addCustomFlavor(cmp, "THIS--foo{}");
-        FlavorMapping mapping = new FlavorMappingImpl.Builder().put(cmp, "foo", style).build();
+        FlavorOverrideLocator mapping = new FlavorOverrideLocatorImpl.Builder().put(cmp, "foo",
+                new FlavorOverrideLocationImpl(style)).build();
         addApp(cmp);
         String fmt = "<aura:flavor component='*' default='foo'/>";
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
@@ -105,7 +108,8 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addStandardFlavor(cmp, ".THIS{} .THIS--foo{}");
         DefDescriptor<FlavoredStyleDef> style = addCustomFlavor(cmp, "THIS--foo{}");
-        FlavorMapping mapping = new FlavorMappingImpl.Builder().put(cmp, "foo", style).build();
+        FlavorOverrideLocator mapping = new FlavorOverrideLocatorImpl.Builder().put(cmp, "foo",
+                new FlavorOverrideLocationImpl(style)).build();
         addApp(cmp);
         String fmt = "<aura:flavor component='*' default='foo'/>";
         checkMatches(fmt, ImmutableMap.of(cmp, "foo"), mapping);
@@ -115,7 +119,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         DefDescriptor<ComponentDef> cmp = addFlavorableComponentDef();
         addApp(cmp);
         String fmt = "<aura:flavor component='*' default='foo'/>";
-        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
     public void testNamespaceGlobMatchFromBundle() throws Exception {
@@ -128,7 +132,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addApp(cmp, cmp2);
 
         String fmt = String.format("<aura:flavor component='%s:*' default='foo'/>", getNs1());
-        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
     public void testNamespaceGlobNoMatch() throws Exception {
@@ -141,7 +145,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addApp(cmp, cmp2);
 
         String fmt = String.format("<aura:flavor component='%s:*' default='foo'/>", getNs1());
-        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
     public void testNameGlobMatchFromBundle() throws Exception {
@@ -154,7 +158,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addApp(cmp, cmp2);
 
         String fmt = String.format("<aura:flavor component='*:%s' default='foo'/>", cmp.getName());
-        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.of(cmp, "foo"), NO_OVERRIDES);
     }
 
     public void testNameGlobNoMatch() throws Exception {
@@ -167,7 +171,7 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         addApp(cmp, cmp2);
 
         String fmt = String.format("<aura:flavor component='*:%s' default='bar'/>", cmp.getName());
-        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_MAPPING);
+        checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
     public void testValidatesReferenceNotFlavorable() throws Exception {

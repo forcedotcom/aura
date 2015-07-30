@@ -23,6 +23,8 @@
     
     ENTER_KEY: 13,
     COMMA_KEY: 188,
+    RIGHT_ARROW_KEY:39,
+    LEFT_ARROW_KEY: 37,
 
     testEnterCreatesPill: {
         test: function (cmp) {
@@ -352,6 +354,98 @@
                 return document.activeElement === textInputElement;
             }, "input should be focused");
         }
+    },
+
+    /**
+     * if in the last pill, pressing right key - move into the input
+     * W-2647751
+     */
+    testRightArrowKeyFromLastPill: {
+        test: [function(cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            secondPill = pillContainer.find("pill")[1];
+            firstPill = pillContainer.find("pill")[0];
+
+            secondPill.focus();
+            this._fireKeydownEvent(secondPill, this.RIGHT_ARROW_KEY);
+
+            $A.test.assertEquals(document.activeElement, this._getInputElement(cmp), "input should be focused");
+        }]
+    },
+    
+    /*
+     * pressing right key on the last pill should goto 1st pill when maxAllowed is reached.
+     * Bug: W-2700320
+     */
+    _testRightArrowKeyFromLastPillWhenMaxAllowedReached: {
+    	attributes: {
+            maxAllowed: 2
+        },
+        test: [function(cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            secondPill = pillContainer.find("pill")[1];
+            firstPill = pillContainer.find("pill")[0];
+
+            secondPill.focus();
+            this._fireKeydownEvent(secondPill, this.RIGHT_ARROW_KEY);
+            $A.test.assertEquals(document.activeElement, firstPill.getElement(), "First Pill should be focused");
+        }]
+    },
+
+    /*
+     * pressing left key on the first pill should goto last pill when maxAllowed is reached.
+     * Bug: W-2700320
+     */
+    testLeftArrowKeyFromFirstPillWhenMaxAllowedReached: {
+    	attributes: {
+            maxAllowed: 2
+        },
+        test: [function(cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            secondPill = pillContainer.find("pill")[1];
+            firstPill = pillContainer.find("pill")[0];
+
+            firstPill.focus();
+            this._fireKeydownEvent(firstPill, this.LEFT_ARROW_KEY);
+            $A.test.assertEquals(document.activeElement, secondPill.getElement(), "Last Pill should be focused");
+        }]
+    },
+    
+    /**
+     * if in the left most side of the input - pressing left key should move me to a pill
+     * W-2647751
+     */
+    testLeftArrowKeyFromInput: {
+        test: [function(cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+
+            this._fireKeydownEvent(textInput, this.LEFT_ARROW_KEY);
+
+            var firstPill = pillContainer.find("pill");
+            $A.test.assertEquals(document.activeElement, firstPill.getElement(), "pill should be focused");
+        }]
+    },
+
+    /**
+     * if in the left most side of the input - pressing left key should NOT move me to a pill if there is un-pilled text.
+     * W-2647751
+     */
+    testLeftArrowKeyFromInputWithText: {
+        test: [function(cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            var textInput = this._getInput(cmp);
+            var textInputElement = this._getInputElement(cmp);
+            this._inputPill(textInput, this.PILLS[0].label);
+
+            textInput.set("v.value", "some input text");
+            textInputElement.setSelectionRange(0, 0);
+            this._fireKeydownEvent(textInput, this.LEFT_ARROW_KEY);
+
+            var firstPill = pillContainer.find("pill");
+            $A.test.assertEquals(document.activeElement, this._getInputElement(cmp), "input should be focused");
+        }]
     },
 
     _getInput: function(cmp) {

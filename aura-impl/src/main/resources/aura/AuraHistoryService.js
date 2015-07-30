@@ -79,7 +79,7 @@ AuraHistoryService.prototype.get = function() {
     // Windows phone doesn't save the hash after navigating backwards. 
     // So get it from the history state. 
     //
-    var token = location["hash"] || (window.history["state"] && window.history["state"]["hash"]) || "";
+    var token = this.getLocationHash() || (window.history["state"] && window.history["state"]["hash"]) || "";
     return this.parseLocation(token);
 };
 
@@ -186,7 +186,7 @@ AuraHistoryService.prototype.init = function() {
             that.changeHandler();
         });
     } else {
-        var hash = location["hash"];
+        var hash = this.getLocationHash();
 
         this.history.push(hash);
         this.currentIndex++;
@@ -202,7 +202,7 @@ AuraHistoryService.prototype.init = function() {
         } else {
             var watch = function(){
                 setTimeout(function(){
-                    var newHash = location["hash"];
+                    var newHash = that.getLocationHash();
                     if (newHash !== hash) {
                         hash = newHash;
                         that.changeHandler();
@@ -231,7 +231,7 @@ AuraHistoryService.prototype.getEvent = function(){
  * @private
  */
 AuraHistoryService.prototype.changeHandler = function(){
-    var loc = location["hash"] || (history["state"] && history["state"]["hash"]);
+    var loc = this.getLocationHash() || (history["state"] && history["state"]["hash"]);
     var event = $A.eventService.newEvent(this.getEvent());
 
     if(!event) {
@@ -282,6 +282,21 @@ AuraHistoryService.prototype.parseLocation = function(location) {
     } else {
         return {"token" : location, "querystring": "" };
     }
+};
+
+/**
+ * Firefox unescapes location.hash, so the results are inconsistent browser to browser.
+ * This method normalizes accessing the hash portion.
+ * @private
+ */
+AuraHistoryService.prototype.getLocationHash = function() {
+    var href = window.location["href"];
+    var hashPosition = href.indexOf("#");
+    if(hashPosition == -1) { 
+        return "";
+    }
+
+    return href.substr(hashPosition);
 };
 
 Aura.Services.AuraHistoryService = AuraHistoryService;

@@ -204,20 +204,6 @@ div.THIS.PHONE .scroller {
     padding: 7px;
 }
 
-.THIS .buttonBar .calToday {
-    color: #0085C7;
-    font-size: 18px;
-	line-height: 24px !important;
-	border:0px solid #fff;
-	background:transparent;
-	cursor:pointer;
-}
-
-.THIS .buttonBar .calToday:hover,
-.THIS .buttonBar .calToday:focus {
-    text-decoration:underline;
-}
-
 .THIS .timeBar {
 	display:inline-block;
 	width: 100%;

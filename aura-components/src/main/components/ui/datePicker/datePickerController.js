@@ -18,6 +18,20 @@
         helper.hide(component, true);
     },
 
+    handleVisible: function(component, event, helper) {
+        if(component.get('v.visible') === true) {
+           component.getElement().style.opacity = 0;
+            setTimeout($A.getCallback(function() {
+                if(component.isValid()) {
+                    helper.position(component);
+                    component.getElement().style.opacity = 1;
+                }   
+            }),10);
+        }
+        
+        
+    },
+
     highlightRange: function(component, event) {
         var params = event.getParam('arguments');
         if (params) {

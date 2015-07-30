@@ -104,6 +104,9 @@
     	var helper = this;
     	if (!component._keyboardEventHandler) {
     		component._keyboardEventHandler = function(event) {
+                // @dval: There a multiple corner cases 
+                // were we might endup in the wrong branch
+                // Make this more robust once we refactor this component
     			var concreteCmp = component.getConcreteComponent();
     			if (event.type === "keydown") {
     				if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
@@ -221,7 +224,7 @@
         for(var i = 0; i < menuItems.length; i++) {
             var c = menuItems[i];
             var text = c.get("v.label");
-            if(text.toLowerCase().indexOf(matchText) === 0) {
+            if(text && text.toLowerCase().indexOf(matchText) === 0) {
                 var action = c.get("c.setFocus");
                 action.runDeprecated();
                 this.fireMenuFocusChangeEvent(component, srcComponent, c);

@@ -410,6 +410,77 @@ Test.Aura.AuraHistoryServiceTest = function(){
 
             Assert.Equal(expected, actual);
         }
-
     }
+    
+    [Fixture]
+    function getLocationHash() {
+        [Fact]
+        function LocationWithHash() {
+            var expected = "#theToken";
+            var windowMock = {
+                location: {
+                    href: "url" + expected
+                }
+            };
+
+            var mockLocationHref = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            
+            var historyService = new Aura.Services.AuraHistoryService();
+            
+            var actual;
+            mockLocationHref(function() {
+                actual = historyService.getLocationHash();
+            });  
+            
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        function LocationEmptyHash() {
+            var expected = "#";
+            var windowMock = {
+                location: {
+                    href: "url" + expected
+                }
+            };
+
+            var mockLocationHref = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            
+            var historyService = new Aura.Services.AuraHistoryService();
+            
+            var actual;
+            mockLocationHref(function() {
+                actual = historyService.getLocationHash();
+            });  
+            
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        function LocationNoHash() {
+            var expected = "";
+            var windowMock = {
+                location: {
+                    href: "url"
+                }
+            };
+
+            var mockLocationHref = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            
+            var historyService = new Aura.Services.AuraHistoryService();
+            
+            var actual;
+            mockLocationHref(function() {
+                actual = historyService.getLocationHash();
+            });  
+            
+            Assert.Equal(expected, actual);
+        }
+    }    
 }

@@ -19,6 +19,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
+import org.auraframework.css.FlavorAnnotation;
+
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.salesforce.omakase.ast.Comment;
@@ -39,35 +42,62 @@ import com.salesforce.omakase.ast.Comment;
  * Available key-value params: <br>
  * <ul>
  * <li>extends <i>name</i></li>
+ * <li>overrides-if <i>condition</i></li>
  */
-final class FlavorAnnotation {
+public final class FlavorAnnotationImpl implements FlavorAnnotation {
+    private static final long serialVersionUID = 4882490457365421070L;
+
     private static final String NAME = "@flavor";
 
     private final String flavorName;
     private final Optional<String> optionExtends;
+    private final Optional<String> optionOverridesIf;
 
-    public FlavorAnnotation(Map<String, String> map) {
+    public FlavorAnnotationImpl(Map<String, String> map) {
         this.flavorName = checkNotNull(map.get("flavor"), "flavorName cannot be null");
         this.optionExtends = Optional.fromNullable(map.get("extends"));
+
+        String overridesIf = map.get("overrides-if");
+        this.optionOverridesIf = overridesIf != null ?Optional.of(overridesIf.toLowerCase()) : Optional.<String>absent();
     }
 
-    /** gets the name of the flavor */
+    public FlavorAnnotationImpl(String name) {
+        this.flavorName = checkNotNull(name, "flavor name cannot be null");
+        this.optionExtends = Optional.absent();
+        this.optionOverridesIf = Optional.absent();
+    }
+
+    @Override
     public String getFlavorName() {
         return flavorName;
     }
 
-    /** optional extends param */
+    @Override
     public Optional<String> getExtends() {
         return optionExtends;
     }
 
-    /** returns a {@link FlavorAnnotation} object if the given CSS comment contains one */
+    @Override
+    public Optional<String> getOverridesIf() {
+        return optionOverridesIf;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this)
+                .add("flavorName", flavorName)
+                .add("optionExtends", optionExtends)
+                .add("optionOverridesIf", optionOverridesIf)
+                .toString();
+    }
+
+    /** returns a {@link FlavorAnnotationImpl} object if the given CSS comment contains one */
     public static Optional<FlavorAnnotation> find(Comment comment) {
         String string = comment.content().trim();
         if (string.startsWith(NAME)) {
             string = string.substring(1); // remove the @ sign
             Map<String, String> map = Splitter.on(",").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(string);
-            return Optional.of(new FlavorAnnotation(map));
+            return Optional.<FlavorAnnotation>of(new FlavorAnnotationImpl(map));
         }
         return Optional.absent();
     }

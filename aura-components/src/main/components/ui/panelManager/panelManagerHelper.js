@@ -304,20 +304,20 @@
         var self = this, manager = this.getManager(cmp);
 
         if (!manager._transitioning) {
-            // avoid more actions at the same time
-            panel.get('c.show').run();
-            var helper = cmp.getConcreteComponent().getDef().getHelper();
-            helper.afterOpenInstance(cmp);
+            if(panel.isRendered()) {
+                // avoid more actions at the same time
+                // If DOM is already there open the panel
+                panel.get('c.show').run();
+             } else {
+                 // Otherwise wait until panel is done rendering and then show it
+                panel.addHandler('panelDoneRendering', panel, 'c.show'); 
+             }
         } else {
             // queue the action to execute it once the transition is done.
         	manager._actionQueue.push(function() {
                 self.openInstance.call(self, cmp, panel, config);
             });
         }
-    },
-    
-    afterOpenInstance: function(cmp) {
-    	//template for subcomponents
     },
     
     isPanel: function(component) {

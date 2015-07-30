@@ -37,16 +37,6 @@
         }
 
         return this.superRerender();
-    },
-
-    unrender: function (cmp, helper) {
-        var items = helper.getTabItems(cmp);
-        try {
-            for (var i = 0, len = items.length; i < len; i++) {
-                items[i].destroy(true);
-            }
-        } finally {
-            this.superUnrender();
-        }
     }
+
 })

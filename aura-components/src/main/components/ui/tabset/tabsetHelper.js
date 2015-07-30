@@ -125,22 +125,26 @@
     setActiveTabBody: function (cmp, option) {
         var tab = option.tab;
 
-        if (option.active) {
+        var isActiveTab = cmp._activeTab === tab;
+
+        if (option.active && !isActiveTab) {
+            //deactivate current tabBody
+            if (cmp._activeTab && cmp._activeTab.isValid()) {
+                cmp._activeTab.get("e.setActive").setComponentEvent().fire({"active": false});
+            }
+
+            //fire event to curent tab to update status
+            tab.get("e.setActive").setComponentEvent().fire({"active": true});
+
             if (!tab.isRendered()) {
                 var renderedTabs = cmp.get("v.body");
                 renderedTabs.push(tab);
                 cmp.set("v.body", renderedTabs);
             }
 
-            //deactivate current tabBody
-            if (cmp._activeTab && cmp._activeTab.isValid()) {
-                cmp._activeTab.get("e.setActive").setComponentEvent().fire({"active": false});
-            }
-            //fire event to curent tab to update status
-            tab.get("e.setActive").setComponentEvent().fire({"active": true});
             //save current active tab
             cmp._activeTab = tab;
-        } else if (option.active === false && cmp._activeTab === tab) {
+        } else if (option.active === false && isActiveTab) {
             //deactivate tab
             tab.get("e.setActive").setComponentEvent().fire({"active": false});
             cmp._activeTab = null;
@@ -236,7 +240,7 @@
                 }
             }
         }
-        tabCmps = this.getTabComponents(body);
+        var tabCmps = this.getTabComponents(body);
         for (var i = 0, len = tabCmps.length; i < len; i++) {
             var tab = tabCmps[i],
                 id = tab.getGlobalId(),
@@ -251,10 +255,6 @@
             tabIds.push(id);
             tabItemConfigs.push(this.getTabItemConfig(cmp, tab));
             tabs[id] = tab;
-        }
-
-        if (tabCmps && tabCmps[activeTab]) {
-            tabCmps[activeTab].set("v.active", true);
         }
 
         this.finishInit(cmp, {
@@ -431,7 +431,7 @@
                 var tabs = this.tabComponents;
                 for (var id in tabs) {
                     if (tabs.hasOwnProperty(id)) {
-                        tabs[id].destroy(true);
+                        tabs[id].destroy();
                     }
                 }
                 this.tabIds = null;

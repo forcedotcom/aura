@@ -26,7 +26,6 @@
     doNotWrapInAuraRun: true,
 
 
-    /* FIXME kwtan: temp comment out this failed test
     testBlurEventBubble: {
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
@@ -36,7 +35,6 @@
             $A.test.assertEquals("blur",result.get("v.value"),"blur event didn't bubble");
         }
     },
-    */
 
     testInsertEventBubble: {
         test: function (cmp) {

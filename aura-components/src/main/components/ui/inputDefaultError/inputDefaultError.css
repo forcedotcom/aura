@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 .THIS {
-    color: red;
-    font-size: 0.75em;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.THIS .form-element__help {
+    font-size: .75rem;
+    margin-top: .5rem;
+    color: rgb(194, 57, 52);
 }
 
 .THIS.hide {

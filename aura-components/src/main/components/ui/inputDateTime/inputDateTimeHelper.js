@@ -168,7 +168,7 @@
 
         var date = $A.localizationService.parseDateTimeISO8601(value);
 
-        if ($A.get("$Browser.formFactor") == "DESKTOP") {
+        if (this.isDesktopMode(component)) {
             if (!$A.util.isUndefinedOrNull(date)) {
                 var dateFormat = component.get("v.dateFormat");
                 dateFormat = !$A.util.isUndefinedOrNull(dateFormat) ? dateFormat : $A.get("$Locale.dateFormat");
@@ -231,18 +231,18 @@
             datePicker.set("v.minutes", date.getUTCMinutes());
             datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
             datePicker.set("v.visible", true);
-            if (($A.get("$Browser.isPhone") === true) || ($A.get("$Browser.isTablet") === true)) {
-                datePicker.set("v.hasTime", true);
-                datePicker.set("v.showToday", true);
-            } else {
+            if (this.isDesktopMode(component)) {
                 datePicker.set("v.hasTime", false);
                 datePicker.set("v.showToday", false);
+            } else {
+                datePicker.set("v.hasTime", true);
+                datePicker.set("v.showToday", true);
             }
         }
     },
 
     toggleClearButton: function(component) {
-        if (($A.get("$Browser.isPhone") === true) || ($A.get("$Browser.isTablet") === true)) {
+        if (!this.isDesktopMode(component)) {
             var inputCmp = component.find("inputDate");
             var inputElem = inputCmp ? inputCmp.getElement() : null;
             var clearCmp = component.find("clear");
@@ -372,7 +372,7 @@
         var dateValue = this.getDateString(component);
 
         // on desktop, time has a separate input field.
-        if ($A.get("$Browser.formFactor") == "DESKTOP" && !$A.util.isEmpty(dateValue)) {
+        if (this.isDesktopMode(component) && !$A.util.isEmpty(dateValue)) {
             var timeValue = this.getTimeString(component);
             dateValue += timeValue ? " " + timeValue : "";
         }
@@ -389,5 +389,10 @@
         var inputTime = component.find("inputTime");
         var timeElem = inputTime ? inputTime.getElement() : null;
         return timeElem ? timeElem.value : null;
+    },
+
+    isDesktopMode: function(component) {
+        return $A.get("$Browser.formFactor") == "DESKTOP" &&
+                !component.get("v.useSingleInput")
     }
 })

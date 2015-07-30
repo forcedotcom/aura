@@ -24,6 +24,7 @@
         if (!$A.util.isUndefinedOrNull(datePicker)) {
             datePicker.set("v.referenceElement", concreteCmp.getElement());
         }
+        _helper.toggleOpenIconVisibility(component);
         return this.superAfterRender();
 	},
 	
@@ -32,6 +33,7 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayValue(component);
         _helper.toggleClearButton(component);
+        _helper.toggleOpenIconVisibility(component);
         return this.superRerender();
     }
 })

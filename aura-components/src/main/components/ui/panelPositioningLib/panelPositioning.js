@@ -43,10 +43,15 @@ function (constraint, elementProxyFactory) {
         }
     };
 
+    function isDomNode(obj) {
+        return obj.nodeType && (obj.nodeType === 1 || obj.nodeType === 11);
+    }
+
 
 
     function reposition(callback) {
 
+        var toSplice = [];
         timeoutHandler = false;
         // this semaphore is to make sure
         // if reposition is called twice within one frame
@@ -54,10 +59,23 @@ function (constraint, elementProxyFactory) {
         if(!repositionScheduled) {
             window.requestAnimationFrame(function() {
                 repositionScheduled = false;
-                constraints.forEach(function(constraint) {
-                    constraint.updateValues();
-                    constraint.reposition();
-                });
+
+                // this must be executed in order or constraints
+                // will behave oddly
+                for (var i = 0; i < constraints.length; i++) {
+                     if(!constraints[i].destroyed) {
+                        constraints[i].updateValues();
+                        constraints[i].reposition();
+                    } else {
+                        // clean up unused constraints
+                        toSplice.push(i);
+                    }
+                }
+
+                while(toSplice.length > 0) {
+                    constraints.splice(toSplice.pop(), 1);
+                }
+
                 elementProxyFactory.bakeOff();
                 
                 if(callback) {
@@ -111,6 +129,8 @@ function (constraint, elementProxyFactory) {
          *                          the vertical alignment, the second the horizontal alignments.
          *                          acceptable values: right, left, center
          * @property {String} config.targetAlign where on the target to align to.
+         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body 
+         *                                               (removed from current context)
          * 
          * @return {Object} constraintHandle
          * @property {Function} constraintHandle.disable Disable the constraint
@@ -127,10 +147,12 @@ function (constraint, elementProxyFactory) {
             var el = config.element;
     		var targ = config.target;
             var constraintList = [];
-            if(!config.element) {
-                throw new Error('Element is undefined or missing');
-            }
+            $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
+            $A.assert(config.target && (config.target === window || isDomNode(config.target)), 'Target is undefined or missing');
             
+            if(config.appendToBody) {
+                document.body.appendChild(config.element);
+            }
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             

@@ -18,6 +18,19 @@ function (w) {
     'use strict';
      w || (w = window);
 
+     function isInDom(el) {
+        if (el === w) {
+            return true;
+        }
+        if(el.parentNode && el.parentNode.tagName.toUpperCase() === 'BODY'){
+            return true;
+        } else if(el.parentNode) {
+            return isInDom(el.parentNode);
+        } else {
+            return false;
+        }
+     }
+
 
     /**
      * Get the position of an element relative
@@ -80,6 +93,17 @@ function (w) {
         this._releaseCb = cb.bind(scopeObj);
     };
 
+    ElementProxy.prototype.checkNodeIsInDom = function() {
+
+        // if underlying DOM node is gone,
+        // this proxy should be released
+        if(!isInDom(this._node)) {
+            return false;
+        } else {
+            return true;
+        }
+    };
+
     /**
      * Update values from the dom
      * 
@@ -90,6 +114,11 @@ function (w) {
         if(this.isDirty()) {
             return;
         }
+
+        if(!this.checkNodeIsInDom) {
+            return this.release();
+        }
+
         var box, x, scrollTop, scrollLeft;
 
         if(typeof w.pageYOffset !== 'undefined') {
@@ -102,6 +131,8 @@ function (w) {
         
         
         if(this._node !== w) {
+            //force paint
+            this._node.offsetHeight;
             box = this._node.getBoundingClientRect();
             for(x in box) {
                 this[x] = box[x];
@@ -145,7 +176,6 @@ function (w) {
      * Computes and applies the positioning changes to the DOM
      */
     ElementProxy.prototype.bake = function() {
-
         var absPos = this._node.getBoundingClientRect();
         this._node.style.position = 'absolute';
         var style = w.getComputedStyle(this._node);

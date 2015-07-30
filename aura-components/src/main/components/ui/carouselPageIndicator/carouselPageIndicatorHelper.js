@@ -15,38 +15,33 @@
  */
 
 ({
-	onPageSelected: function (cmp, evt) {
+    onPageSelected: function (cmp, evt) {
 
         var currentPage = cmp.get("v.currentPage"),
-        	pages = cmp.get("v.pageComponents"),
-        	//page index starts at 1
-        	targetPage =  evt.getParam("pageIndex") - 1,
-        	e,
-        	pageItems = cmp.find('indicatorItems');
-
-        if (pages && pages.length == 1) {
-        	//fire event to target indicator item
-        	e = pageItems.get("e.pageSelected");
-			e.setParams(evt.getParams());
+            pages = cmp.get("v.pageComponents"),
+            //page index starts at 1
+            targetPage =  evt.getParam("pageIndex") - 1,
+            e,
+            pageItems = cmp.find('indicatorItems');
+        
+        if (pages && pages.length > 1 && targetPage < pages.length && targetPage >= 0 && typeof currentPage != 'undefined') {
+            //fire event to previous selected indicator item
+            e = pageItems[currentPage].get("e.pageSelected");
+            e.setParams(evt.getParams());
             e.setComponentEvent();
-			e.fire();
-			cmp.set('v.currentPage', targetPage);
+            e.fire();
         }
-        else if (pages && pages.length > 1 && targetPage < pages.length && targetPage >= 0) {
-    		if (typeof currentPage != 'undefined') {
-    			//fire event to previous selected indicator item
-    			e = pageItems[currentPage].get("e.pageSelected");
-    			e.setParams(evt.getParams());
-                e.setComponentEvent();
-    			e.fire();
-    		}
-        	//fire event to target indicator item
-        	e = pageItems[targetPage].get("e.pageSelected");
-			e.setParams(evt.getParams())
+        if (pages && targetPage < pages.length) {
+            //fire event to target indicator item
+            if ($A.util.isArray(pageItems)) {
+                e = pageItems[targetPage].get("e.pageSelected");
+            } else {
+                e = pageItems.get("e.pageSelected");
+            }
+            e.setParams(evt.getParams());
             e.setComponentEvent();
-			e.fire();
-
-        	cmp.set('v.currentPage', targetPage);
+            e.fire();
+            cmp.set('v.currentPage', targetPage);
         }
     }
 })

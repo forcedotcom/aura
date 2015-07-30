@@ -342,6 +342,13 @@
 		}
 	},
 
+	cleanup: function(component) {
+		if(component._tooltip) {
+			component._tooltip.parentNode.removeChild(component._tooltip);
+		}
+
+	},
+
 	makeTrigger: function(component) {
 		var self = this;
 		var showTrigger = 'mouseover';

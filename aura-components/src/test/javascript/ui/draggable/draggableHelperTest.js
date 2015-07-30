@@ -355,6 +355,7 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			var expected = {
 				type : expectedDropEffect,
 				dragComponent : targetComponent,
+				dragComponentTarget : targetComponent,
 				dropComponent : expectedDropComponent,
 				data : expectedDataTransfer,
 				dropComplete : expectedDropComplete
@@ -367,9 +368,9 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			//Act
 			auraMock$A(function(){
 				var targetEventType = "dragEnd";
-				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, { "dragTarget" :  targetComponent});
 				targetEventType = "dropComplete";
-				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, targetEvent);
+				targetHelper.updateDropOperationStatus(targetComponent, targetEventType, { "dropCompleteEvent" : targetEvent});
 			});
 			//Assert
 			Assert.Equal(expected, actual);

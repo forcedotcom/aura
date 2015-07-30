@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 .THIS .listContent {
-    min-height:100px;
     clear:both;
     position:relative;
+    min-height: 2.5rem;
 }
 
 .THIS .emptyListContent {
@@ -30,6 +30,7 @@
 .THIS .loadingIndicator{
     display: none;
     height:100%;
+    min-height: 2.5rem;
     left:0;
     position:absolute;
     text-align:center;
@@ -70,7 +71,8 @@
     padding-top: 9px;
     position:relative;
     text-shadow: 0.1em 0.1em 0.01em #fff, 0.1em -0.1em 0.01em #fff, -0.1em -0.1em 0.01em #fff, -0.1em 0.1em 0.01em #fff;
-    top: 65px;
     z-index:1;
     zoom: 1;
+    top: 50%;
+    transform: translateY(-50%);
 }

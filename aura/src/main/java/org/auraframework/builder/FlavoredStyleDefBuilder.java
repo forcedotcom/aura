@@ -15,8 +15,9 @@
  */
 package org.auraframework.builder;
 
-import java.util.Set;
+import java.util.Map;
 
+import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.FlavoredStyleDef;
 
 /**
@@ -24,7 +25,7 @@ import org.auraframework.def.FlavoredStyleDef;
  */
 public interface FlavoredStyleDefBuilder extends BaseStyleDefBuilder<FlavoredStyleDef> {
     /**
-     * Sets the specific flavors defined by the source.
+     * Sets the specific flavor metadata defined by the source.
      */
-    FlavoredStyleDefBuilder setFlavorNames(Set<String> flavorNames);
+    FlavoredStyleDefBuilder setFlavorAnnotations(Map<String, FlavorAnnotation> annotations);
 }

@@ -20,21 +20,8 @@
 			$A.error("Undefined tag attribute for " + component.getGlobalId());
 		}
 
-        var element;
 		var HTMLAttributes = component.get("v.HTMLAttributes");
-
-		// FIXME: LEGACY IE SUPPORT
-		// Fix for name being read only attribute on IE7
-		if ($A.get("$Browser.isIE7") && tag === "input") {
-            var value = HTMLAttributes["name"];
-			if ($A.util.isEmpty(value)) {
-				element = document.createElement(tag);
-			} else {
-				element = document.createElement('<input name="' + value + '">');
-			}
-		} else {
-			element = document.createElement(tag);
-		}
+		var element = document.createElement(tag);
 
 		for ( var attribute in HTMLAttributes) {
 			helper.createHtmlAttribute(component, element, attribute, HTMLAttributes[attribute]);

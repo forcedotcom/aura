@@ -57,7 +57,7 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_DEFAULT, ATTRIBUTE_REQUIRED,
             ATTRIBUTE_TYPE, ATTRIBUTE_NAME, ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS);
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-			ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
+            ATTRIBUTE_SERIALIZE_TO).addAll(ALLOWED_ATTRIBUTES).build();
 
     private final AttributeDefImpl.Builder builder = new AttributeDefImpl.Builder();
     private final List<ComponentDefRef> body = Lists.newArrayList();
@@ -91,7 +91,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
         return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void readAttributes() {
         String name = getAttributeValue(ATTRIBUTE_NAME);

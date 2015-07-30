@@ -40,7 +40,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: #2A4158;
+    background-color: #A8B7C7;
 
 }
 
@@ -110,6 +110,21 @@
     max-width: 40rem;
     min-width: 20rem;
     height: 100%;
+}
+
+.THIS .modal-header {
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.THIS .modal-header.empty + .modal-body {
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.THIS .modal-container > div:last-of-type {
+    border-bottom-right-radius: 0.25rem;
+    border-bottom-left-radius: 0.25rem;
 }
 
 .THIS .uiButton.closeBtn {

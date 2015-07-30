@@ -749,7 +749,7 @@ AuraInstance.prototype.getCallback = function(callback) {
             $A.setCurrentTransactionId(transactionId);
         }
         try {
-            return callback.apply(null,Array.prototype.slice.call(arguments));
+            return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
             // Should we even allow 'nested'?
             if (nested) {

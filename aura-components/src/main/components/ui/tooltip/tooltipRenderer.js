@@ -58,5 +58,9 @@
         }
         
         return ret;
+    },
+
+    unrender: function(component, helper) {
+        helper.cleanup(component);
     }
 })

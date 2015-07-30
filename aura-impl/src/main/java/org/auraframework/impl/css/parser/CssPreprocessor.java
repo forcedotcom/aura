@@ -18,9 +18,11 @@ package org.auraframework.impl.css.parser;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -210,7 +212,7 @@ public final class CssPreprocessor {
 
             Optional<FlavorCollectorPlugin> flavorCollector = registry.retrieve(FlavorCollectorPlugin.class);
             if (flavorCollector.isPresent()) {
-                result.flavorNames = flavorCollector.get().getFlavorNames();
+                result.flavorAnnotations = flavorCollector.get().getFlavorAnnotations();
             }
 
             return result;
@@ -221,7 +223,7 @@ public final class CssPreprocessor {
     public static final class ParserResult {
         private String content;
         private Set<String> themeExpressions;
-        private Set<String> flavorNames;
+        private Map<String, FlavorAnnotation> flavorAnnotations;
 
         /** parsed content */
         public String content() {
@@ -233,9 +235,9 @@ public final class CssPreprocessor {
             return themeExpressions;
         }
 
-        /** all flavors names found in the source */
-        public Set<String> flavorNames() {
-            return flavorNames;
+        /** all flavors metadata found in the source */
+        public Map<String, FlavorAnnotation> flavorAnnotations() {
+            return flavorAnnotations;
         }
     }
 }

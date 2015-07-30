@@ -21,9 +21,11 @@
         var helper = cmp.getDef().getHelper();
         return helper.executeAction.call(helper, cmp, actionName, actionParam, additionalProperties, extraCallback);
     },
+
     findAndSetText:function(cmp, targetCmpId, msg){
         cmp.find(targetCmpId).getElement().innerHTML = msg;
     },
+
     /**
      * Verify the default adapter selected when auraStorage:init is used without
      * any specification.

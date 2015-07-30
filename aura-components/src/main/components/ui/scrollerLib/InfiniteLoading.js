@@ -185,7 +185,7 @@ function (w) {
 
             // If we have pixels to scroll 
             // and less than the threshold trigger provider.
-            if (this.distY !== 0 && left >= 0 && left <= threshold) {
+            if (this.distY !== 0 && left <= threshold) {
                 Logger.log('triggerDataProvider');
                 this._triggerInfiniteLoadingDataProvider();
             }

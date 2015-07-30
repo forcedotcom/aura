@@ -200,14 +200,16 @@
 		// reset onDragOver class
 		this.resetCssClass(component);
 		
-		if(!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isValid()) {
+		var isDragComponentValid = false
+		if(!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isInstanceOf("ui:draggable") && dragComponent.isValid()) {
+			isDragComponentValid = true;
 			dragComponent.setDropStatus(true);
 		}
 		
 		var dragEvent = component.getEvent("drop");
 		dragEvent.setParams({
 			"type": operationType,
-			"dragComponent": dragComponent,
+			"dragComponent": isDragComponentValid ? dragComponent : null,
 			"dropComponent": component,
 			"dropComponentTarget": targetComponent,
 			"data": dataTransfer,

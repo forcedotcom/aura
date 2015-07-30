@@ -42,6 +42,7 @@
     
     <aura:attribute name="_sortBy" 		type="String" default="" description="Sort order of the data in the grid. Name of column, predicated by a '-' for descending."/>
     
+    <aura:attribute name="useRowHeaders"	type="Boolean"				default="false" description="Makes the first column of each row a header cell"/>
     <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description="Specifies whether the grid should use CSS to fix the header's position and scroll the table body"/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>

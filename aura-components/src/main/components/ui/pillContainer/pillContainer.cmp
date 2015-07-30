@@ -25,9 +25,12 @@
     <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
     <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button"/>
     <aura:attribute name="pillFlavor" type="String" default="default"/>
+    <aura:attribute name="assistiveTextLabel" type="String"  description="Assitive text for the pill container"/>
     <aura:attribute name="expanded" type="Boolean" default="false" access="private"/>
 
     <!-- events -->
+    <aura:handler name="blur" event="ui:blur" action="{!c.onInputFocus}"/>
+    <aura:handler name="focus" event="ui:focus" action="{!c.onInputBlur}"/>
     <aura:registerevent name="pillInserted"
                         type="ui:response"
                         description="Event fired when a pill is inserted in this container."/>
@@ -44,11 +47,19 @@
     <aura:handler name="change" value="{!v.items}" action="{!c.onItemsChanged}"/>
     <aura:handler name="change" value="{!v.maxAllowed}" action="{!c.onItemsChanged}"/>
 
-    <div aura:flavorable="true"  onmousedown="{!c.onClickBackground}">
+    <div aura:flavorable="true" role="application" onmousedown="{!c.onClickBackground}">
+        <div class="assistiveText">{!v.assistiveTextLabel}</div>
         <ul aura:id="list" class="orderedList">
             <aura:iteration items="{!v.items}" var="item" iterationComplete="{!c.pillIterationComplete}" aura:id="pills">
                 <li aura:id="listitem" class="pillContainerListItem">
-                    <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}" iconUrl="{!item.icon.url}" iconBackgroundColor="{!item.icon.backgroundColor}" label="{!item.label}" id="{!item.id}" showDelete="{!v.allowRemove}" maxCharacters="{!v.maxCharactersInPill}" onHandledEvent="{!c.handlePillEvent}"/>
+                    <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}"
+                             iconUrl="{!item.icon.url}"
+                             iconBackgroundColor="{!item.icon.backgroundColor}"
+                             label="{!item.label}"
+                             id="{!item.id}"
+                             showDelete="{!v.allowRemove}"
+                             maxCharacters="{!v.maxCharactersInPill}"
+                             onHandledEvent="{!c.handlePillEvent}"/>
                 </li>
             </aura:iteration>
             <li aura:id="inputListItem" role="presentation" class="pillContainerListItem">

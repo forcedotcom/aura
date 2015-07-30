@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 ({
-	NS: "UIPERF",
-	NAME: "ui:virtualDataGrid",
-	
+    NS: "UIPERF",
+    NAME: "ui:virtualDataGrid",
+    
     DELEGATED_EVENTS: [
-        'click'
+        'click',
+        'keydown'
     ],
     DEFAULT_TEMPLATES : {
         row    : 'tr',
-        column : 'td'
+        column : 'td',
+        header : 'th'
     },
     initialize: function (cmp) {
         // Internal variables we use
@@ -41,7 +43,7 @@
     initializeDataModel: function(cmp) {
         var dataModel = cmp.get("v.dataModel")[0];
         if (dataModel) {
-        	dataModel.addHandler("onchange", cmp, "c.handleDataChange");
+            dataModel.addHandler("onchange", cmp, "c.handleDataChange");
         }
     },
     initializeItems: function (cmp) {
@@ -52,7 +54,7 @@
         if (items) {
             cmp.set("v.items", items, true);
         } else if (dataModel) {
-        	dataModel.getEvent('provide').fire();
+            dataModel.getEvent('provide').fire();
         }
     },
     initializeTemplates: function (cmp) {
@@ -70,7 +72,7 @@
         }
 
         cmp._ptv = ptv;
-        cmp._rowTemplate = this._initializeRowTemplate(templates);
+        cmp._rowTemplate = this._initializeRowTemplate(templates, cmp.get("v.useRowHeaders"));
         ptv.ignoreChanges = true;
         ptv.dirty = false;
 
@@ -82,17 +84,17 @@
         });
     },
     initializeFixedHeader: function (cmp) {
-    	if (cmp.get("v.fixedHeader")) {
-    		$A.util.toggleClass(cmp, "fixedHeaderTable", true);
-    		this.updateSizesForFixedHeader(cmp);
-    	}
+        if (cmp.get("v.fixedHeader")) {
+            $A.util.toggleClass(cmp, "fixedHeaderTable", true);
+            this.updateSizesForFixedHeader(cmp);
+        }
     },
     updateSizesForFixedHeader: function (cmp) {
-		var table = cmp.getElement(),
-			header = cmp.find("thead").getElement(),
-			body = cmp.find("tbody").getElement();
-	
-    	body.style.height = (table.clientHeight - header.clientHeight) + "px";
+        var table = cmp.getElement(),
+            header = cmp.find("thead").getElement(),
+            body = cmp.find("tbody").getElement();
+    
+        body.style.height = (table.clientHeight - header.clientHeight) + "px";
     },
     virtualRerender: function (cmp) {
         this.bootstrapVirtualGrid(cmp);
@@ -113,14 +115,30 @@
         var concreteCmp = cmp.getConcreteComponent();
         concreteCmp.set('v._dirty', ++cmp._dirtyFlag);
     },
-    _initializeRowTemplate: function (templates) {
-        var row = document.createElement(this.DEFAULT_TEMPLATES.row);
-        for (var i = 0; i < templates.length; i++) {
-            var column = document.createElement(this.DEFAULT_TEMPLATES.column);
-            $A.render(templates[i], column);
+    _initializeRowTemplate: function (templates, useRowHeader) {
+        var row = document.createElement(this.DEFAULT_TEMPLATES.row),
+        	startIndex = 0,
+        	column;
+        
+        // Make the first column a header column
+        if (useRowHeader) {
+        	column = this._createColumn(this.DEFAULT_TEMPLATES.header, templates[0]);
+        	column.setAttribute("scope", "row");
+        	row.appendChild(column);
+        	startIndex = 1;
+        }
+        
+        for (var i = startIndex; i < templates.length; i++) {
+        	column = this._createColumn(this.DEFAULT_TEMPLATES.column, templates[i]);
             row.appendChild(column);
         }
         return row;
+    },
+    
+    _createColumn: function (elementTemplate, columnTemplate) {
+    	var column = document.createElement(elementTemplate);
+    	$A.render(columnTemplate, column);
+    	return column;
     },
     _createPassthroughValue: function(cmp, itemVar, item, rowIndex) {
         var rowContext = {
@@ -225,19 +243,24 @@
                 return i;
             }
         }
+        return null;
     },
     _replaceDOMElement: function (parent, newChild, oldChild) {
-        parent.replaceChild(newChild, oldChild);
+    	if (parent.hasChildNodes()) {
+    		parent.replaceChild(newChild, oldChild);
+    	}
     },
     _rerenderDirtyElement: function (cmp, item, oldElement) {
         var container = cmp._templateContainer,
             listRoot  = this.getGridBody(cmp),
             items     = cmp._virtualItems,
-            position  = this._findVirtualElementPosition(items, oldElement),
-            rendered  = this._generateVirtualRow(cmp, item);
-
-        items[position] = rendered;
-        this._replaceDOMElement(listRoot, rendered, oldElement);
+            position  = this._findVirtualElementPosition(items, oldElement);
+        
+        if (!$A.util.isUndefinedOrNull(position)) {
+        	var rendered  = this._generateVirtualRow(cmp, item);
+        	items[position] = rendered;
+            this._replaceDOMElement(listRoot, rendered, oldElement);
+        }
     },
     _generateVirtualRow: function (cmp, item) {
         var rowTmpl = cmp._rowTemplate,
@@ -266,7 +289,7 @@
         dom._data = item;
     },
     appendVirtualRows: function (cmp, items) {
-    	$A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
+        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
         var fragment  = document.createDocumentFragment(),
             container = this.getGridBody(cmp);
 
@@ -283,7 +306,7 @@
         var items = cmp.get('v.items');
         cmp._virtualItems = [];
         if (items && items.length) {
-        	$A.metricsService.markStart(this.NS, this.NAME + ".createVirtualRows", {auraid : cmp.getGlobalId()});
+            $A.metricsService.markStart(this.NS, this.NAME + ".createVirtualRows", {auraid : cmp.getGlobalId()});
             for (var i = 0; i < items.length; i++) {
                 cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i]));
             }
@@ -298,36 +321,36 @@
      */
     
     initializeSorting: function (cmp) {
-    	var headers = cmp.get('v.headerColumns'),
-    		handleSortTrigger = cmp.get('c.handleSortTrigger');
-    	
-    	if (!headers) {
-    		return;
-    	}
-    	
-    	for (var i = 0; i < headers.length; i++) {
-    		var headerColumn = headers[i],
-    			name = headerColumn.get('v.name');
-    		
-    		if (headerColumn.get('v.sortable')) {
-    			headerColumn.set('v.onsortchange', handleSortTrigger);
-    		}
-    	}
+        var headers = cmp.get('v.headerColumns'),
+            handleSortTrigger = cmp.get('c.handleSortTrigger');
+        
+        if (!headers) {
+            return;
+        }
+        
+        for (var i = 0; i < headers.length; i++) {
+            var headerColumn = headers[i],
+                name = headerColumn.get('v.name');
+            
+            if (headerColumn.get('v.sortable')) {
+                headerColumn.set('v.onsortchange', handleSortTrigger);
+            }
+        }
     },
     
     updateSortData: function (cmp, sortBy) {
-    	var headers  = cmp.get('v.headerColumns'),
-    		isDesc   = (sortBy[0] === '-'),
-    		name 	 = isDesc ? sortBy.slice(1, sortBy.length) : sortBy,
-    		sortText = isDesc ? 'descending' : 'ascending';
-    		
-    		for (var i = 0; i < headers.length; i++) {
-    			var header 	  = headers[i],
-    				direction = (header.get('v.name') === name) ? sortText : '';
-    			header.set('v.direction', direction);
-    		}
-    		
-    	cmp.set('v._sortBy', sortBy);
+        var headers  = cmp.get('v.headerColumns'),
+            isDesc   = (sortBy[0] === '-'),
+            name      = isDesc ? sortBy.slice(1, sortBy.length) : sortBy,
+            sortText = isDesc ? 'descending' : 'ascending';
+            
+            for (var i = 0; i < headers.length; i++) {
+                var header       = headers[i],
+                    direction = (header.get('v.name') === name) ? sortText : '';
+                header.set('v.direction', direction);
+            }
+            
+        cmp.set('v._sortBy', sortBy);
     },
     
     /**
@@ -340,22 +363,26 @@
      * @param {Object} response Response from the sort. Can either be an Array or an Object
      */
     sortCallback: function(cmp, response) {
-		if (response && Array.isArray(response)) {
-			cmp.set('v.items', response);
-			
-			this.updateSortData(cmp, '');
-		} else if (response) {
-			// TODO: handle responses of the following object signature
-			// { data : Array, sortBy : String, state : String, error : Object }
-			if (response.state === 'SUCCESS') {
-				var data   = response.data || [];
-				var sortBy = response.sortBy || '';
-				
-				cmp.set('v.items', data);
-				this.updateSortData(cmp, sortBy);
-			}
-			
-		}
-	}
-    
+        if (response && Array.isArray(response)) {
+            cmp.set('v.items', response);
+            
+            this.updateSortData(cmp, '');
+        } else if (response) {
+            // TODO: handle responses of the following object signature
+            // { data : Array, sortBy : String, state : String, error : Object }
+            if (response.state === 'SUCCESS') {
+                var data   = response.data || [];
+                var sortBy = response.sortBy || '';
+                
+                cmp.set('v.items', data);
+                this.updateSortData(cmp, sortBy);
+            }
+        }
+    },
+    destroyTemplates: function (cmp) {
+        var tmpls = cmp._templates;
+        for (var i = 0; i < tmpls.length; ++i) {
+            tmpls[i].destroy();
+        }
+    }
 })

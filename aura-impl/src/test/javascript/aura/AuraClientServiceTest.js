@@ -83,7 +83,7 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert : we return undefined when calling getAndClearDupes without key
             Assert.Equal(undefined, actual);
     	}
-    	
+
     	[Fact]
     	function deDupeNewEntry() {
     		// This just test the case where we add the action for the first time
@@ -98,21 +98,21 @@ Test.Aura.AuraClientServiceTest = function() {
                 target = new Aura.Services.AuraClientService();
                 target.deDupe(newAction);
             });
-           
+
             // Act
             var actual1;
             mockGlobal(function() {
                 actual1 = target.actionStoreMap["fakeKey"];
                 actual2 = target.actionStoreMap[actionId]
             });
-            // Assert : we add two entry to the actionStoreMap, 
+            // Assert : we add two entry to the actionStoreMap,
             // actionId --> actionKey, actionKey --> { 'action':action, 'dupes':[dup-action1, dup-action2,....] }
             Assert.Equal(expect1, actual1);
             Assert.Equal("fakeKey", actual2);
     	}
-    
+
     }
-    
+
     [Fixture]
     function testAuraXHR() {
     	[Fact]
@@ -123,7 +123,7 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(0, target.length);
             Assert.Undefined(target.foreground);//we no longer have restrictions on how many foreground actions we have
     	}
-    	
+
     	[Fact, Skip("Lin : figure out how to mock Date()")]
     	function MarkAuraXHR() {
     		// Arrange
@@ -137,16 +137,16 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert
             Assert.Equal(expected, actual);
     	}
-    	
+
     	[Fact]
     	function AddAndGetAction() {
     		// Arrange
     		var newAction = new MockAction();
     		var target = new Aura.Services.AuraClientService$AuraXHR();
-    		
+
     		// Act
     		target.addAction(newAction);
-    		
+
     		// Assert
     		Assert.Equal(newAction, target.actions[newAction.id]);
     		// Act and Assert
@@ -154,7 +154,7 @@ Test.Aura.AuraClientServiceTest = function() {
     		// Assert
     		Assert.Equal(undefined, target.actions[newAction.id]);//after the getAction above, this become undefined
     	}
-    	
+
     	[Fact]
     	function countAvailableXHRs() {
     		// Arrange
@@ -162,12 +162,12 @@ Test.Aura.AuraClientServiceTest = function() {
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
             });
-            
+
             // Assert
             Assert.Equal(4, target.countAvailableXHRs());
     	}
     };
-    
+
     [Fixture]
     function testCreateIntegrationErrorConfig() {
         [Fact]
@@ -390,7 +390,7 @@ Test.Aura.AuraClientServiceTest = function() {
                         },
                         keys: Object.keys,
                         sortObject: function(obj) {
-                            return obj
+                            return obj;
                         }
                     },
                     run : function (cb) {

@@ -15,6 +15,7 @@
  */
 package org.auraframework.def;
 
+import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Table;
@@ -32,11 +33,11 @@ public interface FlavorIncludeDef extends Definition {
     String getSource();
 
     /**
-     * Gets a mapping of which {@link FlavoredStyleDef} is specified for a component and flavor name pair.
+     * Gets a mapping of which {@link FlavoredStyleDef} has the override for a component and flavor name pair.
      *
      * @throws QuickFixException If there's a problem loading the flavor def.
      */
-    Table<DefDescriptor<ComponentDef>, String, DefDescriptor<FlavoredStyleDef>> computeFlavorMapping() throws QuickFixException;
+    Table<DefDescriptor<ComponentDef>, String, FlavorOverrideLocation> computeOverrides() throws QuickFixException;
 
     /**
      * @return Returns the parentDescriptor.

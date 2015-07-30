@@ -359,13 +359,19 @@ Aura.Utils.Util.prototype.compareValues = function(expected, actual){
 
 
 /**
- * Checks whether the element has the specified class.
+ * Checks whether the component has the specified CSS class.
  *
- * @param {Object} element The element to check for.
+ * @example
+ * //find a component with aura:id="myCmp" in markup
+ * var myCmp = component.find("myCmp");
+ * $A.util.hasClass(myCmp, "myClass");
+ * 
+ * @param {Object} element The component to check.
  * @param {String} className The CSS class name to check for.
- * @returns {Boolean} True if the specified class is found for the element, or false otherwise.
+ * @returns {Boolean} True if the specified class is found for the component, or false otherwise.
  * @export
  * @platform
+ * 
  */
 Aura.Utils.Util.prototype.hasClass = function(element, className){
     var oldClass='';
@@ -385,10 +391,15 @@ Aura.Utils.Util.prototype.hasClass = function(element, className){
 };
 
 /**
- * Adds the specified class to the element, depending on whether it already existed on that element.
+ * Adds a CSS class to a component.
  *
- * @param {Object} element The element to apply the class on.
- * @param {String} newClass The CSS class to be applied on the element.
+ * @example
+ * //find a component with aura:id="myCmp" in markup
+ * var myCmp = component.find("myCmp");
+ * $A.util.addClass(myCmp, "myClass");
+ * 
+ * @param {Object} element The component to apply the class on.
+ * @param {String} newClass The CSS class to be applied.
  * @export
  * @platform
  */
@@ -397,24 +408,36 @@ Aura.Utils.Util.prototype.addClass = function(element, newClass){
 };
 
 /**
- * Removes the class from an element.
+ * Removes a CSS class from a component.
  *
- * @param {Object} element The element to remove the class from.
+ * @example
+ * //find a component with aura:id="myCmp" in markup
+ * var myCmp = component.find("myCmp");
+ * $A.util.removeClass(myCmp, "myClass");
+ * 
+ * @param {Object} element The component to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
  * @export
  * @platform
+ * 
  */
 Aura.Utils.Util.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
 };
 
 /**
- * Adds a class or removes it from an element.
+ * Toggles (adds or removes) a CSS class from a component.
  *
- * @param {Object} element The element to add or remove the class from.
- * @param {String} className The CSS class to be added or removed from the class.
+ * @example
+ * //find a component with aura:id="toggleMe" in markup
+ * var toggleText = component.find("toggleMe");
+ * $A.util.toggleClass(toggleText, "toggle");
+ * 
+ * @param {Object} element The component to add or remove the class from.
+ * @param {String} className The CSS class to be added or removed.
  * @export
  * @platform
+ * 
  */
 Aura.Utils.Util.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){
@@ -1406,7 +1429,7 @@ Aura.Utils.Util.prototype.stringEndsWith = function(fullstr, substr) {
  * @param {Any} var-args of bound parameters.
  * @returns {Function} a new function that invokes the provided function instance with bound arguments.
  */
-if (!!Function.prototype.bind) {
+if (Function.prototype.bind) {
     Aura.Utils.Util.bind = function(method /*, this, bind arguments*/) {
         var args = Array.prototype.slice.call(arguments, 1);
         return Function.prototype.bind.apply(method, args);
@@ -1441,7 +1464,7 @@ Aura.Utils.Util.prototype.bind = Aura.Utils.Util.bind;
  * @param {Object} map to extract keys from.
  * @returns {Array} of key {String}s.
  */
-if (!!(Object && Object.keys)) {
+if (Object && Object.keys) {
     Aura.Utils.Util.keys = function(object, excludeFunctions) {
         var allKeys = Object.keys(object);
         var keys = [];
@@ -1543,7 +1566,7 @@ Aura.Utils.Util.prototype.merge = function(first /*, var-args of arrays*/) {
 };
 
 /** forEach: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.forEach) {
+if (Array.prototype.forEach) {
     Aura.Utils.Util.forEach = function(array, method, that) {
         array.forEach(method, that);
     };
@@ -1576,7 +1599,7 @@ if (!!Array.prototype.forEach) {
 Aura.Utils.Util.prototype.forEach = Aura.Utils.Util.forEach;
 
 /** map: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.map) {
+if (Array.prototype.map) {
     Aura.Utils.Util.map = function(array, method, that) {
         return array.map(method, that);
     };
@@ -1611,7 +1634,7 @@ if (!!Array.prototype.map) {
 Aura.Utils.Util.prototype.map = Aura.Utils.Util.map;
 
 /** reduce: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.reduce) {
+if (Array.prototype.reduce) {
     Aura.Utils.Util.reduce = function(array, method, initial) {
         return array.reduce(method, initial);
     };
@@ -1648,7 +1671,7 @@ if (!!Array.prototype.reduce) {
 Aura.Utils.Util.prototype.reduce = Aura.Utils.Util.reduce;
 
 /** every: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.every) {
+if (Array.prototype.every) {
     Aura.Utils.Util.every = function(array, predicate, that) {
         return array.every(predicate, that);
     };
@@ -1685,7 +1708,7 @@ if (!!Array.prototype.every) {
 Aura.Utils.Util.prototype.every = Aura.Utils.Util.every;
 
 /** some: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.some) {
+if (Array.prototype.some) {
     Aura.Utils.Util.some = function(array, predicate, that) {
         return array.some(predicate, that);
     };
@@ -1722,7 +1745,7 @@ if (!!Array.prototype.some) {
 Aura.Utils.Util.prototype.some = Aura.Utils.Util.some;
 
 /** filter: see documentation below (attached to last definition so that it is picked up for doc generation). */
-if (!!Array.prototype.filter) {
+if (Array.prototype.filter) {
     Aura.Utils.Util.filter = function(array, predicate, that) {
         return array.filter(predicate, that);
     };
@@ -2185,7 +2208,7 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
                 while(queue.length > 0) {
                     queue.shift().call();
                 }
-            }
+            };
 
             document.head.appendChild( s ).parentNode.removeChild( s );
         }

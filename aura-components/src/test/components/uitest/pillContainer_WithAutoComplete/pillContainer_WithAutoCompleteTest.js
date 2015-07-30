@@ -372,7 +372,45 @@
             $A.test.assertEquals(document.activeElement, this._getInputElement(cmp), "input should be focused");
         }]
     },
+    
+    /*
+     * pressing right key on the last pill should goto 1st pill when maxAllowed is reached.
+     * Bug: W-2700320
+     */
+    _testRightArrowKeyFromLastPillWhenMaxAllowedReached: {
+    	attributes: {
+            maxAllowed: 2
+        },
+        test: [function(cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            secondPill = pillContainer.find("pill")[1];
+            firstPill = pillContainer.find("pill")[0];
 
+            secondPill.focus();
+            this._fireKeydownEvent(secondPill, this.RIGHT_ARROW_KEY);
+            $A.test.assertEquals(document.activeElement, firstPill.getElement(), "First Pill should be focused");
+        }]
+    },
+
+    /*
+     * pressing left key on the first pill should goto last pill when maxAllowed is reached.
+     * Bug: W-2700320
+     */
+    testLeftArrowKeyFromFirstPillWhenMaxAllowedReached: {
+    	attributes: {
+            maxAllowed: 2
+        },
+        test: [function(cmp) {
+            var pillContainer = this._initializeWithTwoPills(cmp);
+            secondPill = pillContainer.find("pill")[1];
+            firstPill = pillContainer.find("pill")[0];
+
+            firstPill.focus();
+            this._fireKeydownEvent(firstPill, this.LEFT_ARROW_KEY);
+            $A.test.assertEquals(document.activeElement, secondPill.getElement(), "Last Pill should be focused");
+        }]
+    },
+    
     /**
      * if in the left most side of the input - pressing left key should move me to a pill
      * W-2647751

@@ -196,8 +196,10 @@
 				wrapper = tooltipElem.querySelector('span.tooltip');
 				$A.test.assertEquals(durations[i], wrapper.style.transitionDuration, "fadeInDuration does not match expected for tooltip with aura:id = " + tooltips[i]);
 		
-				if(assertions[i]) 
+				if(assertions[i]) {
 					$A.test.assertTrue($A.util.hasClass(wrapper,"fade-in"), "fade-in class not attached to tooltip having aura:id = " + tooltips[i]);
+					$A.test.assertFalse($A.util.hasClass(wrapper,"fade-out"), "fade-out class should not be attached to tooltip having aura:id = " + tooltips[i]);
+				}
 				else
 					$A.test.assertFalse($A.util.hasClass(wrapper,"fade-in"), "fade-in class should not be attached to tooltip having aura:id = " + tooltips[i]);
 				
@@ -225,8 +227,11 @@
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
 				$A.test.assertEquals(durations[i], wrapper.style.transitionDuration, "fadeOutDuration does not match expected for tooltip having aura:id = " + tooltips[i]);
-				if(assertions[i]) 
+				if(assertions[i]) {
 					$A.test.assertTrue($A.util.hasClass(wrapper,"fade-out"), "fade-out class not attached to tooltip having aura:id = " + tooltips[i]);
+					$A.test.assertFalse($A.util.hasClass(wrapper,"fade-in"), "fade-in class should not be attached to tooltip having aura:id = " + tooltips[i]);
+				}
+					
 				else
 					$A.test.assertFalse($A.util.hasClass(wrapper,"fade-out"), "fade-out class should not be attached to tooltip having aura:id = " + tooltips[i]);
 			}
@@ -308,6 +313,7 @@
 				$A.test.assertEquals(delayDuration[i], wrapper.style.transitionDelay, "Delay duration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertEquals(fadeInDuration, wrapper.style.transitionDuration, "fadeInDuration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(wrapper,"fade-in"), "fade-in class is not attached to tooltip having aura:id = " + tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(wrapper,"fade-out"), "fade-out class should not be attached to tooltip having aura:id = " + tooltips[i]);
 			}
 		
 		}		
@@ -335,6 +341,7 @@
 				$A.test.assertEquals(delayDuration[i], wrapper.style.transitionDelay, "Delay duration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertEquals(fadeOutDuration, wrapper.style.transitionDuration, "fadeOutDuration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(wrapper,"fade-out"), "fade-out class is not attached to tooltip having aura:id = " + tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(wrapper,"fade-in"), "fade-in class should not be attached to tooltip having aura:id = " + tooltips[i]);
 			}
 		
 		}		

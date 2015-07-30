@@ -288,9 +288,15 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     // Of course, we also have the problem that we might not have valid JSON at all, in which case
     // we have further problems...
     //
-    var status = response["status"];
-    if ((status !== 200) || $A.util.stringEndsWith(text, "/*ERROR*/")) {
-        if (status === 200 || status === 500) {
+    if ((response["status"] !== 200) || (text.length > 9 && text.charAt(text.length - 9) === "/" //
+        && text.charAt(text.length - 8) === "*" //
+        && text.charAt(text.length - 7) === "E" //
+        && text.charAt(text.length - 6) === "R" //
+        && text.charAt(text.length - 5) === "R" //
+        && text.charAt(text.length - 4) === "O" //
+        && text.charAt(text.length - 3) === "R" //
+        && text.charAt(text.length - 2) === "*" && text.charAt(text.length - 1) === "/")) {
+        if (response["status"] === 200) {
             // if we encountered an exception once the response was committed
             // ignore the malformed JSON
             text = "/*" + text;
@@ -314,12 +320,6 @@ AuraClientService.prototype.decode = function(response, noStrip) {
             ret["message"] = "Communication error, please retry or reload the page";
             // #end
             ret["status"] = "ERROR";
-
-            // in case stale application cache, handling old exception code
-            var appCache = window.applicationCache;
-            if (appCache && appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
-                appCache.update();
-            }
             return ret;
         } else if (resp["exceptionEvent"] === true) {
             this.throwExceptionEvent(resp);

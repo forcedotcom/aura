@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -216,7 +215,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Handle an exception in the servlet.
      * 
-     * This routine should be called whenever an exception has surfaced to the top level of the servlet. It should not be
+     * This routine shold be called whenever an exception has surfaced to the top level of the servlet. It should not be
      * overridden unless Aura is entirely subsumed. Most special cases can be handled by the Aura user by implementing
      * {@link ExceptionAdapter ExceptionAdapter}.
      * 
@@ -307,9 +306,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
             PrintWriter out = response.getWriter();
 
-            // First, set status to 500 so it doesn't get cached in browser, appcache, etc
-            response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-
             //
             // If we have written out data, We are kinda toast in this case.
             // We really want to roll it all back, but we can't, so we opt
@@ -364,8 +360,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
             // but at this point, it is unclear what we can do, as stuff is breaking right and left.
             //
             try {
-                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 Aura.getExceptionAdapter().handleException(death);
+                send404(request, response);
                 if (!isProductionMode(context.getMode())) {
                     response.getWriter().println(death.getMessage());
                 }
@@ -377,8 +373,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
                     response.getWriter().println(doubleDeath.getMessage());
                 }
             }
-        } finally {
-            Aura.getContextService().endContext();
         }
     }
 

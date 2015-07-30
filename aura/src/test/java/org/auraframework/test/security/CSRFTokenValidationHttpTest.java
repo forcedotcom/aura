@@ -80,7 +80,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
         assertNotNull(response);
-        if (statusCode != HttpStatus.SC_INTERNAL_SERVER_ERROR || !response.endsWith("/*ERROR*/")) {
+        if (statusCode != HttpStatus.SC_OK || !response.endsWith("/*ERROR*/")) {
             fail("Should not be able to post to aura servlet without a valid CSRF token");
         }
         if (response.startsWith(AuraBaseServlet.CSRF_PROTECT)) {
@@ -129,8 +129,7 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         Map<String, String> params = makeBasePostParams();
         // Valid token
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
-                Aura.getConfigAdapter().getAuraFrameworkNonce()));
+        params.put("aura.context", "{\"mode\":\"FTEST\"}");
         HttpPost post = obtainPostMethod("/aura", params);
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);

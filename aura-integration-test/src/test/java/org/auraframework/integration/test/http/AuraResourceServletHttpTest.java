@@ -266,7 +266,7 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         response = getResponseBody(httpResponse);
         get.releaseConnection();
 
-        assertEquals(HttpStatus.SC_INTERNAL_SERVER_ERROR, statusCode);
+        assertEquals(HttpStatus.SC_OK, statusCode);
         assertNotNull(response);
         assertTrue("SVG source should not have been returned.", response.isEmpty());
     }

@@ -145,7 +145,7 @@ AuraClientService = function AuraClientService () {
     this.isUnloading = false;
     this.initDefsObservers = [];
     this.finishedInitDefs = false;
-    this.protocols={layout:true};
+    this.protocols={"layout":true};
     this.namespaces={};
 
     // token storage key should not be changed because external client may query independently
@@ -1810,6 +1810,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             that.receive(auraXHR);
         }
     };
+    if(context&&context.getCurrentAccess()&&this.inAuraLoop()){
+        auraXHR.request["onreadystatechange"] = $A.getCallback(auraXHR.request["onreadystatechange"]);
+    }
 
     if (options && options["headers"]) {
         var key, headers = options["headers"];
@@ -2581,18 +2584,19 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 // INTERNAL, PUBLIC, or absence of value means "same namespace only".
                 context=$A.getContext();
                 currentAccess=(context&&context.getCurrentAccess())||component;
-                // FIXME: goliver - the isValid is a hack... something is deeply wrong here.
-                if(currentAccess && currentAccess.isValid()){
+                if(currentAccess){// && currentAccess.isValid()){
                     var accessFacetValueProvider = currentAccess.getComponentValueProvider();
-                    if (accessFacetValueProvider && accessFacetValueProvider.isValid()) {
-                        var accessDescriptor=currentAccess.getDef().getDescriptor();
-                        var accessFacetDescriptor=accessFacetValueProvider.getDef().getDescriptor();
-                        var accessNamespace=accessDescriptor.getNamespace();
-                        var accessFacetNamespace=accessFacetDescriptor.getNamespace();
+                    if (accessFacetValueProvider){// && accessFacetValueProvider.isValid()) {
+                        var accessDef=currentAccess.getDef();
+                        var accessFacetDef=accessFacetValueProvider.getDef();
+                        var accessDescriptor=accessDef&&accessDef.getDescriptor();
+                        var accessFacetDescriptor=accessFacetDef&&accessFacetDef.getDescriptor();
+                        var accessNamespace=accessDescriptor&&accessDescriptor.getNamespace();
+                        var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
                         // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
                         // if(definition.access!=="P"){
                         // INTERNAL / DEFAULT
-                        var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor.getPrefix());
+                        var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
                         var allowNamespace=this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace);
                         if(allowProtocol || allowNamespace){
                             // Privileged Namespace
@@ -2602,6 +2606,12 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                         // Not a privileged namespace or explicitly set to PUBLIC
                         var targetNamespace=definition.getDescriptor().getNamespace();
                         return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
+                    }
+                }else{
+                    // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
+                    var descriptor=definition.getDescriptor();
+                    if(descriptor.getNamespace()==="aura"&&descriptor.getName()==="application"){
+                        return true;
                     }
                 }
         }

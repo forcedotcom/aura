@@ -438,6 +438,10 @@ Action.prototype.setCallback = function(scope, callback, name) {
         $A.error("Action.setCallback(): Invalid callback name '" + name + "'");
         return;
     }
+    var context=$A.getContext();
+    if(context&&context.getCurrentAccess()&&$A.clientService.inAuraLoop()) {
+        callback = $A.getCallback(callback);
+    }
     // If name is undefined or specified as "ALL", then apply same callback in all cases
     if (name === undefined || name === "ALL") {
         this.callbacks["SUCCESS"] = {

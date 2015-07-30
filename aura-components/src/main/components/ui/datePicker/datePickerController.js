@@ -19,11 +19,16 @@
     },
 
     handleVisible: function(component, event, helper) {
-        component.getElement().style.opacity = 0;
-        setTimeout(function() {
-            helper.position(component);
-            component.getElement().style.opacity = 1;
-        },10)
+        if(component.get('v.visible') === true) {
+           component.getElement().style.opacity = 0;
+            setTimeout($A.getCallback(function() {
+                if(component.isValid()) {
+                    helper.position(component);
+                    component.getElement().style.opacity = 1;
+                }   
+            }),10);
+        }
+        
         
     },
 

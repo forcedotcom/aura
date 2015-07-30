@@ -270,22 +270,22 @@
         var self = this;
         if (!$A.util.isEmpty(pillInput)) {
             var timeoutHandler = false;
-            var resetWidth = function () {
+            var resetWidth = $A.getCallback(function () {
                 timeoutHandler = false;
                 self._setInputWidthDirectly(cmp, pillInput);
-            }
-            this.resizeHandler = function () {
+            });
+            this.resizeHandler = $A.getCallback(function () {
                 if (!timeoutHandler) {
-                    timeoutHandler = setTimeout($A.getCallback(resetWidth), 30);
+                    timeoutHandler = setTimeout(resetWidth, 30);
                 }
-            }
-            window.addEventListener('resize', $A.getCallback(this.resizeHandler));
+            });
+            window.addEventListener('resize', this.resizeHandler);
         }
     },
 
     deregisterResizeHandler: function(cmp) {
         if (this.resizeHandler) {
-            window.addEventListener('resize', this.resizeHandler);
+            window.removeEventListener('resize', this.resizeHandler);
         }
     },
 

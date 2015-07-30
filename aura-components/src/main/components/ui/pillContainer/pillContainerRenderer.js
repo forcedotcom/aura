@@ -20,7 +20,7 @@
         return this.superRender();
     },
 
-    unrender: function (cmp, hlp) {
+    unrender: function (cmp, helper) {
         helper.deregisterResizeHandler(cmp);
         this.superUnrender();
     },

@@ -22,6 +22,6 @@
 	    			callback();
 	    		}
     		})
-    	}, 250);
+    	}, cmp.get('v.loadDelay_ms'));
     }
 })

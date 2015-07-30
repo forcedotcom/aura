@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 ({
+
+    render: function(cmp, helper) {
+        helper.registerResizeHandler(cmp);
+        return this.superRender();
+    },
+
+    unrender: function (cmp, hlp) {
+        helper.deregisterResizeHandler(cmp);
+        this.superUnrender();
+    },
+
     afterRender: function(cmp, helper) {
         this.superAfterRender();
         if (cmp.get("v.focusOnInput")) {

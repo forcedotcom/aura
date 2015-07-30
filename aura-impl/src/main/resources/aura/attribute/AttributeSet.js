@@ -62,14 +62,21 @@ AttributeSet.prototype.hasAttribute = function(name) {
  */
 AttributeSet.prototype.get = function(key, component) {
 	var value = undefined;
-    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(key), component)){
+    var path = null;
+    var attribute=key;
+    key=key.replace(/^body\b/g,"body."+component.globalId);
+    if(key.indexOf('.')>-1){
+        path=key.split('.');
+        attribute=path[0];
+    }
+    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(attribute), component)){
         // #if {"modes" : ["DEVELOPMENT"]}
-        $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+key+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
         // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
         //return null;
     }
-	if (key.indexOf('.') < 0) {
+	if (!path) {
         var decorators=this.decorators[key];
         if(decorators&&decorators.length){
             if(decorators.decorating){
@@ -139,9 +146,16 @@ AttributeSet.prototype.setShadowValue=function(key,value){
  */
 AttributeSet.prototype.set = function(key, value, component) {
     var target = this.values;
-    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(key),component)){
+    var path = null;
+    var attribute=key;
+    key=key.replace(/^body\b/g,"body."+component.globalId);
+    if(key.indexOf('.')>-1){
+        path=key.split('.');
+        attribute=path[0];
+    }
+    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(attribute),component)){
         // #if {"modes" : ["DEVELOPMENT"]}
-        $A.warning("Access Check Failed! AttributeSet.set(): '"+key+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        $A.warning("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
 
         // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
@@ -158,8 +172,7 @@ AttributeSet.prototype.set = function(key, value, component) {
     }
 
     // Process all keys except last one
-    if (key.indexOf('.') >= 0) {
-        var path = key.split('.');
+    if (path) {
         var step = path.shift();
         while (path.length > 0) {
             var nextStep = path.shift();

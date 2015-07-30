@@ -100,23 +100,24 @@ Aura.Context.AuraContext.prototype.getMode = function() {
 };
 
 Aura.Context.AuraContext.prototype.getCurrentAccess=function(){
-    var access=this.accessStack[this.accessStack.length-1];
-    while(access instanceof PassthroughValue){
-        access=access.getComponent();
-    }
-    return access;
+    return this.accessStack[this.accessStack.length-1];
 };
 
 Aura.Context.AuraContext.prototype.getCurrentAccessCaller=function(){
-    var access=this.accessStack[this.accessStack.length-2];
-    while(access instanceof PassthroughValue){
-        access=access.getComponent();
-    }
-    return access;
+    return this.accessStack[this.accessStack.length-2];
 };
 
 Aura.Context.AuraContext.prototype.setCurrentAccess=function(component){
-    return this.accessStack.push(component?component:this.getCurrentAccess());
+    if(!component){
+        component=this.getCurrentAccess();
+    }else{
+        while(component instanceof PassthroughValue){
+            component=component.getComponent();
+        }
+    }
+    if(component){
+        this.accessStack.push(component);
+    }
 };
 
 Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){

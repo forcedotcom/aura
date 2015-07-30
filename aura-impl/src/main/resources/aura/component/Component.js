@@ -361,7 +361,16 @@ Component.prototype.find = function(name) {
 Component.prototype.findInstancesOf = function(type, ret, cmp) {
     cmp = cmp || this.getSuperest();
 
-    var body = cmp.get("v.body");
+    var body = null;
+    //JBUCH: TODO: HACK: THIS CHECK IS NECESSARY BECAUSE OF THE CUSTOM EXPRESSION RENDERER. ATTEMPT TO ELIMINATE.
+    if(cmp.getDef().getAttributeDefs().getDef("body")){
+        body=cmp.get("v.body");
+    }else if(cmp.isInstanceOf("aura:expression")){
+        var value=cmp.get("v.value");
+        if($A.util.isArray(value)){
+            body=value;
+        }
+    }
     if (body) {
         for (var i = 0; i < body.length; i++) {
             cmp = body[i];
@@ -1065,7 +1074,7 @@ Component.prototype.clearReference = function(key) {
  * @export
  */
 Component.prototype.get = function(key) {
-    key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.globalId);
+    key = $A.expressionService.normalize(key);
     var path = key.split('.');
     var root = path.shift();
     var valueProvider = this.getValueProvider(root, this);
@@ -1112,7 +1121,7 @@ Component.prototype.getShadowAttribute = function(key) {
  * @export
  */
 Component.prototype.set = function(key, value, ignoreChanges) {
-    key = $A.expressionService.normalize(key).replace(/^v\.body\b/g,"v.body."+this.globalId);
+    key = $A.expressionService.normalize(key);
     $A.assert(key.indexOf('.') > -1, "Unable to set value for key '" + key + "'. No value provider was specified. Did you mean 'v." + key + "'?");
 
     var path = key.split('.');
@@ -1864,7 +1873,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             var facetStack = this.createComponentStack([{"descriptor": attribute, value: value}], attributeValueProvider, localCreation);
             // JBUCH: HALO: TODO: DEDUPE THIS AGAINST lines 462 - 467 AFTER CONFIRMING IT WORKS
             if (attribute === "body") {
-                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.get("body"))||{};
+                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
                 attributes[attribute][cmp.globalId] = facetStack["body"] || [];
             } else {
                 attributes[attribute] = facetStack[attribute];
@@ -1912,7 +1921,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 cdrs.push(cdr);
             }
             if (attribute === "body") {
-                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.get("body"))||{};
+                attributes[attribute]=(this.concreteComponentId&&cmp.getConcreteComponent().attributeSet.values["body"])||{};
                 attributes[attribute][cmp.globalId] = cdrs;
             } else {
                 attributes[attribute] = cdrs;

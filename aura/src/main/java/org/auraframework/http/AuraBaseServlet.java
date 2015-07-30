@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.ContentSecurityPolicy;
@@ -215,7 +216,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Handle an exception in the servlet.
      * 
-     * This routine shold be called whenever an exception has surfaced to the top level of the servlet. It should not be
+     * This routine should be called whenever an exception has surfaced to the top level of the servlet. It should not be
      * overridden unless Aura is entirely subsumed. Most special cases can be handled by the Aura user by implementing
      * {@link ExceptionAdapter ExceptionAdapter}.
      * 
@@ -328,6 +329,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 // in some cases, but we don't want to go there unless we have to.
                 //
             }
+            if (format == Format.JS || format == Format.CSS) {
+                // Make sure js and css doesn't get cached in browser, appcache, etc
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            }
             if (format == Format.JSON || format == Format.HTML || format == Format.JS || format == Format.CSS) {
                 //
                 // We only write out exceptions for HTML or JSON.
@@ -360,8 +365,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
             // but at this point, it is unclear what we can do, as stuff is breaking right and left.
             //
             try {
+                response.setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
                 Aura.getExceptionAdapter().handleException(death);
-                send404(request, response);
                 if (!isProductionMode(context.getMode())) {
                     response.getWriter().println(death.getMessage());
                 }
@@ -373,6 +378,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
                     response.getWriter().println(doubleDeath.getMessage());
                 }
             }
+        } finally {
+            Aura.getContextService().endContext();
         }
     }
 

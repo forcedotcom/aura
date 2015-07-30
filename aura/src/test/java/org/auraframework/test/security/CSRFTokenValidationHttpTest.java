@@ -129,7 +129,8 @@ public class CSRFTokenValidationHttpTest extends AuraHttpTestCase {
         Map<String, String> params = makeBasePostParams();
         // Valid token
         params.put("aura.token", getCsrfToken());
-        params.put("aura.context", "{\"mode\":\"FTEST\"}");
+        params.put("aura.context", String.format("{\"mode\":\"FTEST\",\"fwuid\":\"%s\"}",
+                Aura.getConfigAdapter().getAuraFrameworkNonce()));
         HttpPost post = obtainPostMethod("/aura", params);
         HttpResponse httpResponse = perform(post);
         int statusCode = getStatusCode(httpResponse);

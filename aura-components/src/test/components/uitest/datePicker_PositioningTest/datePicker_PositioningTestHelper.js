@@ -1,4 +1,4 @@
-({
+({ 
 	move : function (cmp, direction) {
 		 var inputDateDiv = cmp.find('inputDateDiv').getElement();
 		 var pos = cmp.get('v.pos');

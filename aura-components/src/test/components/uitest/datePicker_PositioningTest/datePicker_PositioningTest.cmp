@@ -1,5 +1,5 @@
 <aura:component>
-
+ 
 	<aura:attribute name="pos" type="Integer" default="1" description="Position at which the datePicker currently is" />
 	
 	<div class="title">

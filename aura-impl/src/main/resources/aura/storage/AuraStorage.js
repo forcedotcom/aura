@@ -27,14 +27,16 @@ var AuraStorage = function AuraStorage(config) {
     this.defaultExpiration = config["defaultExpiration"] * 1000;
     this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
+    this.isolationKey = config["isolationKey"];
+
     this.lastSweep = new Date().getTime();
     this.setVersion(config["version"]);
 
     var clearStorageOnInit = config["clearStorageOnInit"];
 
-    this.log("initializing storage adapter using { name: \"" + config["name"] + "\", implementation: \""
-        + this.adapter.getName() + "\", maxSize: " + this.maxSize + ", defaultExpiration: " + this.defaultExpiration
-        + ", defaultAutoRefreshInterval: " + this.defaultAutoRefreshInterval + ", clearStorageOnInit: " + clearStorageOnInit + ", debugLoggingEnabled: " + this.debugLoggingEnabled + " }");
+    this.log($A.util.format("initializing storage adapter using { maxSize: {0} KB, defaultExpiration: {1} sec, defaultAutoRefreshInterval: {2} sec, clearStorageOnInit: {3}, version: {4} }",
+            (this.maxSize/1024).toFixed(1), this.defaultExpiration/1000, this.defaultAutoRefreshInterval/1000, clearStorageOnInit, this.version
+        ));
 
     // work around the obfuscation logic to allow external Adapters to properly plug in
     this.adapter.clear = this.adapter.clear || this.adapter["clear"];
@@ -118,7 +120,7 @@ AuraStorage.prototype.clear = function() {
  */
 AuraStorage.prototype.get = function(key) {
     var that = this;
-    var promise = this.adapter.getItem(this.version + key).then(function(item) {
+    var promise = this.adapter.getItem(this.isolationKey + this.version + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
 
         if (!item) {
@@ -145,10 +147,10 @@ AuraStorage.prototype.getAll = function() {
         return $A.util.map(items, function(item) {
             var realKey = item["key"],
                 key = realKey;
-            if (realKey.indexOf(that.version) === 0) {
-                // in case version string is part of the actual key
+            if (realKey.indexOf(that.isolationKey + that.version) === 0) {
+                // in case isolation key + version are part of the actual key
                 // then only replace first occurrence
-                key = item["key"].replace(that.version, "");
+                key = item["key"].replace(that.isolationKey + that.version, "");
             }
             return { "key": key, "value": item["value"], "isExpired": (new Date().getTime() > item["expires"]) };
         });
@@ -172,7 +174,7 @@ AuraStorage.prototype.put = function(key, value) {
     };
 
     var that = this;
-    var promise = this.adapter.setItem(this.version + key, item)
+    var promise = this.adapter.setItem(this.isolationKey + this.version + key, item)
         .then(function () {
             that.log("put() - key: " + key + ", value: " + item);
             $A.storageService.fireModified();
@@ -184,7 +186,7 @@ AuraStorage.prototype.put = function(key, value) {
 };
 
 /**
- * Asynchronously removes the item indicated by key.
+ * Asynchronously removes the item from storage corresponding to the specified key.
  * @param {String} key The key of the item to remove.
  * @param {Boolean} doNotFireModified A bool indicating whether or not to fire the modified event on item removal.
  * @returns {Promise} A Promise that will remove the item from storage.
@@ -192,7 +194,7 @@ AuraStorage.prototype.put = function(key, value) {
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
     var that = this;
-    return this.adapter.removeItem(this.version + key)
+    return this.adapter.removeItem(this.isolationKey + this.version + key)
         .then(function(){
             that.log("remove() - key: " + key);
             if (!doNotFireModified) {
@@ -283,7 +285,7 @@ AuraStorage.prototype.log = function() {
 };
 
 /**
- * Whether current storage implementation is persistent.
+ * Whether the storage implementation is persistent.
  * @returns {boolean} true if persistent
  * @export
  */
@@ -292,7 +294,7 @@ AuraStorage.prototype.isPersistent = function() {
 };
 
 /**
- * Whether current storage implementation is secure.
+ * Whether the storage implementation is secure.
  * @returns {boolean} true if secure
  * @export
  */
@@ -319,13 +321,17 @@ AuraStorage.prototype.getVersion  = function() {
     return this.version;
 };
 
+/**
+ * Asynchronously deletes this storage.
+ * @private
+ */
 AuraStorage.prototype.deleteStorage = function() {
     var that = this;
     if (this.adapter.deleteStorage) {
         return this.adapter.deleteStorage();
     } else {
         return new Promise(function(success) {
-            that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement a deleteStorage, returning success");
+            that.log("AuraStorage '" + that.name + "' [" + that.getName() + "] : " + "Does not implement deleteStorage(), returning success");
             success();
         });
     }

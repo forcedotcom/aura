@@ -23,6 +23,7 @@ function AuraStorageService(){
     this.storages = {};
     this.adapters = {};
     this.version = "";
+    this.isolationKey = "";
 }
 
 /**
@@ -84,7 +85,8 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
         "defaultAutoRefreshInterval": defaultAutoRefreshInterval,
         "debugLoggingEnabled": debugLoggingEnabled,
         "clearStorageOnInit": clearStorageOnInit,
-        "version": version
+        "version": version,
+        "isolationKey": this.isolationKey
     };
 
     var storage = new AuraStorage(config);
@@ -239,6 +241,30 @@ AuraStorageService.prototype.setVersion = function(version) {
  */
 AuraStorageService.prototype.getVersion = function(version) {
     return this.version;
+};
+
+/**
+ * Sets a key from which isolation in the storage system is enforced.
+ *
+ * This mechanism is typically used to isolate multiple users' data by setting
+ * the isolation key to the user id.
+ *
+ * It should only be called once during the application life cycle, since it
+ * will be deleted in production mode.
+ *
+ *
+ * @param {String} isolationKey the key defining isolation.
+ * @export
+ */
+AuraStorageService.prototype.setIsolation = function(isolationKey) {
+    // ensure string
+    this.isolationKey = (isolationKey || "") + "";
+
+    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    delete AuraStorageService.prototype.setIsolation;
+    delete AuraStorageService.prototype["setIsolation"];
+    //#end
+
 };
 
 Aura.Services.AuraStorageService = AuraStorageService;

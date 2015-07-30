@@ -49,5 +49,9 @@
             container.removeChild(container.firstChild);
         }
         container.appendChild(fragment);
+    },
+    unrender: function (cmp, helper) {
+        cmp._shape.destroy();
+        this.superUnrender();
     }
 })

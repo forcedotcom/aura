@@ -26,7 +26,7 @@
 	font-size: small;
 }
 
-.THIS.panel {
+.THIS .panel {
 	margin: 8px;
 	padding: 10px;
 	border: 1px solid gray;
@@ -48,5 +48,19 @@
 
 .THIS .autocomplete {
 	margin: 10px;
+}
+
+.THIS.manager {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 0;
+}
+
+.THIS.wrap {
+	position: relative;
+	z-index: 1;
 }
 

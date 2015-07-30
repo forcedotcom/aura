@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS--lookup .lookup__menu, .THIS--lookup.lookup__menu{
+    border: 1px solid #CCC;
+    border-radius: 4px;
+    background-color: #FFF;
+    box-shadow: 0 0 8px rgba(0, 0, 0, .25);
+}
+
+.THIS--lookup ul {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.THIS--lookup .lookup__item a {
+    color: #ccc;
+    display:block;
+    height: 1.1em;
+    padding:3px 9px;
+    text-decoration:none;
+}
+
+.THIS--lookup .lookup__item.highlighted a {
+    background-color:#0683C5;
+    color:#015BA7;
+    outline:none;
+    text-decoration:underline;
+    padding:3px 9px;
+}
+
+.THIS--lookup .lookup__item a.mouseovered {
+    background-color: #A9D0F5;
+}
+
+.THIS--lookup .lookup__item.default .data-match {
+    border-radius: 2px;
+    background-color: #B5DAEE;
+}
+
+.THIS--lookup .lookup__item.default .data-match {
+    border-radius: 2px;
+    background-color: #B5DAEE;
+}

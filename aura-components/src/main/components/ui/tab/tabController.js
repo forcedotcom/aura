@@ -15,7 +15,7 @@
  */
 ({
     setActive: function (cmp, evt) {
-        var active = evt.getParam("active");
+        var active = $A.util.getBooleanValue(evt.getParam("active"));
 
         cmp.set("v.active", active);
 

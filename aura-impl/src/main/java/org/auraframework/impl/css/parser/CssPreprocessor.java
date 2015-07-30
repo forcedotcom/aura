@@ -15,13 +15,12 @@
  */
 package org.auraframework.impl.css.parser;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.StyleContext;
 import org.auraframework.css.FlavorAnnotation;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
@@ -65,12 +64,12 @@ public final class CssPreprocessor {
 
     /** For parsing contextual css, skips syntax validations and static rework, uses client from the current context */
     public static ParserConfiguration runtime() {
-        return runtime(Aura.getContextService().getCurrentContext().getClient().getType());
+        return runtime(Aura.getContextService().getCurrentContext().getStyleContext());
     }
 
     /** For parsing contextual css, skips syntax validations and static rework, uses given client type */
-    public static ParserConfiguration runtime(Client.Type type) {
-        return new ParserConfiguration(true).clientType(type);
+    public static ParserConfiguration runtime(StyleContext styleContext) {
+        return new ParserConfiguration(true).styleContext(styleContext);
     }
 
     /** For parsing css without any of the default plugins */
@@ -84,7 +83,6 @@ public final class CssPreprocessor {
         private String resourceName;
         private final boolean runtime;
         private final Set<Plugin> plugins = Sets.newLinkedHashSet();
-        private Conditionals conditionals;
 
         public ParserConfiguration() {
             this.runtime = false;
@@ -147,23 +145,13 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** eliminate conditionals not matching this client type */
-        public ParserConfiguration clientType(Client.Type client) {
+        /** eliminate conditionals not matching values in this style context */
+        public ParserConfiguration styleContext(StyleContext styleContext) {
             Conditionals conditionals = new Conditionals();
-            if (client != null) {
-                conditionals.config().addTrueConditions(client.name().toLowerCase());
+            if (styleContext != null) {
+                conditionals.config().addTrueConditions(styleContext.getAllTrueConditions());
             }
             plugins.add(conditionals);
-            this.conditionals = conditionals;
-            return this;
-        }
-
-        /** specify additional conditions that are true */
-        public ParserConfiguration extraTrueConditions(Set<String> trueConditions) {
-            if (trueConditions != null && !trueConditions.isEmpty()) {
-                checkState(conditionals != null, "conditionals plugin is not configured");
-                conditionals.config().addTrueConditions(trueConditions);
-            }
             return this;
         }
 

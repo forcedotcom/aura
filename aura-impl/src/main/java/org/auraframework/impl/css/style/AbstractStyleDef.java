@@ -32,7 +32,6 @@ import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -62,13 +61,10 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
 
     @Override
     public String getCode(List<Plugin> plugins) {
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
-
         try {
             return CssPreprocessor.runtime()
                     .source(content)
                     .resourceName(descriptor.getQualifiedName())
-                    .extraTrueConditions(ctx.getStyleContext())
                     .themes(descriptor)
                     .extras(plugins)
                     .parse()

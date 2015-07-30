@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.css.MutableThemeList;
+import org.auraframework.css.StyleContext;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -39,6 +40,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.ThemeDef;
+import org.auraframework.impl.css.theme.StyleContextImpl;
 import org.auraframework.impl.css.theme.ThemeListImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
@@ -65,8 +67,6 @@ import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -283,7 +283,7 @@ public class AuraContextImpl implements AuraContext {
 
     private MutableThemeList themes = new ThemeListImpl();
 
-    private Set<String> styleContext = Sets.newHashSet();
+    private StyleContext styleContext;
 
     private Deque<DefDescriptor<?>> callingDescriptorStack = Lists.newLinkedList();
 
@@ -690,18 +690,23 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void setStyleContext(Set<String> styleContext) {
-        if (styleContext == null) {
-            this.styleContext = ImmutableSet.of();
-        } else {
-            // iteration order is important for serialization in app.css url and also generation of server css cache key
-            this.styleContext = ImmutableSortedSet.copyOf(styleContext);
+    public void setStyleContext(StyleContext styleContext) {
+        this.styleContext = styleContext;
         }
+
+    @Override
+    public void setStyleContext(Map<String, Object> config) {
+        this.styleContext = StyleContextImpl.build(config);
     }
 
     @Override
-    public Set<String> getStyleContext() {
-        return this.styleContext;
+    public StyleContext getStyleContext() {
+        if (styleContext == null) {
+            // in most cases this should not be null by the time it is requested. If it is null then there could
+            // potentially be a consistency problem with the requested vs. served css.
+            styleContext = StyleContextImpl.build(this);
+    }
+        return styleContext;
     }
 
     @Override
@@ -856,17 +861,8 @@ public class AuraContextImpl implements AuraContext {
                     json.writeMapEntry("dynamicVarsUid", dynamicVarsUid.get());
                 }
 
-                // add any extra true conditions (for CSS conditionals). It would make sense to handle client.type
-                // (browser) here as well, but this hasn't been required due to the fact that clients only receive and
-                // cache for the exact same client.type value. Different values of arbitrary conditionals can be
-                // served to the same client, however, hence an explicit cache-buster in the url is required.
-                // This doubly serves the purpose of consistency for client-caching-- it's best that the second request
-                // that actually generates/returns the CSS code doesn't recheck this method directly and potentially end
-                // up with a different value, but instead just depends on what was in the url.
-                Set<String> trueConditions = ImmutableSortedSet.copyOf(Aura.getStyleAdapter().getExtraTrueConditions());
-                if (trueConditions != null && !trueConditions.isEmpty()) {
-                    json.writeMapEntry("styleContext", trueConditions);
-                }
+                // add other contextual CSS information
+                json.writeMapEntry("styleContext", getStyleContext());
             }
 
             // Normal and full get the locales, but not themes

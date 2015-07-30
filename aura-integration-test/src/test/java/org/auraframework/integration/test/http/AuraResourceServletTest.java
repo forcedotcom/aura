@@ -207,7 +207,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraResourceServlet servlet = new AuraResourceServlet();
         doGet(servlet, request, response);
 
-        final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
+        final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
         // Verify something was actually added to cache
         String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);
         assertNotNull("Nothing added to CSS cache", cssCache);
@@ -250,7 +250,7 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraResourceServlet servlet = new AuraResourceServlet();
         doGet(servlet, request, response);
 
-        final String key = "CSS:" + context.getClient().getType() + "$" + mKey + uid;
+        final String key = "CSS:" + context.getClient().getType().name().toLowerCase() + "$" + mKey + uid;
 
         // Verify something was actually added to cache
         String cssCache = context.getDefRegistry().getCachedString(uid, appDesc, key);

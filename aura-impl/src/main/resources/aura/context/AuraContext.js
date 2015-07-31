@@ -126,11 +126,24 @@ Aura.Context.AuraContext.prototype.releaseCurrentAccess=function(){
 
 Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
     var currentAccessCaller = this.getCurrentAccessCaller();
+    var ret = null;
     if (currentAccessCaller) {
-        return currentAccessCaller.getDef().getRequiredVersionDefs().getDef(name);
+        var def = currentAccessCaller.getDef();
+        if (def) {
+            // return the version of currentAccessCaller if namespaces are the same
+            if (def.getDescriptor().getNamespace() == name) {
+                ret = currentAccessCaller.get("version");
+            }
+            else {
+                ret = def.getRequiredVersionDefs().getDef(name);
+                if (ret) {
+                    ret = ret.getVersion();
+                }
+            }
+        }
     }
 
-    return null;
+    return ret;
 };
 
 /**

@@ -22,6 +22,7 @@
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
     <aura:attribute name="scroll" type="Boolean" description="Specified whether scrolling is enabled (true) or not (false) on the tab." default="false"/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
+    <aura:attribute name="hidden" type="Boolean" description="Specifies whether a tab is hidden (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
     <aura:attribute name="closable" type="Boolean" description="Specifies whether to display an 'x' that will close the tab when clicked" />
     <aura:attribute name="ariaControlId" type="String" description="Force the aria-controls attribute to point to this ID. Use only when trying to override default behaviour."/>

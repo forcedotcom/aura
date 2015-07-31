@@ -16,13 +16,11 @@
 
 .THIS {
 	opacity: 0;
-	display: block;
-	pointer-events: none;
+	display: block;	
 	position: absolute;
 }
 
 .THIS.visible {
     opacity: 1;
     display: block;
-	pointer-events: auto;
 }

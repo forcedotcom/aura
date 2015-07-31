@@ -159,6 +159,9 @@ function (scrollUtil) {
          * @param config
          */
         show: function(cmp, config) {
+            if(!cmp.isValid()) {
+                return;
+            }
             var me = this,
                 animEnd    = this.getAnimationEndEventName(),
                 animName   = config.animationName,
@@ -171,7 +174,6 @@ function (scrollUtil) {
             if(useTransition) {
             	useTransition = this.validateAnimationName(animName);
             }
-            
             //need to notify panel manager to de-activate other panels;
             cmp.getEvent('notify').setParams({
                 action: 'beforeShow',
@@ -397,13 +399,15 @@ function (scrollUtil) {
          * @private
          */
         setFocus: function(cmp) {
-            if(cmp.returnFocus) {
-                cmp.returnFocus.focus();
-            } else {
-                var focusables = this.getFocusables(cmp.getElement());
-                focusables.initial && focusables.initial.focus();
+            if(cmp.isValid()) {
+                if(cmp.returnFocus) {
+                    cmp.returnFocus.focus();
+                } else {
+                    var focusables = this.getFocusables(cmp.getElement());
+                    focusables.initial && focusables.initial.focus();
+                }
             }
-            
+
         },
         scopeScroll: function (dom) {
             scrollUtil.scope(dom);

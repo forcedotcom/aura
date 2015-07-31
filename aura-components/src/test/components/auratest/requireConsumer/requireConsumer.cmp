@@ -22,6 +22,8 @@
 
     <aura:method name="updateWithVersionInConsumedComponentInTest"
                  action="{!c.updateWithVersionInConsumedComponentInTest}"/>
+    <aura:method name="updateWithVersionInConsumedComponentInSamenamespace"
+                 action="{!c.updateWithVersionInConsumedComponentInSamenamespace}"/>
     <aura:method name="updateWithVersionInConsumedComponent"
                  action="{!c.updateWithVersionInConsumedComponent}"/>
 
@@ -32,6 +34,7 @@
     <aura:require namespace="componentTest" version="3.0"/>
 
     <test:require aura:id="testCmp" versionEvt="{!c.updateVersionFromVersionEvent}"/>
+    <auratest:require aura:id="auratest_require"/>
 
     <aura:registerEvent name="versionEvt" type="auratest:testEvent"/>
 </aura:component>

@@ -6,6 +6,12 @@
         cmp.set("v.versionInConsumedCmp", targetComponent.get("v.version"));
     },
 
+    updateWithVersionInConsumedComponentInSamenamespace: function(cmp) {
+        var targetComponent = cmp.find("auratest_require");
+        targetComponent.updateVersionFromGetVersionMethod();
+        cmp.set("v.versionInConsumedCmp", targetComponent.get("v.version"));
+    },
+
     updateWithVersionInConsumedComponent: function(cmp) {
         var targetComponent = cmp.get("v.consumedCmp");
         targetComponent.updateVersion();

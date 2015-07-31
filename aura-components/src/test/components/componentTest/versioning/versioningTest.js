@@ -247,6 +247,25 @@
     },
 
     /**
+     * Verify version in client controller is same as its containing component's
+     * version when they are in same namespace.
+     *
+     * Describe: the testing component contains auratest:requireConsumer which contains
+     * auratest:require. In auratest:require, checking if getVersion() returns
+     * required version declared in testing component.
+     */
+    testVersionSameAsContainingCmpVersionWhenInSamenamespace: {
+        test: function(cmp) {
+            var component = cmp.find("requireConsumerInAuraTest");
+            component.updateWithVersionInConsumedComponentInSamenamespace();
+            this.updateVersion(cmp, component.get("v.versionInConsumedCmp"))
+
+            var actual = cmp.get("v.version");
+            $A.test.assertEquals("2.0", actual);
+        }
+    },
+
+    /**
      * Verify getVersion() returns its caller's request version when a component as attribute
      * in different namespace components.
      */

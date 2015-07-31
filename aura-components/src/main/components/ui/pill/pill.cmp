@@ -29,6 +29,7 @@
     <aura:attribute name="showDelete" type="Boolean" default="true" description="Show delete icon inside pill"/>
     <aura:attribute name="iconUrl" type="String" description="The url for the icon"/>
     <aura:attribute name="iconBackgroundColor" type="String" description="The background color for the icon"/>
+    <aura:attribute name="iconAlt" type="String" description="The alt attribute for the icon"/>
     <aura:attribute name="accessibleDeleteLabel" type="String" default="Press Delete to Remove" description="The accessible label for the close icon."/>
     <aura:attribute name="maxCharacters" type="Integer" default="30" description="The maximum number of characters displayed in a pill."/>
     <aura:attribute name="active" type="Boolean" default="true" description="Specifies whether a pill is active and will take focus"/>
@@ -47,7 +48,7 @@
     <a aura:id="link" aura:flavorable="true" class="pill" tabindex="{!v.active ? 0: -1}">
         <aura:if isTrue="{!!empty(v.iconUrl)}">
             <span class="pillIcon" style="{!'background-color: ' + ( empty(v.iconBackgroundColor) ? 'transparent': '#' + v.iconBackgroundColor ) }">
-                <ui:image aura:id="icon" src="{!v.iconUrl}" imageType="decorative" onerror="{!c.onIconError}"/>
+                <ui:image aura:id="icon" src="{!v.iconUrl}" imageType="{!empty(v.iconAlt) ? 'informational' : 'decorative'}" alt="{!v.iconAlt}" onerror="{!c.onIconError}"/>
             </span>
         </aura:if>
         <span aura:id="label" class="pillText">{!v.label}</span>

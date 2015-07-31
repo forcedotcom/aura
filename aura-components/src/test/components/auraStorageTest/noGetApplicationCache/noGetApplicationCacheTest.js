@@ -3,7 +3,8 @@
         $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:noGetApplicationCache"}');
     },
 
-    testOfflineLaunch: {
+    // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
+    _testOfflineLaunch: {
         test: [
             function loadIframe(cmp) {
                 cmp._frameLoaded = false;

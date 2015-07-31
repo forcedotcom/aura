@@ -589,8 +589,9 @@ IndexedDBAdapter.prototype.refreshSize = function(size, count) {
         this.sizeOutsideErrorBar += 1;
     }
 
-    this.log("refreshSize(): size calculation: mistake = "+mistake+", avg = "+(this.sizeMistake/this.sizeMistakeCount)+
-        ", max = "+this.sizeMistakeMax+", outside error bars = "+this.sizeOutsideErrorBar);
+    this.log("refreshSize(): size calculation: current mistake = "+mistake+", avg mistake = "
+        +(this.sizeMistake/this.sizeMistakeCount).toFixed(1)+", max mistake = "+this.sizeMistakeMax
+        +", outside error bars = "+this.sizeOutsideErrorBar);
     this.setSize(size, count);
 };
 

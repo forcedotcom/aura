@@ -350,6 +350,18 @@
         }
     },
 
+    testGetFunctionValue: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+        }
+    },
+
+    testCacheMiss: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+        }
+    },
+
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "cannot store an item over the maxSize");

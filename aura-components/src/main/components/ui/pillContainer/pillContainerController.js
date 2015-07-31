@@ -82,16 +82,16 @@
     },
 
     pillIterationComplete: function(cmp, event, helper) {
-        setTimeout(function(){
+        setTimeout($A.getCallback(function(){
             if (cmp.isValid()) {
                 helper.adjustHeight(cmp);
             }
-        },0);
+        }),0);
     },
 
     focus: function(cmp, event, helper) {
         helper.focusOnInputBox(cmp);
-    },
+    }
 
 
 })

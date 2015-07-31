@@ -53,7 +53,7 @@
         <span aura:id="label" class="pillText">{!v.label}</span>
         <aura:if isTrue="{!v.showDelete}">
             <a onclick="{!c.deleteItem}" tabindex="-1">
-                <span class="{!v.iconClass + ' deleteIcon'}"/>
+                <span class="deleteIcon"/>
                 <span class="assistiveText">{!v.accessibleDeleteLabel}</span>
             </a>
         </aura:if>

@@ -17,23 +17,55 @@
 -->
 <aura:component>
     <aura:attribute name="value" type="String"/>
+    <aura:attribute name="valueElse" type="String"/>
+    <aura:attribute name="date" type="Date" default="2015-09-08"/>
     <aura:attribute name="string" type="String" default="test"/>
     <aura:attribute name="boolean" type="boolean" default="false"/>
     <aura:attribute name="double" type="double" default="20"/>
     <aura:attribute name="undef" type="Object"/>
     <aura:attribute name="noll" type="Object"/>
 
-    <div aura:id="bodyEmpty"><aura:label value="{!v.value}"></aura:label></div>
-    <div aura:id="bodyHtml"><aura:label value="{!v.value}"><div>logout</div></aura:label></div>
-    <div aura:id="bodyComponent"><aura:label value="{!v.value}"><aura:label value="home"/></aura:label></div>
-    <div aura:id="bodyProperties"><aura:label value="{!v.value}">{!v.string}{!v.boolean}{!v.double}self<span>spanned</span><aura:label value="login"/></aura:label></div>
-    <div aura:id="bodyFunction"><aura:label value="{!v.value}">{!v.string + v.boolean + v.double}</aura:label></div>
-    <div aura:id="functionValue"><aura:label value="{!v.string + v.value}">{!v.string}{!v.boolean}{!v.double}</aura:label></div>
-    <div aura:id="bodyUndefined"><aura:label value="{!v.value}">{!v.undef}</aura:label></div>
-    <div aura:id="bodyWithUndefined"><aura:label value="{!v.value}">{!v.undef}{!v.string}</aura:label></div>
-    <div aura:id="bodyNull"><aura:label value="{!v.value}">{!v.noll}</aura:label></div>
-    <div aura:id="bodyWithNull"><aura:label value="{!v.value}">{!v.noll}{!v.string}</aura:label></div>
-    <div aura:id="bodyText"><aura:label value="{!v.value}">inner</aura:label></div>
-    <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div>
-    <div aura:id="bodyWithString"><aura:label value="{!v.value}">{!v.string}</aura:label></div>
+    <div class='divBig'>
+        <p> test Label Simple Case </p>
+        <div aura:id="bodyEmpty"><aura:label value="{!v.value}"></aura:label></div>
+        <div aura:id="bodyHtml"><aura:label value="{!v.value}"><div class='divSmall'>logout</div></aura:label></div>
+        <div aura:id="bodyComponent"><aura:label value="{!v.value}"><aura:label value="home"/></aura:label></div>
+        <div aura:id="bodyProperties"><aura:label value="{!v.value}">{!v.string}{!v.boolean}{!v.double}self<span>spanned</span><aura:label value="login"/></aura:label></div>
+        <div aura:id="bodyFunction"><aura:label value="{!v.value}">{!v.string + v.boolean + v.double}</aura:label></div>
+        <div aura:id="functionValue"><aura:label value="{!v.string + v.value}">{!v.string}{!v.boolean}{!v.double}</aura:label></div>
+        <div aura:id="bodyUndefined"><aura:label value="{!v.value}">{!v.undef}</aura:label></div>
+        <div aura:id="bodyWithUndefined"><aura:label value="{!v.value}">{!v.undef}{!v.string}</aura:label></div>
+        <div aura:id="bodyNull"><aura:label value="{!v.value}">{!v.noll}</aura:label></div>
+        <div aura:id="bodyWithNull"><aura:label value="{!v.value}">{!v.noll}{!v.string}</aura:label></div>
+        <div aura:id="bodyText"><aura:label value="{!v.value}">inner</aura:label></div>
+        <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div>
+        <div aura:id="bodyWithString"><aura:label value="{!v.value}">{!v.string}</aura:label></div>
+    </div>
+    
+    
+    <!-- test label with If -->
+    <aura:attribute name="booleanForIf" type="Boolean" default='true'/>
+    <div class='divBig'>
+        <p> test Label with If </p>
+        <div aura:id="testBodyEmptyWithIf">
+            <aura:if isTrue="{!(v.booleanForIf)}">
+                <aura:label value="{!v.value}"/>
+            <aura:set attribute="else">
+                <aura:label value="{!v.valueElse}"/>
+            </aura:set>
+            </aura:if>
+        </div>
+   </div>
+   
+   
+   <!-- test label , check afterRender is called.
+    outputDate formatDate in its afterRender, this won't show the date if afterRender is not called -->
+   <div class='divBig'>
+        <p> test Label with outputDate </p>
+       <aura:label value="{!v.value}">
+            <span aura:id="outputDateInLabel">
+                <ui:outputDate value="{!v.date}"/>
+            </span>
+        </aura:label>
+    </div>
 </aura:component>

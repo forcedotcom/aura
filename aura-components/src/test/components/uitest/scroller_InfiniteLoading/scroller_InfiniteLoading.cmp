@@ -18,6 +18,7 @@
 <aura:component description="A test scroller.">
 
 	<aura:attribute name="initialSize" type="Integer" default="40"/>
+	<aura:attribute name="loadDelay_ms" type="Integer" default="250" description="delay before the scroller load the new items"/>
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/> 	
 
 	<div id="header" class="common">Scroller - Infinite Loading Test</div>

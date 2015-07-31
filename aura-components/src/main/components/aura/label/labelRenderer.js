@@ -30,7 +30,7 @@
                 if (child.getDef().getDescriptor().getQualifiedName() === "markup://aura:text") {
                     continue;
                 }
-                
+
                 items.push($A.render(child));
             }
 
@@ -71,6 +71,7 @@
     },
 
     rerender: function(component){
+
         var body = component.get("v.body");
         for (var i = 0; i < body.length; i++) {
             var child = body[i];
@@ -81,6 +82,7 @@
     },
 
     afterRender: function(component) {
+
         var body = component.get("v.body");
         for (var i = 0; i < body.length; i++) {
             var child = body[i];
@@ -90,6 +92,10 @@
         }
     },
     unrender: function (component) {
+        // Clean what is added this component.
+        this.superUnrender();
+
+        // Clean what is passed by the child but ignored.
         var body = component.get("v.body");
         for (var i = 0; i < body.length; i++) {
             var child = body[i];

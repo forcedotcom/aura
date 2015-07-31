@@ -280,10 +280,7 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         String response = getResponseBody(httpResponse);
         post.releaseConnection();
 
-        if (HttpStatus.SC_OK != statusCode) {
-            fail(String.format("Unexpected status code <%s>, expected <%s>, response:%n%s", statusCode,
-                    HttpStatus.SC_OK, response));
-        }
+        assertEquals("Status code should be 200", HttpStatus.SC_OK, statusCode);
 
         assertTrue("response not wrapped with ERROR marker: " + response,
                 response.startsWith(AuraBaseServlet.CSRF_PROTECT + "*/") && response.endsWith("/*ERROR*/"));

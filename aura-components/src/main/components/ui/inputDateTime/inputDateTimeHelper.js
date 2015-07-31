@@ -104,10 +104,15 @@
      * Override ui:input because we have two inputs, and ui:input only adds class to the first input
      */
     addInputClass: function(component) {
-        var inputElements = component.getElement().getElementsByTagName('input');
-        for (var i = 0; i < inputElements.length; i++) {
-            var element = inputElements[i];
-            $A.util.addClass(element, component.getConcreteComponent().getDef().getStyleClassName());
+        if (!this.isDesktopMode(component)) {
+            var inputEl = this.getInputElement(component);
+            $A.util.addClass(inputEl, component.getConcreteComponent().getDef().getStyleClassName());
+        } else {
+            var inputElements = component.getElement().getElementsByTagName('input');
+            for (var i = 0; i < inputElements.length; i++) {
+                var element = inputElements[i];
+                $A.util.addClass(element, component.getConcreteComponent().getDef().getStyleClassName());
+            }
         }
     },
 
@@ -115,10 +120,15 @@
      * Override ui:input because we have two inputs, and ui:input only adds handlers to the first input
      */
     addDomHandler : function(component, event) {
-        var inputElements = component.getElement().getElementsByTagName('input');
-        for (var i = 0; i < inputElements.length; i++) {
-            var element = inputElements[i];
-            $A.util.on(element, event, this.lib.interactive.domEventHandler);
+        if (!this.isDesktopMode(component)) {
+            var inputElement = this.getInputElement(component);
+            $A.util.on(inputElement, event, this.lib.interactive.domEventHandler);
+        } else {
+            var inputElements = component.getElement().getElementsByTagName('input');
+            for (var i = 0; i < inputElements.length; i++) {
+                var element = inputElements[i];
+                $A.util.on(element, event, this.lib.interactive.domEventHandler);
+            }
         }
     },
 

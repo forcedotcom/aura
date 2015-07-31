@@ -463,7 +463,9 @@
         test : [function(cmp) {
             this.fireErrorValidation(cmp.find("validate"), false);
         }, function(cmp) {
-            this.validateBasic(cmp, "dateInvalid");
+            var ul = $A.test.getElementByClass("uiInputDefaultError")[0];
+            var input = cmp.find("dateInvalid").find("inputText").getElement();
+            this.verifyInputDefaultStructure(input, ul, 3);
         }]
     },
 

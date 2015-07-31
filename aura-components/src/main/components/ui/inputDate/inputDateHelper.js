@@ -31,9 +31,9 @@
                 }
             }
         }
-        
+
         /**This instance of the component variable was left in because in cases when we are extending inputDate,
-         * getting the concreteComponent will give us the lowest hanging fruit, which does not include an 
+         * getting the concreteComponent will give us the lowest hanging fruit, which does not include an
          * element with an id of inputText. By leaving this variable in, it will work in both cases.
          */
         var elem = component.find("inputText").getElement();
@@ -59,6 +59,19 @@
 
     /**
      * Override ui:input.
+     */
+    handleUpdate : function(component, event) {
+        var helper = component.getDef().getHelper();
+        var updateOn = helper.getUpdateOn(component);
+
+        // if this is an event we're supposed to update on, call this component's update implementation
+        if (updateOn.indexOf(event.type) > -1) {
+            helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
+        }
+    },
+
+    /**
+     * Override ui:input.
      *
      */
     doUpdate : function(component, value) {
@@ -78,6 +91,26 @@
             }
         }
         concCmp.set("v.value", ret);
+    },
+
+    /**
+     * @Override
+     */
+    addDomHandler : function(component, event) {
+        var el = this.getInputElement(component);
+        $A.util.on(el, event, this.lib.interactive.domEventHandler);
+    },
+
+    getInputElement : function(component) {
+        var element;
+        // on desktop, the input is wrapped in a <form> tag
+        if (this.hasLabel(component) || $A.get("$Browser.formFactor") == "DESKTOP") {
+            var el = component.getElement();
+            element = el.getElementsByTagName('input')[0] || el;
+        } else {
+            element = component.getElement();
+        }
+        return element;
     },
 
     getDateString: function(date) {

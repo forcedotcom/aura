@@ -70,9 +70,3 @@ div.THIS:not(.wrapper) {
     width: 50%;
     margin-left: 8px;
 }
-
-.THIS .dateTime-inputDate > a.datePicker-openIcon {
-    right: 50%;
-    padding-right: 0px;
-    margin-right: 16px;
-}

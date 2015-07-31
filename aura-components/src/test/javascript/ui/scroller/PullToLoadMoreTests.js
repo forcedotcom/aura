@@ -72,10 +72,7 @@ Test.Components.Ui.Scroller.PullToLoadMoreTests=function(){
 				});
 			});
 			
-			Assert.True(
-						PTLplugin._ptlIsEnabled()  && 
-						PTLsurfaceItem.innerHTML && 
-						PTLsurfaceItem.className === 'pullToLoadMore');
+			Assert.True(PTLplugin._ptlIsEnabled() && PTLsurfaceItem.className === 'pullToLoadMore');
 		}
 	}
 

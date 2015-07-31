@@ -20,6 +20,7 @@ function (w) {
     
     // NAMESPACES
     var SCROLLER = w.__S || (w.__S = {}),
+        HELPERS  = SCROLLER.helpers,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
         SUPPORT  = SCROLLER.support;
     
@@ -52,6 +53,7 @@ function (w) {
                 prevBtn = this._createButton(config.labelLeft, 'leftButton', function(e){self._pageLeft();});
                 nextBtn = this._createButton(config.labelRight, 'rightButton', function(e){self._pageRight();});
             }
+
             this._enableVoiceOver = config.enable;
             this._prevBtn = prevBtn;
             this._nextBtn = nextBtn;
@@ -64,7 +66,7 @@ function (w) {
         _createButton: function(label, cls, clickListener) {
             var btnCls = 'scrollButton voiceOver ';
             var btn = w.document.createElement('button');
-            btn.innerHTML = '<span>' + label + '</span>';
+            btn.appendChild(HELPERS.createLabel("", label));
             btn.addEventListener('click', clickListener);
             btn.className = btnCls + cls;
             return btn;

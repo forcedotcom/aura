@@ -75,7 +75,12 @@ function (w) {
             var docfrag = w.document.createDocumentFragment();
 
             this.items.forEach(function (i) {docfrag.appendChild(i.dom);});
-            this.scroller.innerHTML = '';
+            // destroy current html
+            while (this.scroller.firstChild) {
+                this.scroller.removeChild(this.scroller.firstChild);
+            }
+
+            // put back the original one
             this.scroller.appendChild(docfrag);
 
             this.items              = [];

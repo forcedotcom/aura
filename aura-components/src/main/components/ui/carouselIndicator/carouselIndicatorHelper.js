@@ -177,7 +177,7 @@
             }
             
             for (var i=0; i< items.length; i++) {
-                items[i].style.maxWidth = '100px'
+                items[i].style.maxWidth = '100px';
             }
         }
     },
@@ -189,8 +189,9 @@
             pageModels     = cmp.get('v.pageModels'),
             pageComponents = cmp.get('v.pageComponents'),
             numberOfPages  = pageModels.length || pageComponents.length,
-            isPageModels      = !!pageModels.length,
-            tmpl = '', page, label, i, root, selected, activePage;
+            isPageModels   = !!pageModels.length,
+            tmpl           = '', 
+            page, label, i, root, selected, activePage;
         
         for (i = 0; i < numberOfPages; i++) {
             page     = isPageModels ? pageModels[i] : pageComponents[i];

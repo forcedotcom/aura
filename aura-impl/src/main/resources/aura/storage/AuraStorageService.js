@@ -71,8 +71,8 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
 
     var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
 
-    // apply the default version if one is not specified
-    if ($A.util.isUndefinedOrNull(version)) {
+    // apply the default version if one is not specified (falsey values, like <auraStorage:init/>'s default empty string, is treated as not specified)
+    if (!version) {
         version = this.version;
     }
 

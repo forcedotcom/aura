@@ -91,6 +91,29 @@
         }]
     },
 
+    /**
+     * test for bug W-2694348
+     * The bug was invalid component trying to call getVersion()
+     * when component version gets wrapped into an server action.
+     */
+    testServerActionAssociatedWithInvalidCmp : {
+        test: function(cmp) {
+            var callbackCalled = false;
+            var action = cmp.get("c.executeInForeground");
+
+            cmp.destroy(false);
+            $A.test.assertFalse(cmp.isValid());
+
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true,
+                function(){return $A.test.areActionsComplete([action]);},
+                function(){
+                    // associated component is invalid, so the action will be aborted
+                    $A.test.assertEquals("ABORTED", action.getState());
+                });
+        }
+    },
+
     testActionStatusIsIncompleteWhenOffline : {
         test: function(cmp) {
             var callbackCalled = false;

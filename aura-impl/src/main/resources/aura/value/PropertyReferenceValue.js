@@ -178,10 +178,7 @@ PropertyReferenceValue.prototype.destroy = function() {
  * @export
  */
 PropertyReferenceValue.prototype.toString = function() {
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        return "{!"+this.expression+"}";
-    //#end
-    return "PropertyReferenceValue";
+    return "{!"+this.expression+"}";
 };
 
 /**

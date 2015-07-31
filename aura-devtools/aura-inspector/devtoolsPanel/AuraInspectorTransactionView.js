@@ -4,30 +4,27 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	var queuedData = [];
 	var transactions = {};
 
-	var markup = [
-		'<div class="aura-panel panel-status-bar">',
-		// '	<button class="record-profile-status-bar-item status-bar-item" title="Record">',
-		// '		<div class="glyph"></div><div class="glyph shadow"></div>',
-		// '	</button>',
-		'	<button class="clear-status-bar-item status-bar-item" title="Clear">',
-		'		<div class="glyph"></div><div class="glyph shadow"></div>',
-		'	</button> ',
-		'</div>',
-		'<div class="transactions" id="trs">',
-		'	<table>',
-		'		<thead>',
-		'			<th>Id</th>',
-		'			<th>StartTime(s) <span style="font-size:8px">(since page loaded)</span></th>',
-		'			<th>Duration(ms)</th>',
-		'			<th>Context</th>',
-		'			<th>Actions <span style="font-size:8px">(in flight)</span></th>',
-		'           <th>XHR <span style="font-size:8px">(in flight)</span></th>',
-		'		</thead>',
-		'		<tbody>',
-		'		</tbody>',
-		'	</table>',
-		'</div>'
-	].join('');
+	var markup = `
+		<div class="aura-panel panel-status-bar">
+			<button class="clear-status-bar-item status-bar-item" title="Clear">
+				<div class="glyph"></div><div class="glyph shadow"></div>
+			</button> 
+		</div>
+		<div class="transactions" id="trs">
+			<table>
+				<thead>
+					<th>Id</th>
+					<th>StartTime(s) <span style="font-size:8px">(since page loaded)</span></th>
+					<th>Duration(ms)</th>
+					<th>Context</th>
+					<th>Actions <span style="font-size:8px">(in flight)</span></th>
+		           <th>XHR <span style="font-size:8px">(in flight)</span></th>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	`;
 
 
 	function OutputListTable_OnClick(event) {
@@ -77,7 +74,9 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		tabBody.innerHTML = markup;
 		tabBody.classList.add("trans-panel");
 
-		console.log('initializing AuraInspectorTransaction');
+		devtoolsPanel.subscribe("Transactions:OnTransactionEnd", function(transactions){
+			this.addTransactions(transactions);
+		}.bind(this));
 	};
 
 	this.summarizeActions = function (t) {

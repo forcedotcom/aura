@@ -1,12 +1,18 @@
 //*** Used by Aura Inspector
 // This is injected in the DOM directly via <script> injection
 (function(){
-    var actions = {
-        "AuraDevToolService.HighlightElement": function(event) {
+    var $Aura = {};
+    
+    // Communicate directly with the aura inspector
+    $Aura.Inspector = new AuraInspector();
+    $Aura.Inspector.init();
+
+    $Aura.actions = {
+        "AuraDevToolService.HighlightElement": function(globalId) {
             // Ensure the classes are present that HighlightElement depends on.
-            if(!actions["AuraDevToolService.AddStyleRules"].addedStyleRules) {
-                actions["AuraDevToolService.AddStyleRules"](event);
-                actions["AuraDevToolService.AddStyleRules"].addedStyleRules = true;
+            if(!$Aura.actions["AuraDevToolService.AddStyleRules"].addedStyleRules) {
+                $Aura.actions["AuraDevToolService.AddStyleRules"](globalId);
+                $Aura.actions["AuraDevToolService.AddStyleRules"].addedStyleRules = true;
             }
 
             var className = "auraDevToolServiceHighlight3";
@@ -18,7 +24,6 @@
             }
 
             // Apply the classes to the elements
-            var globalId = event.data["globalId"];
             if(globalId) {
                 var cmp = $A.getCmp(globalId);
                 if(cmp && cmp.isValid()) {
@@ -32,7 +37,8 @@
                 }
             }
         },
-        "AuraDevToolService.RemoveHighlightElement": function(event) {
+
+        "AuraDevToolService.RemoveHighlightElement": function() {
             var removeClassName = "auraDevToolServiceHighlight3";
             var addClassName = "auraDevToolServiceHighlight4";
             var previous = document.getElementsByClassName(removeClassName);
@@ -42,25 +48,30 @@
             }
 
         },
-        "AuraDevToolService.AddStyleRules": function(event) {
+
+        "AuraDevToolService.AddStyleRules": function(globalId) {
             var styleRuleId = "AuraDevToolService.AddStyleRules";
 
             // Already added
             if(document.getElementById(styleRuleId)) { return; }
 
-            var rules = [
-                ".auraDevToolServiceHighlight2 {",
-                "   border: 1px solid red;",
-                "}",
-                ".auraDevToolServiceHighlight3:before{",
-                "   position:absolute;display:block;width:100%;height:100%;z-index: 10000;",
-                "   background-color:#006699;opacity:.3;content:' ';border : 2px dashed white;",
-                "}",
-                ".auraDevToolServiceHighlight4.auraDevToolServiceHighlight3:before {",
-                "   opacity: 0;",
-                "   transition: opacity 2s;",
-                "}"
-            ].join('');
+            var rules = `
+                .auraDevToolServiceHighlight3:before{
+                   position:absolute;
+                   display:block;
+                   width:100%;
+                   height:100%;
+                   z-index: 10000;
+                   background-color:#006699;
+                   opacity:.3;
+                   content:' ';
+                   border : 2px dashed white;
+                }
+                .auraDevToolServiceHighlight4.auraDevToolServiceHighlight3:before {
+                   opacity: 0;
+                   transition: opacity 2s;
+                }
+            `;
 
             var style = document.createElement("style");
                 style.id = styleRuleId;
@@ -72,17 +83,22 @@
 
 
             document.body.addEventListener("transitionend", function removeClassHandler(event) {
-            var removeClassName = "auraDevToolServiceHighlight3";
-            var addClassName = "auraDevToolServiceHighlight4";
+                var removeClassName = "auraDevToolServiceHighlight3";
+                var addClassName = "auraDevToolServiceHighlight4";
                 //console.log("Remove it", event.target);
                 var element = event.target;
                 element.classList.remove(removeClassName);
                 element.classList.remove(addClassName);
             });
         },
-        "AuraDevToolService.Bootstrap": function(event) {
-            if (typeof $A != "undefined" && $A.initAsync) {
+        /**
+         * Is called after $A is loaded via aura_*.js, but before we run initAsync()
+         */
+        "AuraDevToolService.Bootstrap": function() {
+            if (typeof $A !== "undefined" && $A.initAsync) {
                 bootstrapPerfDevTools();
+
+                // Need a way to conditionally do this based on a user setting. 
                 $A.PerfDevTools.init();
             } else {
                 console.log('Could not attach AuraDevTools Extension.');
@@ -90,16 +106,56 @@
         }
     };
 
-    // How we get rid of the event listeners and the stupid port div below.
-    window.addEventListener("message", function(event) {
-        // Guard a few things like window source and data being empty
+    // Subscribes!
+    $Aura.Inspector.subscribe("AuraInspector:OnBootstrap", $Aura.actions["AuraDevToolService.Bootstrap"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
-        var action = event.data.action;
-        if(actions.hasOwnProperty(action)) {
-            actions[action](event);
+    function AuraInspector() {
+
+        var subscribers = new Map();
+        var PUBLISH_KEY = "AuraInspector:publish";
+
+        this.init = function() {
+            
+        };
+
+        this.publish = function(key, data) {
+            if(!key) { return; }
+
+            window.postMessage({
+                action : PUBLISH_KEY, 
+                key: key,
+                data : data
+            }, '*');
+        };
+
+        this.subscribe = function(key, callback) {
+            if(!key || !callback) { return; }
+
+            if(!subscribers.has(key)) {
+                subscribers.set(key, []);
+            }
+
+            subscribers.get(key).push(callback);
+        };
+
+        // Start listening for messages
+        window.addEventListener("message", Handle_OnPostMessage);
+
+        function Handle_OnPostMessage(event) {
+            if(event && event.data && event.data.action === PUBLISH_KEY) {
+                var key = event.data.key;
+                var data = event.data.data;
+
+                if(subscribers.has(key)) {
+                    subscribers.get(key).forEach(function(callback){
+                        callback(data);
+                    });
+                }
+            }
         }
-    });
-
+    }
 
     var bootstrapPerfDevTools = function () {
         $A.PerfDevToolsEnabled = true;
@@ -140,7 +196,7 @@
                 };
             },
             _initializeHooks: function () {
-                if (this.opts.componentCreation && $A.getContext().mode !== 'PROD') {
+                if (this.opts.componentCreation /* && $A.getContext().mode !== 'PROD'*/) {
                     this._initializeHooksComponentCreation();
                 }
                 // It should work in all modes
@@ -172,10 +228,12 @@
                 setTimeout(function (){ 
                 // We do a timeout to give a chance to 
                 // other transactionEnd handlers to modify the transaction
-                    window.postMessage({
-                        action  : "AuraDevToolService.OnTransactionEnd", 
-                        payload : t
-                    }, '*');    
+                    // window.postMessage({
+                    //     action  : "AuraDevToolService.OnTransactionEnd", 
+                    //     payload : t
+                    // }, '*');
+
+                    $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
                 }, 0);
             },
 

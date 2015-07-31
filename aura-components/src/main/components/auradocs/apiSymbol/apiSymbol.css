@@ -48,4 +48,5 @@
 
 .THIS .examples-list code {
 	padding: 10px;
+	white-space: pre;
 }

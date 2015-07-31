@@ -317,9 +317,12 @@
     
     updateOptionElement: function(cmp, option, optionElement) {
     	var internalText = this.getInternalText(option);
-    	
     	// Check/update label
-    	if (optionElement.label != option.label || optionElement.label != internalText) {
+    	//IE11 is complaining because we're reading "label" attribute before writing to it
+    	if ($A.get("$Browser").isIE11) { 
+    		optionElement.label = option.label || internalText; 
+    	}// End IE11 workaround 
+    	else if (optionElement.label != option.label || optionElement.label != internalText) {
     		optionElement.label = option.label || internalText;
     	}
     	

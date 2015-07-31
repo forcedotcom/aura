@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent" extensible="true" defaultFlavor="default, input"
+<aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent" extensible="true" defaultFlavor="default, input, datetime"
     controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
     description="An input field for entering a date and time.">
 

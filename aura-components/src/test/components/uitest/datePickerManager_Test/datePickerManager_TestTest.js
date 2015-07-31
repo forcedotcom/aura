@@ -12,19 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  */
 ({
     defValueID : "inputWDefValue",
     noDefValueID : "inputWODefValue",
     defDatePickerID : "inputWNoDatePicker",
     dateId : "dpm",
-    
+
     /**
      * Test that opens multiple datepickers then verifies that they are not overriding eachtohers Values
-     * 
+     *
      */
-    testDatepickerStoresCorrectValue : {
+    _testDatepickerStoresCorrectValue : {
 	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         test : [function(cmp) {
             	     this.openDatePicker(cmp, this.defValueID);
@@ -40,17 +40,17 @@
                        $A.test.clickOrTouch(today);
                    },
                    function(cmp){
-                       var inputWDefaultValue = cmp.find(this.defValueID).getElement().value;
-                       var inputWODefaultValue = cmp.find(this.noDefValueID).getElement().value;
+                       var inputWDefaultValue = cmp.find(this.defValueID).getElement().getElementsByTagName('input')[0].value;
+                       var inputWODefaultValue = cmp.find(this.noDefValueID).getElement().getElementsByTagName('input')[0].value;
                        $A.test.assertNotEquals(inputWDefaultValue, inputWODefaultValue, "The dates in the inputText should not be equal");
                    }]
     },
     /**
      * Test verifying that the inputText takes in input
-     * 
+     *
      * Ignores iphone/ipad because those are going to be readonly fields
      */
-    testDatepickerOpensToCorrectValue : {
+    _testDatepickerOpensToCorrectValue : {
 	browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test : [function(cmp) {
             	     cmp.find(this.noDefValueID).set("v.value", "2013-09-25");
@@ -58,16 +58,15 @@
 		   }, function(cmp){
                        var pastWeek   = this.getDatePicker(cmp).find("grid").find("17");
                        pastWeek.getEvent("click").fire({});
-                       
-                       var inputValue = cmp.find(this.defValueID).getElement().value;
+                       var inputValue = cmp.find(this.defValueID).getElement().getElementsByTagName('input')[0].value;
                        $A.test.assertEquals(inputValue, "2013-09-25", "The dates in the inputText should not be equal");
 		   }]
     },
-    
+
     /**
-     * Test verifying that each datepicker opens up on the safe y-axis as the input 
-     * 
-     * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed 
+     * Test verifying that each datepicker opens up on the safe y-axis as the input
+     *
+     * Ignored in IE7 because ie7 handles bounding rectangle differently and the datepicker ends up be askewed
      */
     testCheckDatePickerPosition : {
 	browsers: ["-IE7", "-ANDROID_PHONE", "-ANDROID_TABLET"],
@@ -75,16 +74,16 @@
                     this.openDatePicker(cmp, this.defValueID);
 	        },
 	        function (cmp) {
-	           this.verifyPosition(cmp, this.defValueID);  
+	           this.verifyPosition(cmp, this.defValueID);
 	        },
 	        function(cmp) {
                     this.openDatePicker(cmp, this.noDefValueID);
 	        },
 	        function (cmp) {
-	           this.verifyPosition(cmp, this.noDefValueID);  
+	           this.verifyPosition(cmp, this.noDefValueID);
 	        }]
     },
-    
+
     /**
      * Test verifying that there are two datepickers on the screen (1 from manager, and the other from a normal inputDate components)
      */
@@ -95,17 +94,17 @@
                  $A.test.assertEquals(2, datePickerSize, "There should be two datePickers on the screen and there aren't");
 	       }
     },
-    
+
     //HELPER FUNCTIONS
     getDatePicker: function(cmp){
 	return cmp.find("dpm").find("datePicker");
     },
     /**
-     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
-     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 
+     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because
+     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText
      * and a select value
-     * 
-     */ 
+     *
+     */
     isViewDesktop : function(){
                          return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
     },
@@ -121,7 +120,7 @@
 	}
 	$A.test.addWaitFor(true, function(){return $A.util.hasClass(datePicker, "visible")});
     },
-    
+
     verifyPosition : function (cmp, elmId){
 	 var inp = cmp.find(elmId).getElement().getBoundingClientRect();
          var dp = this.getDatePicker(cmp).getElement().getBoundingClientRect();

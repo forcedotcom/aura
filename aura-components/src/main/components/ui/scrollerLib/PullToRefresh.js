@@ -92,11 +92,9 @@ function (w) {
                 actionLabel   = this._nativePTR ? clickLabel : pullLabel,
                 subtitleLabel = this.opts.pullToRefreshConfig.labelSubtitle;
 
-            ptr_container.innerHTML = [
-                '<span class="' + CLASS_ICON + '"></span>',
-                '<span class="' + CLASS_LABEL + '">' + actionLabel + '</span>',
-                '<span class="' + CLASS_SUBTITLE + '">' + subtitleLabel + '</span>'
-            ].join('');
+            ptr_container.appendChild(HELPERS.createLabel(CLASS_ICON, ""));
+            ptr_container.appendChild(HELPERS.createLabel(CLASS_LABEL, actionLabel));
+            ptr_container.appendChild(HELPERS.createLabel(CLASS_SUBTITLE, subtitleLabel));
 
             ptr_container.className = 'pullToRefresh';
 

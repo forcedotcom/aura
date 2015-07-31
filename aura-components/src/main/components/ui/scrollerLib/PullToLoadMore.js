@@ -93,11 +93,9 @@ function (w) {
                 actionLabel   = this._nativePTL ? clickLabel : pullLabel,
                 subtitleLabel = this.opts.pullToLoadMoreConfig.labelSubtitle;
 
-            ptl_container.innerHTML = [
-                '<span class="' + CLASS_ICON + '"></span>',
-                '<span class="' + CLASS_LABEL + '">' + actionLabel + '</span>',
-                '<span class="' + CLASS_SUBTITLE + '">' + subtitleLabel + '</span>'
-            ].join('');
+            ptl_container.appendChild(HELPERS.createLabel(CLASS_ICON, ""));
+            ptl_container.appendChild(HELPERS.createLabel(CLASS_LABEL, actionLabel));
+            ptl_container.appendChild(HELPERS.createLabel(CLASS_SUBTITLE, subtitleLabel));
 
             if (this._nativePTL) {
                 ptl_container.addEventListener('click', function (e) {

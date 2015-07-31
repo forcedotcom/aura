@@ -44,13 +44,17 @@ function (w) {
                 this.opts.infiniteLoadingConfig
             );
         },
-        _createInfiniteLoadingMarkup: function () {
+       _createInfiniteLoadingMarkup: function () {
             var self         = this,
                 il_container = w.document.createElement('div'),
+                label        = document.createElement('span'),
                 idleLabel    = this.opts.infiniteLoadingConfig.labelIdle;
 
-            il_container.innerHTML = '<span class="' + CLASS_IDLE + '">' + idleLabel + '</span>';
+            label.className        = CLASS_IDLE;
+            label.textContent      = idleLabel;
             il_container.className = 'infinite-loading';
+            
+            il_container.appendChild(label);
 
             return il_container;
         },

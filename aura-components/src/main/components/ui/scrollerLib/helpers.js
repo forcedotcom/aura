@@ -35,15 +35,8 @@ function (w) {
                 return obj3;
             },
             parseDOM: function (data) {
-                var div;
                 if (data && data.length) {
-                    if (typeof data === 'string') {
-                        div = w.document.createElement('div');
-                        div.innerHTML = data;
-                        return Array.prototype.slice.call(div.children, 0);
-                    } else {
-                        return Array.prototype.slice.call(data, 0);
-                    }
+                    return Array.prototype.slice.call(data, 0);
                 }
             },
             bind: function (el, type, fn, capture) {
@@ -51,6 +44,12 @@ function (w) {
             },
             unbind: function (el, type, fn, capture) {
                 el.removeEventListener(type, fn, !!capture);
+            },
+            createLabel: function (className, labelText) {
+                var label = w.document.createElement('span');
+                label.className   = className;
+                label.textContent = labelText;
+                return label;
             }
         };
     SCROLLER.helpers = HELPERS;

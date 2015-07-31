@@ -1980,7 +1980,11 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
     }
 
     try {
-        $A.getContext()['merge'](responseMessage["context"]);
+        var context=$A.getContext();
+        if(!context.getCurrentAccess()){
+            context.setCurrentAccess($A.getRoot());
+        }
+        context['merge'](responseMessage["context"]);
     } catch (e) {
         $A.logger.auraErrorHelper(e);
     }

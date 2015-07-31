@@ -21,6 +21,11 @@
         concreteHelper.handleClick(concrete);
 
         // Un-select the previously selected item
-        helper.fireSelectEvent(component, event, {deselectSiblings: true, hideMenu: concrete.get("v.hideMenuAfterSelected")});
+        var hideMenu = $A.util.getBooleanValue(concrete.get("v.hideMenuAfterSelected"));
+        helper.fireSelectEvent(component, event, {
+            "deselectSiblings": true,
+            "hideMenu": hideMenu,
+            "focusTrigger": hideMenu
+        });
     }
 })

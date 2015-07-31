@@ -272,6 +272,80 @@ Aura.Utils.Util.prototype.clearNode = function (node) {
     }
 };
 
+
+// -- Sanitize Facade (secure-filters) -----------------------------------------------
+
+/**
+ * Encodes values for safe embedding in HTML tags and attributes.
+ *
+ * @param {*} val will be converted to a String prior to encoding
+ * @return {string} the encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeHtml = Aura.Utils.SecureFilters.html;
+
+/**
+ * Encodes values for safe embedding in JavaScript string contexts.
+ *
+ * @param {*} val will be converted to a String prior to encoding
+ * @return {string} the encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeJs = Aura.Utils.SecureFilters.js;
+
+
+/**
+ * Encodes values embedded in HTML scripting attributes.
+ *
+ * @param {*} val will be converted to a String prior to encoding
+ * @return {string} the encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeJsAttr = Aura.Utils.SecureFilters.jsAttr;
+
+/**
+ * Percent-encodes unsafe characters in URIs.
+ *
+ * @param {*} val will be converted to a String prior to encoding
+ * @return {string} the percent-encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeUri = Aura.Utils.SecureFilters.uri;
+
+
+/**
+ * Encodes an object as JSON, but with unsafe characters in string literals
+ * backslash-escaped.
+ *
+ * @param {any} val
+ * @return {string} the JSON and backslash-encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeJsObj = Aura.Utils.SecureFilters.jsObj;
+
+
+/**
+ * Encodes values for safe embedding in CSS context.
+ *
+ * @param {any} val
+ * @return {string} the backslash-encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeCSS = Aura.Utils.SecureFilters.css;
+
+
+/**
+ * Encodes values for safe embedding in HTML style attribute context.
+ *
+ * @param {any} val
+ * @return {string} the entity and backslash-encoded string
+ * @export
+*/
+Aura.Utils.Util.prototype.sanitizeStyle = Aura.Utils.SecureFilters.style;
+
+
+// -----------------------------------------------------------------------------------
+
 /**
  * Gets a DOM element by its id without any leading characters (e.g. #) unless the ID contains them.
  *

@@ -15,6 +15,8 @@ package org.auraframework.test.perf.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -32,6 +34,8 @@ import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraFiles;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.PerfCmpTest;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
@@ -55,16 +59,31 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private PerfConfig config;
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
-
-    public PerfExecutorTest(DefDescriptor<ComponentDef> def, PerfConfig config) {
+    private String dbURI;
+    private String testName;
+    private static String DEFAULT_DB_URI = "mongodb://localhost:27017";
+    
+    public PerfExecutorTest(DefDescriptor<ComponentDef> def, PerfConfig config, String db) {
         super("runTests");
+        // needs to temporarily be set to something non-null as getName() should never return null
+        testName = "runTests";
         this.def = def;
         this.config = config;
+        this.setDB(db);
         init();
     }
 
+    public void setTestName(String testName) {
+        this.testName = testName;
+    }
+
+    @Override
+    public final String getName() {
+        return testName;
+    }
+    
     private void init(){
-        perfMetricsUtil = new PerfMetricsUtil(this, config.getOptions().get("metricsMode"));
+        perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config.getOptions().get("metricsMode"));
         runsCollector = new PerfRunsCollector();
     }
 
@@ -80,6 +99,40 @@ public class PerfExecutorTest extends WebDriverTestCase {
         }
     }
 
+    private void setDB(String dbURI){
+    	this.dbURI = dbURI;
+    	if(dbURI == null) {
+    		this.dbURI = DEFAULT_DB_URI;
+    	}
+    }
+    
+    /**
+     * Required to get component directory in SFDC
+     * @param def
+     * @return
+     */
+    public String resolveComponentDirPath(DefDescriptor<ComponentDef> def) {
+    	String fileName;
+		File moduleDir;
+		String componentsDir = null;
+		try {
+			fileName = def.getDef().getLocation().getFileName();
+			moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
+			if(fileName.contains("/core/")){
+				componentsDir = moduleDir.toString();
+			} else {
+				componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
+			}
+		} catch (QuickFixException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+		return componentsDir;
+    }
+    
     private void loadComponent(String url, DefDescriptor<ComponentDef> descriptor) throws MalformedURLException,
     URISyntaxException {
 

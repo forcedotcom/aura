@@ -49,32 +49,32 @@ public final class PerfResultsUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfResultsUtil.class.getSimpleName());
     public static final Date RUN_TIME = new Date();
-    public static String MONGO_URI = System.getProperty("mongoURI");
-    public static final String DEFAULT_MONGO_URI = "mongodb://localhost:27017";
+    //public static String MONGO_URI = System.getProperty("mongoURI");
+    //public static final String DEFAULT_MONGO_URI = "mongodb://localhost:27017";
     public static MongoClient MONGO_CLIENT; // TODO: Abstract this better
 
-    private static MongoClient getMongoClient() {
+    private static MongoClient getMongoClient(String dbURI) {
         if (MONGO_CLIENT == null) {
             try {
-                LOG.info("Trying to connect to MongoDB: " + MONGO_URI);
+                LOG.info("Trying to connect to DB: " + dbURI);
                 // Default Mongo client to connect to default mongo host.
-                if(MONGO_URI == null){
-                    MONGO_URI = DEFAULT_MONGO_URI;
-                }
-                MongoClientURI uri = new MongoClientURI(MONGO_URI);
+                /*if(MONGO_URI == null){
+                	MONGO_URI = DEFAULT_MONGO_URI;
+                }*/               	
+                MongoClientURI uri = new MongoClientURI(dbURI);
                 MONGO_CLIENT = new MongoClient(uri);
             } catch (Exception e) {
-                LOG.info("Not able to connect to MongoDB");
+                LOG.info("Not able to connect to DB");
                 return null;
             }
         }
         return MONGO_CLIENT;
     }
 
-    @SuppressWarnings("null")
-    public static void writeToDb(PerfMetrics metrics, String test, String traceLog) {
+
+    public static void writeToDb(String dbURI, PerfMetrics metrics, String test, String traceLog) {
         try {
-            MongoClient mongo = getMongoClient();
+            MongoClient mongo = getMongoClient(dbURI);
             LOG.info("Writing perf results into mongo db at: " + mongo.getAddress());
             if (mongo != null) {
                 MongoDatabase db = mongo.getDatabase("performance");
@@ -93,9 +93,9 @@ public final class PerfResultsUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static File exportToCsv() {
+    public static File exportToCsv(PerfExecutorTest test, String dbURI) {
         try {
-            MongoClient mongo = getMongoClient();
+            MongoClient mongo = getMongoClient(dbURI);
             if (mongo != null) {
                 MongoDatabase db = mongo.getDatabase("performance");
                 MongoCollection<Document> collection = db.getCollection("testRun");
@@ -122,7 +122,8 @@ public final class PerfResultsUtil {
                         sb.append("\n");
                     }
                 }
-                File file = PerfFilesUtil.getDbResultsDir("data");
+
+                File file = PerfFilesUtil.getDbResultsDir(test.getExplicitPerfResultsFolder(), "data");
                 LOG.info("Perf results have been exported to csv at: " + file.toString());
                 return writeFile(file, sb.toString(), "metrics from mongodb");
             }
@@ -138,7 +139,7 @@ public final class PerfResultsUtil {
      *
      * @return the written file
      */
-    public static File writeDevToolsLog(List<JSONObject> timeline, String fileName) {
+    /*public static File writeDevToolsLog(List<JSONObject> timeline, String fileName) {
         File file = PerfFilesUtil.getTimelineResultsDir(fileName);
         BufferedWriter writer = null;
         try {
@@ -159,12 +160,12 @@ public final class PerfResultsUtil {
             IOUtil.close(writer);
         }
         return file;
-    }
+    }*/
 
     /**
      * @return the written file
      */
-    public static File writeGoldFile(PerfMetrics metrics, String fileName) {
+    /*public static File writeGoldFile(PerfMetrics metrics, String fileName) {
         try {
             ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
         } catch (JSONException e) {
@@ -172,9 +173,55 @@ public final class PerfResultsUtil {
         }
         File file = PerfFilesUtil.getGoldfilesResultsDir(fileName);
         return writeFile(file, PerfFilesUtil.toGoldFileText(metrics, false), "goldfiles");
+    }*/
 
+    /**
+     * Writes the dev tools log for a perf test run to
+     * System.getProperty("aura.perf.results.dir")/timelines/testName_timeline.json
+     *
+     * @return the written file
+     */
+    public static File writeDevToolsLog(List<JSONObject> timeline, String fileName, PerfExecutorTest test) {
+        File resultsFilePath = PerfFilesUtil.getTimelineResultsDir(test.getExplicitPerfResultsFolder(), fileName);  
+        
+        BufferedWriter writer = null;
+        try {
+        	resultsFilePath.getParentFile().mkdirs();
+            writer = new BufferedWriter(new FileWriter(resultsFilePath));
+            writer.write('[');
+            for (JSONObject entry : timeline) {
+                writer.newLine();
+                writer.write(entry.toString());
+                writer.write(',');
+            }
+            writer.write("]");
+            writer.newLine();
+            LOG.info("wrote dev tools log: " + resultsFilePath.getAbsolutePath());
+        } catch (Exception e) {
+            LOG.log(Level.WARNING, "error writing " + resultsFilePath.getAbsolutePath(), e);
+        } finally {
+            IOUtil.close(writer);
+        }
+        return resultsFilePath;
     }
 
+    
+    /**
+     * @return the written file
+     */
+    public static File writeGoldFile(PerfMetrics metrics, PerfExecutorTest test) {
+    	String fileName = test.getComponentDef().getName();
+    	//String filePath = test.resolveComponentDirPath(test.getComponentDef()) + "/" + fileName;
+        try {
+            ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
+        } catch (JSONException e) {
+            LOG.log(Level.WARNING, "error generating _all.json", e);
+        }
+        File resultsFilePath = PerfFilesUtil.getGoldfilesResultsDir(test.getExplicitPerfResultsFolder(), fileName);       
+        return writeFile(resultsFilePath, PerfFilesUtil.toGoldFileText(metrics, false), "goldfiles");
+
+    }
+    
     private static File writeFile(File file, String contents, String what) {
         OutputStreamWriter writer = null;
         try {

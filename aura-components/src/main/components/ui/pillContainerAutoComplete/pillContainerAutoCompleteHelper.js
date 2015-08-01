@@ -93,10 +93,11 @@
     },
 
     handleListExpand: function(component, event) {
+        var usePanel = component.get('v.usePanel');
         var pillListElement = this._getPillContainerListElement(component);
         if (pillListElement) {
             var autocompleteList = component.find("list");
-            if (autocompleteList) {
+            if (autocompleteList && !usePanel) {
                 autocompleteList.getElement().style.top = pillListElement.offsetHeight+"px";
             }
         }

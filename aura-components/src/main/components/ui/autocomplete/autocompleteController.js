@@ -118,6 +118,19 @@
     },
 
     handleListExpand: function(component, event, helper) {
+        var usePanel = component.get('v.usePanel');
+        var panel = component.find('panel');
+        var zIndex;
+        
+        if(usePanel) {
+            panel.set('v.visible', true);
+            panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
+            $A.get('e.ui:stackPanel').setParams({
+                callback: function(zIndex) {
+                    panel.set('v.zIndex', zIndex);
+                }
+            }).fire();
+        }
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
         concreteHelper.handleListExpand(component, event)

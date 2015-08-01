@@ -31,6 +31,7 @@
     
     <aura:attribute name="header" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
     <aura:attribute name="footer" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
+    <aura:attribute name="usePanel" type="boolean" default="false"/>
     
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
@@ -66,8 +67,9 @@
                                          autocompleteButton="{!v.autocompleteButton}"/>
         </aura:set>
     </aura:if>
-    
-    <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
+    <aura:if isTrue="{!v.usePanel}">
+        <ui:autocompletePanel aura:id="panel">
+            <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
         dataProvider="{!v.dataProvider}" 
         itemVar="{!v.optionVar}" 
         itemTemplate="{!v.listOption}"
@@ -83,4 +85,25 @@
         selectListOption="{!c.handleSelectOption}"
         updateAriaAttributes="{!c.updateAriaAttributes}"
         matchFunc="{!v.matchFunc}"/>
+        </ui:autocompletePanel>
+        <aura:set attribute="else">
+            <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
+        dataProvider="{!v.dataProvider}" 
+        itemVar="{!v.optionVar}" 
+        itemTemplate="{!v.listOption}"
+        emptyListContent="{!v.emptyListContent}"
+        loadingIndicator="{!v.loadingIndicator}"
+        header="{!v.header}"
+        footer="{!v.footer}"
+        theme="{!v.theme}"
+        visible="false"
+        role="listbox"
+        propertyToMatch="{!v.propertyToMatch}"
+        matchDone="{!c.handleMatchDone}"
+        selectListOption="{!c.handleSelectOption}"
+        updateAriaAttributes="{!c.updateAriaAttributes}"
+        matchFunc="{!v.matchFunc}"/>
+    </aura:set>
+    </aura:if>
+    
 </aura:component>

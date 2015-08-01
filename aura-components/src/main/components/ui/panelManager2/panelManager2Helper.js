@@ -122,6 +122,14 @@
         panel._zIndex = this.PANELS_ZOFFSET + this.PANELS_ZINDEX;
     },
 
+    /* 
+     * stack an element as if it was a panel
+     */
+    stackElement: function (cb) {
+        this.PANELS_ZINDEX++;
+        cb(this.PANELS_ZOFFSET + this.PANELS_ZINDEX);
+    },
+
     /*
     * Create panel instance
     * @private

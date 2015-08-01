@@ -41,5 +41,12 @@
         if (callback) {
             helper.getActivePanel(cmp, callback);
         }
-    }
+    },
+
+    stackPanel: function(cmp, event, helper) {
+        var callback = event.getParam('callback');
+        if (callback) {
+            helper.stackElement(callback);
+        }
+    } 
 })

@@ -16,6 +16,7 @@
 
 -->
 <aura:application>
+     <a href="x" onClick="{c.panel}">panel</a>
     <ui:autocomplete aura:id="autoComplete" optionVar="row" 
         matchDone="{!c.handleMatchDone}"
         inputChange="{!c.handleInputChange}" 
@@ -31,4 +32,5 @@
     <p/>
     <div>Some other element</div>
     <input type="text"/>
+
 </aura:application>

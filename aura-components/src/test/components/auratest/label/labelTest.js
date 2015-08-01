@@ -14,29 +14,43 @@
  * limitations under the License.
  */
 ({
+	/**
+	 * ui:outputDate formatDate in its afterRender, if ui:label's afterRender is not called, we won't see any date.
+	 */
+    testAfterRenderCalled : {
+    	attributes : {value: "{0}"},
+    	test: [
+    		function(cmp) {
+	    		var outputDateInLabelCmp = cmp.find("outputDateInLabel");
+	    		var expected = "Sep 8, 2015";
+	    		var actual;
+	    		actual = $A.test.getText(outputDateInLabelCmp.getElement());
+	    		$A.test.assertEquals(expected, actual);
+	    	}
+	    ]
+    },
+
     /**
      * Label without tokens does not use substitutions.
      */
     testNoTokens: {
         attributes : {value: "just text"},
-        test: function(component){
-            aura.test.assertEquals("just text", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
-            aura.test.assertEquals("just text", $A.test.getText(component.find("bodyHtml").getElement()), "value not expected for HtmlElement substitution");
-            aura.test.assertEquals("just text", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
-            aura.test.assertEquals("just text", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("just text", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("testjust text", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-
-//            component.set("v.value", "newness");
-//            $A.renderingService.rerender(component);
-//
-//            aura.test.assertEquals("newness", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body after rerender");
-//            aura.test.assertEquals("newness", $A.test.getText(component.find("bodyHtml").getElement()), "value not expected for HtmlElement substitution after rerender");
-//            aura.test.assertEquals("newness", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution after rerender");
-//            aura.test.assertEquals("newness", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("newness", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("testnewness", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
+        test: [function(component){
+            $A.test.assertEquals("just text", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
+            $A.test.assertEquals("just text", $A.test.getText(component.find("bodyHtml").getElement()), "value not expected for HtmlElement substitution");
+            $A.test.assertEquals("just text", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
+            $A.test.assertEquals("just text", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("just text", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("testjust text", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
+        }, function checkLabelInsideIf(component) {
+        	 $A.test.assertEquals("just text", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf");
+        }, function toggleIf(component) {
+        	 component.set("v.valueElse", "just text else");
+        	 component.set("v.booleanForIf", false);
+        }, function verifyValueChange(component) {
+        	 $A.test.assertEquals("just text else", $A.test.getText(component.find("testBodyEmptyWithIf").getElement()), "value not expected for testBodyEmptyWithIf after toggle If");
         }
+        ]
     },
 
     /**
@@ -44,24 +58,14 @@
      */
     testAddTokens: {
         attributes : {value: "one {0} two"},
-        test: function(component){
-            aura.test.assertEquals("one {0} two", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
-            aura.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/one\s*logout\s*two/), "value not expected for HtmlElement substitution");
-            aura.test.assertEquals("one home two", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
-            aura.test.assertEquals("one test two", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("one testfalse20 two", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("testone test two", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-
-//            component.set("v.value", "a{0}b{1}c{2}d");
-//            $A.renderingService.rerender(component);
-//
-//            aura.test.assertEquals("a{0}b{1}c{2}d", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body after rerender");
-//            aura.test.assertEquals("alogoutb{1}c{2}d", $A.test.getText(component.find("bodyHtml").getElement()), "value not expected for HtmlElement substitution after rerender");
-//            aura.test.assertEquals("ahome{1}c{2}d", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution after rerender");
-//            aura.test.assertEquals("atestbfalsec20d", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("atestfalse20b{1}c{2}d", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("testatestbfalsec20d", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
-        }
+        test: [function(component){
+            $A.test.assertEquals("one {0} two", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
+            $A.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/one\s*logout\s*two/), "value not expected for HtmlElement substitution");
+            $A.test.assertEquals("one home two", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
+            $A.test.assertEquals("one test two", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("one testfalse20 two", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("testone test two", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
+        }]
     },
 
     /**
@@ -69,24 +73,14 @@
      */
     testSubtractTokens: {
         attributes : {value: "A{0}B{1}C{2}D{3}E"},
-        test: function(component){
-            aura.test.assertEquals("A{0}B{1}C{2}D{3}E", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
-            aura.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/A\s*logout\s*B\{1\}C\{2\}D\{3\}E/), "value not expected for HtmlElement substitution");            
-            aura.test.assertEquals("AhomeB{1}C{2}D{3}E", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
-            aura.test.assertEquals("AtestBfalseC20DspannedE", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("Atestfalse20B{1}C{2}D{3}E", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("testAtestBfalseC20D{3}E", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-
-//            component.set("v.value", "${1}${0}$");
-//            $A.renderingService.rerender(component);
-//
-//            aura.test.assertEquals("${1}${0}$", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body after rerender");
-//            aura.test.assertEquals("${1}$logout$", $A.test.getText(component.find("bodyHtml").getElement()), "value not expected for HtmlElement substitution after rerender");
-//            aura.test.assertEquals("${1}$home$", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution after rerender");
-//            aura.test.assertEquals("$false$test$", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("${1}testfalse20$$", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("test$false$test$", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
-        }
+        test: [function(component){
+            $A.test.assertEquals("A{0}B{1}C{2}D{3}E", $A.test.getText(component.find("bodyEmpty").getElement()), "value not expected for no body");
+            $A.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/A\s*logout\s*B\{1\}C\{2\}D\{3\}E/), "value not expected for HtmlElement substitution");            
+            $A.test.assertEquals("AhomeB{1}C{2}D{3}E", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
+            $A.test.assertEquals("AtestBfalseC20DspannedE", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("Atestfalse20B{1}C{2}D{3}E", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("testAtestBfalseC20D{3}E", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
+        }]
     },
 
     /**
@@ -94,16 +88,11 @@
      */
     testRepeatedTokens: {
         attributes : {value: "go {0} go {0} again"},
-        test: function(component){
-            aura.test.assertEquals("go test go test again", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("go testfalse20 go testfalse20 again", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("testgo test go test again", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-//            component.set("v.value", "8{0}8{0}8");
-//            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("8test8test8", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("8testfalse208testfalse208", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("test8test8test8", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
-        }
+        test: [function(component){
+            $A.test.assertEquals("go test go test again", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("go testfalse20 go testfalse20 again", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("testgo test go test again", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
+        }]
     },
 
     /**
@@ -112,12 +101,12 @@
     testTokenFormat: {
         attributes : {value: "{first}{-1}{0.1}{0day}{00}{0}"},
         test: function(component){
-            aura.test.assertEquals("{first}{-1}{0.1}{0day}{00}{0}", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution");
-            aura.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/\{first\}\{\-1\}\{0\.1\}\{0day\}\{00\}\s*logout/), "value not expected for HtmlElement substitution");
-            aura.test.assertEquals("{first}{-1}{0.1}{0day}{00}home", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
-            aura.test.assertEquals("{first}{-1}{0.1}{0day}{00}test", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("{first}{-1}{0.1}{0day}{00}testfalse20", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("test{first}{-1}{0.1}{0day}{00}test", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
+            $A.test.assertEquals("{first}{-1}{0.1}{0day}{00}{0}", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution");
+            $A.test.assertNotNull($A.test.getText(component.find("bodyHtml").getElement()).match(/\{first\}\{\-1\}\{0\.1\}\{0day\}\{00\}\s*logout/), "value not expected for HtmlElement substitution");
+            $A.test.assertEquals("{first}{-1}{0.1}{0day}{00}home", $A.test.getText(component.find("bodyComponent").getElement()), "value not expected for component substitution");
+            $A.test.assertEquals("{first}{-1}{0.1}{0day}{00}test", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("{first}{-1}{0.1}{0day}{00}testfalse20", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("test{first}{-1}{0.1}{0day}{00}test", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
         }
     },
 
@@ -127,14 +116,9 @@
     testOffsetIndex: {
         attributes : {value: "{2}"},
         test: function(component){
-            aura.test.assertEquals("20", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("{2}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("test20", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-//            component.set("v.value", "{1}{3}");
-//            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("falsespanned", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("{1}{3}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("testfalsespanned", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
+            $A.test.assertEquals("20", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("{2}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("test20", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
         }
     },
 
@@ -144,24 +128,11 @@
     testUpdateBody: {
         attributes : {value: "{0}{1}{2}{3}{4}{5}"},
         test: function(component){
-            aura.test.assertEquals("{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution");
-            aura.test.assertEquals("{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution");
-            aura.test.assertEquals("testfalse20spannedlogin{5}", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
-            aura.test.assertEquals("testfalse20{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
-            aura.test.assertEquals("testtestfalse20{3}{4}{5}", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
-
-//            component.set("v.string", "live");
-//            component.set("v.boolean", true);
-//            component.set("v.double", 2.2);
-//            component.set("v.noll", "!null");
-//            component.set("v.undefined", "!undefined");
-//            $A.renderingService.rerender(component);
-//
-//            aura.test.assertEquals("!undefined{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution after rerender");
-//            aura.test.assertEquals("!null{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution after rerender");
-//            aura.test.assertEquals("livetrue2.2spannedlogin{5}", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution after rerender");
-//            aura.test.assertEquals("livetrue2.2{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution after rerender");
-//            aura.test.assertEquals("testlivetrue2.2{3}{4}{5}", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label after rerender");
+            $A.test.assertEquals("{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution");
+            $A.test.assertEquals("{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution");
+            $A.test.assertEquals("testfalse20spannedlogin{5}", $A.test.getText(component.find("bodyProperties").getElement()), "value not expected for property substitution");
+            $A.test.assertEquals("testfalse20{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyFunction").getElement()), "value not expected for function substitution");
+            $A.test.assertEquals("testtestfalse20{3}{4}{5}", $A.test.getText(component.find("functionValue").getElement()), "value not expected for a function label");
         }
     },
 
@@ -171,12 +142,8 @@
     testUndefined: {
         attributes : {value: "one {0}{1} two"},
         test: function(component){
-            aura.test.assertEquals("one {1} two", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution");
-            aura.test.assertEquals("one test two", $A.test.getText(component.find("bodyWithUndefined").getElement()), "value not expected for undefined substitution");
-//            component.set("v.value", "a{0}b{1}c{2}d");
-//            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("aundefinedb{1}c{2}d", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution after rerender");
-//            aura.test.assertEquals("aundefinedbtestc{2}d", $A.test.getText(component.find("bodyWithUndefined").getElement()), "value not expected for undefined substitution after rerender");
+            $A.test.assertEquals("one {1} two", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution");
+            $A.test.assertEquals("one test two", $A.test.getText(component.find("bodyWithUndefined").getElement()), "value not expected for undefined substitution");
         }
     },
 
@@ -186,12 +153,8 @@
     testNull: {
         attributes : {value: "one {0}{1} two"},
         test: function(component){
-            aura.test.assertEquals("one {1} two", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution");
-            aura.test.assertEquals("one test two", $A.test.getText(component.find("bodyWithNull").getElement()), "value not expected for null substitution");
-//            component.set("v.value", "a{0}b{1}c{2}d");
-//            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("ab{1}c{2}d", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution after rerender");
-//            aura.test.assertEquals("abtestc{2}d", $A.test.getText(component.find("bodyWithNull").getElement()), "value not expected for null substitution after rerender");
+            $A.test.assertEquals("one {1} two", $A.test.getText(component.find("bodyNull").getElement()), "value not expected for null substitution");
+            $A.test.assertEquals("one test two", $A.test.getText(component.find("bodyWithNull").getElement()), "value not expected for null substitution");
         }
     },
 
@@ -201,12 +164,8 @@
     testIgnoreTextNode: {
         attributes : {value: "{0}"},
         test: function(component){
-            aura.test.assertEquals("{0}", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution");
-            aura.test.assertEquals("test", $A.test.getText(component.find("bodyWithText").getElement()), "value not expected for substitution with text");
-//            component.set("v.value", "{0} updated");
-//            $A.renderingService.rerender(component);
-//            aura.test.assertEquals("{0} updated", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution after rerender");
-//            aura.test.assertEquals("test updated", $A.test.getText(component.find("bodyWithText").getElement()), "value not expected for substitution with text after rerender");
+            $A.test.assertEquals("{0}", $A.test.getText(component.find("bodyText").getElement()), "value not expected for text node substitution");
+            $A.test.assertEquals("test", $A.test.getText(component.find("bodyWithText").getElement()), "value not expected for substitution with text");
         }
     },
 
@@ -219,10 +178,10 @@
             string: "-"
         },
         test: [function(component){
-            aura.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+            $A.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
         	component.set("v.string", "60");
         },	function(component){
-            aura.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+            $A.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
         }]
     }
 })

@@ -1,0 +1,15 @@
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <!-- global version -->
+        <script>
+            $A.storageService.setVersion("globalVersion");
+        </script>
+
+        <!-- default version from auraStorage:init -->
+        <auraStorage:init name="templateStorageDefaultVersion"/>
+
+        <!-- explicitly set version to empty string-->
+        <auraStorage:init name="templateStorageEmptyVersion" version="" />
+
+    </aura:set>
+</aura:component>

@@ -26,7 +26,7 @@ Test.Aura.Util.SizeEstimatorTest = function() {
             Style: function() {},
             Bitset: {},
             NumberFormat: {},
-            Aura: {Utils:{}},
+            Aura: {Utils:{SecureFilters:{}}},
             $A: {
                 log: function() {},
                 util: {

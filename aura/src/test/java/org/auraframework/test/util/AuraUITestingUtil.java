@@ -902,7 +902,7 @@ public class AuraUITestingUtil {
      */
     public boolean hasScrollBar(String elementClassName) {
         String js = "var elementBody = $A.test.getElementByClass('" + elementClassName
-                + "')[0];return (elementBody.scrollHeight !== elementBody.offsetHeight);";
+                + "')[0];return (elementBody.scrollHeight > this.innerHeight);";
         boolean hasScroll = this.getBooleanEval(js);
         return hasScroll;
     }

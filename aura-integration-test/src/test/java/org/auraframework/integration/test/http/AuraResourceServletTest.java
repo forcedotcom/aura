@@ -595,6 +595,7 @@ public class AuraResourceServletTest extends AuraTestCase {
             handleServletException(servlet, exception, true, mockContext, mockRequest, mockResponse, true);
 
             Mockito.verify(mockResponse).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            Mockito.verify(mockContextService, atLeastOnce()).endContext();
         } finally {
             ServiceLocatorMocker.unmockServiceLocator();
         }
@@ -602,6 +603,8 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     /**
      * Verifies first exception within handleServletException is caught and processed
+     * we throw 'EmptyStackException' when getting InstanceStack, then verify
+     * Aura.getExceptionAdapter().handleException(death) is called with it
      */
     public void testHandleExceptionDeathCaught() throws Exception {
         try {
@@ -638,6 +641,7 @@ public class AuraResourceServletTest extends AuraTestCase {
             assertTrue("Should handle EmptyStackException", handledException.getValue() instanceof EmptyStackException);
 
             Mockito.verify(mockResponse, atLeastOnce()).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            Mockito.verify(mockContextService, atLeastOnce()).endContext();
         } finally {
             ServiceLocatorMocker.unmockServiceLocator();
         }
@@ -645,6 +649,9 @@ public class AuraResourceServletTest extends AuraTestCase {
 
     /**
      * Verifies second exception within handleServletException is caught and processed
+     * we throw 'EmptyStackException' when getting InstanceStack, when
+     * Aura.getExceptionAdapter().handleException(death) handle the exception, 
+     * we throw second exception, then verify we printout the error message to response's writer
      */
     public void testHandleExceptionDoubleDeathCaught() throws Exception {
         try {
@@ -683,6 +690,7 @@ public class AuraResourceServletTest extends AuraTestCase {
 
             assertEquals(ccmeMsg, exceptionMessage.getValue());
             Mockito.verify(mockResponse, atLeastOnce()).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            Mockito.verify(mockContextService, atLeastOnce()).endContext();
         } finally {
             ServiceLocatorMocker.unmockServiceLocator();
         }

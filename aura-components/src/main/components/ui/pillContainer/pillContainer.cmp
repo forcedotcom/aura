@@ -55,6 +55,7 @@
                     <ui:pill aura:id="pill" aura:flavor="{!v.pillFlavor}"
                              iconUrl="{!item.icon.url}"
                              iconBackgroundColor="{!item.icon.backgroundColor}"
+                             iconAlt="{!item.icon.alt}"
                              label="{!item.label}"
                              id="{!item.id}"
                              showDelete="{!v.allowRemove}"

@@ -15,7 +15,7 @@
  */
 ({
     PILLS: [
-        {id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF'}},
+        {id:'pill01',label:"Test Pill 01",icon: {url:'https://ipsumimage.appspot.com/20x20,8888ff?l=1&f=FFFFFF', alt:'pill 01'}},
         {id:'pill02',label:"Test Pill 02",icon: {url:'https://ipsumimage.appspot.com/20x20,ff88cc?l=2&f=FFFFFF'}},
         {id:'pill03',label:"Test Pill 03",icon: {url:'https://ipsumimage.appspot.com/20x20,88cc88?l=3&f=FFFFFF'}}],
     PILLS_CASEINSENSITIVE: [{id:'pill01',label:"TEST PILL 01"},{id:'pill02',label:"TEST PILL 02"},{id:'pill03',label:"Test PILL 03"}],
@@ -51,6 +51,24 @@
         $A.test.assertEquals(1, actualNumberOfPills, "Incorrect number of pills displayed.");
         this._validateIconURLIsPresent(cmp, actualNumberOfPills);
         this._validateTitlePresentInPill(pillItem[0], isTitlePresent, pill.label);
+    },
+
+    testPillIconInformational: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems([this.PILLS[0]]);
+            var pillIcons = $A.test.select(".pillIcon img");
+            $A.test.assertEquals(this.PILLS[0].icon.alt,$A.test.getElementAttributeValue(pillIcons[0], "alt"),"pill icon should have alt attribute");
+        }
+    },
+
+    testPillIconDecorative: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems([this.PILLS[1]]);
+            var pillIcons = $A.test.select(".pillIcon img");
+            $A.test.assertEquals( "", $A.test.getElementAttributeValue(pillIcons[0], "alt"),"pill icon should not have alt attribute");
+        }
     },
     
     testDoNotDisplayDeleteIconInPills: {

@@ -22,10 +22,10 @@ import java.util.Arrays;
 
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
-import org.auraframework.test.util.AuraTestCase;
+import org.auraframework.util.test.util.UnitTestCase;
 import org.auraframework.util.text.Hash;
 
-public class SourceTest extends AuraTestCase {
+public class SourceTest extends UnitTestCase {
     private final static int DEFAULT_HASHCODE = 3;
 
     public SourceTest(String name) throws NoSuchAlgorithmException {

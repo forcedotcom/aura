@@ -61,8 +61,8 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         if (m.find()) {
             url = m.group(1);
         }
-        if( (expectNull == false)&&(url == null) ) {
-        	fail("getManifestURL fail to get valid url, appPath:"+appPath+"\n responseBody:"+responseBody+"\n");
+        if ((expectNull == false) && (url == null)) {
+            fail("getManifestURL fail to get valid url, appPath:"+appPath+"\n responseBody:"+responseBody+"\n");
         }
         return url;
     }
@@ -200,7 +200,7 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
     @ThreadHostileTest("disables AppCache")
     public void testGetManifestWithAppCacheDisabled() throws Exception {
         setHttpUserAgent(APPCACHE_SUPPORTED_USERAGENT);
-        ServletConfigController.setAppCacheDisabled(true);
+        ServletConfigController.setAppCacheDisabled(Boolean.TRUE);
         String manifest = getManifestURL("/appCache/withpreload.app", true);
         if (manifest != null) {
             fail("no manifest url should be present, but got: " + manifest);

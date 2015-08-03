@@ -925,7 +925,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * Gets all the component class definitions for this component definition.
      * Returns a string of all the client component classes wrapped in a closure for later execution.
      */
-    @SuppressWarnings("null")
     @Override
     public String getComponentClass() throws QuickFixException, IOException {
 
@@ -936,7 +935,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             ClientComponentClass clientClass;
 
             sb.append("function(){");
-            while(descriptor != null && !"markup://aura:component".equals(name)) {
+            while(!"markup://aura:component".equals(name)) {
                 clientClass = new ClientComponentClass(descriptor);
                 clientClass.writeComponentClass(sb);
 

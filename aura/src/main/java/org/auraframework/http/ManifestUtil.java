@@ -35,11 +35,11 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.net.HttpHeaders;
 
 /**
- * A set of static http servlet utilities.
+ * A set of manifest utilities.
  *
  * No state is kept in this utility class, and it cannot be instantiated.
  */
-public abstract class ManifestUtil {
+public class ManifestUtil {
     /**
      * An error parameter that causes a double fail.
      */
@@ -72,10 +72,12 @@ public abstract class ManifestUtil {
      */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
 
+    public ManifestUtil() { }
+
     /**
      * Check to see if we allow appcache on the current request.
      */
-    public static boolean isManifestEnabled(HttpServletRequest request) {
+    public boolean isManifestEnabled(HttpServletRequest request) {
     	final String userAgent = request.getHeader(HttpHeaders.USER_AGENT);
         if (userAgent != null && !userAgent.toLowerCase().contains("applewebkit")) {
             return false;
@@ -87,7 +89,7 @@ public abstract class ManifestUtil {
     /**
      * Is AppCache allowed by the current configuration?
      */
-    public static boolean isManifestEnabled() {
+    public boolean isManifestEnabled() {
         if (!Aura.getConfigAdapter().isClientAppcacheEnabled()) {
             return false;
         }
@@ -122,7 +124,7 @@ public abstract class ManifestUtil {
      * @param incoming the cookie from the client.
      * @return either an updated cookie, or null if it was invalid.
      */
-    public static String updateManifestCookieValue(String incoming) {
+    public String updateManifestCookieValue(String incoming) {
         int manifestRequestCount = 0;
         long now = System.currentTimeMillis();
         long cookieTime = now;
@@ -170,7 +172,7 @@ public abstract class ManifestUtil {
      *
      * @return the name (null if none)
      */
-    private static String getManifestCookieName() {
+    private String getManifestCookieName() {
         AuraContext context = Aura.getContextService().getCurrentContext();
         if (context.getApplicationDescriptor() != null) {
             StringBuilder sb = new StringBuilder();
@@ -187,7 +189,7 @@ public abstract class ManifestUtil {
         return null;
     }
 
-    private static void addCookie(HttpServletResponse response, String name, String value, long expiry) {
+    private void addCookie(HttpServletResponse response, String name, String value, long expiry) {
         if (name != null) {
             Cookie cookie = new Cookie(name, value);
             cookie.setPath("/");
@@ -203,14 +205,14 @@ public abstract class ManifestUtil {
      * @param value the value to set.
      * @param expiry the expiry time for the cookie.
      */
-    private static void addManifestCookie(HttpServletResponse response, String value, long expiry) {
+    private void addManifestCookie(HttpServletResponse response, String value, long expiry) {
         String cookieName = getManifestCookieName();
         if (cookieName != null) {
             addCookie(response, cookieName, value, expiry);
         }
     }
 
-    public static Cookie getManifestCookie(HttpServletRequest request) {
+    public Cookie getManifestCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             String cookieName = getManifestCookieName();
@@ -226,11 +228,11 @@ public abstract class ManifestUtil {
         return null;
     }
 
-    public static void addManifestErrorCookie(HttpServletResponse response) {
+    public void addManifestErrorCookie(HttpServletResponse response) {
         addManifestCookie(response, MANIFEST_ERROR, SHORT_EXPIRE_SECONDS);
     }
 
-    public static void deleteManifestCookie(HttpServletResponse response) {
+    public void deleteManifestCookie(HttpServletResponse response) {
         addManifestCookie(response, "", 0);
     }
 
@@ -244,7 +246,7 @@ public abstract class ManifestUtil {
      * @param response the response (for the outgoing cookie and status)
      * @return false if the caller should bolt because we already set the status.
      */
-    public static boolean checkManifestCookie(HttpServletRequest request, HttpServletResponse response) {
+    public boolean checkManifestCookie(HttpServletRequest request, HttpServletResponse response) {
         Cookie cookie = getManifestCookie(request);
         String cookieString = null;
 
@@ -279,7 +281,7 @@ public abstract class ManifestUtil {
      *
      * @return a string for the manifest URL.
      */
-    public static String getManifestUrl() throws QuickFixException {
+    public String getManifestUrl() throws QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         String contextPath = context.getContextPath();
         String ret = "";

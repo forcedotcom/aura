@@ -173,9 +173,12 @@ public class AbstractActionImplTest extends UnitTestCase {
         Mockito.verifyNoMoreInteractions(logger);
 
         test = new MyAction(null, def, null);
-        assertEquals("params can be initialized to null", null, test.getParams());
+        // Rebuild logger to check the logging correctly.
+        logger = Mockito.mock(LoggingContext.KeyValueLogger.class);
+        assertEquals("null params results in empty params", 0, test.getParams().size());
         test.logParams(logger);
-        // params of null should avoid calls to the logger.
+        Mockito.verify(logger, Mockito.times(1)).log("a", "null");
+        Mockito.verify(logger, Mockito.times(1)).log("b", "null");
         Mockito.verifyNoMoreInteractions(logger);
     }
 

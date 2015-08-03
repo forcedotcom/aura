@@ -67,6 +67,7 @@ public class AuraRewriteFilter implements Filter {
 
         String path = request.getRequestURI().substring(request.getContextPath().length());
         String qs = request.getQueryString();
+        request.setAttribute(AuraResourceServlet.ORIG_REQUEST_URI, path);
 
         String newUri = null;
         Matcher pubMatcher = publicPattern.matcher(path);

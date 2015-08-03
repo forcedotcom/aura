@@ -22,6 +22,7 @@ import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.DefinitionParserAdapter;
 import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.LocalizationAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
@@ -167,6 +168,13 @@ public class Aura {
      */
     public static StyleAdapter getStyleAdapter() {
         return Aura.get(StyleAdapter.class);
+    }
+
+    /**
+     * Get the Servlet Util Adapter: Used to provide overrides for servlet functionality.
+     */
+    public static ServletUtilAdapter getServletUtilAdapter() {
+        return Aura.get(ServletUtilAdapter.class);
     }
 
     /**

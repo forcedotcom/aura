@@ -49,7 +49,7 @@ public class AuraValidationServlet extends AuraBaseServlet {
         try {
             handle(request, response);
         } catch (Exception ex) {
-            handleServletException(ex, false, context, request, response, false);
+            Aura.getServletUtilAdapter().handleServletException(ex, false, context, request, response, false);
         } finally {
             ValidationUtil.endValidationContext();
         }

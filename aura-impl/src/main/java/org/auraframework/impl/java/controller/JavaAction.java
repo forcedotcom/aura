@@ -61,6 +61,7 @@ public class JavaAction extends AbstractActionImpl<JavaActionDef> {
         Class<?>[] javaParams = actionDef.getJavaParams();
         Object[] args = new Object[javaParams.length];
         int i = 0;
+
         for (ValueDef valueDef : actionDef.getParameters()) {
             Object param = paramValues.get(valueDef.getName());
             try {

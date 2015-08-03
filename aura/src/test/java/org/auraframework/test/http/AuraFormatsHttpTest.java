@@ -33,6 +33,8 @@ import org.auraframework.util.json.JsonEncoder;
 
 /**
  * Test class to perform sanity tests on AuraServlet with all possible modes.
+ *
+ * This should be killed.
  * 
  * @hierarchy Aura.Configuration
  * @priority high
@@ -144,45 +146,30 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         for (Format format : Format.values()) {
             switch (format) {
             case JSON:
-                // Valid preload namespace
-                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.json?aura.token=+"
-                        + getTestServletConfig().getCsrfToken();
-                getOnAuraResourceServlet(format, url);
-
-                // Cause exception by not specifying CSRF token
-                // The response looks much like a JSON string as much as it
-                // looks like a piece of JS
-                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.json";
-                getOnAuraResourceServlet(format, url);
-
                 break;
             case HTML:// No implementation for this format
                 break;
             case JS:
-                // Valid preload namespace
-                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_SimpleApplication'}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.js";
                 getOnAuraResourceServlet(format, url);
 
                 // Bad preload namespace, should cause an exception in
                 // AuraResourceServlet.
                 // But the response should still be in JavaScript mime type
-                modeAndPreload = "{'mode':'DEV','preloads':['test']}";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_IDontExist'}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.js";
                 getOnAuraResourceServlet(format, url);
                 break;
             case CSS:
-                // Valid preload namespace
-                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_SimpleApplication'}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.css";
                 getOnAuraResourceServlet(format, url);
 
                 // Bad preload namespace, should cause an exception in
                 // AuraResourceServlet.
                 // But the response should still be in CSS mime type
-                modeAndPreload = "{'mode':'DEV','preloads':['test']}";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_IDontExist'}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.css";
                 getOnAuraResourceServlet(format, url);
                 break;
@@ -194,15 +181,15 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 break;
             case SVG:
                 // Valid preload namespace
-                modeAndPreload = "{'mode':'DEV','preloads':['preloadTest']}";
-                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.svg";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_SimpleApplication'}";
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/resources.svg";
                 getOnAuraResourceServlet(format, url);
 
                 // Bad preload namespace, should cause an exception in
                 // AuraResourceServlet.
                 // But the response should still be in SVG mime type
-                modeAndPreload = "{'mode':'DEV','preloads':['test']}";
-                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/app.svg";
+                modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_IDontExist'}";
+                url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/resources.svg";
                 getOnAuraResourceServlet(format, url);
                 break;
             default:

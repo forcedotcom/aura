@@ -28,6 +28,7 @@ import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.adapter.PrefixDefaultsAdapter;
 import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.impl.BuilderServiceImpl;
@@ -49,6 +50,7 @@ import org.auraframework.impl.adapter.ConfigAdapterImpl;
 import org.auraframework.impl.adapter.DefinitionParserAdapterImpl;
 import org.auraframework.impl.adapter.GlobalValueProviderAdapterImpl;
 import org.auraframework.impl.adapter.JsonSerializerAdapterImpl;
+import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
 import org.auraframework.impl.adapter.StyleAdapterImpl;
 import org.auraframework.impl.adapter.format.css.ClientLibraryCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
@@ -62,7 +64,6 @@ import org.auraframework.impl.adapter.format.html.ComponentHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ThrowableHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.embedded.ApplicationDefEmbeddedHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.offline.ApplicationDefOfflineHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ClientLibraryJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ComponentDefJSFormatAdapter;
 import org.auraframework.impl.adapter.format.js.ThrowableJSFormatAdapter;
@@ -130,11 +131,6 @@ public class AuraImplConfig {
     @Impl
     public static FormatAdapter<?> applicationDefEmbeddedHTMLFormatAdapter() {
         return new ApplicationDefEmbeddedHTMLFormatAdapter();
-    }
-
-    @Impl
-    public static FormatAdapter<?> applicationDefOfflineHTMLFormatAdapter() {
-        return new ApplicationDefOfflineHTMLFormatAdapter();
     }
 
     @Impl
@@ -447,6 +443,11 @@ public class AuraImplConfig {
     @Impl
     public static BeanAdapter auraImplBeanAdapter() {
         return new BeanAdapterImpl();
+    }
+
+    @Impl
+    public static ServletUtilAdapter servletUtilAdapter() {
+        return new ServletUtilAdapterImpl();
     }
 
     @Impl

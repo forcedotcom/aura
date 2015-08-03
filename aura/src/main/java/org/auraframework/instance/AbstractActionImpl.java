@@ -27,6 +27,9 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+import javax.annotation.Nonnull;
 
 public abstract class AbstractActionImpl<T extends ActionDef> implements Action {
     public AbstractActionImpl(DefDescriptor<ControllerDef> controllerDescriptor, T actionDef,
@@ -34,7 +37,12 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
         this.state = State.NEW;
         this.actionDef = actionDef;
         this.controllerDescriptor = controllerDescriptor;
+        if (paramValues == null) {
+            // Don't allow params to be null.
+            paramValues = Maps.newHashMap();
+        }
         this.paramValues = paramValues;
+        this.actions = Lists.newArrayList();
     }
 
     @Override
@@ -49,17 +57,11 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
 
     @Override
     public void add(List<Action> newActions) {
-        if (actions == null) {
-            actions = Lists.newArrayList();
-        }
         actions.addAll(newActions);
     }
 
     @Override
     public List<Action> getActions() {
-        if (actions == null) {
-            return Collections.emptyList();
-        }
         return Collections.unmodifiableList(actions);
     }
 
@@ -108,7 +110,7 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
     @Override
     public void logParams(KeyValueLogger logger) {
         List<String> loggableParams = actionDef.getLoggableParams();
-        if (paramValues != null && loggableParams != null) {
+        if (loggableParams != null) {
             for (String paramName : loggableParams) {
                 logger.log(paramName, String.valueOf(paramValues.get(paramName)));
             }
@@ -138,22 +140,22 @@ public abstract class AbstractActionImpl<T extends ActionDef> implements Action 
         this.callingDescriptor = Aura.getDefinitionService().getDefDescriptor(desc, ComponentDef.class);
     }
 
-	@Override
-	public String getCallerVersion() {
-		return this.callerVersion;
-	}
+    @Override
+    public String getCallerVersion() {
+        return this.callerVersion;
+    }
 
-	@Override
-	public void setCallerVersion(String callerVersion) {
-		this.callerVersion = callerVersion;
-	}
+    @Override
+    public void setCallerVersion(String callerVersion) {
+        this.callerVersion = callerVersion;
+    }
 
     private String actionId;
-    private List<Action> actions = null;
+    @Nonnull private final List<Action> actions;
     private boolean storable;
     private InstanceStack instanceStack;
 
-    protected final Map<String, Object> paramValues;
+    @Nonnull protected final Map<String, Object> paramValues;
     protected final DefDescriptor<ControllerDef> controllerDescriptor;
     protected final T actionDef;
     protected State state;

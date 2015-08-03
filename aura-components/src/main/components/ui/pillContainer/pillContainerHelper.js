@@ -160,10 +160,7 @@
         // If the input doesn't exist we wrap around to the beginning of the list
         // If index is < 0 then it means we wrap around to the last item
         if (index >= itemsArray.length) {
-            var pillInput = cmp.get("v.pillInput");
-            if (!$A.util.isEmpty(pillInput)) {
-                this.focusOnInputBox(cmp);
-            } else {
+            if (!this.focusOnInputBox(cmp)) {
                 itemsArray[0].focus();
             }
         } else if (index < 0) {
@@ -174,6 +171,7 @@
     },
 
     focusOnInputBox: function(cmp) {
+        var focused = false;
         var pillInput = cmp.get("v.pillInput");
         var itemsLength = cmp.get("v.items").length
         var maxAllowed = cmp.get("v.maxAllowed");
@@ -187,7 +185,9 @@
             this.setInputWidth(cmp, pillInput);
 
             pillInput[0].focus();
+            focused = true;
         }
+        return focused;
     },
 
     setInputWidth: function(cmp, pillInput) {

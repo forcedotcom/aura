@@ -156,6 +156,13 @@
 		}
 	},
 	
+	renderGrid: function(cmp, evt, helper) {
+		$A.renderingService.render(cmp.find("grid"), cmp.find("container").getElement());
+	},
+	unrenderGrid: function(cmp, evt, helper) {
+		$A.renderingService.unrender(cmp.find("grid"));
+	},
+	
 	/**
 	 * Row Attribute Update Handlers
 	 */

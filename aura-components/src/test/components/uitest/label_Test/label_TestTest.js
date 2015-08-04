@@ -259,5 +259,36 @@
      	    var currLabelTextClass = labelElement[0].getElementsByTagName('span')[0].getAttribute("class");
      	    $A.test.assertEquals("assistiveText", currLabelTextClass, "New label was not populated through");    	    
     	}]
+    },
+
+    /**
+     * Return labelId for label
+     */
+    testDestroyingLabelDoesNotLeakMemory: {
+        test : [function(component) {
+            var labelCmp = component.find("destroyLabel");
+            $A.test.assertDefined(labelCmp, "label is undefined");
+            labelCmp.destroy();
+            $A.test.assertUndefined(component.find("labelText"),
+                "label text node should have been destroyed");
+        },
+        function(component) {
+            var labelCmp = component.find("destroyLabelHidden");
+            $A.test.assertDefined(labelCmp, "label is undefined");
+            labelCmp.destroy();
+            $A.test.assertUndefined(component.find("labelTextHidden"),
+                "label text node should have been destroyed");
+        },
+        function(component) {
+            var labelCmp = component.find("destroyLabelNested");
+            $A.test.assertDefined(labelCmp, "label is undefined");
+            labelCmp.destroy();
+            $A.test.assertUndefined(component.find("labelTextInnermost"),
+                "label text node should have been destroyed");
+            $A.test.assertUndefined(component.find("destroyLabelInner"),
+                "inner label cmp should have been destroyed");
+            $A.test.assertUndefined(component.find("destroyLabelInnermost"),
+                "innermost label cmp should have been destroyed");
+        }]
     }
 })

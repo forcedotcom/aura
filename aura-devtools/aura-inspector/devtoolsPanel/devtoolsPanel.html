@@ -1,41 +1,42 @@
 <html>
-	<head>
-		<link rel="stylesheet" type="text/css" href="devtoolsPanel.css" media="screen">
+    <head>
+        <link rel="stylesheet" type="text/css" href="devtoolsPanel.css" media="screen">
+    </head>
+    <body>
+        <div id="loading">
+            <div class="spinner">
+              <div class="cube1"></div>
+              <div class="cube2"></div>
+            </div>
+            <div class="opaque"></div>
+        </div>
 
-	</head>
-	<body>
-		<div id="loading">
-			<div class="spinner">
-			  <div class="cube1"></div>
-			  <div class="cube2"></div>
-			</div>
-			<div class="opaque"></div>
-		</div>
-
-		<header class="tabs"></header>
+        <header class="tabs"></header>
 
 
-		<!-- Perf Tools from Diego -->
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/inspector.css">
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/profilesPanel.css">
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/flameChart.css">
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/dataGrid.css">
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/splitView.css">
-		<link rel="stylesheet" type="text/css" href="perfpanel/css/custom.css">
+        <!-- Perf Tools from Diego -->
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/inspector.css">
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/profilesPanel.css">
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/flameChart.css">
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/dataGrid.css">
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/splitView.css">
+        <link rel="stylesheet" type="text/css" href="perfpanel/css/custom.css">
 
-		<script type="text/javascript" src="perfpanel/js/Main.js"></script>
-		<script type="text/javascript" src="perfpanel/js/ProfilesPanel.js"></script>
-		<script type="text/javascript" src="perfpanel/js/AuraPerfPanel.js"></script>
+        <script type="text/javascript" src="perfpanel/js/Main.js"></script>
+        <script type="text/javascript" src="perfpanel/js/ProfilesPanel.js"></script>
+        <script type="text/javascript" src="perfpanel/js/AuraPerfPanel.js"></script>
 
-		<!-- DevTools Scripts -->
-		<script src="optionsProxy.js"></script>
-		<script src="treeview.js"></script>
-		<script src="AuraInspectorPerformanceView.js"></script>
-		<script src="AuraInspectorComponentTree.js"></script>
-		<script src="AuraInspectorComponentView.js"></script>
-		<script src="AuraInspectorTransactionView.js"></script>
-		<script src="AuraInspectorEventLog.js"></script>
+        <!-- DevTools Scripts -->
+        <script src="optionsProxy.js"></script>
+        <script src="treeview.js"></script>
+        <script src="renderJson.js"></script>
+        <script src="AuraInspectorPerformanceView.js"></script>
+        <script src="AuraInspectorComponentTree.js"></script>
+        <script src="AuraInspectorComponentView.js"></script>
+        <script src="AuraInspectorTransactionView.js"></script>
+        <script src="AuraInspectorEventLog.js"></script>
+        <script src="AuraInspectorStorageView.js"></script>
 
-		<script src="devtoolsPanel.js"></script>
-	</body>
+        <script src="devtoolsPanel.js"></script>
+    </body>
 </html>

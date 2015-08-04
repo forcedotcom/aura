@@ -1,14 +1,14 @@
 (function(global){
 
-    // Initialize    
+    // Initialize
     var inspector = new AuraInspectorContentScript();
         inspector.init();
         //inspector.addEventLogMessage("AuraDevTools: Content Script Loaded");
-        
+
     global.AuraInspector = global.AuraInspector || {};
     global.AuraInspector.ContentScript = inspector;
 
-    
+
     function AuraInspectorContentScript(){
         var runtime = null;
 
@@ -24,7 +24,7 @@
             // Inject the script that will talk with the $A services.
             var src = chrome.extension.getURL('AuraInspectorInjectedScript.js');
             var scriptElement = global.document.createElement("script");
-            scriptElement.src = src;            
+            scriptElement.src = src;
             scriptElement.onload = function() {
                 this.parentNode.removeChild(this);
             };
@@ -41,7 +41,7 @@
         this.init = function(){
             this.connect();
             this.injectBootstrap();
-            
+
             // Simply catches publish commands and passes them to the AuraInspector
             window.addEventListener("message", Handler_OnWindowMessage);
 
@@ -93,16 +93,16 @@
 
         function Handler_OnWindowMessage(event){
             // Don't handle messages from myself.
-            if(event.data.action == "AuraInspector:publish") {
+            if(runtime && event.data.action === "AuraInspector:publish") {
                 runtime.postMessage(event.data);
             }
         }
-        
+
         function Handler_OnRuntimeMessage(event){
-            if(event && event.data && event.data.action == "AuraInspector:publish") {
+            if(event && event.data && event.data.action === "AuraInspector:publish") {
                 window.postMessage(event.data);
             }
         }
-        
+
     }
 })(this);

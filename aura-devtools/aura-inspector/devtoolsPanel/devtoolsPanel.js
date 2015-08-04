@@ -1,8 +1,7 @@
-
 (function(global){
     /**
      * You can use the publish and subscribe methods to broadcast messages through to the end points of the architecture.
-     * The majority of the work is done in the devtoolsPanel and the AuraInspectorInjectedScript. So you'll usually want 
+     * The majority of the work is done in the devtoolsPanel and the AuraInspectorInjectedScript. So you'll usually want
      * to communicate between those two layers.
      *
      *
@@ -11,13 +10,14 @@
      *      |------------------------------------------------------^
      *
      * The messages you can publish and subscribe to are
-     * 
+     *
      * AuraInspector:OnBootstrap                    $A is available and we are just about to run $A.initAsync
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
      * AuraInspector:ConsoleLog                     Show a log message in the event log panel. You should count on this changing how it gets exposed in the UI.
      * Transactions:OnTransactionEnd                Transaction has ended and should now be added to the UI.
+     * AuraInspector:StorageData                    Aura Storage Service has async fetched data to show in the storage panel.
      */
 
 
@@ -26,11 +26,11 @@
     // Connects to content script
     // and draws the panels.
     panel.init();
-    
+
     // Probably the default we want
     AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
         if(!panel.hasPanel(options["activePanel"])) {
-            // If the panel we are switching to doesn't exist, use the 
+            // If the panel we are switching to doesn't exist, use the
             // default which is the transaction panel.
             options["activePanel"] = "transaction";
         }
@@ -43,7 +43,7 @@
         var runtime = null;
         var actions = new Map();
         // For Drawing the Tree, eventually to be moved into it's own component
-        var nodeId = 0; 
+        var nodeId = 0;
         var events = new Map();
         var panels = new Map();
         var _name = "AuraInspectorDevtoolsPanel" + Date.now();
@@ -58,8 +58,8 @@
             runtime = chrome.runtime.connect({"name": _name });
             runtime.onMessage.addListener(DevToolsPanel_OnMessage.bind(this));
 
-            // AuraInspector:publish is the only thing we listen for anymore. 
-            // We broadcast one publish message everywhere, and then we have subscribers. 
+            // AuraInspector:publish is the only thing we listen for anymore.
+            // We broadcast one publish message everywhere, and then we have subscribers.
             runtime.postMessage({subscribe : ["AuraInspector:publish"], port: runtime.name, tabId: tabId });
         };
 
@@ -75,18 +75,21 @@
             var header = document.querySelector("header.tabs");
             header.addEventListener("click", HeaderActions_OnClick.bind(this));
 
-            // Allows us to toggle the panels based on the mode.
-            
+            // Setup json->html renderer
+            renderjson.set_icons('+', '-').set_show_to_level(1);
+
             // Initialize Panels
             var eventLog = new AuraInspectorEventLog(this);
             var tree = new AuraInspectorComponentTree(this);
             var perf = new AuraInspectorPerformanceView(this);
             var transaction = new AuraInspectorTransactionView(this);
+            var storage = new AuraInspectorStorageView(this);
 
-            this.addPanel("component-tree", tree, "Component Tree");            
+            this.addPanel("component-tree", tree, "Component Tree");
             this.addPanel("performance", perf, "Performance");
             this.addPanel("transaction", transaction, "Transactions");
-            this.addPanel("event-log", eventLog, "Event Log")
+            this.addPanel("event-log", eventLog, "Event Log");
+            this.addPanel(storage.panelId, storage, "Storage");
 
             // Sidebar Panel
             // The AuraInspectorComponentView adds the sidebar class
@@ -97,7 +100,7 @@
 
         /**
          * Adds a tab for the panel interface.
-         * 
+         *
          * @param {String} key unique identifier for the panel.
          * @param {Object} panel Instance of the panel you are adding.
          * @param {String} title The label which goes in the Tab to select for the panel.
@@ -112,7 +115,7 @@
                 if(title) {
                     var tabHeader = document.createElement("button");
                         tabHeader.appendChild(document.createTextNode(title));
-                        tabHeader.id = "tabs-" + key;                    
+                        tabHeader.id = "tabs-" + key;
 
                     var tabs = document.querySelector("header.tabs");
                         tabs.appendChild(tabHeader);
@@ -128,7 +131,6 @@
 
         /*
          * Which panel to show to the user in the dev tools.
-         * Currently: Component Tree (component-tree), and Event Log (event-log)
          */
         this.showPanel = function(key) {
             if(!key) { return; }
@@ -147,7 +149,7 @@
                 }
             }
 
-            // Render the output. Panel is responsibile for not redrawing if necessary.
+            // Render the output. Panel is responsible for not redrawing if necessary.
             var current = panels.get(panelKey);
             if(current) {
                 current.render();
@@ -156,17 +158,17 @@
             AuraInspectorOptions.set("activePanel", panelKey);
         };
 
-        /** 
-         * Check if a panel exists. 
+        /**
+         * Check if a panel exists.
          * Depending on the mode, some panels will not be added.
          */
         this.hasPanel = function(key) {
             return panels.has(key);
-        }
+        };
 
         /**
          * Broadcast a message to a listener at any level in the inspector. Including, the InjectedScript, the ContentScript or the DevToolsPanel object.
-         * 
+         *
          * @param  {String} key MessageID to broadcast.
          * @param  {Object} data any type of data to pass to the subscribe method.
          */
@@ -193,7 +195,7 @@
 
         /**
          * Listen for a published message through the system.
-         * 
+         *
          * @param  {String} key Unique MessageId that would be broadcast through the system.
          * @param  {Function} callback function to be executed when the message is published.
          */
@@ -218,7 +220,7 @@
         this.showSidebar = function() {
             document.body.classList.add("sidebar-visible");
         };
-        
+
         /**
          * Shows the little spinning blocks.
          */
@@ -234,12 +236,12 @@
         };
 
         /**
-         * Gets the mode that Aura is running in. Usually either DEV or PROD. 
+         * Gets the mode that Aura is running in. Usually either DEV or PROD.
          * Try to avoid using this method and try to get everything working in production mode.
-         * 
-         * @param  {Function} callback Since the eval call to get the value is async, you need to provide a callback which has the value as the first parameter to process the mode. 
-         * 
-         * @example 
+         *
+         * @param  {Function} callback Since the eval call to get the value is async, you need to provide a callback which has the value as the first parameter to process the mode.
+         *
+         * @example
          * this.getMode(function(mode){ console.log("The mode is: " + mode)});
          */
         this.getMode = function(callback) {
@@ -247,22 +249,22 @@
         };
 
 
-        /* 
+        /*
          =========== BEGIN REFACTOR! ===============
          Can we move some of these to the individual panels themselves?
          */
         this.highlightElement = function(globalId) {
-            this.publish("AuraInspector:OnHighlightComponent", globalId)
+            this.publish("AuraInspector:OnHighlightComponent", globalId);
         };
 
         this.removeHighlightElement = function() {
-            this.publish("AuraInspector:OnHighlightComponentEnd")
+            this.publish("AuraInspector:OnHighlightComponentEnd");
         };
 
         this.addLogMessage = function(msg) {
             this.publish("AuraInspector:ConsoleLog", msg);
         };
-        
+
         this.updateComponentTree = function(json) {
             this.addLogMessage("Updating Component Tree");
             this.showLoading();
@@ -279,13 +281,13 @@
                 (json);
             `;
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-                if(exceptionInfo) { 
+                if(exceptionInfo) {
                     this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo); 
+                    console.error(exceptionInfo);
                 }
                 if(!response) { return; }
                 var tree = JSON.parse(response);
-                
+
                 // RESOLVE REFERENCES
                 tree = ResolveJSONReferences(tree);
 
@@ -307,13 +309,13 @@
             `;
 
             chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
-                if(exceptionInfo) { 
+                if(exceptionInfo) {
                     this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo); 
+                    console.error(exceptionInfo);
                 }
                 if(!response) { return; }
                 var tree = JSON.parse(response);
-                
+
                 // RESOLVE REFERENCES
                 tree = ResolveJSONReferences(tree);
 
@@ -321,11 +323,20 @@
             }.bind(this));
         };
 
+        this.updateCacheViewer = function(panelId, key, command) {
+            this.showLoading();
+            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { return; }
+                panels.get(panelId).setData(key, response);
+                this.hideLoading();
+            }.bind(this));
+        };
 
         /**
          * Localized Events.
          * Should probably just move to the publish and subscribe methods.
-         */ 
+         */
         this.attach = function(eventName, eventHandler) {
             if(!events.has(eventName)) {
                 events.set(eventName, new Set());
@@ -348,14 +359,14 @@
 
 
         /**
-         * Should show a message of a different type obviously. 
+         * Should show a message of a different type obviously.
          */
         //KRIS: I'm not convinced we should be using the event log as a console. It's supposed to be a running tally of the AuraEvent's being fired.
         this.addErrorMessage = function(msg) {
             panels.get("event-log").addLogItem(msg);
         };
 
-        /* 
+        /*
          =========== END REFACTOR! ===============
          */
 
@@ -390,12 +401,12 @@
 
             if(!message.scriptUrl) {
                 this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
-                return;                
+                return;
             }
 
-            // If we don't have this check, anyone one the web page who 
+            // If we don't have this check, anyone one the web page who
             // reverse enginers our plugin could add a panel to the aura inspector
-            // in which case they would have full access to the page. 
+            // in which case they would have full access to the page.
             // By limiting it to chrome-extension url's only, we are assuming
             // the extension trying to add the panel is already trusted and has access to the page.
             if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
@@ -430,7 +441,7 @@
         /* PRIVATE */
         function stripDescriptorProtocol(descriptor) {
             if(typeof descriptor != 'string') { return descriptor; }
-            if(descriptor.indexOf("://") === -1) { 
+            if(descriptor.indexOf("://") === -1) {
                 return descriptor;
             }
             return descriptor.split("://")[1];
@@ -438,7 +449,7 @@
 
         function ResolveJSONReferences(object) {
             if(!object) { return object; }
-            
+
             var count = 0;
             var serializationMap = new Map();
             var unresolvedReferences = [];
@@ -447,7 +458,7 @@
                 if(!current) { return current; }
                 if(typeof current === "object") {
                     if(current.hasOwnProperty("$serRefId")) {
-                        if(serializationMap.has(current["$serRefId"])) { 
+                        if(serializationMap.has(current["$serRefId"])) {
                             return serializationMap.get(current["$serRefId"]);
                         } else {
                             // Probably Out of order, so we'll do it after scanning the entire tree
@@ -487,4 +498,3 @@
     }
 
 })(this);
-

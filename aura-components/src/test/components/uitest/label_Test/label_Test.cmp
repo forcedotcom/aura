@@ -103,5 +103,27 @@
 	
 <hr />
 <h1>label with hidden position</h1>
-<ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/> 	
+<ui:inputTextArea label="inputTextArea" labelPosition="hidden" value="I'm an inputTextArea" aura:id="hiddenPosition"/><br/>
+<hr />
+
+<h2><b><u>Label memory leak tests</u></b></h2>
+<h1>Label does not leak memory upon destroy</h1>
+<ui:label aura:id="destroyLabel">
+	<span aura:id="labelText">destroyed label text</span>
+</ui:label>
+<hr />
+<h1>Label with hidden text does not leak memory upon destroy</h1>
+<ui:label aura:id="destroyLabelHidden">
+	<span aura:id="labelTextHidden" labelDisplay="false">destroyed label text</span>
+</ui:label>
+<hr />
+<h1>Label with nested ui:label as body does not leak memory upon destroy</h1>
+<ui:label aura:id="destroyLabelNested">
+	<ui:label aura:id="destroyLabelInner">
+		<ui:label aura:id="destroyLabelInnermost">
+        	<span aura:id="labelTextInnermost">destroyed label text</span>
+        	</ui:label>
+	</ui:label>
+</ui:label>
+<hr />
 </aura:component>

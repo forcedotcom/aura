@@ -377,7 +377,7 @@
      * pressing right key on the last pill should goto 1st pill when maxAllowed is reached.
      * Bug: W-2700320
      */
-    _testRightArrowKeyFromLastPillWhenMaxAllowedReached: {
+    testRightArrowKeyFromLastPillWhenMaxAllowedReached: {
     	attributes: {
             maxAllowed: 2
         },

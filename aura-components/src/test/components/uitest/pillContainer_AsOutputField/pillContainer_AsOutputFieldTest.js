@@ -54,7 +54,8 @@
     },
 
     testPillIconInformational: {
-        test: function (cmp) {
+    	failOnWarning: true,
+    	test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems([this.PILLS[0]]);
             var pillIcons = $A.test.select(".pillIcon img");
@@ -63,11 +64,12 @@
     },
 
     testPillIconDecorative: {
-        test: function (cmp) {
+    	failOnWarning: true,
+    	test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems([this.PILLS[1]]);
             var pillIcons = $A.test.select(".pillIcon img");
-            $A.test.assertEquals( "", $A.test.getElementAttributeValue(pillIcons[0], "alt"),"pill icon should not have alt attribute");
+            $A.test.assertEquals("", $A.test.getElementAttributeValue(pillIcons[0], "alt"),"pill icon should not have alt attribute");
         }
     },
     

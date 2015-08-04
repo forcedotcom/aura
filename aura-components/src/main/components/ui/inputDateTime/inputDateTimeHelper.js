@@ -241,6 +241,8 @@
             datePicker.set("v.minutes", date.getUTCMinutes());
             datePicker.set("v.is24HourFormat", this.is24HourFormat(component));
             datePicker.set("v.visible", true);
+            datePicker.set("v.hideOnSelect", true);
+            datePicker.set("v.closeOnClickOut", true);
             if (this.isDesktopMode(component)) {
                 datePicker.set("v.hasTime", false);
                 datePicker.set("v.showToday", false);

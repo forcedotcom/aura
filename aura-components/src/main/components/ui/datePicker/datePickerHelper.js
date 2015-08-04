@@ -59,7 +59,7 @@
      * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
      */
     _getScrollableParent: function(elem) {
-
+        
         // memoize
         if(this._scrollableParent) {
             return this._scrollableParent;
@@ -128,19 +128,25 @@
                 }
 
                 if (!helper.isElementInComponent(component, event.target)) {
-                    // Hide the component
-                    helper.hide(component, false);
+                    
 
                     //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
                     var concreteCmp = component.getConcreteComponent();
                     concreteCmp._clickStart.setEnabled(false);
                     concreteCmp._clickEnd.setEnabled(false);
 
+                    
+                    // Hide the component
+                    helper.hide(component, false);
+
                     var divCmp = component.find("datePicker");
                     if (divCmp) {
                         var elem = divCmp.getElement();
                         $A.util.removeClass(elem, "visible");
                     }
+                    
+
+ 
                 }
             };
             component._onClickEndFunc = f;
@@ -337,19 +343,25 @@
                 
                 var scrollableParent = this._getScrollableParent(elem);
                 var self = this;
+                this._handleScroll = function(e) {
+                    self.lib.panelPositioning.reposition(); 
+                };
+
+                this._handleWheel = function(e) {
+                    var scrollableParent = self._getScrollableParent(elem);
+                    if(scrollableParent && scrollableParent.scrollTop) {
+                        scrollableParent.scrollTop += e.deltaY;
+                    }
+                    
+                };
                 
                 // if the target element is inside a 
                 // scrollable element, we need to make sure
                 // scroll events move that element,
                 // not the parent, also we need to reposition on scroll
                 if(scrollableParent) {
-                    scrollableParent.addEventListener('scroll', function(e) {
-                        self.lib.panelPositioning.reposition();
-                    });
-                    elem.addEventListener('wheel', function(e) {
-                        var scrollableParent = self._getScrollableParent();
-                        scrollableParent.scrollTop += e.deltaY;
-                    });
+                    scrollableParent.addEventListener('scroll', this._handleScroll);
+                    elem.addEventListener('wheel', this._handleWheel);
                 }
 
                 if(!component.positionConstraint) {
@@ -584,6 +596,20 @@
 
     hide: function(component, shouldFocusReferenceElem) {
         component.set("v.visible", false);
+        var divCmp = component.find("datePicker");
+        var elem = divCmp ? divCmp.getElement() : null;
+        var scrollableParent = this._getScrollableParent(elem);
+
+        if(scrollableParent) {
+            scrollableParent.removeEventListener('scroll', this._handleScroll);
+            elem.removeEventListener('wheel', this._handleWheel);
+            this._scrollableParent = null;
+        }
+
+        if(component.positionConstraint) {
+            component.positionConstraint.destroy();
+            delete component.positionConstraint;
+        }
         if ($A.get("$Browser.formFactor") == "DESKTOP" && shouldFocusReferenceElem) {
             var referenceElem = component.get("v.referenceElement");
             if (!$A.util.isUndefinedOrNull(referenceElem)) {

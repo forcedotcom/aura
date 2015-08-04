@@ -53,6 +53,6 @@
     </aura:if>
 
     <aura:if isTrue="{! v.loadDatePicker }">
-        <ui:datePicker aura:id="datePicker" selectDate="{!c.setValue}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
+        <ui:datePicker aura:id="datePicker" hideOnSelect="true" closeOnClickOut="true" selectDate="{!c.setValue}" showToday="{!$Browser.isPhone || $Browser.isTablet}"/>
    </aura:if>
 </aura:component>

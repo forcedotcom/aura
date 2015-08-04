@@ -26,7 +26,9 @@
 
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
-            helper.updateGlobalEventListeners(component);
+            if(component.get('v.closeOnClickOut')) {
+                helper.updateGlobalEventListeners(component);
+            }
         }
 
         // If this picker is not 'managed' (consumed by ui:dataPickerManager),
@@ -50,7 +52,9 @@
 
             helper.setGridInitialValue(component);
             helper.updateMonthYear(component, component.get("v.value"));
-            helper.updateGlobalEventListeners(component);
+            if(component.get('v.closeOnClickOut')) {
+                helper.updateGlobalEventListeners(component);
+            }
         }
 
         this.superRerender();
@@ -78,6 +82,7 @@
     unrender: function(component, helper) {
         if(component.positionConstraint) {
             component.positionConstraint.destroy();
+            delete component.positionConstraint;
         }
     }
 })

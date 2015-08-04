@@ -132,6 +132,7 @@ function (scrollUtil) {
          * @returns {Function}
          */
         getMouseEventListener: function(panelCmp, config, closeAction) {
+            var self = this;
             return function(e) {
                 if (!panelCmp.isValid()) {
                     return;
@@ -143,6 +144,7 @@ function (scrollUtil) {
                 if (config.closeOnClickOut) {
                     var clickedInside = $A.util.contains(panelEl, target);
                     if (panelEl && !clickedInside) {
+
                     	if ($A.util.isFunction(closeAction)) {
                         	closeAction(panelCmp, "closeOnClickOut");
                         } else {

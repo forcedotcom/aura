@@ -34,6 +34,12 @@
         
     },
 
+    // prevent clicks in date picker from bubbling up
+    // to body and closing panels and such.
+    trapClicks: function(component, event) {
+        $A.util.squash(event, true);
+    },
+
     highlightRange: function(component, event) {
         var params = event.getParam('arguments');
         if (params) {

@@ -48,7 +48,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.handleVisible}"/>
     <div aura:id="datePicker" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible ' : ' ') + $Browser.formFactor}">
-        <div class="scroller" aura:id="scroller">
+        <div class="scroller" aura:id="scroller" onclick="{!c.trapClicks}">
             <aura:if isTrue="{!v.hasTime}">
                 <div class="headerBar">
                     <a aura:id="cancel" onclick="{!c.cancel}" class="calCancel button" href="javascript:void(0);">Cancel</a>

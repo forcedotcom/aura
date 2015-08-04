@@ -20,13 +20,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.auraframework.util.AuraFiles;
 import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.auraframework.util.test.perf.rdp.RDPAnalyzer;
@@ -42,9 +39,11 @@ public class PerfMetricsUtil {
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
     private Map<String, Map<String, Map<String, Long>>> auraStats;
+    private String dbURI;
 
-    public PerfMetricsUtil(PerfExecutorTest test, String metricsMode) {
+    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, String metricsMode) {
         this.test = test;
+        this.dbURI = dbURI;
     }
 
     /**
@@ -60,12 +59,13 @@ public class PerfMetricsUtil {
         metrics.setMetricsServiceTransaction(median.getMetricsServiceTransaction());
 
         // Write the results into file
-        String resultsFileName = writeResults(metrics);
+        //String resultsFileName = writeResults(metrics);
+        writeResults(metrics);
         // TODO this is overwritten for every test, needs to be fixed.
-        PerfResultsUtil.exportToCsv();
+        PerfResultsUtil.exportToCsv(test, dbURI);
 
         // Diff the results file against an existing goldfile per component
-        test.setExplicitGoldResultsFolder(resolveGoldFilePath(resultsFileName));
+        //test.setExplicitGoldResultsFolder(resolveGoldFilePath(resultsFileName));
         PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
     }
 
@@ -76,34 +76,36 @@ public class PerfMetricsUtil {
      * @return
      * @throws JSONException
      */
-    private String writeResults(PerfMetrics metrics) throws JSONException {
+    private void writeResults(PerfMetrics metrics) throws JSONException {
         // Write the metrics into result file
         String resultsFileName = test.getComponentDef().getName();
-        PerfResultsUtil.writeGoldFile(metrics, resultsFileName);
+        //PerfResultsUtil.writeGoldFile(metrics, resultsFileName);
 
+    	PerfResultsUtil.writeGoldFile(metrics, test);
+    	
         // Write the timeline events
-        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), resultsFileName);
+        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), resultsFileName, test);
 
         // Write the results to Db
         try {
             InputStream is = new FileInputStream(traceLog);
             String traceJson = IOUtils.toString(is);
-            PerfResultsUtil.writeToDb(metrics, resultsFileName, traceJson);
+            PerfResultsUtil.writeToDb(dbURI, metrics, resultsFileName, traceJson);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return resultsFileName;
+        //return resultsFileName;
     }
 
-    private String resolveGoldFilePath(String resultsFileName) {
+    /*private String resolveGoldFilePath(String resultsFileName) {
         String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
         String componentPath = test.getComponentDef().getNamespace() + "/" + resultsFileName;
         String fullPath = path + componentPath;
         Path resourcesSourceDir = Paths.get(fullPath);
         return resourcesSourceDir.toString();
-    }
+    }*/
 
     private void prepareNetworkMetrics(PerfMetrics metrics) {
         for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {

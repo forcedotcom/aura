@@ -138,6 +138,23 @@ public abstract class UnitTestCase extends TestCase {
 
     private String explicitGoldResultsFolder;
 
+    /**
+     * @return a non null value to specify a results folder for the gold files and to avoid the automatic results folder
+     *         location logic
+     */
+    public final String getExplicitPerfResultsFolder() {
+        return explicitPerfResultsFolder;
+    }
+
+    /**
+     * Overrides the default gold results folder location
+     */
+    public final void setExplicitPerfResultsFolder(String folder) {
+    	explicitPerfResultsFolder = folder;
+    }
+
+    private String explicitPerfResultsFolder;
+    
     public String getGoldFileName() {
         return getName();
     }

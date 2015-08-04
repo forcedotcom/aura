@@ -54,6 +54,16 @@ public class PerfFilesUtil {
             File dir = new File(getPerfResultsDir(), value);
             return new File(dir, fileName + fileExtension);
         }
+
+        
+        public File getFile(String fileDir, String fileName) {
+        	if(fileDir!=null){
+        		File dirPath = new File(fileDir);
+        		dirPath.mkdirs();
+        		return new File(dirPath, fileName + fileExtension);
+        	}       	
+        	return getFile(fileName);
+        }
     }
 
     private static final String getResultsDirPath() {
@@ -91,12 +101,25 @@ public class PerfFilesUtil {
         return PerfFileDirs.TIMELINES.getFile(fileName);
     }
 
+
+    public static final File getTimelineResultsDir(String fileDir, String fileName) {
+        return PerfFileDirs.TIMELINES.getFile(fileDir, fileName);
+    }
+    
     public static final File getGoldfilesResultsDir(String fileName) {
         return PerfFileDirs.GOLDFILES.getFile(fileName);
     }
 
+    public static final File getGoldfilesResultsDir(String fileDir, String fileName) {
+        return PerfFileDirs.GOLDFILES.getFile(fileDir, fileName);
+    }
+    
     public static final File getDbResultsDir(String fileName) {
         return PerfFileDirs.DB.getFile(fileName);
+    }
+
+    public static final File getDbResultsDir(String fileDir, String fileName) {
+        return PerfFileDirs.DB.getFile(fileDir, fileName);
     }
 
     /**

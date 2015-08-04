@@ -17,11 +17,9 @@ package org.auraframework.test.perf.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,6 +40,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
+
 
 import com.google.gson.Gson;
 
@@ -99,7 +98,7 @@ public final class PerfConfigUtil {
         File moduleDir;
         String componentsDir = null;
         try {
-            fileName = def.getDef().getLocation().getFileName();
+            fileName = def.getDef().getLocation().getFileName();            
             moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile();
             if(fileName.contains("/core/")){
                 componentsDir = moduleDir.toString();
@@ -117,19 +116,37 @@ public final class PerfConfigUtil {
     }
 
     private PerfConfig loadConfigMapping(DefDescriptor<ComponentDef> def) {
-        // TODO, if config params per component is unavailable, use a global config .
-        BufferedReader br = null;
-        try {
-            String path = resolveComponentDirPath(def) + "/";
-            String componentPath = def.getNamespace() + "/" + def.getName();
-            String fullPath = path + componentPath;
-            Path resourcesSourceDir = Paths.get(fullPath);
-            Path configPath = resourcesSourceDir.resolve("config.json");
-            br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    	// TODO, if config params per component is unavailable, use a global config .
+    	BufferedReader br = null;
+    	
+    	try {
+	    	String fileName = def.getDef().getLocation().getFileName();
+	    	String componentPath = def.getNamespace() + "/" + def.getName();
+	    	
+	    	// If file is read from a jar, then need to handle it differently.
+	        if(fileName.contains("jar:")){        	
+	        	String resource = "components_aura_components_test/" + componentPath + "/config.json";
+	        	br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(resource)));
+	        }   	
+	        else {
+	    		String componentDirPath = resolveComponentDirPath(def) + "/";
+		    	String fullPath = componentDirPath + componentPath + "/config.json";
+				//Path resourcesSourceDir = Paths.get(fullPath);
+		        //Path configPath = resourcesSourceDir.resolve("config.json");
+		        //br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
+				//br = Files.newBufferedReader(resourcesSourceDir, StandardCharsets.UTF_8);
+		    	//br = new BufferedReader(new FileReader(fullPath));
+		    	//br = new BufferedReader(new InputStreamReader(PerfConfigUtil.class.getClassLoader().getResourceAsStream(fullPath)));
+		    	//ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		    	//br = new BufferedReader(new InputStreamReader(loader.getResourceAsStream(fullPath)));
+		    	//br = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(fullPath)));
+		    	//br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(componentPath + "/config.json")));
+		    	br = new BufferedReader(new FileReader(fullPath));
+	        }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         Gson gson = new Gson();
         PerfConfig config = gson.fromJson(br, PerfConfig.class);
         return config;

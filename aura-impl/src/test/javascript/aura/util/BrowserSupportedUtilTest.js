@@ -28,7 +28,8 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
             Style:function() {},
             Bitset:{},
             NumberFormat:{},
-            SizeEstimator:function() {}
+            SizeEstimator:function() {},
+            SecureFilters:{}
         }
     };
 

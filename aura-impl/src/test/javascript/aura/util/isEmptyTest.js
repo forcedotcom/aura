@@ -19,7 +19,8 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.isEmpty = function(){
     var Aura = {Utils:{
         Style: function() {},
-        SizeEstimator: function() {}
+        SizeEstimator: function() {},
+        SecureFilters:{}
     }};
 
     var targetUtil;

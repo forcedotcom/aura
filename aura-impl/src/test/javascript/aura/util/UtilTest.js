@@ -19,10 +19,11 @@ Function.RegisterNamespace("Test.Aura.Util");
 Test.Aura.Util.UtilTest = function() {
     var Aura = {Utils:{
         Json:function() {},
-            Style:function() {},
-            SizeEstimator: function () {},
-            Bitset:{},
-            NumberFormat:{},
+        Style:function() {},
+        SizeEstimator: function () {},
+        Bitset:{},
+        NumberFormat:{},
+        SecureFilters:{}
     }};
     var auraMock = function(delegate) {
         Mocks.GetMocks(Object.Global(),{

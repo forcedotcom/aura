@@ -48,7 +48,7 @@
     <a aura:id="link" aura:flavorable="true" class="pill" tabindex="{!v.active ? 0: -1}">
         <aura:if isTrue="{!!empty(v.iconUrl)}">
             <span class="pillIcon" style="{!'background-color: ' + ( empty(v.iconBackgroundColor) ? 'transparent': '#' + v.iconBackgroundColor ) }">
-                <ui:image aura:id="icon" src="{!v.iconUrl}" imageType="{!empty(v.iconAlt) ? 'informational' : 'decorative'}" alt="{!v.iconAlt}" onerror="{!c.onIconError}"/>
+                <ui:image aura:id="icon" src="{!v.iconUrl}" imageType="{!empty(v.iconAlt) ? 'decorative' : 'informational'}" alt="{!v.iconAlt}" onerror="{!c.onIconError}"/>
             </span>
         </aura:if>
         <span aura:id="label" class="pillText">{!v.label}</span>

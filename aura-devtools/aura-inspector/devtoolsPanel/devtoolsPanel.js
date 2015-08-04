@@ -83,12 +83,14 @@
             var tree = new AuraInspectorComponentTree(this);
             var perf = new AuraInspectorPerformanceView(this);
             var transaction = new AuraInspectorTransactionView(this);
+            var actions = new AuraInspectorActionsView(this);
             var storage = new AuraInspectorStorageView(this);
 
             this.addPanel("component-tree", tree, "Component Tree");
             this.addPanel("performance", perf, "Performance");
             this.addPanel("transaction", transaction, "Transactions");
             this.addPanel("event-log", eventLog, "Event Log");
+            this.addPanel("actions", actions, "Actions");
             this.addPanel(storage.panelId, storage, "Storage");
 
             // Sidebar Panel

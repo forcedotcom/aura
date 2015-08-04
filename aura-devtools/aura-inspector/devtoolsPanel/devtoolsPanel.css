@@ -8,8 +8,8 @@ p { font-size: 1em; margin: 0 0 1em 0; }
 input, select, textarea, th, td { font-size: 1em; }
 
 /* General Structure */
-header.tabs { padding: .6em 0 0 1em; background: #F0F1F2; margin: 0; }
-header.tabs button { background: #F5F6F7; border: 1px solid #DADEE2; border-bottom: 0px none; margin-right: .2em; }
+header.tabs { background: #F0F1F2; padding: 0 0 0 1em; }
+header.tabs button { background: #F5F6F7; border: 1px solid #DADEE2; border-bottom: 0px none; margin-right: .2em; margin: .6em .2em 0 .2em;}
 header.tabs button:focus { outline: 1px solid #FF9F05; }
 header.tabs button.selected { background: #fff; }
 section.tab-body.selected { display: block; }
@@ -78,6 +78,12 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .trans-panel tr:nth-child(even) {background: #DDD}
 .trans-panel tr:nth-child(odd) {background: #FFF}
 .trans-panel .transactions { padding: 0 1em; height: calc(100% - 60px); overflow: scroll;}
+
+/* Actions List */
+.actions-list { margin: 0; padding: 10px; }
+.actions-list section h1 { font-size: 1.5em; background: #f4f6f9; margin: 5px 0 0 0; padding: 5px; border-bottom: 1px solid #d8dde6; }
+.actions-list .action-card { padding: 10px; display: block; }
+.actions-list .action-card:nth-child(odd) { background: #f0f8fc;} 
 
 /* Loading Indicator */
 #loading { display: none; position: absolute; height: 100%; width: 100%; }

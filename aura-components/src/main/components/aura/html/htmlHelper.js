@@ -181,7 +181,7 @@
                     } else {
                         // prevent default action for anchors on IE11.
                         if ($A.get("$Browser").isDesktop && 
-                            window.location.indexOf("one.app") !== -1 &&
+                            window.location.href.indexOf("one.app") !== -1 &&
                             event.pointerType === "touch") {
                             return;
                         }

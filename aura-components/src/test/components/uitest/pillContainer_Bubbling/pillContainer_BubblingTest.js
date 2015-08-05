@@ -27,6 +27,7 @@
 
 
     testBlurEventBubble: {
+        labels : ["UnAdaptableTest"],
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             cmp.find("autocomplete").focus();

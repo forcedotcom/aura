@@ -22,10 +22,10 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
  * UI test to test autocomplete component. Excluding IE7 and IE8 because component uses html5 specific tags
  */
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
-public class AutocompleteUITest extends BaseAutoComplete {
+public class AutocompleteUsingPanelUITest extends BaseAutoComplete {
 
-	public AutocompleteUITest() {
-		 super("/uitest/autoComplete_Test.cmp");
+	public AutocompleteUsingPanelUITest() {
+		 super("/uitest/autoComplete_Test.cmp?usePanel=true");
 	}
     
 }

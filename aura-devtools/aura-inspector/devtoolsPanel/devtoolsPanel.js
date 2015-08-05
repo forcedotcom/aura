@@ -76,7 +76,7 @@
             header.addEventListener("click", HeaderActions_OnClick.bind(this));
 
             // Setup json->html renderer
-            renderjson.set_icons('+', '-').set_show_to_level(1);
+            renderjson.set_show_to_level(1);
 
             // Initialize Panels
             var eventLog = new AuraInspectorEventLog(this);

@@ -31,7 +31,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
 
     @ThreadHostileTest("ConfigAdapter modified, can't tolerate other tests.")
     public void testCsrfTokenSavedOnBootstrap() throws Exception {
-        String expectedToken = "expectedTestTokenFail";
+        String expectedToken = "expectedTestToken";
 
         getMockConfigAdapter().setCSRFToken(expectedToken);
         open("/clientServiceTest/csrfTokenStorage.app");

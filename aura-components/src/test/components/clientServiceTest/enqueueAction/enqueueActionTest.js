@@ -165,22 +165,25 @@
      * 
      * if enqueue 4 foreground action without releasing any of them, we will run out of available XHR when we want to 
      * enqueue another, no error/warning message on anywhere though, we just put actions in the deferred queue.
+     *
+     * This is dangerous, so we have to ensure that we don't create races. To avoid races, we explicitely chain
+     * our actions using resume and wait. Be careful of deadlocks.
      */
     testMultipleForegroundInFlight : {
         test : [
             function(cmp) {
                 // fire first foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore1;WAIT fore1;COPY;", "fore1"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore1;RESUME fore1.chain;WAIT fore1;COPY;", "fore1"));
             }, function(cmp) {
             	// fire 2nd foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore2;WAIT fore2;COPY;", "fore2"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT fore1.chain;APPEND fore2;RESUME fore2.chain; WAIT fore2;COPY;", "fore2"));
             }, function(cmp) {
             	// fire 3rd foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore3;WAIT fore3;COPY;", "fore3"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT fore2.chain; APPEND fore3;RESUME fore3.chain; WAIT fore3;COPY;", "fore3"));
             }, function(cmp) {
                 // send a 4th action that should release the first one.
                 $A.enqueueAction(this.getActionAndLog(cmp, "c.execute",
-                        "APPEND fore4;READ;APPEND fore4.4;RESUME fore1;RESUME fore2;RESUME fore3", "fore4"));
+                        "WAIT fore3.chain; APPEND fore4;READ;APPEND fore4.4;RESUME fore1;RESUME fore2;RESUME fore3", "fore4"));
                
             }, function(cmp) {
                  this.addWaitForLogRace(cmp, 0, 3, "fore1: SUCCESS fore4.4");
@@ -778,6 +781,8 @@
             $A.enqueueAction(b);
             $A.test.releaseForegroundRequests();
             this.addWaitForLog(cmp, 0, "third: SUCCESS again");
+            // Must wait for parent to complete.
+            $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([ cmp._first_a ]); });
         }, function(cmp) {
             // now parent's abortable callback has executed
             $A.test.assertTrue(cmp._aborted1, "parent should now be aborted");

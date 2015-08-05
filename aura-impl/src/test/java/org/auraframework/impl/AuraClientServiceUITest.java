@@ -37,7 +37,7 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         open("/clientServiceTest/csrfTokenStorage.app");
         WebElement actual = getDriver().findElement(By.className("output"));
 
-        waitForElementTextPresent(actual, expectedToken+"fail");
+        waitForElementTextPresent(actual, expectedToken);
     }
 
     /**

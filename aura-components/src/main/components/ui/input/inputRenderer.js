@@ -28,7 +28,6 @@
 	afterRender: function(component, helper) {
         helper.lib.interactive.addDomEvents(component);
         this.superAfterRender();
-        helper.addInputClass(component);
 
         // Allow override of helper methods.
         var concreteCmp = component.getConcreteComponent();
@@ -48,6 +47,5 @@
         concreteHelper.updateErrorElement(component);
 
         this.superRerender();
-        helper.addInputClass(component);
     }
 })

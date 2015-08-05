@@ -222,7 +222,7 @@
 
     //test to see if datepicker haves correctly
     //when start Date is set
-    testSetInitialStartDate : {
+    _testSetInitialStartDate : {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";
@@ -264,7 +264,7 @@
 
     //test to see if datepicker haves correctly
     //when end Date is set
-    testSetInitialEndDate : {
+    _testSetInitialEndDate : {
         test : [function(cmp) {
             self = this;
             END_DATE = "2021-02-20";
@@ -305,7 +305,7 @@
 
     //test to see if datepicker haves correctly
     //when start Date and end Date are set
-    testSetInitialStartAndEndDate : {
+    _testSetInitialStartAndEndDate : {
         test : [function(cmp) {
             self = this;
             START_DATE = "2020-11-10";

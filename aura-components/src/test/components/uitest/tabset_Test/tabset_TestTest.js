@@ -164,6 +164,61 @@
 	    	 	tabId +  ' should have v.rendered = "' + isRendered + '"'
 	    	)
 		},
+		
+	/**
+	 * Test select current tab does not throw error.
+	 */
+	testSelectCurrentTab : {
+		attributes : {"renderItem" : "tab_lazyCustomTab"},
+        test : [function (cmp){
+        	//verify selected tab on initial load
+        	this.matchSectionAndAnchor('Tab 2', 'Tab 2 Content');
+
+			this._assertTabHasRendered(
+				cmp,
+				false,
+				'lazytab1'
+			);
+
+			this._assertTabHasRendered(
+				cmp,
+				true,
+				'lazytab2'
+			);
+
+			this._assertTabHasRendered(
+				cmp,
+				false,
+				'lazytab3'
+			);
+        }, function(cmp){
+        	// click on current tab
+			var tabSet = cmp.find("tabset_lazyLoading").getElement();
+			var lis = tabSet.getElementsByTagName("li");
+			$A.test.clickOrTouch(lis[1].children[0]);
+        }, function(cmp){
+        	//verify selected tab
+        	this.matchSectionAndAnchor('Tab 2', 'Tab 2 Content');
+
+			this._assertTabHasRendered(
+				cmp,
+				false,
+				'lazytab1'
+			);
+
+			this._assertTabHasRendered(
+				cmp,
+				true,
+				'lazytab2'
+			);
+
+			this._assertTabHasRendered(
+				cmp,
+				false,
+				'lazytab3'
+			);
+        }]
+    },
 
 	/*************************************************************************************************************
      * HELPER FUNCTIONS

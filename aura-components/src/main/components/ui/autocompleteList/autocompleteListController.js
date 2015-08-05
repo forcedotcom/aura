@@ -67,7 +67,12 @@
             obj["aria-expanded"] = true;
             $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
             $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
-            component.get("e.listExpand").fire();
+
+            //push this even to the end of the queue to ensure that the interation in the component body is complete
+            window.setTimeout($A.getCallback(function () {
+                component.get("e.listExpand").fire();
+            }, 0));
+
         }
         
         

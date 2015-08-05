@@ -1,6 +1,7 @@
 ({
     // IndexedDb not supported in IE < 10
-    browsers:["-IE7", "-IE8", "-IE9"],
+    // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],

@@ -16,7 +16,6 @@
 .THIS .listContent {
     clear:both;
     position:relative;
-    min-height: 2.5rem;
 }
 
 .THIS .emptyListContent {
@@ -37,6 +36,10 @@
     top:0;
     width:100%;
     z-index:80;
+}
+
+.THIS.loading {
+    min-height: 2.5rem;
 }
 
 .THIS.loading .loadingIndicator {

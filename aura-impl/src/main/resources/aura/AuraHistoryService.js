@@ -66,6 +66,64 @@ AuraHistoryService.prototype.set = function(token) {
 };
 
 /**
+ * Replaces the current location with the new location, meaning the current location will not be
+ * stored in the browser history. Analogous to window.history.replace().
+ * For example, if the last location in history was '#first', the current location is '#second',
+ * then <code>$A.services.history.replace("third")</code> replaces <code>#second</code> with <code>#third</code>
+ * as the current location. Pressing the browser back button would result in location <code>#first</code>
+ *
+ * Native Android browser doesn't completely support pushState so we force hash method for it
+ * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
+ * Old Native Android and old IE don't support location.replace(), so we fallback to directly
+ * setting window.location.hash.
+ * So, if the browser doesn't support pushState or location.replace, AuraHistoryService.replace()
+ * functions the same a AuraHistoryService.set().
+ *
+ * @param {Object} token The provided token set to the current location hash
+ * @memberOf AuraHistoryService
+ * @public
+ * @export
+ */
+AuraHistoryService.prototype.replace = function(token) {
+    if (token) {
+        // Check for HTML5 window.history.pushState support
+        if (this.usePushState()) {
+            //
+            // Need to pass in the token to the state as
+            // windows phone doesn't persist the hash
+            // after using the back button.
+            //
+            window.history.replaceState({"hash":token}, null, '#' + token);
+            this.changeHandler();
+        } else {
+            if ($A.util.isIOSWebView()) {
+                // roll our own history for IOS UIWebView
+                var historyLength = this.history.length;
+                if (this.currentIndex < (historyLength - 1)) {
+                    // remove forward entries if we moved back and new location is set
+                    this.history.splice(this.currentIndex + 1, historyLength - this.currentIndex);
+                }
+                // replace should just update the entry at the existing current index, so we
+                // don't modify this.currentIndex
+                this.history[this.currentIndex] = token;
+            }
+            //
+            // older browsers, e.g. Android and IE, don't have window.location.replace, so we
+            // check for its existence before calling it.
+            // If it doesn't exist, we fallback to just set the hash directly, which will add an unwanted entry
+            // in the browser history, which isn't what we want, but it's no worse than we have
+            // today with only set().
+            //
+            if(window.location.replace) {
+                window.location.replace('#' + token);
+            } else {
+                window.location.hash = "#" + token;
+            }
+        }
+    }
+};
+
+/**
  * Parses the location. A token can be used here.
  * <p>Example:</p> 
  * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>

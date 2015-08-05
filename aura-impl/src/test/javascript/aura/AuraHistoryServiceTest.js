@@ -42,6 +42,28 @@ Test.Aura.AuraHistoryServiceTest = function(){
             }
         }
     });
+    var mockUserAgentNativeAndroid = Mocks.GetMocks(Object.Global(), {
+        window: {
+            navigator: {
+                userAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
+            },
+            history: {
+                pushState: true
+            }
+        }
+    });
+
+    var mockUserAgentChromeAndroid = Mocks.GetMocks(Object.Global(), {
+        window: {
+            navigator: {
+                userAgent: "Mozilla/5.0 (Linux; Android 4.2.2; Galaxy Nexus Build/IMM76B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.72 Mobile Safari/537.36"
+            },
+            history: {
+                pushState: true
+            }
+        }
+    });
+
 
     [Fixture]
     function set(){
@@ -130,29 +152,152 @@ Test.Aura.AuraHistoryServiceTest = function(){
     }
 
     [Fixture]
+    function replace(){
+        [Fact]
+        function UsePushStateReplacesUrlWithToken(){
+            // if history.pushState is supported, call it setting the url to #<token>
+            var token = "theToken";
+            var expected = "#" + token;
+            var actual;
+            var mockPushState = Mocks.GetMocks(Object.Global(), {
+                window: {
+                    history: {
+                        replaceState: function(state, title, url){
+                            actual = url;
+                        }
+                    }
+                }
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.usePushState = function() { return true; };
+            historyService.changeHandler = function() {};
+
+            mockPushState(function() {
+                historyService.replace(token);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function NonPushStateReplacesLocationHash(){
+            // if history.pushState is not supported, set window.location hash to #<token>
+            var token = "theToken";
+            var expected = "#" + token;
+            var mockLocationReplace = Mocks.GetMocks(Object.Global(), {
+                window: {
+                    location: {
+                        replace: function(url){
+                            actual = url;
+                        }
+                    }
+                }
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.usePushState = function() { return false; };
+
+            var actual;
+            mockIsIOSWebViewFalse(function() {
+                mockLocationReplace(function() {
+                    historyService.replace(token);
+                });
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function iOS7WebViewReplacesTokenInHistoryArray(){
+            // if on iOS WebView, track token manually via history array
+            var token = "theToken";
+            var expectedHash = "#" + token;
+            var actualHash;
+            var windowMock = {
+                location: {
+                    replace: function (url) {
+                        actualHash = url;
+                    }
+                }
+            };
+            var mockLocationReplace = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.usePushState = function() { return false; };
+            historyService.history.push('initial');
+            historyService.currentIndex = 0;
+
+            var historyEntry;
+            mockLocationReplace(function() {
+                mockIsIOSWebViewTrue(function() {
+                    historyService.replace(token);
+                });
+                historyEntry = historyService.history.pop();
+            });
+
+            Assert.Equal(token, historyEntry); // verify token is pushed to history array
+            Assert.Equal(expectedHash, actualHash); // verify location hash set
+        }
+        [Fact]
+        function nativeAndroidSetsWindowLocation(){
+            var token = "theToken";
+            var expectedHash = "#" + token;
+            var actualHash;
+            var windowMock = {
+                location: {
+                    hash: 'initial'
+                }
+            };
+            var mockLocationReplace = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.usePushState = function() { return false; };
+            historyService.history.push('initial');
+            historyService.currentIndex = 0;
+
+            var historyEntry;
+            mockIsIOSWebViewFalse(function() {
+                mockUserAgentNativeAndroid(function() {
+                    mockLocationReplace(function() {
+                        historyService.replace(token);
+                        actualHash = window.location.hash;
+                    });
+                });
+            });
+
+            Assert.Equal(expectedHash, actualHash); // verify location hash set
+        }
+        [Fact]
+        function nonPushStateFallbackSetsLocationHash(){
+            // if history.pushState is supported, call it setting the url to #<token>
+            var token = "theToken";
+            var expectedHash = "#" + token;
+            var windowMock = {
+                location: {
+                    hash: "initial"
+                    // note: no location.replace is defined
+                }
+            };
+            var mockLocationHash = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.usePushState = function() { return false; };
+
+            var actualHash;
+            mockLocationHash(function() {
+                mockIsIOSWebViewFalse(function() {
+                    historyService.replace(token);
+                });
+                actualHash = windowMock.location.hash;
+            });
+
+            Assert.Equal(expectedHash, actualHash); // verify location hash set
+        }
+    }
+    [Fixture]
     function usePushState(){
-        var mockUserAgentNativeAndroid = Mocks.GetMocks(Object.Global(), {
-            window: {
-                navigator: {
-                    userAgent: "Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30"
-                },
-                history: {
-                    pushState: true
-                }
-            }
-        });
-
-        var mockUserAgentChromeAndroid = Mocks.GetMocks(Object.Global(), {
-            window: {
-                navigator: {
-                    userAgent: "Mozilla/5.0 (Linux; Android 4.2.2; Galaxy Nexus Build/IMM76B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.72 Mobile Safari/537.36"
-                },
-                history: {
-                    pushState: true
-                }
-            }
-        });
-
         [Fact]
         function ReturnsFalseIfIOS7WebView() {
             var historyService = new Aura.Services.AuraHistoryService();

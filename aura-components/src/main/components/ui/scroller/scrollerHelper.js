@@ -94,8 +94,13 @@
     },
     // TODO: handleScrollTo: Move and clean this logic inside the scroller (@dval, @jye)
     handleScrollTo : function(component, event) {
-        var scroller   = this.getScrollerInstance(component),
-            isNative   = component.get('v.useNativeScroller'),
+        var scroller   = this.getScrollerInstance(component);
+        if (!scroller) {
+        	$A.warning("Error trying to handleScrollTo: Scroller has not been initialized.");
+        	return;
+        }
+        
+        var isNative   = component.get('v.useNativeScroller'),
             wrapper    = scroller.wrapper,
             scrollBody = scroller.scroller,
             params     = event.getParams(),
@@ -126,8 +131,13 @@
         }
     },
     handleScrollBy: function (component, event) {
-        var scroller = this.getScrollerInstance(component),
-            params   = event.getParams(),
+        var scroller = this.getScrollerInstance(component);
+        if (!scroller) {
+        	$A.warning("Error trying to handleScrollBy: Scroller has not been initialized");
+        	return;
+        }
+        
+        var params   = event.getParams(),
             time     = params.time,
             deltaX   = params.deltaX || 0,
             deltaY   = params.deltaY || 0;

@@ -29,9 +29,10 @@
     <aura:attribute name="managed" type="Boolean" default="false" description="Indicates whether this component is managed by ui:datePickerManager. Defaults to 'false'."/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node which this datePicker should be positioned to. Usually it is a inputDate element." />
     <aura:attribute name="showToday" type="Boolean" default="true" description="Indicates whether a Today link should display at the bottom. If there is a time portion, the Today link wouldn't show up even this is set to true."/>
-    <aura:attribute name="hideOnSelect" type="Boolean" default="true" description="Close the datePicker after a date is selected"/>
+    <aura:attribute name="hideOnSelect" type="Boolean" default="false" description="Close the datePicker after a date is selected"/>
     <aura:attribute name="setFocus" type="Boolean" default="true" description="Control if we should focus any date when we render the month."/>
     <aura:attribute name="titleHeadingLevel" type="String" description="The heading level for the title. The default is h2."/>
+    <aura:attribute name="closeOnClickOut" access="INTERNAL" type="Boolean" default="false" description="true if used with input date, work around for 198 REMOVE in 200"/>
 
     <!-- private attributes -->
     <aura:attribute name="_today" type="String" access="private" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>

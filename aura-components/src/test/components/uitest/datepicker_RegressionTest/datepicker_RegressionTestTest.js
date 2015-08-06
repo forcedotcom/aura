@@ -358,6 +358,33 @@
     },
     
 
+    //test disabled flag and see if the input date is read only.
+    testDisabledInputDate:{
+        attributes : {"renderItem" : "testDisabledInputDate"},
+        test: [function(cmp) {
+            var isDisabled = $A.test.getElementAttributeValue(
+                cmp.getElement().querySelector('input'),
+                'disabled'
+            )
+
+            //disabled attribute is present in the dom,
+            //but the value is empty
+            //so the safest bet here is to compare it against null
+            $A.test.assertNotEquals(
+                null,
+                isDisabled,
+                'disabled should not be equals to NULL'
+            )
+
+
+            $A.test.assertNotEquals(
+                'false',
+                isDisabled + '',
+                'disabled should not be equals to FALSE'
+            )
+        }]
+    },
+
 
     /**
      * HELPER

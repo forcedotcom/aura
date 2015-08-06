@@ -87,4 +87,9 @@
 	<aura:if isTrue="{! v.renderItem == 'testWithCompoundInput'}">	
 		<ui:inputDateTime aura:id="inputDatetime" useSingleInput="false" displayDatePicker="true" />
 	</aura:if>
+
+
+	<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
+		<ui:inputDate aura:id="inputDate" disabled="true" />
+	</aura:if>
 </aura:component>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-
+	browsers : [ "GOOGLECHROME", "FIREFOX", "SAFARI" ],
     sanityCheck: function(cmp) {
         // locationChangeCount is 1 not 0 because Aura sets first history on init
         $A.test.addWaitForWithFailureMessage(1,
@@ -133,7 +133,6 @@
      * W-2322327: test disable for IE8
      */
     testConstHashValue : {
-        browsers:["-IE8"],
         test : [
             function(cmp) {
                 //Click Apple,its url has value="#APPLE", locationChange is fired

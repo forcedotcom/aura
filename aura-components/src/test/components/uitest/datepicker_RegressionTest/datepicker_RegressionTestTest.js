@@ -328,7 +328,35 @@
     },
 
 
+    //test to see if we have only one input when the useSingleInputFlagSet=true
+    //this only applies on desktop
+    testWithSingleInput: {
+        attributes : {"renderItem" : "testWithSingleInput"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            $A.test.assertEquals(
+                1,
+                $A.test.select('input').length,
+                'There should be only one input'
+            );
+        }]
+    },
 
+
+    //test to see if we have 2 inputs when the useSingleInputFlagSet=false
+    //this only applies on desktop
+    testWithCompoundInput: {
+        attributes : {"renderItem" : "testWithCompoundInput"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            $A.test.assertEquals(
+                2,
+                $A.test.select('input').length,
+                'There should be 2 inputs'
+            );
+        }]
+    },
+    
 
 
     /**

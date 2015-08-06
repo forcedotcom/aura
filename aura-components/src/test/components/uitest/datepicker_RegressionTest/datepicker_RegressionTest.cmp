@@ -78,4 +78,13 @@
 	    </div>
 	</div>
 	</aura:if>
+
+
+	<aura:if isTrue="{! v.renderItem == 'testWithSingleInput'}">	
+		<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" />
+	</aura:if>
+
+	<aura:if isTrue="{! v.renderItem == 'testWithCompoundInput'}">	
+		<ui:inputDateTime aura:id="inputDatetime" useSingleInput="false" displayDatePicker="true" />
+	</aura:if>
 </aura:component>

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui.autocomplete;
+package org.auraframework.components.ui.pillContainerAutoComplete;
 
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
-/**
- * UI test to test autocomplete component. Excluding IE7 and IE8 because component uses html5 specific tags
- */
-@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
-public class AutocompleteUITest extends BaseAutoComplete {
+@TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.FIREFOX })
+public class PillContainerAutoCompleteWithUsePanelUITest extends BasePillContainerAutoComplete{
 
-	public AutocompleteUITest() {
-		 super("/uitest/autoComplete_Test.cmp");
+	public PillContainerAutoCompleteWithUsePanelUITest() {
+		super("uitest/pillContainer_WithAutoCompleteUsePanelSet.cmp");	
 	}
-    
+	@Override
+	public void testLossOfFocusVerification(){
+		//TODO:Remove this override test once W-2707857 is fixed
+	}
 }

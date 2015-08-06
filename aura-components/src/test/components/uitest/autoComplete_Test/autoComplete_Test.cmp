@@ -16,8 +16,10 @@
 
 -->
 <aura:component>
+<aura:attribute name="usePanel" type="Boolean" default="false"/>
+<div class="container">
 	<div>Autocomplete test</div><br/>
-	<ui:autocomplete aura:id="autoComplete" optionVar="row" 
+	<ui:autocomplete usePanel="{!v.usePanel}" aura:id="autoComplete" optionVar="row" 
         matchDone="{!c.handleInputChangeAutoCompleteMatchDone}"
         inputChange="{!c.handleInputChangeAutoComplete}" 
         selectListOption="{!c.handleSelectOptionAutoComplete}" label="Generic Auto Complete">
@@ -181,4 +183,13 @@
     </ui:autocomplete>
     Match Count: <ui:outputText aura:id="autoCompleteToggleMatchSize" value=""/> <br/><br/>
     <br/><br/>
+    </div>
+    <div class="manager">
+		<ui:panelManager2 aura:id="pm">
+	        <aura:set attribute="registeredPanels">
+	            <ui:panel alias="panel"/>
+	            <ui:modal alias="modal"/>
+	        </aura:set>
+	    </ui:panelManager2>
+	</div>
 </aura:component>

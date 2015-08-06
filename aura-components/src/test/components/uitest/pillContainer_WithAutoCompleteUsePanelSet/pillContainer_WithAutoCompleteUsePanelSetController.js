@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.components.ui.autocomplete;
+({
 
-import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 
-/**
- * UI test to test autocomplete component. Excluding IE7 and IE8 because component uses html5 specific tags
- */
-@ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
-public class AutocompleteUITest extends BaseAutoComplete {
+    handleMatchDone: function(component, event, helper) {
+    },
 
-	public AutocompleteUITest() {
-		 super("/uitest/autoComplete_Test.cmp");
-	}
-    
-}
+    handleSelectOption: function(component, event, helper) {
+    }
+})

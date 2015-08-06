@@ -62,7 +62,13 @@
         //handling case when there is another element like label in the markup
         var value = component.getDef().getHelper().getInputElement(component).value;
         var inputChangeEvt = component.get("e.inputChange");
-        if (inputChangeEvt) {
+        var el = component.getDef().getHelper().getInputElement(component);
+
+        // IE 11 fires the input event when we tab off, 
+        // causing it to reopen. 
+        // 
+        // if this event is fired and the element is not focused, ignore
+        if (inputChangeEvt && (el === document.activeElement)) {
             inputChangeEvt.setParams({
                 value: value
             });

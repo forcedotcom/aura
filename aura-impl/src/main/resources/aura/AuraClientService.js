@@ -317,7 +317,7 @@ AuraClientService.prototype.decode = function(response, noStrip) {
 
             // in case stale application cache, handling old exception code
             var appCache = window.applicationCache;
-            if (appCache && appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
+            if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING)) {
                 appCache.update();
             }
             return ret;
@@ -846,7 +846,8 @@ AuraClientService.prototype.setOutdated = function() {
     var appCache = window.applicationCache;
     if (!appCache || (appCache && (appCache.status === appCache.UNCACHED || appCache.status === appCache.OBSOLETE))) {
         window.location.reload(true);
-    } else if (appCache.status !== appCache.CHECKING && appCache.status !== appCache.DOWNLOADING) {
+    } else if (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) {
+        // call update when there is a cache ie IDLE (status = 1) or cache is not being checked (status = 2) or downloaded (status = 3)
         appCache.update();
     }
 };

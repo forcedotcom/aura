@@ -38,7 +38,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -112,7 +112,7 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
 
                 auraInit.put("context", new Literal(context.serialize(AuraContext.EncodingStyle.Full)));
 
-                attributes.put("auraInit", Json.serialize(auraInit));
+                attributes.put("auraInit", JsonEncoder.serialize(auraInit));
             }
             Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
             renderingService.render(template, out);

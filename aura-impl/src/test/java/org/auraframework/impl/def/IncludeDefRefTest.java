@@ -24,7 +24,7 @@ import org.auraframework.impl.root.library.IncludeDefRefImpl;
 import org.auraframework.impl.root.library.IncludeDefRefImpl.Builder;
 import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -144,7 +144,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, "function(){}");
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -174,7 +174,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, source);
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -204,7 +204,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, source);
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -235,7 +235,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, "function(){}");
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -269,7 +269,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, "function(){}");
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -309,7 +309,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, "function(){}");
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);
@@ -341,7 +341,7 @@ public class IncludeDefRefTest extends DefinitionTest<IncludeDefRef> {
         addSourceAutoCleanup(includeDesc, "var myexpt=function(){return 'something'}");
 
         StringBuffer buffer = new StringBuffer();
-        Json json = Json.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
+        JsonEncoder json = JsonEncoder.createJsonStream(buffer, Aura.getContextService().getCurrentContext()
                 .getJsonSerializationContext());
 
         builder.setDescriptor(descriptor);

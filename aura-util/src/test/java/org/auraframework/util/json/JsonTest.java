@@ -36,97 +36,97 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 
 /**
- * Test utilities in {@link Json}.
+ * Test utilities in {@link JsonEncoder}.
  */
 public class JsonTest extends UnitTestCase {
 
     public void testSerializeNumbers() throws IOException {
         byte b = 127;
         short s = 32767;
-        assertEquals("127", Json.serialize(b));
-        assertEquals("32767", Json.serialize(s));
-        assertEquals("123", Json.serialize(123));
-        assertEquals("123", Json.serialize(123L));
-        assertEquals("123.456", Json.serialize(123.456f));
-        assertEquals("123.456", Json.serialize(123.456));
-        assertEquals("-123.456", Json.serialize(-123.456d));
-        assertEquals("1.2E21", Json.serialize(12e20));
-        assertEquals("1.2E20", Json.serialize(1.2E+20));
-        assertEquals("-1.2E-20", Json.serialize(-1.2E-20));
+        assertEquals("127", JsonEncoder.serialize(b));
+        assertEquals("32767", JsonEncoder.serialize(s));
+        assertEquals("123", JsonEncoder.serialize(123));
+        assertEquals("123", JsonEncoder.serialize(123L));
+        assertEquals("123.456", JsonEncoder.serialize(123.456f));
+        assertEquals("123.456", JsonEncoder.serialize(123.456));
+        assertEquals("-123.456", JsonEncoder.serialize(-123.456d));
+        assertEquals("1.2E21", JsonEncoder.serialize(12e20));
+        assertEquals("1.2E20", JsonEncoder.serialize(1.2E+20));
+        assertEquals("-1.2E-20", JsonEncoder.serialize(-1.2E-20));
     }
 
     public void testSerializeCharacters() throws IOException {
-        assertEquals("\"a\"", Json.serialize('a'));
-        assertEquals("\"\\n\"", Json.serialize('\n'));
+        assertEquals("\"a\"", JsonEncoder.serialize('a'));
+        assertEquals("\"\\n\"", JsonEncoder.serialize('\n'));
         // JSON spec does not require these chars to be encoded, and we don't.
         // assertEquals("\"\\t\"",Json.serialize('\t'));
-        assertEquals("\"\\\\\"", Json.serialize('\\'));
+        assertEquals("\"\\\\\"", JsonEncoder.serialize('\\'));
         // assertEquals("\"\\b\"",Json.serialize('\b'));
         // assertEquals("\"\\f\"",Json.serialize('\f'));
-        assertEquals("\"\\r\"", Json.serialize('\r'));
-        assertEquals("\"\\\"\"", Json.serialize('\"'));
-        assertEquals("\"\\\"\"", Json.serialize('"'));
+        assertEquals("\"\\r\"", JsonEncoder.serialize('\r'));
+        assertEquals("\"\\\"\"", JsonEncoder.serialize('\"'));
+        assertEquals("\"\\\"\"", JsonEncoder.serialize('"'));
         // assertEquals("\"\\/\"", Json.serialize('/'));
-        assertEquals("\"ë\"", Json.serialize('ë'));
-        assertEquals("\"分\"", Json.serialize('分')); // Chinese
-        assertEquals("\"本\"", Json.serialize('本')); // Japanese
-        assertEquals("\"조\"", Json.serialize('조')); // Korean
-        assertEquals("\"ᄑ\"", Json.serialize('\u1111'));
-        assertEquals("\"\u2111\"", Json.serialize('\u2111'));
-        assertEquals("0", Json.serialize(0x00));
+        assertEquals("\"ë\"", JsonEncoder.serialize('ë'));
+        assertEquals("\"分\"", JsonEncoder.serialize('分')); // Chinese
+        assertEquals("\"本\"", JsonEncoder.serialize('本')); // Japanese
+        assertEquals("\"조\"", JsonEncoder.serialize('조')); // Korean
+        assertEquals("\"ᄑ\"", JsonEncoder.serialize('\u1111'));
+        assertEquals("\"\u2111\"", JsonEncoder.serialize('\u2111'));
+        assertEquals("0", JsonEncoder.serialize(0x00));
     }
 
     public void testSerializeBoolean() throws IOException {
-        assertEquals("true", Json.serialize(true));
-        assertEquals("false", Json.serialize(false));
+        assertEquals("true", JsonEncoder.serialize(true));
+        assertEquals("false", JsonEncoder.serialize(false));
     }
 
     public void testSerializeStrings() throws IOException {
-        assertEquals("null", Json.serialize((String) null));
-        assertEquals("\"\"", Json.serialize(""));
-        assertEquals("\"test\"", Json.serialize("test"));
-        assertEquals("\"    ! @#$%^&*()_+-=|}{[]:;?.,`~\"", Json.serialize("    ! @#$%^&*()_+-=|}{[]:;?.,`~"));
+        assertEquals("null", JsonEncoder.serialize((String) null));
+        assertEquals("\"\"", JsonEncoder.serialize(""));
+        assertEquals("\"test\"", JsonEncoder.serialize("test"));
+        assertEquals("\"    ! @#$%^&*()_+-=|}{[]:;?.,`~\"", JsonEncoder.serialize("    ! @#$%^&*()_+-=|}{[]:;?.,`~"));
         // Japanese, Chinese, Korean
         assertEquals("\"速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 \"",
-                Json.serialize("速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 "));
+                JsonEncoder.serialize("速い茶色のキツネは怠け者の犬を跳び越えました。 福克斯布朗的快速跳过懒狗。 위를 건너뛰었습니다. 게으르고 개 "));
         // Russian, German, Hebrew
         assertEquals(
                 "\"Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן.\"",
-                Json.serialize("Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן."));
+                JsonEncoder.serialize("Быстрый Браун Фокс выросло за ленивый собака. Die schnelle Braun Fuchs sprang über den faulen Hund. השועל החום המהיר קפץ מעל הכלב העצלן."));
     }
 
     public void testSerializeArray() throws IOException {
         String[] s = new String[2];
-        assertEquals("[]", Json.serialize(s));
+        assertEquals("[]", JsonEncoder.serialize(s));
         s[0] = "test1";
-        assertEquals("[\"test1\"]", Json.serialize(s));
+        assertEquals("[\"test1\"]", JsonEncoder.serialize(s));
         s[1] = "test2";
-        assertEquals("[\"test1\",\"test2\"]", Json.serialize(s));
-        assertEquals("[\n  \"test1\",\n  \"test2\"\n]", Json.serialize(s, true, false));
+        assertEquals("[\"test1\",\"test2\"]", JsonEncoder.serialize(s));
+        assertEquals("[\n  \"test1\",\n  \"test2\"\n]", JsonEncoder.serialize(s, true, false));
     }
 
     public void testSerializeMap() throws IOException {
         Map<Object, Object> m = new LinkedHashMap<>(2);
-        assertEquals("{}", Json.serialize(m));
+        assertEquals("{}", JsonEncoder.serialize(m));
         m.put("key1", "val1");
-        assertEquals("{\"key1\":\"val1\"}", Json.serialize(m));
+        assertEquals("{\"key1\":\"val1\"}", JsonEncoder.serialize(m));
         m.put("key2", "val2");
-        assertEquals("{\"key1\":\"val1\",\"key2\":\"val2\"}", Json.serialize(m));
-        assertEquals("{\n  \"key1\":\"val1\",\n  \"key2\":\"val2\"\n}", Json.serialize(m, true, false));
+        assertEquals("{\"key1\":\"val1\",\"key2\":\"val2\"}", JsonEncoder.serialize(m));
+        assertEquals("{\n  \"key1\":\"val1\",\n  \"key2\":\"val2\"\n}", JsonEncoder.serialize(m, true, false));
 
         Map<String, Object> stringMap = new LinkedHashMap<>(2);
         stringMap.put("stringKey", "stringValue");
-        assertEquals("{\"stringKey\":\"stringValue\"}", Json.serialize(stringMap));
+        assertEquals("{\"stringKey\":\"stringValue\"}", JsonEncoder.serialize(stringMap));
     }
 
     public void testSerializeCollection() throws IOException {
         Collection<Object> c = new ArrayList<>();
-        assertEquals("[]", Json.serialize(c));
+        assertEquals("[]", JsonEncoder.serialize(c));
         c.add("val1");
-        assertEquals("[\"val1\"]", Json.serialize(c));
+        assertEquals("[\"val1\"]", JsonEncoder.serialize(c));
         c.add("val2");
-        assertEquals("[\"val1\",\"val2\"]", Json.serialize(c));
-        assertEquals("[\n  \"val1\",\n  \"val2\"\n]", Json.serialize(c, true, false));
+        assertEquals("[\"val1\",\"val2\"]", JsonEncoder.serialize(c));
+        assertEquals("[\n  \"val1\",\n  \"val2\"\n]", JsonEncoder.serialize(c, true, false));
     }
 
     public void testSerializeComplexObject() throws IOException {
@@ -145,7 +145,7 @@ public class JsonTest extends UnitTestCase {
         c2.add(m2);
         m.put("key1", c);
         assertEquals("{\"key1\":[[\"string1\",\"string2\"],true,10,[false,1.5,{\"key2\":[\"string1\",\"string2\"]}]]}",
-                Json.serialize(m));
+                JsonEncoder.serialize(m));
     }
 
 
@@ -155,20 +155,20 @@ public class JsonTest extends UnitTestCase {
         JsonIdentitySerializableTest obj2 = new JsonIdentitySerializableTest(1);
         JsonIdentitySerializableTest[] objArray = { obj1, obj1 };
         // Testing with objects that have same memory reference
-        assertEquals(String.format("[{\"%s\":1,\"%s\":\"JsonIdentitySerializableTest serialized string\"},{\"%s\":1}]",Json.ApplicationKey.SERIAL_ID,Json.ApplicationKey.VALUE,Json.ApplicationKey.SERIAL_REFID),
-                Json.serialize(objArray, false, true));
+        assertEquals(String.format("[{\"%s\":1,\"%s\":\"JsonIdentitySerializableTest serialized string\"},{\"%s\":1}]", Json.ApplicationKey.SERIAL_ID, Json.ApplicationKey.VALUE, Json.ApplicationKey.SERIAL_REFID),
+                JsonEncoder.serialize(objArray, false, true));
         JsonIdentitySerializableTest[] objArray2 = { obj1, obj2 };
         // Testing with objects that have same different memory references
         assertEquals(
-                String.format("[{\"%1$s\":1,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"},{\"%1$s\":2,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"}]",Json.ApplicationKey.SERIAL_ID,Json.ApplicationKey.VALUE),
-                Json.serialize(objArray2, false, true));
+                String.format("[{\"%1$s\":1,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"},{\"%1$s\":2,\"%2$s\":\"JsonIdentitySerializableTest serialized string\"}]", Json.ApplicationKey.SERIAL_ID, Json.ApplicationKey.VALUE),
+                JsonEncoder.serialize(objArray2, false, true));
     }
 
     public void testWriteMapBegin() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         assertEquals("{", json.getAppendable().toString());
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeMapBegin();
         assertEquals("{\n", json.getAppendable().toString());
     }
@@ -190,7 +190,7 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteValueNoSerializer() throws IOException {
-        Json json = new Json(new StringBuilder(), null, new NoSerializerContext());
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), null, new NoSerializerContext());
         try {
             json.writeValue(new NoSerializerClass());
             fail("should throw exception");
@@ -200,7 +200,7 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteKeyNoSerializer() throws IOException {
-        Json json = new Json(new StringBuilder(), null, new NoSerializerContext());
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), null, new NoSerializerContext());
         json.writeMapBegin();
         try {
             json.writeMapKey(new NoSerializerClass());
@@ -212,28 +212,28 @@ public class JsonTest extends UnitTestCase {
 
     public void testWriteMapEnd() throws IOException {
         try {
-            Json json = new Json(new StringBuilder(), false, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
             json.writeMapEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         try {
-            Json json = new Json(new StringBuilder(), true, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
             json.writeMapEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         StringBuilder sb = new StringBuilder();
-        Json json = new Json(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false, false);
         json.writeMapBegin();
         sb.delete(0, sb.length());
         json.writeMapEnd();
         assertEquals("}", sb.toString());
 
         sb.delete(0, sb.length());
-        json = new Json(sb, true, false);
+        json = new JsonEncoder(sb, true, false);
         json.writeMapBegin();
         sb.delete(0, sb.length());
         json.writeMapEnd();
@@ -241,38 +241,38 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteArrayBegin() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeArrayBegin();
         assertEquals("[", json.getAppendable().toString());
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeArrayBegin();
         assertEquals("[\n", json.getAppendable().toString());
     }
 
     public void testWriteArrayEnd() throws IOException {
         try {
-            Json json = new Json(new StringBuilder(), false, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
             json.writeArrayEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         try {
-            Json json = new Json(new StringBuilder(), true, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
             json.writeArrayEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         StringBuilder sb = new StringBuilder();
-        Json json = new Json(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false, false);
         json.writeArrayBegin();
         sb.delete(0, sb.length());
         json.writeArrayEnd();
         assertEquals("]", sb.toString());
 
         sb.delete(0, sb.length());
-        json = new Json(sb, true, false);
+        json = new JsonEncoder(sb, true, false);
         json.writeArrayBegin();
         sb.delete(0, sb.length());
         json.writeArrayEnd();
@@ -281,37 +281,37 @@ public class JsonTest extends UnitTestCase {
 
     public void testMismatchStartEnd() throws Exception {
         try {
-            Json json = new Json(new StringBuilder(), true, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
             json.writeArrayBegin();
             json.writeMapEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         try {
-            Json json = new Json(new StringBuilder(), true, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
             json.writeMapBegin();
             json.writeArrayEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
 
         try {
-            Json json = new Json(new StringBuilder(), true, false);
+            JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
             json.writeCommentBegin();
             json.writeArrayEnd();
             fail("Should throw exception");
-        } catch (Json.JsonException e) {
+        } catch (JsonEncoder.JsonException e) {
         }
     }
 
     public void testCommentBody() throws Exception {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
 
         try {
             json.writeCommentBody("hi");
             fail("Should throw exception");
-        } catch (Json.JsonException expected) {
+        } catch (JsonEncoder.JsonException expected) {
             assertEquals("Json.writeCommentBody must be preceded by Json.writeCommentBegin", expected.getMessage());
         }
 
@@ -324,17 +324,17 @@ public class JsonTest extends UnitTestCase {
             json.writeArrayBegin();
             json.writeCommentBody("hi");
             fail("Should throw exception");
-        } catch (Json.JsonException expected) {
+        } catch (JsonEncoder.JsonException expected) {
             assertEquals("Json.writeCommentBody must be preceded by Json.writeCommentBegin", expected.getMessage());
         }
 
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeCommentBegin();
         json.writeCommentBody("hi");
         json.writeCommentEnd();
         assertEquals("\n/*\n * hi\n */", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeCommentBegin();
         json.writeCommentBody("*/hi*/");
         json.writeCommentEnd();
@@ -342,55 +342,55 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteComma() throws IOException {
-        Json json = new Json(new StringBuilder(), true, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), true, false);
         try {
             json.writeComma();
             fail("Should throw exception");
-        } catch (Json.JsonException expected) {
+        } catch (JsonEncoder.JsonException expected) {
             assertEquals("writeComma with no writeArrayBegin or writeMapBegin", expected.getMessage());
         }
 
         try {
-            json.pushIndent(Json.IndentType.COMMENT);
+            json.pushIndent(JsonEncoder.IndentType.COMMENT);
             json.writeComma();
             fail("Should throw exception");
-        } catch (Json.JsonException expected) {
+        } catch (JsonEncoder.JsonException expected) {
             assertEquals("Cannot use separator on COMMENT", expected.getMessage());
         }
     }
 
     public void testWriteLiteral() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeLiteral(5);
         assertEquals("5", json.getAppendable().toString());
     }
 
     public void testWriteString() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeString("test");
         assertEquals("\"test\"", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeString("<!-- div />");
         assertEquals("HTML markup should be escaped for JSON format.", "\"\\u003C\\u0021-- div /\\u003E\"", json
                 .getAppendable().toString());
     }
 
     public void testWriteArrayEntry() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeArrayBegin();
         json.writeArrayEntry("test");
         json.writeArrayEnd();
         assertEquals("[\"test\"]", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeArrayBegin();
         json.writeArrayEntry("test1");
         json.writeArrayEntry("test2");
         json.writeArrayEnd();
         assertEquals("[\"test1\",\"test2\"]", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeArrayBegin();
         json.writeArrayEntry("test1");
         json.writeArrayEntry("test2");
@@ -399,20 +399,20 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteMapEntry() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapEntry("key", "value");
         json.writeMapEnd();
         assertEquals("{\"key\":\"value\"}", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapEntry("key1", "value1");
         json.writeMapEntry("key2", "value2");
         json.writeMapEnd();
         assertEquals("{\"key1\":\"value1\",\"key2\":\"value2\"}", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeMapBegin();
         json.writeMapEntry("key1", "value1");
         json.writeMapEntry("key2", "value2");
@@ -424,13 +424,13 @@ public class JsonTest extends UnitTestCase {
         List<String> list = new ArrayList<>(2);
         list.add("item1");
         list.add("item2");
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapEntry("key", list);
         json.writeMapEnd();
         assertEquals("{\"key\":[\"item1\",\"item2\"]}", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapEntry("key", null, "java://java.util.List");
         json.writeMapEnd();
@@ -439,7 +439,7 @@ public class JsonTest extends UnitTestCase {
         Map<String,Integer> map = new TreeMap<>();
         map.put("item1", 1);
         map.put("item2", 2);
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapEntry("map1", map);
         json.writeMapEntry("map2", null, "java://java.util.Map");
@@ -448,20 +448,20 @@ public class JsonTest extends UnitTestCase {
     }
 
     public void testWriteMapKey() throws IOException {
-        Json json = new Json(new StringBuilder(), false, false);
+        JsonEncoder json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapKey("key");
         json.writeMapEnd();
         assertEquals("{\"key\":}", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), false, false);
+        json = new JsonEncoder(new StringBuilder(), false, false);
         json.writeMapBegin();
         json.writeMapKey("key1");
         json.writeMapKey("key2");
         json.writeMapEnd();
         assertEquals("{\"key1\":,\"key2\":}", json.getAppendable().toString());
 
-        json = new Json(new StringBuilder(), true, false);
+        json = new JsonEncoder(new StringBuilder(), true, false);
         json.writeMapBegin();
         json.writeMapKey("key1");
         json.writeMapKey("key2");
@@ -476,7 +476,7 @@ public class JsonTest extends UnitTestCase {
 
         // Write out a JSON+binary stream
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         json.writeMapBegin();
         json.writeMapKey("header");
         final String[] columns = new String[] { "guid䷴", "id", "blob" };
@@ -563,7 +563,7 @@ public class JsonTest extends UnitTestCase {
      */
     public void testBinaryStreamOnAppendable() throws Exception {
         final StringBuilder str = new StringBuilder(1);
-        final Json json = new Json(str, false, false);
+        final JsonEncoder json = new JsonEncoder(str, false, false);
         try {
             json.writeBinaryStreamBegin(1);
             fail("should have failed");
@@ -574,7 +574,7 @@ public class JsonTest extends UnitTestCase {
 
     public void testBinaryStreamEndBeforeBegin() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         try {
             json.writeBinaryStreamEnd();
             fail();
@@ -585,7 +585,7 @@ public class JsonTest extends UnitTestCase {
 
     public void testBinaryStreamTooShort() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         final OutputStream out = json.writeBinaryStreamBegin(2);
         out.write(new byte[1]);
         try {
@@ -598,7 +598,7 @@ public class JsonTest extends UnitTestCase {
 
     public void testBinaryStreamTooLong() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         final OutputStream out = json.writeBinaryStreamBegin(1);
         out.write(new byte[2]);
         try {
@@ -615,7 +615,7 @@ public class JsonTest extends UnitTestCase {
      */
     public void testBinaryStreamWithinBinaryStream() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         json.writeBinaryStreamBegin(5);
         try {
             json.writeBinaryStreamBegin(1);
@@ -627,7 +627,7 @@ public class JsonTest extends UnitTestCase {
 
     public void testBinaryStreamOfSizeZero() throws Exception {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        final Json json = Json.createJsonStream(baos, false, false, false);
+        final JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         json.writeBinaryStreamBegin(0);
         json.writeBinaryStreamEnd();
         json.close();
@@ -654,14 +654,14 @@ public class JsonTest extends UnitTestCase {
 
         // Try it with null values disabled
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        Json json = Json.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         json.writeMap(map);
         json.close();
         assertEquals("{\"dogs\":\"bark\",\"birds\":\"chirp\"}", new String(baos.toByteArray(), Charsets.UTF_8));
 
         // Try it with null values enabled
         baos.reset();
-        json = Json.createJsonStream(baos, false, false, true);
+        json = JsonEncoder.createJsonStream(baos, false, false, true);
         json.writeMap(map);
         json.close();
         assertEquals("{\"cats\":null,\"dogs\":\"bark\",\"birds\":\"chirp\",\"bacteria\":null}",
@@ -673,14 +673,14 @@ public class JsonTest extends UnitTestCase {
 
         // Try it with null values disabled
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
-        Json json = Json.createJsonStream(baos, false, false, false);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, false);
         json.writeArray(list);
         json.close();
         assertEquals("[\"cats\",\"dogs\",\"bacteria\"]", new String(baos.toByteArray(), Charsets.UTF_8));
 
         // Try it with null values enabled
         baos.reset();
-        json = Json.createJsonStream(baos, false, false, true);
+        json = JsonEncoder.createJsonStream(baos, false, false, true);
         json.writeArray(list);
         json.close();
         assertEquals("[null,\"cats\",\"dogs\",null,\"bacteria\"]", new String(baos.toByteArray(), Charsets.UTF_8));
@@ -716,7 +716,7 @@ public class JsonTest extends UnitTestCase {
      */
     public void testSerializeSimpleWithNulls() throws IOException {
         SendNullObject sno = new SendNullObject("a", "b");
-        assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", Json.serialize(sno));
+        assertEquals("{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"}", JsonEncoder.serialize(sno));
 
 
     }
@@ -731,7 +731,7 @@ public class JsonTest extends UnitTestCase {
         m.put("x", new SendNullObject("a", "b"));
         m.put("y", null);
         m.put("z", "d");
-        assertEquals("{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}", Json.serialize(m));
+        assertEquals("{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}", JsonEncoder.serialize(m));
     }
 
     // we have two ways to output null in serialization, one is
@@ -748,7 +748,7 @@ public class JsonTest extends UnitTestCase {
         final ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
 
         //test with Json Stream that output null
-        Json json = Json.createJsonStream(baos, false, false, true);
+        JsonEncoder json = JsonEncoder.createJsonStream(baos, false, false, true);
         json.writeMap(m);
         json.close();
         assertEquals("fail with Json Stream output null", expect, new String(baos.toByteArray(), Charsets.UTF_8));
@@ -756,7 +756,7 @@ public class JsonTest extends UnitTestCase {
         //test with Json Stream that skip null
         String expect2 = "{\"v\":\"c\",\"x\":{\"v1\":\"a\",\"v2\":null,\"v3\":\"b\"},\"z\":\"d\"}";
         baos.reset();
-        Json jsonSkipNull = Json.createJsonStream(baos, false, false, false);
+        JsonEncoder jsonSkipNull = JsonEncoder.createJsonStream(baos, false, false, false);
         jsonSkipNull.writeMap(m);
         jsonSkipNull.close();
         assertEquals("fail with Json Stream Skip null", expect2, new String(baos.toByteArray(), Charsets.UTF_8) );

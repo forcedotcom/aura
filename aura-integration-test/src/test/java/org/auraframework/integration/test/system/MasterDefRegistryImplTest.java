@@ -94,7 +94,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -2008,12 +2008,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     private class MasterDefRegistryImplOverride extends MasterDefRegistryImpl {
-        public MasterDefRegistryImplOverride(@NonNull DefRegistry<?>... registries) {
+        public MasterDefRegistryImplOverride(@Nonnull DefRegistry<?>... registries) {
             super(registries);
         }
 
         @Override
-        public <T extends Definition> DependencyEntry compileDE(@NonNull DefDescriptor<T> descriptor)
+        public <T extends Definition> DependencyEntry compileDE(@Nonnull DefDescriptor<T> descriptor)
                 throws QuickFixException {
             return super.compileDE(descriptor);
         }

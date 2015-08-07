@@ -23,7 +23,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import org.auraframework.Aura;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.throwable.ClientSideEventException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.collect.Maps;
@@ -50,7 +50,7 @@ public class ClientSideEventExceptionJSONFormatAdapter extends JSONFormatAdapter
         } else {
             serialized.put("defaultHandler", value.getDefaultHandler() == null ? null : value.getDefaultHandler().toString());
         }
-        Json.serialize(serialized, out, jsonCxt);
+        JsonEncoder.serialize(serialized, out, jsonCxt);
     }
 
 }

@@ -81,11 +81,11 @@ public enum JsonConstant {
 
     }
 
-    private JsonConstant() {
+    JsonConstant() {
         this(null);
     }
 
-    private JsonConstant(Character token) {
+    JsonConstant(Character token) {
         this.token = token;
     }
 

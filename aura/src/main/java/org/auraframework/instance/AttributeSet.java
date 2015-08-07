@@ -26,7 +26,7 @@ import org.auraframework.def.RootDefinition;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * A set of attribute instances on a component, interface or event.
@@ -41,29 +41,29 @@ public interface AttributeSet extends ValueProvider, JsonSerializable, Iterable<
      * @param name
      * @return This should only ever be used from tests
      */
-    Object getExpression(@NonNull String name);
+    Object getExpression(@Nonnull String name);
 
     /**
      * gets the value of an attribute by name, no expressions allowed
      * 
      * @throws QuickFixException
      */
-    Object getValue(@NonNull String s) throws QuickFixException;
+    Object getValue(@Nonnull String s) throws QuickFixException;
 
     /**
      * gets the raw value of an attribute by name, no expressions allowed
      *
      * @throws QuickFixException
      */
-    Object getRawValue(@NonNull String s) throws QuickFixException;
+    Object getRawValue(@Nonnull String s) throws QuickFixException;
 
     /**
      * gets the typed value of an attribute by name, no expressions allowed
      * 
      * @throws QuickFixException
-     * @throws AuraRuntimeException if the type does not match.
+     * @throws QuickFixException if the type does not match.
      */
-    <T> T  getValue(@NonNull String s, @NonNull Class<T> clazz) throws QuickFixException;
+    <T> T  getValue(@Nonnull String s, @Nonnull Class<T> clazz) throws QuickFixException;
 
     void set(Collection<AttributeDefRef> attributeDefRefs) throws QuickFixException;
 

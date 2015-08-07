@@ -33,7 +33,7 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializable;
 import org.auraframework.util.json.JsonSerializer;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 import org.auraframework.util.json.JsonSerializers;
 
 import com.google.common.collect.Maps;

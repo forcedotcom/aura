@@ -31,8 +31,8 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
@@ -375,11 +375,11 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
      * Get an instance from name parts.
      *
      * @param name The simple String representation of the instance requested ("foo:bar" or "java://foo.Bar")
-     * @param defClass The Interface's Class for the DefDescriptor being requested.
+     * @param namespace The Interface's Class for the DefDescriptor being requested.
      * @return An instance of a AuraDescriptor for the provided tag
      */
-    public static DefDescriptor<?> getInstance(@CheckForNull String prefix, @NonNull String namespace,
-            @NonNull String name, @NonNull DefType defType) {
+    public static DefDescriptor<?> getInstance(@CheckForNull String prefix, @Nonnull String namespace,
+            @Nonnull String name, @Nonnull DefType defType) {
         StringBuilder sb = new StringBuilder();
         if (AuraTextUtil.isNullEmptyOrWhitespace(prefix)) {
             prefix = Aura.getContextService().getCurrentContext().getDefaultPrefix(defType);

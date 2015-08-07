@@ -59,8 +59,9 @@ import org.auraframework.throwable.quickfix.InvalidEventTypeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -804,7 +805,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public String serialize(EncodingStyle style) {
         StringBuffer sb = new StringBuffer();
-        Json json = new Json(sb, false, false);
+        JsonEncoder json = new JsonEncoder(sb, false, false);
 
         try {
             json.writeMapBegin();

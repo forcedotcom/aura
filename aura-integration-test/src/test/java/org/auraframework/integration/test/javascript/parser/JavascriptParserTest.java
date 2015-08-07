@@ -52,7 +52,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.ServiceLocator;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 /**
  * This class tests the usage of Javascript to specify Controllers, Renderers and Test suites for Aura Components. The
@@ -143,7 +143,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
         JavascriptActionDef jsActionDef = null;
         jsActionDef = controllerActions.get("functionName");
         assertEquals(ActionType.CLIENT, jsActionDef.getActionType());
-        String[] jsonres = (Json.serialize(jsActionDef)).split("\"");
+        String[] jsonres = (JsonEncoder.serialize(jsActionDef)).split("\"");
         // Verify the second function did replace the first one
         assertEquals("second function didn't survive",
                 ":function(component) {var v = 2;},", jsonres[10]);

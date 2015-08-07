@@ -31,6 +31,7 @@ import org.auraframework.instance.InstanceStack;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
@@ -320,7 +321,7 @@ public class InstanceStackTest extends UnitTestCase {
     public void testSerializeAsPart() throws Exception {
         InstanceStack iStack = new InstanceStack();
 
-        Json jsonMock = Mockito.mock(Json.class);
+        JsonEncoder jsonMock = Mockito.mock(JsonEncoder.class);
         BaseComponent<?, ?> a = getComponentWithPath("a");
         BaseComponent<?, ?> b = getComponentWithPath("b");
         BaseComponent<?, ?> c = getComponentWithPath("c");
@@ -342,7 +343,7 @@ public class InstanceStackTest extends UnitTestCase {
      */
     public void testSerializeAsPartNoComponents() throws Exception {
         InstanceStack iStack = new InstanceStack();
-        Json jsonMock = Mockito.mock(Json.class);
+        JsonEncoder jsonMock = Mockito.mock(JsonEncoder.class);
         iStack.serializeAsPart(jsonMock);
         assertEquals("Components should empty when no registered components", 0, iStack.getComponents().size());
         verifyZeroInteractions(jsonMock);

@@ -55,7 +55,7 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -408,7 +408,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
         case JS:
             return (AuraBaseServlet.JAVASCRIPT_CONTENT_TYPE);
         case JSON:
-            return (Json.MIME_TYPE);
+            return (JsonEncoder.MIME_TYPE);
         case HTML:
             return (AuraBaseServlet.HTML_CONTENT_TYPE);
         case SVG:

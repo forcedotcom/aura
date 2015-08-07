@@ -17,8 +17,7 @@ package org.auraframework.util.json;
 
 import java.io.IOException;
 
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 @Serialization(referenceType = ReferenceType.IDENTITY)
 public class JsonIdentitySerializableTest implements JsonSerializable {

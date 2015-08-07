@@ -46,7 +46,7 @@ import com.google.common.collect.ImmutableMap;
  */
 public interface AuraContext {
 
-    public static enum Mode {
+    enum Mode {
 
         DEV(false, true, true, JavascriptGeneratorMode.DEVELOPMENT, true),
         STATS(true, false, true, JavascriptGeneratorMode.STATS, true),
@@ -69,7 +69,7 @@ public interface AuraContext {
         private final boolean prettyPrint;
         private final boolean allowLocalRendering;
 
-        private Mode(boolean isTestMode, boolean isDevMode, boolean prettyPrint, JavascriptGeneratorMode jsMode,
+        Mode(boolean isTestMode, boolean isDevMode, boolean prettyPrint, JavascriptGeneratorMode jsMode,
                 boolean allowLocalRendering) {
             this.isTestMode = isTestMode;
             this.isDevMode = isDevMode;
@@ -102,24 +102,24 @@ public interface AuraContext {
         }
     }
 
-    public static boolean isDebugToolEnabled = false;
+    boolean isDebugToolEnabled = false;
 
-    public static enum Format {
+    enum Format {
         MANIFEST, CSS, JS, JSON, HTML, SVG;
     }
 
-    public static enum Authentication {
+    enum Authentication {
         UNAUTHENTICATED, AUTHENTICATED
     }
 
-    public static enum Access {
+    enum Access {
         PUBLIC,
         GLOBAL,
         PRIVATE,
         INTERNAL
     }
 
-    static class GlobalValue implements JsonSerializable {
+    class GlobalValue implements JsonSerializable {
         public boolean writable; // if not writable, the contextImpl must provide a mechanism to set
         public Object defaultValue;
         public Object value;
@@ -323,7 +323,7 @@ public interface AuraContext {
      * 
      * @param descriptor the previously marked 'loaded' descriptor.
      */
-    public void dropLoaded(DefDescriptor<?> descriptor);
+    void dropLoaded(DefDescriptor<?> descriptor);
 
     /**
      * Get the uid string for a descriptor.
@@ -331,7 +331,7 @@ public interface AuraContext {
      * @param descriptor the descriptor that we need a UID for.
      * @return the uid from the request (null if none).
      */
-    public String getUid(DefDescriptor<?> descriptor);
+    String getUid(DefDescriptor<?> descriptor);
 
     /**
      * Get the set of loaded descriptors with the uid.

@@ -27,7 +27,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.throwable.AuraExceptionInfo;
 import org.auraframework.throwable.AuraHandledException;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -85,7 +85,7 @@ public class ExceptionAdapterImpl implements ExceptionAdapter {
             if (action != null) {
                 try {
                     // try serializing the entire action.
-                    extended.append(Json.serialize(action));
+                    extended.append(JsonEncoder.serialize(action));
                 } catch (Throwable t) {
                     // totally ignore errors, and just put the action name on.
                     extended.append(action);

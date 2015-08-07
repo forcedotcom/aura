@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.auraframework.util.IOUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.test.annotation.AuraTestLabels;
 import org.auraframework.util.test.annotation.UnitTest;
@@ -213,7 +213,7 @@ public abstract class UnitTestCase extends TestCase {
 
     protected String toJson(Object o) {
         StringBuilder sb = new StringBuilder(100);
-        Json.serialize(o, sb, getJsonSerializationContext());
+        JsonEncoder.serialize(o, sb, getJsonSerializationContext());
         return sb.toString();
     }
 

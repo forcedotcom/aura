@@ -16,6 +16,10 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-interfaces</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -35,10 +39,6 @@
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sourceforge.findbugs</groupId>
-            <artifactId>annotations</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>

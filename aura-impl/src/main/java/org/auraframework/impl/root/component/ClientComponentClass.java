@@ -33,6 +33,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsFunction;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
@@ -156,7 +157,7 @@ public class ClientComponentClass {
 
             HelperDef helperDef = def.getHelperDef();
             if (helperDef != null) {
-                String defInJson = Json.serialize(helperDef, false, true);
+                String defInJson = JsonEncoder.serialize(helperDef, false, true);
 
                 try {
                     @SuppressWarnings("unchecked")
@@ -171,7 +172,7 @@ public class ClientComponentClass {
 
                     for (Entry<String, Object> entry : properties.entrySet()) {
                         helperProperties.add(new HelperInfo2(entry.getKey(),
-                                Json.serialize(entry.getValue(), false, true)));
+                                JsonEncoder.serialize(entry.getValue(), false, true)));
                     }
 
                 } catch (JsonParseException x) {
@@ -191,7 +192,7 @@ public class ClientComponentClass {
             if (rendererDescriptor != null) {
                 RendererDef rendererDef = rendererDescriptor.getDef();
                 if (rendererDef != null && !rendererDef.isLocal()) {
-                    String defInJson = Json.serialize(rendererDef, false, true);
+                    String defInJson = JsonEncoder.serialize(rendererDef, false, true);
 
                     try {
                         @SuppressWarnings("unchecked")

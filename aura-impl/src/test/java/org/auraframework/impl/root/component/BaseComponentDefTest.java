@@ -48,7 +48,6 @@ import org.auraframework.def.BaseComponentDef.RenderType;
 import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.RootDefinitionTest;
-import org.auraframework.impl.root.component.LazyComponentDefRef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
 import org.auraframework.system.Source;
@@ -58,6 +57,7 @@ import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.InvalidReferenceException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader;
 
@@ -1871,7 +1871,7 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
 
     @SuppressWarnings("unchecked")
     private Object serializeAndReadAttributeFromDef(T def, String property) throws Exception {
-        JsonStreamReader jsonStreamReader = new JsonStreamReader(Json.serialize(def));
+        JsonStreamReader jsonStreamReader = new JsonStreamReader(JsonEncoder.serialize(def));
         jsonStreamReader.next();
         Object temp = jsonStreamReader.getValue();
         assertTrue(temp instanceof Map);

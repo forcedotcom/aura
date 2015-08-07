@@ -22,7 +22,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import javax.annotation.Nonnull;
 
 /**
  * An interface to retrieve source for descriptors.
@@ -37,7 +37,7 @@ public interface SourceLoader {
      * 
      * @return List of names of namespaces that this SourceLoader handles.
      */
-    @NonNull
+    @Nonnull
     Set<String> getNamespaces();
     
     /**
@@ -46,7 +46,7 @@ public interface SourceLoader {
      * 
      * @return List of prefixes that this SourceLoader handles.
      */
-    @NonNull
+    @Nonnull
     Set<String> getPrefixes();
 
     /**
@@ -54,7 +54,7 @@ public interface SourceLoader {
      * the namespaces returned by getNamespaces and the prefixes returned by
      * getPrefixes.
      */
-    @NonNull
+    @Nonnull
     Set<DefType> getDefTypes();
 
     /**
@@ -63,12 +63,12 @@ public interface SourceLoader {
      * @param descriptor
      * @return Source referenced by descriptor
      */
-    <D extends Definition> Source<D> getSource(@NonNull DefDescriptor<D> descriptor);
+    <D extends Definition> Source<D> getSource(@Nonnull DefDescriptor<D> descriptor);
 
     /**
      * Match descriptors against a matcher.
      */
-    Set<DefDescriptor<?>> find(@NonNull DescriptorFilter dm);
+    Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter dm);
 
     /**
      * find a set of descriptors based on primary interface in a namespace.
@@ -77,6 +77,6 @@ public interface SourceLoader {
      * @param prefix the required prefix.
      * @param namespace the namespace to search.
      */
-    <T extends Definition> Set<DefDescriptor<T>> find(@NonNull Class<T> primaryInterface,
-            @NonNull String prefix, @NonNull String namespace); 
+    <T extends Definition> Set<DefDescriptor<T>> find(@Nonnull Class<T> primaryInterface,
+            @Nonnull String prefix, @Nonnull String namespace);
 }

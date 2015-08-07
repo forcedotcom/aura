@@ -43,7 +43,7 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.JSTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
@@ -216,7 +216,7 @@ public class ComponentJSTest extends TestSuite {
                     String key = entry.getKey();
                     String value;
                     if(entry.getValue() instanceof Map<?, ?> || entry.getValue() instanceof List<?>) {
-                        value = Json.serialize(entry.getValue());
+                        value = JsonEncoder.serialize(entry.getValue());
                     } else {
                         value = entry.getValue().toString();
                     }

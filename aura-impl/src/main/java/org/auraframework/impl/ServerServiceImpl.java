@@ -52,7 +52,7 @@ import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -75,7 +75,7 @@ public class ServerServiceImpl implements ServerService {
             return;
         }
         List<Action> actions = message.getActions();
-        Json json = Json.createJsonStream(out, context.getJsonSerializationContext());
+        JsonEncoder json = JsonEncoder.createJsonStream(out, context.getJsonSerializationContext());
         try {
             json.writeMapBegin();
             if (extras != null && extras.size() > 0) {
@@ -123,7 +123,7 @@ public class ServerServiceImpl implements ServerService {
         }
     }
 
-    private int run(List<Action> actions, Json json, int idx) throws IOException {
+    private int run(List<Action> actions, JsonEncoder json, int idx) throws IOException {
         LoggingService loggingService = Aura.getLoggingService();
         AuraContext context = Aura.getContextService().getCurrentContext();
         for (Action action : actions) {
@@ -333,7 +333,7 @@ public class ServerServiceImpl implements ServerService {
 
             // append namespaces. for now. *sigh*
             sb.append("namespaces:");
-            Json.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(),sb,context.getJsonSerializationContext());
+            JsonEncoder.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(), sb, context.getJsonSerializationContext());
             sb.append(",");
 
             // append event definitions

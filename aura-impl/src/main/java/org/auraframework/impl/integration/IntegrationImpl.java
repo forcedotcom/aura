@@ -41,7 +41,7 @@ import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -124,7 +124,7 @@ public class IntegrationImpl implements Integration {
                 if (!actionEventHandlers.isEmpty()) {
                     // serialize registered event handlers into js object
                     jsonEventHandlers = new StringBuilder();
-                    Json.serialize(actionEventHandlers, jsonEventHandlers);
+                    JsonEncoder.serialize(actionEventHandlers, jsonEventHandlers);
                 }
 
                 StringBuilder init = new StringBuilder();
@@ -132,7 +132,7 @@ public class IntegrationImpl implements Integration {
                 if (useAsync) {
                     // uses newComponentAsync to create component
                     StringBuilder jsonAttributes = new StringBuilder();
-                    Json.serialize(actionAttributes, jsonAttributes);
+                    JsonEncoder.serialize(actionAttributes, jsonAttributes);
 
                     // set event handlers to either js "undefined" or object of event and handler names
                     String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";

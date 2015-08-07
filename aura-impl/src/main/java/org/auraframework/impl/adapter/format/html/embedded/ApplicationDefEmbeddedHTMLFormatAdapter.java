@@ -36,7 +36,7 @@ import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.Literal;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Maps;
 
@@ -86,7 +86,7 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
 
             auraInit.put("context", new Literal(contextWriter.toString()));
 
-            attributes.put("auraInit", Json.serialize(auraInit, context.getJsonSerializationContext()));
+            attributes.put("auraInit", JsonEncoder.serialize(auraInit, context.getJsonSerializationContext()));
             Component template = instanceService.getInstance(templateDef.getDescriptor(), attributes);
             renderingService.render(template, out);
         } catch (QuickFixException e) {

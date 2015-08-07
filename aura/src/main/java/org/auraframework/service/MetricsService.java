@@ -23,7 +23,7 @@ import org.auraframework.util.json.Json;
  * Service for contacting other Aura servers
  * </p>
  * <p>
- * Instances of all AuraServices should be retrieved from {@link Aura}
+ * Instances of all AuraServices should be retrieved from {@link org.auraframework.Aura}
  * </p>
  */
 public interface MetricsService extends AuraService {

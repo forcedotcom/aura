@@ -26,7 +26,7 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.util.javascript.Literal;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 /**
  * An interface for the server side implementation of an action.
@@ -117,7 +117,7 @@ public interface Action extends Instance<ActionDef> {
 
     /**
      * Log any params that are useful and safe to log.
-     * @param paramLogger
+     * @param logger
      */
     public void logParams(KeyValueLogger logger);
 

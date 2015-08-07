@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -36,7 +36,7 @@ public class ThrowableJSONFormatAdapter extends JSONFormatAdapter<Throwable> {
 
     @Override
     public void write(Throwable value, Map<String, Object> attributes, Appendable out) throws IOException {
-        Json.serialize(value, out, Aura.getContextService().getCurrentContext().getJsonSerializationContext());
+        JsonEncoder.serialize(value, out, Aura.getContextService().getCurrentContext().getJsonSerializationContext());
     }
 
 }

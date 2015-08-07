@@ -31,7 +31,7 @@ import org.auraframework.system.Location;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializer.NoneSerializer;
+import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
 import com.google.common.collect.ImmutableList;
 

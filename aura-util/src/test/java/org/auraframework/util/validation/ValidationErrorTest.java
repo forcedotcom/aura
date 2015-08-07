@@ -18,7 +18,7 @@ package org.auraframework.util.validation;
 import java.util.Map;
 
 import org.auraframework.util.javascript.JavascriptProcessingError.Level;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.util.UnitTestCase;
 
@@ -27,7 +27,7 @@ public final class ValidationErrorTest extends UnitTestCase {
     public void testJsonSerialization() {
         ValidationError error = new ValidationError("tool", "/file/name", 11, 3, "message", "evidence",
                 Level.Error, "rule");
-        String json = Json.serialize(error);
+        String json = JsonEncoder.serialize(error);
         @SuppressWarnings("unchecked")
         ValidationError dError = ValidationError.deserialize((Map<String, ?>) new JsonReader().read(json));
         assertEquals(error.toCommonFormat(), dError.toCommonFormat());

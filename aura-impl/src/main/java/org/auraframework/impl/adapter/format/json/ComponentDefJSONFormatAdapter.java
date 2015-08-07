@@ -25,7 +25,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 
 import aQute.bnd.annotation.component.Component;
 
@@ -44,6 +44,6 @@ public class ComponentDefJSONFormatAdapter extends JSONFormatAdapter<BaseCompone
     public void writeCollection(Collection<? extends BaseComponentDef> values, Appendable out) throws IOException,
             QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-        Json.serialize(values, out, context.getJsonSerializationContext());
+        JsonEncoder.serialize(values, out, context.getJsonSerializationContext());
     }
 }

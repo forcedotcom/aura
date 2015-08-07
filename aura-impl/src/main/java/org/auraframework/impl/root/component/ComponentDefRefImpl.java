@@ -48,8 +48,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.json.Json.Serialization;
-import org.auraframework.util.json.Json.Serialization.ReferenceType;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceType;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -162,8 +162,7 @@ public class ComponentDefRefImpl extends DefinitionImpl<ComponentDef> implements
      * Example: in the component instantiation of myMS:widget validates the specified attributes foo and bar
      * <myNS:uberWidget foo="123" bar="blah"/>
      *
-     * @param rootDef the element being instantiated
-     * @param specifiedAttributes the attributes specified in the comp
+     * @param referencingDesc referencing descriptor
      */
     private void validateAttributesValues(DefDescriptor<?> referencingDesc) throws QuickFixException, AttributeNotFoundException {
         RootDefinition rootDef = getComponentDef();

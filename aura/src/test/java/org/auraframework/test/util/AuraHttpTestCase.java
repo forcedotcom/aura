@@ -59,6 +59,7 @@ import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
+import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableList;
@@ -349,8 +350,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
     /**
      * Convenience method for executing an Action
      *
-     * @param descriptor fully qualified descriptor string for the action - e.g. java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString
-     * @param params a set of name value string pairs to use as parameters to the post call.
+     * @param serverControllerClass controller class
+     * @param methodName name of controller action method
      * @return a {@link HttpPost}
      * @throws Exception
      */
@@ -365,7 +366,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
         }
         Map<?, ?>[] actions = { actionInstance };
         message.put("actions", actions);
-        String jsonMessage = Json.serialize(message);
+        String jsonMessage = JsonEncoder.serialize(message);
 
         if (postParams == null) {
             postParams = Maps.newHashMap();
@@ -596,7 +597,7 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                             ApplicationDef.class);
                 }
                 message.put("actions", actionInstanceArray.toArray());
-                String jsonMessage = Json.serialize(message);
+                String jsonMessage = JsonEncoder.serialize(message);
                 Map<String, String> params = Maps.newHashMap();
                 params.put("message", jsonMessage);
                 params.put("aura.token", getTestServletConfig().getCsrfToken());

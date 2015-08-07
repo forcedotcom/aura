@@ -81,6 +81,7 @@
         </snapshotRepository>
     </distributionManagement>
     <modules>
+        <module>aura-interfaces</module>
         <module>aura-util</module>
         <module>aura</module>
         <module>aura-impl</module>
@@ -92,7 +93,6 @@
         <module>aura-integration-test</module>
         <module>auradocs-integration-test</module>
         <module>aura-archetype</module>
-        <module>aura-osgi-api</module>
     </modules>
     <scm>
         <connection>scm:git:git@github.com:forcedotcom/aura.git</connection>
@@ -124,6 +124,11 @@
                 <artifactId>aura</artifactId>
                 <version>0.2867-SNAPSHOT</version>
                 <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>org.auraframework</groupId>
+                <artifactId>aura-interfaces</artifactId>
+                <version>0.2867-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>
@@ -198,11 +203,6 @@
                 <version>0.2867-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.auraframework</groupId>
-                <artifactId>aura-osgi-api</artifactId>
-                <version>0.2867-SNAPSHOT</version>
-            </dependency>
-            <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.11</version>
@@ -241,11 +241,6 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
                 <version>3.0.5.RELEASE</version>
-            </dependency>
-            <dependency>
-                <groupId>net.sourceforge.findbugs</groupId>
-                <artifactId>annotations</artifactId>
-                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>commons-logging</groupId>

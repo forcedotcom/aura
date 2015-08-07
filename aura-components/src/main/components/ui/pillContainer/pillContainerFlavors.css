@@ -58,7 +58,7 @@
 }
 
 .THIS .showMore {
-    text-align:center;
+    float: right;
     line-height: 26px;
     padding: 5px;
 }

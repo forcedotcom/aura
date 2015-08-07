@@ -49,6 +49,7 @@
 
     <div aura:flavorable="true" role="application" onmousedown="{!c.onClickBackground}">
         <div class="assistiveText">{!v.assistiveTextLabel}</div>
+        <a aura:id="showMore" class="showMore invisible" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
         <ul aura:id="list" class="orderedList">
             <aura:iteration items="{!v.items}" var="item" iterationComplete="{!c.pillIterationComplete}" aura:id="pills">
                 <li aura:id="listitem" class="pillContainerListItem">
@@ -67,7 +68,6 @@
                 {!v.pillInput}
             </li>
         </ul>
-        <a aura:id="showMore" class="showMore invisible" onclick="{!c.onShowMore}">{!v.showMoreLabel}</a>
     </div>
 
 </aura:component>

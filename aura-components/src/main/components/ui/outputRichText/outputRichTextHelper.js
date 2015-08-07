@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 ({
-    SUPPORTED_HTML_TAGS: ["img", "div", "span", "ol", "li", "p", "ul", "a",
-                          "h1", "h2", "h3", "b", "i", "strong", "em", "u", "s", "sub", "sup", "blockquote", 
-                          "pre", "big", "small", "tt", "code", "kbd", "samp", "var", "del", "ins", "cite", "q", 
-                          "table", "tr", "td", "caption", "thead", "th", "tbody", "tfoot", "hr", 
-                          "param"],
+    SUPPORTED_HTML_TAGS: ["a", "b", "big", "blockquote", "caption", "cite", "code", 
+                          "del", "div", "em", "h1", "h2", "h3", "hr", "i", "img", "ins",
+                          "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
+                          "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",
+                          "thead", "tr", "tt", "u", "ul", "var"],
     
     removeEventHandlers: function(element) {
-        var attributes = element.attributes;
+        var attributes = element.attributes || [];
         for (var i = 0; i < attributes.length; i++) {
             if ($A.util.isIE && !attributes[i].specified) {
                 continue;
@@ -44,35 +44,45 @@
         } else {
             supportedTags = this.SUPPORTED_HTML_TAGS;
         }
-        var root = document.createElement('div');
-        root.innerHTML = value;
         
-        this.validateElement(root, supportedTags);
-    
-        var result = root.innerHTML;
-        if (result != value) {
-            component.set("v.value", result);
+        try {
+        	var dummy = document.implementation.createHTMLDocument();
+            var root = dummy.createElement('div');
+            root.innerHTML = value;
+            
+            this.validateElement(root, supportedTags);
+        
+            var result = root.innerHTML;
+            if (result != value) {
+                component.set("v.value", result);
+            }
+            $A.util.removeElement(root);
+        } catch (e) {
+        	$A.warning("Exception caught while attempting to validate " + component.getGlobalId() + "; " + e);
+        	component.set("v.value", $A.util.sanitizeHtml(value));
         }
-        $A.util.removeElement(root);
     },
     
     validateElement: function(element, supportedTags) {
         if (element.nodeType == 3) { // text node
             return;
         }
-        if (supportedTags.indexOf(element.tagName.toLowerCase()) < 0) {
+        if (element.tagName && supportedTags.indexOf(element.tagName.toLowerCase()) < 0) {
             //element.parentNode.removeChild(element);
             $A.util.removeElement(element);
             return;
         }
         this.removeEventHandlers(element);
         var nodes = element.childNodes;
-        var len = nodes.length;
-        for (var i = 0; i < len; i++) {
-            this.validateElement(nodes[i], supportedTags);
-            if (len > nodes.length) { // the current element is removed
-                len = nodes.length;
-                i--;
+
+        if (nodes) {
+        	var len = nodes.length;
+            for (var i = 0; i < len; i++) {
+                this.validateElement(nodes[i], supportedTags);
+                if (len > nodes.length) { // the current element is removed
+                    len = nodes.length
+                    i--;
+                }
             }
         }
     }

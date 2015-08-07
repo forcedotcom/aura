@@ -363,7 +363,7 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         text = "//" + text;
     }
 
-    var responseMessage = $A.util.json.decode(text, true);
+    var responseMessage = $A.util.json.decode(text);
     if ($A.util.isUndefinedOrNull(responseMessage)) {
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
         $A.error("Communication error, invalid JSON: " + text);
@@ -375,6 +375,13 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         // #end
         ret["status"] = "ERROR";
         return ret;
+    } else {
+        // Prevent collision between value providers and serRefId properties (typically "s" and "r").
+        var context = responseMessage["context"];
+        var globalValueProviders = context["globalValueProviders"];
+        context["globalValueProviders"] = undefined;
+        $A.util.json.resolveRefs(responseMessage);
+        context["globalValueProviders"] = globalValueProviders;
     }
     ret["status"] = "SUCCESS";
     ret["message"] = responseMessage;
@@ -1809,7 +1816,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             that.receive(auraXHR);
         }
     };
-    
+
     if(context&&context.getCurrentAccess()&&this.inAuraLoop()){
         auraXHR.request["onreadystatechange"] = $A.getCallback(auraXHR.request["onreadystatechange"]);
     }
@@ -1833,11 +1840,11 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     } else {
         auraXHR.request["send"]();
     }
-    
+
     setTimeout(function() {
         $A.get("e.aura:waiting").fire();
     }, 1);
-    
+
     return true;
 };
 

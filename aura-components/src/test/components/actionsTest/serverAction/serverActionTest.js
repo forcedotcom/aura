@@ -1,4 +1,20 @@
 ({
+	/**
+	 * Verify we can get action not accessable through current component by $A.test.getExternalAction
+	 * in the test down below, if we do cmp.get("c.getNamedComponent"); it will return nothing and error out
+	 */
+    testGetExternalAction : {
+    	test: [function(cmp) {
+    		var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
+    				 {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
+    				 "java://org.auraframework.instance.component",
+    				 function(action){
+    					 $A.test.assertTrue(action.state === "SUCCESS");
+    				});
+    		$A.enqueueAction(eAction);
+    	}]
+    },
+    
 	testServerActionWithStoredResponseGetStorageFirst : {
 		test: [
 		function primeActionStorage(cmp) {

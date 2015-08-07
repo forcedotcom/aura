@@ -33,21 +33,10 @@ TestInstance = function() {
     this.suite = undefined;
     this.stages = undefined;
     this.cmp = undefined;
-
     this.blockForeground = 0;
     this.blockBackground = 0;
     this.sentXHRCount = 0;
-    
     this.prePostSendConfigs = [];
-
-    //vars to store initial and whitelisted variables exposed on window object
-    var _initialGlobalState = Object.keys(window);
-
-    /** @private **/
-    this.getInitialGlobalState = function() {
-        return _initialGlobalState;
-    };
-    
     this.installOverride();
 };
 
@@ -2002,31 +1991,6 @@ TestInstance.prototype.createHttpRequest = function() {
     } else {
         throw new Error("TestInstance.createHttpRequest: Unable to find an appropriate XHR");
     }
-};
-
-/**
- * Performs a check if global namespace is polluted with new
- * variables apart from whitelisted ones
- *
- * @export
- * @function Test#checkGlobalNamespacePollution
- */
-TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollutants) {
-    var that = this,
-        pollutants = [],
-        initialGlobalState = that.getInitialGlobalState();
-    if(!window || !initialGlobalState.length) {
-        return pollutants;
-    }
-    var knownPollutants = initialGlobalState.concat(whitelistedPollutants);
-    var currentGlobalState = Object.keys(window);
-    for (var i = currentGlobalState.length - 1; i >= 0; i--) {
-        var key = currentGlobalState[i];
-        if (-1 === knownPollutants.indexOf(key)) {
-            pollutants.push(key);
-        }
-    }
-    return (pollutants.length ? "New global variables found: " + pollutants.join(",") + "." : "");
 };
 
 /**

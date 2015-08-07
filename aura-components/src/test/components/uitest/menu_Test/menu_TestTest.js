@@ -182,6 +182,62 @@
     },
 
     /**
+     * Test to verify radioMenuItem when hideMenuSelected is set
+     * Test case for W-2678659
+     * using AURA API
+     */
+    testRadioMenuWithHideMenuSelectedSet: {
+        test: [function (cmp) {
+            menuLabel = cmp.find("radioMenuLabel");
+            radioMenu = cmp.find("radioMenu");
+            ouptutButton = cmp.find("radioButton");
+            item1 = cmp.find("radioItem1");
+            item2 = cmp.find("radioItem2");
+            outputText = "radioMenuResult";
+
+            this.clickTrigger(menuLabel);
+            //check if menu is visible
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return $A.util.hasClass(radioMenu.getElement(), "visible")
+            }, "Radio Menu should be visible");
+        }, function (cmp) {
+        	item1.set("v.hideMenuAfterSelected",true);
+            //Select first item from the menu
+            item1.get('e.click').fire();
+            //check if first item is selected
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return item1.get('v.selected')
+            }, "Radio Menu item 1 should be selected");
+        }, function (cmp) {
+            //Menu should be hidden
+        	$A.test.assertFalse($A.util.hasClass(radioMenu.getElement(), "visible"), "Radio Menu Class name should not contain visible");
+        	//MenuTrigger should be active element 
+        	$A.test.assertEquals($A.test.getText(menuLabel.getElement()), $A.test.getActiveElementText(), "Active Element should be Radio MenuList Trigger");
+            this.clickTrigger(menuLabel);
+            item2.get('e.click').fire();
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return item2.get('v.selected')
+            }, "Radio Menu item 2 should be selected");
+        }, function (cmp) {
+            //menu item 1 should be unchecked after selecting item2
+            $A.test.assertFalse(item1.get('v.selected'), "Radio Menu item 1 should be unchecked");
+            this.clickTrigger(menuLabel);
+            $A.test.addWaitForWithFailureMessage(false, function () {
+                return $A.util.hasClass(radioMenu.getElement(), "visible")
+            }, "Radio Menu should not be visible");
+        }, function (cmp) {
+            ouptutButton.get('e.press').fire();
+            var expectedOutputText = item2.get('v.label');
+            $A.test.addWaitForWithFailureMessage(expectedOutputText, function () {
+                return cmp.find(outputText).get('v.value')
+            }, "Radio Menu output text did not get updated");
+        }
+
+        ]
+    },
+
+    
+    /**
      * Test to verify radiobox menu created using iteration cmp works when interacting with the menu items
      * using AURA API
      * Test Case for W-1617363, W-1617518

@@ -142,7 +142,6 @@ AuraClientService = function AuraClientService () {
     this.auraStack = [];
     this.appcacheDownloadingEventFired = false;
     this.isOutdated = false;
-    this.isUnloading = false;
     this.initDefsObservers = [];
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
@@ -152,14 +151,6 @@ AuraClientService = function AuraClientService () {
     this._tokenStorageKey = "$AuraClientService.token$";
 
     this.NOOP = function() {};
-
-    var acs = this;
-
-    Aura.Utils.Util.prototype.on(window, "beforeunload", function() {
-        if (!$A.util.isIE) {
-            acs.isUnloading = true;
-        }
-    });
 
     Aura.Utils.Util.prototype.on(window, "load", function() {
         // Lazy load data-src scripts
@@ -242,10 +233,6 @@ AuraClientService.prototype.setQueueSize = function(queueSize) {
  */
 AuraClientService.prototype.decode = function(response, noStrip) {
     var ret = {};
-    if (this.isUnloading) {
-        ret["status"] = "UNLOADING";
-        return ret;
-    }
 
     var e;
 

@@ -14,31 +14,22 @@
 	<aura:attribute name="value" type="String" default="2015-07-01"/>
 	<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
 	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
-	<div class="block">
+	<div>
 	    <div>
 	        <h1>Test Default Header Tag (h2)</h1>
 	    </div>
-	    <div class="subtitle">
-	    	<div>dp_v_titleHeadingLevel = {!v.dp_v_titleHeadingLevel}</div>
-	    	<div>datepicker_calTitle_v_tag = {!v.datepicker_calTitle_v_tag}</div>
-	    	<div>dp_CalTitle_TagName = {!v.dp_CalTitle_TagName}</div>
-		</div>
 	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-	    	<ui:datePickerManager aura:id="datepickerManager"/>
+	    	<ui:datePicker aura:id="standAloneDatepicker" visible="true"></ui:datePicker>
 	    </div>
 	</div>
 	</aura:if>
 
 
 	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyCustomHeaderTag'}">	
-	<div class="block">
+	<div>
 	    <div>
 	        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
 	    </div>
-	    <div class="subtitle">
-	    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
-		</div>
 	    <div>
 	        <ui:datePicker aura:id="standAloneDatepicker" visible="true" titleHeadingLevel="h3"></ui:datePicker>
 	    </div>
@@ -80,11 +71,19 @@
 	</aura:if>
 
 
-	<aura:if isTrue="{! v.renderItem == 'testWithSingleInput'}">	
-		<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" />
+	<aura:if isTrue="{! v.renderItem == 'testSingleInputFlag'}">	
+		<div id="singleInputField">
+			<b>singleInputField:</b><br />
+			<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" /><br />
+		</div>
+		<div id="compoundInputField">
+			<b>compoundInputField:</b><br />
+			<ui:inputDateTime aura:id="inputDatetime_disabled" useSingleInput="false" displayDatePicker="true" /><br />
+		</div>
 	</aura:if>
 
-	<aura:if isTrue="{! v.renderItem == 'testWithCompoundInput'}">	
-		<ui:inputDateTime aura:id="inputDatetime" useSingleInput="false" displayDatePicker="true" />
+
+	<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
+		<ui:inputDate aura:id="inputDate" disabled="true" />
 	</aura:if>
 </aura:component>

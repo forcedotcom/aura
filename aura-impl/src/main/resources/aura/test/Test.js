@@ -87,40 +87,6 @@ TestInstance.prototype.addWaitFor = function(expected, testFunction, callback) {
     this.addWaitForWithFailureMessage(expected, testFunction, null, callback);
 };
 
-/**
- * @description Asynchronously wait for an action to complete before continuing with the next stage of the test case.
- *              The wait condition is checked after the current test stage is completed but before the next stage is
- *              started.
- *
- * @example
- * $A.test.addWaitForAction(true, "myActionName", function() {alert("My Action Completed");});
- *
- * @param {Object}
- *            success true if the action should succeed.
- * @param {Object}
- *            actionName the name of the action from createAction
- * @param {Function}
- *            callback Invoked after the action completes
- * @export
- * @function Test#addWaitForAction
- */
-TestInstance.prototype.addWaitForAction = function(success, actionName, callback) {
-    var theAction = actionName;
-    var that = this;
-
-    if ($A.util.isUndefinedOrNull(this.completed[theAction])) {
-        this.fail("Unregistered name " + theAction);
-    }
-    this.addWaitForWithFailureMessage(true, function() {
-        if (that.isActionComplete(theAction)) {
-            if (that.isActionSuccessfullyComplete(theAction) !== success) {
-                that.fail("Action " + theAction + " did not complete with success = " + success);
-            }
-            return true;
-        }
-        return false;
-    }, null, callback);
-};
 
 /**
  *
@@ -352,8 +318,9 @@ TestInstance.prototype.enqueueAction = function(action, background) {
  * @description Get an instance of a server action that is not available to the component.
  * 
  * @example
- * $A.test.getExternalAction(cmp, "aura =//ComponentController/ACTION$getComponent",
+ * $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent",
  * 			{name:"aura:text", attributes:{value:"valuable"}},
+ * 			"java://org.auraframework.instance.component",
  * 			function(action){alert(action.getReturnValue().attributes.values.value)})
  * 
  * @param {Component} component

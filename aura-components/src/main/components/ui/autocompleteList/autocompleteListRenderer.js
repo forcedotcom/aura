@@ -17,6 +17,7 @@
     afterRender : function(component, helper){
         this.superAfterRender();
         helper.updateEmptyListContent(component);
+        helper.setUpEvents(component);
     },
     rerender : function(component, helper){
         this.superRerender();

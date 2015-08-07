@@ -48,42 +48,6 @@
     },
 
     visibleChange: function(component, event, helper) {
-        var obj = {};
-        var visible = component.get("v.visible");
-        
-        // Should no longer be necessary. We do this in an expression now on the list
-        //var list = component.find("list");
-        //$A.util.toggleClass(list, "visible", visible);
-        
-        // auto complete list is hidden.
-        if (visible === false) { 
-            // Remove loading indicator
-            obj["aria-activedescendant"] = "";
-            obj["aria-expanded"] = false;
-            // De-register list expand/collapse events
-            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-            $A.util.removeOn(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
-        } else { // Register list expand/collapse events
-            obj["aria-expanded"] = true;
-            $A.util.on(document.body, helper.getOnClickEventProp("onClickStartEvent"), helper.getOnClickStartFunction(component));
-            $A.util.on(document.body, helper.getOnClickEventProp("onClickEndEvent"), helper.getOnClickEndFunction(component));
-
-            //push this even to the end of the queue to ensure that the interation in the component body is complete
-            window.setTimeout($A.getCallback(function () {
-                component.get("e.listExpand").fire();
-            }, 0));
-
-        }
-        
-        
-
-        // Update accessibility attributes
-        var updateAriaEvt = component.get("e.updateAriaAttributes");
-        if (updateAriaEvt) {
-            updateAriaEvt.setParams({
-                attrs: obj
-            })
-            updateAriaEvt.fire();
-        }
+        helper.setUpEvents(component);
     }
 })

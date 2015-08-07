@@ -22,6 +22,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     
     <aura:attribute name="height"               type="Integer"                                    description="Height of the carousel"/>
+    <aura:attribute name="swipeEnabled"         type="Boolean" default="true"                     description="Enable swipe"/>
     <aura:attribute name="width"                type="Integer"                                    description="Width of the carousel"/>
     <aura:attribute name="pageModels"           type="Object[]"                                   description="Array of metadata component definitions to load"/>
     <aura:attribute name="pageComponents"       type="Aura.Component[]"                           description="Array of Components to inject"/>
@@ -60,7 +61,7 @@
             bindEventsToScroller="{!v.bindEventsToScroller}"
             scroll="horizontal"
             supportVoiceOver="false"
-            enabled="{! (v.pageModels.length > 1 || v.pageComponents.length > 1)}"
+            enabled="{! and( v.swipeEnabled, (v.pageModels.length > 1 || v.pageComponents.length > 1))}"
             snap="true"
             lockOnDirection="vertical"
             plugins="Indicators,Carousel"

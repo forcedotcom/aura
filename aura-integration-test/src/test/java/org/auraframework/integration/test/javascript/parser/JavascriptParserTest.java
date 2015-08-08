@@ -148,7 +148,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
         String[] jsonres = (JsonEncoder.serialize(jsActionDef)).split("\"");
         // Verify the second function did replace the first one
         assertEquals("second function didn't survive",
-                ":function(component) {var v = 2;},", jsonres[10]);
+                "function(component) {var v = 2;}", jsonres[0]);
     }
 
     /**

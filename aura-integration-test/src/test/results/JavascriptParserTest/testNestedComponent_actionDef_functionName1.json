@@ -1,12 +1,6 @@
 {
   "s":1,
-  "v":{
-    "descriptor":"js://test.testJSControllerParent/ACTION$functionName1",
-    "name":"functionName1",
-    "code":
-function(args1, args2) {
+  "v":function(args1, args2) {
         var str = 'do Nothing';
-    },
-    "actionType":"CLIENT"
-  }
+    }
 }

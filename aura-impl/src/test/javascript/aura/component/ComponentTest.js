@@ -52,7 +52,7 @@ Test.Aura.Component.ComponentTest=function(){
                     getCurrentAction:function(){
                         return {
                             topPath: function () {},
-                            getNextGlobalId: function () {}, 
+                            getNextGlobalId: function () {},
                             getId: function () {},
                             getCurrentPath: function () {}
                         };
@@ -88,11 +88,10 @@ Test.Aura.Component.ComponentTest=function(){
                                 }}
                             },
                             getModelDef:function(){},
-                            getProviderDef:function(){},
-                            getRenderingDetails:function(){return {}},
                             getSuperDef:function(){},
                             getValueHandlerDefs:function(){},
-                            isAbstract:function(){}
+                            isAbstract:function(){},
+                            isInstanceOf:function(){}
                         };
                     },
                     index:function(){},
@@ -107,7 +106,6 @@ Test.Aura.Component.ComponentTest=function(){
                 },
                 util:{
                     apply:function(){
-
                     },
                     isArray:function(target){
                         return target instanceof Array;
@@ -117,9 +115,11 @@ Test.Aura.Component.ComponentTest=function(){
                     },
                     isString:function(target){
                         return typeof(target) == "string";
+                    },
+                    isUndefinedOrNull:function(){
                     }
                 }
-            } 
+            }
         };
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }

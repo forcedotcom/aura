@@ -1,36 +1,21 @@
 {
   "s":1,
   "v":{
-    "descriptor":"js://test.testJSController",
-    "actionDefs":[
-      {
-        "s":2,
-        "v":{
-          "descriptor":"js://test.testJSController/ACTION$functionName1",
-          "name":"functionName1",
-          "code":
-function(args1, args2) {
+    "functionName1":{
+      "s":2,
+      "v":function(args1, args2) {
         
 
         
 
         var str = 'do Nothing';
+    }
     },
-          "actionType":"CLIENT"
-        }
-      },
-      {
-        "s":3,
-        "v":{
-          "descriptor":"js://test.testJSController/ACTION$functionName2",
-          "name":"functionName2",
-          "code":
-function(args1, args2, args3) {
+    "functionName2":{
+      "s":3,
+      "v":function(args1, args2, args3) {
         var str = 'Still do Nothing';
-    },
-          "actionType":"CLIENT"
-        }
-      }
-    ]
+    }
+    }
   }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint sub: true */
+/*jslint sub: true, evil: true */
 
 /**
  * @description The Aura Component Service, accessible using $A.service.component.  Creates and Manages Components.
@@ -26,9 +26,6 @@ function AuraComponentService () {
     this.controllerDefRegistry = {};
     this.actionDefRegistry     = {};
     this.modelDefRegistry      = {};
-    this.providerDefRegistry   = {};
-    this.rendererDefRegistry   = {};
-    this.helperDefRegistry     = {};
     this.libraryDefRegistry    = new Aura.Library.LibraryDefRegistry(); // To abstract lib logic
     this.componentDefStorage   = new Aura.Component.ComponentDefStorage();
 
@@ -441,18 +438,29 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
 };
 
 /**
+ * Load the initial map of class constructors.
+ * @param {Object} classConstructorExporter A map of descriptor:exporter. See addComponentClass().
+ * @export
+ */
+AuraComponentService.prototype.initComponentClass = function(classConstructorExporter){
+    if (!this.classConstructorExporter) {
+        this.classConstructorExporter = classConstructorExporter;
+    }
+};
+
+/**
  * Use the specified constructor as the definition of the class descriptor.
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
  * @param {String} descriptor Uses the pattern of namespace:componentName.
- * @param {Function} classConstructor A function that when executed will define the class constructor for the specified class.
+ * @param {Function} exporter A function that when executed will return the component object litteral.
  * @export
  */
-AuraComponentService.prototype.addComponentClass = function(descriptor, classConstructor){
+AuraComponentService.prototype.addComponentClass = function(descriptor, exporter){
     if (descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
         return;
     }
 
-    this.classConstructorExporter[descriptor] = classConstructor;
+    this.classConstructorExporter[descriptor] = exporter;
 };
 
 /**
@@ -467,7 +475,8 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
     if (!storedConstructor) {
         var exporter = this.classConstructorExporter[descriptor];
         if (exporter) {
-            storedConstructor = exporter();
+            var componentProperties = exporter();
+            storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;
             // No need to keep all these extra functions.
             delete this.classConstructorExporter[descriptor];
@@ -475,6 +484,103 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
     }
 
     return storedConstructor;
+};
+
+/**
+ * Build the class for the specified component.
+ * This process is broken into subroutines for clarity and maintainabiity,
+ * and those are all combined into one single scope by the compiler.
+ * @param {Object} componentProperties The pre-built component properties.
+ * @returns {Function} The component class.
+ * @export
+ */
+AuraComponentService.prototype.buildComponentClass = function(componentProperties) {
+
+    this.addComponentClassInheritance(componentProperties);
+    this.addComponentClassLibraries(componentProperties);
+    var componentConstructor = this.buildComponentClassConstructor(componentProperties);
+
+    return componentConstructor;
+};
+
+
+/**
+ * Augment the component class properties with thier respective inheritance. The
+ * inner classes are "static" classes, and currenltly, only the helper is inherited.
+ * @param {Object} componentProperties The pre-built component properties.
+ */
+AuraComponentService.prototype.addComponentClassInheritance = function(componentProperties) {
+
+    var superDescriptor = componentProperties["meta"]["extends"];
+    var superConstuctor = this.getComponentClass(superDescriptor);
+
+    // Component has a helper object even there is no helper in the bundle
+    componentProperties["helper"] = componentProperties["helper"] || {};
+
+    // Currently, only the helper is inherited.
+    var superHelper = superConstuctor && superConstuctor.prototype["helper"];
+    if (superHelper) {
+        // TODO: Update to the following line once all browsers have support for writeable __proto__
+        // (requires IE11+, supported elsewhere).
+        // componentProperties["helper"]['__proto__'] = superHelper;
+        var helper = Object.create(superHelper);
+        var helperProperties = componentProperties["helper"];
+        if (helperProperties) {
+            for (var property in helperProperties) {
+                helper[property] = helperProperties[property];
+            }
+        }
+        componentProperties["helper"] = helper;
+    }
+};
+
+/**
+ * Augment the component class properties with the component libraries. This method
+ * attached the component imports (a.k.a. "libraries") on the properties.
+ * @param {Object} componentProperties The pre-built component properties.
+ */
+AuraComponentService.prototype.addComponentClassLibraries = function(componentProperties) {
+
+    var componentImports = componentProperties["meta"]["imports"];
+    if (componentImports) {
+        var helper = componentProperties["helper"];
+        for (var property in componentImports) {
+            helper[property] = this.getLibraryDef(componentImports[property]);
+        }
+        componentProperties["helper"] = helper;
+    }
+};
+
+/**
+ * Build the class constructor for the specified component.
+ * @param {Object} componentProperties The pre-built component properties.
+ * @returns {Function} The component class.
+ */
+AuraComponentService.prototype.buildComponentClassConstructor = function(componentProperties) {
+
+    var className = componentProperties["meta"]["name"];
+
+    // Create a named function dynamically to use as a constructor.
+    // TODO: Update to the following line when all browsers have support for dynamic function names.
+    // (only supported in IE11+).
+    // var componentConstructor = function [className](){ Component.apply(this, arguments); };
+    var componentConstructor = new Function(
+        "Component",
+        "return function " + className + "() { Component.apply(this, arguments); };"
+    )(Component);
+
+    // Extends from Component (and restore constructor).
+    componentConstructor.prototype = Object.create(Component.prototype);
+    componentConstructor.prototype.constructor = componentConstructor;
+
+    // Mixin inner classes (controller, helper, renderer, provider) and meta properties.
+    for (var property in componentProperties) {
+        if (componentProperties.hasOwnProperty(property)) {
+            componentConstructor.prototype[property] = componentProperties[property];
+        }
+    }
+
+    return componentConstructor;
 };
 
 /**
@@ -988,85 +1094,6 @@ AuraComponentService.prototype.createModelDef = function(config) {
     if (!def) {
         def = new ModelDef(config);
         this.modelDefRegistry[descriptor] = def;
-    }
-
-    return def;
-};
-
-/**
- * Gets the provider definition from the registry. A provider enables an abstract component definition to be used directly in markup.
- * @param {String} descriptor component descriptor for ProviderDef
- * @returns {ProviderDef} ProviderDef of component
- * @private
- */
-AuraComponentService.prototype.getProviderDef = function(descriptor) {
-    return this.providerDefRegistry[descriptor];
-};
-
-/**
- * Creates and returns ProviderDef
- * @param {String} componentDescriptor descriptor of component
- * @param {Object} config Configuration for ProviderDef
- * @returns {ProviderDef} ProviderDef from registry
- * @private
- */
-AuraComponentService.prototype.createProviderDef = function(componentDescriptor, config) {
-     var def = this.providerDefRegistry[componentDescriptor];
-    if (!def) {
-        def = new ProviderDef(config);
-        this.providerDefRegistry[componentDescriptor] = def;
-    }
-    return def;
-};
-
-/**
- * Gets the renderer definition from the registry.
- * @param {String} componentDefDescriptor component descriptor for ProviderDef
- * @returns {RendererDef} RendererDef of component
- * @private
- */
-AuraComponentService.prototype.getRendererDef = function(componentDefDescriptor) {
-    return this.rendererDefRegistry[componentDefDescriptor];
-};
-
-/**
- * Creates and returns RendererDef
- * @param {String} descriptor component descriptor for RendererDef
- * @private
- */
-AuraComponentService.prototype.createRendererDef = function(descriptor) {
-    var def = this.rendererDefRegistry[descriptor];
-    if (!def) {
-        def = new RendererDef(descriptor);
-        this.rendererDefRegistry[descriptor] = def;
-    }
-    return def;
-};
-
-/**
- * Gets the helper definition from the registry.
- * @param {String} componentDescriptor component descriptor for ProviderDef
- * @returns {HelperDef} RendererDef of component
- * @private
- */
-AuraComponentService.prototype.getHelperDef = function(componentDescriptor) {
-    return this.helperDefRegistry[componentDescriptor];
-};
-
-/**
- * Creates and returns HelperDef
- * @param {ComponentDef} componentDef component definition
- * @param {Object} libraries library defs map
- * @returns {HelperDef}
- * @private
- */
-AuraComponentService.prototype.createHelperDef = function(componentDef, libraries) {
-    $A.assert(componentDef, "Component definition is required to create ProviderDef");
-    var componentDescriptor = componentDef.getDescriptor().getQualifiedName();
-    var def = this.helperDefRegistry[componentDescriptor];
-    if (!def) {
-        def = new HelperDef(componentDef, libraries);
-        this.helperDefRegistry[componentDescriptor] = def;
     }
 
     return def;

@@ -64,10 +64,9 @@ public class JavascriptProviderDef extends DefinitionImpl<ProviderDef> implement
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
+    	json.writeMapBegin();
         json.writeMapEntry("provide", provide);
-        json.writeMapEnd();
+    	json.writeMapEnd();
     }
 
     @Override

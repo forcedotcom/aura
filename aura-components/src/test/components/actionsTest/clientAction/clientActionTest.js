@@ -92,7 +92,7 @@
             } catch (e) {
                 $A.test.assertEquals("intentional error", e.message);
             }
-            $A.test.assertEquals("Action failed: js://actionsTest.clientAction/ACTION$error", message);
+            $A.test.assertEquals("Action failed: actionsTest$clientAction$controller$error", message);
         }
     },
 
@@ -100,7 +100,7 @@
         test : function(cmp) {
             $A.test.assertTruthy(cmp.get("c.clientExecuteInForeground"));
             $A.test.assertTruthy(cmp.get("c.clientExecuteInFOREGROUND"));
-            
+
             cmp.find("executeInForeground").get("e.press").fire();
             $A.test.assertEquals("clientExecuteInForeground", cmp.get("v.value"));
             cmp.find("executeInFOREGROUND").get("e.press").fire();

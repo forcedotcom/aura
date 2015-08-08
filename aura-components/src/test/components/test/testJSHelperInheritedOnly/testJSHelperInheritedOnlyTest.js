@@ -24,18 +24,6 @@
         }
     },
     /**
-     * Assert characteristics of helper inherited from parent.
-     */
-    testGetHelperDef: {
-        test: function(component){
-            var helperDef = component.getDef().getHelperDef();
-            $A.test.assertNotUndefinedOrNull(helperDef);
-            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions);
-            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions());
-            $A.test.assertAuraType("HelperDef", helperDef);
-        }
-    },
-    /**
      * Assert that helper functions inherited from parent are usable.
      */
     testInheritedFunctions: {

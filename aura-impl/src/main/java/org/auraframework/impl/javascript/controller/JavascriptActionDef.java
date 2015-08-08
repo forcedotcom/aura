@@ -63,12 +63,7 @@ public class JavascriptActionDef extends DefinitionImpl<ActionDef> implements Ac
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapEntry("name", getName());
-        json.writeMapEntry("code", function);
-        json.writeMapEntry("actionType", getActionType());
-        json.writeMapEnd();
+        json.writeValue(function);
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<ActionDef> {

@@ -17,4 +17,5 @@ package org.auraframework.def;
 
 public interface ImportDef extends Definition {
     DefDescriptor<LibraryDef> getLibraryDescriptor();
+	String getProperty();
 }

@@ -57,10 +57,7 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
-        json.writeMapEntry("actionDefs", actionMap.values());
-        json.writeMapEnd();
+        json.writeMap(actionMap);
     }
 
     @Override
@@ -73,9 +70,9 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
      * are sometimes created for bookkeeping.  In particular, if a client-side action execution
      * fails, the failure is logged via ExceptionAdapter, which likes to have an action object,
      * including the action instance identifier in case that helps debugging.
-     * 
-     * @throws DefinitionNotFoundException 
-     * 
+     *
+     * @throws DefinitionNotFoundException
+     *
      * @returns an Action for the given action name.
      */
     @Override

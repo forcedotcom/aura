@@ -24,13 +24,13 @@
     testRendererDefProperties:{
         test:function(cmp){
             //Access the Renderer Def of test:testJSRenderer
-            var rendererDef = cmp.getDef().getRendererDef();
-            //Make sure what you actually accessed was a RendererDef
-            aura.test.assertAuraType("RendererDef", rendererDef, "Was expecting to find a RendererDef object.");
+            var renderer = cmp.getRenderer();
+            //Make sure what you actually accessed was an Object
+            aura.test.assertNotNull(renderer, "Was expecting to find an object.");
             //Verify that the render object is initialized on the RendererDef
-            aura.test.assertNotNull(rendererDef.renderMethod, "Render object not found on the renderer def of this componentDef.");
+            aura.test.assertNotNull(renderer.render, "Render object not found on the renderer of this component.");
             //Verify that the rerender object is initialized on the RendererDef
-            aura.test.assertNotNull(rendererDef.rerenderMethod, "ReRender object not found on the renderer def of this componentDef.");
+            aura.test.assertNotNull(renderer.rerender, "ReRender object not found on the renderer of this component.");
         }
     }
 })

@@ -38,9 +38,6 @@ Test.Aura.AuraRenderingServiceTest = function(){
         "ControllerDefRegistry": function(){},
         "ActionDefRegistry": function(){},
         "ModelDefRegistry": function(){},
-        "ProviderDefRegistry": function(){},
-        "RendererDefRegistry": function(){},
-        "HelperDefRegistry": function(){},
         "$A": $A
     });
 

@@ -1,9 +1,7 @@
 {
   "s":1,
   "v":{
-    "descriptor":"js://test.testJSRenderer",
-    "render":
-function(component) {
+    "render":function(component) {
     
 
     
@@ -13,8 +11,7 @@ function(component) {
         ret.innerHTML = component.get('v.label');
         return [ret];
     },
-    "rerender":
-function(component) {
+    "rerender":function(component) {
         var div = component.getElement();
         div.innerHTML = component.get('v.label');
     }

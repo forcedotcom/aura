@@ -28,16 +28,6 @@
         }
     },
 
-    testGetHelperDef: {
-        test: function(component){
-            var helperDef = component.getDef().getHelperDef();
-            $A.test.assertNotUndefinedOrNull(helperDef);
-            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions);
-            $A.test.assertNotUndefinedOrNull(helperDef.getFunctions());
-            $A.test.assertAuraType("HelperDef", helperDef);
-        }
-    },
-
     testFunctions: {
         test: function(component){
             var helper = component.getDef().getHelper();

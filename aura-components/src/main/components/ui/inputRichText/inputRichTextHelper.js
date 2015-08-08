@@ -170,7 +170,8 @@
 			locale = this.getLocale(cmp),
 			width = cmp.get('v.width'),
 			height = cmp.get('v.height'),
-			toolbarLocation = cmp.get('v.toolbarLocation');
+			toolbarLocation = cmp.get('v.toolbarLocation'),
+			label = cmp.get('v.label');
 
 		var config = {
 				language : locale,
@@ -200,7 +201,8 @@
 				shiftEnterMode : CKEDITOR.ENTER_P,
 
 				forcePasteAsPlainText : false,
-	    		forceSimpleAmpersand : true
+	    		forceSimpleAmpersand : true,
+	    		title : label
 			};
 		return config;
 	},

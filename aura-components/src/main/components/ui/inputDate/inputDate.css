@@ -18,7 +18,7 @@
 of the component*/
 
 div.THIS {
-	position: relative;	
+	position: relative;
 }
 
 .THIS + .datePicker-openIcon,
@@ -31,7 +31,6 @@ div.THIS {
     background: url('/auraFW/resources/aura/images/icon_openCalendar.png') no-repeat 0 0;
 }
 
-.THIS + .datePicker-openIcon + .clearIcon,
 .THIS .clearIcon {
     position: relative;
     vertical-align: middle;

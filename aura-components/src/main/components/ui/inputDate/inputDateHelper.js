@@ -142,7 +142,7 @@
             }
         }
     },
-    
+
     /**
      * Show/hide open date picker icon based on v.disabled
      */
@@ -153,7 +153,11 @@
     	    if (component.get("v.disabled") === true) {
     	    	$A.util.swapClass(openIconEl, "display", "hide");
     	    } else {
-    	    	$A.util.swapClass(openIconEl, "hide", "display");
+                var clearCmp = component.find("clear");
+                var clearElem = clearCmp ? clearCmp.getElement() : null;
+                if (!clearElem || !$A.util.hasClass(clearElem, "display")) {
+                    $A.util.swapClass(openIconEl, "hide", "display");
+                }
     	    }
     	}
     }

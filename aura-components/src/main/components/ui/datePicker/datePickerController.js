@@ -24,14 +24,14 @@
            component.getElement().style.opacity = 0;
             setTimeout($A.getCallback(function() {
                 if(component.isValid()) {
-                    
+
                     helper.position(component);
                     component.getElement().style.opacity = 1;
-                }   
+                }
             }),10);
         }
-        
-        
+
+
     },
 
     // prevent clicks in date picker from bubbling up
@@ -50,29 +50,10 @@
         }
     },
 
-    closeOnTab: function(component, event, helper) {
-        helper.handleESCKey(component, event);
-        var keyCode = event.keyCode;
-        var shiftKey = event.shiftKey;
-        if (keyCode == 9 && shiftKey == true) { // Tab + shift
-            helper.hide(component, true);
-        }
-    },
-
     doInit: function(component, event, helper) {
         helper.localizeToday(component);
         helper.setTitleTag(component);
         component._windowSize = $A.util.getWindowSize();
-    },
-
-    focusDateOnTab: function(component, event, helper) {
-        helper.handleESCKey(component, event);
-        var keyCode = event.keyCode;
-        var shiftKey = event.shiftKey;
-        if (keyCode == 9 && shiftKey != true) { // Tab
-            event.preventDefault();
-            helper.focusDate(component);
-        }
     },
 
 	goToPrevYear: function(component, event, helper) {
@@ -102,7 +83,7 @@
     },
 
     handleKeydown: function(component, event, helper) {
-        helper.handleESCKey(component, event);
+        helper.handleKeydown(component, event);
     },
 
     handleTabToday: function(component, event, helper) {
@@ -163,7 +144,9 @@
     },
 
     hide: function(component, event, helper) {
-        helper.hide(component, true);
+        if (component.get('v.closeOnClickOut')) {
+            helper.hide(component, true);
+        }
     },
 
     selectDate: function(component, event, helper) {

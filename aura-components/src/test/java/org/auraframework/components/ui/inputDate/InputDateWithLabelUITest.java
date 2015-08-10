@@ -50,17 +50,17 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     /**
      * Excluded Browser Reasons:
-     * 
+     *
      * IE7: pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is
      * that it will sometimes stop one short
-     * 
+     *
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
-     * 
+     *
      * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
-     * 
+     *
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
-     * 
+     *
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
@@ -415,8 +415,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // Test Begins
         // Getting the calendar Icon
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        element.click();
         element.sendKeys("2013-10-01");
+        element.click();
 
         element = findDomElement(By.cssSelector(DATE_ICON_SEL));
         element.click();
@@ -443,8 +443,9 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         WebDriver driver = getDriver();
 
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        element.click();
         element.sendKeys(TEST_DATE_TO_USE);
+        element.click();
+
         // Test Begins
         // Grab calendar Icon
         element = findDomElement(By.cssSelector(DATE_ICON_SEL));
@@ -477,8 +478,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         // Start at specific date
         WebElement element = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
-        element.click();
         element.sendKeys(TEST_DATE_TO_USE);
+        element.click();
 
         // Test Begins
         // Select the calendar Icon

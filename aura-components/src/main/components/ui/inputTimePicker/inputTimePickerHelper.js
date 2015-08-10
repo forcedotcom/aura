@@ -122,7 +122,6 @@
     appendListElement: function(listElem, displayValue, hourValue, minuteValue, selected) {
         var entry = document.createElement('li');
         entry.appendChild(document.createTextNode(displayValue));
-        entry.setAttribute("aria-selected", selected);
         // set localId to double digit hour/minute in 24h format, e.g. 2330
         var hours = ("0" + hourValue).slice(-2),
             minutes = ("0" + minuteValue).slice(-2);
@@ -205,12 +204,15 @@
                     } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
                         event.preventDefault();
                         helper.setFocusToPreviousItem(component, event);
+                    } else if (event.keyCode == 9 && event.shiftKey == true) {  // shift tab
+                        $A.util.squash(event, true);
+                        helper.hide(component, true);
                     } else if (event.keyCode === 27) {  // Esc key
-                        event.stopPropagation();
+                        $A.util.squash(event, true);
                         helper.hide(component, true);
                     } else if (event.keyCode === 9) {   // Tab key
                         helper.hide(component, true);
-                    }else if (event.keyCode == 32 || event.keyCode == 13) {  // space bar or enter
+                    } else if (event.keyCode == 32 || event.keyCode == 13) {  // space bar or enter
                         event.preventDefault();
                         helper.selectTime(component, event);
                     }

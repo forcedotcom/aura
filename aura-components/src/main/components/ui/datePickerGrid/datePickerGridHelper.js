@@ -110,7 +110,7 @@
         if ($A.util.isEmpty(rangeClass)) {
             rangeClass = 'highlight'
         }
-        
+
         var today = new Date();
         var _today = component.get("v._today");
         if (_today) {
@@ -246,7 +246,7 @@
         }
     },
 
-    handleESC: function(component) {
+    fireHideEvent: function(component) {
         component.get("e.hide").fire();
     },
 
@@ -276,6 +276,10 @@
             this.handleArrowKey(component, localId, 7);
         } else if (keyCode == 9 && shiftKey == true) { // Tab + shift
             //component.get("e.hide").fire();
+        } else if (keyCode == 9 && shiftKey != true) { // Tab
+            if (!component.get("v.hasTime")) {
+                this.fireHideEvent(component);
+            }
         } else if (keyCode == 33 && shiftKey == true) { // Page Up + shift
             this.changeCalendar(component, localId, 0, -1);
         } else if (keyCode == 34 && shiftKey == true) { // Page Down + shift
@@ -294,7 +298,7 @@
             this.changeCalendar(component, localId, 1, 0            );
         } else if (keyCode == 27) { // ESC
             domEvent.stopPropagation();
-            this.handleESC(component);
+            this.fireHideEvent(component);
         }
     },
 
@@ -401,7 +405,7 @@
             }
             component.set("v._namesOfWeekdays", days);
         } else {
-            component.set("v._namesOfWeekdays", namesOfWeekDays);    
+            component.set("v._namesOfWeekdays", namesOfWeekDays);
         }
     }
 });

@@ -22,12 +22,12 @@
 
         var datePicker = concreteCmp.find("datePicker");
         if (!$A.util.isUndefinedOrNull(datePicker)) {
-            datePicker.set("v.referenceElement", concreteCmp.getElement());
+            datePicker.set("v.referenceElement", concreteCmp.find("inputText").getElement());
         }
         _helper.toggleOpenIconVisibility(component);
         return this.superAfterRender();
 	},
-	
+
 	rerender: function(component, helper) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

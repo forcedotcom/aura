@@ -239,7 +239,7 @@ AuraStorageService.prototype.setVersion = function(version) {
  * @return {String} the default version for storages.
  * @export
  */
-AuraStorageService.prototype.getVersion = function(version) {
+AuraStorageService.prototype.getVersion = function() {
     return this.version;
 };
 

@@ -61,6 +61,7 @@
     "JsonTestInstance": true,
     "LayoutDef": true,
     "LibraryDefRegistry": true,
+    "LayoutsDef": true,
     "LayoutItemDef": true,
     "localizationService": true,
     "moment": true,

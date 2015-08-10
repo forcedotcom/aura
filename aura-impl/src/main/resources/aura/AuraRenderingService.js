@@ -787,7 +787,7 @@ AuraRenderingService.prototype.insertElements = function(elements, refNode, asSi
  * Calculates the flavor css class name for a component instance and element.
  * @private
  */
-AuraRenderingService.prototype.getFlavorClass = function(cmp, element) {
+AuraRenderingService.prototype.getFlavorClass = function(cmp) {
     var flavor = null; // keep in mind here, flavor may get set to "" if it was given a value of {!remove}
     var staticFlavorable = cmp.isFlavorable(); // aura:flavorable="true" on html elements
     var dynamicFlavorable = cmp.getDef().isDynamicallyFlavorable(); // dynamicallyFlavorable="true" on cmp def
@@ -832,7 +832,7 @@ AuraRenderingService.prototype.addAuraClass = function(cmp, element){
     var flavorClassName;
 
     if (className) {
-        flavorClassName = this.getFlavorClass(concrete, element);
+        flavorClassName = this.getFlavorClass(concrete);
         if (flavorClassName) {
             className = className + flavorClassName;
         }

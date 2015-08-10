@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-/*jslint sub: true */
+/*jslint sub: true*/
+/*eslint-disable no-alert, no-console */
 
 (function(){
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}

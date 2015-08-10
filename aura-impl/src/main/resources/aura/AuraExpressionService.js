@@ -125,16 +125,16 @@ AuraExpressionService.prototype.updateGlobalReference = function (expression, ol
 AuraExpressionService.prototype.updateGlobalReferences = function (type, newValues) {
     var gvpValues = $A.get(type);
 
-    function updateNestedValue(expression, values, newValues){
+    function updateNestedValue(expression, values, newValuesInside){
         if(!values) {
             values = {};
         }
 
-        for(var value in newValues){
+        for(var value in newValuesInside){
             var targetExpression=expression+'.'+value;
-            $A.expressionService.updateGlobalReference(targetExpression,values[value],newValues[value]);
-            if($A.util.isObject(newValues[value])){
-                updateNestedValue(targetExpression, values[value], newValues[value]);
+            $A.expressionService.updateGlobalReference(targetExpression,values[value],newValuesInside[value]);
+            if($A.util.isObject(newValuesInside[value])){
+                updateNestedValue(targetExpression, values[value], newValuesInside[value]);
             }
         }
     }

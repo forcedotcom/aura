@@ -229,7 +229,6 @@ AuraStyleService.prototype.removeThemes = function() {
     for (var i = 0, len = this.added.length; i < len; i++) {
         head.removeChild(this.added[i]);
     }
-    added = [];
 };
 
 Aura.Services.AuraStyleService = AuraStyleService;

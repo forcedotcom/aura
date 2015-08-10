@@ -334,8 +334,7 @@ TestInstance.prototype.getDump = function() {
         var actual;
         try {
             actual = this.waits[0].actual();
-        } catch (ignore) {
-        }
+        } catch (ignore) {/*do nothing*/}
         var failureMessage = "";
         if (!$A.util.isUndefinedOrNull(this.waits[0].failureMessage)) {
             failureMessage = " Failure Message: {" + this.waits[0].failureMessage + "}";

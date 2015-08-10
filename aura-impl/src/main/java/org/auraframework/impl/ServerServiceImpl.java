@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.StyleContext;
 import org.auraframework.css.ThemeList;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -175,17 +176,19 @@ public class ServerServiceImpl implements ServerService {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
 
+        StyleContext styleContext = context.getStyleContext();
+
         // build cache key
         final StringBuilder keyBuilder = new StringBuilder(64);
         keyBuilder.append("CSS:");
 
         // browser type
-        keyBuilder.append(context.getClient().getType());
+        keyBuilder.append(styleContext.getClientType());
 
-        // other "true" conditions from style adapter (e.g., isDesktop). For more info see comments in AuraContext serialization
-        String trueConditionsKey = Joiner.on("-").skipNulls().join(context.getStyleContext());
+        // other "true" conditions from style adapter (e.g., isDesktop)
+        String trueConditionsKey = Joiner.on("-").skipNulls().join(styleContext.getExtraTrueConditionsOnly());
         if (!trueConditionsKey.isEmpty()) {
-            keyBuilder.append("-");
+            keyBuilder.append(":");
             keyBuilder.append(trueConditionsKey);
         }
 

@@ -57,7 +57,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
-import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Maps;
 
 public class AuraContextFilter implements Filter {
@@ -189,9 +188,9 @@ public class AuraContextFilter implements Filter {
             }
 
             @SuppressWarnings("unchecked")
-            List<String> styleContextList = (List<String>) configMap.get("styleContext");
-            if (styleContextList != null) {
-                context.setStyleContext(ImmutableSortedSet.copyOf(styleContextList));
+            Map<String, Object> styleContext = (Map<String, Object>) configMap.get("styleContext");
+            if (styleContext != null) {
+                context.setStyleContext(styleContext);
             }
 
             @SuppressWarnings("unchecked")

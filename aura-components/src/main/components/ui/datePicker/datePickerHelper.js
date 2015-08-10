@@ -373,10 +373,11 @@
                         targetAlign: 'left bottom'
                     });
                 }
-                this.lib.panelPositioning.reposition();
-
-                //attaching to the body causes the date to lose focus so we need to add the focus back
-                this.focusDate(component);
+                this.lib.panelPositioning.reposition(function() {
+                    //attaching to the body causes the date to lose focus so we need to add the focus back
+                    self.focusDate(component);
+                });
+                
             } else {
                 if (!$A.util.isUndefinedOrNull(referenceElem)) {
                     $A.util.attachToDocumentBody(component.getElement());

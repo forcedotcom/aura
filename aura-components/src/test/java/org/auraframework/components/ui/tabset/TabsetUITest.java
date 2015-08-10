@@ -306,8 +306,7 @@ public class TabsetUITest extends WebDriverTestCase {
 
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
             BrowserType.IPAD })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testTabbingInTabSet() throws MalformedURLException, URISyntaxException {
+    public void testTabbingInTabSet() throws MalformedURLException, URISyntaxException {
         open(createURL("tab", "true"));
 
         // Focus on tab and move to next focusable element

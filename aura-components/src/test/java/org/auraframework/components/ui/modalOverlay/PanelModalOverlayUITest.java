@@ -281,8 +281,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * @throws URISyntaxException
      * @throws InterruptedException
      */
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testModalOverlayDialogDoesFocusTrapping() throws MalformedURLException, URISyntaxException,
+    public void testModalOverlayDialogDoesFocusTrapping() throws MalformedURLException, URISyntaxException,
             InterruptedException {
         verifyFocusTrappingForModalAndNonModalDialog(PANELDIALOG_MODAL_BUTTON, true);
     }
@@ -290,8 +289,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     /*
      * Tabs on nonModal overlay dialog should close the overlay and not trap the focus within the overlay
      */
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testNonModalOverlayDialogDoesNotDoFocusTrapping() throws MalformedURLException, URISyntaxException,
+    public void testNonModalOverlayDialogDoesNotDoFocusTrapping() throws MalformedURLException, URISyntaxException,
             InterruptedException {
         verifyFocusTrappingForModalAndNonModalDialog(PANELDIALOG_NONMODAL_BUTTON, false);
     }

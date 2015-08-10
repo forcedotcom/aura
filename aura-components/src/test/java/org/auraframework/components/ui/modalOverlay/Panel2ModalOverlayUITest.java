@@ -319,8 +319,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on panel dialog should close the panel and not trap the focus within the panel
      */
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testPanelDoesNotDoFocusTrapping() throws Exception {
+    public void testPanelDoesNotDoFocusTrapping() throws Exception {
         String panelType = "panel";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
         open(url);
@@ -330,8 +329,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Verify custom close action Bug: W-2619406
      */
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testPanelTabOutCallsCustomCloseActionWhenSet() throws Exception {
+    public void testPanelTabOutCallsCustomCloseActionWhenSet() throws Exception {
         String panelType = "panel";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType;
         open(url);
@@ -345,8 +343,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on panel with full-screen should close the panel and not trap the focus within the panel
      */
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testPanelWithFullScreenDoesNotDoFocusTrapping() throws Exception {
+    public void testPanelWithFullScreenDoesNotDoFocusTrapping() throws Exception {
         String panelType = "panel";
         String flavor = "full-screen";
         String url = APP + "?" + PARAM_PANEL_TYPE + panelType + FLAVOR + flavor;

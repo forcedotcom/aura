@@ -1310,9 +1310,13 @@ function (w) {
                 transition = STYLES.transition,
                 style, matrix, x, y;
 
-            // If we are using CSS transitions, we need to calculate the current 
-            // position and reset the transition time.
-            if (this.opts.useCSSTransition) {
+            if (this.opts.useNativeScroller) {
+            	x = this.wrapper.scrollLeft;
+            	y = this.wrapper.scrollTop;
+            	this._translate(x, y);
+            } else if (this.opts.useCSSTransition) {
+            	// If we are using CSS transitions, we need to calculate the current
+                // position and reset the transition time.
                 style  = w.getComputedStyle(this.scroller, null);
                 if (SUPPORT.matrix) {
                     matrix = new STYLES.matrix(style[transform]);

@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
 public class BasePillContainerAutoComplete extends WebDriverTestCase {
 
 	private final String CMP_URL;
-	public static final String INPUT = "input[class*='uiInputTextForAutocomplete']";
+	public static final String INPUT = "div[class*='uiInputTextForAutocomplete'] input";
     public static final String LISTCONTENT_LOCATOR = ".visible";
     
     public BasePillContainerAutoComplete(String urlPath) {

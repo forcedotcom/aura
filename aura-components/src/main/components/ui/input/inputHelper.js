@@ -288,7 +288,13 @@
 
     updateErrorElement : function(component) {
         var errors = component.get("v.errors");
-        $A.util.toggleClass(component, "has-error", !$A.util.isEmpty(errors));
+        var hasError = !$A.util.isEmpty(errors);
+
+        if (this.hasLabel(component)) {
+            $A.util.toggleClass(component.getElement(), "has-error", hasError);
+        } else {
+            $A.util.toggleClass(component, "has-error", hasError);
+        }
     },
 
     addClass: function(component, className) {
@@ -372,13 +378,6 @@
             }
         }
         return str;
-    },
-
-    addInputClass: function(component) {
-    	if (this.hasLabel(component)) {
-    		var inputEl = this.getInputElement(component);
-    		$A.util.addClass(inputEl, component.getConcreteComponent().getDef().getStyleClassName());
-        }
     },
 
     hasLabel: function(cmp) {

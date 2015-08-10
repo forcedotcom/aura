@@ -16,7 +16,7 @@
 
 -->
 <aura:component>
-    <ui:inputSelect class="single" aura:id="InputSelectSingle">
+    <ui:inputSelect class="single" aura:id="InputSelectSingle" label="test">
         <ui:inputSelectOptionGroup label="Mammal">
             <ui:inputSelectOption text="Tiger" label="Tiger"/>
             <ui:inputSelectOption text="Lion"  label="Lion" value="true"/>

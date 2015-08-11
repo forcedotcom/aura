@@ -24,11 +24,11 @@
 		<p>This is a basic set up of a <code>ui:inputURL</code> component.</p>
 		<pre>&lt;ui:inputURL aura:id="url" label="Venue URL" class="field" value="http://www.myURL.com"/></pre>
 		<p>This example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInputText uiInputURL">
-    &lt;label class="uiLabel-left uiLabel">
+<pre>&lt;div class="uiInput uiInputText uiInputURL uiInput--default uiInput--input">
+    &lt;label class="uiLabel-left form-element__label uiLabel">
         &lt;span>Venue URL&lt;/span>
     &lt;/label>
-    &lt;input class="field" type="url">
+    &lt;input class="field input" type="url">
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="url" ref="uiExamples:url" label="Using ui:inputURL">

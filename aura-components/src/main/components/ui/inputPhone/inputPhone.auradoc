@@ -24,11 +24,13 @@
 		<p>This example shows a phone field, which displays the specified phone number.</p>
 <pre>&lt;ui:inputPhone label="Phone" value="415-123-4567" /></pre>
 		<p>The previous example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInputPhone">
-    &lt;label class="uiLabel-left uiLabel">
+<pre>&lt;ui:inputPhone label="Phone" value="415-123-4567" /></pre>
+		<p>The previous example results in the following HTML.</p>
+<pre>&lt;div class="uiInput uiInputPhone uiInput--default uiInput--input">
+    &lt;label class="uiLabel-left form-element__label uiLabel">
         &lt;span>Phone&lt;/span>
     &lt;/label>
-    &lt;input class="uiInput uiInputPhone" type="tel">
+    &lt;input class="input" type="tel">
 &lt;/div></pre>
 		
 	</aura:description>		

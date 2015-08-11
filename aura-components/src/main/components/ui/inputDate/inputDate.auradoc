@@ -24,21 +24,25 @@
 		<p>This is a basic set up of a date field with a date picker, which displays the field value <code>1/30/2014</code>. Specifying <code>format="MMMM d, yyyy"</code> renders the field value as <code>January 30, 2014</code>. </p>
 		<pre>&lt;ui:inputDate aura:id="dateField" label="Birthday" value="2014-01-30" displayDatePicker="true"/></pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputDate">
-  &lt;label class="uiLabel-left uiLabel">
+		<pre>&lt;div class="uiInput uiInputDate uiInput--default uiInput--input uiInput--datetime">
+  &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Birthday&lt;/span>
   &lt;/label>
-  &lt;input placeholder="M/d/yyyy" type="text" class="uiInput uiInputDate">
-  &lt;a class="datePicker-openIcon" aria-haspopup="true">
-    &lt;span class="assistiveText">Date Picker&lt;/span>
-  &lt;/a>
-  &lt;a class="clearIcon">
+  &lt;form class="form--stacked form-element">
+      &lt;input placeholder="MMM d, yyyy" type="text">
+      &lt;a class="datePicker-openIcon display" aria-haspopup="true">
+          &lt;span class="assistiveText">Date Picker&lt;/span>
+      &lt;/a>
+  &lt;a class="clearIcon hide">
     &lt;span class="assistiveText">Clear Button&lt;/span>
   &lt;/a>
-  &lt;div class="uiDatePicker">
+  &lt;/form>
+&lt;/div>
+&lt;div class="DESKTOP uiDatePicker--default uiDatePicker">
     &lt;!--Date picker set to visible when icon is clicked-->
-  &lt;/div>
 &lt;/div></pre>
+<p>On desktop, the &lt;input&gt; tag is wrapped in a &lt;form&gt; tag. 
+   The form factor (DESKTOP, MOBILE, or PHONE) determines the dimensions of the date picker.</p>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">
     		This example sets today's date on a <code>ui:inputDate</code> component, retrieves its value, and displays it using <code>ui:outputDate</code>. The <code>init</code> handler initializes and sets the date on the component.

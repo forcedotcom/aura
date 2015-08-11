@@ -33,9 +33,6 @@
     padding: 0;
 }
 
-.THIS .showMore {
-    display:block;
-}
 
 .THIS.focused .showMore, .THIS .showMore.invisible {
     display:none;

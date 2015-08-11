@@ -27,6 +27,7 @@
 
     afterRender: function(cmp, helper) {
         this.superAfterRender();
+        helper.updateDisplayedItems(cmp);
         if (cmp.get("v.focusOnInput")) {
             helper.focusOnInputBox(cmp);
         }

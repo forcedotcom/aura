@@ -72,7 +72,7 @@
         this.focusOnInputBox(cmp);  // Always focus on the input after adding new pill (W-2529162)
     },
 
-    onItemsChanged: function(cmp){
+    updateDisplayedItems: function(cmp){
         var items = cmp.get("v.items");
         var maxAllowed = cmp.get("v.maxAllowed");
 

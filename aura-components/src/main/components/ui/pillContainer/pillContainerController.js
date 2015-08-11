@@ -55,7 +55,7 @@
     },
 
     onItemsChanged: function(cmp, event, helper) {
-        helper.onItemsChanged(cmp);
+        helper.updateDisplayedItems(cmp);
     },
 
     onShowMore: function(cmp, event, helper) {

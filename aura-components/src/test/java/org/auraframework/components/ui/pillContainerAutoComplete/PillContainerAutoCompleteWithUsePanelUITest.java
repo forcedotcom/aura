@@ -22,7 +22,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 public class PillContainerAutoCompleteWithUsePanelUITest extends BasePillContainerAutoComplete{
 
 	public PillContainerAutoCompleteWithUsePanelUITest() {
-		super("uitest/pillContainer_WithAutoCompleteUsePanelSet.cmp");	
+		super("/uitest/pillContainer_WithAutoCompleteUsePanelSet.cmp");	
 	}
 	@Override
 	public void testLossOfFocusVerification(){

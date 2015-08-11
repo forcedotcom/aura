@@ -22,7 +22,7 @@ import org.auraframework.test.util.WebDriverUtil.BrowserType;
 public class PillContainerAutoCompleteUITest extends BasePillContainerAutoComplete{
 
 	public PillContainerAutoCompleteUITest() {
-		super("uitest/pillContainer_WithAutoComplete.cmp");	
+		super("/uitest/pillContainer_WithAutoComplete.cmp");	
 	}
 
 }

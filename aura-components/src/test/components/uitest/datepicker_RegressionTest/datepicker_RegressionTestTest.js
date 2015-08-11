@@ -123,18 +123,19 @@
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test: [function(cmp) {
             var self = this;
+            if(self.isViewDesktop()){
+                //set date value
+                self.setDateValue(
+                    cmp,
+                    2015,//year
+                    7,//month
+                    1//day
+                );
 
-            //set date value
-            self.setDateValue(
-                cmp,
-                2015,//year
-                7,//month
-                1//day
-            );
 
-
-            //set setFocus=true
-            self.setDatepickerAttribute(cmp, 'v.setFocus', true);
+                //set setFocus=true
+                self.setDatepickerAttribute(cmp, 'v.setFocus', true);
+            }
         }, function(cmp){
             var self = this;
             if(self.isViewDesktop()){
@@ -198,17 +199,18 @@
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test: [function(cmp) {
             var self = this;
+            if(self.isViewDesktop()){
+                //set date value
+                self.setDateValue(
+                    cmp,
+                    2015,//year
+                    7,//month
+                    1//day
+                );
 
-            //set date value
-            self.setDateValue(
-                cmp,
-                2015,//year
-                7,//month
-                1//day
-            );
-
-            //set setFocus=false
-            self.setDatepickerAttribute(cmp, 'v.setFocus', false);
+                //set setFocus=false
+                self.setDatepickerAttribute(cmp, 'v.setFocus', false);
+            }
         }, function(cmp){
             var self = this;
             if(self.isViewDesktop()){
@@ -325,6 +327,81 @@
                 )
             }
         }]
+    },
+
+
+    testCloseOnClickOut:{
+        attributes : {"renderItem" : "testCloseOnClickOut"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            var self = this;
+
+            if(self.isViewDesktop()){
+                //assert that the datepicker is visible
+                self.verifyDatepickerVisibility(
+                    '.uiDatePicker',//css selector
+                    true//visible
+                );
+
+
+                //click
+                $A.test.fireDomEvent(cmp.find("btnPressMe").getElement(), 'mouseup')
+
+
+                //assert that the datepicker is closed
+                self.verifyDatepickerVisibility(
+                    '.uiDatePicker',//css selector
+                    false//visible
+                );
+            }
+        }]
+    },
+
+    testOpenOnClickOut:{
+        attributes : {"renderItem" : "testOpenOnClickOut"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            var self = this;
+
+            if(self.isViewDesktop()){
+                //assert that the datepicker is visible
+                self.verifyDatepickerVisibility(
+                    '.uiDatePicker',//css selector
+                    true//visible
+                );
+
+                //click out
+                $A.test.clickOrTouch( cmp.find("btnPressMe").getElement() );
+
+                //assert that the datepicker is closed
+                self.verifyDatepickerVisibility(
+                    '.uiDatePicker',//css selector
+                    true//visible
+                );
+            }
+        }]
+    },
+
+    
+    
+
+    verifyDatepickerVisibility: function(elSelector, visible){
+        var els = $A.test.select(elSelector, '.uiDatePicker');
+        var el = els[0];
+        var classListString = $A.test.getElementAttributeValue(el, 'class');
+
+        if(visible === true){
+            $A.test.assertTrue(
+                $A.util.hasClass(el, 'visible'),
+                'Datepicker should be VISIBLE : class="' + classListString + '"'// failureMessage
+            )
+        }
+        else{
+            $A.test.assertFalse(
+                $A.util.hasClass(el, 'visible'),
+                'Datepicker should be CLOSED : class="' + classListString + '"'// failureMessage
+            )
+        }
     },
 
 

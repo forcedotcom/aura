@@ -34,21 +34,6 @@
 		    </div>
 		</aura:if>
 
-
-
-		<aura:if isTrue="{! v.renderItem == 'testSetFocusOnDatepickerGridDefaultVal'}">	
-		    <div>
-		        <h1>Test Set Focus Default Value</h1>
-		    </div>
-		    <div class="subtitle">
-		    	<div>dp_v_setFocus (Default Value) = {!v.dp_v_setFocus}</div>
-			</div>
-		    <div>
-		        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-		    	<ui:datePickerManager aura:id="datepickerManager"/>
-		    </div>
-		</aura:if>
-
 		<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">	
 		    <div>
 		        <h1>Test Set Focus Attribute</h1>
@@ -59,8 +44,7 @@
 		    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
 			</div>
 		    <div>
-		        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-		    	<ui:datePickerManager aura:id="datepickerManager"/>
+		        <ui:inputDate aura:id="inputDate" displayDatePicker="true"/>
 		    </div>
 		</aura:if>
 

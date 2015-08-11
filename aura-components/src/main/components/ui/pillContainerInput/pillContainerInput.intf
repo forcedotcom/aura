@@ -18,7 +18,4 @@
 <aura:interface support="PROTO" extends="ui:focusable">
     <aura:registerEvent name="onItemSelected" type="ui:response" access="GLOBAL" description="The event fired when the user selects an item" />
     <aura:registerEvent name="onBackspacePressedWhenEmpty" type="ui:response" access="GLOBAL" description="The event fired when the user presses backspace on an empty input" />
-    <aura:method name="setAvailableWidth" description="This method is called to advise the  how much width is available ">
-        <aura:attribute name="width" type="Integer"/>
-    </aura:method>
 </aura:interface>

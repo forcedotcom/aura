@@ -15,16 +15,6 @@
  */
 ({
 
-    render: function(cmp, helper) {
-        helper.registerResizeHandler(cmp);
-        return this.superRender();
-    },
-
-    unrender: function (cmp, helper) {
-        helper.deregisterResizeHandler(cmp);
-        this.superUnrender();
-    },
-
     afterRender: function(cmp, helper) {
         this.superAfterRender();
         helper.updateDisplayedItems(cmp);

@@ -46,11 +46,8 @@
     overflow-y: scroll;
 }
 
-.THIS input {
-    width:0px;
-}
 .THIS.focused input {
-    width:auto;
+    width:100%;
 }
 
 .THIS.maxAllowed input {

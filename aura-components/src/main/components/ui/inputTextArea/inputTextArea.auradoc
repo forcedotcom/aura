@@ -24,11 +24,11 @@
 		<p>This is a basic set up of a <code>ui:inputTextArea</code> component.</p>
 		<pre>&lt;ui:inputTextArea aura:id="comments" label="Comments" value="My comments" rows="5"/></pre>
 		<p>This example results in the following HTML.</p>
-<pre>&lt;div class="uiInput uiInputTextArea">
-    &lt;label class="uiLabel-left uiLabel">
+<pre>&lt;div class="uiInput uiInputTextArea uiInput--default uiInput--textarea">
+    &lt;label class="uiLabel-left form-element__label uiLabel">
         &lt;span>Comments&lt;/span>
     &lt;/label>
-    &lt;textarea cols="20" rows="5">
+    &lt;textarea class="textarea" cols="20" rows="5">
     &lt;/textarea>
 &lt;/div></pre>
 	</aura:description>	

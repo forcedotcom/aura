@@ -24,11 +24,13 @@
 		<p>This is a basic set up of an email field.</p>
 		<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputEmail">
-  &lt;label class="uiLabel-left uiLabel">
+			<pre>&lt;ui:inputEmail aura:id="email" label="Email" placeholder="abc@email.com"/></pre>
+		<p>This example results in the following HTML.</p>
+		<pre>&lt;div class="uiInput uiInputEmail uiInput--default uiInput--input">
+  &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Email&lt;/span>
   &lt;/label>
-  &lt;input placeholder="abc@email.com" type="email" class="uiInput uiInputEmail">
+  &lt;input placeholder="abc@email.com" type="email" class="field input">
 &lt;/div></pre>
 	</aura:description>	
 	<aura:example name="email" ref="uiExamples:email" label="Using ui:inputEmail">

@@ -24,8 +24,8 @@
 		<p>This is a basic set up of a radio button.</p>		
 		<pre>&lt;ui:inputRadio label="Yes"/></pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputRadio">
-    &lt;label class="uiLabel-left uiLabel">
+		<pre>&lt;div class="uiInput uiInputRadio uiInput--default uiInput--radio">
+    &lt;label class="uiLabel-left form-element__label uiLabel">
         &lt;span>Yes&lt;/span>
     &lt;/label>
     &lt;input type="radio">

@@ -86,4 +86,18 @@
 	<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
 		<ui:inputDate aura:id="inputDate" disabled="true" />
 	</aura:if>
+
+	<aura:if isTrue="{! v.renderItem == 'testCloseOnClickOut'}">	
+		<div>
+			<ui:button aura:id="btnPressMe" label="Press Me and The Datepicker will disappear"></ui:button>
+			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="true" ></ui:datePicker>
+		</div>
+	</aura:if>
+
+	<aura:if isTrue="{! v.renderItem == 'testOpenOnClickOut'}">	
+		<div>
+			<ui:button aura:id="btnPressMe" label="Press Me and the Datepicker still stays opened"></ui:button>
+			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="false"></ui:datePicker>
+		</div>
+	</aura:if>
 </aura:component>

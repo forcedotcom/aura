@@ -11,6 +11,8 @@
     				 function(action){
     					 $A.test.assertTrue(action.state === "SUCCESS");
     				});
+    		$A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); }, 
+    				"external action didn't finish");
     		$A.enqueueAction(eAction);
     	}]
     },

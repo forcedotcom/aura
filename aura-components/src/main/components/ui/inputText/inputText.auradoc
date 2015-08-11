@@ -24,12 +24,12 @@
 		<p>This is a basic set up of a text field.</p>
 		<pre>&lt;ui:inputText label="Expense Name" value="My Expense" required="true"/></pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputText">
-  &lt;label class="uiLabel-left uiLabel">
+			<pre>&lt;div class="uiInput uiInputTextuiInput--default uiInput--input">
+  &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Expense Name&lt;/span>
     &lt;span class="required">*&lt;/span>
   &lt;/label>
-  &lt;input required="required" class="uiInput uiInputText" type="text">
+  &lt;input required="required" class="input" type="text">
 &lt;/div></pre>
 	</aura:description>	
 		<aura:example name="text" ref="uiExamples:text" label="Using ui:inputText">

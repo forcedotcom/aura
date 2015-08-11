@@ -31,20 +31,40 @@
  var today = new Date(); 
 component.set("v.today", today);</pre>
 		<p>This example results in the following HTML.</p>
-		<pre>&lt;div class="uiInput uiInputDateTime">
-&lt;label class="uiLabel-left uiLabel">
+		<pre>&lt;div class="uiInput uiInputDateTime uiInput--default uiInput--input uiInput--datetime">
+&lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Expense Date&lt;/span>
 &lt;/label>
-&lt;input class="form-control uiInput uiInputDateTime" placeholder="M/d/yyyy h:mm a" type="text">
-&lt;a class="datePicker-openIcon" aria-haspopup="true">
-    &lt;span class="assistiveText">Date Picker&lt;/span>
-&lt;/a>
-&lt;a class="clearIcon" href="javascript:void(0);">
-    &lt;span class="assistiveText">Clear Button&lt;/span>
-&lt;/a>
-&lt;div class="uiDatePicker">
+&lt;form class="form--stacked">
+    &lt;div class="dateTime-inputDate form-element form-element__control">
+        &lt;input class="form-control uiInput uiInputDateTime" placeholder="MMM d, yyy" type="text">
+        &lt;a class="datePicker-openIcon display" aria-haspopup="true">
+            &lt;span class="assistiveText">Date Picker&lt;/span>
+        &lt;/a>
+    &lt;/div>
+    &lt;div class="dateTime-inputTime form-element form-element__control">
+        &lt;div class="input-has-icon input-has-icon--right">
+             &lt;label>&lt;/label>
+             &lt;input class="fieldinput" aria-describedby="" type="text" placeholder="h:mm a">
+                &lt;a aria-haspopup="true" class="timePicker-openIcon display" href="javascript:void(0);">
+                    &lt;span class="assistiveText">Time Picker&lt;/span>
+                &lt;/a>
+            &lt;/div>
+        &lt;/div>
+        &lt;div class="uiInputTimePicker--default uiInputTimePicker" >
+            &lt;div aria-hidden="false" data-selection="time" class="dropdown dropdown--left datepicker datepicker--time scrollable">
+                &lt;ul class="datepicker--time__list" role="menu" >&lt;/ul>
+            &lt;/div>
+        &lt;/div>
+&lt;/form>
+&lt;/div>
+&lt;div class="DESKTOP uiDatePicker--default uiDatePicker">
     &lt;!-- Date picker set to visible when icon is clicked -->
 &lt;/div></pre>
+	<p>On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag; the date and time fields display as two separate fields. The form factor (DESKTOP, MOBILE, or PHONE) determines the dimensions of the date picker.
+	The time picker displays a list of time in 30-minute increments.
+    </p>
+	
 	
 	</aura:description>		
 	<aura:example name="datetime" ref="uiExamples:datetime" label="Using ui:inputDateTime">

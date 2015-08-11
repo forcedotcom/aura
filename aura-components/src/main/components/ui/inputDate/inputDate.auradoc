@@ -41,7 +41,7 @@
 &lt;div class="DESKTOP uiDatePicker--default uiDatePicker">
     &lt;!--Date picker set to visible when icon is clicked-->
 &lt;/div></pre>
-<p>On desktop, the &lt;input&gt; tag is wrapped in a &lt;form&gt; tag. 
+<p>On desktop, the <code>input</code> tag is wrapped in a <code>form</code> tag. 
    The form factor (DESKTOP, MOBILE, or PHONE) determines the dimensions of the date picker.</p>
 	</aura:description>		
 	<aura:example name="inputExample" ref="uiExamples:date" label="Using ui:inputDate">

@@ -34,8 +34,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
  */
 @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8 })
 public class BaseAutoComplete extends WebDriverTestCase {
-	private final String URL;
-    //private final String URL = "/uitest/autoComplete_Test.cmp";
+    private final String URL;
+    // private final String URL = "/uitest/autoComplete_Test.cmp";
     private final String INPUT_SELECTOR = "input[class*='default']";
     private final String OUTPUT_SELECTOR = "span[class*='uiOutputText']";
     private final String EVENT_OUTPUT_SELECTOR = "span[class*='outputLabel']";
@@ -192,8 +192,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
     // TODO : Bug W-1780786
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.FIREFOX, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testAutoCompleteTabing() throws Exception {
+    public void testAutoCompleteTabing() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));

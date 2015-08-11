@@ -48,8 +48,7 @@ public class InputRichTextUITest extends WebDriverTestCase {
     /* Excluding ipad and safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testRichTextTabbing() throws Exception {
+    public void testRichTextTabbing() throws Exception {
         open(URL);
         WebElement beforeLink = auraUITestingUtil.waitForElement(By.cssSelector(LINKBEFORE_LOCATOR));
         WebElement ckEditor = auraUITestingUtil.waitForElement(By.cssSelector(CK_EDITOR_LOCATOR));

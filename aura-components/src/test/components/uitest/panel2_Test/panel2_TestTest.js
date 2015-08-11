@@ -540,7 +540,7 @@
     /**
      * Test panel with reference element set
      */
-    // TODO(W-2690094): Tab does not change focus to next element
+    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
     _testPanelWithReferenceElementSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
@@ -578,7 +578,7 @@
     /**
      * Test panel with referece element and selector set
      */
-    // TODO(W-2690094): Tab does not change focus to next element
+    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
     _testPanelWithBothReferenceElementAttributesSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
@@ -599,7 +599,7 @@
     /**
      * Test panel with invalid reference element.
      */
-    // TODO(W-2690094): Tab does not change focus to next element
+    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
     _testPanelWithInvalidReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
@@ -618,7 +618,7 @@
     /**
      * Test panel with empty reference element.
      */
-    // TODO(W-2690094): Tab does not change focus to next element
+    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
     _testPanelWithEmptyReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 

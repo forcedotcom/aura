@@ -190,8 +190,7 @@ public class DialogUITest extends WebDriverTestCase {
     // Checking if Dialog box will will close after having all elements tabbed through
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testDialogNonModalTab() throws MalformedURLException, URISyntaxException {
+    public void testDialogNonModalTab() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
         WebDriver driver = getDriver();
@@ -251,8 +250,7 @@ public class DialogUITest extends WebDriverTestCase {
     // here
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.SAFARI, BrowserType.ANDROID_PHONE,
             BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testDialogNonModalDefaultSubmit() throws MalformedURLException, URISyntaxException {
+    public void testDialogNonModalDefaultSubmit() throws MalformedURLException, URISyntaxException {
         open(URL_NON_MODAL);
 
         WebDriver driver = getDriver();

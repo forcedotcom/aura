@@ -56,8 +56,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testTabIntoCarouselPage() throws Exception {
+    public void testTabIntoCarouselPage() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement carousel = getCarousel(driver, 1);
@@ -129,8 +128,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testTabOutOfCarousel() throws Exception {
+    public void testTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement carousel = getCarousel(driver, 3);
@@ -154,8 +152,7 @@ public class CarouselUITest extends WebDriverTestCase {
     /* Excluding safari because safari driver has issues with element.sendkeys(Keys.TAB) */
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE, BrowserType.SAFARI })
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testShiftTabOutOfCarousel() throws Exception {
+    public void testShiftTabOutOfCarousel() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
         WebElement carousel = getCarousel(driver, 4);

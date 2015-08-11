@@ -30,21 +30,16 @@ public class LocalizationAppUITest extends WebDriverTestCase {
         super(name);
     }
 
-    // FIXME- Empty test to avoid errors. Remove when tests in this class are reenabled.
-    public void testDummy() {
-    }
-
     // Excluded on mobile browsers for lack of tab support
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDate/outputDate components
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testDateComponents() throws Exception {
+    public void testDateComponents() throws Exception {
         open(URL);
 
         // initial load
-        WebElement elementInput = findDomElement(By.cssSelector("input[class~='uiInputDate']"));
-        WebElement elementoutput = findDomElement(By.cssSelector("span[class~='uiOutputDate']"));
+        WebElement elementInput = findDomElement(By.cssSelector(".uiInputDate .input"));
+        WebElement elementoutput = findDomElement(By.cssSelector(".uiOutputDate"));
         assertEquals("InputDate component rendered with wrong value", "Sep 23, 2004",
                 elementInput.getAttribute("value"));
         assertEquals("outputDate component rendered with wrong value", "Sep 23, 2004", elementoutput.getText());
@@ -75,8 +70,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputDateTime/outputDateTime components
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testDateTimeComponents() throws Exception {
+    public void testDateTimeComponents() throws Exception {
         open(URL);
 
         // initial load
@@ -166,8 +160,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputPercent/outputPercent components
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testPercentComponents() throws Exception {
+    public void testPercentComponents() throws Exception {
         open(URL);
 
         // initial load
@@ -200,8 +193,7 @@ public class LocalizationAppUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.IE9, BrowserType.IE10, BrowserType.SAFARI,
             BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // Checking functionality of the inputCurrency/outputCurrency components
-    // TODO(W-2690094): Tab does not change focus to next element
-    public void _testCurrencyComponents() throws Exception {
+    public void testCurrencyComponents() throws Exception {
         open(URL);
 
         // initial load

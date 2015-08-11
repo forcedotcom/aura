@@ -330,6 +330,7 @@
     },
 
 
+    //test if click out will close the datepicker when closedOnClickOutFlag=true
     testCloseOnClickOut:{
         attributes : {"renderItem" : "testCloseOnClickOut"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
@@ -357,6 +358,8 @@
         }]
     },
 
+
+    //test if click out still opens the datepicker when closedOnClickOutFlag=false
     testOpenOnClickOut:{
         attributes : {"renderItem" : "testOpenOnClickOut"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
@@ -383,6 +386,69 @@
     },
 
     
+    //test to see if initial rendering of datepicker is covering the input date textbox.
+    testInputDateTimePositionOnInitalRenderring : {
+        attributes : {"renderItem" : "simpleInputDateTime"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            var ACCEPTABLE_DELTA = 30;//acceptable delta between the datepicker and input textbox
+            var self = this;
+
+            if(self.isViewDesktop()){
+                //acceptable delta
+                cmp.set('v.acceptableDelta', ACCEPTABLE_DELTA);
+
+                //show the datepicker
+                // $A.test.clickOrTouch( cmp.getElement().querySelector('.datePicker-openIcon') );
+                self.showDatepicker();
+
+                //wait for the datepicker to pop
+                $A.test.addWaitForWithFailureMessage(
+                    true,//expected value
+                    function(){//actual value
+                        //get bounding rect of the datepicker
+                        var rectDatepicker = $A.test.select('.uiDatePicker.visible')[0].getBoundingClientRect();
+                        var rectTextbox = $A.test.select('.dateTime-inputDate input')[0].getBoundingClientRect();
+
+                        var actualTopDelta = rectDatepicker.top - rectTextbox.top;
+                        var actualLeftDelta = rectDatepicker.left - rectTextbox.left;
+
+                        cmp.set('v.dpTopDelta', actualTopDelta);
+                        cmp.set('v.dpLeftDelta', actualLeftDelta);
+
+                        return actualTopDelta >= 0 && actualTopDelta <= ACCEPTABLE_DELTA &&
+                            actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
+                    },
+                    'Datepicker position is not aligned to the input textbox',//failureMessage
+                    function(){
+                        //checking out on the time picker position
+                        self.showTimepicker();
+
+
+                        //assertion of time picker intial position
+                        $A.test.addWaitForWithFailureMessage(
+                            true,//expected value
+                            function(){//actual value
+                                //get bounding rect of the datepicker
+                                var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
+                                var rectTextbox = $A.test.select('.dateTime-inputTime input')[0].getBoundingClientRect();
+
+                                var actualTopDelta = rectTimePicker.top - rectTextbox.top;
+                                var actualLeftDelta = rectTimePicker.left - rectTextbox.left;
+
+                                cmp.set('v.tpTopDelta', actualTopDelta);
+                                cmp.set('v.tpLeftDelta', actualLeftDelta);
+
+                                return actualTopDelta >= 0 && actualTopDelta <= ACCEPTABLE_DELTA &&
+                                    actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
+                            },
+                            'Timepicker position is not aligned to the input textbox'//failureMessage
+                        );
+                    }
+                );
+            }
+        }]
+    },
     
 
     verifyDatepickerVisibility: function(elSelector, visible){
@@ -446,7 +512,10 @@
     },
     showDatepicker: function(){
         // clicking on the datepicker open icon
-        $A.test.clickOrTouch( $A.test.select('.datePicker-openIcon')[0]);
+        $A.test.clickOrTouch( $A.test.select('.datePicker-openIcon')[0] );
+    },
+    showTimepicker: function(){
+        $A.test.clickOrTouch( $A.test.select('.timePicker-openIcon')[0] );
     },
     setDateValue: function(cmp, date, month, year){
         var self = this;

@@ -24,12 +24,12 @@
 			<pre>&lt;aura:attribute name="num" type="integer" default="10"/>
 &lt;ui:inputNumber aura:id="num" label="Age" value="{!v.num}"/></pre>
 			<p>The previous example results in the following HTML.</p>
-			<pre>&lt;div class="uiInput uiInputNumber">
-&lt;label class="uiLabel-left uiLabel">
+		        <pre>&lt;div class="uiInput uiInputNumber uiInput--default uiInput--input">
+&lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Age&lt;/span>
 &lt;/label>
 &lt;input max="99999999999999" step="1" type="text" 
-        min="-99999999999999" class="uiInput uiInputNumber">
+        min="-99999999999999" class="input">
 &lt;/div></pre>
 			
 			<p>To render the output from a <code>ui:inputNumber</code> component, use the <code>ui:inputNumber</code> component. When providing a number value with commas, use <code>type="integer"</code>. This example returns <code>100,000</code>.

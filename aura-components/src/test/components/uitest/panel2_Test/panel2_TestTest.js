@@ -540,8 +540,7 @@
     /**
      * Test panel with reference element set
      */
-    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
-    _testPanelWithReferenceElementSet: {
+    testPanelWithReferenceElementSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : ".appInput",
@@ -578,8 +577,7 @@
     /**
      * Test panel with referece element and selector set
      */
-    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
-    _testPanelWithBothReferenceElementAttributesSet: {
+    testPanelWithBothReferenceElementAttributesSet: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testUseReferenceElementSelector" : true,
@@ -599,8 +597,7 @@
     /**
      * Test panel with invalid reference element.
      */
-    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
-    _testPanelWithInvalidReferenceElement: {
+    testPanelWithInvalidReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : ".xyz",
@@ -618,8 +615,7 @@
     /**
      * Test panel with empty reference element.
      */
-    // TODO(W-2714965): panelHelper.js#_getReferenceElement returns NodeList instead of individual element
-    _testPanelWithEmptyReferenceElement: {
+    testPanelWithEmptyReferenceElement: {
     	attributes : {"testPanelType" : "panel", 
     		"testUseReferenceElement" : true, 
     		"testReferenceElementSelector" : "empty",

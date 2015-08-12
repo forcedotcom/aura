@@ -803,6 +803,17 @@
                     <version>1.2.1</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.jasig.maven</groupId>
+                    <artifactId>maven-notice-plugin</artifactId>
+                    <version>1.0.4</version>
+                    <configuration>
+                        <noticeTemplate>licensing/NOTICE.template</noticeTemplate>
+                        <licenseMapping>
+                            <param>licensing/license-mappings.xml</param>
+                        </licenseMapping>
+                    </configuration>
+                </plugin>
+                <plugin>
 	                <!--This plugin's configuration is used to store Eclipse m2e settings
 	                    only. It has no influence on the Maven build itself. -->
                     <groupId>org.eclipse.m2e</groupId>

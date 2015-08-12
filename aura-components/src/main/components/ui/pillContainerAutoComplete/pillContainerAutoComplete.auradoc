@@ -19,11 +19,27 @@
 	<aura:description>
 		<p>A <code>ui:pillContainerAutoComplete</code> component is nested in <code>ui:pillContainer</code> to create pills that work with autocompletion.
 		When users type in the input field, a list of suggested values is displayed. Selecting the value or pressing enter creates a pill with the selected text value.
-		Use the <code>ui:pillContainerAutoCompleteOption</code> component to provide an icon and text label for your predefined list of values.	See the Examples tab for more information.
-		</p>	
+		Use the <code>ui:pillContainerAutoCompleteOption</code> component to provide an icon and text label for your predefined list of values.	
+		</p>
+		<pre>&lt;ui:pillContainer aura:id="pillContainer" maxLines="{!v.maxLines}" aura:flavor="{!v.flavor}" pillFlavor="{!v.flavor}" maxAllowed="{!v.maxAllowed}">
+    &lt;aura:set attribute="pillInput">
+        &lt;ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row" label="lookupLabel" labelPosition="hidden">
+            &lt;aura:set attribute="dataProvider">
+                &lt;uitest:pillContainerAutoCompleteDataProvider/>
+            &lt;/aura:set>
+            &lt;aura:set attribute="listOption">
+                &lt;ui:pillContainerAutoCompleteOption label="{!row.label}" keyword="{!row.keyword}" value="{!row}" visible="{!row.visible}" iconUrl="{!row.icon.url}" iconBackgroundColor="{!row.icon.backgroundColor}"/>
+            &lt;/aura:set>
+        &lt;/ui:pillContainerAutoComplete>
+    &lt;/aura:set>
+&lt;/ui:pillContainer></pre>
+	<p>To provide users with value filtering, set the header facet and use the <code>ui:inputSelect</code> to enable selection from a drop-down menu. See the Examples tab for more information.</p>	
 	</aura:description>	
 		<aura:example name="pillAutoCompleteExample" ref="uitest:pillContainer_WithAutoComplete" label="Creating Pills with Autocompletion">
     	<p>This example shows how to create pills that displays suggested values from a predefined list of values as you type. Type <code>Test Pill</code> and press enter to see how it works.</p>
+	   </aura:example>	
+	   <aura:example name="pillAutoCompleteHeaderExample" ref="uitest:pillContainer_WithAutoCompleteHeader" label="Creating Pills with Autocompletion Categorized by Header">
+    	<p>This example shows how to create pills that displays suggested values from a predefined list of values as you type. Type <code>Test Pill</code> and select a category from the drop-down menu.</p>
 	   </aura:example>	
 		
 </aura:documentation>

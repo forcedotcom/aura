@@ -21,7 +21,9 @@
 			A <code>ui:inputCheckbox</code> component represents a checkbox whose state is controlled by the <code>value</code> and <code>disabled</code> attributes. It's rendered as an HTML <code>input</code> tag of type <code>checkbox</code>.
 			To render the output from a <code>ui:inputCheckbox</code> component, use the <code>ui:outputCheckbox</code> component. 
 		</p>
-		<p>This is a basic set up of a checkbox.</p>		
+		<p>This is a basic set up of a checkbox.</p>
+		<pre>&lt;ui:inputCheckbox label="Reimbursed?"/></pre>
+		<p>This example results in the following HTML.</p>		
 		<pre>&lt;div class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox">
   &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Reimbursed?&lt;/span>

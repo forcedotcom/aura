@@ -400,7 +400,7 @@
         }]
     },
 
-    testCallingComponentExistsInServerAction : {
+    _testCallingComponentExistsInServerAction : {
         test: function(cmp) {
             var a = cmp.get("c.updateTextWithCallingDescrptor");
             $A.enqueueAction(a);

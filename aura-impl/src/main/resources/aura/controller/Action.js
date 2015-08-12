@@ -1152,12 +1152,18 @@ Action.prototype.isChained = function() {
  * @export
  */
 Action.prototype.toJSON = function() {
+    var callingComponentDef = this.callingCmp ? this.callingCmp.getDef() : null;
+    var requiredVersionDefs = callingComponentDef ? callingComponentDef.getRequiredVersionDefs() : null;
+    var version = this.cmp ? this.cmp.getVersion() : null;
+
+    // calling component has requiredVersionDefs or component is versioned.
+    var isVersioned = (requiredVersionDefs && requiredVersionDefs.length > 0) || version;
     return {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),
-        "callingDescriptor" : (this.callingCmp ? (this.callingCmp.getDef() ? this.callingCmp.getDef().getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN"),
+        "callingDescriptor" : isVersioned ? (callingComponentDef ? callingComponentDef.getDescriptor().getQualifiedName() : "UNKNOWN") : "UNKNOWN",
         "params" : this.params,
-        "version" : (this.cmp ? this.cmp.getVersion() : null)
+        "version" : isVersioned ? version : null
     };
 };
 

@@ -46,7 +46,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:set attribute="labelPosition" value="hidden"/>
     <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
-    
+
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
         <ui:inputTextAreaForAutocomplete aura:id="input" 
                                          class="{!v.inputClass+' '+v.theme}" 
@@ -55,6 +55,7 @@
                                          labelPosition="{!v.labelPosition}"
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
+                                         ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"/>
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input" 
@@ -64,6 +65,7 @@
                                          labelPosition="{!v.labelPosition}"
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
+                                         ariaDescribedBy="{!v.ariaDescribedBy}"
                                          autocompleteButton="{!v.autocompleteButton}"/>
         </aura:set>
     </aura:if>

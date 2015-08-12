@@ -26,7 +26,7 @@
   &lt;label class="uiLabel-left form-element__label uiLabel">
     &lt;span>Reimbursed?&lt;/span>
   &lt;/label>
-  &lt;input type="checkbox" class="uiInput uiInputCheckbox">
+  &lt;input type="checkbox">
 &lt;/div></pre>
 	<p>The <code>value</code> attribute controls the state of a checkbox, and events such as <code>click</code> and <code>change</code> determine its behavior. This example updates the checkbox CSS class on a click event.</p>
 	<pre>&lt;!-- Component Markup -->

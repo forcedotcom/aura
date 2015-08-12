@@ -374,14 +374,21 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
-        return ret;
+return ret;
     } else {
-        // Prevent collision between value providers and serRefId properties (typically "s" and "r").
-        var context = responseMessage["context"];
-        var globalValueProviders = context["globalValueProviders"];
-        context["globalValueProviders"] = undefined;
-        $A.util.json.resolveRefs(responseMessage);
-        context["globalValueProviders"] = globalValueProviders;
+        // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
+        if (responseMessage["context"] &&
+            responseMessage["context"]["globalValueProviders"] &&
+            responseMessage["context"]["globalValueProviders"]["$Label"]) {
+
+            var labelGVP = responseMessage["context"]["globalValueProviders"]["$Label"];
+            responseMessage["context"]["globalValueProviders"]["$Label"] = undefined;
+            $A.util.json.resolveRefs(responseMessage);
+            responseMessage["context"]["globalValueProviders"]["$Label"] = labelGVP;
+
+        } else {
+            $A.util.json.resolveRefs(responseMessage);
+        }
     }
     ret["status"] = "SUCCESS";
     ret["message"] = responseMessage;

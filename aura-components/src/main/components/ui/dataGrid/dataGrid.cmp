@@ -17,6 +17,7 @@
 -->
 <aura:component extensible="true" extends="ui:abstractDataGrid" support="PROTO" description="Represents a table containing dynamic rows of data with inline edit support">
 	<aura:attribute name="summary" type="String"/>
+	<aura:attribute name="useRowHeaders" type="Boolean" default="false" description="Makes the first column of each row a header cell"/>
 
 	<aura:registerevent name="updateRowAttributes" type="ui:updateGridRow"/>
 

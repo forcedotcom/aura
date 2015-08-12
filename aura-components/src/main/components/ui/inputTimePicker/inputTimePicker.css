@@ -13,3 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+.THIS div.dropdown {
+	position: absolute;
+	top:0;
+	left:0;
+}

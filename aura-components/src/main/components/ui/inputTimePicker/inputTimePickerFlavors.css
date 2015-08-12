@@ -30,13 +30,16 @@
 }
 
 .THIS div.dropdown:not(.visible) {
-    display: none;
+    display: block;
+    position: absolute;
+    visibility: hidden;
 }
 
 .THIS > div.dropdown.visible {
     display: block;
     position: absolute;
     z-index: 7000;
+    visibility: visible;
 }
 
 .THIS .dropdown {

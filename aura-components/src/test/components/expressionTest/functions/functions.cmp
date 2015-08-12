@@ -28,6 +28,10 @@
 
     <aura:attribute name="object" type="Object"/>
 
+    <aura:attribute name="label0" type="String"/>
+    <aura:attribute name="label1" type="String"/>
+    <aura:attribute name="label2" type="String"/>
+
     <!-- asserts -->
     <expressionTest:test expression="{!v.integer}" exprText="v.integer" expected="7"/>
     <expressionTest:test expression="{!v.double}" exprText="v.double" expected="3.1"/>
@@ -340,18 +344,17 @@
 
     <!-- empty -->
     <expressionTest:test expression="{!empty(null)}" exprText="empty(null)" expected="true"/>
-
     <expressionTest:test expression="{!empty(true)}" exprText="empty(true)" expected="false"/>
     <expressionTest:test expression="{!empty(false)}" exprText="empty(false)" expected="false"/>
 
     <expressionTest:test expression="{!empty(0)}" exprText="empty(0)" expected="false"/>
     <expressionTest:test expression="{!empty(0.0)}" exprText="empty(0.0)" expected="false"/>
-    <!-- WXXXX - NaN is interpreted as "undefined"
+    <!-- WXXXX - NaN is interpreted as "undefined" becuase of model serilization
     <expressionTest:test expression="{!empty(NaN)}" exprText="empty(NaN)" expected="false"/>
     -->
     <expressionTest:test expression="{!empty(m.integer)}" exprText="empty(m.integer)" expected="false"/>
     <expressionTest:test expression="{!empty(m.double)}" exprText="empty(m.double)" expected="false"/>
-    <!-- WXXXX - NaN is interpreted as "undefined"
+    <!-- WXXXX - NaN is interpreted as "undefined" becuase of model serilization
     <expressionTest:test expression="{!empty(m.NaN)}" exprText="empty(m.NaN)" expected="false"/>
     -->
     <expressionTest:test expression="{!empty(v.NaN)}" exprText="empty(v.NaN)" expected="false"/>
@@ -363,14 +366,45 @@
 
     <expressionTest:test expression="{!empty(m.emptyList)}" exprText="empty(m.emptyList)" expected="true"/>
     <expressionTest:test expression="{!empty(m.stringList)}" exprText="empty(m.stringList)" expected="false"/>
-    <!-- WXXXX - [null] is interpreted as []
+    <!-- WXXXX - [null] is interpreted as [] becuase of model serilization
         <expressionTest:test expression="{!empty(m.listOfNull)}" exprText="empty(m.listOfNull)" expected="false"/>
     -->
-    <!-- WXXXX - Objects is serialized as "undefined"
+    <!-- WXXXX - Object is serialized as "undefined" becuase of model serilization
         <expressionTest:test expression="{!empty(m.object)}" exprText="empty(m.object)" expected="false"/>
     -->
     <expressionTest:test expression="{!empty(m.objectNull)}" exprText="empty(m.objectNull)" expected="true"/>
     <expressionTest:test expression="{!empty(v.object)}" exprText="empty(v.object)" expected="true"/>
+
+    <!-- format: template type -->
+    <expressionTest:test expression="{!format()}" exprText="format()" expected="''"/>
+    <expressionTest:test expression="{!format(null)}" exprText="format(null)" expected="''"/>
+    <expressionTest:test expression="{!format(undefined)}" exprText="format(undefined)" expected="''"/>
+    <expressionTest:test expression="{!format(true)}" exprText="format(true)" expected="'true'"/>
+    <expressionTest:test expression="{!format(false)}" exprText="format(false)" expected="'false'"/>
+    <expressionTest:test expression="{!format(123)}" exprText="format(123)" expected="'123'"/>
+    <expressionTest:test expression="{!format(123.4)}" exprText="format(123.4)" expected="'123.4'"/>
+    <expressionTest:test expression="{!format(0)}" exprText="format(0)" expected="'0'"/>
+    <expressionTest:test expression="{!format(0.0)}" exprText="format(0.0)" expected="'0'"/>
+    <expressionTest:test expression="{!format('abc')}" exprText="format('abc')" expected="'abc'"/>
+    <expressionTest:test expression="{!format('')}" exprText="format('')" expected="''"/>
+
+    <!-- format: argument types -->
+    <expressionTest:test expression="{!format(v.label2, null, undefined)}" exprText="format(v.label2, null, undefined" expected="'Hello  and '"/>
+    <expressionTest:test expression="{!format(v.label2, true, false)}" exprText="format(v.label2, v.true, false)" expected="'Hello true and false'"/>
+    <expressionTest:test expression="{!format(v.label2, 123, 123.4)}" exprText="format(v.label2, 123, 123.4)" expected="'Hello 123 and 123.4'"/>
+    <expressionTest:test expression="{!format(v.label2, 0, 0.0)}" exprText="format(v.label2, 0, 0.0)" expected="'Hello 0 and 0'"/>
+    <expressionTest:test expression="{!format(v.label2, m.stringEmpty, m.string)}" exprText="format(v.label2, m.stringEmpty, m.string)" expected="'Hello  and Model'"/>
+    <expressionTest:test expression="{!format(v.label2, m.objectNull, m.object)}" exprText="format(v.label2, m.objectNull, m.object)" expected="'Hello  and '"/>
+    <expressionTest:test expression="{!format(v.label2, m.emptyList, m.stringList)}" exprText="format(v.label2, m.emptyList, m.stringList)" expected="'Hello  and one,two,three'"/>
+
+    <!-- format: argument count -->
+    <expressionTest:test expression="{!format(v.label0)}" exprText="format(v.label0)" expected="'Hello'"/>
+    <expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
+    <expressionTest:test expression="{!format(v.label2)}" exprText="format(v.label2)" expected="'Hello {0} and {1}'"/>
+
+    <expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
+    <expressionTest:test expression="{!format(v.label1, v.string)}" exprText="format(v.label1, v.string)" expected="'Hello Component'"/>
+    <expressionTest:test expression="{!format(v.label1, v.string, v.integer)}" exprText="format(v.label1, v.string, v.integer)" expected="'Hello Component'"/>
 
     <!-- misc -->
     <expressionTest:test expression="{!m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)}" exprText="m.booleanTrue &amp;&amp; v.string == 'Model' ? null : abs(v.Infinity) >= m.double &amp;&amp; (m.double + m.doubleString + 1)" expected="'4.15.11'"/>

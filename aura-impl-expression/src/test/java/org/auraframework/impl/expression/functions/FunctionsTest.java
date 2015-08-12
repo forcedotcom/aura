@@ -33,6 +33,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.GREATER
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN;
 import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_THAN_OR_EQUAL;
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
+import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         return f.evaluate(Lists.newArrayList(args));
     }
 
+    // ADD
+
     public void testAddTwoDoubles() throws Exception {
         assertEquals(3146431.43266 + 937.1652, evaluate(ADD, 3146431.43266, 937.1652));
     }
@@ -67,9 +70,6 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(314 + 3146431.43266, evaluate(ADD, 314, 3146431.43266));
     }
 
-    /**
-     * add() returns the best type available.
-     */
     public void testAddTwoInts() throws Exception {
         assertEquals(235639, evaluate(ADD, 314, 235325));
     }
@@ -204,6 +204,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("[object Object]", evaluate(ADD, map, ""));
     }
 
+    // EQUALS
+
     public void testEqualsSameIntAndDouble() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, 2, 2.0));
     }
@@ -283,6 +285,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, "null"));
     }
 
+    // NOTEQUALS
+
     public void testNotEqualsDifferentBooleans() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, Boolean.FALSE, Boolean.TRUE));
     }
@@ -306,6 +310,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testNotEqualsTwoNulls() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOTEQUALS, null, null));
     }
+
+    // TERNARY
 
     public void testTernaryTrueReturnString() throws Exception {
         assertEquals("1", evaluate(TERNARY, Boolean.TRUE, "1", "2"));
@@ -354,6 +360,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testTernaryNaN() throws Exception {
         assertEquals("2", evaluate(TERNARY, Double.NaN, "1", "2"));
     }
+
+    // SUBTRACT
 
     public void testSubtractDoubleAndNegativeDouble() throws Exception {
         assertEquals(937.1652 - -8426.6, evaluate(SUBTRACT, 937.1652, -8426.6));
@@ -424,6 +432,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(0.0, evaluate(SUBTRACT, null, null));
     }
 
+    // MULTIPLY
+
     public void testMultiplyIntAndDouble() throws Exception {
         assertEquals(1.1, evaluate(MULTIPLY, 1, 1.1));
     }
@@ -488,6 +498,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(0.0, evaluate(MULTIPLY, null, null));
     }
 
+    // DIVIDE
+
     public void testDivideDoubleAndNegativeDouble() throws Exception {
         assertEquals(3146431.43266 / -8426.6, evaluate(DIVIDE, 3146431.43266, -8426.6));
     }
@@ -548,6 +560,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(DIVIDE, null, null));
     }
 
+    // MODULUS
+
     public void testModulusDoubleAndNegativeDouble() throws Exception {
         assertEquals(3146431.43266 % -8426.6, evaluate(MODULUS, 3146431.43266, -8426.6));
     }
@@ -596,6 +610,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Double.NaN, evaluate(MODULUS, null, null));
     }
 
+    // ABSOLUTE
+
     public void testAbsoluteValueDouble() throws Exception {
         assertEquals(Math.abs(3146431.43266), evaluate(ABSOLUTE, 3146431.43266));
     }
@@ -628,6 +644,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(0.0, evaluate(ABSOLUTE, (Object) null));
     }
 
+    // NEGATE
+
     public void testNegatePositiveDouble() throws Exception {
         assertEquals(-3146431.43266, evaluate(NEGATE, 3146431.43266));
     }
@@ -659,6 +677,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testNegateStringNull() throws Exception {
         assertEquals(-0.0, evaluate(NEGATE, (Object) null));
     }
+
+    // GREATER_THAN
 
     public void testGreaterThanTwoDoubles() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN, 3146431.43266, 937.1652));
@@ -752,6 +772,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(GREATER_THAN, null, null));
     }
 
+    // GREATER_THAN_OR_EQUAL
+
     public void testGreaterThanOrEqualTwoDoubles() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, 3146431.43266, 937.1652));
     }
@@ -843,6 +865,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testGreaterThanOrEqualNullAndNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(GREATER_THAN_OR_EQUAL, null, null));
     }
+
+    // LESS_THAN
 
     public void testLessThanTwoDoubles() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, 3146431.43266, 937.1652));
@@ -936,6 +960,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN, null, null));
     }
 
+    // LESS_THAN_OR_EQUAL
+
     public void testLessThanOrEqualTwoDoubles() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(LESS_THAN_OR_EQUAL, 3146431.43266, 937.1652));
     }
@@ -1028,6 +1054,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.TRUE, evaluate(LESS_THAN_OR_EQUAL, null, null));
     }
 
+    // AND
+
     public void testAndBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(AND, Boolean.TRUE, Boolean.FALSE));
     }
@@ -1075,6 +1103,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testAndIntAndEmptyString() throws Exception {
         assertEquals("", evaluate(AND, 314, ""));
     }
+
+    // OR
 
     public void testOrBooleanTrueAndBooleanFalse() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(OR, Boolean.TRUE, Boolean.FALSE));
@@ -1124,6 +1154,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("Random", evaluate(OR, Double.NaN, "Random"));
     }
 
+    // NOT
+
     public void testNotBooleanTrue() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOT, Boolean.TRUE));
     }
@@ -1169,6 +1201,8 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.TRUE, evaluate(NOT, Float.NaN));
     }
 
+    // EMPTY
+
     public void testIsEmptyNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EMPTY, (Object) null));
     }
@@ -1211,11 +1245,101 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     public void testIsEmptyWithList() throws Exception {
         List<Object> list = Lists.newArrayList();
         list.add("a");
+        list.add("b");
 
         assertEquals(Boolean.FALSE, evaluate(EMPTY, list));
     }
 
     public void testIsEmptyObject() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EMPTY, new Object()));
+    }
+
+    // FORMAT: template type
+
+    public void testFormatNoArguments() throws Exception {
+        assertEquals("", evaluate(FORMAT));
+    }
+
+    public void testFormatNull() throws Exception {
+        assertEquals("", evaluate(FORMAT, (Object) null));
+    }
+
+    public void testFormatBooleanTrue() throws Exception {
+        assertEquals("true", evaluate(FORMAT, Boolean.TRUE));
+    }
+
+    public void testFormatBooleanFalse() throws Exception {
+        assertEquals("false", evaluate(FORMAT, Boolean.FALSE));
+    }
+
+    public void testFormatZero() throws Exception {
+        assertEquals("0", evaluate(FORMAT, 0));
+    }
+
+    public void testFormatDouble() throws Exception {
+        assertEquals("0", evaluate(FORMAT, 0.0));
+    }
+
+    public void testFormatNaN() throws Exception {
+        assertEquals("NaN", evaluate(FORMAT, Double.NaN));
+        assertEquals("NaN", evaluate(FORMAT, Float.NaN));
+    }
+
+    public void testFormatWithEmptyString() throws Exception {
+        assertEquals("", evaluate(FORMAT, ""));
+    }
+
+    public void testFormatWithString() throws Exception {
+        assertEquals("Random", evaluate(FORMAT, "Random"));
+    }
+
+    public void testFormatWithEmptyList() throws Exception {
+        assertEquals("", evaluate(FORMAT, Lists.newArrayList()));
+    }
+
+    public void testFormatWithList() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        list.add("a");
+        list.add("b");
+
+        assertEquals("a,b", evaluate(FORMAT, list));
+    }
+
+    public void testFormatObject() throws Exception {
+        assertEquals("[object Object]", evaluate(FORMAT, new Object()));
+    }
+
+    // FORMAT: argument type
+
+	public void testFormatArgNull() throws Exception {
+	    assertEquals("X", evaluate(FORMAT, "X{0}", (Object) null));
+	}
+
+    public void testFormatArgBoolean() throws Exception {
+        assertEquals("XtrueYfalse", evaluate(FORMAT, "X{0}Y{1}", Boolean.TRUE, Boolean.FALSE));
+    }
+
+    public void testFormatArgZero() throws Exception {
+        assertEquals("X0Y0", evaluate(FORMAT, "X{0}Y{1}", 0, 0.0));
+    }
+
+    public void testFormatArgNaN() throws Exception {
+        assertEquals("XNaNYNaN", evaluate(FORMAT, "X{0}Y{1}", Double.NaN, Float.NaN));
+    }
+
+    public void testFormatArgString() throws Exception {
+        assertEquals("XYRandom", evaluate(FORMAT, "X{0}Y{1}", "", "Random"));
+    }
+
+    public void testFormatArgList() throws Exception {
+        List<Object> list = Lists.newArrayList();
+        list.add("a");
+        list.add("b");
+
+        assertEquals("XYa,b", evaluate(FORMAT, "X{0}Y{1}", Lists.newArrayList(), list));
+    }
+
+    public void testFormatArgObject() throws Exception {
+        assertEquals("X[object Object]Y", evaluate(FORMAT, "X{0}Y", new Object()));
     }
 }

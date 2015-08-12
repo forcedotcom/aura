@@ -37,7 +37,7 @@
     margin-bottom: 1.1em;
 }
 
-.THIS div{
+.THIS div {
 	width: 400px;
     padding:10px;
     border: 2px solid green;
@@ -45,4 +45,7 @@
     margin-top: 10px;
 }
 
+.THIS div:nth-child(even) {
+    border: 1px solid gray;
+}
 

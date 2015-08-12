@@ -53,7 +53,9 @@ public class JavascriptHelpers {
         if (depth > 3) {
             return "Too Deep";
         }
-        if (o instanceof Number) {
+        if (o == null) {
+        	return "";
+        } else if (o instanceof Number) {
         	Number n = (Number)o;
         	
                 // Oh fun. Don't know of another way to detect this.
@@ -73,8 +75,8 @@ public class JavascriptHelpers {
             return sb.toString();
         } else if (o instanceof String) {
             return (String)o;
-        } else if (o == null) {
-            return "";
+        } else if (o instanceof Boolean) {
+            return (Boolean)o ? "true" : "false";
         } else {
             return "[object Object]";
         }
@@ -82,7 +84,7 @@ public class JavascriptHelpers {
 
 
     /**
-     * The public method to strigify an object JS style.
+     * The public method to stringify an object JS style.
      *
      * @param o the object to stringify.
      * @return the string version approximating JS.

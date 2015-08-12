@@ -13,91 +13,75 @@
 <aura:component>
 	<aura:attribute name="value" type="String" default="2015-07-01"/>
 	<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
-	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
-	<div>
-	    <div>
-	        <h1>Test Default Header Tag (h2)</h1>
-	    </div>
-	    <div>
-	    	<ui:datePicker aura:id="standAloneDatepicker" visible="true"></ui:datePicker>
-	    </div>
-	</div>
-	</aura:if>
 
-
-	<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyCustomHeaderTag'}">	
-	<div>
-	    <div>
-	        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
-	    </div>
-	    <div>
-	        <ui:datePicker aura:id="standAloneDatepicker" visible="true" titleHeadingLevel="h3"></ui:datePicker>
-	    </div>
-	</div>
-	</aura:if>
-
-
-
-	<aura:if isTrue="{! v.renderItem == 'testSetFocusOnDatepickerGridDefaultVal'}">	
 	<div class="block">
-	    <div>
-	        <h1>Test Set Focus Default Value</h1>
-	    </div>
-	    <div class="subtitle">
-	    	<div>dp_v_setFocus (Default Value) = {!v.dp_v_setFocus}</div>
-		</div>
-	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-	    	<ui:datePickerManager aura:id="datepickerManager"/>
-	    </div>
-	</div>
-	</aura:if>
-
-	<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">	
-	<div class="block">
-	    <div>
-	        <h1>Test Set Focus Attribute</h1>
-	    </div>
-	    <div class="subtitle">
-	    	<div>dp_v_setFocus = {!v.dp_v_setFocus}</div>
-	    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
-	    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
-		</div>
-	    <div>
-	        <ui:inputDateTrigger displayDatePicker="true" format="yyyy-MM-dd" value="{!v.value}"/><br/>
-	    	<ui:datePickerManager aura:id="datepickerManager"/>
-	    </div>
-	</div>
-	</aura:if>
+		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
+		    <div>
+		        <h1>Test Default Header Tag (h2)</h1>
+		    </div>
+		    <div>
+		    	<ui:datePicker aura:id="standAloneDatepicker" visible="true"></ui:datePicker>
+		    </div>
+		</aura:if>
 
 
-	<aura:if isTrue="{! v.renderItem == 'testSingleInputFlag'}">	
-		<div id="singleInputField">
-			<b>singleInputField:</b><br />
-			<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" /><br />
-		</div>
-		<div id="compoundInputField">
-			<b>compoundInputField:</b><br />
-			<ui:inputDateTime aura:id="inputDatetime_disabled" useSingleInput="false" displayDatePicker="true" /><br />
-		</div>
-	</aura:if>
+		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyCustomHeaderTag'}">	
+		    <div>
+		        <h1>Test Custom Header Tag h3 and datepicker.helper.setTitleTag API</h1>
+		    </div>
+		    <div>
+		        <ui:datePicker aura:id="standAloneDatepicker" visible="true" titleHeadingLevel="h3"></ui:datePicker>
+		    </div>
+		</aura:if>
+
+		<aura:if isTrue="{! v.renderItem == 'testDatepickerSetFocus'}">	
+		    <div>
+		        <h1>Test Set Focus Attribute</h1>
+		    </div>
+		    <div class="subtitle">
+		    	<div>dp_v_setFocus = {!v.dp_v_setFocus}</div>
+		    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
+		    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
+			</div>
+		    <div>
+		        <ui:inputDate aura:id="inputDate" displayDatePicker="true"/>
+		    </div>
+		</aura:if>
 
 
-	<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
-		<ui:inputDate aura:id="inputDate" disabled="true" />
-	</aura:if>
+		<aura:if isTrue="{! v.renderItem == 'testSingleInputFlag'}">	
+			<div id="singleInputField">
+				<b>singleInputField:</b><br />
+				<ui:inputDateTime aura:id="inputDatetime" useSingleInput="true" displayDatePicker="true" /><br />
+			</div>
+			<div id="compoundInputField">
+				<b>compoundInputField:</b><br />
+				<ui:inputDateTime aura:id="inputDatetime_disabled" useSingleInput="false" displayDatePicker="true" /><br />
+			</div>
+		</aura:if>
 
-	<aura:if isTrue="{! v.renderItem == 'testCloseOnClickOut'}">	
-		<div>
+
+		<aura:if isTrue="{! v.renderItem == 'testDisabledInputDate'}">	
+			<ui:inputDate aura:id="inputDate" disabled="true" />
+		</aura:if>
+
+		<aura:if isTrue="{! v.renderItem == 'testCloseOnClickOut'}">	
 			<ui:button aura:id="btnPressMe" label="Press Me and The Datepicker will disappear"></ui:button>
 			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="true" ></ui:datePicker>
-		</div>
-	</aura:if>
+		</aura:if>
 
-	<aura:if isTrue="{! v.renderItem == 'testOpenOnClickOut'}">	
-		<div>
+		<aura:if isTrue="{! v.renderItem == 'testOpenOnClickOut'}">	
 			<ui:button aura:id="btnPressMe" label="Press Me and the Datepicker still stays opened"></ui:button>
 			<ui:datePicker aura:id="standAloneDatepicker" visible="true" closeOnClickOut="false"></ui:datePicker>
-		</div>
-	</aura:if>
+		</aura:if>
+
+		<aura:if isTrue="{! v.renderItem == 'simpleInputDateTime'}">	
+			<pre>
+Acceptable Delta: {!v.acceptableDelta}
+Datepicker Top,Left Delta: {!v.dpTopDelta},	{!v.dpLeftDelta}
+Timepicker Top,Left Delta: {!v.tpTopDelta},	{!v.tpLeftDelta}
+			</pre>
+			<ui:inputDateTime displayDatePicker="true"/>
+		</aura:if>
+	</div>
 </aura:component>

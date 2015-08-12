@@ -84,22 +84,24 @@
         }]
     },
 
-    //test the default value of setFocus in datepicker
-    testSetFocusOnDatepickerGridDefaultVal: {
-        attributes : {"renderItem" : "testSetFocusOnDatepickerGridDefaultVal"},
+    //test how datepicker behaves when setFocus=true
+    testSetFocusOnDatepickerGridTrue: {
+        attributes : {"renderItem" : "testDatepickerSetFocus"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test: [function(cmp) {
+            //initial focus state (DEFAULT SETFOCUS state)
             var self = this;
             if(self.isViewDesktop()){
+                var cmpInputDate = cmp.find('inputDate');
                 var setFocusBool = $A.util.getBooleanValue(
-                    self.getDatepickerAttribute(cmp, 'v.setFocus')
+                    cmpInputDate.find('datePicker').get('v.setFocus')
                 );
 
                 var setFocusBool_dpGrid = $A.util.getBooleanValue(
-                    self.getDatepickerGridCmp(cmp).get('v._setFocus')
+                    cmpInputDate.find('datePicker').find('grid').get('v._setFocus')
                 );
 
-                //set this for view in the ui
+                // //set this for view in the ui
                 self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
                 self.setDebugCmpAttribute(cmp, 'v.dpGrid_v_setFocus', setFocusBool_dpGrid);
 
@@ -114,50 +116,11 @@
                     'datePickergrid._setFocus should be true'
                 )
             }
-        }]
-    },
-
-    //test how datepicker behaves when setFocus=true
-    testSetFocusOnDatepickerGridTrue: {
-        attributes : {"renderItem" : "testDatepickerSetFocus"},
-        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
-        test: [function(cmp) {
+        }, function(cmp) {
             var self = this;
             if(self.isViewDesktop()){
-                //set date value
-                self.setDateValue(
-                    cmp,
-                    2015,//year
-                    7,//month
-                    1//day
-                );
+                var cmpInputDate = cmp.find('inputDate');
 
-
-                //set setFocus=true
-                self.setDatepickerAttribute(cmp, 'v.setFocus', true);
-            }
-        }, function(cmp){
-            var self = this;
-            if(self.isViewDesktop()){
-                //get value and assertion
-                //get values
-                var setFocusBool = $A.util.getBooleanValue(
-                    self.getDatepickerAttribute(cmp, 'v.setFocus')
-                );
-
-                //set this for view in the ui
-                self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
-
-                //assertion 
-                $A.test.assertTrue(
-                    setFocusBool,
-                    'dp_v_setFocus should be true'
-                )
-            }
-        }, function(cmp){
-            //assert focus state (expected null)
-            var self = this;
-            if(self.isViewDesktop()){
                 //show datepicker
                 self.showDatepicker();
 
@@ -165,7 +128,7 @@
                 $A.test.addWaitForWithFailureMessage(
                     1,
                     function(){// testFunction
-                        return $A.test.select('.visible.uiDatePicker').length;
+                        return $A.test.select('.uiDatePicker.visible').length;
                     },
                     'datepicker grid is not shown',
                     function(){// callback
@@ -173,8 +136,8 @@
                         var activeElm = $A.test.getActiveElement();
                         var tagName = self.getTagName(activeElm);
 
-                        cmp.set('v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
-                        cmp.set('v.activeElm_tagName', tagName);
+                        self.setDebugCmpAttribute(cmp, 'v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
+                        self.setDebugCmpAttribute(cmp, 'v.activeElm_tagName', tagName);
 
                         //assert focus state
                         $A.test.assertTrue(
@@ -200,42 +163,12 @@
         test: [function(cmp) {
             var self = this;
             if(self.isViewDesktop()){
-                //set date value
-                self.setDateValue(
-                    cmp,
-                    2015,//year
-                    7,//month
-                    1//day
-                );
+                var cmpInputDate = cmp.find('inputDate');
 
                 //set setFocus=false
-                self.setDatepickerAttribute(cmp, 'v.setFocus', false);
-            }
-        }, function(cmp){
-            var self = this;
-            if(self.isViewDesktop()){
-                //get value and assertion
-                //get values
-                var setFocusBool = $A.util.getBooleanValue(
-                    self.getDatepickerAttribute(cmp, 'v.setFocus')
-                );
+                cmpInputDate.find('datePicker').set('v.setFocus', false);
+                cmpInputDate.find('datePicker').find('grid').set('v.setFocus', false)
 
-                //set this for view in the ui
-                self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
-
-                //show datepicker
-                self.showDatepicker();
-
-                //assertion 
-                $A.test.assertFalse(
-                    setFocusBool,
-                    'dp_v_setFocus should be false'
-                )
-            }
-        }, function(cmp){
-            //assert focus state (expected null)
-            var self = this;
-            if(self.isViewDesktop()){
                 //show datepicker
                 self.showDatepicker();
 
@@ -243,7 +176,7 @@
                 $A.test.addWaitForWithFailureMessage(
                     1,
                     function(){// testFunction
-                        return $A.test.select('.visible.uiDatePicker').length;
+                        return $A.test.select('.uiDatePicker.visible').length;
                     },
                     'datepicker grid is not shown',
                     function(){// callback
@@ -251,15 +184,10 @@
                         var activeElm = $A.test.getActiveElement();
                         var tagName = self.getTagName(activeElm);
 
-                        cmp.set('v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
-                        cmp.set('v.activeElm_tagName', tagName);
+                        self.setDebugCmpAttribute(cmp, 'v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
+                        self.setDebugCmpAttribute(cmp, 'v.activeElm_tagName', tagName);
 
                         //assert focus state
-                        $A.test.assertFalse(
-                            $A.util.hasClass(activeElm, 'uiDayInMonthCell'),
-                            'with SetFocus=true, focused elm should NOT have a class named "uiDayInMonthCell"'
-                        );
-
                         $A.test.assertEquals(
                             'BODY',
                             tagName,
@@ -330,6 +258,7 @@
     },
 
 
+    //test if click out will close the datepicker when closedOnClickOutFlag=true
     testCloseOnClickOut:{
         attributes : {"renderItem" : "testCloseOnClickOut"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
@@ -357,6 +286,8 @@
         }]
     },
 
+
+    //test if click out still opens the datepicker when closedOnClickOutFlag=false
     testOpenOnClickOut:{
         attributes : {"renderItem" : "testOpenOnClickOut"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
@@ -383,6 +314,70 @@
     },
 
     
+    //test to see if initial rendering of datepicker is covering the input date textbox.
+    testInputDateTimePositionOnInitalRenderring : {
+        attributes : {"renderItem" : "simpleInputDateTime"},
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
+        test: [function(cmp) {
+            var ACCEPTABLE_DELTA = 30;//acceptable delta between the datepicker and input textbox
+            var self = this;
+
+            if(self.isViewDesktop()){
+                //acceptable delta
+                self.setDebugCmpAttribute(cmp, 'v.acceptableDelta', ACCEPTABLE_DELTA);
+
+                //show the datepicker
+                // $A.test.clickOrTouch( cmp.getElement().querySelector('.datePicker-openIcon') );
+                self.showDatepicker();
+
+                //wait for the datepicker to pop
+                $A.test.addWaitForWithFailureMessage(
+                    true,//expected value
+                    function(){//actual value
+                        //get bounding rect of the datepicker
+                        var rectDatepicker = $A.test.select('.uiDatePicker.visible')[0].getBoundingClientRect();
+                        var rectTextbox = $A.test.select('.dateTime-inputDate input')[0].getBoundingClientRect();
+
+                        var actualTopDelta = rectDatepicker.top - rectTextbox.top;
+                        var actualLeftDelta = rectDatepicker.left - rectTextbox.left;
+
+
+                        self.setDebugCmpAttribute(cmp, 'v.dpTopDelta', actualTopDelta);
+                        self.setDebugCmpAttribute(cmp, 'v.dpLeftDelta', actualLeftDelta);
+
+                        return actualTopDelta >= 0 && actualTopDelta <= ACCEPTABLE_DELTA &&
+                            actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
+                    },
+                    'Datepicker position is not aligned to the input textbox',//failureMessage
+                    function(){
+                        //checking out on the time picker position
+                        self.showTimepicker();
+
+
+                        //assertion of time picker intial position
+                        $A.test.addWaitForWithFailureMessage(
+                            true,//expected value
+                            function(){//actual value
+                                //get bounding rect of the datepicker
+                                var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
+                                var rectTextbox = $A.test.select('.dateTime-inputTime input')[0].getBoundingClientRect();
+
+                                var actualTopDelta = rectTimePicker.top - rectTextbox.top;
+                                var actualLeftDelta = rectTimePicker.left - rectTextbox.left;
+
+                                self.setDebugCmpAttribute(cmp, 'v.tpTopDelta', actualTopDelta);
+                                self.setDebugCmpAttribute(cmp, 'v.tpLeftDelta', actualLeftDelta);
+
+                                return actualTopDelta >= 0 && actualTopDelta <= ACCEPTABLE_DELTA &&
+                                    actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
+                            },
+                            'Timepicker position is not aligned to the input textbox'//failureMessage
+                        );
+                    }
+                );
+            }
+        }]
+    },
     
 
     verifyDatepickerVisibility: function(elSelector, visible){
@@ -408,33 +403,6 @@
     /**
      * HELPER
      */
-    getDatepickerManagerCmp: function(cmp){
-       return cmp.find(this.SELECTOR.datePickerManager); 
-    },
-    getDatepickerCmp: function(cmp){
-        return this.getDatepickerManagerCmp(cmp).find(this.SELECTOR.datePicker)
-    },
-    getDatepickerGridCmp: function(cmp){
-        return this.getDatepickerManagerCmp(cmp).find(this.SELECTOR.datePicker).find('grid');
-    },
-    getDatepickerAttribute: function(cmp, attrName, childId){
-        var cmpDp  = this.getDatepickerCmp(cmp);
-        if(childId === undefined){
-            return cmpDp.get(attrName);    
-        }
-        else{
-            return cmpDp.find(childId).get(attrName);
-        }
-    },
-    setDatepickerAttribute: function(cmp, attrName, newAttrVal, childId){
-        var cmpDp  = this.getDatepickerCmp(cmp);
-        if(childId === undefined){
-            cmpDp.set(attrName, newAttrVal);
-        }
-        else{
-            cmpDp.find(childId).set(attrName, newAttrVal);
-        }
-    },
     getTagName: function(elm){
         return elm.tagName.toUpperCase();
     },
@@ -446,14 +414,11 @@
     },
     showDatepicker: function(){
         // clicking on the datepicker open icon
-        $A.test.clickOrTouch( $A.test.select('.datePicker-openIcon')[0]);
+        $A.test.clickOrTouch( $A.test.select('.datePicker-openIcon')[0] );
     },
-    setDateValue: function(cmp, date, month, year){
-        var self = this;
-        var dpGrid = self.getDatepickerGridCmp(cmp);
-        dpGrid.set("v.date", date);
-        dpGrid.set("v.month", month);
-        dpGrid.set("v.year", year);
+    showTimepicker: function(){
+        //clicking on the timepicker open icon
+        $A.test.clickOrTouch( $A.test.select('.timePicker-openIcon')[0] );
     },
     /**
      * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 

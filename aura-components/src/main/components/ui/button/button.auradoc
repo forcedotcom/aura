@@ -42,7 +42,7 @@ THIS.uiButton {
 background: url(/path/to/img) no-repeat;
 }</pre>
 		<p>The previous markup for a button with text and image results in the following HTML.</p>
-		<pre>&lt;button class="default uiBlock uiButton" accesskey type="button">
+		<pre>&lt;button class="button uiButton--default uiButton" accesskey type="button">
 &lt;span class="label bBody truncate" dir="ltr">Find&lt;/span>
 &lt;/button></pre>
 		

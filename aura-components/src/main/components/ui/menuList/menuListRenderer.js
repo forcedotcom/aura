@@ -28,6 +28,13 @@
     },
 
     rerender: function(component, helper) {
+        if (!component.isDirty("v.childMenuItems")) {
+            // The below will re-scan the body of the menu list to find any changes, and will update
+            // child menu items, hence why we don't re-scan when the chidlMenuItems attribute is changed.
+            var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+            _helper.setEventHandlersOnChildren(component);
+        }
+
         var currentlyVisible = false;
         var divCmp = component.find("menu");
         if (divCmp) {
@@ -43,8 +50,11 @@
     },
 
     unrender: function(component, helper) {
-    	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
-    	_helper.removeKeyboardEventHandlers(component);
-        return this.superUnrender();
+        try {
+            var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
+            _helper.removeKeyboardEventHandlers(component);
+        } finally {
+            return this.superUnrender();
+        }
     }
 })

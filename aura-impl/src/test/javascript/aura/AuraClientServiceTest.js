@@ -86,7 +86,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
     	[Fact]
     	function deDupeNewEntry() {
-    		// This just test the case where we add the action for the first time
+    		// This just tests the case where we add the action for the first time
     		// there is no record in actionStoreMap for this action
     		// Arrange
             var target;

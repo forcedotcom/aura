@@ -108,11 +108,11 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element with matching locator to appear in dom.
-     * 
+     *
      * This will wait for at least one element with the locator to appear in the dom, and it will return the first
      * element found. If there are more than one element that match the locator, this will succeed when the first one
      * appears.
-     * 
+     *
      * @param msg Error message on timeout.
      * @param locator By of element waiting for.
      */
@@ -127,9 +127,9 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element with matching locator to appear in dom.
-     * 
+     *
      * Convenience routine to supply a message.
-     * 
+     *
      * @param locator By of element waiting for.
      */
     public WebElement waitForElement(By locator) {
@@ -139,7 +139,7 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element to be not present
-     * 
+     *
      * @param locator By of element waiting to disapear
      * @return
      */
@@ -177,7 +177,7 @@ public class AuraUITestingUtil {
     private void assertClassNameContains(WebElement element, String namePart, boolean doesContain) {
         String className = element.getAttribute("class").trim();
         className = " " + className + " "; // so we wont get false positive for
-                                           // nonactive if looking for active
+        // nonactive if looking for active
         namePart = " " + namePart + " ";
 
         if (doesContain) {
@@ -206,7 +206,7 @@ public class AuraUITestingUtil {
 
     /**
      * Very useful to get handle on the component passing globalId
-     * 
+     *
      * @param cmp: globalId of the component
      * @return
      */
@@ -217,7 +217,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return the javascript using which component's attribute value could be found out
-     * 
+     *
      * @param cmp : cmpName whose attribute you are looking for
      * @param val : attribute name
      * @return
@@ -228,7 +228,7 @@ public class AuraUITestingUtil {
 
     /**
      * Very useful when we know the globalId of the component, inorder to get the attribute value of cmp
-     * 
+     *
      * @param cmp: globalId of the component
      * @param val: attribute name of the component
      * @return
@@ -276,7 +276,7 @@ public class AuraUITestingUtil {
      * As an implementation detail, we accomplish this by wrapping the given javascript so that we can perform the error
      * check on each evaluation without doing a round-trip to the browser (which might be long in cases of remote test
      * runs).
-     * 
+     *
      * @return the result of calling {@link JavascriptExecutor#executeScript(String, Object...) with the given
      *         javascript and args.
      */
@@ -336,7 +336,7 @@ public class AuraUITestingUtil {
 
     /**
      * Returns value of executing javascript in current window.
-     * 
+     *
      * @see org.openqa.selenium.JavscriptExecutor#executeSript(String, Object...)
      */
     public Object getRawEval(String javascript, Object... args) {
@@ -356,7 +356,7 @@ public class AuraUITestingUtil {
 
     /**
      * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
-     * 
+     *
      * @param errors the raw results from invoking $A.test.getErrors()
      */
     public void assertJsTestErrors(String errors) {
@@ -367,11 +367,15 @@ public class AuraUITestingUtil {
         if (!errors.isEmpty()) {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> errorsList = (List<Map<String, Object>>) new JsonReader().read(errors);
-            StringBuffer errorMessage = new StringBuffer();
+            StringBuilder errorMessage = new StringBuilder();
+            StringBuilder functions = new StringBuilder();
             for (Map<String, Object> error : errorsList) {
                 errorMessage.append(error.get("message") + "\n");
+                if (error.containsKey("lastStage")) {
+                    functions.append(error.get("lastStage") + "\n");
+                }
             }
-            Assert.fail(errorMessage.toString());
+            Assert.fail(errorMessage.toString() + functions.toString());
         }
     }
 
@@ -391,7 +395,7 @@ public class AuraUITestingUtil {
 
     /**
      * use to do mouse over the element
-     * 
+     *
      * @param elem
      */
     public void setHoverOverElement(String elem) {
@@ -404,7 +408,7 @@ public class AuraUITestingUtil {
     /**
      * Get the text content of a DOM node. Tries "innerText" followed by "textContext" to take browser differences into
      * account.
-     * 
+     *
      */
     public String getActiveElementText() {
         return (String) getEval("return $A.test.getActiveElementText()");
@@ -412,7 +416,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return Bounding Rectangle Property for given Element
-     * 
+     *
      * @param elementLocalId
      * @param position = "top, left, right, and bottom"
      * @return
@@ -425,7 +429,7 @@ public class AuraUITestingUtil {
     /**
      * Given Element className, method would return component globalId which could be used with $A.getCmp(globalId) to
      * have handle in the component in UI test
-     * 
+     *
      * @param className
      * @return
      */
@@ -438,7 +442,7 @@ public class AuraUITestingUtil {
 
     /**
      * Check for uncaught Aura or Javascript errors after executing a particular WebDriver function.
-     * 
+     *
      * @param function a Function accepting a WebDriver instance
      * @return
      */
@@ -477,7 +481,7 @@ public class AuraUITestingUtil {
 
     /**
      * Find first matching element in the DOM.
-     * 
+     *
      * @param locator
      * @return
      */
@@ -491,7 +495,7 @@ public class AuraUITestingUtil {
 
     /**
      * Find matching elements in the DOM.
-     * 
+     *
      * @param locator
      * @return
      */
@@ -514,10 +518,10 @@ public class AuraUITestingUtil {
 
     /**
      * Get the current aura error message.
-     * 
+     *
      * This will fail the test if the div is not found (which means that the page did not load at all). If the box is
      * not displayed, it returns an empty string.
-     * 
+     *
      * @return any error message that is displayed.
      */
     public String getAuraErrorMessage() {
@@ -554,7 +558,7 @@ public class AuraUITestingUtil {
 
     /**
      * Get any 'cause' message from a quick fix exception
-     * 
+     *
      * @return the quick fix cause exception.
      */
     public String getQuickFixCause() {
@@ -728,31 +732,31 @@ public class AuraUITestingUtil {
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
         WebDriverWait waitAuraPresent = new WebDriverWait(driver, timeoutInSecs);
         waitAuraPresent.withMessage("Initialization error: Perhaps the initial GET failed")
-                .until(
-                        new Function<WebDriver, Boolean>() {
-                            @Override
-                            public Boolean apply(WebDriver input) {
-                                return (Boolean) getRawEval("return !!window.$A");
-                            }
-                        });
+        .until(
+                new Function<WebDriver, Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver input) {
+                        return (Boolean) getRawEval("return !!window.$A");
+                    }
+                });
 
         WebDriverWait waitFinishedInit = new WebDriverWait(driver, timeoutInSecs);
         waitFinishedInit.ignoring(StaleElementReferenceException.class)
-                .withMessage("Initialization error: $A present but failed to initialize")
-                .until(
-                        new Function<WebDriver, Boolean>() {
-                            @Override
-                            public Boolean apply(WebDriver input) {
-                                assertNoAuraErrorMessage(expectedErrors);
-                                return isAuraFrameworkReady();
-                            }
-                        });
+        .withMessage("Initialization error: $A present but failed to initialize")
+        .until(
+                new Function<WebDriver, Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver input) {
+                        assertNoAuraErrorMessage(expectedErrors);
+                        return isAuraFrameworkReady();
+                    }
+                });
     }
 
     /**
      * Finds the WebElement identified by locator and applies the provided Function to it, ignoring
      * StaleElementReferenceException.
-     * 
+     *
      * @param locator By locator to find WebElement in the DOM.
      * @param function Function to run on web
      * @param message Message to display to user on timeout.
@@ -784,7 +788,7 @@ public class AuraUITestingUtil {
 
     /**
      * Wait for text of an element to be either present or not present.
-     * 
+     *
      * @param locator By locator to find WebElement in the DOM.
      * @param text Text on the found WebElement.
      * @param toBePresent True if we want text passed in as parameter to equal text on found WebElement.
@@ -819,7 +823,7 @@ public class AuraUITestingUtil {
 
     /**
      * Method of exposing accessibility tool to be exposed for testing purposes
-     * 
+     *
      * @return ArrayList - either 0,1, or 2. Position 0: Indicates there were no errors Position 1: Indicates that there
      *         were errors Position 2: Indicates that something unexpected happened.
      */
@@ -896,7 +900,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return true if div has scrollBar
-     * 
+     *
      * @param elementClassName
      * @return
      */

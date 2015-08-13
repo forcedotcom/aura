@@ -18,23 +18,27 @@
     	var concrete = component.getConcreteComponent();
         var children = [];
 
-        this.setHandlersOnMenuItems(concrete, concrete.get("v.body"), children);
+        var existingChildren = concrete.get("v.childMenuItems") || [];
+
+        this.setHandlersOnMenuItems(concrete, concrete.get("v.body"), children, existingChildren);
 
         var items = component.find("item");
         if (items && $A.util.isArray(items)) {
-            this.setHandlersOnMenuItems(concrete, items, children);
+            this.setHandlersOnMenuItems(concrete, items, children, existingChildren);
         }
         concrete.set("v.childMenuItems", children);
     },
 
-    setHandlersOnMenuItems: function(component, items, children) {
+    setHandlersOnMenuItems: function(component, items, children, existingChildren) {
         for (var i = 0; i < items.length; i++) {
             var child = items[i];
             if (child.isInstanceOf("ui:menuItem")) {
-                child.addHandler("menuSelect", component, "c.onMenuItemSelected");
+                if (existingChildren && existingChildren.indexOf(child) === -1) {
+                    child.addHandler("menuSelect", component, "c.onMenuItemSelected");
+                }
                 children.push(child);
             } else if (child.isInstanceOf("aura:iteration") || child.isInstanceOf("aura:if")) {
-                this.setHandlersOnMenuItems(component, child.get("v.body"), children);
+                this.setHandlersOnMenuItems(component, child.get("v.body"), children, existingChildren);
             }
         }
     },
@@ -49,6 +53,10 @@
     handleVisible : function(component) {
         var elements = this.getElementCache(component),
             visible = elements.target.get("v.visible");
+
+        if ($A.util.hasClass(elements.targetElement, "visible") === visible) {
+            return;
+        }
 
         if (visible === true) {
             $A.util.addClass(elements.targetElement, "visible");
@@ -157,8 +165,10 @@
         }
         var nextFocusCmp = menuItems[nextIndex];
         var action = nextFocusCmp.get("c.setFocus");
-        action.runDeprecated();
-        
+        if (action) {
+            action.runDeprecated();
+        }
+
         this.fireMenuFocusChangeEvent(component, srcComponent, nextFocusCmp);
     },
 

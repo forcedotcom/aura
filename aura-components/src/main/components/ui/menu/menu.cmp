@@ -15,6 +15,38 @@
     limitations under the License.
 
 -->
+<!--
+
+    Menu Accessibility rules:
+
+    Opening the menu:
+     * users can tab onto the menu trigger and should see the focus state
+     * pressing space opens the menu
+     * users can also use their mouse to hover over the menu trigger (hover state is triggered)
+     * clicking on the menu trigger opens the menu
+
+    Selecting a menu item:
+     * initially no item in the menu is highlighted
+     * once the menu is open users can arrow down/right through the menu options
+     * arrowing through the menu options is a loop in both directions
+     * items highlighted through arrowing display the same styling as the hover state
+     * pressing (return) selects the highlighted item
+     * arrowing to an item that is out of view because of scroll should be scrolled into view
+     * users can also hover over a menu item, and it will show it's hover state
+     * users can select the item by clicking
+     * while clicking on an item, the menu item should show the active state
+     * disabled items share the highlighting behavior of normal menu items but do not have an active state and
+       cannot be triggered by either pressing return or clicking.
+     * clicking anywhere in the row area (even if not occupied by menu item text) selects the menu item
+     * label items in the menu can not be highlighted but should still be readable by screenreaders
+
+    Exiting the menu:
+     * users can press esc to close the menu without selecting an item, focus is returned to the menu trigger
+     * users can click outside the menu area to close the menu without selecting an item
+     * pressing tab while the menu is open closes the menu and moves the focus to the next focusable element on the page
+     * pressing shift-tab while the menu is open closes the menu and moves the focus to the previous focusable element on the page
+
+-->
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup"
                 description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTriggerLink and menuList component.">
 

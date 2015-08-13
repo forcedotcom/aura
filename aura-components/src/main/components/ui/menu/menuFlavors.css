@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-.THIS .uiTrigger {
+.THIS .uiPopupTrigger {
     position: relative;
     display: inline-block;
 }
 
-.THIS .uiTrigger:hover,
-.THIS .uiTrigger:focus {
+.THIS .uiPopupTrigger a:hover,
+.THIS .uiPopupTrigger a:focus {
     outline: 0;
 }
 

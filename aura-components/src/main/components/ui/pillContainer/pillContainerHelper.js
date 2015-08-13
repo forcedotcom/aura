@@ -178,41 +178,10 @@
         if ($A.util.isEmpty(pillInput)) {
             $A.util.addClass(cmp.getElement(), 'noinput');
         } else if (itemsLength<maxAllowed) {
-            //set the input to min width so it doesn't wrap due to bigger size
-            pillInput[0].setAvailableWidth(this.INPUT_MIN_WIDTH_PX);
-
-            //after everything is rendered calculate the real width
-            this.setInputWidth(cmp, pillInput);
-
             pillInput[0].focus();
             focused = true;
         }
         return focused;
-    },
-
-    setInputWidth: function(cmp, pillInput) {
-        var self = this;
-        window.setTimeout($A.getCallback(function () {
-            self._setInputWidthDirectly(cmp,pillInput);
-        }), 0);
-    },
-
-    _setInputWidthDirectly: function(cmp, pillInput) {
-        if (cmp.isValid()) {
-            var list = cmp.find("list");
-            var listElement = list.getElement();
-            if (list && listElement) {
-                var listBoundingRect = listElement.getBoundingClientRect();
-                var availableWidth = listBoundingRect.right - listBoundingRect.left;
-                var inputListItem = cmp.find("inputListItem");
-                var inputlistItemElement = inputListItem.getElement();
-                if (inputlistItemElement) {
-                    var inputListItemBoundingRect = inputlistItemElement.getBoundingClientRect();
-                    availableWidth = listBoundingRect.right - inputListItemBoundingRect.left - this.SCROLL_BAR_MARGIN_PX;
-                }
-                pillInput[0].setAvailableWidth(availableWidth);
-            }
-        }
     },
 
     adjustHeight: function(cmp) {
@@ -263,32 +232,6 @@
         cmp.set("v.expanded", true);
 
     },
-
-    registerResizeHandler: function(cmp) {
-        //setup a handler for changing the width on resize
-        var pillInput = cmp.get("v.pillInput");
-        var self = this;
-        if (!$A.util.isEmpty(pillInput)) {
-            var timeoutHandler = false;
-            var resetWidth = $A.getCallback(function () {
-                timeoutHandler = false;
-                self._setInputWidthDirectly(cmp, pillInput);
-            });
-            this.resizeHandler = $A.getCallback(function () {
-                if (!timeoutHandler) {
-                    timeoutHandler = setTimeout(resetWidth, 30);
-                }
-            });
-            window.addEventListener('resize', this.resizeHandler);
-        }
-    },
-
-    deregisterResizeHandler: function(cmp) {
-        if (this.resizeHandler) {
-            window.removeEventListener('resize', this.resizeHandler);
-        }
-    },
-
 
     _getActualHeight: function(element) {
         var elmHeight, elmMargin;

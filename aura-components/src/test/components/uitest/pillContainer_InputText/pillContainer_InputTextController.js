@@ -24,10 +24,5 @@
 
     focus: function(component, event, helper) {
         component.getElement().focus();
-    },
-
-    setAvailableWidth: function (component, event, helper) {
-        var width = event.getParam('arguments').width;
-        component.getElement().style.width = width + "px";
     }
 })

@@ -60,14 +60,6 @@
         if (parameters) {
             helper.handleParameterChange(component, parameters);
         }
-    },
-
-    setAvailableWidth: function (component, event, helper) {
-        var width = event.getParam('arguments').width;
-        var inputElement = helper.getInputElement(component);
-        if (inputElement) {
-            inputElement.style.width = width+"px";
-        }
     }
 
 })

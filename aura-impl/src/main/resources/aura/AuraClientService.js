@@ -1663,9 +1663,6 @@ AuraClientService.prototype.continueCompletions = function() {
 };
 
 AuraClientService.prototype.finishProcessing = function() {
-    if (this.collector.completionIndex < this.collector.actionsToComplete.length) {
-        throw new Error("Bah!!!");
-    }
     this.setInCollection();
     try {
         $A.renderingService.rerenderDirty();

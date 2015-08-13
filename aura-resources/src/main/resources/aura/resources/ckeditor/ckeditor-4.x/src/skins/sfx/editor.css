@@ -1277,7 +1277,7 @@ cke_button__blockquote_icon {background: url(icons.png) no-repeat 0 -216px !impo
 .cke_hidpi .cke_button__scayt_icon {background: url(icons_hidpi.png) no-repeat 0 -1872px !important;background-size: 16px !important;}
 .cke_hidpi .cke_button__table_icon {background: url(icons_hidpi.png) no-repeat 0 -1896px !important;background-size: 16px !important;}
 .cke_rtl.cke_hidpi .cke_button__redo_icon, .cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__redo_icon {background: url(icons_hidpi.png) no-repeat 0 -1920px !important;background-size: 16px !important;}.
-cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon {background: url(icons_hidpi.png) no-repeat 0 -1944px !important;background-size: 16px !important;}
+cke_hidpi .cke_ltr .cke_button__redo_icon,.cke_ltr.cke_hidpi .cke_button__redo_icon {background: url(icons_hidpi.png) no-repeat 0 -2112px !important;background-size: 16px !important;}
 .cke_rtl.cke_hidpi .cke_button__undo_icon, .cke_hidpi .cke_mixed_dir_content .cke_rtl .cke_button__undo_icon {background: url(icons_hidpi.png) no-repeat 0 -1968px !important;background-size: 16px !important;}
-.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon {background: url(icons_hidpi.png) no-repeat 0 -1992px !important;background-size: 16px !important;}
+.cke_hidpi .cke_ltr .cke_button__undo_icon,.cke_ltr.cke_hidpi .cke_button__undo_icon {background: url(icons_hidpi.png) no-repeat 0 -2160px !important;background-size: 16px !important;}
 .cke_hidpi .cke_button__spellchecker_icon {background: url(icons_hidpi.png) no-repeat 0 -2016px !important;background-size: 16px !important;}

@@ -536,9 +536,7 @@ function AuraInstance () {
  * @public
  */
 AuraInstance.prototype.initAsync = function(config) {
-    $A.Perf.mark("Component Load Complete");
-    $A.Perf.mark("Component Load Initiated");
-
+          
     //
     // we don't handle components that come back here. This is used in the case where there
     // are none.
@@ -549,10 +547,7 @@ AuraInstance.prototype.initAsync = function(config) {
         $A.clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
             $A.metricsService.bootstrapMark("metadataReady");
             $A.initPriv(resp);
-            $A.Perf.endMark("Component Load Complete");
         }, config["deftype"]);
-
-        $A.Perf.endMark("Component Load Initiated");
     });
 };
 
@@ -598,9 +593,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallUIPerfOnLoad) {
     if (!$A["hasErrors"]) {
-        $A.Perf.mark("ClientService.init");
         var cmp = $A.clientService["init"](config, token, container ? $A.util.getElement(container) : null);
-        $A.Perf.endMark("ClientService.init");
         $A.setRoot(cmp);
 
         if (!$A.initialized) {
@@ -644,12 +637,10 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
  */
 AuraInstance.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
     if (!this["finishedInit"]) {
-        $A.Perf.mark("Aura.finishInit");
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
 
-        $A.Perf.endMark("Aura.finishInit");
-        if (doNotCallUIPerfOnLoad) {
+                 if (doNotCallUIPerfOnLoad) {
             $A.Perf.setTimer("Aura Init");
         } else {
             $A.Perf.onLoad();

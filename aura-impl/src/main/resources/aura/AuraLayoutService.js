@@ -109,18 +109,13 @@ var AuraLayoutService = function() {
 
             // The presence of a semaphore in here makes me think a class-level
             // markName might cause trouble, but...
-            $A.Perf.mark("LayoutService.handleLocationChange (" + token + ")");
-            $A.Perf.mark("Container Action Callback Initiated");
-            // $A.Perf.mark("Container Action Callback Initiated: " +
+                                      // $A.Perf.mark("Container Action Callback Initiated: " +
             // item.getContainer());
             // $A.Perf.mark("Giving control to aura:layoutHandler (" +
             // layoutHandler.toString() + ")");
-            $A.Perf.mark("Giving control to aura:layoutHandler");
-            $A.Perf.mark("Layout Actions Callback Complete");
-            // $A.Perf.mark("Container Layout Complete: "+
+                                      // $A.Perf.mark("Container Layout Complete: "+
             // layoutItem.getContainer());
-            $A.Perf.mark("Container Layout Complete");
-
+             
             var curr = peek();
 
             var layout = layouts.getLayout(token);
@@ -138,7 +133,6 @@ var AuraLayoutService = function() {
                     // be.
                     $A.finishInit();
                     fireOnload();
-                    $A.Perf.endMark("LayoutService.handleLocationChange (" + token + ")");
                     return;
                 }
             }
@@ -210,8 +204,7 @@ var AuraLayoutService = function() {
                         return;
                     }
                     fireLayoutChangeEvent();
-                    $A.Perf.endMark("Layout Actions Callback Complete");
-
+                     
                     $A.finishInit();
                     fireOnload();
                 };
@@ -248,14 +241,9 @@ var AuraLayoutService = function() {
                             }
 
                             action.setCallback(this, function(a) {
-                                // $A.Perf.endMark("Container Action Callback
-                                // Initiated: " + item.getContainer());
-                                $A.Perf.endMark("Container Action Callback Initiated");
                                 if (a.getState() === "SUCCESS") {
                                     var ret = a.getReturnValue();
-                                    layoutService.layoutCallback(ret ? 
-                                    	$A.componentService["newComponentDeprecated"](ret, null, false, true) : 
-                                        null, item);
+                                    layoutService.layoutCallback(ret ? $A.componentService["newComponentDeprecated"](ret, null, false, true) : null, item, layout, params, noTrack);
                                 } else {
                                     if (!layoutErrorFired) {
                                         var evt = $A.get("e.aura:layoutFailed");
@@ -293,8 +281,7 @@ var AuraLayoutService = function() {
                             // $A.Perf.endMark("Giving control to
                             // aura:layoutHandler (" + layoutHandler.toString()
                             // + ")");
-                            $A.Perf.endMark("Giving control to aura:layoutHandler");
-
+                             
                             event.fire();
                         } else {
                             defaultAction();
@@ -360,8 +347,7 @@ var AuraLayoutService = function() {
 
             // $A.Perf.endMark("Container Layout Complete: "+
             // layoutItem.getContainer());
-            $A.Perf.endMark("Container Layout Complete");
-        },
+                     },
 
         /**
          * Sets the current layout title. For example,

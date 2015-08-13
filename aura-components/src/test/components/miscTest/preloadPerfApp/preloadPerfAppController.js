@@ -10,9 +10,7 @@
             var body = cmp.find('placeHolder').get("v.body");
             body.push(c);
             cmp.find('placeHolder').set("v.body", body);
-            $A.Perf.endMark("Fetch preloaded component");
-        });
-        $A.Perf.mark("Fetch preloaded component");
-        $A.enqueueAction(a);
+                     });
+                 $A.enqueueAction(a);
     }
 })

@@ -949,9 +949,7 @@ AuraClientService.prototype.initHost = function(host) {
  * @export
  */
 AuraClientService.prototype.init = function(config, token, container) {
-    $A.Perf.mark("Initial Component Created");
-    $A.Perf.mark("Initial Component Rendered");
-
+          
     //
     // not on in dev modes to preserve stacktrace in debug tools
     // Why? - goliver
@@ -969,13 +967,11 @@ AuraClientService.prototype.init = function(config, token, container) {
         var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
         $A.getContext().setCurrentAccess(component);
 
-        $A.Perf.endMark("Initial Component Created");
-
+         
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
 
-        $A.Perf.endMark("Initial Component Rendered");
-
+         
         return component;
 
         // not on in dev modes to preserve stacktrace in debug tools
@@ -1010,43 +1006,33 @@ AuraClientService.prototype.idle = function() {
  */
 
 AuraClientService.prototype.initDefs = function(config) {
+    var i; 
 
-    var i,
-        evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
-    $A.Perf.mark("Registered Events [" + evtConfigs.length + "]");
+    var evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
-    $A.Perf.endMark("Registered Events [" + evtConfigs.length + "]");
-
+     
     var libraryConfigs = $A.util.json.resolveRefs(config["libraryDefs"]);
-    $A.Perf.mark("Registered Libraries [" + libraryConfigs.length + "]");
     for (i = 0; i < libraryConfigs.length; i++) {
         $A.componentService.createLibraryDef(libraryConfigs[i]);
     }
-    $A.Perf.endMark("Registered Libraries [" + libraryConfigs.length + "]");
-
+     
     var controllerConfigs = $A.util.json.resolveRefs(config["controllerDefs"]);
-    $A.Perf.mark("Registered Controllers [" + controllerConfigs.length + "]");
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
-    $A.Perf.endMark("Registered Controllers [" + controllerConfigs.length + "]");
-
+     
     var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
-    $A.Perf.mark("Registered Components [" + comConfigs.length + "]");
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
-    $A.Perf.endMark("Registered Components [" + comConfigs.length + "]");
-
+     
     var namespaces = config["namespaces"];
-    for(i = 0; i < namespaces.length; i++){
+    for (i = 0; i < namespaces.length; i++){
         this.namespaces[namespaces[i]] = true;
     }
-
-    $A.Perf.endMark("PageStart");
-
+     
     // Let any interested parties know that defs have been initialized
     for ( var n = 0, olen = this.initDefsObservers.length; n < olen; n++) {
         this.initDefsObservers[n]();
@@ -1197,15 +1183,13 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                             storage.put(key, toStore).then(storeCallback, storeCallback);
                         }
                     }
-                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-                }, "SUCCESS");
+            }, "SUCCESS");
             //
             // INCOMPLETE: If we did not initialize from storage, flag an error, otherwise it is a no-op.
             //
             action.setCallback(acs,
                 function (a) {
-                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
-
+                     
                     // Even if bootstrap cache is disabled we still want to load from cache
                     // if action fails as "INCOMPLETE" for offline launch
                     if (!acs._useBootstrapCache && storage) {
@@ -1247,7 +1231,6 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                         errorStr = errors[0].message;
                     }
                     $A.log("$A.loadComponent(): Refresh failed:\n" + errorStr);
-                    $A.Perf.endMark("Sending XHR " + $A.getContext().getNum());
                     var forceError = !stored && (errorStr !== "Received exception event from server");
                     failCallback(forceError, errorStr);
                 }, "ERROR");
@@ -1805,8 +1788,6 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
         if (processed === false && auraXHR.request["readyState"] === 4) {
             processed = true;
-
-            $A.Perf.endMark("Received Response - XHR " + auraXHR.marker);
             that.receive(auraXHR);
         }
     };
@@ -1826,8 +1807,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     }
 
     // Delete all this jiffy nonsense start of 200 release
-    $A.Perf.mark("Received Response - XHR " + auraXHR.marker);
-
+     
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         auraXHR.request["send"](qs);
@@ -1969,8 +1949,7 @@ AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {
-    $A.Perf.mark("Callback Complete - XHR " + auraXHR.marker);
-
+     
     var action, actionResponses, response, dupes;
     var token = responseMessage["token"];
     if (token) {
@@ -2041,8 +2020,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
         }
     }
 
-    $A.Perf.endMark("Callback Complete - XHR " + auraXHR.marker);
-};
+     };
 
 AuraClientService.prototype.buildFakeAction = function(response) {
     var action = null;

@@ -16,32 +16,27 @@
 ({
     init: function(component) {
         var dataProvider = component.get("v.dataProvider[0]");
-        if(dataProvider && dataProvider.getModel()) {
+        if (dataProvider && dataProvider.getModel()) {
             component.set("v.items", dataProvider.get("m.items"));
         }
     },
-
-	showMore: function(component, event, helper) {
-        $A.Perf.mark("infiniteList showMore " + component.getGlobalId());
-
-		var params = event.getParams(),
-			currentPageValue = component.get("v.currentPage"),
-			currentPage = parseInt(currentPageValue, 10),
-			targetPage = currentPage + 1;
+    showMore: function(component, event, helper) {         
+        var params = event.getParams(),
+            currentPageValue = component.get("v.currentPage"),
+            currentPage = parseInt(currentPageValue, 10),
+            targetPage = currentPage + 1;
 
         component.set("v.currentPage", targetPage, true);
 
         if (params.parameters && params.parameters.callback) {
-        	component._callback = params.parameters.callback;
+            component._callback = params.parameters.callback;
         }
 
         helper.triggerDataProvider(component.getSuper());
-	},
+    },
 
-	iterationComplete: function(component, event, helper) {
-        $A.Perf.endMark("infiniteList showMore " + component.getGlobalId());
-
-		helper.showLoading(component, false);
+    iterationComplete: function(component, event, helper) {
+        helper.showLoading(component, false);
         component.get("e.listComplete").fire(event.getParams());
-	}
+    }
 })

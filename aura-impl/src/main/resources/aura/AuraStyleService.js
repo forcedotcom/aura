@@ -148,8 +148,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
     config = config || {};
 
     $A.run(function() {
-        $A.Perf.mark("applyThemes");
-
+         
         // scan for client-loaded style defs if necessary
         var clientLoaded = [];
         if (config["forceClientScan"]) {
@@ -206,8 +205,7 @@ AuraStyleService.prototype.applyThemes = function(themes, config) {
                 }
             }
 
-            $A.Perf.endMark("applyThemes");
-
+             
             if ($A.util.isFunction(config["callback"])) {
                 config["callback"]();
             }

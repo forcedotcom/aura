@@ -17,6 +17,7 @@
 
 // -- Aura Bootstrap ------------------------------------------------------------
 
+/*eslint no-use-before-define:0*/
 if (typeof Aura !== 'undefined') {
     Aura._Aura = Aura;
 }

@@ -877,6 +877,7 @@ Aura.Utils.Util.prototype.trim = function(value){
  * @returns {String}
  * @export
  */
+/*eslint-disable no-unused-vars */
 Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);

@@ -536,7 +536,7 @@ TestInstance.prototype.print = function(value) {
         return "undefined";
     } else if (value === null) {
         return "null";
-    } else if ("string" === typeof value) {
+    } else if (typeof value === "string") {
         return '"' + value + '"';
     } else {
         return value.toString();
@@ -1153,7 +1153,7 @@ TestInstance.prototype.getNonCommentNodes = function(nodes) {
         }
     } else {
         for (var j = 0; j < nodes.length; j++) {
-            if (8 !== nodes[j].nodeType) {
+            if (nodes[j].nodeType !== 8) {
                 ret.push(nodes[j]);
             }
         }
@@ -1994,6 +1994,32 @@ TestInstance.prototype.createHttpRequest = function() {
 };
 
 /**
+ * Performs a check if global namespace is polluted with new
+ * variables apart from whitelisted ones
+ *
+ * @export
+ * @function Test#checkGlobalNamespacePollution
+ */
+TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollutants) {
+    var that = this,
+        pollutants = [],
+        initialGlobalState = that.getInitialGlobalState();
+    if(!window || !initialGlobalState.length) {
+        return pollutants;
+    }
+    var knownPollutants = initialGlobalState.concat(whitelistedPollutants);
+    var currentGlobalState = Object.keys(window);
+    for (var i = currentGlobalState.length - 1; i >= 0; i--) {
+        var key = currentGlobalState[i];
+        if (knownPollutants.indexOf(key) === -1) {
+            pollutants.push(key);
+        }
+    }
+    return (pollutants.length ? "New global variables found: " + pollutants.join(",") + "." : "");
+};
+
+/**
+>>>>>>> clean up js code in framework
  * Json instance for test. Used to export Json methods for testing.
  *
  * @private

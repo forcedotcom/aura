@@ -817,7 +817,7 @@ AuraLocalizationService.prototype.translateFromLocalizedDigits = function(input)
 AuraLocalizationService.prototype.translateFromOtherCalendar = function(date) {
     var userLocaleLang = $A.get("$Locale.userLocaleLang");
     var userLocaleCountry = $A.get("$Locale.userLocaleCountry");
-    if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
+    if (userLocaleLang === 'th' && userLocaleCountry === 'TH') { // Buddhist year
         date.setFullYear(date.getFullYear() - 543);
     }
     return date;
@@ -865,7 +865,7 @@ AuraLocalizationService.prototype.translateToLocalizedDigits = function(input) {
 AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
     var userLocaleLang = $A.get("$Locale.userLocaleLang");
     var userLocaleCountry = $A.get("$Locale.userLocaleCountry");
-    if ('th' === userLocaleLang && 'TH' === userLocaleCountry) { // Buddhist year
+    if (userLocaleLang === 'th' && userLocaleCountry === 'TH') { // Buddhist year
         date.setFullYear(date.getFullYear() + 543);
     }
     return date;
@@ -1055,7 +1055,7 @@ AuraLocalizationService.prototype.getUTCFromWallTime = function(d, timezone) {
         }
         try {
             ret = WallTime["WallTimeToUTC"](timezone, d);
-            } catch (ignore) {}
+            } catch (ignore) {/*we just ignore it*/}
         }
         return ret;
     };
@@ -1076,7 +1076,7 @@ AuraLocalizationService.prototype.getWallTimeFromUTC = function(d, timezone) {
         }
         try {
             ret = WallTime["UTCToWallTime"](d, timezone)["wallTime"];
-        } catch (ignore) {}
+        } catch (ignore) {/*we just ignore it*/}
     }
     return ret;
 };

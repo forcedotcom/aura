@@ -149,7 +149,7 @@ Action.prototype.forceCreationPath = function(path) {
         var top = this.pathStack[this.pathStack.length - 1];
         if (top.absPath === newAbsPath) {
             // We are ok, the creation path is actually the correct one, ignore it.
-            return;
+            return undefined;
         }
         absPath = top.absPath;
     }

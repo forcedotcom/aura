@@ -350,7 +350,7 @@ AuraHistoryService.prototype.parseLocation = function(location) {
 AuraHistoryService.prototype.getLocationHash = function() {
     var href = window.location["href"];
     var hashPosition = href.indexOf("#");
-    if(hashPosition == -1) { 
+    if(hashPosition === -1) { 
         return "";
     }
 

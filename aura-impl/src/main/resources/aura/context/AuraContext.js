@@ -131,7 +131,7 @@ Aura.Context.AuraContext.prototype.getAccessVersion = function(name) {
         var def = currentAccessCaller.getDef();
         if (def) {
             // return the version of currentAccessCaller if namespaces are the same
-            if (def.getDescriptor().getNamespace() == name) {
+            if (def.getDescriptor().getNamespace() === name) {
                 ret = currentAccessCaller.get("version");
             }
             else {

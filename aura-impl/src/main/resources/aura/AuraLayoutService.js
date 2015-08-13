@@ -253,8 +253,9 @@ var AuraLayoutService = function() {
                                 $A.Perf.endMark("Container Action Callback Initiated");
                                 if (a.getState() === "SUCCESS") {
                                     var ret = a.getReturnValue();
-                                    layoutService.layoutCallback(ret ? $A.componentService["newComponentDeprecated"](ret, null, false, true) : null, item, layout,
-                                            params, noTrack);
+                                    layoutService.layoutCallback(ret ? 
+                                    	$A.componentService["newComponentDeprecated"](ret, null, false, true) : 
+                                        null, item);
                                 } else {
                                     if (!layoutErrorFired) {
                                         var evt = $A.get("e.aura:layoutFailed");
@@ -320,7 +321,7 @@ var AuraLayoutService = function() {
         /**
          * @private
          */
-        layoutCallback : function(components, layoutItem, layout, params) {
+        layoutCallback : function(components, layoutItem) {
             if (components === null || components === undefined) {
                 components = [];
             } else if (!$A.util.isArray(components)) {

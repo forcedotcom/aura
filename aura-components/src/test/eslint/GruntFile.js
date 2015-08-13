@@ -7,7 +7,7 @@ module.exports = function (grunt) {
                 outputFile: '${project.build.directory}/eslint-output'
             },
             target: [
-                '${basedir}/src/main/components/'
+                //'${basedir}/src/main/components/'
             ]
         }
     });

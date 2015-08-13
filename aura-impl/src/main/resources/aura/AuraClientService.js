@@ -874,6 +874,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
         e.fire();
     } else {
         // looks like no definitions loaded yet
+    	/*eslint no-alert:0*/
         alert(isDisconnected ? "Connection lost" : "Connection resumed");
     }
 };
@@ -1541,9 +1542,11 @@ AuraClientService.prototype.finishCollection = function() {
     // This way we filter them out, and don't try to process too many things. It also avoids
     // other problems processing the deferred queue.
     //
+    var i = 0;
+    var length;
     var collected = this.collector.collected;
     this.collector.collected = [];
-    for (var i = 0, length = collected.length; i < length; i++) {
+    for (i = 0, length = collected.length; i < length; i++) {
         if (collected[i]) {
             this.actionsDeferred.push(collected[i]);
         }
@@ -1560,7 +1563,7 @@ AuraClientService.prototype.finishCollection = function() {
     // This will only be true if we opt for stored actions after send.
     //
     if (this.collector.actionsToComplete.length) {
-        for (var i = 0; i < this.collector.actionsToComplete.length; i++) {
+        for (i = 0; i < this.collector.actionsToComplete.length; i++) {
             this.collector.collected.push(undefined);
         }
         this.continueCompletions();

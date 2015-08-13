@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+/*eslint-disable no-unused-vars*/
  /*
  * TODO: DELETE THIS FILE WHEN WE DEPRECATE JIFFY MARKS
  */
- 
 /**
  * The levels for logging performance m
  *

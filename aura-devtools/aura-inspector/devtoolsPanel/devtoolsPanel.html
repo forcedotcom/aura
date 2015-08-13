@@ -1,18 +1,18 @@
 <html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="devtoolsPanel.css" media="screen">
+	<head>
+		<link rel="stylesheet" type="text/css" href="devtoolsPanel.css" media="screen">
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    </head>
-    <body>
-        <div id="loading">
-            <div class="spinner">
-              <div class="cube1"></div>
-              <div class="cube2"></div>
-            </div>
-            <div class="opaque"></div>
-        </div>
 
-        <header class="tabs"></header>
+		<link rel="import" href="components/actioncard/actionCard.html"/>
+	</head>
+	<body>
+		<div id="loading">
+			<div class="spinner">
+			  <div class="cube1"></div>
+			  <div class="cube2"></div>
+			</div>
+			<div class="opaque"></div>
+		</div>
 
 
         <!-- Perf Tools from Diego -->
@@ -22,6 +22,7 @@
         <link rel="stylesheet" type="text/css" href="perfpanel/css/dataGrid.css">
         <link rel="stylesheet" type="text/css" href="perfpanel/css/splitView.css">
         <link rel="stylesheet" type="text/css" href="perfpanel/css/custom.css">
+
 
         <script type="text/javascript" src="perfpanel/js/Main.js"></script>
         <script type="text/javascript" src="perfpanel/js/ProfilesPanel.js"></script>
@@ -38,6 +39,17 @@
         <script src="AuraInspectorEventLog.js"></script>
         <script src="AuraInspectorStorageView.js"></script>
 
-        <script src="devtoolsPanel.js"></script>
-    </body>
+		<!-- DevTools Scripts -->
+		<script src="optionsProxy.js"></script>
+		<script src="treeview.js"></script>
+		<script src="AuraInspectorPerformanceView.js"></script>
+		<script src="AuraInspectorComponentTree.js"></script>
+		<script src="AuraInspectorComponentView.js"></script>
+		<script src="AuraInspectorTransactionView.js"></script>
+		<script src="AuraInspectorEventLog.js"></script>
+		<script src="AuraInspectorActionsView.js"></script>
+        <script src="AuraInspectorStorageView.js"></script>
+
+		<script src="devtoolsPanel.js"></script>
+	</body>
 </html>

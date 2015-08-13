@@ -96,6 +96,10 @@
          */
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
+                // Actions Tab
+                bootstrapActionsInstrumentation();
+
+                // Perf Tab
                 bootstrapPerfDevTools();
 
                 // Need a way to conditionally do this based on a user setting. 
@@ -157,7 +161,108 @@
         }
     }
 
-    var bootstrapPerfDevTools = function () {
+    function bootstrapActionsInstrumentation() {
+
+        $A.installOverride("enqueueAction", OnEnqueueAction);
+        $A.installOverride("Action.finishAction", OnFinishAction);
+        $A.installOverride("Action.abort", OnAbortAction);
+        $A.installOverride("ClientService.send", OnSendAction);
+
+        function OnEnqueueAction(config, action, scope) {
+            var ret = config["fn"].call(config["scope"], action, scope);
+
+            var data =  {
+                "id"         : action.getId(),
+                "params"     : action.getParams(),
+                "abortable"  : action.isAbortable(),
+                "storable"   : action.isStorable(),
+                "background" : action.isBackground(),
+                "state"      : action.getState(),
+                "isRefresh"  : action.isRefreshAction(),
+                "defName"    : action.getDef()+""
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnActionEnqueue", data);
+
+            return ret;
+        }
+
+        function OnFinishAction(config, context) {
+            var ret = config["fn"].call(config["scope"], context);
+
+            var action = config["self"];
+
+            var data = {
+                "id": action.getId(),
+                "state": action.getState(),
+                "returnValue": JSON.stringify(action.getReturnValue())
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
+
+            return ret;
+        }
+
+        function OnAbortAction(config, context) {
+            var ret = config["fn"].call(config["scope"], context);
+
+            var action = config["self"];
+
+            var data = {
+                "id": action.getId(),
+                "state": action.getState()
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
+
+            return ret;
+        }
+
+        function OnSendAction(config, auraXHR, actions, method, options) {
+            //var config = Array.prototype.shift.apply(arguments);
+            //var auraXHR = arguments[0];
+            //var actions = arguments[2];
+            //var options = arguments[3];
+            var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
+
+            if (actions) {
+                for(var c=0;c<actions.length;c++) {
+                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                        "id": actions[c].getId(),
+                        "state": "RUNNING"
+                    });
+                }
+                // I'm guessing we iterate over the auraXHR.actions collection (actually $actions$) so we see what was actually sent.
+                // For now I'm going to iterate over the actions parameter, and I can worry about stored actions later.
+                
+                //var actionDefs = [];
+                // for (var id in auraXHR.actions) {
+                //     if (auraXHR.actions.hasOwnProperty(id)) {
+                //         actionDefs.push(auraXHR.actions[id].getDef() + '[' + id + ']');
+
+                //         $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                //             "id": id,
+                //             "state": "RUNNING"
+                //         });
+                //     }
+                // }
+
+                //auraXHR.marker = this.counter++;
+
+                // startMark["context"] = {
+                //     "auraXHRId"     : auraXHR.marker,
+                //     "requestLength" : auraXHR.length,
+                //     "actionDefs"    : actionDefs,
+                //     "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
+                // };
+            }
+            return ret;
+        }
+    }
+
+
+
+    function bootstrapPerfDevTools() {
         $A.PerfDevToolsEnabled = true;
 
         var OPTIONS = {

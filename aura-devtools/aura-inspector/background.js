@@ -45,9 +45,12 @@
 
             // Don't just build up a bunch of messages for tabs that have been unloaded
             if(tab) {
-                // Chrome Tab
-                tabs.delete(tab.id); 
-                stored.delete(tab.id); 
+                var storedTab = tabs.get(tab.id);
+                if(storedTab && storedTab.port && !ports.has(storedTab.port.name)) {
+                    // Chrome Tab
+                    tabs.delete(tab.id); 
+                    stored.delete(tab.id); 
+                }
             }
         }
 
@@ -64,6 +67,7 @@
                 }
                 
                 tabInfo.port = port;
+                port.tabId = tabId;
 
                 for(var i=0;i<message.subscribe.length;i++){
                     var type = message.subscribe[i];

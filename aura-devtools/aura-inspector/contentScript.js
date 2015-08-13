@@ -54,10 +54,12 @@
             script.textContent = script.text = `
                 /**  Aura Inspector Script, ties into $A.initAsync and $A.initConfig to initialize the inspector as soon as possible. **/
                 (function(){
-                    function wrap(obj, original, before) {
+                    function wrap(obj, original, before, after) {
                         return function() {
-                            before.apply(obj, arguments);
-                            return original.apply(obj, arguments);
+                            if(before) before.apply(obj, arguments);
+                            var returnValue = original.apply(obj, arguments);
+                            if(after) after.apply(obj, arguments);
+                            return returnValue;
                         }
                     }
                     function callBootstrap() {

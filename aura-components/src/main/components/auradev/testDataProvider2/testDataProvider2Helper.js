@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide: function(component, event, controller) {
+    provide: function(component, event) {
         var dataProvider = component.getConcreteComponent();
         var keyword = event.getParam("parameters").keyword;
         

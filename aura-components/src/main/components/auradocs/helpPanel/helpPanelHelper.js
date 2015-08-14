@@ -31,9 +31,11 @@
                   } catch (e) {
                   // Handle the catch-all scenario.
                       if(topic !== 'welcome') {
+                    	  /*eslint-disable no-console*/
                            console.log("Got a non-existent topic. Falling back to the welcome topic");
                            setTopicPanelFacet(cmp, 'welcome');
                            } else {
+                        	   /*eslint-disable no-console*/
                        console.log("Unable to get the welcome topic.");
                   }
               }

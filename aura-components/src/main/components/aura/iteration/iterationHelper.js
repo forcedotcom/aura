@@ -18,13 +18,13 @@
         component.set("v.loaded", false);
         component._itemInfo = [];
         this.buildBody(component,
-            function createBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
-                this.buildTemplate(component, template, item, index, itemVar, indexVar, templateValueProvider, true, forceServer, callback);
+            function createBodyItem(cmp, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
+                this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, true, forceServer, callback);
             },
-            function createBodyComplete(component, components){
-                component.set("v.body", components, true);
-                component.set("v.loaded",true);
-                component.get("e.iterationComplete").fire({operation:"Initialize"});
+            function createBodyComplete(cmp, components){
+            	cmp.set("v.body", components, true);
+            	cmp.set("v.loaded",true);
+            	cmp.get("e.iterationComplete").fire({operation:"Initialize"});
             }
         );
     },
@@ -63,7 +63,7 @@
         component._itemInfo.length = 0;
 
         this.buildBody(component,
-            function updateBodyItem(component, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
+            function updateBodyItem(cmp, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
                 var found = false;
                 var components = null;
                 for (var i = 0; i < itemInfo.length; i++) {
@@ -75,33 +75,33 @@
                                 if (avp) {
                                     //JBUCH: HALO: FIXME: THIS IS TO DEAL WITH THE CHANGE TO PTVs BELOW:
                                     avp.set(indexVar, index);
-                                    avp.set(itemVar, component.getReference("v.items[" + index + "]"), true);
+                                    avp.set(itemVar, cmp.getReference("v.items[" + index + "]"), true);
                                 }
                             }
                         }
                         found = true;
                         itemInfo.splice(i, 1);
-                        this.trackItem(component, item, index, components);
+                        this.trackItem(cmp, item, index, components);
                         callback(components);
                         break;
                     }
                 }
                 if (!found) {
-                    this.buildTemplate(component, template, item, index, itemVar, indexVar, templateValueProvider, false, forceServer, callback);
+                    this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, false, forceServer, callback);
                 }
             },
-            function updateBodyComplete(component, components){
+            function updateBodyComplete(cmp, components){
             //  if (itemInfo.length) {
             //      We have deletes. Do we even care? RenderingService and Garbage Collection should handle that.
             //      If we do care, it will be to detach PRVs from firing.
             //  }
-                component.set("v.body", components);
-                component.set("v.loaded",true);
-                component.get("e.iterationComplete").fire({operation:"Update"});
-                if(component._queueUpdate){
-                    helper.updateBody(component);
+                cmp.set("v.body", components);
+                cmp.set("v.loaded",true);
+                cmp.get("e.iterationComplete").fire({operation:"Update"});
+                if(cmp._queueUpdate){
+                    helper.updateBody(cmp);
                 }
-                component._queueUpdate=false;
+                cmp._queueUpdate=false;
             }
         );
     },
@@ -124,12 +124,13 @@
                     collector[index]=itemComponents;
                     if(++currentCall===expectedCalls){
                         var components=[];
-                        for(var i=0;i<collector.length;i++){
+                        var i = 0;
+                        for(i=0;i<collector.length;i++){
                             components=components.concat(collector[i]);
                         }
                         completeHandler(component,components);
                     }
-                }
+                };
             }
             $A.pushCreationPath("body");
             for (var i = startIndex; i < endIndex; i++) {

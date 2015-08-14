@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    friendlyErrorThrow : function(cmp){
+    friendlyErrorThrow : function(){
         var afe = new $A.auraFriendlyError();
         afe.data = {"friendlyMessage": "Hello friend, you've encountered an error!"};
         throw afe;

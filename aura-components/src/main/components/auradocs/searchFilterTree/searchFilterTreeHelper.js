@@ -76,6 +76,7 @@
                     node.set('v.expanded', false);
                 } else {
                     var title = node.get('v.item.title') || '' + node.get('v.title') || '';
+                    /*eslint-disable no-console*/
                     console.log(title);
                     // If a node matches then expand and show it.
                     node.set('v.expanded', true);

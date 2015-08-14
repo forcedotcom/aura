@@ -44,6 +44,7 @@
             });
 
             a.setCallback(cmp, function(){
+            	/*eslint-disable no-alert*/
                 alert("woohoo");
             });
 

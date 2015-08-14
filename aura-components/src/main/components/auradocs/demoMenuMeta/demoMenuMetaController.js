@@ -33,6 +33,7 @@
     clickMenu: function(cmp, event) {
         var source = event.getSource();
         var label = source.get("v.label");
+        /*eslint-disable no-console*/
         console.log("click menu item " + label);
     },
     pickPlace: function(cmp, event) {

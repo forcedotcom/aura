@@ -21,9 +21,11 @@
     	a.setCallback(cmp, function(action){
     	    serializeBtn.set("v.disabled", false);
     	    if(action.getState() === "SUCCESS"){
+    	    	/*eslint-disable no-alert*/
     	    	alert("Registry Serialized to: "+action.getReturnValue());
     	    }
     	    else{
+    	    	/*eslint-disable no-alert*/
     			alert("Oops something went wrong.");
     		}
         });

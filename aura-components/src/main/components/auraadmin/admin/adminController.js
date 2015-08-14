@@ -15,10 +15,12 @@
  */
 ({
     clearAll: function(cmp) {
+    	/*eslint-disable no-alert*/
         if (confirm("Are you sure you want to clear all aura definitions out of every cache?")) {
             var a = cmp.get("c.clearAllRegistries");
             a.setCallback(cmp, function(){
-                alert("done");
+            	/*eslint-disable no-alert*/
+            	alert("done");
             });
             $A.enqueueAction(a);
         }

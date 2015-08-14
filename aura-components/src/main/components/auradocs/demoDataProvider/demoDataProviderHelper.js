@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    provide: function(component, event) {
+    provide: function(component) {
         var dataProvider = component.getConcreteComponent();
         if (!dataProvider._loadedOnce) {
             // This dataProvider should come fully equipped with an initial data payload in its model.

@@ -19,8 +19,10 @@
 
         a.setCallback(cmp, function(action){
             if (action.getState() === "SUCCESS") {
+            	/*eslint-disable no-alert*/
                alert('Done! Content written to:'+ action.getReturnValue());
             } else {
+            	/*eslint-disable no-alert*/
                alert('Ooops! Something went wrong check your console.');
             }
         });

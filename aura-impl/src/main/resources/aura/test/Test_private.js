@@ -120,27 +120,27 @@ TestInstance.prototype.logError = function(msg, e) {
     var err;
     var p, i;
 
+    err = {
+            "message" : msg
+    };
+    
     if (e) {
-        err = {
-            "message" : msg + ": " + (e.message || e.toString())
-        };
+        err["message"] += ": " + e.toString();
+        
         for (p in e) {
             if (p === "message") {
-                continue;
+                continue;   
             }
             err[p] = "" + e[p];
         }
-    } else {
-        err = {
-            "message" : msg
-        };
-    }
+    } 
 
     // Don't add duplicate entries
     for (i = 0; i < errors.length; i++) {
         var existing = errors[i]["message"];
         var newMsg = err["message"];
         if (newMsg.indexOf(existing) > -1) {
+            errors[i] = err;
             return;
         }
     }

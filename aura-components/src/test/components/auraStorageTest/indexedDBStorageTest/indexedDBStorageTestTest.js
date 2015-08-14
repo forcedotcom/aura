@@ -352,7 +352,7 @@
 
     testDeleteDatabase: {
         // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
         function deleteDatabase(cmp) {
             var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
@@ -390,7 +390,7 @@
 
     testDeleteDatabaseTwice: {
         // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
         function deleteDatabaseTwice(cmp) {
             var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);
@@ -413,7 +413,7 @@
 
     testDeleteAndRecreateDatabase: {
         // Safari doesn't like deleting the database immediately after initializing it.
-        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI"],
+        browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
         test: [
         function deleteAndRecreateDatabase(cmp) {
             var die = function(error) { completed=true; this.dieDieDie(cmp, error); }.bind(this);

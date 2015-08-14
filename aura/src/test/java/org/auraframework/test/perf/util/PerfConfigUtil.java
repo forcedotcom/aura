@@ -41,19 +41,13 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 
-
 import com.google.gson.Gson;
 
 public final class PerfConfigUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfConfigUtil.class.getSimpleName());
-
-    //private static final Set<String> BLACKLISTED_COMPONENTS = ImmutableSet.of("markup://ui:inputDate"
-    //        , "markup://ui:action"
-    //        , "markup://perfTest:dummyPerf");
-    //TODO Remove this later, temporarily stopping from running more than one component.
-    //, "markup://performanceTest:runnerExample2");
-
+    private static final String CONFIG_FILE = "/config.json";
+    
     public Map<DefDescriptor<ComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
         // Establish Aura Context before fetching all component defs
         ContextService contextService = establishAuraContext();
@@ -118,34 +112,25 @@ public final class PerfConfigUtil {
     private PerfConfig loadConfigMapping(DefDescriptor<ComponentDef> def) {
     	// TODO, if config params per component is unavailable, use a global config .
     	BufferedReader br = null;
+    	String componentPath = null;
+    	String componentDirPath = null;   	
     	
     	try {
 	    	String fileName = def.getDef().getLocation().getFileName();
-	    	String componentPath = def.getNamespace() + "/" + def.getName();
+	    	componentPath = def.getNamespace() + "/" + def.getName();
 	    	
 	    	// If file is read from a jar, then need to handle it differently.
 	        if(fileName.contains("jar:")){        	
-	        	String resource = "components_aura_components_test/" + componentPath + "/config.json";
-	        	br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(resource)));
+	        	componentDirPath = "components_aura_components_test/" + componentPath + CONFIG_FILE;
+	        	br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(componentDirPath)));
 	        }   	
 	        else {
-	    		String componentDirPath = resolveComponentDirPath(def) + "/";
-		    	String fullPath = componentDirPath + componentPath + "/config.json";
-				//Path resourcesSourceDir = Paths.get(fullPath);
-		        //Path configPath = resourcesSourceDir.resolve("config.json");
-		        //br = Files.newBufferedReader(configPath, StandardCharsets.UTF_8);
-				//br = Files.newBufferedReader(resourcesSourceDir, StandardCharsets.UTF_8);
-		    	//br = new BufferedReader(new FileReader(fullPath));
-		    	//br = new BufferedReader(new InputStreamReader(PerfConfigUtil.class.getClassLoader().getResourceAsStream(fullPath)));
-		    	//ClassLoader loader = Thread.currentThread().getContextClassLoader();
-		    	//br = new BufferedReader(new InputStreamReader(loader.getResourceAsStream(fullPath)));
-		    	//br = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(fullPath)));
-		    	//br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(componentPath + "/config.json")));
+	    		componentDirPath = resolveComponentDirPath(def) + "/";
+		    	String fullPath = componentDirPath + componentPath + CONFIG_FILE;
 		    	br = new BufferedReader(new FileReader(fullPath));
 	        }
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException("Component Config file missing at: " + componentDirPath, e);
 		}
         Gson gson = new Gson();
         PerfConfig config = gson.fromJson(br, PerfConfig.class);
@@ -159,26 +144,10 @@ public final class PerfConfigUtil {
         }
         return contextService;
     }
-
-    /**
-     * Components that we aren't able to instantiate from client side. The reason could be a dependency to a server side
-     * model. Eg. ui:inputDate ui:action cmp should be abstract?
-     */
-    /*
-    private Set<String> getBlacklistedComponents() {
-        return BLACKLISTED_COMPONENTS;
-    }
-     */
-
+    
     private boolean skipComponentPerfTests() {
         return (System.getProperty("skipCmpPerfTests") != null);
     }
-
-    /*
-    private boolean isBlackListedComponent(DefDescriptor<ComponentDef> descriptor) throws QuickFixException {
-        return descriptor.getDef().isAbstract() || getBlacklistedComponents().contains(descriptor.getQualifiedName());
-    }
-     */
 
     @SuppressWarnings("unchecked")
     private Set<DefDescriptor<ComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
@@ -192,7 +161,6 @@ public final class PerfConfigUtil {
             if (descriptor.getDefType().equals(DefType.COMPONENT)) {
                 defs.add(((DefDescriptor<ComponentDef>) descriptor));
             }
-
         }
         return defs;
     }

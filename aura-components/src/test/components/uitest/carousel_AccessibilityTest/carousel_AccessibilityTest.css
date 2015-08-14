@@ -1,0 +1,10 @@
+.THIS {
+	/* 
+		For this test, the loading indicator is changing 
+		the dimensions of the page during the processing of 
+		the scroller, and so the math gets off. Predefining a
+		width of the component assures the changing of the 
+		DOM size doesn't effect this test. 
+	*/
+	width: 800px;
+}

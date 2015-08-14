@@ -53,7 +53,6 @@
     <aura:attribute name="manifest"                 type="String"                  description="Specifies the location of the document's cache manifest. Works with HTML5 only."/>
     <aura:attribute name="lastMod"                  type="String"                  description="The last modified date."/>
     <aura:attribute name="afterAuraInit"            type="String"                  description="Not used."/>
-    <aura:attribute name="auraLoading"              type="Aura.Component[]"        description="Aura Loading Screen Markup"/>
 
     <!-- Default initial CSS -->
     <aura:attribute name="inlineStyle" type="Aura.Component[]" description="The CSS style used to display inline elements">
@@ -64,14 +63,6 @@
     <aura:attribute name="appcacheProgressBarStyle" type="Aura.Component[]" description="The CSS style used to display appcache progress bar.">
         #auraAppcacheProgress{display:none;position:absolute;width:120px;height:26px;top:-10px;left:50%;margin-left:-60px;background-color:gray;border-radius:5px;overflow:hidden;z-index:9999}#auraAppcacheProgress .progressBox{position:absolute;top:14px;left:10px;width:100px;height:6px;overflow:hidden;background-color:white;border-style:solid;border-color:#999;border-width:1px}#auraAppcacheProgress .progressBar{width:1px;height:8px;overflow:hidden;background-color:blue;border-style:solid;border-color:black;border-width:1px}#auraAppcacheProgress.error .progressBar{border-color:red;background-color:pink}
     </aura:attribute>
-
-    <aura:set attribute="auraLoading">
-        <div class="auraMsgBox auraLoadingBox" aura:id="auraLoadingBox">
-            <div class="logo"/>
-            <div class="spinner"/>
-            <h2>{!v.loadingText}</h2>
-        </div>
-    </aura:set>
 
     {!v.doctype}
     <html manifest="{!v.manifest}">
@@ -98,7 +89,11 @@
                     <div class="progressBar"></div>
                 </div>
             </div>
-            {!v.auraLoading}
+            <div class="auraMsgBox auraLoadingBox" aura:id="auraLoadingBox">
+	            <div class="logo"/>
+	            <div class="spinner"/>
+	            <h2>{!v.loadingText}</h2>
+	        </div>
             <div aura:id="auraErrorMask" class="{! 'auraMsgMask' + ( v.forceError ? ' auraForcedErrorBox' : '' )}" >
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>

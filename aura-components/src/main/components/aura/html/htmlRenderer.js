@@ -28,6 +28,7 @@
 		}
 
 		if (element.tagName === "A" && !element.getAttribute("href")) {
+			 /*eslint-disable no-script-url*/
             element.setAttribute("href", "javascript:void(0);");
 		}
 
@@ -99,6 +100,7 @@
 		}
 		
 		if (element.tagName ==="A" && !element.getAttribute("href")) {
+			/*eslint-disable no-script-url*/
 			element.setAttribute("href", "javascript:void(0);");
 		}
 

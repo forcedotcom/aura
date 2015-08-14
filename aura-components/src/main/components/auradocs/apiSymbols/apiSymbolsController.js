@@ -19,7 +19,7 @@
      * scrolling because we use the hash fragment for navigation.
      */
     jumpScroll : function(cmp, event) {
-        var link = event.target
+        var link = event.target;
         var scrollTo = cmp.getGlobalId() + "_symbol_" + link.innerText;
         document.getElementById(scrollTo).scrollIntoView();
     }

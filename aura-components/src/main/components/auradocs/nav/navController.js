@@ -18,7 +18,7 @@
      * Update the currently selected location in the UI.
      */
     handleLocationChange : function(cmp, event) {
-        if (aura.util.isUndefinedOrNull(cmp._activeCmp)) {
+        if ($A.util.isUndefinedOrNull(cmp._activeCmp)) {
             // The current docsLayout catchall is help. It would be better if
             // the layout service exposed a catchall as a separate event for
             // more dynamic handling.
@@ -33,7 +33,7 @@
         // Lookup the new location.
         var token = event.getParam('token');
         var newLocationComp = cmp.find(token);
-        if (aura.util.isUndefinedOrNull(newLocationComp)) {
+        if ($A.util.isUndefinedOrNull(newLocationComp)) {
             newLocationComp = cmp.find('help');
         }
         

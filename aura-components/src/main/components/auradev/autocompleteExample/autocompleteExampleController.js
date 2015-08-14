@@ -45,6 +45,7 @@
     },
     
     handleMatchDone: function(component, event) {
+    	/*eslint-disable no-console*/
         console.log("There are " + event.getParam("size") + " matched options.");
     },
     

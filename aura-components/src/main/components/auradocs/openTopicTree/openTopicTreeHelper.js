@@ -32,11 +32,11 @@
              * @param {Object} topicMap a map to populate with a {string} href => {ui:treeNode} node mapping
              * @param {Object} parentMap a map to populate with a {string} globalId => {ui:treeNode} node mapping
              */
-            helper.ActiveTopicVisitor = function(topicMap, parentMap) {
+            helper.ActiveTopicVisitor = function(topicMapInside, parentMapInside) {
                 // Maintain the current stack in order to build parent uplinks.
                 this.stack = [];
-                this.topicMap = topicMap;
-                this.parentMap = parentMap;
+                this.topicMap = topicMapInside;
+                this.parentMap = parentMapInside;
             };
 
             /**
@@ -74,9 +74,9 @@
                 }
             };
 
-            helper.ActiveTopicVisitor.prototype.endVisit = function(node) {
+            helper.ActiveTopicVisitor.prototype.endVisit = function() {
                 this.stack.pop();
-            }
+            };
         }
         return new helper.ActiveTopicVisitor(topicMap, parentMap);
     },

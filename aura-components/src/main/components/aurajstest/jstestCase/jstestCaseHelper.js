@@ -34,7 +34,7 @@
         try {
             var root = win.$A.getRoot();
         } catch (e) {
-            // Do nothing
+            // empty
         }
 
         if (!root) {
@@ -62,6 +62,7 @@
         if (win.aura.test.getErrors() !== "") {
             cmp.set("v.status", "fail");
             var msg = "";
+            /*eslint-disable no-eval*/
             var errorsInCallbackFunc = eval("(" + win.aura.test.getErrors() + ")");
             var error = null;
             for (var i = 0; i < errorsInCallbackFunc.length; i++) {

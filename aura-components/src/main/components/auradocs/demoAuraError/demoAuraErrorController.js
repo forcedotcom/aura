@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    controllerThrow : function(component) {
+    controllerThrow : function() {
         throw new $A.auraError("Controller Error Test");
     },
 

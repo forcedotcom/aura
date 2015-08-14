@@ -31,7 +31,7 @@
 		} else if (descriptor.indexOf("java://") === 0) {
 			parserFile = ["../contrib/java/js/tokenizejava.js", "../contrib/java/js/parsejava.js"];
 			stylesheet = "/auraFW/resources/codemirror/contrib/java/css/javacolors.css";
-		} else if (descriptor.indexOf("js://") === 0 || descriptor.indexOf("markup://aura:library") == 0) {
+		} else if (descriptor.indexOf("js://") === 0 || descriptor.indexOf("markup://aura:library") === 0) {
 			parserFile = ["tokenizejavascript.js", "parsejavascript.js"];
 			stylesheet = "/auraFW/resources/codemirror/css/jscolors.css";
 		} else if (descriptor.indexOf("css://") === 0) {
@@ -39,6 +39,7 @@
 			stylesheet = "/auraFW/resources/codemirror/css/csscolors.css";
 		}
 
+		/*eslint-disable no-undef*/
 		cmp.codeMirror = new CodeMirror(container, {
 			path: "/auraFW/resources/codemirror/js/",
 			parserfile: parserFile,
@@ -48,9 +49,9 @@
 			lineNumbers: useLines,
 			activeTokens: function(element, token) {
 				if (token.style === 'xml-tagname') {
-					var name = aura.util.trim(token.value);
+					var name = $A.util.trim(token.value);
 					var s = element.style;
-					var on = aura.util.on;
+					var on = $A.util.on;
 					on(element,"click", function(e){
 						if (e.ctrlKey || e.metaKey) {
 							cmp.get('c.open').runDeprecated(name);

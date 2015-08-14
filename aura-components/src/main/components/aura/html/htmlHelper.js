@@ -177,7 +177,7 @@
                     if (isString && value.indexOf("#") === 0) {
                         $A.run(function () {
                             $A.historyService.set(value.substring(1));
-                        })
+                        });
                     } else {
                         // prevent default action for anchors on IE11.
                         if ($A.get("$Browser").isDesktop && 
@@ -192,6 +192,7 @@
                     }
                 }, this.NAMES.hashHandler);
 
+                /*eslint-disable no-script-url*/
                 var href = "javascript:void(0";
                 if ($A.getContext().getMode() !== "PROD") {
                     // for testing we need to be able to easily identify

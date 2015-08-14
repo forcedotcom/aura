@@ -15,6 +15,7 @@
  */
 ({
     refresh : function(cmp){
+    	/*eslint-disable no-undef*/
         var frame = Ext.getCmp(cmp.find("frame").getElement().id).el.dom;
         frame.contentWindow.location.reload(true);
     },

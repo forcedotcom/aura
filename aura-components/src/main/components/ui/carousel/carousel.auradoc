@@ -28,8 +28,8 @@
 		    For a continuous horizontal flow, use the <code>continuousFlow="true"</code> attribute in <code>ui:carousel</code>.
 		    <p>If multiple carousels are used, specify the <code>width</code> and <code>height</code> attributes for each carousel. Additionally, ensure that the child carousel has a smaller dimension than its parent carousel. If the <code>width</code> and <code>height</code> attributes are not specified, these values default to the screen length and height.</p>
 	</aura:description>	
-		<aura:example name="carousel" ref="auradocs:demoCarousel" label="Using ui:carousel">
-    	<p>This example shows a carousel that loads content from a client-side model.</p>
+		<aura:example name="carousel" ref="uiExamples:carouselExample" label="Using ui:carousel">
+    	<p>This example shows a carousel that loads content provided to the <code>pageComponents</code> attribute.</p>
     	
 	</aura:example>
 	

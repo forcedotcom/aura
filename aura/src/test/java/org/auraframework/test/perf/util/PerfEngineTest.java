@@ -221,7 +221,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
      */
 	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
 			DefDescriptor<ComponentDef> descriptor) throws Exception {
-		test.setTestName("perf_" + descriptor.getDescriptorName());
+		//test.setTestName("perf_" + descriptor.getDescriptorName());
 		test.setExplicitGoldResultsFolder(resolveGoldFilePath(test));
 		return test;
 	}

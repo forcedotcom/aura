@@ -548,11 +548,13 @@
             var y = grid.get("v.year");
             var titleCmp = component.find("calTitle");
             if (titleCmp) {
-                var elem = titleCmp.getElement();
+            	var elem = titleCmp.getElement();
                 if (elem) {
-                    var monthLabels = $A.get("$Locale.nameOfMonths");
-                    var title = monthLabels ? monthLabels[m].fullName + " " + y : this.MonthLabels[m].fullName + " " + y;
-                    elem.textContent = elem.innerText = title;
+                	var monthLabels = $A.get("$Locale.nameOfMonths");
+                    var title = monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName;
+                    if($A.util.getText(elem) !== title){
+                    	$A.util.setText(elem, title);
+                    }
                 }
             }
             var yearTitleCmp = component.find("yearTitle");

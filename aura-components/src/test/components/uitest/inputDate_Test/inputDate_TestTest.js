@@ -63,6 +63,7 @@
         doNotWrapInAuraRun : true,
         test : [function(cmp) {
                      this.openDatePicker(cmp);
+                     isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
 		},function(cmp) {
                      var actual = "";
                      var expected = "";
@@ -70,14 +71,19 @@
 
                      for(var i = 0; i<12; i++){
                              expected = this.convertMonth(i) + " 2043";
+                             if (isDesktop) { 
+                            	 expected = this.convertMonth(i);
+                             }
                              actual   = this.getTextFromElm(datePicker);	                
                              $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
                              datePicker.get('c.goToNextMonth').runDeprecated({});
                       }
-
-                      expected = "January 2044";
-                      actual   = this.getTextFromElm(datePicker);	 
-                      $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
+                     expected = "January 2044";
+                     if (isDesktop) { 
+                    	 expected = "January";
+                     }
+                     actual   = this.getTextFromElm(datePicker);	 
+                     $A.test.assertEquals(expected, actual, "Month year Combo incorrect incorrect");
 	       }] 
     }, 
 
@@ -88,14 +94,18 @@
         attributes : {value: "2012-09-10", format: "MM-dd-yyyy"},
         test : [function(cmp) {
                       this.openDatePicker(cmp);
-		     },function(cmp) {                     
+             },function(cmp) {                     
                       datePicker = cmp.find("datePickerTestCmp").find('datePicker');
 
                       this.iterateCal(7, 5, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToNextYear'));
 		     },function(cmp) { 
-                      var expected = "February 2017";
-                      var actual   = this.getTextFromElm(datePicker);
-                      $A.test.assertEquals(expected, actual, "Month year combo incorrect");       
+		    	 	var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+		    	 	var expected = "February 2017";
+		    	 	if (isDesktop) { 
+		    	 		expected = "February";
+		    	 	}
+		    	 	var actual   = this.getTextFromElm(datePicker);
+		    	 	$A.test.assertEquals(expected, actual, "Month year combo incorrect");       
 	         }] 
     },
 
@@ -110,9 +120,13 @@
                        datePicker = cmp.find("datePickerTestCmp").find('datePicker');
                        this.iterateCal(7, 15, datePicker.get('c.goToPrevMonth'), datePicker.get('c.goToPrevYear'));
     		},function(cmp) {
-                       var expected = "February 1997";
-                       var actual   = this.getTextFromElm(datePicker);
-                       $A.test.assertEquals(expected, actual, "Initial value incorrect");
+    					var expected = "February 1997";
+    					var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+    					if (isDesktop) { 
+    		    	 		expected = "February";
+    		    	 	}
+    					var actual   = this.getTextFromElm(datePicker);
+    					$A.test.assertEquals(expected, actual, "Initial value incorrect");
 	    }]
     },
 
@@ -128,9 +142,13 @@
                       
                       this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToPrevYear'));
 		    },function(cmp) {
-                      var expected = "September 2029";
-                      var actual   = this.getTextFromElm(datePicker);
-	              $A.test.assertEquals(expected, actual, "Initial value incorrect");       
+		    		var expected = "September 2029";
+					var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+					if (isDesktop) { 
+			    	 	expected = "September";
+			    	}
+					var actual   = this.getTextFromElm(datePicker);
+					$A.test.assertEquals(expected, actual, "Initial value incorrect");       
 	    }]
     },
 
@@ -157,6 +175,10 @@
     		        this.iterateCal(12, 10, datePicker.get('c.goToNextMonth'), datePicker.get('c.goToNextYear'));
     		  },function(cmp) {
     		        var expected = "September 2023";
+    		        var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+					if (isDesktop) { 
+			    	 	expected = "September";
+			    	}
     		        var actual   = this.getTextFromElm(datePicker);
     		        $A.test.assertEquals(expected, actual, "Initial value incorrect");
     		 }]

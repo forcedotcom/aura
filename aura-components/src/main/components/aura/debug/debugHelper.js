@@ -44,4 +44,4 @@
 
 		return output;
 	}
-})
+})// eslint-disable-line semi

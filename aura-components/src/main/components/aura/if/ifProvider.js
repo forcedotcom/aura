@@ -17,4 +17,4 @@
     provide : function IfProvider(component) {
         return component;
     }
-})
+})// eslint-disable-line semi

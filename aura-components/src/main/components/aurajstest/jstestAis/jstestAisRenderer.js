@@ -17,4 +17,4 @@
     afterRender : function(cmp, helper){
     	helper.runNextTest(cmp);
     }
-})
+})// eslint-disable-line semi

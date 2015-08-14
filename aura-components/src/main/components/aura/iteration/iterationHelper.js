@@ -195,4 +195,5 @@
 //			hash : $A.util.json.encode(itemval)
         });
     }
+/*eslint-disable semi*/
 })

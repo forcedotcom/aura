@@ -25,4 +25,4 @@
         cmp.find("tabs").get("e.activateTab").setParams({"index": index}).fire();
         cmp.set("v.index", index + 1);
     }
-})
+})// eslint-disable-line semi

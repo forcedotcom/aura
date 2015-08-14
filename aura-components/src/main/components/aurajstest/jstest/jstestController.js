@@ -23,4 +23,4 @@
         $A.util.toggleClass(codeEl, "show");
 	}
 
-})
+})// eslint-disable-line semi

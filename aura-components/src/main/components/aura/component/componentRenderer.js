@@ -33,4 +33,4 @@
         var body = component.get("v.body");
         $A.renderingService.unrenderFacet(component,body);
     }
-})
+})/*eslint-disable semi*/

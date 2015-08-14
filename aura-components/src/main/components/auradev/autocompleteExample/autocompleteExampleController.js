@@ -52,4 +52,4 @@
     handleSelectOption: function(component, event) {
         event.getParam("option");
     }
-})
+})// eslint-disable-line semi

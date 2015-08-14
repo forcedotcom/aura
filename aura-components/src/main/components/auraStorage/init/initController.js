@@ -31,4 +31,4 @@
             storage.resumeSweeping();
         }
     }
-})
+})// eslint-disable-line semi

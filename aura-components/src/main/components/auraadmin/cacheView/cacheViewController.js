@@ -18,4 +18,4 @@
         var val = $A.util.getBooleanValue(cmp.get("v.expanded"));
         cmp.set("v.expanded", !val);
     }
-})
+})// eslint-disable-line semi

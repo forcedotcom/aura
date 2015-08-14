@@ -30,4 +30,4 @@
         });
         $A.enqueueAction(action);
     }
-})
+})// eslint-disable-line semi

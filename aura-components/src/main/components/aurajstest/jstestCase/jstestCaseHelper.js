@@ -85,4 +85,4 @@
 
         cmp.get("e.done").fire();
     }
-})
+})// eslint-disable-line semi

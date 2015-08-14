@@ -574,11 +574,7 @@ AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
 AuraRenderingService.prototype.rerenderDirty = function(stackName) {
     if (this.needsCleaning) {
         var maxiterations = 1000;
-        var num = aura.getContext().incrementRender();
-        var initialMarkName = "Rerendering-" + num;
-        $A.Perf.mark(initialMarkName);
-        $A.Perf.mark("Fired aura:doneRendering event");
-
+                  
         // #if {"modes" : ["PTEST","STATS"]}
         var allRerendered = [],
             startTime,
@@ -653,32 +649,12 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
             $A.error("Max Callstack Exceeded: Rerendering loop resulted in to many rerenderings.");
         }
         // #if {"modes" : ["PTEST","STATS"]}
-        if(allRerendered.length) {
+        if (allRerendered.length) {
             cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;
             this.statsIndex["rerenderDirty"].push(cmpsWithWhy);
         }
         // #end
-
-
-        $A.Perf.endMark(initialMarkName);
         $A.get("e.aura:doneRendering").fire();
-        $A.Perf.endMark("Fired aura:doneRendering event");
-
-        // update the mark info after the fact to avoid unnecessary hits early to get cmp info
-        // #if {"modes" : ["PTEST","STATS"]}
-        var markDescription = initialMarkName + ": [";
-        for (var m = 0; m < allRerendered.length; m++) {
-            var rerenderedCmpDef = allRerendered[m].getDef();
-            if (rerenderedCmpDef) {
-                markDescription += "'" + rerenderedCmpDef.descriptor.getQualifiedName() + "'";
-            }
-            if (m < allRerendered.length - 1) {
-                markDescription += ",";
-            }
-        }
-        markDescription += "]";
-        $A.Perf.updateMarkName(initialMarkName, markDescription);
-        // #end
     }
 };
 

@@ -55,6 +55,7 @@ import org.auraframework.throwable.AuraUnhandledException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
@@ -274,7 +275,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
                     if (!isProductionMode(context.getMode())) {
                         // Preserve new lines and tabs in the stacktrace since this is directly being written on to the
                         // page
-                        denyMessage = "<pre>" + denyMessage + "</pre>";
+                        denyMessage = "<pre>" + AuraTextUtil.escapeForHTML(denyMessage) + "</pre>";
                         response.getWriter().println(denyMessage);
                     }
                     return;

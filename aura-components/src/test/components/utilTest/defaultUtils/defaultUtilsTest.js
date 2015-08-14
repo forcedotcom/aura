@@ -130,7 +130,7 @@
     testKeys: {
         test : function() {
             var object = { I: 0, have: 1, four: 2, keys: 3 };
-            var keys = $A.util.keys(object);
+            var keys = Object.keys(object);
             $A.test.assertEquals("I have four keys", keys.join(" "));
         }
     },

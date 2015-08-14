@@ -290,7 +290,7 @@ AuraEventService.prototype.hasHandlers = function(name) {
  * @export
  */
 AuraEventService.prototype.getRegisteredEvents = function() {
-    return $A.util.keys(this.registry.eventDefs);
+    return Object.keys(this.registry.eventDefs);
 };
 
 /**

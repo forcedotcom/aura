@@ -71,7 +71,17 @@
     },
 
     calculateSize: function(map) {
-        return $A.util.keys(map, true).length;
+        if(!map) {
+            return 0;
+        }
+
+        var keys = [];
+        for(var key in map) {
+            if(map.hasOwnProperty(key) && typeof map[key] != "function") {
+                keys.push(key);
+            }
+        }
+        return keys.length;
     },
 
     /**

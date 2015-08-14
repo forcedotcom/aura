@@ -45,7 +45,7 @@ LibraryDefRegistry.prototype.createDef = function(config) {
     this.libraryDefs[descriptor] = this.libraryDefs[descriptor] || {};
     var registered = this.libraryDefs[descriptor];
 
-    $A.util.forEach($A.util.keys(config["includes"]), function(libName) {
+    $A.util.forEach(Object.keys(config["includes"]), function(libName) {
         if (!(libName in registered)) {
             config["includes"][libName]($A.util.bind(this.define, this)); // adds to the registry
         }

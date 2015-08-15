@@ -860,6 +860,52 @@ Aura.Utils.Util.prototype.urlDecode = function(url){
 };
 
 /**
+ * Manipulate the properties of the querystring portion of a url.
+ * @param {String} url Any url to manipulate, if it doesn't have a question mark in it. Any hash remains not affected.
+ * @param {Object} params Map of key->value's to set in the url. Set key to null to remove it from the url.
+ * @export
+ */
+Aura.Utils.Util.prototype.generateUrl = function(url, params) {
+    if (this.isString(url) && this.isObject(params)) {
+        var pieces = url.split("?");
+        var query = pieces[1] || "";
+
+        var map = {};
+
+        var pairs = query.split('&');
+        for (var i = 0; i < pairs.length; i++) {
+            if (pairs[i] > "") {
+                var pair = pairs[i].split('=');
+                map[pair[0]] = pair[1];
+            }
+        }
+        for (var k1 in params) {
+            if (params.hasOwnProperty(k1)) {
+                var v1 = params[k1];
+                if (v1 > "") {
+                    map[k1] = encodeURIComponent(params[k1]);
+                } else {
+                    delete map[k1];
+                }
+            }
+        }
+
+        pairs = [];
+        for (var k2 in map) {
+            if (map.hasOwnProperty(k2)) {
+                var v2 = map[k2];
+                pairs.push(k2 + "=" + v2);
+            }
+        }
+
+        query = pairs.join("&");
+        pieces[1] = query;
+        url = pieces.join("?");
+    }
+    return url;
+ };
+
+/**
  * Trims a string by removing newlines, spaces, and tabs from the beginning and end of the string.
  *
  * @param {String} value The string to be trimmed.

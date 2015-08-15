@@ -201,10 +201,10 @@ public class TabsetUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-
+    //W-2721500 : in iterateThroughTabs(), we need to wait after click()
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
             BrowserType.IE8, BrowserType.IE7 })
-    public void testLeftRightUpDownArrows() throws MalformedURLException, URISyntaxException {
+    public void _testLeftRightUpDownArrows() throws MalformedURLException, URISyntaxException {
         open(createURL("basic", "false"));
 
         // Left/Up and Right/Down Arrows do the samething. Making sure that the result is also the same

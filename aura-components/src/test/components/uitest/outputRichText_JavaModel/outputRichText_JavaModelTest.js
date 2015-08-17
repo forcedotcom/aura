@@ -39,7 +39,7 @@
         }
     },
         
-    testStringValueWithScriptTag:{
+   /* testStringValueWithScriptTag:{
         test:function(cmp){
             var testCmp = cmp.find('myComp4');
             $A.test.assertNotNull(testCmp);
@@ -100,23 +100,23 @@
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("script").length, "script tag should not be there");
             $A.test.assertEquals(0, testCmp.find('div').getElement().getElementsByTagName("style").length, "style tag should not be there");
         }
-    },
+    },*/
     
     /**
      * We remove events and IE7 handles null events differently. 
      */
-    testStringValueWithEvent:{
+   /* testStringValueWithEvent:{
     	browsers:["-IE7"],
         test:function(cmp){
             var testCmp = cmp.find('myComp10');
             $A.test.assertNotNull(testCmp);
-            $A.test.assertEquals('Some text from server with input tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
-            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should be there");
+            $A.test.assertEquals('Some text from server with anchor tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("a").length, "Anchor tag should be there");
             
-            var ele = testCmp.find('div').getElement().getElementsByTagName("input")[0];
-            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Input tag should be there");
+            var ele = testCmp.find('div').getElement().getElementsByTagName("a")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Anchor tag should be there");
             var cl = ele.onclick;
-            $A.test.assertFalse($A.util.isUndefinedOrNull(cl) , "Input tag should have onclick attribute");
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl) , "Anchor tag should have onclick attribute");
             $A.test.assertTrue($A.util.isUndefinedOrNull(cl.nodeValue) , "onclick attribute should be null");
         }
     },
@@ -126,41 +126,41 @@
         test:function(cmp){
             var testCmp = cmp.find('myComp10');
             $A.test.assertNotNull(testCmp);
-            $A.test.assertEquals('Some text from server with input tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
-            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tag should be there");
+            $A.test.assertEquals('Some text from server with anchor tag with event', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(1, testCmp.find('div').getElement().getElementsByTagName("input").length, "Anchor tag should be there");
             
-            var ele = testCmp.find('div').getElement().getElementsByTagName("input")[0];
-            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Input tag should be there");
+            var ele = testCmp.find('div').getElement().getElementsByTagName("a")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele) , "Anchor tag should be there");
             var cl = ele.onclick;
-            $A.test.assertTrue($A.util.isUndefinedOrNull(cl) , "Input tag should not have onclick attribute");
+            $A.test.assertTrue($A.util.isUndefinedOrNull(cl) , "Anchor tag should not have onclick attribute");
         }
-    },
+    },*/
     
     /**
      * We remove events and IE7 handles null events differently. 
      */
-    testStringValueWithMultipleEvent:{
+    /*testStringValueWithMultipleEvent:{
     	browsers:["-IE7"],
         test:function(cmp){
             var testCmp = cmp.find('myComp11');
             $A.test.assertNotNull(testCmp);
-            $A.test.assertEquals('Some text from server with input tags with events', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
-            $A.test.assertEquals(2, testCmp.find('div').getElement().getElementsByTagName("input").length, "Input tags should be there");
+            $A.test.assertEquals('Some text from server with anchor tags with events', $A.test.getText(testCmp.find('div').getElement()), "Failed to display richtext from Java model");            
+            $A.test.assertEquals(2, testCmp.find('div').getElement().getElementsByTagName("a").length, "Anchor tags should be there");
             
-            var ele1 = testCmp.find('div').getElement().getElementsByTagName("input")[0];
-            $A.test.assertFalse($A.util.isUndefinedOrNull(ele1) , "Input tag should be there");
+            var ele1 = testCmp.find('div').getElement().getElementsByTagName("a")[0];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele1) , "Anchor tag should be there");
             var cl1 = ele1.onclick;
-            $A.test.assertFalse($A.util.isUndefinedOrNull(cl1) , "Input tag should have onclick attribute");
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl1) , "Anchor tag should have onclick attribute");
             $A.test.assertTrue($A.util.isUndefinedOrNull(cl1.nodeValue) , "onclick attribute should be null");
             
-            var ele2 = testCmp.find('div').getElement().getElementsByTagName("input")[1];
-            $A.test.assertFalse($A.util.isUndefinedOrNull(ele2) , "Input tag should be there");
+            var ele2 = testCmp.find('div').getElement().getElementsByTagName("a")[1];
+            $A.test.assertFalse($A.util.isUndefinedOrNull(ele2) , "Anchor tag should be there");
             var cl21 = ele2.onclick;
-            $A.test.assertFalse($A.util.isUndefinedOrNull(cl21) , "Input tag should have onclick attribute");
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl21) , "Anchor tag should have onclick attribute");
             $A.test.assertTrue($A.util.isUndefinedOrNull(cl21.nodeValue) , "onclick attribute should be null");            
             var cl22 = ele2.onfocus;
-            $A.test.assertFalse($A.util.isUndefinedOrNull(cl22) , "Input tag should have onfocus attribute");
+            $A.test.assertFalse($A.util.isUndefinedOrNull(cl22) , "Anchor tag should have onfocus attribute");
             $A.test.assertTrue($A.util.isUndefinedOrNull(cl22.nodeValue) , "onfocus attribute should be null");
         }
-    }
+    }*/
 })

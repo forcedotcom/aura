@@ -110,6 +110,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
         		value : null,	
     			get:function(attribute){
     				if(attribute=="v.value") return this.value;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};   
         	
@@ -117,6 +120,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 				util: {   
 					isUndefinedOrNull: function(value) { return true; },
 					isEmpty: function(value) { return false; }	  
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						
@@ -138,6 +144,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
         		value : '',	
     			get:function(attribute){
     				if(attribute=="v.value") return this.value;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};   
     	
@@ -145,6 +154,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 				util: {   
 					isUndefinedOrNull: function(value) { return false; },
 					isEmpty: function(value) { return true; }
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						
@@ -160,9 +172,8 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
         [Fact]
         function valueWithDefaultTags(){
         	// Arrange    
-        	var expected = 'value:form,input,button,img,div,span,ol,li,p,ul,a,h1,h2,h3,b,i,strong,em,u,s,sub,sup,blockquote,pre,big,' +
-        				   'small,tt,code,kbd,samp,var,del,ins,cite,q,table,tr,td,caption,thead,th,tbody,tfoot,hr,object,param,' +
-        				   'embed,iframe';  
+        	var expected = 'value:a,b,big,blockquote,caption,cite,code,del,div,em,h1,h2,h3,hr,i,img,ins,kbd,li,' +
+        				   'ol,p,param,pre,q,s,samp,small,span,strong,sub,sup,table,tbody,td,tfoot,th,thead,tr,tt,u,ul,var';  
         	
         	var targetComponent={
         		value : 'value',	
@@ -172,6 +183,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     			},
     			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};           	             	    
         	
@@ -180,8 +194,14 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     		};
         	
         	var mockDocument = Mocks.GetMock(Object.Global(), "document", {				
-    			createElement:function(value){
-    				if(value == 'div') return mockDiv;
+    			implementation: {
+    				createHTMLDocument:function() {
+    					return {
+    						createElement:function(value){
+    		    				if(value == 'div') return mockDiv;
+    		    			}
+    					}
+    				}
     			}
     		});
     			        	
@@ -196,6 +216,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 					removeElement: function(element) { 
 						if(element != mockDiv) throw new Error("Wrong Element, expected div"); 
 					}
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						
@@ -225,6 +248,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     			},
     			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};           	        	    	    
         	
@@ -233,8 +259,14 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     		};
         	
         	var mockDocument = Mocks.GetMock(Object.Global(), "document", {				
-    			createElement:function(value){
-    				if(value == 'div') return mockDiv;
+        		implementation: {
+    				createHTMLDocument:function() {
+    					return {
+    						createElement:function(value){
+    		    				if(value == 'div') return mockDiv;
+    		    			}
+    					}
+    				}
     			}
     		});
     			        	
@@ -251,6 +283,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 					removeElement: function(element) { 
 						if(element != mockDiv) throw new Error("Wrong Element, expected div"); 
 					}
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						
@@ -280,6 +315,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     			},
     			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};           	        	
         	
@@ -288,8 +326,14 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     		};
         	
         	var mockDocument = Mocks.GetMock(Object.Global(), "document", {				
-    			createElement:function(value){
-    				if(value == 'div') return mockDiv;
+        		implementation: {
+    				createHTMLDocument:function() {
+    					return {
+    						createElement:function(value){
+    		    				if(value == 'div') return mockDiv;
+    		    			}
+    					}
+    				}
     			}
     		});
     			        	
@@ -306,6 +350,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 					removeElement: function(element) { 
 						if(element != mockDiv) throw new Error("Wrong Element, expected div"); 
 					}
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						
@@ -335,6 +382,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     			},
     			set:function(attribute, val){
     				if(attribute=="v.value") this.value = val;
+    			},
+    			getGlobalId:function(){
+    				return 'id'
     			}
     		};           	        	  
         	
@@ -343,8 +393,14 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     		};
         	
         	var mockDocument = Mocks.GetMock(Object.Global(), "document", {				
-    			createElement:function(value){
-    				if(value == 'div') return mockDiv;
+        		implementation: {
+    				createHTMLDocument:function() {
+    					return {
+    						createElement:function(value){
+    		    				if(value == 'div') return mockDiv;
+    		    			}
+    					}
+    				}
     			}
     		});
     			        	
@@ -359,6 +415,9 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 					removeElement: function(element) { 
 						if(element != mockDiv) throw new Error("Wrong Element, expected div"); 
 					}
+	            },
+	            warning: function(msg) {
+	            	throw new Error(msg);
 	            }
 	        });												
 						

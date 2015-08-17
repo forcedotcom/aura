@@ -54,6 +54,14 @@
     },
 
     onNotify: function(cmp, event, helper) {
+    	var params = event.getParams();
+        if (!params) {
+            return;
+        }
+        if (params.action === 'destroyPanel') {
+        	//in case caller bypass the close method
+        	helper.unsetOverflow(cmp);
+        }
         helper.lib.panelLibCore.handleNotify(cmp, event, helper);
     },
 })

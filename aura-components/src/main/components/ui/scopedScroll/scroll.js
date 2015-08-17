@@ -16,11 +16,11 @@
 function () {
     var mouseWheelHandler = function (e) {
         var wrapper      = e.currentTarget;
-            scrollTop    = wrapper.scrollTop;
-            scrollHeight = wrapper.scrollHeight;
-            height       = wrapper.offsetHeight;
-            delta        = e.wheelDelta;
-            up           = delta > 0;
+        var scrollTop    = wrapper.scrollTop;
+        var scrollHeight = wrapper.scrollHeight;
+        var height       = wrapper.offsetHeight;
+        var delta        = e.wheelDelta;
+        var up           = delta > 0;
 
         if (e.scopedScroll) {
             return;

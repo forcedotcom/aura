@@ -143,10 +143,12 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *********************************** Date Picker Tests*******************************************
      ***********************************************************************************************/
+    //W-2721497: test flapper, in homeEndButtonHelper() above
+    //we might need some wait between click() and findDomElement(...) 
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    public void testHomeEnd() throws Exception {
+    public void _testHomeEnd() throws Exception {
         open(URL);
 
         // Checking January (31 days)
@@ -432,8 +434,9 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of arrows being used one after the other
+    //W-2721497: test flapper, we might need some wait between click() and findDomElement(...) 
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testLeftAndRightArrows() throws Exception {
+    public void _testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
         open(URL);
         WebDriver driver = getDriver();

@@ -322,7 +322,8 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Checkbox items selected are not correct", "St. Louis Rams,Arizona Cardinals", result.getText());
     }
 
-    public void testMenuRadio() throws MalformedURLException, URISyntaxException {
+    //W-2721266 : disable this test because it's a flapper. 
+    public void _testMenuRadio() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();
         String label = "radioMenuLabel";

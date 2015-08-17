@@ -59,4 +59,4 @@
             $A.test.assertEquals("{0}", $A.test.getText(component.getElement()), "value not expected");
         }
     }
-})
+})// eslint-disable-line semi

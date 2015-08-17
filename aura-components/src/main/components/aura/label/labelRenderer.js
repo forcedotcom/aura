@@ -102,4 +102,4 @@
             $A.unrender(child);
         }
     }
-})
+})// eslint-disable-line semi

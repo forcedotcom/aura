@@ -20,4 +20,4 @@
         container.innerHTML = "";
         $A.render(evt.getParam("ui"), container);
     }
-})
+})// eslint-disable-line semi

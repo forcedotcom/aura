@@ -45,4 +45,4 @@
 
         $A.storageService.initStorage(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version);
     }
-})
+})// eslint-disable-line semi

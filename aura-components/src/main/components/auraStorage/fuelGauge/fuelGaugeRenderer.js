@@ -27,4 +27,4 @@
 
     	return this.superRender();
     }
-})
+})// eslint-disable-line semi

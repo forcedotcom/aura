@@ -22,4 +22,4 @@
         var codeEl = cmp.find("test-suite-code").getElement();
         $A.util.toggleClass(codeEl, "show");
     }
-})
+})// eslint-disable-line semi

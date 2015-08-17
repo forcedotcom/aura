@@ -94,4 +94,4 @@
 
         this.superAfterRender();
     }
-})
+})// eslint-disable-line semi

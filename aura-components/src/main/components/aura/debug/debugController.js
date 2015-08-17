@@ -86,4 +86,4 @@
 	    var array = opener.$A.devToolService.checkAccessibility();
 		helper.output(cmp, "accessibilityData", array, true);
 	}
-})
+})// eslint-disable-line semi

@@ -51,4 +51,4 @@
             $A.enqueueAction(a);
         }
     }
-})
+})// eslint-disable-line semi

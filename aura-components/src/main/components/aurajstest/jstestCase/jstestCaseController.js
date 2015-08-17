@@ -39,4 +39,4 @@
     onActivate: function(cmp, evt, helper) {
         helper.loadTest(cmp);
     }
-})
+})// eslint-disable-line semi

@@ -45,4 +45,4 @@
             cmp._truth = isTrue;
         }
     }
-})
+})// eslint-disable-line semi

@@ -22,4 +22,4 @@
     	/*eslint-disable no-alert*/
     	alert("Storage name: " + cmp.get("v.storageName") + "\nImplementation: " + cmp.get("v.implementation"));
     }
-})
+})// eslint-disable-line semi

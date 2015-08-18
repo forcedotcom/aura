@@ -28,6 +28,7 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Maps;
 
@@ -57,9 +58,9 @@ public class ThrowableHTMLFormatAdapter extends HTMLFormatAdapter<Throwable> {
             writeStack = mode != Mode.PROD && mode != Mode.PRODDEBUG;
         }            
         if (writeStack) {
-            attribs.put("errorMessage", AuraExceptionUtil.getStackTrace(value));
+            attribs.put("errorMessage", AuraTextUtil.escapeForHTML(AuraExceptionUtil.getStackTrace(value)));
         } else {
-            attribs.put("errorMessage", value.getMessage());
+            attribs.put("errorMessage", AuraTextUtil.escapeForHTML(value.getMessage()));
         }
         try {
             Component c = Aura.getInstanceService().getInstance("aura:template", ComponentDef.class, attribs);

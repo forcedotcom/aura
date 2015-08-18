@@ -682,4 +682,35 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
                 response.contains("AuraUnhandledException: Unable to process your request"));
         get.releaseConnection();
     }
+
+    /**
+     * Verify providing invalid DefDescriptor format to the aura.tag param results in the proper handled Exception and
+     * not an AuraUnhandledException, which results in a Gack on SFDC.
+     */
+    public void testInvalidDefDescriptorFormatExploit() throws Exception {
+        String url = "/aura?aura.tag=one:one%3Csvg%3E%3Cscript%3E0%3C1%3Ealert(document.domain)%3C%2Fscript%3E.app";
+
+        // test in prod.
+        HttpGet get = obtainGetMethod(url+"&aura.mode=PROD");
+        HttpResponse httpResponse = perform(get);
+
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        String response = getResponseBody(httpResponse);
+        assertTrue("Expected 'Invalid Descriptor Format' but got: " + response,
+                response.contains("Invalid Descriptor Format: one:one&lt;svg&gt;&lt;script&gt;"));
+        assertFalse("Invalid aura.tag input should not result in an AuraUnhandledException. " + response,
+                response.contains("AuraUnhandledException: Unable to process your request"));
+        get.releaseConnection();
+
+        // and in dev.
+        get = obtainGetMethod(url+"&aura.mode=DEV");
+        httpResponse = perform(get);
+        assertEquals(HttpStatus.SC_OK, getStatusCode(httpResponse));
+        response = getResponseBody(httpResponse);
+        assertTrue("Expected 'Invalid Descriptor Format' but got: " + response,
+                response.contains("Invalid Descriptor Format: one:one&lt;svg&gt;&lt;script&gt;"));
+        assertFalse("Invalid aura.tag input should not result in an AuraUnhandledException. " + response,
+                response.contains("AuraUnhandledException: Unable to process your request"));
+        get.releaseConnection();
+    }
 }

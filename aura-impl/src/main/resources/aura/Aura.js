@@ -558,17 +558,15 @@ AuraInstance.prototype.initAsync = function(config) {
  * @param {Boolean} useExisting
  * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
  * 	 they should. Defaults to true for Aura Integration Service.
- * @param {Boolean} doNotCallUIPerfOnLoad True if UIPerf.onLoad() should not be called after initialization. In case of
- *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  */
-AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices, doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefs(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"], config["sid"]);
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"]);
-        this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices, doNotCallUIPerfOnLoad);
+        this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
         $A.context.setCurrentAction(null);
     } else {
@@ -587,11 +585,9 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @param {Object} container Sets the container for the component.
  * @param {Boolean=} doNotInitializeServices True if Layout and History services should not be initialized, or false if
  *        they should. Defaults to true for Aura Integration Service.
- * @param {Boolean} doNotCallUIPerfOnLoad True if UIPerf.onLoad() should not be called after initialization. In case of
- *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
-AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices, doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
     if (!$A["hasErrors"]) {
         var cmp = $A.clientService["init"](config, token, container ? $A.util.getElement(container) : null);
         $A.setRoot(cmp);
@@ -620,7 +616,7 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
 
             $A.initialized = true;
         }
-        $A.finishInit(doNotCallUIPerfOnLoad);
+        $A.finishInit();
 
         // After App initialization is done
         if (!doNotInitializeServices) {
@@ -631,24 +627,12 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
 
 /**
  * Signals that initialization has completed.
- * @param {Boolean} doNotCallUIPerfOnLoad True if UIPerf.onLoad() should not be called after initialization. In case of
- *       IntegrationService when aura components are embedded on the page, onLoad is called by the parent container.
  * @private
  */
-AuraInstance.prototype.finishInit = function(doNotCallUIPerfOnLoad) {
+AuraInstance.prototype.finishInit = function() {
     if (!this["finishedInit"]) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
-
-                 if (doNotCallUIPerfOnLoad) {
-            $A.Perf.setTimer("Aura Init");
-        } else {
-            $A.Perf.onLoad();
-            if (window["Perf"] && window["Perf"]["ui"] && window["Perf"]["ui"]["onLoad"]) {
-                window["Perf"]["ui"]["onLoad"]();
-            }
-        }
-
         this["finishedInit"] = true;
         $A.get("e.aura:initialized").fire();
         $A.metricsService.applicationReady();

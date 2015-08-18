@@ -1063,7 +1063,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // 13 from clientLibraryTest:testDependencies and its dependencies + 1 from aura:component
         // Update this number when you add new aura:clientLibrary tags to these components
-        assertEquals(14, libDefs.size());
+        assertEquals(13, libDefs.size());
     }
 
     public void testAssertAccess_IfGlobalAccessThenPassesCheck() throws Exception {

@@ -548,19 +548,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return null;
     }
 
-    // UIPerf: note that UIPerf is only loaded in PTEST (and CADENCE) modes.
-
-    protected void clearUIPerfStats() {
-        perfWebDriverUtil.clearUIPerfStats();
-    }
-
-    public Map<String, String> getUIPerfStats(
-            List<String> transactionsToGather) {
-        return perfWebDriverUtil.getUIPerfStats(null, transactionsToGather);
-    }
-
-    // Perf: END
-
     /**
      * Wrapper for non-asserted failures
      */

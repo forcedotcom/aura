@@ -52,10 +52,6 @@ public interface LoggingService extends AuraService {
     public static final String TIMER_SERIALIZATION = "serialization";
     public static final String TIMER_SERIALIZATION_AURA = "serializationAura";
     public static final String USER_AGENT = "userAgent";
-    /**
-     * Transaction beacon data from UIPerf to create 'i' log lines
-     */
-    public static final String BEACON_DATA = "beaconData";
 
     /**
      * Establish logging context

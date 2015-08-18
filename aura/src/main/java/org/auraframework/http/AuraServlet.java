@@ -325,14 +325,6 @@ public class AuraServlet extends AuraBaseServlet {
             if (msg == null) {
                 throw new AuraRuntimeException("Invalid request, no message");
             }
-            //
-            // handle transaction beacon JSON data
-            // FIXME: this should be an action.
-            //
-            String beaconData = beaconParam.get(request);
-            if (!"undefined".equals(beaconData) && !AuraTextUtil.isNullEmptyOrWhitespace(beaconData)) {
-                loggingService.setValue(LoggingService.BEACON_DATA, new JsonReader().read(beaconData));
-            }
 
             String fwUID = Aura.getConfigAdapter().getAuraFrameworkNonce();
             if (!fwUID.equals(context.getFrameworkUID())) {

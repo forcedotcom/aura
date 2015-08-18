@@ -170,42 +170,6 @@ public final class PerfWebDriverUtil {
         return entries;
     }
 
-    // UIPerfStats:
-
-    public void clearUIPerfStats() {
-        auraUITestingUtil.getEval("$A.Perf.removeStats()");
-    }
-
-    public Map<String, String> getUIPerfStats(String stage, List<String> transactionsToGather) {
-        Map<String, String> stats = Maps.newHashMap();
-        String json = auraUITestingUtil.getEval("return $A.util.json.encode($A.Perf.toJson())").toString();
-        json = json.substring(1, json.length() - 1);
-        json = json.replace("\\\"", "\"");
-        StringReader in = new StringReader(json);
-        Map<?, ?> message = (Map<?, ?>) new JsonReader().read(in);
-        @SuppressWarnings("unchecked")
-        ArrayList<HashMap<?, ?>> measures = (ArrayList<HashMap<?, ?>>) message
-                .get("measures");
-        for (HashMap<?, ?> marks : measures) {
-            if (!transactionsToGather.isEmpty()) {
-                if (!transactionsToGather.contains(marks.get("measure")) &&
-                        // IE10 list of measures was not in the same order
-                        // as expected in transactionsToGather so need to
-                        // make sure measure and transactionsToGather are
-                        // similar
-                        !AuraTextUtil.stringsHaveSameContent(
-                                (String) marks.get("measure"),
-                                transactionsToGather.get(0))) {
-                    continue;
-                }
-            }
-            String measureName = marks.get("measure").toString()
-                    + (stage != null ? ("_" + stage) : "");
-            stats.put(measureName, marks.get("et").toString());
-        }
-        return stats;
-    }
-
     // JS heap snapshot
 
     /**

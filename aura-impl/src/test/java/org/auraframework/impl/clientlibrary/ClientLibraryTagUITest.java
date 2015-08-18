@@ -73,10 +73,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
     public void testModeDependentResources() throws Exception {
         open("/clientLibraryTest/clientLibraryTest.app", Mode.PTEST);
 
-        // PTEST only resources
-        Object UIPerfData = auraUITestingUtil.getEval("return $A.Perf.toJson()");
-        assertNotNull(UIPerfData);
-
         // Mode independent resources
         Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
         assertNotNull(minuteThruMoment);

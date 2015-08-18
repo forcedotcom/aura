@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component 
-    isTemplate="true" 
-    extensible="true" 
-    support="GA" 
-    access="GLOBAL" 
+<aura:component
+    isTemplate="true"
+    extensible="true"
+    support="GA"
+    access="GLOBAL"
     description="Default template used to bootstrap Aura framework. To use another template, extend aura:template and set attributes using aura:set.">
 
     <aura:attribute name="title"                    type="String" access="GLOBAL" default="Aura" description="The title of the template."/>
@@ -32,7 +32,7 @@
     <aura:attribute name="auraInlineStyle"          type="String"           description="Loads Aura inline style from template.css."/>
     <aura:attribute name="auraInit"                 type="String"           description="Initializes Aura ayncronously."/>
     <aura:attribute name="auraInitSync"             type="String"           description="Denotes synchronous initialization of Aura. Returns the same value as auraInit."/>
-    <aura:attribute name="auraPreInitBlock"         type="Aura.Component[]" description="The block of content that is rendered before Aura initialization."/>
+    <aura:attribute name="auraPreInitBlock"         type="Aura.Component[]" access="GLOBAL" description="The block of content that is rendered before Aura initialization."/>
     <aura:attribute name="auraInitBlock"            type="Aura.Component[]" description="The block of content that is rendered when initialization is complete."/>
 
     <aura:attribute name="autoInitialize"           type="String" default="true" description="Denotes whether Aura should auto-initialize (true) or not (false)."/>
@@ -56,7 +56,7 @@
 
     <!-- Default initial CSS -->
     <aura:attribute name="inlineStyle" type="Aura.Component[]" description="The CSS style used to display inline elements">
-        .auraMsgMask{position:absolute;top:0;bottom:0;left:0;right:0;background:-webkit-radial-gradient(circle,rgba(0,0,0,.2),#000);z-index:1000;display:none}.auraMsgBox{display:none;width:100%;margin:120px auto 0;background-color:#708090;z-index:1002;border-radius:5px;box-shadow:0 20px 40px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.3);overflow:hidden}.auraMsgBox h2{font-weight:700;font-size:1.2em;line-height:1.5em;margin:0;padding:10px;overflow:hidden}.auraErrorBox h2{text-shadow:1px 1px 1px rgba(0,0,0,.5);color:#fff}.auraMsgBox a.close{float:right;font-weight:700;font-size:20px;line-height:1em;color:#fff;background-color:transparent;border:1px solid #666;box-shadow:inset 0 1px 1px rgba(255,255,255,.2),0 1px 1px rgba(0,0,0,.4);border-radius:4px;padding:0 6px 4px;margin:0}.auraLoadingBox{text-align:center;width:200px;line-height:80px}.auraErrorBox{position:relative;width:80%;z-index:999}.auraError #auraErrorMessage{background-color:#dcdcdc;margin:0 10px 10px;padding:10px;color:#333;min-height:200px;max-height:300px;overflow:auto;white-space:pre-wrap;font-family:monospace;box-shadow:inset 0 0 10px rgba(0,0,0,.4);border:1px solid #666}.auraForcedErrorBox .auraErrorBox,.auraForcedErrorBox.auraMsgMask,body.auraError .auraErrorBox,body.auraError .auraMsgMask,body.loading .auraLoadingBox{display:block}.assistiveText{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}.visible{display:block}.invisible{display:none}    
+        .auraMsgMask{position:absolute;top:0;bottom:0;left:0;right:0;background:-webkit-radial-gradient(circle,rgba(0,0,0,.2),#000);z-index:1000;display:none}.auraMsgBox{display:none;width:100%;margin:120px auto 0;background-color:#708090;z-index:1002;border-radius:5px;box-shadow:0 20px 40px rgba(0,0,0,.8),inset 0 1px 1px rgba(255,255,255,.3);overflow:hidden}.auraMsgBox h2{font-weight:700;font-size:1.2em;line-height:1.5em;margin:0;padding:10px;overflow:hidden}.auraErrorBox h2{text-shadow:1px 1px 1px rgba(0,0,0,.5);color:#fff}.auraMsgBox a.close{float:right;font-weight:700;font-size:20px;line-height:1em;color:#fff;background-color:transparent;border:1px solid #666;box-shadow:inset 0 1px 1px rgba(255,255,255,.2),0 1px 1px rgba(0,0,0,.4);border-radius:4px;padding:0 6px 4px;margin:0}.auraLoadingBox{text-align:center;width:200px;line-height:80px}.auraErrorBox{position:relative;width:80%;z-index:999}.auraError #auraErrorMessage{background-color:#dcdcdc;margin:0 10px 10px;padding:10px;color:#333;min-height:200px;max-height:300px;overflow:auto;white-space:pre-wrap;font-family:monospace;box-shadow:inset 0 0 10px rgba(0,0,0,.4);border:1px solid #666}.auraForcedErrorBox .auraErrorBox,.auraForcedErrorBox.auraMsgMask,body.auraError .auraErrorBox,body.auraError .auraMsgMask,body.loading .auraLoadingBox{display:block}.assistiveText{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px)}.visible{display:block}.invisible{display:none}
     </aura:attribute>
 
     <!-- appcache progressbar proto -->
@@ -105,7 +105,7 @@
             </div>
 
             {!v.body}
-            
+
             {!v.extraScriptTags}
             {!v.auraScriptTags}
             {!v.auraBaseScriptTags}
@@ -139,7 +139,7 @@
                   }
                 }
             </script>
-            
+
             {!v.auraInitBlock}
 
             {!v.auraNamespacesScriptTags}

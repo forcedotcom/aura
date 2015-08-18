@@ -15,17 +15,17 @@
     limitations under the License.
 
 -->
-<aura:component renderer="java://org.auraframework.component.auraStorage.InitRenderer" support="GA" description="Initializes a storage instance using an adapter that satisfies the provided criteria.">
-    <aura:attribute name="name" type="String" required="true" description="The programmatic name for the storage instance."/>
-    <aura:attribute name="persistent" type="Boolean" default="false" description="Set to true if this storage desires persistence."/>
-    <aura:attribute name="secure" type="Boolean" default="false" description="Set to true if this storage requires secure storage support."/>
-    <aura:attribute name="clearStorageOnInit" type="Boolean" default="true" description="Set to true to delete all previous data on initialization (relevant for persistent storage only)."/>
-    <aura:attribute name="defaultExpiration" type="Integer" default="10" description="The default duration (seconds) that an object will be retained in storage. Actions may override this on a per-entry basis with Action.setStorable()."/>
-    <aura:attribute name="defaultAutoRefreshInterval" type="Integer" default="30" description="The default duration (seconds) before an auto refresh request will be initiated. Actions may override this on a per-entry basis with Action.setStorable()."/>
-    <aura:attribute name="maxSize" type="Integer" default="1000" description="Maximum size (KB) of the storage instance. Existing items will be evicted to make room for new items; algorithm is adapter-specific."/>
-    <aura:attribute name="debugLoggingEnabled" type="Boolean" default="false" description="Set to true to enable debug logging with $A.log()."/>
-    <aura:attribute name="requireUseStorageQueryParam" type="Boolean" default="false" description="Set to true to require URL query paramter aura.useStorage=true to use the storage service."/>
-    <aura:attribute name="version" type="String" default="" description="Optional. Version to associate with all stored items."/>
+<aura:component renderer="java://org.auraframework.component.auraStorage.InitRenderer" support="GA" access="GLOBAL" description="Initializes a storage instance using an adapter that satisfies the provided criteria.">
+    <aura:attribute name="name"                         type="String"  required="true" access="GLOBAL" description="The programmatic name for the storage instance."/>
+    <aura:attribute name="persistent"                   type="Boolean" default="false" access="GLOBAL" description="Set to true if this storage desires persistence."/>
+    <aura:attribute name="secure"                       type="Boolean" default="false" access="GLOBAL" description="Set to true if this storage requires secure storage support."/>
+    <aura:attribute name="clearStorageOnInit"           type="Boolean" default="true"  access="GLOBAL" description="Set to true to delete all previous data on initialization (relevant for persistent storage only)."/>
+    <aura:attribute name="defaultExpiration"            type="Integer" default="10"    access="GLOBAL" description="The default duration (seconds) that an object will be retained in storage. Actions may override this on a per-entry basis with Action.setStorable()."/>
+    <aura:attribute name="defaultAutoRefreshInterval"   type="Integer" default="30"    access="GLOBAL" description="The default duration (seconds) before an auto refresh request will be initiated. Actions may override this on a per-entry basis with Action.setStorable()."/>
+    <aura:attribute name="maxSize"                      type="Integer" default="1000"  access="GLOBAL" description="Maximum size (KB) of the storage instance. Existing items will be evicted to make room for new items; algorithm is adapter-specific."/>
+    <aura:attribute name="debugLoggingEnabled"          type="Boolean" default="false" access="GLOBAL" description="Set to true to enable debug logging with $A.log()."/>
+    <aura:attribute name="version"                      type="String"  default=""      access="GLOBAL" description="Version to associate with all stored items."/>
+    <aura:attribute name="requireUseStorageQueryParam"  type="Boolean" default="false"                 description="Set to true to require URL query paramter aura.useStorage=true to use the storage service."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:connectionLost" action="{!c.connectionLost}"/>

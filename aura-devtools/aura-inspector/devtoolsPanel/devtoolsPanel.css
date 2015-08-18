@@ -32,9 +32,21 @@ body.sidebar-visible .sidebar { display: block; }
 
 
 /* Common Panel Styles */
-.tab-body-settings { border-bottom: 1px solid #F0F1F2; padding: .5em; }
-.tab-body-settings button { border: 1px solid #DADEE2; background: #F5F6F7; cursor: pointer; }
-.tab-body-settings button:active { border: 1px solid #999; background: #ddd; }
+menu { border-bottom: 1px solid #F0F1F2; padding: .5em; margin: 0; }
+menu li { display: inline-block; list-style: none; vertical-align: middle; }
+menu button { border: 1px solid #DADEE2; background: #F5F6F7; cursor: pointer; }
+menu button:active { border: 1px solid #999; background: #ddd; }
+menu li.divider { background: #ccc; height: 22px; width: 1px;  margin: auto 2px; display: inline-block; vertical-align: bottom; } 
+menu button.circle { border: 0px none; border-radius: 10px; }
+
+menu aurainspector-onOffButton.circle { width: 15px; height: 15px; border-radius: 50%; box-shadow: 0px 0px 5px #999; background: #888; }
+menu aurainspector-onOffButton.circle:hover { background: 666; }
+menu aurainspector-onOffButton.circle.on { background: #F00; }
+menu aurainspector-onOffButton.circle.on:hover { background: #F00; }
+menu aurainspector-onOffButton.circle span { display: none; }
+menu aurainspector-onOffButton { border: 0px none; border-radius: 10px; color: #fff; background: #ddd; text-shadow: 1px 1px #aaa; padding: 2px 6px 3px; display: inline-block; cursor: pointer; }
+menu aurainspector-onOffButton:hover { background: #bbb; }
+menu aurainspector-onOffButton.on { color: #111; font-weight: bold; background: #d8dde6; text-shadow: 1px 1px #efefef;}
 
 /* General Component Styling */
 .component-prefix { color: maroon; }
@@ -84,6 +96,10 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .actions-list section h1 { font-size: 1.5em; background: #f4f6f9; margin: 5px 0 0 0; padding: 5px; border-bottom: 1px solid #d8dde6; }
 .actions-list .action-card { padding: 10px; display: block; }
 .actions-list .action-card:nth-child(odd) { background: #f0f8fc;} 
+#tab-body-actions #filter-text { width: 300px; }
+
+/* Storage Panel */
+#storage-viewer { padding: 10px; }
 
 /* Loading Indicator */
 #loading { display: none; position: absolute; height: 100%; width: 100%; }
@@ -118,48 +134,3 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
   }
 }
 
-/** JSON->HTML renderer */
-.renderjson a {
-    text-decoration: none;
-}
-
-.renderjson .disclosure {
-    color: crimson;
-    display: inline-block;
-    width: 15px;
-    font-size: 16px;
-    line-height: 16px;
-}
-
-.renderjson .syntax {
-    color: grey;
-}
-
-.renderjson .string {
-    color: green;
-}
-
-.renderjson .number {
-    color: darkcyan;
-}
-
-.renderjson .boolean {
-    color: blueviolet;
-}
-
-.renderjson .key {
-    color: darkblue;
-}
-
-.renderjson .keyword {
-    color: blue;
-}
-
-.renderjson .object.syntax {
-    color: lightseagreen;
-    padding: 0 4px;
-}
-
-.renderjson .array.syntax {
-    color: orange;
-}

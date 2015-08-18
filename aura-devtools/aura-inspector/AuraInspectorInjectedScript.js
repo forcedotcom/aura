@@ -179,7 +179,9 @@
                 "background" : action.isBackground(),
                 "state"      : action.getState(),
                 "isRefresh"  : action.isRefreshAction(),
-                "defName"    : action.getDef()+""
+                "defName"    : action.getDef()+"",
+                "fromStorage": action.isFromStorage(),
+                "enqueueTime": Date.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionEnqueue", data);
@@ -195,7 +197,9 @@
             var data = {
                 "id": action.getId(),
                 "state": action.getState(),
-                "returnValue": JSON.stringify(action.getReturnValue())
+                "fromStorage": action.isFromStorage(),
+                "returnValue": JSON.stringify(action.getReturnValue()),
+                "finishTime": Date.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
@@ -210,7 +214,8 @@
 
             var data = {
                 "id": action.getId(),
-                "state": action.getState()
+                "state": action.getState(),
+                "finishTime": Date.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
@@ -229,32 +234,10 @@
                 for(var c=0;c<actions.length;c++) {
                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                         "id": actions[c].getId(),
-                        "state": "RUNNING"
+                        "state": "RUNNING",
+                        "sentTime": Date.now()
                     });
                 }
-                // I'm guessing we iterate over the auraXHR.actions collection (actually $actions$) so we see what was actually sent.
-                // For now I'm going to iterate over the actions parameter, and I can worry about stored actions later.
-                
-                //var actionDefs = [];
-                // for (var id in auraXHR.actions) {
-                //     if (auraXHR.actions.hasOwnProperty(id)) {
-                //         actionDefs.push(auraXHR.actions[id].getDef() + '[' + id + ']');
-
-                //         $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                //             "id": id,
-                //             "state": "RUNNING"
-                //         });
-                //     }
-                // }
-
-                //auraXHR.marker = this.counter++;
-
-                // startMark["context"] = {
-                //     "auraXHRId"     : auraXHR.marker,
-                //     "requestLength" : auraXHR.length,
-                //     "actionDefs"    : actionDefs,
-                //     "requestId"     : auraXHR["requestId"] || (options && options["requestId"])
-                // };
             }
             return ret;
         }

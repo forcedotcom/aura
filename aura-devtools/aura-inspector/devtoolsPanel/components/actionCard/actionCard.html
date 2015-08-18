@@ -7,13 +7,14 @@
 		td { font-size: .75em; padding: 0 10px 0 5px; }
 		code { margin: 5px; display: block; white-space: pre; }
 		.parameters:before { content: 'Parameters'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; }
-		.result:before { content: 'Result'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; }
+		.result:before { content: 'Result'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; font-family: monospace;  vertical-align: top; }
+        aurainspector-json.result { margin: 5px; display: inline-block; }
 	</style>
 	
 	<article>
         <header></header>
         <code class="parameters"></code>
-        <code class="result"></code>
+        <aurainspector-json class="result" expandTo="0"></aurainspector-json>
         <table>
             <thead>
                 <th>Id</th>
@@ -22,6 +23,7 @@
                 <th>Storable</th>
                 <th>Background</th>
                 <th>Is Refresh</th>
+                <th>From Storage</th>
             </thead>
             <tbody>
                 <td id="actionId"></td>
@@ -30,6 +32,7 @@
                 <td id="actionIsStorable"></td>
                 <td id="actionIsBackground"></td>
                 <td id="actionIsRefresh"></td>
+                <td id="actionFromStorage"></td>
             </tbody>
         </table>
     </article>

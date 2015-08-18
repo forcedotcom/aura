@@ -21,7 +21,8 @@
 			isRefresh: 		this.getAttribute("isRefresh"),
 			isAbortable:	this.getAttribute("isAbortable"),
 			isBackground: 	this.getAttribute("isBackground"),
-			returnValue:	this.getAttribute("returnValue")
+			returnValue:	this.getAttribute("returnValue"),
+			fromStorage:	this.getAttribute("isFromStorage")
 		};
 
 		// I'm still working on what the best pattern is here
@@ -35,6 +36,7 @@
     	this.shadowRoot.querySelector("#actionIsStorable").textContent 	= model.isStorable;
     	this.shadowRoot.querySelector("#actionIsBackground").textContent = model.isBackground;
     	this.shadowRoot.querySelector("#actionIsRefresh").textContent 	= model.isRefresh;
+    	this.shadowRoot.querySelector("#actionFromStorage").textContent = model.fromStorage;
 	};
 
 	/*

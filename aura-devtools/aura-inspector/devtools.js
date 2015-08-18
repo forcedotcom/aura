@@ -17,13 +17,24 @@
 //   chrome.devtools.panels.elements.onSelectionChanged.addListener(updateElementProperties);
 // });
 
-chrome.devtools.panels.create("Aura",
-                              "icon24.png",
-                              "devtoolsPanel/devtoolsPanel.html",
-                              function(panel) {
-                                // panel.onShown.addListener(function(win){
-                                //   win.refresh();
-                                // });
-                              });
+chrome.devtools.inspectedWindow.eval("window.location.href", function(url){
 
+	// So we don't include Aura when inspecting an Inspector
+	if(!url.startsWith("chrome-")) {
+		chrome.devtools.panels.create("Aura",
+		                              "icon24.png",
+		                              "devtoolsPanel/devtoolsPanel.html",
+		                              function(/*ExtensionPanel*/ panel) { 
+
+		                              	// Implement Search!
+		                              	// panel.onSearch.addListener(function(action, queryString){
+		                              	// 	console.log("Searching!", action, queryString);
+		                              	// });
+
+		                              });
+	}
+
+
+
+});
 

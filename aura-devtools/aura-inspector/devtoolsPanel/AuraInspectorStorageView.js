@@ -15,10 +15,12 @@ function AuraInspectorStorageView(devtoolsPanel) {
     this.panelId = "storage";
 
     /** Markup of panel */
-    var markup = `<div class="tab-body-settings">
-                    <button id="refresh-button"><span>Refresh</span></button>
-                  </div>
-                  <div class="storage-viewer" id="storage-viewer"/>`
+    var markup = `
+        <menu type="toolbar">
+            <li><button id="refresh-button"><span>Refresh</span></button></li>
+        </menu>
+        <div class="storage-viewer" id="storage-viewer"/>
+    `;
 
     this.init = function(tabBody) {
         tabBody.innerHTML = markup;
@@ -71,31 +73,43 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
             formatted[i] = f;
         }
+        
+        var output = document.createElement("aurainspector-json");
+        output.setAttribute("expandTo", 2);
+        output.textContent = JSON.stringify(formatted);
 
         var node = document.getElementById("storage-viewer");
         node.removeChildren();
-        node.appendChild(renderjson(formatted));
+        node.appendChild(output);
     };
 
     this.updateCache = function() {
-        var template = `var o_{0} = new Object();
-            var i_{0} = $A.storageService.getStorage('{0}');
-            // sync
-            o_{0}.name = i_{0}.getName();
-            o_{0}.maxSize = i_{0}.getMaxSize();
-            o_{0}.version = i_{0}.getVersion();
-            // async
-            i_{0}.getSize().then(function(size) { o_{0}.size = size; }, function(err) { o_{0}.size = JSON.stringify(err); })
-            .then(function() { return i_{0}.getAll(); }).then(function(all) { o_{0}.all = all; }, function(err) { o_{0}.all = JSON.stringify(err); })
-            // last then() is to post the results to aura inspector
-            .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{id:'{0}', data:JSON.stringify(o_{0})} }, '*'); });
-            // sync return whatever properties we have
-            o_{0};`
-
         var command;
-        for (var i in stores) {
-            command = format(template, stores[i]);
-            devtoolsPanel.updateCacheViewer(this.panelId, stores[i], command);
+        for (var key in stores) {
+            var store = stores[key];
+            var command = `
+                var o_${store} = new Object();
+                var i_${store} = $A.storageService.getStorage('${store}');
+                
+                // sync
+                o_${store}.name = i_${store}.getName();
+                o_${store}.maxSize = i_${store}.getMaxSize();
+                o_${store}.version = i_${store}.getVersion();
+
+                // async
+                i_${store}.getSize()
+                    .then(function(size) { o_${store}.size = size; }, function(err) { o_${store}.size = JSON.stringify(err); })
+                    .then(function() { return i_${store}.getAll(); })
+                    .then(function(all) { o_${store}.all = all; }, function(err) { o_${store}.all = JSON.stringify(err); })
+                    // last then() is to post the results to aura inspector
+                    .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, '*'); });
+                
+                // sync return whatever properties we have
+                o_${store};
+            `;
+            
+            // Move this out of the devtools panel
+            devtoolsPanel.updateCacheViewer(this.panelId, store, command);
         }
     };
 
@@ -104,7 +118,6 @@ function AuraInspectorStorageView(devtoolsPanel) {
         data[key] = value;
         this.render();
     };
-
 
     function AuraInspector_StorageData(event) {
         this.setData(event.id, JSON.parse(event.data));
@@ -123,18 +136,6 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
     function RefreshButton_OnClick(event) {
         getStoresAndData.bind(this)();
-    }
-
-    // borrowed from $A.util.format
-    function format(formatString,arg1,arg2,argN) {
-        var formatArguments=Array.prototype.slice.call(arguments,1);
-        return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index){
-            if(formatArguments[index]===undefined){
-                match='';
-                return match;
-            }
-            return formatArguments[index]+'';
-        });
     }
 
     /**

@@ -171,19 +171,25 @@
 			var auraId = null;
 			var dataTransfer = {};
 			
-			if ($A.util.isIE) {
+			try {
+				var auraId = event.dataTransfer.getData("aura/id");
+				if (auraId) {
+					var dataTransferTypes = event.dataTransfer.types;
+					for (var i = 0; i < dataTransferTypes.length; i++) {
+						var dataTransferType = dataTransferTypes[i];
+						if (dataTransferType !== "aura/id") {
+							dataTransfer[dataTransferType] = event.dataTransfer.getData(dataTransferType);
+						}
+					}
+				} else if (event.dataTransfer.getData("Text")) {
+					// MS Edge doesn't throw unlike IE so throw here so that we can handle the two in similar fashion
+					throw new Error("Unsupported argument");
+				}
+			} catch (e) {
+				// This is IE case
 				var dataTransfer = JSON.parse(event.dataTransfer.getData("Text"));
 				auraId = dataTransfer["aura/id"];
 				delete dataTransfer["aura/id"];
-			} else {
-				var auraId = event.dataTransfer.getData("aura/id");
-				var dataTransferTypes = event.dataTransfer.types;
-				for (var i = 0; i < dataTransferTypes.length; i++) {
-					var dataTransferType = dataTransferTypes[i];
-					if (dataTransferType !== "aura/id") {
-						dataTransfer[dataTransferType] = event.dataTransfer.getData(dataTransferType);
-					}
-				}
 			}
 			
 			// Get draggable component

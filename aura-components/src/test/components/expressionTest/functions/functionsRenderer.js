@@ -24,6 +24,11 @@
         cmp.set("v.NegativeInfinity", -Infinity);
         cmp.set("v.NaN", NaN);
         cmp.set("v.object", {});
+
+        cmp.set("v.label0", "Hello");
+        cmp.set("v.label1", "Hello {0}");
+        cmp.set("v.label2", "Hello {0} and {1}");
+
         return this.superRender();
     }
 })

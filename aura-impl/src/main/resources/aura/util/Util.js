@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
@@ -16,7 +17,7 @@
 /*jslint evil:true, sub: true */
 
 /**
- * @description 
+ * @description
  * Util methods provide utility functions for browsers in addition to
  * functions for retrieving, manipulating, or checking DOM elements.
  * @constructor
@@ -439,13 +440,13 @@ Aura.Utils.Util.prototype.compareValues = function(expected, actual){
  * //find a component with aura:id="myCmp" in markup
  * var myCmp = component.find("myCmp");
  * $A.util.hasClass(myCmp, "myClass");
- * 
+ *
  * @param {Object} element The component to check.
  * @param {String} className The CSS class name to check for.
  * @returns {Boolean} True if the specified class is found for the component, or false otherwise.
  * @export
  * @platform
- * 
+ *
  */
 Aura.Utils.Util.prototype.hasClass = function(element, className){
     var oldClass='';
@@ -471,7 +472,7 @@ Aura.Utils.Util.prototype.hasClass = function(element, className){
  * //find a component with aura:id="myCmp" in markup
  * var myCmp = component.find("myCmp");
  * $A.util.addClass(myCmp, "myClass");
- * 
+ *
  * @param {Object} element The component to apply the class on.
  * @param {String} newClass The CSS class to be applied.
  * @export
@@ -488,12 +489,12 @@ Aura.Utils.Util.prototype.addClass = function(element, newClass){
  * //find a component with aura:id="myCmp" in markup
  * var myCmp = component.find("myCmp");
  * $A.util.removeClass(myCmp, "myClass");
- * 
+ *
  * @param {Object} element The component to remove the class from.
  * @param {String} newClass The CSS class to be removed from the element.
  * @export
  * @platform
- * 
+ *
  */
 Aura.Utils.Util.prototype.removeClass = function(element, newClass){
     this.setClass(element,newClass,true);
@@ -506,12 +507,12 @@ Aura.Utils.Util.prototype.removeClass = function(element, newClass){
  * //find a component with aura:id="toggleMe" in markup
  * var toggleText = component.find("toggleMe");
  * $A.util.toggleClass(toggleText, "toggle");
- * 
+ *
  * @param {Object} element The component to add or remove the class from.
  * @param {String} className The CSS class to be added or removed.
  * @export
  * @platform
- * 
+ *
  */
 Aura.Utils.Util.prototype.toggleClass = function(element, className, condition){
     if(condition===undefined){
@@ -881,14 +882,15 @@ Aura.Utils.Util.prototype.trim = function(value){
 Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
-    return formatString.toString().replace(/\{(\d*)\}/gm,function(match,index){
-        if(formatArguments[index]===undefined){
+    return formatString.toString().replace(/\{(\d+)\}/gm,function(match,index){
+        var substitution=formatArguments[index];
+        if(substitution===undefined){
             //#if {"modes" : ["PRODUCTION"]}
             match='';
             //#end
             return match;
         }
-        return formatArguments[index]+'';
+        return substitution + '';
     });
 };
 
@@ -1269,10 +1271,10 @@ Aura.Utils.Util.prototype.isSubDef = function(def, qname) {
  *
  * @example
  * $A.util.apply(Child.prototype, { isCool: true }); // Parent would then have a property of child.
- * 
+ *
  * @example
  * $A.util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, true); //== {foo:'bar', diameter: 20, bat: 'man'}
- * 
+ *
  * @example
  * $A.util.apply({ foo: 'bar', diameter: 10}, { diameter: 20, bat: 'man' }, false); //== {foo:'bar', diameter: 10, bat: 'man'}
  *

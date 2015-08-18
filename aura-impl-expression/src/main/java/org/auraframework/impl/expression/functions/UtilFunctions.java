@@ -15,48 +15,93 @@
  */
 package org.auraframework.impl.expression.functions;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
  * An implementation of utility functions to mimic Util.js.
  */
 public class UtilFunctions {
-    public static final Function EMPTY = new Empty();
+	public static final Function EMPTY = new Empty();
+	public static final Function FORMAT = new Format();
 
-    /**
-     * Checks if the object is empty.
-     * An empty object's value is undefined (only in JS), null, an empty array, or empty string. An object
-     * with no native properties is not considered empty at this time.
-     */
-    public static boolean isEmpty(Object obj) {
-        if (obj == null) {
-            return true;
-        }
-        if (obj instanceof String) {
-            return "".equals(obj);
-        }
-        if (obj instanceof List) {
-            return ((List<?>) obj).isEmpty();
-        }
-        return false;
-    }
+	/**
+	 * Checks if the object is empty. An empty object's value is undefined (only
+	 * in JS), null, an empty array, or empty string. An object with no native
+	 * properties is not considered empty at this time.
+	 */
+	public static boolean isEmpty(Object obj) {
+		if (obj == null) {
+			return true;
+		}
+		if (obj instanceof String) {
+			return "".equals(obj);
+		}
+		if (obj instanceof List) {
+			return ((List<?>) obj).isEmpty();
+		}
+		return false;
+	}
 
-    /**
-     * Not is meant to match Util.js isEmpty().
-     *
-     * Not will always return a boolean, and evaluates using isTruthy.
-     */
-    public static class Empty implements Function {
+	/**
+	 * Empty is meant to match isEmpty() in Util.js
+	 */
+	public static class Empty implements Function {
 		private static final long serialVersionUID = -8834318118368934926L;
 
 		@Override
-        public Object evaluate(List<Object> args) {
-            return Boolean.valueOf(isEmpty(args.get(0)));
-        }
+		public Object evaluate(List<Object> args) {
+			return Boolean.valueOf(isEmpty(args.get(0)));
+		}
 
-        @Override
-        public String[] getKeys() {
-            return new String[] { "empty" };
-        }
-    }
+		@Override
+		public String[] getKeys() {
+			return new String[] { "empty" };
+		}
+	}
+
+	/**
+	 * Format is meant to match format() in Util.js, except
+	 * that we safeguard against missing, undefined, or null
+	 * format string.
+     *
+     * Since expressions are exposed to the UI, we try to do
+     * the most sensible thing, and prevent the display of nulls
+     * and undefined like we do with the ADD function.
+	 */
+	public static class Format implements Function {
+
+		private static final long serialVersionUID = -7261120970634674388L;
+
+		@Override
+		public Object evaluate(List<Object> args) {
+			int size = args.size();
+			if (size == 0) {
+				return "";
+			}
+
+			Object a0 = args.get(0);
+			if (a0 == null) {
+				return "";
+			}
+
+			String formatString = JavascriptHelpers.stringify(a0);
+			if (size == 1) {
+				return formatString;
+			}
+
+			Object[] formatArguments = new Object[size - 1];
+			for (int index = 0; index < size - 1; index ++) {
+				Object ai = args.get(index + 1);
+				formatArguments[index] = ai == null ? "" : JavascriptHelpers.stringify(ai);
+			}
+
+			return MessageFormat.format(formatString, formatArguments);
+		}
+
+		@Override
+		public String[] getKeys() {
+			return new String[] { "format" };
+		}
+	}
 }

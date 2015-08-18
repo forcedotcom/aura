@@ -13,36 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
-.THIS.divBig {
-    width: 600px;
-    padding:10px;
-    border: 2px solid blue;
-    margin-left: 20px;
-    margin-top: 20px;
-}
-
-.THIS .divSmall {
-	width: 300px;
-    padding:10px;
-    border: 2px solid yellow;
-    margin-left: 40px;
-    margin-top: 5px;
-}
-
-.THIS p {
-	color: Blue;
-    line-height: 1.4;
-    margin-bottom: 1.1em;
-}
-
-.THIS div{
-	width: 400px;
-    padding:10px;
-    border: 2px solid green;
-    margin-left: 100px;
-    margin-top: 10px;
-}
-
-
+({
+    render : function(cmp, helper){
+        cmp.set("v.noll", null);
+        cmp.set("v.undef", undefined);
+        return this.superRender();
+    }
+})

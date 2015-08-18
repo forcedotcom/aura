@@ -130,6 +130,36 @@ var expressionFunctions = {
     "empty": function empty(args) {
         var a = args[0];
         return aura.util.isEmpty(a);
+    },
+
+    /**
+     * Preprocess the arguments of format() so they make sense in
+     * a UI context, where the expressions are used. Prevent the
+     * output of null and undefined but still allow for any missing
+     * placeholders to be seen in developement mode.
+     */
+
+    "format": function format(args) {
+        if (args.length === 0) {
+            return "";
+        }
+
+        var a0 = args[0];
+        if (a0 === undefined || a0 === null) {
+            return "";
+        }
+
+        if (args.length === 1) {
+            return a0 + '';
+        }
+
+        var formatArguments = [];
+        for (var i = 0; i < args.length; i++) {
+            var ai = args[i];
+            formatArguments[i] = (ai === undefined || ai === null) ? "" : ai;
+        }
+
+        return aura.util.format.apply(aura.util.format, formatArguments);
     }
 };
 

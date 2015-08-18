@@ -298,18 +298,42 @@
                 }));
             }
 
-            cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
-                    element:cmp.getElement(),
-                    target:window,
-                    type:'bounding box',
-                    enable: true,
-                    boxDirections: {
-                        top: true,
-                        bottom: true
-                    },
-                    pad: 5
-            }));
+            // The following constraints are there
+            // to keep east and west panels inside the viewport where possible
+            // but still allow them to leave the viewport cleanly on scroll and 
+            // never open with a panel top outside the viewport
+            // W-2678291 & W-2701440
+            if(direction === 'east' || direction === 'west') {
 
+                // keep the panel above the bottom of the viewport...
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                        element:cmp.getElement(),
+                        target:window,
+                        type:'bounding box',
+                        enable: true,
+                        boxDirections: {
+                            top: false,
+                            bottom: true
+                        },
+                        pad: 5
+                }));
+
+                // unless it would go off screen to the top
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                        element:cmp.getElement(),
+                        target:window,
+                        type:'bounding box',
+                        enable: true,
+                        boxDirections: {
+                            top: true,
+                            bottom: false
+                        },
+                        pad: 5
+                }));
+            }
+
+            // this constraint will keep the pointer attached to the panel,
+            // so if the target is scrolled out of the viewport the whole panel will go with it
             if(pointer && direction === 'east' || direction === 'west') {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:cmp.getElement(),

@@ -552,7 +552,8 @@
                 if (elem) {
                 	var monthLabels = $A.get("$Locale.nameOfMonths");
                     var title = monthLabels ? monthLabels[m].fullName : this.MonthLabels[m].fullName;
-                    if($A.util.getText(elem) !== title){
+                    var textContent = elem.textContent || elem.innerText;
+                    if(textContent !== title){
                     	$A.util.setText(elem, title);
                     }
                 }

@@ -60,6 +60,7 @@
 The customized <code>closeAction</code> is called when the close button is clicked or when user press ESC key, click out, or tab out of the panel. The default <code>closeAction</code> hides and destroys the panel.
         
         </p>
+        <p>If you use your own <code>closeAction</code> method, you are overriding the default behavior. The closed panel is not destroyed until the parent compoment is unrendered. To destroy the panel, call the <code>close()</code> method on the panel object.</p>
         <h4>Positioning Panels</h4>
         <p>Position your panels using the <code>ui:panelPositioningLib</code> library, which creates positioning constraints for elements.</p> 
 <pre>//Import library

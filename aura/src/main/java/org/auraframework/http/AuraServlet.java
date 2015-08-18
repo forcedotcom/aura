@@ -104,75 +104,9 @@ public class AuraServlet extends AuraBaseServlet {
     private final static StringParam messageParam = new StringParam("message", 0, false);
     private final static StringParam beaconParam = new StringParam("beaconData", 0, false);
 
-    // FIXME: is this really a good idea?
-    private final static StringParam nocacheParam = new StringParam("nocache", 0, false);
-
     @Override
     public void init() throws ServletException {
         super.init();
-    }
-
-    /**
-     * Check for the nocache parameter and redirect as necessary.
-     * 
-     * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
-     * avoiding the appcache.
-     * 
-     * It maybe should be done differently (e.g. a nonce).
-     * 
-     * @param request The request to retrieve the parameter.
-     * @param response the response (for setting the location header.
-     * @returns true if we are finished with the request.
-     */
-    private void handleNoCacheRedirect(String nocache, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        //
-        // FIXME:!!!
-        // This is part of the appcache refresh, forcing a reload while
-        // avoiding the appcache. It is here because (fill in the blank).
-        //
-        // This should probably be handled a little differently, maybe even
-        // before we do any checks at all.
-        //
-        response.setContentType("text/plain");
-        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-        String newLocation = "/";
-        try {
-            final URI uri = new URI(nocache);
-            final String fragment = uri.getFragment();
-            final String query = uri.getQuery();
-            final String scheme = uri.getScheme();
-            final StringBuffer sb = request.getRequestURL();
-            String httpProtocol = "http://";
-            String defaultUriScheme = "http";
-            String secureUriScheme = "https";
-            int dIndex = sb.indexOf(httpProtocol);
-
-            // if nocache has https specified, or the request is secure,
-            // modify sb if it's http
-            if (((scheme != null && scheme.equals(secureUriScheme)) || request.isSecure()) && dIndex == 0) {
-                sb.replace(dIndex, dIndex + defaultUriScheme.length(), secureUriScheme);
-            }
-
-            int index = sb.indexOf("//");
-            index = sb.indexOf("/", index + 2); // find the 3rd slash, start of path
-            sb.setLength(index);
-            sb.append(uri.getPath());
-            if (query != null && !query.isEmpty()) {
-                sb.append("?").append(query);
-            }
-            if (fragment != null && !fragment.isEmpty()) {
-                sb.append("#").append(fragment);
-            }
-            newLocation = sb.toString();
-        } catch (Exception e) {
-            // This exception should never happen.
-            // If happened: log a gack and redirect
-            Aura.getExceptionAdapter().handleException(e);
-        }
-
-        setNoCache(response);
-        response.setHeader(HttpHeaders.LOCATION, newLocation);
     }
 
     /**
@@ -207,11 +141,6 @@ public class AuraServlet extends AuraBaseServlet {
             //
             Aura.getExceptionAdapter().handleException(re);
             send404(request, response);
-            return;
-        }
-        String nocache = nocacheParam.get(request);
-        if (nocache != null && !nocache.isEmpty()) {
-            handleNoCacheRedirect(nocache, request, response);
             return;
         }
 

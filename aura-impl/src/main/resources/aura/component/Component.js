@@ -1517,7 +1517,7 @@ Component.prototype.hasEventHandler = function(eventName) {
  * @export
  */
 Component.prototype.getFacets = function() {
-    if (!this.getFacets.cachedFacetNames) {
+    if (!this._cachedFacetNames) {
         // grab the names of each of the facets from the ComponentDef
         var facetNames = [];
         var attributeDefs = this.getDef().getAttributeDefs();
@@ -1530,13 +1530,12 @@ Component.prototype.getFacets = function() {
         });
 
         // cache the names--they're not going to change
-        this.getFacets.cachedFacetNames = facetNames;
+        this._cachedFacetNames = facetNames;
     }
 
     // then grab each of the facets themselves
-    var names = this.getFacets.cachedFacetNames;
+    var names = this._cachedFacetNames;
     var facets = [];
-
     for (var i = 0, len = names.length; i < len; i++) {
         facets.push(this.get("v." + names[i]));
     }
@@ -1806,6 +1805,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
     var attributeDefs = this.componentDef.attributeDefs;
 
     var attributeNames=attributeDefs.getNames();
+    var setByDefault={};
 
 //JBUCH: HALO: TODO: EXTRACT THIS HACK; NEED TO GENERATE DEFAULT FACETS AS WELL
     if(!this.concreteComponentId) {
@@ -1815,6 +1815,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 var defaultDef = attributeDefs.getDef(name);
                 var defaultValue = defaultDef.getDefault();
                 if (defaultValue && defaultValue.length) {
+                    setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
                         configValues[defaultDef.getDescriptor().getName()] = defaultValue;
                     }else{
@@ -1840,7 +1841,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             value = value["value"];
         }
 
-        if (!$A.clientService.allowAccess(attributeDef,cmp)) {
+        if (!setByDefault[attribute]&&!$A.clientService.allowAccess(attributeDef,cmp)) {
             // #if {"modes" : ["DEVELOPMENT"]}
             $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
             // #end

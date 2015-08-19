@@ -31,7 +31,7 @@
     <!-- private attributes -->
     <aura:attribute name="_setFocus" type="Boolean" default="true" description="The internal state of setFocus."/>
     <aura:attribute name="_namesOfWeekdays" type="List" description="The names of the week days based on locale."/>
-    <aura:attribute name="_today" type="String" access="private" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
+    <aura:attribute name="_today" type="String" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
 
     <aura:registerevent name="hide" type="ui:change" description="The event fired when the date picker is hidden from view."/>
     <aura:registerevent name="focus" type="ui:focus" description="The event fired when a date is focused."/>

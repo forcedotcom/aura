@@ -184,4 +184,5 @@
             $A.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
         }]
     }
+    
 })

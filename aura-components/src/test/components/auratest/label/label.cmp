@@ -28,8 +28,8 @@
     <div class='divBig'>
         <p> test Label Simple Case </p>
         <div aura:id="bodyEmpty"><aura:label value="{!v.value}"></aura:label></div>
-        <div aura:id="bodyHtml"><aura:label value="{!v.value}"><div class='divSmall'>logout</div></aura:label></div>
-        <div aura:id="bodyComponent"><aura:label value="{!v.value}"><aura:label value="home"/></aura:label></div>
+        <div aura:id="bodyHtml"><aura:label value="{!v.value}"><div class='divSmall'>logout</div></aura:label></div><!-- cannot use format -->
+        <div aura:id="bodyComponent"><aura:label value="{!v.value}"><aura:label value="home"/></aura:label></div><!-- cannot use format -->
         <div aura:id="bodyProperties"><aura:label value="{!v.value}">{!v.string}{!v.boolean}{!v.double}self<span>spanned</span><aura:label value="login"/></aura:label></div>
         <div aura:id="bodyFunction"><aura:label value="{!v.value}">{!v.string + v.boolean + v.double}</aura:label></div>
         <div aura:id="functionValue"><aura:label value="{!v.string + v.value}">{!v.string}{!v.boolean}{!v.double}</aura:label></div>
@@ -38,7 +38,7 @@
         <div aura:id="bodyNull"><aura:label value="{!v.value}">{!v.noll}</aura:label></div>
         <div aura:id="bodyWithNull"><aura:label value="{!v.value}">{!v.noll}{!v.string}</aura:label></div>
         <div aura:id="bodyText"><aura:label value="{!v.value}">inner</aura:label></div>
-        <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div>
+        <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div><!-- diff -->
         <div aura:id="bodyWithString"><aura:label value="{!v.value}">{!v.string}</aura:label></div>
     </div>
     

@@ -22,10 +22,14 @@
 
     <auratest:requireWithServerAction aura:id="auratest_requireWithServerAction"/>
     <auratest:requireConsumer aura:id="auratest_requireConsumer"/>
+    <test:cmpWithServerAction aura:id="test_cmpWithServerAction"/>
 
     <aura:require namespace ="auratest" version="2.0"/>
     <aura:require namespace ="test" version="5.0"/>
 
     Requested Version: {!v.version}<br/>
+
+    <auraStorage:init name="actions" secure="true" debugLoggingEnabled="true" defaultExpiration="60"
+                      defaultAutoRefreshInterval="60"/>
 
 </aura:component>

@@ -1,36 +1,36 @@
 ({
-	/**
-	 * Verify we can get action not accessable through current component by $A.test.getExternalAction
-	 * in the test down below, if we do cmp.get("c.getNamedComponent"); it will return nothing and error out
-	 */
+    /**
+     * Verify we can get action not accessable through current component by $A.test.getExternalAction
+     * in the test down below, if we do cmp.get("c.getNamedComponent"); it will return nothing and error out
+     */
     testGetExternalAction : {
-    	test: [function(cmp) {
-    		var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
-    				 {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
-    				 "java://org.auraframework.instance.component",
-    				 function(action){
-    					 $A.test.assertTrue(action.state === "SUCCESS");
-    				});
-    		$A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); }, 
-    				"external action didn't finish");
-    		$A.enqueueAction(eAction);
-    	}]
+        test: [function(cmp) {
+            var eAction = $A.test.getExternalAction(cmp, "java://org.auraframework.impl.java.controller.TestController/ACTION$getNamedComponent",
+                    {"componentName":"markup://aura:text", 'attributes':{'value':'valuable'}},
+                    "java://org.auraframework.instance.component",
+                    function(action){
+                        $A.test.assertTrue(action.state === "SUCCESS");
+                    });
+            $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([eAction]); },
+                    "external action didn't finish");
+            $A.enqueueAction(eAction);
+        }]
     },
-    
-	testServerActionWithStoredResponseGetStorageFirst : {
-		test: [
-		function primeActionStorage(cmp) {
-			var action = cmp.get("c.executeInForeground");
-			action.setStorable();
-			$A.enqueueAction(action);
-			$A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
-		},
-		function runRefreshAction(cmp) {
-			cmp._callbackDone = false;
 
-			var action = cmp.get("c.executeInForeground");
+    testServerActionWithStoredResponseGetStorageFirst : {
+        test: [
+        function primeActionStorage(cmp) {
+            var action = cmp.get("c.executeInForeground");
+            action.setStorable();
+            $A.enqueueAction(action);
+            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
+        },
+        function runRefreshAction(cmp) {
+            cmp._callbackDone = false;
+
+            var action = cmp.get("c.executeInForeground");
             action.setCallback(this, function(a) {
-            	cmp._callbackDone = true;
+                cmp._callbackDone = true;
             }, "SUCCESS");
             action.setStorable({
                 "refresh": 0
@@ -41,8 +41,8 @@
             // watch for the action we gonna enqueue
             var preSendCallback = function(actions, actionToWatch) {
                 if (actionToWatch) {
-                	$A.test.assertTrue(cmp._callbackDone,
-                			"we should fetch response from storage first, before sending the action to server")
+                    $A.test.assertTrue(cmp._callbackDone,
+                            "we should fetch response from storage first, before sending the action to server")
                     watch_done = true;
                 }
             };
@@ -51,9 +51,9 @@
 
             //now enqueue the action
             $A.enqueueAction(action);
-		}
-		]
-	},
+        }
+        ]
+    },
 
     testIncompleteActionRefreshDoesNotInvokeCallback: {
         test: [
@@ -400,20 +400,6 @@
         }]
     },
 
-    _testCallingComponentExistsInServerAction : {
-        test: function(cmp) {
-            var a = cmp.get("c.updateTextWithCallingDescrptor");
-            $A.enqueueAction(a);
-            $A.test.addWaitFor(false,
-                function() {return $A.util.isUndefined(cmp.get("v.text"));},
-                function() {
-                    var expect = cmp.getDef().getDescriptor().getQualifiedName();
-                    $A.test.assertEquals(expect, cmp.get("v.text"),
-                            "Calling component should be the testing component");
-                });
-        }
-    },
-
     isAuraErrorDivVisible: function() {
         var element = $A.util.getElement("auraErrorMessage");
         return element.offsetWidth > 0 && element.offsetHeight > 0;
@@ -704,17 +690,17 @@
      * that's why we check new counter = old counter+2 at the end of the test, and also why this test is threadHostile
      */
     testConcurrentServerActionsBothStorableWithResponseStored : {
-    	labels : [ "threadHostile" ],
+        labels : [ "threadHostile" ],
         test : [ function primeActionStorage(cmp) {
-        	var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
-        	a0.setStorable();
-        	cmp._storageKey = a0.getStorageKey();
-        	$A.enqueueAction(a0);
-        	$A.test.addWaitForWithFailureMessage(true, function(){
+            var a0 = $A.test.getAction(cmp, "c.executeInForegroundWithReturn", {i : 1});
+            a0.setStorable();
+            cmp._storageKey = a0.getStorageKey();
+            $A.enqueueAction(a0);
+            $A.test.addWaitForWithFailureMessage(true, function(){
                 return $A.test.areActionsComplete([a0]) && !$A.test.isActionPending();
             }, "a0 doesn't finish",
             function() {
-            	cmp._counter = a0.getReturnValue().recordObjCounter;
+                cmp._counter = a0.getReturnValue().recordObjCounter;
             });
         }, function enqueueTwoActionWithSameSignature(cmp) {
             var recordObjCounterFromA1 = undefined;
@@ -734,16 +720,16 @@
                     function() { return $A.test.areActionsComplete([a1, a2]) },
                     "fail waiting for action1 and 2 to finish",
                     function() {
-                    	$A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
-                    	$A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
+                        $A.test.assertTrue(a1.isFromStorage(), "1st action should get response from storage");
+                        $A.test.assertTrue(a2.isFromStorage(), "2st action should get response from storage");
                     }
             );
         }, function bothRefreshActionsGoToServer(cmp) {
-        	$A.test.addWaitForWithFailureMessage(true, function() {
-        		var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
-        				function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
-        		return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
-        	}, "fail to update stored response");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var res = $A.storageService.getStorage("actions").get(cmp._storageKey).then(
+                        function(item) { cmp._newCounter = item.value.returnValue.recordObjCounter; });
+                return cmp._newCounter&&(cmp._newCounter == cmp._counter+2);
+            }, "fail to update stored response");
         }
         ]
     },

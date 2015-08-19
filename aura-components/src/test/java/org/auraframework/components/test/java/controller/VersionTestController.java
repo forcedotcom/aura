@@ -16,6 +16,9 @@
 package org.auraframework.components.test.java.controller;
 
 import org.auraframework.Aura;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.Action;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.AuraContext;
@@ -27,5 +30,16 @@ public class VersionTestController {
     public static String getContextAccessVersion() throws QuickFixException {
         AuraContext ac = Aura.getContextService().getCurrentContext();
         return ac.getAccessVersion();
+    }
+
+    @AuraEnabled
+    public static String currentCallingDescriptor() {
+        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
+        DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
+        String qualifiedName = null;
+        if(defDescr != null) {
+            qualifiedName = defDescr.getQualifiedName();;
+        }
+        return qualifiedName;
     }
 }

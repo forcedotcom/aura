@@ -6,20 +6,6 @@
       {
         "s":2,
         "v":{
-          "name":"currentCallingDescriptor",
-          "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$currentCallingDescriptor",
-          "actionType":"SERVER",
-          "returnType":"java://java.lang.String",
-          "background":false,
-          "caboose":false,
-          "params":[
-
-          ]
-        }
-      },
-      {
-        "s":3,
-        "v":{
           "name":"errorInForeground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$errorInForeground",
           "actionType":"SERVER",
@@ -32,7 +18,7 @@
         }
       },
       {
-        "s":4,
+        "s":3,
         "v":{
           "name":"executeInBackground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackground",
@@ -46,7 +32,7 @@
         }
       },
       {
-        "s":5,
+        "s":4,
         "v":{
           "name":"executeInBackgroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInBackgroundWithReturn",
@@ -56,7 +42,7 @@
           "caboose":false,
           "params":[
             {
-              "s":6,
+              "s":5,
               "v":{
                 "name":"i",
                 "type":"java://int"
@@ -66,7 +52,7 @@
         }
       },
       {
-        "s":7,
+        "s":6,
         "v":{
           "name":"executeInForeground",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForeground",
@@ -80,7 +66,7 @@
         }
       },
       {
-        "s":8,
+        "s":7,
         "v":{
           "name":"executeInForegroundWithReturn",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$executeInForegroundWithReturn",
@@ -90,7 +76,7 @@
           "caboose":false,
           "params":[
             {
-              "s":9,
+              "s":8,
               "v":{
                 "name":"i",
                 "type":"java://int"
@@ -100,7 +86,7 @@
         }
       },
       {
-        "s":10,
+        "s":9,
         "v":{
           "name":"throwsClientOutOfSyncException",
           "descriptor":"java://org.auraframework.impl.java.controller.ParallelActionTestController/ACTION$throwsClientOutOfSyncException",

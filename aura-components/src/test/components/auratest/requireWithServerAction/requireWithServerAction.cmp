@@ -3,9 +3,11 @@ model="java://org.auraframework.components.test.java.model.TestModel">
 
     <aura:attribute type="Boolean" name="actionDone" default="false"/>
     <aura:attribute type="String" name="version"/>
+    <aura:attribute type="String" name="text"/>
 
     <aura:method name="updateVersionFromClientController" action="{!c.updateVersionFromClientController}"/>
     <aura:method name="updateVersionFromServerController" action="{!c.updateVersionFromServerController}"/>
+    <aura:method name="updateTextWithCallingDescriptor" action="{!c.updateTextWithCallingDescriptor}"/>
     <aura:method name="fireVersionEvent" action="{!c.fireVersionEvent}"/>
 
     <aura:registerEvent name="versionEvt" type="auratest:testEvent"/>

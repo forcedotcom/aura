@@ -152,16 +152,22 @@ public class AttributeSetImpl implements AttributeSet {
             // Uncomment and test against the app before trying to check this in.
             // Mode mode = Aura.getContextService().getCurrentContext().getMode();
             // if(mode.isDevMode() || mode.isTestMode()) {
-            // 	throw new InvalidValueSetTypeException(
-            // 			String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()),
-            // 			exception.getLocation());
+            //  throw new InvalidValueSetTypeException(
+            //                  String.format("Error setting the attribute '%s' of type %s to a value of type %s.", attributeDef.getName(), attributeDef.getTypeDef().getName(), attributeDefRef.getValue().getClass().getName()),
+            //                  exception.getLocation());
             // }
         }
         Object value = attributeDefRef.getValue();
         InstanceStack iStack = Aura.getContextService().getCurrentContext().getInstanceStack();
         iStack.markParent(parent);
         iStack.setAttributeName(attributeDef.getDescriptor().toString());
+        if (valueProvider != null) {
+            iStack.pushAccess(valueProvider);
+        }
         value = attributeDef.getTypeDef().initialize(value, valueProvider);
+        if (valueProvider != null) {
+            iStack.popAccess(valueProvider);
+        }
         iStack.clearAttributeName(attributeDef.getDescriptor().toString());
         iStack.clearParent(parent);
         attribute.setValue(value);
@@ -279,7 +285,13 @@ public class AttributeSetImpl implements AttributeSet {
 
             iStack.markParent(parent);
             iStack.setAttributeName(desc.toString());
+            if (valueProvider != null) {
+                iStack.pushAccess(valueProvider);
+            }
             att.setValue(rootDefDescriptor.getDef().getAttributeDef(att.getName()).getTypeDef().initialize(value, null));
+            if (valueProvider != null) {
+                iStack.popAccess(valueProvider);
+            }
             iStack.clearAttributeName(desc.toString());
             iStack.clearParent(parent);
         }

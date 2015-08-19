@@ -54,13 +54,58 @@
         <p>By default, a close button is provided on the modal but you can provide your own close button. You can also create your own <code>closeAction</code> override. 
         To remove the close button and provide a custom action, set <code>showCloseButton</code> to false and <code>closeOnClickOut</code> to true. 
         Override the close action by passing in the <code>closeAction</code> function in your <code>panelConfig</code> attribute.
-<pre>closeAction : function(panel) {
-    panel.hide();
-}</pre>
-The customized <code>closeAction</code> is called when the close button is clicked or when user press ESC key, click out, or tab out of the panel. The default <code>closeAction</code> hides and destroys the panel.
-        
+        The customized <code>closeAction</code> is called when the close button is clicked or when user press ESC key, click out, or tab out of the panel. The default <code>closeAction</code> hides and destroys the panel.
         </p>
-        <p>If you use your own <code>closeAction</code> method, you are overriding the default behavior. The closed panel is not destroyed until the parent compoment is unrendered. To destroy the panel, call the <code>close()</code> method on the panel object.</p>
+         <p>If you use your own <code>closeAction</code> method, you are overriding the default behavior. The closed panel is not destroyed until the parent component is unrendered. To destroy the panel, call the <code>close()</code> method on the panel object.</p>
+        <pre>var myPanel;
+$A.get('e.ui:createPanel').setParams({
+    // options go here
+
+onCreate: function(panel) {
+    myPanel = panel;
+}
+}).fire();
+
+// Destroy the panel
+closeAction: function(panel) {
+    myPanel.close();
+ }</pre>
+ 
+ 	<p>Alternatively, if you're configuring the panel from the context of the panel, use the <code>ui:notify</code> event.</p>
+        <pre>cmp.get('e.notify').setParams({
+    action: 'closePanel',
+    payload: {callback: yourCallback}
+}).fire();</pre>
+	<p>The following API methods are available on the <code>ui:panelType</code> interface.</p>
+	<table>
+        <thead>
+		    <tr>
+		      <th>Method</th>
+		      <th>Description</th>
+		    </tr>
+		  </thead>
+		  <tr>
+		    <td>show()</td>
+		    <td>Makes the panel visible.</td>
+		  </tr>
+		  <tr>
+		    <td>hide()</td>
+		    <td>Hides the panel from view.</td>
+		  </tr>
+		  <tr>
+		    <td>update()</td>
+		    <td>Updates the body of the panel.</td>
+		  </tr>
+		  <tr>
+		  	<td>close()</td>
+		  	<td>Hides and destroys the panel.</td>
+		  </tr>
+		  <tr>
+		  	<td>setActive()</td>
+		  	<td>Sets the panel as active or inactive.</td>
+		  </tr>
+		</table>
+     
         <h4>Positioning Panels</h4>
         <p>Position your panels using the <code>ui:panelPositioningLib</code> library, which creates positioning constraints for elements.</p> 
 <pre>//Import library

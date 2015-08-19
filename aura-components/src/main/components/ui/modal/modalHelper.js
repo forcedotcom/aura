@@ -115,7 +115,7 @@
             closeAnimation = cmp.get('v.closeAnimation'),
             panel = this._findContainedComponent(cmp, 'panel').getElement(),
             mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
-        
+
         if(useTransition) {
             panel.style.opacity = '0';
             setTimeout(function() {
@@ -129,7 +129,7 @@
         } else {
             document.body.style.overflow = '';
         }
-        
+
         if(closeAnimation) {
             animationName = closeAnimation;
         }
@@ -137,7 +137,9 @@
         var timeout;
         var onFinish = function() {
             clearTimeout(timeout);
-            $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
+            if ($A.util.isComponent(cmp) && cmp.isValid()) {
+                $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
+            }
             if(callback) { //give time for all transitions to complete
                 setTimeout(callback, 2);
             }
@@ -179,8 +181,8 @@
         } else {
             mask.style.opacity = 1;
         }
-        
-        
-        
+
+
+
     }
 })

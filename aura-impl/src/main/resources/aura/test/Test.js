@@ -37,6 +37,16 @@ TestInstance = function() {
     this.blockBackground = 0;
     this.sentXHRCount = 0;
     this.prePostSendConfigs = [];
+    this.preDecodeConfigs = [];
+
+    //vars to store initial and whitelisted variables exposed on window object
+    var _initialGlobalState = Object.keys(window);
+
+    /** @private **/
+    this.getInitialGlobalState = function() {
+        return _initialGlobalState;
+    };
+    
     this.installOverride();
 };
 
@@ -1715,7 +1725,25 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     if (this.disconnected) {
         return { "status": "INCOMPLETE" };
     }
-    return config["fn"].call(config["scope"], response, noStrip);
+    //run callbacks 
+    var cb_config;
+    var processing = this.preDecodeConfigs;
+    //we cannot modify the original reponse, however, we can make a copy, modify it, then later feed decode() with that copy 
+    var oldResponse = response; 
+    var newResponse; var i;
+    if(processing) {
+    	this.preDecodeConfigs = [];
+	    for (i = 0; i < processing.length; i++) {
+	        cb_config = processing[i];
+	        if (cb_config && cb_config.preDecodeCallback) {
+	        	newResponse = cb_config.preDecodeCallback(oldResponse);
+	        	oldResponse = newResponse;
+	        }
+	    }
+	    
+    }
+    //now feed decode() with our copy of response
+    return config["fn"].call(config["scope"], oldResponse, noStrip);
 };
 
 /**
@@ -1724,10 +1752,11 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
  * @struct
  * @private
  */
-TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSendCallback) {
+TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSendCallback, preDecodeCallback) {
     this.action = action;
     this.preSendCallback = preSendCallback;
     this.postSendCallback = postSendCallback;
+    this.preDecodeCallback = preDecodeCallback;
 };
 
 /**
@@ -1783,6 +1812,34 @@ TestInstance.prototype.removePrePostSendCallback = function (handle) {
     for (i = 0; i < this.prePostSendConfigs.length; i++) {
         if (this.prePostSendConfigs[i] === handle) {
             this.prePostSendConfigs.splice(i, 1);
+            return;
+        }
+    }
+};
+
+/**
+ * Add a callback right before we decode response
+ * @export
+ */
+TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
+	if(!preDecodeCallback) {
+		throw new Error("addPreDecodeCallback: callback cannot be null");
+	}
+	
+	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback);
+	this.preDecodeConfigs.push(config);
+	return config;
+};
+
+/**
+ * Remove a previously added callback 
+ * @export
+ */
+TestInstance.prototype.removePreDecodeCallback = function (handle) {
+    var i;
+    for (i = 0; i < this.preDecodeConfigs.length; i++) {
+        if (this.preDecodeConfigs[i] === handle) {
+            this.preDecodeConfigs.splice(i, 1);
             return;
         }
     }

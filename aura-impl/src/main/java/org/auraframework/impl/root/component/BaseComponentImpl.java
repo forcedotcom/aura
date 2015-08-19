@@ -155,7 +155,7 @@ BaseComponent<D, I> {
         DefDescriptor<? extends RootDefinition> desc = null;
 
         InstanceStack instanceStack = context.getInstanceStack();
-        Instance<?> parent = instanceStack.peek();
+        Instance<?> accessParent = instanceStack.getAccess();
 
         this.descriptor = descriptor;
         this.originalDescriptor = descriptor;
@@ -194,9 +194,9 @@ BaseComponent<D, I> {
         }
 
         MasterDefRegistry defRegistry = Aura.getDefinitionService().getDefRegistry();
-        if (parent != null) {
-            // Insure that the parent is allowed to create an instance of this component
-            defRegistry.assertAccess(parent.getDescriptor(), desc.getDef());
+        if (accessParent != null) {
+            // Insure that the access 'Parent' is allowed to create an instance of this component
+            defRegistry.assertAccess(accessParent.getDescriptor(), desc.getDef());
         }
 
         LoggingService loggingService = Aura.getLoggingService();

@@ -88,6 +88,36 @@ public class InstanceStack {
     }
 
     /**
+     * Push an access entry onto the stack.
+     *
+     * This is orthogonal to the instance stack so that attribute sets can bounce 'up' the
+     * stack to assign access rights correctly.
+     *
+     * @param instance the instance to push on to the stack.
+     * @throws AuraRuntimeException if there is nowhere to push (i.e. no instance has been set).
+     */
+    public void pushAccess(Instance<?> instance) {
+        if (current == null) {
+            throw new AuraRuntimeException("no instance when pushing access");
+        }
+        current.pushAccess(instance);
+    }
+
+    /**
+     * Pop an access entry off the stack.
+     *
+     * This must exactly correspond to the push.
+     *
+     * @param instance the instance that was pushed onto the stack.
+     * @throws AuraRuntimeException if there is a mismatch on the stack.
+     */
+    public void popAccess(Instance<?> instance) {
+        if (current == null || current.popAccess() != instance) {
+            throw new AuraRuntimeException("mismatched access pop");
+        }
+    }
+
+    /**
      * Ensure that we have the expected parent.
      *
      * This is used by parented items to ensure that their parent is on the
@@ -201,6 +231,17 @@ public class InstanceStack {
     public Instance<?> peek() {
         if (current != null) {
             return current.instance;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * get the top of the access stack.
+     */
+    public Instance<?> getAccess() {
+        if (current != null) {
+            return current.getAccess();
         } else {
             return null;
         }
@@ -347,6 +388,7 @@ public class InstanceStack {
         public int count;
         public int index;
         public boolean top;
+        public List<Instance<?>> accessStack;
         
         public Entry(Instance<?> instance, int startPos) {
             this.instance = instance;
@@ -358,9 +400,37 @@ public class InstanceStack {
             this.index = -1;
         }
 
+        public void pushAccess(Instance<?> instance) {
+            if (accessStack == null) {
+                accessStack = Lists.newArrayList();
+            }
+            accessStack.add(instance);
+        }
+
+        public Instance<?> popAccess() {
+            if (accessStack == null || accessStack.size() == 0) {
+                return null;
+            }
+            return accessStack.remove(accessStack.size()-1);
+        }
+        
+        public Instance<?> getAccess() {
+            if (accessStack != null && accessStack.size() > 0) {
+                return accessStack.get(accessStack.size()-1);
+            }
+            return instance;
+        }
+
+        public String accessString() {
+            if (accessStack != null && accessStack.size() > 0) {
+                return accessStack.toString();
+            }
+            return "";
+        }
+
         @Override
         public String toString() {
-            return "" + this.instance + " @ " + this.index;
+            return "" + this.instance + " @ " + this.index + accessString();
         }
     };
 

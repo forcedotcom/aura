@@ -23,7 +23,6 @@
         In non full screen mode, the panel aligns to the center of a parent DOM container and closes when you click outside the boundaries of the panel.
         </p>
         <p>Include one instance of <code>ui:panelManager2</code> to handle and control visibility of all panels in your component or app.
-         Use events such as <code>ui:createPanel</code> and <code>ui:destroyPanel</code> to display or destroy your panels.
          You can customize a panel's styling, header, body, footer. You can also customize the close button with your own logic.
         </p>
         <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>. You must register your panels using <code>ui:panelManager2</code> before you can create them.</p>

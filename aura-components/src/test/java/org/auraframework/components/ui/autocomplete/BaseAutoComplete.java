@@ -16,6 +16,8 @@
 package org.auraframework.components.ui.autocomplete;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -495,6 +497,19 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
     private WebElement getAutoCompleteList(WebDriver d, int listNumber) {
         List<WebElement> lists = d.findElements(By.cssSelector(AUTOCOMPLETE_LIST_SELECTOR));
+        
+        Collections.sort(lists, new Comparator<WebElement>() {
+        	public int compare(WebElement w1, WebElement w2) {
+        		String globalId1 = w1.getAttribute("data-aura-rendered-by").toString();
+        		String globalId2 = w2.getAttribute("data-aura-rendered-by").toString();
+        		String partialGlobalId1 = globalId1.substring(0, globalId1.indexOf(':'));
+        		String partialGlobalId2 = globalId2.substring(0, globalId2.indexOf(':'));
+        		int element1 = Integer.parseInt(partialGlobalId1);
+        		int element2 = Integer.parseInt(partialGlobalId2);
+        		return element1 - element2;
+        	}
+        });
+        
         return lists.get(listNumber - 1);
     }
 

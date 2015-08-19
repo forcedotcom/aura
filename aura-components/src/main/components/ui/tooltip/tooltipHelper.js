@@ -305,7 +305,10 @@
 		requestAnimationFrame(function() {
 			tt.classList.add('transition-start');
 			requestAnimationFrame(function() {
-				tt.classList.add('visible');
+				if(component.get('v.isVisible')) {
+					tt.classList.add('visible');
+				}
+				
 			});
 			
 		});

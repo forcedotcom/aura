@@ -142,7 +142,7 @@
     },
     _createPassthroughValue: function(cmp, itemVar, item, rowIndex) {
         var rowContext = {
-            index : rowIndex || 0,
+            index : rowIndex || 0
         };
         rowContext[itemVar] = item;
         return $A.expressionService.createPassthroughValue(rowContext, cmp);
@@ -170,9 +170,7 @@
         actionHandler.evaluate().runDeprecated(event);
     },
     _getActionHandler: function (htmlCmp, eventType) {
-        var eventTypeAttribute = 'on' + eventType,
-            htmlAttr = htmlCmp.get('v.HTMLAttributes');
-        return htmlAttr && htmlAttr[eventTypeAttribute];
+        return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get('v.HTMLAttributes.on'+eventType);
     },
     _eventDelegator: function (cmp, e) {
          var type     = e.type,

@@ -119,18 +119,20 @@ AuraRenderingService.prototype.rerender = function(components) {
     var elements = [];
 
     components = this.getArray(components);
+    var context=$A.getContext();
     for (var i = 0; i < components.length; i++) {
         var cmp = components[i];
         var id = cmp.getGlobalId();
         if (cmp.isValid()){
-            $A.getContext().setCurrentAccess(cmp);
             var renderedElements=[];
             var addExistingElements=visited[id];
             if(!visited[id]) {
                 if (cmp.isRendered()) {
                     var rerenderedElements = undefined;
                     try {
+                        context.setCurrentAccess(cmp);
                         rerenderedElements=cmp["rerender"]();
+                        context.releaseCurrentAccess();
                     } catch (e) {
                         $A.error("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                         // we fall through here, and put whatever the component gives us in the set.
@@ -152,7 +154,6 @@ AuraRenderingService.prototype.rerender = function(components) {
                 renderedElements=renderedElements.concat(cmp.getElements());
             }
             elements=elements.concat(renderedElements);
-            $A.getContext().releaseCurrentAccess();
         }
         this.cleanComponent(id);
     }
@@ -188,6 +189,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
     //#end
 
     components = this.getArray(components);
+    var context=$A.getContext();
     for(var i=0;i<components.length;i++){
         var cmp = components[i];
         if(!$A.util.isComponent(cmp)){
@@ -196,7 +198,9 @@ AuraRenderingService.prototype.afterRender = function(components) {
         }
         if(cmp.isValid()) {
             try {
+                context.setCurrentAccess(cmp);
                 cmp["afterRender"]();
+                context.releaseCurrentAccess(cmp);
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
@@ -238,6 +242,7 @@ AuraRenderingService.prototype.unrender = function(components) {
     var visited = this.visited;
 
     components = this.getArray(components);
+    var context=$A.getContext();
     for (var i = 0; i < components.length; i++){
         var cmp = components[i];
         if (cmp.isValid() && cmp.isRendered()) {
@@ -250,7 +255,9 @@ AuraRenderingService.prototype.unrender = function(components) {
 						// KRIS:
                         // The Stub generated for unrender seems to not work
                         // when used for one of the base components. (aura:text in this case)
-				        cmp["unrender"]();
+                        context.setCurrentAccess(cmp);
+                        cmp["unrender"]();
+                        context.releaseCurrentAccess(cmp);
                     } catch (e) {
                         $A.error("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
                     }

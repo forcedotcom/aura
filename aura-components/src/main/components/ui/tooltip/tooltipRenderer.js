@@ -46,7 +46,6 @@
         if(isDirty) {
             helper.initStyle(component);
         }
-        
         return this.superRerender();
     },
 

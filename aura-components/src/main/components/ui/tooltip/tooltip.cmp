@@ -49,7 +49,7 @@
         <div class="{!(v.triggerClass ? v.triggerClass + ' ' : '') + 'tooltip-trigger'}" aria-describedby="{!v.domId}" tabindex="{!v.tabIndex}" onkeypress="{!c.handleKeyPress}">
             {!v.body}
             <div class="uiTooltip advanced-wrapper" aura:flavorable="true" aura:id="tooltip" aria-hidden="{!!v.isVisible}">
-                <div class="{!v.classList}">
+                <div aura:id="tooltipwrapper">
                     <div class="pointer pointer-advanced"></div>
                     <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body" id="{!v.domId}">{!v.tooltipBody}</div>
                     

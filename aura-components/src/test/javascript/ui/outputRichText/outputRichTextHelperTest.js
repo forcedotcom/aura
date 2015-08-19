@@ -99,7 +99,7 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     }
 	
     [Fixture]
-    function validate(){    	    	    	        
+    /*function validate(){    	    	    	        
     	    	    	    	    	
         [Fact]
         function valueUndefinedOrNull(){
@@ -434,7 +434,7 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
             Assert.Equal(expected, targetComponent.value);            
         }                
                           
-    }
+    }*/
     
     [Fixture]
     function validateElement(){    	    	    	        

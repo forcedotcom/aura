@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 ({
-    SUPPORTED_HTML_TAGS: ["a", "b", "big", "blockquote", "caption", "cite", "code", 
-                          "del", "div", "em", "h1", "h2", "h3", "hr", "i", "img", "ins",
-                          "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
-                          "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",
-                          "thead", "tr", "tt", "u", "ul", "var"],
+    SUPPORTED_HTML_TAGS: 	["a", "b", "big", "blockquote", "caption", "cite", "code", 
+                         	 "del", "div", "em", "h1", "h2", "h3", "hr", "i", "img", "ins",
+                         	 "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
+                         	 "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",
+                         	 "thead", "tr", "tt", "u", "ul", "var"],
+                         	 
+    SUPPORTED_ATTRS:		['accept','action','align','alt','autocomplete','background','bgcolor',
+                    	     'border','cellpadding','cellspacing','checked','cite','class','clear','color',
+                    	     'cols','colspan','coords','datetime','default','dir','disabled',
+                    	     'download','enctype','face','for','headers','height','hidden','high','href',
+                    	     'hreflang','id','ismap','label','lang','list','loop', 'low','max',
+                    	     'maxlength','media','method','min','multiple','name','noshade','novalidate',
+                    	     'nowrap','open','optimum','pattern','placeholder','poster','preload','pubdate',
+                    	     'radiogroup','readonly','rel','required','rev','reversed','rows',
+                    	     'rowspan','spellcheck','scope','selected','shape','size','span',
+                    	     'srclang','start','src','step','style','summary','tabindex','title',
+                    	     'type','usemap','valign','value','width','xmlns'],
     
     removeEventHandlers: function(element) {
         var attributes = element.attributes || [];
@@ -38,25 +50,15 @@
             return;
         }
         
-        var supportedTags = component.get("v.supportedTags");
-        if (supportedTags) {
-            supportedTags = supportedTags.replace(/ /g,'').toLowerCase().split(",");
-        } else {
-            supportedTags = this.SUPPORTED_HTML_TAGS;
-        }
+        var supportedTags = this.getSupportedTags(component);
+        var supportedAttrs = this.getSupportedAttributes(component);
         
         try {
-        	var dummy = document.implementation.createHTMLDocument();
-            var root = dummy.createElement('div');
-            root.innerHTML = value;
+            var sanitizedValue = this.lib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs})
             
-            this.validateElement(root, supportedTags);
-        
-            var result = root.innerHTML;
-            if (result != value) {
-                component.set("v.value", result);
+            if (sanitizedValue != value) {
+                component.set("v.value", sanitizedValue);
             }
-            $A.util.removeElement(root);
         } catch (e) {
         	$A.warning("Exception caught while attempting to validate " + component.getGlobalId() + "; " + e);
         	component.set("v.value", $A.util.sanitizeHtml(value));
@@ -85,6 +87,26 @@
                 }
             }
         }
+    },
+    
+    /**
+     * Retrieve the HTML tag whitelist
+     */
+    getSupportedTags: function(component) {
+    	var supportedTags = component.get("v.supportedTags");
+    	
+    	return supportedTags ? supportedTags.replace(/ /g,'').toLowerCase().split(",")
+    						 : this.SUPPORTED_HTML_TAGS;
+    },
+    
+    /**
+     * Retrieve the attribute whitelist
+     */
+    getSupportedAttributes: function(component) {
+    	var supportedAttrs = component.get("v.supportedAttrs");
+    	
+    	return supportedAttrs ? supportedAttrs.replace(/ /g,'').toLowerCase().split(",")
+    						  : this.SUPPORTED_ATTRS;
     }
  // eslint-disable-line semi 
 })

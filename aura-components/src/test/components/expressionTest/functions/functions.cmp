@@ -27,6 +27,8 @@
     <aura:attribute name="NaN" type="double"/>
 
     <aura:attribute name="object" type="Object"/>
+    
+    <aura:attribute name="list" type="List"/>
 
     <aura:attribute name="label0" type="String"/>
     <aura:attribute name="label1" type="String"/>
@@ -376,6 +378,11 @@
     <expressionTest:test expression="{!empty(v.object)}" exprText="empty(v.object)" expected="true"/>
 
     <!-- format: template type -->
+    <!--
+    we try to make sure FORMAT() on java side give us the same result as format() on js side
+    tests on java side are in FunctionTest.java
+    here every test cmp 'expressionTest:test' map to a test function there (more or less) 
+    -->
     <expressionTest:test expression="{!format()}" exprText="format()" expected="''"/>
     <expressionTest:test expression="{!format(null)}" exprText="format(null)" expected="''"/>
     <expressionTest:test expression="{!format(undefined)}" exprText="format(undefined)" expected="''"/>
@@ -387,8 +394,9 @@
     <expressionTest:test expression="{!format(0.0)}" exprText="format(0.0)" expected="'0'"/>
     <expressionTest:test expression="{!format('abc')}" exprText="format('abc')" expected="'abc'"/>
     <expressionTest:test expression="{!format('')}" exprText="format('')" expected="''"/>
+    <expressionTest:test expression="{!format(NaN)}" exprText="format(NaN)" expected="''"/>
 
-    <!-- format: argument types -->
+    <!-- format: argument types. v.label2 = "Hello {0} and {1}". -->
     <expressionTest:test expression="{!format(v.label2, null, undefined)}" exprText="format(v.label2, null, undefined" expected="'Hello  and '"/>
     <expressionTest:test expression="{!format(v.label2, true, false)}" exprText="format(v.label2, v.true, false)" expected="'Hello true and false'"/>
     <expressionTest:test expression="{!format(v.label2, 123, 123.4)}" exprText="format(v.label2, 123, 123.4)" expected="'Hello 123 and 123.4'"/>
@@ -397,12 +405,13 @@
     <expressionTest:test expression="{!format(v.label2, m.objectNull, m.object)}" exprText="format(v.label2, m.objectNull, m.object)" expected="'Hello  and '"/>
     <expressionTest:test expression="{!format(v.label2, m.emptyList, m.stringList)}" exprText="format(v.label2, m.emptyList, m.stringList)" expected="'Hello  and one,two,three'"/>
 
-    <!-- format: argument count -->
+    <!-- format: argument count. v.label0 = "Hello", v.label1 = "Hello {0}", v.label2 = "Hello {0} and {1}".-->
     <expressionTest:test expression="{!format(v.label0)}" exprText="format(v.label0)" expected="'Hello'"/>
     <expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
     <expressionTest:test expression="{!format(v.label2)}" exprText="format(v.label2)" expected="'Hello {0} and {1}'"/>
 
     <expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
+    <expressionTest:test expression="{!format(v.label1, NaN)}" exprText="format(v.label1, NaN)" expected="'Hello '"/>
     <expressionTest:test expression="{!format(v.label1, v.string)}" exprText="format(v.label1, v.string)" expected="'Hello Component'"/>
     <expressionTest:test expression="{!format(v.label1, v.string, v.integer)}" exprText="format(v.label1, v.string, v.integer)" expected="'Hello Component'"/>
 

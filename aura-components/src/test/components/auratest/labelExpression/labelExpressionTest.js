@@ -99,9 +99,9 @@
     },
 
     /**
-     * Label is updated if substitution values are updated.
+     * Label is updated if substitution values are updated. -- same as testSubtractTokens??
      */
-    testUpdateBody: {
+    testMoreSubThanExpected: {
         attributes : {value: "{0}{1}{2}{3}{4}{5}"},
         test: function(component){
             $A.test.assertEquals("{1}{2}{3}{4}{5}", $A.test.getText(component.find("bodyUndefined").getElement()), "value not expected for undefined substitution");
@@ -147,6 +147,34 @@
         	component.set("v.string", "60");
         },	function(component){
             $A.test.assertEquals("blah 60 meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+        }]
+    },
+    
+    /**
+     * Test updating token and rerendering
+     */
+    testUpdateToken: {
+    	 attributes : {
+             value: "blah {0} meh",
+             string: "-"
+         },
+         test: [function(component){
+             $A.test.assertEquals("blah - meh", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+         	component.set("v.value", "Zzzz {0} zzzZ");
+         },	function(component){
+             $A.test.assertEquals("Zzzz - zzzZ", $A.test.getText(component.find("bodyWithString").getElement()), "value not expected for text node substitution");
+         }]
+    },
+    
+    /**
+     * List substitution works
+     */
+    testList: {
+    	attributes : {
+            value: "This is a list: {0};"
+        },
+        test: [function(component){
+            $A.test.assertEquals("This is a list: 1,2,3,4,5;", $A.test.getText(component.find("bodyList").getElement()), "value not expected for list value substitution");
         }]
     }
 })

@@ -1255,48 +1255,72 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
     }
 
     // FORMAT: template type
+    /* we try to make sure FORMAT() on java side give us the same output as format() on js side
+    tests on js side are in expressionTest/functions.cmp
+    here every test function (more or less) is a equivalent to a test cmp (expressionTest:test) in function.cmp.
+    'skip' in the comment means we cannot test the same thing on the other side
+    'diff' means js side give us different output
+    just fyi: v.label1 = "Hello {0}", v.label2 = "Hello {0} and {1}"
+    */
 
+    //<expressionTest:test expression="{!format()}" exprText="format()" expected="''"/>
     public void testFormatNoArguments() throws Exception {
         assertEquals("", evaluate(FORMAT));
     }
 
+    //<expressionTest:test expression="{!format(null)}" exprText="format(null)" expected="''"/>
     public void testFormatNull() throws Exception {
         assertEquals("", evaluate(FORMAT, (Object) null));
     }
+    
+    //skip: java doesn't have 'undefined'
+    //<expressionTest:test expression="{!format(undefined)}" exprText="format(undefined)" expected="''"/>
 
+    //<expressionTest:test expression="{!format(true)}" exprText="format(true)" expected="'true'"/>
     public void testFormatBooleanTrue() throws Exception {
         assertEquals("true", evaluate(FORMAT, Boolean.TRUE));
     }
 
+    //<expressionTest:test expression="{!format(false)}" exprText="format(false)" expected="'false'"/>
     public void testFormatBooleanFalse() throws Exception {
         assertEquals("false", evaluate(FORMAT, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!format(0)}" exprText="format(0)" expected="'0'"/>
     public void testFormatZero() throws Exception {
         assertEquals("0", evaluate(FORMAT, 0));
     }
 
+    //<expressionTest:test expression="{!format(0.0)}" exprText="format(0.0)" expected="'0'"/>
+    //<expressionTest:test expression="{!format(123)}" exprText="format(123)" expected="'123'"/>
+    //<expressionTest:test expression="{!format(123.4)}" exprText="format(123.4)" expected="'123.4'"/>
     public void testFormatDouble() throws Exception {
         assertEquals("0", evaluate(FORMAT, 0.0));
     }
 
+    //<expressionTest:test expression="{!format(NaN)}" exprText="format(NaN)" expected="''"/>
     public void testFormatNaN() throws Exception {
         assertEquals("NaN", evaluate(FORMAT, Double.NaN));
         assertEquals("NaN", evaluate(FORMAT, Float.NaN));
     }
 
+    //<expressionTest:test expression="{!format('')}" exprText="format('')" expected="''"/>
     public void testFormatWithEmptyString() throws Exception {
         assertEquals("", evaluate(FORMAT, ""));
     }
 
+    //<expressionTest:test expression="{!format('abc')}" exprText="format('abc')" expected="'abc'"/>
+    //<expressionTest:test expression="{!format(v.label0)}" exprText="format(v.label0)" expected="'Hello'"/>
     public void testFormatWithString() throws Exception {
         assertEquals("Random", evaluate(FORMAT, "Random"));
     }
 
+    //skip: cannot have format([1,2,3...])
     public void testFormatWithEmptyList() throws Exception {
         assertEquals("", evaluate(FORMAT, Lists.newArrayList()));
     }
 
+    //skip: cannot have format([1,2,3...])
     public void testFormatWithList() throws Exception {
         List<Object> list = Lists.newArrayList();
         list.add("a");
@@ -1305,32 +1329,41 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("a,b", evaluate(FORMAT, list));
     }
 
+    //skip: cannot have format({key: value})
     public void testFormatObject() throws Exception {
         assertEquals("[object Object]", evaluate(FORMAT, new Object()));
     }
 
     // FORMAT: argument type
 
+    //<expressionTest:test expression="{!format(v.label2, null, undefined)}" exprText="format(v.label2, null, undefined" expected="'Hello  and '"/>
 	public void testFormatArgNull() throws Exception {
 	    assertEquals("X", evaluate(FORMAT, "X{0}", (Object) null));
 	}
 
+	//<expressionTest:test expression="{!format(v.label2, true, false)}" exprText="format(v.label2, v.true, false)" expected="'Hello true and false'"/>
     public void testFormatArgBoolean() throws Exception {
         assertEquals("XtrueYfalse", evaluate(FORMAT, "X{0}Y{1}", Boolean.TRUE, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!format(v.label2, 0, 0.0)}" exprText="format(v.label2, 0, 0.0)" expected="'Hello 0 and 0'"/>
+    //<expressionTest:test expression="{!format(v.label2, 123, 123.4)}" exprText="format(v.label2, 123, 123.4)" expected="'Hello 123 and 123.4'"/>
     public void testFormatArgZero() throws Exception {
         assertEquals("X0Y0", evaluate(FORMAT, "X{0}Y{1}", 0, 0.0));
     }
 
+    //<expressionTest:test expression="{!format(v.label1, NaN)}" exprText="format(v.label1, NaN)" expected="'Hello '"/>
     public void testFormatArgNaN() throws Exception {
         assertEquals("XNaNYNaN", evaluate(FORMAT, "X{0}Y{1}", Double.NaN, Float.NaN));
     }
 
+    //<expressionTest:test expression="{!format(v.label2, m.stringEmpty, m.string)}" exprText="format(v.label2, m.stringEmpty, m.string)" expected="'Hello  and Model'"/>
+    //<expressionTest:test expression="{!format(v.label1, v.string)}" exprText="format(v.label1, v.string)" expected="'Hello Component'"/>
     public void testFormatArgString() throws Exception {
         assertEquals("XYRandom", evaluate(FORMAT, "X{0}Y{1}", "", "Random"));
     }
 
+    //<expressionTest:test expression="{!format(v.label2, m.emptyList, m.stringList)}" exprText="format(v.label2, m.emptyList, m.stringList)" expected="'Hello  and one,two,three'"/>
     public void testFormatArgList() throws Exception {
         List<Object> list = Lists.newArrayList();
         list.add("a");
@@ -1339,7 +1372,20 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("XYa,b", evaluate(FORMAT, "X{0}Y{1}", Lists.newArrayList(), list));
     }
 
+    //diff: <expressionTest:test expression="{!format(v.label2, m.objectNull, m.object)}" exprText="format(v.label2, m.objectNull, m.object)" expected="'Hello  and '"/>
     public void testFormatArgObject() throws Exception {
         assertEquals("X[object Object]Y", evaluate(FORMAT, "X{0}Y", new Object()));
     }
+    
+    //<expressionTest:test expression="{!format(v.label1, v.string, v.integer)}" exprText="format(v.label1, v.string, v.integer)" expected="'Hello Component'"/>
+    public void testFormatMoreArgThanExpect() throws Exception {
+    	assertEquals("X0Y", evaluate(FORMAT, "X{0}Y", 0, 1, 2));
+    }
+    
+    //<expressionTest:test expression="{!format(v.label1)}" exprText="format(v.label1)" expected="'Hello {0}'"/>
+    //<expressionTest:test expression="{!format(v.label2)}" exprText="format(v.label2)" expected="'Hello {0} and {1}'"/>
+    public void testFormatLessArgThanExpect() throws Exception {
+    	assertEquals("X{0}Y", evaluate(FORMAT, "X{0}Y"));
+    }
+    
 }

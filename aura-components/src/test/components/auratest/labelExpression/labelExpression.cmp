@@ -22,8 +22,9 @@
     <aura:attribute name="string" type="String" default="test"/>
     <aura:attribute name="boolean" type="boolean" default="false"/>
     <aura:attribute name="double" type="double" default="20"/>
-    <aura:attribute name="undef" type="Object"/>
+    <aura:attribute name="undef" type="Object"/><!-- v.undef is set to undefined, and v.noll to null in renderer -->
     <aura:attribute name="noll" type="Object"/>
+    <aura:attribute name="list" type="List" default="1,2,3,4,5"/>
 
     <div class='divBig'>
         <p> test Label Simple Case </p>
@@ -55,9 +56,17 @@
 
         <div><aura:label value="{!v.value}">inner</aura:label></div>
         <div aura:id="bodyText">{!format(v.value)}</div>
+        
+        <!-- diff when value has token {x} -->
+        <div aura:id="bodyWithText"><aura:label value="{!v.value}">inner{!v.string}space</aura:label></div>
+        <div aura:id="bodyWithText">{!format(v.value, 'inner', v.string, 'space')}</div>
 
         <div><aura:label value="{!v.value}">{!v.string}</aura:label></div>
         <div aura:id="bodyWithString">{!format(v.value, v.string)}</div>
+        
+        <!-- <div><aura:label value="{!v.value}">{!v.list}</aura:label></div> -->
+        <div> for label, we cannot sub with a list, but format can :-) </div>
+        <div aura:id="bodyList">{!format(v.value, v.list)}</div>
     </div>
 
 

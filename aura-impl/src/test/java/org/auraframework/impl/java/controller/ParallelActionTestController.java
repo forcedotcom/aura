@@ -17,10 +17,6 @@ package org.auraframework.impl.java.controller;
 
 import java.io.IOException;
 
-import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.instance.Action;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.BackgroundAction;
 import org.auraframework.system.Annotations.Controller;
@@ -63,17 +59,6 @@ public class ParallelActionTestController {
 	public static Record executeInBackgroundWithReturn(@Key("i")int i) {
 		return new Record(i);
 	}
-
-    @AuraEnabled
-    public static String currentCallingDescriptor() {
-        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
-        DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
-        String qualifiedName = null;
-        if(defDescr != null) {
-            qualifiedName = defDescr.getQualifiedName();;
-        }
-        return qualifiedName;
-    }
 
     @AuraEnabled
     public static void throwsClientOutOfSyncException() {

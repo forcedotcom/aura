@@ -76,22 +76,12 @@
         ]
      },
 
-
-    /**
-     * This test has same behavior with a passing test:
-     * componentTest.versioningTest.testVersionInDynamicallyCreatedComponent
-     * The only difference is the created component in this test is associated with a model.
-     * If set up break point in updateVersionFromClientController in auratest:requireWithServerAction's
-     * controller, when cmp.getVersion() gets called, this test component doesn't exist in
-     * accessStack.
-     *
-     * TODO: W-2609199
-     * This is caused by access stack issue. Since the component has model, it may have to go to server.
-     * Every time we go to server, we lose the context. So in createComponent callback, it currently push
-     * undefined to access stack. For getVersion, we rely on the component in access stack, so it uses
-     * undefined in this case.
-     */
-    _testVersionFromClientControllerOfCreatedCmpWithModel: {
+     /**
+      * Create an auratest:requireWithServerAction in controller and verify the version
+      * in client controller of the created component is same as the require version
+      * declared in testing component for auratest namespace.
+      */
+    testVersionFromClientControllerOfCreatedCmpWithModel: {
         test:[
             function(cmp) {
                 var action = cmp.get("c.updateVersionFromCreatedComponent");
@@ -106,9 +96,11 @@
     },
 
     /**
-     * TODO: W-2609199
-     */
-    _testVersionFromServerControllerOfCreatedCmp: {
+      * Create an auratest:requireWithServerAction in controller and verify the version
+      * in server controller of the created component is same as the require version
+      * declared in testing component for auratest namespace.
+      */
+    testVersionFromServerControllerOfCreatedCmp: {
         test:[
             function(cmp) {
                 var action = cmp.get("c.updateVersionFromCreatedComponentServerController");
@@ -125,7 +117,60 @@
                         this.updateVersion(cmp, actual);
                         $A.test.assertEquals("2.0", actual);
                     });
+            }
+        ]
+    },
 
+    /**
+     * test for W-2717580
+     * Verify calling descriptor in server action is null when the calling component is not versioned.
+     */
+    testCallingDescriptorIsNullWhenNonVersioned: {
+        test: [
+            function(cmp) {
+                var action = cmp.get("c.getContextAccessVersion");
+                action.setCallback(cmp, function(a) {
+                    $A.test.assertEquals("SUCCESS", a.getState());
+                    $A.test.assertNull(a.getReturnValue());
+                });
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function() {return $A.test.areActionsComplete([action]);});
+            },
+            function(cmp) {
+                var callbackCalled = false;
+                var action = cmp.get("c.currentCallingDescriptor");
+                action.setCallback(cmp, function(a) {
+                    $A.test.assertEquals("SUCCESS", a.getState());
+                    $A.test.assertNull(a.getReturnValue());
+                    callbackCalled = true;
+                });
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true,
+                    function() {return $A.test.areActionsComplete([action]);},
+                    // make sure callback gets called.
+                    function() {$A.test.assertTrue(callbackCalled);}
+                );
+            }
+        ]
+    },
+
+    /**
+     * Verify calling descriptor is set when component is versioned.
+     * Testing component has require version declaration for auratest namespace.
+     */
+    testCallingDescriptorWhenComponentIsVersioned: {
+        test: [
+            function(cmp) {
+                var targetComponent = cmp.find("auratest_requireWithServerAction");
+                targetComponent.updateTextWithCallingDescriptor();
+
+                $A.test.addWaitFor(true, function(){return targetComponent.get("v.actionDone")});
+            },
+            function(cmp) {
+                var targetComponent = cmp.find("auratest_requireWithServerAction");
+                var expect = targetComponent.getDef().getDescriptor().getQualifiedName();
+                $A.test.assertEquals(expect, targetComponent.get("v.text"),
+                        "Calling component should be " + expect);
             }
         ]
     },

@@ -421,6 +421,45 @@
             $A.test.addWaitFor(false, $A.test.isActionPending);
         }]
     },
+
+    /**
+     * callingDescriptor is added in request for versioning use. Verify this does not impact actions
+     * storage.
+     */
+    testCallingDescriptorNotAffectCachedStorableActions: {
+        test: [
+            function(cmp) {
+                var targetComponent = cmp.find("test_cmpWithServerAction");
+                targetComponent.updateTextWithStringFromServerController(true);
+                $A.test.addWaitFor(true, function() { return targetComponent.get("v.actionDone")});
+            },
+            function(cmp) {
+                // send same action with testing component
+                var action = $A.test.getExternalAction(cmp,
+                    "java://org.auraframework.components.test.java.controller.TestController/ACTION$getString",
+                    {},
+                    'java://java.lang.String',
+                    function(result) {
+                        $A.test.assertEquals("SUCCESS", result.getState());
+                        $A.test.assertTrue(result.isFromStorage());
+                    });
+                action.setStorable();
+                $A.enqueueAction(action);
+                $A.test.addWaitFor(true, function() { return $A.test.areActionsComplete([action]); });
+            },
+            function(cmp) {
+                var targetComponent = cmp.find("test_cmpWithServerAction");
+
+                targetComponent.updateTextWithStringFromServerController(true);
+                $A.test.addWaitFor(true,
+                    function() { return targetComponent.get("v.actionDone")},
+                    function() {
+                        $A.test.assertTrue(targetComponent.get("v.isTextFromCache"))
+                    });
+            }
+        ]
+    },
+
     initiateServerAction:function(cmp, _testName, actionNames){
         //Run the action that sets up other actions to be storable
         var a = cmp.get("c.setStorable");

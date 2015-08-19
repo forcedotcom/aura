@@ -24,6 +24,7 @@
                       defaultAutoRefreshInterval="{!v.defaultAutoRefreshInterval}"/>
 
     <ui:button press="{!c.handleClick}" aura:id="button" label="Get a stored action from the server"/>
+    <test:cmpWithServerAction aura:id="test_cmpWithServerAction"/>
 
     <div aura:id="facet"></div>
 </aura:component>

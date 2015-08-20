@@ -18,6 +18,7 @@
 <aura:component>
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="tooltipBody" type="String" access="INTERNAL" default="false" description="The message to display in the tooltip"/>
+    <aura:attribute name="tooltipStyle" type="String" access="INTERNAL" default="false" description="The style of the tooltip"/>
     <aura:attribute name="disabled" type="Boolean" access="INTERNAL" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
     <aura:attribute access="INTERNAL" name="advanced" type="Boolean" default="false" description="Determines if the tooltip uses JavaScript positioning. The default is &quot;false&quot;. Setting it to false creates the tooltip using CSS only."/>
     <aura:attribute access="INTERNAL" name="trigger" type="String" default="hover" description="TThe event that toggles the tooltip. Valid values are &quot;focus&quot;, &quot;click&quot;, &quot;hover&quot;, and &quot;none&quot;. The default is &quot;hover&quot;. Only &quot;focus&quot; and &quot;click&quot; are keyboard accessible."/>
@@ -31,9 +32,11 @@
     <aura:attribute name="fadeInDuration" access="INTERNAL" default="0" type="Integer" description="Fade in duration in ms"/>
     <aura:attribute name="delay" default="0" access="INTERNAL" type="Integer" description="Appearance delay in ms" />
     <aura:attribute name="class" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="classList" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
 
 
     <aura:attribute name="tabIndex" type="Integer" access="INTERNAL" description="The tab index for the trigger, REQUIRED if the trigger is focus and there are no focusable elements in the body"/>
+    <aura:attribute name="tabIndexOverride" type="Integer" access="INTERNAL" description="The tab index override "/>
 
      <aura:attribute name="direction" type="String" access="INTERNAL" default="north" description="The direction in which the tooltip should go. Valid values are &quot;north&quot;, &quot;south&quot;, &quot;west&quot;, and &quot;east&quot;. The default is &quot;north&quot;."/>
 

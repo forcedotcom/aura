@@ -17,19 +17,6 @@
         }]
     },
 
-    testServerActionWithStoredResponseGetStorageFirst : {
-        test: [
-        function primeActionStorage(cmp) {
-            var action = cmp.get("c.executeInForeground");
-            action.setStorable();
-            $A.enqueueAction(action);
-            $A.test.addWaitFor(true, function(){ return $A.test.areActionsComplete([action])});
-        },
-        function runRefreshAction(cmp) {
-            cmp._callbackDone = false;
-
-            var action = cmp.get("c.executeInForeground");
-    
 	testModifyResponseFromServer : {
 		test: [
 		       function(cmp) {
@@ -39,7 +26,8 @@
 		           
 			       var modifyResponse = function (oldResponse) {
 			        	var response = oldResponse["response"];
-			        	if( response.indexOf("recordObjCounter") >= 0) {
+			        	//Dangerous : executeInForegroundWithReturn is part of response because perf metrics add it, if they decide to remove it in the future, we need to modify condition below
+			        	if( response.indexOf("testModifyResponseFromServer") >= 0 && response.indexOf("executeInForegroundWithReturn") >= 0 && response.indexOf("recordObjCounter") >= 0) {
 				        	var newResponse = {};
 				    		//copy everything from oldResponse
 				    		var responseText = oldResponse["responseText"];
@@ -48,12 +36,12 @@
 				    		newResponse["response"] = response;
 				    		newResponse["responseText"] = responseText;
 				    		//change recordObjCounter to 10
-				    		var idx = response.indexOf("recordObjCounter");
-				    		var idxNumberStart = idx + "recordObjCounter".length + 2;//"recordObjCounter":1 
-				    		var idxNumberEnd = response.indexOf("\n", idx);
+				    		var idx = response.indexOf("Counter");
+				    		var idxNumberStart = idx;// Counter":1 
+				    		var idxNumberEnd = response.indexOf(",", idx);
 				    		var numberStr = response.substring(idxNumberStart, idxNumberEnd);
-			    			newResponse["response"] = newResponse["response"].replace(numberStr, '10');
-			    			newResponse["responseText"] = newResponse["responseText"].replace(numberStr, '10');
+			    			newResponse["response"] = newResponse["response"].replace(numberStr, "Counter\": 10");
+			    			newResponse["responseText"] = newResponse["responseText"].replace(numberStr, "Counter\": 10");
 			    			decode_done = true;
 			    			$A.test.removePreDecodeCallback(cb_handle);
 			    			
@@ -76,7 +64,7 @@
 						   function(){ return $A.test.areActionsComplete([action])},
 						   "fail waiting for server action to finish",
 						   function() {
-							   $A.test.assertEquals(10, action.getReturnValue().recordObjCounter, "fail to modify return Value in response");
+							   $A.test.assertEquals(10, action.getReturnValue().Counter, "fail to modify return Value in response");
 						   });
 		       }
 		]

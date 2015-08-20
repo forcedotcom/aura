@@ -18,17 +18,26 @@
     	var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
-        //create default close button
-        if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
-            $A.componentService.createComponent('ui:button', {
-                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
-                'class': "closeBtn",
-                'press': cmp.getReference("c.onCloseBtnPressed"),
-                'label': cmp.get('v.closeDialogLabel'),
-                'labelDisplay': "false"
-            }, function(button){
-                cmp.set('v.closeButton', button);
-            });
+        this.initCloseBtn(cmp);
+    },
+    
+    initCloseBtn: function(cmp) {
+        if (cmp.get('v.showCloseButton')) {
+        	var closeBtn = cmp.get('v.closeButton');
+        	if ($A.util.isEmpty(closeBtn)) {
+	        	//create default close button
+	            $A.componentService.createComponent('ui:button', {
+	                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
+	                'class': "closeBtn",
+	                'press': cmp.getReference("c.onCloseBtnPressed"),
+	                'label': cmp.get('v.closeDialogLabel'),
+	                'labelDisplay': "false"
+	            }, function(button){
+	                cmp.set('v.closeButton', button);
+	            });
+        	} else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
+        		closeBtn[0].addHandler('press', cmp, 'c.onCloseBtnPressed');
+        	}
         }
     },
 

@@ -554,30 +554,22 @@ public abstract class AuraBaseServlet extends HttpServlet {
                 if (terms.size() == 0) {
                     // closed to any framing at all
                     rsp.setHeader(HDR_FRAME_OPTIONS, HDR_FRAME_DENY);
-                } else {
-                    if (terms.size() == 1) {
-                        // With one ancestor term, we're either SAMEORIGIN or ALLOWFROM
-                        for (String site : terms) {
-                            if (site == null) {
-                                // Add same-origin headers and policy terms
-                                rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
-                            } else if (!site.contains("*") && !site.matches("^[a-z]+:$")) {
-                                // XFO can't express wildcards or protocol-only, so set only for a specific site:
-                                rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWFROM + site);
-                            } else {
-                                // When XFO can't express it, still set an ALLOWALL so filters don't jump in
-                                rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWALL);
-                            }
+                } else if (terms.size() == 1) {
+                    // With one ancestor term, we're either SAMEORIGIN or ALLOWFROM
+                    for (String site : terms) {
+                        if (site == null) {
+                            // Add same-origin headers and policy terms
+                            rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_SAMEORIGIN);
+                        } else if (!site.contains("*") && !site.matches("^[a-z]+:$")) {
+                            // XFO can't express wildcards or protocol-only, so set only for a specific site:
+                            rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWFROM + site);
+                        } else {
+                            // When XFO can't express it, still set an ALLOWALL so filters don't jump in
+                            rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWALL);
                         }
-                    } else {
-                        // If we have multiple allowed framers, serve an ALLOWALL.  That's not quite
-                        // standard, but it prevents other filters from thinking they should jump
-                        // in with, say, SAMEORIGIN just because the header wasn't set.
-                        rsp.addHeader(HDR_FRAME_OPTIONS, HDR_FRAME_ALLOWALL);
                     }
                 }
             }
-
         }
     }
 }

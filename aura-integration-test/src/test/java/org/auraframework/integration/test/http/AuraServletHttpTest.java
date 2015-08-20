@@ -316,14 +316,13 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
     // note these tests are for aura stand alone only, when running in core, it has different CSP (with more script-src
     // etc)
 
-    // 1.if we set ancestor resources with more than one url('self' counts as url), we won't change X-FRAME-OPTIONS
+    // 1.if we set ancestor resources with more than one url('self' counts as url), we won't create X-FRAME-OPTIONS
     @ThreadHostileTest("swaps config adapter")
     @UnAdaptableTest("CSP is different between aura-stand-alone and core")
     public void testSpecialCspMultipleAncestors() throws Exception {
         Header[] headers = doSpecialCspTest("'self' www.itrustu.com/frame www.also.com/other",
                 null, "www.itrustu.com/frame", "www.also.com/other");
-        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 1, headers.length);
-        assertEquals("ALLOWALL", headers[0].getValue());
+        assertEquals("wrong number of X-FRAME-OPTIONS header lines", 0, headers.length);
     }
 
     // 2.if we set ancestor resources with one url (without wildcard), that url will get written into X-FRAME-OPTIONS

@@ -68,8 +68,8 @@
         if (helper.fireEvent) {
             helper.fireEvent(component, event, helper);
         }
-
-        if (event.type === "click" && component.get("v.disableDoubleClicks")) {
+// JBUCH: HACK: FIXME: EXTRACT disableDoubleClicks TO AN INTERFACE WE CAN CHECK
+        if (event.type === "click" && component.getDef().getAttributeDefs().getDef("disableDoubleClicks") && component.get("v.disableDoubleClicks")) {
         	component._recentlyClicked = true;
         	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
         }

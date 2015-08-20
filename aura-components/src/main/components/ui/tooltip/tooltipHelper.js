@@ -95,49 +95,61 @@
 
         component.set('v.tooltipStyle', styleDeclaration.join(';'));
         component.set('v.domId', domId);
-        component.set('v.classList', classList.join(' '));
+
+        
+       	component.set('v.classList', classList.join(' '));
+        
 	},
 
 	updateConstraints: function(component) {
 		/* Distance from the top or bottom of the viewport
 		   that causes a flip */
-		var FLIP_THRESHOLD = 50;
+
+		/* TODO this method talks to the DOM a lot because I wrote this before I
+			understood aura and is in general janky, please fix in 200: W-2726214 */
+		
 		var direction = component.get('v.direction');
+		
 		var allowFlips = $A.util.getBooleanValue(component.get('v.allowFlips'));
 		var target = component.getElement();
 		var boundingRect = target.getBoundingClientRect();
-		
-		if(allowFlips && boundingRect.top < FLIP_THRESHOLD) {
-			direction = 'south';
-			component.set('v.direction', 'south');
-		} else if (allowFlips && document.documentElement.clientHeight - (boundingRect.top + boundingRect.height) < FLIP_THRESHOLD) {
-			direction = 'north';
-			component.set('v.direction', 'north');
-		} else if (allowFlips) {
-			direction = component.originalDirection;
-			component.set('v.direction', component.originalDirection);
-		}
+		var ttWrapper = component.find('tooltipwrapper').getElement();
+
+
+		component.set('v.direction', direction);
 
 		['north', 'south', 'west' , 'east'].forEach(function(direction) {
 			component.constraints[direction].disable();
 			component.constraints[direction + '_pointer'].disable();
+			component.constraints[direction + 'pointerBox'].disable();
+
+			// Manipulating classes directly to avoid re-render: 
+			ttWrapper.classList.remove(direction);
 			if(component.constraints[direction + 'PointerOverlap']) {
 				component.constraints[direction + 'PointerOverlap'].disable();
 				component.constraints[direction + 'pointerBox'].disable();
 			}  
 		});
 
+		
+
+
+
 		component.constraints[direction].enable();
+		ttWrapper.classList.add(direction);
 		component.constraints[direction + '_pointer'].enable();
 		if(component.constraints[direction + 'PointerOverlap']) {
 			component.constraints[direction + 'PointerOverlap'].enable();
 		}
 		component.constraints[direction + 'pointerBox'].enable();
+		// classname must be set after constraints
+        // for advanced tooltips to avoid positioning issues
+		
 		
 	},
 
 	buildTooltip: function(component) {
-
+		var FLIP_THRESHOLD = 50;
 		var node = component.find('tooltip').getElement();
 		var direction = component.get('v.direction');
 		var ttbodyNode = component.find('tooltipbody').getElement();
@@ -147,7 +159,35 @@
 		var bbDirections;
 		var targetAlign, align;
 		var thisConstraint;
+		var classList = component.get('v.classList');
 		
+
+		var allowFlips = $A.util.getBooleanValue(component.get('v.allowFlips'));
+		var boundingRect = target.getBoundingClientRect();
+		var ttWrapper = component.find('tooltipwrapper').getElement();
+
+		if(allowFlips && boundingRect.top < FLIP_THRESHOLD) {
+			direction = 'south';
+		} else if (allowFlips && document.documentElement.clientHeight - (boundingRect.top + boundingRect.height) < FLIP_THRESHOLD) {
+			direction = 'north';
+		}
+		
+		// TODO remove ugly class manipulation, W-2726214
+		var classArr = classList.split(' ');
+		classArr = classArr.filter(function(item) {
+			if(item.match(/north|east|west|south/)) {
+				return false;
+			} else {
+				return true;
+			}
+		});
+		
+		classArr.push(direction);
+		component.set('v.direction', direction);
+		component.set('v.classList', classArr.join(' '));
+
+		ttWrapper.className = classArr.join(' ');
+
 		var constraintMap = {
             north : {
                 align: 'center bottom',
@@ -400,8 +440,6 @@
 				});
 			}
 			
-		} else {
-			console.log('disabled');
 		}
 		component._trigger = node;
 		this.buildTooltip(component);

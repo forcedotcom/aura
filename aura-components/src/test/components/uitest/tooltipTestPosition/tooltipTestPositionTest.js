@@ -35,9 +35,13 @@
 				function topRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var tt = component.find(ttLabel);
+					$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
 					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
+						/* verticalEpsilon is different from epsilon since for north and south,
+						   the boundaries of the pointer and tooltip body are not perfectly aligned */
+						var verticalEpsilon = 4;
 						var epsilon = 0.001;
 						var direction = tt.get('v.direction');
 						var wrapper = tt._tooltip.querySelector('div.tooltip');
@@ -48,23 +52,15 @@
 						
 						// Check if correct styling has been applied 
 						// and make sure pointer is not disjoint from the tooltip body
-						if(direction == "west") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"west"), 'the class west is not attached to tooltip: ' + ttLabel);		
-							$A.test.assertTrue(pointerBoundingRect.left <= (bodyBoundingRect.right + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						else if(direction == "north") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"north"), 'the class north is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue(pointerBoundingRect.top <= (bodyBoundingRect.bottom + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						else if(direction == "south") {
+						
+						/* For tooltip triggers along the top edge of the viewport, 
+						   the tooltip is displayed in the 'south' direction only */
+						if(direction == "south") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"south"), 'the class south is not attached to tooltip: ' + ttLabel);
 							$A.test.assertTrue((pointerBoundingRect.bottom + epsilon) >= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue((pointerBoundingRect.bottom - verticalEpsilon) <= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
-						else if(direction == "east") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"east"), 'the class east is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue((pointerBoundingRect.right + epsilon) >= bodyBoundingRect.left, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						
+
 						// Check that the tooltip body is within the viewport
 						$A.test.assertTrue(bodyBoundingRect.right < window.innerWidth, 'Right edge leaving the view port for tooltip ' + ttLabel);
 						$A.test.assertTrue(bodyBoundingRect.left >= 0, 'Left edge leaving the view port for tooltip ' + ttLabel);
@@ -98,10 +94,14 @@
 				function centerRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var tt = component.find(ttLabel);
+					$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
 					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
+						/* verticalEpsilon is different from epsilon since for north and south,
+						   the boundaries of the pointer and tooltip body are not perfectly aligned */
 						var epsilon = 0.001;
+						var verticalEpsilon = 4;
 						var direction = tt.get('v.direction');
 						var wrapper = tt._tooltip.querySelector('div.tooltip');
 						var body = tt._tooltip.querySelector('div.tooltip-body');
@@ -114,18 +114,22 @@
 						if(direction == "west") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"west"), 'the class west is not attached to tooltip: ' + ttLabel);		
 							$A.test.assertTrue(pointerBoundingRect.left <= (bodyBoundingRect.right + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue(pointerBoundingRect.left >= (bodyBoundingRect.right - epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
 						else if(direction == "north") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"north"), 'the class north is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue(pointerBoundingRect.top <= (bodyBoundingRect.bottom + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue(pointerBoundingRect.top <= (bodyBoundingRect.bottom + verticalEpsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue(pointerBoundingRect.top >= (bodyBoundingRect.bottom - verticalEpsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
 						else if(direction == "south") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"south"), 'the class south is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue((pointerBoundingRect.bottom + epsilon) >= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue((pointerBoundingRect.bottom + verticalEpsilon) >= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue((pointerBoundingRect.bottom - verticalEpsilon) <= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
 						else if(direction == "east") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"east"), 'the class east is not attached to tooltip: ' + ttLabel);
 							$A.test.assertTrue((pointerBoundingRect.right + epsilon) >= bodyBoundingRect.left, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+							$A.test.assertTrue((pointerBoundingRect.right - epsilon) <= bodyBoundingRect.left, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
 						
 						// Check that the tooltip body is within the viewport
@@ -160,10 +164,14 @@
 				function bottomRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var tt = component.find(ttLabel);
+					$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
 					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
+						/* verticalEpsilon is different from epsilon since for north and south,
+						   the boundaries of the pointer and tooltip body are not perfectly aligned */
 						var epsilon = 0.001;
+						var verticalEpsilon = 4;
 						var direction = tt.get('v.direction');
 						var wrapper = tt._tooltip.querySelector('div.tooltip');
 						var body = tt._tooltip.querySelector('div.tooltip-body');
@@ -173,21 +181,14 @@
 						
 						// Check if correct styling has been applied 
 						// and make sure pointer is not disjoint from the tooltip body
-						if(direction == "west") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"west"), 'the class west is not attached to tooltip: ' + ttLabel);		
-							$A.test.assertTrue(pointerBoundingRect.left <= (bodyBoundingRect.right + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						else if(direction == "north") {
+						
+						/* For tooltip triggers along the bottom edge of the viewport, 
+						   the tooltip is displayed in the 'north' direction only */
+						//TODO: bvenkataraman; uncomment final check when W-2678602 is fixed
+						if(direction == "north") {
 							$A.test.assertTrue($A.util.hasClass(wrapper,"north"), 'the class north is not attached to tooltip: ' + ttLabel);
 							$A.test.assertTrue(pointerBoundingRect.top <= (bodyBoundingRect.bottom + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						else if(direction == "south") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"south"), 'the class south is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue((pointerBoundingRect.bottom + epsilon) >= bodyBoundingRect.top, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
-						}
-						else if(direction == "east") {
-							$A.test.assertTrue($A.util.hasClass(wrapper,"east"), 'the class east is not attached to tooltip: ' + ttLabel);
-							$A.test.assertTrue((pointerBoundingRect.right + epsilon) >= bodyBoundingRect.left, 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
+						//	$A.test.assertTrue(pointerBoundingRect.top >= (bodyBoundingRect.bottom - verticalEpsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 						}
 						
 						// Check that the tooltip body is within the viewport

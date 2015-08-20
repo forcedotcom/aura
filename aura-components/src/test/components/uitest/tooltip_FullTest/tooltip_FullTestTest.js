@@ -46,6 +46,7 @@
 				else
 					trigger = document.getElementById(triggers[2]);
 				tt = component.find(tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.fireDomEvent(trigger, "mouseover");			
 				$A.test.addWaitForWithFailureMessage(true, function(){return ($A.util.hasClass(tt._tooltip,"visible"));}, "Problem with tooltip having aura:id = " + tooltips[i]);
 					
@@ -70,6 +71,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tt,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.fireDomEvent(trigger, "mouseover");
 				
 				if(assertions[i])
@@ -94,18 +96,19 @@
 			for(var i = 0; i < triggers.length; i++) {
 				var trigger = component.find(triggers[i]).getElement();
 				var tt = component.find(tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.clickOrTouch(trigger, true, true);
 				if(tt.get('v.advanced')) {
 					var wrapper = tt._tooltip;
 					var body = wrapper.querySelector('div.tooltip-body');
 					$A.test.assertTrue(tt.get('v.isVisible'),"Tooltip not visible");
-					$A.test.assertTrue($A.util.hasClass(body,'tooltip-advanced'),"tooltip-advanced class not attached to tooltip with aura:id" + tooltips[i]);
+					$A.test.assertTrue($A.util.hasClass(body,'tooltip-advanced'),"tooltip-advanced class not attached to tooltip with aura:id " + tooltips[i]);
 				}
 				else {
-					$A.test.assertTrue(!tt.get('v.isVisible'),"Tooltip should not visible");
+					$A.test.assertTrue(!tt.get('v.isVisible'),"Tooltip should not be visible");
 					var wrapper = tt.getElement();
 					var body = wrapper.querySelector('div.tooltip-body');	
-					$A.test.assertFalse($A.util.hasClass(body,'tooltip-advanced'),"tooltip-advanced class should not be attached to tooltip with aura:id" + tooltips[i]);
+					$A.test.assertFalse($A.util.hasClass(body,'tooltip-advanced'),"tooltip-advanced class should not be attached to tooltip with aura:id " + tooltips[i]);
 				}				
 			}			
 		
@@ -128,8 +131,9 @@
 				function checkTrigger(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
 					var tt = component.find(ttLabel);
+					$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
 					$A.test.fireDomEvent(trigger, domEvents[i]);		
-					$A.test.addWaitForWithFailureMessage(assertions[i], function(){return ($A.util.hasClass(tt._tooltip,"visible"));}, "Problem with tooltip having aura:id = " + tooltips[i]);
+					$A.test.addWaitForWithFailureMessage(assertions[i], function(){return ($A.util.hasClass(tt._tooltip,"visible"));}, "Problem with tooltip having aura:id = " + ttLabel);
 				}
 				checkTrigger(tooltips[i], triggers[i]);
 			}
@@ -148,7 +152,8 @@
 			var tt = "";
 			for(var i = 0;i < triggers.length; i++) {
 				var trigger = component.find(triggers[i]).getElement();
-				var tt = component.find(tooltips[i]).getElement();				
+				var tt = component.find(tooltips[i]).getElement();	
+				$A.test.assertFalse($A.util.hasClass(tt,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(tt,"tooltip-basic"), "tooltip-basic styling not attached to tooltip having aura:id = " + tooltips[i]);
 				
 			}
@@ -170,6 +175,7 @@
 			for(var i = 0;i < triggers.length; i++) {
 				var trigger = component.find(triggers[i]).getElement();
 				var tt = component.find(tooltips[i]).getElement();
+				$A.test.assertFalse($A.util.hasClass(tt,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(tt, triggerClasses[i]));
 				
 			}
@@ -194,6 +200,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(durations[i], wrapper.style.transitionDuration, "fadeInDuration does not match expected for tooltip with aura:id = " + tooltips[i]);
 		
 				if(assertions[i]) {
@@ -226,6 +233,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(durations[i], wrapper.style.transitionDuration, "fadeOutDuration does not match expected for tooltip having aura:id = " + tooltips[i]);
 				if(assertions[i]) {
 					$A.test.assertTrue($A.util.hasClass(wrapper,"fade-out"), "fade-out class not attached to tooltip having aura:id = " + tooltips[i]);
@@ -255,6 +263,7 @@
 				trigger = component.find(triggers[i]).getElement();
 				tt = component.find(tooltips[i]).getElement();
 				wrapper = tt.querySelector("span.tooltip");
+				$A.test.assertFalse($A.util.hasClass(tt,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(durations[i], wrapper.style.transitionDuration, "fadeInDuration or fadeOutDuration does not match expected for tooltip having aura:id = " + tooltips[i]);
 				if(classes[i] != "") {
 					$A.test.assertTrue($A.util.hasClass(wrapper,classes[i]),"Appropriate class not attached to tooltip having aura:id = " + tooltips[i]);
@@ -286,6 +295,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tt,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(delayDurations[i], wrapper.style.transitionDelay, "Delay duration does not match expected for tooltip having aura:id = " + tooltips[i]);
 			}
 		
@@ -310,6 +320,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(delayDuration[i], wrapper.style.transitionDelay, "Delay duration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertEquals(fadeInDuration, wrapper.style.transitionDuration, "fadeInDuration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(wrapper,"fade-in"), "fade-in class is not attached to tooltip having aura:id = " + tooltips[i]);
@@ -338,6 +349,7 @@
 				var tt = component.find(tooltips[i]);
 				var tooltipElem = tt.getElement();
 				var wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(delayDuration[i], wrapper.style.transitionDelay, "Delay duration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertEquals(fadeOutDuration, wrapper.style.transitionDuration, "fadeOutDuration did not match expected for tooltip having aura:id = " + tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(wrapper,"fade-out"), "fade-out class is not attached to tooltip having aura:id = " + tooltips[i]);
@@ -364,6 +376,7 @@
 				var tt = component.find(tooltips[i]);
 				var tooltipElem = tt.getElement();
 				var wrapper = tooltipElem.querySelector('span.tooltip');	
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertTrue($A.util.hasClass(wrapper,classNames[i]), "class name did not match expected for tooltip having aura:id = " + tooltips[i]);
 			}
 		
@@ -390,6 +403,7 @@
 				tt = component.find(tooltips[i]);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				$A.test.assertEquals(expectedBodies[i], $A.test.getText(wrapper).trim(), "Content of the tooltip did not match expected for tooltip with aura:id = " + tooltips[i]);
 				
 			}
@@ -413,6 +427,7 @@
 				var tt = component.find(tooltips[i]);
 				var tooltipElem = tt.getElement();
 				var domId = tooltipElem.getAttribute('aria-describedby');
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
 				if(triggers[i] == "domIdEmptyLabel")
 					$A.test.assertNotEquals(expectedDomIds[i], domId, "domId should be resolved to globalId for tooltip with aura:id = " + tooltips[i]);
 				else

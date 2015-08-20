@@ -150,13 +150,16 @@
         }
     },
 
+    /**
+     * uiAutocompletePanel does destroy the panel
+     * Bug: W-2707857
+     */
     testEnterOnAutoCompleteItemHidesList: {
         test: function (cmp) {
             this._createPillByAutoComplete(cmp);
             var list = cmp.find("autocomplete").getSuper().find("list");
             $A.test.assertFalse(list.get("v.visible"), "list should be hidden");
-            //TODO:Uncomment below assert once W-2707857 is fixed
-        	//$A.test.assertUndefinedOrNull($A.test.select(".visible"), "Auto complete List Content should not be visible in dom");
+            $A.test.assertUndefinedOrNull($A.test.select(".visible")[0], "Auto complete List Content should not be visible in dom");
         }
     },
     

@@ -1739,18 +1739,21 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.request = this.createXHR();
     auraXHR.request["open"](method, url, true);
     auraXHR.request["withCredentials"] = true;
-    auraXHR.request["onreadystatechange"] = function() {
-    // Ordering is important. auraXHR will no longer be valid after processed.
-
+    //
+    // Careful! On some browsers "onreadystatechange" is a write only property, so make
+    // sure that we only write it. And for safety's sake, just write it once.
+    //
+    var onReady = function() {
+        // Ordering is important. auraXHR will no longer be valid after processed.
         if (processed === false && auraXHR.request["readyState"] === 4) {
             processed = true;
             that.receive(auraXHR);
         }
     };
-
     if(context&&context.getCurrentAccess()&&this.inAuraLoop()){
-        auraXHR.request["onreadystatechange"] = $A.getCallback(auraXHR.request["onreadystatechange"]);
+        onReady = $A.getCallback(onReady);
     }
+    auraXHR.request["onreadystatechange"] = onReady;
 
     if (options && options["headers"]) {
         var key, headers = options["headers"];

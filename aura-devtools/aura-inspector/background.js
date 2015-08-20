@@ -40,7 +40,15 @@
 
             if(port.name){
                 // Dev Tool
+                
+                // Delete the stored port on the tab
+                if(tabs.has(port.tabId)) {
+                    tabs.get(port.tabId).port = null;
+                }
+
+                // Port is closed, delete it.
                 ports.delete(port.name);
+
             }
 
             // Don't just build up a bunch of messages for tabs that have been unloaded

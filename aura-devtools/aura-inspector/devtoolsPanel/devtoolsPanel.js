@@ -77,6 +77,7 @@
 
             // Setup json->html renderer
             renderjson.set_show_to_level(1);
+            renderjson.set_icons('+', '-');
 
             // Initialize Panels
             var eventLog = new AuraInspectorEventLog(this);

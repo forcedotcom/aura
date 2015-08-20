@@ -6,13 +6,13 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var isDirty = false;
     var initial = true;
 
-    var markup = [
-        '<div class="tab-body-settings">',
-        '    <button id="refresh-button"><span>Refresh</span></button>',
-        '    <input type="checkbox" id="showglobalids-checkbox"> Show Global IDs',
-        '</div>',
-        '<div class="component-tree" id="tree"></div>'
-    ].join("");
+    var markup = `
+        <menu type="toolbar">
+            <li><button id="refresh-button"><span>Refresh</span></button></li>
+            <li><input type="checkbox" id="showglobalids-checkbox"> Show Global IDs</li>
+        </menu>
+        <div class="component-tree" id="tree"></div>
+    `;
 
     this.init = function(tabBody) {
         tabBody.innerHTML = markup;

@@ -61,6 +61,72 @@ public class AuraUITestingUtil {
         this.driver = driver;
         setTimeoutInSecs(timeoutInSecs);
     }
+    
+    public enum ActionDuringTransit {
+        DROPACTION,
+        NAVIGATEBACK
+        //TODO: navigate to other place
+        //TODO: delay the action
+    }
+    
+    public enum ActionTiming {
+        PRESEND,
+        POSTSEND,
+        PREDECODE,
+        //TODO: AFTERDECODE 
+    }
+    
+    public Object runActionsDuringTransit(String actionName, ActionTiming actionTiming, ActionDuringTransit actionDuringTransit) {
+        String jsScript;
+        jsScript ="var customCallback = function(actions) { "+
+        "var i;"+
+        "var action = undefined;"+
+        "for (i = 0; i < actions.length; i++) {"+
+        "if (actions[i].getDef().name === '"+ actionName +"') {"+
+        "action = actions[i];"+
+        "break;"+
+        "}"+
+        "}"+
+        "if (action) {";
+        
+        switch(actionDuringTransit) {
+            case DROPACTION : 
+                jsScript+= "actions.splice(i, 1);";
+                break;
+            case NAVIGATEBACK :
+                jsScript += "$A.historyService.back();";
+                break;
+            default: //do nothing
+                break;
+        }
+        
+        //remove the callback once we are done, only do it once
+        jsScript += "$A.test.removePrePostSendCallback(cb_handle);";
+        jsScript += "}"+ //end of if(action)
+        "};"; //end of function customCallback
+        
+        //register the custom callback
+        switch(actionTiming) {
+            case PRESEND: 
+                jsScript += "var cb_handle = $A.test.addPrePostSendCallback(undefined, customCallback, undefined);";
+                break;
+            case POSTSEND:
+                jsScript += "var cb_handle = $A.test.addPrePostSendCallback(undefined, undefined, customCallback);";
+                break;
+            //we need different customCallback for this case PREDECODE:
+            //jsScript += "var cb_handle = $A.test.addPreDecodeCallback(customCallback);";
+            default:
+                break;
+        }
+        
+        //TODO & Note:
+        //getEval will wrap jsScript in a try...catch(e), return an array of  [result, jsTestErrors, scriptExecException]
+        //result is the result of executing jsScript
+        //jsTestErrors = window.$A.test.getErrors() if there is any
+        //scriptExecException = e.message() , e is what we catched if any
+        //if jsTestErrors exist, we fail the test right away -- this is not what we want, if we are expecting some error in test
+        return getEval(jsScript);
+    }
 
     public void setTimeoutInSecs(int timeoutInSecs) {
         this.timeoutInSecs = timeoutInSecs;

@@ -513,7 +513,8 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
  * @param {Action} action the action.
  * @param {Object} actionResponse the server response.
  * @param {string} key the storage key (may be null).
- * @param {Boolean} store should we store the response to storage?
+ * @param {Boolean} store should storable action responses get stored? Set to false when
+ *        for duplicate storable actions are deduped on the client.
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
@@ -1955,7 +1956,14 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                     }
                 }
             } else {
+                // the client didn't request the action response but the server sent it so
+                // a component is priming the actions cache. if the response isn't success
+                // (which should never happen) then skip processing the action
                 action = this.buildFakeAction(response);
+
+                if (action.getState() !== "SUCCESS") {
+                    continue;
+                }
             }
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);

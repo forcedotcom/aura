@@ -33,6 +33,7 @@
     <aura:attribute name="isTransient" type="Boolean" default="true" description="Indicates if the dialog is one-time use and should be destroyed when hidden"/>
     <aura:attribute name="isModal" type="Boolean" default="false" description="Indicates if this dialog is modal"/>
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned" />
+    <aura:attribute name="lastFocusedInput" type="Object" description="The last element within the panel to receive input focus."/>
 
     <!-- supported callbacks: onClose -->
     <aura:attribute name="callbacks" type="Object" description="Option callbacks that can be set when creating a new panel through the panelManager." />

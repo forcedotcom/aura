@@ -1806,23 +1806,27 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
 
     var attributeNames=attributeDefs.getNames();
     var setByDefault={};
+    var partialAttributes=this.partialConfig&&this.partialConfig["attributes"]&&this.partialConfig["attributes"]["values"];
 
 //JBUCH: HALO: TODO: EXTRACT THIS HACK; NEED TO GENERATE DEFAULT FACETS AS WELL
     if(!this.concreteComponentId) {
         for (var x = 0; x < attributeNames.length; x++) {
             var name = attributeNames[x];
-            if (!configValues.hasOwnProperty(name)) {
-                var defaultDef = attributeDefs.getDef(name);
-                var defaultValue = defaultDef.getDefault();
-                if (defaultValue && defaultValue.length) {
+            var defaultDef = attributeDefs.getDef(name);
+            var defaultValue = defaultDef.getDefault();
+            if (defaultValue && defaultValue.length) {
+                if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
                         configValues[defaultDef.getDescriptor().getName()] = defaultValue;
-                    }else{
+                    } else {
                         //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS
-                        configValues[defaultDef.getDescriptor().getName()]=valueFactory.create(defaultValue,null,cmp);
+                        configValues[defaultDef.getDescriptor().getName()] = valueFactory.create(defaultValue, null, cmp);
                     }
                 }
+            }
+            if(!setByDefault[name]&&partialAttributes&&partialAttributes[name]===configValues[name]){
+                setByDefault[name]=true;
             }
         }
     }

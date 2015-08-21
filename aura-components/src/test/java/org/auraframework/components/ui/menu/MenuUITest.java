@@ -487,8 +487,8 @@ public class MenuUITest extends WebDriverTestCase {
      */
     public void testDoubleClickOnMenuTrigger() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_APP);
-        String label = "triggercheckPosition";
-        String menuName = "checkPosition";
+        String label = "doubleClick";
+        String menuName = "doubleClickDisabledMenuList";
         WebDriver driver = this.getDriver();
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));

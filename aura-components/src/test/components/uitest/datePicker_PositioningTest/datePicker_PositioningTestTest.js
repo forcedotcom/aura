@@ -1,5 +1,10 @@
 ({
 
+	testDummy : {
+		test : function(cmp) {
+			
+		}
+	},
 	/**
 	 * Test Flow:
 	 * For each position:
@@ -12,7 +17,7 @@
 	 */
 	
 
-	testPositioning: {
+	_testPositioning: {
         test:  function(cmp) {
            	//trying 9 times since there 9 different positions to check at
         	this.checkEachPosition(cmp, 9);

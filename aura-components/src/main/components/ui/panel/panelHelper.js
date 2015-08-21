@@ -334,7 +334,7 @@
 
             // this constraint will keep the pointer attached to the panel,
             // so if the target is scrolled out of the viewport the whole panel will go with it
-            if(pointer && direction === 'east' || direction === 'west') {
+            if(pointer && (direction === 'east' || direction === 'west')) {
                 cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                     element:cmp.getElement(),
                     target:pointer,

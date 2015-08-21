@@ -170,7 +170,7 @@
         actionHandler.evaluate().runDeprecated(event);
     },
     _getActionHandler: function (htmlCmp, eventType) {
-        return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get('v.HTMLAttributes.on'+eventType);
+        return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get("v.HTMLAttributes")["on"+eventType];
     },
     _eventDelegator: function (cmp, e) {
          var type     = e.type,

@@ -1,0 +1,10 @@
+language: java
+jdk:
+- oraclejdk7
+install:
+- true
+#before_script:
+#- export http_proxy='http://public-proxy1-0-crd.data.sfdc.net:8080'
+#- export https_proxy='http://public-proxy1-0-crd.data.sfdc.net:8080'
+script:
+- mvn clean install -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml

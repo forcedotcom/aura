@@ -18,10 +18,20 @@
         if (event && $A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
             $A.util.squash(event);
         }
+
+        if (component._recentlyClicked) {
+            return;
+        }
+
         var concreteCmp = component.getConcreteComponent();
         var concreteHelper = concreteCmp.helper;
         concreteHelper.handleTriggerPress(concreteCmp);
         helper.fireMenuTriggerPress(component);
+
+        if ($A.util.getBooleanValue(component.get("v.disableDoubleClicks"))) {
+            component._recentlyClicked = true;
+            window.setTimeout($A.getCallback(function() { component._recentlyClicked = false; }), 350);
+        }
     },
 
     focus: function(component, event, helper) {

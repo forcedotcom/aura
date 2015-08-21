@@ -25,7 +25,7 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Check Menu Position Test</h2>
         <ui:menu aura:id="uiMenu" class="checkPositionMenu">
-            <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club" disableDoubleClicks="true"/>
+            <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
             <ui:menuList class="checkPosition" aura:id="checkPosition" menuCollapse="{!c.menuCollapse}" menuExpand="{!c.menuExpand}" menuSelect="{!c.incrementMenuSelectFireCount}">
                 <ui:actionMenuItem class="checkPositionItem1" aura:id="checkPositionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
                 <ui:actionMenuItem class="checkPositionItem2" aura:id="checkPositionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
@@ -369,6 +369,16 @@
                 <ui:actionMenuItem class="actionItem4Image" aura:id="actionItem4Image" label="Manchester United" click="{!c.updateTriggerLabel}"/>
             </ui:menuList>
         </ui:menu>
+    </div>
+    <hr/>
+    <div>
+      <h2>Disable double clicks</h2>
+      <ui:menu>
+          <ui:menuTriggerLink class="doubleClick" aura:id="doubleClick" label="Trigger (double-click disabled)" disableDoubleClicks="true"/>
+          <ui:menuList class="doubleClickDisabledMenuList">
+            <ui:actionMenuItem label="Menu item"/>
+          </ui:menuList>
+      </ui:menu>
     </div>
     <hr/>
 </aura:application>

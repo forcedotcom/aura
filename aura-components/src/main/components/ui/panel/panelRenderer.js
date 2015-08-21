@@ -19,9 +19,11 @@
         this.superAfterRender();
         var dom = cmp.getElement();
         var scrollables = dom.querySelectorAll('.scrollable');
+        
         for (var i = 0; i < scrollables.length; i++) {
             helper.lib.panelLibCore.scopeScroll(scrollables[i]);
         }
+
     },
     rerender: function (cmp, helper) {
 

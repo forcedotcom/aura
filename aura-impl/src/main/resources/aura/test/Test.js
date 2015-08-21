@@ -38,15 +38,6 @@ TestInstance = function() {
     this.sentXHRCount = 0;
     this.prePostSendConfigs = [];
     this.preDecodeConfigs = [];
-
-    //vars to store initial and whitelisted variables exposed on window object
-    var _initialGlobalState = Object.keys(window);
-
-    /** @private **/
-    this.getInitialGlobalState = function() {
-        return _initialGlobalState;
-    };
-    
     this.installOverride();
 };
 

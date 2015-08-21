@@ -47,7 +47,6 @@ import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
 import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.Instance;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.Client;
@@ -692,7 +691,7 @@ public class AuraContextImpl implements AuraContext {
     @Override
     public void setStyleContext(StyleContext styleContext) {
         this.styleContext = styleContext;
-        }
+    }
 
     @Override
     public void setStyleContext(Map<String, Object> config) {
@@ -705,22 +704,8 @@ public class AuraContextImpl implements AuraContext {
             // in most cases this should not be null by the time it is requested. If it is null then there could
             // potentially be a consistency problem with the requested vs. served css.
             styleContext = StyleContextImpl.build(this);
-    }
-        return styleContext;
-    }
-
-    @Override
-    public DefDescriptor<?> getCurrentDescriptor() {
-        DefDescriptor<?> caller = getCurrentCallingDescriptor();
-        if (caller == null) {
-            InstanceStack istack = getInstanceStack();
-            Instance<?> instance = istack.getAccess();
-            if (instance != null) {
-                caller = instance.getDescriptor();
-            }
         }
-
-        return caller;
+        return styleContext;
     }
 
     @Override

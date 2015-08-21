@@ -52,11 +52,11 @@ public class InstanceStackTest extends UnitTestCase {
      */
     @Override
     public void setUp() throws Exception {
-    	 super.setUp();
-    	 mci = Mockito.mock(ConfigAdapter.class);
-    	 Mockito.when(mci.isPrivilegedNamespace((String)Mockito.any())).thenReturn(true);
-    	 ServiceLoader msl = ServiceLocatorMocker.mockServiceLocator();
-    	 Mockito.when(msl.get(ConfigAdapter.class)).thenReturn(mci);    	 
+        super.setUp();
+        mci = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(mci.isPrivilegedNamespace((String) Mockito.any())).thenReturn(true);
+        ServiceLoader msl = ServiceLocatorMocker.mockServiceLocator();
+        Mockito.when(msl.get(ConfigAdapter.class)).thenReturn(mci);
     }
 
     /**
@@ -75,29 +75,29 @@ public class InstanceStackTest extends UnitTestCase {
     private class TestInstance implements Instance<Definition> {
         private final String path;
         protected final DefDescriptor<Definition> descriptor;
-        
+
         private DefDescriptor<Definition> createMockDescriptor(String namespace) {
-        	@SuppressWarnings("unchecked")
-			DefDescriptor<Definition> desc = Mockito.mock(DefDescriptor.class);
-        	Mockito.when(desc.getNamespace()).thenReturn(namespace);
-        	return desc;
+            @SuppressWarnings("unchecked")
+            DefDescriptor<Definition> desc = Mockito.mock(DefDescriptor.class);
+            Mockito.when(desc.getNamespace()).thenReturn(namespace);
+            return desc;
         }
-        
+
         public TestInstance() {
             this.path = "testInstance";
             this.descriptor = createMockDescriptor("aura");
         }
 
         public TestInstance(String path) {
-        	this.path = path;
-        	this.descriptor = createMockDescriptor("aura");
+            this.path = path;
+            this.descriptor = createMockDescriptor("aura");
         }
-        
+
         public TestInstance(String namespace, String name) {
-        	this.path = namespace;
-        	this.descriptor = createMockDescriptor(namespace);
+            this.path = namespace;
+            this.descriptor = createMockDescriptor(namespace);
         }
-        
+
         @Override
         public DefDescriptor<Definition> getDescriptor() {
             return this.descriptor;
@@ -350,38 +350,44 @@ public class InstanceStackTest extends UnitTestCase {
     }
 
     public void testPrivileged() throws Exception {
-    	//setting up 
-    	String namespace_Priv = "previlege";
-    	String namespace_UnPriv = "unprevilege";
-    	String name1 = "one";
-    	String name2 = "two";
-    	String name3 = "three";
-    	String name4 = "four";
-    	Mockito.when(mci.isPrivilegedNamespace(namespace_Priv)).thenReturn(true);
-    	Mockito.when(mci.isPrivilegedNamespace(namespace_UnPriv)).thenReturn(false);
-    	//create empty stack, sanity check
+        // setting up
+        String namespace_Priv = "previlege";
+        String namespace_UnPriv = "unprevilege";
+        String name1 = "one";
+        String name2 = "two";
+        String name3 = "three";
+        String name4 = "four";
+        Mockito.when(mci.isPrivilegedNamespace(namespace_Priv)).thenReturn(true);
+        Mockito.when(mci.isPrivilegedNamespace(namespace_UnPriv)).thenReturn(false);
+        // create empty stack, sanity check
         InstanceStack iStack = new InstanceStack();
         assertFalse("stack should has topUnprivileged=null at the beginning", iStack.isUnprivileged());
-        //start pushing
-        TestInstance one = new TestInstance(namespace_Priv,name1);
+        // start pushing
+        TestInstance one = new TestInstance(namespace_Priv, name1);
         iStack.pushInstance(one, one.getDescriptor());
-        assertFalse("topUnprivileged is still null after pushing in one previleged instance:instance1", iStack.isUnprivileged());
-        TestInstance two = new TestInstance(namespace_UnPriv,name2);
+        assertFalse("topUnprivileged is still null after pushing in one previleged instance:instance1",
+                iStack.isUnprivileged());
+        TestInstance two = new TestInstance(namespace_UnPriv, name2);
         iStack.pushInstance(two, two.getDescriptor());
         assertTrue("topUnprivileged should become first unprivilege instance:instance2", iStack.isUnprivileged());
-        TestInstance three = new TestInstance(namespace_Priv,name3);
+        TestInstance three = new TestInstance(namespace_Priv, name3);
         iStack.pushInstance(three, three.getDescriptor());
-        assertTrue("topUnprivileged should remain unchanged after pushing in a new privilege instance:instance3", iStack.isUnprivileged());
-        TestInstance four = new TestInstance(namespace_UnPriv,name4);
+        assertTrue("topUnprivileged should remain unchanged after pushing in a new privilege instance:instance3",
+                iStack.isUnprivileged());
+        TestInstance four = new TestInstance(namespace_UnPriv, name4);
         iStack.pushInstance(four, four.getDescriptor());
-        assertTrue("topUnprivileged should be unchanged after pushing in a new unprivilege instance:instance4", iStack.isUnprivileged());
-        //start poping
+        assertTrue("topUnprivileged should be unchanged after pushing in a new unprivilege instance:instance4",
+                iStack.isUnprivileged());
+        // start poping
         iStack.popInstance(four);
-        assertTrue("topUnprivileged should be unchanged after poping out unprivilege instance:instance4", iStack.isUnprivileged());
+        assertTrue("topUnprivileged should be unchanged after poping out unprivilege instance:instance4",
+                iStack.isUnprivileged());
         iStack.popInstance(three);
-        assertTrue("topUnprivileged should be unchanged after poping out privilege instance:instance3", iStack.isUnprivileged());
+        assertTrue("topUnprivileged should be unchanged after poping out privilege instance:instance3",
+                iStack.isUnprivileged());
         iStack.popInstance(two);
-        assertFalse("topUnprivileged should become null after poping out first unprivilege instance:instance2", iStack.isUnprivileged());
+        assertFalse("topUnprivileged should become null after poping out first unprivilege instance:instance2",
+                iStack.isUnprivileged());
         iStack.popInstance(one);
         assertFalse("topUnprivileged should be unchanged(null) after poping out instance1", iStack.isUnprivileged());
     }
@@ -390,54 +396,114 @@ public class InstanceStackTest extends UnitTestCase {
         InstanceStack iStack = new InstanceStack();
         assertEquals("Expecting null at top of empty stack", null, iStack.peek());
     }
-    
+
     public void testPeekAtStackWithOneReturnsTop() throws Exception {
         InstanceStack iStack = new InstanceStack();
         Instance<?> ti = new TestInstance();
         iStack.pushInstance(ti, ti.getDescriptor());
         assertEquals("Expecting top of stack", ti, iStack.peek());
     }
-    
+
     public void testPeekAtStackWithTwoReturnsTop() throws Exception {
         InstanceStack iStack = new InstanceStack();
 
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
-        
+
         Instance<?> ti2 = new TestInstance();
         iStack.pushInstance(ti2, ti2.getDescriptor());
 
         assertEquals("Expecting top of stack", ti2, iStack.peek());
     }
-    
+
     public void testPeekAtStackAfterPopReturnsTop() throws Exception {
         InstanceStack iStack = new InstanceStack();
 
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
-        
+
         Instance<?> ti2 = new TestInstance();
         iStack.pushInstance(ti2, ti2.getDescriptor());
 
         iStack.popInstance(ti2);
-        
+
         assertEquals("Expecting top of stack", ti1, iStack.peek());
     }
-    
+
     public void testPeekAtEmptiedStackReturnsNull() throws Exception {
         InstanceStack iStack = new InstanceStack();
 
         Instance<?> ti1 = new TestInstance();
         iStack.pushInstance(ti1, ti1.getDescriptor());
-        
+
         Instance<?> ti2 = new TestInstance();
         iStack.pushInstance(ti2, ti2.getDescriptor());
 
         iStack.popInstance(ti2);
         iStack.popInstance(ti1);
-        
+
         assertEquals("Expecting null at top of empty stack", null, iStack.peek());
     }
-    
+
+    public void testPushThenPopAccessSuccess() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        Instance<?> ti2 = new TestInstance("path2");
+        iStack.pushAccess(ti1);
+        iStack.pushAccess(ti2);
+        iStack.popAccess(ti2);
+        iStack.popAccess(ti1);
+        assertNull("Stack should return null after popping only instance", iStack.getAccess());
+    }
+
+    public void testPopAccessWithDifferentInstanceThrowsError() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        Instance<?> ti2 = new TestInstance("path2");
+        try {
+            iStack.pushAccess(ti1);
+            iStack.popAccess(ti2);
+            fail("Expected exception when popping access with mismatched instances");
+        } catch (Exception e) {
+            assertExceptionMessage(e, AuraRuntimeException.class, "mismatched access pop");
+        }
+    }
+
+    public void testPopAccessPastEmptyThrowsError() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        try {
+            iStack.pushAccess(ti1);
+            iStack.popAccess(ti1);
+            iStack.popAccess(ti1);
+            fail("Expected exception when popping access twice but only pushed instance once");
+        } catch (Exception e) {
+            assertExceptionMessage(e, AuraRuntimeException.class, "mismatched access pop");
+        }
+    }
+
+    public void testGetAccessReturnsPushedAccess() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        iStack.pushAccess(ti1);
+        assertEquals(ti1, iStack.getAccess());
+    }
+
+    public void testGetAccessReturnsInstanceWhenNoAccessStack() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        iStack.pushInstance(ti1, ti1.getDescriptor());
+        assertEquals(ti1, iStack.getAccess());
+    }
+
+    public void testGetAccessReturnsTopOfAccessStackWhenInstance() throws Exception {
+        InstanceStack iStack = new InstanceStack();
+        Instance<?> ti1 = new TestInstance("path1");
+        Instance<?> ti2 = new TestInstance("path2");
+        iStack.pushInstance(ti1, ti1.getDescriptor());
+        iStack.pushAccess(ti2);
+        assertEquals(ti2, iStack.getAccess());
+    }
+
     private ConfigAdapter mci;
 }

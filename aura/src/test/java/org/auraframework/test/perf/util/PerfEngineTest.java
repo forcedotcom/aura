@@ -15,8 +15,6 @@
  */
 package org.auraframework.test.perf.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +34,6 @@ import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraFiles;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.test.annotation.PerfTestSuite;
@@ -87,7 +84,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
     public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests() {
         return perfConfigUtil.getComponentTestsToRun(getNamespaces());
     }
-
+    
     public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap) {
         List<DefDescriptor<ComponentDef>> defs = new ArrayList<>();
         for (DefDescriptor<ComponentDef> def : configMap.keySet())
@@ -144,74 +141,13 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
         return ImmutableList.of("PerformanceTest");
     }
     
-    /**
-     * Required to get component directory in SFDC
-     * @param def
-     * @return
-     */
-    protected String resolveComponentDirPath(String fileName) {
-        File moduleDir;
-        String componentsDir = null;
-        try {
-            moduleDir = new File(fileName).getCanonicalFile().getParentFile().getParentFile().getParentFile().getParentFile();
-            if(fileName.contains("/core/")){
-                componentsDir = moduleDir.toString();
-            } else {
-                componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test";
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }       
-        return componentsDir;
+    private String resolveGoldFilePath(PerfExecutorTest test) {
+        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
+        String componentPath = test.getComponentDef().getNamespace() + "/" + test.getComponentDef().getName();
+        String fullPath = path + componentPath;
+        return fullPath;
     }
     
-    protected String resolveGoldFilePath(PerfExecutorTest test) {
-        DefDescriptor<ComponentDef> def = test.getComponentDef();
-        String fileName = null;
-		try {
-			fileName = def.getDef().getLocation().getFileName();
-		} catch (QuickFixException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        String componentPath = def.getNamespace() + "/" + def.getName();
-        
-        // If file is read from a jar, then need to handle it differently.
-        if(fileName.contains("jar:")){        	
-        	String resource = "components_aura_components_test/" + componentPath;
-        	return resource;
-        	//br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(resource)));
-        }
-        String path = resolveComponentDirPath(fileName) + "/components/";
-        String fullPath = path + componentPath;
-        return fullPath.toString();
-    }
-
-
-    protected String resolveResultsFilePath(PerfExecutorTest test) {
-        DefDescriptor<ComponentDef> def = test.getComponentDef();
-        String fileName = null;
-		try {
-			fileName = def.getDef().getLocation().getFileName();
-		} catch (QuickFixException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        String componentPath = def.getNamespace() + "/" + def.getName();
-        
-        // If file is read from a jar, then need to handle it differently.
-        if(fileName.contains("jar:")){        	
-        	String resource = "components_aura_components_test/" + componentPath;
-        	return resource;
-        	//br = new BufferedReader(new InputStreamReader(Aura.getConfigAdapter().getResourceLoader().getResourceAsStream(resource)));
-        }
-        
-        String path = resolveComponentDirPath(fileName) + "/results/perf/";
-        String fullPath = path + componentPath;
-        return fullPath.toString();
-    }
-
     /**
      * Sfdc specific tweaks can be made here to tests running in core.
      * @param test
@@ -221,7 +157,6 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
      */
 	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
 			DefDescriptor<ComponentDef> descriptor) throws Exception {
-		//test.setTestName("perf_" + descriptor.getDescriptorName());
 		test.setExplicitGoldResultsFolder(resolveGoldFilePath(test));
 		return test;
 	}

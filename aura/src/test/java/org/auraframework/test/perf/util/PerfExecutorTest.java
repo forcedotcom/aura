@@ -60,38 +60,27 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
     private String dbURI;
-    private String testName;
     private static String DEFAULT_DB_URI = "mongodb://fjunod-wsl4:27017";
     
     public PerfExecutorTest(DefDescriptor<ComponentDef> def, PerfConfig config, String db) {
-        //super("runTests");
-        // needs to temporarily be set to something non-null as getName() should never return null
-        //testName = "runTests";
     	super("perf_" + def.getDescriptorName());
-    	//testName = "perf_" + def.getDescriptorName();
         this.def = def;
         this.config = config;
         this.setDB(db);
         init();
     }
-
-    /*public void setTestName(String testName) {
-        this.testName = testName;
-    }
-
-    @Override
-    public final String getName() {
-        return testName;
-    }*/
-    
+   
     @Override
     protected void superRunTest() throws Throwable {
     	try {
             int numberOfRuns = config.getNumberOfRuns();
+            runsCollector = new PerfRunsCollector();
             while(numberOfRuns-- > 0)
                 runWithPerfApp(def, config);
             //Evaluate results after all the runs are done.
             perfMetricsUtil.evaluateResults();
+            // Destroy the collector object after all runs are done.
+            runsCollector = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -99,21 +88,8 @@ public class PerfExecutorTest extends WebDriverTestCase {
     
     private void init(){
         perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config.getOptions().get("metricsMode"));
-        runsCollector = new PerfRunsCollector();
     }
-
-    /*public void runTests() {
-        try {
-            int numberOfRuns = config.getNumberOfRuns();
-            while(numberOfRuns-- > 0)
-                runWithPerfApp(def, config);
-            //Evaluate results after all the runs are done.
-            perfMetricsUtil.evaluateResults();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }*/
-
+    
     private void setDB(String dbURI){
     	this.dbURI = dbURI;
     	if(dbURI == null) {

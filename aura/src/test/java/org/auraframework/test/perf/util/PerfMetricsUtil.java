@@ -180,7 +180,7 @@ public class PerfMetricsUtil {
 
     public void startCollecting() {
         // Start recording
-        test.getRDPNotifications();
+        //test.getRDPNotifications();
     }
 
     @SuppressWarnings("unchecked")

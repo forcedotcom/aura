@@ -58,7 +58,7 @@ public class PerfFilesUtil {
         
         public File getFile(String fileDir, String fileName) {
         	if(fileDir!=null){
-        		File dirPath = new File(fileDir);
+        		File dirPath = new File(fileDir, value);
         		dirPath.mkdirs();
         		return new File(dirPath, fileName + fileExtension);
         	}       	

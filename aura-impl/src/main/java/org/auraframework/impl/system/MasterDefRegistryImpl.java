@@ -16,6 +16,7 @@
 package org.auraframework.impl.system;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -897,9 +898,18 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
 
             List<CompilingDef<?>> compiled = Lists.newArrayList(cc.compiled.values());
-            Collections.sort(compiled);
 
-            Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
+            // Sort based on descriptor only (not level) for uid calculation.
+            // There are situations where components dependencies are read at different
+            // levels where affected the ordering of dependencies creating different uid.
+            //
+            // Using descriptor only produces a more consistent UID
+            Collections.sort(compiled, new Comparator<CompilingDef<?>>() {
+                @Override
+                public int compare(CompilingDef<?> cd1, CompilingDef<?> cd2) {
+                    return cd1.descriptor.compareTo(cd2.descriptor);
+                }
+            });
 
             //
             // Now walk the sorted list, building up our dependencies, and uid
@@ -911,8 +921,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                     // actually, this should never happen.
                     throw new DefinitionNotFoundException(cd.descriptor);
                 }
-
-                deps.add(cd.descriptor);
 
                 //
                 // Now update our hash.
@@ -936,6 +944,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             de = getDE(uid, descriptor);
             if (de != null) {
                 return de;
+            }
+
+            Set<DefDescriptor<? extends Definition>> deps = Sets.newLinkedHashSet();
+
+            // level sorting is important for css and aura:library dependency ordering
+            Collections.sort(compiled);
+            for (CompilingDef<?> cd : compiled) {
+                deps.add(cd.descriptor);
             }
 
             de = new DependencyEntry(uid, Collections.unmodifiableSet(deps), clientLibs);

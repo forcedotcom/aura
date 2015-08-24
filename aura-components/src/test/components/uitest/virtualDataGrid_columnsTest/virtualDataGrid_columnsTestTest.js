@@ -16,6 +16,8 @@
 ({
   browsers: ["-IE7","-IE8"],
   
+  ASSISTIVE_SORT_TEXT : "Sort",
+  
   /**************************************************HELPER FUNCTIONS**************************************************/
   
   /**
@@ -98,7 +100,7 @@
 			  
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
-				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]).toUpperCase();
+				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[1]).toUpperCase();
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");
@@ -159,7 +161,7 @@
 	  {
 		  length = allSortedElements.length;	
 		  // assert that the correct element is sorted
-		  $A.test.assertEquals(0, $A.test.getText(allSortedElements[0]).toUpperCase().indexOf(expectedElementToBeSorted), "Wrong element is sorted");
+		  $A.test.assertEquals(this.ASSISTIVE_SORT_TEXT.length, $A.test.getText(allSortedElements[0]).toUpperCase().indexOf(expectedElementToBeSorted), "Wrong element is sorted");
 	  }			  
 	  else //when no element is sorted (initial case when page loads)
 		  length = 0;
@@ -265,7 +267,7 @@
 			  expectedNumberOfElements = 1; // test will now have 1 class having either 'ascending' or 'descending'
 			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  	  
 						  
-			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"DESCENDING",isEnabled:true}];
+			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"SORTED DESCENDING",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData(), null, true);
 			  
@@ -282,7 +284,7 @@
 			  expectedNumberOfElements = 1; //test will now have 1 class having either 'ascending' or 'descending'
 			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  
 			  
-			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"ASCENDING",isEnabled:true}];
+			  expectedSortableColumns = [{name:"ID",sort:"",isEnabled:true}, {name:"SUBJECT",sort:"SORTED ASCENDING",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData());
 			  
@@ -299,7 +301,7 @@
 			  expectedNumberOfElements = 1; //test will now have 1 class having either 'ascending' or 'descending'
 			  this.verifySortedElements(expectedNumberOfElements, expectedElementToBeSorted);  
 			  
-			  expectedSortableColumns = [{name:"ID",sort:"DESCENDING",isEnabled:true}, {name:"SUBJECT",sort:"",isEnabled:true}];
+			  expectedSortableColumns = [{name:"ID",sort:"SORTED DESCENDING",isEnabled:true}, {name:"SUBJECT",sort:"",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData(), null, true);
 	  }]

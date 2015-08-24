@@ -22,6 +22,8 @@
   EXPECTED_2_1  : ['Item Id', 'Item Subject', "Name"],
   EXPECTED_ADD  : ['Due Date'],
   
+  ASSISTIVE_SORT_TEXT : "Sort",
+  
   /**************************************************HELPER FUNCTIONS**************************************************/
   
   /**
@@ -122,8 +124,12 @@
     for(var i = 0; i < expectedNumberOfHeaders; i++){
        headerText_internal = $A.util.getText(headers_internal[i].getElement());
        headerText_rendered = $A.util.getText(headers_rendered[i]);
-       $A.test.assertEquals(expectedResults[i],headerText_internal,"Header value from internal variable is not correct");
-       $A.test.assertEquals(expectedResults[i],headerText_rendered,"Header rendered is not correct");
+
+       var expectedResult = headers_internal[i].get("v.sortable") ? (this.ASSISTIVE_SORT_TEXT + expectedResults[i])
+    		   													  : expectedResults[i];
+       
+       $A.test.assertEquals(expectedResult,headerText_internal,"Header value from internal variable is not correct");
+       $A.test.assertEquals(expectedResult,headerText_rendered,"Header rendered is not correct");
     }
   },
   
@@ -151,7 +157,7 @@
 			  
 			  if (expectedHeader.isEnabled) {
 				  var expectedSort = expectedHeader.sort;
-				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[0]);
+				  var actualSort = $A.test.getText(header.getElementsByTagName("span")[1]);
 				  $A.test.assertEquals(expectedSort, actualSort , "Sort direction incorrect");
 			  } else {
 				  var headerClass = $A.util.getElementAttributeValue(header, "class");
@@ -235,18 +241,23 @@
    * Fire button that will create and add headers, then wait for them to appear
    */
   fireAndWait : function(cmp, id, firstElm){
+	  var assistiveSortText = this.ASSISTIVE_SORT_TEXT;
 	  this.fireButton(cmp, id);
       $A.test.addWaitFor(true, function() {
     	  
-         var text = cmp.find("grid").getElement().getElementsByTagName("th")[0]
-         if($A.util.isUndefinedOrNull(text) && $A.util.isUndefinedOrNull(firstElm)){
+         var header = cmp.find("grid").getElement().getElementsByTagName("th")[0]
+         if($A.util.isUndefinedOrNull(header) && $A.util.isUndefinedOrNull(firstElm)){
         	 return true;
          }
-         else if($A.util.isUndefinedOrNull(text)){
+         else if($A.util.isUndefinedOrNull(header)){
            return false;
          }
-
-         return $A.util.getText(text) === firstElm;
+         
+         var text = $A.util.getText(header);
+         if (text.indexOf(assistiveSortText) == 0) {
+        	 text = text.slice(4);
+         }
+         return text === firstElm;
         });  
   },
   /**
@@ -424,19 +435,19 @@
 			  this.toggleSortForSortableColumn(2);
 		  }, function(cmp) {
 			  // test sort of 2nd sortable column
-			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Descending",isEnabled:true}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Sorted Descending",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"), null, true);
 			  this.toggleSortForSortableColumn(2);
 		  }, function(cmp) {
 			  // test toggling sort order on same column
-			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Ascending",isEnabled:true}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"",isEnabled:true}, {name:"Item Name",sort:"Sorted Ascending",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"));
 			  this.toggleSortForSortableColumn(1);
 		  }, function(cmp) {
 			  // test switching sort order to another column
-			  var expectedSortableColumns = [{name:"Item Id",sort:"Descending",isEnabled:true}, {name:"Item Name",sort:"",isEnabled:true}];
+			  var expectedSortableColumns = [{name:"Item Id",sort:"Sorted Descending",isEnabled:true}, {name:"Item Name",sort:"",isEnabled:true}];
 			  this.verifySortableHeaders(expectedSortableColumns);
 			  this.verifyBodyElements(cmp, this.getExpectedData("5"), null, true);
 	  }]

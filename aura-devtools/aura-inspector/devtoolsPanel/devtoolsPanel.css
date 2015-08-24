@@ -65,11 +65,14 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .auraInspectorIFrameTab iframe { width: 100%; height: 100%; }
 
 /* Event Log */
-.event-log { list-style-type: none; margin: 1em 0 0 1em; padding: 0; }
-.event-log li { list-style: none; }
-.event-log-timestamp::before { content: "[";}
-.event-log-timestamp::after { content: "]"; margin: 0 3px 0 0; }
+.event-log { list-style-type: none; margin: 0; padding: 0 10px; }
+.event-log li { list-style: none; border-bottom: 1px solid #ddd; padding: 5px 0; }
+.event-log li aurainspector-eventCard { display: inline-block; }
+.event-log-timestamp:before { content: "[";}
+.event-log-timestamp:after { content: "]"; margin: 0 3px 0 0; }
 .event-log-timestamp { color: maroon; }
+.event-log li button { cursor: pointer; display: inline-block; font-family: monospace; font-size: 1.25em; vertical-align: top; background: transparent; border: 0 none; margin-right: 3px; margin-left: 3px; padding-right: 3px; padding-left: 3px; }
+.event-log li button:focus { outline: 1px solid #ddd; }
 
 /* Component View */
 .component-view { position: absolute; width: 25%; top: 0; right: 0; bottom: 0; background: #fff; opacity: .8; border-left: 1px solid #efefef;}

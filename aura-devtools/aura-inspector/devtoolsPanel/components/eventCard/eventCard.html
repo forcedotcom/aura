@@ -1,0 +1,32 @@
+
+<template>
+	<style>
+		header { display: inline-block; }
+		h1 { display: inline-block; font-weight: bold; font-family: 'Lucida Grande', 'Consolas', 'sans-serif'; font-size: 1.25em; padding: 0 0 3px 0; margin: 0;}
+		h6 { color: #bbb; display: inline; font-size: .75em; margin: 0; padding: 0; }
+		dl, dt, dd { margin: 0; padding: 0; display: inline-block; }
+		dd { padding: 0 10px; display: block; }
+		.parameters { display: block; }
+		.parameters:before { content: 'Parameters'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		.caller { display: block; }
+		.caller:before { content: 'Caller'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		#eventSource::before { content: 'Source'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		#eventDuration::before { content: 'Duration'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		#eventHandledBy::before { content: 'Handled By'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		.hidden { display: none; }
+	</style>
+	<header>
+    	<h1><!-- Event Name --></h1>
+		<h6></h6>
+    </header>
+    <section>
+	    <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
+	    <aurainspector-outputFunction class="caller"><!-- caller --></aurainspector-outputFunction>
+	    <div id="eventSource"></div>
+	    <div id="eventDuration"></div>
+	    <div id="eventHandledBy"></div>
+    </section>
+</template>
+
+<!-- CSP ruins all our fun, this has to be external because of that -->
+<script src="eventCard.js"></script>

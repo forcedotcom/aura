@@ -61,8 +61,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
 
         // Attach event handlers
-        var recording = tabBody.querySelector("menu");
-        recording.addEventListener("click", Menu_OnClick.bind(this));
+        var menu = tabBody.querySelector("menu");
+        menu.addEventListener("click", Menu_OnClick.bind(this));
 
         var clearButton = tabBody.querySelector("#clear-button");
         clearButton.addEventListener("click", ClearButton_OnClick.bind(this));
@@ -129,7 +129,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
             var filter = target.getAttribute("data-filter");
             if(_filtered.hasOwnProperty(filter)) {
                 _filtered[filter] = !target.classList.contains("on");
-                this.refresh();
+                if(filter !== "all") {
+                    this.refresh();
+                }
             }
         }
     }
@@ -147,25 +149,31 @@ function AuraInspectorActionsView(devtoolsPanel) {
         return current;
     }
 
-    function isFiltered(action) {
-        if(_filtered.all) { return true; }
-        if(_filtered.storable && action.storable) { return true; }
-        if(_filtered.background && action.background) { return true; }
-        if(_filtered.success && action.state === "SUCCESS") { return true; }
-        if(_filtered.incomplete && action.state === "INCOMPLETE") { return true; }
-        if(_filtered.error && action.state === "ERROR") { return true; }
-        if(_filtered.aborted && action.state === "ABORTED") { return true; }
-        if(_filtered.stored && action.fromStorage) { return true; }
+    function isAllowed(action) {
+        if(_filtered.all) { return false; }
+        if(_filtered.storable && action.storable) { return false; }
+        if(_filtered.background && action.background) { return false; }
+        if(_filtered.success && action.state === "SUCCESS") { return false; }
+        if(_filtered.incomplete && action.state === "INCOMPLETE") { return false; }
+        if(_filtered.error && action.state === "ERROR") { return false; }
+        if(_filtered.aborted && action.state === "ABORTED") { return false; }
+        if(_filtered.stored && action.fromStorage) { return false; }
 
         if(_filtered.name) {
-            return action.defName.indexOf(_filtered.name) === -1;
+            // Allows you to do !aura:// to get everything that doesn't match the pattern.
+            var exclude = _filtered.name.indexOf("!") === 0;
+            if(exclude) {
+                var name = _filtered.name.substr(1);
+                return !action.defName.includes(name);
+            }
+            return action.defName.includes(_filtered.name);
         }
 
-        return false;
+        return true;
     }
 
     function upsertCard(action) {
-        if(isFiltered(action)) {
+        if(!isAllowed(action)) {
             return;
         }
 
@@ -176,7 +184,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("fromStorage", action.fromStorage);
             card.parentNode.removeChild(card);
         } else {
-            card = renderActionCard(action.id);
+            card = createActionCard(action.id);
         }
 
         switch(action.state) {
@@ -201,7 +209,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
     }
 
-    function renderActionCard(actionId) {
+    function createActionCard(actionId) {
         if(!actions.has(actionId)) {
             return;
         }

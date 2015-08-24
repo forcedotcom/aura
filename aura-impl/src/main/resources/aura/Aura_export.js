@@ -130,7 +130,35 @@ Aura.OverrideMap = function OverrideMap() {
             },
             function(orig) {
                 Aura.Controller.Action.prototype.abort = orig;
+            }),
+        "Action.runDeprecated":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.runDeprecated, true,
+            function(bound) {
+                Aura.Controller.Action.prototype.runDeprecated = bound;
+                Aura.Controller.Action.prototype["runDeprecated"] = bound;
+
+                Aura.Controller.Action.prototype["getComponent"] = function() {
+                    return this.cmp;
+                };
+            },
+            function(orig) {
+                Aura.Controller.Action.prototype.runDeprecated = orig;
+                Aura.Controller.Action.prototype["runDeprecated"] = orig;
+
+                // Not exported, so delete the public exposure.
+                delete Aura.Controller.Action.prototype["getComponent"];
+
+            }),
+        "Event.fire":new Aura.Utils.Override(null, Aura.Event.Event.prototype.fire, true,
+            function(bound) {
+                Aura.Event.Event.prototype.fire = bound;
+                Aura.Event.Event.prototype["fire"] = bound;
+
+            },
+            function(orig) {
+                Aura.Event.Event.prototype.fire = orig;
+                Aura.Event.Event.prototype["fire"] = orig;
             })
+
     };
 };
 

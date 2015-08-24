@@ -1738,7 +1738,9 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
     auraXHR.request["open"](method, url, true);
-    auraXHR.request["withCredentials"] = true;
+    if ("withCredentials" in auraXHR.request) {
+        auraXHR.request["withCredentials"] = true;
+    }
     //
     // Careful! On some browsers "onreadystatechange" is a write only property, so make
     // sure that we only write it. And for safety's sake, just write it once.

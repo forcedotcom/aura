@@ -50,8 +50,8 @@ import org.auraframework.impl.css.style.StyleDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.provider.JavaProviderDefFactory;
-import org.auraframework.impl.java.provider.JavaThemeDescriptorProviderDefFactory;
-import org.auraframework.impl.java.provider.JavaThemeMapProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaTokenDescriptorProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaTokenMapProviderDefFactory;
 import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
 import org.auraframework.impl.root.RootDefFactory;
@@ -90,7 +90,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
     private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
     private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.LAYOUTS, DefType.NAMESPACE, DefType.THEME,
+            DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.LAYOUTS, DefType.NAMESPACE, DefType.TOKENS,
             DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG, DefType.FLAVORS, DefType.FLAVOR_ASSORTMENT);
 
     private static class SourceLocationInfo {
@@ -334,10 +334,10 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                         DefType.MODEL, DefDescriptor.JAVA_PREFIX));
                 regBuild.add(createDefRegistry(new JavaProviderDefFactory(javaLoaders), DefType.PROVIDER,
                         DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaThemeDescriptorProviderDefFactory(javaLoaders),
-                        DefType.THEME_PROVIDER, DefDescriptor.JAVA_PREFIX));
-                regBuild.add(createDefRegistry(new JavaThemeMapProviderDefFactory(javaLoaders),
-                        DefType.THEME_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
+                regBuild.add(createDefRegistry(new JavaTokenDescriptorProviderDefFactory(javaLoaders),
+                        DefType.TOKEN_DESCRIPTOR_PROVIDER, DefDescriptor.JAVA_PREFIX));
+                regBuild.add(createDefRegistry(new JavaTokenMapProviderDefFactory(javaLoaders),
+                        DefType.TOKEN_MAP_PROVIDER, DefDescriptor.JAVA_PREFIX));
             }
 
             ret = regBuild.toArray(new DefRegistry<?>[regBuild.size()]);

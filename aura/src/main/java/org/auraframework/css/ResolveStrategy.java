@@ -16,20 +16,20 @@
 package org.auraframework.css;
 
 /**
- * Represents an <em>indication</em> of how theme variable resolution in CSS source will behave.
+ * Represents an <em>indication</em> of how token resolution in CSS source will behave.
  */
 public enum ResolveStrategy {
     /**
-     * Indicates that variable resolution is unnecessary.
+     * Indicates that resolution is unnecessary.
      */
     PASSTHROUGH,
     /**
-     * Indicates that it's only necessary to resolve to the default variable value. This is usually used when validating
-     * that a default value for a variable exists, and thus context-specified overrides are irrelevant.
+     * Indicates that it's only necessary to resolve to the default token value. This is usually used when validating
+     * that a default value for a token exists, and thus context-specified overrides are irrelevant.
      */
     RESOLVE_DEFAULTS,
     /**
-     * Indicates normal variable resolution. This usually means that context-specified overrides should be observed.
+     * Indicates normal token resolution. This usually means that context-specified overrides should be observed.
      */
     RESOLVE_NORMAL
 }

@@ -1,0 +1,5 @@
+<aura:tokens description="changes last three colors to fuchsia">
+    <aura:token name="color3" value="#F012BE" />
+    <aura:token name="color4" value="#F012BE" />
+    <aura:token name="color5" value="#F012BE" />
+</aura:tokens>

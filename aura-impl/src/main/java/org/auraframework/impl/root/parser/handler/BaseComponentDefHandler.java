@@ -44,7 +44,6 @@ import org.auraframework.def.RequiredVersionDef;
 import org.auraframework.def.ResourceDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Flavors;
@@ -386,13 +385,6 @@ public abstract class BaseComponentDefHandler<T extends BaseComponentDef, B exte
                     ResourceDef.class);
             if (mdr.exists(cssResourceDescriptor)) {
                 builder.addResource(cssResourceDescriptor.getQualifiedName());
-            }
-
-            // See if there is a themedef that has the same qname. todo -- add cmpTheme attr as well?
-            String themeName = String.format("%s:%s", defDescriptor.getNamespace(), defDescriptor.getName());
-            DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(themeName, ThemeDef.class);
-            if (mdr.exists(themeDesc)) {
-                builder.cmpThemeDescriptor = themeDesc;
             }
 
             // see if there is a flavors def

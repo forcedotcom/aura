@@ -36,8 +36,8 @@ import com.google.common.collect.ImmutableSortedSet;
 
 /**
  * ConfigAdapter for Aura tests.
- * 
- * 
+ *
+ *
  * @since 0.0.178
  */
 public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConfigAdapter {
@@ -126,7 +126,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             "clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest",
             "handleEventTest", "ifTest", "iterationTest",
             "layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest",
-            "setAttributesTest", "test", "themeSanityTest", "uitest", "utilTest",
+            "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
             "updateTest", "whitespaceBehaviorTest", "appCache").build();
 
     private Boolean isClientAppcacheEnabled = null;

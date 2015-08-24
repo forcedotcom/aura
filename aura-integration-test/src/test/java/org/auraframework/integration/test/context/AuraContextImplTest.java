@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.ThemeList;
+import org.auraframework.css.TokenOptimizer;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
@@ -29,7 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.context.AuraContextImpl;
@@ -359,71 +359,71 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(cmpDesc, cntx.getApplicationDescriptor());
     }
 
-    public void testAddAppThemeDescriptors() throws Exception {
-        DefDescriptor<ThemeDef> t = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        String src = String.format("<aura:application access='unauthenticated' theme='%s'/>", t.getDescriptorName());
+    public void testAddAppTokensDescriptors() throws Exception {
+        DefDescriptor<TokensDef> t = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
+        String src = String.format("<aura:application access='unauthenticated' tokens='%s'/>", t.getDescriptorName());
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED, app);
 
-        ctx.addAppThemeDescriptors();
+        ctx.addAppTokensDescriptors();
 
-        ThemeList descriptors = ctx.getThemeList();
+        TokenOptimizer descriptors = ctx.getTokenOptimizer();
         assertEquals(1, descriptors.size());
         assertEquals(t, descriptors.get(0));
     }
 
-    public void testGetThemeDescriptors() throws Exception {
+    public void testGetTokensDescriptors() throws Exception {
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
 
-        DefDescriptor<ThemeDef> t1 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        DefDescriptor<ThemeDef> t2 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        DefDescriptor<ThemeDef> t3 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        ctx.appendThemeDescriptor(t1);
-        ctx.appendThemeDescriptor(t2);
-        ctx.appendThemeDescriptor(t3);
+        DefDescriptor<TokensDef> t1 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
+        DefDescriptor<TokensDef> t2 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
+        DefDescriptor<TokensDef> t3 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
+        ctx.appendTokensDescriptor(t1);
+        ctx.appendTokensDescriptor(t2);
+        ctx.appendTokensDescriptor(t3);
 
-        ThemeList explicit = ctx.getThemeList();
+        TokenOptimizer explicit = ctx.getTokenOptimizer();
         assertEquals(explicit.get(0), t1);
         assertEquals(explicit.get(1), t2);
         assertEquals(explicit.get(2), t3);
     }
 
-    public void testSerializeWithThemes() throws Exception {
-        // this app specifies test:fakeTheme
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+    public void testSerializeWithTokens() throws Exception {
+        // this app specifies test:fakeTokens
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
 
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeThemeWithMapProvider", ThemeDef.class));
-        ctx.addAppThemeDescriptors();
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokensWithMapProvider", TokensDef.class));
+        ctx.addAppTokensDescriptors();
         ctx.setFrameworkUID("#FAKEUID#");
-        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Theme);
+        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Css);
         res = AuraTextUtil.urldecode(res);
         // expected order
-        // "test:fakeTheme" (app specified comes first)
-        // "test:fakeTheme2" (explicit order)
-        // "test:fakeThemeWithMapProvider" (explicit order)
+        // "test:fakeTokens" (app specified comes first)
+        // "test:fakeTokens2" (explicit order)
+        // "test:fakeTokensWithMapProvider" (explicit order)
         // also expect the vars hash to be present
         goldFileJson(res);
     }
 
-    public void testSerializeWithThemesHasNonce() throws Exception {
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+    public void testSerializeWithTokensHasNonce() throws Exception {
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
 
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeTheme2", ThemeDef.class));
-        ctx.appendThemeDescriptor(DefDescriptorImpl.getInstance("test:fakeThemeWithMapProvider", ThemeDef.class));
-        ctx.addAppThemeDescriptors();
-        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Theme);
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
+        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokensWithMapProvider", TokensDef.class));
+        ctx.addAppTokensDescriptors();
+        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Css);
         res = AuraTextUtil.urldecode(res);
-        assertTrue("Theme encoded URL must have framework UID",
+        assertTrue("Tokens encoded URL must have framework UID",
                 res.indexOf(Aura.getConfigAdapter().getAuraFrameworkNonce()) > 0);
     }
 
@@ -431,7 +431,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
      * Verify contextPath property in JSON is set when contextPath present.
      */
     public void testSerializeWithContextPath() throws Exception {
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeThemeApp", ApplicationDef.class);
+        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
 
         AuraContext ctx = Aura.getContextService()
                 .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);

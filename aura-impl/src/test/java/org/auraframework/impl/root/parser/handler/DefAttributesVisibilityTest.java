@@ -96,7 +96,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
                     "additionalAppCacheURLs", "controller",
                     "model", "apiVersion", "abstract", "extensible", "extends", "template");
             expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "isOnePageApp",
-                    "theme", "render", "template", "provider", "style", "helper", "renderer", "whitespace", "support",
+                    "tokens", "render", "template", "provider", "style", "helper", "renderer", "whitespace", "support",
                     "defaultFlavor", "defaultFlavors", "dynamicallyFlavorable");
             expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
             clazz = ApplicationDef.class;

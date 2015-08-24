@@ -20,8 +20,7 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -102,7 +101,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /**
      * W-788745
-     * 
+     *
      * @throws Exception
      */
     public void testNonExistantNameSpace() throws Exception {
@@ -117,7 +116,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     /**
      * Verify the isOnePageApp() API on ApplicationDef Applications who have the isOnePageApp attribute set, will have
      * the template cached.
-     * 
+     *
      * @throws Exception
      */
     public void testIsOnePageApp() throws Exception {
@@ -136,111 +135,69 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
         assertEquals(Boolean.FALSE, simpleApp.isOnePageApp());
     }
 
-    /** verify that we set the correct theme descriptor when there is an explicit theme on the app tag */
-    public void testExplicitTheme() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        String src = String.format("<aura:application theme=\"%s\"/>", theme.getDescriptorName());
+    /** verify that we set tokens explicitly set on the tokens tag */
+    public void testExplicitTokens() throws QuickFixException {
+        DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
+        String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, desc.getDef().getThemeDescriptors().size());
-        assertEquals(theme, desc.getDef().getThemeDescriptors().get(0));
+        assertEquals(1, desc.getDef().getTokenDescriptors().size());
+        assertEquals(tokens, desc.getDef().getTokenDescriptors().get(0));
     }
 
-    /** verify that we set the correct theme descriptor when there is an explicit theme and a cmp theme */
-    public void testExplicitAndCmpTheme() throws QuickFixException {
-        // standalone theme
-        DefDescriptor<ThemeDef> explicitTheme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+    /** verify that we set the implicit namespace default app overrides */
+    public void testImplicitTokenOverrides() throws QuickFixException {
+        DefDescriptor<TokensDef> dummy = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        // style
-        DefDescriptor<StyleDef> styleDesc = addSourceAutoCleanup(StyleDef.class, ".THIS{}");
-
-        // theme is in same bundle as style
-        String qn = String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName());
-        DefDescriptor<ThemeDef> cmpTheme = DefDescriptorImpl.getInstance(qn, ThemeDef.class);
-        addSourceAutoCleanup(cmpTheme, "<aura:theme/>");
-
-        // app is in same bundle as theme and style
-        DefDescriptor<ApplicationDef> appDesc = DefDescriptorImpl.getInstance(qn, ApplicationDef.class);
-        String src = String.format("<aura:application theme=\"%s\"/>", explicitTheme.getDescriptorName());
-        addSourceAutoCleanup(appDesc, src);
-
-        // cmp theme should not have an impact, explicit theme should be used
-        assertEquals(1, appDesc.getDef().getThemeDescriptors().size());
-        assertEquals(explicitTheme, appDesc.getDef().getThemeDescriptors().get(0));
-    }
-
-    /** verify that we set the correct theme descriptor when there is only the namespace default theme */
-    public void testImplicitTheme() throws QuickFixException {
-        DefDescriptor<ThemeDef> dummy = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-
-        DefDescriptor<ThemeDef> nsTheme = DefDescriptorImpl.getInstance(
-                String.format("%s:%sTheme", dummy.getNamespace(), dummy.getNamespace()), ThemeDef.class);
-        addSourceAutoCleanup(nsTheme, "<aura:theme></aura:theme>");
+        DefDescriptor<TokensDef> nsTokens = DefDescriptorImpl.getInstance(
+                String.format("%s:%sNamespace", dummy.getNamespace(), dummy.getNamespace()), TokensDef.class);
+        addSourceAutoCleanup(nsTokens, "<aura:tokens></aura:tokens>");
 
         String src = "<aura:application/>";
         DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertEquals(1, desc.getDef().getThemeDescriptors().size());
-        assertEquals(nsTheme, desc.getDef().getThemeDescriptors().get(0));
+        assertEquals(1, desc.getDef().getTokenDescriptors().size());
+        assertEquals(nsTokens, desc.getDef().getTokenDescriptors().get(0));
     }
 
-    /** an empty value for the theme attr means that you don't want any theme, even the implicit one */
-    public void testThemeAttrIsEmptyString() throws QuickFixException {
-        DefDescriptor<ThemeDef> dummy = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+    /** an empty value for the tokens attr means that you don't want any token overrides, even the implicit one */
+    public void testTokensAttrIsEmptyString() throws QuickFixException {
+        DefDescriptor<TokensDef> dummy = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        DefDescriptor<ThemeDef> nsTheme = DefDescriptorImpl.getInstance(
-                String.format("%s:%sTheme", dummy.getNamespace(), dummy.getNamespace()), ThemeDef.class);
-        addSourceAutoCleanup(nsTheme, "<aura:theme></aura:theme>");
+        DefDescriptor<TokensDef> nsTokens = DefDescriptorImpl.getInstance(
+                String.format("%s:%sNamespace", dummy.getNamespace(), dummy.getNamespace()), TokensDef.class);
+        addSourceAutoCleanup(nsTokens, "<aura:tokens></aura:tokens>");
 
-        String src = "<aura:application theme=''/>";
+        String src = "<aura:application tokens=''/>";
         DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(
                 String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
                 ApplicationDef.class);
         addSourceAutoCleanup(desc, src);
-        assertTrue(desc.getDef().getThemeDescriptors().isEmpty());
+        assertTrue(desc.getDef().getTokenDescriptors().isEmpty());
     }
 
-    /** verify theme descriptor is added to dependency set */
-    public void testThemeAddedToDeps() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        String src = String.format("<aura:application theme=\"%s\"/>", theme.getDescriptorName());
+    /** verify tokens descriptor is added to dependency set */
+    public void testTokensAddedToDeps() throws QuickFixException {
+        DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
+        String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
         desc.getDef().appendDependencies(deps);
-        assertTrue(deps.contains(theme));
+        assertTrue(deps.contains(tokens));
     }
 
-    /** verify theme descriptor ref is validated */
-    public void testInvalidThemeRef() throws QuickFixException {
-        String src = String.format("<aura:application theme=\"%s\"/>", "wall:maria");
+    /** verify tokens descriptor ref is validated */
+    public void testInvalidTokensRef() throws QuickFixException {
+        String src = String.format("<aura:application tokens=\"%s\"/>", "wall:maria");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {
             desc.getDef().validateReferences();
             fail("expected to get an exception");
         } catch (Exception e) {
-            checkExceptionContains(e, DefinitionNotFoundException.class, "No THEME");
-        }
-    }
-
-    /** an application can't specify a cmp bundle theme as its theme (even the one in its own bundle) */
-    public void testAppThemeCantBeCmpTheme() throws QuickFixException {
-        DefDescriptor<StyleDef> styleDesc = addSourceAutoCleanup(StyleDef.class, ".THIS{}");
-
-        String fmt = String.format("%s:%s", styleDesc.getNamespace(), styleDesc.getName());
-        DefDescriptor<ThemeDef> themeDesc = DefDescriptorImpl.getInstance(fmt, ThemeDef.class);
-        addSourceAutoCleanup(themeDesc, "<aura:theme/>");
-
-        String src = String.format("<aura:application theme=\"%s\"/>", themeDesc.getDescriptorName());
-        DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-
-        try {
-            desc.getDef().validateReferences();
-            fail("expected to get an exception");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, "must not specify");
+            checkExceptionContains(e, DefinitionNotFoundException.class, "No TOKENS");
         }
     }
 }

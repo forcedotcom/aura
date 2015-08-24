@@ -19,7 +19,7 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 
 /**
  */
@@ -28,11 +28,11 @@ public interface ApplicationDefBuilder extends BaseComponentDefBuilder<Applicati
     ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
     /**
-     * Specifies a {@link ThemeDef} as an override across the whole application. Vars specified in this theme will
-     * override default var values throughout all components used in the application.
+     * Specifies a {@link TokensDef} as an override across the whole application. Tokens specified in this def will
+     * override default tokens values throughout all components used in the application.
      *
      */
-    ApplicationDefBuilder appendThemeDescriptor(DefDescriptor<ThemeDef> themeDescriptor);
+    ApplicationDefBuilder appendTokensDescriptor(DefDescriptor<TokensDef> descriptor);
 
     /**
      * Specifies the {@link FlavorAssortmentDef} containing the flavors to use as defaults.

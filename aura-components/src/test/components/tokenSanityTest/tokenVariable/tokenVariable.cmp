@@ -1,0 +1,4 @@
+<!-- I want to use token variables in my CSS -->
+<aura:component>
+  <tokenSanityTest:header> Hello World </tokenSanityTest:header>
+</aura:component>

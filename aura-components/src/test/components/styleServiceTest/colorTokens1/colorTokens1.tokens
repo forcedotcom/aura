@@ -1,0 +1,5 @@
+<aura:tokens description="changes first three colors to teal">
+    <aura:token name="color1" value="#39CCCC" />
+    <aura:token name="color2" value="#39CCCC" />
+    <aura:token name="color3" value="#39CCCC" />
+</aura:tokens>

@@ -21,12 +21,12 @@ import org.auraframework.builder.ComponentDefBuilder;
 import org.auraframework.builder.ComponentDefRefBuilder;
 import org.auraframework.builder.FlavoredStyleDefBuilder;
 import org.auraframework.builder.StyleDefBuilder;
-import org.auraframework.builder.ThemeDefBuilder;
+import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.impl.css.flavor.FlavoredStyleDefImpl;
 import org.auraframework.impl.css.style.StyleDefImpl;
-import org.auraframework.impl.css.theme.ThemeDefImpl;
+import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.component.ComponentDefImpl;
 import org.auraframework.impl.root.component.ComponentDefRefImpl;
@@ -70,8 +70,8 @@ public class BuilderServiceImpl implements BuilderService {
     }
 
     @Override
-    public ThemeDefBuilder getThemeDefBuilder() {
-        return new ThemeDefImpl.Builder();
+    public TokensDefBuilder getTokensDefBuilder() {
+        return new TokensDefImpl.Builder();
     }
 
     @Override

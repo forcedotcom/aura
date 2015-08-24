@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.css.ResolveStrategy;
-import org.auraframework.css.ThemeList;
-import org.auraframework.css.ThemeValueProvider;
+import org.auraframework.css.TokenOptimizer;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.system.AuraContext;
 
 import com.salesforce.omakase.plugin.Plugin;
@@ -34,40 +34,37 @@ import com.salesforce.omakase.plugin.Plugin;
  */
 public interface StyleAdapter extends AuraAdapter {
     /**
-     * Gets a {@link ThemeValueProvider} using whatever theme overrides are set on the current {@link AuraContext}. This
-     * is usually the method you want.
+     * Gets a {@link TokenValueProvider} using whatever overrides are set on the current {@link AuraContext}. This is
+     * usually the method you want.
      *
      * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
-     *            (if applicable).
+     *            namespace-default {@link TokensDef} to use.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style);
+    TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style);
 
     /**
-     * Gets a {@link ThemeValueProvider}.
+     * Gets a {@link TokenValueProvider}.
      * <p>
      * The given {@link ResolveStrategy} determines which overrides are automatically included. If
-     * {@link ResolveStrategy#RESOLVE_NORMAL} then this will use whatever theme overrides are set on the current
+     * {@link ResolveStrategy#RESOLVE_NORMAL} then this will use whatever overrides are set on the current
      * {@link AuraContext}. Otherwise, no overrides will be automatically included.
      *
      * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
-     *            (if applicable).
+     *            namespace-default {@link TokensDef} to use.
      * @param strategy An indication of how this provider is going to be used.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy);
+    TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy);
 
     /**
-     * Gets a {@link ThemeValueProvider} using the given overrides.
+     * Gets a {@link TokenValueProvider} using the given overrides.
      *
      * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
-     *            namespace-default {@link ThemeDef} to use, as well as which component-bundle {@link ThemeDef} to use
-     *            (if applicable).
+     *            namespace-default {@link TokensDef} to use.
      * @param strategy An indication of how this provider is going to be used.
-     * @param overrides The {@link ThemeList} containing the override themes.
+     * @param overrides The {@link TokenOptimizer} containing the overrides.
      */
-    ThemeValueProvider getThemeValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
-            ThemeList overrides);
+    TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
+            TokenOptimizer overrides);
 
     /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.
@@ -77,10 +74,9 @@ public interface StyleAdapter extends AuraAdapter {
      * <p>
      * A plugin is appropriate to return here if it only needs to run the first time the CSS source code is parsed.
      * Validating plugins may be good candidates. However note that if your plugin is reworking or validating syntax
-     * units that may encountered as a result of theme token substitutions, {@link #getRuntimePlugins()} is usually the
-     * better method to return your plugin from. That is, if a theme token substitution results in changes that your
-     * plugin may be interested in, your plugin will only have access to this information when executed during the
-     * runtime phase.
+     * units that may encountered as a result of token substitutions, {@link #getRuntimePlugins()} is usually the better
+     * method to return your plugin from. That is, if a token substitution results in changes that your plugin may be
+     * interested in, your plugin will only have access to this information when executed during the runtime phase.
      * <p>
      * All plugins specified here will run <em>after</em> any of the default compilation-only plugins specified by Aura,
      * but <em>before</em> any of the default compilation+runtime plugins specified by Aura or any plugins returned from
@@ -103,8 +99,8 @@ public interface StyleAdapter extends AuraAdapter {
      * During the runtime parsing phase, only explicitly refined syntax units will be delivered to subscription methods.
      * You may choose to explicitly refine a syntax unit yourself, but <b>only if you guard against unnecessarily
      * refining anything inapplicable to what you are doing.</b> It is perfectly fine, and usually what you want, to not
-     * refine anything at all but to simply deal with whatever other plugins (such as theme token substitution) have
-     * decided to refine.
+     * refine anything at all but to simply deal with whatever other plugins (such as token substitution) have decided
+     * to refine.
      * <p>
      * This method is called once per parsing of a single {@link StyleDef}, thus any plugins specified here will not
      * have insight into the entire set of CSS to be combined and served together. This is usually fine for most
@@ -129,8 +125,8 @@ public interface StyleAdapter extends AuraAdapter {
      * During the runtime parsing phase, only explicitly refined syntax units will be delivered to subscription methods.
      * You may choose to explicitly refine a syntax unit yourself, but <b>only if you guard against unnecessarily
      * refining anything inapplicable to what you are doing.</b> It is perfectly fine, and usually what you want, to not
-     * refine anything at all but to simply deal with whatever other plugins (such as theme token substitution) have
-     * decided to refine.
+     * refine anything at all but to simply deal with whatever other plugins (such as token substitution) have decided
+     * to refine.
      * <p>
      * The same instance of each plugin returned here will be used for each {@link StyleDef}, which gives the plugin
      * insight into the entire set of CSS to be combined and served together (e.g., in app.css). This may be important

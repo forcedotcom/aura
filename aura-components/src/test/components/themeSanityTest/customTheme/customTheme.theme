@@ -1,3 +1,0 @@
-<aura:theme>
-	<aura:var name="color2" value="yellow"/>
-</aura:theme>

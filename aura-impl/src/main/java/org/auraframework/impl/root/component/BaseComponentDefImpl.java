@@ -56,7 +56,6 @@ import org.auraframework.def.ResourceDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -101,7 +100,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
     private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
-    private final DefDescriptor<ThemeDef> cmpThemeDescriptor;
     private final DefDescriptor<DesignDef> designDefDescriptor;
     private final DefDescriptor<SVGDef> svgDefDescriptor;
 
@@ -164,7 +162,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.clientLibraries = AuraUtil.immutableList(builder.clientLibraries);
         this.render = builder.renderType;
         this.whitespaceBehavior = builder.whitespaceBehavior;
-        this.cmpThemeDescriptor = builder.cmpThemeDescriptor;
         this.designDefDescriptor = builder.designDefDescriptor;
         this.svgDefDescriptor = builder.svgDefDescriptor;
         this.hasFlavorableChild = builder.hasFlavorableChild;
@@ -180,7 +177,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, methodDefs, rendererDescriptors, helperDescriptors, resourceDescriptors,
-                cmpThemeDescriptor, imports);
+                imports);
     }
 
     /**
@@ -600,10 +597,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             dependencies.add(templateDefDescriptor);
         }
 
-        if (cmpThemeDescriptor != null) {
-            dependencies.add(cmpThemeDescriptor);
-        }
-
         if (designDefDescriptor != null) {
             dependencies.add(designDefDescriptor);
         }
@@ -838,10 +831,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return styleDescriptor;
     }
 
-    @Override
-    public DefDescriptor<ThemeDef> getCmpTheme() {
-        return cmpThemeDescriptor;
-    }
 
     @Override
     public boolean isAbstract() {
@@ -902,8 +891,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     : modelDefDescriptor.equals(other.modelDefDescriptor))
                     && (extendsDescriptor == null ? other.extendsDescriptor == null
                     : extendsDescriptor.equals(other.extendsDescriptor))
-                    && (cmpThemeDescriptor == null ? other.cmpThemeDescriptor == null
-                    : cmpThemeDescriptor.equals(other.cmpThemeDescriptor))
                     && events.equals(other.events)
                     && getLocation().equals(other.getLocation());
         }
@@ -1283,7 +1270,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public DefDescriptor<T> extendsDescriptor;
         public DefDescriptor<ComponentDef> templateDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
-        public DefDescriptor<ThemeDef> cmpThemeDescriptor;
         public DefDescriptor<FlavoredStyleDef> flavorDescriptor;
         public DefDescriptor<DesignDef> designDefDescriptor;
         public DefDescriptor<SVGDef> svgDefDescriptor;

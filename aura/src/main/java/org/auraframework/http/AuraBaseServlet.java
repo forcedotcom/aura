@@ -98,7 +98,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
      * header at all is taken as an invitation for filters to add their own ideas.
      */
     public static final String HDR_FRAME_ALLOWALL = "ALLOWALL";
-      
+
     protected static MimetypesFileTypeMap mimeTypesMap = new MimetypesFileTypeMap();
     public static final String OUTDATED_MESSAGE = "OUTDATED";
     protected final static StringParam csrfToken = new StringParam(AURA_PREFIX + "token", 0, true);
@@ -122,10 +122,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Tell the browser to not cache.
-     * 
+     *
      * This sets several headers to try to ensure that the page will not be cached. Not sure if last modified matters
      * -goliver
-     * 
+     *
      * @param response the HTTP response to which we will add headers.
      */
     public static void setNoCache(HttpServletResponse response) {
@@ -138,10 +138,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Set a long cache timeout.
-     * 
+     *
      * This sets several headers to try to ensure that the page will be cached for a reasonable length of time. Of note
      * is the last-modified header, which is set to a day ago so that browsers consider it to be safe.
-     * 
+     *
      * @param response the HTTP response to which we will add headers.
      */
     public static void setLongCache(HttpServletResponse response) {
@@ -154,10 +154,10 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Set a 'short' cache timeout.
-     * 
+     *
      * This sets several headers to try to ensure that the page will be cached for a shortish length of time. Of note is
      * the last-modified header, which is set to a day ago so that browsers consider it to be safe.
-     * 
+     *
      * @param response the HTTP response to which we will add headers.
      */
     public static void setShortCache(HttpServletResponse response) {
@@ -216,11 +216,11 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     /**
      * Handle an exception in the servlet.
-     * 
+     *
      * This routine should be called whenever an exception has surfaced to the top level of the servlet. It should not be
      * overridden unless Aura is entirely subsumed. Most special cases can be handled by the Aura user by implementing
      * {@link ExceptionAdapter ExceptionAdapter}.
-     * 
+     *
      * @param t the throwable to write out.
      * @param quickfix is this exception a valid quick-fix
      * @param context the aura context.
@@ -476,13 +476,13 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
 
-        // add app theme to the context. we do this here so that when the context is serialized below it includes the
-        // app themes. This ensures ALL applicable themes are part of the url, making client-side caching more
+        // add app tokens to the context. we do this here so that when the context is serialized below it includes the
+        // app tokens. This ensures ALL applicable token defs are part of the url, making client-side caching more
         // predictable
-        // TODONM remove this, as we don't need to have themes specified via AuraContext anymore, just the app
-        context.addAppThemeDescriptors();
+        // TODONM remove this, as we don't need to have tokens specified via AuraContext anymore, just the app
+        context.addAppTokensDescriptors();
 
-        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Theme));
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Css));
         defs.append("/app.css");
         ret.add(defs.toString());
 
@@ -492,8 +492,8 @@ public abstract class AuraBaseServlet extends HttpServlet {
     /**
      * Gets all client libraries specified. Uses client library service to resolve any urls that weren't specified.
      * Returns list of non empty client library urls.
-     * 
-     * 
+     *
+     *
      * @param context aura context
      * @param type CSS or JS
      * @return list of urls for client libraries

@@ -20,7 +20,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.parser.XMLParser;
@@ -102,30 +102,30 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    public void testReadThemeAttribute() throws QuickFixException {
-        DefDescriptor<ThemeDef> theme = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+    public void testReadTokensAttribute() throws QuickFixException {
+        DefDescriptor<TokensDef> desc = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        String src = String.format("<aura:application theme=\"%s\"></aura:application>",
-                theme.getDescriptorName());
+        String src = String.format("<aura:application tokens=\"%s\"></aura:application>",
+                desc.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, app.getDef().getThemeDescriptors().size());
-        assertEquals(theme, app.getDef().getThemeDescriptors().get(0));
+        assertEquals(1, app.getDef().getTokenDescriptors().size());
+        assertEquals(desc, app.getDef().getTokenDescriptors().get(0));
     }
 
-    public void testReadThemeAttributeMultiple() throws QuickFixException {
-        DefDescriptor<ThemeDef> t1 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        DefDescriptor<ThemeDef> t2 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
-        DefDescriptor<ThemeDef> t3 = addSourceAutoCleanup(ThemeDef.class, "<aura:theme></aura:theme>");
+    public void testReadTokensAttributeMultiple() throws QuickFixException {
+        DefDescriptor<TokensDef> t1 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
+        DefDescriptor<TokensDef> t2 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
+        DefDescriptor<TokensDef> t3 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        String src = String.format("<aura:application theme=\"%s, %s, %s\"></aura:application>",
+        String src = String.format("<aura:application tokens=\"%s, %s, %s\"></aura:application>",
                 t1.getDescriptorName(), t2.getDescriptorName(), t3.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(3, app.getDef().getThemeDescriptors().size());
-        assertEquals(t1, app.getDef().getThemeDescriptors().get(0));
-        assertEquals(t2, app.getDef().getThemeDescriptors().get(1));
-        assertEquals(t3, app.getDef().getThemeDescriptors().get(2));
+        assertEquals(3, app.getDef().getTokenDescriptors().size());
+        assertEquals(t1, app.getDef().getTokenDescriptors().get(0));
+        assertEquals(t2, app.getDef().getTokenDescriptors().get(1));
+        assertEquals(t3, app.getDef().getTokenDescriptors().get(2));
     }
 
     public void testReadDefaultFlavorsAttribute() throws QuickFixException {

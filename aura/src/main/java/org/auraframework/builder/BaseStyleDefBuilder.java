@@ -31,18 +31,18 @@ public interface BaseStyleDefBuilder<D extends BaseStyleDef> extends DefBuilder<
     /**
      * Specifies all expressions found in the source.
      * <p>
-     * An expression is the argument passed to the theme function. For example, in:
+     * An expression is the argument passed to the token function. For example, in:
      *
      * <pre>
      * <code>
      * .THIS {
-     *   color: theme(color);
-     *   margin: theme(small + large + 'px');
+     *   color: token(color);
+     *   margin: token(small + large + 'px');
      * }
      * </code>
      * </pre>
      *
-     * both "color" and "small + large + 'px'" would be theme expressions.
+     * both "color" and "small + large + 'px'" would be token expressions.
      */
-    BaseStyleDefBuilder<D> setThemeExpressions(Set<String> expressions);
+    BaseStyleDefBuilder<D> setTokenExpressions(Set<String> expressions);
 }

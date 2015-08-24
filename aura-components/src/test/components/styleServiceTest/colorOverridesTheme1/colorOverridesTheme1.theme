@@ -1,5 +1,0 @@
-<aura:theme description="changes first three colors to teal">
-    <aura:var name="color1" value="#39CCCC" />
-    <aura:var name="color2" value="#39CCCC" />
-    <aura:var name="color3" value="#39CCCC" />
-</aura:theme>

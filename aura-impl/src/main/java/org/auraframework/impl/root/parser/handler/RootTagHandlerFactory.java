@@ -29,7 +29,7 @@ import org.auraframework.def.LayoutsDef;
 import org.auraframework.def.LibraryDef;
 import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.RootDefinition;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -61,9 +61,9 @@ public class RootTagHandlerFactory {
         case NAMESPACE:
             return (RootTagHandler<T>) new NamespaceDefHandler((DefDescriptor<NamespaceDef>) defDescriptor,
                     (Source<NamespaceDef>) source, xmlReader);
-        case THEME:
-            return (RootTagHandler<T>) new ThemeDefHandler((DefDescriptor<ThemeDef>) defDescriptor,
-                    (Source<ThemeDef>) source, xmlReader);
+        case TOKENS:
+            return (RootTagHandler<T>) new TokensDefHandler((DefDescriptor<TokensDef>) defDescriptor,
+                    (Source<TokensDef>) source, xmlReader);
         case DOCUMENTATION:
             return (RootTagHandler<T>) new DocumentationDefHandler((DefDescriptor<DocumentationDef>) defDescriptor,
                     (Source<DocumentationDef>) source, xmlReader);

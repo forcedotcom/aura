@@ -94,11 +94,11 @@ public final class StyleParser implements Parser {
 
             ParserResult result = parserConfig
                     .componentClass(className, shouldValidate(descriptor.getName()))
-                    .themes(styleDescriptor)
+                    .tokens(styleDescriptor)
                     .parse();
 
             builder.setContent(result.content());
-            builder.setThemeExpressions(result.themeExpressions());
+            builder.setTokenExpressions(result.expressions());
             return (D) builder.build();
         } else if (descriptor.getDefType() == DefType.FLAVORED_STYLE) {
             DefDescriptor<FlavoredStyleDef> flavorDescriptor = (DefDescriptor<FlavoredStyleDef>) descriptor;
@@ -109,12 +109,12 @@ public final class StyleParser implements Parser {
             builder.setOwnHash(source.getHash());
 
             ParserResult result = parserConfig
-                    .themes(flavorDescriptor)
+                    .tokens(flavorDescriptor)
                     .flavors(flavorDescriptor)
                     .parse();
 
             builder.setContent(result.content());
-            builder.setThemeExpressions(result.themeExpressions());
+            builder.setTokenExpressions(result.expressions());
             builder.setFlavorAnnotations(result.flavorAnnotations());
             return (D) builder.build();
         } else if (descriptor.getDefType() == DefType.RESOURCE) {

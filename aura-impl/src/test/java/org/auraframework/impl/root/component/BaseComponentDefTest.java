@@ -28,10 +28,13 @@ import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.BaseComponentDef.RenderType;
+import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventHandlerDef;
@@ -43,10 +46,6 @@ import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
-import org.auraframework.def.BaseComponentDef.RenderType;
-import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.root.RootDefinitionTest;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Location;
@@ -1897,18 +1896,5 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         } catch (QuickFixException e) {
             checkExceptionFull(e, InvalidDefinitionException.class, "No resource named js://foo.bar found");
         }
-    }
-
-    /** tests the cmp theme is added to the dependencies */
-    public void testAppendsCmpThemeToDependencies() throws Exception {
-        DefDescriptor<ThemeDef> themeDesc = addSourceAutoCleanup(ThemeDef.class, "<aura:theme/>");
-        String fmt = String.format("%s:%s", themeDesc.getNamespace(), themeDesc.getName());
-        DefDescriptor<T> desc = DefDescriptorImpl.getInstance(fmt, getDefClass());
-        addSourceAutoCleanup(desc, String.format(baseTag, "", ""));
-        assertEquals(themeDesc, desc.getDef().getCmpTheme());
-
-        Set<DefDescriptor<?>> deps = Sets.newHashSet();
-        desc.getDef().appendDependencies(deps);
-        assertTrue(deps.contains(themeDesc));
     }
 }

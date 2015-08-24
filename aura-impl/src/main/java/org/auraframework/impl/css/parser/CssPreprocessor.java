@@ -28,7 +28,7 @@ import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.parser.plugin.FlavorCollectorPlugin;
 import org.auraframework.impl.css.parser.plugin.FlavorPlugin;
 import org.auraframework.impl.css.parser.plugin.SelectorScopingPlugin;
-import org.auraframework.impl.css.parser.plugin.ThemeFunctionPlugin;
+import org.auraframework.impl.css.parser.plugin.TokenFunctionPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -127,9 +127,9 @@ public final class CssPreprocessor {
             return this;
         }
 
-        /** enables aura themes */
-        public ParserConfiguration themes(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
-            plugins.add(runtime ? ThemeFunctionPlugin.resolving(style) : ThemeFunctionPlugin.passthrough(style));
+        /** enables aura tokens */
+        public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
+            plugins.add(runtime ? TokenFunctionPlugin.resolving(style) : TokenFunctionPlugin.passthrough(style));
             return this;
         }
 
@@ -193,9 +193,9 @@ public final class CssPreprocessor {
                 result.content += "\n"; // in dev mode print an extra new line after each stylesheet for readability
             }
 
-            Optional<ThemeFunctionPlugin> themeFunctionPlugin = registry.retrieve(ThemeFunctionPlugin.class);
-            if (themeFunctionPlugin.isPresent()) {
-                result.themeExpressions = themeFunctionPlugin.get().parsedExpressions();
+            Optional<TokenFunctionPlugin> tokensPlugin = registry.retrieve(TokenFunctionPlugin.class);
+            if (tokensPlugin.isPresent()) {
+                result.expressions = tokensPlugin.get().parsedExpressions();
             }
 
             Optional<FlavorCollectorPlugin> flavorCollector = registry.retrieve(FlavorCollectorPlugin.class);
@@ -210,7 +210,7 @@ public final class CssPreprocessor {
     /** Result of calling {@link ParserConfiguration#parse()} */
     public static final class ParserResult {
         private String content;
-        private Set<String> themeExpressions;
+        private Set<String> expressions;
         private Map<String, FlavorAnnotation> flavorAnnotations;
 
         /** parsed content */
@@ -218,9 +218,9 @@ public final class CssPreprocessor {
             return content;
         }
 
-        /** all theme references found in the source */
-        public Set<String> themeExpressions() {
-            return themeExpressions;
+        /** all token references found in the source */
+        public Set<String> expressions() {
+            return expressions;
         }
 
         /** all flavors metadata found in the source */

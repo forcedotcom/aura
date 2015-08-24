@@ -47,8 +47,8 @@ public class DefinitionNotFoundException extends AuraValidationException {
             return new AuraQuickFix[] { new CreateComponentDefQuickFix(descriptor) };
         case APPLICATION:
             return new AuraQuickFix[] { new CreateApplicationDefQuickFix(descriptor) };
-        case THEME:
-            return new AuraQuickFix[] { new CreateThemeDefQuickFix(descriptor) };
+        case TOKENS:
+            return new AuraQuickFix[] { new CreateTokenDefQuickFix(descriptor) };
         default:
             return null;
         }

@@ -22,7 +22,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.controller.DynamicStylingController;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.instance.Action;
@@ -37,16 +37,16 @@ import com.google.common.collect.Lists;
  * More tests in test/components/dynamicStylingTest
  */
 public class DynamicStylingControllerTest extends StyleTestCase {
-    private static final String ACTION = "java://org.auraframework.impl.controller.DynamicStylingController/ACTION$applyThemes";
+    private static final String ACTION = "java://org.auraframework.impl.controller.DynamicStylingController/ACTION$applyTokens";
 
     public DynamicStylingControllerTest(String name) {
         super(name);
     }
 
     /** test basic usage */
-    public void testApplyThemes() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+    public void testApplyTokens() throws Exception {
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(".THIS{margin: 10px; color: t(color);}");
         addContextApp("<aura:application/>");
@@ -60,8 +60,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
 
     /** at-rules with tokens inside should be included if applicable */
     public void testTokenInsideMediaQuery() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{margin: 10px; color: t(color);}} .THIS {color: red}");
@@ -76,8 +76,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
 
     /** at rules without tokens inside should not be included */
     public void testNoTokenInsideMediaQuery() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{margin: 10px;}} .THIS {color:t(color)}");
@@ -92,8 +92,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
 
     /** at-rules using a token directly should be included if applicable */
     public void testMediaQueryUsingTokenDirectly() throws Exception {
-        addNsTheme(theme().var("query", "all and (min-width:300px)"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("query", "screen"));
+        addNsTokens(tokens().token("query", "all and (min-width:300px)"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("query", "screen"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media t(query) {.THIS{color:red}}");
@@ -108,8 +108,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
 
     /** at-rules not using a token anywhere should not be included */
     public void testMediaQueryNotUsingTokenDirectlyNorInside() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@media screen {.THIS{color:red}} .THIS{color: t(color);}");
@@ -123,8 +123,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     public void testTokenInsideConditional() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@if(OTHER) {.THIS{margin: 10px; color: t(color);}} .THIS {color: red}");
@@ -138,8 +138,8 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     }
 
     public void testNoTokenInsideConditional() throws Exception {
-        addNsTheme(theme().var("color", "red"));
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color", "green"));
+        addNsTokens(tokens().token("color", "red"));
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color", "green"));
 
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(
                 "@if(OTHER) {.THIS{margin: 10px}} .THIS {color: t(color)}");
@@ -155,10 +155,10 @@ public class DynamicStylingControllerTest extends StyleTestCase {
     /** if a var is an alias, references to the aliased var should be included */
     public void testCrossReference() throws Exception {
         // color2 points to color1
-        addNsTheme(theme().var("color1", "red").var("color2", "{!color1}").var("color3", "yellow"));
+        addNsTokens(tokens().token("color1", "red").token("color2", "{!color1}").token("color3", "yellow"));
 
-        // theme overrides color1
-        DefDescriptor<ThemeDef> toApply = addSeparateTheme(theme().var("color1", "green"));
+        // token overrides color1
+        DefDescriptor<TokensDef> toApply = addSeparateTokens(tokens().token("color1", "green"));
 
         // style points to color2, it should be included because color1 is overridden
         DefDescriptor<StyleDef> style = addContextAppBundleStyle(".THIS{color: t(color2); background: t(color3);}");
@@ -171,9 +171,9 @@ public class DynamicStylingControllerTest extends StyleTestCase {
         assertEquals(expected, action.getReturnValue());
     }
 
-    private Action runAction(String theme) throws Exception {
+    private Action runAction(String descriptor) throws Exception {
         Map<String, Object> params = new HashMap<>();
-        params.put("themes", Lists.newArrayList(theme));
+        params.put("descriptors", Lists.newArrayList(descriptor));
         params.put("extraStyles", ImmutableList.<String>of());
         Action action = (Action) Aura.getInstanceService().getInstance(ACTION, ActionDef.class, params);
         action.run();

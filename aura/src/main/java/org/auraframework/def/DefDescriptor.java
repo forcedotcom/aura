@@ -37,7 +37,7 @@ import org.auraframework.util.json.JsonSerializable;
  * A descriptor "handle" for a definition. For applications which care about sorting, such as generating a unique hash
  * from an application and all its dependencies, descriptors are comparable by their qualified name
  * (case-insensitively).
- * 
+ *
  * @param <T> the more specific subtype of definition being described, e.g. {@link ComponentDef}, {@link EventDef}, etc.
  */
 public interface DefDescriptor<T extends Definition> extends JsonSerializable,
@@ -123,11 +123,11 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         FLAVOR_DEFAULT(FlavorDefaultDef.class), //
         FLAVOR_INCLUDE(FlavorIncludeDef.class), //
         FLAVORS(FlavorsDef.class), //
-        THEME(ThemeDef.class, true), //
-        THEME_DEF_REF(ThemeDefRef.class), //
-        THEME_PROVIDER(ThemeDescriptorProviderDef.class), //
-        THEME_MAP_PROVIDER(ThemeMapProviderDef.class), //
-        VAR(VarDef.class), //
+        TOKEN(TokenDef.class), //
+        TOKENS(TokensDef.class, true), //
+        TOKENS_IMPORT(TokensImport.class), //
+        TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
+        TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
         DOCUMENTATION(DocumentationDef.class), //
         DESCRIPTION(DescriptionDef.class), //
         EXAMPLE(ExampleDef.class), //
@@ -246,10 +246,10 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
 
     /**
      * get the 'bundle' for this descriptor.
-     * 
+     *
      * If we have a bundle for the descriptor, then the descriptor is for a file within the bundle, and it is fully
      * specified by the bundle descriptor plus the name from this descriptor.
-     * 
+     *
      * @return the bundle associated with this descriptor.
      */
     DefDescriptor<? extends Definition> getBundle();
@@ -257,7 +257,7 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     /**
      * Gets the actual definition described by this descriptor, compiling it if necessary, from Aura's definition
      * service.
-     * 
+     *
      * @return the definition (compiles it if necessary)
      * @throws QuickFixException if the definition is not found
      */

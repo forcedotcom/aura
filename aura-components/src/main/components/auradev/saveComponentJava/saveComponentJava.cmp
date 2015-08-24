@@ -90,7 +90,7 @@ public final class {!v.def.descriptor.name} implements ComponentDef{
     }
 
     @Override
-    public DefDescriptor<ThemeDef> getThemeDescriptor() {
+    public DefDescriptor<TokensDef> getTokensDescriptor() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -124,7 +124,7 @@
                                 <argument>${basedir}/src/test/components</argument>
                                 <argument>${project.build.testOutputDirectory}/${component.test.dir}</argument>
                                 <argument>auratest</argument>
-                                <argument>themeProviderTest</argument>
+                                <argument>tokenProviderTest</argument>
                                 <argument>flavorTest</argument>
                                 <argument>lintTest</argument>
                                 <argument>handleEventTest</argument>
@@ -229,7 +229,7 @@
                                         <include name="**/*.lib" />
                                         <include name="**/*.app" />
                                         <include name="**/*.css" />
-                                        <include name="**/*.theme" />
+                                        <include name="**/*.tokens" />
                                         <include name="**/*Test.js" />
                                         <include name="**/*.auradoc" />
                                     </fileset>
@@ -257,7 +257,7 @@
                                         <include name="**/*.evt" />
                                         <include name="**/*.app" />
                                         <include name="**/*.css" />
-                                        <include name="**/*.theme" />
+                                        <include name="**/*.tokens" />
                                         <include name="**/*Test.js" />
                                         <include name="**/*.auradoc" />
                                     </fileset>

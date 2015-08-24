@@ -1,0 +1,1 @@
+{"mode":"UTEST","app":"test:fakeTokensApp","fwuid":"#FAKEUID#","tokens":["markup://test:fakeTokens2","markup://test:fakeTokensWithMapProvider"],"tokensUid":"4yo4Xi5U6nLqDwehxfxHRQ","styleContext":{"c":"other"},"test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeWithTokens"}

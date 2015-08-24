@@ -24,7 +24,7 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ThemeDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.system.AuraContext.Access;
@@ -37,39 +37,39 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 
 	public BaseAccessAttributeTest(String name) {
-		super(name);		
+		super(name);
 	}
-		
+
 	public void testDefaultAccess() throws Exception {
 		testCase = TestCase.DEFAULT;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testEmptyAccess() throws Exception {
-		testCase = TestCase.EMPTY;		 
+		testCase = TestCase.EMPTY;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testInvalidAccess() throws Exception {
 		testCase = TestCase.INVALID;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testInvalidAccessDynamic() throws Exception {
 		testCase = TestCase.INVALID;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testInvalidValidAccess() throws Exception {
-		ArrayList<String> failures = new ArrayList<>();		
+		ArrayList<String> failures = new ArrayList<>();
 		for (Access access : Access.values()) {
-			testCase = getTestCase(access, "INVALID");	
+			testCase = getTestCase(access, "INVALID");
 			testNamespace = TestNamespace.System;
-			if(testCase != null){	
+			if(testCase != null){
 				try{
 					runTestCase();
 				}
@@ -77,12 +77,12 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					failures.add(e.getMessage());
 				}
 			}
-			else{				
-				failures.add("TestCase not found for Access: " + access.toString());				
+			else{
+				failures.add("TestCase not found for Access: " + access.toString());
 			}
 		}
-		
-		if(!failures.isEmpty()){			
+
+		if(!failures.isEmpty()){
 			String message = "";
 			for(int i = 0; i < failures.size(); i++){
 				message += failures.get(i);
@@ -93,13 +93,13 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			fail("Test failed because: " + message);
 		}
     }
-	
+
 	public void testInvalidValidAuthentication() throws Exception {
-		ArrayList<String> failures = new ArrayList<>();		
+		ArrayList<String> failures = new ArrayList<>();
 		for (Authentication authentication : Authentication.values()) {
-			testCase = getTestCase(authentication, "INVALID");	
+			testCase = getTestCase(authentication, "INVALID");
 			testNamespace = TestNamespace.System;
-			if(testCase != null){	
+			if(testCase != null){
 				try{
 					runTestCase();
 				}
@@ -107,12 +107,12 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					failures.add(e.getMessage());
 				}
 			}
-			else{				
-				failures.add("TestCase not found for Access: " + authentication.toString());				
+			else{
+				failures.add("TestCase not found for Access: " + authentication.toString());
 			}
 		}
-		
-		if(!failures.isEmpty()){			
+
+		if(!failures.isEmpty()){
 			String message = "";
 			for(int i = 0; i < failures.size(); i++){
 				message += failures.get(i);
@@ -123,96 +123,96 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			fail("Test failed because: " + message);
 		}
     }
-	
+
 	public void testAccessValueAndStaticMethod() throws Exception {
 		testCase = TestCase.VALUE_METHOD;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testStaticMethodAndAuthentication() throws Exception {
 		testCase = TestCase.METHOD_AUTHENTICATION;
 		testNamespace = TestNamespace.System;
         runTestCase();
     }
-	
+
 	public void testSimpleAccessInSystemNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.System, false);
 	}
-	
+
 	public void testSimpleAccessDynamicInSystemNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.System, true);
 	}
-	
+
 	public void testCombinationAccessInSystemNamespace() throws Exception {
 		verifyCombinationAccess(TestNamespace.System);
 	}
-	
+
 	public void testSimpleAuthenticationInSystemNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.System, false);
 	}
-	
+
 	public void testSimpleAuthenticationDynamicInSystemNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.System, true);
 	}
-	
+
 	public void testCombinationAuthenticationInSystemNamespace() throws Exception {
 		verifyCombinationAuthentication(TestNamespace.System);
 	}
-	
+
 	public void testAccessAuthenticationInSystemNamespace() throws Exception {
 		verifyAccessAuthentication(TestNamespace.System);
 	}
-	
+
 	public void testSimpleAccessInCustomNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.Custom, false);
 	}
-	
+
 	public void testSimpleAccessDynamicInCustomNamespace() throws Exception {
 		verifySimpleAccess(TestNamespace.Custom, true);
 	}
-	
+
 	public void testCombinationAccessInCustomNamespace() throws Exception {
 		verifyCombinationAccess(TestNamespace.Custom);
-    }				
-	
+    }
+
 	public void testSimpleAuthenticationInCustomNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.Custom, false);
 	}
-	
+
 	public void testSimpleAuthenticationDynamicInCustomNamespace() throws Exception {
 		verifySimpleAuthentication(TestNamespace.Custom, true);
 	}
-	
+
 	public void testCombinationAuthenticationInCustomNamespace() throws Exception {
 		verifyCombinationAuthentication(TestNamespace.Custom);
 	}
-	
+
 	public void testAccessAuthenticationInCustomNamespace() throws Exception {
 		verifyAccessAuthentication(TestNamespace.Custom);
 	}
-	
-	private void verifySimpleAccess(TestNamespace namespace, boolean isDynamic) throws Exception {		
-		ArrayList<String> failures = new ArrayList<>();		
+
+	private void verifySimpleAccess(TestNamespace namespace, boolean isDynamic) throws Exception {
+		ArrayList<String> failures = new ArrayList<>();
 		for (Access access : Access.values()) {
 			if(!(isDynamic && access == Access.PRIVATE)){ // TODO W-2085835
-				testCase = getTestCase(access, isDynamic);	
+				testCase = getTestCase(access, isDynamic);
 				testNamespace = namespace;
-				if(testCase != null){	
-					try{					
+				if(testCase != null){
+					try{
 						runTestCase();
 					}
 					catch(Throwable e) {
 						failures.add(e.getMessage());
 					}
 				}
-				else{				
-					failures.add("TestCase not found for Access: " + access.toString());				
+				else{
+					failures.add("TestCase not found for Access: " + access.toString());
 				}
 			}
 		}
-		
-		if(!failures.isEmpty()){			
+
+		if(!failures.isEmpty()){
 			String message = "";
 			for(int i = 0; i < failures.size(); i++){
 				message += failures.get(i);
@@ -222,16 +222,16 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			}
 			fail("Test failed because: " + message);
 		}
-    }		
-	
+    }
+
 	private void verifyCombinationAccess(TestNamespace namespace) throws Exception {
 		ArrayList<String> failures = new ArrayList<>();
 		Access[] accessValues = Access.values();
-		for (int i = 0; i < accessValues.length-1; i++) {	
+		for (int i = 0; i < accessValues.length-1; i++) {
 			for (int j = i+1; j < accessValues.length; j++) {
-				testCase = getTestCase(accessValues[i], accessValues[j]);	
+				testCase = getTestCase(accessValues[i], accessValues[j]);
 				testNamespace = namespace;
-				if(testCase != null){					
+				if(testCase != null){
 		        	try{
 		        		runTestCase();
 		        	}
@@ -240,11 +240,11 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					}
 				}
 				else{
-					failures.add("TestCase not found for Access: " + accessValues[i].toString() + " , " + accessValues[j].toString());										
+					failures.add("TestCase not found for Access: " + accessValues[i].toString() + " , " + accessValues[j].toString());
 				}
 			}
 		}
-		
+
 		if(!failures.isEmpty()){
 			String message = "";
 			for(int i = 0; i < failures.size(); i++){
@@ -256,13 +256,13 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			fail("Test failed because: " + message);
 		}
     }
-	
+
 	private void verifySimpleAuthentication(TestNamespace namespace, boolean isDynamic) throws Exception {
 		ArrayList<String> failures = new ArrayList<>();
 		for (Authentication authentication : Authentication.values()) {
-			testCase = getTestCase(authentication, isDynamic);	
+			testCase = getTestCase(authentication, isDynamic);
 			testNamespace = namespace;
-			if(testCase != null){	
+			if(testCase != null){
 				try{
 					runTestCase();
 				}
@@ -270,8 +270,8 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					failures.add(e.getMessage());
 				}
 			}
-			else{				
-				failures.add("TestCase not found for Access: " + authentication.toString());				
+			else{
+				failures.add("TestCase not found for Access: " + authentication.toString());
 			}
 		}
 		if(!failures.isEmpty()){
@@ -285,23 +285,23 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			fail("Test failed because: " + message);
 		}
     }
-	
-	private void verifyCombinationAuthentication(TestNamespace namespace) throws Exception {		
-		testCase = TestCase.AUTHENTICATED_UNAUTHENTICATED;	
-		testNamespace = namespace;						
-        runTestCase();				
+
+	private void verifyCombinationAuthentication(TestNamespace namespace) throws Exception {
+		testCase = TestCase.AUTHENTICATED_UNAUTHENTICATED;
+		testNamespace = namespace;
+        runTestCase();
     }
-	
-	private void verifyAccessAuthentication(TestNamespace namespace) throws Exception {		
+
+	private void verifyAccessAuthentication(TestNamespace namespace) throws Exception {
 		ArrayList<String> failures = new ArrayList<>();
 		Access[] accessValues = Access.values();
 		Authentication[] authenticationValues = Authentication.values();
-		
-		for (int i = 0; i < accessValues.length; i++) {	
+
+		for (int i = 0; i < accessValues.length; i++) {
 			for (int j = 0; j < authenticationValues.length; j++) {
-				testCase = getTestCase(accessValues[i], authenticationValues[j]);		
+				testCase = getTestCase(accessValues[i], authenticationValues[j]);
 				testNamespace = namespace;
-				if(testCase != null){	
+				if(testCase != null){
 					try{
 						runTestCase();
 					}
@@ -309,13 +309,13 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 						failures.add(e.getMessage());
 					}
 				}
-				else{				
-					failures.add("TestCase not found for Access: " + accessValues[i].toString() + "," + authenticationValues[j].toString());				
+				else{
+					failures.add("TestCase not found for Access: " + accessValues[i].toString() + "," + authenticationValues[j].toString());
 				}
 			}
 		}
-		
-		if(!failures.isEmpty()){			
+
+		if(!failures.isEmpty()){
 			String message = "";
 			for(int i = 0; i < failures.size(); i++){
 				message += failures.get(i);
@@ -323,18 +323,18 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					message += ", ";
 				}
 			}
-			
+
 			fail("Test failed because: " + message);
 		}
-    }	
-		
+    }
+
 	protected void runTestCase() throws Exception{
-		try{																	
+		try{
 			DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(getDefClass(), getResourceSource(), getDefDescriptorName(), (testNamespace == TestNamespace.System? true: false));
-			Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);			
+			Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);
 			Definition def = parser.parse(descriptor, source);
-			def.validateDefinition();			
-			
+			def.validateDefinition();
+
 			if(!isValidTestCase()) {
 				fail("Should have thrown Exception for access: " + getAccess());
 			}
@@ -350,49 +350,49 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			}
 		}
 	}
-	
+
 	private String getDefDescriptorName() {
-		String name = null;		
+		String name = null;
 		String namespace = StringSourceLoader.DEFAULT_NAMESPACE;
-				
+
 		if(testNamespace == TestNamespace.Custom){
 			namespace = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE;
 		}
-		
+
 		switch(testResource){
 			case Application:
 				name = namespace + ":testapplication";
 				break;
-				
+
 			case Component:
 				name = namespace + ":testcomponent";
 				break;
-				
+
 			case Interface:
 				name = namespace + ":testinterface";
-				break;				
-				
+				break;
+
 			case Attribute:
 				name = namespace + ":testcomponent";
 				break;
-				
+
 			case Event:
-			case RegisterEvent:	
+			case RegisterEvent:
 				name = namespace + ":testevent";
 				break;
-				
-			case Theme:
-				name = namespace + ":testtheme";
-				break;											
+
+			case Tokens:
+				name = namespace + ":testtokens";
+				break;
 
             case Module:
                 name = namespace + ":testmodule";
-                break;                                          
-		}				
-		
-		return name;		
+                break;
+		}
+
+		return name;
 	}
-	
+
 	private Class<? extends Definition> getDefClass(){
 		Class<? extends Definition> classDef = null;
 		switch(testResource){
@@ -402,7 +402,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			case Component:
 				classDef =  ComponentDef.class;
 				break;
-			case Interface:				
+			case Interface:
 				classDef =  InterfaceDef.class;
 				break;
 			case Attribute:
@@ -414,25 +414,25 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			case Module:
 				classDef =  LibraryDef.class;
 				break;
-			case Theme:
-				classDef =  ThemeDef.class;		
+			case Tokens:
+				classDef =  TokensDef.class;
 				break;
 			case RegisterEvent:
-				classDef =  ComponentDef.class;	
+				classDef =  ComponentDef.class;
 		}
-		
-		return classDef;		
+
+		return classDef;
 	}
-	
+
 	private String getResourceSource(){
 		String resource = testResource.toString().toLowerCase();
 		String access = getAccess();
 		String source = null;
-		
+
 		if(testResource == TestResource.Application ||
 		   testResource == TestResource.Component ||
-		   testResource == TestResource.Interface){					
-			source = "<aura:"+resource+" " + (access!= null?"access='" +access+ "'" : "") + " /> ";            		
+		   testResource == TestResource.Interface){
+			source = "<aura:"+resource+" " + (access!= null?"access='" +access+ "'" : "") + " /> ";
 		}
 		else if(testResource == TestResource.Attribute){
 			source = "<aura:component>";
@@ -442,58 +442,58 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 		else if(testResource == TestResource.Event){
 			source = "<aura:event type='COMPONENT' " + (access!= null?"access='" +access+ "'" : "") + " />";
 		}
-		else if(testResource == TestResource.Theme){
-			source = "<aura:theme " + (access!= null?"access='" + access+ "'" : "") + " />";
+		else if(testResource == TestResource.Tokens){
+			source = "<aura:tokens " + (access!= null?"access='" + access+ "'" : "") + " />";
 		}
 		else if(testResource == TestResource.RegisterEvent){
 			source = "<aura:component>";
 			source += "<aura:registerEvent name='testevent' type='ui:keydown' description='For QA' " + (access!= null?"access='" +access+ "'" : "") + " />";
 			source += "</aura:component> ";
 		}
-		
+
 		return source;
-	}	
-	
+	}
+
 	private String getAccess(){
 		StringBuffer access = new StringBuffer();
-		
+
 		if(testCase == TestCase.DEFAULT){
 			return null;
 		}
-		
+
 		if(testCase == TestCase.EMPTY){
 			return "";
 		}
-		
+
 		if(testCase == TestCase.INVALID){
 			return "BLAH";
 		}
-		
+
 		if(testCase == TestCase.INVALID_DYNAMIC){
 			return "org.auraframework.impl.test.util.TestAccessMethods.invalid";
 		}
-		
+
 		if(testCase == TestCase.AUTHENTICATED_UNAUTHENTICATED){
 			return "AUTHENTICATED,UNAUTHENTICATED";
 		}
-		
+
 		if(testCase == TestCase.VALUE_METHOD){
 			return "GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal";
 		}
-		
+
 		if(testCase == TestCase.METHOD_AUTHENTICATION){
 			return "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal,AUTHENTICATED";
 		}
-		
+
 		if(testCase.toString().contains("INVALID")){
 			access.append("BLAH,");
 		}
-		
+
 		boolean isDynamic = false;
 		if(testCase.toString().endsWith("DYNAMIC")){
 			isDynamic = true;
 		}
-		
+
 		if(testCase.toString().contains("GLOBAL")){
 			if(!isDynamic){
 				access.append("GLOBAL,");
@@ -502,7 +502,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return "org.auraframework.impl.test.util.TestAccessMethods.allowGlobal";
 			}
 		}
-		
+
 		if(testCase.toString().contains("PUBLIC")){
 			if(!isDynamic){
 				access.append("PUBLIC,");
@@ -511,7 +511,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return "org.auraframework.impl.test.util.TestAccessMethods.allowPublic";
 			}
 		}
-		
+
 		if(testCase.toString().contains("PRIVATE")){
 			if(!isDynamic){
 				access.append("PRIVATE,");
@@ -520,7 +520,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return "org.auraframework.impl.test.util.TestAccessMethods.allowPrivate";
 			}
 		}
-		
+
 		if(testCase.toString().contains("INTERNAL")){
 			if(!isDynamic){
 				access.append("INTERNAL,");
@@ -529,7 +529,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return "org.auraframework.impl.test.util.TestAccessMethods.allowInternal";
 			}
 		}
-				
+
 		if(testCase.toString().contains("UNAUTHENTICATED")){
 			if(!isDynamic){
 				access.append("UNAUTHENTICATED,");
@@ -538,53 +538,53 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return "org.auraframework.impl.test.util.TestAccessMethods.allowUnAuthenticated";
 			}
 		}
-		else{					
+		else{
 			if(testCase.toString().contains("AUTHENTICATED")){
-				if(!isDynamic){	
+				if(!isDynamic){
 					access.append("AUTHENTICATED,");
 				}
 				else{
 					return "org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated";
 				}
 			}
-		}				
-				
-		int index = access.lastIndexOf(",");		
+		}
+
+		int index = access.lastIndexOf(",");
 		if(index == access.length()-1){
 			access.deleteCharAt(index);
 		}
-		
+
 		return access.toString();
-	}		
-	
+	}
+
 	private boolean isValidTestCase(){
 		String access = getAccess();
 		if(access == null){
 			return true;
 		}
-		
-		if(access == "" || access.equals("BLAH")  
-		   || access.equals("AUTHENTICATED,UNAUTHENTICATED") 
+
+		if(access == "" || access.equals("BLAH")
+		   || access.equals("AUTHENTICATED,UNAUTHENTICATED")
 		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.invalid")
 		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.allowAuthenticated")
 		   || access.equals("org.auraframework.impl.test.util.TestAccessMethods.allowUnAuthenticated")
 		   || access.equals("GLOBAL,org.auraframework.impl.test.util.TestAccessMethods.allowGlobal")){
 			return false;
-		}	
-		
+		}
+
 		String[] accessValues;
-		
+
 		if(access.startsWith("org.auraframework.impl.test.util.TestAccessMethods.")){
 			String[] vals =  access.split("\\.");
 			String val = vals[vals.length-1];
-			
+
 			accessValues = new String[]{val.toUpperCase()};
 		}
 		else{
-			accessValues = access.split(","); 
+			accessValues = access.split(",");
 		}
-		
-		for(int i = 0; i < accessValues.length; i++){				
+
+		for(int i = 0; i < accessValues.length; i++){
 			switch (testResource) {
 			case Application:
 				if(testNamespace == TestNamespace.System){
@@ -598,9 +598,9 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					}
 				}
 				break;
-				
+
 			case Component:
-			case Interface:	
+			case Interface:
 				if(testNamespace == TestNamespace.System){
 					if(accessValues[i].contains("PRIVATE") || accessValues[i].contains("AUTHENTICATED") || accessValues[i].contains("BLAH")){
 						return false;
@@ -612,7 +612,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 					}
 				}
 				break;
-				
+
 			default:
 				if(testNamespace == TestNamespace.System){
 					if(accessValues[i].contains("AUTHENTICATED") || accessValues[i].contains("BLAH")){
@@ -626,43 +626,43 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				}
 			}
 		}
-		
+
 		if(accessValues.length == 2){
 			if(access.contains("GLOBAL")){
 				if(access.contains("PUBLIC") || access.contains("PRIVATE") || access.contains("INTERNAL")){
 					return false;
 				}
 			}
-			
+
 			if(access.contains("PUBLIC")){
 				if(access.contains("PRIVATE") || access.contains("INTERNAL")){
 					return false;
 				}
 			}
-			
+
 			if(access.contains("PRIVATE") && access.contains("INTERNAL")){
 				return false;
 			}
-						
+
 		}
 		return true;
 	}
-	
+
 	protected TestCase getTestCase(Access access, boolean isDynamic) {
 		try{
 			String accessVal = access.toString();
-			
+
 			if(isDynamic){
 				accessVal += "_DYNAMIC";
 			}
-			
+
 			return TestCase.valueOf(accessVal);
 		}
 		catch(Exception e){
 			return null;
 		}
 	}
-	
+
 	private TestCase getTestCase(Access access, String prefix) {
 		try{
 			String accessVal = prefix + "_" + access.toString();
@@ -672,7 +672,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			return null;
 		}
 	}
-	
+
 	private TestCase getTestCase(Access access1, Access access2) {
 		try{
 			return TestCase.valueOf(access1.toString() + "_" + access2.toString());
@@ -685,23 +685,23 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 				return null;
 			}
 		}
-	}	
-	
+	}
+
 	private TestCase getTestCase(Authentication authentication, boolean isDynamic) {
 		try{
 			String accessVal = authentication.toString();
-			
+
 			if(isDynamic){
 				accessVal += "_DYNAMIC";
 			}
-			
+
 			return TestCase.valueOf(accessVal);
 		}
 		catch(Exception e){
 			return null;
 		}
 	}
-	
+
 	private TestCase getTestCase(Authentication authentication, String prefix) {
 		try{
 			String accessVal = prefix + "_" + authentication.toString();
@@ -711,37 +711,37 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
 			return null;
 		}
 	}
-	
+
 	private TestCase getTestCase(Access access, Authentication authentication) {
 		try{
 			return TestCase.valueOf(access.toString() + "_" + authentication.toString());
 		}
-		catch(Exception e1){			
-			return null;			
+		catch(Exception e1){
+			return null;
 		}
 	}
-	
+
 	XMLParser parser = XMLParser.getInstance();
-	
+
 	protected TestCase testCase;
 	protected TestResource testResource;
 	protected TestNamespace testNamespace;
-	
-	protected enum TestResource {Application, Component, Interface, Attribute, Event, Theme, RegisterEvent, Module};
-	
+
+	protected enum TestResource {Application, Component, Interface, Attribute, Event, Tokens, RegisterEvent, Module};
+
 	protected enum TestNamespace {System, Custom};
-	
+
 	private enum TestCase {EMPTY, DEFAULT, INVALID, GLOBAL, PUBLIC, PRIVATE, INTERNAL, AUTHENTICATED, UNAUTHENTICATED,
 							 INVALID_DYNAMIC, GLOBAL_DYNAMIC, PUBLIC_DYNAMIC, PRIVATE_DYNAMIC, INTERNAL_DYNAMIC, AUTHENTICATED_DYNAMIC, UNAUTHENTICATED_DYNAMIC,
 							 GLOBAL_AUTHENTICATED, GLOBAL_UNAUTHENTICATED,
 							 PUBLIC_AUTHENTICATED, PUBLIC_UNAUTHENTICATED,
 							 PRIVATE_AUTHENTICATED, PRIVATE_UNAUTHENTICATED,
 							 INTERNAL_AUTHENTICATED, INTERNAL_UNAUTHENTICATED,
-							 GLOBAL_PUBLIC, GLOBAL_PRIVATE, GLOBAL_INTERNAL, 
+							 GLOBAL_PUBLIC, GLOBAL_PRIVATE, GLOBAL_INTERNAL,
 							 PUBLIC_PRIVATE, PUBLIC_INTERNAL,
 							 PRIVATE_INTERNAL,
 							 AUTHENTICATED_UNAUTHENTICATED,
 							 VALUE_METHOD, METHOD_AUTHENTICATION,
-							 INVALID_GLOBAL, INVALID_PUBLIC, INVALID_PRIVATE, INVALID_INTERNAL, INVALID_AUTHENTICATED, INVALID_UNAUTHENTICATED}; 
-			 							 
+							 INVALID_GLOBAL, INVALID_PUBLIC, INVALID_PRIVATE, INVALID_INTERNAL, INVALID_AUTHENTICATED, INVALID_UNAUTHENTICATED};
+
 }

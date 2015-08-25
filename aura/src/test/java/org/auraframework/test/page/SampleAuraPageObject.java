@@ -26,7 +26,8 @@ public class SampleAuraPageObject extends AuraPageObject<ComponentDef> {
         super(name, isComponent, descriptorString, pageObjectTest);
     }
 
-    public void clickOnButton() {
+    @Override
+	public void clickOnButton() {
         WebElement element = pageObjectTestCase.getDriver().findElement(By.cssSelector(".uiButton"));
         element.click();
     }

@@ -24,8 +24,10 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.util.test.configuration.TestServletConfig;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
-public abstract class AuraPageObject<T extends BaseComponentDef> implements PageObject {
+public abstract class AuraPageObject<T extends BaseComponentDef> implements AuraPageObjectInterface {
     
     //we need servletConfig to convert url to uri, TODO: maybe this should be a function from xxxUtil as well?
     private TestServletConfig servletConfig;
@@ -36,6 +38,8 @@ public abstract class AuraPageObject<T extends BaseComponentDef> implements Page
     private final DefDescriptor<T> defDescriptor;
     
     protected PageObjectTestCase<?> pageObjectTestCase;
+    
+    //private final String cssSelector_uiButton = ".uiButton";
     
     
     @SuppressWarnings("unchecked")
@@ -62,7 +66,14 @@ public abstract class AuraPageObject<T extends BaseComponentDef> implements Page
         return this.name;
     }
     
-    public void open() throws MalformedURLException, URISyntaxException {
+    @Override
+	public void open() throws MalformedURLException, URISyntaxException {
         pageObjectTestCase.open(defDescriptor);
+    }
+    
+    @Override
+	public void clickOnButton() {
+        //WebElement element = pageObjectTestCase.getDriver().findElement(By.cssSelector(this.cssSelector_uiButton));
+        //element.click();
     }
 }

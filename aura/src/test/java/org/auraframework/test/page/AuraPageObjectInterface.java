@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.auraframework.test.page;
 
-public interface PageObject {
-	//getters begin
-	String getName();
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+
+public interface AuraPageObjectInterface {
+	public String getName();
+	public void open() throws MalformedURLException, URISyntaxException;
+	public void clickOnButton();
 }

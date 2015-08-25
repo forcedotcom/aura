@@ -76,21 +76,51 @@ public class AuraUITestingUtil {
         //TODO: AFTERDECODE 
     }
     
-    public Object runActionsDuringTransit(String actionName, ActionTiming actionTiming, ActionDuringTransit actionDuringTransit) {
+    public static class StressAction {
+    	private String auraActionWeCare;
+    	private ActionTiming actionTiming;
+    	private ActionDuringTransit[] actionDuringTransit;
+    	public StressAction(String auraActionWeCare, ActionTiming actionTiming, ActionDuringTransit... actionDuringTransit) {
+    		this.auraActionWeCare = auraActionWeCare;
+    		this.actionTiming = actionTiming;
+    		this.actionDuringTransit = actionDuringTransit;
+    	}
+		public String getAuraActionWeCare() {
+			return auraActionWeCare;
+		}
+		public ActionTiming getActionTiming() {
+			return actionTiming;
+		}
+		public ActionDuringTransit[] getActionDuringTransit() {
+			return actionDuringTransit;
+		}
+    };
+    
+    public static StressAction createStressAction(String auraActionWeCare, ActionTiming stressActionTiming, ActionDuringTransit... stressActionDuringTransitList) {
+    	return new StressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
+    }
+    
+    public Object performStressActionsDuringTransit(StressAction stressAction) {
+    	return performStressActionsDuringTransit(stressAction.getAuraActionWeCare(), stressAction.getActionTiming(), stressAction.getActionDuringTransit());
+    }
+    
+    public Object performStressActionsDuringTransit(String auraActionWeCare, ActionTiming stressActionTiming, ActionDuringTransit... stressActionDuringTransitList) {
         String jsScript;
         jsScript ="var customCallback = function(actions) { "+
         "var i;"+
         "var action = undefined;"+
         "for (i = 0; i < actions.length; i++) {"+
-        "if (actions[i].getDef().name === '"+ actionName +"') {"+
+        "if (actions[i].getDef().name === '"+ auraActionWeCare +"') {"+
         "action = actions[i];"+
         "break;"+
         "}"+
         "}"+
         "if (action) {";
         
-        switch(actionDuringTransit) {
+		for(ActionDuringTransit actionDuringTransit : stressActionDuringTransitList) {
+			switch(actionDuringTransit) {
             case DROPACTION : 
+            	System.out.println("!!!!!DROPACTION!!!!!!!");
                 jsScript+= "actions.splice(i, 1);";
                 break;
             case NAVIGATEBACK :
@@ -98,6 +128,7 @@ public class AuraUITestingUtil {
                 break;
             default: //do nothing
                 break;
+			}
         }
         
         //remove the callback once we are done, only do it once
@@ -106,7 +137,7 @@ public class AuraUITestingUtil {
         "};"; //end of function customCallback
         
         //register the custom callback
-        switch(actionTiming) {
+        switch(stressActionTiming) {
             case PRESEND: 
                 jsScript += "var cb_handle = $A.test.addPrePostSendCallback(undefined, customCallback, undefined);";
                 break;

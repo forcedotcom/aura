@@ -537,6 +537,8 @@
     	}]
     },
     
+    /**************************************************PANEL POSITION TEST**************************************************/
+    
     /**
      * Test panel with reference element set
      */
@@ -646,6 +648,132 @@
     		var actualRefElId = cmp.find("tester").find("idRefEl").get("v.value");
     		$A.test.assertEquals("", actualRefElId, "ReferenceElement's id is incorrect")
     	}]
+    },
+    
+    testPanelWestPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "west"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelEastPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testDirection" : "east"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelNorthPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testDirection" : "north"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelSouthPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelWestPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testShowPointer" : true,
+    		"testDirection" : "west"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelEastPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testShowPointer" : true,
+    		"testDirection" : "east"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelNorthPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testShowPointer" : true,
+    		"testDirection" : "north"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelSouthPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testShowPointer" : true,
+    		"testDirection" : "south"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    /**************************************************PANEL POSITION TEST ENDS**************************************************/
+    
+    verifyPointerPresent : function(isPresent) {
+    	var errorMsg = "Pointer for panel should not be present";
+    	if(isPresent){
+    		errorMsg = "Pointer for panel should be present";
+    	}
+    	this.verifyElementWithClassPresent("pointer", isPresent, errorMsg);
     },
     
     verifyElementWithClassPresent : function(className, isPresent, errorMsg) {

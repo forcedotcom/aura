@@ -5,7 +5,8 @@ function AuraInspectorComponentView(devtoolsPanel) {
         "rendered": "IsRendered",
         "valid": "IsValid",
         "localId": "aura:id",
-        "descriptor": "Descriptor"
+        "descriptor": "Descriptor",
+        "elementCount": "HTML Elements"
     }
     var treeComponent;
     var _items = {};
@@ -139,6 +140,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
                 nodes.push(TreeNode.create({key: propertyMap[prop], value: json[prop] }, prop, "keyvalue"));
             }
         }
+
         return nodes;
     }
 }

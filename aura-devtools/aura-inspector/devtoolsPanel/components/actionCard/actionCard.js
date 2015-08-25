@@ -1,7 +1,7 @@
 (function() {
 	var ownerDocument = document.currentScript.ownerDocument;
 
-	var prototype = Object.create(HTMLElement.prototype);
+	var actionCard = Object.create(HTMLElement.prototype);
 
 	/**
 	 * The element has been attached to the DOM, update the structure.
@@ -11,7 +11,7 @@
 	 * 
 	 * @return {[type]} [description]
 	 */
-	prototype.attachedCallback = function() {
+	actionCard.attachedCallback = function() {
 		var model = {
 			id: 			this.getAttribute("actionId"),
 			actionName: 	this.getAttribute("name"),
@@ -42,7 +42,7 @@
 	/*
 		New Action Card created, update it's body
 	 */
-	prototype.createdCallback = function(){
+	actionCard.createdCallback = function(){
     	var template = ownerDocument.querySelector("template");
 
     	var clone = document.importNode(template.content, true);
@@ -52,12 +52,12 @@
     	
 	};
 
-	prototype.attributeChangedCallback = function(attr) {
+	actionCard.attributeChangedCallback = function(attr) {
 		//console.log("The attribute %s changed", attr);
 	};
 
 	var actionCardConstructor = document.registerElement('aurainspector-actionCard', {
-		prototype: prototype
+		prototype: actionCard
 	});
 
 })();

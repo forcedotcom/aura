@@ -1,9 +1,9 @@
 (function() {
 	var ownerDocument = document.currentScript.ownerDocument;
 
-	var prototype = Object.create(HTMLDivElement.prototype);
+	var jsonPrototype = Object.create(HTMLDivElement.prototype);
 
-	prototype.createdCallback = function(){
+	jsonPrototype.createdCallback = function(){
     	var template = ownerDocument.querySelector("template");
 
     	var clone = document.importNode(template.content, true);
@@ -30,10 +30,7 @@
     	});
 	};
 
-	//prototype.attributeChangedCallback = function(attr) {};
-	//prototype.attachedCallback = function(){};
-
-	prototype.update = function() {
+	jsonPrototype.update = function() {
 		var shadowRoot = this.shadowRoot || this.createShadowRoot();
 		
 		var output = shadowRoot.querySelector(".renderjson");
@@ -65,7 +62,7 @@
 	};
 
 	document.registerElement('aurainspector-json', {
-		prototype: prototype
+		prototype: jsonPrototype
 	});
 
 	function formatJSON(object, options) {
@@ -80,6 +77,7 @@
 		// Shared state, so store the old, so we can reset it when we are done.
 		var showlevel = renderjson.show_to_level;
 
+		renderjson.set_icons('+', '-');
 		renderjson.set_show_to_level(options.expandTo);
 
 		var result = renderjson(object);

@@ -79,9 +79,11 @@ AuraComponentService.prototype.getComponent = function(identifier) {
 };
 
 /**
- * Gets an instance of a component from either a GlobalId or a DOM element that was created via a Component Render.
- * @param {Object} identifier that is either a globalId or an element.
+ * Counts all the components currently created in the application.
  *
+ * @example
+ * var count = $A.componentService.countComponents();
+ * 
  * @public
  * @platform
  * @export

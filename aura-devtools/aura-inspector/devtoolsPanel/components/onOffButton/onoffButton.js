@@ -1,18 +1,16 @@
 (function() {
-//	var ownerDocument = document.currentScript.ownerDocument;
+	var onoffButton = Object.create(HTMLButtonElement.prototype);
 
-	var prototype = Object.create(HTMLButtonElement.prototype);
-
-	prototype.createdCallback = function(){
+	onoffButton.createdCallback = function(){
     	this.addEventListener("click", OnOffButton_Click);	
 	};
 
-	prototype.attributeChangedCallback = function(attr) {
+	onoffButton.attributeChangedCallback = function(attr) {
 		//console.log("The attribute %s changed", attr);
 	};
 
 	document.registerElement('aurainspector-onOffButton', {
-		prototype: prototype
+		prototype: onoffButton
 	});
 
 	function OnOffButton_Click(event) {

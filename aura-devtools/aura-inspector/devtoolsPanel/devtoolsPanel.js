@@ -15,9 +15,13 @@
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
-     * AuraInspector:ConsoleLog                     Show a log message in the event log panel. You should count on this changing how it gets exposed in the UI.
+     * AuraInspector:ConsoleLog                     [DEPRECATED] Show a message in the DevTools console.
+     * AuraInspector:OnEventStart                   An Aura event is about to fire. Allows us to track that everything between the start and end happend as a result of this event.
+     * AuraInspector:OnEventEnd                     An Aura event fired. Process all the events and actions that have happened since the event fired. 
      * Transactions:OnTransactionEnd                Transaction has ended and should now be added to the UI.
      * AuraInspector:StorageData                    Aura Storage Service has async fetched data to show in the storage panel.
+     * AuraInspector:OnClientActionStart
+     * AuraInspector:OnClientActionEnd
      */
 
 
@@ -74,10 +78,6 @@
             //-- Attach Event Listeners
             var header = document.querySelector("header.tabs");
             header.addEventListener("click", HeaderActions_OnClick.bind(this));
-
-            // Setup json->html renderer
-            renderjson.set_show_to_level(1);
-            renderjson.set_icons('+', '-');
 
             // Initialize Panels
             var eventLog = new AuraInspectorEventLog(this);
@@ -274,7 +274,7 @@
             // $A will be present on aura error pages
             // but we won't have a root
             var command = `
-                json = "{}";
+                var json = "{}";
                 if(window.$A) {
                     var root = $A.getRoot();
                     if(root) {
@@ -301,14 +301,23 @@
         };
 
         this.updateComponentView = function(globalId) {
-            // var panel = panels.get("component-view");
-            // if(panel) {
-            //     panel.update(globalId);
-            // }
-
             var cmd = `
-                var component = $A.getComponent('${globalId}');
-                if(component) { component.toJSON(); }
+                var component = $A.getComponent("${globalId}");
+                if(component) { 
+                    var result = component.toJSON();
+                    var tmpResult = JSON.parse(result);
+                    var elements = component.getElements() || [];
+                    var elementCount = 0;
+                    elements.forEach(function(current){
+                        // Sub elements
+                        elementCount += current.getElementsByTagName("*").length;
+                        // For the current element. 
+                        elementCount++;
+                    });
+                    tmpResult.elementCount = elementCount;
+
+                    JSON.stringify(tmpResult);
+                }
             `;
 
             chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
@@ -364,9 +373,8 @@
         /**
          * Should show a message of a different type obviously.
          */
-        //KRIS: I'm not convinced we should be using the event log as a console. It's supposed to be a running tally of the AuraEvent's being fired.
         this.addErrorMessage = function(msg) {
-            panels.get("event-log").addLogItem(msg);
+            console.error(msg);
         };
 
         /*

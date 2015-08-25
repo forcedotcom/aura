@@ -96,11 +96,19 @@
          */
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
-                // Actions Tab
-                bootstrapActionsInstrumentation();
-
-                // Perf Tab
-                bootstrapPerfDevTools();
+                // Try catches for branches that don't have the overrides
+                try {
+                    // Actions Tab
+                    bootstrapActionsInstrumentation();
+                } catch(e){}
+                try {
+                    // Perf Tab
+                    bootstrapPerfDevTools();
+                } catch(e){}
+                try {
+                    // Events Tab
+                    bootstrapEventInstrumentation();
+                } catch(e){}
 
                 // Need a way to conditionally do this based on a user setting. 
                 $A.PerfDevTools.init();
@@ -161,12 +169,51 @@
         }
     }
 
+    function bootstrapEventInstrumentation() {
+
+        // Doesn't exist in 198 yet, once it does lets remove this try catch.
+        try {
+            $A.installOverride("Event.fire", OnEventFire);
+        } catch(e){}
+
+        function OnEventFire(config, params) {
+            var startTime = performance.now();
+            var eventId = "event_" + startTime;
+            var data = {
+                "eventId": eventId
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnEventStart", data);
+
+            var ret = config["fn"].call(config["scope"], params);
+
+            var event = config["scope"];
+            var source = event.getSource();
+
+            data = {
+                "eventId": eventId,
+                "caller": arguments.callee.caller.caller.caller+"",
+                "name": event.getDef().getDescriptor().getQualifiedName(),
+                "parameters": JSON.stringify(event.getParams()),
+                "sourceId": source ? source.getGlobalId() : "",
+                "startTime": startTime,
+                "endTime": performance.now(),
+                "type": event.getDef().getEventType()
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnEventEnd", data);
+
+            return ret;
+        }
+    }
+
     function bootstrapActionsInstrumentation() {
 
         $A.installOverride("enqueueAction", OnEnqueueAction);
         $A.installOverride("Action.finishAction", OnFinishAction);
         $A.installOverride("Action.abort", OnAbortAction);
         $A.installOverride("ClientService.send", OnSendAction);
+        $A.installOverride("Action.runDeprecated", OnActionRunDeprecated);
 
         function OnEnqueueAction(config, action, scope) {
             var ret = config["fn"].call(config["scope"], action, scope);
@@ -181,7 +228,7 @@
                 "isRefresh"  : action.isRefreshAction(),
                 "defName"    : action.getDef()+"",
                 "fromStorage": action.isFromStorage(),
-                "enqueueTime": Date.now()
+                "enqueueTime": performance.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionEnqueue", data);
@@ -199,7 +246,7 @@
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
                 "returnValue": JSON.stringify(action.getReturnValue()),
-                "finishTime": Date.now()
+                "finishTime": performance.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
@@ -215,7 +262,7 @@
             var data = {
                 "id": action.getId(),
                 "state": action.getState(),
-                "finishTime": Date.now()
+                "finishTime": performance.now()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);
@@ -224,10 +271,6 @@
         }
 
         function OnSendAction(config, auraXHR, actions, method, options) {
-            //var config = Array.prototype.shift.apply(arguments);
-            //var auraXHR = arguments[0];
-            //var actions = arguments[2];
-            //var options = arguments[3];
             var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
 
             if (actions) {
@@ -235,11 +278,30 @@
                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                         "id": actions[c].getId(),
                         "state": "RUNNING",
-                        "sentTime": Date.now()
+                        "sentTime": performance.now()
                     });
                 }
             }
             return ret;
+        }
+
+        function OnActionRunDeprecated(config, event) {
+            var action = config["self"];
+            var data = {
+                "actionId": action.getId()
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnClientActionStart", data);
+
+            var ret = config["fn"].call(config["scope"], event);
+
+            data = {
+                "actionId": action.getId(),
+                "name": action.getDef().getName(),
+                "scope": action.getComponent().getGlobalId()
+            };
+
+            $Aura.Inspector.publish("AuraInspector:OnClientActionEnd", data);
         }
     }
 

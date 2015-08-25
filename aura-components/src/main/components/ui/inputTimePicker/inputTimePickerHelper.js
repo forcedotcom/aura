@@ -17,6 +17,7 @@
     position: function(component) {
         var element = component.find("timeDropdown").getElement();
         var target = component.get("v.referenceElement");
+        var self = this;
         if (target && element) {
             component.positionConstraint = this.lib.panelPositioning.createRelationship({
                 element: element,
@@ -24,9 +25,13 @@
                 align: 'left top',
                 targetAlign: 'left bottom'
             });
-            this.lib.panelPositioning.reposition();
+            this.lib.panelPositioning.reposition($A.getCallback(function(){
+                self.scrollToSelectedTime(component);
+            }));
+        } else {
+            this.scrollToSelectedTime(component);
         }
-        this.scrollToSelectedTime(component);
+        
     },
 
     selectTime: function(component, event) {

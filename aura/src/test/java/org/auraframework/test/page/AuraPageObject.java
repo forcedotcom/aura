@@ -24,8 +24,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.util.test.configuration.TestServletConfig;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 
 public abstract class AuraPageObject<T extends BaseComponentDef> implements AuraPageObjectInterface {
     

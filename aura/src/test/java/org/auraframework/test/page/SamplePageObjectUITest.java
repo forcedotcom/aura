@@ -17,6 +17,7 @@ package org.auraframework.test.page;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.AuraUITestingUtil.ActionDuringTransit;
@@ -47,13 +48,17 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
     
     public void testProxy() throws MalformedURLException, URISyntaxException {
     	final SampleAuraPageObject sapo1 = new SampleAuraPageObject(this.getName(), true, "actionsTest:serverAction", this);
-    	
+    	//we want to drop action "executeInForeground" right before it get send to server, the Page Object function that
+    	//send the action is "clickOnButton"
+    	String methodWeWantToIntercept = "clickOnButton";
     	String auraActionWeCare = "executeInForeground";
     	ActionTiming stressActionTiming = ActionTiming.PRESEND;
     	ActionDuringTransit[] stressActionDuringTransitList = {ActionDuringTransit.DROPACTION};
     	StressAction stressAction = AuraUITestingUtil.createStressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
-    	AuraPageObjectInterface apoi = AuraPageObjectHandler.getAuraPageObjectInterface(sapo1, stressAction);
-    	
+    	HashMap<String, StressAction> methodNameToStressActionMap = new HashMap<>();
+    	methodNameToStressActionMap.put(methodWeWantToIntercept, stressAction);
+    	AuraPageObjectInterface apoi = AuraPageObjectHandler.getAuraPageObjectInterface(sapo1, methodNameToStressActionMap);
+    	//now do the test
     	apoi.open();
     	apoi.clickOnButton();
     }

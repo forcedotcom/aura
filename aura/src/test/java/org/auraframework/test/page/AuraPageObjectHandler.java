@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.AuraUITestingUtil.ActionDuringTransit;
@@ -29,39 +30,43 @@ import org.auraframework.test.util.AuraUITestingUtil.StressAction;
 public class AuraPageObjectHandler implements InvocationHandler {
 	
 	private SampleAuraPageObject sampleAuraPageObject;
-	private StressAction stressAction;
+	private HashMap<String, StressAction> methodNameToStressActionMap = new HashMap<>();
 	
-	public void setStressAction(StressAction stressAction) {
-		this.stressAction = stressAction;
-	}
-
-	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject, StressAction stressAction) {
+	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject) {
 		this.sampleAuraPageObject = sampleAuraPageObject;
-		this.stressAction = stressAction;
+	}
+	
+	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject, HashMap<String, StressAction> methodNameToStressActionMap) {
+		this.sampleAuraPageObject = sampleAuraPageObject;
+		this.methodNameToStressActionMap = methodNameToStressActionMap;
+	}
+	
+	public void addStressAction(String methodName, StressAction stressAction) {
+		methodNameToStressActionMap.put(methodName, stressAction);
 	}
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args)
 		throws Throwable {
-		switch (method.getName()) {
-        case "clickOnButton":
-        	//let's do something before click
+		String methodName = method.getName();
+		StressAction stressAction = methodNameToStressActionMap.get(methodName);
+		if(stressAction != null) {
+			//let's do something before calling real method
         	AuraUITestingUtil auraUITestingUtil = sampleAuraPageObject.pageObjectTestCase.getAuraUITestingUtil();
-        	auraUITestingUtil.performStressActionsDuringTransit(this.stressAction);
-        	//then do the actual click
-        	return method.invoke(sampleAuraPageObject, args);
-		default:
-        	return method.invoke(sampleAuraPageObject, args);
-        }
+        	auraUITestingUtil.performStressActionsDuringTransit(stressAction);
+        	
+		} 
+		//then do the actual method
+		return method.invoke(sampleAuraPageObject, args);
 	}
 	
-	public static AuraPageObjectInterface getAuraPageObjectInterface(SampleAuraPageObject sampleAuraPageObject, StressAction stressAction) {
-		AuraPageObjectHandler auraPageObjectHandler = new AuraPageObjectHandler(sampleAuraPageObject, stressAction);
+	public static AuraPageObjectInterface getAuraPageObjectInterface(SampleAuraPageObject sampleAuraPageObject, HashMap<String, StressAction> methodNameToStressActionMap) {
+		AuraPageObjectHandler auraPageObjectHandler = new AuraPageObjectHandler(sampleAuraPageObject, methodNameToStressActionMap);
     	AuraPageObjectInterface apoi = (AuraPageObjectInterface) Proxy.newProxyInstance(AuraPageObjectInterface.class.getClassLoader(),
     			new Class<?>[] {AuraPageObjectInterface.class},
     			auraPageObjectHandler
     	);
     	return apoi;
 	}
-	
+
 }

@@ -726,23 +726,6 @@ AuraClientService.prototype.handleAppCache = function() {
             showProgress(-1);
         }
 
-        /*
-         * WARNING!
-         * Removing this XHR for the manifest will likely cause hard to reproduce appcache errors.
-         * Only remove if you are confident it is absolutely no longer needed.
-         */
-        var manifestURL = acs.getManifestURL();
-        if (manifestURL) {
-            setTimeout(function() {
-                var xhr = acs.createXHR();
-                var qs = acs.buildParams({
-                        "aura.error" : "true"
-                });
-                xhr["open"]("GET", manifestURL+"?"+qs, true);
-                xhr["send"]();
-            }, 500);
-        }
-
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
             // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");

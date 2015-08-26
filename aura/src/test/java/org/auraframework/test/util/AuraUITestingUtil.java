@@ -107,20 +107,19 @@ public class AuraUITestingUtil {
     public Object performStressActionsDuringTransit(String auraActionWeCare, ActionTiming stressActionTiming, ActionDuringTransit... stressActionDuringTransitList) {
         String jsScript;
         jsScript ="var customCallback = function(actions) { "+
-        "var i;"+
-        "var action = undefined;"+
-        "for (i = 0; i < actions.length; i++) {"+
-        "if (actions[i].getDef().name === '"+ auraActionWeCare +"') {"+
-        "action = actions[i];"+
-        "break;"+
-        "}"+
+        		"var i;"+
+        		"var action = undefined;"+
+        		"for (i = 0; i < actions.length; i++) {"+
+        		"if (actions[i].getDef().name === '"+ auraActionWeCare +"') {"+
+        			"action = actions[i];"+
+        			"break;"+
+        		"}"+
         "}"+
         "if (action) {";
         
 		for(ActionDuringTransit actionDuringTransit : stressActionDuringTransitList) {
 			switch(actionDuringTransit) {
             case DROPACTION : 
-            	System.out.println("!!!!!DROPACTION!!!!!!!");
                 jsScript+= "actions.splice(i, 1);";
                 break;
             case NAVIGATEBACK :

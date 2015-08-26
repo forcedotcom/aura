@@ -19,24 +19,22 @@ package org.auraframework.test.page;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.auraframework.test.util.AuraUITestingUtil;
-import org.auraframework.test.util.AuraUITestingUtil.ActionDuringTransit;
-import org.auraframework.test.util.AuraUITestingUtil.ActionTiming;
 import org.auraframework.test.util.AuraUITestingUtil.StressAction;
 
 public class AuraPageObjectHandler implements InvocationHandler {
 	
 	private SampleAuraPageObject sampleAuraPageObject;
-	private HashMap<String, StressAction> methodNameToStressActionMap = new HashMap<>();
+	private Map<String, StressAction> methodNameToStressActionMap = new HashMap<>();
 	
 	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject) {
 		this.sampleAuraPageObject = sampleAuraPageObject;
 	}
 	
-	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject, HashMap<String, StressAction> methodNameToStressActionMap) {
+	public AuraPageObjectHandler(SampleAuraPageObject sampleAuraPageObject, Map<String, StressAction> methodNameToStressActionMap) {
 		this.sampleAuraPageObject = sampleAuraPageObject;
 		this.methodNameToStressActionMap = methodNameToStressActionMap;
 	}
@@ -60,7 +58,7 @@ public class AuraPageObjectHandler implements InvocationHandler {
 		return method.invoke(sampleAuraPageObject, args);
 	}
 	
-	public static AuraPageObjectInterface getAuraPageObjectInterface(SampleAuraPageObject sampleAuraPageObject, HashMap<String, StressAction> methodNameToStressActionMap) {
+	public static AuraPageObjectInterface getAuraPageObjectInterface(SampleAuraPageObject sampleAuraPageObject, Map<String, StressAction> methodNameToStressActionMap) {
 		AuraPageObjectHandler auraPageObjectHandler = new AuraPageObjectHandler(sampleAuraPageObject, methodNameToStressActionMap);
     	AuraPageObjectInterface apoi = (AuraPageObjectInterface) Proxy.newProxyInstance(AuraPageObjectInterface.class.getClassLoader(),
     			new Class<?>[] {AuraPageObjectInterface.class},

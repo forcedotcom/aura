@@ -17,7 +17,7 @@ package org.auraframework.test.page;
 
 import org.auraframework.test.util.WebDriverTestCase;
 
-public abstract class PageObjectTestCase<T extends PageObject> extends WebDriverTestCase {
+public abstract class PageObjectTestCase<T extends AuraPageObjectInterface> extends WebDriverTestCase {
 
 	public PageObjectTestCase(String name) {
 		super(name);

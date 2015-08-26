@@ -217,8 +217,9 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing the functionality of page_down, page_up, shift+page_down, shift+page_up
+    // test disabled due to flapper: W-2733724
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void testPageUpDownMonth() throws Exception {
+    public void _testPageUpDownMonth() throws Exception {
         DateFormat formatter = new SimpleDateFormat(DATE_FORMAT_STR);
         open(URL);
 

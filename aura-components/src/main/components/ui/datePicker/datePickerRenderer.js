@@ -83,6 +83,7 @@
         if(component.positionConstraint) {
             component.positionConstraint.destroy();
             delete component.positionConstraint;
-        }
+        }  
+        this.superUnrender();  
     }
 })

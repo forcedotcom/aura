@@ -142,12 +142,19 @@
         // if this is an event we're supposed to update on, call this component's update implementation
         if (updateOn.indexOf(event.type) > -1) {
             var dateValue = this.getDateString(component);
-            if (!$A.util.isEmpty(dateValue)) {
-                var timeValue = this.getTimeString(component);
-                var dateTimeString = timeValue ? dateValue + " " + timeValue : dateValue;
-                var hasTime = !$A.util.isEmpty(timeValue);
-                this.doUpdate(component, dateTimeString, hasTime);
+            var timeValue = this.getTimeString(component);
+            var dateTimeString = "";
+            if (this.isDesktopMode(component)) {
+            	if ($A.util.isEmpty(dateValue) && !$A.util.isEmpty(timeValue)) { // if date is empty, but time is not empty, do not update
+            		return;
+            	} else {
+            		dateTimeString = timeValue ? dateValue + " " + timeValue : dateValue;
+            	}
+            } else {
+            	dateTimeString = dateValue;
             }
+            var hasTime = !$A.util.isEmpty(timeValue);
+            this.doUpdate(component, dateTimeString, hasTime);
         }
     },
 
@@ -156,12 +163,10 @@
      *
      */
     doUpdate : function(component, value, hasTime) {
-        if (!$A.util.isEmpty(value)) {
-            var langLocale = component.get("v.langLocale");
-            langLocale = !$A.util.isUndefinedOrNull(langLocale) ? langLocale : $A.get("$Locale.langLocale");
+        var langLocale = component.get("v.langLocale");
+        langLocale = !$A.util.isUndefinedOrNull(langLocale) ? langLocale : $A.get("$Locale.langLocale");
 
-            this.setDateTimeValue(component, value, hasTime, langLocale);
-        }
+        this.setDateTimeValue(component, value, hasTime, langLocale);
     },
 
     formatDateTime: function(component) {

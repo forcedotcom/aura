@@ -321,12 +321,10 @@
         }
     },
 
-
     position: function(component) {
         var divCmp = component.find("datePicker");
         var elem = divCmp ? divCmp.getElement() : null;
         var visible = component.get("v.visible");
-        var viewPort = $A.util.getWindowSize();
         var self = this;
         var referenceElem = component.getConcreteComponent().get("v.referenceElement");
 
@@ -342,7 +340,7 @@
                     if (isAndroid == true) {
                         scrollerElem.style.height = component._windowSize.height + "px";
                     } else {
-                        scrollerElem.style.height = viewPort.height + "px";
+                        scrollerElem.style.height = $A.util.getWindowSize().height + "px";
                     }
                 }
 
@@ -387,11 +385,11 @@
                 });
                 
             } else {
+                var viewPort = $A.util.getWindowSize();
                 if (!$A.util.isUndefinedOrNull(referenceElem)) {
                     $A.util.attachToDocumentBody(component.getElement());
                     var elemRect = elem.getBoundingClientRect();
                     var referenceElemRect = referenceElem.getBoundingClientRect();
-                    var viewPort = $A.util.getWindowSize();
 
                     // Vertical alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8

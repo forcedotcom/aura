@@ -321,6 +321,10 @@ function (scrollUtil) {
                         header = facets['header'] || panel.get('v.header'), 
                         footer = facets['footer'] || panel.get('v.footer');
                     
+                    if ($A.util.isComponent(avp)) {
+                       avp.setAttributeValueProvider(panel);
+                    }
+                    
                     if (!$A.util.isEmpty(header)) {
                         if ($A.util.isComponent(header)) {
                             header.setAttributeValueProvider(avp);
@@ -343,7 +347,32 @@ function (scrollUtil) {
             }
             callback && callback();
         },
-
+        handleNotify: function(cmp, event, helper) {
+        	var params = event.getParams();
+	        if (!params) {
+	            return;
+	        }
+	        switch (params.action) {
+	            case 'destroyPanel':
+	                //contained component tries to close the panel but doesn't have access to this panelInstance
+	                //attach this id to the event and let it bubble up
+	                if (params.typeOf === 'ui:destroyPanel' && !params.payload) {
+	                    params.payload = {
+	                        panelInstance: cmp.getGlobalId()
+	                    }
+	                }
+	                break;
+	            case 'closePanel':
+	                event.stopPropagation();
+	                helper.close(cmp, params.payload ? params.payload.callback : null);
+	                break;
+	            case 'setFocus':
+	                if (cmp.get('v.autoFocus')) {
+	                    this.setFocus(cmp);
+	                }
+	                break;
+	        }
+        },
         /**
          * Activate or de-activate the panel
          * @param cmp

@@ -18,22 +18,31 @@
     	var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
-        //create default close button
-        if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
-            $A.componentService.createComponent('ui:button', {
-                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
-                'class': "closeBtn",
-                'press': cmp.getReference("c.onCloseBtnPressed"),
-                'label': cmp.get('v.closeDialogLabel'),
-                'labelDisplay': "false"
-            }, function(button){
-                cmp.set('v.closeButton', button);
-            });
+        this.initCloseBtn(cmp);
+    },
+    
+    initCloseBtn: function(cmp) {
+        if (cmp.get('v.showCloseButton')) {
+        	var closeBtn = cmp.get('v.closeButton');
+        	if ($A.util.isEmpty(closeBtn)) {
+	        	//create default close button
+	            $A.componentService.createComponent('ui:button', {
+	                'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
+	                'class': "closeBtn",
+	                'press': cmp.getReference("c.onCloseBtnPressed"),
+	                'label': cmp.get('v.closeDialogLabel'),
+	                'labelDisplay': "false"
+	            }, function(button){
+	                cmp.set('v.closeButton', button);
+	            });
+        	} else if ($A.util.isComponent(closeBtn[0]) && closeBtn[0].isInstanceOf('ui:button') && !closeBtn[0].getHandledEvents()['press']) {
+        		closeBtn[0].addHandler('press', cmp, 'c.onCloseBtnPressed');
+        	}
         }
     },
 
     _getKeyHandler: function(cmp) {
-        if (!cmp._keyHandler) {
+        if (!cmp._keyHandler && cmp.isValid()) {
         	var closeAction = cmp.get("v.closeAction");
             cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
         }
@@ -66,7 +75,10 @@
             animationEl: panel,
             autoFocus: autoFocus,
             onFinish: function() {
-                $A.util.on(containerEl, 'keydown', self._getKeyHandler(cmp));
+            	var handler = self._getKeyHandler(cmp);
+            	if ($A.util.isFunction(handler)) {
+            		$A.util.on(containerEl, 'keydown', self._getKeyHandler(cmp));
+            	}
                 callback && callback();
             }
         };
@@ -113,22 +125,9 @@
             animationName = cmp.get('v.animation'),
             useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition')),
             closeAnimation = cmp.get('v.closeAnimation'),
-            panel = this._findContainedComponent(cmp, 'panel').getElement(),
-            mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
-
-        if(useTransition) {
-            panel.style.opacity = '0';
-            setTimeout(function() {
-                 mask.style.opacity = '0';
-            }, 50);
-        }
-
-        // remove overflow changes
-        if(cmp._bodyInlineOverflow) {
-            document.body.style.overflow = cmp._bodyInlineOverflow;
-        } else {
-            document.body.style.overflow = '';
-        }
+            panel = this._findContainedComponent(cmp, 'panel').getElement();
+        
+        this.unmask(cmp, useTransition, panel);
 
         if(closeAnimation) {
             animationName = closeAnimation;
@@ -137,9 +136,15 @@
         var timeout;
         var onFinish = function() {
             clearTimeout(timeout);
+
             if ($A.util.isComponent(cmp) && cmp.isValid()) {
-                $A.util.removeOn(containerEl, 'keydown', self._getKeyHandler(cmp));
+
+                var handler = self._getKeyHandler(cmp);
+                if ($A.util.isFunction(handler)) {
+                    $A.util.removeOn(containerEl, 'keydown', handler);
+                }
             }
+            
             if(callback) { //give time for all transitions to complete
                 setTimeout(callback, 2);
             }
@@ -167,11 +172,14 @@
     mask: function(cmp) {
         var useTransition = $A.util.getBooleanValue(cmp.get('v.useTransition'));
         var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
-        cmp._bodyInlineOverflow = document.body.style.overflow;
-
-        // prevent scrolling of the body when modals are open
-        document.body.style.overflow = 'hidden';
-
+        
+        if ($A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
+        	var overflowStyle = window.getComputedStyle(document.body, '').overflow;
+        	this.global._originalOverflowStyle = overflowStyle;
+            // prevent scrolling of the body when modals are open
+            document.body.style.overflow = 'hidden';
+        }
+        
         $A.util.removeClass(mask, 'hidden');
         $A.util.addClass(mask, 'fadein');
         if(useTransition) {
@@ -181,8 +189,29 @@
         } else {
             mask.style.opacity = 1;
         }
-
-
-
-    }
+    },
+    
+    unmask: function(cmp, useTransition, panel) {
+    	var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();
+    	
+        if(useTransition) {
+            panel.style.opacity = '0';
+            setTimeout(function() {
+                 mask.style.opacity = '0';
+            }, 50);
+        }
+        
+        this.unsetOverflow(cmp);
+    },
+    
+    unsetOverflow: function(cmp) {
+    	 // remove overflow changes only when it's the last modal that's opened
+        var openedMasks = document.querySelectorAll('.uiModal .modal-glass.fadein');
+        if(openedMasks.length === 1 && !$A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {
+            document.body.style.overflow = this.global._originalOverflowStyle;
+            delete this.global._originalOverflowStyle;
+        }
+    },
+    
+    global: {}
 })

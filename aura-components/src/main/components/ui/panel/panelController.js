@@ -47,17 +47,7 @@
     },
 
     onNotify: function(cmp, event, helper) {
-        var params = event.getParams();
-        if (params && params.action === 'destroyPanel' && params.typeOf === 'ui:destroyPanel' && !params.payload) {
-            //contained component tries to close the panel but doesn't have access to this panelInstance
-            //attach this id to the event and let it bubble up
-            params.payload = {
-                panelInstance: cmp.getGlobalId()
-            }
-        } else if (params && params.action === 'closePanel') {
-        	event.stopPropagation();
-        	helper.close(cmp, params.payload ? params.payload.callback : null);
-        }
+        helper.lib.panelLibCore.handleNotify(cmp, event, helper);
     },
 
     onCloseBtnPressed: function(cmp, evt, helper) {

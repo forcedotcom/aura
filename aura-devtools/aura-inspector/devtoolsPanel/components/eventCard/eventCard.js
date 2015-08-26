@@ -34,7 +34,6 @@
     	this.shadowRoot.querySelector(".caller").textContent 		= model.eventCaller;
     	this.shadowRoot.querySelector("#eventDuration").textContent = model.eventDuration+"ms";
     	this.shadowRoot.querySelector(".parameters").textContent 	= model.parameters;
-		this.shadowRoot.querySelector("#eventHandledBy").appendChild(buildHandledBy(model.handledBy));
 
 		var collapsed = this.getAttribute("collapsed");
 		if(collapsed === "true" || collapsed === "collapsed") {
@@ -71,6 +70,7 @@
 				section.classList.add("hidden");
 			} else if(newValue !== "true" && newValue !== "collapsed" && isCollapsed) {
 				section.classList.remove("hidden");
+				renderHandledBy(this);
 			}
 
 		}
@@ -84,6 +84,14 @@
 		prototype: eventCard
 	});
 
+	function renderHandledBy(element) {
+		var handledBy = element.getAttribute("handledBy");
+
+		// build the handled collection
+		var handledContainer = element.shadowRoot.querySelector("#eventHandledBy");
+		handledContainer.removeChildren();
+		handledContainer.appendChild(buildHandledBy(handledBy));
+	}
 	// This will improve. 
 	// I need to account for doing a deep network graph here too.
 	function buildHandledBy(dataString) {
@@ -96,11 +104,14 @@
 		var data = JSON.parse(dataString);
 		var dl = document.createElement("dl");
 		var dt;
+		var auracomponent;
 		var dd;
 		for(var c=0;c<data.length;c++) {
-			// Use aurainspector-component when it's ready
+			auracomponent = document.createElement("aurainspector-auracomponent");
+			auracomponent.setAttribute("globalId", data[c].scope);
+			
 			dt = document.createElement("dt");
-			dt.textContent = data[c].scope;
+			dt.appendChild(auracomponent);
 
 			dd = document.createElement("dd");
 			dd.textContent = "c." + data[c].name;

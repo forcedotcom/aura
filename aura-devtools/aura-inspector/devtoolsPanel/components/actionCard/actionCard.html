@@ -6,13 +6,13 @@
 		th { font-weight: normal; font-size: .75em; color: #999; padding: 0 10px 0 5px; text-align: left; letter-spacing: .03em; }
 		td { font-size: .75em; padding: 0 10px 0 5px; }
 		code { margin: 5px; display: block; white-space: pre; }
-		.parameters:before { content: 'Parameters'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; }
+		.parameters:before { content: 'Parameters'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; font-family: monospace;  vertical-align: top;}
 		.result:before { content: 'Result'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; font-family: monospace;  vertical-align: top; }
-        aurainspector-json.result { margin: 5px; display: inline-block; }
+        aurainspector-json { margin: 5px; display: block; }
 	</style>
 	
     <header></header>
-    <code class="parameters"></code>
+    <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
     <aurainspector-json class="result" expandTo="0"></aurainspector-json>
     <table>
         <thead>

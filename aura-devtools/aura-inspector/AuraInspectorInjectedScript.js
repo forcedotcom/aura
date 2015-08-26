@@ -100,12 +100,12 @@
                 try {
                     // Actions Tab
                     bootstrapActionsInstrumentation();
-                } catch(e){}
-                try {
+                 } catch(e){}
+                 try {
                     // Perf Tab
                     bootstrapPerfDevTools();
-                } catch(e){}
-                try {
+                 } catch(e){}
+                 try {
                     // Events Tab
                     bootstrapEventInstrumentation();
                 } catch(e){}

@@ -4,7 +4,8 @@ function AuraInspectorEventLog(devtoolsPanel) {
         all: true,
         eventName: "",
         application: true,
-        component: true
+        component: true,
+        handledOnly: false
     };
     var ol;
     var _events = [];
@@ -20,6 +21,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
             <li><input id="filter-text" type="search" placeholder="Filter"/></li>
             <li><aurainspector-onOffButton class="on" data-filter="application" title="Show Application Events"><span>App Events</span></aurainspector-onOffButton></li>
             <li><aurainspector-onOffButton class="on" data-filter="component" title="Show Component Events"><span>Cmp Events</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="" data-filter="handledOnly" title="Hide Unhandled Events"><span>Handled Only</span></aurainspector-onOffButton></li>
         </menu>
         <ol class="event-log" id="event-log"></ol>
     `;
@@ -69,6 +71,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         if(!_filters.all) { return false; }
         if(!_filters.application && eventInfo.type === "APPLICATION") { return false; }
         if(!_filters.component && eventInfo.type === "COMPONENT") { return false; }
+        if(_filters.handledOnly && hasHandledData(eventInfo)) { return false; }
 
         var eventName = _filters.eventName;
         if(eventName) {
@@ -84,7 +87,6 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
     function addCard(eventInfo) {
         var eventId = "event_" + eventInfo.startTime;
-        var handleData = _handled.get(eventId);
 
         var li = document.createElement("li");
 
@@ -100,7 +102,17 @@ function AuraInspectorEventLog(devtoolsPanel) {
         card.setAttribute("caller", eventInfo.caller);
         card.setAttribute("parameters", eventInfo.parameters);
         card.setAttribute("collapsed", "true");
-        card.setAttribute("handledBy", JSON.stringify(handleData));
+
+        if(!eventInfo.handledBy) {
+            var handleData = _handled.get(eventId);
+            if(handleData) {
+                card.setAttribute("handledBy", JSON.stringify(handleData));
+                eventInfo.handledBy = handleData;
+            }
+        } else {
+            card.setAttribute("handledBy", JSON.stringify(eventInfo.handledBy));            
+        }
+
         card.id = eventId;
 
         li.appendChild(expand);
@@ -119,6 +131,17 @@ function AuraInspectorEventLog(devtoolsPanel) {
             _events.pop();
         }
         _events.push(eventInfo);
+    }
+
+    function hasHandledData(eventInfo) {
+        if('handledBy' in eventInfo) { return !eventInfo.handledBy || eventInfo.handledBy.length === 0; }
+
+        var eventId = "event_" + eventInfo.startTime;
+        var handleData = _handled.get(eventId);
+        if(handleData) {
+            return !handleData || handleData.length === 0; 
+        }
+        return false;
     }
 
     function getParent(element, selector) {

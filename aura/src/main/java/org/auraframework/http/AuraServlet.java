@@ -268,13 +268,45 @@ public class AuraServlet extends AuraBaseServlet {
         return attributes;
     }
 
+    private boolean isBootstrapAction(Message message, boolean productionMode) {
+        // The bootstrap action cannot not have a CSRF token so we let it through
+        boolean isBootstrapAction = false;
+        if (message.getActions().size() == 1) {
+            Action action = message.getActions().get(0);
+            String name = action.getDescriptor().getQualifiedName();
+            if (name.equals("aura://ComponentController/ACTION$getApplication")
+                    || (name.equals("aura://ComponentController/ACTION$getComponent") && !productionMode)) {
+                //
+                // Oooooh this is _ugly_, digging in to the internals like this. There has got to be
+                // a better way.
+                //
+                Boolean loadLabels=(Boolean)(action.getParams()!=null?action.getParams().get("chainLoadLabels"):null);
+                isBootstrapAction = Boolean.TRUE.equals(loadLabels);
+            }
+        } else if (message.getActions().size() == 2) {
+            Action action = message.getActions().get(0);
+            String name = action.getDescriptor().getQualifiedName();
+            if (name.equals("aura://ComponentController/ACTION$getApplication")
+                    || (name.equals("aura://ComponentController/ACTION$getComponent") && productionMode)) {
+                isBootstrapAction = true;
+            }
+            Action labelAction = message.getActions().get(1);
+            name = labelAction.getDescriptor().getQualifiedName();
+            if (!name.equals("aura://ComponentController/ACTION$loadLabels")) {
+                isBootstrapAction = false;
+            }
+        }
+        return isBootstrapAction;
+    }
+
+
     /**
      * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException,
-            IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         SerializationService serializationService = Aura.getSerializationService();
         LoggingService loggingService = Aura.getLoggingService();
         ContextService contextService = Aura.getContextService();
@@ -317,23 +349,8 @@ public class AuraServlet extends AuraBaseServlet {
                 loggingService.stopTimer(LoggingService.TIMER_DESERIALIZATION);
             }
 
-            // The bootstrap action cannot not have a CSRF token so we let it
-            // through
-            boolean isBootstrapAction = false;
-            if (message.getActions().size() == 2) {
-                Action action = message.getActions().get(0);
-                String name = action.getDescriptor().getQualifiedName();
-                if (name.equals("aura://ComponentController/ACTION$getApplication")
-                        || (name.equals("aura://ComponentController/ACTION$getComponent")
-                        && !isProductionMode(context.getMode()))) {
-                    isBootstrapAction = true;
-                }
-                Action labelAction = message.getActions().get(1);
-                name = labelAction.getDescriptor().getQualifiedName();
-                if (!name.equals("aura://ComponentController/ACTION$loadLabels")) {
-                    isBootstrapAction = false;
-                }
-            }
+            // The bootstrap action cannot not have a CSRF token so we let it through
+            boolean isBootstrapAction = isBootstrapAction(message, isProductionMode(context.getMode()));
 
             if (!isBootstrapAction) {
                 validateCSRF(csrfToken.get(request));

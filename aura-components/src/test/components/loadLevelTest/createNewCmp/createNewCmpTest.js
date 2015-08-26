@@ -94,7 +94,7 @@
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
-                $A.test.assertEquals("1:5;a",textCmp.getGlobalId(), "Expected global id to be 1:5;a");
+                $A.test.assertEquals("1:4;a",textCmp.getGlobalId(), "Expected global id to be 1:4;a");
                 $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to created component");
                 $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
             });
@@ -757,7 +757,7 @@
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function(){
                 var textCmp = cmp.get('v.body')[0];
                 //Since this is created under root component and this is the first component from the server
-                $A.test.assertEquals("1:5;a",textCmp.getGlobalId(), "Expected global id to be 1:5;a");
+                $A.test.assertEquals("1:4;a",textCmp.getGlobalId(), "Expected global id to be 1:4;a");
                 $A.test.assertEquals(99,textCmp.get('v.number'), "Failed to pass attribute values to created component");
                 $A.test.assertEquals("99",$A.test.getTextByComponent(textCmp), "Failed to pass attribute values to created component");
             });

@@ -18,6 +18,7 @@
  * AuraXHR: struct used to represent a connection.
  *
  * @private
+ * @constructor
  */
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.length = 0;
@@ -73,6 +74,7 @@ Aura.Services.AuraClientService$AuraXHR.prototype.getAction = function(id) {
 /**
  * A handy structure to hold data.
  *
+ * @constructor
  * @private
  */
 Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollector() {
@@ -1074,8 +1076,9 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             action.setAbortable(false);
 
             action.setParams({
-                name: tag,
-                attributes: attributes
+                "name": tag,
+                "attributes": attributes,
+                "chainLoadLabels": true
             });
 
             //
@@ -1193,14 +1196,6 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                 }, "ERROR");
 
             acs.enqueueAction(action);
-
-            //
-            // Now make sure we load labels....
-            //
-            var labelAction = $A.get("c.aura://ComponentController.loadLabels");
-            // no parameters, no callback.
-            labelAction.setCallback(acs, function(/*action*/) {});
-            acs.enqueueAction(labelAction);
         }, "loadComponent");
     });
 };
@@ -1717,12 +1712,16 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var processed = false;
     var qs;
     try {
-        qs = this.buildParams({
+        var params = {
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),
-            "aura.token"   : this._token,
-            "aura.context" : context.encodeForServer()
-        });
-
+            "aura.context" : context.encodeForServer(method === "POST")
+        };
+        if (method === "GET") {
+            params["aura.access"] = "UNAUTHENTICATED";
+        } else {
+            params["aura.token"] = this._token;
+        }
+        qs = this.buildParams(params);
     } catch (e) {
         for (i = 0; i < actions.length; i++) {
             action = actions[i];
@@ -1732,7 +1731,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     }
 
     var url = this._host + "/aura";
-    if (qs && method !== "POST") {
+    if (qs && method === "GET") {
         url = url + "?" + qs;
     }
 

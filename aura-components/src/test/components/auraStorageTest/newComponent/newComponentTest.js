@@ -23,7 +23,7 @@
      */
     testActionIds:{
         test:[function(cmp){
-            var startactioncount = 18;
+            var startactioncount = 17;
             var a = cmp.get("c.getRoster");
             $A.test.assertEquals(++startactioncount+";a", a.getId(),
                 "Action numbering gone wild - Client Action(1)");
@@ -31,7 +31,7 @@
             $A.test.assertEquals(++startactioncount+";a", b.getId(),
                 "Action numbering gone wild - Client Action(2)");
         },function(cmp){
-            var startactioncount = 20;
+            var startactioncount = 19;
             var a = cmp.get("c.getBaseball");
             $A.test.assertEquals(++startactioncount+";a", a.getId(),
                 "Action numbering gone wild - Server Action(1)");

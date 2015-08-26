@@ -31,11 +31,15 @@ public class SystemErrorException extends ClientSideEventException {
     private static final long serialVersionUID = -2007734227131769994L;
 
     public SystemErrorException(Throwable cause) {
-        this(cause.getMessage());
+        this(cause.getMessage(), cause);
     }
 
     public SystemErrorException(String message) {
         super(message);
+    }
+
+    public SystemErrorException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     @Override

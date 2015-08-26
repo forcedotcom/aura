@@ -19,12 +19,10 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
         BrowserType.IE7, BrowserType.IE8 })
@@ -32,6 +30,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     private final String APP = "/uitest/panel2_Test.app";
     private final String PARAM_PANEL_TYPE = "&testPanelType=";
     private final String PARAM_DIRECTION = "&testDirection=";
+    private final String PARAM_USE_FOOTER = "&testUseFooter=";
     private final String FLAVOR = "&testFlavor=";
     private final String CREATE_PANEL_BUTTON = ".createPanelBtnClass";
     private final String PANEL_DIALOG = ".uiPanel";
@@ -374,6 +373,21 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
         // check focus
         activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         assertTrue("Active element is not app input", activeElement.getAttribute("class").contains("appInput2"));
+    }
+    
+    /**
+     * Test tabbing goes through footer
+     */
+    public void testPanelTabWithFooter() throws Exception {
+        String url = APP + "?" + PARAM_PANEL_TYPE + "modal" +
+                PARAM_USE_FOOTER + "true";
+
+        open(url);
+        cycleThroughPanelInputElements(url, "modal", false);
+        
+        // check focus on footer's button
+        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        assertTrue("Active element is not button in footer", activeElement.getAttribute("class").contains("defaultCustomPanelFooterBtn"));
     }
 
     private void cycleThroughPanelInputElements(String url, String panelType, boolean doesPanelClose) throws Exception {

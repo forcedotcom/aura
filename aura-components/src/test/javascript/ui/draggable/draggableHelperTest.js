@@ -51,7 +51,23 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 				setDragImage : function() {setDragImageFired = true;}
 			}, 
 			target : "targetEvent"
-		};	
+		};
+		var targetEventIE = {
+			dataTransfer : {
+				data : {},
+				effectAllowed : null,
+				setData : function(key, value){
+					if (key !== "Text") {
+						throw new Error("Unsupported");
+					}
+					this.data[key] = value;
+				},
+				getData : function(key) {
+					return this.data[key];
+				}
+			}, 
+			target : "targetEventIE"
+		};
 		var targetComponent = {
 			get : function(expression){
 				if(expression == "v.type"){return expectedType;}
@@ -108,17 +124,17 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 		[Fact]
         function testIESerialization(){	
 			//Arrange
-			targetEvent.dataTransfer.data = {};
+			targetEventIE.dataTransfer.data = {};			
 			//Act
 			mock$A(function() {
 				mockJSON(function() {
 					enterDragOperationMock(function() {
-						targetHelper.handleDragStart(targetComponent, targetEvent);
+						targetHelper.handleDragStart(targetComponent, targetEventIE);
 					});
 				});
 			});
 			//Assert
-			Assert.Equal(targetEvent.dataTransfer.getData("Text"), expectedStringified);
+			Assert.Equal(targetEventIE.dataTransfer.getData("Text"), expectedStringified);
 		}
 		
 		[Fact]
@@ -128,12 +144,12 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 				"text/plain": expectedDataTransfer,
 				"aura/id" : expectedGlobalId
 			};
-			targetEvent.dataTransfer.data = {};
+			targetEventIE.dataTransfer.data = {};
 			//Act
 			mock$A(function() {
 				mockJSON(function() {
 					enterDragOperationMock(function() {
-						targetHelper.handleDragStart(targetComponent, targetEvent);
+						targetHelper.handleDragStart(targetComponent, targetEventIE);
 					});
 				});
 			});

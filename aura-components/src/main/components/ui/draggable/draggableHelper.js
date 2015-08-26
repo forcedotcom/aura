@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({	
-	resetCssClass: function(component) {
+	resetCssClass: function(component) { 
 		var cssClass = component.get("v.class").trim();
 		var dragClass = component.get("v.dragClass").trim();
 		var dragAccessibilityClass = component.get("v.dragAccessibilityClass").trim();
@@ -87,16 +87,17 @@
 				dataTransfer = { "text/plain": dataTransfer};
 			}
 			
-			if ($A.util.isIE) {
-				dataTransfer["aura/id"] = auraId;
-				event.dataTransfer.setData("Text", JSON.stringify(dataTransfer));
-			} else {
+			try {
 				event.dataTransfer.setData("aura/id", auraId);
 				for (var key in dataTransfer) {
 					if (key !== "aura/id" && dataTransfer.hasOwnProperty(key)) {
 						event.dataTransfer.setData(key, dataTransfer[key]);
 					}
 				}
+			} catch (e) {
+				// This is IE case
+				dataTransfer["aura/id"] = auraId;
+				event.dataTransfer.setData("Text", JSON.stringify(dataTransfer));
 			}
 		}
 		
@@ -177,20 +178,25 @@
 		return dragImage;
 	},
 	
+	/**
+	 * @param {Aura.Component} component - this component
+	 * @param {Event} event - HTML DOM Event for dragend
+	 * @returns true if drop event is successful or false otherwise
+	 */
 	isDropEventSuccessful: function(component, event) {
 		if (!component.isValid()) {
 			return false;
 		}
 		
 		var dropEffect = event.dataTransfer.dropEffect;
-		if (dropEffect === "none" && $A.util.isIE) {
+		if (dropEffect === "none") {
 			// Don't return false right away, since IE always 
 			// returns "none" even though the drop has been performed
 			// successfully. This is not the right way to check
 			// whether or not drop has been performed since this
 			// doesn't handle drag and drop cross different context, 
 			// e.g. dropping on different browser windows.
-			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();		
+			return component.$dragOperation$.$dropOperationStatus$.getDropStatus();
 		}
 		
 		return dropEffect === component.get("v.type");

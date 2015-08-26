@@ -258,8 +258,22 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			stopPropagation : true,
 			stopPropagation : function(){propagationStopped = true;},
 			dataTransfer : {
+				getData : function(expression){},
+				types : [],
+				effectAllowed : expectedOperationType
+			},
+			target : expectedRenderingComponent
+		};
+		var targetEventIE = {
+			stopPropagation : true,
+			stopPropagation : function(){propagationStopped = true;},
+			dataTransfer : {
 				getData : function(expression){
-					if(expression == "Text") {parsedText = true;}
+					if(expression == "Text") {
+						parsedText = true;
+					} else {
+						throw new Error("Unsupported");
+					}
 				},
 				types : [],
 				effectAllowed : expectedOperationType
@@ -344,7 +358,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			//Act
 			auraMock(function(){
 				mockJSON(function(){
-					targetHelper.handleDrop(targetComponent, targetEvent);
+					targetHelper.handleDrop(targetComponent, targetEventIE);
 				});
 			});
 			//Assert

@@ -58,6 +58,22 @@
         helper.displayTimePicker(component);
     },
 
+    inputDateFocus: function(component, event, helper) {
+        var inputText = helper.getDateString(component);
+
+        if ($A.util.isEmpty(inputText) && !component.get("v.disabled")) {
+            helper.displayDatePicker(component);
+        }
+    },
+
+    inputTimeFocus: function(component, event, helper) {
+        event.stopPropagation();
+        var inputText = helper.getTimeString(component);
+        if ($A.util.isEmpty(inputText) && !component.get("v.disabled")) {
+            helper.displayTimePicker(component);
+        }
+    },
+
     setValue: function(component, event, helper) {
         if (helper.isDesktopMode(component)) {
             var dateValue = event.getParam("value"),

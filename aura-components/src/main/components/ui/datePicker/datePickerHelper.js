@@ -59,13 +59,13 @@
      * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
      */
     _getScrollableParent: function(elem) {
-        
+
         // memoize
         if(this._scrollableParent) {
             return this._scrollableParent;
         }
 
-        // if overflow is auto overflow-y is also auto, 
+        // if overflow is auto overflow-y is also auto,
         // however in firefox the opposite is not true
         var overflow = getComputedStyle(elem)['overflow-y'];
 
@@ -128,14 +128,14 @@
                 }
 
                 if (!helper.isElementInComponent(component, event.target)) {
-                    
+
 
                     //Since we are no longer going into the rerender function, updateGlobalEventListeners does not get called and the listeners will never get turned off
                     var concreteCmp = component.getConcreteComponent();
                     concreteCmp._clickStart.setEnabled(false);
                     concreteCmp._clickEnd.setEnabled(false);
 
-                    
+
                     // Hide the component
                     helper.hide(component, false);
 
@@ -144,9 +144,9 @@
                         var elem = divCmp.getElement();
                         $A.util.removeClass(elem, "visible");
                     }
-                    
 
- 
+
+
                 }
             };
             component._onClickEndFunc = f;
@@ -224,10 +224,18 @@
 	    }
 	},
 
-    handleESCKey: function(component, event) {
-        var keyCode = event.keyCode;
-        if (keyCode == 27) { // Esc key is pressed
-            this.hide(component, true)
+    handleKeydown: function(component, event) {
+        if (component.get('v.closeOnClickOut')) {
+            var keyCode = event.keyCode;
+            var elem = event.target || event.srcElement;
+            if (keyCode == 9 && event.shiftKey == true) { // shift + tab
+                if ($A.util.hasClass(elem, 'prevMonth')) {
+                    $A.util.squash(event, true);
+                    this.hide(component, true);
+                }
+            } else if (keyCode == 27) { // Esc key is pressed
+                this.hide(component, true)
+            }
         }
     },
 
@@ -340,11 +348,11 @@
 
             // Scoping this to desktop to prevent regressions
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") == "DESKTOP") {
-                
+
                 var scrollableParent = this._getScrollableParent(elem);
                 var self = this;
                 this._handleScroll = function(e) {
-                    self.lib.panelPositioning.reposition(); 
+                    self.lib.panelPositioning.reposition();
                 };
 
                 this._handleWheel = function(e) {
@@ -352,10 +360,10 @@
                     if(scrollableParent && scrollableParent.scrollTop) {
                         scrollableParent.scrollTop += e.deltaY;
                     }
-                    
+
                 };
-                
-                // if the target element is inside a 
+
+                // if the target element is inside a
                 // scrollable element, we need to make sure
                 // scroll events move that element,
                 // not the parent, also we need to reposition on scroll

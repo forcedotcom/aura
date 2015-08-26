@@ -44,7 +44,7 @@
     <aura:handler name="updateCalendar" action="{!c.updateCalendar}"/>
 
     <div aura:flavorable="true" class="{!v.class}">
-    <table class="calGrid" aura:id="datePickerGrid">
+    <table class="calGrid" aura:id="datePickerGrid" role="grid">
         <thead>
             <tr>
                 <aura:iteration items="{!v._namesOfWeekdays}" var="day">

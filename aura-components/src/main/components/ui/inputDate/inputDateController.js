@@ -17,7 +17,7 @@
 	clearValue: function(component, event, helper) {
 		component.set("v.value", "");
 	},
-	
+
 	click: function(component, event, helper) {
         event.preventDefault();
         var concreteCmp = component.getConcreteComponent();
@@ -39,6 +39,14 @@
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayDatePicker(component);
+    },
+
+    inputDateFocus: function(component, event, helper) {
+        var inputText = component.find("inputText").getElement().value;
+
+        if ($A.util.isEmpty(inputText) && !component.get("v.disabled") && component.get("v.displayDatePicker")) {
+            helper.displayDatePicker(component);
+        }
     },
 
     setValue: function(component, event, helper) {

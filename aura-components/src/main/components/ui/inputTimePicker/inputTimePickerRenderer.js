@@ -33,10 +33,7 @@
         this.superRerender();
         var visible = component.get("v.visible");
         if (visible === true) {
-            var shouldRerender = component.get("v._timeListInitialized") === false ||
-                                component.isDirty("v.hours") ||
-                                component.isDirty("v.minutes") ||
-                                component.isDirty("v.interval");
+            var shouldRerender = component.get("v._timeListInitialized") === false || component.isDirty("v.interval");
             if (shouldRerender) {
                 helper.renderList(component);
                 component.set("v._timeListInitialized", true);

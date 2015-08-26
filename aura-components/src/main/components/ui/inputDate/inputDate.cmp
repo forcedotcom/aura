@@ -39,7 +39,7 @@
 
     <aura:if isTrue="{!$Browser.formFactor == 'DESKTOP'}">
         <form class="form--stacked form-element">
-            <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
+            <input aura:id="inputText" id="{!v.domId}" class="{!v.class + ' input'}" onclick="{!c.inputDateFocus}" type="text" placeholder="{!v.placeholder}" aria-describedby="{!v.ariaDescribedBy}" disabled="{!v.disabled}"/>
 
             <aura:if isTrue="{!v.displayDatePicker}">
                 <a aura:id="datePickerOpener" class="datePicker-openIcon display" aria-haspopup="true" onclick="{!c.openDatePicker}">

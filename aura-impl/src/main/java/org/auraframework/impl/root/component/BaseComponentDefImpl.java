@@ -20,42 +20,12 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.AttributeDefRef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DependencyDef;
-import org.auraframework.def.EventHandlerDef;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.ImportDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.MethodDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RegisterEventDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.RequiredVersionDef;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.def.RootDefinition;
-import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -68,17 +38,11 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -1623,8 +1587,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     } else if (dep.getDefType() == DefType.INTERFACE) {
                         InterfaceDefImpl depDef = (InterfaceDefImpl) dep.getDef();
                         ret = ret && depDef.isInConcreteAndHasLocalProvider();
-                    } else if (dep.getDefType() == DefType.LAYOUTS) {
-                        return false;
                     }
                 }
             }

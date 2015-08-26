@@ -15,17 +15,11 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.TokensDef;
+import org.auraframework.def.*;
 
 /**
  */
 public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
-
-    ApplicationDefBuilder setLayouts(LayoutsDef layouts);
 
     /**
      * Specifies a {@link TokensDef} as an override across the whole application. Tokens specified in this def will

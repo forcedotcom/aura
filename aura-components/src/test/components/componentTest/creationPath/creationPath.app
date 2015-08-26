@@ -90,7 +90,6 @@
         </componentTest:appendComponent>
     </aura:iteration>
     
-    <aura:handler event="aura:layoutChange" action="{!c.layoutChange}"/>
     <div>
 	    <ui:outputUrl aura:id="defaultlink" label="default layout" value="#default"/><br/>
 	    <ui:outputUrl aura:id="actionlink" label="action layout" value="#action"/><br/>

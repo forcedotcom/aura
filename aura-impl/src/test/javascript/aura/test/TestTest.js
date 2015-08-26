@@ -27,8 +27,7 @@ Test.Aura.TestTest = function() {
         "$A": $A, 
         "window": window,
         Aura: Aura,
-        AuraInstance:function(){},
-        AuraLayoutService:{}
+        AuraInstance:function(){}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/test/Test.js")]
         [Import("aura-impl/src/main/resources/aura/test/Test_private.js")]

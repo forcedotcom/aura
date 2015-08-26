@@ -82,7 +82,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
                         "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
                         "extends", "template");
-            privilegedAttrs = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "isOnePageApp",
+            privilegedAttrs = Sets.newHashSet("preload", "locationChangeEvent", "isOnePageApp",
                         "tokens", "render", "provider", "style", "helper", "renderer", "whitespace",
                         "support", "defaultFlavor", "defaultFlavors", "dynamicallyFlavorable");
             super.setUp();

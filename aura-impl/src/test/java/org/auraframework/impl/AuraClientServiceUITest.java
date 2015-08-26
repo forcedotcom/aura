@@ -40,29 +40,4 @@ public class AuraClientServiceUITest extends WebDriverTestCase {
         waitForElementTextPresent(actual, expectedToken);
     }
 
-    /**
-     * Verify that a refresh during a location change does not display an alert. The component under test uses
-     * DelayedController.java to ensure that the refresh occurs while the location change is still taking place.
-     *
-     * Excluded on ipad/iphone due to known WebDriver issue: http://code.google.com/p/selenium/issues/detail?id=4348
-     */
-    @ExcludeBrowsers({ BrowserType.IPAD, BrowserType.IPHONE })
-    public void testRefreshDuringLocationChange() throws Exception {
-        open("/clientServiceTest/refreshDuringLocationChange.app");
-
-        WebDriver d = getDriver();
-        d.findElement(By.cssSelector(".uiOutputURL")).click();
-        d.navigate().refresh();
-
-        assertFalse("Alert should not be shown on refresh", isAlertPresent());
-    }
-
-    private boolean isAlertPresent() {
-        try {
-            getDriver().switchTo().alert();
-            return true;
-        } catch (NoAlertPresentException e) {
-            return false;
-        }
-    }
 }

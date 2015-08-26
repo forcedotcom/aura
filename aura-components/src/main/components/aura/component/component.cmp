@@ -26,7 +26,6 @@
 
     <!-- we need to include all of the aura events, because many don't have direct references -->
     <aura:dependency resource="markup://aura:applicationEvent" type="EVENT" />
-    <aura:dependency resource="markup://aura:beforeLayoutChange" type="EVENT" />
     <aura:dependency resource="markup://aura:clientOutOfSync" type="EVENT" />
     <aura:dependency resource="markup://aura:clientRedirect" type="EVENT" />
     <aura:dependency resource="markup://aura:componentEvent" type="EVENT" />
@@ -37,14 +36,11 @@
     <aura:dependency resource="markup://aura:doneWaiting" type="EVENT" />
     <aura:dependency resource="markup://aura:initialized" type="EVENT" />
     <aura:dependency resource="markup://aura:invalidSession" type="EVENT" />
-    <aura:dependency resource="markup://aura:layoutChange" type="EVENT" />
-    <aura:dependency resource="markup://aura:layoutFailed" type="EVENT" />
     <aura:dependency resource="markup://aura:locationChange" type="EVENT" />
     <aura:dependency resource="markup://aura:methodCall" type="EVENT" />
     <aura:dependency resource="markup://aura:noAccess" type="EVENT" />
     <aura:dependency resource="markup://aura:operationComplete" type="EVENT" />
     <aura:dependency resource="markup://aura:systemError" type="EVENT" />
-    <aura:dependency resource="markup://aura:titleChange" type="EVENT" />
     <aura:dependency resource="markup://aura:valueChange" type="EVENT" />
     <aura:dependency resource="markup://aura:valueDestroy" type="EVENT" />
     <aura:dependency resource="markup://aura:valueEvent" type="EVENT" />

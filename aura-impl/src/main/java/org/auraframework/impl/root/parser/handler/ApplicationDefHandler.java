@@ -16,20 +16,12 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.TokensDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
@@ -93,20 +85,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             builder.locationChangeEventDescriptor = DefDescriptorImpl.getInstance(locationChangeEvent,
                     EventDef.class);
         }
-
-        String layouts = getAttributeValue(ATTRIBUTE_LAYOUTS);
-        DefDescriptor<LayoutsDef> layoutsDefDescriptor = null;
-
-        if (layouts == null) {
-            layoutsDefDescriptor = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(), LayoutsDef.class,
-                    DefDescriptor.MARKUP_PREFIX);
-            if (!layoutsDefDescriptor.exists()) {
-                layoutsDefDescriptor = null;
-            }
-        } else if (!AuraTextUtil.isNullEmptyOrWhitespace(layouts)) {
-            layoutsDefDescriptor = DefDescriptorImpl.getInstance(layouts, LayoutsDef.class);
-        }
-        builder.layoutsDefDescriptor = layoutsDefDescriptor;
 
         String preloadNames = getAttributeValue(ATTRIBUTE_PRELOAD);
         if (!AuraTextUtil.isNullEmptyOrWhitespace(preloadNames)) {
@@ -191,7 +169,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     }
 
     private static final String ATTRIBUTE_PRELOAD = "preload";
-    private static final String ATTRIBUTE_LAYOUTS = "layouts";
     private static final String ATTRIBUTE_LOCATION_CHANGE_EVENT = "locationChangeEvent";
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
@@ -204,7 +181,7 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_PRELOAD, ATTRIBUTE_LAYOUTS, ATTRIBUTE_LOCATION_CHANGE_EVENT,
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_LOCATION_CHANGE_EVENT,
             ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_TOKENS, ATTRIBUTE_DEFAULT_FLAVORS)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)

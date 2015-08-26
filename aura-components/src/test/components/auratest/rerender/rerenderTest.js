@@ -76,14 +76,18 @@
         var val = $A.util.getBooleanValue(component.get(targetExpression));
         component.set(targetExpression, !val);
     },
+
+    switchToLayout: function(component, layout) {
+        $A.historyService.set(layout);
+    },
     
     /**
      * Update attribute from abstract component.
      * Nothing should rerender but the cmp itself
      */
     testAbstractAttributeUpdated: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
         		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
@@ -99,9 +103,9 @@
      * Nothing should rerender but the cmp itself
      */
     testAbstractModelUpdated: {
-        attributes : { __layout: "#def" },
         test: [
             function(component){
+                this.switchToLayout(component, "def");
         		this.addWaitForLayoutItem(component, "def layout item");
             }, 
             function(component) {
@@ -119,8 +123,8 @@
      * Nothing should rerender but the cmp itself
      */
     testInterfaceAttributeUpdated: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
         		this.addWaitForLayoutItem(component, "def layout item");
             }, function(component){
                 var child1 = component.find("child1");
@@ -136,8 +140,8 @@
      * Nothing should rerender but the cmp itself
      */
     testParentAttributeUpdated: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 var child2 = component.find("child2");
@@ -153,8 +157,8 @@
      * Nothing should rerender but the cmp itself (no participation (dirtyness on the children))
      */
     testParentModelUpdated: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 var child2 = component.find("child2");
@@ -171,8 +175,8 @@
      * because that attribute does not participate any where else.
      */
     testChildtAttributeUpdated: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 				this.addWaitForLayoutItem(component, "def layout item");
 		    }, function(component){
                 var child2 = component.find("child2");
@@ -185,45 +189,14 @@
             }]
     },
 
-    /**
-     * Layout change will not rerender the container.
-     * Nothing should rerender but the cmp itself
-     */
-    _testLayoutChange: {
-    	doNotWrapInAuraRun : true,
-        attributes : { __layout: "#def" },
-        test: [
-            function (component) {
-        		this.addWaitForLayoutItem(component, "def layout item");
-            }, function(component){
-                var child1 = component.find("child1");
-                child1.getSuper().getSuper().find("toggleAbstract").get("e.press").fire();
-            }, function(component){
-                var child1 = component.find("child1");
-                child1.getSuper().find("toggleParent").get("e.press").fire();
-            }, function(component){
-                this.addWaitForCounter(component.find("child1"), "2");
-            }, function(component){
-                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "2");
-                $A.layoutService.layout("death");
-        		this.addWaitForLayoutItem(component, "death layout item");
-            }, function(component){
-                this.assertCounters(component, "2", "2", "0", "0", "0", "0", "0");
-            }, function(component){        
-                component.find("child1").find("toggleChild").get("e.press").fire();
-            }, function(component){
-                this.addWaitForCounter(component.find("child1"), "3");
-            }, function(component){
-                this.assertCounters(component, "3", "3", "0", "0", "0", "0", "1");
-            }]
-    },
+   
     /**
      * Update attribute on a layout item.
      */
     testLayoutItemAttributeUpdated: {
-        attributes : { __layout: "#def" },
         test: [
             function(component){
+                this.switchToLayout(component, "def");
         		this.addWaitForLayoutItem(component, "def layout item");
             }, 
             function(component){
@@ -243,8 +216,8 @@
     },
     
     testRerenderOnceIfContainerRerenderedInEventLoop: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
 	        	var cmp = component;
@@ -264,8 +237,8 @@
     },
 
     testRerenderOnceForNonConcreteComponentsIfContainerRerenderedInEventLoop: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
 	        	var cmp = component;
@@ -286,8 +259,8 @@
 
     /** Tests rerender ordering. */
     testRerenderOrder: {
-        attributes : { __layout: "#def" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
 	            var child2 = component.find("child2");
@@ -313,9 +286,10 @@
      * Add component to empty array.
      */
     testAddComponentToEmptyArray: {
-        attributes : { __layout: "#def", whichArray: "v.emptyArray" },
+        attributes : { whichArray: "v.emptyArray" },
         test: [
             function (component) {
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, 
             function (component) {
@@ -340,8 +314,9 @@
      * Clear an array.
      */
     testClearArray: {
-        attributes : { __layout: "#def", whichArray: "v.emptyArray" },
+        attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 component.find("pushText").get("e.press").fire();
@@ -375,6 +350,7 @@
     _testReverseArray: {
         attributes : { whichArray: "v.emptyArray" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 component.find("pushText").get("e.press").fire();
@@ -422,6 +398,7 @@
     _testUpdateBody: {
         attributes : { whichArray: "emptyArrayContainer.super.v.body" },
         test: [function(component){
+                this.switchToLayout(component, "def");
 	    		this.addWaitForLayoutItem(component, "def layout item");
 	        }, function(component){
                 var cmp = component.find("emptyArrayContainer");

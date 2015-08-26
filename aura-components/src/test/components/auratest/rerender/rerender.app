@@ -15,7 +15,8 @@
     limitations under the License.
 
 -->
-<aura:application model="java://org.auraframework.components.test.java.model.TestJavaModel">
+<aura:application locationChangeEvent="aura:locationChange" model="java://org.auraframework.components.test.java.model.TestJavaModel">
+    <aura:handler event="aura:locationChange" action="{!c.locationChanged}"/>
     <aura:attribute name="whichArray" type="String" default="v.emptyArray"/>
     <aura:attribute name="emptyArray" type="Aura.Component[]"/>
 

@@ -14,6 +14,37 @@
  * limitations under the License.
  */
 ({
+    locationChange: function(cmp, event, helper) {
+        // See if sidebar needs populating
+        // Should only need being done once.
+        var sidebar = cmp.find("sidebar");
+        var sidebarBody = sidebar.get("v.body");
+        if(sidebarBody.length === 0) {
+            $A.createComponent("auradocs:referenceTree", {}, function(referenceTreeCmp){
+                sidebar.set("v.body", referenceTreeCmp);
+            });
+        }
+
+        var getReference = cmp.get("c.getReference");
+        getReference.setStorable();
+        getReference.setParams(event.getParams());
+
+        getReference.setCallback(this, function(action) {
+            var state = action.getState();
+            if (state === "SUCCESS") {
+                var ret = action.getReturnValue();
+                if(ret) {
+                    var content = cmp.find("content");
+                    var newComponents = $A.componentService["newComponentDeprecated"](ret, null, false, true);
+
+                    content.set("v.body", newComponents);
+                }
+            }
+        });
+
+        $A.enqueueAction(getReference);
+    },
+    
     waiting : function(cmp, event, helper){
         helper.showWaiting(cmp);
     },

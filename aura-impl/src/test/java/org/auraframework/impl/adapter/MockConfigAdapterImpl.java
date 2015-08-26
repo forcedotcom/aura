@@ -125,7 +125,7 @@ public class MockConfigAdapterImpl extends ConfigAdapterImpl implements MockConf
             "clientLibraryTest", "clientApiTest",
             "clientServiceTest", "componentTest", "docstest", "expressionTest", "forEachDefTest", "forEachTest",
             "handleEventTest", "ifTest", "iterationTest",
-            "layoutServiceTest", "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest",
+            "listTest", "loadLevelTest", "perfTest", "performanceTest", "renderingTest",
             "setAttributesTest", "test", "tokenSanityTest", "uitest", "utilTest",
             "updateTest", "whitespaceBehaviorTest", "appCache").build();
 

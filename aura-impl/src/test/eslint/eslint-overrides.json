@@ -22,7 +22,6 @@
     "AuraSerializationService": true,
     "AuraExpressionService": true,
     "AuraEventService": true,
-    "AuraLayoutService": true,
     "AuraLocalizationService": true,
     "AuraStorage": true,
     "AuraStorageService": true,

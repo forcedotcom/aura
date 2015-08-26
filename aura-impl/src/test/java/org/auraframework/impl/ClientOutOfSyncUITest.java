@@ -17,28 +17,12 @@ package org.auraframework.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TokensDef;
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.def.*;
+import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 import com.google.common.base.Function;
@@ -277,26 +261,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         // Firefox caches the response so we need to manually include a nonce to effect a reload
         openNoAura(url + "?nonce=" + System.nanoTime());
         auraUITestingUtil.waitForElementText(By.cssSelector("body"), "secret", true);
-    }
-
-    @ThreadHostileTest("LayoutsDef modification affects namespace")
-    @ExcludeBrowsers({ BrowserType.IE10, BrowserType.IE11 })
-    // known issue with IE11 and layout : W-2375142
-    public void testGetClientRenderingAfterLayoutChange() throws Exception {
-        DefDescriptor<ApplicationDef> appDesc = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, "", "<div aura:id='xspot'/>"));
-        DefDescriptor<?> layoutsDesc = Aura.getDefinitionService().getDefDescriptor(appDesc,
-                DefDescriptor.MARKUP_PREFIX, LayoutsDef.class);
-        addSourceAutoCleanup(
-                layoutsDesc,
-                "<aura:layouts default='def'><aura:layout name='def'><aura:layoutItem container='xspot'>first</aura:layoutItem></aura:layout></aura:layouts>");
-        open(appDesc);
-        auraUITestingUtil.waitForElementText(By.cssSelector("body"), "first", true);
-        updateStringSource(
-                layoutsDesc,
-                "<aura:layouts default='def'><aura:layout name='def'><aura:layoutItem container='xspot'>second</aura:layoutItem></aura:layout></aura:layouts>");
-        open(appDesc);
-        auraUITestingUtil.waitForElementText(By.cssSelector("body"), "second", true);
     }
 
     public void testGetClientRenderingAfterDependencyChange() throws Exception {

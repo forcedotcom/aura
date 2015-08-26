@@ -58,11 +58,7 @@ public class JSTestCaseModel {
                 } else {
                     value = entry.getValue().toString();
                 }
-                if (key.equals("__layout")) {
-                    hash = value;
-                } else {
-                    newParams.add(new BasicNameValuePair(key, value));
-                }
+                newParams.add(new BasicNameValuePair(key, value));
             }
         }
         newParams.add(new BasicNameValuePair("aura.test", caseDef.getDescriptor().getQualifiedName()));

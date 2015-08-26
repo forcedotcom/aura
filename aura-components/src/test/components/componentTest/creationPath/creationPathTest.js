@@ -16,15 +16,6 @@
 ({
     failOnWarning : true,
 
-    waitForLayoutChange : function(cmp) {
-        var target = cmp;
-        $A.test.addWaitForWithFailureMessage(
-                true,
-                function(){return target._layoutChanged || false},
-                "waiting for layout change",
-                function(){target._layoutChanged = false});
-    },
-
     assertCreationPath : function(cmp, path, msg) {
         var cp = $A.test.getCreationPath(cmp);
         $A.test.assertEquals(path, cp.substring(cp.indexOf("/")), msg); 
@@ -73,41 +64,6 @@
         }
     },
     
-    testDefaultLayoutItem : {
-    	browsers: ["-IE10", "-IE11"],
-        test : [function(cmp) {
-        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
-        }, function(cmp) {
-            $A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
-        }]
-    },
-    
-   testActionLayoutItem : {
-	    browsers: ["-IE10", "-IE11"],
-        attributes : { __layout : "#action" },
-        test : [function(cmp) {
-        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
-        }, function(cmp) {
-            $A.test.assertEquals("action:java:0", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
-        }]
-    },
-    
-    testChangeLayoutItem : {
-    	browsers: ["-IE10", "-IE11"],
-        attributes : { __layout : "#action" },
-        test : [ function(cmp) {
-        	this.waitForLayoutChange(cmp); //move this from setUp and disable the test as layout issue with IE10&11 : W-2375142
-        }, function(cmp) {
-            $A.test.assertEquals("action:java:0", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            $A.layoutService.layout("default");
-            this.waitForLayoutChange(cmp);
-        }, function(cmp){
-            $A.test.assertEquals("fromDefaultLayout", $A.test.getText(cmp.find("layoutTarget").getElement()));
-            this.assertCreationPath(cmp.find("layoutTarget").get("v.body")[0], "/*[0]");
-        }]
-    },
 
     testIfTrue : {
         attributes : { iftrue : true },

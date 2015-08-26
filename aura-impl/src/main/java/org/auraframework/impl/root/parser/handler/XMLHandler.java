@@ -15,33 +15,24 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
+
+import javax.xml.namespace.QName;
+import javax.xml.stream.*;
+
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.root.parser.handler.design.DesignAttributeDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignItemsDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignLayoutAttributeDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignLayoutDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignOptionDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignSectionDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignTemplateDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignTemplateRegionDefHandler;
-import org.auraframework.impl.root.parser.handler.design.DesignLayoutComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.design.*;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * Superclass for all the xml handlers.
@@ -52,8 +43,8 @@ public abstract class XMLHandler<T extends Definition> {
 
     public final static Set<String> SYSTEM_TAGS = ImmutableSet.of(ApplicationDefHandler.TAG,
             AttributeDefHandler.TAG, ComponentDefHandler.TAG, EventDefHandler.TAG, InterfaceDefHandler.TAG,
-            EventHandlerDefHandler.TAG, ImportDefHandler.TAG, LayoutDefHandler.TAG, LayoutsDefHandler.TAG,
-            LayoutItemDefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG, AttributeDefRefHandler.TAG,
+            EventHandlerDefHandler.TAG, ImportDefHandler.TAG, MethodDefHandler.TAG,RegisterEventHandler.TAG, 
+            AttributeDefRefHandler.TAG,
             DependencyDefHandler.TAG, NamespaceDefHandler.TAG, TokensDefHandler.TAG, DesignDefHandler.TAG,
             DesignAttributeDefHandler.TAG, DesignTemplateDefHandler.TAG, DesignTemplateRegionDefHandler.TAG,
             DesignLayoutDefHandler.TAG, DesignSectionDefHandler.TAG, DesignItemsDefHandler.TAG, DesignLayoutAttributeDefHandler.TAG,

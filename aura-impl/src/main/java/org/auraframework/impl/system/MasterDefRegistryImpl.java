@@ -15,36 +15,22 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.Location;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.Source;
+import org.auraframework.system.*;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -53,13 +39,7 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import com.google.common.collect.*;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -326,8 +306,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 break;
             case ATTRIBUTE:
             case REQUIRED_VERSION:
-            case LAYOUT:
-            case LAYOUT_ITEM:
             case TESTCASE:
             case APPLICATION:
             case COMPONENT:
@@ -335,7 +313,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case EVENT:
             case LIBRARY:
             case DOCUMENTATION:
-            case LAYOUTS:
             case NAMESPACE:
             case TOKENS:
             case TOKENS_IMPORT:

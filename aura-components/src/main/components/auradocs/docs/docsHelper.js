@@ -28,6 +28,43 @@
 
     hideRefreshing : function(cmp){
         $A.util.removeClass(cmp.find('navbar').getElement(), "refreshing");
+    },
+
+    setLayout: function(cmp, layout, parameters) {
+        var action = layout == "reference" ? cmp.get("c.getReference") : cmp.get("c.getTopic");
+        action.setStorable();
+        action.setParams(parameters);
+
+        action.setCallback(this, function(action) {
+            var state = action.getState();
+            if (state === "SUCCESS") {
+                var ret = action.getReturnValue();
+                if(ret) {
+                    var content = cmp.find("content");
+                    var newComponents = $A.componentService["newComponentDeprecated"](ret, null, false, true);
+
+                    content.set("v.body", newComponents);
+
+                    if(layout === "reference") {
+                        var sidebar = cmp.find("sidebar");
+                        if(sidebar.get("v.body").length === 0) {
+                            $A.createComponent("auradocs:referenceTree", {}, function(referenceTree) {
+                                sidebar.set("v.body", referenceTree);
+                            });
+                        }
+                    }
+                    
+
+                }
+            } else {
+
+                // KRIS
+                // Lets cause this to fail so we can give a better error message.
+                $A.error("Layout Failed for the docs app.");
+            }
+        });
+
+        $A.enqueueAction(action);
     }
 })
 

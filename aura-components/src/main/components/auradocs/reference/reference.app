@@ -30,6 +30,7 @@
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
     <aura:handler name="refreshBegin" action="{!c.refreshBegin}"/>
     <aura:handler name="refreshEnd" action="{!c.refreshEnd}"/>
+    <aura:handler event="auradocs:locationChange" action="{!c.locationChange}"/>
 		
     <header><auradocs:nav aura:id="navbar" referenceOnly="true"/></header>
 

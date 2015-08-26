@@ -17,11 +17,7 @@ package org.auraframework.impl.source.file;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.nio.file.FileSystems;
 
@@ -29,10 +25,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.system.SourceListener;
 import org.auraframework.util.FileChangeEvent;
 import org.auraframework.util.test.util.UnitTestCase;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 /**
  * Unit tests for {@link FileSourceListener}
@@ -151,11 +144,6 @@ public class FileSourceListenerTest extends UnitTestCase {
     public void testSourceChangedTokens() throws Exception {
         assertSourceChangedCalled("markup", "ui", "uiNamespace", DefDescriptor.DefType.TOKENS,
                 "/some/awesome/ui/uiNamespace/uiNamespace.tokens");
-    }
-
-    public void testSourceChangedLayouts() throws Exception {
-        assertSourceChangedCalled("markup", "test", "layouts", DefDescriptor.DefType.LAYOUTS,
-                "/some/awesome/test/layouts/layoutsLayouts.xml");
     }
 
     public void testSourceChangedNamespace() throws Exception {

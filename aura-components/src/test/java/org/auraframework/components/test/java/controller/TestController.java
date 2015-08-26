@@ -56,11 +56,11 @@ public class TestController {
         String[] s = { "Atlantic", "Central", "Southeast", "Northwest", "Pacific", "Southwest" };
         Map<String, Object> m = Maps.newHashMap();
         m.put("string", Lists.newArrayList(s));
-        return Aura.getInstanceService().getInstance("forEachDefTest:basicDataType", ComponentDef.class, m);
+        return Aura.getInstanceService().getInstance("iterationTest:basicIteration", ComponentDef.class, m);
     }
-    
+
     @AuraEnabled
-    public static List<String> getAppCacheUrls() throws Exception{
+    public static List<String> getAppCacheUrls() throws Exception {
         List<String> urls = Lists.newArrayList();
         urls.add("/auraFW/resources/aura/auraIdeLogo.png");
         urls.add("/auraFW/resources/aura/resetCSS.css");

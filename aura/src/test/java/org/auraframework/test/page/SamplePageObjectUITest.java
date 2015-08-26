@@ -18,6 +18,7 @@ package org.auraframework.test.page;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.AuraUITestingUtil.ActionDuringTransit;
@@ -52,10 +53,8 @@ public class SamplePageObjectUITest extends PageObjectTestCase<SampleAuraPageObj
     	//send the action is "clickOnButton"
     	String methodWeWantToIntercept = "clickOnButton";
     	String auraActionWeCare = "executeInForeground";
-    	ActionTiming stressActionTiming = ActionTiming.PRESEND;
-    	ActionDuringTransit[] stressActionDuringTransitList = {ActionDuringTransit.DROPACTION};
-    	StressAction stressAction = AuraUITestingUtil.createStressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
-    	HashMap<String, StressAction> methodNameToStressActionMap = new HashMap<>();
+    	StressAction stressAction = AuraUITestingUtil.createStressAction(auraActionWeCare, ActionTiming.PRESEND, ActionDuringTransit.DROPACTION);
+    	Map<String, StressAction> methodNameToStressActionMap = new HashMap<>();
     	methodNameToStressActionMap.put(methodWeWantToIntercept, stressAction);
     	AuraPageObjectInterface apoi = AuraPageObjectHandler.getAuraPageObjectInterface(sapo1, methodNameToStressActionMap);
     	//now do the test

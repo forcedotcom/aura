@@ -26,7 +26,7 @@ Test.Aura.Util.UtilTest = function() {
         SecureFilters:{}
     }};
     var auraMock = function(delegate) {
-        Mocks.GetMocks(Object.Global(),{
+        Mocks.GetMocks(Object.Global(), {
             exp:function() {},
             window:Object.Global(),
             document:{createDocumentFragment:function() {}},
@@ -38,7 +38,7 @@ Test.Aura.Util.UtilTest = function() {
             Aura: Aura,
             $A:{ns:{},assert:Stubs.GetMethod(function(condition,message){if(!condition)throw message;})},
             navigator:{userAgent:''}
-        })(function(){
+         })(function(){
             [Import("aura-impl/src/main/resources/aura/util/Util.js")]
             delegate();
         });
@@ -828,6 +828,58 @@ Test.Aura.Util.UtilTest = function() {
             var actual;
 
             actual = targetUtil.urlDecode(data);
+
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function generateUrl() {
+
+        [Fact]
+        function createQuery() {
+            var url = "http://salesforce.com";
+            var params = { "key": "value", "key2": "value2" };
+            var expected = "http://salesforce.com?key=value&key2=value2";
+            var actual;
+
+            actual = targetUtil.generateUrl(url, params);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function updateQuery() {
+            var url = "http://salesforce.com?key=key&key2=key2";
+            var params = { "key": "value", "key2": "value2" };
+            var expected = "http://salesforce.com?key=value&key2=value2";
+            var actual;
+
+            actual = targetUtil.generateUrl(url, params);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function encodeQuery() {
+            var url = "http://salesforce.com?key=key&key2=key2";
+            var params = { "key": "value=valid", "key2": "value2" };
+            var expected = "http://salesforce.com?key=value%3Dvalid&key2=value2";
+            var actual;
+
+            actual = targetUtil.generateUrl(url, params);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function removeQueryKey() {
+            var url = "http://salesforce.com?key=key&key2=key2";
+            var params = { "key": "value", "key2": undefined };
+            var expected = "http://salesforce.com?key=value";
+            var actual;
+
+            actual = targetUtil.generateUrl(url, params);
 
             Assert.Equal(expected, actual);
         }

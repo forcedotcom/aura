@@ -31,6 +31,10 @@
         cmp._initializing = false;
     },
     handleItemsChange: function (cmp, event, helper) {
+        if (cmp._initializing || cmp._appending) {
+            return;
+        }
+
         helper.markClean(cmp, 'v.items');
     	helper.createVirtualRows(cmp);
         helper.markDirty(cmp); // So we go into the rerender
@@ -150,7 +154,9 @@
         }
 
         if (items && items.length) {
+            cmp._appending = true;
             helper.appendVirtualRows(cmp, items);
+            cmp._appending = false;
         }
     }
 })// eslint-disable-line semi

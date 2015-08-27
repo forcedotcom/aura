@@ -1,7 +1,5 @@
 <aura:application render="client" useAppcache="true" access="global">
 
-    <!-- test duplicates -->
-    <aura:clientLibrary name="UIPerf" type="JS" modes="PTEST,CADENCE"/>
     <aura:clientLibrary name="CkEditor" type="JS" />
 
     <aura:clientLibrary name="clTestAppJS" url="js://clientLibraryTest.clientLibraryTest" type="JS" />

@@ -102,7 +102,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
                     .then(function() { return i_${store}.getAll(); })
                     .then(function(all) { o_${store}.all = all; }, function(err) { o_${store}.all = JSON.stringify(err); })
                     // last then() is to post the results to aura inspector
-                    .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, '*'); });
+                    .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, window.location.href); });
                 
                 // sync return whatever properties we have
                 o_${store};

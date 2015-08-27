@@ -13,20 +13,28 @@
 		#eventSource::before { content: 'Source'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
 		#eventDuration::before { content: 'Duration'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
 		#eventHandledBy::before { content: 'Handled By'; color: #777; letter-spacing: .03em; display:inline-block; width: 80px; vertical-align: top; }
+		#eventHandledByGrid { width: 700px; height: 400px; background: #efefef; border-radius: 10px; margin-left: 80px; }
+		#gridToggle { border: 1px solid #ddd; border-radius: 5px; background: #eee; float: left; }
 		.hidden { display: none; }
 	</style>
 	<header>
     	<h1><!-- Event Name --></h1>
-		<h6></h6>
+		<h6><!-- Event Type --></h6>
     </header>
     <section>
-	    <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
-	    <aurainspector-outputFunction class="caller"><!-- caller --></aurainspector-outputFunction>
+	    <aurainspector-json class="parameters" expandTo="0"><!-- Parameters --></aurainspector-json>
+	    <aurainspector-outputFunction class="caller"><!-- Caller --></aurainspector-outputFunction>
 	    <div id="eventSource"></div>
 	    <div id="eventDuration"></div>
 	    <div id="eventHandledBy"></div>
+	    <button id="gridToggle" class="hidden">Toggle Grid</button>
+	    <div id="eventHandledByGrid" class="hidden">
+	    </div>
     </section>
 </template>
+
+<link href="../../external/vis.min.css" rel="stylesheet"/>
+<script src="../../external/vis.min.js"></script>
 
 <!-- CSP ruins all our fun, this has to be external because of that -->
 <script src="eventCard.js"></script>

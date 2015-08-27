@@ -18,8 +18,9 @@
 			eventDuration: 	this.getAttribute("duration"),
 			eventType: 		this.getAttribute("type") === "APPLICATION" ? "APP" : "CMP",
 			eventCaller: 	this.getAttribute("caller"),
-			parameters: 	this.getAttribute("parameters"),
-			handledBy: 		this.getAttribute("handledBy")
+			parameters: 	this.getAttribute("parameters")//,
+			// handledBy: 		this.getAttribute("handledBy"),
+			// handledByTree: 	this.getAttribute("handledByTree")
 		};
 
 		// remove markup:// from the event name if present
@@ -43,7 +44,9 @@
 
 		var source = this.shadowRoot.querySelector("#eventSource");
 		if(model.eventSourceId) {
-			source.textContent 	= model.eventSourceId;
+			var auracomponent = document.createElement("aurainspector-auracomponent");
+			auracomponent.setAttribute("globalId", model.eventSourceId);
+			source.appendChild(auracomponent);
 		} else {
 			source.classList.add("hidden");
 		}
@@ -60,6 +63,9 @@
 
     	var shadowRoot = this.createShadowRoot();
     		shadowRoot.appendChild(clone);
+
+    	var toggleButton = shadowRoot.querySelector("#gridToggle");
+    	toggleButton.addEventListener("click", ToggleButton_OnClick.bind(this));
 	};
 
 	eventCard.attributeChangedCallback = function(attr, oldValue, newValue) {
@@ -71,8 +77,17 @@
 			} else if(newValue !== "true" && newValue !== "collapsed" && isCollapsed) {
 				section.classList.remove("hidden");
 				renderHandledBy(this);
+				if(this.getAttribute("showGrid") === "true") {
+					renderHandledByTree(this);
+				}
 			}
-
+		}
+		if(attr === "showgrid" || attr === "showGrid") {
+			if(newValue === "true") {
+				renderHandledByTree(this);
+			} else {
+				this.shadowRoot.querySelector("#eventHandledByGrid").classList.add("hidden");
+			}
 		}
 	};
 
@@ -85,23 +100,17 @@
 	});
 
 	function renderHandledBy(element) {
-		var handledBy = element.getAttribute("handledBy");
-
-		// build the handled collection
+		var data = getData(element.getAttribute("handledBy"));
 		var handledContainer = element.shadowRoot.querySelector("#eventHandledBy");
 		handledContainer.removeChildren();
-		handledContainer.appendChild(buildHandledBy(handledBy));
-	}
-	// This will improve. 
-	// I need to account for doing a deep network graph here too.
-	function buildHandledBy(dataString) {
-		if(!dataString || dataString === "[]") { 
+
+		if(!data || data.length === 0) { 
 			var span = document.createElement("span");
 			span.textContent = "None";
-			return span;
+			handledContainer.appendChild(span);
+			return;
 		}
 
-		var data = JSON.parse(dataString);
 		var dl = document.createElement("dl");
 		var dt;
 		var auracomponent;
@@ -120,6 +129,91 @@
 			dl.appendChild(dd);
 		}
 
-		return dl;
+		// build the handled collection
+		handledContainer.appendChild(dl);
+
+		// Show Toggle Button
+		var gridToggle = element.shadowRoot.querySelector("#gridToggle");
+		gridToggle.classList.remove("hidden");
+
+	}
+
+	function renderHandledByTree(element) {
+		var handledByTree = getData(element.getAttribute("handledByTree")) || [];
+
+		// Empty, or just itself? Don't draw
+		if(handledByTree.length < 2) {
+			return;
+		}
+
+		var gridContainer = element.shadowRoot.querySelector("#eventHandledByGrid");
+		gridContainer.removeChildren();
+		gridContainer.classList.remove("hidden");
+
+		var eventId = element.id;
+		var rawEdges = [];
+		var rawNodes = [];
+
+		var handled;
+		for(var c = 0; c < handledByTree.length;c++) {
+			var handled = handledByTree[c];
+			if(handled.type === "action") {
+			  	rawNodes.push({ "id": handled.id, "label": `{${handled.data.scope}} c.${handled.data.name}`, "color": "maroon" });
+			} else {
+				var label = handled.data.sourceId ? `{${handled.data.sourceId}} ${handled.data.name}` : handled.data.name;
+			  	var data = { "id": handled.id, "label": label, "color": "steelblue" };
+			  	if(handled.id === eventId) {
+			  		data.size = 60;
+			  		data.color = "#333";
+			  	}
+			  	rawNodes.push(data);
+			}
+			if(handled.parent) {
+			  	rawEdges.push( { "from": handled.id, "to": handled.parent, arrows: "from" } );
+			}
+		}
+
+		  var nodes = new vis.DataSet(rawNodes);
+		  var edges = new vis.DataSet(rawEdges);
+		  var options = {
+		  	nodes: {
+		  		borderWidth: 1,
+		  		shape: "box",
+		  		size: 50,
+		  		font: {
+		  			color: "#fff"
+		  		},
+		  		color: {
+		  			border: "#222"
+		  		}
+		  	},
+		  	layout: {
+		  		hierarchical: {
+			      enabled: true,
+			      //levelSeparation: 70,
+			      direction: 'DU',   // UD, DU, LR, RL
+			      sortMethod: 'directed' // hubsize, directed
+			    }
+		  	},
+		  	interaction: {
+		  		dragNodes: true
+		  	}
+		  };
+
+		  var network = new vis.Network(gridContainer, { "nodes": nodes, "edges": edges }, options);
+	}
+
+	function getData(data) {
+		if(!data) { return data; }
+		if(data.length === 0) { return data; }
+		if(typeof data === "string") { 
+			return JSON.parse(data);
+		} 
+		return data;
+	}
+
+	function ToggleButton_OnClick(event) {
+		var showGrid = this.getAttribute("showGrid");
+		this.setAttribute("showGrid", (!showGrid || showGrid !== "true") ? "true" : "false");
 	}
 })();

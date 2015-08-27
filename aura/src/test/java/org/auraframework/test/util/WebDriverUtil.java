@@ -39,6 +39,18 @@ import com.google.common.collect.Lists;
 public final class WebDriverUtil {
     private static String SELENIUM_VERSION = null;
     private static Set<BrowserType> defaultBrowsers = EnumSet.of(BrowserType.GOOGLECHROME);
+    public static Set<BrowserType> MOBILE = 
+    		EnumSet.of(BrowserType.IPHONE,
+                    	BrowserType.IPAD,
+                    	BrowserType.ANDROID_PHONE,
+                    	BrowserType.ANDROID_TABLET);
+    public static Set<BrowserType> DESKTOP = 
+    		EnumSet.of(BrowserType.IE9,
+                    	BrowserType.IE10,
+    					BrowserType.IE11,
+			            BrowserType.FIREFOX,
+			            BrowserType.GOOGLECHROME,
+			            BrowserType.SAFARI);
     private static Set<BrowserType> availableBrowsers = null;
 
     private enum ExtraCapability {

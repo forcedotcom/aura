@@ -40,6 +40,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverUtil;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -190,7 +191,13 @@ public class ComponentJSTest extends TestSuite {
                     set = targetBrowsers;
                 }
                 try {
-                    set.add(BrowserType.valueOf(token));
+                	if (token.equals("MOBILE")) {
+                        set.addAll(WebDriverUtil.MOBILE);
+                    } else if (token.equals("DESKTOP")) {
+                        set.addAll(WebDriverUtil.DESKTOP);      
+                    } else {
+                        set.add(BrowserType.valueOf(token));
+                    }
                 } catch (IllegalArgumentException e) {
                     fail("Unknown BrowserType: " + browser);
                 }

@@ -1986,8 +1986,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
 
 Component.prototype.getMethodHandler = function(valueProvider,name,action,attributes){
     var observer=this.getActionCaller(valueProvider,action||("c."+name));
-    /*eslint no-unused-vars:0 */
-    return function(param1,param2,paramN){
+    return function(param1,param2,paramN){//eslint-disable-line no-unused-vars
         var eventDef = $A.get("e").getEventDef("aura:methodCall");
         var dispatcher = {};
         dispatcher[eventDef.getDescriptor().getQualifiedName()] = [observer];
@@ -2345,8 +2344,7 @@ Component.prototype.output = function(value, avp, serialized, depth) {
                 domOutput["id"] = value.id||"";
                 domOutput["className"] = value.className||"";
                 domOutput["$serId"] = value["$serId"];
-                /*eslint no-proto:0 */
-                domOutput["__proto__"] = null;
+                domOutput["__proto__"] = null;//eslint-disable-line no-proto
                 return domOutput;
             } else if($A.util.isObject(value)){
                 return this.outputMapValue(value, avp, serialized, depth);
@@ -2377,8 +2375,7 @@ Component.prototype.outputMapValue = function(map, avp, serialized, depth) {
             $A.warning("Error in chrome plugin support", e);
         }
     }
-    /*eslint no-proto:0 */
-    ret["__proto__"] = null;
+    ret["__proto__"] = null;//eslint-disable-line no-proto
     return ret;
 };
 
@@ -2387,8 +2384,7 @@ Component.prototype.outputArrayValue = function(array, avp, serialized, depth) {
     for (var i = 0; i < array.length; i++) {
         ret.push(this.output(array[i], avp, serialized, depth));
     }
-    /*eslint no-proto:0 */
-    ret["__proto__"] = null;
+    ret["__proto__"] = null;//eslint-disable-line no-proto
     return ret;
 };
 
@@ -2396,8 +2392,7 @@ Component.prototype.outputComponent = function(cmp, serialized, depth) {
     /*jslint reserved: true */
     if (cmp) {
         var ret = {
-        	/*eslint no-proto:0 */
-            __proto__ : null
+            __proto__ : null//eslint-disable-line no-proto
         };
         ret["descriptor"] = cmp.getDef().getDescriptor().toString();
         ret["globalId"] = cmp.globalId;
@@ -2445,8 +2440,7 @@ Component.prototype.outputComponent = function(cmp, serialized, depth) {
                 }
             }
         });
-        /*eslint no-proto:0 */
-        ret.attributes["__proto__"] = null;
+        ret.attributes["__proto__"] = null;//eslint-disable-line no-proto
         //}
         var valueProvider = cmp.getAttributeValueProvider();
         ret["attributeValueProvider"] = this.output(valueProvider,

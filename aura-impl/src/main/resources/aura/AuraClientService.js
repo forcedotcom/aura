@@ -816,8 +816,7 @@ AuraClientService.prototype.setConnected = function(isConnected) {
         e.fire();
     } else {
         // looks like no definitions loaded yet
-    	/*eslint no-alert:0*/
-        alert(isDisconnected ? "Connection lost" : "Connection resumed");
+        alert(isDisconnected ? "Connection lost" : "Connection resumed");//eslint-disable-line no-alert
     }
 };
 

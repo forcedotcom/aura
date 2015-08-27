@@ -138,8 +138,7 @@ AuraRenderingService.prototype.rerender = function(components) {
                         // we fall through here, and put whatever the component gives us in the set.
                         // This may not be ideal, but it is not clear what we should do.
                     }
-                    /*eslint eqeqeq:0 */
-                    if(rerenderedElements!=undefined){
+                    if(rerenderedElements!=undefined){//eslint-disable-line eqeqeq
                         renderedElements=renderedElements.concat(rerenderedElements);
                     }else{
                         addExistingElements=true;

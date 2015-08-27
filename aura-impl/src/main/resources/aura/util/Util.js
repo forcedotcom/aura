@@ -560,8 +560,7 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
         if(attribute){
             var useShadowClass=false;
             var oldClass=element.getShadowAttribute(attribute);
-            /*eslint eqeqeq:0 */
-            if(oldClass!=undefined){
+            if(oldClass!=undefined){//eslint-disable-line eqeqeq
                 useShadowClass=true;
             }else{
                 oldClass=element.get(attribute)||'';
@@ -924,8 +923,7 @@ Aura.Utils.Util.prototype.trim = function(value){
  * @returns {String}
  * @export
  */
-/*eslint-disable no-unused-vars */
-Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){
+Aura.Utils.Util.prototype.format=function(formatString,arg1,arg2,argN){//eslint-disable-line no-unused-vars
     $A.assert(formatString&&formatString.toString,"$A.util.format(): 'formatString' must be convertible to String.");
     var formatArguments=Array.prototype.slice.call(arguments,1);
     return formatString.toString().replace(/\{(\d+)\}/gm,function(match,index){
@@ -1336,8 +1334,7 @@ Aura.Utils.Util.prototype.apply = function(/* Object|Function */ baseObject, /* 
             var setValue=forceCopy||!baseObject.hasOwnProperty(property);
             if(setValue||deepCopy){
                 value=members[property];
-                /*eslint eqeqeq:0 */
-                if(deepCopy&&value!=undefined) {
+                if(deepCopy&&value!=undefined) {//eslint-disable-line eqeqeq
                     var branchValue = null;
                     switch (value.constructor) {
                         case Array:

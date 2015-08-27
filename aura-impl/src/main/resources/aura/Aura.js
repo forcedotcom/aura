@@ -17,8 +17,7 @@
 
 // -- Aura Bootstrap ------------------------------------------------------------
 
-/*eslint no-use-before-define:0*/
-if (typeof Aura !== 'undefined') {
+if (typeof Aura !== 'undefined') {//eslint-disable-line no-use-before-define
     Aura._Aura = Aura;
 }
 var Aura = {};

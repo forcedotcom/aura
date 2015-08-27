@@ -313,6 +313,61 @@
     	}]
     	
     },
+    
+    testInvalidDateInput: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', format: 'MM-DD-YYYY'},
+        test: function(cmp){
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+
+            var invalidDates = [
+                "15-10-2015",
+                "10-40-2015",
+                "1/6/2015",
+                "01-02-20a5",
+                "10102015",
+                "Sep 10th, 2015",
+                "abcefghijklm"];
+
+            if (this.isViewDesktop()) {
+                for(var i = 0; i < invalidDates.length; i++) {
+                    inputDateElement.value = invalidDates[i];
+                    $A.test.fireDomEvent(inputDateElement, "change");
+                    var expectedValue = invalidDates[i];
+                    aura.test.assertEquals(expectedValue, inputDateTimeCmp.get("v.value"), "value should not change when input is invalid");
+                    aura.test.assertEquals(invalidDates[i], inputDateElement.value, "input value doesn't change on invalid input");
+                }
+            }
+        }
+    },
+
+    testValidDateInput: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', format: 'MM-DD-YYYY'},
+        test: function(cmp){
+            var inputDateTimeCmp = cmp.find("datePickerTestCmp");
+            var inputDateElement = inputDateTimeCmp.find("inputText").getElement();
+
+            var validDates = {
+                "11-15-2015" : "2015-11-15",
+                "8-23-2015" : "2015-08-23",
+                "8-8-2015" : "2015-08-08",
+                "01-02-2015" : "2015-01-02"
+            };
+
+            if (this.isViewDesktop()) {
+                for(var key in validDates) {
+                    if (validDates.hasOwnProperty(key)) {
+                        var validDate = key;
+                        var expectedValue = validDates[key];
+                        inputDateElement.value = validDate;
+                        $A.test.fireDomEvent(inputDateElement, "change");
+                        aura.test.assertEquals(expectedValue, cmp.get("v.value"), "value should change when input is valid");
+                        aura.test.assertEquals(validDate, inputDateElement.value, "input value doesn't change on valid input");
+                    }
+                }
+            }
+        }
+    },
 
     iterateCal : function(monthIter, yearIter, monthButton, yearButton){
                       var i;

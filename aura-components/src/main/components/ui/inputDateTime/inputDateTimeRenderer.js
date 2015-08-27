@@ -33,10 +33,23 @@
     },
 
     rerender: function(component, helper) {
-        var ret = this.superRerender();
+    	var ret = this.superRerender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
-        _helper.formatDateTime(component);
+
+        if (component.isDirty("v.value")) {
+            // on rerender, if an incorrect datetime is entered, do not change the display value so the user has a chance to fix the invalid input
+            var currentDateString = _helper.getDateString(component);
+            var currentTimeString = _helper.getTimeString(component);
+
+            if (!_helper.isDesktopMode(component)
+                || ($A.util.isEmpty(currentDateString) && $A.util.isEmpty(currentTimeString))
+                || _helper.parseDateTimeInput(false, component, currentDateString, currentTimeString)) {
+
+                _helper.formatDateTime(component);
+            }
+        }
+
         _helper.toggleClearButton(component);
         return ret;
     }

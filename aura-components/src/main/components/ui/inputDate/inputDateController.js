@@ -26,13 +26,15 @@
     },
 
     doInit: function(component, event, helper) {
-        // Set placeholder
-        var concreteCmp = component.getConcreteComponent();
-        var format = concreteCmp.get("v.format");
-        if (!format) {
-            format = $A.get("$Locale.dateFormat");
+    	// only add the placeholder when there is no date picker opener.
+        if ($A.get("$Browser.formFactor") == "DESKTOP" && !component.get("v.displayDatePicker")) {
+            var concreteCmp = component.getConcreteComponent();
+            var format = concreteCmp.get("v.format");
+            if (!format) {
+                format = $A.get("$Locale.dateFormat");
+            }
+            component.set("v.placeholder", format);
         }
-        component.set("v.placeholder", format);
     },
 
     openDatePicker: function(component, event, helper) {

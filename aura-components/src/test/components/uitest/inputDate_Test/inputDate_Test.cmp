@@ -17,11 +17,12 @@
 -->
 <aura:component>
       <aura:attribute name="value" type="String"/>
+      <aura:attribute name="format" default="yyyy-MM-dd" type="String"/>
       <aura:handler name="change" value="{!v.value}" action="{!c.valueChange}"/>
       <div id="dlh_outputText">
           after datePicker show up, click me or any other place on the page to make it disappear
       </div>
       <ui:outputText class="outputStatus" aura:id="outputStatus" value=""/><br/><br/>
       <ui:label for="datePickerTestCmp" label="date picker with label" />
-      <ui:inputDate aura:id="datePickerTestCmp" displayDatePicker="true" class="date_input_box" format="yyyy-MM-dd" value="{!v.value}"/>
+      <ui:inputDate aura:id="datePickerTestCmp" displayDatePicker="true" class="date_input_box" format="{!v.format}" value="{!v.value}"/>
 </aura:component>

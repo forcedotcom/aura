@@ -31,6 +31,7 @@ function AuraLocalizationService() {
 
     this.cache = {
         format : {},
+        strictModeFormat : {},
         langLocale : {}
     };
 }
@@ -671,18 +672,20 @@ AuraLocalizationService.prototype.isSame = function(date1, date2, unit) {
  * @param {String} dateTimeString The datetime string to be parsed.
  * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
  * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
+ * @param {Boolean} set to true to turn off moment's forgiving parsing and use strict validation
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @public
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, targetFormat, locale) {
+AuraLocalizationService.prototype.parseDateTime = function(dateTimeString, targetFormat, locale, strictParsing) {
     if (!dateTimeString) {
         return null;
     }
-
-    var mDate = moment(dateTimeString, this.getNormalizedFormat(targetFormat), this.getNormalizedLangLocale(locale));
+    var format = strictParsing ? this.getStrictModeFormat(targetFormat) : this.getNormalizedFormat(targetFormat);
+    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
+    var mDate = moment(value, format, this.getNormalizedLangLocale(locale), strictParsing);
     if (mDate && mDate["isValid"]()) {
         return mDate["toDate"]();
     }
@@ -715,18 +718,21 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
  * @param {String} dateTimeString The datetime string to be parsed
  * @param {String} targetFormat A Java format string which is used to parse datetime. The default is from LocaleValueProvider.
  * @param {String} locale A Java locale string used to parse datetime. The default is from LocaleValueProvider.
+ * @param {Boolean} set to true to turn off moment's forgiving parsing and use strict validation
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
  * @public
  * @export
  * @platform
  */
-AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, targetFormat, locale) {
+AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, targetFormat, locale, strictParsing) {
     if (!dateTimeString) {
         return null;
     }
 
-    var mDate = moment["utc"](dateTimeString, this.getNormalizedFormat(targetFormat), this.getNormalizedLangLocale(locale));
+    var format = strictParsing ? this.getStrictModeFormat(targetFormat) : this.getNormalizedFormat(targetFormat);
+    var value = strictParsing ? this.getStrictModeDateTimeString(dateTimeString) : dateTimeString;
+    var mDate = moment["utc"](value, format, this.getNormalizedLangLocale(locale), strictParsing);
     if (mDate && mDate["isValid"]()) {
         return mDate["toDate"]();
     }
@@ -959,13 +965,58 @@ AuraLocalizationService.prototype.displayDateTime = function(mDate, format, loca
 AuraLocalizationService.prototype.getNormalizedFormat = function(format) {
     if (format) {
         if (!this.cache.format[format]) {
-            var normalizedFormat = format.replace(/([^yY])[yY](?![yY])/g, "$1YYYY")
-                .replace(/y/g, "Y").replace(/d/g, "D").replace(/E/g, "d").replace(/a/g, "A");
+            var normalizedFormat =
+                format.replace(/y/g, "Y")
+                .replace(/(\b|[^Y])Y(?!Y)/g, "$1YYYY")
+                .replace(/d/g, "D")
+                .replace(/E/g, "d")
+                .replace(/a/g, "A");
             this.cache.format[format] = normalizedFormat;
         }
         return this.cache.format[format];
     }
     return format;
+};
+
+/**
+ * Modifying the format so that moment's strict parsing doesn't break on minor deviations
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.getStrictModeFormat = function(format) {
+    if (format) {
+        if (!this.cache.strictModeFormat[format]) {
+            var normalizedFormat = this.getNormalizedFormat(format);
+            if (normalizedFormat) {
+                var strictModeFormat = normalizedFormat
+                    .replace(/(\b|[^D])D{2}(?!D)/g, "$1D")
+                    .replace(/(\b|[^M])M{2}(?!M)/g, "$1M")
+                    .replace(/(\b|[^h])h{2}(?!h)/g, "$1h")
+                    .replace(/(\b|[^H])H{2}(?!H)/g, "$1H")
+                    .replace(/(\b|[^m])m{2}(?!m)/g, "$1m")
+                    .replace(/(\b|[^s])s{2}(?!s)/g, "$1s")
+                    .replace(/\s*A/g, " A")
+                    .trim();
+                this.cache.strictModeFormat[format] = strictModeFormat;
+            }
+        }
+        return this.cache.strictModeFormat[format];
+    }
+    return format;
+};
+
+
+/**
+ * Modifying the date time string so that moment's strict parsing doesn't break on minor deviations
+ *
+ *
+ * @private
+ */
+AuraLocalizationService.prototype.getStrictModeDateTimeString = function(dateTimeString) {
+    if (dateTimeString) {
+        return dateTimeString.replace(/(\d)([AaPp][Mm])/g, "$1 $2");
+    }
+    return dateTimeString;
 };
 
 /**

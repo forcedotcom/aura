@@ -26,26 +26,22 @@
     },
 
     doInit: function(component, event, helper) {
+    	// only add the placeholder when there is no date picker opener.
         if (helper.isDesktopMode(component)) {
             helper.updateTimeFormat(component);
-            var dateFormat = component.get("v.dateFormat"),
-                timeFormat = component.get("v.timeFormat");
-            dateFormat = $A.util.isEmpty(dateFormat) ? $A.get("$Locale.dateFormat") : dateFormat;
-            timeFormat = $A.util.isEmpty(timeFormat) ? $A.get("$Locale.timeFormat") : timeFormat;
+            if (!component.get("v.displayDatePicker")) {
+                var dateFormat = component.get("v.dateFormat"),
+                    timeFormat = component.get("v.timeFormat");
+                dateFormat = $A.util.isEmpty(dateFormat) ? $A.get("$Locale.dateFormat") : dateFormat;
+                timeFormat = $A.util.isEmpty(timeFormat) ? $A.get("$Locale.timeFormat") : timeFormat;
 
-            if ($A.util.isEmpty(component.get("v.placeholder"))) {
-                component.set("v.placeholder", dateFormat);
+                if ($A.util.isEmpty(component.get("v.placeholder"))) {
+                    component.set("v.placeholder", dateFormat);
+                }
+                if ($A.util.isEmpty(component.get("v.timePlaceholder"))) {
+                    component.set("v.timePlaceholder", timeFormat);
+                }
             }
-            if ($A.util.isEmpty(component.get("v.timePlaceholder"))) {
-                component.set("v.timePlaceholder", timeFormat);
-            }
-        } else {
-            // Set placeholder
-            var format = component.get("v.format");
-            if (!format) {
-                format = $A.get("$Locale.datetimeFormat");
-            }
-            component.set("v.placeholder", format);
         }
     },
 

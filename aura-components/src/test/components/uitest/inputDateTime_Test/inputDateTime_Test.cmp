@@ -20,6 +20,7 @@
     <aura:attribute name="format" type="String"/>
     <aura:attribute name="dateFormat" type="String"/>
     <aura:attribute name="timeFormat" type="String"/>
+    <aura:attribute name="timezone" type="String"/>
 
     <ui:inputDateTime aura:id="dateTimePickerTest"
                       label="label"
@@ -28,5 +29,6 @@
                       value="{!v.value}"
                       format="{!v.format}"
                       dateFormat="{!v.dateFormat}"
-                      timeFormat="{!v.timeFormat}"/>
+                      timeFormat="{!v.timeFormat}"
+                      timezone="{!v.timezone}"/>
 </aura:component>

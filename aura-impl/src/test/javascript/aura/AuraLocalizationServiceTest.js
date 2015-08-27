@@ -1533,6 +1533,117 @@ Test.Aura.AuraLocalizationServiceTest = function(){
             Assert.Equal(expected, actual);
         }
     }
+    
+    [Fixture]
+	function getStrictModeFormat(){
+
+		var targetFormat = "DDMMYYYY";
+
+		[Fact]
+		function emptyFormat(){
+			// Arrange
+			var expected = "";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateOnlySingleLetterFormat(){
+			// Arrange
+			var expected = "D-M-YYYY";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("d-M-y");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+
+		[Fact]
+		function dateOnlyDoubleLetterFormat(){
+			// Arrange
+			var expected = "D-M-YYYY";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("dd-MM-y");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateTimeSingleLetterFormat(){
+			// Arrange
+			var expected = "D-M-YYYY h:m A";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("d-M-y h:m a");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateTimeDoubleLetterFormat(){
+			// Arrange
+			var expected = "D-M-YYYY h:m A";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("dd-MM-y hh:mm a");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateTimeNoSpaceAMPMFormat(){
+			// Arrange
+			var expected = "D-M-YYYY h:m A";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("dd-MM-y hh:mmA  ");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateTimeExtraSpaceAMPMFormat(){
+			// Arrange
+			var expected = "D-M-YYYY h:m A";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("dd-MM-y hh:mm   A  ");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function dateTime24HrFormat(){
+			// Arrange
+			var expected = "D-M-YYYY H:m";
+			var actual;
+
+			// Act
+			actual = targetService.getStrictModeFormat("d-M-y HH:mm");
+
+			// Assert
+			Assert.Equal(expected, actual);
+		}
+	}
 
     [Fixture]
     function getNormalizedLangLocale(){

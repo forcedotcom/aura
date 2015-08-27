@@ -49,7 +49,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,
                 "<div class='MyClass'>Child Text<br/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source);
@@ -82,7 +82,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,
                 "<div><aura:set attribute='header' value='false'/></div>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         htmlHandler = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source);
@@ -124,7 +124,7 @@ public class HTMLComponentDefRefHandlerTest extends AuraImplTestCase {
     public void testReadFlavorable() throws Exception {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc,"<div aura:flavorable='true'></div>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         ComponentDefHandler cdh = new ComponentDefHandler(null, source, xmlReader);
         HTMLComponentDefRefHandler<?> h = new HTMLComponentDefRefHandler<>(cdh, "div", xmlReader, source);

@@ -92,12 +92,14 @@ public class JavascriptParserTest extends AuraImplTestCase {
         DefDescriptor<TestSuiteDef> descriptor = DefDescriptorImpl.getInstance(
                 "js://test.testNoJSControllers", TestSuiteDef.class);
         Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
+        boolean failed = false;
         // Test case 1: Try to create a Source for a component which does not
         // have any javascript associated with it
         // getSource() call is looking for testNoJSControllersTest.js in the
         // component folder
         try {
             parser.parse(descriptor, source);
+            failed = true;
         } catch (Exception e) {// Expect a file not found Exception
             assertEquals(
                     "Exception must be "
@@ -105,6 +107,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
                     AuraRuntimeException.class, e.getClass());
             e.getMessage().contains("testNoJSControllersTest.js");
         }
+        assertFalse("Parser should have thrown and exception", failed);
         // Test case 2: Null source
         try {
             parser.parse(descriptor, null);
@@ -284,8 +287,8 @@ public class JavascriptParserTest extends AuraImplTestCase {
     public void testInvalidJSController() throws Exception {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl.getInstance("js://test.testInvalidJSController",
                 ControllerDef.class);
-        Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
-        ControllerDef cd = parser.parse(descriptor, source);
+        Source<ControllerDef> source = getJavascriptSourceLoader().getSource(descriptor);
+        ControllerDef cd = (ControllerDef)parser.parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Javascript controller must only contain functions");
@@ -305,8 +308,8 @@ public class JavascriptParserTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> descriptor = DefDescriptorImpl
                 .getInstance("js://test.testNonFunctionElementsInJSController",
                         ControllerDef.class);
-        Source<?> source = getJavascriptSourceLoader().getSource(descriptor);
-        ControllerDef cd = parser.parse(descriptor, source);
+        Source<ControllerDef> source = getJavascriptSourceLoader().getSource(descriptor);
+        ControllerDef cd = (ControllerDef)parser.parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Javascript controller must only contain functions");
@@ -513,7 +516,7 @@ public class JavascriptParserTest extends AuraImplTestCase {
     private void assertInvalidTestCase(String suiteContent, String expectedMessageStartsWith) throws Exception {
         DefDescriptor<TestSuiteDef> desc = addSourceAutoCleanup(TestSuiteDef.class, suiteContent);
         Source<TestSuiteDef> source = getSource(desc);
-        TestSuiteDef d = parser.parse(desc, source);
+        TestSuiteDef d = (TestSuiteDef)parser.parse(desc, source);
         try {
             d.validateDefinition();
             fail("Invalid testsuite: Every test case should have a function assigned to it");

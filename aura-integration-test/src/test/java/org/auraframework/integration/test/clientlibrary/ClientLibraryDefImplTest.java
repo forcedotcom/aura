@@ -240,7 +240,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
 
     private XMLStreamReader getXmlReader(StringSource<ClientLibraryDef> clSource) throws FactoryConfigurationError,
             XMLStreamException {
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(clSource.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(clSource.getHashingReader());
         xmlReader.next();
         return xmlReader;
     }

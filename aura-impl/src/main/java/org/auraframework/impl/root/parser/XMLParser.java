@@ -26,10 +26,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
-import org.auraframework.impl.root.parser.handler.RootTagHandlerFactory;
 import org.auraframework.system.Location;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
@@ -44,7 +42,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * to try to keep the memory footprint low, and reduce creation of extraneous
  * Objects.
  */
-public class XMLParser implements Parser {
+public abstract class XMLParser<D extends RootDefinition> implements Parser<D> {
 
     private static final XMLInputFactory xmlInputFactory;
 
@@ -72,20 +70,14 @@ public class XMLParser implements Parser {
         }
     }
 
-    private static final XMLParser instance = new XMLParser();
-
-    private XMLParser() {}
-
-    public static XMLParser getInstance() {
-        return instance;
-    }
+    protected abstract RootTagHandler<D> getHandler(DefDescriptor<D>defDescriptor, Source<D> source,
+            XMLStreamReader xmlReader) throws QuickFixException;
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
+    public D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
         Reader reader = null;
         XMLStreamReader xmlReader = null;
-        RootTagHandler<? extends RootDefinition> handler = null;
+        RootTagHandler<D> handler = null;
 
         D ret = null;
         try {
@@ -95,8 +87,7 @@ public class XMLParser implements Parser {
 
                 xmlReader = xmlInputFactory.createXMLStreamReader(reader);
             }
-            handler = RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>) descriptor,
-                    (Source<RootDefinition>) source, xmlReader);
+            handler = getHandler(descriptor, source, xmlReader);
             if (xmlReader != null) {
                 // need to skip junk above the start that is ok
                 LOOP: while (xmlReader.hasNext()) {
@@ -119,7 +110,7 @@ public class XMLParser implements Parser {
                     throw new InvalidDefinitionException("Empty file", getLocation(xmlReader, source));
                 }
             }
-            ret = (D)handler.getElement();
+            ret = handler.getElement();
             if (xmlReader != null) {
                 LOOP: while (xmlReader.hasNext()) {
                     int type = xmlReader.next();
@@ -145,7 +136,7 @@ public class XMLParser implements Parser {
                         getLocation(xmlReader, source), e));
                 }
                 try {
-                    ret = (D)handler.getErrorElement();
+                    ret = handler.getErrorElement();
                 } catch (Throwable t) {
                     // rethrow our original error, what else can we do?
                     throw new AuraUnhandledException(e.getLocalizedMessage(), getLocation(xmlReader, source), e);
@@ -221,7 +212,7 @@ public class XMLParser implements Parser {
      * @return xml stream reader implementation
      * @throws XMLStreamException
      */
-    public XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
+    public static XMLStreamReader createXMLStreamReader(Reader reader) throws XMLStreamException {
         return xmlInputFactory.createXMLStreamReader(reader);
     }
 

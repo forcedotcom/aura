@@ -13,74 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.integration.test.root.parser.handler;
-
-import javax.xml.stream.XMLStreamReader;
+package org.auraframework.integration.test.root.parser;
 
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.component.ComponentDefImpl;
-import org.auraframework.impl.root.parser.XMLParser;
-import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
+import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSource;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
-public class ComponentDefHandlerTest extends AuraImplTestCase {
-    XMLStreamReader xmlReader;
-    ComponentDefHandlerOverride cdHandler;
-    XMLParser parser = XMLParser.getInstance();
+public class ComponentXMLParserTest extends AuraImplTestCase {
+    ComponentXMLParser parser = new ComponentXMLParser();
 
-    public ComponentDefHandlerTest(String name) {
+    public ComponentXMLParserTest(String name) {
         super(name);
     }
-
-    private static class ComponentDefHandlerOverride extends ComponentDefHandler {
-        public ComponentDefHandlerOverride(DefDescriptor<ComponentDef> componentDefDescriptor,
-                Source<?> source, XMLStreamReader xmlReader) {
-            super(componentDefDescriptor, source, xmlReader);
-        }
-
-        @Override
-        public void readAttributes() throws QuickFixException {
-            super.readAttributes();
-        }
-
-        @Override
-        public ComponentDefImpl createDefinition() throws QuickFixException {
-            return (ComponentDefImpl)super.createDefinition();
-        }
-    };
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        StringSource<ComponentDef> source = new StringSource<>(vendor.getComponentDefDescriptor(),
-                "<aura:component controller='" + vendor.getControllerDescriptor().getQualifiedName() + "' extends='"
-                        + vendor.getParentComponentDefDescriptor() + "' implements='"
-                        + vendor.getInterfaceDefDescriptor()
-                        + "' abstract='true'>Child Text<aura:foo/></aura:component>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
-        xmlReader.next();
-        cdHandler = new ComponentDefHandlerOverride(vendor.getComponentDefDescriptor(), source, xmlReader);
-    }
-
-    public void testReadAttributes() throws Exception {
-        cdHandler.readAttributes();
-        ComponentDefImpl cd = cdHandler.createDefinition();
-        assertEquals(vendor.getParentComponentDefDescriptor(), cd.getExtendsDescriptor());
-        assertEquals(vendor.getInterfaceDefDescriptor(), cd.getInterfaces().iterator().next());
-        assertTrue(cd.isAbstract());
-        assertTrue(cd.isExtensible());
-        assertFalse(cd.isTemplate());
-    }
-
-    public void testGetHandledTag() {
-        assertEquals("aura:component", cdHandler.getHandledTag());
     }
 
     public void testDuplicateAttributeNames() throws Exception {

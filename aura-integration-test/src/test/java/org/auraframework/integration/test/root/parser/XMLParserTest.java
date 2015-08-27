@@ -27,6 +27,8 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.event.EventDefImpl;
+import org.auraframework.impl.root.parser.ComponentXMLParser;
+import org.auraframework.impl.root.parser.EventXMLParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.source.file.FileSource;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -50,9 +52,9 @@ public class XMLParserTest extends AuraImplTestCase {
     public void setUp() throws Exception {
         super.setUp();
         try {
-            XMLParser parser = XMLParser.getInstance();
+            ComponentXMLParser parser = new ComponentXMLParser();
             descriptor = DefDescriptorImpl.getInstance("test:parser", ComponentDef.class);
-            Source<?> source = getSource(descriptor);
+            Source<ComponentDef> source = getSource(descriptor);
             def = parser.parse(descriptor, source);
         } catch (Exception e) {
             tearDown();
@@ -65,9 +67,9 @@ public class XMLParserTest extends AuraImplTestCase {
     }
 
     public void testParseInvalid() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserInvalid", ComponentDef.class);
-        Source<?> source = getSource(descriptor);
+        Source<ComponentDef> source = getSource(descriptor);
         ComponentDef cd = parser.parse(descriptor, source);
         try {
             cd.validateDefinition();
@@ -81,9 +83,9 @@ public class XMLParserTest extends AuraImplTestCase {
     }
 
     public void testParseFragment() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserFragment", ComponentDef.class);
-        Source<?> source = getSource(descriptor);
+        Source<ComponentDef> source = getSource(descriptor);
         ComponentDef cd = parser.parse(descriptor, source);
         try {
             cd.validateDefinition();
@@ -98,7 +100,7 @@ public class XMLParserTest extends AuraImplTestCase {
     }
 
     public void testParseNonexistent() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        ComponentXMLParser parser = new ComponentXMLParser();
         
         // Cannot use Mockito on JDK7 because the File class has been changed to directly access File.path data member
         File tmpFile = new File("") {
@@ -125,7 +127,7 @@ public class XMLParserTest extends AuraImplTestCase {
             private static final long serialVersionUID = 1L;
         };
         
-        Source<?> source = new FileSource<>(descriptor, tmpFile, Format.XML);
+        Source<ComponentDef> source = new FileSource<>(descriptor, tmpFile, Format.XML);
         try {
             parser.parse(null, source);
             fail("Parsing nonexistent source should throw exception");
@@ -135,9 +137,9 @@ public class XMLParserTest extends AuraImplTestCase {
     }
 
     public void testParseNull() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:parserNonexistent", ComponentDef.class);
-        Source<?> source = null;
+        Source<ComponentDef> source = null;
         try {
             parser.parse(descriptor, source);
             fail("Parsing null source should throw exception");
@@ -152,9 +154,9 @@ public class XMLParserTest extends AuraImplTestCase {
     }
 
     public void testParseEvent() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        EventXMLParser parser = new EventXMLParser();
         DefDescriptor<EventDef> eventDescriptor = DefDescriptorImpl.getInstance("test:anevent", EventDef.class);
-        Source<?> source = getSource(eventDescriptor);
+        Source<EventDef> source = getSource(eventDescriptor);
         EventDefImpl eventDef = (EventDefImpl) parser.parse(eventDescriptor, source);
         assertNotNull(eventDef);
         assertEquals("Unexpected Descriptor", eventDescriptor, eventDef.getDescriptor());
@@ -170,9 +172,9 @@ public class XMLParserTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testParseComments() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
+        ComponentXMLParser parser = new ComponentXMLParser();
         descriptor = DefDescriptorImpl.getInstance("test:test_Parser_Comments", ComponentDef.class);
-        Source<?> source = getSource(descriptor);
+        Source<ComponentDef> source = getSource(descriptor);
         def = parser.parse(descriptor, source);
         assertEquals("Unexpected Descriptor", descriptor, def.getDescriptor());
     }

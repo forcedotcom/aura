@@ -22,7 +22,7 @@ import org.auraframework.def.ClientLibraryDef.Type;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Parser.Format;
@@ -36,7 +36,6 @@ import com.google.common.collect.Sets;
  * Unit tests for ClientLibraryDefHandler.
  */
 public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
-    private XMLParser parser = XMLParser.getInstance();
     private DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
             ComponentDef.class);
 
@@ -59,7 +58,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
     }
 
     private void assertDefaultType(StringSource<ComponentDef> source, String errorMsg) throws Exception {
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(1, libraries.size());
         assertEquals(Type.JS, libraries.get(0).getType());
@@ -70,7 +69,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='fooBar' /></aura:component>", "myID",
                 Format.XML);
 
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = new ComponentXMLParser().parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have failed on encountering bad type attribute");
@@ -83,7 +82,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS, CSS' /></aura:component>", "myID",
                 Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = new ComponentXMLParser().parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should accept only valid types for type attribute.");
@@ -99,7 +98,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='UIPerf' type='JS' modes=''/>" +
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(2, libraries.size());
         ClientLibraryDef cld1 = libraries.get(0);
@@ -116,7 +115,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='UIPerf' type='JS' modes='DEV,FTEST'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(2, libraries.size());
 
@@ -136,7 +135,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='fooBar'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = new ComponentXMLParser().parse(descriptor, source);
         try {
         	cd.validateDefinition();
             fail("Should not accept invalid mode specification.");
@@ -151,7 +150,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
                 "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(1, libraries.size());
 
@@ -173,7 +172,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='UIPerf' type='JS' combine='false'/>" + //8
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(9, libraries.size());
         ClientLibraryDef cld;
@@ -198,7 +197,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary url='http://www.likeaboss.com/jslibrary/xyz/sfdc/Zen.js' combine='false'/>" + //6
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(6, libraries.size());
         ClientLibraryDef cld;
@@ -215,7 +214,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary url='css://clientLibraryTest.clientLibraryTest' type='CSS' combine='false' />"+ //3
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(2, libraries.size());
         ClientLibraryDef cld;
@@ -231,7 +230,7 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
-        ComponentDef cmpDef = parser.parse(descriptor, source);
+        ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
         assertEquals(1, libraries.size());
 

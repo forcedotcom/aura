@@ -30,7 +30,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.def.SVGDef;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.SVGDefHandler;
@@ -40,7 +39,7 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.SVGParserException;
 
-public class SVGParser implements Parser {
+public class SVGParser implements Parser<SVGDef> {
     private static final SVGParser instance = new SVGParser();
     private static final XMLInputFactory xmlInputFactory;
     private static final Pattern DISSALOWED_LIST = Pattern.compile(".*(&|/|<|>).*", Pattern.DOTALL | Pattern.MULTILINE);
@@ -98,16 +97,14 @@ public class SVGParser implements Parser {
         return instance;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws SVGParserException,
+    public SVGDef parse(DefDescriptor<SVGDef> descriptor, Source<SVGDef> source) throws SVGParserException,
     QuickFixException {
         if (descriptor.getDefType() == DefType.SVG) {
             XMLStreamReader reader = null;
             String contents = source.getContents();
             //If the file is too big throw before we parse the whole thing.
-            D ret = (D) new SVGDefHandler<>((DefDescriptor<SVGDef>) descriptor,
-                    (Source<SVGDef>) source).createDefinition();
+            SVGDef ret = new SVGDefHandler<>(descriptor, source).createDefinition();
             try (StringReader stringReader = new StringReader(contents)){
                 reader = xmlInputFactory.createXMLStreamReader(stringReader);
                 if (reader != null) {

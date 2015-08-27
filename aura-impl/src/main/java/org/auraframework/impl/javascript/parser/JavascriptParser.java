@@ -37,17 +37,17 @@ import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-public class JavascriptParser implements Parser {
+public class JavascriptParser<D extends Definition> implements Parser<D> {
 
-    private static JavascriptParser instance = new JavascriptParser();
+    private static JavascriptParser<?> instance = new JavascriptParser();
 
-    public static JavascriptParser getInstance() {
+    public static JavascriptParser<?> getInstance() {
         return instance;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
+    public D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
         switch (descriptor.getDefType()) {
         case CONTROLLER:
             return (D) new JavascriptControllerDefHandler((DefDescriptor<ControllerDef>) descriptor, source)

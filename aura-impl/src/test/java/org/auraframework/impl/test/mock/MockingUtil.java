@@ -26,9 +26,10 @@ import org.auraframework.def.Definition;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.instance.Action.State;
 import org.auraframework.instance.ComponentConfig;
+import org.auraframework.system.Parser;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.mock.MockAction;
@@ -94,10 +95,10 @@ public class MockingUtil {
      * @return the Definition created from the provided markup
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
-        D def = XMLParser.getInstance().parse(
-                descriptor,
+        @SuppressWarnings("unchecked")
+        Parser<D> parser = (Parser<D>)ParserFactory.getParser(Parser.Format.XML, descriptor.getDefType());
+        D def = parser.parse(descriptor,
                 new StringSource<>(descriptor, markup, descriptor.getQualifiedName(),
                         org.auraframework.system.Parser.Format.XML));
         mockDef(def);

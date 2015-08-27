@@ -57,7 +57,7 @@ public class ContainerTagHandlerTest extends AuraImplTestCase {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("fake:component",
                 ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(desc, markup, "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         // Assume we found the markup in a component, create a
         // ComponentDefHandler to represent that

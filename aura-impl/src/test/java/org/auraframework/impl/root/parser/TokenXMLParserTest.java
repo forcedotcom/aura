@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.root.tokens;
+package org.auraframework.impl.root.parser;
 
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TokenDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.root.parser.handler.TokenDefHandler;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -28,8 +27,8 @@ import com.google.common.collect.Iterables;
 /**
  * Unit tests for {@link TokenDefHandler}.
  */
-public class TokenDefHandlerTest extends StyleTestCase {
-    public TokenDefHandlerTest(String name) {
+public class TokenXMLParserTest extends StyleTestCase {
+    public TokenXMLParserTest(String name) {
         super(name);
     }
 

@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.root.parser.handler.BaseAccessAttributeEnforcementTest;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
 
-public class AccessAttributeEnforcementTest extends
-BaseAccessAttributeEnforcementTest {
+public class AccessAttributeEnforcementTest extends BaseAccessAttributeEnforcementTest {
 
     public AccessAttributeEnforcementTest(String name) {
         super(name);
@@ -272,14 +272,10 @@ BaseAccessAttributeEnforcementTest {
     public void testComponentWithClientLibrary() throws Exception {
         String resourceSource = "<aura:component><aura:clientLibrary name='HTML5Shiv' type='JS' /></aura:component>";
         String errorMessage = "No COMPONENT named markup://aura:clientLibrary found";
-        runNegativeTestCase(resourceSource, errorMessage);
-    }
-
-    private void runNegativeTestCase(String resourceSource, String errorMessage) throws Exception {
-        DefDescriptor<? extends Definition> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource, TestNamespace.Custom+":testCmp", false);
-        Source<? extends Definition> source = StringSourceLoader.getInstance().getSource(descriptor);
+        DefDescriptor<ComponentDef> descriptor = getAuraTestingUtil().addSourceAutoCleanup(ComponentDef.class, resourceSource, TestNamespace.Custom+":testCmp", false);
+        Source<ComponentDef> source = StringSourceLoader.getInstance().getSource(descriptor);
         try {
-            Definition def = parser.parse(descriptor, source);
+            Definition def = new ComponentXMLParser().parse(descriptor, source);
             def.validateDefinition();
             fail("Should have thrown Exception");
         } catch (Exception e) {

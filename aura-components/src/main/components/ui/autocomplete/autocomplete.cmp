@@ -34,6 +34,7 @@
     <aura:attribute name="showListHeader" type="Boolean" default="true" description="When true the listHeader will be visible"/>
     <aura:attribute name="showListFooter" type="Boolean" default="true" description="When true the listFooter will be visible"/>
     <aura:attribute name="usePanel" type="boolean" default="false"/>
+    <aura:attribute name="setDefaultHighlight" type="boolean" default="false" description="Indicate if the first option item should be highlighted by default."/>
     
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
@@ -90,7 +91,8 @@
         matchDone="{!c.handleMatchDone}"
         selectListOption="{!c.handleSelectOption}"
         updateAriaAttributes="{!c.updateAriaAttributes}"
-        matchFunc="{!v.matchFunc}"/>
+        matchFunc="{!v.matchFunc}"
+        setDefaultHighlight="{!v.setDefaultHighlight}"/>
         </ui:autocompletePanel>
         <aura:set attribute="else">
             <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
@@ -110,7 +112,8 @@
         matchDone="{!c.handleMatchDone}"
         selectListOption="{!c.handleSelectOption}"
         updateAriaAttributes="{!c.updateAriaAttributes}"
-        matchFunc="{!v.matchFunc}"/>
+        matchFunc="{!v.matchFunc}"
+        setDefaultHighlight="{!v.setDefaultHighlight}"/>
     </aura:set>
     </aura:if>
     

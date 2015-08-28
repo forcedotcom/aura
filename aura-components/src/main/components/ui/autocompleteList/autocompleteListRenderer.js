@@ -19,12 +19,14 @@
         helper.updateEmptyListContent(component);
         helper.setUpEvents(component);
         helper.addHeaderAndFooterClassesAndAttributes(component);
+        helper.setDefaultHighlight(component);
     },
     rerender : function(component, helper){
         this.superRerender();
         if (component.isDirty('v.visible')) {
             helper.updateEmptyListContent(component);
         }
+        helper.setDefaultHighlight(component);
     },
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 

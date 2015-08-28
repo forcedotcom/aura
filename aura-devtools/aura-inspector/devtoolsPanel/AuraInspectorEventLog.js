@@ -1,11 +1,11 @@
 /* Listens for events and shows them in the event log */
 function AuraInspectorEventLog(devtoolsPanel) {
     var _filters = {
-        all: false,
+        all: false, // default off because of the volume of data this collects
         eventName: "",
         application: true,
         component: true,
-        handledOnly: false
+        unhandled: false
     };
     var ol;
     var _events = [];
@@ -18,12 +18,14 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
     var markup = `
         <menu type="toolbar">
-            <li><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle Recording"><span>Recording</span></aurainspector-onOffButton></li>
-            <li><button id="clear-button" class="circle on" title="Clear"><span>X</span></button></li>
+            <li><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
+            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
+            <li class="divider" style="margin-left: -3px;"></li>
             <li><input id="filter-text" type="search" placeholder="Filter"/></li>
-            <li><aurainspector-onOffButton class="on" data-filter="application" title="Show Application Events"><span>App Events</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="component" title="Show Component Events"><span>Cmp Events</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="" data-filter="handledOnly" title="Hide Unhandled Events"><span>Handled Only</span></aurainspector-onOffButton></li>
+            <li class="divider"></li>
+            <li><aurainspector-onOffButton class="on" data-filter="application" title="Show application events"><span>App Events</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="component" title="Show component events"><span>Cmp Events</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="" data-filter="unhandled" title="Show unhandled events"><span>Unhandled</span></aurainspector-onOffButton></li>
         </menu>
         <ol class="event-log" id="event-log"></ol>
     `;
@@ -73,7 +75,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         if(!_filters.all) { return false; }
         if(!_filters.application && eventInfo.type === "APPLICATION") { return false; }
         if(!_filters.component && eventInfo.type === "COMPONENT") { return false; }
-        if(_filters.handledOnly && hasHandledData(eventInfo)) { return false; }
+        if(!_filters.unhandled && !hasHandledData(eventInfo)) { return false; }
 
         var eventName = _filters.eventName;
         if(eventName) {
@@ -112,7 +114,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
                 eventInfo.handledBy = handleData;
             }
         } else {
-            card.setAttribute("handledBy", JSON.stringify(eventInfo.handledBy)); 
+            card.setAttribute("handledBy", JSON.stringify(eventInfo.handledBy));
             card.setAttribute("handledByTree", JSON.stringify(eventInfo.handledByTree || "{}"));
         }
 
@@ -132,7 +134,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
     function storeEvent(eventInfo) {
         if(_events.length > MAX_EVENTS) {
             var removed = _events.pop();
-            _eventsMap.delete(getEventId(removed));            
+            _eventsMap.delete(getEventId(removed));
         }
         _events.push(eventInfo);
         _eventsMap.set(getEventId(eventInfo), eventInfo);
@@ -155,7 +157,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         var handled;
         for(var c=0;c<currentHandlers.length;c++) {
             handled = currentHandlers[c];
-            id = currentHandlers[c].id;            
+            id = currentHandlers[c].id;
             tree = tree.concat(getHandledDataTree(id, contextId));
         }
         return tree;
@@ -167,7 +169,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
         var eventId = getEventId(eventInfo);
         var handleData = _handled.get(eventId);
         if(handleData) {
-            return handleData.length > 0; 
+            return handleData.length > 0;
         }
         return false;
     }
@@ -230,7 +232,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
                 if(eventElement){
                     _eventsMap.get(tree[c].id).handledByTree = tree;
                     eventElement.setAttribute("handledByTree", JSON.stringify(tree));
-                }    
+                }
             }
             _handled = new Map();
         }
@@ -256,7 +258,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
         _contextStack.pop();
         _currentContext = _contextStack[_contextStack.length-1];
-        
+
         var data = { "id": "action_" + actionInfo.actionId, "scope": actionInfo.scope, "name": actionInfo.name, "actionId": actionInfo.actionId };
 
         var stored = _handled.get(_currentContext);

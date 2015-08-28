@@ -154,7 +154,6 @@
 		var rawEdges = [];
 		var rawNodes = [];
 
-		var handled;
 		for(var c = 0; c < handledByTree.length;c++) {
 			var handled = handledByTree[c];
 			if(handled.type === "action") {

@@ -73,7 +73,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
             formatted[i] = f;
         }
-        
+
         var output = document.createElement("aurainspector-json");
         output.setAttribute("expandTo", 2);
         output.textContent = JSON.stringify(formatted);
@@ -90,7 +90,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
             var command = `
                 var o_${store} = new Object();
                 var i_${store} = $A.storageService.getStorage('${store}');
-                
+
                 // sync
                 o_${store}.name = i_${store}.getName();
                 o_${store}.maxSize = i_${store}.getMaxSize();
@@ -103,11 +103,11 @@ function AuraInspectorStorageView(devtoolsPanel) {
                     .then(function(all) { o_${store}.all = all; }, function(err) { o_${store}.all = JSON.stringify(err); })
                     // last then() is to post the results to aura inspector
                     .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, window.location.href); });
-                
+
                 // sync return whatever properties we have
                 o_${store};
             `;
-            
+
             // Move this out of the devtools panel
             devtoolsPanel.updateCacheViewer(this.panelId, store, command);
         }

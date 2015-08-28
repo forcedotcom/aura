@@ -1,11 +1,10 @@
-/* Just some base styles not needed for example to function */
-*, html { font-family: Verdana, Arial, Helvetica, sans-serif; }
+*, html { font-family: 'Lucida Grande', sans-serif; }
 
 body, form, ul, li, p, h1, h2, h3, h4, h5 { margin: 0; padding: 0; }
 body { background-color: #fefefe; color: #111; margin: 0; display: flex; flex-direction: column; height: 100%; }
 img { border: none; }
 p { font-size: 1em; margin: 0 0 1em 0; }
-input, select, textarea, th, td { font-size: 1em; }
+input, select, textarea, th, td { font-size: 12px; }
 
 /* General Structure */
 header.tabs { background: #F0F1F2; padding: 0 0 0 1em; }
@@ -36,17 +35,18 @@ menu { border-bottom: 1px solid #F0F1F2; padding: .5em; margin: 0; }
 menu li { display: inline-block; list-style: none; vertical-align: middle; }
 menu button { border: 1px solid #DADEE2; background: #F5F6F7; cursor: pointer; }
 menu button:active { border: 1px solid #999; background: #ddd; }
-menu li.divider { background: #ccc; height: 22px; width: 1px;  margin: auto 2px; display: inline-block; vertical-align: bottom; } 
+menu li.divider { background: #ccc; height: 22px; width: 1px; display: inline-block; vertical-align: bottom; margin: auto 6px; }
 menu button.circle { border: 0px none; border-radius: 10px; }
 
-menu aurainspector-onOffButton.circle { width: 15px; height: 15px; border-radius: 50%; box-shadow: 0px 0px 5px #999; background: #888; }
-menu aurainspector-onOffButton.circle:hover { background: 666; }
-menu aurainspector-onOffButton.circle.on { background: #F00; }
-menu aurainspector-onOffButton.circle.on:hover { background: #F00; }
+menu aurainspector-onOffButton.circle { width: 12px; height: 12px; border-radius: 50%; background: rgb(103, 103, 103); }
+menu aurainspector-onOffButton.circle:hover { background: rgb(64, 64, 64); }
+menu aurainspector-onOffButton.circle.on { background: rgb(223, 51, 51); box-shadow: 0 0 2px 2px rgb(246,194,194); }
+menu aurainspector-onOffButton.circle.on:hover { background: rgb(216, 0, 0); }
 menu aurainspector-onOffButton.circle span { display: none; }
-menu aurainspector-onOffButton { border: 0px none; border-radius: 10px; color: #fff; background: #ddd; text-shadow: 1px 1px #aaa; padding: 2px 6px 3px; display: inline-block; cursor: pointer; }
-menu aurainspector-onOffButton:hover { background: #bbb; }
-menu aurainspector-onOffButton.on { color: #111; font-weight: bold; background: #d8dde6; text-shadow: 1px 1px #efefef;}
+menu aurainspector-onOffButton { display: inline-block; cursor: pointer; padding: 4px 6px 3px 6px; margin: auto 2px; border-radius: 8px;}
+menu aurainspector-onOffButton:hover { background: rgba(0, 0, 0, 0.2); color: white; }
+menu aurainspector-onOffButton:active{ background: rgba(0, 0, 0, 0.5); color: white; }
+menu aurainspector-onOffButton.on { background: rgba(0, 0, 0, .3); color: white; text-shadow: rgba(0, 0, 0, 0.4) 0 1px 0;  }
 
 /* General Component Styling */
 .component-prefix { color: maroon; }
@@ -98,42 +98,55 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .actions-list { margin: 0; padding: 10px; }
 .actions-list section h1 { font-size: 1.5em; background: #f4f6f9; margin: 5px 0 0 0; padding: 5px; border-bottom: 1px solid #d8dde6; }
 .actions-list .action-card { padding: 10px; display: block; }
-.actions-list .action-card:nth-child(odd) { background: #f0f8fc;} 
-#tab-body-actions #filter-text { width: 300px; }
+.actions-list .action-card:nth-child(odd) { background: #f0f8fc;}
+#tab-body-actions #filter-text { width: 150px; }
 
 /* Storage Panel */
 #storage-viewer { padding: 10px; }
 
 /* Loading Indicator */
 #loading { display: none; position: absolute; height: 100%; width: 100%; }
-#loading .spinner { margin: 100px 0 0 100px; width: 100px; height: 100px; position: absolute; z-index: 100; }
-#loading .opaque { content: ' '; background: #fff; width: 100%; height: 100%; opacity: .3; z-index: 50; }
-#loading .cube1, .cube2 { background-color: #333; width: 10px; height: 10px; position: absolute; top: 0; left: 0; -webkit-animation: cubemove 1.8s infinite ease-in-out; animation: cubemove 1.8s infinite ease-in-out; }
-#loading .cube2 { -webkit-animation-delay: -0.9s; animation-delay: -0.9s; }
+#loading .dotsSpinner { margin: 100px 0 0 100px; width: 100px; height: 100px; position: absolute; z-index: 100; }
+#loading .opaque { content: ' '; background: #fff; width: 100%; height: 100%; opacity: .6; z-index: 99; }
 
-@-webkit-keyframes cubemove {
-  25% { -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5) }
-  50% { -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg) }
-  75% { -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5) }
-  100% { -webkit-transform: rotate(-360deg) }
+#loading .dots { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg); width: 32px; }
+#loading .dots, #loading .dots div { transform-origin: 50% 50%; }
+#loading .dots div { position: absolute; top: 0; left: 0; width: 100%; }
+
+#loading .dots:before, #loading .dots:after, #loading .dots div:before, #loading .dots div:after { animation-duration: 1000ms; animation-iteration-count: infinite; content: ""; background: rgb(21, 137, 238); border-radius: 100%; width: 8px; height: 8px; position: absolute; }
+#loading .dots:before, #loading .dots div:before { animation-name: dotsBounceBefore-medium; top: -4px; left: -4px; }
+#loading .dots:after, #loading .dots div:after { animation-name: dotsBounceAfter-medium; top: -4px; right: -4px; }
+
+#loading .a { transform: rotate(60deg) translateY(0); }
+#loading .b { transform: rotate(120deg) translateY(0); }
+
+#loading .dots:before { animation-delay: -83.33333ms; }
+#loading .a:before { animation-delay: 83.33333ms; }
+#loading .b:before { animation-delay: 250ms; }
+#loading .dots:after { animation-delay: 416.66667ms; }
+#loading .a:after { animation-delay: 583.33333ms; }
+#loading .b:after { animation-delay: 750.0ms; }
+
+
+@-webkit-keyframes dotsBounceBefore-medium {
+  60% { transform: translateX(0); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+  80% { animation-timing-function: cubic-bezier(0, 1.11, 0.7, 1.43); transform: translateX(-8px); }
+  100% { transform: translateX(0); }
+}
+@keyframes dotsBounceBefore-medium {
+  60% { transform: translateX(0); animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); }
+  80% { animation-timing-function: cubic-bezier(0, 1.11, 0.7, 1.43); transform: translateX(-8px); }
+  100% { transform: translateX(0); }
 }
 
-@keyframes cubemove {
-  25% {
-    transform: translateX(42px) rotate(-90deg) scale(0.5);
-    -webkit-transform: translateX(42px) rotate(-90deg) scale(0.5);
-  } 50% {
-    transform: translateX(42px) translateY(42px) rotate(-179deg);
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-179deg);
-  } 50.1% {
-    transform: translateX(42px) translateY(42px) rotate(-180deg);
-    -webkit-transform: translateX(42px) translateY(42px) rotate(-180deg);
-  } 75% {
-    transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
-    -webkit-transform: translateX(0px) translateY(42px) rotate(-270deg) scale(0.5);
-  } 100% {
-    transform: rotate(-360deg);
-    -webkit-transform: rotate(-360deg);
-  }
+@-webkit-keyframes dotsBounceAfter-medium {
+  60% { animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); transform: translateX(0); }
+  80% { animation-timing-function: cubic-bezier(0, 1.11, 0.7, 1.43); transform: translateX(8px); }
+  100% { transform: translateX(0); }
+}
+@keyframes dotsBounceAfter-medium {
+  60% { animation-timing-function: cubic-bezier(0.55, 0.085, 0.68, 0.53); transform: translateX(0); }
+  80% { animation-timing-function: cubic-bezier(0, 1.11, 0.7, 1.43); transform: translateX(8px); }
+  100% { transform: translateX(0); }
 }
 

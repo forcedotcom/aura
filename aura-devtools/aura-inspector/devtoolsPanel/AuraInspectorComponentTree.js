@@ -9,7 +9,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var markup = `
         <menu type="toolbar">
             <li><button id="refresh-button"><span>Refresh</span></button></li>
-            <li><input type="checkbox" id="showglobalids-checkbox"> Show Global IDs</li>
+            <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
         </menu>
         <div class="component-tree" id="tree"></div>
     `;

@@ -21,17 +21,18 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     var markup = `
         <menu type="toolbar">
-            <li><aurainspector-onOffButton class="circle on" data-filter="all" title="Toggle Recording"><span>Recording</span></aurainspector-onOffButton></li>
-            <li><button id="clear-button" class="circle on" title="Clear"><span>X</span></button></li>
-            <li class="divider"></li>
+            <li><aurainspector-onOffButton class="circle on" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
+            <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
+            <li class="divider" style="margin-left: -3px;"></li>
             <li><input id="filter-text" type="search" placeholder="Filter"/></li>
-            <li><aurainspector-onOffButton class="on" data-filter="storable" title="Show Storable"><span>Storable</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="stored" title="Hide from Storage"><span>From Storage</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="background" title="Show Background actions"><span>Background</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="success" title="Show actions of type Success"><span>Success</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="incomplete" title="Show actions of type Incomplete"><span>Incomplete</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions of type Error"><span>Error</span></aurainspector-onOffButton></li>
-            <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show actions of type Aborted"><span>Aborted</span></aurainspector-onOffButton></li>
+            <li class="divider"></li>
+            <li><aurainspector-onOffButton class="on" data-filter="storable" title="Show storable actions"><span>Storable</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="stored" title="Show storable actions served from cache"><span>Cached</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="background" title="Show background actions"><span>Background</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="success" title="Show actions that succeeded"><span>Success</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="incomplete" title="Show actions in incomplete state"><span>Incomplete</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions that errored"><span>Error</span></aurainspector-onOffButton></li>
+            <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show aborted actions"><span>Aborted</span></aurainspector-onOffButton></li>
         </menu>
         <div id="actions-list" class="actions-list">
             <section id="actions-pending">

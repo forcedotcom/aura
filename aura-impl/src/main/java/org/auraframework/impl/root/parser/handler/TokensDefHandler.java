@@ -66,7 +66,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
     }
 
     public TokensDefHandler(DefDescriptor<TokensDef> defDescriptor, Source<TokensDef> source, XMLStreamReader xmlReader)
-            throws DefinitionNotFoundException {
+            throws QuickFixException {
         super(defDescriptor, source, xmlReader);
 
         if (!isInPrivilegedNamespace()) {

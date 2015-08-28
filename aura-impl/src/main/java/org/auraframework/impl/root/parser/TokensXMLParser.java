@@ -13,26 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.system;
+package org.auraframework.impl.root.parser;
 
+import javax.xml.stream.XMLStreamReader;
+
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.impl.root.parser.handler.TokensDefHandler;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * Creates Definitions from Source of a particular format.
- */
-public interface Parser<D extends Definition> {
-
-    /**
-     * Supported Source Formats
-     * 
-     * 
-     * 
-     */
-    public enum Format {
-        XML, JS, CSS, JAVA, TEMPLATE_CSS, APEX, SVG
+public class TokensXMLParser extends XMLParser<TokensDef> {
+    @Override
+    protected TokensDefHandler getHandler(DefDescriptor<TokensDef> descriptor,
+            Source<TokensDef> source, XMLStreamReader xmlReader) throws QuickFixException {
+        return new TokensDefHandler(descriptor, source, xmlReader);
     }
-
-    D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException;
 }

@@ -39,10 +39,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
+ * Temporary hack using generics.
+ *
+ * This class needs to be broken up.
  */
-public final class StyleParser implements Parser {
-    private static final StyleParser INSTANCE = new StyleParser(true);
-    private static final StyleParser NON_VALIDATING_INSTANCE = new StyleParser(false);
+public final class StyleParser<D extends Definition> implements Parser<D> {
+    private static final StyleParser<?> INSTANCE = new StyleParser(true);
+    private static final StyleParser<?> NON_VALIDATING_INSTANCE = new StyleParser(false);
     public static final Set<String> ALLOWED_CONDITIONS;
 
     private final boolean doValidation;
@@ -74,7 +77,7 @@ public final class StyleParser implements Parser {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <D extends Definition> D parse(DefDescriptor<D> descriptor, Source<?> source) throws QuickFixException {
+    public D parse(DefDescriptor<D> descriptor, Source<D> source) throws QuickFixException {
         ParserConfiguration parserConfig = CssPreprocessor
                 .initial()
                 .source(source.getContents())

@@ -57,10 +57,8 @@ import javax.annotation.Nonnull;
  * Note that the output file is a binary object file that is a set of registries,
  * one per namespace, that contain all of the defs that are in the namespaces.
  */
-@SuppressWarnings("deprecation")
 public class RegistrySerializer {
-    private static final Log log =
-            LogFactory.getLog(RegistrySerializer.class);
+    private static final Log log = LogFactory.getLog(RegistrySerializer.class);
 
     /**
      * An exception during serialization.

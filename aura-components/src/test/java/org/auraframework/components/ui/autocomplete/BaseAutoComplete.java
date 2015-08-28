@@ -499,15 +499,16 @@ public class BaseAutoComplete extends WebDriverTestCase {
         List<WebElement> lists = d.findElements(By.cssSelector(AUTOCOMPLETE_LIST_SELECTOR));
         
         Collections.sort(lists, new Comparator<WebElement>() {
-        	public int compare(WebElement w1, WebElement w2) {
-        		String globalId1 = w1.getAttribute("data-aura-rendered-by").toString();
-        		String globalId2 = w2.getAttribute("data-aura-rendered-by").toString();
-        		String partialGlobalId1 = globalId1.substring(0, globalId1.indexOf(':'));
-        		String partialGlobalId2 = globalId2.substring(0, globalId2.indexOf(':'));
-        		int element1 = Integer.parseInt(partialGlobalId1);
-        		int element2 = Integer.parseInt(partialGlobalId2);
-        		return element1 - element2;
-        	}
+            @Override
+            public int compare(WebElement w1, WebElement w2) {
+                String globalId1 = w1.getAttribute("data-aura-rendered-by").toString();
+                String globalId2 = w2.getAttribute("data-aura-rendered-by").toString();
+                String partialGlobalId1 = globalId1.substring(0, globalId1.indexOf(':'));
+                String partialGlobalId2 = globalId2.substring(0, globalId2.indexOf(':'));
+                int element1 = Integer.parseInt(partialGlobalId1);
+                int element2 = Integer.parseInt(partialGlobalId2);
+                return element1 - element2;
+            }
         });
         
         return lists.get(listNumber - 1);

@@ -57,7 +57,7 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
 
         RootDefinition def;
 
-        Source<?> source = sourceFactory.getSource(descriptor);
+        Source<RootDefinition> source = sourceFactory.getSource(descriptor);
         /*
          * We don't require the xml file to actually exist for namespaces. The
          * existance of the dir is enough. If the dir doesn't exist, source will
@@ -67,9 +67,9 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
             return null;
         }
 
-        descriptor = (DefDescriptor<RootDefinition>) source.getDescriptor();
+        descriptor = source.getDescriptor();
 
-        Parser parser = ParserFactory.getParser(source.getFormat());
+        Parser<RootDefinition> parser = (Parser<RootDefinition>)ParserFactory.getParser(source.getFormat(), descriptor.getDefType());
         def = parser.parse(descriptor, source);
         return def;
     }

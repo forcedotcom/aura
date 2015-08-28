@@ -16,43 +16,220 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 import com.google.common.collect.Sets;
 
 public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
-    protected Set<String> expectedAttrsInPrivilegedNS;
-    protected Set<String> expectedAttrsInCustomNS;
-    protected XMLHandler<?> defHandler;
-    private static AtomicLong counter = new AtomicLong();
 
     public DefAttributesVisibilityTest(String name){
         super(name);
     }
 
-    public void testVerifyAttributesVisibleInPrivilegedNamespace()throws Exception{
-        defHandler = getHandler(false);
-        compareExpectedWithActual(expectedAttrsInPrivilegedNS, defHandler);
+    protected Set<String> publicAttrs;
+    protected Set<String> privilegedAttrs;
+    protected Set<String> publicAndPrivilegedAttrs;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        publicAndPrivilegedAttrs = Sets.newHashSet(privilegedAttrs);
+        publicAndPrivilegedAttrs.addAll(publicAttrs);
     }
 
-    public void testVerifyAttributesVisibleInCustomNamespace() throws Exception{
-        defHandler = getHandler(true);
-        compareExpectedWithActual(expectedAttrsInCustomNS, defHandler);
+    protected <D extends Definition> DefDescriptor<D> getDescriptor(boolean privileged, Class<D> clazz) {
+        StringSourceLoader loader = StringSourceLoader.getInstance();
+        String prefix;
+        
+        if (privileged) {
+            prefix = StringSourceLoader.DEFAULT_NAMESPACE + ":";
+        } else {
+            prefix = StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":";
+        }
+        return loader.createStringSourceDescriptor(prefix, clazz, null);
     }
 
-    abstract XMLHandler<?> getHandler(boolean b) throws DefinitionNotFoundException;
+    protected abstract XMLHandler<?> getHandler(boolean privileged);
+
+    public void testAttributeSettings() throws Exception {
+        Set<String> intersect = Sets.intersection(publicAttrs, privilegedAttrs);
+        assertTrue("Privileged and private sets must not intersect" + intersect, intersect.size() == 0);
+    }
+
+    public void testPrivilegedAttributeSet() throws Exception {
+        compareExpectedWithActual(publicAndPrivilegedAttrs, getHandler(true));
+    }
+
+    public void testNonPrivilegedAttributeSet() throws Exception {
+        compareExpectedWithActual(publicAttrs, getHandler(false));
+    }
+
+    public static class ApplicationDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public ApplicationDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "description", "implements", "useAppcache",
+                        "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
+                        "extends", "template");
+            privilegedAttrs = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "isOnePageApp",
+                        "tokens", "render", "provider", "style", "helper", "renderer", "whitespace",
+                        "support", "defaultFlavor", "defaultFlavors", "dynamicallyFlavorable");
+            super.setUp();
+        }
+
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            return new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+        }
+    }
+
+    public static class ComponentDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public ComponentDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "description", "implements", "controller",
+            		"model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
+            privilegedAttrs = Sets.newHashSet("render", "template", "provider", "style", "helper",
+                "renderer", "whitespace", "support", "defaultFlavor", "dynamicallyFlavorable");
+            super.setUp();
+        }
+
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            return new ComponentDefHandler(getDescriptor(privileged, ComponentDef.class), null, null);
+        }
+    }
+
+    public static class EventDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public EventDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
+            privilegedAttrs = Sets.newHashSet("support");
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            return new EventDefHandler(getDescriptor(privileged, EventDef.class), null, null);
+        }
+    }
+
+    public static class InterfaceDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public InterfaceDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "description", "extends", "apiVersion");
+            privilegedAttrs = Sets.newHashSet("support", "provider");
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            return new InterfaceDefHandler(getDescriptor(privileged, InterfaceDef.class), null, null);
+        }
+    }
+
+    public static class AttributeDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public AttributeDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "default", "description", "name", "required", "type");
+            privilegedAttrs = Sets.newHashSet("serializeTo");
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            ApplicationDefHandler parentHandler;
+            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            return new AttributeDefHandler<>(parentHandler, null, null);
+        }
+    }
+
+    public static class RegisterEventAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public RegisterEventAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("access", "description", "name", "type");
+            privilegedAttrs = Sets.newHashSet();
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            ApplicationDefHandler parentHandler;
+            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            return new RegisterEventHandler<>(parentHandler, null, null);
+        }
+    }
+
+    public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public AttributeDefRefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("attribute", "value");
+            privilegedAttrs = Sets.newHashSet();
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            ApplicationDefHandler parentHandler;
+            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            return new AttributeDefRefHandler<>(parentHandler, null, null);
+        }
+    }
+
+    public static class EventHandlerDefAttributesVisibilityTest extends DefAttributesVisibilityTest {
+        public EventHandlerDefAttributesVisibilityTest(String name) {
+            super(name);
+        }
+
+        @Override
+        public void setUp() throws Exception {
+            publicAttrs = Sets.newHashSet("action", "description", "event", "name", "value");
+            privilegedAttrs = Sets.newHashSet();
+            super.setUp();
+        }
+       
+        @Override
+        protected XMLHandler<?> getHandler(boolean privileged) {
+            ApplicationDefHandler parentHandler;
+            parentHandler = new ApplicationDefHandler(getDescriptor(privileged, ApplicationDef.class), null, null);
+            return new EventHandlerDefHandler(parentHandler, null, null);
+        }
+    }
+
     private static void compareExpectedWithActual(Set<String> expected, XMLHandler<?> defHandler)throws Exception{
         Set<String> actualAttributes=null;
         if (defHandler != null) {
@@ -67,164 +244,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         notExpectedButPresent.removeAll(expected);
 
         assertTrue("Expected attributes but not allowed "+ expectedButAbsent+
-                "\n Not expected attributes but allowed "+ notExpectedButPresent, expectedButAbsent.isEmpty()&&notExpectedButPresent.isEmpty());
-    }
-
-    static abstract class RootDefAttributesVisibilityTest extends DefAttributesVisibilityTest{
-        Class<? extends RootDefinition> clazz;
-        public RootDefAttributesVisibilityTest(String name){
-            super(name);
-        }
-        @Override
-        XMLHandler<?> getHandler(boolean b)throws DefinitionNotFoundException{
-            return getHandler(b, clazz);
-        }
-        @SuppressWarnings("unchecked")
-        private static <T extends Definition> ContainerTagHandler<?> getHandler(boolean isCustomNamespace, Class<T> clazz) throws DefinitionNotFoundException{
-            DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(
-                    String.format("%s:%s", (isCustomNamespace?StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE:StringSourceLoader.DEFAULT_NAMESPACE),
-                            "stringResource"+counter),
-                            clazz);
-            return RootTagHandlerFactory.newInstance((DefDescriptor<RootDefinition>)desc, null, null);
-        }
-    }
-    public static class ApplicationDefAttributesVisibilityTest extends RootDefAttributesVisibilityTest {
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "useAppcache",
-                    "additionalAppCacheURLs", "controller",
-                    "model", "apiVersion", "abstract", "extensible", "extends", "template");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("preload", "layouts", "locationChangeEvent", "isOnePageApp",
-                    "tokens", "render", "template", "provider", "style", "helper", "renderer", "whitespace", "support",
-                    "defaultFlavor", "defaultFlavors", "dynamicallyFlavorable");
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-            clazz = ApplicationDef.class;
-        }
-        public ApplicationDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-    }
-    public static class ComponentDefAttributesVisibilityTest extends RootDefAttributesVisibilityTest{
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "implements", "controller",
-            		"model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("render", "template", "provider",
-                    "style", "helper", "renderer", "whitespace", "support", "defaultFlavor", "dynamicallyFlavorable", "isTemplate");
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-            clazz = ComponentDef.class;
-        }
-        public ComponentDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-    }
-    public static class EventDefAttributesVisibilityTest extends RootDefAttributesVisibilityTest{
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends", "type", "apiVersion");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("support");
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-            clazz = EventDef.class;
-        }
-        public EventDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-    }
-    public static class InterfaceDefAttributesVisibilityTest extends RootDefAttributesVisibilityTest{
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "extends", "apiVersion");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("support", "provider");
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-            clazz = InterfaceDef.class;
-        }
-        public InterfaceDefAttributesVisibilityTest(String name) {
-            super(name);
-        }
-    }
-
-    public static class AttributeDefAttributesVisibilityTest extends DefAttributesVisibilityTest{
-        public AttributeDefAttributesVisibilityTest(String name){
-            super(name);
-        }
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "default", "description", "name", "required", "type");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet("serializeTo");//TODO support?
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-        }
-        @Override
-        @SuppressWarnings("unchecked")
-        XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
-            return new AttributeDefHandler<>(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
-                    null,
-                    null);
-        }
-    }
-    public static class RegisterEventDefAttributesVisibilityTest extends DefAttributesVisibilityTest{
-        public RegisterEventDefAttributesVisibilityTest(String name){
-            super(name);
-        }
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("access", "description", "name", "type");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet();
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-        }
-        @Override
-        public void testVerifyAttributesVisibleInCustomNamespace() throws Exception{
-            //Nothing to verify, no special behavior based on namespace
-        }
-        @Override
-        XMLHandler<?> getHandler(boolean b) throws DefinitionNotFoundException {
-            return new RegisterEventHandler<>();
-        }
-    }
-    public static class AttributeDefRefAttributesVisibilityTest extends DefAttributesVisibilityTest{
-        public AttributeDefRefAttributesVisibilityTest(String name){
-            super(name);
-        }
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("attribute", "value");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet();
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-        }
-        @Override
-        @SuppressWarnings("unchecked")
-        XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
-            return new AttributeDefRefHandler<>(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
-                    null,
-                    null);
-        }
-    }
-    public static class EventHandlerDefAttributesVisibilityTest extends DefAttributesVisibilityTest{
-        public EventHandlerDefAttributesVisibilityTest(String name){
-            super(name);
-        }
-        @Override
-        public void setUp() throws Exception {
-            super.setUp();
-            expectedAttrsInCustomNS = Sets.newHashSet("action", "description", "event", "name", "value");
-            expectedAttrsInPrivilegedNS = Sets.newHashSet();
-            expectedAttrsInPrivilegedNS.addAll(expectedAttrsInCustomNS);
-        }
-        @Override
-        @SuppressWarnings("unchecked")
-        XMLHandler<?> getHandler(boolean isCustomNamespace) throws DefinitionNotFoundException{
-            return new EventHandlerDefHandler(
-                    (RootTagHandler<ApplicationDef>)RootDefAttributesVisibilityTest.getHandler(isCustomNamespace, ApplicationDef.class),
-                    null,
-                    null);
-        }
+                "\n Not expected attributes but allowed "+ notExpectedButPresent,
+                expectedButAbsent.isEmpty()&&notExpectedButPresent.isEmpty());
     }
 }

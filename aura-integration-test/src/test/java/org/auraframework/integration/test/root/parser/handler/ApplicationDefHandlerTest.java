@@ -23,6 +23,7 @@ import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
+import org.auraframework.impl.root.parser.ApplicationXMLParser;
 import org.auraframework.impl.root.parser.XMLParser;
 import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -65,7 +66,7 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
                         + vendor.getParentComponentDefDescriptor() + "' implements='"
                         + vendor.getInterfaceDefDescriptor()
                         + "' abstract='true'>Child Text<aura:foo/></aura:application>", "myID", Format.XML);
-        xmlReader = XMLParser.getInstance().createXMLStreamReader(source.getHashingReader());
+        xmlReader = XMLParser.createXMLStreamReader(source.getHashingReader());
         xmlReader.next();
         cdHandler = new ApplicationDefHandlerOverride(vendor.getApplicationDefDescriptor(), source, xmlReader);
     }
@@ -85,14 +86,13 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testDuplicateAttributeNames() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ApplicationDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser",
                 ApplicationDef.class);
         StringSource<ApplicationDef> source = new StringSource<>(descriptor,
                 "<aura:application><aura:attribute name=\"implNumber\" type=\"String\"/>"
                         + "<aura:attribute name=\"implNumber\" type=\"String\"/></aura:application>", "myID",
                 Format.XML);
-        ApplicationDef ad = parser.parse(descriptor, source);
+        ApplicationDef ad = new ApplicationXMLParser().parse(descriptor, source);
         try {
             ad.validateDefinition();
             fail("Should have thrown Exception. Two attributes with the same name cannot exist");

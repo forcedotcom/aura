@@ -169,14 +169,14 @@ public class SVGParserTest extends AuraImplTestCase {
 
     public void testValidTags() throws QuickFixException {
         DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(VALID_SVG);
-        Source<?> source = getSource(descriptor);
+        Source<SVGDef> source = getSource(descriptor);
         parser.parse(descriptor,source);
     }
 
     public void testInvalidTags() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_SCRIPT);
-            Source<?> source = getSource(descriptor);
+            Source<SVGDef> source = getSource(descriptor);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
             assertTrue(e.getMessage().contains("script"));
@@ -188,7 +188,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidCharacters() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_CHAR);
-            Source<?> source = getSource(descriptor);
+            Source<SVGDef> source = getSource(descriptor);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
             assertTrue(e.getMessage().contains("<"));
@@ -200,7 +200,7 @@ public class SVGParserTest extends AuraImplTestCase {
     public void testInvalidXML() {
         try {
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_XML);
-            Source<?> source = getSource(descriptor);
+            Source<SVGDef> source = getSource(descriptor);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
             assertTrue(e.getMessage().contains("ParseError"));
@@ -213,7 +213,7 @@ public class SVGParserTest extends AuraImplTestCase {
         try {
 
             DefDescriptor<SVGDef> descriptor = setupSimpleSVGDef(INVALID_ATTR);
-            Source<?> source = getSource(descriptor);
+            Source<SVGDef> source = getSource(descriptor);
             parser.parse(descriptor,source);
         } catch (QuickFixException e) {
             assertTrue(e.getMessage().contains("onclick"));

@@ -209,7 +209,7 @@ public class AttributeDefHandlerTest extends AuraImplTestCase {
 
     private XMLStreamReader getXmlReader(StringSource<AttributeDef> attributeSource) throws FactoryConfigurationError,
     XMLStreamException {
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(attributeSource.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(attributeSource.getHashingReader());
         xmlReader.next();
         return xmlReader;
     }

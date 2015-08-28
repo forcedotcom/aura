@@ -55,11 +55,13 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
 
     public RegisterEventHandler(RootTagHandler<P> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
-        builder.setOwnHash(source.getHash());
+        if (source != null) {
+            builder.setOwnHash(source.getHash());
+        }
     }
 
     @Override
-	protected void readAttributes() throws QuickFixException {
+    protected void readAttributes() throws QuickFixException {
         String name = getAttributeValue(ATTRIBUTE_NAME);
         if (AuraTextUtil.isNullEmptyOrWhitespace(name)) {
             error("name is a required attribute on tag registerevent");

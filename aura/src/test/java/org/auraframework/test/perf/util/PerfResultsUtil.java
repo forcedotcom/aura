@@ -75,8 +75,8 @@ public final class PerfResultsUtil {
     public static void writeToDb(String dbURI, PerfMetrics metrics, String test, String traceLog) {
         try {
             MongoClient mongo = getMongoClient(dbURI);
-            LOG.info("Writing perf results into mongo db at: " + mongo.getAddress());
             if (mongo != null) {
+                LOG.info("Writing perf results into mongo db at: " + mongo.getAddress());
                 MongoDatabase db = mongo.getDatabase("performance");
                 MongoCollection<Document> runs = db.getCollection("testRun");
                 JSONObject json = metrics.toJSONObject();

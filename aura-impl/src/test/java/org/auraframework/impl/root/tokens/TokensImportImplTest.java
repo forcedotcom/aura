@@ -40,7 +40,7 @@ public class TokensImportImplTest extends StyleTestCase {
     private TokensImport source(String src) throws Exception {
         DefDescriptor<TokensImport> desc = Aura.getDefinitionService().getDefDescriptor("test", TokensImport.class);
         StringSource<TokensImport> ss = new StringSource<>(desc, src, "myID", Format.XML);
-        XMLStreamReader xmlReader = XMLParser.getInstance().createXMLStreamReader(ss.getHashingReader());
+        XMLStreamReader xmlReader = XMLParser.createXMLStreamReader(ss.getHashingReader());
         xmlReader.next();
         TokensImportHandler<TokensDef> handler = new TokensImportHandler<>(null, xmlReader, ss);
         return handler.getElement();

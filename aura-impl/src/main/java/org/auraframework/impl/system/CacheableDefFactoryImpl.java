@@ -36,11 +36,11 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
 
     @Override
     public D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
-        Source<?> source = sourceFactory.getSource(descriptor);
+        Source<D> source = sourceFactory.getSource(descriptor);
         if (source != null && source.exists()) {
-            Parser parser = ParserFactory.getParser(source.getFormat());
+            @SuppressWarnings("unchecked")
+            Parser<D> parser = (Parser<D>)ParserFactory.getParser(source.getFormat(), descriptor.getDefType());
             D def = parser.parse(descriptor, source);
-            // def.validateDefinition();
             return def;
         }
 

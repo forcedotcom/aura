@@ -43,7 +43,7 @@ public class FlavorAssortmentDefHandler extends RootTagHandler<FlavorAssortmentD
     }
 
     public FlavorAssortmentDefHandler(DefDescriptor<FlavorAssortmentDef> defDescriptor, Source<FlavorAssortmentDef> source,
-            XMLStreamReader xmlReader) throws DefinitionNotFoundException {
+            XMLStreamReader xmlReader) throws QuickFixException {
         super(defDescriptor, source, xmlReader);
 
         builder.setDescriptor(getDefDescriptor());

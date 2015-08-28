@@ -19,7 +19,8 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.root.parser.XMLParser;
+import org.auraframework.impl.root.parser.ComponentXMLParser;
+import org.auraframework.impl.root.parser.EventXMLParser;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.test.source.StringSource;
@@ -32,22 +33,20 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
     }
 
     public void testEventHandlerDefHandler() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component><aura:handler event='aura:click' action='{!c.action}'/></aura:component>", "myID",
                 Format.XML);
-        ComponentDef def = parser.parse(descriptor, source);
+        ComponentDef def = new ComponentXMLParser().parse(descriptor, source);
         assertNotNull(def);
     }
 
     public void testRegisterDuplicateEventNames() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
         DefDescriptor<ComponentDef> descriptor = DefDescriptorImpl.getInstance("test:fakeparser", ComponentDef.class);
         StringSource<ComponentDef> source = new StringSource<>(descriptor, "<aura:component>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>"
                 + "<aura:registerevent name='dupName' type='aura:click'/>" + "</aura:component>", "myID", Format.XML);
-        ComponentDef cd = parser.parse(descriptor, source);
+        ComponentDef cd = new ComponentXMLParser().parse(descriptor, source);
         try {
             cd.validateDefinition();
             fail("Should have thrown AuraRuntimeException for registering two events with the same name");
@@ -64,11 +63,10 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
      * @throws Exception
      */
     public void testAbstractEvent() throws Exception {
-        XMLParser parser = XMLParser.getInstance();
         DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
         StringSource<EventDef> source = new StringSource<>(descriptor,
                 "<aura:event type='component' abstract='true'></aura:event>", "myID", Format.XML);
-        EventDef ed = parser.parse(descriptor, source);
+        EventDef ed = new EventXMLParser().parse(descriptor, source);
         try {
             ed.validateDefinition();
             fail("Should have thrown AuraRuntimeException for creating an abstract event");

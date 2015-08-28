@@ -26,4 +26,4 @@
         component.get("e.listComplete").fire(event.getParams());
     }
 
-})
+})// eslint-disable-line semi

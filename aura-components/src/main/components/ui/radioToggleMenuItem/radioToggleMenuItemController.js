@@ -17,4 +17,4 @@
 	updateDirection: function(cmp, evt, helper) {
 		helper.updateDirection(cmp);
 	}
-})
+})// eslint-disable-line semi

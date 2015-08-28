@@ -206,7 +206,7 @@
 		// reset onDragOver class
 		this.resetCssClass(component);
 		
-		var isDragComponentValid = false
+		var isDragComponentValid = false;
 		if(!$A.util.isUndefinedOrNull(dragComponent) && dragComponent.isInstanceOf("ui:draggable") && dragComponent.isValid()) {
 			isDragComponentValid = true;
 			dragComponent.setDropStatus(true);
@@ -243,4 +243,5 @@
 		// reset onDragOver class
 		this.resetCssClass(component);
 	}
+// eslint-disable-line semi
 })

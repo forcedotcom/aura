@@ -119,4 +119,4 @@
 	handleAddRemove: function (cmp, params) {
 		$A.error('Unimplemented function in abstractDataGridHelper');
 	}
-});
+})// eslint-disable-line semi

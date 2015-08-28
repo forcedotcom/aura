@@ -29,4 +29,4 @@
     close: function (cmp, event, helper) {
     	helper.close(cmp, event);
     }
-})
+})// eslint-disable-line semi

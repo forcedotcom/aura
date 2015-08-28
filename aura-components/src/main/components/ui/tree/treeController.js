@@ -49,4 +49,4 @@
         
         cmp._activeNode = activeNode;
     }
-})
+})// eslint-disable-line semi

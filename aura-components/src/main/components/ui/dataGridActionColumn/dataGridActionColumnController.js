@@ -20,4 +20,4 @@
 			cmp.set('v.outputComponent', cmp.get('v.body'));
 		}
 	}
-})
+})// eslint-disable-line semi

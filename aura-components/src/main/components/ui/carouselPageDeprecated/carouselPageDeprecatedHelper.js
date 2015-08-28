@@ -113,4 +113,4 @@
 			cmp.getElement().setAttribute('aria-expanded', 'false');
 		}
 	}
-})
+})// eslint-disable-line semi

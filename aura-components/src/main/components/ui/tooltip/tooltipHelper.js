@@ -444,4 +444,4 @@
 		component._trigger = node;
 		this.buildTooltip(component);
 	}
-})
+})// eslint-disable-line semi

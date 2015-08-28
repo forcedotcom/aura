@@ -314,4 +314,4 @@
             provider = source !== provider ? source : null;
         }
     }
-})
+})// eslint-disable-line semi

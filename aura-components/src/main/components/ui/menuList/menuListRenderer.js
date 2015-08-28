@@ -57,4 +57,4 @@
             return this.superUnrender();
         }
     }
-})
+})// eslint-disable-line semi

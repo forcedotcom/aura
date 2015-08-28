@@ -46,7 +46,7 @@
             id: component.get('v.id'),
             label: component.get('v.label'),
             action: action
-        }
+        };
         ev.setParams({ value : params }).fire();
     },
 
@@ -66,4 +66,4 @@
             $A.util.removeClass(elem, "focused");
         }
     }
-})
+})// eslint-disable-line semi

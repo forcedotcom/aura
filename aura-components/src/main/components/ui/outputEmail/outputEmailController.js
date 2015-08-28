@@ -22,4 +22,4 @@
         var label = component.get('v.label');
         component.set('v.label', $A.util.trim((label)));
     }
-})
+})// eslint-disable-line semi

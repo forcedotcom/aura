@@ -19,4 +19,4 @@
     	cmp.find("tabBody").getElement().setAttribute("id", cmp.getConcreteComponent().getGlobalId());
         this.superAfterRender();
     }
-})
+})// eslint-disable-line semi

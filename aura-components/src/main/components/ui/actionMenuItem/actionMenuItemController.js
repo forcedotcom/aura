@@ -19,4 +19,4 @@
     	//set focus to menuTrigger is hideMenu is true
     	helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": hideMenu});         
     }
-})
+})// eslint-disable-line semi

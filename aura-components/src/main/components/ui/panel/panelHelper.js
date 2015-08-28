@@ -353,4 +353,4 @@
             this.positioningLib.panelPositioning.reposition(callback);
         }
     }
-})
+})// eslint-disable-line semi

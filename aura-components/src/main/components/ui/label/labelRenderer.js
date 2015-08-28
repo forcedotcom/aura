@@ -20,4 +20,4 @@
     	// need to update attribute in afterRender lifecycle so that it can reference other components from it's valueProvider
     	helper.updateAttribute(component);    	
     }
-})
+})// eslint-disable-line semi

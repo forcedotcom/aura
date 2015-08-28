@@ -71,9 +71,10 @@
         for (var i = 0; i < len; i++) {
             this.validateElement(nodes[i], supportedTags);
             if (len > nodes.length) { // the current element is removed
-                len = nodes.length
+                len = nodes.length;
                 i--;
             }
         }
     }
+ // eslint-disable-line semi 
 })

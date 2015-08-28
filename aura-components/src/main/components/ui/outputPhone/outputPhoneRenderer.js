@@ -33,4 +33,4 @@
             helper.updateValue(cmp);
         }
     }
-})
+})// eslint-disable-line semi

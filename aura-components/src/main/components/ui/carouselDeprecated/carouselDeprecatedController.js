@@ -90,4 +90,4 @@
             helper.selectDefaultPage(cmp, evt);
         }
     }
-})
+})// eslint-disable-line semi

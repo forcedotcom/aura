@@ -45,4 +45,4 @@
     onPopupToggle : function(component, event, helper) {
     	helper.handlePopupToggle(component, event);
     }
-})
+})// eslint-disable-line semi

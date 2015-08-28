@@ -93,4 +93,4 @@
 	iterationComplete: function(cmp, evt, helper) {
 		helper.refreshMenu(cmp);
 	}
-})
+})// eslint-disable-line semi

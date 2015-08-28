@@ -18,9 +18,11 @@
         var type=component.get("v.type")||'';
         var typeMap=getTypeMap();
         var typeDescriptor=(type.indexOf(':')>-1)?type:typeMap[type];
-        if(typeDescriptor!=null)return typeDescriptor;
+        if(typeDescriptor!=null){
+        	return typeDescriptor;
+        }
         var typeList=[]; // Ok to do this at call time because we are in a fatal error
-        for(var typeName in typeMap)typeList.push(typeName)
+        for(var typeName in typeMap)typeList.push(typeName);
         throw new Error("Unknown type attribute specified for ui:listViewColumn '"+type+"'. Remove the type attribute, or use one of the following values: '"+typeList.join("', '")+"', or any namespaced component descriptor, e.g. ns:CustomColumn.");
 
         function getTypeMap(){
@@ -40,4 +42,4 @@
             return callee.typeMap;
         }
     }
-})
+})// eslint-disable-line semi

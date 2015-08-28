@@ -57,4 +57,4 @@
 
 		el.dispatchEvent(event);
 	}
-})
+})// eslint-disable-line semi

@@ -17,4 +17,4 @@
     valueChange: function(cmp, evt, helper) {
         helper.setDomElementValue(cmp);
     }
-})
+})// eslint-disable-line semi

@@ -262,4 +262,4 @@
             ptv.sync = false;
         }
     }
-})
+})// eslint-disable-line semi

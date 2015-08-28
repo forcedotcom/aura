@@ -54,7 +54,7 @@
             } else {
                 // create a new utc date string, append the inputTime value
                 var todayDate = new Date();
-                var todayDateString = todayDate.getFullYear() + "-" + (todayDate.getMonth() + 1) + "-" + todayDate.getDate()
+                var todayDateString = todayDate.getFullYear() + "-" + (todayDate.getMonth() + 1) + "-" + todayDate.getDate();
                 var utcDate = $A.localizationService.parseDateTimeUTC(todayDateString, "yyyy-MM-dd");
                 if (!$A.util.isUndefinedOrNull(utcDate)) {
                     var dateFormat = component.get("v.dateFormat");
@@ -398,7 +398,7 @@
 
     isDesktopMode: function(component) {
         return $A.get("$Browser.formFactor") == "DESKTOP" &&
-                !component.get("v.useSingleInput")
+                !component.get("v.useSingleInput");
     },
     
     parseDateTimeInput: function(isUTC, component, dateValue, timeValue) {
@@ -430,4 +430,4 @@
 
         return date;
     }
-})
+})// eslint-disable-line semi

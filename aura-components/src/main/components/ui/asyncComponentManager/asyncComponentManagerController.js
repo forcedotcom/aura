@@ -37,5 +37,5 @@
         // load next components if number of loading components is under concurrency limit
     	helper.loadComponents(cmp);
     }
-})
+})// eslint-disable-line semi
 

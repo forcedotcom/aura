@@ -77,7 +77,7 @@
             if ($A.util.isArray(htmlBody)) {
                 for (var i=0; i<htmlBody.length; i++) {
                     if (htmlBody[i].isInstanceOf("ui:label")) {
-                        label = htmlBody[i]
+                        label = htmlBody[i];
                         htmlBody.splice(i,1);
                     }
                 }
@@ -90,7 +90,7 @@
                 } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom') {
                     htmlBody.push(label);
                 }
-                body[0].set("v.body", htmlBody)
+                body[0].set("v.body", htmlBody);
             }
         }
     },
@@ -396,4 +396,4 @@
     domEventHandler : function (event) {
         this.lib.interactive.domEventHandler(event);
     }
-})
+})// eslint-disable-line semi

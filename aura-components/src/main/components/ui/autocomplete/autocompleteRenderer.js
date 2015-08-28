@@ -23,4 +23,4 @@
         this.superRerender();
         helper.setIgnoredElements(component);
     }
-})
+})// eslint-disable-line semi

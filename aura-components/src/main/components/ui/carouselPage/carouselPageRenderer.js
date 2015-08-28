@@ -22,4 +22,4 @@
     unrender: function (component, helper) {
         this.superUnrender();
     }
-})
+})// eslint-disable-line semi

@@ -172,7 +172,7 @@
 
         return function () {
             method.apply(context, xArgs.concat(Array.prototype.slice.call(arguments)));
-        }
+        };
     },
     _getScrollerWrapper: function (component) {
         return component.find('scrollWrapper').getElement();
@@ -185,7 +185,7 @@
             labelUpdate   : component.get("v.pullToRefreshUpdating"),
             labelSubtitle : component.get("v.pullToRefreshSubtitle"),
             labelError    : component.get("v.pullToRefreshError")
-        }
+        };
     },
     _getPullToLoadMoreConfig: function (component) {
         var nativeScroller = component.get('v.useNativeScroller');
@@ -195,7 +195,7 @@
             labelUpdate   : component.get("v.pullToShowMoreUpdating"),
             labelSubtitle : component.get("v.pullToShowMoreSubtitle"),
             labelError    : component.get("v.pullToShowMoreError")
-        }
+        };
     },
     _getInfiniteLoadingConfig: function (component) {
         var auraDataProvider   = component.get('v.infiniteLoadingDataProvider'),
@@ -207,7 +207,7 @@
             labelNoData  : component.get("v.infiniteLoadingNoDataLabel"),
             labelIdle    : component.get("v.infiniteLoadingIdleLabel"),
             labelLoading : component.get("v.infiniteLoadingLoadingLabel")
-        }
+        };
     },
     _getVoiceOverConfig: function (component) {
         return {
@@ -217,7 +217,7 @@
             labelDown        : component.get('v.scrollButtonDown'),
             labelLeft        : component.get('v.scrollButtonLeft'),
             labelRight       : component.get("v.scrollButtonRight")
-    	}
+    	};
     },
     _getPlugins: function (component) {
         var rawPlugins      = component.get('v.plugins') || '',
@@ -384,4 +384,5 @@
 
        delete component._scroller;
     }
-})
+ // eslint-disable-line semi
+ })

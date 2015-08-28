@@ -20,4 +20,4 @@
         concrete.set("v.selected", !current);
         helper.fireSelectEvent(component, event);
     }
-})
+})// eslint-disable-line semi

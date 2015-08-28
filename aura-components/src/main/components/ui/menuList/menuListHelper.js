@@ -132,7 +132,7 @@
     					helper.setFocusToTypingChars(concreteCmp, event);
     				}
     			}
-    		}
+    		};
     	}
     	return component._keyboardEventHandler;
     },
@@ -287,4 +287,4 @@
     	var htmlCmp = $A.componentService.getRenderingComponentForElement(element);
     	return htmlCmp ? htmlCmp.getComponentValueProvider().getConcreteComponent() : null;
     }
-})
+})// eslint-disable-line semi

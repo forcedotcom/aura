@@ -539,7 +539,7 @@
 		rowData.columnData[colIndex] = {
 				elementRef : null,
 				components : []
-		}
+		};
 		return rowData.columnData[colIndex];
 	},
 	
@@ -818,7 +818,7 @@
 		for (var i=0; i<count; i++) {
 			columnData = rowDataArray[rowIndex + i].columnData;
 			for (var j=0; j<columnData.length; j++) {
-				var components = columnData[j].components
+				var components = columnData[j].components;
 				if (batch && components) {
 					batchedCmps = batchedCmps.concat(components);
 				} else {

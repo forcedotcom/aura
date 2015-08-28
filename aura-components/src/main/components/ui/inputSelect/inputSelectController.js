@@ -35,4 +35,4 @@
     	    helper.updateValueFromOptions(concreteCmp);
     	}
     }
-})
+})// eslint-disable-line semi

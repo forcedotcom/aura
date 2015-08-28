@@ -46,7 +46,7 @@
             var grid = component.find("grid");
             grid.set("v.rangeStart", params.rangeStart);
             grid.set("v.rangeEnd", params.rangeEnd);
-            grid.set("v.rangeClass", params.rangeClass)
+            grid.set("v.rangeClass", params.rangeClass);
         }
     },
 
@@ -206,4 +206,4 @@
     yearChange: function(component, event, helper) {
         helper.yearChange(component);
     }
-})
+})// eslint-disable-line semi

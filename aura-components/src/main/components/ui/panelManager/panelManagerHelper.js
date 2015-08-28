@@ -232,14 +232,14 @@
     },
     
     isModal: function(panelType) {
-    	return  panelType == 'markup://ui:panelDialog'
+    	return  panelType == 'markup://ui:panelDialog';
     },
     
     getCloseActionForModal: function(cmp) {
     	return function(cmp) {
    		     // On close, fire event that can be handled by many observers.
    			 $A.get('e.ui:closePanel').fire();
-    	}
+    	};
     },
 
     // generic create method for all panel types
@@ -844,4 +844,4 @@
             }
         }
     }
-})
+})// eslint-disable-line semi

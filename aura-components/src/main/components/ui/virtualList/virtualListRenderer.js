@@ -54,4 +54,4 @@
         cmp._shape.destroy();
         this.superUnrender();
     }
-})
+})// eslint-disable-line semi

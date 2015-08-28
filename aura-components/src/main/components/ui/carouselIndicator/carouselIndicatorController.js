@@ -20,4 +20,4 @@
     setAriaAttributes: function (component, event, helper) {
         helper.setAriaAttributes(component, event);
     }
-})
+})// eslint-disable-line semi

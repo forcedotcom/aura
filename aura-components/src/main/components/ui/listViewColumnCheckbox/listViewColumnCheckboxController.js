@@ -18,4 +18,4 @@
         if(domEvent.cancelBubble)domEvent.cancelBubble();
         helper.fireEvent(component, "onchange", "checkbox", domEvent, {checked:domEvent.target.checked});
     }
-})
+})// eslint-disable-line semi

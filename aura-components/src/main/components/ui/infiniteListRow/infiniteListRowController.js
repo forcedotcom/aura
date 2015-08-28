@@ -23,4 +23,4 @@
 		var parameters = evt.getParam('parameters');
 		hlp.close(cmp, parameters); 
 	}
-})
+})// eslint-disable-line semi

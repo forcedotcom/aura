@@ -214,4 +214,4 @@
     },
     
     global: {}
-})
+})// eslint-disable-line semi

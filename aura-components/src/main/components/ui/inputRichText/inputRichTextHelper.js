@@ -317,4 +317,4 @@
 			editorInstance.destroy();
 		} catch (e) {}
 	}
-})
+})// eslint-disable-line semi

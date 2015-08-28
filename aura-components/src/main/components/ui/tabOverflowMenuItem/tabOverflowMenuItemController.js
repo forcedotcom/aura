@@ -76,4 +76,4 @@
 	handleReverseWrap: function(cmp, evt, helper) {
 		helper.triggerTab(cmp, null, -1, true);
 	}
-})
+})// eslint-disable-line semi

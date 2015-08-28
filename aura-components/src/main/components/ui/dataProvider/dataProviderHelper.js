@@ -27,4 +27,4 @@
     invokeProvide:function(component){
         component.getConcreteComponent().get("c.provide").runDeprecated();
     }
-})
+})// eslint-disable-line semi

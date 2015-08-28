@@ -60,4 +60,4 @@
     onTabClosed: function(cmp, evt, helper) {
     	helper.removeTabBody(cmp, evt.getParam("index"));
     }
-})
+})// eslint-disable-line semi

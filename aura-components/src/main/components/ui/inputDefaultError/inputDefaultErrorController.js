@@ -22,4 +22,4 @@
 			component.set("v.domId", globalId);
 		}
 	}
-})
+})// eslint-disable-line semi

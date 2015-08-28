@@ -18,4 +18,4 @@
     	var _helper = component.getConcreteComponent().getDef().getHelper() || helper;
     	_helper.handleKeyboardEvent(component.getConcreteComponent(), event);
     }
-})
+})// eslint-disable-line semi

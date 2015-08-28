@@ -27,4 +27,4 @@
         imageElement.onload = callback;
         imageElement.onerror = callback;
     }
-})
+})// eslint-disable-line semi

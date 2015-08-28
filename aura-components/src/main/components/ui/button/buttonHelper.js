@@ -59,4 +59,5 @@
 
         return classList.join(' ');
     }
+// eslint-disable-line semi
 })

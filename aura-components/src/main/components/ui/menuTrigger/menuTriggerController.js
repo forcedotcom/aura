@@ -42,4 +42,4 @@
         	concreteHelper.focus(concreteCmp);
         }
     }
-})
+})// eslint-disable-line semi

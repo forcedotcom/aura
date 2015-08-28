@@ -57,4 +57,4 @@
             component.set("v.value", dateValue);
         }
     }
-})
+})// eslint-disable-line semi

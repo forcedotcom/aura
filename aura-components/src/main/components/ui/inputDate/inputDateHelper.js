@@ -163,4 +163,4 @@
     	    }
     	}
     }
-})
+})// eslint-disable-line semi

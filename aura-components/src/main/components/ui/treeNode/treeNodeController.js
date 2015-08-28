@@ -87,4 +87,4 @@
         var ret = helper.getChildren(cmp);
         event.getParam('callback')(ret);
     }
-})
+})// eslint-disable-line semi

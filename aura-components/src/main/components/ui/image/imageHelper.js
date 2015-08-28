@@ -75,7 +75,7 @@
 
         image["onload"] = $A.getCallback(function () {
             if (cmp.isValid()) {
-                cmp.get("e.onload").setParams({"value": image}).fire()
+                cmp.get("e.onload").setParams({"value": image}).fire();
             }
         });
 

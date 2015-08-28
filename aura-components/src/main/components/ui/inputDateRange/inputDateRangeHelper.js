@@ -63,7 +63,7 @@
         window.setTimeout(function () {
             $A.run(function () {
                 datePicker.set("v.visible", false);
-            })
+            });
         }, timeout);
     },
 
@@ -165,4 +165,4 @@
         }
         return null;
     }
-})
+})// eslint-disable-line semi

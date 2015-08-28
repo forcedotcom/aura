@@ -38,4 +38,4 @@
 
 		$A.util.setDataAttribute(el, 'action-value', value);
 	}
-})
+})// eslint-disable-line semi

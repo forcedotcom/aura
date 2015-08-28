@@ -27,4 +27,4 @@
         var focusActionHandler = $A.expressionService.create(component, component.getConcreteComponent().get('c.focusTrigger'));
         targetComponent.set("v.focusTrigger", focusActionHandler);
     }
-})
+})// eslint-disable-line semi

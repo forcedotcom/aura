@@ -22,4 +22,4 @@
 	toggle : function(cmp, evt, helper) {
 		helper.toggle(cmp, evt.getParam('isRichText'));		
 	}
-})
+})// eslint-disable-line semi

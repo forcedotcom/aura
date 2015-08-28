@@ -140,4 +140,4 @@
             $A.test.assertEquals('22.7%', value, "Element: Value not formatted correctly");
         }
     }
-})
+})// eslint-disable-line semi

@@ -20,7 +20,7 @@
 				$A.test.assertTrue(true);
 			}
 		}
-})
+})// eslint-disable-line semi
 /* Disabling test as the cmp is deprecated
      testControllerClickHandler:{
         test:[

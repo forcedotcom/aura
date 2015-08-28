@@ -83,7 +83,7 @@
             if (succeed) {
                 self.removeTabBody(cmp, index);
             }
-        }
+        };
         e.setParams({"index": index, "callback": callback}).setComponentEvent().fire();
     },
     /**
@@ -98,7 +98,7 @@
         var target = target || cmp;
         var callback = function (doActivate) {
             activate = doActivate;
-        }
+        };
         var tab = typeof params.index === "number" ? cmp._tabCollection.getTab(params.index) : params.tab;
         var oldTab = typeof params.oldTab === "number" ? cmp._tabCollection.getTab(params.oldTab) : params.oldTab;
 
@@ -217,7 +217,7 @@
                 }
             }
             count++;
-        }
+        };
         for (var i = 0; i < tabConfigs.length; i++) {
             this.createTabComponent(cmp, tabConfigs[i], callback);
         }
@@ -437,7 +437,7 @@
                 this.tabIds = null;
                 this.tabComponents = null;
             }
-        }
+        };
         return new TabCollection();
     },
 
@@ -445,4 +445,4 @@
         TAB_DEF: "markup://ui:tab",
         TAB_ITEM_DEF: "markup://ui:tabItem"
     }
-})
+})// eslint-disable-line semi

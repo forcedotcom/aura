@@ -412,7 +412,7 @@
             };
             updateAriaEvt.setParams({
                 attrs: obj
-            })
+            });
             updateAriaEvt.fire();
         }
     },
@@ -470,9 +470,9 @@
             if (updateAriaEvt) {
                 updateAriaEvt.setParams({
                     attrs: obj
-                })
+                });
                 updateAriaEvt.fire();
             }
         }
     }
-})
+})// eslint-disable-line semi

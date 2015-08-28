@@ -23,4 +23,4 @@
         this.superRerender();
         helper.addParentListElementAsInput(component);
     }
-})
+})// eslint-disable-line semi

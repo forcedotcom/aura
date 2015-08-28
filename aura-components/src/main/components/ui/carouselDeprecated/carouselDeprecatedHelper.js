@@ -143,10 +143,10 @@
 		cmp._moveEvt = hasTouch ? 'touchmove' : 'mousemove';
 		cmp._resizeEvt =  hasTouch ? 'orientationchange' : 'resize';
 
-		cmp._onStart = function(e) {helper.onStart(cmp, e)};
-		cmp._onMove = function(e) {helper.onMove(cmp, e)};
-		cmp._onClick = function(e){helper.onClick(cmp, e)};
-		cmp._onResize = function(e) {helper.refresh(cmp)};
+		cmp._onStart = function(e) {helper.onStart(cmp, e);};
+		cmp._onMove = function(e) {helper.onMove(cmp, e);};
+		cmp._onClick = function(e){helper.onClick(cmp, e);};
+		cmp._onResize = function(e) {helper.refresh(cmp);};
 
 		$A.util.on(el, cmp._startEvt, cmp._onStart);
 		$A.util.on(el, cmp._moveEvt, cmp._onMove);
@@ -169,7 +169,7 @@
 		cmp._startPos = {
 			startx: point.pageX,
 			starty: point.pageY
-		}
+		};
 	},
 
 	onMove: function(cmp, evt) {
@@ -190,7 +190,7 @@
 	 * Check whether the mouse/touch past the boundary since it started
 	 */
 	hasMoved : function(cmp, evt, direction) {
-		var startPos = cmp._startPos
+		var startPos = cmp._startPos;
 		if (!startPos) {
 			return false;
 		}
@@ -237,7 +237,7 @@
 			//TODO: this should be fixed inside ui:scroller instead of here
 			if (selectedPage > 0) {
 				if (cmp._scrollToTimeout) {
-					window.clearTimeout(cmp._scrollToTimeout)
+					window.clearTimeout(cmp._scrollToTimeout);
 					cmp._scrollToTimeout = null;
 				}
 				//need to wait for scroller to finish refreshing
@@ -491,7 +491,7 @@
 		var pages = this.getPageComponents(cmp);
 
 		if ($A.util.isNumber(from) && $A.util.isNumber(to) && from > 0 && from <= pages.length && to > 0 && to <= pages.length) {
-			var pageCmp = pages[from-1]
+			var pageCmp = pages[from-1];
 			this.showPage(pageCmp, from);
 			//show rest of the pages for smoother swiping
 			if (to > from && to <= pages.length) {
@@ -660,7 +660,7 @@
 	delayHideAllUnselectedPages : function(cmp) {
 		if (!cmp._delayHidePagesTimer) {
 			var that = this;
-			cmp._delayHidePagesTimer = window.setTimeout(function(){that.hideAllUnselectedPages(cmp)}, 500);
+			cmp._delayHidePagesTimer = window.setTimeout(function(){that.hideAllUnselectedPages(cmp);}, 500);
 		}
 	},
 
@@ -701,4 +701,4 @@
     	this.detachEvents(cmp);
     }
 
-})
+})// eslint-disable-line semi

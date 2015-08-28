@@ -44,4 +44,4 @@
         helper = component.getConcreteComponent().getDef().getHelper();
         helper.handleRefresh(component, event);
     }
-})
+})// eslint-disable-line semi

@@ -23,4 +23,4 @@
             cmp.get("e.onActivated").setParams({"tab": cmp}).fire();
         }
     }
-})
+})// eslint-disable-line semi

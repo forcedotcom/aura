@@ -30,4 +30,4 @@
         }); 
         pressEvent.fire();
     }
-})
+})// eslint-disable-line semi

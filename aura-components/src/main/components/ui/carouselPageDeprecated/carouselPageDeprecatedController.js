@@ -42,4 +42,4 @@
 			helper.updateSize(cmp, size.width, size.height);
 		}
 	}
-})
+})// eslint-disable-line semi

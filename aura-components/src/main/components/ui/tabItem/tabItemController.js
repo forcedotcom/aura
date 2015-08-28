@@ -42,4 +42,4 @@
 	onTabUnhover: function(cmp, evt, helper) {
 		helper.handleHoverEvent(cmp, 'onTabUnhover');
 	}
-})
+})// eslint-disable-line semi

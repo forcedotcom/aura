@@ -153,7 +153,7 @@
     _testAccessibility: {
         test: function (cmp) {
             var imgElement = cmp.getElement();
-            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement))
+            $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement));
             $A.test.assertEquals("", imgElement.alt, "Expected a empty alt text for all image tags.");
             cmp.set("v.alt", 'Help Accessibility');
             cmp.set("v.src", 'http://www.google.com/intl/en_com/images/srpr/logo3w.png');
@@ -163,4 +163,4 @@
             $A.test.assertEquals("Help Accessibility", imgElement.alt, "Expected alt text for the image element.");
         }
     }
-})
+})// eslint-disable-line semi

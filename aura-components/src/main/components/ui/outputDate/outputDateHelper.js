@@ -34,4 +34,4 @@
             elem.textContent = elem.innerText = $A.localizationService.translateToLocalizedDigits(displayValue);
         }
     }
-})
+})// eslint-disable-line semi

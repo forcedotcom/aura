@@ -111,4 +111,4 @@
         }
         helper.triggerDataProvider(component, index);
     }
-})
+})// eslint-disable-line semi

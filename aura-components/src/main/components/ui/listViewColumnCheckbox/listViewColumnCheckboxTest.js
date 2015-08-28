@@ -138,6 +138,6 @@
                 delete mock.mocked;
                 target[name] = original;
             }
-        }
+        };
     }
-})
+})// eslint-disable-line semi

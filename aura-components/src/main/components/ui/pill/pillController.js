@@ -37,4 +37,4 @@
     onIconError: function(component, event, helper) {
         $A.util.addClass(component.find("icon").getElement(), 'invisible');
     }
-})
+})// eslint-disable-line semi

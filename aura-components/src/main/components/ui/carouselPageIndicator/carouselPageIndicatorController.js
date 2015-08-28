@@ -38,4 +38,4 @@
         compEvent.setParams(evt.getParams());
         compEvent.fire();        
     }
-})
+})// eslint-disable-line semi

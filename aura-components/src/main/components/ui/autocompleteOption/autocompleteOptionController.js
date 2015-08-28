@@ -31,4 +31,4 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.handleMouseout(concreteCmp);
     }   
-})
+})// eslint-disable-line semi

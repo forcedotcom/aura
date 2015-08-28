@@ -17,4 +17,4 @@
 	getDomElementValue: function(element) {
         return element.checked;
     }
-})
+})// eslint-disable-line semi

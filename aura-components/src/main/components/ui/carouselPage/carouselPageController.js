@@ -39,4 +39,4 @@
     handleNoMoreContent: function (component, event, helper) {
         component.find('scroller').set('v.canShowMore', false);
     }
-})
+})// eslint-disable-line semi

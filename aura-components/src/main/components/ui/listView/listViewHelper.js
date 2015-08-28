@@ -308,7 +308,7 @@
         if (this.decodeTimer)
             clearTimeout(this.decodeTimer);
         this.decodeTimer = setTimeout(function() {
-            this.translator = null
+            this.translator = null;
         }.bind(this), 100);
         return textContent;
     },
@@ -677,4 +677,4 @@
         this.setImmediate = global.requestAnimationFrame.bind(global);
         this.setImmediate(callback);
     }
-})
+})// eslint-disable-line semi

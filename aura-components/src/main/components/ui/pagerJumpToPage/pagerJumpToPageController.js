@@ -26,4 +26,4 @@
 
         helper.changePage(component,targetPage,domEvent);
     }
-})
+})// eslint-disable-line semi

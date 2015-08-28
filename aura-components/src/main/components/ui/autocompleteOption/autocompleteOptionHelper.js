@@ -81,4 +81,4 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
     }
-})
+})// eslint-disable-line semi

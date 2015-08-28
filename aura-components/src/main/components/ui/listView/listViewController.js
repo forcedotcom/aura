@@ -53,4 +53,4 @@
     touchendHandler:function (component, domEvent, helper) {
         helper.fireEvents(component, "touchend", domEvent);
     }
-})
+})// eslint-disable-line semi

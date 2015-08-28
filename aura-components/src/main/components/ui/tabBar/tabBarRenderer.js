@@ -39,4 +39,4 @@
         return this.superRerender();
     }
 
-})
+})// eslint-disable-line semi

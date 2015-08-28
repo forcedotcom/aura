@@ -177,7 +177,7 @@
 			}
 		}*/
 		//reset selected menu items
-		var menuItems = cmp.find('sorterMenuList').get('v.childMenuItems')		 
+		var menuItems = cmp.find('sorterMenuList').get('v.childMenuItems'); 
 		for (var i=0; i < menuItems.length; i++) {			 
 			var item = menuItems[i];
 			if (item.get('v.selected') === true) {
@@ -362,7 +362,7 @@
 			var helper = this;		
 			cmp._orientationChange = function(event) {
 				helper.updateSize(cmp);
-			}
+			};
 		}
 		return cmp._orientationChange;
 	},
@@ -384,7 +384,7 @@
 	                    }          
 		                break;
 	            }   	
-			}
+			};
     	}
     	return cmp._keydownHandler;
     },
@@ -419,4 +419,4 @@
     		sorterMenu.get('e.refresh').fire();
     	}
 	}
-})
+})// eslint-disable-line semi

@@ -49,4 +49,4 @@
         }
         helper.removeEventHandlers(component);
     }
-})
+})// eslint-disable-line semi

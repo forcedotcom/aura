@@ -80,4 +80,4 @@
         }
         component.set("v.isValid", false);
     }
-})
+})// eslint-disable-line semi

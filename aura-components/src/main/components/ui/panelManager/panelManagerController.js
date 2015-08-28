@@ -62,4 +62,4 @@
     onPanelLoaded: function(cmp, evt, helper) {
         helper.onPanelLoaded(cmp, evt);
     }
-})
+})// eslint-disable-line semi

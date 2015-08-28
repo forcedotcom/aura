@@ -355,11 +355,11 @@
     		$A.util.setText(optionElement, internalText);
     	}
     	
-    	return optionElement
+    	return optionElement;
     },
     
     getInternalText: function(option) {
     	return ($A.util.isEmpty(option.label) ? option.value : option.label) || '';
     }
 
-})
+})// eslint-disable-line semi

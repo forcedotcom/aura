@@ -341,4 +341,4 @@
     getCarouselDOM: function (cmp) {
         return cmp.find('carousel').getElement();
     }
-})
+})// eslint-disable-line semi

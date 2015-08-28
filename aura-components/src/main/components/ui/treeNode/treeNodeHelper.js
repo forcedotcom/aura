@@ -185,7 +185,7 @@
             };
 
             helper.ApplyVisitor.prototype.accept = function(node) {
-                this.funcToApply(node)
+                this.funcToApply(node);
             };
 
             helper.ApplyVisitor.prototype.endVisit = function(node) {
@@ -216,8 +216,8 @@
             };
 
             helper.CollapseVisitor.prototype.endVisit = function(node) {
-            }
+            };
         }
         return new helper.CollapseVisitor();
     }
-})
+})// eslint-disable-line semi

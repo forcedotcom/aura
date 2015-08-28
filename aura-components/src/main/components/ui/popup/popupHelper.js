@@ -120,4 +120,4 @@
 
         return elem;
     }
-})
+})// eslint-disable-line semi

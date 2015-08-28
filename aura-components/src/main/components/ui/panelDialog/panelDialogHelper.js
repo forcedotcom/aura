@@ -274,4 +274,4 @@
 	    ms : 'animationend' // IE 10 or above 
 	}
 
-})
+})// eslint-disable-line semi

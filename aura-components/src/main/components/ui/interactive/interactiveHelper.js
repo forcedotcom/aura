@@ -146,7 +146,7 @@
             } else {
                 params[key] = DOMEvent[key];
             }
-        };
+        }
         e.setParams(params);
     },
 
@@ -167,4 +167,4 @@
         }
     }
 
-})
+})// eslint-disable-line semi

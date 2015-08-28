@@ -152,7 +152,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
-    public void _testCacheError() throws Exception {
+    @Flapper
+    public void testCacheError() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);
@@ -220,7 +221,8 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
-    public void _testManifestRequestLimitExceeded() throws Exception {
+    @Flapper
+    public void testManifestRequestLimitExceeded() throws Exception {
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);
         assertAppCacheStatus(Status.IDLE);

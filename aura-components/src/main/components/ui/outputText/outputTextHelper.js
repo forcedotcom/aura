@@ -59,4 +59,4 @@
 			}
 		}
 	}
-})
+})// eslint-disable-line semi

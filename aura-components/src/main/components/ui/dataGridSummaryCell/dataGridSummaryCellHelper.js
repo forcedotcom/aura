@@ -96,7 +96,7 @@
 	 * @param {String} column 
 	 */
 	aggregate_sum: function (items, column) {
-		var sum = 0
+		var sum = 0;
 
 		for(var i=0;i<items.length;i++){
             var num = parseFloat(item.get(column),10);
@@ -136,4 +136,4 @@
 		var values = this.extractNumbers(items, column);	
 		return Math.max.call(this, values);
 	}
-})
+})// eslint-disable-line semi

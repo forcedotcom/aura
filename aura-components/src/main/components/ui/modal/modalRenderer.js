@@ -23,4 +23,4 @@
             helper.lib.panelLibCore.scopeScroll(scrollables[i]);
         }
     }
-})
+})// eslint-disable-line semi

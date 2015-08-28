@@ -44,4 +44,4 @@
             cmp.set('v.currentPage', targetPage);
         }
     }
-})
+})// eslint-disable-line semi

@@ -101,4 +101,4 @@
 		
 		cmp.get("e.onTabSelection").setParams(params).fire();
 	}
-})
+})// eslint-disable-line semi

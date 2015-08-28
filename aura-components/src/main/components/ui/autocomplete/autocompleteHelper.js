@@ -205,4 +205,4 @@
 
     handleListExpand: function(component, event) {
     }
-})
+})// eslint-disable-line semi

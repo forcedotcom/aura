@@ -96,4 +96,5 @@
             span.getElement().textContent = span.getElement().innerText = formatted;
         }
     }
-})
+ // eslint-disable-line semi
+ })

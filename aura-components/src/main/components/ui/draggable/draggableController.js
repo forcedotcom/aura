@@ -42,4 +42,4 @@
 		var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;
 		helper.fireDragEnd(component, target, params.isValid, params.isInAccessibilityMode);
 	}
-})
+})// eslint-disable-line semi

@@ -48,4 +48,4 @@
         var targetPage = Math.max(currentPage-1, 1);
         helper.changePage(component, targetPage, domEvent);
     }
-})
+})// eslint-disable-line semi

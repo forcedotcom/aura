@@ -115,4 +115,4 @@
             resizer._resizer();
         }
     }
-})
+})// eslint-disable-line semi

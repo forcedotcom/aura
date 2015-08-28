@@ -32,7 +32,7 @@
         attributes : {label : 'Ok'},
         test:function(component){
             var element = component.getElement();
-            aura.test.assertEquals('button', component.get('v.buttonType'), "default value of buttonType attribute should be 'button'")
+            aura.test.assertEquals('button', component.get('v.buttonType'), "default value of buttonType attribute should be 'button'");
             aura.test.assert('button',element.getAttribute('type'), "By default ui:button should create a button element of type 'Button'");
 
             aura.test.assertTrue(!component.get('v.buttonTitle'), "Button should not have a default value for title");
@@ -62,14 +62,14 @@
     _testInvalidButtonType:{
         attributes:{buttonType: 'fooBar'},
         test:function(component){
-            aura.test.assertEquals('submit', component.find("button").getElement().type, "Button not rendered with default type when a bad type is specified")
+            aura.test.assertEquals('submit', component.find("button").getElement().type, "Button not rendered with default type when a bad type is specified");
         }
     },
     testLabelClass:{
         attributes:{label:'Ok', labelClass: 'OkStyling'},
         test:function(component){
             aura.test.assertNotEquals(component.find("span").getElement().className.toString().indexOf('OkStyling'), -1,
-                    "Button not rendered with specified labelStyle class")
+                    "Button not rendered with specified labelStyle class");
         }
     },
     
@@ -80,9 +80,9 @@
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
                     aura.test.assertNotEquals(child.className.toString().indexOf('Red'), -1 ,
-                            "Button not rendered with specified iconClass")
+                            "Button not rendered with specified iconClass");
                     aura.test.assertNotEquals(child.src.indexOf('/auraFW/resources/aura/images/bug.png'), -1,
-                            "Button not rendered with specified icon img")
+                            "Button not rendered with specified icon img");
                     return;
                 }
             }
@@ -116,7 +116,7 @@
     testLabelDir:{
         attributes:{label:"Click right Now!", labelDir:'rtl'},
         test:function(component){
-            aura.test.assertEquals('rtl', component.find('span').getElement().dir, "Label not rendered with specified text direction.")
+            aura.test.assertEquals('rtl', component.find('span').getElement().dir, "Label not rendered with specified text direction.");
         }
     },
     //TODO W-1014086
@@ -136,7 +136,7 @@
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
-                    aura.test.assertTrue(child.src.indexOf('/auraFW/resources/aura/images/clear.png')!==-1, "Button not rerendered with specified icon img")
+                    aura.test.assertTrue(child.src.indexOf('/auraFW/resources/aura/images/clear.png')!==-1, "Button not rerendered with specified icon img");
                 }
             }
             $A.renderingService.rerender(component);
@@ -150,4 +150,4 @@
         }
     }
 
-})
+})// eslint-disable-line semi

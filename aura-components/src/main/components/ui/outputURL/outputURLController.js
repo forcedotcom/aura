@@ -43,4 +43,4 @@
 
         return navigateToUrl;
     }
-})
+})// eslint-disable-line semi

@@ -44,4 +44,4 @@
     rerenderList: function (cmp, evt, helper) {
         helper.createVirtualList(cmp);
     }
-})
+})// eslint-disable-line semi

@@ -28,4 +28,4 @@
             "focusTrigger": hideMenu
         });
     }
-})
+})// eslint-disable-line semi

@@ -463,7 +463,7 @@
                 if (callback) {
                     callback();        
                 }
-            }, timeout)
+            }, timeout);
         }
         else {
             rm();
@@ -623,4 +623,4 @@
         el.style.transform = style;
         el.style.webkitTransform = style;
     }
-})
+})// eslint-disable-line semi

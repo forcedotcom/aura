@@ -44,4 +44,4 @@
             hlp.getScrollerInstance(cmp).enableVoiceOver(evt.getParam('value'));
         }
     }
-})
+})// eslint-disable-line semi

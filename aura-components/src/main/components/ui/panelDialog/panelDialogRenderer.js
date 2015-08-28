@@ -26,4 +26,4 @@
 			helper.show(cmp);
 		}
 	}
-})
+})// eslint-disable-line semi

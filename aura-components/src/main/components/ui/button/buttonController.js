@@ -44,4 +44,4 @@
     press : function(cmp, event, helper){
         return helper.catchAndFireEvent(cmp, event, 'press');
     }
-})
+})// eslint-disable-line semi

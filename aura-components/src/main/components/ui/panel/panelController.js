@@ -58,4 +58,4 @@
             helper.close(cmp);
         }
     }
-})
+})// eslint-disable-line semi

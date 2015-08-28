@@ -383,4 +383,4 @@
             tmpls[i].destroy();
         }
     }
-})
+})// eslint-disable-line semi

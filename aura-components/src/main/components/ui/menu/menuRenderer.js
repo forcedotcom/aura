@@ -23,4 +23,4 @@
 
     	return this.superAfterRender();
 	}
-})
+})// eslint-disable-line semi

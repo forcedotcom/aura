@@ -22,4 +22,4 @@
         helper.addTriggerDomEvents(component);
         return this.superRerender();
     }
-})
+})// eslint-disable-line semi

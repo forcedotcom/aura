@@ -31,4 +31,4 @@
             helper.updateEmptyListContent(component);
         }
     }
-})
+})// eslint-disable-line semi

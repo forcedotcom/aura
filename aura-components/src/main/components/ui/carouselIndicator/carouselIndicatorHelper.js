@@ -100,7 +100,7 @@
             this.goToPage(cmp, pageNumber);
 
             if(e.preventDefault) {
-                e.preventDefault()
+                e.preventDefault();
             }
         }
     },
@@ -215,4 +215,4 @@
         return root;
         
     }
-})
+})// eslint-disable-line semi

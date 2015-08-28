@@ -18,4 +18,4 @@
 		var params = event.getParam("arguments");
 		helper.startDragAndDrop(component, params.draggables, params.target);
 	}
-})
+})// eslint-disable-line semi

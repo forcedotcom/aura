@@ -75,4 +75,4 @@
     		cmp.set("v.priv_selectedClass", "");
     	}
     }
-})
+})// eslint-disable-line semi

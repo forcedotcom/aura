@@ -17,4 +17,4 @@
     clickHandler:function(component,domEvent,helper){
         helper.fireEvent(component, "onclick", "link", domEvent);
     }
-})
+})// eslint-disable-line semi

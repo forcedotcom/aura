@@ -53,4 +53,4 @@
             helper.resetLabelPosition(cmp);
         }
     }
-})
+})// eslint-disable-line semi

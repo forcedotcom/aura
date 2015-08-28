@@ -22,4 +22,4 @@
             $A.util.addClass(cmp.find("spinner").getElement(), "hideEl");
         }
     }
-})
+})// eslint-disable-line semi

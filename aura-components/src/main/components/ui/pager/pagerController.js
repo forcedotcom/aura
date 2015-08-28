@@ -17,4 +17,4 @@
 	updateCalculatedFields: function(component, event, helper) {
 		helper.updateCalculatedFields(component);
 	}
-})
+})// eslint-disable-line semi

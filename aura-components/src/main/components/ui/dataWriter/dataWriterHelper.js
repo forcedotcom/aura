@@ -76,4 +76,4 @@
 	write: function (concrete, cfg, callback) {
 		$A.error('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
 	}
-})
+})// eslint-disable-line semi

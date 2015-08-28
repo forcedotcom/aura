@@ -17,4 +17,4 @@
     updateSize: function(component, event, helper) {
         helper.updateSize(component);
     }
-})
+})// eslint-disable-line semi

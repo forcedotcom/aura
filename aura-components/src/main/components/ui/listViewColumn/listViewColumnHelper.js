@@ -27,4 +27,4 @@
         });
         listViewEvent.fire();
     }
-})
+})// eslint-disable-line semi

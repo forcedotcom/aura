@@ -27,4 +27,4 @@
 			
 		hlp.handleWrite(cmp);	
 	}
-})
+})// eslint-disable-line semi

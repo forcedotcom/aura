@@ -21,4 +21,4 @@
     setFocus: function(component, event, helper) {
         helper.setFocus(component);
     }
-})
+})// eslint-disable-line semi

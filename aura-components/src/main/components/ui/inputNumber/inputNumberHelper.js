@@ -17,4 +17,4 @@
     getNumber: function(cmp) {
         return cmp.get("v.value");
     }
-})
+})// eslint-disable-line semi

@@ -96,4 +96,4 @@
 			helper.updateValueProvider(cmp, rowData, params.attributes);
 		}
 	}
-})
+})// eslint-disable-line semi

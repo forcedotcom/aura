@@ -36,4 +36,4 @@
     handleCanShowMoreChange: function (cmp, evt, hlp) {
 		hlp.swapShowMore(cmp);
     }
-})
+})// eslint-disable-line semi

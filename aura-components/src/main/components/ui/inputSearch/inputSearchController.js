@@ -32,4 +32,4 @@
     input: function(component, event, helper) {
         helper.toggleClearButton(component);
     }
-})
+})// eslint-disable-line semi

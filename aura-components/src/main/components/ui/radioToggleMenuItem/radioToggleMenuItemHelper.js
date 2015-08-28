@@ -28,7 +28,7 @@
     	
     	cmp.set("v.isAscending", !ascending, true);
     	
-    	this.updateDirection(cmp, !ascending)
+    	this.updateDirection(cmp, !ascending);
     },
     
     updateDirection: function(cmp, ascending) {
@@ -44,4 +44,4 @@
     		$A.util.removeClass(ascLabel, "visible");
     	}
     }
-})
+})// eslint-disable-line semi

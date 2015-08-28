@@ -17,4 +17,4 @@
     changePageSize:function(component,domEvent,helper){
         helper.changePageSize(component, component.get("v.pageSize"), domEvent);
     }
-})
+})// eslint-disable-line semi

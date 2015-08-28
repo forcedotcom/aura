@@ -53,4 +53,4 @@
         _helper.toggleClearButton(component);
         return ret;
     }
-})
+})// eslint-disable-line semi

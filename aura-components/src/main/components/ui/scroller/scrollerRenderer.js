@@ -37,4 +37,4 @@
         helper.deactivate(component);
         this.superUnrender();
     }
-})
+})// eslint-disable-line semi

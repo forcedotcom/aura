@@ -66,4 +66,4 @@
         
         this.fireMenuFocusChangeEvent(component, srcComponent, previousFocusCmp);
     },
-})
+})// eslint-disable-line semi

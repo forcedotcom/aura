@@ -46,4 +46,4 @@
 			selected.runDeprecated(evt);
 		}
 	}
-})
+})// eslint-disable-line semi

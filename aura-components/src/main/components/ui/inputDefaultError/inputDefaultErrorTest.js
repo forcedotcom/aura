@@ -261,7 +261,7 @@
             cmp.set("v.value", [ "v1", "v2" ]);
             cmp.set("v.errors", [ {
                 "message" : "e1"
-            } ])
+            } ]);
         }, function(cmp) {
             var ul = cmp.getElement();
             $A.test.assertEquals(3, ul.children.length);
@@ -274,7 +274,7 @@
                 "message" : "e3"
             }, {
                 "message" : "e4"
-            } ])
+            } ]);
         }, function(cmp) {
             var ul = cmp.getElement();
             $A.test.assertEquals(2, ul.children.length);
@@ -290,4 +290,4 @@
             $A.test.assertEquals("e4", $A.test.getText(ul.children[2]));
         } ]
     }
-})
+})// eslint-disable-line semi

@@ -28,4 +28,4 @@
         
         return el;
     }
-})
+})// eslint-disable-line semi

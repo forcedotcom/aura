@@ -47,4 +47,4 @@
         component.get("e.menuTriggerPress").fire();
     }
 
-})
+})// eslint-disable-line semi

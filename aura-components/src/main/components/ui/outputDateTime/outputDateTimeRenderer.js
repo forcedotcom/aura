@@ -29,4 +29,4 @@
         _helper.formatDateTime(concreteCmp);
         return ret;
     }
-})
+})// eslint-disable-line semi

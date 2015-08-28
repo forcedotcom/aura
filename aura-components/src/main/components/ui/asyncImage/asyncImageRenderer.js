@@ -23,4 +23,4 @@
             "asyncComponent": component
         }).fire();
     }
-})
+})// eslint-disable-line semi

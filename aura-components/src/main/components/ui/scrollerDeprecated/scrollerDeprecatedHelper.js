@@ -53,7 +53,7 @@
 	swapShowMore: function (cmp) {
 		// Timeout to allow for rendering of new element.
 		setTimeout(function () {
-			cmp._pullUpEl = cmp.find('pullUp').getElement();;
+			cmp._pullUpEl = cmp.find('pullUp').getElement();
 		}, 100);
 	},
 
@@ -201,7 +201,7 @@
 									$A.util.squash(e, true);
 									scroller._resetPos(200);
 								}
-							}
+							};
 						}
 						return this._eventBuster;
 					};
@@ -437,7 +437,7 @@
 			fields : "globalId as id, def.descriptor.namespace as namespace, def.descriptor.name as name",
 			from : "component",
 			where : function(row) {
-				return row.namespace == 'ui' && row.name == 'scroller'
+				return row.namespace == 'ui' && row.name == 'scroller';
 			}
 		});
 
@@ -1716,4 +1716,4 @@
 
 		})(window, document);
 	}
-})
+})// eslint-disable-line semi

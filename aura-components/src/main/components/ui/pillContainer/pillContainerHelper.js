@@ -26,7 +26,7 @@
             // when we've reached max pills
             // allow the iteration to rerender the pills before setting focus to th last pill
             // this only happens when pill selection comes from input
-            var itemsLength = cmp.get("v.items").length
+            var itemsLength = cmp.get("v.items").length;
             var maxAllowed = cmp.get("v.maxAllowed");
             if (itemsLength >= maxAllowed) {
                 window.setTimeout(function () {
@@ -41,7 +41,7 @@
                                 }
                             }
                         }
-                    })
+                    });
                 }, 0);
             }
         }
@@ -118,7 +118,7 @@
                     if (cmp.isValid()) {
                         that._deleteItem(cmp, data);
                     }
-                })
+                });
             }, 0);
         }
     },
@@ -173,7 +173,7 @@
     focusOnInputBox: function(cmp) {
         var focused = false;
         var pillInput = cmp.get("v.pillInput");
-        var itemsLength = cmp.get("v.items").length
+        var itemsLength = cmp.get("v.items").length;
         var maxAllowed = cmp.get("v.maxAllowed");
         if ($A.util.isEmpty(pillInput)) {
             $A.util.addClass(cmp.getElement(), 'noinput');
@@ -199,7 +199,7 @@
                         firstItem = listItems[0].getElement();
                         lastItem = listItems[listItems.length - 1].getElement();
                     } else {
-                        lastItem = firstItem = listItems.getElement()
+                        lastItem = firstItem = listItems.getElement();
                     }
                     var pillHeight = this._getActualHeight(firstItem);
 
@@ -211,7 +211,7 @@
 
                     //only show the Show More button if there's overflow
                     var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
-                    console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight)
+                    console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight);
                     if (lastItemBottom > limitedHeight) {
                         hideShowMore = false;
                     }
@@ -313,4 +313,4 @@
         }
     }
 
-})
+})// eslint-disable-line semi

@@ -91,4 +91,4 @@
         $A.unrender(component.get("v.body"));
         $A.unrender(component.get("v.south"));
     }
-})
+})// eslint-disable-line semi

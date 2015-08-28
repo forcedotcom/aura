@@ -27,4 +27,4 @@
         _helper.formatDate(concreteCmp);
         return this.superRerender();
     }
-})
+})// eslint-disable-line semi

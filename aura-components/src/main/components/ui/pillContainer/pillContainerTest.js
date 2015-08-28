@@ -27,7 +27,7 @@
 	    			'invisible'// className
 				),
         		'Show More Button in Pill Container should be invisible on page load'
-    		)
+    		);
         }]
     }
-})
+})// eslint-disable-line semi

@@ -22,4 +22,4 @@
         helper.setSelected(component);
         return this.superRerender();
     }
-})
+})// eslint-disable-line semi

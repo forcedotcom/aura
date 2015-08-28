@@ -198,7 +198,7 @@
 	    hideFunc = function() {
 			$A.util.addClass(elements.targetElement, component.get('v.preTransitionClass'));
 			$A.util.removeOn(elements.targetElement, transitionEndEventName, hideFunc);
-		}
+		};
 	    
 	    // setTimeout is so we can wait for the next life cycle to apply visible classes
 	    // or else CSS transitions will not work when the target is appended to the body
@@ -345,7 +345,7 @@
         	
         	component._windowBlurHandlerFunc = function (event) {
         		elements.target.set("v.visible", !elements.target.get("v.visible"));
-        	}
+        	};
         }
         
         return component._windowBlurHandlerFunc;
@@ -355,7 +355,7 @@
 		if ($A.util.isUndefined(component._windowResizeHandlerFunc)) {
 			component._windowResizeHandlerFunc = function () {
 				component.getDef().getHelper().position(component);
-			}
+			};
 		}
 
 		return component._windowResizeHandlerFunc;
@@ -412,4 +412,4 @@
      */
     handleKeyboardEvent : function(component, event) {
     }
-})
+})// eslint-disable-line semi

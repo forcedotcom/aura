@@ -25,4 +25,4 @@
         _helper.displayDates(component);
         return this.superRerender();
     }
-})
+})// eslint-disable-line semi

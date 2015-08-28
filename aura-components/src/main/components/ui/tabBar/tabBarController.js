@@ -97,4 +97,5 @@
 	onTabUnhover: function(cmp, evt, helper) {
 		cmp.getEvent("onTabUnhover").setParams(evt.getParams()).fire();
 	}
+// eslint-disable-line semi
 })

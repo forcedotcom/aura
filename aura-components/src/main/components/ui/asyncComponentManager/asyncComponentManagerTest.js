@@ -48,7 +48,7 @@
         test: function (cmp) {
         	var mockAsyncCmp = {
         			get : function() {
-        				return {fire : function() {}}
+        				return {fire : function() {}};
         			},
 					isValid: function() {
 						return true;
@@ -76,7 +76,7 @@
     	test : function (cmp) {
     		var mockAsyncCmp = {
         			get : function() {
-        				return {fire : function() {}}
+        				return {fire : function() {}};
         			}
         	};
     		// Initial _numOfLoadingComponents 
@@ -88,4 +88,4 @@
 					"Number of loading component should be set to 0.");
     	}
     }
-})
+})// eslint-disable-line semi

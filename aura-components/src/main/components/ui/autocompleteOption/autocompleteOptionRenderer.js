@@ -30,4 +30,4 @@
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayText(component);
     }
-})
+})// eslint-disable-line semi

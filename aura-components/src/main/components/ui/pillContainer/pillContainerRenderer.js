@@ -22,4 +22,4 @@
             helper.focusOnInputBox(cmp);
         }
     }
-})
+})// eslint-disable-line semi

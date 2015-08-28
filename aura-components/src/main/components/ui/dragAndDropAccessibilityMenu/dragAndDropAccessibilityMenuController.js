@@ -27,4 +27,4 @@
 	handleMenuSelect: function (component, event, helper) {
 		helper.handleMenuSelect(component, event);
 	}
-})
+})// eslint-disable-line semi

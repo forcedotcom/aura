@@ -234,7 +234,7 @@
                     this.hide(component, true);
                 }
             } else if (keyCode == 27) { // Esc key is pressed
-                this.hide(component, true)
+                this.hide(component, true);
             }
         }
     },
@@ -627,4 +627,4 @@
             }
         }
     }
-})
+})// eslint-disable-line semi

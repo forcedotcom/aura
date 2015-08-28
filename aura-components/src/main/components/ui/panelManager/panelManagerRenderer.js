@@ -17,4 +17,4 @@
 	render : function(cmp, helper) {
 		return this.superRender();
 	}
-})
+})// eslint-disable-line semi

@@ -99,4 +99,4 @@
 			dropzone.fireDrop(target, draggables, true);
 		});
 	}
-})
+})// eslint-disable-line semi

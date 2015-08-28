@@ -45,4 +45,4 @@
     		aura.test.assertTrue(radioElement.checked, "Radio Element was not clickable");
     	}
     }
-})
+})// eslint-disable-line semi

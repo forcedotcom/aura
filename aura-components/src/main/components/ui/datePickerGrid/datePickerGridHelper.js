@@ -108,7 +108,7 @@
             rangeEnd = this.getDateFromString(component.get("v.rangeEnd")),
             rangeClass = component.get("v.rangeClass");
         if ($A.util.isEmpty(rangeClass)) {
-            rangeClass = 'highlight'
+            rangeClass = 'highlight';
         }
 
         var today = new Date();

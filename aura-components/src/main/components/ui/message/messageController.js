@@ -18,4 +18,4 @@
         var theMessage = cmp.getElement();
         $A.util.addClass(theMessage,"hide");
     }
-})
+})// eslint-disable-line semi

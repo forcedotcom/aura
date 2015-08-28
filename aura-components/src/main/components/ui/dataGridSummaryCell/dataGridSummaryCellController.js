@@ -24,4 +24,4 @@
 		var helper = cmp.getConcreteComponent().getDef().getHelper();
 		helper.calculate(cmp);
 	}
-})
+})// eslint-disable-line semi

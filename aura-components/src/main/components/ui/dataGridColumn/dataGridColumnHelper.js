@@ -81,4 +81,4 @@
 			onsortchange.runDeprecated(name);
 		}
 	}
-})
+})// eslint-disable-line semi

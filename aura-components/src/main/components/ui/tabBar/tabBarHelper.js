@@ -174,7 +174,7 @@
             if (counter === 0 && callback) {
                 callback(items);
             }
-        }
+        };
 
         for (var i = 0; i < len; i++) {
             var config = tabValues.get ? tabValues.get(i) : tabValues[i];
@@ -327,4 +327,4 @@
 	createMenuItem : function(id, label) {
 		return {id : id, label : label};
 	},
-})
+})// eslint-disable-line semi

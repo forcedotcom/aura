@@ -49,4 +49,4 @@
             helper.stackElement(callback);
         }
     } 
-})
+})// eslint-disable-line semi

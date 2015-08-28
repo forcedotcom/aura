@@ -24,4 +24,4 @@
             elem.focus();
         }
     }
-})
+})// eslint-disable-line semi

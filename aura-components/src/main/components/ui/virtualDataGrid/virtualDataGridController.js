@@ -119,4 +119,4 @@
             helper.appendVirtualRows(cmp, items);
         }
     }
-})
+})// eslint-disable-line semi

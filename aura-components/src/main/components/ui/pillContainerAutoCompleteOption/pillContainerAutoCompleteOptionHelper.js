@@ -31,4 +31,4 @@
      */
     handleMouseout : function(component) {
     }
-})
+})// eslint-disable-line semi

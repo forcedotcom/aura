@@ -61,4 +61,4 @@
         helper.destroyTemplates(cmp);
         this.superUnrender();
     }
-})
+})// eslint-disable-line semi

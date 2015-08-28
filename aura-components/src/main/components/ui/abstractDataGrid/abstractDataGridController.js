@@ -55,4 +55,4 @@
 		hlp = concrete.getDef().getHelper();
 		hlp.handleAddRemove(cmp, evt.getParams()); 	
 	}
-})
+})// eslint-disable-line semi

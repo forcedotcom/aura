@@ -144,4 +144,5 @@
 		this.fireDrop([dropzone], component.get("v.draggables"));
 		this.$isDropPerformed$ = true;
 	}    
+// eslint-disable-line semi
 })

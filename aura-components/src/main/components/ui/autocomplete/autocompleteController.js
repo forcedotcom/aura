@@ -133,6 +133,6 @@
         }
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
-        concreteHelper.handleListExpand(component, event)
+        concreteHelper.handleListExpand(component, event);
     }
-})
+})// eslint-disable-line semi

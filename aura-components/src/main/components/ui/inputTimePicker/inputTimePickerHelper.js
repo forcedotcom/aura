@@ -101,7 +101,7 @@
             if (!helper.isElementInComponent(component, event.target)) {
                 helper.hide(component, false);
             }
-        }
+        };
         return f;
     },
 
@@ -129,7 +129,7 @@
         entry.setAttribute("tabindex", 0);
         entry.setAttribute("role", "menuitem");
         entry.setAttribute("data-minutes", minutes);
-        entry.setAttribute("id", hours + minutes)
+        entry.setAttribute("id", hours + minutes);
         listElem.appendChild(entry);
     },
 
@@ -165,7 +165,7 @@
                         elem.focus();
                     }
                 }
-            })
+            });
         }, 0);
     },
 
@@ -188,7 +188,7 @@
             component._mousewheelEventHandler = function (event) {
                 // modal panel scopes scroll events which results in weird behavior when scrolling the time picker inside it
                 event.stopPropagation();
-            }
+            };
         }
         return component._mousewheelEventHandler;
     },
@@ -217,7 +217,7 @@
                         helper.selectTime(component, event);
                     }
                 }
-            }
+            };
         }
         return component._keyboardEventHandler;
     },
@@ -269,4 +269,4 @@
             }
         }
     }
-})
+})// eslint-disable-line semi

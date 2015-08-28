@@ -77,7 +77,7 @@
 			var pageCount = component.get("v.pageCount");
 			var newPageCount = Math.ceil(totalItems / pageSize);
 			if (!isNaN(newPageCount) && pageCount != newPageCount) {
-				component.set("v.pageCount", newPageCount)
+				component.set("v.pageCount", newPageCount);
 			}
 		} else {
 			component.set("v.pageCount", 1);
@@ -101,4 +101,4 @@
 			updateDisplay.call(component, component);
 		}
 	}
-})
+})// eslint-disable-line semi

@@ -23,4 +23,4 @@
 
 		return [];
 	}
-})
+})// eslint-disable-line semi

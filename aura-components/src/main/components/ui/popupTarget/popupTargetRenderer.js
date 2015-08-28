@@ -52,4 +52,4 @@
         helper.removeDismissEvents(component);
         this.superUnrender();
     }
-})
+})// eslint-disable-line semi

@@ -250,7 +250,7 @@
 	 * @param {Object} config - additional config
 	 */
 	updateDropOperationStatus: function(component, eventType, config) {
-		var dragOperationStatus = null
+		var dragOperationStatus = null;
 		var dragOperation = component.$dragOperation$;
 		if ($A.util.isUndefinedOrNull(dragOperation)) {
 			// This could happen when drag and drop is performed in different
@@ -332,4 +332,5 @@
 		// Set aria-describe
 		component.set("v.ariaGrabbed", false);
 	}
+// eslint-disable-line semi
 })

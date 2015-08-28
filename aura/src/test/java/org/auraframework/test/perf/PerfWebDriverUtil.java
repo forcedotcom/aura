@@ -15,9 +15,6 @@
  */
 package org.auraframework.test.perf;
 
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -26,8 +23,6 @@ import java.util.logging.Logger;
 import org.auraframework.test.util.AuraUITestingUtil;
 import org.auraframework.test.util.SauceUtil;
 import org.auraframework.test.util.WebDriverTestCase.UnexpectedError;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.perf.PerfUtil;
 import org.auraframework.util.test.perf.rdp.CPUProfilerAnalyzer;
 import org.auraframework.util.test.perf.rdp.RDPNotification;
@@ -46,7 +41,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 /**
  * Utility WebDriver methods related to performance
@@ -94,11 +88,9 @@ public final class PerfWebDriverUtil {
     // instance:
 
     private final WebDriver driver;
-    private final AuraUITestingUtil auraUITestingUtil;
 
     public PerfWebDriverUtil(WebDriver driver, AuraUITestingUtil auraUITestingUtil) {
         this.driver = driver;
-        this.auraUITestingUtil = auraUITestingUtil;
     }
 
     /**

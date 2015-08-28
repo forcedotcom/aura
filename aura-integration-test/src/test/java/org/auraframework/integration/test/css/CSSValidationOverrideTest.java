@@ -45,7 +45,8 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
                 String.format(baseComponentTag, "", ""));
         assertNotNull(cmp.getDef());
         styleDefDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, cmp.getNamespace(), cmp.getName()),
+                String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX,
+                    cmp.getNamespace(), cmp.getName()),
                 StyleDef.class);
         addSourceAutoCleanup(styleDefDesc,
                 ".xyErrorText {" +
@@ -61,7 +62,8 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
      * By default all component CSS is validated by StyleParser.
      */
     public void testDefaultProps() {
-        assertTrue("By default all component CSS should be validated", Aura.getConfigAdapter().validateCss());
+        assertTrue("By default all component CSS should be validated",
+                Aura.getConfigAdapter().validateCss());
         getInvalidStyleDef(true);
     }
 
@@ -77,16 +79,16 @@ public class CSSValidationOverrideTest extends AuraImplTestCase {
 
     private void getInvalidStyleDef(boolean expectException) {
         try {
-            StyleParser.getInstance().parse(styleDefDesc, getSource(styleDefDesc));
-            if (expectException) fail("Expected CSS validation to be turned on and catch the invalid CSS");
+            new StyleParser(true).parse(styleDefDesc, getSource(styleDefDesc));
+            if (expectException) {
+                fail("Expected CSS validation to be turned on and catch the invalid CSS");
+            }
         } catch (StyleParserException expected) {
             if (!expectException) {
                 fail("Did not expect to encounter CSS validation exception.");
             } else {
-                assertTrue(
-                        "Unexpected error message in StyleParserException",
-                        expected.getMessage().contains(
-                                "CSS selector must begin with"));
+                assertTrue("Unexpected error message in StyleParserException",
+                           expected.getMessage().contains("CSS selector must begin with"));
             }
         } catch (QuickFixException e) {
             fail("Test setup failed. Looking for component test.testInValidCSS with invalid CSS");

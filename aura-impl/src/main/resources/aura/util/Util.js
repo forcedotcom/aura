@@ -2265,33 +2265,30 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
     };
 
     /**
-     * Get the text content of a DOM node. Tries <code>innerText</code> followed by
-     * <code>textContext</code>, followed by <code>nodeValue</code> to take browser differences into account.
-     * @param {Node} node
-     *             The node to get the text content from
-     * @returns {String} The text content of the DOM node
+     * Get the text content of a DOM node. Tries <code>textContent</code> followed by
+     * <code>innerText</code>, followed by <code>nodeValue</code> to take browser differences into account.
+     * @param {Node} node The node to get the text content from
+     * @returns {String} The text content of the DOM node or empty string if unable to extract text
      * @export
      */
     Aura.Utils.Util.prototype.getText = function(node) {
-        var t;
-        //text nodes
-        if(node.nodeType === 3){
-            t = node.nodeValue;
-        } else {
-            // chrome, safari, IE have this
-            t = node.innerText;
-            t = this.trim(t);
+        $A.assert(!this.isUndefinedOrNull(node), "node cannot be undefined or null");
 
-            // FF & chrome with visibility set to false
-            if (node.textContent !== undefined) {
-                if(this.isEmpty(t)){
-                    t = node.textContent;
-                }
+        var t = node.textContent;
+        if (t === undefined) {
+            t = node.innerText || "";
+        }
+
+        // Older IE needs special handling
+        if (t === "") {
+            // Text nodes
+            if (node.nodeType === 3) {
+                return node.nodeValue;
             }
 
-            // if its <style> innerText doesnt work so try cssText (for IE)
-            if (node.tagName === "STYLE" && this.isEmpty(t) && !this.isUndefinedOrNull(node.styleSheet)) {
-                t = node.styleSheet.cssText;
+            // For old IE, if it's a <style> tag innerText doesnt work so try cssText
+            if (node.tagName === "STYLE" && !this.isUndefinedOrNull(node.styleSheet)) {
+                return node.styleSheet.cssText || "";
             }
         }
         return t;

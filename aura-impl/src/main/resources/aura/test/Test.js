@@ -1073,12 +1073,11 @@ TestInstance.prototype.getOuterHtml = function(node) {
 };
 
 /**
- * Get the text content of a DOM node. Tries <code>innerText</code> followed by <code>textContext</code>, followed
+ * Get the text content of a DOM node. Tries <code>textContent</code> followed by <code>innerText</code>, followed
  * by <code>nodeValue</code> to take browser differences into account.
  *
- * @param {Node}
- *            node The node to get the text content from
- * @returns {String} The text content of the specified DOM node
+ * @param {Node} node The node to get the text content from
+ * @returns {String} The text content of the specified DOM node or empty string if unable to extract text
  * @export
  * @function Test#getText
  */

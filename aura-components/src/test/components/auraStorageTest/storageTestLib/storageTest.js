@@ -126,8 +126,10 @@ function () {
     return {
         testSizeInitial: function(storage) {
             var completed = false;
-            storage.getSize().then(function(size) { $A.test.assertEquals(0, size); })
-                .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+            storage.getSize()
+            .then(function(size) { $A.test.assertEquals(0, size); })
+            .then(function() { completed = true; })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         },

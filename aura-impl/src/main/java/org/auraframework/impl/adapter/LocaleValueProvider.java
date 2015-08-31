@@ -191,6 +191,12 @@ public class LocaleValueProvider implements GlobalValueProvider {
     }
 
     @Override
+    public boolean refSupport() {
+    	// $Locales have not refs.
+        return false;
+    }
+
+    @Override
     public Map<String, ?> getData() {
         return data;
     }

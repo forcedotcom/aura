@@ -15,15 +15,19 @@
  */
 package org.auraframework.util.json;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * standard jsony stuff
  */
 public abstract class BaseJsonSerializationContext implements JsonSerializationContext {
     private final boolean format;
-    private final boolean refSupport;
+    private boolean refSupport;
     private final int dataSizeLimit;
     private final int collectionSizeLimit;
     private boolean nullValues;
+	private List<Boolean> refSupportStack;
 
     public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit,
             boolean nullValues) {
@@ -42,6 +46,23 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     @Override
     public boolean refSupport() {
         return refSupport;
+    }
+
+    @Override
+    public void pushRefSupport(boolean refSupport) {
+        if (refSupportStack == null) {
+        	refSupportStack = new ArrayList<>();
+        }
+        refSupportStack.add(this.refSupport);
+        this.refSupport = refSupport;
+    }
+
+    @Override
+    public void popRefSupport() {
+        if (refSupportStack == null || refSupportStack.size() == 0) {
+            return;
+        }
+        refSupport = refSupportStack.remove(refSupportStack.size()-1);
     }
 
     @Override

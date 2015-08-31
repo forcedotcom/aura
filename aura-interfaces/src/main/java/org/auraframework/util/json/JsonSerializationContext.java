@@ -43,8 +43,19 @@ public interface JsonSerializationContext {
     boolean refSupport();
 
     /**
+     * Set a new state of serialization by reference, preserving the previous one.
+     * @param refSupport whenther objects should be serialized by reference.
+     */
+    void pushRefSupport(boolean refSupport);
+
+    /**
+     * Restore the previous state of reference serialization.
+     */
+    void popRefSupport();
+
+    /**
      * Get the serializer to use for the given object
-     * 
+     *
      * @return the serializer
      */
     <T> JsonSerializer<T> getSerializer(T o);
@@ -52,7 +63,7 @@ public interface JsonSerializationContext {
     /**
      * Returns whether or not null values in arrays and objects get written out.
      * By default, this is false.
-     * 
+     *
      * @return When false, array and object values that are null cause the entry
      *         to not get written out. When true, these are written out.
      */
@@ -62,7 +73,7 @@ public interface JsonSerializationContext {
      * sets whether or not null values in arrays and objects get written out.
      *
      * By default, this is false. It should be treated as a stack.
-     * 
+     *
      * @param nullValueEnabled the new value to set.
      * @return the previous value.
      */

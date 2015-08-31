@@ -363,18 +363,24 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
-return ret;
+        return ret;
     } else {
         // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
-        if (responseMessage["context"] &&
-            responseMessage["context"]["globalValueProviders"] &&
-            responseMessage["context"]["globalValueProviders"]["$Label"]) {
+        if (responseMessage["context"] && responseMessage["context"]["globalValueProviders"]) {
+            var saved = [];
+            var gvpList = responseMessage["context"]["globalValueProviders"];
 
-            var labelGVP = responseMessage["context"]["globalValueProviders"]["$Label"];
-            responseMessage["context"]["globalValueProviders"]["$Label"] = undefined;
+            // Filter out providers without refs
+            for (var i = gvpList.length - 1; i >= 0; i--) {
+                if (gvpList[i]["hasRefs"] !== true) {
+                    saved.push(gvpList.splice(i, 1));
+                }
+            }
+
             $A.util.json.resolveRefs(responseMessage);
-            responseMessage["context"]["globalValueProviders"]["$Label"] = labelGVP;
 
+            // Restore original provider (order doesn't matter)
+            gvpList.concat(saved);
         } else {
             $A.util.json.resolveRefs(responseMessage);
         }
@@ -939,7 +945,7 @@ AuraClientService.prototype.initHost = function(host) {
  * @export
  */
 AuraClientService.prototype.init = function(config, token, container) {
-          
+
     //
     // not on in dev modes to preserve stacktrace in debug tools
     // Why? - goliver
@@ -957,11 +963,11 @@ AuraClientService.prototype.init = function(config, token, container) {
         var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
         $A.getContext().setCurrentAccess(component);
 
-         
+
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
 
-         
+
         return component;
 
         // not on in dev modes to preserve stacktrace in debug tools
@@ -996,33 +1002,33 @@ AuraClientService.prototype.idle = function() {
  */
 
 AuraClientService.prototype.initDefs = function(config) {
-    var i; 
+    var i;
 
     var evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
-     
+
     var libraryConfigs = $A.util.json.resolveRefs(config["libraryDefs"]);
     for (i = 0; i < libraryConfigs.length; i++) {
         $A.componentService.createLibraryDef(libraryConfigs[i]);
     }
-     
+
     var controllerConfigs = $A.util.json.resolveRefs(config["controllerDefs"]);
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
-     
+
     var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
-     
+
     var namespaces = config["namespaces"];
     for (i = 0; i < namespaces.length; i++){
         this.namespaces[namespaces[i]] = true;
     }
-     
+
     // Let any interested parties know that defs have been initialized
     for ( var n = 0, olen = this.initDefsObservers.length; n < olen; n++) {
         this.initDefsObservers[n]();
@@ -1180,7 +1186,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             //
             action.setCallback(acs,
                 function (a) {
-                     
+
                     // Even if bootstrap cache is disabled we still want to load from cache
                     // if action fails as "INCOMPLETE" for offline launch
                     if (!acs._useBootstrapCache && storage) {
@@ -1799,7 +1805,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     }
 
     // Delete all this jiffy nonsense start of 200 release
-     
+
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
         auraXHR.request["send"](qs);
@@ -1941,7 +1947,7 @@ AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
 };
 
 AuraClientService.prototype.processResponses = function(auraXHR, responseMessage) {
-     
+
     var action, actionResponses, response, dupes;
     var token = responseMessage["token"];
     if (token) {

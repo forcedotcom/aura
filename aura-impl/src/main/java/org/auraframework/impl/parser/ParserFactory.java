@@ -19,6 +19,8 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.impl.css.parser.FlavoredStyleParser;
+import org.auraframework.impl.css.parser.ResourceCSSParser;
 import org.auraframework.impl.css.parser.StyleParser;
 import org.auraframework.impl.java.writer.JavaScriptWriter;
 import org.auraframework.impl.java.writer.JavaWriter;
@@ -78,8 +80,6 @@ public class ParserFactory {
     private static EnumMap<Format, SourceWriter> writers = new EnumMap<>(Format.class);
 
     static {
-        badParsers.put(Format.CSS, StyleParser.getInstance());
-        badParsers.put(Format.TEMPLATE_CSS, StyleParser.getNonValidatingInstance());
         badParsers.put(Format.JS, JavascriptParser.getInstance());
 
         parsers.put(new ParserKey(Format.SVG, DefType.SVG), SVGParser.getInstance());
@@ -95,6 +95,11 @@ public class ParserFactory {
         parsers.put(new ParserKey(Format.XML, DefType.NAMESPACE), new NamespaceXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.TOKENS), new TokensXMLParser());
 
+        parsers.put(new ParserKey(Format.CSS, DefType.RESOURCE), new ResourceCSSParser());
+        parsers.put(new ParserKey(Format.CSS, DefType.STYLE), new StyleParser(true));
+        parsers.put(new ParserKey(Format.TEMPLATE_CSS, DefType.STYLE), new StyleParser(false));
+        parsers.put(new ParserKey(Format.CSS, DefType.FLAVORED_STYLE), new FlavoredStyleParser());
+
 
         writers.put(Format.XML, XMLWriter.getInstance());
         writers.put(Format.JAVA, JavaWriter.getInstance());
@@ -102,10 +107,6 @@ public class ParserFactory {
         writers.put(Format.CSS, StyleWriter.getInstance());
         writers.put(Format.TEMPLATE_CSS, StyleWriter.getInstance());
         writers.put(Format.SVG, SVGWriter.getInstance());
-    }
-
-    public static Parser<?> getParser(Format format) {
-        return badParsers.get(format);
     }
 
     /**

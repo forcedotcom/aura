@@ -49,8 +49,6 @@ import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
 
 import com.google.common.collect.Maps;
@@ -100,7 +98,6 @@ public class AuraServlet extends AuraBaseServlet {
     private final static StringParam formatAdapterParam = new StringParam(AURA_PREFIX + "formatAdapter", 0, false);
 
     private final static StringParam messageParam = new StringParam("message", 0, false);
-    private final static StringParam beaconParam = new StringParam("beaconData", 0, false);
 
     @Override
     public void init() throws ServletException {

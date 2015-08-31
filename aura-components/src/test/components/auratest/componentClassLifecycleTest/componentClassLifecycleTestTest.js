@@ -19,13 +19,20 @@
 	},
 	
     // set target only once, for test reuse 
-    setTargetCmp: function(testCmp, targetCmp) {
+    setTargetCmp: function(testCmp, targetCmp, othercmpsInsideTestCmp) {
         testCmp._target = testCmp._target || targetCmp;
+        testCmp._othercmpsInsideTestCmp = testCmp._othercmpsInsideTestCmp || othercmpsInsideTestCmp;
     },
     
     getLogs : function(testCmp) {
         var targetId = testCmp._target.getGlobalId();
-        var filterStr = "^" + targetId + ":(.*)";
+        var otherCmpsInsideTestCmp = testCmp._othercmpsInsideTestCmp;
+        if(otherCmpsInsideTestCmp) {
+        	for (var i = 0; i < otherCmpsInsideTestCmp.length; i++) {
+        		targetId = targetId+","+otherCmpsInsideTestCmp[i].getGlobalId(); 
+        	}
+        }
+        var filterStr = "^[" + targetId + "]+.:(.*)";
         testCmp.set("v.logFilter", filterStr);
         return testCmp.find("logPanel").get("v.logs");
     },
@@ -36,7 +43,7 @@
         var expectedStr = expected.join();
         var actual;
         $A.test.addWaitForWithFailureMessage(true, function() {
-            actual = that.getLogs(testCmp, testCmp._target);
+            actual = that.getLogs(testCmp);
             if (actual) {
                 var actualStr = actual.join();
                 if(expectedStr === actualStr){
@@ -208,7 +215,223 @@
         	this.testStaticParent_Unrender.test.call(this, testCmp, "ClientCreatedParent");
         }]
     },
+   
     
+///////////////////////////////////////   tests with componentClassOuter.cmp begin   /////////////////////////////////////////
+    
+    /* 
+     * componentClassOuter has componentClassInner in its markup
+     * during init, we call
+     * #1 Outer's provider then Inner's provider
+     * #2 Inner's init then Outer's init (in controller)
+     * #3 Outer's render then Inner's render
+     * #4 Outer's after-render, then Inner's after-render
+     */ 
+    testStaticOuter_Init : {
+    	attributes : { "testOuter": true },
+    	test : function(testCmp, expectedId) {
+    			 if(!expectedId) {//only need to setTarget when running this test directly
+	    			 expectedId = expectedId || "Outer";
+	    			 var targetCmp = testCmp.find(expectedId);
+	    			 targetCmp = (targetCmp.length === undefined)?targetCmp:targetCmp[0];
+	    			 var innerCmp = targetCmp.find("Inner");
+		             this.setTargetCmp(testCmp, targetCmp, [innerCmp]);
+    			 }
+	             // first check initial state
+	             var expected = testCmp._initialExpected || [
+	                                                         "OuterHelperOuterProvide",
+	                                                         "InnerHelperInnerProvide",
+	                                                         "InnerHelperInnerInit",
+	                                                         "OuterHelperOuterInit",
+	                                                         "OuterHelperOuterRender",
+	                                                         "InnerHelperInnerRender",
+	                                                         "OuterHelperOuterAfterrender",
+	                                                         "InnerHelperInnerAfterrender"];
+	             this.assertLogs(testCmp, expected);
+             }
+    },
+    
+    /* 
+     * componentClassOuter has componentClassInner in its markup, componentClassInner has attribute v.value
+     * we change v.value by clicking on a button in componentClassInner
+     * these happens: 
+     * #1 valueChange event handler in componentClassInner
+     * #2 Re-render in componentClassInner
+     * #3 valueChange event handler in componentClassOuter
+     * #4 Re-render in componentClassOuter
+     * #5 valueChange event handler in componentClassInner ... again ...
+     * #6 Re-render in componentClassInner
+     * 
+     * W-2739264 : handling value change twice is a performance no-no
+     */
+    testStaticOuter_RerenderInnerCmp : {
+    	attributes : { "testOuter": true },
+    	test : function(testCmp, expectedId) {
+    		if(!expectedId) {//only need to setTarget when running this test directly
+	   			 expectedId = expectedId || "Outer";
+	   			 var targetCmp = testCmp.find(expectedId);
+	   			 targetCmp = (targetCmp.length === undefined)?targetCmp:targetCmp[0];
+	   			 var innerCmp = targetCmp.find("Inner");
+	             this.setTargetCmp(testCmp, targetCmp, [innerCmp]);
+			}
+    		testCmp.find("logPanel").clear();
+    		// then fire an action and check after rerender
+            testCmp._target.find("Inner").find("button").getElement().click();
+            var expected = [ "InnerHelperInnerAction",
+                             "[InnerHelperInnerParam]",
+                             "InnerHelperInnerValuechange",
+                             "OuterHelperOuterValuechange", 
+                             "InnerHelperInnerValuechange",
+                             "OuterHelperOuterRerender",
+                             "InnerHelperInnerRerender"
+                             ];
+            this.assertLogs(testCmp, expected);
+    	}
+    	
+    },
+    
+    /* 
+     * componentClassOuter has componentClassInner in its markup, componentClassInner has attribute v.value
+     * we change v.value by clicking on a button in componentClassOuter
+     * these happens: 
+     * #1 valueChange event handler in componentClassInner -- this is because we pass valueOuter to Inner as v.valueInner
+     * #2 valueChange event handler in componentClassOuter
+     * #3 Re-render in componentClassOuter
+     * #4 Re-render in componentClassInner 
+     */
+    testStaticOuter_RerenderOuterCmp : {
+    	attributes : { "testOuter": true },
+    	test : function(testCmp, expectedId) {
+    		if(!expectedId) {//only need to setTarget when running this test directly
+	   			 expectedId = expectedId || "Outer";
+	   			 var targetCmp = testCmp.find(expectedId);
+	   			 targetCmp = (targetCmp.length === undefined)?targetCmp:targetCmp[0];
+	   			 var innerCmp = targetCmp.find("Inner");
+	             this.setTargetCmp(testCmp, targetCmp, [innerCmp]);
+			}
+    		testCmp.find("logPanel").clear();
+    		// then fire an action and check after rerender
+            testCmp._target.find("button").getElement().click();
+            var expected = [ "OuterHelperOuterAction",
+                             "[OuterHelperOuterParam]",
+                             "InnerHelperInnerValuechange",
+                             "OuterHelperOuterValuechange",
+                             "OuterHelperOuterRerender",
+                             "InnerHelperInnerRerender"
+                             ];
+            this.assertLogs(testCmp, expected);
+    	}
+    	
+    },
+    
+    /*
+     * componentClassOuter has componentClassInner in its markup
+     * toggle v.shouldRender, will un-Render componentClassOuter
+     * Unrender of componentClassOuter is called before Unrender of componentClassInner.
+     */
+    testStaticOuter_Unrender : {
+    	attributes : { "testOuter": true },
+    	test : function(testCmp, expectedId) {
+    		var that = this;
+    		testCmp.find("logPanel").clear();
+    		if(!expectedId) {//only need to setTarget when running this test directly
+	   			 expectedId = expectedId || "Outer";
+	   			 var targetCmp = testCmp.find(expectedId);
+	   			 targetCmp = (targetCmp.length === undefined)?targetCmp:targetCmp[0];
+	   			 var innerCmp = targetCmp.find("Inner");
+	             this.setTargetCmp(testCmp, targetCmp, [innerCmp]);
+			}
+    		// then check after unrender
+            testCmp.set("v.shouldRender", false);
+            var expected = [ "OuterHelperOuterUnrender",
+                             "InnerHelperInnerUnrender"];
+            that.assertLogs(testCmp, expected, function() {
+                // then check after render again (same as initial without provide or init)
+                testCmp.set("v.shouldRender", true);
+                var expected = [ "OuterHelperOuterRender",
+                                 "InnerHelperInnerRender",
+                                 "OuterHelperOuterAfterrender",
+                                 "InnerHelperInnerAfterrender" ];
+                this.assertLogs(testCmp, expected);
+            });
+    	}
+    },
+    
+    //put componentClassOuter in iteration and check if it behaves just like loading it alone
+    testIteratedOuter_Init : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            "testOuterInIteration": true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("OuterInIteration")[0], [testCmp.find("OuterInIteration")[0].find("Inner")]);
+            this.testStaticOuter_Init.test.call(this, testCmp, "OuterInIteration");
+        }]
+    },
+    
+    //put Parent in iteration and check if it behaves just like loading it alone
+    testIteratedOuter_Rerender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            "testOuterInIteration": true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("OuterInIteration")[0], [testCmp.find("OuterInIteration")[0].find("Inner")]);
+        	this.testStaticOuter_RerenderOuterCmp.test.call(this, testCmp, "OuterInIteration");
+        }, function(testCmp) {
+        	this.testStaticOuter_RerenderInnerCmp.test.call(this, testCmp, "OuterInIteration");
+        }]
+    },
+    
+    //put Parent in iteration and check if it behaves just like loading it alone
+    testIteratedOuter_Unrender : {
+        attributes : {
+            iterationItems : "ONE,TWO",
+            "testOuterInIteration": true
+        },
+        test : [function(testCmp) {
+            this.setTargetCmp(testCmp, testCmp.find("OuterInIteration")[0], [testCmp.find("OuterInIteration")[0].find("Inner")]);
+        	this.testStaticOuter_Unrender.test.call(this, testCmp, "OuterInIteration");
+        }]
+    },
+    /*
+     * componentClassOuter has componentClassInner in its markup
+     * we create componentClassOuter dynamically, then make sure it behaves the same as loading directly in markup
+     */
+    testClientCreatedOuter : {
+        test : [function(testCmp) {
+            var componentConfig = {
+                componentDef : "markup://auratest:componentClassOuter",
+                attributes : {
+                    values : {
+                        id : "ClientCreatedOuter"
+                    }
+                }
+            };
+           //create the component and push it to testCmp's body
+            var that = this;
+            var cmpCreated = false;
+            $A.componentService.newComponentAsync(that, function(newCmp) {
+                var output = testCmp.find("client");
+                var body = output.get("v.body");
+                body.push(newCmp);
+                output.set("v.body", body);
+                that.setTargetCmp(testCmp, newCmp, [newCmp.find("Inner")]);
+                cmpCreated = true;
+            }, componentConfig, null, true, true);
+            $A.test.addWaitFor(true, function() {
+                return cmpCreated;
+            });
+        }, function(testCmp) {
+        	this.testStaticOuter_Init.test.call(this, testCmp, "ClientCreatedOuter");
+        }, function(testCmp) {
+        	this.testStaticOuter_RerenderInnerCmp.test.call(this, testCmp, "ClientCreatedOuter");
+        },  function(testCmp) {
+        	this.testStaticOuter_RerenderOuterCmp.test.call(this, testCmp, "ClientCreatedOuter");
+        },function(testCmp) {
+        	this.testStaticOuter_Unrender.test.call(this, testCmp, "ClientCreatedOuter");
+        }]
+    },
     
 ///////////////////////////////////////   tests with componentClassChild.cmp begin   /////////////////////////////////////////
     

@@ -29,7 +29,7 @@
         connect-src 'self' http://invalid.salesforce.com; 
         report-uri /_/csp
         
-       Note: these are all positive tests, negative ones are in CSPReportLoggingTest.java
+       Note: these are all positive tests, negative ones are in CSPReportLoggingUITest.java
      */
     
     labels : ["UnAdaptableTest"],//mark as unadaptable as csp is different between aura-stand-alone and the core

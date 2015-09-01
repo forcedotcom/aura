@@ -655,9 +655,8 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
  * @export
  */
 AuraClientService.prototype.hardRefresh = function() {
-    var appCache = window.applicationCache;
-    if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) && this.isManifestPresent()) {
-        appCache.update();
+    if (window.applicationCache && this.isManifestPresent()) {
+        window.applicationCache.update();
     } else {
         location.reload(true);
     }

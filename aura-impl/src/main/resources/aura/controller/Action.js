@@ -1157,7 +1157,7 @@ Action.prototype.toJSON = function() {
     var version = this.cmp ? this.cmp.getVersion() : null;
 
     // calling component has requiredVersionDefs or component is versioned.
-    var isVersioned = (requiredVersionDefs && requiredVersionDefs.length > 0) || version;
+    var isVersioned = (requiredVersionDefs && requiredVersionDefs.values) || version;
     return {
         "id" : this.getId(),
         "descriptor" : (this.def?this.def.getDescriptor():"UNKNOWN"),

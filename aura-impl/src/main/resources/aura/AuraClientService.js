@@ -649,7 +649,12 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
 
 
 /**
- * Perform a hard refresh.
+ * Perform hard refresh
+ * 
+ * This is part of the appcache refresh, forcing a reload while
+ * avoiding the appcache which is important for system such as 
+ * Android such doesn't adhere to window.location.reload(true)
+ * and still uses appcache.
  *
  * @memberOf AuraClientService
  * @export

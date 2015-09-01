@@ -18,6 +18,7 @@ package org.auraframework.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -110,8 +112,10 @@ public class AuraServlet extends AuraBaseServlet {
     /**
      * Check for the nocache parameter and redirect as necessary.
      * 
-     * Not entirely sure what this is used for (need doco). It is part of the appcache refresh, forcing a reload while
-     * avoiding the appcache.
+     * This is part of the appcache refresh, forcing a reload while
+     * avoiding the appcache which is important for system such as 
+     * Android such doesn't adhere to window.location.reload(true)
+     * and still uses appcache.
      * 
      * It maybe should be done differently (e.g. a nonce).
      * 
@@ -121,14 +125,7 @@ public class AuraServlet extends AuraBaseServlet {
      */
     private void handleNoCacheRedirect(String nocache, HttpServletRequest request,
             HttpServletResponse response) throws IOException {
-        //
-        // FIXME:!!!
-        // This is part of the appcache refresh, forcing a reload while
-        // avoiding the appcache. It is here because (fill in the blank).
-        //
-        // This should probably be handled a little differently, maybe even
-        // before we do any checks at all.
-        //
+
         response.setContentType("text/plain");
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
         String newLocation = "/";

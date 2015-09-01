@@ -28,8 +28,6 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
         for (var key in Object) { MockObject[key] = Object[key]; }
         MockObject.prototype = Object.create(Object.prototype);
 
-        MockObject.keys = undefined;
-
         var MockFunction = function MockFunction() {};
         MockFunction.prototype = Object.create(Function.prototype);
 
@@ -263,37 +261,6 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                 } catch (e) {
                     Assert.True(e instanceof TypeError);
                     Assert.Equal("$A.util.bind called on non-function.",  e.message);
-                }
-            });
-        }
-
-        [Fact]
-        function testKeys() {
-            utilMock(MockObject, function(util) {
-                var testObjects = [{}, new function(){}, []], i;
-                for (i = 0; i < testObjects.length; i++) {
-                    testObjects[i]["hello"] = "world";
-                    testObjects[i]["goodbye"] = "cruel world";
-                }
-
-                for (i = 0; i < testObjects.length; i++) {
-                    var keys = util.keys(testObjects[i]);
-                    Assert.Equal(2, keys.length);
-                    Assert.Equal("hello", keys[0]);
-                    Assert.Equal("goodbye", keys[1]);
-                }
-            });
-        }
-
-        [Fact]
-        function testKeysError() {
-            utilMock(MockObject, function(util) {
-                try {
-                    util.keys(1);
-                    Assert.False(true, "Method should throw an error.");
-                } catch (e) {
-                    Assert.True(e instanceof TypeError);
-                    Assert.Equal("$A.util.keys called on non-object.",  e.message);
                 }
             });
         }

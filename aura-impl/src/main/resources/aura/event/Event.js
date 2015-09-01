@@ -104,7 +104,7 @@ Aura.Event.Event.prototype.setParams = function(config) {
                 if (attributeDefs[key]) {
                     this.params[key] = config[key];
                 } else {
-                    $A.warning("Event.setParams(): '" + key +"'('" + config[key] + "') is not a valid parameter. Valid parameter are '"+ $A.util.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
+                    $A.warning("Event.setParams(): '" + key +"'('" + config[key] + "') is not a valid parameter. Valid parameters are '"+ Object.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
                 }
             }
         }
@@ -126,7 +126,7 @@ Aura.Event.Event.prototype.setParam = function(key, value) {
     if (this.eventDef.getAttributeDefs()[key]) {
         this.params[key] = value;
     } else {
-        $A.warning("Event.setParam(): '"+key+"' is not a valid property. Valid properties are '" + $A.util.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
+        $A.warning("Event.setParam(): '"+key+"' is not a valid parameter. Valid parameters are '" + Object.keys(this.eventDef.getAttributeDefs()).join("', '") + "'");
     }
 };
 

@@ -53,7 +53,7 @@
     testHasAttrWithExtraPassInParameter:{
         test:[ 
             function(cmp){
-            	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameter are 'name', 'arguments'");
+            	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameters are 'name', 'arguments'");
             	var cmpME = cmp.find("auraMethod");
             	cmpME.hasAttr("pass in string","second pass in string");
             	var res = cmpME.get("v.outputStringAttr");
@@ -202,7 +202,7 @@
     testHasAttrWithExtraPassInParameter_Child:{
         test:[ 
             function(cmp){
-            	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameter are 'name', 'arguments'");
+            	$A.test.expectAuraWarning("'argument_1'('second pass in string') is not a valid parameter. Valid parameters are 'name', 'arguments'");
             	var cmpME = cmp.find("auraMethodChild");
             	cmpME.hasAttr("pass in string","second pass in string");
             	var res = cmpME.get("v.outputStringAttr");

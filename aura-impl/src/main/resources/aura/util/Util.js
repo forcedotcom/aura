@@ -1580,49 +1580,6 @@ if (Function.prototype.bind) {
 Aura.Utils.Util.prototype.bind = Aura.Utils.Util.bind;
 
 /**
- * Returns the map's keys as an array.
- * @param {Object} map to extract keys from.
- * @returns {Array} of key {String}s.
- */
-if (Object && Object.keys) {
-    Aura.Utils.Util.keys = function(object, excludeFunctions) {
-        var allKeys = Object.keys(object);
-        var keys = [];
-        for (var n = 0; n < allKeys.length; n++) {
-            var key = allKeys[n];
-            if (!excludeFunctions || typeof (object[key]) !== "function") {
-                keys.push(key);
-            }
-        }
-
-        return keys;
-    };
-} else {
-    Aura.Utils.Util.keys = function(object, excludeFunctions) {
-        var util = this instanceof Aura.Utils.Util ? this : new Aura.Utils.Util();
-
-        var isAnyObjectType = !util.isObject(object)
-            && !util.isFunction(object)
-            && !util.isArray(object);
-
-        if (isAnyObjectType) {
-            throw new TypeError("$A.util.keys called on non-object.");
-        }
-
-        var keys = [], key;
-        for (key in object) {
-            if (Object.prototype.hasOwnProperty.call(object, key) && (!excludeFunctions || typeof (object[key]) !== "function")) {
-                keys.push(key);
-            }
-        }
-        return keys;
-    };
-}
-
-/** @export */
-Aura.Utils.Util.prototype.keys = Aura.Utils.Util.keys;
-
-/**
  * Performs a series of 'safe' sequential lookup of nested properies.
  *
  * Example: a safe lookup for "VALUE" in: object: {

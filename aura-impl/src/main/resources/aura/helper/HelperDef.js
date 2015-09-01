@@ -29,11 +29,11 @@ function HelperDef(componentDef, libraries){
     }
 
     if (libraries) {
-        $A.util.forEach($A.util.keys(libraries), function(importName) {
+        $A.util.forEach(Object.keys(libraries), function(importName) {
             var definition = libraries[importName];
             functions.constructor.prototype[importName] = {};
 
-            $A.util.forEach($A.util.keys(definition || []), function(key) {
+            $A.util.forEach(Object.keys(definition || []), function(key) {
                 functions.constructor.prototype[importName][key] = definition[key];
             });
         });

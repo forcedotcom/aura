@@ -39,8 +39,6 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
         for (var key in Object) { MockObject[key] = Object[key]; }
         MockObject.prototype = Object.create(Object.prototype);
 
-        MockObject.keys = function() {throw "KEYS";};
-
         var MockFunction = function MockFunction() {};
         MockFunction.prototype = Object.create(Function.prototype);
 
@@ -177,18 +175,6 @@ Test.Aura.Util.BrowserSupportedUtilTest = function() {
                     Assert.False(true, "default call should have raised an exception!");
                 } catch (e) {
                     Assert.Equal("BIND", e);
-                }
-            });
-        }
-
-        [Fact]
-        function testKeys() {
-            utilMock(MockObject, function(util){
-                try {
-                    var actual = util.keys({});
-                    Assert.False(true, "default call should have raised an exception!");
-                } catch (e) {
-                    Assert.Equal("KEYS", e);
                 }
             });
         }

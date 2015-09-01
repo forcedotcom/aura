@@ -30,6 +30,8 @@
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
     <aura:attribute name="onsortchange" type="Aura.Action"/>
 	
+	<aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels."/>
+	
 	<aura:attribute name="outputComponent" 
 					type="Aura.ComponentDefRef[]" 
 					description="Used by cells to override render output. Default value is wired to item's name field.">
@@ -43,7 +45,8 @@
 	<!-- Currently works only for output components -->
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
-	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }">
+	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }"
+						   style="{! (v.width gt 0) ? 'min-width:' + v.width + 'px; max-width:' + v.width + 'px;' : ''}">
 		
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">

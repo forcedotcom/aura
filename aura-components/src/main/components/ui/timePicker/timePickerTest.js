@@ -361,4 +361,4 @@
             $A.test.assertEquals("01", "" + minutes, "The item in the minutes textbox was not correctly converted");
         }]
     }
-})// eslint-disable-line semi
+})

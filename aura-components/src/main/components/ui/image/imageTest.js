@@ -163,4 +163,4 @@
             $A.test.assertEquals("Help Accessibility", imgElement.alt, "Expected alt text for the image element.");
         }
     }
-})// eslint-disable-line semi
+})

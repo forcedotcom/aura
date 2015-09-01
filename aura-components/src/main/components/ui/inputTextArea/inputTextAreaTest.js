@@ -111,4 +111,4 @@
         	}
         }
     }
-})// eslint-disable-line semi
+})

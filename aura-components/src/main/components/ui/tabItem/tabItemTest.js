@@ -38,4 +38,4 @@
         var img = anchor.getElementsByTagName(elementName)[0];
         $A.test.assertNotUndefinedOrNull(img, text);  
     }
-})// eslint-disable-line semi
+})

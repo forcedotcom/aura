@@ -71,4 +71,4 @@
      	   $A.test.assertEquals("$1,234.0000", value, "Element value does not equal expected");
         }
     }
-})// eslint-disable-line semi
+})

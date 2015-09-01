@@ -33,4 +33,4 @@
             aura.test.assertEquals('holy guacamole!', $A.test.getText(component.find('span').getElement()), "Select text not correct");
         }
     }
-})// eslint-disable-line semi
+})

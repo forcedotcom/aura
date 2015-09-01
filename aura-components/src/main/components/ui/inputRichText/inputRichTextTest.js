@@ -367,4 +367,4 @@
     			button + " button in toolbar should NOT be present");
     	}
     }
-})// eslint-disable-line semi
+})

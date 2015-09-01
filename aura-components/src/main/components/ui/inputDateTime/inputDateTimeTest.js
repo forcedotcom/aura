@@ -378,4 +378,4 @@
 	isViewDesktop : function(){
 		return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
 	}
-})// eslint-disable-line semi
+})

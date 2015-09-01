@@ -217,4 +217,4 @@
       }
     }
 
-})// eslint-disable-line semi
+})

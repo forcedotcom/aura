@@ -38,4 +38,4 @@
 			$A.test.assertTrue($A.util.isUndefinedOrNull(nav,'Navigation indicators should not be displayed'));
 		}
 	}
-})// eslint-disable-line semi
+})

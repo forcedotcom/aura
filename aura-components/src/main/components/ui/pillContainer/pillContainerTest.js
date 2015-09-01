@@ -30,4 +30,4 @@
     		);
         }]
     }
-})// eslint-disable-line semi
+})

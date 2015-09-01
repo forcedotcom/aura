@@ -274,4 +274,4 @@
             aura.test.assertEquals('GBP1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     }
-})// eslint-disable-line semi
+})

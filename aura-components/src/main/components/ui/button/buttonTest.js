@@ -150,4 +150,4 @@
         }
     }
 
-})// eslint-disable-line semi
+})

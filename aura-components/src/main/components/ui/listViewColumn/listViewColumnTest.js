@@ -176,4 +176,4 @@
             }
         };
     }
-})// eslint-disable-line semi
+})

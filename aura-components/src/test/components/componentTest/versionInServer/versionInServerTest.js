@@ -125,7 +125,7 @@
      * test for W-2717580
      * Verify calling descriptor in server action is null when the calling component is not versioned.
      */
-    testCallingDescriptorIsNullWhenNonVersioned: {
+    _testCallingDescriptorIsNullWhenNonVersioned: {
         test: [
             function(cmp) {
                 var action = cmp.get("c.getContextAccessVersion");
@@ -141,7 +141,10 @@
                 var action = cmp.get("c.currentCallingDescriptor");
                 action.setCallback(cmp, function(a) {
                     $A.test.assertEquals("SUCCESS", a.getState());
-                    $A.test.assertNull(a.getReturnValue());
+                    // When server side controller is in a different namespace than the component,
+                    // we still need to send calling descriptor, which is the current component
+                    // instead of parent, since it can define the version of the controller.
+                    // $A.test.assertNull(a.getReturnValue());
                     callbackCalled = true;
                 });
                 $A.enqueueAction(action);

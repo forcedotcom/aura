@@ -394,8 +394,9 @@ public class BaseAutoComplete extends WebDriverTestCase {
 
     /**
      * Test editing value to new value works.
+     * disable due to flapper : W-2741411
      */
-    public void testAutocompleteEditSelectedValue() throws Exception {
+    public void _testAutocompleteEditSelectedValue() throws Exception {
         doTestSelectOption(AUTOCOMPLETE_COMPONENT.get("Generic"), OptionType.AUTOCOMPLETE_OPTION);
         WebDriver driver = getDriver();
         WebElement input = getAutoCompleteInput(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));

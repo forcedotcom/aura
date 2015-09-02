@@ -27,7 +27,7 @@
 	<ui:button aura:id="fireDP" label="Fire datagrid's provide" press="{!c.replaceData}"/>
 	<ui:button aura:id="refreshGrid" label="Refresh" press="{!c.refreshData}"/><br/> 
     <ui:inputText aura:id="index" label="index" labelPosition="hidden" placeholder="index" value="{!v.index}"/>
-    <ui:inputText aura:id="index" label="count" labelPosition="hidden" placeholder="count" value="{!v.count}"/>
+    <ui:inputText aura:id="count" label="count" labelPosition="hidden" placeholder="count" value="{!v.count}"/>
     <ui:button aura:id="addRow" label="Add row" press="{!c.handleAddRow}"/>
     <ui:button aura:id="insert" label="Insert" press="{!c.handleInsert}"/>
     <ui:button aura:id="remove" label="Remove" press="{!c.handleRemove}"/><br/>

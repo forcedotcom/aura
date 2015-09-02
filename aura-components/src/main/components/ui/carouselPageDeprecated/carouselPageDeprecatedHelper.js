@@ -75,7 +75,7 @@
 
 		if (!cmp.get('v.priv_continuousFlow')) {
 			var snap = cmp.get('v.priv_snap');
-			if (snap && snap.indexOf('.') != -1) {
+			if (snap && snap.indexOf('.') !== -1) {
 				cmp.set('v.priv_snap', snap.substring(snap.indexOf('.') + 1));
 			}
 		}
@@ -86,7 +86,7 @@
 			isVisible = $A.util.getBooleanValue(cmp.get('v.priv_visible')),
 			hiddenClass = 'hidden';
 
-		if (pageIndex == curPage && !isVisible) {
+		if (pageIndex === curPage && !isVisible) {
             if(cmp.getElement()) {
                 $A.util.removeClass(cmp.getElement(), hiddenClass);
                 cmp.getElement().setAttribute('aria-expanded', 'true');
@@ -101,7 +101,7 @@
 			isVisible = $A.util.getBooleanValue(cmp.get('v.priv_visible')),
 			hiddenClass = 'hidden';
 
-		if (pageIndex == curPage && isVisible) {
+		if (pageIndex === curPage && isVisible) {
 			$A.util.addClass(cmp.getElement(), hiddenClass);
 			cmp.getElement().setAttribute('aria-expanded', 'false');
 			cmp.set('v.priv_visible', false);

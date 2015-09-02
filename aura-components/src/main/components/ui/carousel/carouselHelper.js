@@ -24,7 +24,7 @@
     /*
      * Carousel Plugin (will be injected into the Scroller overriding and extending functionality)
      */
-    _buildCarouselPlugin : function (cmp) {
+    _buildCarouselPlugin : function () {
         return {
             init: function () {
                 this.opts.carouselTransitionTime = this.opts.carouselTransitionTime || 300;
@@ -138,7 +138,7 @@
                 var dest = this._calculateScrollByPage(pageIndex, force);
                 this.scrollTo(dest.x, dest.y, this.opts.carouselTransitionTime);
             },
-            getActivePage: function (pageIndex) {
+            getActivePage: function () {
                 return this._activePage;
             },
             /**

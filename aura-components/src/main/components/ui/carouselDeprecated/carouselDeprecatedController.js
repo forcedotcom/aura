@@ -39,7 +39,7 @@
     /**
      * Handle scroller refreshed event
      */
-    onScrollerRefreshed: function(cmp, evt, helper) {       
+    onScrollerRefreshed: function(cmp) {       
         //fire selectDefaultPage only after the the scroller has initialized and ready
         var e = cmp.getEvent("selectDefaultPage");
         e.fire();       
@@ -75,7 +75,9 @@
         
         helper.handlePagerClicked(cmp, pageIndex);
         
-        if (evt.preventDefault) evt.preventDefault();
+        if (evt.preventDefault) {
+        	evt.preventDefault();
+        }
     },
 
     /**

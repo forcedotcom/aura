@@ -22,7 +22,7 @@
     getInputElement: function (cmp) {
         var el = cmp.getElement();
 
-        if (el.tagName.toLowerCase() != 'input') {
+        if (el.tagName.toLowerCase() !== 'input') {
         	el = el.getElementsByTagName('input')[0] ||  el.getElementsByTagName('button')[0] || el;
         }
         

@@ -27,7 +27,7 @@
         component._delay = (function(){
             var timer = 0;
             return function(callback, ms){
-                clearTimeout (timer);
+                clearTimeout(timer);
                 timer = setTimeout(callback, ms);
             };
         })();
@@ -37,7 +37,7 @@
         helper.fetchData(component, event);
     },
     
-    fireEventsFromInput: function(component, event, helper) {
+    fireEventsFromInput: function(component, event) {
         var e = component.getEvent(event.getName());
         if (e) {
         	e.setParams(event.getParams());
@@ -87,7 +87,7 @@
         helper.fireEvent(component, domEvent, helper);
     },
     
-    handleMatchDone: function(component, event, helper) {
+    handleMatchDone: function(component, event) {
         var evt = component.get("e.matchDone");
         if (evt) {
             evt.setParams({
@@ -97,7 +97,7 @@
         }
     },
     
-    handleSelectOption: function(component, event, helper) {
+    handleSelectOption: function(component, event) {
         var optionSelectEvt = component.get("e.selectListOption");
         optionSelectEvt.setParams({
             option: event.getParam("option")
@@ -105,7 +105,7 @@
         optionSelectEvt.fire();
     },
     
-    matchText: function(component, event, helper) {
+    matchText: function(component, event) {
         var listCmp = component.find("list");
         if (listCmp) {
             listCmp.set("v.keyword", event.getParam("keyword"));
@@ -117,7 +117,7 @@
         helper.updateAriaAttributes(component, event);
     },
 
-    handleListExpand: function(component, event, helper) {
+    handleListExpand: function(component, event) {
         var usePanel = component.get('v.usePanel');
         var panel = component.find('panel');
         var zIndex;

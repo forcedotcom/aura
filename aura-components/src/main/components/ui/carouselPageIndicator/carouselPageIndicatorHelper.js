@@ -24,7 +24,7 @@
             e,
             pageItems = cmp.find('indicatorItems');
         
-        if (pages && pages.length > 1 && targetPage < pages.length && targetPage >= 0 && typeof currentPage != 'undefined') {
+        if (pages && pages.length > 1 && targetPage < pages.length && targetPage >= 0 && typeof currentPage !== 'undefined') {
             //fire event to previous selected indicator item
             e = pageItems[currentPage].get("e.pageSelected");
             e.setParams(evt.getParams());

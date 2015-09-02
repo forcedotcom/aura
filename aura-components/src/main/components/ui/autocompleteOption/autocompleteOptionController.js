@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 ({
-	init: function(component, event, helper) {
+	init: function(component) {
 		var concreteId = component.getConcreteComponent().getGlobalId();
 		
 		component.set("v.domId", concreteId);
 	},
 	
-    handleMouseover: function(component, event, helper) {
+    handleMouseover: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.handleMouseover(concreteCmp);
     },
     
-    handleMouseout: function(component, event, helper) {
+    handleMouseout: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.handleMouseout(concreteCmp);

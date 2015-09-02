@@ -24,7 +24,7 @@
     /**
      * Handle clicking event from the indicator
      */
-    clickHandler: function (cmp, evt, helper) {    	
+    clickHandler: function (cmp, evt) {    	
         var compEvent = cmp.getEvent("pagerClicked");        
         compEvent.setParams(evt.getParams());
         compEvent.fire();
@@ -33,7 +33,7 @@
     /**
      * Handle key event from the indicator
      */
-    keyHandler: function (cmp, evt, helper) {    	
+    keyHandler: function (cmp, evt) {    	
         var compEvent = cmp.getEvent("pagerKeyed");        
         compEvent.setParams(evt.getParams());
         compEvent.fire();        

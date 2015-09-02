@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	handleClick: function (cmp, evt) {
+	handleClick: function (cmp) {
 		cmp.set("v.value", cmp.find('cb').get("v.value"));
-	},
+	}
 })// eslint-disable-line semi

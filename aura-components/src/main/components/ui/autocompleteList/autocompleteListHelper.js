@@ -76,8 +76,8 @@
         
         if (next < 0) { // If no visible is found below the current highlighted,  let's start from top.
             for (var j = 0; j < k; j++) {
-                var optionCmp = iters[j];
-                if (optionCmp.get("v.visible") === true) {
+                var optCmp = iters[j];
+                if (optCmp.get("v.visible") === true) {
                     next = j;
                     break;
                 }
@@ -89,13 +89,14 @@
     getOnClickEndFunction : function(component) {
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             var helper = this;
+            var i;
             var f = function(event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var clickEndEvent;
 
                 if (helper.getOnClickEventProp("isTouchDevice")) {
                     var touchIdFound = false;
-                    for (var i = 0; i < event.changedTouches.length; i++) {
+                    for (i = 0; i < event.changedTouches.length; i++) {
                         clickEndEvent = event.changedTouches[i];
                         if (clickEndEvent.identifier === component._onStartId) {
                             touchIdFound = true;
@@ -122,7 +123,7 @@
                 var clickOutside = true;
                 if (listElems) {
                     var ret = true;
-                    for (var i = 0; ret; i++) {
+                    for (i = 0; ret; i++) {
                         ret = listElems[i];
                         if (ret && helper.isHTMLElement(ret) && $A.util.contains(ret, event.target)) {
                             clickOutside = false;
@@ -206,8 +207,8 @@
         }
         if (prev >= iters.length) { // If no visible is found above the current highlighted,  let's start from bottom.
             for (var j = iters.length - 1; j > k; j--) {
-                var optionCmp = iters[j];
-                if (optionCmp.get("v.visible") === true) {
+                var optCmp = iters[j];
+                if (optCmp.get("v.visible") === true) {
                     prev = j;
                     break;
                 }
@@ -227,22 +228,22 @@
         this.matchText(concreteCmp, event.getParam("data"));
     },
 
-    handleEsckeydown: function(component, event) {
+    handleEsckeydown: function(component) {
         component.set("v.visible", false);
     },
 
     handleKeydown: function(component, event) {
         var keyCode = event.keyCode;
-        if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
+        if (keyCode === 39 || keyCode === 40) {  // right or down arrow key
             event.preventDefault();
             this.setFocusToNextItem(component, event);
-        } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
+        } else if (keyCode === 37 || keyCode === 38) {  // left or up arrow key
             event.preventDefault();
             this.setFocusToPreviousItem(component, event);
-        } else if (event.keyCode === 27) {  // Esc key
+        } else if (keyCode === 27) {  // Esc key
             event.stopPropagation();
             this.handleEsckeydown(component, event);
-        } else if (event.keyCode === 9) {  // tab key: dismiss the list
+        } else if (keyCode === 9) {  // tab key: dismiss the list
             this.handleTabkeydown(component, event);
         }
     },
@@ -261,7 +262,7 @@
                 activeIndex = highlightedIndex < 0 ? this.getNextVisibleOption(iters, -1)
                                                    : this.getNextVisibleOption(iters, highlightedIndex);
             }
-            if (activeIndex >= 0 && activeIndex < iters.length && activeIndex != highlightedIndex) {
+            if (activeIndex >= 0 && activeIndex < iters.length && activeIndex !== highlightedIndex) {
                 if (highlightedIndex >= 0) {
                     iters[highlightedIndex].set("v.highlighted", false);
                 }
@@ -281,7 +282,7 @@
         }
     },
 
-    handlePressOnHighlighted: function(component, event) {
+    handlePressOnHighlighted: function(component) {
         var iterCmp = component.find("iter");
         if (iterCmp) {
             var iters = iterCmp.get("v.body");
@@ -297,7 +298,7 @@
         }
     },
 
-    handleTabkeydown: function(component, event) {
+    handleTabkeydown: function(component) {
         component.set("v.visible", false);
     },
     

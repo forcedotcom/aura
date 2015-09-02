@@ -23,7 +23,7 @@
     		hlp.loadComponent(cmp);
     	}
     },
-    handleShowMore: function (component, scrollerCallback, helper) {
+    handleShowMore: function (component, scrollerCallback) {
     	var contentCmp        = component.get('v.body')[0],
     		canHandleShowMore = contentCmp.isInstanceOf("ui:handlesShowMore"), 
 			canShowMore       = canHandleShowMore && !!contentCmp.get('e.showMore'),
@@ -36,7 +36,7 @@
     		scrollerCallback({labelError: 'Nothing to show.'});
     	}
     },
-    handleNoMoreContent: function (component, event, helper) {
+    handleNoMoreContent: function (component) {
         component.find('scroller').set('v.canShowMore', false);
     }
 })// eslint-disable-line semi

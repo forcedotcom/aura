@@ -124,7 +124,7 @@
                     collector[index]=itemComponents;
                     if(++currentCall===expectedCalls){
                         var components=[];
-                        var i = 0;
+                        var i;
                         for(i=0;i<collector.length;i++){
                             components=components.concat(collector[i]);
                         }

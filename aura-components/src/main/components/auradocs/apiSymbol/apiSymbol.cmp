@@ -53,7 +53,7 @@
         <p><aura:unescapedHtml value="{!v.symbol.classDesc + v.symbol.description}"/></p>
         <aura:if isTrue="{! !empty(v.symbol.deprecated)}">
             <p>
-                <ui:stamp severity="inverse">DEPRECATED</ui:stamp>&nbsp;<aura:unescapedHtml value="{!v.symbol.deprecated}"/>
+                <ui:stamp severity="inverse">DEPRECATED</ui:stamp>&nbsp;<ui:outputRichText value="{!v.symbol.deprecated}"/>
             </p>
         </aura:if>
         <aura:if isTrue="{!v.symbol.params.length > 0}">

@@ -649,17 +649,63 @@ AuraClientService.prototype.releaseXHR = function(auraXHR) {
 
 
 /**
- * Perform a hard refresh.
+ * Perform hard refresh
+ * 
+ * This is part of the appcache refresh, forcing a reload while
+ * avoiding the appcache which is important for system such as 
+ * Android such doesn't adhere to window.location.reload(true)
+ * and still uses appcache.
  *
  * @memberOf AuraClientService
  * @export
  */
 AuraClientService.prototype.hardRefresh = function() {
-    var appCache = window.applicationCache;
-    if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING) && this.isManifestPresent()) {
-        appCache.update();
-    } else {
+    var url = location.href;
+    if (!this.isManifestPresent() || url.indexOf("?nocache=") > -1) {
         location.reload(true);
+        return;
+    }
+
+    // if BB10 and using application cache
+    if (this.isBB10() && window.applicationCache
+        && window.applicationCache.status !== window.applicationCache.UNCACHED) {
+        url = location.protocol + "//" + location.host + location.pathname + "?b=" + Date.now();
+    }
+
+    // replace encoding of spaces (%20) with encoding of '+' (%2b) so that when request.getParameter is called in the server, it will decode back to '+'.
+    var params = "?nocache=" + encodeURIComponent(url).replace(/\%20/g,"%2b");
+    // insert nocache param here for hard refresh
+    var hIndex = url.indexOf("#");
+    var qIndex = url.indexOf("?");
+    var cutIndex = -1;
+    if (hIndex > -1 && qIndex > -1) {
+        cutIndex = (hIndex < qIndex) ? hIndex : qIndex;
+    } else if (hIndex > -1) {
+        cutIndex = hIndex;
+    } else if (qIndex > -1) {
+        cutIndex = qIndex;
+    }
+
+    if (cutIndex > -1) {
+        url = url.substring(0, cutIndex);
+    }
+
+
+    var sIndex = url.lastIndexOf("/");
+    var appName = url.substring(sIndex+1,url.length);
+    var newUrl = appName + params;
+    //use history.pushState to change the url of current page without actually loading it.
+    //AuraServlet will force the reload when GET request with current url contains '?nocache=someUrl'
+    //after reload, someUrl will become the current url.
+    //state is null: don't need to track the state with popstate
+    //title is null: don't want to set the page title.
+    history.pushState(null,null,newUrl);
+
+    //fallback to old way : set location.href will trigger the reload right away
+    //we need this because when AuraResourceServlet's GET request with a 'error' cookie,
+    //AuraServlet doesn't get to do the GET reqeust
+    if( (location.href).indexOf("?nocache=") > -1 ) {
+        location.href = (url + params);
     }
 };
 
@@ -717,6 +763,9 @@ AuraClientService.prototype.handleAppCache = function() {
          * BB10 triggers appcache ERROR when the current manifest is a 404.
          * Other browsers triggers OBSOLETE and we refresh the page to get
          * the new manifest.
+         *
+         * For BB10, we append cache busting param to url to force BB10 browser
+         * not to use cached HTML via hardRefresh
          */
         if (acs.isBB10()) {
             acs.hardRefresh();

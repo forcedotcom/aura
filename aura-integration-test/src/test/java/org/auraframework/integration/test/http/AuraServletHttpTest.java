@@ -16,23 +16,37 @@
 package org.auraframework.integration.test.http;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-import org.apache.http.*;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.util.EntityUtils;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ContentSecurityPolicy;
 import org.auraframework.adapter.DefaultContentSecurityPolicy;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.adapter.MockConfigAdapter;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraHttpTestCase;
-import org.auraframework.util.json.*;
+import org.auraframework.util.json.JsFunction;
+import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.ServiceLocatorMocker;
@@ -282,6 +296,117 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
         assertEquals(JsFunction.class, f.getClass());
         assertEquals("try{$A.clientService.setOutdated()}catch(e){$L.clientService.setOutdated()}",
                 ((JsFunction) f).getBody());
+    }
+
+    private void assertNoCacheRequest(String inputUrl, String expectedRedirect) throws Exception {
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+
+        assertEquals(HttpStatus.SC_MOVED_TEMPORARILY, getStatusCode(response));
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+        assertTrue("Location is not absolute (but should be by spec): " + location,
+                location.matches("^https?://[a-zA-Z0-9_\\-.]*:[0-9]*(/.*)?$"));
+        int index = location.indexOf(':');
+        index = location.indexOf(':', index + 1) + 1; // find the port-separating colon
+        while (location.charAt(index) >= '0' && location.charAt(index) <= '9') {
+            index++;
+        }
+        assertEquals("Wrong URI path", expectedRedirect, location.substring(index));
+        assertEquals("no-cache, no-store", response.getFirstHeader(HttpHeaders.CACHE_CONTROL).getValue());
+        assertEquals("no-cache", response.getFirstHeader(HttpHeaders.PRAGMA).getValue());
+        assertDefaultAntiClickjacking(response, false, false); // Redirects don't have XFO/CSP guarding
+    }
+
+    /**
+     * nocache in the request will redirect to the input url (minus the protocol and host)
+     */
+    public void testNoCache() throws Exception {
+        assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8")),
+                "/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam");
+    }
+
+    /**
+     * This handles a Chrome (or maybe WebKit) bug where a Location semi-correctly beginning with a double or more slash
+     * is taken as a hostname (i.e. as if it were http: + the location),
+     *
+     */
+    public void testNoCacheDoubleSlash() throws Exception {
+        assertNoCacheRequest(String.format("/aura?aura.tag&nocache=%s",
+                URLEncoder.encode("http://any.host//www.badnews.com", "UTF-8")),
+                "//www.badnews.com");
+        assertNoCacheRequest("/aura?aura.tag&nocache=/", "/");
+    }
+
+    public void testNoCacheNoFragment() throws Exception {
+        assertNoCacheRequest(
+                String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode("http://any.host/m?chatter", "UTF-8")),
+                "/m?chatter");
+    }
+
+    public void testNoCacheNoQuery() throws Exception {
+        assertNoCacheRequest(
+                String.format("/aura?aura.tag&nocache=%s",
+                        URLEncoder.encode("http://any.host/m#someid?param=extra", "UTF-8")), "/m#someid?param=extra");
+    }
+
+    public void testNoCacheNoTag() throws Exception {
+        HttpGet get = obtainGetMethod("/aura?aura.tag&nocache");
+        HttpResponse response = perform(get);
+
+        assertEquals(HttpStatus.SC_OK, getStatusCode(response));
+        String responseText = getResponseBody(response);
+        assertTrue("Expected tag error in: " + responseText,
+                responseText.contains("Invalid request, tag must not be empty"));
+        get.releaseConnection();
+    }
+
+    /**
+     * Verify https is preserved in the nocache redirect
+     */
+    public void testNoCacheHttpsRedirect() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "https://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        assertTrue("Location should start with https but was: " + location, location.startsWith("https:"));
+    }
+
+    /**
+     * Verify http is preserved in the nocache redirect
+     */
+    public void testNoCacheHttpRedirect() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?aura.mode=PROD&aura.format=HTML#someidinhere?has=someparam", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        assertTrue("Location should start with http but was: " + location, location.startsWith("http:"));
+    }
+
+    /**
+     * Verify http redirect URL with plus can be correctly decoded
+     */
+    public void testRedirectUrlWithPlus() throws Exception {
+        String inputUrl = String.format("/aura?aura.tag&nocache=%s", URLEncoder.encode(
+                "http://any.host/m?foo=bar+bar", "UTF-8"));
+        HttpGet get = obtainGetMethod(inputUrl, false);
+        HttpResponse response = perform(get);
+        EntityUtils.consume(response.getEntity());
+        get.releaseConnection();
+        String location = response.getFirstHeader(HttpHeaders.LOCATION).getValue();
+
+        String actual = location.substring(location.indexOf('?') + 1);
+        assertEquals("foo=bar+bar", actual);
     }
 
     public void testHTMLTemplateCaching() throws Exception {

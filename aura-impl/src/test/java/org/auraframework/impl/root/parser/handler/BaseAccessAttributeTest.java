@@ -337,8 +337,7 @@ public abstract class BaseAccessAttributeTest extends AuraImplTestCase {
                     getResourceSource(), getDefDescriptorName(),
                     (testNamespace == TestNamespace.System? true: false));
             Source<D> source = StringSourceLoader.getInstance().getSource(descriptor);
-            @SuppressWarnings("unchecked")
-            Parser<D> parser = (Parser<D>)ParserFactory.getParser(Format.XML, descriptor.getDefType());
+            Parser<D> parser = ParserFactory.getParser(Format.XML, descriptor);
             Definition def = parser.parse(descriptor, source);
             def.validateDefinition();
             //def.validateReferences();

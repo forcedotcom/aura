@@ -13,31 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.impl.clientlibrary.handler;
+package org.auraframework.impl.javascript.parser;
 
+import org.auraframework.def.RendererDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ResourceDef;
-import org.auraframework.impl.clientlibrary.ResourceDefImpl;
+import org.auraframework.impl.javascript.parser.handler.JavascriptRendererDefHandler;
+import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-/**
- * ResourceDef handler.
- */
-public class ResourceDefHandler {
-
-    private ResourceDefImpl.Builder builder = new ResourceDefImpl.Builder();
-
-    public ResourceDefHandler(DefDescriptor<ResourceDef> descriptor, Source<ResourceDef> source) {
-
-        this.builder.setDescriptor(descriptor);
-        this.builder.setLocation(source.getSystemId(), source.getLastModified());
-        this.builder.setOwnHash(source.getHash());
-
-        this.builder.setSource(source);
-    }
-
-    public ResourceDef createDefinition() throws QuickFixException {
-        return builder.build();
+public class JavascriptRendererParser implements Parser<RendererDef> {
+    @Override
+    public RendererDef parse(DefDescriptor<RendererDef> descriptor, Source<RendererDef> source)
+            throws QuickFixException {
+        return new JavascriptRendererDefHandler(descriptor, source).getDefinition();
     }
 }

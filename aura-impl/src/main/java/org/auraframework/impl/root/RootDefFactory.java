@@ -51,7 +51,6 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
         this.sourceFactory = sourceFactory;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public RootDefinition getDef(DefDescriptor<RootDefinition> descriptor) throws QuickFixException {
 
@@ -69,7 +68,7 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
 
         descriptor = source.getDescriptor();
 
-        Parser<RootDefinition> parser = (Parser<RootDefinition>)ParserFactory.getParser(source.getFormat(), descriptor.getDefType());
+        Parser<RootDefinition> parser = ParserFactory.getParser(source.getFormat(), descriptor);
         def = parser.parse(descriptor, source);
         return def;
     }

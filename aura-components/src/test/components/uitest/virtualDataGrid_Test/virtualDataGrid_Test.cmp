@@ -17,7 +17,21 @@
 -->
 <aura:component>
 	<aura:attribute name="testFixedHeader" type="Boolean" default="false"/>
+	<aura:attribute name="pageSize" type="Integer" default="10"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"/>
+    <aura:attribute name="totalPages" type="Integer" default="5"/>
+    <aura:attribute name="sortBy" type="String"/>
+    <aura:attribute name="index" type="Integer"/>
+    <aura:attribute name="count" type="Integer"/>
 	
+	<ui:button aura:id="fireDP" label="Fire datagrid's provide" press="{!c.replaceData}"/>
+	<ui:button aura:id="refreshGrid" label="Refresh" press="{!c.refreshData}"/><br/> 
+    <ui:inputText aura:id="index" label="index" labelPosition="hidden" placeholder="index" value="{!v.index}"/>
+    <ui:inputText aura:id="index" label="count" labelPosition="hidden" placeholder="count" value="{!v.count}"/>
+    <ui:button aura:id="addRow" label="Add row" press="{!c.handleAddRow}"/>
+    <ui:button aura:id="insert" label="Insert" press="{!c.handleInsert}"/>
+    <ui:button aura:id="remove" label="Remove" press="{!c.handleRemove}"/><br/>
+    
     <ui:virtualDataGrid aura:id="grid" fixedHeader="{!v.testFixedHeader}">      
         <aura:set attribute="headerColumns">
             <ui:dataGridColumn name="Name"    label="Name"/>
@@ -32,7 +46,13 @@
         </aura:set>
 
         <aura:set attribute="dataModel">
-            <uitest:virtualDataGridProvider_Test/>
+            <uitest:virtualDataGridProvider_Test 
+            	aura:id="provider"
+            	sortBy="{!v.sortBy}"
+            	pageSize="{!v.pageSize}"
+                currentPage="{!v.currentPage}"
+                totalPages="{!v.totalPages}"
+                totalItems="{!v.totalItems}"/>
         </aura:set>
     </ui:virtualDataGrid>
 

@@ -17,7 +17,23 @@
     init: function (cmp, event, helper) {
     	console.log('init');
     },
-    provide: function (cmp, event, helper) {
-    	console.log('provide');
+    
+    provide: function (cmp, evt, helper) {
+        var currentPage = cmp.get('v.currentPage'),
+            pageSize = cmp.get('v.pageSize'),
+            items = [],
+            tmpId;
+        
+        for (var i = 1; i <= pageSize; i++) {
+        	tmpId = ((currentPage * pageSize) + i);
+            items.push({
+                id : tmpId,
+                name : 'John Doe ' + tmpId, 
+                phone : '555-' + tmpId,
+                balance : '$' + tmpId
+            });
+        }
+        
+        this.fireDataChangeEvent(cmp, items);
     }
 })

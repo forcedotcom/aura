@@ -435,6 +435,42 @@
 			
 			}
 		}	
+	},
+	
+	testStickiness : {
+		test : [
+		        	//checking tooltips whose advanced attribute is true
+		        	//when advanced is false, we need to hover over the tooltip to display it
+					function(component) {
+						var triggers = ["bodyhtmlimgtag", "triggerhoverlabel"];
+						var tooltips = ["bodyhtmlimg", "triggerhover"];
+						
+						for(var i = 0; i < tooltips.length; i++) {
+							this.openOrCloseTT(component, triggers[i], tooltips[i], "open");
+						}
+					},
+					function(component) {
+						var triggers = ["bodyhtmlimgtag", "triggerhoverlabel"];
+						var tooltips = ["bodyhtmlimg", "triggerhover"];
+						
+						for(var i = 0; i < tooltips.length; i++) {
+							this.openOrCloseTT(component, triggers[i], tooltips[i], "close");
+						}
+					}
+				]
+	},
+	
+	openOrCloseTT : function(component, ttLabel, tooltip, action) {
+		var trigger = component.find(ttLabel).getElement();
+		var tt = component.find(tooltip);
+		if(action == "open") {
+			$A.test.fireDomEvent(trigger, "mouseover");
+			$A.test.addWaitForWithFailureMessage(true, function(){return ($A.util.hasClass(tt._tooltip,"visible"));}, "Tooltip not opening for tooltip with aura:id = " + tooltip);
+		}
+		else if(action == "close") {
+			$A.test.fireDomEvent(trigger, "mouseout");
+			$A.test.addWaitForWithFailureMessage(false, function(){return ($A.util.hasClass(tt._tooltip,"visible"));}, "Tooltip not closing for tooltip with aura:id = " + tooltip);
+		}
 	}
 
 })

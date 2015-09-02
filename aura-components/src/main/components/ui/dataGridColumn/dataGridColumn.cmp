@@ -18,6 +18,7 @@
 <aura:component implements="ui:visible" support="PROTO" description="A column of data in ui:dataGrid">
 	<aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
 	<aura:attribute name="label" type="String" description="The text label displayed in column header."/>
+	<aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
 	<aura:attribute name="type" type="String" description="Data type."/>
 	<aura:attribute name="sortable" type="Boolean"/>
 	<aura:attribute name="disabled" type="Boolean" default="false" description="Sets whether the column header's interactions should be disabled"/>
@@ -45,7 +46,7 @@
 	<!-- Currently works only for output components -->
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
-	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }"
+	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }" title="{!v.title}"
 						   style="{! (v.width gt 0) ? 'min-width:' + v.width + 'px; max-width:' + v.width + 'px;' : ''}">
 		
 		<!-- Conditionally insert link for column sorting. -->

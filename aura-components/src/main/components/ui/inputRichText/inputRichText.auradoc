@@ -20,6 +20,7 @@
 		<p>
 		    By default, <code>ui:inputRichText</code> renders a WYSIWYG editor for entering rich text. 
 		    Setting <code>isRichText="false"</code> uses the <code>ui:inputTextArea</code> component instead of a WYSIWYG editor.
+		    The <code>placeholder</code> attribute is supported only when you set <code>isRichText="false"</code>.
 		</p>
 		<pre>&lt;ui:inputRichText aura:id="inputRT" label="Rich text demo with basic toolbar" /></pre>
 		

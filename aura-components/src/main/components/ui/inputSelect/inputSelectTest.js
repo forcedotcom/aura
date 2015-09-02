@@ -59,4 +59,4 @@
             $A.test.assertEquals(5, component.find("select").getElement().size, "Size attribute not correct");
         }
     }
-})// eslint-disable-line semi
+})

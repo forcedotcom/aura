@@ -312,4 +312,4 @@
         }
     }
 
-})// eslint-disable-line semi
+})

@@ -46,4 +46,4 @@
         }
     }
 
-})// eslint-disable-line semi
+})

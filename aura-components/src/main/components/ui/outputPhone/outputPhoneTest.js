@@ -146,4 +146,4 @@
         return component.getElement().firstChild;
     }
 
-})// eslint-disable-line semi
+})

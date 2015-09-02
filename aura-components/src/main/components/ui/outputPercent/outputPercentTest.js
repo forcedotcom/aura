@@ -164,4 +164,4 @@
             $A.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Expected error message");
         }
     }
-})// eslint-disable-line semi
+})

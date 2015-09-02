@@ -140,4 +140,4 @@
         aura.test.assertEquals(expectedLabel, $A.test.getText(elements[1]), "Label attribute not correctly set");
     }
 
-})// eslint-disable-line semi
+})

@@ -153,4 +153,4 @@
 	
       	return window.getComputedStyle(element);      
      }
-})// eslint-disable-line semi
+})

@@ -15,76 +15,55 @@
  */
 ({  
     replaceData : function(cmp, evt, hlp) {
-        cmp.find("provider").getEvent("provide").fire();
+    	cmp.find('provider').getEvent('provide').fire();
     },
-
-    handleCurrentPageChange: function (cmp) {
-        // Tell the grid to fetch new items from the dataProvider.
-        cmp.find('grid').getEvent('refresh').fire();
+    
+    refreshData : function(cmp, evt, hlp) {
+    	cmp.find('grid').getEvent('refresh').fire();
     },
-     handleAddRow: function (cmp, evt, hlp) {
-		var dynamicItems = [];
-		var amtToCreate = cmp.get("v.numItems2Create");
-		var num = cmp.get("v.currentRandNum");
-		var i = 0;
+    
+    handleAddRow: function (cmp, evt, hlp) {
+    	var dynamicItems = [];
+    	var suffix = cmp.get('v.index') || 1;
+		var amtToCreate = cmp.get('v.count') || 1;
+		var i = 1;
 		
-		for (i; i < amtToCreate; i++, num++){
-			dynamicItems.push( { 
-				"date": "2020-10-12 "+num,
-            	"id": ""+num,
-            	"name": "Peter Parker "+num,
-            	"relatedTo": "Media Inc "+num,
-            	"subject": "Spidey "+num
+		for (i; i <= amtToCreate; i++, suffix++){
+			dynamicItems.push({ 
+				'name' : 'Peter Parker ' + suffix,
+				'phone' : '415555-' + suffix,
+				'balance' : '$' + suffix,
             });
-		}
-		cmp.set("v.currentRandNum", num);
+		};
 		
-			
-		hlp.fireAddRemove(cmp, {
-            last: true,
-            count: i,
-            index: 0,
-            items : dynamicItems
-        }); 	
+		hlp.append(cmp, dynamicItems);
+		cmp.set('v.index', suffix);
     },
-
+    
     handleInsert: function (cmp, evt, hlp) {
-        var index = cmp.get('v.index'),
+        var index = cmp.get('v.index') || 0,
             count = cmp.get('v.count') || 1,
-            items = [],
-            seed = cmp.get('v.currentRandNum'),
+            items = cmp.find('grid').get('v.items'),
             i=0;
         
-        for (i; i < count; i++, seed++) {
-        	
-        	items.push({
-                id           : seed,
-                subject      : 'Bar '+seed, 
-                date : '2014-11-11 '+seed,
-                name : 'New John '+seed,
-                relatedTo : 'SFDC '+seed,
-            });
+        for (i; i < count; i++, index++) {
+        	var item = {
+                name : 'Mary Jane' + index,
+                phone : '999-' + index,
+                balance : '$9' + index
+            };
+        	items.splice(index, 0, item);
         }
-        cmp.set('v.currentRandNum', seed);
-        if (!$A.util.isUndefinedOrNull(index)) {
-            hlp.fireAddRemove(cmp, {
-                index : index,
-                count : count,
-                items : items
-            }); 
-        }
+        
+    	cmp.find('grid').set('v.items', items);
+    	cmp.set('v.index', index);
     },
-
+    
     handleRemove: function (cmp, evt, hlp) {
-        var index = cmp.get('v.index'),
-            count = cmp.get('v.count') || 1;
-
-        if (!$A.util.isUndefinedOrNull(index)) {
-            hlp.fireAddRemove(cmp, {
-                index  : index,
-                count  : count,
-                remove : true
-            }); 
-        }
+        var index = cmp.get('v.index') || 0,
+            count = cmp.get('v.count') || 1,
+            items = cmp.find('grid').get('v.items');
+        items.splice(index, count);
+        cmp.find('grid').set('v.items', items);
     }
 })

@@ -16,6 +16,11 @@
 
 -->
 <aura:component extends="ui:dataProvider" description="">
+	<aura:attribute name="currentPage" type="Integer"/>
+    <aura:attribute name="pageSize" type="Integer"/>
+    <aura:attribute name="loadData" type="Integer"/>
+    <aura:attribute name="totalPages" type="Integer"/>
+    
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="provide" action="{!c.provide}"/>
 </aura:component>

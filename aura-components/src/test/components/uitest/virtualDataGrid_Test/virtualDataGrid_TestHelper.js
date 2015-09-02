@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 ({
-    fireAddRemove: function (cmp, params) {
-        cmp.find('grid')
-            .getEvent('addRemove')
-            .setParams(params)
-            .fire();  
+    append: function (cmp, params) {
+        cmp.find('grid').appendItems(params);
     }
 })

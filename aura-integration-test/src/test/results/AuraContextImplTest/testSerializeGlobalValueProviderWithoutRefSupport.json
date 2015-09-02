@@ -1,0 +1,1 @@
+{"mode":"PROD","test":"org.auraframework.integration.test.context.AuraContextImplTest.testSerializeGlobalValueProviderWithoutRefSupport","fwuid":"#FAKEUID#","globalValueProviders":[{"type":"$NONE","hasRefs":false,"values":{"data":"identity"}}]}

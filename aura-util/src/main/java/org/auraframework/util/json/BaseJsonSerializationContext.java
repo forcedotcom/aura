@@ -15,8 +15,8 @@
  */
 package org.auraframework.util.json;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * standard jsony stuff
@@ -27,7 +27,7 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     private final int dataSizeLimit;
     private final int collectionSizeLimit;
     private boolean nullValues;
-	private List<Boolean> refSupportStack;
+	private Deque<Boolean> refSupportStack;
 
     public BaseJsonSerializationContext(boolean format, boolean refSupport, int dataSizeLimit, int collectionSizeLimit,
             boolean nullValues) {
@@ -51,9 +51,9 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     @Override
     public void pushRefSupport(boolean refSupport) {
         if (refSupportStack == null) {
-        	refSupportStack = new ArrayList<>();
+        	refSupportStack = new ArrayDeque<>();
         }
-        refSupportStack.add(this.refSupport);
+        refSupportStack.push(this.refSupport);
         this.refSupport = refSupport;
     }
 
@@ -62,7 +62,7 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
         if (refSupportStack == null || refSupportStack.size() == 0) {
             return;
         }
-        refSupport = refSupportStack.remove(refSupportStack.size()-1);
+        refSupport = refSupportStack.pop();
     }
 
     @Override

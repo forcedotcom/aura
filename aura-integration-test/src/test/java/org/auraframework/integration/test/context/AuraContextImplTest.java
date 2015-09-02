@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.context;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,24 +32,36 @@ import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
 import org.auraframework.def.TokensDef;
 import org.auraframework.def.TypeDef;
+import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.context.AuraContextImpl;
 import org.auraframework.impl.root.AttributeDefImpl;
 import org.auraframework.impl.root.event.EventDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Event;
+import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializable;
+import org.auraframework.util.json.Serialization;
+import org.auraframework.util.json.Serialization.ReferenceType;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -609,5 +622,191 @@ public class AuraContextImplTest extends AuraImplTestCase {
 
         String version = ctx.getAccessVersion();
         assertEquals("2.0", version);
+    }
+
+    /**
+     * Some data that should serialize a reference ID.
+     */
+    @Serialization(referenceType = ReferenceType.IDENTITY)
+    private class DataWithRef implements JsonSerializable {
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeValue("identity");
+        }
+    }
+
+    /**
+     * Some data that should not serialize a reference ID.
+     */
+    @Serialization(referenceType = ReferenceType.NONE)
+    private class DataWithoutRef implements JsonSerializable {
+        @Override
+        public void serialize(Json json) throws IOException {
+            json.writeValue("none");
+        }
+    }
+
+    /**
+     * A simple configurable GlobalValueProvider
+     */
+    private class TestValueProvider implements GlobalValueProvider {
+        private String prefix;
+        private boolean refSupport;
+        private Map<String, ?> data;
+        
+        @Override
+        public Object getValue(PropertyReference key) throws QuickFixException {
+            throw new UnsupportedOperationException("Not expecting to getValue");
+        }
+
+        @Override
+        public ValueProviderType getValueProviderKey() {
+            return new ValueProviderType() {
+                @Override
+                public String getPrefix() {
+                    return prefix;
+                }
+
+                @Override
+                public boolean isGlobal() {
+                    return true;
+                }
+            };
+        }
+
+        @Override
+        public DefDescriptor<TypeDef> getReturnTypeDef() {
+            return null;
+        }
+
+        @Override
+        public void validate(PropertyReference expr) throws InvalidExpressionException {
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public boolean refSupport() {
+            return refSupport;
+        }
+
+        @Override
+        public Map<String, ?> getData() {
+            return data;
+        }
+    }
+    
+    /**
+     * GVP with refSupport should serialize reference IDs of data that supports references. 
+     */
+    public void testSerializeGlobalValueProviderWithRefSupport() throws Exception {
+        TestValueProvider provider = new TestValueProvider();
+        provider.prefix = "$REFS";
+        provider.data = ImmutableMap.of("data", new DataWithRef());
+        provider.refSupport = true;
+
+        Map<String, GlobalValueProvider> globalProviders = Maps.newHashMap();
+        globalProviders.put(provider.prefix, provider);
+
+        Mode mode = Mode.PROD;
+        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, false);
+        ctx.setFrameworkUID("#FAKEUID#");
+        
+        String res = JsonEncoder.serialize(ctx, serCtx);
+        goldFileJson(res);
+    }
+
+    /**
+     * GVP without refSupport should serialize data, that supports references, as-is (without reference IDs). 
+     */
+    public void testSerializeGlobalValueProviderWithoutRefSupport() throws Exception {
+        TestValueProvider provider = new TestValueProvider();
+        provider.prefix = "$NONE";
+        provider.data = ImmutableMap.of("data", new DataWithRef());
+        provider.refSupport = false;
+
+        Map<String, GlobalValueProvider> globalProviders = Maps.newHashMap();
+        globalProviders.put(provider.prefix, provider);
+
+        Mode mode = Mode.PROD;
+        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, false);
+        ctx.setFrameworkUID("#FAKEUID#");
+        
+        String res = JsonEncoder.serialize(ctx, serCtx);
+        goldFileJson(res);
+    }
+
+    /**
+     * GVP with refSupport should handle data without references. 
+     */
+    public void testSerializeGlobalValueProviderWithRefSupportWithoutAReference() throws Exception {
+        TestValueProvider provider = new TestValueProvider();
+        provider.prefix = "$REFS";
+        provider.data = ImmutableMap.of("data", new DataWithoutRef());
+        provider.refSupport = true;
+
+        Map<String, GlobalValueProvider> globalProviders = Maps.newHashMap();
+        globalProviders.put(provider.prefix, provider);
+
+        Mode mode = Mode.PROD;
+        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, false);
+        ctx.setFrameworkUID("#FAKEUID#");
+        
+        String res = JsonEncoder.serialize(ctx, serCtx);
+        goldFileJson(res);
+    }
+    
+    /**
+     * GVPs with mixed refSupport should handle respective data with and without references. Note: ordering of
+     * serialized providers is not guaranteed, but should be consistent.
+     */
+    public void testSerializeGlobalValueProvidersWithMixedRefSupport() throws Exception {
+        TestValueProvider provider1 = new TestValueProvider();
+        provider1.prefix = "$REFS1";
+        provider1.data = ImmutableMap.of("yes", new DataWithRef(), "no", new DataWithoutRef());
+        provider1.refSupport = true;
+
+        TestValueProvider provider2 = new TestValueProvider();
+        provider2.prefix = "$NONE2";
+        provider2.data = ImmutableMap.of("yes", new DataWithRef(), "no", new DataWithoutRef());
+        provider2.refSupport = false;
+
+        TestValueProvider provider3 = new TestValueProvider();
+        provider3.prefix = "$REFS3";
+        provider3.data = ImmutableMap.of("yes", new DataWithRef(), "no", new DataWithoutRef());
+        provider3.refSupport = true;
+
+        TestValueProvider provider4 = new TestValueProvider();
+        provider4.prefix = "$NONE4";
+        provider4.data = ImmutableMap.of("yes", new DataWithRef(), "no", new DataWithoutRef());
+        provider4.refSupport = false;
+
+        Map<String, GlobalValueProvider> globalProviders = Maps.newHashMap();
+        globalProviders.put(provider1.prefix, provider1);
+        globalProviders.put(provider2.prefix, provider2);
+        globalProviders.put(provider3.prefix, provider3);
+        globalProviders.put(provider4.prefix, provider4);
+
+        Mode mode = Mode.PROD;
+        MasterDefRegistry mdr = Mockito.mock(MasterDefRegistry.class);
+        AuraJsonContext serCtx = AuraJsonContext.createContext(mode, true);
+        AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
+                globalProviders, false);
+        ctx.setFrameworkUID("#FAKEUID#");
+        
+        String res = JsonEncoder.serialize(ctx, serCtx);
+        goldFileJson(res);
     }
 }

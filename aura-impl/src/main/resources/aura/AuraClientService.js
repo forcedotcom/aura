@@ -373,14 +373,14 @@ AuraClientService.prototype.decode = function(response, noStrip) {
             // Filter out providers without refs
             for (var i = gvpList.length - 1; i >= 0; i--) {
                 if (gvpList[i]["hasRefs"] !== true) {
-                    saved.push(gvpList.splice(i, 1));
+                    saved.push(gvpList.splice(i, 1)[0]);
                 }
             }
 
             $A.util.json.resolveRefs(responseMessage);
 
             // Restore original provider (order doesn't matter)
-            gvpList.concat(saved);
+            responseMessage["context"]["globalValueProviders"] = gvpList.concat(saved);
         } else {
             $A.util.json.resolveRefs(responseMessage);
         }

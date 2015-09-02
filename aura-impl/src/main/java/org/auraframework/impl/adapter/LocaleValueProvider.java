@@ -192,7 +192,7 @@ public class LocaleValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Locales have not refs.
+    	// $Locale has no serialization references.
         return false;
     }
 

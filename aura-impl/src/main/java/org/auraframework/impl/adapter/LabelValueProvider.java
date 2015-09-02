@@ -95,7 +95,7 @@ public class LabelValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Label have no refs.
+    	// $Label has no serialization references.
         return false;
     }
 

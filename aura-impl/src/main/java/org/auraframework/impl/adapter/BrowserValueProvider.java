@@ -118,7 +118,7 @@ public class BrowserValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-    	// $Browser has not refs.
+    	// $Browser has no serialization references.
         return false;
     }
 

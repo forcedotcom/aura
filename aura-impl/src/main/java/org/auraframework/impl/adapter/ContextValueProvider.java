@@ -72,7 +72,7 @@ public class ContextValueProvider implements GlobalValueProvider {
 
     @Override
     public boolean refSupport() {
-        // AuraContext can have refs.
+        // $Global may have serialization references.
         return true;
     }
 

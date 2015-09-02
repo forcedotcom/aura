@@ -25,4 +25,9 @@
     <div>simplevalue2: {!v.simplevalue2}</div>
     <div>simplevalue3: {!v.simplevalue3}</div>
     <div>simplevalue4: {!v.simplevalue4}</div>
+    
+    <div aura:id="json_s">{!$Label.SectionJsonTest_s.s}</div>
+    <div aura:id="json_sid">{!$Label.SectionJsonTest_sid.sid}</div>
+    <div aura:id="json_r">{!$Label.SectionJsonTest_r.r}</div>
+    <div aura:id="json_rid">{!$Label.SectionJsonTest_rid.rid}</div>
 </aura:component>

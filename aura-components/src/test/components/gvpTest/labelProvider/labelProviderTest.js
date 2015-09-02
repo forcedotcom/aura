@@ -163,5 +163,24 @@
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","Mary Poppins")});
             $A.test.addWaitFor("Today + Overdue", function(){return $A.get("$Label.Related_Lists.task_mode_today_overdue","undefined")});
         }
+    },
+
+    /**
+     * Verify that $Label is not processed by JSON.resolveRefs.
+     * Labels retrieved via $A.get go via a different path, so we need to access the provider via an expression.
+     */
+    testLabelJsonIsNotResolved: {
+        test: [
+            function (cmp) {
+                $A.test.assertEquals("serialId", $A.test.getText(cmp.find("json_s").getElement()),
+                    "'s' should not have been resolved within $Label");
+                $A.test.assertEquals("serialIdShort", $A.test.getText(cmp.find("json_sid").getElement()),
+                    "'sid' should not have been resolved within $Label");
+                $A.test.assertEquals("serialRefId", $A.test.getText(cmp.find("json_r").getElement()),
+                    "'r' should not have been resolved within $Label");
+                $A.test.assertEquals("serialRefIdShort", $A.test.getText(cmp.find("json_rid").getElement()),
+                    "'rid' should not have been resolved within $Label");
+            }
+        ]
     }
 })

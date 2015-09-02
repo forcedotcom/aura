@@ -174,7 +174,8 @@ public class FlavorDefaultDefImplTest extends StyleTestCase {
         checkMatches(fmt, ImmutableMap.<DefDescriptor<ComponentDef>, String>of(), NO_OVERRIDES);
     }
 
-    public void testValidatesReferenceNotFlavorable() throws Exception {
+    /* disabled, see note in impl java file */
+    public void _testValidatesReferenceNotFlavorable() throws Exception {
         try {
             DefDescriptor<ComponentDef> cmp = addComponentDef();
             String fmt = String.format("<aura:flavor component='%s' default='foo'/>", cmp.getDescriptorName());

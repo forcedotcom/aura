@@ -149,16 +149,19 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         return map;
     }
 
-    @Override
-    public void validateReferences() throws QuickFixException {
-        if (singleComponent != null) {
-            ComponentDef def = singleComponent.getDef();
-            if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() && !def.isDynamicallyFlavorable()) {
-                throw new InvalidDefinitionException(String.format("%s must contain at least one aura:flavorable element",
-                        singleComponent), getLocation());
-            }
-        }
-    }
+    // TODONM can't add validation without imposing a dependency...
+    // @Override
+    // public void validateReferences() throws QuickFixException {
+    // if (singleComponent != null) {
+    // ComponentDef def = singleComponent.getDef();
+    // if (!def.hasFlavorableChild() && !def.inheritsFlavorableChild() &&
+    // !def.isDynamicallyFlavorable()) {
+    // throw new InvalidDefinitionException(
+    // String.format("%s must contain at least one aura:flavorable element", singleComponent),
+    // getLocation());
+    // }
+    // }
+    // }
 
     @Override
     public void serialize(Json json) throws IOException {

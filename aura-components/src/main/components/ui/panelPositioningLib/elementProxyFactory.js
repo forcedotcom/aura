@@ -71,17 +71,19 @@ function (elementProxy, win) {
         //validate node
         if(el !== w && !el.id) {
             el.id = w.$A.getComponent(el).getGlobalId();
-        } else if (el === w) {
-            el.id = 'window';
         }
-       
-        key = el.id;
+
+        if(el === w) {
+            key = 'window';
+        } else {
+            key = el.id;
+        }
         
         if(proxyCache[key]) {
             proxyCache[key].refCount++;
             return proxyCache[key].el;
         } else {
-            newProxy = new ElementProxy(el, el.id);
+            newProxy = new ElementProxy(el, key);
             newProxy.setReleaseCallback(release, newProxy);
 
             proxyCache[key] = {

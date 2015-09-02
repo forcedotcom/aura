@@ -184,7 +184,7 @@
                     "action": "${PUBLISH_KEY}",
                     "key": "${key}",
                     "data": ${jsonData}
-                }, "*");
+                }, window.location.href);
             `;
 
             chrome.devtools.inspectedWindow.eval(command, function() {

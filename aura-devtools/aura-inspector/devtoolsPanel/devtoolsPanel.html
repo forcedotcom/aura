@@ -5,7 +5,7 @@
 
         <!-- Web Components -->
 		<link rel="import" href="components/json/json.html"/>
-		<link rel="import" href="components/actioncard/actionCard.html"/>
+		<link rel="import" href="components/actionCard/actionCard.html"/>
 		<link rel="import" href="components/eventCard/eventCard.html"/>
 		<link rel="import" href="components/onOffButton/onOffButton.html"/>
 		<link rel="import" href="components/outputFunction/outputFunction.html"/>
@@ -13,16 +13,17 @@
 	</head>
 	<body>
 		<div id="loading">
-			<div class="spinner">
-			  <div class="cube1"></div>
-			  <div class="cube2"></div>
-			</div>
-			<div class="opaque"></div>
+                    <div class="dotsSpinner">
+                        <div class="dots">
+                            <div class="a"></div>
+                            <div class="b"></div>
+                        </div>
+                    </div>
+                    <div class="opaque"></div>
 		</div>
 		<header class="tabs"></header>
 
 
-        <!-- Perf Tools from Diego -->
         <link rel="stylesheet" type="text/css" href="perfpanel/css/inspector.css">
         <link rel="stylesheet" type="text/css" href="perfpanel/css/profilesPanel.css">
         <link rel="stylesheet" type="text/css" href="perfpanel/css/flameChart.css">

@@ -8,17 +8,17 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		<div class="aura-panel panel-status-bar">
 			<button class="clear-status-bar-item status-bar-item" title="Clear">
 				<div class="glyph"></div><div class="glyph shadow"></div>
-			</button> 
+			</button>
 		</div>
 		<div class="transactions" id="trs">
 			<table>
 				<thead>
 					<th>Id</th>
-					<th>StartTime(s) <span style="font-size:8px">(since page loaded)</span></th>
-					<th>Duration(ms)</th>
+					<th>Start Time (seconds)<br /><span style="font-size:8px">(since page loaded)</span></th>
+					<th>Duration (milliseconds)</th>
 					<th>Context</th>
-					<th>Actions <span style="font-size:8px">(in flight)</span></th>
-		           <th>XHR <span style="font-size:8px">(in flight)</span></th>
+					<th>Actions</th>
+					<th>XHRs</th>
 				</thead>
 				<tbody>
 				</tbody>
@@ -114,15 +114,14 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		// Already rendered
 		if (outputList) {
 			while (queuedData.length) {
-				this.addTransactions(queuedData.pop());			
+				this.addTransactions(queuedData.pop());
 			}
 			return;
 		}
 
 		outputList = document.getElementById('trs');
 		clearButton = document.querySelector('#tab-body-transaction .clear-status-bar-item');
-        
-        //this.recordButton = document.querySelector('.trans-panel .record-profile-status-bar-item');
+
         outputList.addEventListener('click', OutputListTable_OnClick.bind(this), false);
         clearButton.addEventListener('click', ClearTable_OnClick.bind(this), false);
 		devtoolsPanel.hideSidebar();

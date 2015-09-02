@@ -139,7 +139,7 @@
                 action : PUBLISH_KEY, 
                 key: key,
                 data : data
-            }, '*');
+            }, window.location.href);
         };
 
         this.subscribe = function(key, callback) {
@@ -180,7 +180,7 @@
             var startTime = performance.now();
             var eventId = "event_" + startTime;
             var data = {
-                "eventId": eventId
+                "id": eventId
             };
 
             $Aura.Inspector.publish("AuraInspector:OnEventStart", data);
@@ -189,12 +189,13 @@
 
             var event = config["scope"];
             var source = event.getSource();
+            var parameters = output(event.getParams());
 
             data = {
-                "eventId": eventId,
+                "id": eventId,
                 "caller": arguments.callee.caller.caller.caller+"",
                 "name": event.getDef().getDescriptor().getQualifiedName(),
-                "parameters": JSON.stringify(event.getParams()),
+                "parameters": parameters,
                 "sourceId": source ? source.getGlobalId() : "",
                 "startTime": startTime,
                 "endTime": performance.now(),
@@ -204,6 +205,24 @@
             $Aura.Inspector.publish("AuraInspector:OnEventEnd", data);
 
             return ret;
+        }
+
+        function output(data) {
+            var toJSON = Component.prototype.toJSON;
+            delete Component.prototype.toJSON;
+
+            var json = JSON.stringify(data, function(key, value){
+                if($A.util.isComponent(value)) {
+                    return "[Component] {" + value.getGlobalId() + "}";
+                } else if(value instanceof Function) {
+                    return value +"";
+                }
+                return value;
+            });
+
+            Component.prototype.toJSON = toJSON;
+
+            return json;
         }
     }
 
@@ -287,6 +306,7 @@
 
         function OnActionRunDeprecated(config, event) {
             var action = config["self"];
+            var startTime = performance.now();
             var data = {
                 "actionId": action.getId()
             };

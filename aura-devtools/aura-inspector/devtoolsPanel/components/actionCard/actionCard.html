@@ -1,16 +1,16 @@
 
 <template>
 	<style>
-		header { font-weight: bold; font-family: 'Lucida Grande', 'Consolas', 'sans-serif'; font-size: 1.25em; padding: 0 0 3px 0; }
+		header { font-weight: bold; font-size: 1.25em; padding: 0 0 3px 0; }
 		table { margin: 5px 0 0 0;}
-		th { font-weight: normal; font-size: .75em; color: #999; padding: 0 10px 0 5px; text-align: left; letter-spacing: .03em; }
+		th { font-weight: bold; font-size: .75em; padding: 0 10px 0 5px; text-align: left; }
 		td { font-size: .75em; padding: 0 10px 0 5px; }
 		code { margin: 5px; display: block; white-space: pre; }
-		.parameters:before { content: 'Parameters'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; font-family: monospace;  vertical-align: top;}
-		.result:before { content: 'Result'; color: #999; letter-spacing: .03em; display:inline-block; width: 80px; font-family: monospace;  vertical-align: top; }
+		.parameters:before { content: 'Parameters'; display:inline-block; width: 80px; font-weight: bold; vertical-align: top;}
+		.result:before { content: 'Result'; display:inline-block; width: 80px; font-weight: bold; vertical-align: top; }
         aurainspector-json { margin: 5px; display: block; }
 	</style>
-	
+
     <header></header>
     <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
     <aurainspector-json class="result" expandTo="0"></aurainspector-json>
@@ -19,22 +19,22 @@
             <th>Id</th>
             <th>State</th>
             <th>Abortable</th>
-            <th>Storable</th>
             <th>Background</th>
-            <th>Is Refresh</th>
-            <th>From Storage</th>
+            <th>Storable</th>
+            <th>Storable Refresh</th>
+            <th>Storable Cache Hit</th>
         </thead>
         <tbody>
             <td id="actionId"></td>
             <td id="actionState"></td>
             <td id="actionIsAbortable"></td>
-            <td id="actionIsStorable"></td>
             <td id="actionIsBackground"></td>
+            <td id="actionIsStorable"></td>
             <td id="actionIsRefresh"></td>
             <td id="actionFromStorage"></td>
         </tbody>
     </table>
-    
+
 </template>
 
 <!-- CSP ruins all our fun, this has to be external because of that -->

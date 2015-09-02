@@ -12,11 +12,16 @@
 	auracomponent.attachedCallback = function() {
 		var _data = this.getAttribute("componentData");
 		if(!_data) {
-			getComponentData(this.getAttribute("globalId"), function(data) {
-				_data = data;
-				this.setAttribute("componentData", _data);
-				render(this, _data);
-			}.bind(this));
+            // This is currently way to expensive.
+            // We need to not return the body or the attribute value provider
+            // before we can realistically do this.
+            var shadowRoot = this.shadowRoot || this.createShadowRoot();
+            shadowRoot.appendChild(document.createTextNode(this.getAttribute("globalId")));
+			// getComponentData(this.getAttribute("globalId"), function(data) {
+			// 	_data = data;
+			// 	this.setAttribute("componentData", _data);
+			// 	render(this, _data);
+			// }.bind(this));
 		} else {
             // If we do a setAttribute("componentData", "JSONSTRING"); 
             // It would be nice if it just worked.

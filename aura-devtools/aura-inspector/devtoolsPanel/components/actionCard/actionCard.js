@@ -8,7 +8,7 @@
 	 *
 	 * Kris: This probably wouldn't even be necessary if we configured the
 	 * attributeChangedCallback correctly.
-	 * 
+	 *
 	 * @return {[type]} [description]
 	 */
 	actionCard.attachedCallback = function() {
@@ -17,24 +17,24 @@
 			actionName: 	this.getAttribute("name"),
 			parameters: 	this.getAttribute("parameters"),
 			state: 			this.getAttribute("state"),
-			isStorable: 	this.getAttribute("isStorable"),
-			isRefresh: 		this.getAttribute("isRefresh"),
-			isAbortable:	this.getAttribute("isAbortable"),
 			isBackground: 	this.getAttribute("isBackground"),
+			isStorable: 	this.getAttribute("isStorable"),
+			isRefresh: 		this.getAttribute("isStorable") === "true" ? this.getAttribute("isRefresh") : "-",
+			isAbortable:	this.getAttribute("isAbortable"),
 			returnValue:	this.getAttribute("returnValue"),
-			fromStorage:	this.getAttribute("isFromStorage")
+			fromStorage:	this.getAttribute("isStorable") === "true" ? this.getAttribute("isFromStorage") : "-"
 		};
 
 		// I'm still working on what the best pattern is here
-		// This seems sloppy    	
+		// This seems sloppy
     	this.shadowRoot.querySelector("header").textContent 		= model.actionName;
     	this.shadowRoot.querySelector(".parameters").textContent 	= model.parameters;
     	this.shadowRoot.querySelector(".result").textContent 		= model.returnValue;
     	this.shadowRoot.querySelector("#actionId").textContent 		= model.id;
     	this.shadowRoot.querySelector("#actionState").textContent 	= model.state;
     	this.shadowRoot.querySelector("#actionIsAbortable").textContent = model.isAbortable;
-    	this.shadowRoot.querySelector("#actionIsStorable").textContent 	= model.isStorable;
     	this.shadowRoot.querySelector("#actionIsBackground").textContent = model.isBackground;
+    	this.shadowRoot.querySelector("#actionIsStorable").textContent 	= model.isStorable;
     	this.shadowRoot.querySelector("#actionIsRefresh").textContent 	= model.isRefresh;
     	this.shadowRoot.querySelector("#actionFromStorage").textContent = model.fromStorage;
 	};
@@ -49,7 +49,7 @@
 
     	var shadowRoot = this.createShadowRoot();
     		shadowRoot.appendChild(clone);
-    	
+
 	};
 
 	actionCard.attributeChangedCallback = function(attr) {

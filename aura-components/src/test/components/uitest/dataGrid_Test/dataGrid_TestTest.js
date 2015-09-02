@@ -30,13 +30,26 @@
     },
 
     /**
-     * Start at last possible page, then verify that last paging elements acknowledge the change
+     * Start at last possible page, then verify that last paging elements acknowledge the change.
+     * Ignore FF because row creation and rendering takes too long for FF
      */
     testWithLargeData : {
-    	browsers : ["-IE8", "-IE7"],
+    	browsers : ["-IE8", "-IE7", "-Firefox"],
         attributes : {"pageSize" : 3000, "currentPage" : 1},
         test : function(cmp){
             this.verifyDataGridUsingPager(cmp,[true, true, false, false], 3000, "1 - 3000 of 15000");
+        }
+    },
+    
+    /**
+     * Start at last possible page, then verify that last paging elements acknowledge the change.
+     * Row creation and rendering takes too long for FF need to reduce size of page.
+     */
+    testWithLargeDataFF : {
+    	browsers : ["Firefox"],
+        attributes : {"pageSize" : 1500, "currentPage" : 1},
+        test : function(cmp){
+            this.verifyDataGridUsingPager(cmp,[true, true, false, false], 1500, "1 - 1500 of 7500");
         }
     },
     

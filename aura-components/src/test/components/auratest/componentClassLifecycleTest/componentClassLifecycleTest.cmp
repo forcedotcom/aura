@@ -17,6 +17,11 @@
 -->
 <aura:component>
 	<!-- let's only load the component we want to test -->
+	
+	<!-- componentClassOuter has a component(componentClassInner) in its markup -->
+	<aura:attribute name="testOuter" type="Boolean" default="false"/>
+	<aura:attribute name="testOuterInIteration" type="Boolean" default="false"/>
+	
 	<!-- Child extends Parent, GrandChildXXX extends Child -->
 	<aura:attribute name="testParent" type="Boolean" default="false"/>
 	<aura:attribute name="testParentInIteration" type="Boolean" default="false"/>
@@ -75,7 +80,9 @@
 	<div aura:id="testPanel" class="testPanel">
 		<aura:if isTrue="{!v.shouldCreate}">
 			<aura:renderIf isTrue="{!v.shouldRender}">
-			
+			    <aura:if isTrue="{!v.testOuter}">
+			    	<auratest:componentClassOuter aura:id="Outer" id="Outer"/><br/>
+			    </aura:if>			    
 				<aura:if isTrue="{!v.testParent}">
 					<auratest:componentClassParent aura:id="Parent" id="Parent"/><br/>
 				</aura:if>
@@ -108,6 +115,9 @@
 				</aura:if>
 				
 				<aura:iteration items="{!v.iterationItems}" var="x" forceServer="{!v.iterationForceServer}">
+				    <aura:if isTrue="{!v.testOuterInIteration}">
+                        <auratest:componentClassOuter aura:id="OuterInIteration" id="OuterInIteration"/><br/>
+                    </aura:if>
 					<aura:if isTrue="{!v.testParentInIteration}">
 						<auratest:componentClassParent aura:id="ParentInIteration" id="ParentInIteration"/><br/>
 					</aura:if>

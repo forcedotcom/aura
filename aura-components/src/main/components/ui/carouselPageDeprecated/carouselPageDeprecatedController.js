@@ -15,7 +15,7 @@
  */
 
 ({	
-	onInit: function(cmp, evt, helper) {
+	onInit: function(cmp) {
 		//populate pageId with component's globalId
 		cmp.set('v.priv_pageId', cmp.getGlobalId());
 	},

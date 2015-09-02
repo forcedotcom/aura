@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render: function (cmp, hlp) {
+    render: function () {
         var dom = this.superRender();
         return dom;
     },
@@ -22,7 +22,7 @@
         this.superAfterRender();
         hlp.afterRenderCarousel(cmp);
     },
-    unrender: function (cmp, hlp) {
+    unrender: function () {
         this.superUnrender();
     }
 })// eslint-disable-line semi

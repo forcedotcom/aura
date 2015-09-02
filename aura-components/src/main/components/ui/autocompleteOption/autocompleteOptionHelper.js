@@ -23,7 +23,7 @@
         }
     },
     
-    displayText: function(component, keyword) {
+    displayText: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var keyword = concreteCmp.get("v.keyword");
         var optionCmp = concreteCmp.find("option");

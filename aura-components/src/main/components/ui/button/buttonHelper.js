@@ -25,7 +25,7 @@
             return false;
         }
 
-        var eventObj = cmp.getEvent(eventName).fire({"domEvent": event});
+        cmp.getEvent(eventName).fire({"domEvent": event});
         return true;
     },
 
@@ -41,9 +41,8 @@
         }
     },
 
-    updateStatefulClasses: function (cmp, event) {
+    updateStatefulClasses: function (cmp) {
         var classList = [];
-        var stateful = cmp.get('v.stateful');
         var selected = cmp.get('v.selected');
         var vClass = cmp.get('v.class');
 

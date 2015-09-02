@@ -15,7 +15,7 @@
  */
 ({
 
-	handleZIndex: function(cmp, evt, helper) {
+	handleZIndex: function(cmp) {
 		cmp.getElement().style.zIndex = cmp.get('v.zIndex');
 	},
 

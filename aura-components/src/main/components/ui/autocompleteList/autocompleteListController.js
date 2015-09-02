@@ -30,7 +30,7 @@
         selectEvt.fire();
     },
 
-    handleMouseDown: function(component, event, helper) {
+    handleMouseDown: function(component, event) {
         //prevent loss of focus from the auto complete input
        event.preventDefault();
     },

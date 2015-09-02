@@ -28,8 +28,8 @@
 
 		this._initScrollerPagePlugin(cmp);
 	},
-	_buildScrollerPagePlugin: function (cmp) {
-		function S() {};
+	_buildScrollerPagePlugin: function () {
+		function S() {}
 
 		S.prototype = {
 			_setNormalizedXY: function (x, y) {
@@ -62,9 +62,8 @@
         }
 	},
 	loadComponent: function (cmp) {
-        var pageIndex            = cmp.get('v.pageIndex'),
-            content              = cmp.get('v.content'),
-            cmpDef               = content.executionComponent || content;
+        var content              = cmp.get('v.content'),
+            cmpDef               = content.executionComponent || content,
             ignoreExistingAction = cmp.get("v.ignoreExistingAction");
 
 		if (cmpDef.isClientSideCreatable){
@@ -134,10 +133,9 @@
 	 * @return {Boolean} true if the component was successfully loaded and false otherwise.
 	 */
 	onLoadComponent: function (cmp, action, isAlreadyLoaded) {
-		var pageIndex   = cmp.get('v.pageIndex'),
-			actionState = action.getState(),
+		var actionState = action.getState(),
 			isLoadSuccessful = false,
-			contentCmp, cmpDef;
+			contentCmp, cmpDef, ignoreExistingAction;
 
 		if (actionState === 'SUCCESS') {
 		    var config = action.getReturnValue();
@@ -196,7 +194,6 @@
 			if (updateEventExists) {
 				scroller.on('scrollMove', function (action) {
 					var y = this.y;
-					var x = this.x;
 					var updateHighlightsEvt = $A.getEvt('force:updateHighlights');
 					if (action === 'gestureMove' || action === 'scroll') {
 						if (y < 0) {

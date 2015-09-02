@@ -15,7 +15,7 @@
  */
 
 ({
-	onInit: function(cmp, evt, helper) {
+	onInit: function(cmp) {
 		var pageCmp = cmp.get('v.priv_pageComponent'),
 			title = 'Page ' + cmp.get('v.pageIndex'), //TODO: localize
 			label = title;
@@ -37,7 +37,7 @@
 		cmp.set('v.label', label);
 	},
 
-	clickHandler: function (cmp, evt, helper) {
+	clickHandler: function (cmp) {
         var compEvent = cmp.getEvent("pagerClicked"),
         	pageIndex = cmp.get("v.pageIndex");
 
@@ -45,7 +45,7 @@
         compEvent.fire();
     },
 
-    keyHandler: function (cmp, evt, helper) {
+    keyHandler: function (cmp, evt) {
         var compEvent = cmp.getEvent("pagerKeyed"),
         	pageIndex = cmp.get("v.pageIndex");
 
@@ -53,13 +53,13 @@
         compEvent.fire();
     },
 
-    onPageSelected: function(cmp, evt, helper) {
+    onPageSelected: function(cmp, evt) {
 		var selectedPage = evt.getParam('pageIndex'),
 			pageId = evt.getParam('pageId'),
 			curPage = cmp.get('v.pageIndex'),
 			selectedItemCss = 'carousel-nav-item-selected';
 
-    	if (selectedPage == curPage) {
+    	if (selectedPage === curPage) {
     		cmp.set("v.priv_ariaControlId", pageId);
     		cmp.set("v.priv_ariaSelected", true);
     		cmp.set("v.priv_tabIndex", 0);

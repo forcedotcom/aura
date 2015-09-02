@@ -72,12 +72,13 @@
 		cmp.set('v.priv_currentPage', -1);
 
 		if (pageCmps && pageCmps.length > 0) {
+			var i;
 			//TODO: need a better solution to handle iteration inside the pageComponents
 			if (pageCmps[0].isInstanceOf('aura:iteration')) {
 				pageCmps = this.getPageComponentsFromIteration(pageCmps[0]);
 			}
 
-			for ( var i = 0; i < pageCmps.length; i++) {
+			for ( i = 0; i < pageCmps.length; i++) {
 				page = pageCmps[i];
 				pageSuper = page.getSuper();
 				//append page components to page container body
@@ -98,7 +99,7 @@
 			
 			cmp.set('v.pageComponents', pages, true);
 		} else if (pageModels.length > 0) {
-			for ( var i = 0; i < pageModels.length; i++) {
+			for ( i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
 				//create new instance of carousePage and pass pageModel to it
 				 var component=$A.componentService.newComponentDeprecated({
@@ -146,7 +147,7 @@
 		cmp._onStart = function(e) {helper.onStart(cmp, e);};
 		cmp._onMove = function(e) {helper.onMove(cmp, e);};
 		cmp._onClick = function(e){helper.onClick(cmp, e);};
-		cmp._onResize = function(e) {helper.refresh(cmp);};
+		cmp._onResize = function() {helper.refresh(cmp);};
 
 		$A.util.on(el, cmp._startEvt, cmp._onStart);
 		$A.util.on(el, cmp._moveEvt, cmp._onMove);
@@ -156,8 +157,7 @@
 
 	detachEvents : function(cmp) {
 		var el = cmp.getElement();
-		var hasTouch = 'ontouchstart' in window;
-
+		
 		$A.util.removeOn(el, cmp._startEvt, cmp._onStart);
 		$A.util.removeOn(el, cmp._moveEvt, cmp._onMove);
 		$A.util.removeOn(el, 'click', cmp._onClick, true);
@@ -165,7 +165,7 @@
 	},
 
 	onStart: function(cmp, evt) {
-		var point = evt.touches && evt.touches.length == 1 ? evt.touches[0] : evt;
+		var point = evt.touches && evt.touches.length === 1 ? evt.touches[0] : evt;
 		cmp._startPos = {
 			startx: point.pageX,
 			starty: point.pageY
@@ -195,13 +195,13 @@
 			return false;
 		}
 
-		var point = evt.changedTouches && evt.changedTouches.length == 1 ? evt.changedTouches[0] : evt;
+		var point = evt.changedTouches && evt.changedTouches.length === 1 ? evt.changedTouches[0] : evt;
         var dx = point.pageX - startPos.startx,
             dy = point.pageY - startPos.starty,
             y = Math.abs(dy),
             x = Math.abs(dx);
 
-        if (direction == this.HORIZONTAL) {
+        if (direction === this.HORIZONTAL) {
         	return x > this.DISTANCE_THRESHOLD && x > y;
         } else {
         	return x > this.DISTANCE_THRESHOLD || y > this.DISTANCE_THRESHOLD;
@@ -226,7 +226,7 @@
 	/**
 	 * Handle window resize or orientationchange event
 	 */
-	refresh: function(cmp, evt) {
+	refresh: function(cmp) {
 		//need to call getConcreteComponent() in case there's a sub-component that extends this component
 		if (cmp.isValid() && cmp.getConcreteComponent().isRendered()) {
 			var me = this;
@@ -243,7 +243,7 @@
 				//need to wait for scroller to finish refreshing
 				cmp._scrollToTimeout = window.setTimeout(function(){
 					var curPage = me.getSelectedPage(cmp);
-					if (curPage == selectedPage) {
+					if (curPage === selectedPage) {
 						scroller.scrollToPage(--selectedPage, null, 0);
 					}
 				}, 500);
@@ -256,9 +256,6 @@
 	 * Update carousel and page size if carousel width is not pre-defined
 	 */
 	updateSize: function(cmp, force) {
-		var width = cmp.get('v.width'),
-			height = cmp.get('v.height');
-
 		var pages = this.getPageComponents(cmp);
 		//need to update size width if carousel width and height is not explicitly set
 		if (pages.length > 0) {
@@ -347,7 +344,7 @@
 	handlePagerKeyed : function(cmp, evt) {
 		var keyCode = evt.getParam("event").keyCode;
         // left arrow or right arrow
-        if (keyCode === 37 || keyCode == 39) {
+        if (keyCode === 37 || keyCode === 39) {
             var pageComps = this.getPageComponents(cmp),
             	prevPage = evt.getParam("pageIndex"),
             	pageIndex = prevPage;
@@ -372,22 +369,23 @@
     			me.selectPage(cmp, pageIndex);
     		}, this.KEY_PAGE_SELECTION_TIMEOUT_DURATION);
 
-            if (evt.preventDefault) evt.preventDefault();
+            if (evt.preventDefault) {
+            	evt.preventDefault();
+            }
         }
 	},
 
 	/**
 	 * Handle scrollStart event
 	 */
-	handleScrollMove: function(cmp, evt) {
+	handleScrollMove: function(cmp) {
 		if (!this.SHOW_SELECTED_PAGE_ONLY) {
 			return;
 		}
 
 		var scroller = this.getScroller(cmp),
 			nextPage,
-			toPage,
-			prevSelectedPage = cmp.get('v.priv_currentPage');
+			toPage;
 
 		cmp._isMoving = true;
 
@@ -395,12 +393,12 @@
 			var pages = this.getPageComponents(cmp);
 			cmp._isScrollStartProcessed = true;
 
-			if (scroller.dirX == 1) {
+			if (scroller.dirX === 1) {
 				//scrolling to right
 				//scroller page starts with 0;
 				nextPage = scroller.currPageX + 2;
 				toPage = Math.min(nextPage + this.NUMBER_OF_PAGES_TO_SHOW, pages.length);
-			} else if (scroller.dirX == -1) {
+			} else if (scroller.dirX === -1) {
 				//scrolling to the left
 				nextPage = scroller.currPageX;
 				toPage = Math.max(1, nextPage - this.NUMBER_OF_PAGES_TO_SHOW);
@@ -415,7 +413,7 @@
 	/**
 	 * Handle scroll event
 	 */
-	handleScrollEnd: function(cmp, evt) {
+	handleScrollEnd: function(cmp) {
 		var scroller = this.getScroller(cmp),
 			//scroller page starts with 0
 			currentPageX = scroller.currPageX + 1,
@@ -424,7 +422,7 @@
 		cmp._isScrollStartProcessed = false;
 		cmp._isMoving = false;
 
-		if (prevSelectedPage == currentPageX) {
+		if (prevSelectedPage === currentPageX) {
 			//scrolled back to the same page
 			return;
 		}
@@ -456,7 +454,7 @@
 
 		var prevSelectedPage = cmp.get('v.priv_currentPage');
 		var me = this;
-		if (prevSelectedPage == pageIndex) {
+		if (prevSelectedPage === pageIndex) {
 			return;
 		}
 
@@ -487,26 +485,26 @@
 	},
 
 	showPages: function(cmp, from, to) {
-		var that = this;
 		var pages = this.getPageComponents(cmp);
-
+		var i;
+		
 		if ($A.util.isNumber(from) && $A.util.isNumber(to) && from > 0 && from <= pages.length && to > 0 && to <= pages.length) {
 			var pageCmp = pages[from-1];
 			this.showPage(pageCmp, from);
 			//show rest of the pages for smoother swiping
 			if (to > from && to <= pages.length) {
 				//scrolling to the right
-				for (var i=from + 1; i<= to; i++) {
+				for (i=from + 1; i<= to; i++) {
 					this.showPage(pages[i-1], i);
 				}
 			} else if (from > to && to > 0) {
 				//scrolling to the left
-				for (var i=from - 1; i >= to; i--) {
+				for (i=from - 1; i >= to; i--) {
 					this.showPage(pages[i-1], i);
 				}
 			}
 		} else {
-			for (var i=1; i<= pages.length; i++) {
+			for ( i=1; i<= pages.length; i++) {
 				this.showPage(pages[i-1], i);
 			}
 		}
@@ -531,7 +529,7 @@
 			selectedPage = this.getSelectedPage(cmp);
 
 		for (var i=1; i<= pages.length; i++) {
-			if (i != selectedPage) {
+			if (i !== selectedPage) {
 				this.hidePage(pages[i-1], i);
 			}
 		}

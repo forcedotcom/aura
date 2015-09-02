@@ -19,7 +19,7 @@
         this.superAfterRender();
         helper.afterRenderCarouselPage(component);
     },
-    unrender: function (component, helper) {
+    unrender: function () {
         this.superUnrender();
     }
 })// eslint-disable-line semi

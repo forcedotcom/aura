@@ -33,7 +33,7 @@
     },
 
     /** Behavior to prepare the list for new data before a refresh **/
-    beforeRefresh: function(component, event) {
+    beforeRefresh: function(component) {
         component.getConcreteComponent().set("v.items", []);
     },
 
@@ -77,7 +77,7 @@
 
             for (var n = 0; n < facet.length; n++) {
                 var c = facet[n];
-                if (c.getDef().getDescriptor().getQualifiedName() != "markup://aura:unescapedHtml") {
+                if (c.getDef().getDescriptor().getQualifiedName() !== "markup://aura:unescapedHtml") {
                     if (c.isInstanceOf("ui:pager")) {
                         pagers.push(c);
                     } else {

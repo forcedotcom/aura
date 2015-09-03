@@ -404,6 +404,52 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         assertTrue("Escape button did not close the calendar", escButtonClosedCal);
     }
+    
+    /**
+     * Test Flow:
+     * 1. Have focus on inputDate
+     * 2. Tab onto the calendar icon and press enter
+     * 3. After datepicker opens, press a button (ESC, ENTER, SPACE) to close it
+     * 4. Check if inputDate has focus
+     * @throws Exception
+     */
+    // Testing the focus after closing datePicker
+    // Disabling for Safari since Safari does not handle tabs normally
+    @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
+    
+    public void testFocusOnClosingDP() throws Exception {
+    	
+    	// the different keys we will use to close the datePicker
+    	Keys[] keysToClose = {Keys.ESCAPE, Keys.ENTER, Keys.SPACE};
+        String getActiveElem = "return $A.test.getActiveElement()";
+        
+    	open(URL);
+    	
+        for(int i = 0; i < keysToClose.length; i++) {
+        	
+        	WebElement inputDate = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
+            inputDate.sendKeys(Keys.TAB);
+            
+            //active element should now be the calendar icon - hit enter to open datePicker
+            WebElement activeElement = (WebElement)auraUITestingUtil.getEval(getActiveElem);
+            activeElement.sendKeys(Keys.ENTER);
+            
+            //datePicker should be open
+            waitForElementAppear("datePicker should been present, but its not", By.cssSelector(".uiDatePicker.visible"));
+            
+            //use key to close the datePicker
+            WebElement selectedDate = findDomElement(By.cssSelector(SELECTED_DATE));
+            selectedDate.sendKeys(keysToClose[i]);
+            
+            //check if datePicker is closed
+            waitForElementDisappear("datePicker should not be present, but it is", By.cssSelector(".uiDatePicker.visible"));
+            
+            //check if active element is the inputDate
+            activeElement = (WebElement)auraUITestingUtil.getEval(getActiveElem);
+            assertEquals("Focus not on the right element", activeElement, inputDate);
+            
+        }
+    }
 
     // Testing Functionality of calendar in traversing through 1 year by the keys
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })

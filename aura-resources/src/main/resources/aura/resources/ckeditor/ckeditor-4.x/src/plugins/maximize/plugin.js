@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -92,7 +92,9 @@
 	}
 
 	CKEDITOR.plugins.add( 'maximize', {
+		// jscs:disable maximumLineLength
 		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		icons: 'maximize', // %REMOVE_LINE_CORE%
 		hidpi: true, // %REMOVE_LINE_CORE%
 		init: function( editor ) {
@@ -141,8 +143,8 @@
 						savedScroll = [ $textarea.scrollLeft, $textarea.scrollTop ];
 					}
 
-					if ( this.state == CKEDITOR.TRISTATE_OFF ) // Go fullscreen if the state is off.
-					{
+					// Go fullscreen if the state is off.
+					if ( this.state == CKEDITOR.TRISTATE_OFF ) {
 						// Add event handler for resizing.
 						mainWindow.on( 'resize', resizeHandler );
 
@@ -200,9 +202,9 @@
 
 						// Fixing positioning editor chrome in Firefox break design mode. (#5149)
 						CKEDITOR.env.gecko && refreshCursor( editor );
-
-					} else if ( this.state == CKEDITOR.TRISTATE_ON ) // Restore from fullscreen if the state is on.
-					{
+					}
+					// Restore from fullscreen if the state is on.
+					else if ( this.state == CKEDITOR.TRISTATE_ON ) {
 						// Remove event handler for resizing.
 						mainWindow.removeListener( 'resize', resizeHandler );
 
@@ -237,7 +239,11 @@
 
 						// Emit a resize event, because this time the size is modified in
 						// restoreStyles.
-						editor.fire( 'resize' );
+						editor.fire( 'resize', {
+							outerHeight: editor.container.$.offsetHeight,
+							contentsHeight: contents.$.offsetHeight,
+							outerWidth: editor.container.$.offsetWidth
+						} );
 					}
 
 					this.toggleState();
@@ -250,7 +256,7 @@
 						var buttonNode = CKEDITOR.document.getById( button._.id );
 						buttonNode.getChild( 1 ).setHtml( label );
 						buttonNode.setAttribute( 'title', label );
-						buttonNode.setAttribute( 'href', 'javascript:void("' + label + '");' );
+						buttonNode.setAttribute( 'href', 'javascript:void("' + label + '");' ); // jshint ignore:line
 					}
 
 					// Restore selection and scroll position in editing area.
@@ -262,8 +268,9 @@
 							editor.getSelection().selectRanges( savedSelection );
 							var element = editor.getSelection().getStartElement();
 							element && element.scrollIntoView( true );
-						} else
+						} else {
 							mainWindow.$.scrollTo( savedScroll.x, savedScroll.y );
+						}
 					} else {
 						if ( savedSelection ) {
 							$textarea.selectionStart = savedSelection[ 0 ];

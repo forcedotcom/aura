@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -81,11 +81,11 @@ CKEDITOR.lang[ 'km' ] = {
 		alignLeft: 'ខាងឆ្វង',
 		alignRight: 'ខាងស្តាំ',
 		alignCenter: 'កណ្តាល',
-		alignJustify: '両端揃え',
+		alignJustify: 'តំរឹមសងខាង',
 		alignTop: 'ខាងលើ',
 		alignMiddle: 'កណ្តាល',
 		alignBottom: 'ខាងក្រោម',
-		alignNone: 'អត់',
+		alignNone: 'គ្មាន',
 		invalidValue	: 'តម្លៃ​មិន​ត្រឹម​ត្រូវ។',
 		invalidHeight: 'តម្លៃ​កំពស់​ត្រូវ​តែ​ជា​លេខ។',
 		invalidWidth: 'តម្លៃ​ទទឹង​ត្រូវ​តែ​ជា​លេខ។',

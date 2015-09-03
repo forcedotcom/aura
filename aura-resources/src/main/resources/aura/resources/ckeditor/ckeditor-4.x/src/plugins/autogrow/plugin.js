@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -34,7 +34,7 @@
 			scrollable,
 			marker,
 			configBottomSpace = editor.config.autoGrow_bottomSpace || 0,
-			configMinHeight = editor.config.autoGrow_minHeight != undefined ? editor.config.autoGrow_minHeight : 200,
+			configMinHeight = editor.config.autoGrow_minHeight !== undefined ? editor.config.autoGrow_minHeight : 200,
 			configMaxHeight = editor.config.autoGrow_maxHeight || Infinity,
 			maxHeightIsUnlimited = !editor.config.autoGrow_maxHeight;
 

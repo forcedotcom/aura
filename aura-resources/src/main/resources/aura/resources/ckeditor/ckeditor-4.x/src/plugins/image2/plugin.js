@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -13,12 +13,13 @@
 				template +
 				'<figcaption>{captionPlaceholder}</figcaption>' +
 			'</figure>' ),
-		alignmentsArr = [ 'left', 'center', 'right' ],
 		alignmentsObj = { left: 0, center: 1, right: 2 },
 		regexPercent = /^\s*(\d+\%)\s*$/i;
 
 	CKEDITOR.plugins.add( 'image2', {
+		// jscs:disable maximumLineLength
 		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		requires: 'widget,dialog',
 		icons: 'image',
 		hidpi: true,
@@ -262,8 +263,9 @@
 
 			// If now widget was destroyed just update wrapper's alignment.
 			// According to the new state.
-			else
+			else {
 				setWrapperAlign( this.widget, alignClasses );
+			}
 		}
 
 		return {
@@ -383,23 +385,26 @@
 				// Note: Center alignment is detected during upcast, so only left/right cases
 				// are checked below.
 				if ( !data.align ) {
+					var alignElement = data.hasCaption ? this.element : image;
+
 					// Read the initial left/right alignment from the class set on element.
 					if ( alignClasses ) {
-						if ( this.element.hasClass( alignClasses[ 0 ] ) )
+						if ( alignElement.hasClass( alignClasses[ 0 ] ) ) {
 							data.align = 'left';
-						else if ( this.element.hasClass( alignClasses[ 2 ] ) )
+						} else if ( alignElement.hasClass( alignClasses[ 2 ] ) ) {
 							data.align = 'right';
+						}
 
-						if ( data.align )
-							this.element.removeClass( alignClasses[ alignmentsObj[ data.align ] ] );
-						else
+						if ( data.align ) {
+							alignElement.removeClass( alignClasses[ alignmentsObj[ data.align ] ] );
+						} else {
 							data.align = 'none';
+						}
 					}
 					// Read initial float style from figure/image and then remove it.
 					else {
-						data.align = this.element.getStyle( 'float' ) || image.getStyle( 'float' ) || 'none';
-						this.element.removeStyle( 'float' );
-						image.removeStyle( 'float' );
+						data.align = alignElement.getStyle( 'float' ) || 'none';
+						alignElement.removeStyle( 'float' );
 					}
 				}
 
@@ -410,8 +415,9 @@
 					// Get rid of cke_widget_* classes in data. Otherwise
 					// they might appear in link dialog.
 					var advanced = data.link.advanced;
-					if ( advanced && advanced.advCSSClasses )
+					if ( advanced && advanced.advCSSClasses ) {
 						advanced.advCSSClasses = CKEDITOR.tools.trim( advanced.advCSSClasses.replace( /cke_\S+/, '' ) );
+					}
 				}
 
 				// Get rid of extra vertical space when there's no caption.
@@ -422,7 +428,7 @@
 
 				// Setup dynamic image resizing with mouse.
 				// Don't initialize resizer when dimensions are disallowed (#11004).
-				if ( editor.filter.checkFeature( this.features.dimension ) )
+				if ( editor.filter.checkFeature( this.features.dimension ) && editor.config.image2_disableResizer !== true )
 					setupResizer( this );
 
 				this.shiftState = helpers.stateShifter( this.editor );
@@ -694,8 +700,9 @@
 
 					editable.insertElementIntoRange( replacing, range );
 				}
-				else
+				else {
 					replacing.replace( replaced );
+				}
 			}
 
 			return function( shift ) {
@@ -785,10 +792,12 @@
 				// 			<img />
 				// 		</p>
 				// 	</div>
-				if ( hasCaption )
+				if ( hasCaption ) {
 					wrapper.addClass( alignClasses[ 1 ] );
-			} else if ( align != 'none' )
+				}
+			} else if ( align != 'none' ) {
 				wrapper.addClass( alignClasses[ alignmentsObj[ align ] ] );
+			}
 		} else {
 			if ( align == 'center' ) {
 				if ( hasCaption )
@@ -861,12 +870,13 @@
 			}
 
 			// No center wrapper has been found.
-			else if ( name == 'figure' && el.hasClass( captionedClass ) )
+			else if ( name == 'figure' && el.hasClass( captionedClass ) ) {
 				image = el.getFirst( 'img' ) || el.getFirst( 'a' ).getFirst( 'img' );
 
-			// Upcast linked image like <a><img/></a>.
-			else if ( isLinkedOrStandaloneImage( el ) )
+				// Upcast linked image like <a><img/></a>.
+			} else if ( isLinkedOrStandaloneImage( el ) ) {
 				image = el.name == 'a' ? el.children[ 0 ] : el;
+			}
 
 			if ( !image )
 				return;
@@ -1068,8 +1078,9 @@
 			// and which could be corrupted (e.g. resizer span has been lost).
 			if ( oldResizeWrapper.is( 'span' ) )
 				oldResizeWrapper.remove();
-		} else
+		} else {
 			widget.wrapper.append( resizer );
+		}
 
 		// Calculate values of size variables and mouse offsets.
 		resizer.on( 'mousedown', function( evt ) {
@@ -1192,8 +1203,9 @@
 						}
 
 						// Case: II.
-						else
+						else {
 							adjustToY();
+						}
 					}
 				}
 
@@ -1210,8 +1222,9 @@
 						}
 
 						// Case: I.
-						else
+						else {
 							adjustToY();
+						}
 					} else {
 						// Case: III.
 						if ( moveDiffY <= 0 )
@@ -1219,10 +1232,11 @@
 
 						// Case: II.
 						else {
-							if ( moveRatio >= ratio )
+							if ( moveRatio >= ratio ) {
 								adjustToX();
-							else
+							} else {
 								adjustToY();
+							}
 						}
 					}
 				}
@@ -1232,11 +1246,12 @@
 				if ( newWidth >= 15 && newHeight >= 15 ) {
 					image.setAttributes( { width: newWidth, height: newHeight } );
 					updateData = true;
-				} else
+				} else {
 					updateData = false;
+				}
 			}
 
-			function onMouseUp( evt ) {
+			function onMouseUp() {
 				var l;
 
 				while ( ( l = listeners.pop() ) )
@@ -1314,7 +1329,7 @@
 				// Cache "enabled" on first use. This is because filter#checkFeature may
 				// not be available during plugin's afterInit in the future — a moment when
 				// alignCommandIntegrator is called.
-				if ( enabled == undefined )
+				if ( enabled === undefined )
 					enabled = editor.filter.checkFeature( editor.widgets.registered.image.features.align );
 
 				// Don't allow justify commands when widget alignment is disabled (#11004).
@@ -1322,13 +1337,12 @@
 					this.setState( CKEDITOR.TRISTATE_DISABLED );
 				else {
 					this.setState(
-						( widget.data.align == value ) ?
-								CKEDITOR.TRISTATE_ON
-							:
-								( value in allowed ) ?
-										CKEDITOR.TRISTATE_OFF
-									:
-										CKEDITOR.TRISTATE_DISABLED );
+						( widget.data.align == value ) ? (
+							CKEDITOR.TRISTATE_ON
+						) : (
+							( value in allowed ) ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_DISABLED
+						)
+					);
 				}
 
 				evt.cancel();
@@ -1378,8 +1392,9 @@
 
 						// Set collected data to widget.
 						widget.setData( 'link', data );
-					} else
+					} else {
 						onOk.apply( this, arguments );
+					}
 				};
 			}
 		} );
@@ -1517,12 +1532,33 @@
  * A CSS class applied to the `<figure>` element of a captioned image.
  *
  *		// Changes the class to "captionedImage".
- *		CKEDITOR.config.image2_captionedClass = 'captionedImage';
+ *		config.image2_captionedClass = 'captionedImage';
  *
  * @cfg {String} [image2_captionedClass='image']
  * @member CKEDITOR.config
  */
 CKEDITOR.config.image2_captionedClass = 'image';
+
+/**
+ * Determines whether dimension inputs should be automatically filled when the image URL changes in the Enhanced Image
+ * plugin dialog window.
+ *
+ *		config.image2_prefillDimensions = false;
+ *
+ * @since 4.5
+ * @cfg {Boolean} [image2_prefillDimensions=true]
+ * @member CKEDITOR.config
+ */
+
+/**
+ * Disables the image resizer. By default the resizer is enabled.
+ *
+ *		config.image2_disableResizer = true;
+ *
+ * @since 4.5
+ * @cfg {Boolean} [image2_disableResizer=false]
+ * @member CKEDITOR.config
+ */
 
 /**
  * CSS classes applied to aligned images. Useful to take control over the way

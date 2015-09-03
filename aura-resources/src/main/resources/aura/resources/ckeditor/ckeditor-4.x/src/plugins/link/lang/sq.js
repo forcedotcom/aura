@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'link', 'sq', {
@@ -41,14 +41,14 @@ CKEDITOR.plugins.setLang( 'link', 'sq', {
 	popupLocationBar: 'Shiriti i Lokacionit',
 	popupMenuBar: 'Shiriti i Menysë',
 	popupResizable: 'I ndryshueshëm',
-	popupScrollBars: 'Scroll Bars', // MISSING
+	popupScrollBars: 'Shiritat zvarritës',
 	popupStatusBar: 'Shiriti i Statutit',
 	popupToolbar: 'Shiriti i Mejteve',
 	popupTop: 'Top Pozita',
 	rel: 'Marrëdhëniet',
 	selectAnchor: 'Përzgjidh një Spirancë',
 	styles: 'Stil',
-	tabIndex: 'Tab Index', // MISSING
+	tabIndex: 'Indeksi i fletave',
 	target: 'Objektivi',
 	targetFrame: '<frame>',
 	targetFrameName: 'Emri i Kornizës së Synuar',

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'table', 'tt', {
@@ -50,13 +50,13 @@ CKEDITOR.plugins.setLang( 'table', 'tt', {
 	headersColumn: 'Беренче багана',
 	headersNone: 'Һичбер',
 	headersRow: 'Беренче юл',
-	invalidBorder: 'Border size must be a number.', // MISSING
+	invalidBorder: 'Чик киңлеге сан булырга тиеш.',
 	invalidCellPadding: 'Cell padding must be a positive number.', // MISSING
-	invalidCellSpacing: 'Cell spacing must be a positive number.', // MISSING
+	invalidCellSpacing: 'Күзәнәкләр аралары уңай сан булырга тиеш.',
 	invalidCols: 'Number of columns must be a number greater than 0.', // MISSING
-	invalidHeight: 'Table height must be a number.', // MISSING
+	invalidHeight: 'Таблица биеклеге сан булырга тиеш.',
 	invalidRows: 'Number of rows must be a number greater than 0.', // MISSING
-	invalidWidth: 'Table width must be a number.', // MISSING
+	invalidWidth: 'Таблица киңлеге сан булырга тиеш',
 	menu: 'Таблица үзлекләре',
 	row: {
 		menu: 'Юл',

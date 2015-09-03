@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'forms', 'pt', {
@@ -7,7 +7,7 @@ CKEDITOR.plugins.setLang( 'forms', 'pt', {
 		title: 'Propriedades do Botão',
 		text: 'Texto (Valor)',
 		type: 'Tipo',
-		typeBtn: 'Button',
+		typeBtn: 'Botão',
 		typeSbm: 'Submit',
 		typeRst: 'Reset'
 	},
@@ -15,7 +15,8 @@ CKEDITOR.plugins.setLang( 'forms', 'pt', {
 		checkboxTitle: 'Propriedades da Caixa de Verificação',
 		radioTitle: 'Propriedades do Botão de Opção',
 		value: 'Valor',
-		selected: 'Seleccionado'
+		selected: 'Seleccionado',
+		required: 'Required' // MISSING
 	},
 	form: {
 		title: 'Propriedades do Formulário',
@@ -37,6 +38,7 @@ CKEDITOR.plugins.setLang( 'forms', 'pt', {
 		size: 'Tamanho',
 		lines: 'linhas',
 		chkMulti: 'Permitir selecções múltiplas',
+		required: 'Required', // MISSING
 		opText: 'Texto',
 		opValue: 'Valor',
 		btnAdd: 'Adicionar',
@@ -57,12 +59,13 @@ CKEDITOR.plugins.setLang( 'forms', 'pt', {
 		value: 'Valor',
 		charWidth: 'Tamanho do caracter',
 		maxChars: 'Nr. Máximo de Caracteres',
+		required: 'Required', // MISSING
 		type: 'Tipo',
 		typeText: 'Texto',
-		typePass: 'Palavra-chave',
+		typePass: 'Senha',
 		typeEmail: 'Email',
 		typeSearch: 'Pesquisar',
-		typeTel: 'Numero de telefone',
+		typeTel: 'Telefone',
 		typeUrl: 'URL'
 	}
 } );

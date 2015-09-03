@@ -1,7 +1,8 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
+
 CKEDITOR.dialog.add( 'hiddenfield', function( editor ) {
 	return {
 		title: editor.lang.forms.hidden.title,
@@ -24,9 +25,10 @@ CKEDITOR.dialog.add( 'hiddenfield', function( editor ) {
 		},
 		onOk: function() {
 			var name = this.getValueOf( 'info', '_cke_saved_name' ),
-				value = this.getValueOf( 'info', 'value' ),
 				editor = this.getParentEditor(),
-				element = CKEDITOR.env.ie && !( CKEDITOR.document.$.documentMode >= 8 ) ? editor.document.createElement( '<input name="' + CKEDITOR.tools.htmlEncode( name ) + '">' ) : editor.document.createElement( 'input' );
+				element = CKEDITOR.env.ie && CKEDITOR.document.$.documentMode < 8 ?
+					editor.document.createElement( '<input name="' + CKEDITOR.tools.htmlEncode( name ) + '">' ) :
+					editor.document.createElement( 'input' );
 
 			element.setAttribute( 'type', 'hidden' );
 			this.commitContent( element );
@@ -39,13 +41,11 @@ CKEDITOR.dialog.add( 'hiddenfield', function( editor ) {
 			}
 			return true;
 		},
-		contents: [
-			{
+		contents: [ {
 			id: 'info',
 			label: editor.lang.forms.hidden.title,
 			title: editor.lang.forms.hidden.title,
-			elements: [
-				{
+			elements: [ {
 				id: '_cke_saved_name',
 				type: 'text',
 				label: editor.lang.forms.hidden.name,
@@ -62,7 +62,7 @@ CKEDITOR.dialog.add( 'hiddenfield', function( editor ) {
 
 				}
 			},
-				{
+			{
 				id: 'value',
 				type: 'text',
 				label: editor.lang.forms.hidden.value,
@@ -77,9 +77,7 @@ CKEDITOR.dialog.add( 'hiddenfield', function( editor ) {
 					else
 						element.removeAttribute( 'value' );
 				}
-			}
-			]
-		}
-		]
+			} ]
+		} ]
 	};
 } );

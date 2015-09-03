@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -32,55 +32,50 @@ CKEDITOR.plugins.add( 'iframedialog', {
 				height: '100%'
 			};
 
-			if ( typeof( onContentLoad ) == 'function' )
+			if ( typeof onContentLoad == 'function' )
 				element.onContentLoad = onContentLoad;
-			else
+			else {
 				element.onContentLoad = function() {
-				var element = this.getElement(),
-					childWindow = element.$.contentWindow;
+					var element = this.getElement(), childWindow = element.$.contentWindow;
 
-				// If the inner frame has defined a "onDialogEvent" function, setup listeners
-				if ( childWindow.onDialogEvent ) {
-					var dialog = this.getDialog(),
-						notifyEvent = function( e ) {
+					// If the inner frame has defined a "onDialogEvent" function, setup listeners
+					if ( childWindow.onDialogEvent ) {
+						var dialog = this.getDialog(), notifyEvent = function( e ) {
 							return childWindow.onDialogEvent( e );
 						};
 
-					dialog.on( 'ok', notifyEvent );
-					dialog.on( 'cancel', notifyEvent );
-					dialog.on( 'resize', notifyEvent );
+						dialog.on( 'ok', notifyEvent );
+						dialog.on( 'cancel', notifyEvent );
+						dialog.on( 'resize', notifyEvent );
 
-					// Clear listeners
-					dialog.on( 'hide', function( e ) {
-						dialog.removeListener( 'ok', notifyEvent );
-						dialog.removeListener( 'cancel', notifyEvent );
-						dialog.removeListener( 'resize', notifyEvent );
+						// Clear listeners
+						dialog.on( 'hide', function( e ) {
+							dialog.removeListener( 'ok', notifyEvent );
+							dialog.removeListener( 'cancel', notifyEvent );
+							dialog.removeListener( 'resize', notifyEvent );
 
-						e.removeListener();
-					} );
+							e.removeListener();
+						} );
 
-					// Notify child iframe of load:
-					childWindow.onDialogEvent( {
-						name: 'load',
-						sender: this,
-						editor: dialog._.editor
-					} );
-				}
-			};
+						// Notify child iframe of load:
+						childWindow.onDialogEvent( {
+							name: 'load', sender: this, editor: dialog._.editor
+						} );
+					}
+				};
+			}
 
 			var definition = {
 				title: title,
 				minWidth: minWidth,
 				minHeight: minHeight,
-				contents: [
-					{
+				contents: [ {
 					id: 'iframe',
 					label: title,
 					expand: true,
 					elements: [ element ],
 					style: 'width:' + element.width + ';height:' + element.height
-				}
-				]
+				} ]
 			};
 
 			for ( var i in userDefinition )
@@ -140,7 +135,7 @@ CKEDITOR.plugins.add( 'iframedialog', {
 					};
 					var myHtml = [];
 
-					if ( typeof( elementDefinition.onContentLoad ) == 'function' )
+					if ( typeof elementDefinition.onContentLoad == 'function' )
 						attributes.onload = 'CKEDITOR.tools.callFunction(%1);';
 
 					CKEDITOR.ui.dialog.uiElement.call( this, dialog, elementDefinition, myHtml, 'iframe', {
@@ -162,7 +157,7 @@ CKEDITOR.plugins.add( 'iframedialog', {
 					} );
 				};
 
-			iframeElement.prototype = new CKEDITOR.ui.dialog.uiElement;
+			iframeElement.prototype = new CKEDITOR.ui.dialog.uiElement();
 
 			CKEDITOR.dialog.addUIElement( 'iframe', {
 				build: function( dialog, elementDefinition, output ) {

@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -320,38 +320,6 @@
 		return cursorPosition;
 	}
 
-	function getFocusElementAfterDelCols( cells ) {
-		var cellIndexList = [],
-			table = cells[ 0 ] && cells[ 0 ].getAscendant( 'table' ),
-			i, length, targetIndex, targetCell;
-
-		// get the cellIndex list of delete cells
-		for ( i = 0, length = cells.length; i < length; i++ )
-			cellIndexList.push( cells[ i ].$.cellIndex );
-
-		// get the focusable column index
-		cellIndexList.sort();
-		for ( i = 1, length = cellIndexList.length; i < length; i++ ) {
-			if ( cellIndexList[ i ] - cellIndexList[ i - 1 ] > 1 ) {
-				targetIndex = cellIndexList[ i - 1 ] + 1;
-				break;
-			}
-		}
-
-		if ( !targetIndex )
-			targetIndex = cellIndexList[ 0 ] > 0 ? ( cellIndexList[ 0 ] - 1 ) : ( cellIndexList[ cellIndexList.length - 1 ] + 1 );
-
-		// scan row by row to get the target cell
-		var rows = table.$.rows;
-		for ( i = 0, length = rows.length; i < length; i++ ) {
-			targetCell = rows[ i ].cells[ targetIndex ];
-			if ( targetCell )
-				break;
-		}
-
-		return targetCell ? new CKEDITOR.dom.element( targetCell ) : table.getPrevious();
-	}
-
 	function insertCell( selection, insertBefore ) {
 		var startElement = selection.getStartElement();
 		var cell = startElement.getAscendant( 'td', 1 ) || startElement.getAscendant( 'th', 1 );
@@ -564,11 +532,12 @@
 		}
 		// Be able to merge cells only if actual dimension of selected
 		// cells equals to the caculated rectangle.
-		else
+		else {
 			return ( totalRowSpan * totalColSpan ) == dimension;
+		}
 	}
 
-	function verticalSplitCell( selection, isDetect ) {
+	function horizontalSplitCell( selection, isDetect ) {
 		var cells = getSelectedCells( selection );
 		if ( cells.length > 1 )
 			return false;
@@ -601,8 +570,9 @@
 				if ( candidateCell.parentNode == newCellTr.$ && c > colIndex ) {
 					newCell.insertBefore( new CKEDITOR.dom.element( candidateCell ) );
 					break;
-				} else
+				} else {
 					candidateCell = null;
+				}
 			}
 
 			// The destination row is empty, append at will.
@@ -632,7 +602,7 @@
 		return newCell;
 	}
 
-	function horizontalSplitCell( selection, isDetect ) {
+	function verticalSplitCell( selection, isDetect ) {
 		var cells = getSelectedCells( selection );
 		if ( cells.length > 1 )
 			return false;
@@ -670,8 +640,6 @@
 
 		return newCell;
 	}
-	// Context menu on table caption incorrect (#3834)
-	var contextMenuTags = { thead: 1, tbody: 1, tfoot: 1, td: 1, tr: 1, th: 1 };
 
 	CKEDITOR.plugins.tabletools = {
 		requires: 'table,dialog,contextmenu',

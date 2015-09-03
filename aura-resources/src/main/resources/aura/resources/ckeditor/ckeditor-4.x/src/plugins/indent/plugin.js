@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -435,10 +435,7 @@
 			for ( var s in evt.data.states )
 				states.push( evt.data.states[ s ] );
 
-			this.setState( CKEDITOR.tools.search( states, TRISTATE_OFF ) ?
-					TRISTATE_OFF
-				:
-					TRISTATE_DISABLED );
+			this.setState( CKEDITOR.tools.search( states, TRISTATE_OFF ) ? TRISTATE_OFF : TRISTATE_DISABLED );
 		}, command, null, 100 );
 
 		// Initialization. Save bookmarks and mark event as not handled

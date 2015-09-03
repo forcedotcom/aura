@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -103,7 +103,8 @@
 				y: tbodyPosition.y,
 				width: pillarWidth,
 				height: tbody.$.offsetHeight,
-				rtl: rtl } );
+				rtl: rtl
+			} );
 		}
 
 		return pillars;
@@ -209,7 +210,8 @@
 
 		function resizeColumn() {
 			var rtl = pillar.rtl,
-				cellsCount = rtl ? rightSideCells.length : leftSideCells.length;
+				cellsCount = rtl ? rightSideCells.length : leftSideCells.length,
+				cellsSaved = 0;
 
 			// Perform the actual resize to table cells, only for those by side of the pillar.
 			for ( var i = 0; i < cellsCount; i++ ) {
@@ -226,17 +228,26 @@
 					// If we're in the last cell, we need to resize the table as well
 					if ( tableWidth )
 						table.setStyle( 'width', pxUnit( tableWidth + sizeShift * ( rtl ? -1 : 1 ) ) );
+
+					// Cells resizing is asynchronous-y, so we have to use syncing
+					// to save snapshot only after all cells are resized. (#13388)
+					if ( ++cellsSaved == cellsCount ) {
+						editor.fire( 'saveSnapshot' );
+					}
 				}, 0, this, [
 					leftCell, leftCell && getWidth( leftCell ),
 					rightCell, rightCell && getWidth( rightCell ),
 					( !leftCell || !rightCell ) && ( getWidth( table ) + getBorderWidth( table, 'left' ) + getBorderWidth( table, 'right' ) ),
-					currentShift ] );
+					currentShift
+				] );
 			}
 		}
 
 		function onMouseDown( evt ) {
 			cancel( evt );
 
+			// Save editor's state before we do any magic with cells. (#13388)
+			editor.fire( 'saveSnapshot' );
 			resizeStart();
 
 			document.on( 'mouseup', onMouseUp, this );
@@ -384,6 +395,12 @@
 						return;
 
 					table = target.getAscendant( 'table', 1 );
+
+					// Make sure the table we found is inside the container
+					// (eg. we should not use tables the editor is embedded within)
+					if ( !editor.editable().contains( table ) ) {
+						return;
+					}
 
 					if ( !( pillars = table.getCustomData( '_cke_table_pillars' ) ) ) {
 						// Cache table pillars calculation result.

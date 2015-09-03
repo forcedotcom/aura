@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'forms', 'id', {
@@ -15,7 +15,8 @@ CKEDITOR.plugins.setLang( 'forms', 'id', {
 		checkboxTitle: 'Checkbox Properties', // MISSING
 		radioTitle: 'Radio Button Properties', // MISSING
 		value: 'Nilai',
-		selected: 'Terpilih'
+		selected: 'Terpilih',
+		required: 'Required' // MISSING
 	},
 	form: {
 		title: 'Form Properties', // MISSING
@@ -37,6 +38,7 @@ CKEDITOR.plugins.setLang( 'forms', 'id', {
 		size: 'Ukuran',
 		lines: 'garis',
 		chkMulti: 'Izinkan pemilihan ganda',
+		required: 'Required', // MISSING
 		opText: 'Teks',
 		opValue: 'Nilai',
 		btnAdd: 'Tambah',
@@ -57,6 +59,7 @@ CKEDITOR.plugins.setLang( 'forms', 'id', {
 		value: 'Nilai',
 		charWidth: 'Character Width', // MISSING
 		maxChars: 'Maximum Characters', // MISSING
+		required: 'Required', // MISSING
 		type: 'Tipe',
 		typeText: 'Teks',
 		typePass: 'Kata kunci',

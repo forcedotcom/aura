@@ -1,5 +1,5 @@
-﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+/**
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -21,10 +21,7 @@
 		var pageOffset = side == 'left' ? 'pageXOffset' : 'pageYOffset',
 			docScrollOffset = side == 'left' ? 'scrollLeft' : 'scrollTop';
 
-		return ( pageOffset in win.$ ) ?
-				win.$[ pageOffset ]
-			:
-				CKEDITOR.document.$.documentElement[ docScrollOffset ];
+		return ( pageOffset in win.$ ) ? win.$[ pageOffset ] : CKEDITOR.document.$.documentElement[ docScrollOffset ];
 	}
 
 	function attach( editor ) {
@@ -75,8 +72,14 @@
 					if ( !( editable = editor.editable() ) )
 						return;
 
+					var show = ( evt && evt.name == 'focus' );
+
 					// Show up the space on focus gain.
-					evt && evt.name == 'focus' && floatSpace.show();
+					if ( show ) {
+						floatSpace.show();
+					}
+
+					editor.fire( 'floatingSpaceLayout', { show: show } );
 
 					// Reset the horizontal position for below measurement.
 					floatSpace.removeStyle( 'left' );
@@ -146,12 +149,15 @@
 						changeMode( 'bottom' );
 
 					var mid = viewRect.width / 2,
-						alignSide =
-								( editorRect.left > 0 && editorRect.right < viewRect.width && editorRect.width > spaceRect.width ) ?
-										( editor.config.contentsLangDirection == 'rtl' ? 'right' : 'left' )
-									:
-										( mid - editorRect.left > editorRect.right - mid ? 'left' : 'right' ),
-						offset;
+						alignSide, offset;
+
+					if ( config.floatSpacePreferRight ) {
+						alignSide = 'right';
+					} else if ( editorRect.left > 0 && editorRect.right < viewRect.width && editorRect.width > spaceRect.width ) {
+						alignSide = config.contentsLangDirection == 'rtl' ? 'right' : 'left';
+					} else {
+						alignSide = mid - editorRect.left > editorRect.right - mid ? 'left' : 'right';
+					}
 
 					// (#9769) If viewport width is less than space width,
 					// make sure space never cross the left boundary of the viewport.
@@ -253,10 +259,7 @@
 
 					// Pin mode is fixed, so don't include scroll-x.
 					// (#9903) For mode is "top" or "bottom", add opposite scroll-x for right-aligned space.
-					var scroll = mode == 'pin' ?
-							0
-						:
-							alignSide == 'left' ? pageScrollX : -pageScrollX;
+					var scroll = mode == 'pin' ? 0 : alignSide == 'left' ? pageScrollX : -pageScrollX;
 
 					floatSpace.setStyle( alignSide, pixelate( ( mode == 'pin' ? pinnedOffsetX : dockedOffsetX ) + offset + scroll ) );
 				};
@@ -279,7 +282,7 @@
 						'<div id="{topId}" class="cke_top" role="presentation">{content}</div>' +
 					'</div>' +
 				'</div>' ),
-                floatSpace = CKEDITOR.document.getBody().append( CKEDITOR.dom.element.createFromHtml( floatSpaceTpl.output( {
+				floatSpace = CKEDITOR.document.getBody().append( CKEDITOR.dom.element.createFromHtml( floatSpaceTpl.output( {
 					content: topHtml,
 					id: editor.id,
 					langDir: editor.lang.dir,
@@ -337,8 +340,8 @@
 
 /**
  * Along with {@link #floatSpaceDockedOffsetY} it defines the
- * amount of offset (in pixels) between float space and the editable left/right
- * boundaries when space element is docked at either side of the editable.
+ * amount of offset (in pixels) between the float space and the editable left/right
+ * boundaries when the space element is docked on either side of the editable.
  *
  *		config.floatSpaceDockedOffsetX = 10;
  *
@@ -348,8 +351,8 @@
 
 /**
  * Along with {@link #floatSpaceDockedOffsetX} it defines the
- * amount of offset (in pixels) between float space and the editable top/bottom
- * boundaries when space element is docked at either side of the editable.
+ * amount of offset (in pixels) between the float space and the editable top/bottom
+ * boundaries when the space element is docked on either side of the editable.
  *
  *		config.floatSpaceDockedOffsetY = 10;
  *
@@ -359,8 +362,8 @@
 
 /**
  * Along with {@link #floatSpacePinnedOffsetY} it defines the
- * amount of offset (in pixels) between float space and the view port boundaries
- * when space element is pinned.
+ * amount of offset (in pixels) between the float space and the viewport boundaries
+ * when the space element is pinned.
  *
  *		config.floatSpacePinnedOffsetX = 20;
  *
@@ -370,11 +373,34 @@
 
 /**
  * Along with {@link #floatSpacePinnedOffsetX} it defines the
- * amount of offset (in pixels) between float space and the view port boundaries
- * when space element is pinned.
+ * amount of offset (in pixels) between the float space and the viewport boundaries
+ * when the space element is pinned.
  *
  *		config.floatSpacePinnedOffsetY = 20;
  *
  * @cfg {Number} [floatSpacePinnedOffsetY=0]
  * @member CKEDITOR.config
+ */
+
+/**
+ * Indicates that the float space should be aligned to the right side
+ * of the editable area rather than to the left (if possible).
+ *
+ *		config.floatSpacePreferRight = true;
+ *
+ * @since 4.5
+ * @cfg {Boolean} [floatSpacePreferRight=false]
+ * @member CKEDITOR.config
+ */
+
+/**
+ * Fired when the viewport or editor parameters change and the floating space needs to check and
+ * eventually update its position and dimensions.
+ *
+ * @since 4.5
+ * @event floatingSpaceLayout
+ * @member CKEDITOR.editor
+ * @param {CKEDITOR.editor} editor The editor instance.
+ * @param data
+ * @param {Boolean} data.show True if the float space should show up as a result of this event.
  */

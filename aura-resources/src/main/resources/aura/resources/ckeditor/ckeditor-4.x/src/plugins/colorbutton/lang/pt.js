@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'colorbutton', 'pt', {
@@ -37,17 +37,17 @@ CKEDITOR.plugins.setLang( 'colorbutton', 'pt', {
 		AFEEEE: 'Pale Turquoise',
 		ADD8E6: 'Light Blue',
 		DDA0DD: 'Plum',
-		D3D3D3: 'Light Grey',
+		D3D3D3: 'Cinza claro',
 		FFF0F5: 'Lavender Blush',
-		FAEBD7: 'Antique White',
-		FFFFE0: 'Light Yellow',
+		FAEBD7: 'Branco velho',
+		FFFFE0: 'Amarelo claro',
 		F0FFF0: 'Honeydew',
 		F0FFFF: 'Azure',
 		F0F8FF: 'Alice Blue',
 		E6E6FA: 'Lavender',
-		FFF: 'White'
+		FFF: 'Branco'
 	},
-	more: 'Mais Cores...',
-	panelTitle: 'Colors',
-	textColorTitle: 'Cor do Texto'
+	more: 'Mais cores...',
+	panelTitle: 'Cores',
+	textColorTitle: 'Cor do texto'
 } );

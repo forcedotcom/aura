@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -19,6 +19,14 @@
  */
 
 ( function( $ ) {
+	if ( typeof $ == 'undefined' ) {
+		throw new Error( 'jQuery should be loaded before CKEditor jQuery adapter.' );
+	}
+
+	if ( typeof CKEDITOR == 'undefined' ) {
+		throw new Error( 'CKEditor should be loaded before CKEditor jQuery adapter.' );
+	}
+
 	/**
 	 * Allows CKEditor to override `jQuery.fn.val()`. When set to `true`, the `val()` function
 	 * used on textarea elements replaced with CKEditor uses the CKEditor API.
@@ -42,13 +50,8 @@
 	 * @cfg {Boolean} [jqueryOverrideVal=true]
 	 * @member CKEDITOR.config
 	 */
-	CKEDITOR.config.jqueryOverrideVal = typeof CKEDITOR.config.jqueryOverrideVal == 'undefined'  ?
-				true
-			:
-				CKEDITOR.config.jqueryOverrideVal;
-
-	if ( typeof $ == 'undefined' )
-		return;
+	CKEDITOR.config.jqueryOverrideVal =
+		typeof CKEDITOR.config.jqueryOverrideVal == 'undefined' ? true : CKEDITOR.config.jqueryOverrideVal;
 
 	// jQuery object methods.
 	$.extend( $.fn, {
@@ -121,7 +124,7 @@
 					element = this,
 					dfd = new $.Deferred();
 
-					promises.push( dfd.promise() );
+				promises.push( dfd.promise() );
 
 				if ( editor && !instanceLock ) {
 					if ( callback )
@@ -132,8 +135,7 @@
 					// CREATE NEW INSTANCE
 
 					// Handle config.autoUpdateElement inside this plugin if desired.
-					if ( config.autoUpdateElement
-						|| ( typeof config.autoUpdateElement == 'undefined' && CKEDITOR.config.autoUpdateElement ) ) {
+					if ( config.autoUpdateElement || ( typeof config.autoUpdateElement == 'undefined' && CKEDITOR.config.autoUpdateElement ) ) {
 						config.autoUpdateElementJquery = true;
 					}
 
@@ -260,7 +262,7 @@
 					}, null, null, 9999 );
 				} else {
 					// Editor is already during creation process, bind our code to the event.
-					editor.once( 'instanceReady', function( evt ) {
+					editor.once( 'instanceReady', function() {
 						setTimeout( function() {
 							// Delay bit more if editor is still not ready.
 							if ( !editor.element ) {
@@ -339,10 +341,10 @@
 
 								promises.push( dfd.promise() );
 								return true;
-							}
-							// Call default .val function for rest of elements
-							else
+								// Call default .val function for rest of elements
+							} else {
 								return oldValMethod.call( $elem, value );
+							}
 						} );
 
 					// If there is no promise return default result (jQuery object of chaining).

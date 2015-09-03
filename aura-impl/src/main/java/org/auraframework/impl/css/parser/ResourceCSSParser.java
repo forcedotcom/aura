@@ -30,6 +30,6 @@ public final class ResourceCSSParser implements Parser<ResourceDef> {
     @Override
     public ResourceDef parse(DefDescriptor<ResourceDef> descriptor,
             Source<ResourceDef> source) throws QuickFixException {
-        return new ResourceDefHandler<>(descriptor, source).createDefinition();
+        return new ResourceDefHandler(descriptor, source).createDefinition();
     }
 }

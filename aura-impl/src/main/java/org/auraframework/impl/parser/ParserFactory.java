@@ -18,7 +18,9 @@ package org.auraframework.impl.parser;
 import java.util.EnumMap;
 import java.util.Map;
 
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
 import org.auraframework.impl.css.parser.FlavoredStyleParser;
 import org.auraframework.impl.css.parser.ResourceCSSParser;
 import org.auraframework.impl.css.parser.StyleParser;
@@ -26,7 +28,14 @@ import org.auraframework.impl.java.writer.JavaScriptWriter;
 import org.auraframework.impl.java.writer.JavaWriter;
 import org.auraframework.impl.java.writer.SVGWriter;
 import org.auraframework.impl.java.writer.StyleWriter;
-import org.auraframework.impl.javascript.parser.JavascriptParser;
+import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
+import org.auraframework.impl.javascript.parser.JavascriptHelperParser;
+import org.auraframework.impl.javascript.parser.JavascriptIncludeParser;
+import org.auraframework.impl.javascript.parser.JavascriptModelParser;
+import org.auraframework.impl.javascript.parser.JavascriptProviderParser;
+import org.auraframework.impl.javascript.parser.JavascriptRendererParser;
+import org.auraframework.impl.javascript.parser.JavascriptResourceParser;
+import org.auraframework.impl.javascript.parser.JavascriptTestSuiteParser;
 import org.auraframework.impl.root.parser.ApplicationXMLParser;
 import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.root.parser.DesignXMLParser;
@@ -76,12 +85,9 @@ public class ParserFactory {
     };
 
     private static Map<ParserKey, Parser<?>> parsers = Maps.newHashMap();
-    private static EnumMap<Format, Parser<?>> badParsers = new EnumMap<>(Format.class);
     private static EnumMap<Format, SourceWriter> writers = new EnumMap<>(Format.class);
 
     static {
-        badParsers.put(Format.JS, JavascriptParser.getInstance());
-
         parsers.put(new ParserKey(Format.SVG, DefType.SVG), SVGParser.getInstance());
         parsers.put(new ParserKey(Format.XML, DefType.APPLICATION), new ApplicationXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.COMPONENT), new ComponentXMLParser());
@@ -100,6 +106,14 @@ public class ParserFactory {
         parsers.put(new ParserKey(Format.TEMPLATE_CSS, DefType.STYLE), new StyleParser(false));
         parsers.put(new ParserKey(Format.CSS, DefType.FLAVORED_STYLE), new FlavoredStyleParser());
 
+        parsers.put(new ParserKey(Format.JS, DefType.CONTROLLER), new JavascriptControllerParser());
+        parsers.put(new ParserKey(Format.JS, DefType.HELPER), new JavascriptHelperParser());
+        parsers.put(new ParserKey(Format.JS, DefType.INCLUDE), new JavascriptIncludeParser());
+        parsers.put(new ParserKey(Format.JS, DefType.MODEL), new JavascriptModelParser());
+        parsers.put(new ParserKey(Format.JS, DefType.PROVIDER), new JavascriptProviderParser());
+        parsers.put(new ParserKey(Format.JS, DefType.RENDERER), new JavascriptRendererParser());
+        parsers.put(new ParserKey(Format.JS, DefType.RESOURCE), new JavascriptResourceParser());
+        parsers.put(new ParserKey(Format.JS, DefType.TESTSUITE), new JavascriptTestSuiteParser());
 
         writers.put(Format.XML, XMLWriter.getInstance());
         writers.put(Format.JAVA, JavaWriter.getInstance());
@@ -112,19 +126,18 @@ public class ParserFactory {
     /**
      * Get a parser based on format and def type.
      *
-     * This parser should be a singleton/factory that is stateless. If state is required, the parse() function
-     * should instantiate a stateful handler internally.
+     * This parser should be a singleton/factory that is stateless. If state is required,
+     * the parse() function should instantiate a stateful handler internally.
      *
      * @param format the format of the source to be parsed.
-     * @param defType the definition type that we are meant to return.
+     * @param desc the descriptor for which we need a parser.
      */
-    public static Parser<?> getParser(Format format, DefType defType) {
-        Parser<?> parser = parsers.get(new ParserKey(format, defType));
+    public static <D extends Definition> Parser<D> getParser(Format format, DefDescriptor<D> desc) {
+        @SuppressWarnings("unchecked")
+        Parser<D> parser = (Parser<D>)parsers.get(new ParserKey(format, desc.getDefType()));
         if (parser == null) {
-            // This will be put in place when we have finished the migration.
-            // throw new RuntimeException("unable to find a parser for format "+format+", of type "+defType);
-            // for now, just assume that we want the format one.
-            return badParsers.get(format);
+            throw new RuntimeException("unable to find a parser for format "+format
+                    +", for descriptor "+desc+" of type "+desc.getDefType());
         }
         return parser;
     }

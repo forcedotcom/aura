@@ -51,8 +51,8 @@
     	<aura:set attribute="else">
     		<ui:dataGrid aura:id="grid" mode="VIEW" sortBy="{!v.sortBy}">
 	    		<aura:set attribute="columns">     
-		            <ui:dataGridColumn label="Item Id" name="id" sortable="true"/>             
-		            <ui:dataGridColumn label="Item Subject" name="subject"/>
+		            <ui:dataGridColumn label="Item Id" name="id" sortable="true" title="Item Id" width="100"/>             
+		            <ui:dataGridColumn label="Item Subject" name="subject" title="Item Subject" width="100"/>
 		        </aura:set>  
 		        <aura:set attribute="dataProvider">
 		            <uitest:dataGrid_TestDataProvider      aura:id="provider"

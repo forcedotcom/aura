@@ -20,7 +20,7 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "When value is initialized to an empty string, nothing should be shown.");
+            $A.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
     /**
@@ -29,7 +29,27 @@
     testValue: {
         attributes : {value : 'Hello World!'},
         test: function(component){        	
-            aura.test.assertEquals('Hello World!', $A.test.getText(component.find("span").getElement()), "Value attribute not correct");
+        	$A.test.assertEquals('Hello World!', $A.test.getText(component.find("span").getElement()), "Value attribute not correct");
+        }
+    },
+    
+    /**
+     * W-2743289: Verify title is not present for span element by default
+     */
+    testTitleNotPresentByDefault: {
+        attributes : {value : 'Hello World!'},
+        test: function(component){        
+        	$A.test.assertEquals('', $A.test.getElementAttributeValue(component.find("span").getElement(), "title"), "Title attribute on element should not be present");
+        }
+    },
+    
+    /**
+     * W-2743289: Verify title present
+     */
+    testTitlePresent: {
+        attributes : {value : 'Hello World!', title: 'TestTitle'},
+        test: function(component){        	
+        	$A.test.assertEquals('TestTitle', $A.test.getElementAttributeValue(component.find("span").getElement(), "title"), "Title attribute on element should  be present");
         }
     },
     /**
@@ -38,7 +58,7 @@
     testDefaultDirection:{
         attributes : {value : 'some text'},
         test:function(component){
-            aura.test.assertEquals('ltr', component.get('v.dir'), "Default direction should be left to right.");
+        	$A.test.assertEquals('ltr', component.get('v.dir'), "Default direction should be left to right.");
         }
     },
     /**
@@ -47,7 +67,7 @@
     testDir: {
         attributes : {value: 'Hello World! You are welcome.', dir : 'rtl'},
         test: function(component){
-            aura.test.assertEquals('rtl', component.find("span").getElement().dir, "Dir attribute not correct");
+        	$A.test.assertEquals('rtl', component.find("span").getElement().dir, "Dir attribute not correct");
         }
     },
     /**
@@ -56,7 +76,7 @@
     testNonStringValue:{
         attributes: {value: 3.1415},
         test: function(component){
-            aura.test.assertEquals('3.1415', $A.test.getText(component.find("span").getElement()), "Failed to display string form of numeric value");
+        	$A.test.assertEquals('3.1415', $A.test.getText(component.find("span").getElement()), "Failed to display string form of numeric value");
         }
     },
     /**
@@ -66,7 +86,7 @@
     _testTrimmingSpaces:{
         attributes: {value: '   '},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
+        	$A.test.assertEquals('', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
         }
     },
     /**
@@ -76,7 +96,7 @@
     _testTrimmingSpacesAtFrontAndEnd:{
         attributes: {value: '   foo '},
         test: function(component){
-            aura.test.assertEquals('foo', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
+        	$A.test.assertEquals('foo', $A.test.getText(component.find("span").getElement()), "Failed to trim spaces");
         }
     },
     /**
@@ -88,7 +108,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n'},
         test: function(component){
-            aura.test.assertEquals('', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
+        	$A.test.assertEquals('', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -101,10 +121,9 @@
         labels : ["UnAdaptableTest"],
         attributes: {value: '\r\n'},
         test: function(component){
-        	debugger;
         	var tags = component.find("span").getElement().innerHTML;
 			tags = tags.replace(/<!---->/g, '');
-            aura.test.assertEquals('<br>', tags, "Failed to convert \r\n\ and \n into <br>");
+			$A.test.assertEquals('<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -116,7 +135,7 @@
         browsers: ["-IE7", "-IE8"],
         attributes: {value: '\n1\n2\n'},
         test: function(component){
-            aura.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
+        	$A.test.assertEquals('12', component.find("span").getElement().textContent, "Failed to convert \r\n\ and \n into <br>");
         }
     },
     /**
@@ -131,7 +150,7 @@
         test: function(component){ 
         	var tags = component.find("span").getElement().innerHTML;
 			tags = tags.replace(/<!---->/g, '');			
-            aura.test.assertEquals('<br>a<br>b<br>', tags, "Failed to convert \r\n\ and \n into <br>");
+			$A.test.assertEquals('<br>a<br>b<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     }
 })

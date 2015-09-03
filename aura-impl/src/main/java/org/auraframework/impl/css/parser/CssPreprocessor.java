@@ -20,8 +20,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.StyleContext;
 import org.auraframework.css.FlavorAnnotation;
+import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -40,11 +40,11 @@ import com.google.common.collect.Sets;
 import com.salesforce.omakase.Omakase;
 import com.salesforce.omakase.PluginRegistry;
 import com.salesforce.omakase.plugin.Plugin;
-import com.salesforce.omakase.plugin.basic.Conditionals;
-import com.salesforce.omakase.plugin.basic.ConditionalsValidator;
-import com.salesforce.omakase.plugin.basic.PrefixPruner;
-import com.salesforce.omakase.plugin.basic.Prefixer;
-import com.salesforce.omakase.plugin.other.UnquotedIEFilterPlugin;
+import com.salesforce.omakase.plugin.conditionals.Conditionals;
+import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
+import com.salesforce.omakase.plugin.misc.UnquotedIEFilterPlugin;
+import com.salesforce.omakase.plugin.prefixer.PrefixCleaner;
+import com.salesforce.omakase.plugin.prefixer.Prefixer;
 import com.salesforce.omakase.plugin.validator.StandardValidation;
 import com.salesforce.omakase.writer.StyleWriter;
 
@@ -102,8 +102,8 @@ public final class CssPreprocessor {
             plugins.add(new UrlContextPathPlugin());
             plugins.add(new UrlCacheBustingPlugin());
             plugins.add(new UnquotedIEFilterPlugin());
-            plugins.add(Prefixer.defaultBrowserSupport().prune(true));
-            plugins.add(PrefixPruner.prunePrefixedAtRules());
+            plugins.add(Prefixer.defaultBrowserSupport().prune(true).rearrange(true));
+            plugins.add(PrefixCleaner.mismatchedPrefixedUnits());
             plugins.addAll(Aura.getStyleAdapter().getRuntimePlugins());
         }
 

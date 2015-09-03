@@ -1,5 +1,5 @@
 ﻿/*
- Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  For licensing, see LICENSE.md or http://ckeditor.com/license
 */
-CKEDITOR.plugins.setLang("codesnippet","da",{button:"Indsæt koden her",codeContents:"Code content",emptySnippetError:"A code snippet cannot be empty.",language:"Sprog",title:"Kodestykke",pathName:"kodestykke"});
+CKEDITOR.plugins.setLang("codesnippet","da",{button:"Indsæt kodestykket her",codeContents:"Koden",emptySnippetError:"Kodestykket kan ikke være tomt.",language:"Sprog",title:"Kodestykke",pathName:"kodestykke"});

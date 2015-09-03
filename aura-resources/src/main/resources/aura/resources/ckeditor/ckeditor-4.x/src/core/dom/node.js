@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -121,27 +121,55 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype, {
 	clone: function( includeChildren, cloneId ) {
 		var $clone = this.$.cloneNode( includeChildren );
 
-		var removeIds = function( node ) {
-				// Reset data-cke-expando only when has been cloned (IE and only for some types of objects).
-				if ( node[ 'data-cke-expando' ] )
-					node[ 'data-cke-expando' ] = false;
-
-				if ( node.nodeType != CKEDITOR.NODE_ELEMENT )
-					return;
-				if ( !cloneId )
-					node.removeAttribute( 'id', false );
-
-				if ( includeChildren ) {
-					var childs = node.childNodes;
-					for ( var i = 0; i < childs.length; i++ )
-						removeIds( childs[ i ] );
-				}
-			};
-
 		// The "id" attribute should never be cloned to avoid duplication.
 		removeIds( $clone );
 
-		return new CKEDITOR.dom.node( $clone );
+		var node = new CKEDITOR.dom.node( $clone );
+
+		// On IE8 we need to fixed HTML5 node name, see details below.
+		if ( CKEDITOR.env.ie && CKEDITOR.env.version < 9 &&
+			( this.type == CKEDITOR.NODE_ELEMENT || this.type == CKEDITOR.NODE_DOCUMENT_FRAGMENT ) ) {
+			renameNodes( node );
+		}
+
+		return node;
+
+		function removeIds( node ) {
+			// Reset data-cke-expando only when has been cloned (IE and only for some types of objects).
+			if ( node[ 'data-cke-expando' ] )
+				node[ 'data-cke-expando' ] = false;
+
+			if ( node.nodeType != CKEDITOR.NODE_ELEMENT && node.nodeType != CKEDITOR.NODE_DOCUMENT_FRAGMENT  )
+				return;
+
+			if ( !cloneId && node.nodeType == CKEDITOR.NODE_ELEMENT )
+				node.removeAttribute( 'id', false );
+
+			if ( includeChildren ) {
+				var childs = node.childNodes;
+				for ( var i = 0; i < childs.length; i++ )
+					removeIds( childs[ i ] );
+			}
+		}
+
+		// IE8 rename HTML5 nodes by adding `:` at the begging of the tag name when the node is cloned,
+		// so `<figure>` will be `<:figure>` after 'cloneNode'. We need to fix it (#13101).
+		function renameNodes( node ) {
+			if ( node.type != CKEDITOR.NODE_ELEMENT && node.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT )
+				return;
+
+			if ( node.type != CKEDITOR.NODE_DOCUMENT_FRAGMENT ) {
+				var name = node.getName();
+				if ( name[ 0 ] == ':' ) {
+					node.renameNode( name.substring( 1 ) );
+				}
+			}
+
+			if ( includeChildren ) {
+				for ( var i = 0; i < node.getChildCount(); i++ )
+					renameNodes( node.getChild( i ) );
+			}
+		}
 	},
 
 	/**
@@ -522,7 +550,14 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype, {
 	},
 
 	/**
-	 * @todo
+	 * Determines the position relation between this node and the given {@link CKEDITOR.dom.node} in the document.
+	 * This node can be preceding ({@link CKEDITOR.POSITION_PRECEDING}) or following ({@link CKEDITOR.POSITION_FOLLOWING})
+	 * the given node. This node can also contain ({@link CKEDITOR.POSITION_CONTAINS}) or be contained by
+	 * ({@link CKEDITOR.POSITION_IS_CONTAINED}) the given node. The function returns a bitmask of constants
+	 * listed above or {@link CKEDITOR.POSITION_IDENTICAL} if the given node is the same as this node.
+	 *
+	 * @param {CKEDITOR.dom.node} otherNode A node to check relation with.
+	 * @returns {Number} Position relation between this node and given node.
 	 */
 	getPosition: function( otherNode ) {
 		var $ = this.$;
@@ -558,13 +593,10 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype, {
 			addressOfOther = otherNode.getAddress(),
 			minLevel = Math.min( addressOfThis.length, addressOfOther.length );
 
-		// Determinate preceed/follow relationship.
-		for ( var i = 0; i <= minLevel - 1; i++ ) {
+		// Determinate preceding/following relationship.
+		for ( var i = 0; i < minLevel; i++ ) {
 			if ( addressOfThis[ i ] != addressOfOther[ i ] ) {
-				if ( i < minLevel )
-					return addressOfThis[ i ] < addressOfOther[ i ] ? CKEDITOR.POSITION_PRECEDING : CKEDITOR.POSITION_FOLLOWING;
-
-				break;
+				return addressOfThis[ i ] < addressOfOther[ i ] ? CKEDITOR.POSITION_PRECEDING : CKEDITOR.POSITION_FOLLOWING;
 			}
 		}
 
@@ -765,43 +797,54 @@ CKEDITOR.tools.extend( CKEDITOR.dom.node.prototype, {
 	/**
 	 * Checks if this node is read-only (should not be changed).
 	 *
-	 * **Note:** When `attributeCheck` is not used, this method only works for elements
-	 * that are already present in the document, otherwise the result
-	 * is not guaranteed. It is mainly for performance consideration.
-	 *
 	 *		// For the following HTML:
-	 *		// <div contenteditable="false">Some <b>text</b></div>
+	 *		// <b>foo</b><div contenteditable="false"><i>bar</i></div>
 	 *
-	 *		// If "ele" is the above <div>
-	 *		element.isReadOnly(); // true
+	 *		elB.isReadOnly(); // -> false
+	 *		foo.isReadOnly(); // -> false
+	 *		elDiv.isReadOnly(); // -> true
+	 *		elI.isReadOnly(); // -> true
+	 *
+	 * This method works in two modes depending on browser support for the `element.isContentEditable` property and
+	 * the value of the `checkOnlyAttributes` parameter. The `element.isContentEditable` check is faster, but it is known
+	 * to malfunction in hidden or detached nodes. Additionally, when processing some detached DOM tree you may want to imitate
+	 * that this happens inside an editable container (like it would happen inside the {@link CKEDITOR.editable}). To do so,
+	 * you can temporarily attach this tree to an element with the `data-cke-editable` attribute and use the
+	 * `checkOnlyAttributes` mode.
 	 *
 	 * @since 3.5
+	 * @param {Boolean} [checkOnlyAttributes=false] If `true`, only attributes will be checked, native methods will not
+	 * be used. This parameter needs to be `true` to check hidden or detached elements. Introduced in 4.5.
 	 * @returns {Boolean}
 	 */
-	isReadOnly: function() {
+	isReadOnly: function( checkOnlyAttributes ) {
 		var element = this;
 		if ( this.type != CKEDITOR.NODE_ELEMENT )
 			element = this.getParent();
 
-		if ( element && typeof element.$.isContentEditable != 'undefined' )
+		// Prevent Edge crash. #13609.
+		if ( CKEDITOR.env.edge && element && element.is( 'textarea' ) ) {
+			checkOnlyAttributes = true;
+		}
+
+		if ( !checkOnlyAttributes && element && typeof element.$.isContentEditable != 'undefined' ) {
 			return !( element.$.isContentEditable || element.data( 'cke-editable' ) );
+		}
 		else {
 			// Degrade for old browsers which don't support "isContentEditable", e.g. FF3
 
 			while ( element ) {
-				if ( element.data( 'cke-editable' ) )
-					break;
-
-				if ( element.getAttribute( 'contentEditable' ) == 'false' )
-					return true;
-				else if ( element.getAttribute( 'contentEditable' ) == 'true' )
-					break;
+				if ( element.data( 'cke-editable' ) ) {
+					return false;
+				} else if ( element.hasAttribute( 'contenteditable' ) ) {
+					return element.getAttribute( 'contenteditable' ) == 'false';
+				}
 
 				element = element.getParent();
 			}
 
 			// Reached the root of DOM tree, no editable found.
-			return !element;
+			return true;
 		}
 	}
 } );

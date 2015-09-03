@@ -1,5 +1,5 @@
-﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+/**
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -153,8 +153,8 @@ CKEDITOR.plugins.add( 'floatpanel', {
 
 				var element = this.element,
 					iframe = this._.iframe,
-					// Non IE prefer the event into a window object.
-					focused = CKEDITOR.env.ie ? iframe : new CKEDITOR.dom.window( iframe.$.contentWindow ),
+					// Edge prefers iframe's window to the iframe, just like the rest of the browsers (#13143).
+					focused = CKEDITOR.env.ie && !CKEDITOR.env.edge ? iframe : new CKEDITOR.dom.window( iframe.$.contentWindow ),
 					doc = element.getDocument(),
 					positionedAncestor = this._.parentElement.getPositionedAncestor(),
 					position = offsetParent.getDocumentPosition( doc ),
@@ -213,8 +213,9 @@ CKEDITOR.plugins.add( 'floatpanel', {
 							if ( CKEDITOR.env.iOS ) {
 								if ( !this._.hideTimeout )
 									this._.hideTimeout = CKEDITOR.tools.setTimeout( doHide, 0, this );
-							} else
+							} else {
 								doHide.call( this );
+							}
 						}
 
 						function doHide() {
@@ -268,7 +269,7 @@ CKEDITOR.plugins.add( 'floatpanel', {
 
 						if ( block.autoSize ) {
 							var panelDoc = block.element.getDocument();
-							var width = ( CKEDITOR.env.webkit? block.element : panelDoc.getBody() )[ '$' ].scrollWidth;
+							var width = ( CKEDITOR.env.webkit ? block.element : panelDoc.getBody() ).$.scrollWidth;
 
 							// Account for extra height needed due to IE quirks box model bug:
 							// http://en.wikipedia.org/wiki/Internet_Explorer_box_model_bug
@@ -293,8 +294,9 @@ CKEDITOR.plugins.add( 'floatpanel', {
 
 							// Fix IE < 8 visibility.
 							panel._.currentBlock.element.setStyle( 'display', 'none' ).removeStyle( 'display' );
-						} else
+						} else {
 							target.removeStyle( 'height' );
+						}
 
 						// Flip panel layout horizontally in RTL with known width.
 						if ( rtl )
@@ -480,10 +482,10 @@ CKEDITOR.plugins.add( 'floatpanel', {
 			/**
 			 * @todo
 			 */
-			allowBlur: function( allow ) // Prevent editor from hiding the panel. #3222.
-			{
+			allowBlur: function( allow ) {
+				// Prevent editor from hiding the panel. (#3222)
 				var panel = this._.panel;
-				if ( allow != undefined )
+				if ( allow !== undefined )
 					panel.allowBlur = allow;
 
 				return panel.allowBlur;

@@ -35,9 +35,14 @@
 		}
 	} );
 
-	function create( editor, spaceName, targetId ) {
-		var target = CKEDITOR.document.getById( targetId ),
-			innerHtml, space;
+	function create( editor, spaceName, target ) {
+		var innerHtml, space;
+
+		if ( typeof target == 'string' ) {
+			target = CKEDITOR.document.getById( target );
+		} else {
+			target = new CKEDITOR.dom.element( target );
+		}
 
 		if ( target ) {
 			// Have other plugins filling the space.
@@ -122,10 +127,18 @@
  *			top: 'someElementId'
  *		};
  *
+ *		// (Since 4.5)
+ *		// Place the toolbar inside a DOM element passed by a reference. The
+ *		// elements path will remain attached to the editor UI.
+ *		var htmlElement = document.getElementById( 'someElementId' );
+ *		config.sharedSpaces = {
+ *			top: htmlElement
+ *		};
+ *
  * **Note:** The [Maximize](http://ckeditor.com/addon/maximize) and [Editor Resize](http://ckeditor.com/addon/resize)
  * features are not supported in the shared space environment and should be disabled in this context.
  *
- *		config.removePlugins = 'maximize,resize'; 
+ *		config.removePlugins = 'maximize,resize';
  *
  * @cfg {Object} [sharedSpaces]
  * @member CKEDITOR.config

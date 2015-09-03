@@ -1,12 +1,14 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
 ( function() {
 	CKEDITOR.plugins.add( 'pastefromword', {
 		requires: 'clipboard',
+		// jscs:disable maximumLineLength
 		lang: 'af,ar,bg,bn,bs,ca,cs,cy,da,de,el,en,en-au,en-ca,en-gb,eo,es,et,eu,fa,fi,fo,fr,fr-ca,gl,gu,he,hi,hr,hu,id,is,it,ja,ka,km,ko,ku,lt,lv,mk,mn,ms,nb,nl,no,pl,pt,pt-br,ro,ru,si,sk,sl,sq,sr,sr-latn,sv,th,tr,tt,ug,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		// jscs:enable maximumLineLength
 		icons: 'pastefromword,pastefromword-rtl', // %REMOVE_LINE_CORE%
 		hidpi: true, // %REMOVE_LINE_CORE%
 		init: function( editor ) {
@@ -29,7 +31,12 @@
 
 					editor.getClipboardData( { title: editor.lang.pastefromword.title }, function( data ) {
 						// Do not use editor#paste, because it would start from beforePaste event.
-						data && editor.fire( 'paste', { type: 'html', dataValue: data.dataValue } );
+						data && editor.fire( 'paste', {
+							type: 'html',
+							dataValue: data.dataValue,
+							method: 'paste',
+							dataTransfer: CKEDITOR.plugins.clipboard.initPasteDataTransfer()
+						} );
 
 						editor.fire( 'afterCommandExec', {
 							name: commandName,
@@ -63,6 +70,9 @@
 
 				// MS-WORD format sniffing.
 				if ( mswordHtml && ( forceFromWord || ( /(class=\"?Mso|style=\"[^\"]*\bmso\-|w:WordDocument)/ ).test( mswordHtml ) ) ) {
+					// Do not apply paste filter to data filtered by the Word filter (#13093).
+					data.dontFilter = true;
+
 					// If filter rules aren't loaded then cancel 'paste' event,
 					// load them and when they'll get loaded fire new paste event
 					// for which data will be filtered in second execution of
@@ -71,9 +81,11 @@
 						// Event continuation with the original data.
 						if ( isLazyLoad )
 							editor.fire( 'paste', data );
-						else if ( !editor.config.pasteFromWordPromptCleanup || ( forceFromWord || confirm( editor.lang.pastefromword.confirmCleanup ) ) )
+						else if ( !editor.config.pasteFromWordPromptCleanup || ( forceFromWord || confirm( editor.lang.pastefromword.confirmCleanup ) ) ) // jshint ignore:line
 							data.dataValue = CKEDITOR.cleanWord( mswordHtml, editor );
 
+						// Reset forceFromWord.
+						forceFromWord = 0;
 					} );
 
 					// The cleanup rules are to be loaded, we should just cancel
@@ -81,14 +93,6 @@
 					isLazyLoad && evt.cancel();
 				}
 			}, null, null, 3 );
-
-			function resetFromWord( evt ) {
-				evt && evt.removeListener();
-				editor.removeListener( 'beforePaste', forceHtmlMode );
-				forceFromWord && setTimeout( function() {
-					forceFromWord = 0;
-				}, 0 );
-			}
 		}
 
 	} );

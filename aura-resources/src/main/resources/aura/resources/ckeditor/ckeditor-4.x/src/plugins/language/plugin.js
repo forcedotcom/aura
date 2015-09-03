@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -16,7 +16,7 @@
 
 	CKEDITOR.plugins.add( 'language', {
 		requires: 'menubutton',
-		lang: 'ar,ca,cs,cy,da,de,el,en,en-gb,eo,es,fa,fi,fr,gl,he,hr,hu,it,ja,km,ku,nb,nl,no,pl,pt,pt-br,ru,sk,sl,sv,tr,tt,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
+		lang: 'ar,bg,ca,cs,cy,da,de,el,en,en-gb,eo,es,fa,fi,fo,fr,gl,he,hr,hu,it,ja,km,ko,ku,nb,nl,no,pl,pt,pt-br,ru,sk,sl,sq,sv,tr,tt,uk,vi,zh,zh-cn', // %REMOVE_LINE_CORE%
 		icons: 'language', // %REMOVE_LINE_CORE%
 		hidpi: true, // %REMOVE_LINE_CORE%
 
@@ -41,7 +41,7 @@
 					if ( item )
 						editor[ item.style.checkActive( editor.elementPath(), editor ) ? 'removeStyle' : 'applyStyle' ]( item.style );
 				},
-				refresh: function( editor, path ) {
+				refresh: function( editor ) {
 					this.setState( plugin.getCurrentLangElement( editor ) ?
 						CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF );
 				}

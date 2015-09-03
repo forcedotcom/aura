@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -98,6 +98,15 @@
 		afterInit: function( editor ) {
 			var config = editor.config;
 
+			function getChar( character ) {
+				return baseEntitiesTable[ character ];
+			}
+
+			function getEntity( character ) {
+				return config.entities_processNumerical == 'force' || !entitiesTable[ character ] ? '&#' + character.charCodeAt( 0 ) + ';'
+				: entitiesTable[ character ];
+			}
+
 			var dataProcessor = editor.dataProcessor,
 				htmlFilter = dataProcessor && dataProcessor.htmlFilter;
 
@@ -133,19 +142,10 @@
 
 				entitiesRegex = new RegExp( entitiesRegex, 'g' );
 
-				function getEntity( character ) {
-					return config.entities_processNumerical == 'force' || !entitiesTable[ character ] ? '&#' + character.charCodeAt( 0 ) + ';'
-						: entitiesTable[ character ];
-				}
-
 				// Decode entities that the browsers has transformed
 				// at first place.
 				var baseEntitiesTable = buildTable( [ htmlbase, 'shy' ].join( ',' ), true ),
 					baseEntitiesRegex = new RegExp( baseEntitiesTable.regex, 'g' );
-
-				function getChar( character ) {
-					return baseEntitiesTable[ character ];
-				}
 
 				htmlFilter.addRules( {
 					text: function( text ) {

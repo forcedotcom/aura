@@ -1,5 +1,5 @@
-﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+/**
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -202,7 +202,7 @@
 
 	CKEDITOR.htmlDataProcessor.prototype = {
 		/**
-		 * Processes the input (potentially malformed) HTML to a purified form which
+		 * Processes the (potentially malformed) input HTML to a purified form which
 		 * is suitable for using in the WYSIWYG editable.
 		 *
 		 * This method fires the {@link CKEDITOR.editor#toHtml} event which makes it possible
@@ -215,20 +215,22 @@
 		 * @param {String} data The raw data.
 		 * @param {Object} [options] The options object.
 		 * @param {String} [options.context] The tag name of a context element within which
-		 * the input is to be processed, default to be the editable element.
+		 * the input is to be processed, defaults to the editable element.
 		 * If `null` is passed, then data will be parsed without context (as children of {@link CKEDITOR.htmlParser.fragment}).
 		 * See {@link CKEDITOR.htmlParser.fragment#fromHtml} for more details.
-		 * @param {Boolean} [options.fixForBody=true] Whether to trigger the auto paragraph for non-block contents.
+		 * @param {Boolean} [options.fixForBody=true] Whether to trigger the auto paragraph for non-block content.
 		 * @param {CKEDITOR.filter} [options.filter] When specified, instead of using the {@link CKEDITOR.editor#filter main filter},
-		 * passed instance will be used to filter the content.
+		 * the passed instance will be used to filter the content.
 		 * @param {Boolean} [options.dontFilter] Do not filter data with {@link CKEDITOR.filter} (note: transformations
-		 * will be still applied).
-		 * @param {Number} [options.enterMode] When specified it will be used instead of the {@link CKEDITOR.editor#enterMode main enterMode}.
+		 * will still be applied).
+		 * @param {Number} [options.enterMode] When specified, it will be used instead of the {@link CKEDITOR.editor#enterMode main enterMode}.
+		 * @param {Boolean} [options.protectedWhitespaces] Indicates that content was wrapped with `<span>` elements to preserve
+		 * leading and trailing whitespaces. Option used by the {@link CKEDITOR.editor#method-insertHtml} method.
 		 * @returns {String}
 		 */
 		toHtml: function( data, options, fixForBody, dontFilter ) {
 			var editor = this.editor,
-				context, filter, enterMode;
+				context, filter, enterMode, protectedWhitespaces;
 
 			// Typeof null == 'object', so check truthiness of options too.
 			if ( options && typeof options == 'object' ) {
@@ -237,6 +239,7 @@
 				dontFilter = options.dontFilter;
 				filter = options.filter;
 				enterMode = options.enterMode;
+				protectedWhitespaces = options.protectedWhitespaces;
 			}
 			// Backward compatibility. Since CKEDITOR 4.3 every option was a separate argument.
 			else {
@@ -253,7 +256,8 @@
 				fixForBody: fixForBody,
 				dontFilter: dontFilter,
 				filter: filter || editor.filter,
-				enterMode: enterMode || editor.enterMode
+				enterMode: enterMode || editor.enterMode,
+				protectedWhitespaces: protectedWhitespaces
 			} ).dataValue;
 		},
 
@@ -261,15 +265,15 @@
 		 * See {@link CKEDITOR.dataProcessor#toDataFormat}.
 		 *
 		 * This method fires the {@link CKEDITOR.editor#toDataFormat} event which makes it possible
-		 * to hook into the process at various steps.
+		 * to hook into the process at various stages.
 		 *
 		 * @param {String} html
 		 * @param {Object} [options] The options object.
-		 * @param {String} [options.context] The tag name of a context element within which
-		 * the input is to be processed, default to be the editable element.
+		 * @param {String} [options.context] The tag name of the context element within which
+		 * the input is to be processed, defaults to the editable element.
 		 * @param {CKEDITOR.filter} [options.filter] When specified, instead of using the {@link CKEDITOR.editor#filter main filter},
-		 * passed instance will be used to apply content transformations to the content.
-		 * @param {Number} [options.enterMode] When specified it will be used instead of the {@link CKEDITOR.editor#enterMode main enterMode}.
+		 * the passed instance will be used to apply content transformations to the content.
+		 * @param {Number} [options.enterMode] When specified, it will be used instead of the {@link CKEDITOR.editor#enterMode main enterMode}.
 		 * @returns {String}
 		 */
 		toDataFormat: function( html, options ) {
@@ -328,9 +332,11 @@
 
 				cleanBogus( block );
 
-				var shouldFillBlock = typeof fillEmptyBlock == 'function' ? fillEmptyBlock( block ) : fillEmptyBlock;
+				// Add fillers to input (always) and to output (if fillEmptyBlock is ok with that).
+				var shouldFillBlock = !isOutput ||
+					( typeof fillEmptyBlock == 'function' ? fillEmptyBlock( block ) : fillEmptyBlock ) !== false;
 
-				if ( shouldFillBlock !== false && isEmptyBlockNeedFiller( block ) ) {
+				if ( shouldFillBlock && isEmptyBlockNeedFiller( block ) ) {
 					block.add( createFiller( isOutput ) );
 				}
 			};
@@ -766,7 +772,7 @@
 		// 	'data-x' => '&lt;a href=&quot;X&quot;'
 		//
 		// which, can be easily filtered out (#11508).
-		protectAttributeRegex = /([\w-]+)\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|(?:[^ "'>]+))/gi,
+		protectAttributeRegex = /([\w-:]+)\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|(?:[^ "'>]+))/gi,
 		protectAttributeNameRegex = /^(href|src|name)$/i;
 
 		// Note: we use lazy star '*?' to prevent eating everything up to the last occurrence of </style> or </textarea>.
@@ -867,7 +873,7 @@
 		var regexes = [
 			// Script tags will also be forced to be protected, otherwise
 			// IE will execute them.
-			( /<script[\s\S]*?<\/script>/gi ),
+			( /<script[\s\S]*?(<\/script>|$)/gi ),
 
 			// <noscript> tags (get lost in IE and messed up in FF).
 			/<noscript[\s\S]*?<\/noscript>/gi,
@@ -905,7 +911,7 @@
 		// Different protection pattern is used for those that
 		// live in attributes to avoid from being HTML encoded.
 		// Why so serious? See #9205, #8216, #7805, #11754, #11846.
-		data = data.replace( /<\w+(?:\s+(?:(?:[^\s=>]+\s*=\s*(?:[^'"\s>]+|'[^']*'|"[^"]*"))|[^\s=>]+))+\s*>/g, function( match ) {
+		data = data.replace( /<\w+(?:\s+(?:(?:[^\s=>]+\s*=\s*(?:[^'"\s>]+|'[^']*'|"[^"]*"))|[^\s=\/>]+))+\s*\/?>/g, function( match ) {
 			return match.replace( /<!--\{cke_protected\}([^>]*)-->/g, function( match, data ) {
 				store[ store.id ] = decodeURIComponent( data );
 				return '{cke_protected_' + ( store.id++ ) + '}';
@@ -987,6 +993,7 @@
  * @param {Boolean} data.dontFilter See {@link CKEDITOR.htmlDataProcessor#toHtml} The `dontFilter` argument.
  * @param {Boolean} data.filter See {@link CKEDITOR.htmlDataProcessor#toHtml} The `filter` argument.
  * @param {Boolean} data.enterMode See {@link CKEDITOR.htmlDataProcessor#toHtml} The `enterMode` argument.
+ * @param {Boolean} [data.protectedWhitespaces] See {@link CKEDITOR.htmlDataProcessor#toHtml} The `protectedWhitespaces` argument.
  */
 
 /**

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'forms', 'uk', {
@@ -15,7 +15,8 @@ CKEDITOR.plugins.setLang( 'forms', 'uk', {
 		checkboxTitle: 'Властивості галочки',
 		radioTitle: 'Властивості кнопки вибору',
 		value: 'Значення',
-		selected: 'Обрана'
+		selected: 'Обрана',
+		required: 'Required' // MISSING
 	},
 	form: {
 		title: 'Властивості форми',
@@ -37,6 +38,7 @@ CKEDITOR.plugins.setLang( 'forms', 'uk', {
 		size: 'Кількість',
 		lines: 'видимих позицій у списку',
 		chkMulti: 'Список з мультивибором',
+		required: 'Required', // MISSING
 		opText: 'Текст',
 		opValue: 'Значення',
 		btnAdd: 'Добавити',
@@ -57,6 +59,7 @@ CKEDITOR.plugins.setLang( 'forms', 'uk', {
 		value: 'Значення',
 		charWidth: 'Ширина',
 		maxChars: 'Макс. к-ть символів',
+		required: 'Required', // MISSING
 		type: 'Тип',
 		typeText: 'Текст',
 		typePass: 'Пароль',

@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -318,8 +318,9 @@ CKEDITOR.plugins.add( 'richcombo', {
 					if ( !( value || text ) ) {
 						text = this.label;
 						textElement.addClass( 'cke_combo_inlinelabel' );
-					} else
+					} else {
 						textElement.removeClass( 'cke_combo_inlinelabel' );
+					}
 
 					textElement.setText( typeof text != 'undefined' ? text : value );
 				}

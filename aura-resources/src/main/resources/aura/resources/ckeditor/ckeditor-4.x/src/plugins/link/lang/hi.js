@@ -1,5 +1,5 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'link', 'hi', {
@@ -40,12 +40,12 @@ CKEDITOR.plugins.setLang( 'link', 'hi', {
 	popupLeft: 'बायीं तरफ',
 	popupLocationBar: 'लोकेशन बार',
 	popupMenuBar: 'मॅन्यू बार',
-	popupResizable: 'Resizable', // MISSING
+	popupResizable: 'आकार बदलने लायक',
 	popupScrollBars: 'स्क्रॉल बार',
 	popupStatusBar: 'स्टेटस बार',
 	popupToolbar: 'टूल बार',
 	popupTop: 'दायीं तरफ',
-	rel: 'Relationship', // MISSING
+	rel: 'संबंध',
 	selectAnchor: 'ऐंकर चुनें',
 	styles: 'स्टाइल',
 	tabIndex: 'टैब इन्डॅक्स',

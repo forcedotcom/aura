@@ -1,5 +1,5 @@
 ﻿/**
- * Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -7,6 +7,7 @@ CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here. For example:
 	// config.language = 'fr';
 	// config.uiColor = '#AADC6E';
+
 	// CK4 filters some html tags and attributes by default, which disappear on save or during toggle from html to source and back
 	// see http://docs.ckeditor.com#!/guide/dev_allowed_content_rules
 	// these are safe, supported tags we always want to allow in client validation regardless of which plugins or toolbars are loaded

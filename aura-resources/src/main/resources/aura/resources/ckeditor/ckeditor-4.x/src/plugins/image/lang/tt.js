@@ -1,26 +1,25 @@
 ﻿/*
-Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
 For licensing, see LICENSE.md or http://ckeditor.com/license
 */
 CKEDITOR.plugins.setLang( 'image', 'tt', {
-	alertUrl: 'Please type the image URL', // MISSING
 	alt: 'Альтернатив текст',
 	border: 'Чик',
 	btnUpload: 'Серверга җибәрү',
 	button2Img: 'Do you want to transform the selected image button on a simple image?', // MISSING
-	hSpace: 'HSpace', // MISSING
+	hSpace: 'Горизонталь ара',
 	img2Button: 'Do you want to transform the selected image on a image button?', // MISSING
 	infoTab: 'Рәсем тасвирламасы',
 	linkTab: 'Сылталама',
 	lockRatio: 'Lock Ratio', // MISSING
 	menu: 'Рәсем үзлекләре',
-	resetSize: 'Reset Size', // MISSING
+	resetSize: 'Баштагы зурлык',
 	title: 'Рәсем үзлекләре',
 	titleButton: 'Рәсемле төймə үзлекләре',
 	upload: 'Йөкләү',
 	urlMissing: 'Image source URL is missing.', // MISSING
-	vSpace: 'VSpace', // MISSING
-	validateBorder: 'Чик киңлеге сан булырга тиеш',
-	validateHSpace: 'HSpace must be a whole number.', // MISSING
-	validateVSpace: 'VSpace must be a whole number.' // MISSING
+	vSpace: 'Вертикаль ара',
+	validateBorder: 'Чик киңлеге сан булырга тиеш.',
+	validateHSpace: 'Горизонталь ара бөтен сан булырга тиеш.',
+	validateVSpace: 'Вертикаль ара бөтен сан булырга тиеш.'
 } );

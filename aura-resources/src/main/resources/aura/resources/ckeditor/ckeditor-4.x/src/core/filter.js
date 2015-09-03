@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -1779,10 +1779,8 @@
 			else
 				stripBlock( element, enterTag, toBeChecked );
 		}
-		// Special case - elements that may contain CDATA
-		// should be removed completely. <script> is handled
-		// by processProtectedElement().
-		else if ( name == 'style' )
+		// Special case - elements that may contain CDATA should be removed completely.
+		else if ( name in { style: 1, script: 1 } )
 			element.remove();
 		// The rest of inline elements. May also be the last resort
 		// for some special elements.

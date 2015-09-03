@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -236,14 +236,12 @@ CKEDITOR.dialog.add( 'colordialog', function( editor ) {
 		oRow.setAttribute( 'role', 'row' );
 
 		// Create the gray scale colors cells.
-		for ( var n = 0; n < 6; n++ ) {
-			appendColorCell( oRow.$, '#' + aColors[ n ] + aColors[ n ] + aColors[ n ] );
+		appendColorCell( oRow.$, '#000000' );
+		for ( var n = 0; n < 16; n++  ) {
+			var c = n.toString( 16 );
+			appendColorCell( oRow.$, '#' + c + c + c + c + c + c );
 		}
-
-		// Fill the row with black cells.
-		for ( var i = 0; i < 12; i++ ) {
-			appendColorCell( oRow.$, '#000000' );
-		}
+		appendColorCell( oRow.$, '#ffffff' );
 	}
 
 	var numbering = function( id ) {
@@ -268,18 +266,15 @@ CKEDITOR.dialog.add( 'colordialog', function( editor ) {
 			clearSelected();
 			clearHighlight();
 		},
-		contents: [
-			{
+		contents: [ {
 			id: 'picker',
 			label: lang.title,
 			accessKey: 'I',
-			elements: [
-				{
+			elements: [ {
 				type: 'hbox',
 				padding: 0,
 				widths: [ '70%', '10%', '30%' ],
-				children: [
-					{
+				children: [ {
 					type: 'html',
 					html: '<div></div>',
 					onLoad: function() {
@@ -291,20 +286,19 @@ CKEDITOR.dialog.add( 'colordialog', function( editor ) {
 						( focused || this.getElement().getElementsByTag( 'td' ).getItem( 0 ) ).focus();
 					}
 				},
-					spacer,
+				spacer,
 				{
 					type: 'vbox',
 					padding: 0,
 					widths: [ '70%', '5%', '25%' ],
-					children: [
-						{
+					children: [ {
 						type: 'html',
-						html: '<span>' + lang.highlight + '</span>\
-												<div id="' + hicolorId + '" style="border: 1px solid; height: 74px; width: 74px;"></div>\
-												<div id="' + hicolorTextId + '">&nbsp;</div><span>' + lang.selected + '</span>\
-												<div id="' + selHiColorId + '" style="border: 1px solid; height: 20px; width: 74px;"></div>'
+						html: '<span>' + lang.highlight + '</span>' +
+							'<div id="' + hicolorId + '" style="border: 1px solid; height: 74px; width: 74px;"></div>' +
+							'<div id="' + hicolorTextId + '">&nbsp;</div><span>' + lang.selected + '</span>' +
+							'<div id="' + selHiColorId + '" style="border: 1px solid; height: 20px; width: 74px;"></div>'
 					},
-						{
+					{
 						type: 'text',
 						label: lang.selected,
 						labelStyle: 'display:none',
@@ -319,19 +313,15 @@ CKEDITOR.dialog.add( 'colordialog', function( editor ) {
 							}
 						}
 					},
-						spacer,
+					spacer,
 					{
 						type: 'button',
 						id: 'clear',
 						label: lang.clear,
 						onClick: clearSelected
-					}
-					]
-				}
-				]
-			}
-			]
-		}
-		]
+					} ]
+				} ]
+			} ]
+		} ]
 	};
 } );

@@ -1,5 +1,5 @@
-﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+/**
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -20,10 +20,22 @@
 		ltRegex = /</g,
 		quoteRegex = /"/g,
 
-		ampEscRegex = /&amp;/g,
-		gtEscRegex = /&gt;/g,
-		ltEscRegex = /&lt;/g,
-		quoteEscRegex = /&quot;/g;
+		allEscRegex = /&(lt|gt|amp|quot|nbsp|shy|#\d{1,5});/g,
+		namedEntities = {
+			lt: '<',
+			gt: '>',
+			amp: '&',
+			quot: '"',
+			nbsp: '\u00a0',
+			shy: '\u00ad'
+		},
+		allEscDecode = function( match, code ) {
+			if ( code[ 0 ] == '#' ) {
+				return String.fromCharCode( parseInt( code.slice( 1 ), 10 ) );
+			} else {
+				return namedEntities[ code ];
+			}
+		};
 
 	CKEDITOR.on( 'reset', function() {
 		functions = [];
@@ -69,6 +81,26 @@
 		},
 
 		/**
+		 * Finds the index of the first element in an array for which the `compareFunction` returns `true`.
+		 *
+		 *		CKEDITOR.tools.getIndex( [ 1, 2, 4, 3, 5 ], function( el ) {
+		 *			return el >= 3;
+		 *		} ); // 2
+		 *
+		 * @since 4.5
+		 * @param {Array} array Array to search in.
+		 * @param {Function} compareFunction Compare function.
+		 * @returns {Number} The index of the first matching element or `-1` if none matches.
+		 */
+		getIndex: function( arr, compareFunction ) {
+			for ( var i = 0; i < arr.length; ++i ) {
+				if ( compareFunction( arr[ i ] ) )
+					return i;
+			}
+			return -1;
+		},
+
+		/**
 		 * Creates a deep copy of an object.
 		 *
 		 * **Note**: Recursive references are not supported.
@@ -106,7 +138,7 @@
 			}
 
 			// "Static" types.
-			if ( obj === null || ( typeof( obj ) != 'object' ) || ( obj instanceof String ) || ( obj instanceof Number ) || ( obj instanceof Boolean ) || ( obj instanceof Date ) || ( obj instanceof RegExp ) )
+			if ( obj === null || ( typeof obj != 'object' ) || ( obj instanceof String ) || ( obj instanceof Number ) || ( obj instanceof Boolean ) || ( obj instanceof Date ) || ( obj instanceof RegExp ) )
 				return obj;
 
 			// DOM objects and window.
@@ -168,9 +200,9 @@
 			var argsLength = arguments.length,
 				overwrite, propertiesList;
 
-			if ( typeof( overwrite = arguments[ argsLength - 1 ] ) == 'boolean' )
+			if ( typeof ( overwrite = arguments[ argsLength - 1 ] ) == 'boolean' )
 				argsLength--;
-			else if ( typeof( overwrite = arguments[ argsLength - 2 ] ) == 'boolean' ) {
+			else if ( typeof ( overwrite = arguments[ argsLength - 2 ] ) == 'boolean' ) {
 				propertiesList = arguments[ argsLength - 1 ];
 				argsLength -= 2;
 			}
@@ -334,19 +366,32 @@
 		 * @returns {String} The encoded string.
 		 */
 		htmlEncode: function( text ) {
+			// Backwards compatibility - accept also non-string values (casting is done below).
+			// Since 4.4.8 we return empty string for null and undefined because these values make no sense.
+			if ( text === undefined || text === null ) {
+				return '';
+			}
+
 			return String( text ).replace( ampRegex, '&amp;' ).replace( gtRegex, '&gt;' ).replace( ltRegex, '&lt;' );
 		},
 
 		/**
-		 * Decodes HTML entities.
+		 * Decodes HTML entities that browsers tend to encode when used in text nodes.
 		 *
 		 *		alert( CKEDITOR.tools.htmlDecode( '&lt;a &amp; b &gt;' ) ); // '<a & b >'
+		 *
+		 * Read more about chosen entities in the [research](http://dev.ckeditor.com/ticket/13105#comment:8).
 		 *
 		 * @param {String} The string to be decoded.
 		 * @returns {String} The decoded string.
 		 */
 		htmlDecode: function( text ) {
-			return text.replace( ampEscRegex, '&' ).replace( gtEscRegex, '>' ).replace( ltEscRegex, '<' );
+			// See:
+			// * http://dev.ckeditor.com/ticket/13105#comment:8 and comment:9,
+			// * http://jsperf.com/wth-is-going-on-with-jsperf JSPerf has some serious problems, but you can observe
+			// that combined regexp tends to be quicker (except on V8). It will also not be prone to fail on '&amp;lt;'
+			// (see http://dev.ckeditor.com/ticket/13105#DXWTF:CKEDITOR.tools.htmlEnDecodeAttr).
+			return text.replace( allEscRegex, allEscDecode );
 		},
 
 		/**
@@ -358,21 +403,72 @@
 		 * @returns {String} The encoded value.
 		 */
 		htmlEncodeAttr: function( text ) {
-			return text.replace( quoteRegex, '&quot;' ).replace( ltRegex, '&lt;' ).replace( gtRegex, '&gt;' );
+			return CKEDITOR.tools.htmlEncode( text ).replace( quoteRegex, '&quot;' );
 		},
 
 		/**
-		 * Replace HTML entities previously encoded by
-		 * {@link #htmlEncodeAttr htmlEncodeAttr} back to their plain character
-		 * representation.
+		 * Decodes HTML entities that browsers tend to encode when used in attributes.
 		 *
 		 *		alert( CKEDITOR.tools.htmlDecodeAttr( '&lt;a &quot; b&gt;' ) ); // '<a " b>'
+		 *
+		 * Since CKEditor 4.5 this method simply executes {@link #htmlDecode} which covers
+		 * all necessary entities.
 		 *
 		 * @param {String} text The text to be decoded.
 		 * @returns {String} The decoded text.
 		 */
 		htmlDecodeAttr: function( text ) {
-			return text.replace( quoteEscRegex, '"' ).replace( ltEscRegex, '<' ).replace( gtEscRegex, '>' );
+			return CKEDITOR.tools.htmlDecode( text );
+		},
+
+		/**
+		 * Transforms text to valid HTML: creates paragraphs, replaces tabs with non-breaking spaces etc.
+		 *
+		 * @since 4.5
+		 * @param {String} text Text to transform.
+		 * @param {Number} enterMode Editor {@link CKEDITOR.config#enterMode Enter mode}.
+		 * @returns {String} HTML generated from the text.
+		 */
+		transformPlainTextToHtml: function( text, enterMode ) {
+			var isEnterBrMode = enterMode == CKEDITOR.ENTER_BR,
+				// CRLF -> LF
+				html = this.htmlEncode( text.replace( /\r\n/g, '\n' ) );
+
+			// Tab -> &nbsp x 4;
+			html = html.replace( /\t/g, '&nbsp;&nbsp; &nbsp;' );
+
+			var paragraphTag = enterMode == CKEDITOR.ENTER_P ? 'p' : 'div';
+
+			// Two line-breaks create one paragraphing block.
+			if ( !isEnterBrMode ) {
+				var duoLF = /\n{2}/g;
+				if ( duoLF.test( html ) ) {
+					var openTag = '<' + paragraphTag + '>', endTag = '</' + paragraphTag + '>';
+					html = openTag + html.replace( duoLF, function() {
+						return endTag + openTag;
+					} ) + endTag;
+				}
+			}
+
+			// One <br> per line-break.
+			html = html.replace( /\n/g, '<br>' );
+
+			// Compensate padding <br> at the end of block, avoid loosing them during insertion.
+			if ( !isEnterBrMode ) {
+				html = html.replace( new RegExp( '<br>(?=</' + paragraphTag + '>)' ), function( match ) {
+					return CKEDITOR.tools.repeat( match, 2 );
+				} );
+			}
+
+			// Preserve spaces at the ends, so they won't be lost after insertion (merged with adjacent ones).
+			html = html.replace( /^ | $/g, '&nbsp;' );
+
+			// Finally, preserve whitespaces that are to be lost.
+			html = html.replace( /(>|\s) /g, function( match, before ) {
+				return before + '&nbsp;';
+			} ).replace( / (?=<)/g, '&nbsp;' );
+
+			return html;
 		},
 
 		/**
@@ -406,6 +502,21 @@
 		},
 
 		/**
+		 * Gets a universally unique ID. It returns a random string
+		 * compliant with ISO/IEC 11578:1996, without dashes, with the "e" prefix to
+		 * make sure that the ID does not start with a number.
+		 *
+		 * @returns {String} A global unique ID.
+		 */
+		getUniqueId: function() {
+			var uuid = 'e'; // Make sure that id does not start with number.
+			for ( var i = 0; i < 8; i++ ) {
+				uuid += Math.floor( ( 1 + Math.random() ) * 0x10000 ).toString( 16 ).substring( 1 );
+			}
+			return uuid;
+		},
+
+		/**
 		 * Creates a function override.
 		 *
 		 *		var obj = {
@@ -433,14 +544,14 @@
 		},
 
 		/**
-		 * Executes a function after specified delay.
+		 * Executes a function after a specified delay.
 		 *
 		 *		CKEDITOR.tools.setTimeout( function() {
 		 *			alert( 'Executed after 2 seconds' );
 		 *		}, 2000 );
 		 *
 		 * @param {Function} func The function to be executed.
-		 * @param {Number} [milliseconds=0] The amount of time (in millisecods) to wait
+		 * @param {Number} [milliseconds=0] The amount of time (in milliseconds) to wait
 		 * to fire the function execution.
 		 * @param {Object} [scope=window] The object to store the function execution scope
 		 * (the `this` object).
@@ -1079,19 +1190,24 @@
 		 * @since 4.2.1
 		 * @param {Number} minInterval Minimum interval between `output` calls in milliseconds.
 		 * @param {Function} output Function that will be executed as `output`.
+		 * @param {Object} [scopeObj] The object used to scope the listener call (the `this` object).
 		 * @returns {Object}
 		 * @returns {Function} return.input Buffer's input method.
 		 * @returns {Function} return.reset Resets buffered events &mdash; `output` will not be executed
 		 * until next `input` is triggered.
 		 */
-		eventsBuffer: function( minInterval, output ) {
+		eventsBuffer: function( minInterval, output, scopeObj ) {
 			var scheduled,
 				lastOutput = 0;
 
 			function triggerOutput() {
 				lastOutput = ( new Date() ).getTime();
 				scheduled = false;
-				output();
+				if ( scopeObj ) {
+					output.call( scopeObj );
+				} else {
+					output();
+				}
 			}
 
 			return {
@@ -1130,7 +1246,7 @@
 		 * @param {Boolean} [withAppend] Whether to append created elements to the `doc`.
 		 */
 		enableHtml5Elements: function( doc, withAppend ) {
-			var els = 'abbr,article,aside,audio,bdi,canvas,data,datalist,details,figcaption,figure,footer,header,hgroup,mark,meter,nav,output,progress,section,summary,time,video'.split( ',' ),
+			var els = 'abbr,article,aside,audio,bdi,canvas,data,datalist,details,figcaption,figure,footer,header,hgroup,main,mark,meter,nav,output,progress,section,summary,time,video'.split( ',' ),
 				i = els.length,
 				el;
 

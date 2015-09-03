@@ -15,8 +15,13 @@ var config = {
 
 	framework: 'yui',
 
+	// secure: true,
+	privateKey: 'tests/_benderjs/ssl/key.pem',
+	certificate: 'tests/_benderjs/ssl/cert.pem',
+
 	plugins: [
 		'benderjs-yui',
+		'benderjs-sinon',
 		'benderjs-jquery',
 		'tests/_benderjs/ckeditor'
 	],
@@ -32,7 +37,7 @@ var config = {
 			// Latest of the old API (1.8.3)
 			// Latest of the 1.* branch
 			// Latest of the 2.* branch
-			jquery: [ '1.8.3', '1.11.1', '2.1.1' ]
+			jQuery: [ '1.8.3', '1.11.1', '2.1.1' ]
 		},
 
 		'Core': {
@@ -49,6 +54,9 @@ var config = {
 
 				// IE8 (fails only in testing env - window.window === window gives false)
 				'tests/core/tools#test_clone_Window': 'env.ie && env.version == 8',
+
+				// IE8-10 (#13154)
+				'tests/core/selection/editor#test initial selection after set data in autoparagraphing inline editor': 'env.ie && env.version < 11',
 
 				// Safari (#11980)
 				'tests/core/editable/keystrokes/delbackspacequirks/collapsed#test backspace #2': 'env.safari',
@@ -88,7 +96,6 @@ var config = {
 				'tests/plugins/magicline/widgets#test commands[next], last block in nested': 'env.gecko',
 
 				// Safari (#12690)
-				'tests/plugins/font/font#test apply font size over another font size (collapsed selection in empty span)': 'env.safari',
 				'tests/plugins/font/font#test apply font size over another font size (deeply nested collapsed selection)': 'env.safari'
 			}
 		},
@@ -121,11 +128,7 @@ var config = {
 			paths: [
 				'utils/**',
 				'!**/_*/**'
-			],
-			regressions: {
-				// Safari (#12690)
-				'tests/utils/selection/setgetwithhtml#test setSelection - in empty inline element': 'env.safari'
-			}
+			]
 		}
 	}
 };

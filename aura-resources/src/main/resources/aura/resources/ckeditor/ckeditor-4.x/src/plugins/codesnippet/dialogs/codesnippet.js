@@ -1,5 +1,5 @@
 /**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -24,11 +24,13 @@
 			width = Math.min( size.width - 70, 800 ),
 			// Make it use 2/3 of the viewport height.
 			height = size.height / 1.5;
-			// Low resolution settings.
-			if ( clientHeight < 650 )
-				height = clientHeight - 220;
 
-		return  {
+		// Low resolution settings.
+		if ( clientHeight < 650 ) {
+			height = clientHeight - 220;
+		}
+
+		return {
 			title: lang.title,
 			minHeight: 200,
 			resizable: CKEDITOR.DIALOG_RESIZE_NONE,
@@ -71,7 +73,7 @@
 								'height:' + height + 'px;' +
 								'tab-size:4;' +
 								'text-align:left;',
-								'class': 'cke_source'
+							'class': 'cke_source'
 						}
 					]
 				}

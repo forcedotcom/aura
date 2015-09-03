@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -73,8 +73,9 @@
 				}
 			}
 			// raw style text form.
-			else
+			else {
 				addingStyleText += name;
+			}
 
 			isPrepend = value;
 		}
@@ -156,7 +157,6 @@
 		}
 	}
 
-	var cssLengthRelativeUnit = /^([.\d]*)+(em|ex|px|gd|rem|vw|vh|vm|ch|mm|cm|in|pt|pc|deg|rad|ms|s|hz|khz){1}?/i;
 	var emptyMarginRegex = /^(?:\b0[^\s]*\s*){1,4}$/; // e.g. 0px 0pt 0px
 	var romanLiternalPattern = '^m{0,4}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})$',
 		lowerRomanLiteralRegex = new RegExp( romanLiternalPattern ),
@@ -166,7 +166,7 @@
 		unorderedPatterns = { 'disc': /[l\u00B7\u2002]/, 'circle': /[\u006F\u00D8]/, 'square': /[\u006E\u25C6]/ },
 		listMarkerPatterns = { 'ol': orderedPatterns, 'ul': unorderedPatterns },
 		romans = [ [ 1000, 'M' ], [ 900, 'CM' ], [ 500, 'D' ], [ 400, 'CD' ], [ 100, 'C' ], [ 90, 'XC' ], [ 50, 'L' ], [ 40, 'XL' ], [ 10, 'X' ], [ 9, 'IX' ], [ 5, 'V' ], [ 4, 'IV' ], [ 1, 'I' ] ],
-		alpahbets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		alpahbets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 	// Convert roman numbering back to decimal.
 	function fromRoman( str ) {
@@ -247,6 +247,11 @@
 							// The best situation: "mso-list:l0 level1 lfo2" tells the belonged list root, list item indentation, etc.
 							[ ( /^mso-list$/ ), null, function( val ) {
 								val = val.split( ' ' );
+								// Ignore values like "mso-list:Ignore". (FF #11976)
+								if ( val.length < 2 ) {
+									return;
+								}
+
 								var listId = Number( val[ 0 ].match( /\d+/ ) ),
 									indent = Number( val[ 1 ].match( /\d+/ ) );
 
@@ -273,8 +278,9 @@
 					return true;
 				}
 				// Current list disconnected.
-				else
+				else {
 					previousListId = previousListItemMargin = listBaseIndent = null;
+				}
 
 				return false;
 			},
@@ -330,7 +336,17 @@
 						var attributes = child.attributes,
 							listItemChildren = child.children,
 							count = listItemChildren.length,
+							first = listItemChildren[ 0 ],
 							last = listItemChildren[ count - 1 ];
+
+						// Converts <li><p style="_MSO_LIST_STYLES_">{...}</p></li> -> <li style="_MSO_LIST_STYLES_">{...}</li>.
+						// The above format is what we got when pasting from Word 2010 to IE11 and possibly some others.
+						// Existence of extra <p> tag that can be later recognized as list item (see #getRules.return.elements.p)
+						// creates incorrect and problematic structures similar to <cke:li><cke:li>{...}</cke:li></cke:li>. (#11376)
+						if ( first.attributes && first.attributes.style && first.attributes.style.indexOf( 'mso-list' ) > -1 ) {
+							child.attributes.style = first.attributes.style;
+							first.replaceWithChildren();
+						}
 
 						// Move out nested list.
 						if ( last.name in CKEDITOR.dtd.$list ) {
@@ -348,7 +364,9 @@
 
 						plugin.filters.stylesFilter( [
 							[ 'tab-stops', null, function( val ) {
-								var margin = val.split( ' ' )[ 1 ].match( cssLengthRelativeUnit );
+								// val = [left|center|right|decimal] <value><unit> Source: W3C, WD-tabs-970117.
+								// In some cases the first word is missing - hence the square brackets.
+								var margin = val.match( /0$|\d+\.?\d*\w+/ );
 								margin && ( previousListItemMargin = CKEDITOR.tools.convertToPx( margin[ 0 ] ) );
 							} ],
 							( level == 1 ? [ 'mso-list', null, function( val ) {
@@ -400,7 +418,7 @@
 				for ( var i = 0; i < children.length; i++ ) {
 					child = children[ i ];
 
-					if ( 'cke:li' == child.name ) {
+					if ( child.name == 'cke:li' ) {
 						child.name = 'li';
 						listItem = child;
 						listItemAttrs = listItem.attributes;
@@ -508,16 +526,18 @@
 									list = parent.parent;
 
 								list.add( listItem );
-							} else
+							} else {
 								list.add( listItem );
+							}
 
 							children.splice( i--, 1 );
 						}
 
 						lastListItem = listItem;
 						lastIndent = listItemIndent;
-					} else if ( list )
+					} else if ( list ) {
 						list = lastIndent = lastListItem = null;
+					}
 				}
 
 				for ( i = 0; i < openedLists.length; i++ )
@@ -527,7 +547,7 @@
 			},
 
 			// A simple filter which always rejecting.
-			falsyFilter: function( value ) {
+			falsyFilter: function() {
 				return false;
 			},
 
@@ -592,6 +612,10 @@
 					element.name = styleDef.element;
 					CKEDITOR.tools.extend( element.attributes, CKEDITOR.tools.clone( styleDef.attributes ) );
 					element.addStyle( CKEDITOR.style.getStyleText( styleDef ) );
+					// Mark style classes as allowed so they will not be filtered out (#12256).
+					if ( styleDef.attributes && styleDef.attributes[ 'class' ] ) {
+						element.classWhiteList = ' ' + styleDef.attributes[ 'class' ] + ' ';
+					}
 				} : function() {};
 			},
 
@@ -745,8 +769,7 @@
 								// Extract selectors and style properties.
 								.replace( /(.+?)\{(.+?)\}/g, function( rule, selectors, styleBlock ) {
 									selectors = selectors.split( ',' );
-									var length = selectors.length,
-										selector;
+									var length = selectors.length;
 									for ( var i = 0; i < length; i++ ) {
 										// Assume MS-Word mostly generate only simple
 										// selector( [Type selector][Class selector]).
@@ -790,7 +813,8 @@
 						// that doesn't include "mso-list:Ignore" on list bullets,
 						// note it's not perfect as not all list style (e.g. "heading list") is shipped
 						// with this pattern. (#6662)
-						if ( ( /MsoListParagraph/i ).exec( element.attributes[ 'class' ] ) || element.getStyle( 'mso-list' ) ) {
+						if ( ( /MsoListParagraph/i ).exec( element.attributes[ 'class' ] ) ||
+							( element.getStyle( 'mso-list' ) && !element.getStyle( 'mso-list' ).match( /^(none|skip)$/i ) ) ) {
 							var bulletText = element.firstChild( function( node ) {
 								return node.type == CKEDITOR.NODE_TEXT && !containsNothingButSpaces( node.parent );
 							} );
@@ -813,8 +837,9 @@
 							// We suffer from attribute/style lost in this situation.
 							delete element.name;
 							element.add( new CKEDITOR.htmlParser.element( 'br' ) );
-						} else
+						} else {
 							elementMigrateFilter( config[ 'format_' + ( config.enterMode == CKEDITOR.ENTER_P ? 'p' : 'div' ) ] )( element );
+						}
 					},
 
 					'div': function( element ) {
@@ -859,8 +884,7 @@
 							styleText = attrs.style,
 							parent = element.parent;
 
-						if ( 'font' == parent.name ) // Merge nested <font> tags.
-						{
+						if ( parent.name == 'font' ) { // Merge nested <font> tags.
 							CKEDITOR.tools.extend( parent.attributes, element.attributes );
 							styleText && parent.addStyle( styleText );
 							delete element.name;
@@ -926,10 +950,8 @@
 						}
 
 						// Update the src attribute of image element with href.
-						var children = element.children,
-							attrs = element.attributes,
-							styleText = attrs && attrs.style,
-							firstChild = children && children[ 0 ];
+						var attrs = element.attributes,
+							styleText = attrs && attrs.style;
 
 						// Assume MS-Word mostly carry font related styles on <span>,
 						// adapting them to editor's convention.
@@ -937,11 +959,11 @@
 							attrs.style = stylesFilter( [
 								// Drop 'inline-height' style which make lines overlapping.
 								[ 'line-height' ],
-								[ ( /^font-family$/ ), null, !removeFontStyles ? styleMigrateFilter( config[ 'font_style' ], 'family' ) : null ],
-								[ ( /^font-size$/ ), null, !removeFontStyles ? styleMigrateFilter( config[ 'fontSize_style' ], 'size' ) : null ],
-								[ ( /^color$/ ), null, !removeFontStyles ? styleMigrateFilter( config[ 'colorButton_foreStyle' ], 'color' ) : null ],
-								[ ( /^background-color$/ ), null, !removeFontStyles ? styleMigrateFilter( config[ 'colorButton_backStyle' ], 'color' ) : null ]
-								] )( styleText, element ) || '';
+								[ ( /^font-family$/ ), null, !removeFontStyles ? styleMigrateFilter( config.font_style, 'family' ) : null ],
+								[ ( /^font-size$/ ), null, !removeFontStyles ? styleMigrateFilter( config.fontSize_style, 'size' ) : null ],
+								[ ( /^color$/ ), null, !removeFontStyles ? styleMigrateFilter( config.colorButton_foreStyle, 'color' ) : null ],
+								[ ( /^background-color$/ ), null, !removeFontStyles ? styleMigrateFilter( config.colorButton_backStyle, 'color' ) : null ]
+							] )( styleText, element ) || '';
 						}
 
 						if ( !attrs.style )
@@ -954,16 +976,22 @@
 					},
 
 					// Migrate basic style formats to editor configured ones.
-					b: elementMigrateFilter( config[ 'coreStyles_bold' ] ),
-					i: elementMigrateFilter( config[ 'coreStyles_italic' ] ),
-					u: elementMigrateFilter( config[ 'coreStyles_underline' ] ),
-					s: elementMigrateFilter( config[ 'coreStyles_strike' ] ),
-					sup: elementMigrateFilter( config[ 'coreStyles_superscript' ] ),
-					sub: elementMigrateFilter( config[ 'coreStyles_subscript' ] ),
+					b: elementMigrateFilter( config.coreStyles_bold ),
+					i: elementMigrateFilter( config.coreStyles_italic ),
+					u: elementMigrateFilter( config.coreStyles_underline ),
+					s: elementMigrateFilter( config.coreStyles_strike ),
+					sup: elementMigrateFilter( config.coreStyles_superscript ),
+					sub: elementMigrateFilter( config.coreStyles_subscript ),
 
 					// Remove full paths from links to anchors.
 					a: function( element ) {
 						var attrs = element.attributes;
+
+						if ( attrs.name && attrs.name.match( /ole_link\d+/i ) ) {
+							delete element.name;
+							return;
+						}
+
 						if ( attrs.href && attrs.href.match( /^file:\/\/\/[\S]+#/i ) )
 							attrs.href = attrs.href.replace( /^file:\/\/\/[^#]+/i, '' );
 					},
@@ -1057,7 +1085,13 @@
 					// Only Firefox carry style sheet from MS-Word, which
 					// will be applied by us manually. For other browsers
 					// the css className is useless.
-					'class': falsyFilter,
+					// We need to keep classes added as a style (#12256).
+					'class': function( value, element ) {
+						if ( element.classWhiteList && element.classWhiteList.indexOf( ' ' + value + ' ' ) != -1 ) {
+							return value;
+						}
+						return false;
+					},
 
 					// MS-Word always generate 'background-color' along with 'bgcolor',
 					// simply drop the deprecated attributes.
@@ -1120,6 +1154,10 @@
 	};
 
 	CKEDITOR.cleanWord = function( data, editor ) {
+		// We get <![if !supportLists]> and <![endif]> when we started using `dataTransfer` instead of pasteBin, so we need to
+		// change <![if !supportLists]> to <!--[if !supportLists]--> and <![endif]> to <!--[endif]-->.
+		data = data.replace( /<!\[([^\]]*?)\]>/g, '<!--[$1]-->' );
+
 		// Firefox will be confused by those downlevel-revealed IE conditional
 		// comments, fixing them first( convert it to upperlevel-revealed one ).
 		// e.g. <![if !vml]>...<![endif]>
@@ -1158,7 +1196,7 @@
 		try {
 			data = dataProcessor.toHtml( data );
 		} catch ( e ) {
-			alert( editor.lang.pastefromword.error );
+			editor.showNotification( editor.lang.pastefromword.error );
 		}
 
 		// Below post processing those things that are unable to delivered by filter rules.

@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -68,7 +68,6 @@ CKEDITOR.plugins.add( 'menubutton', {
 			 */
 			$: function( definition ) {
 				// We don't want the panel definition in this object.
-				var panelDefinition = definition.panel;
 				delete definition.panel;
 
 				this.base( definition );

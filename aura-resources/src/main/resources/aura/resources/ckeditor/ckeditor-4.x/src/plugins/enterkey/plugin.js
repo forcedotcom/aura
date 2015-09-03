@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -112,29 +112,36 @@
 						//      </li>                    =>          </li>
 						//  </ul>                        =>      </ul>
 
-						if ( firstChild || lastChild )
-							block[ firstChild ? 'insertBefore' : 'insertAfter' ]( blockGrandParent );
+						if ( firstChild || lastChild ) {
 
-						// If the empty block is neither first nor last child
-						// then split the list and the block as an element
-						// of outer list.
-						//
-						//                              =>      <ul>
-						//                              =>          <li>
-						//  <ul>                        =>              <ul>
-						//      <li>                    =>                  <li>x</li>
-						//          <ul>                =>              </ul>
-						//              <li>x</li>      =>          </li>
-						//              <li>^</li>      =>          <li>^</li>
-						//              <li>y</li>      =>          <li>
-						//          </ul>               =>              <ul>
-						//      </li>                   =>                  <li>y</li>
-						//  </ul>                       =>              </ul>
-						//                              =>          </li>
-						//                              =>      </ul>
+							// If it's only child, we don't want to keep perent ul anymore.
+							if ( firstChild && lastChild ) {
+								blockParent.remove();
+							}
 
-						else
+							block[lastChild ? 'insertAfter' : 'insertBefore']( blockGrandParent );
+
+							// If the empty block is neither first nor last child
+							// then split the list and the block as an element
+							// of outer list.
+							//
+							//                              =>      <ul>
+							//                              =>          <li>
+							//  <ul>                        =>              <ul>
+							//      <li>                    =>                  <li>x</li>
+							//          <ul>                =>              </ul>
+							//              <li>x</li>      =>          </li>
+							//              <li>^</li>      =>          <li>^</li>
+							//              <li>y</li>      =>          <li>
+							//          </ul>               =>              <ul>
+							//      </li>                   =>                  <li>y</li>
+							//  </ul>                       =>              </ul>
+							//                              =>          </li>
+							//                              =>      </ul>
+
+						} else {
 							block.breakParent( blockGrandParent );
+						}
 					}
 
 					else if ( !needsBlock ) {

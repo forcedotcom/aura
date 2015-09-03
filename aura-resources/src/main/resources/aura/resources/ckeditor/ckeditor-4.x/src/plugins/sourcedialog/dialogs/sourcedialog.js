@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2015, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -40,7 +40,7 @@ CKEDITOR.dialog.add( 'sourcedialog', function( editor ) {
 				} );
 			}
 
-			return function( event ) {
+			return function() {
 				// Remove CR from input data for reliable comparison with editor data.
 				var newData = this.getValueOf( 'main', 'data' ).replace( /\r/g, '' ),
 					that = this;

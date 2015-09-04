@@ -64,19 +64,6 @@
 
     /**
      * Override ui:input.
-     */
-    handleUpdate : function(component, event) {
-        var helper = component.getDef().getHelper();
-        var updateOn = helper.getUpdateOn(component);
-
-        // if this is an event we're supposed to update on, call this component's update implementation
-        if (updateOn.indexOf(event.type) > -1) {
-            helper.doUpdate(component, helper.getDomElementValue(this.getInputElement(component)));
-        }
-    },
-
-    /**
-     * Override ui:input.
      *
      */
     doUpdate : function(component, value) {
@@ -96,23 +83,14 @@
     },
 
     /**
-     * @Override
+     * Override ui:input.
      */
-    addDomHandler : function(component, event) {
-        var el = this.getInputElement(component);
-        $A.util.on(el, event, this.lib.interactive.domEventHandler);
-    },
-
     getInputElement : function(component) {
-        var element;
-        // on desktop, the input is wrapped in a <form> tag
-        if (this.hasLabel(component) || $A.get("$Browser.formFactor") == "DESKTOP") {
-            var el = component.getElement();
-            element = el.getElementsByTagName('input')[0] || el;
-        } else {
-            element = component.getElement();
+        var inputCmp = component.getConcreteComponent().find("inputText");
+        if (inputCmp) {
+            return inputCmp.getElement();
         }
-        return element;
+        return component.getElement();
     },
 
     getDateString: function(date) {

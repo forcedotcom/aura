@@ -182,6 +182,7 @@ public class MenuUITest extends WebDriverTestCase {
     public void testActionMenuNestedMenuItems() throws MalformedURLException, URISyntaxException {
         testActionMenuForApp(MENUTEST_APP, "Nested");
     }
+
     /**
      * Uncomment test once W-2515040 is fixed
      * 
@@ -218,13 +219,11 @@ public class MenuUITest extends WebDriverTestCase {
         testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
     }
 
-    // TODO: W-2479332, disabled due to flapper
     @PerfTest
     public void testCheckboxMenu() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
 
-    // TODO: W-2479332, disabled due to flapper
     public void testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
@@ -322,7 +321,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Checkbox items selected are not correct", "St. Louis Rams,Arizona Cardinals", result.getText());
     }
 
-    //W-2721266 : disable this test because it's a flapper. 
+    // W-2721266 : disable this test because it's a flapper.
     public void _testMenuRadio() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();

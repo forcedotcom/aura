@@ -50,17 +50,17 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     /**
      * Excluded Browser Reasons:
-     *
+     * 
      * IE7: pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is
      * that it will sometimes stop one short
-     *
+     * 
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
-     *
+     * 
      * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
-     *
+     * 
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
-     *
+     * 
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
@@ -143,8 +143,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *********************************** Date Picker Tests*******************************************
      ***********************************************************************************************/
-    //W-2721497: test flapper, in homeEndButtonHelper() above
-    //we might need some wait between click() and findDomElement(...) 
+    // W-2721497: test flapper, in homeEndButtonHelper() above
+    // we might need some wait between click() and findDomElement(...)
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
@@ -284,7 +284,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Test case for W-2031902
-    // TODO: disabled due to flapper W-2479332
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
     public void testValueChangeEvent() throws Exception {
@@ -454,7 +453,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Testing Functionality of calendar in traversing through 1 year by the keys
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
-    public void _testDateWithOneArrow() throws Exception {
+    @Flapper
+    public void testDateWithOneArrow() throws Exception {
         open(URL);
         WebDriver driver = getDriver();
 
@@ -481,7 +481,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of arrows being used one after the other
-    //W-2721497: test flapper, we might need some wait between click() and findDomElement(...) 
+    // W-2721497: test flapper, we might need some wait between click() and findDomElement(...)
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void _testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1

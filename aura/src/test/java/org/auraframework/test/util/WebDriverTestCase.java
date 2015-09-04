@@ -60,6 +60,7 @@ import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
 import org.auraframework.test.perf.util.PerfExecutorTest;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.util.AuraUtil;
 import org.auraframework.util.test.annotation.FreshBrowserInstance;
 import org.auraframework.util.test.annotation.WebDriverTest;
@@ -103,6 +104,9 @@ import com.google.common.collect.Sets;
  */
 @WebDriverTest
 public abstract class WebDriverTestCase extends IntegrationTestCase {
+    // Rerun test marked with the flapper annotation a certain number of times before failing the build
+    private static int FLAPPER_NUM_RETRIES = 1;
+
     private static final Logger logger = Logger.getLogger("WebDriverTestCase");
     private final String LOADING_INDICATOR = "div.loadingIndicator";
 
@@ -136,8 +140,14 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     public @interface CheckAccessibility {
         boolean value() default true;
 
-        BrowserType browserType() default BrowserType.GOOGLECHROME; // default browser to run accessibility test is
-                                                                    // Google Chrome
+        // Default browser to run accessibility test is Google Chrome
+        BrowserType browserType() default BrowserType.GOOGLECHROME;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target({ ElementType.TYPE, ElementType.METHOD })
+    @Inherited
+    public @interface Flapper {
     }
 
     public WebDriverTestCase(String name) {
@@ -206,13 +216,44 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
         if (isPerfTest()) {
             runPerfTests();
-        } else {
+            return;
+        }
+
+        for (int i = 0; i <= FLAPPER_NUM_RETRIES; i++) {
             try {
                 perBrowserSetUp();
                 superRunTest();
+                return;
+            } catch (Throwable th) {
+                if (!isFlapper()) {
+                    throw th;
+                }
+
+                logger.info(getName() + " failed at iteration " + (i + 1) + " of " + (FLAPPER_NUM_RETRIES + 1)
+                        + " with error: " + AuraExceptionUtil.getStackTrace(th));
+
+                quitDriver();
             } finally {
                 perBrowserTearDown();
             }
+        }
+    }
+
+    /**
+     * Checks if the current test is marked with the flapper annotation.
+     */
+    private boolean isFlapper() {
+        Class<?> testClass = getClass();
+        if (testClass.isAnnotationPresent(Flapper.class)) {
+            return true;
+        }
+        if (getTestLabels().contains("flapper")) {
+            return true;
+        }
+        try {
+            return testClass.getMethod(getName()).isAnnotationPresent(Flapper.class);
+        } catch (Throwable t) {
+            return false;
         }
     }
 

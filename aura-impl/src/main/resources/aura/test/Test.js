@@ -47,7 +47,7 @@ TestInstance = function() {
  *
  * Note that this set of errors is 'static', since it can be accessed from window.onerror even before the $A.test
  * instance is initialized. We are careful to update it globally on the prototype instead of in the class.
- * 
+ *
  * @private
  * @memberof Test
  */
@@ -307,13 +307,13 @@ TestInstance.prototype.enqueueAction = function(action, background) {
 /**
  *
  * @description Get an instance of a server action that is not available to the component.
- * 
+ *
  * @example
  * $A.test.getExternalAction(cmp, "aura://ComponentController/ACTION$getComponent",
  * 			{name:"aura:text", attributes:{value:"valuable"}},
  * 			"java://org.auraframework.instance.component",
  * 			function(action){alert(action.getReturnValue().attributes.values.value)})
- * 
+ *
  * @param {Component} component
  *            The scope to run the action with, even if the action is not visible to it
  * @param {String} descriptor
@@ -623,14 +623,14 @@ TestInstance.prototype.assertAccessible = function() {
 };
 
 /**
- * 
+ *
  * @description Assert that if(condition) check evaluates to true.
  * A truthy value refers to an Object, a string, a non-zero number, a non-empty array, or true.
- * 
+ *
  * @example
  * assertTruthy("helloWorld"); // Positive
  * assertTruthy(null); // Negative
- * 
+ *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not true
  * @export
@@ -647,7 +647,7 @@ TestInstance.prototype.assertTruthy = function(condition, assertMessage) {
  *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not false
- * 
+ *
  * @example
  * assertFalsy("helloWorld"); // Negative
  * assertFalsy(null); // Positive
@@ -663,11 +663,11 @@ TestInstance.prototype.assertFalsy = function(condition, assertMessage) {
 
 /**
  * @description Assert that if(condition) check evaluates to true.
- * 
+ *
  * @param {Object} condition The condition to evaluate
  * @param {String} assertMessage The message that is returned if the condition is not true
- * 
- * 
+ *
+ *
  * @example
  * assert("helloWorld"); // Positive
  * assert(null); // Negative
@@ -1716,11 +1716,11 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     if (this.disconnected) {
         return { "status": "INCOMPLETE" };
     }
-    //run callbacks 
+    //run callbacks
     var cb_config;
     var processing = this.preDecodeConfigs;
-    //we cannot modify the original reponse, however, we can make a copy, modify it, then later feed decode() with that copy 
-    var oldResponse = response; 
+    //we cannot modify the original reponse, however, we can make a copy, modify it, then later feed decode() with that copy
+    var oldResponse = response;
     var newResponse; var i;
     if(processing) {
     	this.preDecodeConfigs = [];
@@ -1731,7 +1731,7 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
 	        	oldResponse = newResponse;
 	        }
 	    }
-	    
+
     }
     //now feed decode() with our copy of response
     return config["fn"].call(config["scope"], oldResponse, noStrip);
@@ -1763,7 +1763,7 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  * @param postSendCallback the hook function for after send.
  * one of preSendCallback and postSendCallback can be null, but not both of them
  * @return a handle to remove the callback (only needed if the first parameter:action is empty).
- * 
+ *
  * @export
  * @function Test#addPrePostSendCallback
  */
@@ -1793,7 +1793,7 @@ TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallbac
 
 /**
  * Remove a previously added callback.
- * 
+ *
  * @export
  * @function Test#removePrePostSendCallback
  */
@@ -1816,14 +1816,14 @@ TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
 	if(!preDecodeCallback) {
 		throw new Error("addPreDecodeCallback: callback cannot be null");
 	}
-	
+
 	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback);
 	this.preDecodeConfigs.push(config);
 	return config;
 };
 
 /**
- * Remove a previously added callback 
+ * Remove a previously added callback
  * @export
  */
 TestInstance.prototype.removePreDecodeCallback = function (handle) {
@@ -2004,6 +2004,18 @@ TestInstance.prototype.executeAfterCkEditorIsReady = function(inputRichTextCompo
  */
 TestInstance.prototype.reloadGlobalValueProviders = function(gvp, callback) {
     $A.getContext().globalValueProviders = new Aura.Provider.GlobalValueProviders(gvp, callback);
+};
+
+/**
+ * Gets the Global Value Providers based on type.
+ *
+ * @param {String}
+ *            gvp type to get Global Value Provider
+ * @export
+ * @function Test#getGlobalValueProviders
+ */
+TestInstance.prototype.getGlobalValueProvider = function(type) {
+    return $A.getContext().getGlobalValueProvider(type);
 };
 
 /**

@@ -901,18 +901,18 @@
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
-                									<pluginExecutionFilter>
-                										<groupId>org.apache.maven</groupId>
-                										<artifactId>maven-plugin-plugin</artifactId>
-                										<goals>
-                											<goal>descriptor</goal>
-                										</goals>
-                										<versionRange>[1.0,)</versionRange>
-                									</pluginExecutionFilter>
-                									<action>
-                										<execute />
-                									</action>
-              								</pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-plugin-plugin</artifactId>
+										<goals>
+											<goal>descriptor</goal>
+										</goals>
+										<versionRange>[3.3,)</versionRange>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+  								</pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -922,6 +922,11 @@
                     <artifactId>maven-external-dependency-plugin</artifactId>
                     <version>0.5</version>
                 </plugin>
+	            <plugin>
+	                <groupId>org.apache.maven.plugins</groupId>
+	                <artifactId>maven-plugin-plugin</artifactId>
+	                <version>3.3</version>
+	            </plugin>
                 <plugin>
                     <groupId>com.github.phasebash</groupId>
                     <artifactId>jsdoc3-maven-plugin</artifactId>

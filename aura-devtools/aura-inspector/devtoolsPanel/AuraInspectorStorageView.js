@@ -128,6 +128,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
         // must collect the store names before doing the cache update
         var command = "Object.keys($A.storageService.getStorages());";
         chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+            if(!response) { return; }
             // Replace ' \' '  to '_' so that template strings doesn't break.
             stores = response.map(function(x){ return x.replace('\'', '_'); });
             this.updateCache();

@@ -11,6 +11,10 @@
 
     function AuraInspectorContentScript(){
         var runtime = null;
+        var allowedPostMessageKeys = {
+            "AuraInspector:publishbatch": true,
+            "AuraInspector:publish": true
+        };
 
         /**
          * Initializes the connection to the chrome extensions runtime
@@ -95,13 +99,13 @@
 
         function Handler_OnWindowMessage(event){
             // Don't handle messages from myself.
-            if(runtime && event.data.action === "AuraInspector:publish") {
+            if(runtime && allowedPostMessageKeys[event.data.action]) {
                 runtime.postMessage(event.data);
             }
         }
 
         function Handler_OnRuntimeMessage(event){
-            if(event && event.data && event.data.action === "AuraInspector:publish") {
+            if(event && event.data && allowedPostMessageKeys[event.data.action]) {
                 window.postMessage(event.data);
             }
         }

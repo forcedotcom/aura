@@ -116,17 +116,28 @@
 		var auracomponent;
 		var dd;
 		for(var c=0;c<data.length;c++) {
-			auracomponent = document.createElement("aurainspector-auracomponent");
-			auracomponent.setAttribute("globalId", data[c].scope);
-			
-			dt = document.createElement("dt");
-			dt.appendChild(auracomponent);
+			if(data[c].scope) {
+				auracomponent = document.createElement("aurainspector-auracomponent");
+				auracomponent.setAttribute("globalId", data[c].scope);
+				
+				dt = document.createElement("dt");
+				dt.appendChild(auracomponent);
 
-			dd = document.createElement("dd");
-			dd.textContent = "c." + data[c].name;
+				dd = document.createElement("dd");
+				dd.textContent = "c." + data[c].name;
 
-			dl.appendChild(dt);
-			dl.appendChild(dd);
+				dl.appendChild(dt);
+				dl.appendChild(dd);
+			} else {				
+				dt = document.createElement("dt");
+				dt.appendChild(document.createTextNode("{Bubbled Event}"));
+
+				dd = document.createElement("dd");
+				dd.textContent = data[c].name;
+
+				dl.appendChild(dt);
+				dl.appendChild(dd);
+			}
 		}
 
 		// build the handled collection

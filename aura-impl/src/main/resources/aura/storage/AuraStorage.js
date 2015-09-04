@@ -27,10 +27,12 @@ var AuraStorage = function AuraStorage(config) {
     this.defaultExpiration = config["defaultExpiration"] * 1000;
     this.defaultAutoRefreshInterval = config["defaultAutoRefreshInterval"] * 1000;
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
+
     this.isolationKey = config["isolationKey"];
+    this.setVersion(config["version"]);
+    this.updateKeyPrefix();
 
     this.lastSweep = new Date().getTime();
-    this.setVersion(config["version"]);
 
     var clearStorageOnInit = config["clearStorageOnInit"];
 
@@ -120,7 +122,7 @@ AuraStorage.prototype.clear = function() {
  */
 AuraStorage.prototype.get = function(key) {
     var that = this;
-    var promise = this.adapter.getItem(this.isolationKey + this.version + key).then(function(item) {
+    var promise = this.adapter.getItem(this.keyPrefix + key).then(function(item) {
         that.log("get() " + (item ? "HIT" : "MISS") + " - key: " + key + ", value: " + item);
 
         if (!item) {
@@ -143,17 +145,21 @@ AuraStorage.prototype.get = function(key) {
 AuraStorage.prototype.getAll = function() {
     var that = this;
     return this.adapter.getAll().then(function(items) {
-        that.log("getAll() - found " + items.length + " items");
-        return $A.util.map(items, function(item) {
-            var realKey = item["key"],
-                key = realKey;
-            if (realKey.indexOf(that.isolationKey + that.version) === 0) {
-                // in case isolation key + version are part of the actual key
-                // then only replace first occurrence
-                key = item["key"].replace(that.isolationKey + that.version, "");
+        var length = items.length ? items.length : 0;
+
+        var now = new Date().getTime();
+        var results = [];
+        for (var i = 0; i < length; i++) {
+            var item = items[i];
+            if (item["key"].indexOf(that.keyPrefix) === 0) {
+                var key = item["key"].replace(that.keyPrefix, "");
+                results.push({ "key": key, "value": item["value"], "isExpired": (now > item["expires"]) });
             }
-            return { "key": key, "value": item["value"], "isExpired": (new Date().getTime() > item["expires"]) };
-        });
+            // else: wrong isolationKey/version so ignore the entry
+        }
+
+        that.log("getAll() - found " + results.length + " items");
+        return results;
     });
 };
 
@@ -174,7 +180,7 @@ AuraStorage.prototype.put = function(key, value) {
     };
 
     var that = this;
-    var promise = this.adapter.setItem(this.isolationKey + this.version + key, item)
+    var promise = this.adapter.setItem(this.keyPrefix + key, item)
         .then(function () {
             that.log("put() - key: " + key + ", value: " + item);
             $A.storageService.fireModified();
@@ -194,7 +200,7 @@ AuraStorage.prototype.put = function(key, value) {
  */
 AuraStorage.prototype.remove = function(key, doNotFireModified) {
     var that = this;
-    return this.adapter.removeItem(this.isolationKey + this.version + key)
+    return this.adapter.removeItem(this.keyPrefix + key)
         .then(function(){
             that.log("remove() - key: " + key);
             if (!doNotFireModified) {
@@ -220,8 +226,11 @@ AuraStorage.prototype.sweep = function() {
     if (this.adapter.sweep) {
         this.adapter.sweep();
     } else {
-        // Check simple expirations
         this.adapter.getExpired().then(function (expired) {
+            // note: expired includes any key prefix. and it may
+            // include items with different key prefixes which
+            // we want to expire first. thus remove directly from the
+            // adapter to avoid re-adding the key prefix.
 
             if (expired.length === 0) {
                 return;
@@ -232,7 +241,7 @@ AuraStorage.prototype.sweep = function() {
             for (var n = 0; n < expired.length; n++) {
                 key = expired[n];
                 that.log("sweep() - expiring item with key: " + key);
-                promiseSet.push(that.remove(key, true));
+                promiseSet.push(that.adapter.removeItem(key));
             }
 
             // When all of the remove promises have completed...
@@ -310,6 +319,7 @@ AuraStorage.prototype.isSecure = function() {
 AuraStorage.prototype.setVersion  = function(version) {
     // ensure string
     this.version = (version || "") + "";
+    this.updateKeyPrefix();
 };
 
 /**
@@ -336,3 +346,19 @@ AuraStorage.prototype.deleteStorage = function() {
         });
     }
 };
+
+/**
+ * Update the prefix for all storage keys.
+ * @private
+ */
+AuraStorage.prototype.updateKeyPrefix = function() {
+    this.keyPrefix = this.isolationKey + this.version + AuraStorage.KEY_DELIMITER;
+};
+
+
+/**
+ * Storage key delimiter, separating isolation and version key from
+ * the user-provided key.
+ * @private
+ */
+AuraStorage.KEY_DELIMITER = ":";

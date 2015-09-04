@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 ({
-    /** IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com, 
+    /** IE & FIREFOX are excluded:The tests try to send out a request to other domains http://invalid.salesforce.com,
      * IE and Firefox block it by default
      */
     browsers:["GOOGLECHROME","SAFARI"],
-    
+
     /**
      * Sets up the test, caching the component, setting the action storages expire time and creating an action for
      * testing.
      */
     setUp: function(component) {
-        // Store a reference to the component to facilitate the use of the test's helpers. 
+        // must match AuraStorage.KEY_DELIMITER
+        component.DELIMITER = ":";
+
+        // Store a reference to the component to facilitate the use of the test's helpers.
         this._component = component;
         this._expiryTime = 10000;
         this._action = component.get("c.getString");
@@ -35,7 +38,7 @@
         this._actionDescriptor = "java://org.auraframework.components.test.java.controller.JavaTestController/ACTION$getString";
         this._actionParams = this._action.getParams();
     },
-    
+
     /**
      * We don't increase RequestCount if the action is from storage
      */
@@ -43,12 +46,12 @@
     	 test : [function(component) {
     		 var startCount = $A.test.getSentRequestCount();
     		 var callback = function() {
-    			 $A.test.assertEquals(startCount+1, $A.test.getSentRequestCount(), 
+    			 $A.test.assertEquals(startCount+1, $A.test.getSentRequestCount(),
     					 "we don't expect SentRequestCount to increase when action response is from storage");
     		 }
              this.prepareAction();
-             $A.test.addWaitForWithFailureMessage(startCount+1, 
-            		 function() { return $A.test.getSentRequestCount(); }, 
+             $A.test.addWaitForWithFailureMessage(startCount+1,
+            		 function() { return $A.test.getSentRequestCount(); },
             		 "expect 1 extra sent request",
             		 function() {
             			 this.prepareAction(callback);
@@ -57,7 +60,7 @@
          }
     	 ]
     },
-    
+
     /**
      * Tests to ensure the isInStorage method returns true when an action is being stored.
      */
@@ -72,25 +75,25 @@
                 $A.test.assertTrue(isInStorage, "Action should be found in storage.");
                 cacheChecked = true;
             });
-            
+
             $A.test.addWaitFor(true, function() {
                 return cacheChecked;
             });
         }, function(component) {
             var cacheChecked = false;
-            
+
             // The unknown action should not be in storage, ensure isInStorage returns false for it:
             $A.clientService.isActionInStorage("nonexistent", {param: "none"}, function(isInStorage) {
                 $A.test.assertFalse(isInStorage, "Non-existent action should not be found in storage.");
                 cacheChecked = true;
             });
-            
+
             $A.test.addWaitFor(true, function() {
                 return cacheChecked;
             });
         }]
     },
-    
+
     /**
      * Tests to ensure that the errorHandler parameter passed into an action's storableConfig will be invoked
      * when there is an error being added to storage.
@@ -102,19 +105,19 @@
             this._actionParams = action.getParams();
             //actionStorage.app set maxSize to 10, that will give us 10240 bytes, tooLarge has size 40414 after this
             var tooLarge = new Array(10000).join("!");
-            
+
             action.setParams({ param: tooLarge });
-            
+
             action.setStorable({
                 errorHandler: function(error) {
                     errorHandled = error;
                 }
             });
-            
+
             $A.run(function() {
                 $A.enqueueAction(action);
             });
-            
+
             $A.test.addWaitForWithFailureMessage(
                 true,
                 function() { return errorHandled!=null; },
@@ -134,7 +137,7 @@
                     $A.test.assertFalse(isInStorage, "Action with error should not be found in storage");
                     }
             );
-            
+
             //because the isActionInStorage's callback could be async, we need to make sure it did get called before test end
             $A.test.addWaitForWithFailureMessage(true,
                 function() { return actionIsInStorage!=null; },
@@ -142,7 +145,7 @@
             );
         }]
     },
-    
+
     /**
      * Tests to ensure that invalidating an action correctly removes it from storage:
      */
@@ -151,11 +154,11 @@
             this.prepareAction();
         }, function(component) {
             var isInvalidated = false;
-            
+
             // Invalidate the action:
             $A.clientService.invalidateAction(this._actionDescriptor, this._actionParams);
-            
-            // Keep checking to see if the action is in storage, set isInvalidated to true as soon as we find its no 
+
+            // Keep checking to see if the action is in storage, set isInvalidated to true as soon as we find its no
             // longer present:
             function check() {
                 $A.clientService.isActionInStorage(this._actionDescriptor, this._actionParams, function(isInStorage) {
@@ -164,21 +167,21 @@
                     } else {
                         isInvalidated = true;
                     }
-                });            
+                });
             }
-            
+
             // start recursing:
             check();
-            
+
             // Wait for the action to be removed from cache:
             $A.test.addWaitFor(true, function() {
                 return isInvalidated;
             });
         }]
     },
-    
+
     /**
-     * Tests to ensure that revalidate property sets the expiry time of cached actions: 
+     * Tests to ensure that revalidate property sets the expiry time of cached actions:
      */
     testRevalidate: {
         test : [function(component) {
@@ -186,17 +189,17 @@
         }, function(component) {
             var expiryTime = this._expiryTime,
                 expiryChecked = false;
-            
+
             // The action is in cache assert that the difference between the time it expires and the time it was added
             // is the expiry time:
             var adapter = this._action.getStorage().adapter;
 
-            adapter.getItem(this._action.getStorageKey())
+            adapter.getItem(component.DELIMITER + this._action.getStorageKey())
                 .then(function(item) {
                     $A.test.assertEquals(expiryTime, item.expires - item.created, "Expiry time not set properly.");
                     expiryChecked = true;
                 });
-            
+
             $A.test.addWaitFor(true, function() { return expiryChecked; });
         }, function(component) {
             var expiryTime = this._expiryTime,
@@ -209,7 +212,7 @@
                 var revalidateTime = new Date().getTime();
 
                 var adapter = action.getStorage().adapter;
-                adapter.getItem(action.getStorageKey())
+                adapter.getItem(component.DELIMITER + action.getStorageKey())
                     .then(function(item) {
 
                         $A.test.assertTrue(
@@ -220,13 +223,13 @@
                         expiryChecked = true;
                     });
             });
-            
+
             $A.test.addWaitFor(true, function() {
                 return expiryChecked;
             });
         }]
     },
-    
+
     /**
      * Fires this._action and waits for the server's response.
      */
@@ -239,11 +242,11 @@
             	callback();
             }
         });
-        
+
         $A.run(function() {
             $A.enqueueAction(action);
         });
-        
+
         $A.test.addWaitFor(true, function() {
             return actionReceived;
         });

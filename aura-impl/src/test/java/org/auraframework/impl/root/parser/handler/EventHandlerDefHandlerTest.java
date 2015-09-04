@@ -56,23 +56,46 @@ public class EventHandlerDefHandlerTest extends AuraImplTestCase {
         }
 
     }
-
+    
+    /**
+     * verify basic aura:event 
+     * verify we can pass type/access/support/description to it, support is only available for privileged nameSpace
+     * also we have have attributes and comments in the markup 
+     * @throws Exception
+     */
+    public void testEventXMLParser() throws Exception {
+    	DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("auratest"+":fakeEvent", EventDef.class);
+    	StringSource<EventDef> source = new StringSource<>(descriptor,
+    			 "<aura:event type='component' access='GLOBAL' support='GA' description='Something'>"+
+    					 "<aura:attribute name='att1' type='String'/>"+
+    					 "<aura:attribute name='att2' required='true' type='String'/>"+
+    					 "<aura:attribute name='att3' type='String'/>"+
+    					 "<!-- more comments -->"+
+    			"</aura:event>",
+                "myID", Format.XML);
+        EventDef ed = new EventXMLParser().parse(descriptor, source);
+        ed.validateDefinition();
+    }
+    
     /**
      * Events cannot be abstract
      * 
      * @throws Exception
      */
-    public void testAbstractEvent() throws Exception {
-        DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("aura:testevent", EventDef.class);
-        StringSource<EventDef> source = new StringSource<>(descriptor,
-                "<aura:event type='component' abstract='true'></aura:event>", "myID", Format.XML);
-        EventDef ed = new EventXMLParser().parse(descriptor, source);
+    public void testEventXMLParserAbstractEventErrorOut() throws Exception {
         try {
+    		//runTestEventXMLParser(false, true, true, true, true, "abstract='true'");
+        	DefDescriptor<EventDef> descriptor = DefDescriptorImpl.getInstance("auratest"+":fakeEvent", EventDef.class);
+        	StringSource<EventDef> source = new StringSource<>(descriptor,
+        			 "<aura:event type='component' abstract='true'>"+
+        			"</aura:event>",
+                    "myID", Format.XML);
+            EventDef ed = new EventXMLParser().parse(descriptor, source);
             ed.validateDefinition();
-            fail("Should have thrown AuraRuntimeException for creating an abstract event");
-        } catch (Exception e) {
-            checkExceptionContains(e, InvalidDefinitionException.class, 
+            fail("event cannot be abstract");
+    	} catch (Exception e) {
+    		checkExceptionContains(e, InvalidDefinitionException.class, 
                     "Invalid attribute \"abstract\"");
-        }
+    	}
     }
 }

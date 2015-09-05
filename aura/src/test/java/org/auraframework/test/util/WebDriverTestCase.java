@@ -212,6 +212,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     public void runTestWithBrowser(BrowserType browserType) throws Throwable {
+        Throwable failure = null;
         currentBrowserType = browserType;
 
         if (isPerfTest()) {
@@ -225,8 +226,9 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 superRunTest();
                 return;
             } catch (Throwable th) {
+                failure = th;
                 if (!isFlapper()) {
-                    throw th;
+                    break;
                 }
 
                 logger.info(getName() + " failed at iteration " + (i + 1) + " of " + (FLAPPER_NUM_RETRIES + 1)
@@ -236,6 +238,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             } finally {
                 perBrowserTearDown();
             }
+        }
+
+        if (failure != null) {
+            throw failure;
         }
     }
 

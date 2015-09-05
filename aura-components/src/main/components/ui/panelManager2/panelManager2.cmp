@@ -15,16 +15,25 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" description="Panel manager 2">
-    <aura:attribute name="registeredPanels" type="Aura.ComponentDefRef[]" description="A list of managed panels"/>
+<aura:component extensible="true" description="Panel manager">
+    <aura:attribute name="registeredPanels"   type="Aura.ComponentDefRef[]" />
+    <aura:attribute name="useSharedContainer" type="Boolean" default="false"/>
+
+    <aura:import library="ui:containerManagerLib" property="cmLib" />
+    <aura:import library="ui:stackManagerLib"     property="smLib" />
+
+    <!-- To be integrated -->
+    <!--<aura:import library="ui:focusManagerLib" property="focusLib" />-->
     
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler name="init"   value="{!this}"   action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.handleNotify}"/>
 
     <aura:handler event="ui:createPanel"    action="{!c.createPanel}"/>
     <aura:handler event="ui:destroyPanel"   action="{!c.destroyPanel}"/>
     <aura:handler event="ui:getActivePanel" action="{!c.getActivePanel}"/>
-    <aura:handler event="ui:stackPanel" action="{!c.stackPanel}"/>
+    <aura:handler event="ui:stackPanel"     action="{!c.stackPanel}"/>
 
-    <div aura:id="container" class="{!$Browser.formFactor}"/>
+    <aura:if isTrue="{! not(v.useSharedContainer) }">
+        <div aura:id="container" class="{!$Browser.formFactor}"/>
+    </aura:if>
 </aura:component>

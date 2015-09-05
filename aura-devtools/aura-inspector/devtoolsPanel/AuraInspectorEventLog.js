@@ -1,6 +1,6 @@
 /* Listens for events and shows them in the event log */
 function AuraInspectorEventLog(devtoolsPanel) {
-    var _filters = {
+    var _visible = {
         all: false, // default off because of the volume of data this collects
         eventName: "",
         application: true,
@@ -69,15 +69,18 @@ function AuraInspectorEventLog(devtoolsPanel) {
         devtoolsPanel.hideSidebar();
     };
 
+    function isRecording(){
+        return _visible.all;
+    }
+
     // Returns True if allowed, false if filtered out.
     function isAllowed(eventInfo) {
         if(!eventInfo) { return false; }
-        if(!_filters.all) { return false; }
-        if(!_filters.application && eventInfo.type === "APPLICATION") { return false; }
-        if(!_filters.component && eventInfo.type === "COMPONENT") { return false; }
-        if(!_filters.unhandled && !hasHandledData(eventInfo)) { return false; }
+        if(!_visible.application && eventInfo.type === "APPLICATION") { return false; }
+        if(!_visible.component && eventInfo.type === "COMPONENT") { return false; }
+        if(!_visible.unhandled && !hasHandledData(eventInfo)) { return false; }
 
-        var eventName = _filters.eventName;
+        var eventName = _visible.eventName;
         if(eventName) {
             if(eventName.startsWith("!")) {
                 eventName = eventName.substr(1);
@@ -132,12 +135,15 @@ function AuraInspectorEventLog(devtoolsPanel) {
     }
 
     function storeEvent(eventInfo) {
+        _eventsMap.set(getEventId(eventInfo), eventInfo);
+    }
+
+    function storeFilteredEvent(eventInfo) {
         if(_events.length > MAX_EVENTS) {
             var removed = _events.pop();
             _eventsMap.delete(getEventId(removed));
         }
-        _events.push(eventInfo);
-        _eventsMap.set(getEventId(eventInfo), eventInfo);
+        _events.push(eventInfo);        
     }
 
     function getHandledDataTree(contextId, previousId) {
@@ -148,10 +154,16 @@ function AuraInspectorEventLog(devtoolsPanel) {
         var type;
 
         if(_actionsMap.has(contextId)) {
-            tree.push({ "id": contextId, "data": _actionsMap.get(contextId), "type": "action", "parent": previousId });
-        } else {
-            data = _eventsMap.get(contextId);
-            tree.push({ "id": contextId, "data":  { "id": data.id, "sourceId": data.sourceId, "name": data.name, "startTime": data.startTime } , "type": "event", "parent": previousId });
+            type = "action";
+            data = _actionsMap.get(contextId);
+        } else if(_eventsMap.has(contextId)) {
+            type = "event";
+            var currentEvent = _eventsMap.get(contextId);
+            data = { "id": currentEvent.id, "sourceId": currentEvent.sourceId, "name": currentEvent.name, "startTime": currentEvent.startTime };
+        }
+
+        if(data) {
+            tree.push({ "id": contextId, "parent": previousId, "data": data , "type": type });
         }
 
         var handled;
@@ -194,7 +206,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
     }
 
     function AuraInspectorEventLog_OnEventStart(eventInfo) {
-        if(!_filters.all) {
+        if(!isRecording()) {
             return;
         }
 
@@ -206,8 +218,12 @@ function AuraInspectorEventLog(devtoolsPanel) {
     }
 
     function AuraInspectorEventLog_OnEventEnd(eventInfo) {
+        if(!isRecording()) { return; }
+
+        storeEvent(eventInfo);
+
         if(isAllowed(eventInfo)) {
-            storeEvent(eventInfo);
+            storeFilteredEvent(eventInfo);
             addCard(eventInfo);
         }
 
@@ -295,7 +311,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
     function FilterText_OnChange(event) {
         var text = event.currentTarget;
-        _filters.eventName = text.value;
+        _visible.eventName = text.value;
 
         this.refresh();
     }
@@ -305,8 +321,8 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
         if(target && target.hasAttribute("data-filter")) {
             var filter = target.getAttribute("data-filter");
-            if(_filters.hasOwnProperty(filter)) {
-                _filters[filter] = target.classList.contains("on");
+            if(_visible.hasOwnProperty(filter)) {
+                _visible[filter] = target.classList.contains("on");
                 if(filter !== "all") {
                     this.refresh();
                 }

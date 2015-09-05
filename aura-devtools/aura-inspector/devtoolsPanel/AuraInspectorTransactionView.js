@@ -113,9 +113,6 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 	this.render = function() {
 		// Already rendered
 		if (outputList) {
-			while (queuedData.length) {
-				this.addTransactions(queuedData.pop());
-			}
 			return;
 		}
 
@@ -125,6 +122,10 @@ function AuraInspectorTransactionView(devtoolsPanel) {
         outputList.addEventListener('click', OutputListTable_OnClick.bind(this), false);
         clearButton.addEventListener('click', ClearTable_OnClick.bind(this), false);
 		devtoolsPanel.hideSidebar();
+
+		while (queuedData.length) {
+			this.addTransactions(queuedData.pop());
+		}
 	};
 
 	this.addTransactions = function (rowData) {

@@ -127,6 +127,9 @@
 
         var subscribers = new Map();
         var PUBLISH_KEY = "AuraInspector:publish";
+        var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
+        var postMessagesQueue = [];
+        var batchPostId = null;
 
         this.init = function() {
             
@@ -135,11 +138,14 @@
         this.publish = function(key, data) {
             if(!key) { return; }
 
-            window.postMessage({
-                action : PUBLISH_KEY, 
-                key: key,
-                data : data
-            }, window.location.href);
+            // We batch the post messages
+            // to avoid excessive messages which was causing 
+            // stabalization issues.
+            postMessagesQueue.push({"key":key, "data":data});
+
+            if(batchPostId === null) {
+                batchPostId = sendQueuedPostMessages();
+            }
         };
 
         this.subscribe = function(key, callback) {
@@ -156,15 +162,41 @@
         window.addEventListener("message", Handle_OnPostMessage);
 
         function Handle_OnPostMessage(event) {
-            if(event && event.data && event.data.action === PUBLISH_KEY) {
-                var key = event.data.key;
-                var data = event.data.data;
-
-                if(subscribers.has(key)) {
-                    subscribers.get(key).forEach(function(callback){
-                        callback(data);
-                    });
+            if(event && event.data) {
+                if(event.data.action === PUBLISH_KEY) {
+                    callSubscribers(event.data.key, event.data.data);
+                } else if(event.data.action === PUBLISH_BATCH_KEY) {
+                    var data = event.data.data || [];
+                    for(var c=0,length=data.length;c<length;c++) {
+                        callSubscribers(data[c].key, data[c].data);
+                    }        
                 }
+            }
+        }
+
+        function callSubscribers(key, data) {
+            if(subscribers.has(key)) {
+                subscribers.get(key).forEach(function(callback){
+                    callback(data);
+                });
+            }
+        }
+
+        function sendQueuedPostMessages() {
+            if("requestIdleCallback" in window) {
+                batchPostId = window.requestIdleCallback(sendQueuedPostMessagesCallback);
+            } else {
+                batchPostId = window.requestAnimationFrame(sendQueuedPostMessagesCallback);
+            }
+
+            function sendQueuedPostMessagesCallback() {
+                window.postMessage({
+                    "action": PUBLISH_BATCH_KEY,
+                    "data": postMessagesQueue
+                }, window.location.href);
+                
+                postMessagesQueue = [];
+                batchPostId = null;
             }
         }
     }

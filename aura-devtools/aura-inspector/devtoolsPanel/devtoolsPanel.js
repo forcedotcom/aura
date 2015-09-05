@@ -44,6 +44,7 @@
     function AuraInspectorDevtoolsPanel() {
         //var EXTENSIONID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
         var PUBLISH_KEY = "AuraInspector:publish";
+        var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
         var runtime = null;
         var actions = new Map();
         // For Drawing the Tree, eventually to be moved into it's own component
@@ -64,7 +65,7 @@
 
             // AuraInspector:publish is the only thing we listen for anymore.
             // We broadcast one publish message everywhere, and then we have subscribers.
-            runtime.postMessage({subscribe : ["AuraInspector:publish"], port: runtime.name, tabId: tabId });
+            runtime.postMessage({subscribe : [PUBLISH_KEY, PUBLISH_BATCH_KEY], port: runtime.name, tabId: tabId });
         };
 
         this.disconnect = function(port) {
@@ -389,15 +390,22 @@
         }
 
         function DevToolsPanel_OnMessage(message) {
-            if(message && message.action === PUBLISH_KEY) {
-                var key = message.key;
-                var data = message.data;
-
-                if(_subscribers.has(key)) {
-                    _subscribers.get(key).forEach(function(callback){
-                        callback(data);
-                    });
+            if(!message) { return; }
+            if(message.action === PUBLISH_KEY) {
+                callSubscribers(message.key, message.data);
+            } else if(message.action === PUBLISH_BATCH_KEY) {
+                var data = message.data || [];
+                for(var c=0,length=data.length;c<length;c++) {
+                    callSubscribers(data[c].key, data[c].data);
                 }
+            }
+        }
+
+        function callSubscribers(key, data) {
+            if(_subscribers.has(key)) {
+                _subscribers.get(key).forEach(function(callback){
+                    callback(data);
+                });
             }
         }
 

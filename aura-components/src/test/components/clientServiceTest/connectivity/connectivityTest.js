@@ -31,14 +31,15 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange")
+                component.sendRequest();
+                this.waitForEvents("SUCCESS")
             }, function(component) {
                 this.sendAndWaitForSuccessfulRequest();
             }, function(component) {
             	// We received a status change after a successful request, assert that the current status is SUCCESS:
             	this.assertActionStatus("SUCCESS");
 
-                $A.test.assertEquals("layoutChange", component.get("v.eventsFired"));
+                $A.test.assertEquals("SUCCESS", component.get("v.eventsFired"));
                 // ensure we still think we're connected
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
@@ -49,21 +50,22 @@
      */
     testConnectionLost : {
         test : [function(component) {
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
                 this.sendAndWaitForFailedRequest();
             }, function(component) {
             	// We received a status change after a failed request, assert that the current status is INCOMPLETE:
             	this.assertActionStatus("INCOMPLETE");
 
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.tryToConnect();
                 // Wait for any status change:
                 this.waitForActionStatusChange();
             }, function(component) {
                 // connectionLost event is not repeated
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 // still offline
                 $A.test.assertFalse($A.clientService.isConnected());
             }]
@@ -76,7 +78,8 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
             	// set connected to true should not affect the connected state:
                 component.find("setConnectedTrueButton").get("e.press").fire();
@@ -88,7 +91,7 @@
             	this.assertActionStatus("SUCCESS");
 
                 // There should be no events beside the layout change since we started connected:
-                $A.test.assertEquals("layoutChange", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
@@ -100,13 +103,14 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
              }, function(component) {
                 component.find("setConnectedFalseButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost")
+                this.waitForEvents("SUCCESS connectionLost")
              }, function(component) {
             	component.find("setConnectedTrueButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost connectionResumed");
+                this.waitForEvents("SUCCESS connectionLost connectionResumed");
              }]
     },
 
@@ -117,10 +121,11 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
                 component.find("setConnectedFalseButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost");
+                this.waitForEvents("SUCCESS connectionLost");
             }, function(component) {
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.sendAndWaitForFailedRequest();
@@ -128,11 +133,11 @@
             	// We received a status change after a failed request, assert that the current status is INCOMPLETE:
             	this.assertActionStatus("INCOMPLETE");
 
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertFalse($A.clientService.isConnected());
 
                 component.find("setConnectedTrueButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost connectionResumed");
+                this.waitForEvents("SUCCESS connectionLost connectionResumed");
             }, function(component) {
             	// We have been set back to connected in the previous step:
             	$A.test.assertTrue($A.clientService.isConnected());
@@ -143,7 +148,7 @@
 
                 // ensure there are not 2 connectionResumed events generated after invoking setConnected when
             	// and then making a successful request:
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
@@ -157,10 +162,11 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
              }, function(component) {
                 component.find("setConnectedFalseButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost");
+                this.waitForEvents("SUCCESS connectionLost");
              }, function(component) {
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.sendAndWaitForSuccessfulRequest();
@@ -168,7 +174,7 @@
             	// We received a status change after a successful request, assert that the current status is SUCCESS:
             	this.assertActionStatus("SUCCESS");
 
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
@@ -180,18 +186,19 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
                 this.sendAndWaitForFailedRequest();
             }, function(component) {
             	// We received a status change after a failed request, assert that the current status is INCOMPLETE:
             	this.assertActionStatus("INCOMPLETE");
 
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertFalse($A.clientService.isConnected());
             }, function(component) {
                 component.find("setConnectedFalseButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost");
+                this.waitForEvents("SUCCESS connectionLost");
             }, function(component) {
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.sendAndWaitForSuccessfulRequest();
@@ -200,7 +207,7 @@
             	this.assertActionStatus("SUCCESS");
 
                 // ensure there are not 2 connectionLost events generated before a resume
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
@@ -211,10 +218,11 @@
         test : [function(component) {
                 // we assume we start connected
                 $A.test.assertTrue($A.clientService.isConnected());
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
                 component.find("setConnectedFalseButton").get("e.press").fire();
-                this.waitForEvents("layoutChange connectionLost");
+                this.waitForEvents("SUCCESS connectionLost");
             }, function(component) {
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.sendAndWaitForFailedRequest();
@@ -222,7 +230,7 @@
             	// We received a status change after a failed request, assert that the current status is INCOMPLETE:
             	this.assertActionStatus("INCOMPLETE");
 
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertFalse($A.clientService.isConnected());
             }, function(component) {
             	this.sendAndWaitForSuccessfulRequest();
@@ -231,7 +239,7 @@
             	this.assertActionStatus("SUCCESS");
 
                 // ensure there are not 2 connectionLost events generated before a resume
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
@@ -241,21 +249,22 @@
      */
     testConnectionResumed : {
         test : [function(component) {
-                this.waitForEvents("layoutChange");
+                component.sendRequest();
+                this.waitForEvents("SUCCESS");
             }, function(component) {
                 this.sendAndWaitForFailedRequest();
             }, function(component) {
             	// We received a status change after a failed request, assert that the current status is INCOMPLETE:
             	this.assertActionStatus("INCOMPLETE");
 
-                $A.test.assertEquals("layoutChange connectionLost", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertFalse($A.clientService.isConnected());
                 this.sendAndWaitForSuccessfulRequest();
             }, function(component) {
             	// We received a status change after a successful request, assert that the current status is SUCCESS:
             	this.assertActionStatus("SUCCESS");
 
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 $A.test.assertTrue($A.clientService.isConnected());
                 this.sendAndWaitForSuccessfulRequest();
             }, function(component) {
@@ -263,42 +272,12 @@
             	this.assertActionStatus("SUCCESS");
 
                 // connectionResumed event is not repeated
-                $A.test.assertEquals("layoutChange connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
+                $A.test.assertEquals("SUCCESS connectionLost connectionResumed", $A.util.trim(component.get("v.eventsFired")));
                 // still online
                 $A.test.assertTrue($A.clientService.isConnected());
             }]
     },
-
-    /**
-     * Changing layout with no connection throws connectionLost and layoutFailed events.
-     */
-    testConnectionLostForLayout : {
-        attributes : { host : "http://invalid.salesforce.com" },
-        test : [function(component) {
-                this.waitForEvents("connectionLost layoutFailed layoutChange");
-            }, function(component) {
-                $A.test.assertFalse($A.clientService.isConnected());
-            }]
-    },
-
-    /**
-     * Changing layout after a prior connection failure succeeds.
-     * Excluding IE: history service was not previously supported in IE
-     */
-    testConnectionResumedForLayout : {
-        attributes : { host : "http://invalid.salesforce.com" },
-        test : [function(component) {
-        		this.waitForEvents("connectionLost layoutFailed layoutChange");
-            }, function(component) {
-                $A.test.assertFalse($A.clientService.isConnected());
-                component.set("v.host", undefined); // restore to default
-                $A.historyService.set("action");
-                this.waitForEvents("connectionLost layoutFailed layoutChange connectionResumed layoutChange");
-            }, function(component) {
-                $A.test.assertTrue($A.clientService.isConnected());
-            }]
-    },
-
+    
     // HELPERS:
 
     /**

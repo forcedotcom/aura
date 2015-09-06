@@ -44,5 +44,12 @@
 
     refreshEnd : function(cmp, event, helper){
         helper.hideRefreshing(cmp);
+    },
+
+    locationChange: function(cmp, event, helper) {
+        var token = event.getParam("token");
+        var layout = token === "reference" ? "reference" : "help";
+
+        helper.setLayout(cmp, layout, event.getParams());
     }
 })

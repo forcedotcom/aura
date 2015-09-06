@@ -22,10 +22,10 @@
     
     <aura:handler event="aura:connectionLost" action="{!c.logEvent}"/>
     <aura:handler event="aura:connectionResumed" action="{!c.logEvent}"/>
-    <aura:handler event="aura:layoutChange" action="{!c.logEvent}"/>
-    <aura:handler event="aura:layoutFailed" action="{!c.logEvent}"/>
     <aura:handler name="init" value="{!this}" action="{!c.setHost}"/>
     <aura:handler name="change" value="{!v.host}" action="{!c.setHost}"/>
+    
+    <aura:method name="sendRequest" action="{!c.sendRequest}"/>
 
     <ui:inputText aura:id="inputHost" label="inputTextForConnection" labelPosition="hidden" value="{!v.host}"/>
     <ui:button aura:id="testConnection" label="test connection" press="{!c.testConnection}"/><br/>

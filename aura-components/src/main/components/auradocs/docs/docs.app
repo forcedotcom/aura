@@ -28,6 +28,7 @@
 
     <aura:handler event="aura:waiting" action="{!c.waiting}"/>
     <aura:handler event="aura:doneWaiting" action="{!c.doneWaiting}"/>
+    <aura:handler event="auradocs:locationChange" action="{!c.locationChange}"/>
     <aura:handler name="refreshBegin" action="{!c.refreshBegin}"/>
     <aura:handler name="refreshEnd" action="{!c.refreshEnd}"/>
 		

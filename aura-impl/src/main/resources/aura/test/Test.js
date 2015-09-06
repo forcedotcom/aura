@@ -2123,18 +2123,3 @@ $A.logger.subscribe("ERROR", $A["test"].auraError.bind($A["test"]));
         return originalDestroy.call(this, false);
     };
 })(Component.prototype.destroy);
-
-/**
- * For Selenium
- *
- * @ignore
- */
-AuraLayoutService.fireOnload = function() {
-    window.console.log("AuraLayoutService.fireOnload");
-    var frame = window.frameElement;
-    if (frame && document.createEvent) {
-        var loadEvent = document.createEvent('HTMLEvents');
-        loadEvent.initEvent("load", true, true); // event type,bubbling,cancelable
-        frame.dispatchEvent(loadEvent);
-    }
-};

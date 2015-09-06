@@ -19,18 +19,16 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import aQute.bnd.annotation.component.Component;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
+import org.auraframework.def.*;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
@@ -39,8 +37,6 @@ import org.auraframework.system.DependencyEntry;
 import org.auraframework.system.SourceListener;
 
 import com.google.common.base.Optional;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class CachingServiceImpl implements CachingService {
@@ -276,9 +272,6 @@ public class CachingServiceImpl implements CachingService {
             case NAMESPACE:
                 // invalidate all DDs with the same namespace if its a namespace DD
                 invalidateScope(descriptor, true, false);
-                break;
-            case LAYOUTS:
-                invalidateScope(descriptor, true, true);
                 break;
             case INCLUDE:
                 invalidateSourceRelatedCaches(descriptor.getBundle());

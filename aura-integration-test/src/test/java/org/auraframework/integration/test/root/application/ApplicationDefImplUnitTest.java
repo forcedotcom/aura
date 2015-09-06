@@ -16,14 +16,10 @@
 package org.auraframework.integration.test.root.application;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
+import org.auraframework.def.*;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl.Builder;
+import org.auraframework.impl.root.component.BaseComponentDefImplUnitTest;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -32,8 +28,6 @@ public class ApplicationDefImplUnitTest extends
 
     @Mock
     DefDescriptor<EventDef> locationChangeEventDescriptor;
-    @Mock
-    DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     DefinitionAccess access;
     Boolean isAppcacheEnabled;
     String additionalAppCacheURLs;
@@ -52,7 +46,6 @@ public class ApplicationDefImplUnitTest extends
     @Override
     protected ApplicationDef buildDefinition(Builder builder) throws Exception {
         builder.locationChangeEventDescriptor = this.locationChangeEventDescriptor;
-        builder.layoutsDefDescriptor = this.layoutsDefDescriptor;
         builder.setAccess(this.access);
         builder.isAppcacheEnabled = this.isAppcacheEnabled;
         builder.additionalAppCacheURLs = this.additionalAppCacheURLs;

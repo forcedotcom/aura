@@ -16,20 +16,11 @@
 package org.auraframework.impl.root.application;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.ApplicationDefBuilder;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.TokensDef;
+import org.auraframework.def.*;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
@@ -61,7 +52,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
         this.locationChangeEventDescriptor = builder.locationChangeEventDescriptor;
 
-        this.layoutsDefDescriptor = builder.layoutsDefDescriptor;
         this.isAppcacheEnabled = builder.isAppcacheEnabled;
         this.additionalAppCacheURLs = builder.additionalAppCacheURLs;
         this.isOnePageApp = builder.isOnePageApp;
@@ -73,7 +63,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
 
     public static class Builder extends BaseComponentDefImpl.Builder<ApplicationDef> implements ApplicationDefBuilder {
         public DefDescriptor<EventDef> locationChangeEventDescriptor;
-        public DefDescriptor<LayoutsDef> layoutsDefDescriptor;
         public Boolean isAppcacheEnabled;
         public Boolean isOnePageApp;
         public String additionalAppCacheURLs;
@@ -88,12 +77,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
         public ApplicationDefImpl build() {
             finish();
             return new ApplicationDefImpl(this);
-        }
-
-        @Override
-        public Builder setLayouts(LayoutsDef layouts) {
-            layoutsDefDescriptor = layouts.getDescriptor();
-            return this;
         }
 
         @Override
@@ -132,19 +115,10 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     @Override
-    public DefDescriptor<LayoutsDef> getLayoutsDefDescriptor() {
-        return layoutsDefDescriptor;
-    }
-
-    @Override
     protected void serializeFields(Json json) throws IOException, QuickFixException {
         DefDescriptor<EventDef> locationChangeEventDescriptor = getLocationChangeEventDescriptor();
         if (locationChangeEventDescriptor != null) {
             json.writeMapEntry("locationChangeEventDef", locationChangeEventDescriptor.getDef());
-        }
-
-        if (layoutsDefDescriptor != null) {
-            json.writeMapEntry("layouts", getLayoutsDefDescriptor().getDef());
         }
 
         if (flavors != null) {
@@ -155,10 +129,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
-
-        if (layoutsDefDescriptor != null) {
-            dependencies.add(layoutsDefDescriptor);
-        }
 
         for (DefDescriptor<TokensDef> tokenDescriptor : tokenDescriptors) {
             dependencies.add(tokenDescriptor);
@@ -247,9 +217,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     public List<DefDescriptor<?>> getBundle() {
         List<DefDescriptor<?>> ret = Lists.newArrayList();
         ret.addAll(super.getBundle());
-        if (layoutsDefDescriptor != null) {
-            ret.add(layoutsDefDescriptor);
-        }
         if (flavors != null) {
             ret.add(flavors);
         }
@@ -285,7 +252,6 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
     }
 
     private final DefDescriptor<EventDef> locationChangeEventDescriptor;
-    private final DefDescriptor<LayoutsDef> layoutsDefDescriptor;
     private final List<DefDescriptor<TokensDef>> tokenDescriptors;
     private final DefDescriptor<FlavorAssortmentDef> flavors;
     private final int hashCode;

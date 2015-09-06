@@ -15,14 +15,11 @@
  */
 package org.auraframework.impl.source;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -127,7 +124,6 @@ public class DescriptorFileMapper {
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
         addExtension(".flavors", NameFormat.BUNDLE, "markup", DefType.FLAVOR_ASSORTMENT, Format.XML);
-        addExtension("Layouts.xml", NameFormat.BUNDLE, "markup", DefType.LAYOUTS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
         addExtension("Renderer.js", NameFormat.BUNDLE, "js", DefType.RENDERER, Format.JS);

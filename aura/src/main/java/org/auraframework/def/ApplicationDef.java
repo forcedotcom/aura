@@ -28,8 +28,6 @@ public interface ApplicationDef extends BaseComponentDef {
     @Override
     DefDescriptor<ApplicationDef> getExtendsDescriptor();
 
-    DefDescriptor<LayoutsDef> getLayoutsDefDescriptor();
-
     DefDescriptor<EventDef> getLocationChangeEventDescriptor() throws QuickFixException;
 
     Boolean isAppcacheEnabled() throws QuickFixException;

@@ -15,9 +15,7 @@
  */
 package org.auraframework.test.source;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
@@ -26,41 +24,15 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.DocumentationDef;
-import org.auraframework.def.EventDef;
-import org.auraframework.def.FlavorAssortmentDef;
-import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.IncludeDef;
-import org.auraframework.def.InterfaceDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.LibraryDef;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.ProviderDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.SVGDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.TokensDef;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.PrivilegedNamespaceSourceLoader;
-import org.auraframework.system.Source;
+import org.auraframework.system.*;
 import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.system.SourceLoader;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 /**
  * This source loader allows tests to load and unload source from strings.
@@ -87,7 +59,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
             DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX);
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
-            DefType.INCLUDE, DefType.INTERFACE, DefType.LAYOUTS, DefType.CONTROLLER,
+            DefType.INCLUDE, DefType.INTERFACE, DefType.CONTROLLER,
             DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
             DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN, DefType.FLAVORED_STYLE);
 
@@ -426,7 +398,6 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         LIBRARY(LibraryDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        LAYOUTS(LayoutsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
         CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),

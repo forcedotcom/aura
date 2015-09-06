@@ -64,11 +64,6 @@ function ComponentDef(config) {
 
     this.facets = config["facets"];
     this.isAbs = !!config["isAbstract"];
-    if (config["layouts"]) {
-        this.layouts = new LayoutsDef(config["layouts"]);
-    } else {
-        this.layouts = null;
-    }
 
     if (config["locationChangeEventDef"]) {
         this.locationChangeEventDef = $A.eventService.createEventDef(config["locationChangeEventDef"]);

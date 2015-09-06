@@ -19,16 +19,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.def.design.DesignAttributeDef;
-import org.auraframework.def.design.DesignDef;
-import org.auraframework.def.design.DesignItemsDef;
-import org.auraframework.def.design.DesignLayoutAttributeDef;
-import org.auraframework.def.design.DesignLayoutComponentDef;
-import org.auraframework.def.design.DesignLayoutDef;
-import org.auraframework.def.design.DesignOptionDef;
-import org.auraframework.def.design.DesignSectionDef;
-import org.auraframework.def.design.DesignTemplateDef;
-import org.auraframework.def.design.DesignTemplateRegionDef;
+import org.auraframework.def.design.*;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
@@ -134,9 +125,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TESTSUITE(TestSuiteDef.class), //
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //
-        LAYOUTS(LayoutsDef.class), //
-        LAYOUT(LayoutDef.class), //
-        LAYOUT_ITEM(LayoutItemDef.class), //
         REQUIRED_VERSION(RequiredVersionDef.class), //
         NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class),

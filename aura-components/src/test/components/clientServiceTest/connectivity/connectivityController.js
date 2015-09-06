@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 ({
+    sendRequest: function(component, event, helper) {
+        var getComponents = component.get("c.getComponents");
+        getComponents.setStorable();
+        getComponents.setCallback(this, function(action) {
+            var oldVal = component.get("v.eventsFired");
+            component.set("v.eventsFired", oldVal + (oldVal == "" ? "" : " ") + action.getState());
+        });
+
+        $A.enqueueAction(getComponents);
+    },
+    
     setHost : function(component, event, helper) {
         $A.clientService.initHost(component.get("v.host"));
     },

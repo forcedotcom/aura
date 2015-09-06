@@ -14,6 +14,32 @@
  * limitations under the License.
  */
 ({
+	locationChanged: function(cmp, event, helper) {
+		var token = event.getParam("token");
+		if(!token) {
+			return;
+		}
+
+		var container = cmp.find("layoutTarget");
+		var callback = function(newBody) {
+			container.set("v.body", newBody);
+		};
+		switch(token) {
+			case "def":
+				//<auratest:rerenderChild aura:id="layoutItem" title="def layout item">
+				$A.createComponent("auratest:rerenderChild", { "aura:id": "layoutItem", "title": "def layout item"}, callback);
+				break;
+			case "death":
+				//<auratest:rerenderChild aura:id="layoutItem" title="death layout item"/>
+				$A.createComponent("auratest:rerenderChild", { "aura:id": "layoutItem", "title": "death layout item"}, callback);
+				break;
+			case "empty":
+				//<aura:unescapedHtml aura:id="layoutItem" value=""/>
+				$A.createComponent("aura:unescapedHtml", { "aura:id": "layoutItem", "value":""}, callback);
+				break;
+		}
+	},
+	
 	pushText : function(cmp) {
 		var whichArray = cmp.get("v.whichArray");
 		var array = cmp.get(whichArray);

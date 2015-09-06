@@ -15,14 +15,16 @@
  */
 package org.auraframework.impl.system;
 
+import java.io.IOException;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import org.auraframework.Aura;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
-import org.auraframework.impl.util.AuraUtil;
-import org.auraframework.impl.util.TypeParser;
+import org.auraframework.impl.util.*;
 import org.auraframework.impl.util.TypeParser.Type;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
@@ -30,10 +32,6 @@ import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import java.io.IOException;
 
 /**
  */
@@ -142,8 +140,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case ATTRIBUTE:
             case METHOD:
             case REQUIRED_VERSION:
-            case LAYOUT:
-            case LAYOUT_ITEM:
             case TESTCASE:
             case TOKEN:
             case TOKENS_IMPORT:
@@ -168,7 +164,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LIBRARY:
             case DOCUMENTATION:
             case EXAMPLE:
-            case LAYOUTS:
             case NAMESPACE:
             case TOKENS:
             case DESIGN:

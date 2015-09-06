@@ -90,16 +90,6 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /**
-     * Additional test cases which are specific to Applications. Test Case: When a component has a layout.xml specified,
-     * do not auto render serverside. Automation for W-911562
-     */
-    public void testIsLocallyRenderable_extra() throws Exception {
-        ApplicationDef appdef = Aura.getDefinitionService().getDefinition("test:test_Layouts", ApplicationDef.class);
-        assertNotNull(appdef);
-        assertFalse("Applications with a layout def should not be locally renderable.", appdef.isLocallyRenderable());
-    }
-
-    /**
      * W-788745
      *
      * @throws Exception

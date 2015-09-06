@@ -133,11 +133,6 @@ window['$A'] = {};
 // #include aura.event.EventDef
 // #include aura.event.Event
 
-// -- Layouts ------------------------------------------------------------
-// #include aura.layouts.LayoutItemDef
-// #include aura.layouts.LayoutDef
-// #include aura.layouts.LayoutsDef
-
 // -- Controller ---------------------------------------------------------
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
@@ -170,7 +165,6 @@ window['$A'] = {};
 // #include aura.AuraExpressionService
 // #include aura.AuraHistoryService
 // #include aura.AuraEventService
-// #include aura.AuraLayoutService
 // #include aura.AuraLocalizationService
 // #include aura.AuraStyleService
 // #include aura.metrics.AuraMetricsService
@@ -235,7 +229,6 @@ function AuraInstance () {
     this.expressionService    = new Aura.Services.AuraExpressionService();
     this.historyService       = new Aura.Services.AuraHistoryService();
     this.eventService         = new Aura.Services.AuraEventService();
-    this.layoutService        = new Aura.Services.AuraLayoutService();
     this.storageService       = new Aura.Services.AuraStorageService();
     this.styleService         = new Aura.Services.AuraStyleService();
     this.metricsService       = new Aura.Services.MetricsService();
@@ -555,8 +548,8 @@ AuraInstance.prototype.initAsync = function(config) {
  *
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
- * @param {Boolean} doNotInitializeServices Set to true if Layout and History services should not be initialized, or false if
- * 	 they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean} doNotInitializeServices Set to true if the History service should not be initialized, or false if
+ * 	 it should. Defaults to true for Aura Integration Service.
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefs(config);
@@ -582,8 +575,8 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  *        timestamp of last modified change
  * @param {String} token
  * @param {Object} container Sets the container for the component.
- * @param {Boolean=} doNotInitializeServices True if Layout and History services should not be initialized, or false if
- *        they should. Defaults to true for Aura Integration Service.
+ * @param {Boolean=} doNotInitializeServices True if the History service should not be initialized, or false if
+ *        it should. Defaults to true for Aura Integration Service.
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
@@ -592,10 +585,6 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         $A.setRoot(cmp);
 
         if (!$A.initialized) {
-            if (!doNotInitializeServices) {
-                $A.layoutService.init(cmp);
-            }
-
             // restore component definitions from AuraStorage into memory
             $A.componentService.registry.restoreAllFromStorage();
 

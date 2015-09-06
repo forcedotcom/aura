@@ -16,68 +16,39 @@
 package org.auraframework.integration.test.system;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
+
+import javax.annotation.Nonnull;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DefinitionAccess;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.HelperDef;
-import org.auraframework.def.LayoutsDef;
-import org.auraframework.def.NamespaceDef;
-import org.auraframework.def.RendererDef;
-import org.auraframework.def.StyleDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.service.BuilderService;
-import org.auraframework.service.CachingService;
-import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.service.*;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.Location;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
-import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.NoAccessException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
@@ -93,8 +64,6 @@ import org.mockito.stubbing.Answer;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import javax.annotation.Nonnull;
 
 /**
  * @see org.auraframework.impl.registry.RootDefFactoryTest
@@ -931,28 +900,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify caches are cleared after a source change to a Layouts def file. In this case all items in the layouts
-     * bundle should be cleared.
-     */
-    @ThreadHostileTest("requires cache to remain stable")
-    public void testInvalidateCacheLayoutsFile() throws Exception {
-        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
-
-        Map<DefType, DefDescriptor<?>> defs = addDefsToCaches(mdr);
-        DefDescriptor<?> layoutsDef = defs.get(DefType.LAYOUTS);
-        Aura.getCachingService().notifyDependentSourceChange(Collections.<WeakReference<SourceListener>> emptySet(),
-                layoutsDef, SourceListener.SourceMonitorEvent.CHANGED, null);
-
-        assertFalse("LayoutsDef not cleared from cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdr));
-        assertFalse("ApplicationDef in same bundle as LayoutsDef not cleared from cache",
-                isInDefsCache(defs.get(DefType.APPLICATION), mdr));
-        assertTrue("NamespaceDef should not be cleared from cache on LayoutsDef source change",
-                isInDefsCache(defs.get(DefType.NAMESPACE), mdr));
-        assertTrue("Cmp in same namespace but different bundle as Layouts def should not be cleared from cache",
-                isInDefsCache(defs.get(DefType.COMPONENT), mdr));
-    }
-
-    /**
      * Create a set of DefDescriptors and add them to the MDR caches by calling getDef() on them.
      *
      * @return List of DefDescriptors that have been added to the mdr caches.
@@ -965,18 +912,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 "js://test.test_button", ControllerDef.class);
         DefDescriptor<RendererDef> otherNamespaceDef = DefDescriptorImpl.getInstance(
                 "js://gvpTest.labelProvider", RendererDef.class);
-        DefDescriptor<ApplicationDef> appInLayoutsBundleDef = DefDescriptorImpl.getInstance("test:layouts",
-                ApplicationDef.class);
-        DefDescriptor<LayoutsDef> layoutsDef = DefDescriptorImpl.getInstance("test:layouts",
-                LayoutsDef.class);
+        DefDescriptor<ApplicationDef> appDef = DefDescriptorImpl.getInstance("test:basicCspTest", ApplicationDef.class);
+
 
         Map<DefType, DefDescriptor<?>> map = new HashMap<>();
         map.put(DefType.NAMESPACE, namespaceDef);
         map.put(DefType.COMPONENT, cmpDef);
         map.put(DefType.CONTROLLER, cmpControllerDef);
         map.put(DefType.RENDERER, otherNamespaceDef);
-        map.put(DefType.APPLICATION, appInLayoutsBundleDef);
-        map.put(DefType.LAYOUTS, layoutsDef);
+        map.put(DefType.APPLICATION, appDef);
 
         for (DefType defType : map.keySet()) {
             DefDescriptor<?> dd = map.get(defType);
@@ -1156,14 +1100,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
         DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
         DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
         DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
 
         DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
         DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
         DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
         DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
@@ -1172,13 +1114,9 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
-        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
         assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
 
-        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
         assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
         assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged",
@@ -1193,14 +1131,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             assertTrue(dd + " should exist.", dd.exists());
         }
         assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri2));
-        assertTrue("LayoutsDef is in cache", isInExistsCache(defs.get(DefType.LAYOUTS), mdri2));
         assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri2));
         assertTrue("app is in cache", isInExistsCache(appDef, mdri2));
         assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri2));
         assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri2));
 
         assertFalse("npNSDef is not in cache", isInExistsCache(npNSDef, mdri2));
-        assertFalse("npLayoutsDef is not in cache", isInExistsCache(npLayoutDef, mdri2));
         assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri2));
         assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri2));
         assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri2));
@@ -1210,14 +1146,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl mdri3 = (MasterDefRegistryImpl) mdr3;
 
         assertTrue("nsDef is in cache", isInExistsCache(nsDef, mdri3));
-        assertTrue("LayoutsDef is in cache", isInExistsCache(defs.get(DefType.LAYOUTS), mdri3));
         assertTrue("RendererDef is in cache", isInExistsCache(rendererDef, mdri3));
         assertTrue("app is in cache", isInExistsCache(appDef, mdri3));
         assertTrue("controller is in cache", isInExistsCache(controllerDef, mdri3));
         assertTrue("cmp is in cache", isInExistsCache(cmpDef, mdri3));
 
         assertFalse("npNSDef is not in cache", isInExistsCache(npNSDef, mdri3));
-        assertFalse("npLayoutsDef is not in cache", isInExistsCache(npLayoutDef, mdri3));
         assertFalse("npRendererDef is notin cache", isInExistsCache(npRendererDef, mdri3));
         assertFalse("nsApp is not in cache", isInExistsCache(nsAppDef, mdri3));
         assertFalse("nsController is not in cache", isInExistsCache(nsControllerDef, mdri3));
@@ -1232,14 +1166,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
 
         DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
         DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
         DefDescriptor<?> appDef = defs.get(DefType.APPLICATION);
         DefDescriptor<?> controllerDef = defs.get(DefType.CONTROLLER);
         DefDescriptor<?> cmpDef = defs.get(DefType.COMPONENT);
 
         DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
         DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
         DefDescriptor<?> nsAppDef = nonPrivDefs.get(DefType.APPLICATION);
         DefDescriptor<?> nsControllerDef = nonPrivDefs.get(DefType.CONTROLLER);
@@ -1248,27 +1180,25 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         // only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
-        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
+        assertTrue(appDef.getNamespace() + "  should have been isPriveleged",
+                configAdapter.isPrivilegedNamespace(appDef.getNamespace()));
         assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
 
-        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
         assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
+        assertFalse(nsAppDef.getNamespace() + "  should not have been isPriveleged",
+                configAdapter.isPrivilegedNamespace(nsAppDef.getNamespace()));
         assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(npRendererDef.getNamespace()));
 
         assertTrue("nsDef is in cache", isInDefsCache(nsDef, mdri));
-        assertTrue("LayoutsDef is in cache", isInDefsCache(layoutDef, mdri));
         assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri));
         assertTrue("app is in cache", isInDefsCache(appDef, mdri));
         assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri));
         assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri));
 
         assertFalse("npNSDef is not in cache", isInDefsCache(npNSDef, mdri));
-        assertFalse("npLayoutsDef is not in cache", isInDefsCache(npLayoutDef, mdri));
         assertFalse("npRendererDef is not in cache", isInDefsCache(npRendererDef, mdri));
         assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri));
         assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri));
@@ -1278,14 +1208,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImpl mdri2 = (MasterDefRegistryImpl) mdr2;
 
         assertTrue("nsDef is in cache", isInDefsCache(nsDef, mdri2));
-        assertTrue("LayoutsDef is in cache", isInDefsCache(defs.get(DefType.LAYOUTS), mdri2));
         assertTrue("RendererDef is in cache", isInDefsCache(rendererDef, mdri2));
         assertTrue("app is in cache", isInDefsCache(appDef, mdri2));
         assertTrue("controller is in cache", isInDefsCache(controllerDef, mdri2));
         assertTrue("cmp is in cache", isInDefsCache(cmpDef, mdri2));
 
         assertFalse("npNSDef is not in cache", isInDefsCache(npNSDef, mdri2));
-        assertFalse("npLayoutsDef is not in cache", isInDefsCache(npLayoutDef, mdri2));
         assertFalse("npRendererDef is notin cache", isInDefsCache(npRendererDef, mdri2));
         assertFalse("nsApp is not in cache", isInDefsCache(nsAppDef, mdri2));
         assertFalse("nsController is not in cache", isInDefsCache(nsControllerDef, mdri2));
@@ -1300,23 +1228,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         Map<DefType, DefDescriptor<?>> nonPrivDefs = addNonPriveledgedDefsToMDR(mdri);
 
         DefDescriptor<?> nsDef = defs.get(DefType.NAMESPACE);
-        DefDescriptor<?> layoutDef = defs.get(DefType.LAYOUTS);
         DefDescriptor<?> rendererDef = defs.get(DefType.RENDERER);
 
         DefDescriptor<?> npNSDef = nonPrivDefs.get(DefType.NAMESPACE);
-        DefDescriptor<?> npLayoutDef = nonPrivDefs.get(DefType.LAYOUTS);
         DefDescriptor<?> npRendererDef = nonPrivDefs.get(DefType.RENDERER);
 
         // only picking 3 defs to test the ns as they are mostly dupes
         assertTrue(nsDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(nsDef.getNamespace()));
-        assertTrue(layoutDef.getNamespace() + "  should have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(layoutDef.getNamespace()));
         assertTrue(rendererDef.getNamespace() + "  should have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(rendererDef.getNamespace()));
 
-        assertFalse(npLayoutDef.getNamespace() + "  should not have been isPriveleged",
-                configAdapter.isPrivilegedNamespace(npLayoutDef.getNamespace()));
         assertFalse(npNSDef.getNamespace() + "  should not have been isPriveleged",
                 configAdapter.isPrivilegedNamespace(npNSDef.getNamespace()));
         assertFalse(npRendererDef.getNamespace() + "  should not have been isPriveleged",
@@ -1595,24 +1517,17 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                                 + "return this.superRender();"
                                 + "}})",
                         "cstring1.labelProvider", false);
-        DefDescriptor<ApplicationDef> appInLayoutsBundleDef = getAuraTestingUtil().addSourceAutoCleanup(
+        DefDescriptor<ApplicationDef> app = getAuraTestingUtil().addSourceAutoCleanup(
                 ApplicationDef.class,
-                "<aura:application>    before    <div aura:id='content'/>    after</aura:application>",
-                "cstring:layouts", false);
-        DefDescriptor<LayoutsDef> layoutsDef = getAuraTestingUtil().addSourceAutoCleanup(LayoutsDef.class,
-                "<aura:layouts default='def'>"
-                        + "<aura:layout name='def'>"
-                        + "<aura:layoutItem container='target' action='{!c.act}'/>"
-                        + "</aura:layout>"
-                        + "</aura:layouts>", "cstring:nplayout", false);
+                "<aura:application></aura:application>", "cstring1:blank", false);
+
 
         Map<DefType, DefDescriptor<?>> map = new HashMap<>();
         map.put(DefType.NAMESPACE, namespaceDef);
         map.put(DefType.COMPONENT, cmpDef);
         map.put(DefType.CONTROLLER, cmpControllerDef);
         map.put(DefType.RENDERER, otherNamespaceDef);
-        map.put(DefType.APPLICATION, appInLayoutsBundleDef);
-        map.put(DefType.LAYOUTS, layoutsDef);
+        map.put(DefType.APPLICATION, app);
 
         for (DefType defType : map.keySet()) {
             DefDescriptor<?> dd = map.get(defType);

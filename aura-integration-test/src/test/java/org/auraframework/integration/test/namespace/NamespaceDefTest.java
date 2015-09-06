@@ -57,10 +57,11 @@ public class NamespaceDefTest extends AuraImplTestCase {
             checkExceptionFull(e, DefinitionNotFoundException.class,
                     "No NAMESPACE named markup://nonExistantNamespace found");
         }
-
+        
         descriptor = defService.getDefDescriptor("namespaceDefTest", NamespaceDef.class);
         def = descriptor.getDef();
         assertNotNull(def);
         assertEquals("red", def.getStyleTokens().get("FOO"));
     }
+    
 }

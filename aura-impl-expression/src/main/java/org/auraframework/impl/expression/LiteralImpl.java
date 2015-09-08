@@ -25,6 +25,8 @@ import org.auraframework.expression.Literal;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.instance.ValueProvider;
 import org.auraframework.system.Location;
+import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
@@ -53,6 +55,22 @@ public class LiteralImpl implements Literal {
     @Override
     public Object evaluate(ValueProvider vp) {
         return getValue();
+    }
+
+
+    @Override
+    public void compile(Appendable out) throws IOException {
+        if (value == null) {
+            out.append("null");
+        } else if (value instanceof String) {
+        	out.append('"').append(AuraTextUtil.escapeForJSONString(value.toString())).append('"');
+        } else if (value instanceof Number) {
+        	out.append(value.toString());
+        } else if (value instanceof Boolean) {
+        	out.append(value.toString());
+        } else {
+            throw new AuraRuntimeException("Unexpected literal type in function expression.");
+        }
     }
 
     @Override

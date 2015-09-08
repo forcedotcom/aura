@@ -27,7 +27,7 @@
     <aura:attribute name="NaN" type="double"/>
 
     <aura:attribute name="object" type="Object"/>
-    
+
     <aura:attribute name="list" type="List"/>
 
     <aura:attribute name="label0" type="String"/>
@@ -111,6 +111,8 @@
     <!-- ternary -->
     <expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>
     <expressionTest:test expression="{!false ? 'yes' : 'no'}" exprText="false ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!if(true, 'yes')}" exprText="if(true, 'yes')" expected="'yes'"/>
+    <expressionTest:test expression="{!if(false, 'yes')}" exprText="if(false, 'yes')" expected="''"/>
     <expressionTest:test expression="{!if(true, 'yes', 'no')}" exprText="if(true, 'yes', 'no')" expected="'yes'"/>
     <expressionTest:test expression="{!if(false, 'yes', 'no')}" exprText="if(false, 'yes', 'no')" expected="'no'"/>
     <expressionTest:test expression="{!0 ? 'yes' : 'no'}" exprText="0 ? 'yes' : 'no'" expected="'no'"/>
@@ -381,7 +383,7 @@
     <!--
     we try to make sure FORMAT() on java side give us the same result as format() on js side
     tests on java side are in FunctionTest.java
-    here every test cmp 'expressionTest:test' map to a test function there (more or less) 
+    here every test cmp 'expressionTest:test' map to a test function there (more or less)
     -->
     <expressionTest:test expression="{!format()}" exprText="format()" expected="''"/>
     <expressionTest:test expression="{!format(null)}" exprText="format(null)" expected="''"/>

@@ -73,13 +73,13 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         assertEquals("Boolean precedence not evaluated correctly", 235.66, e.evaluate(null));
 
         e = buildExpression("false == false ? 16 : 21");
-        assertEquals("Boolean precedence not evaluated correctly", 16., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 16L, e.evaluate(null));
 
         e = buildExpression("false && false ? 16 : 21");
-        assertEquals("Boolean precedence not evaluated correctly", 21., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 21L, e.evaluate(null));
 
         e = buildExpression("true ? 16 : 21 < 20");
-        assertEquals("Boolean precedence not evaluated correctly", 16., e.evaluate(null));
+        assertEquals("Boolean precedence not evaluated correctly", 16L, e.evaluate(null));
 
         e = buildExpression("! true && false");
         assertEquals("Boolean precedence not evaluated correctly", false, e.evaluate(null));
@@ -110,7 +110,7 @@ public class ExpressionParserTest extends AuraImplExpressionTestCase {
         Expression e = buildExpression("5");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());
         LiteralImpl l = (LiteralImpl) e;
-        assertEquals("Unexpected number literal value", 5.0, l.getValue());
+        assertEquals("Unexpected number literal value", 5L, l.getValue());
 
         e = buildExpression("5.345");
         assertEquals("Unexpected expression type", ExpressionType.LITERAL, e.getExpressionType());

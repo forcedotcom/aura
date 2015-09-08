@@ -4,6 +4,8 @@
     },
 
     testApplicationRefreshedEvent: {
+    	// TODO(W-2701964): Flapping in autobuilds, needs to be revisited
+    	labels: ["flapper"],
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);

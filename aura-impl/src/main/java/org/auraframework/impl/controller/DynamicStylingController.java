@@ -47,7 +47,7 @@ import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.Declaration;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.Plugin;
-import com.salesforce.omakase.plugin.basic.ConditionalsValidator;
+import com.salesforce.omakase.plugin.conditionals.ConditionalsValidator;
 import com.salesforce.omakase.util.Args;
 
 /**

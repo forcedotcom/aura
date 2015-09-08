@@ -35,7 +35,7 @@ import com.salesforce.omakase.ast.selector.ClassSelector;
 import com.salesforce.omakase.ast.selector.Selector;
 import com.salesforce.omakase.broadcast.annotation.Rework;
 import com.salesforce.omakase.plugin.DependentPlugin;
-import com.salesforce.omakase.plugin.basic.Conditionals;
+import com.salesforce.omakase.plugin.conditionals.Conditionals;
 
 /**
  * Enables removing flavor styles that have been overridden via an app's {@link FlavorAssortmentDef}.

@@ -24,5 +24,5 @@ public interface DesignLayoutComponentDef extends Definition {
      * Gets the defDescriptor of a component
      * @return
      */
-    public DefDescriptor<ComponentDef> getComponentDef();
+    DefDescriptor<ComponentDef> getComponentDef();
 }

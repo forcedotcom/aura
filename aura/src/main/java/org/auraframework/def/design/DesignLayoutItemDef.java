@@ -20,17 +20,17 @@ public interface DesignLayoutItemDef{
      * Whether this item is a LayoutComponent or a LayoutAttribute
      * @return true if Attribute, false if Component.
      */
-    public boolean isAttribute();
+    boolean isAttribute();
 
     /**
      * Get the attribute definition
      * @return a LayoutAttribute, can be null
      */
-    public DesignLayoutAttributeDef getAttribute();
+    DesignLayoutAttributeDef getAttribute();
 
     /**
      * Get the component definition
      * @return a LayoutComponent, can be null
      */
-    public DesignLayoutComponentDef getComponent();
+    DesignLayoutComponentDef getComponent();
 }

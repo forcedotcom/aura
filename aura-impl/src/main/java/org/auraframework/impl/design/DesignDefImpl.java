@@ -122,6 +122,10 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
                 }
             }
         }
+
+        for (DesignAttributeDef attr : attributeDesignDefs.values()) {
+            attr.validateReferences();
+        }
     }
 
     @Override

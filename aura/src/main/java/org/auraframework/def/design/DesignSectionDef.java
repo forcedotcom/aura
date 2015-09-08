@@ -15,14 +15,14 @@
  */
 package org.auraframework.def.design;
 
-import java.util.Set;
-
 import org.auraframework.def.Definition;
+
+import java.util.Set;
 
 public interface DesignSectionDef extends Definition  {
     /**
      * get a set of design items found under a section
      * @return a set of items
      */
-    public Set<DesignItemsDef> getItems();
+    Set<DesignItemsDef> getItems();
 }

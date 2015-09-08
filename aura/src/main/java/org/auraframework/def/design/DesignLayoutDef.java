@@ -24,5 +24,5 @@ public interface DesignLayoutDef extends Definition {
      * Get the set of sections defined under a layout
      * @return a set
      */
-    public Set<DesignSectionDef> getSections();
+    Set<DesignSectionDef> getSections();
 }

@@ -47,6 +47,7 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         assertEquals("100", element.getMax());
         assertEquals("some label", element.getLabel());
         assertEquals("some placeholder", element.getPlaceholderText());
+        assertNull(element.getAttributeDefault());
     }
 
     public void testRequiredAndReadOnlyAttributeParsingNull() throws Exception {
@@ -134,6 +135,62 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
         }
     }
 
+    public void testDesignWithDefaultBlockNonPriviledgedFails() throws Exception {
+        final String attr = "attr";
+        String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
+        String design = "<design:component>" +
+                "<design:attribute name=\"" + attr + "\"><design:attributeDefault/>" + "</design:attribute></design:component>";
+
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design, false);
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), DesignDef.class);
+        } catch (Exception e) {
+            assertExceptionMessageEndsWith(e, InvalidDefinitionException.class, "Found unexpected tag design:attributeDefault");
+        }
+    }
+
+    public void testDesignWithDefaultBlock() throws Exception {
+        final String attr = "attr";
+        String cmp = "<aura:attribute name=\"" + attr +"\" type=\"Object[]\" />";
+        String design = "<design:component>" +
+                "<design:attribute name=\"" + attr + "\"><design:attributeDefault/>" + "</design:attribute></design:component>";
+
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design, true);
+        Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), DesignDef.class);
+    }
+
+    public void testDesignWithDefaultBlockAndDefaultAttributeFail() throws Exception {
+        final String attr = "attr";
+        String cmp = "<aura:attribute name=\"" + attr +"\" type=\"Object[]\" />";
+        String design = "<design:component>" +
+                "<design:attribute name=\"" + attr + "\" default=\"test\"><design:attributeDefault/>" + "</design:attribute></design:component>";
+
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design, true);
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Should not be able to have a default and default tag");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class,
+                    "Design attribute can not contain a default attribute and a default tag");
+        }
+    }
+
+    public void testDesignWithDefaultBlockWithInvalidAttributeType() throws Exception {
+        final String attr = "attr";
+        String cmp = "<aura:attribute name=\"" + attr +"\" type=\"String\" />";
+        String design = "<design:component>" +
+                "<design:attribute name=\"" + attr + "\"><design:attributeDefault/>" + "</design:attribute></design:component>";
+
+        DefDescriptor<ComponentDef> cmpDesc = createAuraDefinitionWithDesignFile(cmp, design, true);
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDesc.getQualifiedName(), ComponentDef.class);
+            fail("Should not allow default blocks if attribute is not object[] or aura.component[]");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class,
+                    "Only attributes of type Object[] or Aura.Component[] may have default blocks");
+        }
+    }
+
 
     private DesignAttributeDef setupAttributeDesignDef(String name, String markup) throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(null,
@@ -149,12 +206,16 @@ public class DesignAttributeDefHandlerTest extends AuraImplTestCase {
     }
 
     private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource) {
+        return createAuraDefinitionWithDesignFile(cmpAttributes, designSource, false);
+    }
+
+    private DefDescriptor<ComponentDef> createAuraDefinitionWithDesignFile(String cmpAttributes, String designSource, boolean isPriviledged) {
         DefDescriptor<ComponentDef> cmpDesc = getAuraTestingUtil().createStringSourceDescriptor(StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE + ":",
                 ComponentDef.class, null);
-        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), false);
+        getAuraTestingUtil().addSourceAutoCleanup(cmpDesc, String.format(baseComponentTag, "", cmpAttributes), isPriviledged);
         DefDescriptor<DesignDef> desc = Aura.getDefinitionService().getDefDescriptor(cmpDesc.getQualifiedName(),
                 DesignDef.class);
-        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, false);
+        getAuraTestingUtil().addSourceAutoCleanup(desc, designSource, isPriviledged);
         return cmpDesc;
     }
 }

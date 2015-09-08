@@ -45,6 +45,7 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     private static final String ATTRIBUTE_LABEL = "label";
 
     private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
+    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET = Sets.newHashSet("object[]", "aura.component[]");
     private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
 
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
@@ -169,6 +170,11 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         } else if(!isInPrivilegedNamespace() && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
                 attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
             throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
+        }
+
+        if (designAttr.getAttributeDefault() != null &&
+                !VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())) {
+            throw new InvalidDefinitionException("Only attributes of type Object[] or Aura.Component[] may have default blocks", getLocation());
         }
     }
 

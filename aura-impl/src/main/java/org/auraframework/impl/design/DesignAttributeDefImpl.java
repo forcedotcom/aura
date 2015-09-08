@@ -17,7 +17,9 @@ package org.auraframework.impl.design;
 
 import org.auraframework.builder.design.DesignAttributeDefBuilder;
 import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -41,6 +43,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     private final String minApi;
     private final String maxApi;
     private final boolean translatable;
+    private final DesignAttributeDefaultDef defaultFacet;
 
 
     protected DesignAttributeDefImpl(Builder builder) {
@@ -60,6 +63,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         this.minApi = builder.minApi;
         this.maxApi = builder.maxApi;
         this.translatable = builder.translatable;
+        this.defaultFacet = builder.defaultFacet;
     }
 
     @Override
@@ -118,6 +122,11 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     }
 
     @Override
+    public DesignAttributeDefaultDef getAttributeDefault() {
+        return defaultFacet;
+    }
+
+    @Override
     public String getMinApi() {
         return minApi;
     }
@@ -138,8 +147,15 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     }
 
     @Override
-    public void validateDefinition() throws QuickFixException {
-        super.validateDefinition();
+    public void validateReferences() throws QuickFixException {
+        super.validateReferences();
+        if (defaultFacet != null && defaultValue != null) {
+            throw new InvalidDefinitionException("Design attribute can not contain a default attribute and a default tag.",
+                    getLocation());
+        }
+        if (defaultFacet != null) {
+            defaultFacet.validateReferences();
+        }
     }
 
     @Override
@@ -162,6 +178,7 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         private String minApi;
         private String maxApi;
         private boolean translatable;
+        private DesignAttributeDefaultDef defaultFacet;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -238,6 +255,12 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         @Override
         public DesignAttributeDefBuilder setDefault(String defaultValue) {
             this.defaultValue = defaultValue;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setDefault(DesignAttributeDefaultDef defaultValue) {
+            this.defaultFacet = defaultValue;
             return this;
         }
 

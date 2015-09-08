@@ -22,14 +22,14 @@ import java.util.Map;
 
 public interface DesignTemplateDef extends Definition {
     @Override
-    public DefDescriptor<DesignTemplateDef> getDescriptor();
+    DefDescriptor<DesignTemplateDef> getDescriptor();
 
     /**
      * Get a map of design template region definitions by name. Will be empty if no regions were defined.
      * 
      * @return a map of design template region definitions
      */
-    public Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> getDesignTemplateRegionDefs();
+    Map<DefDescriptor<DesignTemplateRegionDef>, DesignTemplateRegionDef> getDesignTemplateRegionDefs();
 
     /**
      * Get the design template region with the specified name
@@ -37,5 +37,5 @@ public interface DesignTemplateDef extends Definition {
      * @param name
      * @return the design template region, may be null if no region was defined with name
      */
-    public DesignTemplateRegionDef getDesignTemplateRegionDef(String name);
+    DesignTemplateRegionDef getDesignTemplateRegionDef(String name);
 }

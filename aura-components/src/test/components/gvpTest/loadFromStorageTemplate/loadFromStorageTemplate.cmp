@@ -20,6 +20,9 @@
                     // use setTimeout() to trigger a context switch. 1500 is chosen because it's
                     // long enough for aura to initialize if it's not correctly waiting for the callback.
                     setTimeout(function() {
+                        // strip AuraStorage.KEY_DELIMITER
+                        key = key.slice(key.indexOf(":") + 1);
+
                         // record which keys had their callbacks invoked
                         window.mockStorageAdapter.getItemInvocations[key] = true;
 

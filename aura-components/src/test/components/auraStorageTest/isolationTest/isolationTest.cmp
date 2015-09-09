@@ -1,2 +1,13 @@
 <aura:component>
+    <aura:attribute name="status" type="String" default="Waiting"/>
+    <aura:attribute name="items" type="Object"/>
+    <aura:attribute name="isolationKey" type="String" default="" />
+    <aura:attribute name="storageItemValue" type="String" default="value" />
+
+    <aura:method name="addItemToStorage" action="{!c.addItemToStorage}"/>
+    <aura:method name="getAllFromStorage" action="{!c.getAllFromStorage}"/>
+
+    <div aura:id="iframeContainer" />
+
+    Status: <span aura:id="status">{!v.status}</span><br/>
 </aura:component>

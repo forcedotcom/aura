@@ -23,6 +23,9 @@
     // maintaining its performance these tests will have to be updated.
 
     setUp : function(cmp) {
+        // must match AuraStorage.KEY_DELIMITER
+        cmp.DELIMITER = ":";
+
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "memory"; });
 
         this.storage = $A.storageService.initStorage(
@@ -215,24 +218,37 @@
 
     testLeastRecentlyUsedEviction : {
         test : function(cmp) {
+            /**
+             * Generates raw adapter keys values given a list of keys.
+             * @param {String[]} keys storage keys from which the raw adapter keys are generated.
+             * @return {String[]} raw adapter keys.
+             */
+            function generateRawAdapterKeys(keys) {
+                var s = "";
+                for (var i = 0; i < keys.length; i++) {
+                    s+= cmp.DELIMITER + keys[i] + ",";
+                }
+                return s.slice(0, -1);
+            }
+
             var that = this;
             var completed = false;
             this.storage.put("key1", {"value" : {"foo" : new Array(256).join("x")}})
                 .then(function() { return that.adapter.getMRU(); })
-                .then(function(mru) { $A.test.assertEquals("key1", mru.toString()); })
+                .then(function(mru) { $A.test.assertEquals(":key1", mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(283, size*1024); })
 
                 .then(function() { return that.storage.put("key2", { "value" : { "bar" : new Array(512).join("y")}}); })
                 .then(function() { return that.adapter.getMRU(); })
-                .then(function(mru) { $A.test.assertEquals("key1,key2", mru.toString()); })
+                .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key2"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(283+539, size*1024); })
 
                 // touch key1 to move it up to the top of the MRU
                 .then(function() {return that.storage.get("key1"); })
                 .then(function(item) { return that.adapter.getMRU(); })
-                .then(function(mru) { $A.test.assertEquals("key2,key1", mru.toString()); })
+                .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key2", "key1"]), mru.toString()); })
 
                 // add another item to push out the oldest item
                 // oldest (key2) item should have been evicted
@@ -240,7 +256,7 @@
                 .then(function() { return that.storage.get("key2"); })
                 .then(function(item) { $A.util.isUndefined(item); })
                 .then(function() { return that.adapter.getMRU(); })
-                .then(function(mru) { $A.test.assertEquals("key1,key3", mru.toString()); })
+                .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key1", "key3"]), mru.toString()); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(283+3327, size*1024); })
 
@@ -248,7 +264,7 @@
                 // add a new key which would require all the current entries to be evicted
                 .then(function() { return that.storage.put("key4", { "value" : { "buz" : new Array(4000).join("w") }}); })
                 .then(function() { return that.adapter.getMRU(); })
-                .then(function(mru) { $A.test.assertEquals("key4", mru.toString()); } )
+                .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key4"]), mru.toString()); } )
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(4027, size*1024); })
                 .then(

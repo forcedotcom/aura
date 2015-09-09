@@ -1,5 +1,8 @@
 ({
     setUp : function(component) {
+        // must match AuraStorage.KEY_DELIMITER
+        component.DELIMITER = ":";
+
         var completed = false;
         $A.storageService.getStorage("cmpStorage").clear()
             .then(
@@ -23,7 +26,7 @@
 
             var storage = $A.storageService.getStorage("cmpStorage");
             storage.put(key, expected).then(function() {
-                return storage.adapter.getItem(version + key);
+                return storage.adapter.getItem(version + cmp.DELIMITER + key);
             })
             .then(function(item) {
                 $A.test.assertEquals(expected, item["value"], "Storage with prefixed key should return correct value");
@@ -38,7 +41,7 @@
 
                 completed = true;
             })
-            ["catch"](function(error) { $A.test.fail(error); });
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -87,6 +90,86 @@
                $A.test.assertEquals(expected, storage.getVersion(), "<auraStorage:init/> component with empty version did not inherit global value");
            }
        ]
-    }
+    },
 
+    testGetAllOnlyReturnsCurrentVersionWhenSwitchingBetweenVersions: {
+        test: [function(cmp) {
+            var completed = false;
+            var storage = $A.storageService.initStorage("getAllIsolation", false, false, 1024);
+            storage.setVersion("versionA");
+            storage.put("keyA","valueA")
+            .then(function() {
+                storage.setVersion("versionB");
+                return storage.put("keyB","valueB");
+            })
+            .then(function() {
+                completed = true;
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }, function(cmp) {
+            var storage = $A.storageService.getStorage("getAllIsolation");
+            storage.getAll()
+            .then(function(items) {
+                $A.test.assertEquals(1, items.length, "Unexpected number of items returned from storage.getAll()");
+                $A.test.assertEquals("valueB", items[0].value, "Unexpected value returned from storage");
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+        }]
+    },
+
+    testGetAllOnlyReturnsCurrentVersionWhenSwitchingToNoVersion: {
+        test: [function(cmp) {
+            var completed = false;
+            var storage = $A.storageService.initStorage("getAllIsolation", false, false, 1024);
+            storage.setVersion("versionA");
+            storage.put("keyA","valueA")
+            .then(function() {
+                storage.setVersion("");
+                return storage.put("keyB","valueB");
+            })
+            .then(function() {
+                completed = true;
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }, function(cmp) {
+            var storage = $A.storageService.getStorage("getAllIsolation");
+            storage.getAll()
+            .then(function(items) {
+                $A.test.assertEquals(1, items.length, "Unexpected number of items returned from storage.getAll()");
+                $A.test.assertEquals("valueB", items[0].value, "Unexpected value returned from storage");
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+        }]
+    },
+
+    testGetAllOnlyReturnsCurrentVersionWhenSwitchingFromNoVersion: {
+        test: [function(cmp) {
+            var completed = false;
+            var storage = $A.storageService.initStorage("getAllIsolation", false, false, 1024);
+            storage.setVersion("");
+            storage.put("keyA","valueA")
+            .then(function() {
+                storage.setVersion("versionB");
+                return storage.put("keyB","valueB");
+            })
+            .then(function() {
+                completed = true;
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }, function(cmp) {
+            var storage = $A.storageService.getStorage("getAllIsolation");
+            storage.getAll()
+            .then(function(items) {
+                $A.test.assertEquals(1, items.length, "Unexpected number of items returned from storage.getAll()");
+                $A.test.assertEquals("valueB", items[0].value, "Unexpected value returned from storage");
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+        }]
+    }
 })

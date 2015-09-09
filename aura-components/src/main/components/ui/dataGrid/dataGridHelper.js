@@ -107,8 +107,7 @@
 	 */
 	// TODO rework
 	handleItemsChange: function (cmp, params) {
-		var self = this,
-			concrete = cmp.getConcreteComponent();
+		var concrete = cmp.getConcreteComponent();
 		
 		// If adding or removing rows, escape.
 		if (cmp._addRemove) { 
@@ -168,7 +167,7 @@
 
 		if (name === 'dataGrid:select') {
 			if (typeof value === 'string') {
-				value = (value == 'true');
+				value = (value === 'true');
 			}
 			
 			// An empty index implies that this is select all. 

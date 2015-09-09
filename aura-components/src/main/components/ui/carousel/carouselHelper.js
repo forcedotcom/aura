@@ -211,13 +211,12 @@
         		isScrollable:         cmp.get("v.isScrollable"),
         		ignoreExistingAction: cmp.get("v.ignoreExistingAction")
         	},
-            page, i;
+            i;
 
         cmp._numOfPages = numberOfPages;
         this.setCurrentPageIndex(cmp, 0);
 
         for (i = 0; i < numberOfPages; i++) {
-        	page = pages[i];
         	if (i === prefetchedTabIndex) {
         		this.setCurrentPageIndex(cmp, i);
         		cmp._swiped[i] = true; // for instrumentation purposes
@@ -267,8 +266,7 @@
     		initialPage = this.getCurrentPageIndex(cmp),
     		carousel    = this.getCarouselInstance(cmp),
             indicator   = cmp.get('v.pageIndicatorComponent')[0],
-    		pages       = cmp.get('v.body'),
-    		page        = pages[initialPage];
+    		pages       = cmp.get('v.body');
 
     	carousel._updatePagesSize(cmp, carousel);
         indicator.get('c.changeActivePage').run({pageIndex: initialPage});

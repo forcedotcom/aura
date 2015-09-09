@@ -15,7 +15,7 @@
  */
 
 ({
-    load: function (cmp, event) {
+    load: function (cmp) {
         var imageElement = cmp.getElement().getElementsByTagName("img")[0];
         imageElement.src = cmp.get("v.actualImageSrc");
         var callback = $A.getCallback(function () {

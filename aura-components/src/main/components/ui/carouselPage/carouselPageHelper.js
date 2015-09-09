@@ -203,7 +203,7 @@
 						}
 					}
 				});
-				scroller.on('scrollEnd', function (action) {
+				scroller.on('scrollEnd', function () {
 					var updateHighlightsEvt = $A.getEvt('force:updateHighlights');
 					if (scroller.y >= 0 && scroller.scrollerHeight > scroller.wrapperHeight) {
 						updateHighlightsEvt.setParams({action: 'show'}).fire();

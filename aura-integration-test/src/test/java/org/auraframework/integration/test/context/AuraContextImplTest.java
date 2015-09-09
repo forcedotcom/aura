@@ -497,7 +497,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testSetGlobalUnregistered() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
-            ctx.setGlobal("unknown", "irrelevant");
+            ctx.setGlobalDefaultValue("unknown", "irrelevant");
             fail("expected to throw if global unregistered");
         } catch (Throwable t) {
             this.assertExceptionMessage(t, AuraRuntimeException.class,
@@ -508,7 +508,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testSetGlobalNullName() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
         try {
-            ctx.setGlobal(null, "irrelevant");
+            ctx.setGlobalDefaultValue(null, "irrelevant");
             fail("expected to throw if global unregistered");
         } catch (Throwable t) {
             this.assertExceptionMessage(t, AuraRuntimeException.class,
@@ -521,7 +521,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         registerGlobal(name, true, "some default value");
         Object expected = new Object();
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setGlobal(name, expected);
+        ctx.setGlobalDefaultValue(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
 
@@ -530,7 +530,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         registerGlobal(name, true, "some default value");
         Object expected = null;
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setGlobal(name, expected);
+        ctx.setGlobalDefaultValue(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
 
@@ -578,7 +578,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         Object expected = new Object();
         registerGlobal(name, true, defaultValue);
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setGlobal(name, expected);
+        ctx.setGlobalDefaultValue(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
 
@@ -588,7 +588,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         Object expected = null;
         registerGlobal(name, true, defaultValue);
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setGlobal(name, expected);
+        ctx.setGlobalDefaultValue(name, expected);
         assertEquals(expected, ctx.getGlobal(name));
     }
 
@@ -600,15 +600,13 @@ public class AuraContextImplTest extends AuraImplTestCase {
         registerGlobal(name1, true, defaultValue);
         registerGlobal(name2, true, defaultValue);
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.UNAUTHENTICATED);
-        ctx.setGlobal(name2, setValue);
+        ctx.setGlobalDefaultValue(name2, setValue);
 
         ImmutableMap<String, GlobalValue> globals = ctx.getGlobals();
         assertEquals("missing first registered value", true, globals.containsKey(name1));
         assertEquals("missing second registered value", true, globals.containsKey(name2));
-        assertEquals("unexpected first default value", defaultValue, globals.get(name1).defaultValue);
-        assertEquals("unexpected second default value", defaultValue, globals.get(name2).defaultValue);
-        assertEquals("unexpected first value", null, globals.get(name1).value);
-        assertEquals("unexpected second value", setValue, globals.get(name2).value);
+        assertEquals("unexpected first value", defaultValue, globals.get(name1).getValue());
+        assertEquals("unexpected second value", setValue, globals.get(name2).getValue());
     }
 
     public void testGetAccessVersion() throws Exception {

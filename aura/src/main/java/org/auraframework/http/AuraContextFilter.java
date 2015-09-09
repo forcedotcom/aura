@@ -197,7 +197,7 @@ public class AuraContextFilter implements Filter {
             Map<String, Object> gvp = (Map<String, Object>) configMap.get("globals");
             if (gvp != null) {
                 for (Map.Entry<String, Object> entry : gvp.entrySet()) {
-                    context.setGlobal(entry.getKey(), entry.getValue());
+                    context.setGlobalValue(entry.getKey(), entry.getValue());
                 }
             }
         }

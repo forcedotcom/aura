@@ -76,20 +76,34 @@ ContextValueProvider.prototype.merge = function(values) {
     for (var key in values) {
         if (values.hasOwnProperty(key)) {
             var value = values[key];
-            var old = undefined;
-            if (this.values.hasOwnProperty(key)) {
-                old = this.values[key];
-            }
-            if (!value || !value.hasOwnProperty("defaultValue")) {
+            // var old = undefined;
+            // if (this.values.hasOwnProperty(key)) {
+            //     old = this.values[key];
+            // }
+            
+            if (!value || !(value.hasOwnProperty("value") || value.hasOwnProperty("defaultValue"))) {
                 throw new Error("Invalid merge value at key '"+key+"' with value '"+value+"'");
             }
-            if (value["writable"] && old && old.hasOwnProperty("value")) {
-                value["value"] = old["value"];
+
+            // So if they set a value on the client for a $Global property
+            // Setting it on the server will never take effect. 
+            // Even if we do a setGlobalValue()
+            // It feels like we'd want to set the value to the clientValue, but 
+            // I feel we need a test to validate that first.
+            // 
+            // Kris: Testing now 
+            // if (value["writable"] && old && old.hasOwnProperty("value")) {
+            //     value["value"] = old["value"]; 
+            // }
+            if(value.hasOwnProperty("value")) {
+                if(value["originalValue"] === this.values[key].value) {
+                    delete value["originalValue"];
+                    this.values[key] = value;
+                }
+            } else {
+                delete value["originalValue"];
+                this.values[key] = value;
             }
-            this.values[key] = value;
-            // Change notification.
-            //var oldValue = this.extract(old);
-            //var newValue = this.extract(value);
         }
     }
 };

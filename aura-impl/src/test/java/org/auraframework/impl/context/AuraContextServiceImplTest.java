@@ -78,8 +78,8 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
         contextService.registerGlobal(name, true, defaultValue);
         assertEquals("registered value should be allowed", true, contextService.getAllowedGlobals().containsKey(name));
         GlobalValue value = contextService.getAllowedGlobals().get(name);
-        assertEquals(true, value.writable);
-        assertEquals(defaultValue, value.defaultValue);
+        assertEquals(true, value.isWritable());
+        assertEquals(defaultValue, value.getValue());
     }
 
     public void testRegisterGlobalWithInvalidName() {
@@ -117,13 +117,13 @@ public class AuraContextServiceImplTest extends AuraImplTestCase {
 
         contextService.registerGlobal(name, true, initialDefaultValue);
         GlobalValue value = contextService.getAllowedGlobals().get(name);
-        assertEquals(true, value.writable);
-        assertEquals(initialDefaultValue, value.defaultValue);
+        assertEquals(true, value.isWritable());
+        assertEquals(initialDefaultValue, value.getValue());
 
         contextService.registerGlobal(name, false, defaultValue);
         value = contextService.getAllowedGlobals().get(name);
-        assertEquals(false, value.writable);
-        assertEquals(defaultValue, value.defaultValue);
+        assertEquals(false, value.isWritable());
+        assertEquals(defaultValue, value.getValue());
     }
 
 }

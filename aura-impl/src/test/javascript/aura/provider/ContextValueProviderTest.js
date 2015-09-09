@@ -75,8 +75,10 @@ Test.Aura.Provider.ContextValueProviderTest = function() {
         [Fact]
         function OverwriteGVOnSecondMerge() {
             var target = getCVP();
-            var expected = { "writable" : { "defaultValue":"start", "writable":true },
-                "readOnly" : { "defaultValue":"baffle", "writable":true } };
+            var expected = { 
+                "writable" : { "defaultValue":"start", "writable":true },
+                "readOnly" : { "defaultValue":"baffle", "writable":true } 
+            };
 
             target.merge({ "readOnly" : { "defaultValue":"baffle", "writable":true } });
 
@@ -95,29 +97,64 @@ Test.Aura.Provider.ContextValueProviderTest = function() {
         }
 
         [Fact]
-        function NoOverwriteValueOnSetWritable() {
+        function NoOverwriteValueAfterClientSet() {
             var target = getCVP();
-            var expected = { "writable" : { "value":"end", "defaultValue":"start", "writable":true },
-                "readOnly" : { "defaultValue":"value" } };
+            var expected = { 
+                "writable" : { "value":"end", "defaultValue":"start", "writable":true },
+                "readOnly" : { "defaultValue":"value" } 
+            };
 
             mockDollarA()(function () {
                 target.set("writable", "end");
                 target.merge({ "writable" : { "value":"flub", "defaultValue":"start", "writable":true }});
             });
 
-            Assert.Equal(expected, target.values);
+            Assert.Equal(expected.writable.value, target.values.writable.value);
+        }
+
+        [Fact]
+        function OverwriteValueAfterClientSetWithOriginalValue() {
+            var target = getCVP();
+            var expected = { 
+                "writable" : { "value":"flub", "defaultValue":"start", "writable":true },
+                "readOnly" : { "defaultValue":"value" } 
+            };
+
+            mockDollarA()(function () {
+                target.set("writable", "end");
+                target.merge({ "writable" : { "value":"flub", "defaultValue":"start", "originalValue":"end", "writable":true }});
+            });
+            Assert.Equal(expected.writable.value, target.values.writable.value);
+        }
+
+        [Fact]
+        function NoOverwriteValueAfterClientSetWithDifferentOriginalValue() {
+            var target = getCVP();
+            var expected = { 
+                "writable" : { "value":"end", "defaultValue":"start", "writable":true },
+                "readOnly" : { "defaultValue":"value" } 
+            };
+
+            mockDollarA()(function () {
+                target.set("writable", "end");
+                target.merge({ "writable" : { "value":"flub", "defaultValue":"start", "originalValue":"start", "writable":true }});
+            });
+
+            Assert.Equal(expected.writable.value, target.values.writable.value);
         }
 
         [Fact]
         function OverwriteValueOnReadOnly() {
             var target = getCVP();
-            var expected = { "writable" : { "defaultValue":"start", "writable":true },
-                "readOnly" : { "value":"two", "defaultValue":"value" } };
+            var expected = { 
+                "writable" : { "defaultValue":"start", "writable":true },
+                "readOnly" : { "value":"two", "defaultValue":"value" } 
+            };
 
             target.merge({ "readOnly" : { "value":"one", "defaultValue":"value" }});
-            target.merge({ "readOnly" : { "value":"two", "defaultValue":"value" }});
+            target.merge({ "readOnly" : { "value":"two", "defaultValue":"value", "originalValue": "one" }});
 
-            Assert.Equal(expected, target.values);
+            Assert.Equal(expected.readOnly.value, target.values.readOnly.value);
         }
     }
 

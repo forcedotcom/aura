@@ -1,4 +1,11 @@
 <aura:component controller="java://org.auraframework.components.test.java.controller.ContextVPTestController">
-  <div aura:id="data">{!$Global.isVoiceOver}</div>
-  <div aura:id="insertion"/>
+
+	<aura:method name="updateGvpValue">
+		<aura:attribute type="String" name="name"/>
+		<aura:attribute type="String" name="value"/>
+	</aura:method>
+
+	<div aura:id="data">{!$Global.isVoiceOver}</div>
+	<div aura:id="dynamicTypeSize">{!$Global.dynamicTypeSize}</div>
+	<div aura:id="insertion"/>
 </aura:component>

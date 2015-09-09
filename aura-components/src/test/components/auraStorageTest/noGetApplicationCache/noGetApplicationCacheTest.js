@@ -1,4 +1,8 @@
 ({
+	// IndexedDb not supported in IE < 10
+    // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+	
     tearDown: function() {
         $A.storageService.getStorage('actions').remove('aura://ComponentController/ACTION$getApplication:{"name":"auraStorageTest:noGetApplicationCache"}');
     },

@@ -48,6 +48,10 @@ public class TestLocalizationAdapterImpl extends LocalizationAdapterImpl {
         setTestLabel("Section2", "library", "Library2");
         setTestLabel("Section1", "badlibrary", "BadLibrary1");
         setTestLabel("Section2", "badlibrary", "BadLibrary2");
+        setTestLabel("SectionJsonTest_s", "s", "serialId");
+        setTestLabel("SectionJsonTest_sid", "sid", "serialIdShort");
+        setTestLabel("SectionJsonTest_r", "r", "serialRefId");
+        setTestLabel("SectionJsonTest_rid", "rid", "serialRefIdShort");
     }
 
     private Object getLabelKey(String section, String name) {

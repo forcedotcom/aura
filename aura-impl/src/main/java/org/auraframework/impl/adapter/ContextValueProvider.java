@@ -71,6 +71,12 @@ public class ContextValueProvider implements GlobalValueProvider {
     }
 
     @Override
+    public boolean refSupport() {
+        // $Global may have serialization references.
+        return true;
+    }
+
+    @Override
     public Map<String, ?> getData() {
         AuraContext context = Aura.getContextService().getCurrentContext();
 

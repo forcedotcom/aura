@@ -94,6 +94,12 @@ public class LabelValueProvider implements GlobalValueProvider {
     }
 
     @Override
+    public boolean refSupport() {
+    	// $Label has no serialization references.
+        return false;
+    }
+
+    @Override
     public Map<String, ?> getData() {
         return labels;
     }

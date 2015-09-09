@@ -735,4 +735,207 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fixture]
+    function Decode() {
+        var mockData = {
+            decodedResponse : undefined
+        };
+        var requestedToResolve = [];
+        var mocksForDecode = Mocks.GetMocks(Object.Global(), {
+            "Date" : {
+                getTime : function() {
+                    return "today is a good day";
+                }
+            },
+            "$A" : {
+                error : function(text){
+                    throw text;
+                },
+                log : function() {
+                },
+                assert : function(condition, message) {
+                    if (!condition) {
+                        throw message;
+                    }
+                },
+                util : {
+                    on : function() {
+                    },
+                    isUndefinedOrNull : function(obj) {
+                        return obj === undefined || obj === null;
+                    },
+                    isUndefined : function() {
+                    },
+                    isArray : function() {
+                    },
+                    json : {
+                        encode : function(errorText) {
+                            return "mockedJson:" + errorText;
+                        },
+                        orderedEncode : function(obj) {
+                            return obj;
+                        },
+                        decode : function() {
+                            return mockData.decodedResponse;
+                        },
+                        resolveRefs : function(input) {
+                            // copy input in case inner objects are changed
+                            requestedToResolve.push(JSON.stringify(input));
+                        }
+                    },
+                    stringEndsWith : function() {
+                        return false;
+                    }
+                },
+                mark : function() {
+                }
+            },
+            window : {},
+            document : {},
+            Aura : Aura
+        });
+
+        [Fact]
+        function GvpWithRefSupportIsResolved() {
+            requestedToResolve.length = 0;
+            mockData.decodedResponse = {
+                "context" : {
+                    "globalValueProviders" : [ {
+                        "hasRefs" : true,
+                        "type" : "$TEST"
+                    } ]
+                }
+            };
+            
+            var response = {
+                status : 200,
+                responseText : "'useDecodedResponseInstead'"
+            };
+            
+            var target;
+            mocksForDecode(function() {
+                target = new Aura.Services.AuraClientService();
+                
+                target.decode(response);
+            });
+            
+            Assert.Equal('{"context":{"globalValueProviders":[{"hasRefs":true,"type":"$TEST"}]}}',
+                requestedToResolve);
+        }
+
+        [Fact]
+        function GvpWithoutRefSupportIsNotResolved() {
+            requestedToResolve.length = 0;
+            mockData.decodedResponse = {
+                "context" : {
+                    "globalValueProviders" : [ {
+                        "hasRefs" : false,
+                        "type" : "$NOREF"
+                    } ]
+                }
+            };
+            
+            var response = {
+                status : 200,
+                responseText : "'useDecodedResponseInstead'"
+            };
+            
+            mocksForDecode(function() {
+                var target = new Aura.Services.AuraClientService();
+                target.decode(response);
+            });
+            
+            Assert.Equal('{"context":{"globalValueProviders":[]}}', requestedToResolve);
+        }
+        
+        [Fact]
+        function GvpsWithRefSupportInMixedSetAreResolved() {
+            requestedToResolve.length = 0;
+            mockData.decodedResponse = {
+                "context" : {
+                    "globalValueProviders" : [ {
+                        "hasRefs" : true,
+                        "type" : "$TEST_A"
+                    }, {
+                        "hasRefs" : false,
+                        "type" : "$NOREF_1"
+                    }, {
+                        "hasRefs" : true,
+                        "type" : "$TEST_B"
+                    }, {
+                        "hasRefs" : false,
+                        "type" : "$NOREF_2"
+                    } ]
+                }
+            };
+            
+            var response = {
+                status : 200,
+                responseText : "'useDecodedResponseInstead'"
+            };
+            
+            mocksForDecode(function() {
+                var target = new Aura.Services.AuraClientService();
+                target.decode(response);
+            });
+            
+            Assert.Equal(
+                '{"context":{"globalValueProviders":[{"hasRefs":true,"type":"$TEST_A"},{"hasRefs":true,"type":"$TEST_B"}]}}',
+                requestedToResolve);
+        }
+
+        [Fact]
+        function UnresolvedGvpsRetained() {
+            requestedToResolve.length = 0;
+            mockData.decodedResponse = {
+                "context" : {
+                    "globalValueProviders" : [ {
+                        "hasRefs" : false,
+                        "type" : "$NOREF_1"
+                    }, {
+                        "hasRefs" : true,
+                        "type" : "$TEST_A"
+                    }, {
+                        "hasRefs" : false,
+                        "type" : "$NOREF_2"
+                    }, {
+                        "hasRefs" : true,
+                        "type" : "$TEST_B"
+                    }, {
+                        "hasRefs" : false,
+                        "type" : "$NOREF_3"
+                    } ]
+                }
+            };
+            
+            var response = {
+                status : 200,
+                responseText : "'useDecodedResponseInstead'"
+            };
+            
+            var actual;
+            mocksForDecode(function() {
+                var target = new Aura.Services.AuraClientService();
+                actual = target.decode(response);
+            });
+            
+            Assert.Equal(
+                '{' + 
+                    '"status":"SUCCESS",' +
+                    '"message":{' +
+                        '"context":{' +
+                            '"globalValueProviders":[' +
+                                '{"hasRefs":true,"type":"$TEST_A"},' +
+                                '{"hasRefs":true,"type":"$TEST_B"},' +
+                                '{"hasRefs":false,"type":"$NOREF_3"},' +
+                                '{"hasRefs":false,"type":"$NOREF_2"},' +
+                                '{"hasRefs":false,"type":"$NOREF_1"}' +
+                            ']' +
+                        '}' +
+                    '}' +
+                '}',
+                JSON.stringify(actual));
+        }
+    }
 }

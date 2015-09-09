@@ -212,12 +212,19 @@ public class AuraContextImpl implements AuraContext {
                         json.writeArrayBegin();
                         started = true;
                     }
-                    json.writeComma();
-                    json.writeIndent();
-                    json.writeMapBegin();
-                    json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
-                    json.writeMapEntry("values", valueProvider.getData());
-                    json.writeMapEnd();
+                    try {  
+                        // Conditionally disable refSupport for specific value providers.
+                    	json.getSerializationContext().pushRefSupport(valueProvider.refSupport()); 
+                        json.writeComma();
+                        json.writeIndent();
+                        json.writeMapBegin();
+                        json.writeMapEntry("type", valueProvider.getValueProviderKey().getPrefix());
+                    	json.writeMapEntry("hasRefs", valueProvider.refSupport());
+	                    json.writeMapEntry("values", valueProvider.getData());
+	                    json.writeMapEnd();
+                    } finally { 
+                    	json.getSerializationContext().popRefSupport(); 
+                    }
                 }
             }
 

@@ -117,6 +117,12 @@ public class BrowserValueProvider implements GlobalValueProvider {
     }
 
     @Override
+    public boolean refSupport() {
+    	// $Browser has no serialization references.
+        return false;
+    }
+
+    @Override
     public Map<String, ?> getData() {
         if (browserDetails == null) {
             browserDetails = AuraUtil.immutableMap(parse());

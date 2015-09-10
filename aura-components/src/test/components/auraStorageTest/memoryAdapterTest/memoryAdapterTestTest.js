@@ -62,12 +62,10 @@
             var that = this;
             var completed = false;
             that.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })
-                .then(function() { return that.storage.getSize(); })
-                .then(function(size) { that.assertSimilarSize(50, size*1024); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+            .then(function() { return that.storage.getSize(); })
+            .then(function(size) { that.assertSimilarSize(50, size*1024); })
+            .then( function() { completed = true; })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -98,11 +96,9 @@
                         that.assertSimilarSize(size1*1024 + 10, size3*1024);
 
                         completed = true;
-                    },
-                    function(err) {
-                        $A.test.fail("Failed testSizeSameKeySameObject." + err);
                     }
-            );
+                )
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -120,10 +116,9 @@
                 // the size should not have changed
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { $A.test.assertEquals(originalSize, size); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
+            
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -139,10 +134,8 @@
                 .then(function() { return that.storage.put("key1", {"value" : {"alpha":"epsilon", "gamma":"zeta", "now" : true }}); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(63, size*1024); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -180,10 +173,8 @@
                 ])
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(201, size*1024); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -207,10 +198,8 @@
                 .then(function() { return that.storage.put("key1", {"value" : {"alpha" : "epsilon", "gamma" : "zeta"}}); })
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(102, size*1024); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -267,10 +256,8 @@
                 .then(function(mru) { $A.test.assertEquals(generateRawAdapterKeys(["key4"]), mru.toString()); } )
                 .then(function() { return that.storage.getSize(); })
                 .then(function(size) { that.assertSimilarSize(4027, size*1024); })
-                .then(
-                    function() { completed = true; },
-                    function(err) { $A.test.fail(err); }
-                );
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         }

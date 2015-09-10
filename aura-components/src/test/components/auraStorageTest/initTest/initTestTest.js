@@ -522,9 +522,13 @@
                     $A.test.assertEquals("1", $A.test.getText(cmp.find("callbackCounter").getElement()));
 
                     storage.getSize()
-                        .then(function(size) { $A.test.assertTrue(size > 0,
-                            "Expected first action to be stored in storage service."); })
-                        .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+                    .then(function(size) {
+                        $A.test.assertTrue(size > 0, "Expected first action to be stored in storage service.");
+                    })
+                    .then(function() {
+                        completed = true;
+                    })
+                    ["catch"](function(error) { $A.test.fail(error.toString()); });
                 });
 
                 $A.test.addWaitFor(true, function() { return completed; });
@@ -566,8 +570,9 @@
                 this.resetCounter(cmp, "testUnmarkedActionAreNotStored");
                 var storage = $A.storageService.getStorage("actions");
                 storage.getSize()
-                    .then(function(size) { $A.test.assertEquals(0, size); })
-                    .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+                .then(function(size) { $A.test.assertEquals(0, size); })
+                .then(function() { completed = true; })
+                ["catch"](function(error) { $A.test.fail(error.toString()); });
 
                 $A.test.addWaitFor(true, function() { return completed; });
             },
@@ -592,8 +597,9 @@
                     );
 
                     storage.getSize()
-                        .then(function(size) { $A.test.assertEquals(0, size, "Storage service saw an increase in size."); })
-                        .then(function() { completed = true; }, function(err) { $A.test.fail(err); });
+                    .then(function(size) { $A.test.assertEquals(0, size, "Storage service saw an increase in size."); })
+                    .then(function() { completed = true; })
+                    ["catch"](function(error) { $A.test.fail(error.toString()); });
                 });
 
                 $A.test.addWaitFor(true, function() { return completed; });

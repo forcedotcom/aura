@@ -96,7 +96,7 @@
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
-                	$A.test.fail("There should be no image element for this button");
+                    $A.test.fail("There should be no image element for this button");
                 }
             }
         }
@@ -144,7 +144,7 @@
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
-                	$A.test.fail("There should be no image element for the button");
+                    $A.test.fail("There should be no image element for the button");
                 }
             }
         }

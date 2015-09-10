@@ -86,9 +86,15 @@ public class ReferenceTreeModel {
                                 ret.add(namespaceTreeNode);
                             }
 
-                            String href = String.format("#reference?descriptor=%s:%s", namespace, desc.getName());
+                            String href;
+                            DefType defType = desc.getDefType();
+                            if (defType.equals(DefType.TESTSUITE)) {
+                                href = String.format("#reference?descriptor=%s.%s", namespace, desc.getName());
+                            } else {
+                                href = String.format("#reference?descriptor=%s:%s", namespace, desc.getName());
+                            }
 
-                            href += "&defType=" + desc.getDefType().name().toLowerCase();
+                            href += "&defType=" + defType.name().toLowerCase();
 
                             // Preload the def
                             try {
@@ -101,7 +107,9 @@ public class ReferenceTreeModel {
                         }
                     } catch (Exception x) {
                         // Skip any invalid def
-                        System.out.printf("\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n", desc, x.toString());
+                        System.out.printf(
+                                "\n*** ReferenceTreeModel.makeTreeNodes() failed to load component '%s': %s\n", desc,
+                                x.toString());
                     }
                 }
             }
@@ -121,7 +129,7 @@ public class ReferenceTreeModel {
 
             tree.add(new TreeNode("#reference", "Overview"));
             tree.add(new TreeNode(null, "Applications", makeTreeNodes("markup", DefType.APPLICATION), false));
-            tree.add(new TreeNode(null, "Components", makeTreeNodes("markup",  DefType.COMPONENT), false));
+            tree.add(new TreeNode(null, "Components", makeTreeNodes("markup", DefType.COMPONENT), false));
             tree.add(new TreeNode(null, "Interfaces", makeTreeNodes("markup", DefType.INTERFACE), false));
             tree.add(new TreeNode(null, "Events", makeTreeNodes("markup", DefType.EVENT), false));
             tree.add(new TreeNode(null, "Libraries", makeTreeNodes("markup", DefType.LIBRARY), false));

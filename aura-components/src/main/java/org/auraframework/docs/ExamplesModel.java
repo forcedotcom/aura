@@ -40,11 +40,12 @@ public class ExamplesModel {
     public ExamplesModel() throws Exception {
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        String name = (String)Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
+        String name = (String) Aura.getContextService().getCurrentContext().getCurrentComponent().getAttributes()
                 .getValue("name");
 
         if (name != null && !name.isEmpty()) {
-            Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("markup://" + name, DefType.DOCUMENTATION.name()));
+            Set<DefDescriptor<?>> descriptors = definitionService.find(new DescriptorFilter("markup://" + name,
+                    DefType.DOCUMENTATION.name()));
             if (descriptors.size() > 0) {
                 for (DefDescriptor<?> descriptor : descriptors) {
 
@@ -54,10 +55,9 @@ public class ExamplesModel {
                         Map<String, String> m;
 
                         try {
-                            DocumentationDef docDef = (DocumentationDef)descriptor.getDef();
+                            DocumentationDef docDef = (DocumentationDef) descriptor.getDef();
 
                             Collection<ExampleDef> exampleDefs = docDef.getExampleDefs();
-
 
                             for (ExampleDef example : exampleDefs) {
                                 m = new TreeMap<>();

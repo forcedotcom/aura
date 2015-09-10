@@ -52,46 +52,55 @@
         </aura:if>
     </aura:set>
     <ui:tabSet class="subtabs">
-        <auradocs:stretchTab title="Overview">
-        	<aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.descriptions.length > 0}">
-        		<auradocs:defDescription descriptions="{!m.documentation.descriptions}"/>
-        	</aura:if>
+        <aura:if isTrue="{!v.defType != 'TESTSUITE'}">
+	        <auradocs:stretchTab title="Overview">
+	        	<aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.descriptions.length > 0}">
+	        		<auradocs:defDescription descriptions="{!m.documentation.descriptions}"/>
+	        	</aura:if>
+	
+	            <aura:if isTrue="{!m.attributes.length > 0}">
+	                <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
+	            </aura:if>
+	
+	            <aura:if isTrue="{!m.handledEvents.length > 0}">
+	                <auradocs:defMemberList title="Handled Events" list="{!m.handledEvents}"/>
+	            </aura:if>
+	
+	            <aura:if isTrue="{!m.events.length > 0}">
+	                <auradocs:defMemberList title="Events" list="{!m.events}"/>
+	            </aura:if>
+	        </auradocs:stretchTab>
+	
+			<aura:if isTrue="{!m.showSource}">
+	        	<auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+	       	</aura:if>
+	 
+	        <aura:iteration items="{!m.defs}" var="def">
+	            <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+	        </aura:iteration>
+	
+	        <aura:iteration items="{!m.includeDefs}" var="def">
+	            <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
+	        </aura:iteration>
 
-            <aura:if isTrue="{!m.attributes.length > 0}">
-                <auradocs:defMemberList title="Attributes" list="{!m.attributes}"/>
-            </aura:if>
-
-            <aura:if isTrue="{!m.handledEvents.length > 0}">
-                <auradocs:defMemberList title="Handled Events" list="{!m.handledEvents}"/>
-            </aura:if>
-
-            <aura:if isTrue="{!m.events.length > 0}">
-                <auradocs:defMemberList title="Events" list="{!m.events}"/>
-            </aura:if>
-        </auradocs:stretchTab>
-
-		<aura:if isTrue="{!m.showSource}">
-        	<auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
-       	</aura:if>
- 
-        <aura:iteration items="{!m.defs}" var="def">
-            <auradocs:stretchEditorPanel title="{!def.name}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
-        </aura:iteration>
-
-        <aura:iteration items="{!m.includeDefs}" var="def">
-            <auradocs:stretchEditorPanel title="{!def.includeDefName + '.js'}" descriptor="{!def.descriptor}" defType="{!def.defType}" includeDefName="{! def.includeDefName}"/>
-        </aura:iteration>
-
-        <auradocs:stretchTab title="Dependencies">
-            <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
-        </auradocs:stretchTab>
+	        <auradocs:stretchTab title="Dependencies">
+	            <auradocs:defDependencies descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+	        </auradocs:stretchTab>
 
         <!-- findInstancesOf cannot traverse if or renderIf -->
         <!--aura:if isTrue="{!m.documentation != null &amp;&amp; m.documentation.hasExamples}"-->
 	        <auradocs:stretchTab title="Examples">
 	            <auradocs:examplesc name="{!v.descriptor}"/>
 	        </auradocs:stretchTab>
-	    <!--/aura:if-->
+	    <!--/aura:if--> 
+
+	        <!-- Only show source for tests -->
+	        <aura:set attribute="else">
+                <aura:if isTrue="{!m.showSource}">
+                    <auradocs:stretchEditorPanel title="Source" descriptor="{!v.descriptor}" defType="{!v.defType}"/>
+                </aura:if>
+	        </aura:set>
+	    </aura:if>
     </ui:tabSet>
 
 </aura:component>

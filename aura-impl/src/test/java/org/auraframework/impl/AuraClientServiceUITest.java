@@ -16,11 +16,8 @@
 package org.auraframework.impl;
 
 import org.auraframework.test.util.WebDriverTestCase;
-import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class AuraClientServiceUITest extends WebDriverTestCase {

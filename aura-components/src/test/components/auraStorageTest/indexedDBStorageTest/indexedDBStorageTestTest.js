@@ -449,8 +449,7 @@
         }]
     },
 
-    // TODO(W-2599085): Storages should clear existing entry after trying to put an item above the max size
-    _testReplaceExistingWithEntryTooLarge: {
+    testReplaceExistingWithEntryTooLarge: {
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
             var maxSize = 5120;
@@ -458,9 +457,8 @@
             cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
                     true, false, maxSize, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });
-            var expectedError = "IndexedDBAdapter.setItem(): Item larger than size limit of " + maxSize*0.25;
 
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage, expectedError);
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
         },
         function getItem(cmp) {
             cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);

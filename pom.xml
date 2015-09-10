@@ -964,6 +964,8 @@
                             <configuration>
                                 <nodeVersion>v0.10.18</nodeVersion>
                                 <npmVersion>1.3.8</npmVersion>
+                                <nodeDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/node/</nodeDownloadRoot>
+                                <npmDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/npm/</npmDownloadRoot>
                             </configuration>
                         </execution>
                         <execution>

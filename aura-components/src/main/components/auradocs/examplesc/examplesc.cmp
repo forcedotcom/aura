@@ -16,7 +16,7 @@
 
 -->
 <aura:component model="java://org.auraframework.docs.ExamplesModel">
-<aura:attribute name="name" type="String"/>
+    <aura:attribute name="name" type="String"/>
 
 	{!m.message}
 	<ul class="unstyledList">

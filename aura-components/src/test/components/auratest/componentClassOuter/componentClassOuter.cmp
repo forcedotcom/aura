@@ -36,7 +36,7 @@
 	{!v.id}:
 	<ui:button label="OuterButton" aura:id="button" press="{!c.clientAction}" class="uiButtonOuter"/>
 	{!v.body}
-	<aura:text value="{!v.value}"/>
+	<aura:text value="{!v.valueOuter}"/>
 	
 	<!-- this div is here so we can create component and push it to here, in test -->
 	<div aura:id="serverInOuter"></div>

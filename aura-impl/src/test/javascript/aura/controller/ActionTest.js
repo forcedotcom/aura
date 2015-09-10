@@ -15,77 +15,98 @@
  */
 Function.RegisterNamespace("Test.Aura.Controller");
 
-[ Fixture, Skip("JBUCH: FIXME") ]
+[Fixture]
 Test.Aura.Controller.ActionTest = function() {
-    // Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+    var Aura = {
+        "Controller": {}
+    };
 
     Mocks.GetMocks(Object.Global(), {
-        "exp": function() {},
-        "$A": {ns:{}},
-        "Aura": {Controller: {}}
+        "Aura": Aura,
+        "Action": function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
     });
 
-    var mockGlobal = Mocks.GetMocks(Object.Global(), {
-        "$A" : {
-            clientService : {
-                inAuraLoop : function() {
-                    return false;
-                }
-            },
-            mark : function() {
-            }
-        }
-    });
-
     var targetNextActionId = 123;
     var mockActionId = function(during){
-        Mocks.GetMock(Action.prototype, "nextActionId", targetNextActionId)(during);
+        Mocks.GetMock(Aura.Controller.Action.prototype, "nextActionId", targetNextActionId)(during);
     }
+
+    // Just sets up the mocks before creating a new action.
+    // No logic
+    function newAction() {
+        var action;
+        Mocks.GetMocks(Object.Global(), {
+            "$A": { getContext: function() {} },
+            "Action": Aura.Controller.Action
+        })(function(){
+            action = new Action();
+        });
+        return action;
+    }
+
+    var mockActionDependencies = Mocks.GetMocks(Object.Global(), {
+            "$A": { 
+                getContext: function() { return null; },
+                util: {
+                    isFunction: function(value) {
+                        return typeof value === "function";
+                    }
+                }
+            },
+            "Action": Aura.Controller.Action        
+    });
 
     [ Fixture ]
     function Constructor() {
-        [ Fact ]
+        [Fact]
         function SetsStateToNew() {
             // Arrange
+            var target;
             var expected = "NEW";
-            var target = new Action();
-
-            // Act
-            var actual = target.state;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
-        function SetsActionId() {
-            // Arrange
-            var expected = targetNextActionId;
-            var target;
-
-            // Act
-            mockActionId(function() {
-                target = new Action();
-            });
-            var actual = target.actionId;
-
-            // Assert
-            Assert.Equal(expected, actual);
-        }
-
-        [ Fact ]
-        function IncrementsNextActionId() {
-            // Arrange
-            var expected = targetNextActionId + 1;
-            var target;
             var actual;
 
             // Act
-            mockActionId(function() {
+            mockActionDependencies(function(){
                 target = new Action();
-                actual = Action.prototype.nextActionId;
+                actual = target.state;
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsActionId() {
+            // Arrange
+            var expected = targetNextActionId;
+            var actual;
+
+            // Act
+            mockActionDependencies(function(){
+                mockActionId(function() {
+                    var target = new Aura.Controller.Action();
+                    actual = target.actionId;
+                }); 
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function IncrementsNextActionId() {
+            // Arrange
+            var expected = targetNextActionId + 1;
+            var actual;
+
+            // Act
+            mockActionDependencies(function(){
+                mockActionId(function() {
+                    var target = new Aura.Controller.Action();
+                    actual = Aura.Controller.Action.prototype.nextActionId;
+                });
             });
 
             // Assert
@@ -97,40 +118,34 @@ Test.Aura.Controller.ActionTest = function() {
     function GetId() {
 
         var targetContextNum = "expectedContextNum";
-        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-            getContext : function() {
-                return {
-                    getNum : function() {
-                        return targetContextNum;
-                    }
-                };
-            }
-        });
-
-        [ Fact ]
+        
+        [Fact]
         function ReturnsIdIfSet() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
-            target.id = expected;
+            var actual;
 
             // Act
-            var actual = target.getId();
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action();
+                target.id = expected;
+                actual = target.getId();
+            });
 
             // Assert
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ConstructsIdIfNotSet() {
             // Arrange
             var expected = String.Format("{0};{1}", targetNextActionId, targetContextNum);
             var actual;
 
             // Act
-            mockContext(function() {
+            mockActionDependencies(function() {
                 mockActionId(function() {
-                    actual = new Action(null, targetContextNum).getId();
+                    actual = new Aura.Controller.Action(null, targetContextNum).getId();
                 });
             });
 
@@ -138,16 +153,16 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsConstructedIdOnAction() {
             // Arrange
             var expected = String.Format("{0};{1}", targetNextActionId, targetContextNum);
             var target;
 
             // Act
-            mockContext(function() {
+            mockActionDependencies(function() {
                 mockActionId(function() {
-                    target = new Action(null, targetContextNum);
+                    target = new Aura.Controller.Action(null, targetContextNum);
                     target.getId();
                 });
             });
@@ -160,11 +175,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetNextGlobalId() {
-        [ Fact ]
+        [Fact]
         function ReturnsOneIfNotSet() {
             // Arrange
             var expected = 1;
-            var target = new Action();
+            var target = newAction();
 
             // Act
             var actual = target.getNextGlobalId();
@@ -173,11 +188,11 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsNextGlobalIdWhenSet() {
             // Arrange
             var expected = 123;
-            var target = new Action();
+            var target = newAction();
             target.nextGlobalId = expected;
 
             // Act
@@ -187,11 +202,11 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function IncrementsIdAfterUse() {
             // Arrange
             var expected = 100;
-            var target = new Action();
+            var target = newAction();
             target.nextGlobalId = 99;
 
             // Act
@@ -205,11 +220,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetDef() {
-        [ Fact ]
+        [Fact]
         function ReturnsDef() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.def = expected;
 
             // Act
@@ -222,25 +237,27 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function SetParams() {
-        [ Fact ]
+        [Fact]
         function MapsKeyInParamDefsToConfig() {
-            var expected = "expected";
+            var data = "expected";
             var paramDefs = {
                 key : 1
             };
-            var target = new Action(null, null, null, paramDefs);
-            var config = {
-                key : expected
+            var expected = {
+                key : data
             };
+            var actual;
 
-            target.setParams(config);
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action(null, null, null, paramDefs);
+                target.setParams({key: data});
+                actual = target.params;
+            });
 
-            Assert.Equal({
-                key : expected
-            }, target.params);
+            Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ClearsPreviouslySetParamsIfMissingFromConfig() {
             var paramDefs = {
                 key1 : 1,
@@ -249,18 +266,23 @@ Test.Aura.Controller.ActionTest = function() {
             var config = {
                 key2 : "new"
             };
-            var target = new Action(null, null, null, paramDefs);
-            target.params["key1"] = "existing";
-
-            target.setParams(config);
-
-            Assert.Equal({
+            var expected = {
                 key1 : undefined,
                 key2 : "new"
-            }, target.params);
+            };
+            var actual;
+
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action(null, null, null, paramDefs);
+                target.params["key1"] = "existing";
+                target.setParams(config);
+                actual = target.params;
+            });
+
+            Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function DoesNotSetParamsWithoutDefs() {
             var paramDefs = {
                 key1 : 1,
@@ -270,24 +292,29 @@ Test.Aura.Controller.ActionTest = function() {
                 key1 : "new",
                 key3 : "ignored"
             };
-            var target = new Action(null, null, null, paramDefs);
-
-            target.setParams(config);
-
-            Assert.Equal({
+            var expected = {
                 key1 : "new",
                 key2 : undefined
-            }, target.params);
+            };
+            var actual;
+
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action(null, null, null, paramDefs);
+                target.setParams(config);
+                actual = target.params;    
+            });
+            
+            Assert.Equal(expected, actual);
         }
     }
 
     [ Fixture ]
     function GetParam() {
-        [ Fact ]
+        [Fact]
         function ReturnsValueFromParamsIfKeyFound() {
             var expected = "expected";
             var paramsKey = "key";
-            var target = new Action();
+            var target = newAction();
             target.params[paramsKey] = expected;
 
             var actual = target.getParam(paramsKey);
@@ -295,10 +322,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsUndefinedIfKeyNotFound() {
             var paramsKey = "key";
-            var target = new Action();
+            var target = newAction();
             target.params = {};
 
             var actual = target.getParam(paramsKey);
@@ -309,11 +336,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetParams() {
-        [ Fact ]
+        [Fact]
         function ReturnsParamsObject() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.params = expected;
 
             // Act
@@ -326,11 +353,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetComponent() {
-        [ Fact ]
+        [Fact]
         function ReturnsCmpObject() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.cmp = expected;
 
             // Act
@@ -343,123 +370,116 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function SetCallback() {
-        var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-            util : {
-                isFunction : function() {
-                    return true;
-                }
-            }
-        });
-
-        [ Fact ]
+        [Fact]
         function SetsCallbackWhenNameSet() {
             // Arrange
             var expectedScope = "expectedScope";
-            var expectedCallback = "expectedCallback";
+            var expectedCallback = function expectedCallback(){};
             var name = "SUCCESS";
-            var target = new Action();
-
-            // Act
-            mockContext(function() {
-                target.setCallback(expectedScope, expectedCallback, name);
-            });
-
-            // Assert
-            Assert.Equal({
+            var expected = {
                 "SUCCESS" : {
                     s : expectedScope,
                     fn : expectedCallback
                 }
-            }, target.callbacks);
+            };
+            var actual;
+
+            // Act
+            mockActionDependencies(function() {
+                var target = new Aura.Controller.Action();
+                target.setCallback(expectedScope, expectedCallback, name);
+                actual = target.callbacks;
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsErrorWhenNameIsInvalid() {
             // Arrange
             var stubbedError = Stubs.GetMethod("msg", null);
             var name = "someInvalidName";
-            var target = new Action();
+            var expected = "Action.setCallback(): Invalid callback name '" + name + "'";
 
             // Act
-            mockContext(function() {
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action();
                 $A.error = stubbedError;
-                target.setCallback(null, null, name);
-            });
+                target.setCallback(null, function(){}, name);
+            });            
 
             // Assert
-            Assert.Equal("Action.setCallback(): Invalid callback name '" + name + "'",
-                stubbedError.Calls[0].Arguments.msg);
+            Assert.Equal(expected, stubbedError.Calls[0].Arguments.msg);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAllCallbacksAndScopeWhenNameUndefined() {
             // Arrange
             var expectedScope = "expectedScope";
-            var expectedCallback = "expectedCallback";
+            var expectedCallback = function expectedCallback(){};
             var expected = {
                 s : expectedScope,
                 fn : expectedCallback
             };
-            var target = new Action();
-
-            // Act
-            mockContext(function() {
-                target.setCallback(expectedScope, expectedCallback);
-            });
-
-            // Assert
-            Assert.Equal({
-                "SUCCESS" : expected,
-                "ERROR" : expected,
-                "INCOMPLETE" : expected
-            }, target.callbacks);
-        }
-
-        [ Fact ]
-        function SetsAllCallbacksAndScopeWhenNameAll() {
-            // Arrange
-            var expectedScope = "expectedScope";
-            var expectedCallback = "expectedCallback";
             var expected = {
-                s : expectedScope,
-                fn : expectedCallback
-            };
-            var target = new Action();
-
-            // Act
-            mockContext(function() {
-                target.setCallback(expectedScope, expectedCallback, "ALL");
-            });
-
-            // Assert
-            Assert.Equal({
                 "SUCCESS" : expected,
                 "ERROR" : expected,
                 "INCOMPLETE" : expected
-            }, target.callbacks);
-        }
-
-        [ Fact ]
-        function ThrowsErrorIfCallbackNotAFunction() {
-            // Arrange
-            var expected = "Action.setCallback(): callback for 'bogus' must be a function";
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                error : function(msg) {
-                    actual = msg;
-                },
-                util : {
-                    isFunction : function() {
-                        return false;
-                    }
-                }
-            })
-            var target = new Action();
+            };
             var actual;
 
             // Act
-            mockContext(function() {
-                target.setCallback(undefined, undefined, "bogus");
+            mockActionDependencies(function() {
+                var target = new Aura.Controller.Action();
+                target.setCallback(expectedScope, expectedCallback);
+                actual = target.callbacks;
             });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SetsAllCallbacksAndScopeWhenNameAll() {
+            // Arrange
+            var expectedScope = "expectedScope";
+            var expectedCallback = function expectedCallback(){};
+            var expected = {
+                s : expectedScope,
+                fn : expectedCallback
+            };
+            var expected = {
+                "SUCCESS" : expected,
+                "ERROR" : expected,
+                "INCOMPLETE" : expected
+            };
+            var actual;
+
+            // Act
+            mockActionDependencies(function(){
+                var target = new Aura.Controller.Action();
+                target.setCallback(expectedScope, expectedCallback, "ALL");
+                actual = target.callbacks;
+            });
+            
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ThrowsErrorIfCallbackNotAFunction() {
+            // Arrange
+            var expected = "Action.setCallback(): callback for 'bogus' must be a function";
+            var actual;
+
+            // Act
+            mockActionDependencies(function(){
+                $A.error = function(msg){ actual = msg; };
+                var target = new Aura.Controller.Action();
+                target.setCallback(undefined, undefined, "bogus");
+            })
 
             // Assert
             Assert.Equal(expected, actual);
@@ -484,22 +504,22 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function ConstructorClearsCallback() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
 
             // Act
             // Assert
             Assert.Undefined(target.allAboardCallback);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsCallback() {
             // Arrange
             var expectedScope = "expectedScope";
             var expectedCallback = "expectedCallback";
-            var target = new Action();
+            var target = newAction();
 
             // Act
             mockContext(function() {
@@ -513,7 +533,7 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function WrapCallback() {
-        [ Fact ]
+        [Fact]
         function SetsCallbackToCurrentCallbackThenNewCallback() {
             // Arrange
             var expectedScope = "expectedScope";
@@ -521,7 +541,7 @@ Test.Aura.Controller.ActionTest = function() {
             var outerCallback = function() {
                 outerCallbackFlag = true;
             }
-            var target = new Action();
+            var target = newAction();
             target.getState = function() {
                 return "STATE";
             };
@@ -558,11 +578,14 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function AssertsIsClientAction() {
             // Arrange
             var expected = "expected";
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() {
+                    return Test.Stubs.Aura.GetContext();
+                },
                 assert : function(param) {
                     actual = param;
                 }
@@ -584,7 +607,7 @@ Test.Aura.Controller.ActionTest = function() {
                 call : function() {
                 }
             };
-            var target = new Action();
+            var target = newAction();
             target.def = def;
             target.meth = meth;
             target.cmp = cmp;
@@ -599,7 +622,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function LogsFailMessageOnException() {
             // Arrange
             var expectedName = "expectedName";
@@ -608,6 +631,9 @@ Test.Aura.Controller.ActionTest = function() {
             var reportErrorCalled = false;
 
             var mockAura = Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() {
+                    return Test.Stubs.Aura.GetContext();
+                },
                 assert : function(param) {
                 },
                 warning : function(msg) {
@@ -649,7 +675,7 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             };
-            var target = new Action();
+            var target = newAction();
             target.cmp = cmp;
             target.def = {
                 getDescriptor : function() {
@@ -678,11 +704,14 @@ Test.Aura.Controller.ActionTest = function() {
             // Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsStateToSuccess() {
             // Arrange
             var expectedState = "SUCCESS";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() { 
+                    return Test.Stubs.Aura.GetContext();
+                },
                 assert : function(param) {
                 }
             });
@@ -702,7 +731,7 @@ Test.Aura.Controller.ActionTest = function() {
                 call : function() {
                 }
             };
-            var target = new Action();
+            var target = newAction();
             target.def = def;
             target.meth = meth;
             target.cmp = cmp;
@@ -716,29 +745,72 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expectedState, target.state);
         }
 
-        [ Fact ]
-        function SetsStateToFailureOnException() {
+        [Fact]
+        function SetsStateToErrorOnException() {
             // Arrange
-            var expectedState = "FAILURE";
+            var expectedState = "ERROR";
+            var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() { 
+                    return Test.Stubs.Aura.GetContext();
+                },
+                assert : function(param) {},
+                warning : function() {},
+                get : function(actDesc) {
+                    return {
+                        setStorable : function() {},
+                        setAbortable : function() {},
+                        setParams : function() {},
+                        setCallback : function() {}
+                    };
+                },
+                clientService : {
+                    inAuraLoop : function() {
+                        return false;
+                    }
+                },
+                logger : {
+                    reportError : function() {}
+                }
+            });
+            var target = newAction();
+            target.cmp = Test.Stubs.Aura.GetComponent();
+            target.def = {
+                getDescriptor : function() {
+                    return {
+                        getQualifiedName : function() {
+                            return "aura://ComponentController.reportFailedAction";
+                        }
+                    }
+                },
+                getName : function() {},
+                isClientAction : function() {}
+            };
+
+            // Act
+            mockAssert(function() {
+                target.meth = null; // Fails cause there is no method to call
+                target.runDeprecated();
+            })
+
+            // Assert
+            Assert.Equal(expectedState, target.state);
+        }
+
+        [Fact]
+        function ActionErrorsReportedToServer() {
+            // Arrange
+            var expectedState = "ERROR";
             // We also use this test to check that reportFailure failures are NOT re-sent
             var sentToServer = 0;
 
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                assert : function(param) {
+                getContext: function() { 
+                    return Test.Stubs.Aura.GetContext();
                 },
-                warning : function() {
-                },
+                assert : function(param) {},
+                warning : function() {},
                 get : function(actDesc) {
-                    return {
-                        setStorable : function() {
-                        },
-                        setAbortable : function() {
-                        },
-                        setParams : function() {
-                        },
-                        setCallback : function() {
-                        }
-                    };
+                    return Test.Stubs.Aura.GetAction();
                 },
                 clientService : {
                     inAuraLoop : function() {
@@ -751,20 +823,8 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             });
-            var cmp = {
-                getDef : function() {
-                    return {
-                        getDescriptor : function() {
-                            return {
-                                getQualifiedName : function() {
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-            var target = new Action();
-            target.cmp = cmp;
+            var target = newAction();
+            target.cmp = Test.Stubs.Aura.GetComponent();
             target.def = {
                 getDescriptor : function() {
                     return {
@@ -773,30 +833,28 @@ Test.Aura.Controller.ActionTest = function() {
                         }
                     }
                 },
-                getName : function() {
-                },
-                isClientAction : function() {
-                }
+                getName : function() {},
+                isClientAction : function() {}
             };
 
             // Act
             mockAssert(function() {
+                target.meth = null; // Fails cause there is no method to call
                 target.runDeprecated();
             })
 
             // Assert
-            Assert.Equal(expectedState, target.state);
             Assert.Equal(1, sentToServer);
         }
     }
 
     [ Fixture ]
     function GetState() {
-        [ Fact ]
+        [Fact]
         function ReturnsState() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.state = expected;
 
             // Act
@@ -809,11 +867,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetReturnValue() {
-        [ Fact ]
+        [Fact]
         function ReturnsReturnValue() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.returnValue = expected;
 
             // Act
@@ -826,11 +884,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetError() {
-        [ Fact ]
+        [Fact]
         function ReturnsError() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.error = expected;
 
             // Act
@@ -843,10 +901,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function IsBackground() {
-        [ Fact ]
+        [Fact]
         function ReturnsTrueIfBackgroundSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.background = true;
 
             // Act
@@ -856,10 +914,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfBackgroundNotSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
 
             // Act
             var actual = target.isBackground();
@@ -868,10 +926,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.False(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfBackgroundNotTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.background = "true";
 
             // Act
@@ -884,10 +942,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function SetBackground() {
-        [ Fact ]
+        [Fact]
         function SetsBackgroundToTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
 
             // Act
             target.setBackground();
@@ -897,9 +955,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function CannotSetBackgroundToFalse() {
-            var target = new Action();
+            var target = newAction();
             target.background = true;
 
             target.setBackground(false);
@@ -911,11 +969,14 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function RunAfter() {
-        [ Fact ]
+        [Fact]
         function AddsActionParamToQueue() {
             // Arrange
             var expectedReturn = "expectedReturn";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
+                getContext: function() { 
+                    return Test.Stubs.Aura.GetContext();
+                },
                 assert : function(param) {
                 },
                 clientService : {
@@ -924,7 +985,7 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             });
-            var target = new Action();
+            var target = newAction();
             var action = {
                 def : {
                     isServerAction : function() {
@@ -945,10 +1006,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetStored() {
-        [ Fact ]
+        [Fact]
         function NullIfNotSuccessful() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storable = true;
             target.returnValue = "NONE";
             target.state = "FAILURE";
@@ -961,10 +1022,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(null, stored);
         }
 
-        [ Fact ]
+        [Fact]
         function NullIfNotStorable() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storable = false;
             target.returnValue = "NONE";
             target.state = "SUCCESS";
@@ -977,30 +1038,80 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(null, stored);
         }
 
-        [ Fact ]
-        function ValuesFromResponse() {
+        [Fact]
+        function ActionGetStoredReturnsComponents() {
             // Arrange
-            var target = new Action();
+            var expected = [Test.Stubs.Aura.GetComponent()];
+            var target = newAction();
+            target.storable = true;
+            target.responseState = "SUCCESS";
+            target.components = expected;
+
+            // Act
+            var stored = target.getStored();
+
+            // Assert
+            Assert.Equal(expected, stored.components);
+        }
+
+        [Fact]
+        function ActionGetStoredReturnsCreatedTime() {
+            // Arrange
+            var target = newAction();
+            target.storable = true;
+            target.responseState = "SUCCESS";
+            var expected = "NOW";
+            var mockDateTime = Mocks.GetMock(Date.prototype, "getTime", function() { return expected; });
+            var actual;
+
+            // Act
+            mockDateTime(function(){
+                var stored = target.getStored();
+                actual = stored.storage.created;
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ActionGetStoredReturnsReturnValue() {
+            // Arrange
+            var target = newAction();
             target.storable = true;
             target.returnValueUnmodified = "NONE";
             target.state = "SUCCESS";
             target.responseState = "SUCCESS";
-            target.components = [];
 
             // Act
             var stored = target.getStored();
 
             // Assert
             Assert.Equal("NONE", stored["returnValue"]);
-            Assert.Equal({}, stored["components"]);
+        }
+
+        [Fact]
+        function ActionGetStoredReturnsState() {
+            // Arrange
+            var target = newAction();
+            target.storable = true;
+            target.state = "SUCCESS";
+            target.responseState = "SUCCESS";
+
+            // Act
+            var stored = target.getStored();
+
+            // Assert
             Assert.Equal("SUCCESS", stored["state"]);
-            // time is harder.
         }
     }
 
     [ Fixture ]
     function UpdateFromResponse() {
         var mockContext = Mocks.GetMock(Object.Global(), "$A", {
+            getContext: function() { 
+                return Test.Stubs.Aura.GetContext();
+            },
             util : {
                 isArray : function(v) { return false; },
                 isObject : function(v) { return true; },
@@ -1012,10 +1123,10 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function ReturnValueCopied() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storable = true;
             var response = {};
             response.state = "SUCCESS";
@@ -1031,10 +1142,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal({foo:"bar"}, target.returnValueUnmodified);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnValueNotCopiedIfNotSuccessful() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storable = true;
             var response = {};
             response.state = "ERROR";
@@ -1051,10 +1162,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(undefined, target.returnValueUnmodified);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnValueNotCopiedIfNotStorable() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var response = {};
             response.state = "SUCCESS";
             response.returnValue = {foo:"bar"};
@@ -1075,15 +1186,7 @@ Test.Aura.Controller.ActionTest = function() {
         var mockContext = function(inloop) {
             return Mocks.GetMock(Object.Global(), "$A", {
                 getContext : function() {
-                    return {
-                        joinComponentConfigs : function() {
-                        },
-                        finishComponentConfigs : function() {
-                        },
-                        getNum : function() {
-                            return 0;
-                        }
-                    };
+                    return Test.Stubs.Aura.GetContext();
                 },
                 clientService : {
                     inAuraLoop : function() {
@@ -1102,10 +1205,10 @@ Test.Aura.Controller.ActionTest = function() {
             });
         };
 
-        [ Fact ]
+        [Fact]
         function CallsActionCallbackIfCmpIsValid() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.sanitizeStoredResponse = function() {
             };
             delete target.originalResponse;
@@ -1135,12 +1238,11 @@ Test.Aura.Controller.ActionTest = function() {
             // Act
             mockContext(false)(function() {
                 target.finishAction({
-                    setCurrentAction: function () {
-                    },
-                    joinComponentConfigs: function () {
-                    },
-                    finishComponentConfigs: function () {
-                    }
+                    setCurrentAccess: function(){},
+                    releaseCurrentAccess: function(){},
+                    setCurrentAction: function () {},
+                    joinComponentConfigs: function () {},
+                    finishComponentConfigs: function () {}
                 });
             });
 
@@ -1148,15 +1250,15 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsContextFinishComponentsWithStorageFalse() {
-            var target = new Action();
+            var target = newAction();
             var expectedId = "9955";
             var context = {
-                joinComponentConfigs : function() {
-                },
-                setCurrentAction : function() {
-                }
+                setCurrentAccess: function(){},
+                releaseCurrentAccess: function(){},
+                joinComponentConfigs : function() {},
+                setCurrentAction : function() {}
             };
             context.finishComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
@@ -1183,15 +1285,15 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal([], context.clearComponentConfigs.Calls);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsClearComponentsWithStorageTrueAndNoCB() {
-            var target = new Action();
+            var target = newAction();
             var expectedId = "9955";
             var context = {
-                joinComponentConfigs : function() {
-                },
-                setCurrentAction : function() {
-                }
+                setCurrentAccess: function(){},
+                releaseCurrentAccess: function(){},
+                joinComponentConfigs : function() {},
+                setCurrentAction : function() {}
             };
             context.finishComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
@@ -1221,15 +1323,15 @@ Test.Aura.Controller.ActionTest = function() {
             } ], context.clearComponentConfigs.Calls);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsContextFinishComponentsWithCB() {
-            var target = new Action();
+            var target = newAction();
             var expectedId = "9955";
             var context = {
-                joinComponentConfigs : function() {
-                },
-                setCurrentAction : function() {
-                }
+                setCurrentAccess: function(){},
+                releaseCurrentAccess: function(){},
+                joinComponentConfigs : function() {},
+                setCurrentAction : function() {}
             };
             context.finishComponentConfigs = Stubs.GetMethod("id", null);
             context.clearComponentConfigs = Stubs.GetMethod("id", null);
@@ -1277,10 +1379,10 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToTrueByDefault() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1294,10 +1396,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(true, target.abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1310,10 +1412,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToFalse() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1327,10 +1429,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(false, target.abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToNull() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1343,10 +1445,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToNumber() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1360,10 +1462,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(true, target.abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsAbortableToString() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1389,10 +1491,10 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseByDefault() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var abortable;
 
             // Act
@@ -1404,10 +1506,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.False(abortable);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsTrueIfSetToTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.abortable = true;
             var actual;
 
@@ -1423,10 +1525,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function SetExclusive() {
-        [ Fact ]
+        [Fact]
         function SetsExclusiveTrueIfParamUndefined() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
 
             // Act
             target.setExclusive(undefined);
@@ -1435,11 +1537,11 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(target.exclusive);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsExclusiveToParamIfDefined() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
 
             // Act
             target.setExclusive(expected);
@@ -1452,11 +1554,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function IsExclusive() {
-        [ Fact ]
+        [Fact]
         function ReturnsExclusiveIfSet() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.exclusive = expected;
 
             // Act
@@ -1466,10 +1568,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfExclusiveNotSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.exclusive = undefined;
 
             // Act
@@ -1493,14 +1595,14 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function SetsStorableToTrue() {
             // Arrange
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
                 assert : function() {
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.def = {
                 isServerAction : function() {
                 }
@@ -1519,7 +1621,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsStorableConfigToParam() {
             // Arrange
             var expected = "expected";
@@ -1527,7 +1629,7 @@ Test.Aura.Controller.ActionTest = function() {
                 assert : function() {
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.def = {
                 isServerAction : function() {
                 }
@@ -1546,7 +1648,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function StorableErrorHandlerFromParam() {
             // Arrange
             var expected = function expected() {
@@ -1556,7 +1658,7 @@ Test.Aura.Controller.ActionTest = function() {
                 assert : function() {
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.def = {
                 isServerAction : function() {
                 }
@@ -1577,7 +1679,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function SetsStorableCallsSetAbortable() {
             // Arrange
             var expected = "expected";
@@ -1585,7 +1687,7 @@ Test.Aura.Controller.ActionTest = function() {
                 assert : function() {
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.def = {
                 isServerAction : function() {
                 }
@@ -1606,7 +1708,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function AssertsDefIsServerAction() {
             // Arrange
             var expected = "expected";
@@ -1618,7 +1720,7 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.def = {
                 isServerAction : function() {
                     return expectedReturn;
@@ -1640,10 +1742,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function IsStorable() {
-        [ Fact ]
+        [Fact]
         function ReturnsFalseWhenIgnoreExistingFlagSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storableConfig = {
                 ignoreExisting : true
             };
@@ -1658,10 +1760,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.False(ret);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseWhen_IsStorableFalse() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target._isStorable = function() {
                 return false;
             }
@@ -1673,10 +1775,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.False(ret);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsTrueWhen_IsStorableTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target._isStorable = function() {
                 return true;
             }
@@ -1691,11 +1793,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function _IsStorable() {
-        [ Fact ]
+        [Fact]
         function ReturnsStorableIfSet() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.storable = expected;
 
             // Act
@@ -1705,10 +1807,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfStorableNotSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.storable = undefined;
 
             // Act
@@ -1721,23 +1823,29 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function getStorageKey() {
-        [ Fact ]
+        [Fact]
         function ReturnsKeyAsDescriptorAndEncodedParams() {
             // Arrange
             var expectedEncode = "encodedString";
             var expectedDescriptor = "expectedDescriptor";
             var expected = expectedDescriptor + ":" + expectedEncode;
             var actual=null;
-            var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-                util : {
-                    json : {
-                        encode : function() {
-                            return expectedEncode;
+            var mockContext = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    util : {
+                        json : {
+                            encode : function() {
+                                return expectedEncode;
+                            },
+                            orderedEncode: function(){
+                                return expectedEncode;
+                            }
                         }
-                    }
-                }
+                    },
+                },
+                "Action": Aura.Controller.Action
             });
-            var target = new Action();
+            var target = newAction();
             target.params = undefined;
             target.def = {
                 getDescriptor : function() {
@@ -1769,9 +1877,9 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function ReturnsTrueIfStorageSet() {
-            var target = new Action();
+            var target = newAction();
             target.storage = {};
             var actual = null;
 
@@ -1782,9 +1890,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfStorageNotSet() {
-            var target = new Action();
+            var target = newAction();
             delete target.storage;
             var actual = null;
 
@@ -1795,9 +1903,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.False(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfStorageNull() {
-            var target = new Action();
+            var target = newAction();
             target.storage = null;
             var actual = null;
 
@@ -1811,10 +1919,10 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function SetChained() {
-        [ Fact ]
+        [Fact]
         function SetsChainedTrue() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 enqueueAction : function() {
                 }
@@ -1829,10 +1937,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.True(target.chained);
         }
 
-        [ Fact ]
+        [Fact]
         function ChainsCurrentAction() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             var mockContext = Mocks.GetMock(Object.Global(), "$A", {
                 enqueueAction : function(param) {
                     actual = param;
@@ -1852,11 +1960,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function IsChained() {
-        [ Fact ]
+        [Fact]
         function ReturnsChainedIfSet() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.chained = expected;
 
             // Act
@@ -1866,10 +1974,10 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsFalseIfStorableNotSet() {
             // Arrange
-            var target = new Action();
+            var target = newAction();
             target.chained = undefined;
 
             // Act
@@ -1882,7 +1990,7 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function ToJSON() {
-        [ Fact ]
+        [Fact]
         function ReturnsMapOfIdDescriptorAndParams() {
             // Arrange
             var expectedId = "expectedId";
@@ -1891,9 +1999,11 @@ Test.Aura.Controller.ActionTest = function() {
             var expected = {
                 "id" : expectedId,
                 "descriptor" : expectedDescriptor,
-                "params" : expectedParams
+                "params" : expectedParams,
+                "callingDescriptor": "UNKNOWN",
+                "version": null
             };
-            var target = new Action();
+            var target = newAction();
             target.getId = function() {
                 return expectedId;
             }
@@ -1914,16 +2024,19 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function GetStorage() {
-        [ Fact ]
+        [Fact]
         function ReturnsStorageServiceGetStorage() {
             // Arrange
-            var target = new Action();
-            var mockStorageService = Mocks.GetMock(Object.Global(), "$A", {
-                storageService : {
-                    getStorage : function(param) {
-                        return param === "actions";
+            var target = newAction();
+            var mockStorageService = Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    storageService : {
+                        getStorage : function(param) {
+                            return param === "actions";
+                        }
                     }
-                }
+                },
+                "Action": Aura.Controller.Action
             });
             var actual = false;
 
@@ -1939,7 +2052,7 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function ParseAndFireEvent() {
-        [ Fact ]
+        [Fact]
         function CallsClientServiceWhenEventNotFoundByDescriptor() {
             // Arrange
             var expected = "expected";
@@ -1950,7 +2063,7 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.getComponent = function() {
                 return {
                     getEventByDescriptor : function() {
@@ -1969,7 +2082,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsClientServiceWithNullComponent() {
             // Arrange
             var expected = "expected";
@@ -1980,7 +2093,7 @@ Test.Aura.Controller.ActionTest = function() {
                     }
                 }
             });
-            var target = new Action();
+            var target = newAction();
             target.getComponent = function() {
                 return undefined;
             }
@@ -1995,7 +2108,7 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function FiresEventWhenEventFoundByDescriptor() {
             // Arrange
             var expected = "expected";
@@ -2004,7 +2117,7 @@ Test.Aura.Controller.ActionTest = function() {
                     actual = expected;
                 }
             }
-            var target = new Action();
+            var target = newAction();
             target.getComponent = function() {
                 return {
                     getEventByDescriptor : function() {
@@ -2024,11 +2137,11 @@ Test.Aura.Controller.ActionTest = function() {
 
     [ Fixture ]
     function FireRefreshEvent() {
-        [ Fact ]
+        [Fact]
         function FiresRefreshEventIfImplementsRefreshObserver() {
             // Arrange
             var expected = "expected";
-            var target = new Action();
+            var target = newAction();
             target.cmp = {
                 isValid : function() {
                     return true;
@@ -2069,17 +2182,21 @@ Test.Aura.Controller.ActionTest = function() {
                     json : {
                         encode : function(val) {
                             return val;
+                        },
+                        orderedEncode: function(val) {
+                            return val;
                         }
                     }
                 },
                 log : function() {
                 }
-            }
+            },
+            "Action": Aura.Controller.Action
         });
 
-        [ Fact ]
+        [Fact]
         function SetsStateToAborted() {
-            var target = new Action();
+            var target = newAction();
 
             mockGlobal(function() {
                 target.abort();
@@ -2088,9 +2205,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal("ABORTED", target.state);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsAbortedCallback() {
-            var target = new Action();
+            var target = newAction();
             var actual = false;
             target.callbacks = {
                 "ABORTED" : {
@@ -2112,6 +2229,7 @@ Test.Aura.Controller.ActionTest = function() {
     [ Fixture ]
     function setParentAction() {
         var mockContext = Mocks.GetMocks(Object.Global(), {
+            "Action": Aura.Controller.Action,
             "$A" : {
                 util : {
                     isUndefinedOrNull : function(obj) {
@@ -2124,25 +2242,26 @@ Test.Aura.Controller.ActionTest = function() {
             }
         });
 
-        [ Fact ]
+        [Fact]
         function SetsParentAction() {
-            var target = new Action();
+            var target = newAction();
+            var parent = newAction();
             var expected = "EXPECTED";
             var actual;
 
             mockContext(function() {
-                target.setParentAction({
-                    abortable : true,
-                    abortableId : expected
-                });
+                parent.setAbortable(true);
+                parent.setAbortableId(expected);
+                target.setParentAction(parent);
+                actual = target.abortableId;
             });
 
-            Assert.Equal(expected, target.abortableId);
+            Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentIsUndefined() {
-            var target = new Action();
+            var target = newAction();
             var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: undefined";
             var actual;
 
@@ -2155,9 +2274,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentIsNull() {
-            var target = new Action();
+            var target = newAction();
             var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: null";
             var actual;
 
@@ -2170,9 +2289,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentIsNotAnAction() {
-            var target = new Action();
+            var target = newAction();
             var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
             var actual;
 
@@ -2185,9 +2304,9 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentNotAbortable() {
-            var target = new Action();
+            var target = newAction();
             var expected = "Action.setParentAction(): The provided parent action must be a valid abortable Action: [object Object]";
             var actual;
 
@@ -2204,29 +2323,32 @@ Test.Aura.Controller.ActionTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentNotEnqueued() {
-            var target = new Action();
+            var target = newAction();
+            target.abortableId = true;
+            target.getStorageKey = function(){ return "PROVIDED" };
+            var parent = newAction();
+            parent.setAbortable(true);
             var expected = "Action.setParentAction(): The provided parent action must be enqueued: [object Object]";
             var actual;
 
             mockContext(function() {
-                target.abortableId = true;
-                target.getStorageKey = function(){ return "PROVIDED" };
 
                 actual = Record.Exception(function() {
-                    target.setParentAction({
-                        abortable : true
-                    });
+                    target.setParentAction(parent);
                 })
             });
             Assert.Equal(expected, actual);
         }
 
 
-        [ Fact ]
+        [Fact]
         function ThrowsIfParentAlreadySet() {
-            var target = new Action();
+            var target = newAction();
+            var parent = newAction();
+            parent.setAbortable(true);
+            parent.setAbortableId("value");
             var expected = "Action.setParentAction(): The abortable group is already set, call setParentAction before enqueueing : PROVIDED";
             var actual;
 
@@ -2235,10 +2357,7 @@ Test.Aura.Controller.ActionTest = function() {
                 target.getStorageKey = function(){ return "PROVIDED" };
 
                 actual = Record.Exception(function() {
-                    target.setParentAction({
-                        abortable : true,
-                        abortableId : "value"
-                    });
+                    target.setParentAction(parent);
                 })
             });
 

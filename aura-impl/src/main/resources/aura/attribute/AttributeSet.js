@@ -484,3 +484,4 @@ AttributeSet.prototype.initialize = function(attributes) {
     $A.assert(unknownAttributes.length===0,"AttributeSet.initialize: The following unknown attributes could not be initialized: '"+unknownAttributes.join("', '")+"'. Please confirm the spelling and definition of these attributes.");
 };
 
+Aura.Attribute.AttributeSet = AttributeSet;

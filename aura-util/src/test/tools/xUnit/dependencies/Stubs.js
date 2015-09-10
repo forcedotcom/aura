@@ -41,7 +41,6 @@ Test.Stubs.Aura=new function(){
         if(target){
             target.runAfter=Stubs.GetMethod("action",undefined);
         }
-
         return target;
     }
 
@@ -54,45 +53,48 @@ Test.Stubs.Aura=new function(){
         },{params:params||{}});
     };
 
-    this.GetValue=function(value){
-        return Stubs.GetObject({
-            getValue:function(){return value;},
-            setValue:function(newValue){value=newValue;},
-            unwrap:function(){return value;}
-        });
-    };
-
     this.GetComponent = function (attributes, children, propertyBag, descriptor) {
         var stubbedAttributes={};
-        Object.ForEach(attributes||{},function(value,context){stubbedAttributes[context.Name]=Stubs.Aura.GetValue(value);});
+        Object.ForEach(attributes||{},function(value,context){stubbedAttributes[context.Name]=value;});
         var stubbedChildren={};
-        Object.ForEach(children||{},function(value,context){stubbedChildren[context.Name]=value&&(Object.IsType(Stubs.Aura.GetComponent,value)||Object.IsType(Array,value))&&value||Stubs.Aura.GetComponent(value);});
+        Object.ForEach(children||{},function(value,context){stubbedChildren[context.Name]=value&&(Object.IsType(Test.Stubs.Aura.GetComponent,value)||Object.IsType(Array,value))&&value||Test.Stubs.Aura.GetComponent(value);});
         var stubbedAttributeDefs=Stubs.GetList(attributes&&Object.keys(attributes)||[], {each:function(value){return this.Source_Value;}});
         var stubbedDescriptor=Stubs.GetObject({getQualifiedName:function(){return descriptor;}});
         var stubbedDef=Stubs.GetObject({getAttributeDefs:{returnValue:stubbedAttributeDefs}, getDescriptor:stubbedDescriptor});
 
-		var getValue = function(expression){return stubbedAttributes[expression]||Stubs.Aura.GetValue()};
-		var setValue = function(expression,value){if(stubbedAttributes[expression])stubbedAttributes[expression].setValue(value);else stubbedAttributes[expression]=Stubs.Aura.GetValue(value)};
+		var get = function(expression){return stubbedAttributes[expression]};
+		var set = function(expression,value){if(stubbedAttributes[expression])stubbedAttributes[expression]=value;else stubbedAttributes[expression]=value};
 
         var stub=Stubs.GetObject({
             find:function(expression){return stubbedChildren[expression];},
-            get:function(expression){return stubbedAttributes[expression]&&stubbedAttributes[expression].getValue();},
-            getAttributes:function(){
-				return Stubs.GetObject({
-					getValue:function(expression){return getValue(String.Format("v.{0}",expression))},
-					setValue:function(expression,value){setValue(String.Format("v.{0}", expression),value)}
-				});
-			},
+            get:function(expression){return stubbedAttributes[expression]&&stubbedAttributes[expression];},
             getConcreteComponent:function(){return this;},
             getDef:{returnValue:stubbedDef},
-            getElement:{returnValue:Stubs.Dom.GetNode()},
+            getElement:{returnValue:Test.Stubs.Aura.Dom.GetNode()},
             getEventDispatcher:{},
-            getValue:getValue,
-            setValue:setValue,
-            set:setValue
+            get:get,
+            set:set
         },propertyBag||{});
-        stub.constructor=Stubs.Aura.GetComponent;
+        stub.constructor=Test.Stubs.Aura.GetComponent;
         return stub;
+    };
+
+    this.GetComponentDef = function(descriptor) {
+        return Stubs.GetObject({
+            descriptor: Stubs.GetObject({
+                getQualifiedName: function() { return descriptor; }
+            })
+        });
+    };
+
+    this.GetContext = function(){
+        return Stubs.GetObject({
+            setCurrentAccess: function(){},
+            releaseCurrentAccess: function(){},
+            joinComponentConfigs : function() {},
+            finishComponentConfigs : function() {},
+            getNum : function() { return 0; }
+        });
     };
 };
 
@@ -132,7 +134,7 @@ Test.Stubs.Aura.Dom=new function(){
                         return newElement;
                     }
                 }
-                throw new Error("Stubs.Dom.GetNode.insertBefore: 'referenceElement' was not found in the childNodes collection.");
+                throw new Error("Test.Stubs.Dom.GetNode.insertBefore: 'referenceElement' was not found in the childNodes collection.");
             },
             removeChild:function(child){
                 for (var i = 0; i < this.childNodes.length; i++) {
@@ -145,7 +147,7 @@ Test.Stubs.Aura.Dom=new function(){
                         return child;
                     }
                 }
-                throw new Error("Stubs.Dom.GetNode.removeChild: 'child' was not found in the childNodes collection.");
+                throw new Error("Test.Stubs.Dom.GetNode.removeChild: 'child' was not found in the childNodes collection.");
             },
             replaceChild: function (newChild,oldChild) {
                 for (var i = 0; i < this.childNodes.length; i++) {
@@ -159,7 +161,7 @@ Test.Stubs.Aura.Dom=new function(){
                         return oldChild;
                     }
                 }
-                throw new Error("Stubs.Dom.GetNode.replaceChild: 'oldChild' was not found in the childNodes collection.");
+                throw new Error("Test.Stubs.Dom.GetNode.replaceChild: 'oldChild' was not found in the childNodes collection.");
             },
             setAttribute:function(name,value){attributes[name]=value;},
             addEventListener:function(type,fn,capture){},

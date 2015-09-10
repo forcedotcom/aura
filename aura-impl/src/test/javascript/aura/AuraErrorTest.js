@@ -20,7 +20,8 @@ Test.Aura.AuraErrorTest = function() {
     var Aura = {Errors: {}};
 
     Mocks.GetMocks(Object.Global(), { 
-        Aura: Aura
+        "Aura": Aura,
+        "AuraError": function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/AuraError.js")]
     });

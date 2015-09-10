@@ -17,13 +17,14 @@ Function.RegisterNamespace("Test.Aura.Provider");
 
 [ Fixture ]
 Test.Aura.Provider.ContextValueProviderTest = function() {
-    var $A = {ns : {}};
+    var $A = {
+    };
     var Aura = {Provider: {}};
     
     Mocks.GetMocks(Object.Global(), { 
-        exp: function(){},
-        "$A":$A, 
-        Aura: Aura })(function(){
+        "Aura": Aura,
+        "ContextValueProvider": function(){}
+    })(function(){
         [Import("aura-impl/src/main/resources/aura/provider/ContextValueProvider.js")]
     });
 

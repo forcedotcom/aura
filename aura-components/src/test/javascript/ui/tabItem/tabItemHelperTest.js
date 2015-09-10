@@ -58,13 +58,13 @@ Test.Components.Ui.TabItem = function() {
     
     [Fixture]
     function testHandleHoverEvent(){
-    	
+        
         [Fact]
-        function TestHandleHoverEvent() {   
+        function HandleHoverEventFiresSpecifiedEvent() {   
             // ARRANGE -- setup aura and component mocks
-        	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
             var tabItemComponentMock = getTabItemComponentMock();
-        	var eventName = "testEvent";
+            var eventName = "testEvent";
             
             // ACT -- call target function with mocked data
             auraMock(function(){
@@ -73,10 +73,25 @@ Test.Components.Ui.TabItem = function() {
             
             // ASSERT -- make sure that the event was fired ... and with the proper params
             Assert.Contains(tabItemComponentMock.firedEvents, eventName);
-            var actualParams = tabItemComponentMock.paramsSetByEvents[eventName];
-            Assert.NotUndefined(actualParams);
-            Assert.NotNull(actualParams);
-            Assert.Equal(tabItemComponentMock, actualParams.tabComponent);
         } 
+
+        [Fact]
+        function HandleHoverEventStoresEventParameters() {   
+            // ARRANGE -- setup aura and component mocks
+            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var tabItemComponentMock = getTabItemComponentMock();
+            var eventName = "testEvent";
+            var actual;
+
+            // ACT -- call target function with mocked data
+            auraMock(function(){
+                targetHelper.handleHoverEvent(tabItemComponentMock, eventName);
+                actual = tabItemComponentMock.paramsSetByEvents[eventName];
+            });
+            
+            // ASSERT -- make sure that the event was fired ... and with the proper params
+            Assert.Equal(tabItemComponentMock, actual.tabComponent);
+        } 
+
     }
 }

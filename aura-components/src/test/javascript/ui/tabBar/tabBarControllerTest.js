@@ -49,52 +49,95 @@ Test.Components.Ui.TabBar = function() {
 				return getEventMock(this, eventName);
 			}
 		}
-    }
-      
-    // Verifies that when the target function is called that the event with the specified name is called
-    // with the expected params
-    function testHoverEventHandlers(targetFunction, eventName) {
-    	// ARRANGE -- setup aura and component mocks
-    	var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
-        var componentMock = getComponentMock();
-    	
-        // The event param that gets passed into the target function
-        var handlerEventParam = {
-        	getParams : function(){
-        		return "component";
-        	}	
-        };
-        
-        // ACT -- call target function with mocked data
-        auraMock(function(){
-           targetFunction(componentMock, handlerEventParam, null);
-        });
-        
-        // ASSERT -- make sure that the event was fired ... and with the proper params
-        Assert.Contains(componentMock.firedEvents, eventName);
-        var actualParams = componentMock.paramsSetByEvents[eventName];
-        Assert.NotUndefined(actualParams);
-        Assert.NotNull(actualParams);
-        Assert.Equal("component", actualParams);
-    }
-    
+    }    
     // -- TESTS -- //
     
 	[Fixture]
-	function testOnTabHover(){
+	function ControllerActionOnTabHover(){
 	  	
-	    [Fact]
-	    function TestHoverEventIsFiredWithComponentAsParam() {   
-	  	  testHoverEventHandlers(targetController.onTabHover, 'onTabHover');
-	    } 
+        [Fact]
+        function OnTabHoverFiresOnTabHoverComponentEvent() {
+            // ARRANGE -- setup aura and component mocks
+            var eventName = "onTabHover";
+            var onTabHoverEvent = Test.Stubs.Aura.GetEvent();
+            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+                getEvent: function(name){
+                    if(name === eventName) {return onTabHoverEvent;}
+                }
+            });
+            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            
+            // ACT -- call target function with mocked data
+            targetController.onTabHover(component, event);
+            
+            // ASSERT -- make sure that the event was fired ... and with the proper params
+            Assert.Equal(1, onTabHoverEvent.fire.Calls.length);
+        } 
+
+        [Fact]
+        function OnTabHoverPassesComponent() {
+            // ARRANGE -- setup aura and component mocks
+            var eventName = "onTabHover";
+            var onTabHoverEvent = Test.Stubs.Aura.GetEvent();
+            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+                getEvent: function(name){
+                    if(name === eventName) {return onTabHoverEvent;}
+                }
+            });
+            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var expected = event.getParams();
+            
+            // ACT -- call target function with mocked data
+            targetController.onTabHover(component, event);
+            var actual = onTabHoverEvent.getParams();
+            
+            // ASSERT -- make sure that the event was fired ... and with the proper params
+            Assert.Equal(expected, actual);
+        } 
     }
     
     [Fixture]
-    function testOnTabUnhover(){
-    	
+    function ControllerActionOnTabUnhover(){
+
         [Fact]
-        function TestUnhoverEventIsFired() {   
-        	testHoverEventHandlers(targetController.onTabUnhover, 'onTabUnhover');
+        function OnTabUnhoverFiresOnTabHoverComponentEvent() {
+            // ARRANGE -- setup aura and component mocks
+            var eventName = "onTabUnhover";
+            var onTabUnhoverEvent = Test.Stubs.Aura.GetEvent();
+            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+                getEvent: function(name){
+                    if(name === eventName) {return onTabUnhoverEvent;}
+                }
+            });
+            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            
+            // ACT -- call target function with mocked data
+            targetController.onTabUnhover(component, event);
+            
+            // ASSERT -- make sure that the event was fired ... and with the proper params
+            Assert.Equal(1, onTabUnhoverEvent.fire.Calls.length);
+        }
+
+        [Fact]
+        function OnTabUnhoverPassesComponent() {
+            // ARRANGE -- setup aura and component mocks
+            var eventName = "onTabUnhover";
+            var onTabUnhoverEvent = Test.Stubs.Aura.GetEvent();
+            var component = Test.Stubs.Aura.GetComponent({}, {}, {
+                getEvent: function(name){
+                    if(name === eventName) {return onTabUnhoverEvent;}
+                }
+            });
+            var event = Test.Stubs.Aura.GetEvent({"tabComponent":component});
+            var expected = event.getParams();
+            
+            // ACT -- call target function with mocked data
+            targetController.onTabUnhover(component, event);
+            var actual = onTabUnhoverEvent.getParams();
+            
+            // ASSERT -- make sure that the event was fired ... and with the proper params
+            Assert.Equal(expected, actual);
         } 
+
     }
 }

@@ -21,8 +21,8 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
     var Aura = {Component: {}};
 
     Mocks.GetMocks(Object.Global(), {
-        "window" : {},
-        Aura: Aura
+        "Aura": Aura,
+        "ComponentDefRegistry": function(){} // Prevent Global Reference
     })
     (function () {
         [Import("aura-impl/src/main/resources/aura/component/ComponentDefRegistry.js")]
@@ -106,7 +106,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         [Fact]
         function ThrowsIfConfigParamUndefined() {
             // Arrange
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var expected = "No ComponentDef descriptor specified";
             var actual;
 
@@ -129,7 +129,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         [Fact]
         function ThrowsIfNoConfig() {
             // Arrange
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var expected = "ComponentDef config required for registration";
             var actual;
 
@@ -148,7 +148,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
         [Fact]
         function ThrowsIfNoDescriptor() {
             // Arrange
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var expected = "ComponentDef config required for registration";
             var actual;
 
@@ -166,32 +166,28 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function ShouldNotSaveIfDefExists() {
-            var expected = "ComponentDef";
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var descriptor = "markup://foo:bar";
-            var saved = false;
-            var actual;
+            var actual = false;
             var newConfig = {
-                "descriptor": descriptor,
-                "rendererDef": {}
+                "descriptor": descriptor
             };
 
-            target.componentDefs[descriptor] = expected;
+            target.componentDefs[descriptor] = true;
             target.saveComponentDef = function() {
-                saved = true;
+                actual = true;
             };
 
             mockAuraUtil(function() {
-                actual = target.createDef(newConfig);
+                target.createDef(newConfig);
             });
 
-            Assert.Equal(expected, actual);
-            Assert.False(saved);
+            Assert.False(actual);
         }
 
         [Fact]
         function ShouldSaveIfDefDoesntExist() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var descriptor = "markup://foo:bar";
             var saved = false;
             var newConfig = {
@@ -217,7 +213,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function ShouldAddToDynamicNamespaces() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var descriptor = "layout://foo:bar";
             var newConfig = {
                 "descriptor": descriptor,
@@ -233,7 +229,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function ShouldNotAddToDynamicNamespaces() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var descriptor = "markup://foo:bar";
             var newConfig = {
                 "descriptor": descriptor,
@@ -253,13 +249,13 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function ShouldNotStoreNonLayoutDef() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             Assert.False(target.shouldStore("markup://foo:bar"));
         }
 
         [Fact]
         function ShouldStoreLayoutDef() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             Assert.True(target.shouldStore("layout://foo:bar"));
         }
     }
@@ -294,25 +290,24 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function ShouldNotUseNotPersistentStorage() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             target.useDefStore = undefined;
             mockStorageService(false, false)(function () {
                 target.setupDefinitionStorage();
             });
 
             Assert.False(target.useDefStore);
-            Assert.True(target.definitionStorage === undefined);
         }
 
+        [Fact]
         function OnlyUsePersistent() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             target.useDefStore = undefined;
             mockStorageService(true, false)(function () {
                 target.setupDefinitionStorage();
             });
 
             Assert.True(target.useDefStore);
-            Assert.True(target.definitionStorage !== undefined);
         }
 
     }
@@ -322,7 +317,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function RemoveDef() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             target.componentDefs = {
                 "markup://foo:bar": "hello"
             };
@@ -337,7 +332,7 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
 
         [Fact]
         function RemoveLayoutDef() {
-            var target = new ComponentDefRegistry();
+            var target = new Aura.Component.ComponentDefRegistry();
             var descriptor = "layout://foo:bar";
             target.componentDefs = {
                 "layout://foo:bar": "hello"
@@ -348,17 +343,13 @@ Test.Aura.Component.ComponentDefRegistryTest = function () {
             target.shouldStore = function() {
                 return true;
             };
-            var actual;
             target.definitionStorage = {
-                remove: function(descriptor) {
-                    actual = descriptor;
-                }
+                remove: function(descriptor) {}
             };
 
             target.removeDef(descriptor);
 
             Assert.Undefined(target.componentDefs[descriptor]);
-            Assert.Equal(descriptor, actual);
         }
     }
 };

@@ -17,11 +17,13 @@ Function.RegisterNamespace("Test.Aura.Controller");
 
 [ Fixture ]
 Test.Aura.Controller.ActionDefTest = function() {
-	// Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
+	var Aura = {
+		"Controller": {}
+	}
 	Mocks.GetMocks(Object.Global(), {
-		"exp": function() {},
-		"$A": {ns:{}},
-		"Aura": {Controller: {}}
+		"Aura": Aura,
+		"ActionDef": function(){},
+		"Action": function(){}
 	})(function() {
         [Import("aura-impl/src/main/resources/aura/controller/ActionDef.js")]
         [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
@@ -29,7 +31,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function Constructor() {
-		[ Fact ]
+		[Fact]
 		function SetsName() {
 			// Arrange
 			var expected = "expected";
@@ -39,13 +41,13 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var actual;
 
 			// Act
-			var actual = new ActionDef(config).name;
+			var actual = new Aura.Controller.ActionDef(config).name;
 
 			// Assert
 			Assert.Equal(expected, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function SetsDescriptor() {
 			// Arrange
 			var expected = "expected";
@@ -55,13 +57,13 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var actual;
 
 			// Act
-			var actual = new ActionDef(config).descriptor;
+			var actual = new Aura.Controller.ActionDef(config).descriptor;
 
 			// Assert
 			Assert.Equal(expected, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function SetsActionType() {
 			// Arrange
 			var expected = "expected";
@@ -71,7 +73,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 			var actual;
 
 			// Act
-			var actual = new ActionDef(config).actionType;
+			var actual = new Aura.Controller.ActionDef(config).actionType;
 
 			// Assert
 			Assert.Equal(expected, actual);
@@ -89,7 +91,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 			};
 			var mockValueDef = Mocks.GetMock(Object.Global(), "ValueDef", ValueDef);
 
-			[ Fact ]
+			[Fact]
 			function SetsReturnType() {
 				// Arrange
 				var expected = "expected";
@@ -101,14 +103,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).returnType;
+					actual = new Aura.Controller.ActionDef(config).returnType;
 				})
 
 				// Assert
 				Assert.Equal(new ValueDef(expected), actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function SetsEmptyParamDefsWhenParamsNotArray() {
 				// Arrange
 				var config = {
@@ -128,7 +130,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 				// Act
 				mockAuraUtil(function() {
 					mockValueDef(function() {
-						actual = new ActionDef(config).paramDefs;
+						actual = new Aura.Controller.ActionDef(config).paramDefs;
 					})
 				});
 
@@ -146,7 +148,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					}
 				});
 
-				[ Fact ]
+				[Fact]
 				function SetsEmptyParamDefsWhenParamsEmpty() {
 					// Arrange
 					var config = {
@@ -158,7 +160,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					// Act
 					mockAuraUtil(function() {
 						mockValueDef(function() {
-							actual = new ActionDef(config).paramDefs;
+							actual = new Aura.Controller.ActionDef(config).paramDefs;
 						})
 					});
 
@@ -166,7 +168,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					Assert.Empty(actual);
 				}
 
-				[ Fact ]
+				[Fact]
 				function SetsParamDefsWhenParamsHasOne() {
 					// Arrange
 					var config = {
@@ -178,7 +180,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					// Act
 					mockAuraUtil(function() {
 						mockValueDef(function() {
-							actual = new ActionDef(config).paramDefs;
+							actual = new Aura.Controller.ActionDef(config).paramDefs;
 						})
 					});
 
@@ -188,7 +190,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					}, actual);
 				}
 
-				[ Fact ]
+				[Fact]
 				function SetsParamDefsWhenParamsHasTwo() {
 					// Arrange
 					var config = {
@@ -200,7 +202,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					// Act
 					mockAuraUtil(function() {
 						mockValueDef(function() {
-							actual = new ActionDef(config).paramDefs;
+							actual = new Aura.Controller.ActionDef(config).paramDefs;
 						})
 					});
 
@@ -211,7 +213,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 					}, actual);
 				}
 			}
-			[ Fact ]
+			[Fact]
 			function DefaultBackground() {
 				// Arrange
 				var config = {
@@ -221,13 +223,13 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).background;
+					actual = new Aura.Controller.ActionDef(config).background;
 				})
 
 				// Assert
 				Assert.Equal(false, actual);
 			}
-			[ Fact ]
+			[Fact]
 			function SetsBackground() {
 				// Arrange
 				var expected = "expected";
@@ -239,13 +241,13 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).background;
+					actual = new Aura.Controller.ActionDef(config).background;
 				})
 
 				// Assert
 				Assert.Equal(true, actual);
 			}
-			[ Fact ]
+			[Fact]
 			function DefaultCaboose() {
 				// Arrange
 				var config = {
@@ -255,14 +257,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).caboose;
+					actual = new Aura.Controller.ActionDef(config).caboose;
 				})
 
 				// Assert
 				Assert.Equal(false, actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function SetsCaboose() {
 				// Arrange
 				var expected = "expected";
@@ -274,14 +276,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).caboose;
+					actual = new Aura.Controller.ActionDef(config).caboose;
 				})
 
 				// Assert
 				Assert.Equal(true, actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function SetsMethNull() {
 				// Arrange
 				var config = {
@@ -292,7 +294,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockValueDef(function() {
-					actual = new ActionDef(config).meth;
+					actual = new Aura.Controller.ActionDef(config).meth;
 				})
 
 				// Assert
@@ -312,7 +314,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 				}
 			});
 
-			[ Fact ]
+			[Fact]
 			function SetsMeth() {
 				// Arrange
 				var config = {
@@ -323,14 +325,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockAuraUtil(function() {
-					actual = new ActionDef(config).meth;
+					actual = new Aura.Controller.ActionDef(config).meth;
 				});
 
 				// Assert
 				Assert.Equal("decoded", actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function DecodesCodeProperty() {
 				// Arrange
 				var config = {
@@ -342,7 +344,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 				// Act
 				mockAuraUtil(function() {
 					$A.util.json.decodeString = stubbedDecoder;
-					new ActionDef(config);
+					new Aura.Controller.ActionDef(config);
 				});
 				var actual = stubbedDecoder.Calls[0].Arguments.toDecode;
 
@@ -350,7 +352,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 				Assert.Equal("decode me", actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function DoesNotSetReturnType() {
 				// Arrange
 				var config = {
@@ -361,14 +363,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockAuraUtil(function() {
-					actual = new ActionDef(config).returnType;
+					actual = new Aura.Controller.ActionDef(config).returnType;
 				});
 
 				// Assert
 				Assert.Undefined(actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function SetsEmptyParamDefs() {
 				// Arrange
 				var config = {
@@ -378,14 +380,14 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockAuraUtil(function() {
-					actual = new ActionDef(config).paramDefs;
+					actual = new Aura.Controller.ActionDef(config).paramDefs;
 				});
 
 				// Assert
 				Assert.Empty(actual);
 			}
 
-			[ Fact ]
+			[Fact]
 			function DoesNotSetBackground() {
 				// Arrange
 				var config = {
@@ -396,55 +398,91 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 				// Act
 				mockAuraUtil(function() {
-					actual = new ActionDef(config).background;
+					actual = new Aura.Controller.ActionDef(config).background;
 				});
 
 				// Assert
 				Assert.Equal(false, actual);
 			}
 
-			[ Fact ]
+			[Fixture]
 			function LogsDecodeError() {
-				// Arrange
-				var config = {
-					actionType : "CLIENT",
-					code : "decodable"
-				};
-				var expected = new Error("expected");
-                var actual;
-				var stubbedLogger = Stubs.GetMethod("msg", "error", null);
-				var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
-					util : {
-						json : {
-							decodeString : function() {
-								throw expected;
+
+				[Fact]
+				function LogsDecodeAndSpecifySourceFunction() {
+					// Arrange
+					var expected = "function logic(){}";
+					var config = {
+						actionType : "CLIENT",
+						code : expected
+					};
+					var error = new Error("errorMessage");
+	                var actual;
+					var stubbedLogger = Stubs.GetMethod("msg", "error", null);
+					var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+						util : {
+							json : {
+								decodeString : function() {
+									throw error;
+								}
 							}
-						}
-					},
-					error : stubbedLogger
-				});
+						},
+						error : stubbedLogger
+					});
 
-				// Act
-				mockAuraUtil(function() {
-                    actual = Record.Exception(function() {
-                        new ActionDef(config);
-                    });
-                });
+					// Act
+					mockAuraUtil(function() {
+	                    Record.Exception(function() {
+	                        new Aura.Controller.ActionDef(config);
+	                    });
+	                });
 
-				// Assert
-                Assert.Equal(expected, actual);
-				Assert.Equal("decodable", stubbedLogger.Calls[0].Arguments.msg);
-				Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.error);
+					// Assert
+					Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.msg);
+				}
+
+				
+				[Fact]
+				function LogsDecodeAndSpecifyErrorMessage() {
+					// Arrange
+					var config = {
+						actionType : "CLIENT",
+						code : "decodable"
+					};
+					var expected = new Error("expected");
+					var stubbedLogger = Stubs.GetMethod("msg", "error", null);
+					var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
+						util : {
+							json : {
+								decodeString : function() {
+									throw expected;
+								}
+							}
+						},
+						error : stubbedLogger
+					});
+
+					// Act
+					mockAuraUtil(function() {
+	                    Record.Exception(function() {
+	                        new Aura.Controller.ActionDef(config);
+	                    });
+	                });
+
+					// Assert
+					Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.error);
+				}
+
 			}
 		}
 	}
 	[ Fixture ]
 	function GetName() {
-		[ Fact ]
+		[Fact]
 		function ReturnsName() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.name = expected;
 
 			// Act
@@ -457,11 +495,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function GetDescriptor() {
-		[ Fact ]
+		[Fact]
 		function ReturnsDescriptor() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.descriptor = expected;
 
 			// Act
@@ -474,11 +512,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function GetActionType() {
-		[ Fact ]
+		[Fact]
 		function ReturnsActionType() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.actionType = expected;
 
 			// Act
@@ -491,9 +529,9 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function IsBackground() {
-		[ Fact ]
+		[Fact]
 		function ReturnsTrueIfBackgroundTrue() {
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.background = true;
 
 			var actual = target.isBackground();
@@ -501,9 +539,9 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.True(actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsFalseIfBackgroundNotTrue() {
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.background = "true";
 
 			var actual = target.isBackground();
@@ -514,10 +552,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function IsClientAction() {
-		[ Fact ]
+		[Fact]
 		function ReturnsTrueIfActionTypeEqualsCLIENT() {
 			// Arrange
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.actionType = "CLIENT";
 
 			// Act
@@ -527,10 +565,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.True(actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsFalseIfActionTypeNotEqualsCLIENT() {
 			// Arrange
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.actionType = "client";
 
 			// Act
@@ -543,10 +581,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function IsServerAction() {
-		[ Fact ]
+		[Fact]
 		function ReturnsTrueIfActionTypeEqualsSERVER() {
 			// Arrange
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.actionType = "SERVER";
 
 			// Act
@@ -556,10 +594,10 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.True(actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsFalseIfActionTypeNotEqualsSERVER() {
 			// Arrange
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.actionType = "server";
 
 			// Act
@@ -572,12 +610,17 @@ Test.Aura.Controller.ActionDefTest = function() {
 
 	[ Fixture ]
 	function NewInstance() {
-        var mockAuraContext = Mocks.GetMock(Object.Global(), "$A", { getContext : function() {return null;} });
+        var mockAuraContext = Mocks.GetMocks(Object.Global(),  {
+        	"$A": { 
+        		getContext : function() {return null;} 
+        	},
+        	"Action": Aura.Controller.Action
+        });
 
-		[ Fact ]
+		[Fact]
 		function ReturnsActionWithDef() {
 			// Arrange
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 
 			// Act
 			var actual;
@@ -589,11 +632,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.Equal(target, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsActionWithMeth() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.meth = expected;
 
 			// Act
@@ -606,11 +649,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.Equal(expected, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsActionWithParamDefs() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 			target.paramDefs = expected;
 
 			// Act
@@ -623,12 +666,12 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.Equal(expected, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsActionWithBackgroundFromIsBackground() {
                         // Note, this used to use 'expected', but that breaks with the new
                         // more strict values.
 			var expected = true;
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
                         target.background = expected;
 
 			var actual;
@@ -639,11 +682,11 @@ Test.Aura.Controller.ActionDefTest = function() {
 			Assert.Equal(expected, actual);
 		}
 
-		[ Fact ]
+		[Fact]
 		function ReturnsActionWithCmp() {
 			// Arrange
 			var expected = "expected";
-			var target = new ActionDef({});
+			var target = new Aura.Controller.ActionDef({});
 
 			// Act
 			var actual;

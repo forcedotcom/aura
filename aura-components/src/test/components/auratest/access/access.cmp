@@ -16,7 +16,7 @@
 
 -->
 <aura:component access="GLOBAL" description="An abstract component that provides a basic layout for the ui:list component.">
-    <aura:attribute name="currentTest" type="String"/>
+    <aura:attribute name="testType" type="String"/>
 
     <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>

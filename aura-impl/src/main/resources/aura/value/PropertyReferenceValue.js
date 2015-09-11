@@ -26,7 +26,7 @@ function PropertyReferenceValue(path, valueProvider) {
     this.expression = isArray?path.join('.'):path;
     this.isGlobal=this.expression.charAt(0) === '$';
     this.valueProvider = valueProvider;
-    this.context=$A.getContext().getCurrentAccess();
+    this.context=(valueProvider instanceof PassthroughValue)?valueProvider:$A.getContext().getCurrentAccess();
 
     // #if {"modes" : ["STATS"]}
     valueFactory.index(this);

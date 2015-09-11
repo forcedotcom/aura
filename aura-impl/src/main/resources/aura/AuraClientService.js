@@ -2566,40 +2566,47 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 // PRIVATE means "same component only".
                 context=$A.getContext();
                 currentAccess=context&&context.getCurrentAccess();
-                return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component);
+                return currentAccess&&(currentAccess===component||currentAccess.getComponentValueProvider()===component||currentAccess.getDef()===component);
             default:
                 // INTERNAL, PUBLIC, or absence of value means "same namespace only".
                 context=$A.getContext();
                 currentAccess=(context&&context.getCurrentAccess())||component;
                 if(currentAccess){// && currentAccess.isValid()){
-                    var accessFacetValueProvider = currentAccess.getComponentValueProvider();
-                    if (accessFacetValueProvider){// && accessFacetValueProvider.isValid()) {
-                        var accessDef=currentAccess.getDef();
-                        var accessFacetDef=accessFacetValueProvider.getDef();
-                        var accessDescriptor=accessDef&&accessDef.getDescriptor();
-                        var accessFacetDescriptor=accessFacetDef&&accessFacetDef.getDescriptor();
-                        var accessNamespace=accessDescriptor&&accessDescriptor.getNamespace();
-                        var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
-                        // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
-                        // if(definition.access!=="P"){
-                        // INTERNAL / DEFAULT
-                        var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
-                        var allowNamespace=this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace);
-                        if(allowProtocol || allowNamespace){
-                            // Privileged Namespace
-                            return true;
-                        }
-                        //}
-                        // Not a privileged namespace or explicitly set to PUBLIC
-                        var targetNamespace=definition.getDescriptor().getNamespace();
-                        return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
+                    var accessDef=null;
+                    var accessFacetDef=null;
+                    if(currentAccess instanceof Component){
+                        var accessFacetValueProvider = currentAccess.getComponentValueProvider();
+                        accessFacetDef=accessFacetValueProvider&&accessFacetValueProvider.getDef();
+                        accessDef=currentAccess.getDef();
+                    }else{
+                        accessDef=currentAccess;
                     }
-                }else{
-                    // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
-                    var descriptor=definition.getDescriptor();
-                    if(descriptor.getNamespace()==="aura"&&descriptor.getName()==="application"){
+
+                    var accessDescriptor=accessDef&&accessDef.getDescriptor();
+                    var accessFacetDescriptor=accessFacetDef&&accessFacetDef.getDescriptor();
+                    var accessNamespace=accessDescriptor&&accessDescriptor.getNamespace();
+                    var accessFacetNamespace=accessFacetDescriptor&&accessFacetDescriptor.getNamespace();
+                    // JBUCH: ACCESS: TODO: DETERMINE IF THIS IS THE CORRECT DEFAULT BEHAVIOR; FOR NOW, TREAT PUBLIC/OMITTED AS INTERNAL
+                    // if(definition.access!=="P"){
+                    // INTERNAL / DEFAULT
+                    var allowProtocol=this.protocols.hasOwnProperty(accessDescriptor&&accessDescriptor.getPrefix()) || this.protocols.hasOwnProperty(accessFacetDescriptor&&accessFacetDescriptor.getPrefix());
+                    var allowNamespace=this.namespaces.hasOwnProperty(accessNamespace) || this.namespaces.hasOwnProperty(accessFacetNamespace);
+                    if(allowProtocol || allowNamespace){
+                        // Privileged Namespace
                         return true;
                     }
+                    //}
+                    // Not a privileged namespace or explicitly set to PUBLIC
+                    var targetNamespace=definition.getDescriptor().getNamespace();
+                    return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
+                }else{
+                    // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
+                    return definition.isInstanceOf("aura:application") ||
+                    // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
+                    // This check allows components to be loaded directly in the browser in DEV/TEST
+                     !(context&&context.getCurrentAccess()) ||
+                    // #end
+                    false;
                 }
         }
     }

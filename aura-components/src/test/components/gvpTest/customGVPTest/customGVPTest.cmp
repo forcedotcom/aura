@@ -16,4 +16,5 @@
 -->
 
 <aura:component template="gvpTest:customGVPTemplate">
+    <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
 </aura:component>

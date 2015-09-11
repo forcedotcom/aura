@@ -1359,12 +1359,11 @@ Component.prototype.getEvent = function(name) {
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
-        // #if {"modes" : ["DEVELOPMENT"]}
+        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
         // #end
 
-        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-        // return null;
+        return null;
     }
     return new Aura.Event.Event({
         "name" : name,
@@ -1771,6 +1770,13 @@ Component.prototype.setupSuper = function(configAttributes, localCreation) {
             var facets=this.componentDef.getFacets();
             if(facets) {
                 for (var i = 0; i < facets.length; i++) {
+                    var facetDef=this.attributeSet.getDef(facets[i]["descriptor"],this.componentDef);
+                    if(!$A.clientService.allowAccess(facetDef[0],facetDef[1])) {
+                        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
+                        $A.warning("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+                        // #end
+                        continue;
+                    }
                     superAttributes["values"][facets[i]["descriptor"]] = facets[i]["value"];
                 }
             }
@@ -1814,7 +1820,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             var name = attributeNames[x];
             var defaultDef = attributeDefs.getDef(name);
             var defaultValue = defaultDef.getDefault();
-            if (defaultValue && defaultValue.length) {
+            if (defaultValue!==undefined) {
                 if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
@@ -1846,12 +1852,11 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         }
 
         if (!setByDefault[attribute]&&!$A.clientService.allowAccess(attributeDef,cmp)) {
-            // #if {"modes" : ["DEVELOPMENT"]}
+            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
             $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
             // #end
 
-            // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-            // continue;
+            continue;
         }
 
         if (isFacet) {

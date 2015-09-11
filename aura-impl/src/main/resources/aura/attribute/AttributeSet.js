@@ -52,6 +52,29 @@ AttributeSet.prototype.hasAttribute = function(name) {
 };
 
 /**
+ * Returns the highest extended reference of the attribute using property syntax.
+ *
+ * @param {String} key The data key to look up.
+ * @param {Object} component The component hierarchy to investigate
+ * @returns {Object} the attribute def
+ * @protected
+ *
+ */
+AttributeSet.prototype.getDef = function(key, component) {
+    var def=[];
+    var target=component.getConcreteComponent?component.getConcreteComponent():component;
+    while(target){
+        var tempDef=target.getDef?target.getDef().getAttributeDefs().getDef(key):target.getAttributeDefs().getDef(key);
+        if(!tempDef){
+            break;
+        }
+        def[0]=tempDef;
+        def[1]=target;
+        target=target.getSuper?target.getSuper():target.getSuperDef();
+    }
+    return def;
+};
+/**
  * Returns the value referenced using property syntax.
  *
  * @param {String}
@@ -69,12 +92,12 @@ AttributeSet.prototype.get = function(key, component) {
         path=key.split('.');
         attribute=path[0];
     }
-    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(attribute), component)){
-        // #if {"modes" : ["DEVELOPMENT"]}
+    var defs=this.getDef(attribute,component);
+    if(!$A.clientService.allowAccess(defs[0], defs[1])){
+        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
-        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-        //return null;
+        return undefined;
     }
 	if (!path) {
         var decorators=this.decorators[key];
@@ -153,13 +176,13 @@ AttributeSet.prototype.set = function(key, value, component) {
         path=key.split('.');
         attribute=path[0];
     }
-    if(!$A.clientService.allowAccess(this.attributeDefSet.getDef(attribute),component)){
-        // #if {"modes" : ["DEVELOPMENT"]}
+    var defs=this.getDef(attribute,component);
+    if(!$A.clientService.allowAccess(defs[0],defs[1])){
+        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
 
-        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-        //return;
+        return;
     }
     if(!$A.util.isUndefinedOrNull(value) && !this.isValueValidForAttribute(key, value)) {
     	if(this.isTypeOfArray(key)) {

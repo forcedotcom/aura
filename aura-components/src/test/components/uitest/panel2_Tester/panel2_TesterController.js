@@ -84,10 +84,10 @@
 		var CustomizeCloseAction = $A.util.getBooleanValue(cmp
 				.get("v.customizeCloseAction"));
 		if (CustomizeCloseAction) {
-			config["closeAction"] = function(cmp, reason) {
+			config["closeAction"] = $A.getCallback(function(panel, reason) {
 				cmp.set("v.closeActionCalled",
 						"CloseActionCustomMethodCalled when " + reason);
-			}
+            })
 		}
 		helper.createHeaderFooterInstance(cmp, true);
 
@@ -137,7 +137,7 @@
 					}
 				}
 			}, {
-				componentDef : "markup://uitest:panel2_Tester",
+				componentDef : "markup://uitest:panel2_Tester"
 			} ]);
 		}
 		config["body"] = panelBody;
@@ -149,7 +149,7 @@
 					visible : cmp.get("v.isVisible"),
 					panelConfig : config,
 
-					onCreate : function(panel) {
+					onCreate : $A.getCallback(function(panel) {
 						cmp._panel = panel;
 						cmp.find("idCreated").set("v.value", panel.getGlobalId());
 						
@@ -165,11 +165,11 @@
 							}
 							cmp.find("idRefEl").set("v.value", refElIds);
 						}
-					},
+					}),
 
-					onDestroy : function(panelId) {
+					onDestroy : $A.getCallback(function(panelId) {
 						cmp.find("idDestroyed").set("v.value", panelId);
-					}
+					})
 				}).fire();
 	}
 

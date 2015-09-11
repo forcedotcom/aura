@@ -202,14 +202,11 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
     	        component=this.createComponentInstance(configItem, true);
 				status="SUCCESS";
         	}else{
-            	// #if {"modes" : ["DEVELOPMENT"]}
+            	// #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
 	            $A.warning("Access Check Failed! AuraComponentService.createComponent(): '"+(def&&def.getDescriptor().getQualifiedName())+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
     	        // #end
-        	    // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-           		//status="ERROR";
-				//message="Unknown component '"+type+"'.";
-				component=this.createComponentInstance(configItem, true);
-				status="SUCCESS";
+           		status="ERROR";
+				message="Unknown component '"+type+"'.";
 			}
         } catch(e) {
             status = "ERROR";
@@ -349,13 +346,12 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
         // var currentAccess = $A.getContext().getCurrentAccess();
         // Server should handle the case of an unknown def fetched "lazily"
         if(!$A.clientService.allowAccess(def) /* && currentAccess  */) {
-            // #if {"modes" : ["DEVELOPMENT"]}
+            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
             $A.warning("Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
                 (def&&def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
                 $A.getContext().getCurrentAccess() + "'.");
             // #end
-            // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-            //return null;
+            return null;
         }
     }
 
@@ -571,12 +567,10 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 if($A.clientService.allowAccess(def)) {
                     collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
                 }else{
-                    // #if {"modes" : ["DEVELOPMENT"]}
+                    // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
                     $A.warning("Access Check Failed! AuraComponentService.newComponentAsync(): '"+def.getDescriptor().getQualifiedName()+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
                     // #end
-                    // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-                    //collectComponent(null,"ERROR","Unknown component '"+desc+"'.",i);
-                    collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
+                    collectComponent(null,"ERROR","Unknown component '"+desc+"'.",i);
                 }
             }
         }
@@ -794,12 +788,11 @@ AuraComponentService.prototype.getDef = function(descriptor) {
     var def = this.getComponentDef(descriptor);
 
     if (def && !$A.clientService.allowAccess(def)) {
-        // #if {"modes" : ["DEVELOPMENT"]}
+        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
         // #end
 
-        // JBUCH: TODO: ACCESS CHECKS: TEMPORARY REPRIEVE
-        // return null;
+        return null;
     }
     return def;
 };

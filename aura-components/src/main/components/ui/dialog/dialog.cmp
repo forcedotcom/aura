@@ -26,6 +26,7 @@
     <aura:attribute name="isModal" type="Boolean" default="{!false}" description="Whether or not the dialog is modal. Modal dialogs do not allow any interaction with other page elements until the dialog is dealt with. Non-modal dialogs allow interactivity with other parts of the page, even when the dialog is open. The default is 'false'."/>
     <aura:attribute name="title" type="String" description="The title displayed in the dialog's header. Required for accessibility." required="true"/>
     <aura:attribute name="width" type="String" default="medium" description="The width of the dialog. Valid values are 'small', 'medium', 'large' (which equal 310px, 620px, and 940px, respectively), and 'auto', which sizes based on the contents of the dialog. Note that 'auto' will only work properly when the 'isModal' attribute is set to 'false'. The default is 'medium'."/>
+    <aura:attribute name="theme" type="String" default="" description="Theme to apply to this component."/>
 
     <!-- css, label, and title hooks -->
     <aura:attribute name="closeClass" type="String" description="Additional CSS classes to apply to the dialog close button, located in the upper right corner of the dialog window."/>

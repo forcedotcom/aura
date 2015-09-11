@@ -19,6 +19,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:attribute name="data" type="Object"></aura:attribute>
     <aura:attribute name="innerClassName" type="String"/>
+    <aura:attribute name="_initialized" type="String" access="PRIVATE" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
 
     <aura:if isTrue="{!v._initialized}">
         <aura:iteration items="{!v.data.elements}" var="item">

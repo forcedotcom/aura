@@ -487,8 +487,6 @@
                 // lowest level columns
                 colSpans.length += childColumns.length;
             }
-
-            component.set("v.colSpan", colSpans.length);
         } else {
             // No child columns, so add this column to the list of data columns,
             // mark it, and count it for parent column spans

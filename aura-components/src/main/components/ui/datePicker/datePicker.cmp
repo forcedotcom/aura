@@ -35,7 +35,7 @@
     <aura:attribute name="closeOnClickOut" access="INTERNAL" type="Boolean" default="false" description="true if used with input date, work around for 198 REMOVE in 200"/>
 
     <!-- private attributes -->
-    <aura:attribute name="_today" type="String" access="private" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
+    <aura:attribute name="_today" type="String" description="The date string (yyyy-MM-dd) of today based on the Aura time zone."/>
 
     <aura:method name="highlightRange" action="{!c.highlightRange}" access="PUBLIC"
                  description="highlight the dates between rangeStart and rangeEnd inclusive">

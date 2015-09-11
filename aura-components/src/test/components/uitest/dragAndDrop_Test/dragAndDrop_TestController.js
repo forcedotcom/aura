@@ -40,7 +40,7 @@
 	    	var items = source.get("v.items");
 	    	
 	    	var removeIndex = -1;
-	    	for (var i = 0; i < items.length; i++) {
+	    	for (var i = 0; items && i < items.length; i++) {
 				if (record === items[i]) {
 					removeIndex = i;
 					break;

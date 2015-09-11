@@ -48,6 +48,7 @@
     
     <!-- map value need to get init when we create this component, not in the js controller(that's too late), 
     we do it in the outter component-->
+    <aura:attribute name="map" type="Map"/>
     <div aura:id="PV_mapFromModelContainer">{#v.map.fruit}</div>
     
     

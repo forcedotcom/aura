@@ -16,6 +16,16 @@
 
 -->
 <aura:component>
+    <aura:attribute name="selectedDate" type="DateTime" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="expectedDiffCase" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="timeDiffCase" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="todayDate_str" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="todayDate" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="todayDate1" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="todayDate2" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="timezone1" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+    <aura:attribute name="timezone2" type="String" description="ACCESS CHECK FIX. PLEASE INVESTIGATE."/>
+
 	<aura:attribute name="renderItem" type="String" default="" description="used to selectively pick the right block to run the tests" />
 
 	<aura:if isTrue="{! v.renderItem == 'testShowTodayDatepickerFlag'}">	

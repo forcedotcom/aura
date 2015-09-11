@@ -753,19 +753,19 @@ public class AuraContextImpl implements AuraContext {
             throw new AuraRuntimeException("Attempt to retrieve unknown $Global variable: " + approvedName);
         }
         if (globalValues.containsKey(approvedName)) {
-            return (globalValues.get(approvedName)).value;
+        	return globalValues.get(approvedName).getValue();
         }
-        return allowedGlobalValues.get(approvedName).defaultValue;
+        return allowedGlobalValues.get(approvedName).getValue();
     }
 
     @Override
-    public void setGlobal(String approvedName, Object value) {
+    public void setGlobalDefaultValue(String approvedName, Object value) {
         if (!validateGlobal(approvedName)) {
             throw new AuraRuntimeException("Attempt to set unknown $Global variable: " + approvedName);
         }
 
         if (globalValues.containsKey(approvedName)) {
-            (globalValues.get(approvedName)).value = value;
+            (globalValues.get(approvedName)).setDefaultValue(value);
         }
         else {
             // copy the registered record to globals, replacing value with supplied value
@@ -774,7 +774,29 @@ public class AuraContextImpl implements AuraContext {
             // You could add "if (temp.defaultValue.equals(value)) return;"
             // if you wished to store values sparsely (not re-storing default even if explicitly set)
             // But you would lose the ability to test whether the value was explicitly set
-            globalValues.put(approvedName, new GlobalValue(temp.writable, temp.defaultValue, value));
+            globalValues.put(approvedName, new GlobalValue(temp.isWritable(), value));
+        }
+    }
+
+    @Override
+    public void setGlobalValue(String approvedName, Object clientValue) {
+        if (!validateGlobal(approvedName)) {
+            throw new AuraRuntimeException("Attempt to set unknown $Global variable: " + approvedName);
+        }
+
+        if (globalValues.containsKey(approvedName)) {
+            (globalValues.get(approvedName)).setValue(clientValue);
+        }
+        else {
+            // copy the registered record to globals, replacing value with supplied value
+            GlobalValue temp = allowedGlobalValues.get(approvedName);
+
+            // You could add "if (temp.defaultValue.equals(value)) return;"
+            // if you wished to store values sparsely (not re-storing default even if explicitly set)
+            // But you would lose the ability to test whether the value was explicitly set
+            GlobalValue newGlobal = new GlobalValue(temp.isWritable(), null);
+            newGlobal.setValue(clientValue);
+            globalValues.put(approvedName, newGlobal);
         }
     }
 
@@ -796,7 +818,7 @@ public class AuraContextImpl implements AuraContext {
                             "Invalid name for $Global value: '%s'. The name must be valid for serialization as a key to the client.",
                             approvedName));
         }
-        allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable, defaultValue, null));
+        allowedGlobalValues.put(approvedName, new GlobalValue(publicallyWritable, defaultValue));
     }
 
     @Override

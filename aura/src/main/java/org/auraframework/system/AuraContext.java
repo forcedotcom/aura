@@ -121,15 +121,53 @@ public interface AuraContext {
     }
 
     class GlobalValue implements JsonSerializable {
-        public boolean writable; // if not writable, the contextImpl must provide a mechanism to set
-        public Object defaultValue;
-        public Object value;
+        private final boolean writable; // if not writable, the contextImpl must provide a mechanism to set
+        private Object value;
+        private Object defaultValue;
+        private Object originalValue = null;
 
-        public GlobalValue(boolean writable, Object defaultValue, Object value) {
+        public GlobalValue(boolean writable, Object defaultValue) {
             this.writable = writable;
             this.defaultValue = defaultValue;
-            this.value = value;
         }
+        
+        public boolean isWritable() {
+        	return this.writable;
+        }
+        
+        public void setValue(Object value) {
+        	// We only want to do it the first time. 
+        	// It's expected that this is the value that is on the client.
+        	// We'll serialize it down to the client so that when we do a merge
+        	// we say, is the current value the original that we had on the server?
+        	// If yes, then use this new value, otherwise the value was probably changed mid flight, don't reset.
+        	if(this.originalValue == null && this.value != value) {
+        		this.originalValue = this.value;
+        	}
+        	this.value = value;
+        	
+        }
+
+        /**
+         * Primarily used by tests.
+         * @param defaultValue the value to specify for a global value if no value has been explicitly set.
+         */
+        public void setDefaultValue(Object defaultValue) {
+        	this.defaultValue = defaultValue;
+        }
+        
+        /**
+         * We ALWAYS prioritize the clientValue.
+         * Since thats the one that takes priority.
+         * @return
+         */
+        public Object getValue() {
+        	if(this.value != null) {
+        		return this.value;
+        	}
+        	return this.defaultValue;
+        }
+        
 
         @Override
         public void serialize(Json json) throws IOException {
@@ -137,10 +175,13 @@ public interface AuraContext {
             json.writeMapEntry("writable", this.writable);
             json.writeMapEntry("defaultValue", this.defaultValue);
             json.writeMapEntry("value", this.value);
+            if(this.originalValue != null) {
+            	json.writeMapEntry("originalValue", this.originalValue);
+            }
             json.writeMapEnd();
         }
     }
-
+    
     /**
      * @return the master def registry
      */
@@ -551,11 +592,16 @@ public interface AuraContext {
      * validates the global's existence Non-registered names will return false
      */
     boolean validateGlobal(String approvedName);
-
+    
     /**
-     * @set state of one approved Globals
+     * @set Set the state of the global value from the server.
      */
-    void setGlobal(String approvedName, Object value);
+    void setGlobalDefaultValue(String approvedName, Object defaultValue);
+    /**
+     * @set Set the state of the global value for the client, should only get set if the value has not changed since 
+     */
+    void setGlobalValue(String approvedName, Object value);
+
 
     /*
      * The encoding style for URLs.

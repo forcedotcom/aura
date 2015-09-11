@@ -40,7 +40,7 @@ public class ContextVPTestController {
 
     @AuraEnabled
     public static void setContextVPValue(@Key("name") String name, @Key("value") Object value) {
-        Aura.getContextService().getCurrentContext().setGlobal(name, value);
+        Aura.getContextService().getCurrentContext().setGlobalValue(name, value);
     }
 
     @AuraEnabled

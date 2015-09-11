@@ -1,4 +1,140 @@
 ({
+    testChangeEventFired: {
+        test: function(cmp) {
+            var expected = "true";
+
+            cmp.updateGvpValue("isVoiceOver", "true");
+
+            // Update it once, see that it changes.
+            // Because of a quirk in the ContextValueProvider
+            // this is working. So we do it twice to ensure our fix works.
+            $A.test.addWaitFor(expected, function() {
+                return cmp.find("data").getElement().textContent;
+            }, function() {
+                
+                // The real test that fails and we need to fix.                
+                expected = Date.now()+"";
+                cmp.updateGvpValue("isVoiceOver", expected);
+
+                 $A.test.addWaitFor(expected, function() {
+                    // We verify the DOM vs $A.get() as we want to track
+                    // if the change event fired which would cause a rerender
+                    // and update of the expression.
+                    return cmp.find("data").getElement().textContent;
+                });
+            });
+        }
+    },
+
+
+    testChangeEventFiredWithBooleans: {
+        test: function(cmp) {
+            var expected = "true";
+
+            cmp.updateGvpValue("isVoiceOver", true);
+
+            // Update it once, see that it changes.
+            // Because of a quirk in the ContextValueProvider
+            // this is working. So we do it twice to ensure our fix works.
+            $A.test.addWaitFor(expected, function() {
+                return cmp.find("data").getElement().textContent;
+            }, function() {
+                
+                // The real test that fails and we need to fix.                
+                expected = Date.now();
+                cmp.updateGvpValue("isVoiceOver", expected);
+
+                 $A.test.addWaitFor(expected+"", function() {
+                    // We verify the DOM vs $A.get() as we want to track
+                    // if the change event fired which would cause a rerender
+                    // and update of the expression.
+                    return cmp.find("data").getElement().textContent;
+                });
+            });
+        }
+    },
+
+    /**
+     * Update $Global.isVoiceOver on the client.
+     * Update $Global.dynamicTypeSize on the server.
+     * Ensure $Global.isVoiceOver was not updated from the server.
+     * @type {Object}
+     */
+    testClientValueNotOverridden: {
+        test: function(cmp) {
+            var isVoiceOver = "isVoiceOver" + new Date().getTime();
+            var typeSize = "typeSize" + new Date().getTime();
+
+            $A.set("$Global.isVoiceOver", isVoiceOver);
+
+            cmp.updateGvpValue("dynamicTypeSize", typeSize);
+
+            // Update it once, see that it changes.
+            // Because of a quirk in the ContextValueProvider
+            // this is working. So we do it twice to ensure our fix works.
+            $A.test.addWaitFor(typeSize, function() {
+                return cmp.find("dynamicTypeSize").getElement().textContent;
+            }, function() {
+                // The real test that fails and we need to fix.                
+                typeSize = "typeSize" + new Date().getTime();
+                cmp.updateGvpValue("dynamicTypeSize", typeSize);
+
+                 $A.test.addWaitFor(isVoiceOver, function() {
+                    // We verify the DOM vs $A.get() as we want to track
+                    // if the change event fired which would cause a rerender
+                    // and update of the expression.
+                    return cmp.find("data").getElement().textContent;
+                });
+            });
+        }
+    },
+
+    testClientServerUpdateServerPriority: {
+        test: function(cmp) {
+            var value1 = "true";
+            var value2 = "false"
+
+            $A.set("$Global.isVoiceOver", value1);
+            cmp.updateGvpValue("isVoiceOver", value2);
+
+            // Update it once, see that it changes.
+            // Because of a quirk in the ContextValueProvider
+            // this is working. So we do it twice to ensure our fix works.
+            $A.test.addWaitFor(value2, function() {
+                return cmp.find("data").getElement().textContent;
+            });
+        }
+    },
+
+    testClientServerClientUpdate: {
+        test: function(cmp) {
+            var value1 = "true";
+            var value2 = "false"
+
+            $A.set("$Global.isVoiceOver", value1);
+            cmp.updateGvpValue("isVoiceOver", value2);
+
+            // Update it once, see that it changes.
+            // Because of a quirk in the ContextValueProvider
+            // this is working. So we do it twice to ensure our fix works.
+            $A.test.addWaitFor(value2, function() {
+                return cmp.find("data").getElement().textContent;
+            }, function() {
+                $A.set("$Global.isVoiceOver", value1);
+
+                 $A.test.addWaitFor(value1, function() {
+                    // We verify the DOM vs $A.get() as we want to track
+                    // if the change event fired which would cause a rerender
+                    // and update of the expression.
+                    return cmp.find("data").getElement().textContent;
+                });
+            });
+        }
+    },
+
+
+
+
     testServerRegistersNewValue : {
         test : [ function(cmp) {
             $A.test.expectAuraError("Attempting to retrieve an unknown global item 'aNewValue'. Global items must be pre-registered and have a default value");

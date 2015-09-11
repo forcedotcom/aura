@@ -19,6 +19,7 @@
     <aura:attribute name="case" type="java://org.auraframework.def.TestCaseDef"/>
     <aura:attribute name="suite" type="java://org.auraframework.def.TestSuiteDef"/>
     <aura:attribute name="shortName" type="String"/>
+    <aura:attribute name="runTime" type="String"/>
     <aura:attribute name="url" type="String"/>
 
 	<!-- PRIVATE ATTRIBUTE(S) -->

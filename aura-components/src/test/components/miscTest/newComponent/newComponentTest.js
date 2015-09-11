@@ -7,7 +7,7 @@
      * Seems this case only happens on newComponentDeprecated which is a deprecated function,
      * updating or removing this test if we remove newComponentDeprecated.
      */
-    testThrowsComponentClassNotFoundError: {
+    _testThrowsComponentClassNotFoundError: {
         test: function() {
             // a component is not defined in markup or aura:dependency
             var cmpDescr="ui:message";

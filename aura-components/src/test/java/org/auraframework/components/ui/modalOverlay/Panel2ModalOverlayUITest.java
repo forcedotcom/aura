@@ -137,7 +137,7 @@ public class Panel2ModalOverlayUITest extends WebDriverTestCase {
     }
 
     private void verifyCustomCloseActionMethodCalled(String actionType) {
-        String panelGlobalId = findDomElements(By.cssSelector(".info .idCreated")).get(0).getText();
+        String panelGlobalId = findDomElements(By.cssSelector(".info .idCurrent")).get(0).getText();
         String attrValueExp = auraUITestingUtil.getValueFromCmpExpression(panelGlobalId, "v.closeActionCalled");
 
         String attrValueText = (String) auraUITestingUtil.getEval(attrValueExp);

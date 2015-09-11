@@ -19,8 +19,8 @@
 	<aura:import library="ui:panelPositioningLib" property="positioningLib" description="Library to help position accessibility menu" />
 	
 	<aura:attribute name="class" type="String" default="" description="Additional CSS style to be attached to this component."/>
-	<aura:attribute name="draggables" type="Aura.Component[]" access="private" description="Currently active draggable components."/>	
-	<aura:attribute name="dropzoneMenu" type="List" access="private" description="Dropzone components to be rendered as menuItem."/>
+	<aura:attribute name="draggables" type="Aura.Component[]" description="Currently active draggable components."/>
+	<aura:attribute name="dropzoneMenu" type="List" description="Dropzone components to be rendered as menuItem."/>
 	
 	<div>
     	<ui:menu aura:id="menu" class="{!v.class}">

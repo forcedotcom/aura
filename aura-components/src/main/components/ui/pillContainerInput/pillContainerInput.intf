@@ -18,4 +18,5 @@
 <aura:interface support="PROTO" extends="ui:focusable">
     <aura:registerEvent name="onItemSelected" type="ui:response" access="GLOBAL" description="The event fired when the user selects an item" />
     <aura:registerEvent name="onBackspacePressedWhenEmpty" type="ui:response" access="GLOBAL" description="The event fired when the user presses backspace on an empty input" />
+    <aura:attribute name="value" type="String"/>
 </aura:interface>

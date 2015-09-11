@@ -2,5 +2,6 @@
     <aura:import library="ui:eventLib" property="lib"/>
     <aura:registerEvent name="keydown" type="ui:keydown" access="GLOBAL" description="The event fired when the user presses a keyboard key on the component."/>
     <aura:handler name="keydown" action="{!c.onKeydown}"/>
+
     <input type="text" value="{!v.value}"/>
 </aura:component>

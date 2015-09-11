@@ -17,9 +17,9 @@
     render : function(cmp, helper) {
         $A.logger.info(cmp.getGlobalId() + ":" + helper.getDelimiter(cmp) + 'GrandChildClientProviderRender' );
         //Test how we behave when error out
-        var errorOutFromRender = cmp.get("v.errorOutFromRender");
+        var errorOutFromRender = cmp.get("v.errorOutFromRender_Child");
         if(errorOutFromRender === true) {
-        	blah.willExplode();
+            blahFromChildRerender.willExplode();
         }
         return this.superRender();
     },

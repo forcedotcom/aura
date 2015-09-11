@@ -49,6 +49,7 @@
 	
 	<div class="info">
 		<ui:outputText value="Create a panel to your liking"/> <br/><br/>
+        ID of CURRENT component: <ui:outputText class="idCurrent" aura:id="idCurrent" value="{!globalId}"/> <br/>
 		ID of NEW Panel/Modal created: <ui:outputText class="idCreated" aura:id="idCreated" value=""/> <br/>
 		ID of Destroyed Panel/Modal: <ui:outputText class="idDestroyed" aura:id="idDestroyed" value=""/> <br/>
 		ID of Reference Element: <ui:outputText class="idRefEl" aura:id="idRefEl" value=""/> <br/>

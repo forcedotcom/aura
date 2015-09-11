@@ -93,7 +93,7 @@ public class ComponentClassErrorUITest extends WebDriverTestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassChild.cmp's render
     public void testGrandChildClientErrorOutFromChildRender() throws Exception {
-        String expectLocation = "auratest$componentClassChild.render";
+        String expectLocation = "auratest$componentClassGrandChildClientProvider.render";
         String expectErrorMessage = "ReferenceError: blahFromChildRerender is not defined";
         runTestGrandChildClientErrorOutFrom("errorOutFromRender_Child", expectErrorMessage, expectLocation);
     }

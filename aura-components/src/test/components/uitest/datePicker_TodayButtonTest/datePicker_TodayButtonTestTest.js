@@ -18,7 +18,7 @@
     
     CSS_SELECTOR:{
         todayButton : '.calToday.uiButton',
-        uiDatePicker : '.uiDatePicker',
+        uiDatePicker : '.uiDatePicker'
     },
 
 

@@ -231,8 +231,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                     break;
                 }
 
-                logger.info(getName() + " failed at iteration " + (i + 1) + " of " + (FLAPPER_NUM_RETRIES + 1)
-                        + " with error: " + AuraExceptionUtil.getStackTrace(th));
+                logger.info(getClass().getName() + "." + getName() + " failed at iteration " + (i + 1) + " of "
+                        + (FLAPPER_NUM_RETRIES + 1) + " with error: " + AuraExceptionUtil.getStackTrace(th));
 
                 quitDriver();
             } finally {

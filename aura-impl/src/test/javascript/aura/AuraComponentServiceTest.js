@@ -18,7 +18,6 @@ Function.RegisterNamespace("Test.Aura");
 [Fixture]
 Test.Aura.AuraComponentServiceTest = function(){
     var $A = {
-        ns : {},
         assert: function(condition, message) {
             if (!condition) {
                 var error = new Error(message);
@@ -31,15 +30,12 @@ Test.Aura.AuraComponentServiceTest = function(){
             }
         }
     };
-    var NS = {Component: {}, Services: {}};
+    var Aura = {Component: {}, Services: {}};
 
     //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMocks(Object.Global(), {
-        "exp": function(){},
-        "$A": $A,
-        "window": function(){},
-        "Components": function(){},
-        Aura: NS
+        "AuraComponentService": function(){},
+        "Aura": Aura
     })(function(){
         [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
     });
@@ -54,11 +50,10 @@ Test.Aura.AuraComponentServiceTest = function(){
         "ProviderDefRegistry": function(){},
         "RendererDefRegistry": function(){},
         "HelperDefRegistry": function(){},
-        "exp": function(){},
         "$A": $A,
         "window": function(){},
         "Components": function(){},
-        Aura: NS
+        Aura: Aura
     });
 
     var targetService;

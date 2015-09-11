@@ -19,7 +19,10 @@ Function.RegisterNamespace("Test.Aura");
 Test.Aura.LoggerTest = function() {
     var Aura = {Utils:{SecureFilters:{}}};
 
-    Mocks.GetMocks(Object.Global(), {Aura: Aura })(function(){
+    Mocks.GetMocks(Object.Global(), {
+        "Aura": Aura,
+        "Logger": function(){}
+    })(function(){
         [Import("aura-impl/src/main/resources/aura/Logger.js")]
     });
 

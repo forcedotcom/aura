@@ -17,17 +17,19 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraClientServiceTest = function() {
-    var $A = {ns : {Util:{prototype:{on:function(){}}}}};
+    var $A = {};
     var Aura = {Services: {}, Controller: {}, Utils: {Util:{prototype:{on:function(){}}}}};
 
     var Importer = Mocks.GetMocks(Object.Global(), {
-        exp: function(){},
         "$A": $A,
-        Aura: Aura
+        "Aura": Aura,
+        "Action": function(){},
+        "AuraClientService": function(){}
     });
 
     Importer(function () {
         [Import("aura-impl/src/main/resources/aura/AuraClientService.js")]
+        [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
     });
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
@@ -124,15 +126,18 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Undefined(target.foreground);//we no longer have restrictions on how many foreground actions we have
     	}
 
-    	[Fact, Skip("Lin : figure out how to mock Date()")]
+    	[Fact]
     	function MarkAuraXHR() {
     		// Arrange
             var expected = "today is a good day";
+            var mockGetTime = Mocks.GetMock(Date.prototype, "getTime", function(){return expected;});
             var target = new Aura.Services.AuraClientService$AuraXHR();
-
+            var actual;
             // Act
-            target.mark();
-            var actual = target.time;
+            mockGetTime(function(){
+                target.mark();
+                actual = target.time;
+            });
 
             // Assert
             Assert.Equal(expected, actual);
@@ -348,20 +353,13 @@ Test.Aura.AuraClientServiceTest = function() {
         // Sets up the environment with a mock action storage:
         var mockActionService = function(delegate) {
             Mocks.GetMocks(Object.Global(), {
-                Aura: Aura,
+                "Aura": Aura,
+                "Action": Aura.Controller.Action,
                 "$A" : {
                     "storageService": {
                         "getStorage": function(name) {
                             Assert.Equal("actions", name, "action service should only access the 'actions' cache");
                             return mockActionStorage;
-                        }
-                    },
-                    ns : {
-                        Util : {
-                            prototype : {
-                                on : function() {
-                                }
-                            }
                         }
                     },
                     assert : function() {},
@@ -410,7 +408,6 @@ Test.Aura.AuraClientServiceTest = function() {
                         then: function(suc, err) { func(suc, err); }
                     };
                 },
-                exp: function() {},
                 window: Object.Global()
             })(function() {
                 mockActionStorage.clear()

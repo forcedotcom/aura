@@ -82,3 +82,5 @@ AttributeDefSet.prototype.getNames = function() {
 AttributeDefSet.prototype.getValues = function() {
     return this.values;
 };
+
+Aura.Attribute.AttributeDefSet = AttributeDefSet;

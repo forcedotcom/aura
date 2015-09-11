@@ -15,10 +15,15 @@
  */
 Function.RegisterNamespace("Test.Aura.Attribute");
 
+
 [Fixture]
 Test.Aura.Attribute.AttributeDefSetTest = function(){
-    Mocks.GetMock(Object.Global(), "exp", function() {
-    })(function() {
+    var Aura = {Attribute: {}};
+
+    Mocks.GetMocks(Object.Global(), {
+        "Aura": Aura,
+        "AttributeDefSet": function(){}
+    })(function () {
         [Import("aura-impl/src/main/resources/aura/attribute/AttributeDefSet.js")]
     });
 
@@ -45,17 +50,15 @@ Test.Aura.Attribute.AttributeDefSetTest = function(){
         [Fact]
         function PushesItemsToValuesArrayInOrder(){
             var config = [configItem("item1"), configItem("item2"), configItem("item3")];
+            var expected = ["item1", "item2", "item3"];
             var actual;
 
             mockAttributeDef(function(){
-                var defSet = new AttributeDefSet(config);
+                var defSet = new Aura.Attribute.AttributeDefSet(config);
                 actual = defSet.valuesOrder;
             });
 
-            Assert.True(actual.length == 3, "Wrong length for values array");
-            Assert.Equal(actual[0],"item1", "First item of config not found at first index of array");
-            Assert.Equal(actual[1],"item2", "Second item of config not found at second index of array");
-            Assert.Equal(actual[2],"item3", "Third item of config not found at third index of array");
+            Assert.Equal(expected, actual);
         }
     }
 }

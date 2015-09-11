@@ -17,13 +17,12 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.AuraExpressionServiceTest = function(){
-    var $A = { ns : {} };
     var Aura = { Services:{} };
 
     Mocks.GetMocks(Object.Global(), {
-        "exp": function(){}, 
-        "$A":$A, 
-        Aura: Aura})
+        "Aura": Aura,
+        "AuraExpressionService": function(){}
+    })
     (function(){
         [Import("aura-impl/src/main/resources/aura/AuraExpressionService.js")]
     });
@@ -32,7 +31,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     function normalize(){
     	[Fact]
         function trimString(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "something";
             var actual;
@@ -46,7 +45,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function trimStringEscapeCharactor(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "abcdef";
             var actual;
@@ -60,7 +59,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function passInNonString(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
     		var someObj = {};
             var expected = someObj;
@@ -75,7 +74,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function passByValue(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "m.something";
             var actual;
@@ -89,7 +88,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function arrayNotation(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "v.something.0.  1  ";
             var actual;
@@ -103,7 +102,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function arrayNotationBadInput(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "v.something..";
             var actual;
@@ -118,7 +117,7 @@ Test.Aura.AuraExpressionServiceTest = function(){
     	
     	[Fact]
         function arrayNotationNestedInput(){
-    		var targetService = new AuraExpressionService();
+    		var targetService = new Aura.Services.AuraExpressionService();
             // Arrange
             var expected = "v.something.bla[key]";
             var actual;

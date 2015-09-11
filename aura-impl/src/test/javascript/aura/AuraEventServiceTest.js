@@ -15,11 +15,11 @@
  */
 Function.RegisterNamespace("Test.Aura");
 
-[ Fixture ]
+[Fixture]
 Test.Aura.AuraTest = function() {
 	Mocks.GetMocks(Object.Global(), {
-        "exp": function() {},
-        Aura: {Services:{}}
+        "Aura": {Services:{}},
+        "AuraEventService": function(){}
     })(function() {
 		[Import("aura-impl/src/main/resources/aura/AuraEventService.js")]
 	});

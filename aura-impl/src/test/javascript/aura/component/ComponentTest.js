@@ -21,80 +21,99 @@ Function.RegisterNamespace("Test.Aura.Component");
 // JBUCH: TODO: Don't love this line. Let's try to get namespaces declared in appropriate files.
 Function.RegisterNamespace("Aura.Component");
 
-[Import("aura-impl/src/main/resources/aura/component/Component.js")]
-[Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
-[Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js")]
 [Fixture]
 Test.Aura.Component.ComponentTest=function(){
-    function mockFramework(during){
-        return Mocks.GetMock(Object.Global(),"$A",{
-            assert:function(condition,message){if(!condition)throw new Error(message)},
-            error:function(message){throw new Error(message)},
-            getContext:function(){return {
-                getAccessVersion:function(){},
-                getCurrentAction:function(){return null}                
-            }},
-            componentService:{
-                get:function(){},
-                getDef:function(){
-                    // JBUCH: TODO: ADD COMPONENTDEF STUB
-                    return {
-                        attributeDefs:{
-                            getDef:function(){},
-                            getNames:function(){return []},
-                            getValues:function(){return null}
-                        },
-                        getAllEvents:function(){
-                            return []
-                        },
-                        getAppHandlerDefs:function(){},
-                        getCmpHandlerDefs:function(){},
-                        getControllerDef:function(){},
-                        getDescriptor:function(){
-                            return {
-                                getNamespace:function(){}
-                            }
-                        },
-                        getEventDef:function(){
-                            return {getDescriptor:function(){
-                                return {
-                                    getQualifiedName:function(){}
-                                }
-                            }}
-                        },
-                        getModelDef:function(){},
-                        getProviderDef:function(){},
-                        getRenderingDetails:function(){return {}},
-                        getSuperDef:function(){},
-                        getValueHandlerDefs:function(){},
-                        isAbstract:function(){}
-                    };
-                },
-                index:function(){},
-                deIndex:function(){}
-            },
-            expressionService:{
-                clearReferences:function(){},
-                normalize:function(target){return target}
-            },
-            renderingService:{
-                unrender:function(){}
-            },
-            util:{
-                apply:function(){
+    var Aura = {
+        "Component": {},
+        "Attribute": {}
+    };
 
+    Mocks.GetMocks(Object.Global(), {
+        "Aura": Aura,
+        "Component": function(){}, // Prevent Global
+        "InvalidComponent": function(){}, // Prevent Global
+        "AttributeSet": function(){} // Prevent Global
+    })(function(){
+        [Import("aura-impl/src/main/resources/aura/component/Component.js"),
+         Import("aura-impl/src/main/resources/aura/attribute/AttributeSet.js"),
+         Import("aura-impl/src/main/resources/aura/component/InvalidComponent.js")]
+    });
+
+    function mockFramework(during){
+        var mock = {
+            "Component": Aura.Component.Component,
+            "InvalidComponent": Aura.Component.InvalidComponent,
+            "AttributeSet": Aura.Attribute.AttributeSet,
+            "$A": {
+                assert:function(condition,message){if(!condition)throw new Error(message)},
+                error:function(message){throw new Error(message)},
+                getContext:function(){return {
+                    getAccessVersion:function(){},
+                    getCurrentAction:function(){return null}                
+                }},
+                componentService:{
+                    get:function(){},
+                    getDef:function(){
+                        // JBUCH: TODO: ADD COMPONENTDEF STUB
+                        return {
+                            attributeDefs:{
+                                getDef:function(){},
+                                getNames:function(){return []},
+                                getValues:function(){return null}
+                            },
+                            getAllEvents:function(){
+                                return []
+                            },
+                            getAppHandlerDefs:function(){},
+                            getCmpHandlerDefs:function(){},
+                            getControllerDef:function(){},
+                            getDescriptor:function(){
+                                return {
+                                    getNamespace:function(){}
+                                }
+                            },
+                            getEventDef:function(){
+                                return {getDescriptor:function(){
+                                    return {
+                                        getQualifiedName:function(){}
+                                    }
+                                }}
+                            },
+                            getModelDef:function(){},
+                            getProviderDef:function(){},
+                            getRenderingDetails:function(){return {}},
+                            getSuperDef:function(){},
+                            getValueHandlerDefs:function(){},
+                            isAbstract:function(){}
+                        };
+                    },
+                    index:function(){},
+                    deIndex:function(){}
                 },
-                isArray:function(target){
-                    return target instanceof Array;
+                expressionService:{
+                    clearReferences:function(){},
+                    normalize:function(target){return target}
                 },
-                isFunction:function(target){
-                    return target instanceof Function;
+                renderingService:{
+                    unrender:function(){}
                 },
-                isString:function(target){
-                    return typeof(target) == "string";
+                util:{
+                    apply:function(){
+
+                    },
+                    isArray:function(target){
+                        return target instanceof Array;
+                    },
+                    isFunction:function(target){
+                        return target instanceof Function;
+                    },
+                    isString:function(target){
+                        return typeof(target) == "string";
+                    }
                 }
-            }
-        })(during);
+            } 
+        };
+        return Mocks.GetMocks(Object.Global(),mock)(during);
     }
     [Fixture]
     function DeIndex() {
@@ -104,7 +123,7 @@ Test.Aura.Component.ComponentTest=function(){
             //Arrange
             var target = null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function() {return false};
             });
             //Act
@@ -121,8 +140,9 @@ Test.Aura.Component.ComponentTest=function(){
             var actual=null;
             var localid = "testLocalId";
             var globalid = "testGlobalId";
+            var Component = Aura.Component.Component;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function(){return true};
                 target.localIndex = null;
             });
@@ -141,7 +161,7 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = globalid;
@@ -164,7 +184,7 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.localIndex = [];
                 target.localIndex[localid] = [globalid];
             });
@@ -188,7 +208,7 @@ Test.Aura.Component.ComponentTest=function(){
             var actual= null;
             var expected= [globalid2];
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = [globalid1,globalid2];
@@ -213,7 +233,7 @@ Test.Aura.Component.ComponentTest=function(){
             var actual = null;
             var expected=[globalid2];
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = [globalid1,globalid1,globalid2,globalid1,globalid1];
@@ -236,7 +256,7 @@ Test.Aura.Component.ComponentTest=function(){
             var actual=null;
             var expected=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.isValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = "something";
@@ -257,7 +277,7 @@ Test.Aura.Component.ComponentTest=function(){
             //Arrange
             var target = null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.assertValid = function(){return false};
             });
             //Act
@@ -276,7 +296,7 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.assertValid = function(){return true};
             });
             //Act
@@ -297,7 +317,7 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.assertValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = original_globalid;
@@ -322,7 +342,7 @@ Test.Aura.Component.ComponentTest=function(){
             var target = null;
             var actual=null;
             mockFramework(function(){
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.assertValid = function(){return true};
                 target.localIndex = [];
                 target.localIndex[localid] = original_globalid_array;
@@ -344,7 +364,7 @@ Test.Aura.Component.ComponentTest=function(){
             // Arrange
             var target = null;
             mockFramework(function() {
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.destroy(false);
             });
 
@@ -361,7 +381,7 @@ Test.Aura.Component.ComponentTest=function(){
             var expected = "Expected ComponentDef";
             var target = null;
             mockFramework(function() {
-                target = new Component({},true);
+                target = new Aura.Component.Component({},true);
                 target.componentDef = expected;
             });
 

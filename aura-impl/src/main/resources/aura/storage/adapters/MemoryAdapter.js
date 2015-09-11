@@ -116,20 +116,12 @@ MemoryAdapter.prototype.updateMRU = function(key) {
  * Stores item into storage.
  * @param {String} key key for item
  * @param {*} item item item to store
+ * @param {Number} size of item value
  * @returns {Promise} a promise that resolves when the item is stored.
  */
-MemoryAdapter.prototype.setItem = function(key, item) {
+MemoryAdapter.prototype.setItem = function(key, item, size) {
     var that = this;
     return new Promise(function(success, error) {
-        // For the size calculation, consider only the inputs to the storage layer: key and value
-        // Ignore all the extras added by the Storage layer.
-        var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
-
-        if (size > that.maxSize) {
-            error(new Error("MemoryAdapter.setItem() cannot store an item over the maxSize"));
-            return;
-        }
-
         // existing item ?
         var existingItem = that.backingStore[key],
             existingItemSize = 0;

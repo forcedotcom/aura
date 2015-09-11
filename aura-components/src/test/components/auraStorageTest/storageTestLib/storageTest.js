@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function () {
+function storageTest () {
     function dieDieDie(cmp, thing) {
         var string;
         if (typeof thing === "string") {
@@ -215,10 +215,11 @@ function () {
             $A.test.addWaitFor(true, function(){ return completed; });
         },
 
-        testSetItemOverMaxSize_stage1: function(cmp, storage, expected) {
+        testSetItemOverMaxSize_stage1: function(cmp, storage) {
             var completed = false;
             var result = "";
             var sizeTooBig = (storage.getMaxSize() + 1) * 1000;
+            var expected = "AuraStorage.put() cannot store an item over the max size of " + (storage.getMaxSize() * 1024);
 
             storage.put("overSize", { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
                 .then(
@@ -279,10 +280,11 @@ function () {
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
-        testReplaceExistingWithEntryTooLarge_stage1: function(cmp, storage, expectedError) {
+        testReplaceExistingWithEntryTooLarge_stage1: function(cmp, storage) {
             var sizeTooBig = (storage.getMaxSize() + 1) * 1000;
             var itemTooLarge = new Array(sizeTooBig).join("x");
             var completed = false;
+            var expectedError = "AuraStorage.put() cannot store an item over the max size of " + (storage.getMaxSize() * 1024);
 
             storage.put("testReplaceExistingWithEntryTooLarge", "ORIGINAL")
                 .then(function() { return storage.get("testReplaceExistingWithEntryTooLarge"); })
@@ -303,7 +305,7 @@ function () {
             var completed = false;
 
             storage.get("testReplaceExistingWithEntryTooLarge")
-                .then(function(item) { $A.test.assertEquals("", item.value, "Entry should be empty after attemping to put item too large"); })
+                .then(function(item) { $A.test.assertUndefined(item, "Entry should be empty after attemping to put item too large"); })
                 .then(function(){ completed = true;}, function(err) { dieDieDie(cmp, err)});
 
             $A.test.addWaitFor(true, function() { return completed; });

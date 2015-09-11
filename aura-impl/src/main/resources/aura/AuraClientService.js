@@ -887,7 +887,8 @@ AuraClientService.prototype.saveTokenToStorage = function() {
         var token = this._token;
         // certain storage adapters require token object be wrapped in "value" object for indexing
         var value = { "value": { "token": this._token } };
-        return storage.adapter.setItem(this._tokenStorageKey, value).then(
+        var size = $A.util.estimateSize(this._tokenStorageKey) + $A.util.estimateSize(this._token);
+        return storage.adapter.setItem(this._tokenStorageKey, value, size).then(
             function() { return token; },
             function(err) {
                 $A.warning("AuraClientService.saveTokenToStorage(): failed to persist token: " + err);

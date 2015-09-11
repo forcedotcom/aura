@@ -123,9 +123,9 @@
                 function() { return errorHandled!=null; },
                 "error handler didn't get called",
                 function() {
-                    $A.test.assertEquals(
-                    "MemoryAdapter.setItem() cannot store an item over the maxSize",
-                    errorHandled.message);
+                    $A.test.assertTrue(
+                        errorHandled.message.indexOf("AuraStorage.put() cannot store an item over the max size") == 0,
+                        "Should have returned error indicating size too big");
                 }
             );
          },

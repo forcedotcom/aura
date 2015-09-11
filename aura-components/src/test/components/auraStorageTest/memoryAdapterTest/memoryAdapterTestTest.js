@@ -374,12 +374,10 @@
         }]
     },
 
-    // TODO(W-2599085): Storages should clear existing entry after trying to put an item above the max size
-    _testReplaceExistingWithEntryTooLarge: {
+    testReplaceExistingWithEntryTooLarge: {
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
-            var expectedError = "MemoryAdapter.setItem() cannot store an item over the maxSize";
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage, expectedError);
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage);
         },
         function getItem(cmp) {
             cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);

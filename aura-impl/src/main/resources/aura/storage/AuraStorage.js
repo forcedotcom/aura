@@ -165,12 +165,23 @@ AuraStorage.prototype.getAll = function() {
 
 /**
  * Asynchronously stores the value in storage using the specified key.
+ * Calculates the approximate size of the data and provides it to adapter.
+ *
  * @param {String} key The key of the item to store.
  * @param {*} value The value of the item to store.
  * @returns {Promise} A Promise that will put the value in storage.
  * @export
  */
 AuraStorage.prototype.put = function(key, value) {
+
+    // For the size calculation, consider only the inputs to the storage layer: key and value
+    // Ignore all the extras in the item object below
+    var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
+    if (size > this.maxSize) {
+        this.remove(key, true);
+        return Promise["reject"](new Error("AuraStorage.put() cannot store an item over the max size of " + this.maxSize));
+    }
+
     var now = new Date().getTime();
 
     var item = {
@@ -180,7 +191,7 @@ AuraStorage.prototype.put = function(key, value) {
     };
 
     var that = this;
-    var promise = this.adapter.setItem(this.keyPrefix + key, item)
+    var promise = this.adapter.setItem(this.keyPrefix + key, item, size)
         .then(function () {
             that.log("put() - key: " + key + ", value: " + item);
             $A.storageService.fireModified();

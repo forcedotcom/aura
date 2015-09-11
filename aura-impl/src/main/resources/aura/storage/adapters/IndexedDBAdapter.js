@@ -164,12 +164,13 @@ IndexedDBAdapter.prototype.getAll = function() {
  * Stores an item in the ObjectStore.
  * @param {String} key the key.key for the item
  * @param {Object} item the item to store.
+ * @param {Number} size of item value
  * @return {Promise} a promise that resolves when the item is stored.
  */
-IndexedDBAdapter.prototype.setItem = function(key, item) {
+IndexedDBAdapter.prototype.setItem = function(key, item, size) {
     var that = this;
     var execute = function(success, error) {
-        that.setItemInternal(key, item, success, error);
+        that.setItemInternal(key, item, size, success, error);
     };
     return this.enqueue(execute);
 };
@@ -394,11 +395,11 @@ IndexedDBAdapter.prototype.walkInternal = function(success, error, sendResult) {
  * Sets an item in the ObjectStore.
  * @param {String} key the key to set.
  * @param {String} item the item to set for the key.
+ * @param {Number} size of item value
  * @param {function} success the promise success callback.
  * @param {function} error the promise error callback.
  */
-IndexedDBAdapter.prototype.setItemInternal = function(key, item, success, error) {
-    var size = $A.util.estimateSize(key) + $A.util.estimateSize(item["value"]);
+IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, success, error) {
     var expires = +item["expires"];
     var that = this;
     if (!expires) {
@@ -410,6 +411,9 @@ IndexedDBAdapter.prototype.setItemInternal = function(key, item, success, error)
         "size":size,
         "expires": expires
     };
+
+    // maxSize check happens in AuraStorage.
+    // TODO: refactor size calculations
     if (size > this.limitItem) {
         error(new Error("IndexedDBAdapter.setItem(): Item larger than size limit of " + this.limitItem));
         return;

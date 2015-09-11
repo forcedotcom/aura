@@ -201,19 +201,20 @@
                     } else {
                         lastItem = firstItem = listItems.getElement();
                     }
-                    var pillHeight = this._getActualHeight(firstItem);
+                    if (firstItem) {
+                    	var pillHeight = this._getActualHeight(firstItem);
 
-                    //set the maximum height of the pill container based on maxLines attribute
-                    var list = cmp.find("list");
-                    var limitedHeight = pillHeight * maxLines;
-                    var scrollHeight = list.getElement().scrollHeight;
-                    list.getElement().style.maxHeight = limitedHeight + "px";
+                        //set the maximum height of the pill container based on maxLines attribute
+                        var list = cmp.find("list");
+                        var limitedHeight = pillHeight * maxLines;
+                        var scrollHeight = list.getElement().scrollHeight;
+                        list.getElement().style.maxHeight = limitedHeight + "px";
 
-                    //only show the Show More button if there's overflow
-                    var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
-                    console.log("lastItemBottom: " + lastItemBottom + " limitedHeight: " + limitedHeight);
-                    if (lastItemBottom > limitedHeight) {
-                        hideShowMore = false;
+                        //only show the Show More button if there's overflow
+                        var lastItemBottom = lastItem.offsetTop - list.getElement().offsetTop + pillHeight;
+                        if (lastItemBottom > limitedHeight) {
+                            hideShowMore = false;
+                        }
                     }
                 }
             }

@@ -29,12 +29,7 @@
 			var triggers = ['topLeftWestlabel', 'topLeftNorthlabel', 'topLeftSouthlabel', 'topLeftEastlabel',
 			                'topCenterWestlabel', 'topCenterNorthlabel', 'topCenterSouthlabel', 'topCenterEastlabel', 
 			                'topRightWestlabel', 'topRightNorthlabel', 'topRightSouthlabel', 'topRightEastlabel'];
-			
-			for(var i = 0; i < tooltips.length; i++) {
-				var tt = component.find(tooltips[i]);
-				$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-			}
-			
+
 			for(var i = 0; i < tooltips.length; i++) {
 				
 				function topRow(ttLabel, triggerLabel) {
@@ -97,12 +92,7 @@
 			var triggers = ['leftCenterWestlabel', 'leftCenterNorthlabel', 'leftCenterSouthlabel', 'leftCenterEastlabel',
 			                'centerCenterWestlabel', 'centerCenterNorthlabel', 'centerCenterSouthlabel', 'centerCenterEastlabel', 
 			                'rightCenterWestlabel', 'rightCenterNorthlabel', 'rightCenterSouthlabel', 'rightCenterEastlabel'];
-			
-			for(var i = 0; i < tooltips.length; i++) {
-				var tt = component.find(tooltips[i]);
-				$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-			}
-			
+
 			for(var i = 0; i < tooltips.length; i++) {
 				
 				function centerRow(ttLabel, triggerLabel) {
@@ -178,12 +168,7 @@
 			var triggers = ['bottomLeftWestlabel', 'bottomLeftNorthlabel', 'bottomLeftSouthlabel', 'bottomLeftEastlabel',
 			                'bottomCenterWestlabel', 'bottomCenterNorthlabel', 'bottomCenterSouthlabel', 'bottomCenterEastlabel', 
 			                'bottomRightWestlabel', 'bottomRightNorthlabel', 'bottomRightSouthlabel', 'bottomRightEastlabel'];
-			
-			for(var i = 0; i < tooltips.length; i++) {
-				var tt = component.find(tooltips[i]);
-				$A.test.assertFalse($A.util.hasClass(tt._tooltip,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-			}
-			
+
 			for(var i = 0; i < tooltips.length; i++) {
 				
 				function bottomRow(ttLabel, triggerLabel) {

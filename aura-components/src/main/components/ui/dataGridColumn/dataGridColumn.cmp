@@ -25,11 +25,13 @@
 	<aura:attribute name="required" type="Boolean" default="false" description="Required field in current layout."/>
 	<aura:attribute name="direction" type="String" description="{ '', ascending, descending }"/>
 	<aura:attribute name="initialDirectionOnSort" type="String" default="descending" description="The initial sort direction when user clicks on the column header: {ascending, descending}"/>
-	<aura:attribute name="ascLabel" type="String" default="Ascending" description="Accessibility label to use when column is ascending"/>
-	<aura:attribute name="descLabel" type="String" default="Descending" description="Accessibility label to use when column is descending"/>
+	<aura:attribute name="ascLabel" type="String" default="Sorted Ascending" description="Accessibility label to use when column is ascending"/>
+	<aura:attribute name="descLabel" type="String" default="Sorted Descending" description="Accessibility label to use when column is descending"/>
 	<aura:attribute name="order" type="Integer" default="0" description="The ordering of the sort (non-zero applies to multilevel sort only)."/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
     <aura:attribute name="onsortchange" type="Aura.Action"/>
+    
+    <aura:attribute name="assistiveSortText" type="String" default="Sort" description="Accessibility label for sort trigger links"/>
 	
 	<aura:attribute name="width" type="Integer" default="-1" description="Fixed width of the column in pixels."/>
 	
@@ -52,6 +54,7 @@
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">
 			<a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
+				<span class="assistiveText">{! v.disabled ? '' : v.assistiveSortText}</span>
 				{!v.label}
 				<span class="assistiveText">{! v.disabled ? ''
 												: ((v.direction == 'ascending') ? v.ascLabel 

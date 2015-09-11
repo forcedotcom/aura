@@ -16,6 +16,8 @@
 ({
   browsers: ["-IE7","-IE8"],
   
+  ASSISTIVE_SORT_TEXT : "Sort",
+  
   /**************************************************HELPER FUNCTIONS**************************************************/
   
   compare: function(sortBy) {
@@ -63,7 +65,7 @@
 		  if (ths[i].firstChild.nodeType == 3) { // text node
 			  headers.push($A.test.getText(ths[i]).toLowerCase());
 		  } else {
-			  headers.push($A.test.getText(ths[i].firstChild.firstChild).toLowerCase());
+			  headers.push($A.test.getText(ths[i].firstChild.childNodes[1]).toLowerCase());
 		  }
 	  }
 	  
@@ -86,7 +88,7 @@
 	  var ths = thead.getElementsByTagName("th");
 	  var anchor = ths[index].firstChild;
 	  if (anchor.nodeType != 3) {
-		  return $A.test.getText(anchor.getElementsByTagName("span")[0]);
+		  return $A.test.getText(anchor.getElementsByTagName("span")[1]);
 	  }
 	  return "";
   },
@@ -157,7 +159,7 @@
 			  // test aura:method sort
 	    	  cmp.find("grid").sort("-name");
 	    	  var that = this;
-	    	  $A.test.addWaitForWithFailureMessage("descending", function() {
+	    	  $A.test.addWaitForWithFailureMessage("sorted descending", function() {
 				  return that.getColumnDirection(1).toLowerCase();
 		      }, "Method sort does not work correctly");	
 	      }, function(cmp) {

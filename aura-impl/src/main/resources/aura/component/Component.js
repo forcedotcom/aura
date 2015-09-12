@@ -1735,7 +1735,7 @@ Component.prototype.createComponentStack = function(facets,valueProvider,localCr
                     action.setCreationPathIndex(index);
                 }
                 $A.getContext().setCurrentAccess(valueProvider);
-                components.push($A.componentService["newComponentDeprecated"](config, valueProvider, localCreation, true));
+                components.push($A.componentService["newComponentDeprecated"](config, (config["attributes"]&&config["attributes"]["valueProvider"])||valueProvider, localCreation, true));
                 $A.getContext().releaseCurrentAccess();
             } else {
                 // KRIS: HALO:
@@ -1824,6 +1824,11 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
+                        for(var facet=0;facet<defaultValue.length;facet++){
+                            if(defaultValue[facet]["attributes"]&&!defaultValue[facet]["attributes"]["valueProvider"]){
+                                defaultValue[facet]["attributes"]["valueProvider"]=this;
+                            }
+                        }
                         configValues[defaultDef.getDescriptor().getName()] = defaultValue;
                     } else {
                         //JBUCH: HALO: FIXME: FIND A BETTER WAY TO HANDLE DEFAULT EXPRESSIONS

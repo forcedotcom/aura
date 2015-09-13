@@ -301,7 +301,7 @@ Test.Aura.Provider.ContextValueProviderTest = function() {
         }
 
         [Fact]
-        function SetKeyHasDotThrows() {
+        function SetKeyWithDotThrows() {
             var target = getCVP();
             var actual;
 
@@ -311,9 +311,6 @@ Test.Aura.Provider.ContextValueProviderTest = function() {
                 });
             });
 
-            Assert.Equal(1, $A.assert.Calls.length);
-            Assert.Equal(false, $A.assert.Calls[0].Arguments.value);
-            Assert.Equal("Unable to set value for key 'blah.blah', did you add an extra '.'?", $A.assert.Calls[0].Arguments.message);
             Assert.Equal("Attempting to set an unknown global item 'blah.blah'. Global items must be pre-registered and have a default value", actual.message);
         }
 

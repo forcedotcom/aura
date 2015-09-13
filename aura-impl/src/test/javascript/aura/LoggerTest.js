@@ -17,7 +17,7 @@ Function.RegisterNamespace("Test.Aura");
 
 [Fixture]
 Test.Aura.LoggerTest = function() {
-    var Aura = {Utils:{SecureFilters:{}}};
+    var Aura = {Utils:{}};
 
     Mocks.GetMocks(Object.Global(), {
         "Aura": Aura,
@@ -57,28 +57,64 @@ Test.Aura.LoggerTest = function() {
 
     [Fixture]
     function info() {
-
         var logger = new Aura.Utils.Logger(),
             level, message, error;
-        var cb = function(l, m, e) {
-            level = l;
-            message = m;
-            error = e;
-        };
+
 
         [Fact]
-        function InfoLog() {
-            var expectedLevel = "INFO",
-                expectedMsg = "expectedMsg";
-            logger.subscribe(expectedLevel, cb);
+        function InfoLogsWithINFOLevel() {
+            var level = "INFO";
+            var expected = "INFO";
+            var actual;
+            logger.subscribe(level, function(level, message, error) {
+                actual = level;
+            });
             mockUtil(function() {
-                logger.info(expectedMsg);
+                logger.info(expected);
             });
 
-            Assert.Equal(expectedLevel, level);
-            Assert.Equal(expectedMsg, message);
-            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
-            Assert.Equal(undefined, error);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function InfoLogsMessage() {
+            var level = "INFO";
+            var expected = "expectedMsg";
+            var actual;
+            logger.subscribe(level, function(level, message, error) {
+                actual = message;
+            });
+            mockUtil(function() {
+                logger.info(expected);
+            });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function SubscribeAddsSubscription() {
+            var level = "INFO";
+            var expected = "expectedMsg";
+            var actual;
+
+            logger.subscribe(level, function(level, message, error) {});
+
+            Assert.True(logger.hasSubscriptions(level));
+        }
+
+        [Fact]
+        function InfoLogsDoesNotHaveError() {
+            var level = "INFO";
+            var expected = "expectedMsg";
+            var actual;
+            logger.subscribe(level, function(level, message, error) {
+                actual = error;
+            });
+            mockUtil(function() {
+                logger.info(expected);
+            });
+
+            Assert.Undefined(error);
         }
     }
 
@@ -102,10 +138,7 @@ Test.Aura.LoggerTest = function() {
                 logger.warning(expectedMsg);
             });
 
-            Assert.Equal(expectedLevel, level);
             Assert.Equal(expectedMsg, message);
-            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
-            Assert.Equal(undefined, error);
         }
     }
 
@@ -130,10 +163,7 @@ Test.Aura.LoggerTest = function() {
                 logger.assert(false, expectedMsg);
             });
 
-            Assert.Equal(expectedLevel, level);
             Assert.Equal("Assertion Failed!: " + expectedMsg + " : " + condition, message);
-            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
-            Assert.Equal(undefined, error);
         }
 
         [Fact]
@@ -154,41 +184,67 @@ Test.Aura.LoggerTest = function() {
 
         var logger = new Aura.Utils.Logger(),
             level, message, error;
-        var cb = function(l, m, e) {
-            level = l;
-            message = m;
-            error = e;
-        };
 
         [Fact]
-        function ErrorLog() {
+        function ErrorsLoggedToSubscriberUseERRORLevel() {
+            var actual;
+            var expected = "ERROR";
             var expectedLevel = "ERROR",
                 expectedMsg = "expectedMsg";
-            logger.subscribe(expectedLevel, cb);
+            logger.subscribe(expectedLevel, function(level, message, error){actual = level;});
+            
             mockUtil(function() {
                 logger.error(expectedMsg);
             });
 
-            Assert.Equal(expectedLevel, level);
-            Assert.Equal(0, message.indexOf(expectedMsg));
-            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
-            Assert.Equal(undefined, error);
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function ErrorsLoggedToSubscriber() {
+            var actual;
+            var expected = "expectedMsg";
+            logger.subscribe("ERROR", function(level, message, error){actual = message;});
+            
+            mockUtil(function() {
+                logger.error(expected);
+            });
+
+            Assert.Contains(expected, actual);
+        }
+
+        [Fact]
+        function ErrorsSubscriberAdded() {
+            var actual;
+
+            logger.subscribe("ERROR", function(level, message, error){});
+            actual = logger.hasSubscriptions("ERROR");
+
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ErrorNotSpecified() {
+            var actual;
+            logger.subscribe("ERROR", function(level, message, error){ actual = error; });
+
+            mockUtil(function() {
+                logger.error("error");
+            });
+
+            Assert.Undefined(actual);
         }
 
         [Fact]
         function NoMessageWhenShowErrorsFalse() {
             var expectedLevel = "ERROR",
                 expectedMsg = "expectedMsg";
-            logger.subscribe(expectedLevel, cb);
+            logger.subscribe(expectedLevel, function(level, message, error){});
             showErrors = false;
             mockUtil(function() {
                 logger.error(expectedMsg);
             });
 
-            Assert.Equal(expectedLevel, level);
-            Assert.Equal(0, message.indexOf(expectedMsg));
-            Assert.Equal(true, logger.hasSubscriptions(expectedLevel));
-            Assert.Equal(undefined, error);
             Assert.False(messageCalled);
             // reset
             messageCalled = false;
@@ -229,85 +285,64 @@ Test.Aura.LoggerTest = function() {
         [Fact]
         function SubscriberRemoved() {
             logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
-
             logger.unsubscribe("INFO", cb);
+
             Assert.False(logger.hasSubscriptions("INFO"));
         }
 
         [Fact]
         function SubscriberForLevelRemoved() {
             logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
             logger.subscribe("WARNING", cb);
-            Assert.True(logger.hasSubscriptions("Warning"));
-
             logger.unsubscribe("INFO", cb);
+
             Assert.False(logger.hasSubscriptions("INFO"));
-            Assert.True(logger.hasSubscriptions("WARNING"));
         }
 
         [Fact] // splice makes iteration dependent on traversal direction
         function OlderSubscriberRemoved() {
             logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
             logger.subscribe("WARNING", cb);
-            Assert.True(logger.hasSubscriptions("Warning"));
 
             logger.unsubscribe("INFO", cb);
             Assert.False(logger.hasSubscriptions("INFO"));
-            Assert.True(logger.hasSubscriptions("WARNING"));
         }
 
         [Fact] // splice makes iteration dependent on traversal direction
         function NewerSubscriberRemoved() {
             logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
             logger.subscribe("WARNING", cb);
-            Assert.True(logger.hasSubscriptions("Warning"));
-
             logger.unsubscribe("WARNING", cb);
-            Assert.True(logger.hasSubscriptions("INFO"));
+
             Assert.False(logger.hasSubscriptions("WARNING"));
         }
 
         [Fact]
         function NoOpIfNotSubscriber() {
             logger.unsubscribe("INFO", cb);
-            Assert.False(logger.hasSubscriptions("INFO"));
-
             logger.subscribe("INFO", cb);
+
             Assert.True(logger.hasSubscriptions("InFo"));
         }
         
         [Fact]
         function NonSubscriberNotRemoved() {
             var expectedMsg = "expectedMsg";
-            logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
 
+            logger.subscribe("INFO", cb);
             logger.unsubscribe("INFO", function(){});
-            Assert.True(logger.hasSubscriptions("INFO"));
             
-            mockUtil(function() {
-                logger.info(expectedMsg);
-            });
-            Assert.Equal(expectedMsg, message);
+            Assert.True(logger.hasSubscriptions("INFO"));
         }
 
         [Fact]
         function WrongLevelNotRemoved() {
             var expectedMsg = "expectedMsg";
-            logger.subscribe("INFO", cb);
-            Assert.True(logger.hasSubscriptions("InFo"));
 
+            logger.subscribe("INFO", cb);
             logger.unsubscribe("WARNING", cb);
-            Assert.True(logger.hasSubscriptions("INFO"));
             
-            mockUtil(function() {
-                logger.info(expectedMsg);
-            });
-            Assert.Equal(expectedMsg, message);
+            Assert.True(logger.hasSubscriptions("INFO"));
         }
     }
 

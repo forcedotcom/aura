@@ -50,9 +50,9 @@ Test.Components.Ui.Scroller.SnapPluginTests=function(){
 		})]
 		function GetsVerticalSnapSize(data){
 			//Arrange
-			var expected = data.expected,
-				actual = 0;
-				snapPlugin = new plugins.Snap();
+			var expected = data.expected;
+			var actual = 0;
+			var snapPlugin = new plugins.Snap();
 			snapPlugin.itemHeight = data.itemHeight;
 			snapPlugin.wrapperHeight = data.wrapperHeight;
 

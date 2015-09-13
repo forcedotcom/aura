@@ -36,7 +36,8 @@ Test.Aura.Util.SizeEstimatorTest = function() {
                     }
                 }
             },
-            navigator: { userAgent:'' }
+            navigator: { userAgent:'' },
+            "SizeEstimator": function(){}
         })(function(){
             [Import("aura-impl/src/main/resources/aura/util/SizeEstimator.js")]
             delegate();

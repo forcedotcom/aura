@@ -15,7 +15,7 @@
  */
 Function.RegisterNamespace("Test.Components.Ui.Scroller");
 
-[Fixture, Skip("@dval: Fix classList dependency, Im in a rush...")]
+[Fixture]
 Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 
 	var targetHelper,
@@ -53,6 +53,7 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 						dataProvider:function(){expected=true;}	
 					}
 				};
+				infiniteLoadingPlugin._setState = function(){};
 				infiniteLoadingPlugin.fetchData();
 			});
 
@@ -75,15 +76,14 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 						}	
 					}
 				};
+				infiniteLoadingPlugin._setState = function(){};
+				infiniteLoadingPlugin.appendItems = function(items) {
+					itemsLength = items.length;
+				}
 				infiniteLoadingPlugin.fetchData();
 			});
-			appendItemsMock=Mocks.GetMock(infiniteLoadingPlugin, "appendItems", function(items){
-				itemsLength=items.length;
-			});
 
-			appendItemsMock(function(){
-				callback(0,[1,2]);
-			});
+			callback([1,[2,3]]);
 
 			Assert.True(itemsLength===2);
 		}
@@ -104,12 +104,13 @@ Test.Components.Ui.Scroller.EndlessPluginTests=function(){
 						}	
 					}
 				};
+				infiniteLoadingPlugin._setState = function(){};
 				infiniteLoadingPlugin.fetchData();
 			});
 			appendItemsMock=Mocks.GetMock(infiniteLoadingPlugin, "appendItems", function(items){});
 
 			appendItemsMock(function(){
-				callback(0,[]);
+				callback('nomoredata');
 			});
 
 			Assert.True(infiniteLoadingPlugin._ilNoMoreData);

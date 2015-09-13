@@ -97,7 +97,7 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 		}
 
 		[Fact]
-		function instantiationWithWindow() {
+		function instantiationWithWindowCalculatesWidth() {
 			var el = windowMock;
 			windowMock.innerWidth = 415;
 			windowMock.document = {
@@ -106,9 +106,26 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 					clientHeight: 200
 				}
 			}
+
 			var proxy = new positioningNS.ElementProxy(el, "foo");
-			Assert.Equal(el, proxy.getNode());
+			
 			Assert.Equal(415, proxy.width);
+		}
+
+		[Fact]
+		function instantiationWithWindowSetsNodeAsWindow() {
+			var el = windowMock;
+			windowMock.innerWidth = 415;
+			windowMock.document = {
+				documentElement : {
+					clientWidth: 415,
+					clientHeight: 200
+				}
+			}
+
+			var proxy = new positioningNS.ElementProxy(el, "foo");
+			
+			Assert.Equal(el, proxy.getNode());
 		}
 
 		[Fact] 
@@ -134,10 +151,19 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 		function setLeft() {
 			var el = getMockElement("foo");
 			var proxy = new positioningNS.ElementProxy(el, "foo");
+
 			proxy.set("left", 413);
 
-
 			Assert.Equal(413, proxy.left);
+		}
+
+		[Fact]
+		function SettingValueMakesProxyDirty() {
+			var el = getMockElement("foo");
+			var proxy = new positioningNS.ElementProxy(el, "foo");
+
+			proxy.set("left", 413);
+
 			Assert.True(proxy.isDirty(), "Proxy should be dirty");
 		}
 	}
@@ -147,14 +173,21 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 	function Refresh() {
 
 		[Fact]
-		function refreshLeft() {
+		function ElementProxyParsesLeftProperty() {
+			var el = getMockElement("foo", {top: 0, left:1, right:500, bottom:500, width:500, height:500});
+
+			var proxy = new positioningNS.ElementProxy(el, "bar");
+
+			Assert.Equal(1, proxy.left);
+		}
+
+		[Fact]
+		function ElementProxyRefreshReparsesElementLeftProperty() {
 			var el = getMockElement("foo", {top: 0, left:1, right:500, bottom:500, width:500, height:500});
 			var proxy = new positioningNS.ElementProxy(el, "bar");
-			Assert.Equal(1, proxy.left);
 
 			el._dimensions.left = 25;
 			proxy.refresh();
-
 
 			Assert.Equal(25, proxy.left);
 		}
@@ -165,8 +198,65 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 
 		[Fact]
 		function bakeLeft() {
+			var el = getMockElement("foo",
+				{
+					top:0, 
+					left:0, 
+					width:20, 
+					height: 20
+				}, 
+				{
+					left: "0px",
+					top: "0px"
+			});
+			var expected = {"top":"0px", "left":"314px"};
+			
+			var proxy = new positioningNS.ElementProxy(el, "foo");
+			proxy.set("left", 314);
+			proxy.bake();
+			var actual = {"top":el.style.top, "left":el.style.left};
 
-			Assert.Equal(true, true);
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function bakeTop() {
+			var el = getMockElement("foo", {top:0, left:0, width:20, height: 20},{
+				top: "0px",
+				left: "0px"
+			});
+			var expected = {"top":"314px", "left": "0px"};
+
+			var proxy = new positioningNS.ElementProxy(el, "foo");
+			proxy.set("top", 314);
+			proxy.bake();
+			var actual = {"top": el.style.top, "left": el.style.left };
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function bakeDeepInDom() {
+			var body = new MockElement({top:0, left:0, width:600, height:800});
+			var wrapper = new MockElement({top:100,left:400, width:600, height: 800 }, body);
+			var el = new MockElement({top:200, left: 800, width:400, height:400}, wrapper, {
+				left: "400px",
+				top: "100px"
+			});
+			var expected = {"left": "-380px", "top": "-80px"};
+
+			el.id = "foo";
+			var proxy = new positioningNS.ElementProxy(el, "foo");
+			proxy.set("top", 20);
+			proxy.set("left", 20)
+			proxy.bake();
+			var actual = {"left": el.style.left, "top": el.style.top }; 
+
+			Assert.Equal(expected, actual);
+		}
+
+		[Fact]
+		function backSetsProxyToClean() {
 			var el = getMockElement("foo",
 				{
 					top:0, 
@@ -181,50 +271,9 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 			
 			var proxy = new positioningNS.ElementProxy(el, "foo");
 			proxy.set("left", 314);
-
-			Assert.True(proxy.isDirty(), "should be dirty");
 			proxy.bake();
 
-			Assert.Equal("314px", el.style.left);
-			Assert.Equal("0px", el.style.top);
-			Assert.False(proxy.isDirty(), "should be clean");
-		}
-
-		[Fact]
-		function bakeTop() {
-
-			var el = getMockElement("foo", {top:0, left:0, width:20, height: 20},{
-				top: "0px",
-				left: "0px"
-			});
-
-			var proxy = new positioningNS.ElementProxy(el, "foo");
-			proxy.set("top", 314);
-			Assert.True(proxy.isDirty(), "should be dirty");
-			proxy.bake();
-			Assert.Equal("0px", el.style.left);
-			Assert.Equal("314px", el.style.top);
-			Assert.False(proxy.isDirty(), "should be clean");
-		}
-
-		[Fact]
-		function bakeDeepInDom() {
-
-			var body = new MockElement({top:0, left:0, width:600, height:800});
-			var wrapper = new MockElement({top:100,left:400, width:600, height: 800 }, body);
-			var el = new MockElement({top:200, left: 800, width:400, height:400}, wrapper, {
-				left: "400px",
-				top: "100px"
-			});
-
-			el.id = "foo";
-			var proxy = new positioningNS.ElementProxy(el, "foo");
-			proxy.set("top", 20);
-			proxy.set("left", 20)
-			proxy.bake();
-
-			Assert.Equal("-380px", el.style.left);
-			Assert.Equal("-80px", el.style.top);
+			Assert.False(proxy.isDirty());
 		}
 	}
 

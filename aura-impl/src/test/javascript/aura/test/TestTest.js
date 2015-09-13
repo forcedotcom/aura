@@ -36,7 +36,8 @@ Test.Aura.TestTest = function() {
         "JsonTestInstance": function(){}
     })(function(){
         [Import("aura-impl/src/main/resources/aura/component/Component.js"),
-        Import("aura-impl/src/main/resources/aura/test/Test.js")]
+        Import("aura-impl/src/main/resources/aura/test/Test.js"),
+        Import("aura-impl/src/main/resources/aura/test/Test_private.js")]
     });
 
     var getWindowMock = function() {
@@ -47,16 +48,23 @@ Test.Aura.TestTest = function() {
     function clearExpected() {
 
         [Fact]
-        function DoesNotClearMultiplePreEntiresWhenExpectedMatches() { 
+        function DoesNotClearDuplicatePreEntiresWhenExpectedMatches() { 
             var preArray = ["Mammoth", "Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
+            $A.test.clearExpected(preArray, expectedArray);
 
-                Assert.Equal([undefined, "Mammoth", undefined], preArray);
-                Assert.Equal([undefined, undefined], expectedArray);
-            });
+            Assert.Equal([undefined, "Mammoth", undefined], preArray);
+        }
+
+        [Fact]
+        function DoesClearExpectedEntiresWhenExpectedMatchesOnPreDuplicates() { 
+            var preArray = ["Mammoth", "Mammoth", "Lake Tahoe"];
+            var expectedArray = ["Lake Tahoe", "Mammoth"];
+
+            $A.test.clearExpected(preArray, expectedArray);
+
+            Assert.Equal([undefined, undefined], expectedArray);
         }
 
         [Fact]
@@ -64,12 +72,19 @@ Test.Aura.TestTest = function() {
             var preArray = ["Mammoth", "Lake Tahoe"];
             var expectedArray = ["Lake Tahoe", "Mammoth", "Mammoth"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
+            $A.test.clearExpected(preArray, expectedArray);
 
-                Assert.Equal([undefined, undefined], preArray);
-                Assert.Equal([undefined, undefined, "Mammoth"], expectedArray);
-            });
+            Assert.Equal([undefined, undefined, "Mammoth"], expectedArray);
+        }
+
+        [Fact]
+        function DoesClearMultiplePreEntiresWhenPreMatches() { 
+            var preArray = ["Mammoth", "Lake Tahoe"];
+            var expectedArray = ["Lake Tahoe", "Mammoth", "Mammoth"];
+
+            $A.test.clearExpected(preArray, expectedArray);
+
+            Assert.Equal([undefined, undefined], preArray);
         }
 
         [Fact]
@@ -80,39 +95,54 @@ Test.Aura.TestTest = function() {
             var preArray = ["undefined something", "something undefined"];
             var expectedArray = ["undefined something", "don't clear me"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
-
-                Assert.Equal([undefined, "don't clear me"], expectedArray);
-            });
+            new $A.test.clearExpected(preArray, expectedArray);
+            
+            Assert.Equal([undefined, "don't clear me"], expectedArray);
         }
 
         [Fact]
-        function ClearsAllWithSameArrayForBothParams() { 
+        function ClearsPreWithSameArrayForBothParams() { 
             var expected = [undefined, undefined, undefined];
             var preArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
             var expectedArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
+            $A.test.clearExpected(preArray, expectedArray);
 
-                Assert.Equal(expected, preArray);
-                Assert.Equal(expected, expectedArray);
-            });
+            Assert.Equal(expected, preArray);
         }
 
         [Fact]
-        function ClearsAllWithSameArrayContainingDuplicateEntiresForBothParams() { 
+        function ClearsExpectedWithSameArrayForBothParams() { 
+            var expected = [undefined, undefined, undefined];
+            var preArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
+            var expectedArray = ["Mammoth", "Lake Tahoe", "Yosemite"];
+
+            $A.test.clearExpected(preArray, expectedArray);
+
+            Assert.Equal(expected, expectedArray);
+        }
+
+        [Fact]
+        function ClearsPreWithSameArrayContainingDuplicateEntiresForBothParams() { 
             var expected = [undefined, undefined, undefined, undefined];
             var preArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
             var expectedArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
+            
+            $A.test.clearExpected(preArray, expectedArray);
+            
+            Assert.Equal(expected, preArray);
+        }
 
-                Assert.Equal(expected, preArray);
-                Assert.Equal(expected, expectedArray);
-            });
+        [Fact]
+        function ClearsExpectedWithSameArrayContainingDuplicateEntiresForBothParams() { 
+            var expected = [undefined, undefined, undefined, undefined];
+            var preArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
+            var expectedArray = ["Yosemite", "Yosemite", "Lake Tahoe", "Lake Tahoe"];
+
+            $A.test.clearExpected(preArray, expectedArray);
+            
+            Assert.Equal(expected, expectedArray);
         }
 
         [Fact]
@@ -120,12 +150,9 @@ Test.Aura.TestTest = function() {
             var preArray = [];
             var expectedArray = ["Yosemite", "Lake Tahoe"];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
-
-                Assert.Equal([], preArray);
-                Assert.Equal(["Yosemite", "Lake Tahoe"], expectedArray);
-            });
+            $A.test.clearExpected(preArray, expectedArray);
+                        
+            Assert.Equal(["Yosemite", "Lake Tahoe"], expectedArray);
         }
 
         [Fact]
@@ -133,12 +160,9 @@ Test.Aura.TestTest = function() {
             var preArray = ["Yosemite", "Lake Tahoe"];
             var expectedArray = [];
 
-            getWindowMock(function() {
-                new $A.test.TestInstance().clearExpected(preArray, expectedArray);
+            $A.test.clearExpected(preArray, expectedArray);
 
-                Assert.Equal(["Yosemite", "Lake Tahoe"], preArray);
-                Assert.Equal([], expectedArray);
-            });
+            Assert.Equal(["Yosemite", "Lake Tahoe"], preArray);
         }
     }
 }

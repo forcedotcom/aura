@@ -19,6 +19,7 @@ Function.RegisterNamespace("Test.Components.Ui.OutputDateTime");
 [Fixture]
 Test.Components.Ui.OutputDateTime.HelperTest = function(){
 	var targetHelper;	
+	var message;
 	
 	// Aura Files need to be loaded as Json, to catch the object they contain
 	ImportJson("aura-components/src/main/components/ui/outputDateTime/outputDateTimeHelper.js",function(path,result){
@@ -63,7 +64,6 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 
             // Assert
             Assert.Equal(displayTime, targetElement.textContent);
-            Assert.Equal(displayTime, targetElement.innerText);
         }
         
         [Fact]
@@ -93,7 +93,6 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 
             // Assert
             Assert.Equal("", targetElement.textContent);
-            Assert.Equal("", targetElement.innerText);
         }        
     }
     
@@ -150,7 +149,8 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
         	// Arrange        	
         	var expectedDate = "Date";
         	var expectedFormat = "YYYY-MM-DD 00:00";
-        	var expectedLang = "en";        	
+        	var expectedLang = "en";
+        	var expected = "DateYYYY-MM-DD 00:00en";        	
         	var actual;	
 			
 			var helper={	
@@ -193,7 +193,7 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
 				localizationService: {   
 					UTCToWallTime: function(dateObj,timezone, callback ) { callback(dateObj); },
-					formatDateTimeUTC: function(walltime, format, langLocale) { return "Date"+format+langLocale; },
+					formatDateTimeUTC: function(walltime, format, langLocale) { return expectedDate+format+langLocale; },
                     parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
                     translateToOtherCalendar: function(date) { return date; }
 	            }
@@ -206,9 +206,7 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 			});			
 
             // Assert
-            Assert.NotEqual(-1, actual.indexOf(expectedDate));
-            Assert.NotEqual(-1, actual.indexOf(expectedFormat));
-            Assert.NotEqual(-1, actual.indexOf(expectedLang));
+            Assert.Equal(expected, actual);
         }
         
         
@@ -259,7 +257,7 @@ Test.Components.Ui.OutputDateTime.HelperTest = function(){
 			var mockContext = Mocks.GetMock(Object.Global(), "$A", {                                
 				localizationService: {   
 					UTCToWallTime: function(dateObj,timezone, callback) { callback(dateObj); },			
-					formatDateTimeUTC: function(walltime, format, langLocale) { throw {message: expected}; },
+					formatDateTimeUTC: function(walltime, format, langLocale) { throw {"message": expected}; },
 
 					parseDateTimeISO8601: function(datetimeString) { return new Date(datetimeString); },
                     translateToOtherCalendar: function(date) { return date; }           	

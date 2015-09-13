@@ -24,160 +24,6 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 		targetHelper=result;
 	});
 
-	[Fixture]
-    function initPages(){
-    	[Fact, Skip("JBUCH: HALO: THIS TEST IS TOO COMPLICATED. FIX ME.")]
-		function InitPagesUsingPageComponents(){
-			// Arrange
-			var expected = [{
-				isInstanceOf : function(expression) {
-					return expression !== "aura:iteration";
-				},
-				getValue : function() {
-					return {
-						set: function(label, value) {}
-					}
-				},
-				getSuper: function() {
-					return {
-						isInstanceOf: function() {
-							return false;
-						}
-					}
-				},
-				pageIndex : 0,
-				parent : null,
-				width : 3,
-				height : 4
-			}];
-
-			var targetComponent = {
-				set: function(expression,value){},
-				find : function(expression) {
-					return {
-                        set:function(){},
-						getElement : function() {
-							return null;
-						}
-					}
-				},
-				getSuper: function() {
-					return {
-                        set:function(){},
-						isInstanceOf: function() {
-							return false;
-						}
-					}
-				},
-
-				get: function(expression) {
-					if(expression=== 'v.continuousFlow'){
-                        return false;
-                    } else if (expression === "v.pageComponents") {
-						return {
-							set : function(key, value, bool) {
-								actual = value;
-							}
-						};
-					} else if (expression === "v.priv_currentPage") {
-						return {
-							set : function(key, value) {
-								actual = -1;
-							}
-						};
-					}
-				},
-				_width : 450
-			}
-
-			var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
-				util : {
-					isComponent : function(expression) {return true;}
-				}
-			}));
-			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				SHOW_SELECTED_PAGE_ONLY : true,
-				getPageModels : function(value){},
-				getPageComponents : function(value){return expected;},
-				getSnap : function(value){},
-				initPageIndicator : function(value){},
-				initScroller : function(value){}
-			});
-
-			var actual = null;
-
-			// Act
-            mockAura(function(){
-                mockHelperMethods(function(){
-                    targetHelper.initPages(targetComponent);
-                })
-            });
-
-			// Assert
-			Assert.Equal(expected,actual);
-		}
-
-        [Fact, Skip("JBUCH: HALO: THIS TEST IS TOO COMPLICATED. FIX ME.")]
-        function InitPagesUsingPageModel(){
-			// Arrange
-			var expected = ["page from model"];
-
-			var targetComponent = {
-				get : function(expression) {return false;},
-				find : function(expression) {
-					return {
-						getElement : function() {
-							return null;
-						}
-					}
-				},
-				getValue : function(expression) {
-					if (expression === "v.pageComponents") {
-						return {
-							setValue : function(value, bool) {
-								actual = value;
-							}
-						};
-					} else if (expression === "v.priv_currentPage") {
-						return {
-							setValue : function(value) {
-								actual = -1;
-							}
-						};
-					}
-				},
-				_width : 450
-			}
-
-			var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
-				componentService : {
-					newComponentDeprecated : function(component, locationCreation, doForce) {return expected;}
-				}
-			}));
-			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
-				SHOW_SELECTED_PAGE_ONLY : true,
-				getPageModels : function(value) {return [{dummy : "dummy"}];},
-				getPageComponents : function(value) {return [];},
-				getSnap : function(value){},
-				initPageIndicator : function(value){},
-				initScroller : function(value){}
-			});
-
-			var acutal = null;
-
-			// Act
-			mockAura(function(){
-				mockHelperMethods(function(){
-					targetHelper.initPages(targetComponent);
-				})
-			});
-
-			// Assert
-			Assert.Equal(expected,actual);
-		}
-
-    }
-
     [Fixture]
     function selectPage(){
     	[Fact]
@@ -214,7 +60,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 				}
 			});
 
-			actual = false;
+			var actual = false;
 
 			var mockAura = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({}, {
 				util : {
@@ -242,7 +88,6 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					}
 				}
 			};
-
 			var mockHelperMethods = Mocks.GetMocks(targetHelper, {
 				getPageComponents : function(value){return ["page1", "page2", "page3"];},
 				getScroller : function(value){
@@ -253,8 +98,7 @@ Test.Components.Ui.Carousel.CarouselHelperTest=function(){
 					};
 				}
 			});
-
-			actual = false;
+			var actual = false;
 
 			// Act
 			mockHelperMethods(function(){

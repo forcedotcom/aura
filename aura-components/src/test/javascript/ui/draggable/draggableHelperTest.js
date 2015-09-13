@@ -108,6 +108,7 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 				data : expectedDataTransfer,
 				isInAccessibilityMode : false
 			};		
+			
 			//Act
 			mock$A(function() {
 				mockJSON(function() {
@@ -116,9 +117,9 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 					});
 				});
 			});
+
 			//Assert
 			Assert.Equal(expected, actual);
-			Assert.True(fired);
 		}
 		
 		[Fact]
@@ -252,7 +253,6 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			});
 			//Assert
 			Assert.Equal(expected, actual);
-			Assert.True(fired);
 		}
 		
 		[Fact]
@@ -390,7 +390,6 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 			});
 			//Assert
 			Assert.Equal(expected, actual);
-			Assert.True(fired);
 		}
 	}
 	
@@ -423,7 +422,25 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 		});
 		
 		[Fact]
-		function testIEAndDropEffectNone(){
+		function testIEAndDropEffectNoneUsesGetDropStatus(){
+			//Arrange
+			var targetEvent = {
+				dataTransfer : {
+					dropEffect : "none"
+				}
+			};
+
+			//Act
+			auraMock$A(function(){
+				targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
+			});			
+
+			//Assert
+			Assert.True(getDropStatusFired);
+		}
+
+		[Fact]
+		function testIEAndDropEffectNoneIsUnsuccessful(){
 			//Arrange
 			var targetEvent = {
 				dataTransfer : {
@@ -431,36 +448,42 @@ Test.Components.Ui.Draggable.HelperTest = function(){
 				}
 			};
 			var result;
+
 			//Act
 			auraMock$A(function(){
 				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
 			});			
+
 			//Assert
 			Assert.True(result);
-			Assert.True(getDropStatusFired);
 		}
 		
 		[Fact]
 		function testInvalidComponent(){
 			//Arrange
+			var result;
 			var targetComponent = {
 				isValid : function() {return false;}
 			};
-			var result;
+
 			//Act
 			auraMock$A(function(){
 				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
-			});			
+			});		
+
 			//Assert
 			Assert.False(result);
 		}
 		
 		[Fact]
 		function testNonIEDropEventWithTypeMove(){
+			var result; 
+
 			//Act
 			auraMock$A(function(){
 				result = targetHelper.isDropEventSuccessful(targetComponent, targetEvent);
-			});			
+			});	
+
 			//Assert
 			Assert.True(result);
 		}

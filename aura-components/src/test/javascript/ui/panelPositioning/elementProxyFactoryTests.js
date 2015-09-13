@@ -194,9 +194,7 @@ Test.Components.Ui.PanelPositioning.elementProxyFactoryTest=function(){
 				proxyFactory.bakeOff();
 			});
 			
-			Assert.True(bakedMap.foo1);
-			Assert.True(bakedMap.foo2);
-			Assert.True(bakedMap.foo3);
+			Assert.True(bakedMap.foo1 && bakedMap.foo2 && bakedMap.foo3);
 		}
 
 	}

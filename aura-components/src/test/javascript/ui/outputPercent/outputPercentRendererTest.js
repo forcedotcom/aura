@@ -73,8 +73,6 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
                 
@@ -111,8 +109,6 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
@@ -141,14 +137,13 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
         function NotEmptyFormat(){
         	// Arrange
+			var targetValue = 10;
         	var expected = targetValue;    
         	var actual;
         	
@@ -177,13 +172,48 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
-        function InvalidFormat(){
+        function InvalidFormatLogsError(){
+        	// Arrange
+        	var expected = new Error();    
+        	var actual;        	
+        	
+        	var mockFormat={
+				format:function(num){
+					if(num == targetValue) return targetValue;
+				}
+			}		
+			
+        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isNumber: function(num) { if(num == targetValue)return true;},
+					isString: function(num) { if(num == targetValue)return false;},
+					isEmpty: function(f) { if(f == targetFormat)return false;}
+	            },
+	            localizationService: {
+	            	getNumberFormat: function(f) { if(f == targetFormat) throw expected;}	            	
+	            },	            
+	            log: function(e){
+	            	actual = e;
+	            }
+	        });										
+
+            // Act
+        	mockUtil(function(){
+				mockSuper(function(){					
+					targetRenderer.render(targetComponent, targetHelper);					
+				});
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        } 
+
+        [Fact]
+        function InvalidFormatSetsErrorMessageOnRenderedElement(){
         	// Arrange
         	var expected = 'Invalid format attribute';    
         	var actual;        	
@@ -203,9 +233,7 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 	            localizationService: {
 	            	getNumberFormat: function(f) { if(f == targetFormat) throw new Error();}	            	
 	            },	            
-	            log: function(e){
-	            	message = 'Error';
-	            }
+	            log: function(e){}
 	        });										
 
             // Act
@@ -216,9 +244,42 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, 'Error');
             Assert.Equal(expected, actual.innerText);
-            Assert.Equal(expected, actual.textContent);
+        }
+
+        [Fact]
+        function InvalidFormatSetsErrorMessageOnRenderedElementForIE(){
+        	// Arrange
+        	var expected = 'Invalid format attribute';    
+        	var actual;        	
+        	
+        	var mockFormat={
+				format:function(num){
+					if(num == targetValue) return targetValue;
+				}
+			}		
+			
+        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isNumber: function(num) { if(num == targetValue)return true;},
+					isString: function(num) { if(num == targetValue)return false;},
+					isEmpty: function(f) { if(f == targetFormat)return false;}
+	            },
+	            localizationService: {
+	            	getNumberFormat: function(f) { if(f == targetFormat) throw new Error();}	            	
+	            },	            
+	            log: function(e){}
+	        });										
+
+            // Act
+        	mockUtil(function(){
+				mockSuper(function(){					
+					actual = targetRenderer.render(targetComponent, targetHelper);					
+				});
+			});
+
+            // Assert
+            Assert.Equal(expected, actual.innerText);
         }
     }
     
@@ -268,8 +329,6 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
                 
@@ -307,8 +366,6 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -335,8 +392,6 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -369,13 +424,46 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
         [Fact]
-        function InvalidFormat(){
+        function InvalidFormatLogsErrorObject(){
+        	// Arrange
+        	var expected = new Error();    
+        	var actual;        	
+        	
+        	var mockFormat={
+				format:function(num){
+					if(num == targetValue) return targetValue;
+				}
+			}		
+			
+        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isNumber: function(num) { if(num == targetValue)return true;},
+					isString: function(num) { if(num == targetValue)return false;},
+					isEmpty: function(f) { if(f == targetFormat)return false;}
+	            },
+	            localizationService: {
+	            	getNumberFormat: function(f) { if(f == targetFormat) throw expected;}	            	
+	            },	            
+	            log: function(e){
+	            	actual = e;
+	            }
+	        });										
+
+            // Act
+        	mockUtil(function(){				
+				targetRenderer.rerender(targetComponent, targetHelper);				
+			});
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function InvalidFormatAddsErrorMessageToRenderedElement(){
         	// Arrange
         	var expected = 'Invalid format attribute';    
         	var actual;        	
@@ -395,9 +483,7 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 	            localizationService: {
 	            	getNumberFormat: function(f) { if(f == targetFormat) throw new Error();}	            	
 	            },	            
-	            log: function(e){
-	            	message = 'Error';
-	            }
+	            log: function(e){}
 	        });										
 
             // Act
@@ -406,9 +492,40 @@ Test.Components.Ui.OutputPercent.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, 'Error');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
+        }
+
+        [Fact]
+        function InvalidFormatAddsErrorMessageToRenderedElementForIE(){
+        	// Arrange
+        	var expected = 'Invalid format attribute';    
+        	var actual;        	
+        	
+        	var mockFormat={
+				format:function(num){
+					if(num == targetValue) return targetValue;
+				}
+			}		
+			
+        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+				util: {   
+					isNumber: function(num) { if(num == targetValue)return true;},
+					isString: function(num) { if(num == targetValue)return false;},
+					isEmpty: function(f) { if(f == targetFormat)return false;}
+	            },
+	            localizationService: {
+	            	getNumberFormat: function(f) { if(f == targetFormat) throw new Error();}	            	
+	            },	            
+	            log: function(e){}
+	        });										
+
+            // Act
+        	mockUtil(function(){				
+				targetRenderer.rerender(targetComponent, targetHelper);				
+			});
+
+            // Assert
+            Assert.Equal(expected, targetElement.innerText);
         }
     }
 }

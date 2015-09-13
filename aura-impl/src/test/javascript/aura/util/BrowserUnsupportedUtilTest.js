@@ -78,84 +78,48 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
             });
         };
 
-        function doArrayErrorTest(methodName, isPredicate) {
-            utilMock(MockArray, function(util){
-                try {
-                    util[methodName]({});
-                    Assert.False(true, "Method should throw an error.");
-                } catch (e) {
-                    Assert.True(e instanceof TypeError);
-                    Assert.Equal("$A.util." + methodName + " called on non-array.",  e.message);
-                }
-
-                try {
-                    util[methodName]([], {});
-                    Assert.False(true, "Method should throw an error.");
-                } catch (e) {
-                    Assert.True(e instanceof TypeError);
-                    Assert.Equal(
-                        "$A.util." + methodName + " called with non-function " + (isPredicate ? "predicate." : "callback."),
-                        e.message
-                    );
-                }
-            });
-        }
-
         [Fact]
         function testForEach() {
+            var expected = ["THIS_OBJECTA0", "THIS_OBJECTB1", "THIS_OBJECTC2"];
+            var actual = [];
             utilMock(MockArray, function(util){
-                var actual = [];
                 util.forEach(["A", "B", "C"], function(letter, index) {
                     actual.push(this + letter + index);
                 }, "THIS_OBJECT");
-
-                Assert.Equal(actual[0], "THIS_OBJECTA0");
-                Assert.Equal(actual[1], "THIS_OBJECTB1");
-                Assert.Equal(actual[2], "THIS_OBJECTC2");
             });
-        }
 
-        [Fact]
-        function testForEachError() {
-            doArrayErrorTest("forEach");
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function testMap() {
+            var expected = ["THIS_OBJECTA0", "THIS_OBJECTB1", "THIS_OBJECTC2"];
+            var actual;
+
             utilMock(MockArray, function(util){
-                var actual = util.map(["A", "B", "C"], function(letter, index) {
+                actual = util.map(["A", "B", "C"], function(letter, index) {
                     return this + letter + index;
                 }, "THIS_OBJECT");
-
-                Assert.Equal(actual[0], "THIS_OBJECTA0");
-                Assert.Equal(actual[1], "THIS_OBJECTB1");
-                Assert.Equal(actual[2], "THIS_OBJECTC2");
             });
-        }
 
-        [Fact]
-        function testMapError() {
-            doArrayErrorTest("map");
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function testReduce() {
+            var expected = ["A0", "B1", "C2"];
+            var actual;
+
             utilMock(MockArray, function(util){
-                var actual = util.reduce(["A", "B", "C"], function(current, letter, index) {
+                actual = util.reduce(["A", "B", "C"], function(current, letter, index) {
                     current.push(letter + index);
                     return current;
                 }, []);
-
-                Assert.Equal(actual[0], "A0");
-                Assert.Equal(actual[1], "B1");
-                Assert.Equal(actual[2], "C2");
             });
+
+            Assert.Equal(expected, actual);
         }
 
-        [Fact]
-        function testReduceError() {
-            doArrayErrorTest("reduce");
-        }
 
         [Fact]
         function testFilter() {
@@ -167,21 +131,9 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     }, 1),
                     "Result should only contain even numbers."
                 );
-
-                Assert.Equal(
-            		[],
-                    util.every([1, 3, 5], function(element, index) {
-                        return (this + element) % 2 === 1;
-                    }, 1),
-                    "All numbers were odd, result should be empty."
-                );
             });
         }
 
-        [Fact]
-        function testFilterError() {
-            doArrayErrorTest("filter", true);
-        }
 
         [Fact]
         function testEvery() {
@@ -192,19 +144,7 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     }, 1),
                     "All elements + 1 should be odd."
                 );
-
-                Assert.False(
-                    util.every([1, 2, 4], function(element, index) {
-                        return (this + element) % 2 === 1;
-                    }, 1),
-                    "First elements + 1 should not be odd."
-                );
             });
-        }
-
-        [Fact]
-        function testEveryError() {
-            doArrayErrorTest("every", true);
         }
 
         [Fact]
@@ -216,53 +156,55 @@ Test.Aura.Util.BrowserUnsupportedUtilTest=function() {
                     }, 1),
                     "Last element + 2 should be odd."
                 );
-
-                Assert.False(
-                    util.some([1, 3, 5], function(element, index) {
-                        return (this + element) % 2 === 1;
-                    }, 1),
-                    "No element + 1 should be odd."
-                );
             });
-        }
-
-        [Fact]
-        function testSomeError() {
-            doArrayErrorTest("some", true);
         }
 
         [Fact]
         function testBind() {
-            function multiplyBPlusCByA(a, b, c) {
-                return a * (b + c);
+            var bindTarget = function (/*arguments*/){
+                var parameters = Array.prototype.slice.call(arguments);
+                return parameters.join("|");
             }
+            var expected = "bound|one|two";
+            var actual;
 
             utilMock(MockFunction, function(util) {
-                var bPlusCTimes5 = util.bind(multiplyBPlusCByA, null, 5);
-                Assert.Equal(20, bPlusCTimes5(1, 3));
-                Assert.Equal(50, bPlusCTimes5(7, 3));
-
-                var cPlus1Times5 = util.bind(bPlusCTimes5, null, 1);
-                Assert.Equal(20, cPlus1Times5(3));
-                Assert.Equal(25, cPlus1Times5(4));
-
-                var bPlusCTime5Called = util.bind.call(null, multiplyBPlusCByA, null, 5);
-                Assert.Equal(20, bPlusCTimes5(1, 3));
-                Assert.Equal(50, bPlusCTimes5(7, 3));
+                var target = util.bind(bindTarget, null, "bound");
+                actual = target("one", "two");
             });
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function testBindOnBind() {
+            var bindTarget = function (/*arguments*/){
+                var parameters = Array.prototype.slice.call(arguments);
+                return parameters.join("|");
+            }
+            var expected = "bound|one|two|three";
+            var actual;
+
+            utilMock(MockFunction, function(util) {
+                var target = util.bind(bindTarget, null, "bound");
+                var secondTarget = util.bind(target, null, "one");
+                actual = secondTarget("two", "three");
+            });
+
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
         function testBindError() {
+            var expected = "$A.util.bind called on non-function.";
+            var actual;
             utilMock(MockFunction, function(util) {
-                try {
+                actual = Record.Exception(function(){
                     util.bind({});
-                    Assert.False(true, "Method should throw an error.");
-                } catch (e) {
-                    Assert.True(e instanceof TypeError);
-                    Assert.Equal("$A.util.bind called on non-function.",  e.message);
-                }
+                });
             });
+
+            Assert.Equal(expected, actual);
         }
     }
 }

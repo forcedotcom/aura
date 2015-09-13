@@ -31,37 +31,29 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
     	    	    	    	    	
         [Fact]
         function noAttribute(){
-        	// Arrange     
-        	var expected = undefined;               	
-        	
+        	// Arrange         	
         	var targetElement={
     			attributes: ''
     		}; 
         	
-            // Act            				
-			var actual = targetHelper.removeEventHandlers(targetElement);				
+            // Act
+            targetHelper.removeEventHandlers(targetElement);				
 
             // Assert
-            Assert.Equal(expected, actual); 
             Assert.Equal('', targetElement.attributes);
         }
         
         [Fact]
         function IEAndAttributeNotSpecified(){
-        	// Arrange     
-        	var expected = undefined;  
-        	var actual;
-        	
+        	// Arrange        	
         	var targetAttribute={
     			specified: false,
     			nodeName: '',
     			nodeValue: ''
-    		}; 
-        	
+    		};        	
         	var targetElement={
     			attributes: [targetAttribute]
     		}; 
-        	
 			var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
 				util: {   
 					isIE: true 
@@ -70,11 +62,10 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 						
             // Act
             mockUtil(function(){					
-            	actual = targetHelper.removeEventHandlers(targetElement);
+            	targetHelper.removeEventHandlers(targetElement);
 			});	
 
             // Assert
-            Assert.Equal(expected, actual); 
             Assert.Equal(targetAttribute, targetElement.attributes[0]);            
         }
         
@@ -82,18 +73,15 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
         function foundEvent(){
         	// Arrange     
         	var expected = undefined;    
-        	var actual
-        	
+        	var actual;        	
         	var targetAttribute={
     			specified: true,
     			nodeName: 'onFocus',
     			nodeValue: 'attack'
-    		}; 
-        	
+    		};        	
         	var targetElement={
     			attributes: [targetAttribute]
-    		}; 
-        	
+    		};        	
 			var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
 				util: {   
 					isIE: false 
@@ -106,8 +94,6 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
 			});	
 
             // Assert
-            Assert.Equal(expected, actual); 
-            Assert.Equal(targetAttribute, targetElement.attributes[0]);   
             Assert.Equal(null, targetAttribute.nodeValue);
         }
     }
@@ -442,31 +428,26 @@ Test.Components.Ui.OutputRichText.HelperTest = function(){
         function removeEventsAndValidateChildren(){
         	// Arrange     
         	var expected = 'input';    
-        	var actual = '';  
-        	var returnVal = '';
-        	
+        	var actual = '';        	
         	var childElement={
     			nodeType: 3
-    		};  
-        	
+    		};        	
         	var targetElement={
     			nodeType: 1,
     			tagName: 'input',    			
 				childNodes: [childElement]
-    		};          	        	        	
-        	
+    		};
         	var mockHelper =  Mocks.GetMock(targetHelper, "removeEventHandlers", function(element){        						
     			 actual = element;				    						
     		});           													
 						
             // Act            
         	mockHelper(function(){	
-        		returnVal = targetHelper.validateElement(targetElement, ['input', 'button']);
+        		targetHelper.validateElement(targetElement, ['input', 'button']);
         	});				
 
             // Assert        	            
             Assert.Equal(expected, actual.tagName);
-            Assert.Equal(undefined, returnVal);
         }
                  
     }

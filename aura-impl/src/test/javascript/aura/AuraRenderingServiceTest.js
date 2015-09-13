@@ -107,13 +107,6 @@ Test.Aura.AuraRenderingServiceTest = function(){
         };
     };
 
-    // This is bad, I'm comming it out cause what is it testing?
-    // I just... ugh.
-    var validateError = function(mockAuraInfo, msgContains, error) {
-        // Assert.Equal(1, mockAuraInfo.stubbedLogger.Calls.length);
-        // Assert.True(mockAuraInfo.stubbedLogger.Calls[0].Arguments.msg.indexOf(msgContains) >= 0);
-        // Assert.Equal(error, mockAuraInfo.stubbedLogger.Calls[0].Arguments.error);
-    };
 
     [Fixture]
     function Rerender(){
@@ -126,17 +119,66 @@ Test.Aura.AuraRenderingServiceTest = function(){
             var mockAuraInfo = getMockAuraInfo(true);
             var expectedRenderable = 'value';
             var mockComponent = getFakeComponent(true, true, expectedRenderable);
+
             // Act
             mockAuraInfo.mock(function() {
                 target.rerender(mockComponent);
             });
-            stubs = getStubs(mockComponent);
-            // AfterRender is not called when re-rendering, except for newly rendered sub-components.
-            Assert.Equal(0, stubs.afterRender.Calls.length);
-            Assert.Equal(0, stubs.render.Calls.length);
+            var stubs = getStubs(mockComponent);
+
             Assert.Equal(1, stubs.rerender.Calls.length);
-            //Assert.Equal(expectedRenderable, stubs.rerender.Calls[0].Arguments.component);
+        }
+
+        [Fact]
+        function AssertRenderNotCalled() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var mockAuraInfo = getMockAuraInfo(true);
+            var expectedRenderable = 'value';
+            var mockComponent = getFakeComponent(true, true, expectedRenderable);
+
+            // Act
+            mockAuraInfo.mock(function() {
+                target.rerender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
+            Assert.Equal(0, stubs.render.Calls.length);
+        }
+
+        [Fact]
+        function AssertUnRenderNotCalled() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var mockAuraInfo = getMockAuraInfo(true);
+            var expectedRenderable = 'value';
+            var mockComponent = getFakeComponent(true, true, expectedRenderable);
+            // Act
+            mockAuraInfo.mock(function() {
+                target.rerender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
             Assert.Equal(0, stubs.unrender.Calls.length);
+        }
+
+        [Fact]
+        function AssertAfterRenderNotCalled() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var mockAuraInfo = getMockAuraInfo(true);
+            var expectedRenderable = 'value';
+            var mockComponent = getFakeComponent(true, true, expectedRenderable);
+            // Act
+            mockAuraInfo.mock(function() {
+                target.rerender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
+            Assert.Equal(0, stubs.afterRender.Calls.length);
         }
     }
 
@@ -144,17 +186,22 @@ Test.Aura.AuraRenderingServiceTest = function(){
     function AfterRender(){
         [Fact]
         function ErrorOnNoComponent() {
+            var expected = "AuraRenderingService.afterRender: 'cmp' must be a valid Component, found 'bad'.";
             var target;
             mockOnLoadUtil(function(){
                 target = new Aura.Services.AuraRenderingService();
             });
             var mockAuraInfo = getMockAuraInfo(false);
-            var mockComponent = 'bad';
+            var actual;
+
             // Act
             mockAuraInfo.mock(function() {
-                target.afterRender(mockComponent);
+                target.afterRender("bad");
+                actual = mockAuraInfo.stubbedLogger.Calls[0].Arguments.msg;
             });
-            validateError(mockAuraInfo, "'bad'", undefined);
+
+            Assert.Equal(expected, actual);
+
         }
 
         [Fact]
@@ -171,15 +218,67 @@ Test.Aura.AuraRenderingServiceTest = function(){
             mockAuraInfo.mock(function() {
                 target.afterRender(mockComponent);
             });
-            stubs = getStubs(mockComponent);
+            var stubs = getStubs(mockComponent);
+
             Assert.Equal(stubs.afterRender.Calls.length, 0);
+        }
+
+        [Fact]
+        function AssertRenderNotCalledForInvalid() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var stubbedAfterRender = Stubs.GetMethod("rendered", null);
+            var mockAuraInfo = getMockAuraInfo(true);
+            var mockComponent = getFakeComponent(false, undefined, undefined)
+
+            // Act
+            mockAuraInfo.mock(function() {
+                target.afterRender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
             Assert.Equal(stubs.render.Calls.length, 0);
+        }
+
+        [Fact]
+        function AssertReRenderNotCalledForInvalid() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var stubbedAfterRender = Stubs.GetMethod("rendered", null);
+            var mockAuraInfo = getMockAuraInfo(true);
+            var mockComponent = getFakeComponent(false, undefined, undefined)
+
+            // Act
+            mockAuraInfo.mock(function() {
+                target.afterRender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
             Assert.Equal(stubs.rerender.Calls.length, 0);
+        }
+
+        [Fact]
+        function AssertUnRenderNotCalledForInvalid() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var stubbedAfterRender = Stubs.GetMethod("rendered", null);
+            var mockAuraInfo = getMockAuraInfo(true);
+            var mockComponent = getFakeComponent(false, undefined, undefined)
+
+            // Act
+            mockAuraInfo.mock(function() {
+                target.afterRender(mockComponent);
+            });
+            var stubs = getStubs(mockComponent);
             Assert.Equal(stubs.unrender.Calls.length, 0);
         }
 
         [Fact]
-        function ErrorOnAfterRenderThrows() {
+        function ErrorOnAfterRenderDoesNotCallRender() {
             var target;
             mockOnLoadUtil(function(){
                 target = new Aura.Services.AuraRenderingService();
@@ -192,12 +291,50 @@ Test.Aura.AuraRenderingServiceTest = function(){
             mockAuraInfo.mock(function() {
                 target.afterRender(mockComponent);
             });
-            validateError(mockAuraInfo, "'rendered'", expected);
-            stubs = getStubs(mockComponent);
+
+            var stubs = getStubs(mockComponent);
             //AfterRender is not a stub, it is replaced above.
             //Assert.Equal(stubs.afterRender.Calls.length, 1);
             Assert.Equal(0, stubs.render.Calls.length);
+        }
+
+        [Fact]
+        function ErrorOnAfterRenderDoesNotCallReRender() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var expected = new Error("expected");
+            var mockAuraInfo = getMockAuraInfo(true);
+            var mockComponent = getFakeComponent(true, true, 'rendered');
+            forceStub(mockComponent, 'afterRender', function () { throw expected; });
+            // Act
+            mockAuraInfo.mock(function() {
+                target.afterRender(mockComponent);
+            });
+
+            var stubs = getStubs(mockComponent);
+            //AfterRender is not a stub, it is replaced above.
+            //Assert.Equal(stubs.afterRender.Calls.length, 1);
             Assert.Equal(0, stubs.rerender.Calls.length);
+        }
+
+        [Fact]
+        function ErrorOnAfterRenderDoesNotCallUnRender() {
+            var target;
+            mockOnLoadUtil(function(){
+                target = new Aura.Services.AuraRenderingService();
+            });
+            var expected = new Error("expected");
+            var mockAuraInfo = getMockAuraInfo(true);
+            var mockComponent = getFakeComponent(true, true, 'rendered');
+            forceStub(mockComponent, 'afterRender', function () { throw expected; });
+            // Act
+            mockAuraInfo.mock(function() {
+                target.afterRender(mockComponent);
+            });
+
+            var stubs = getStubs(mockComponent);
             Assert.Equal(0, stubs.unrender.Calls.length);
         }
     }

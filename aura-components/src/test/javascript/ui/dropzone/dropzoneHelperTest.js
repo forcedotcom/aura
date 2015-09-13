@@ -32,24 +32,18 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
         function testDragEventParams(){
 			//Arrange
 			var expectedRenderingComponent = "someComponent";
-			var dragEvent = {
-				setParams : function(arg){actual = arg;},
-				fire : function(){fired = true;}
-			};
-			var targetComponent = {
-				getEvent : function(expression){
-					if(expression == "dragEnter"){return dragEvent;}
-				},
-				get : function(expression){
-					if(expression == "v.types"){return "move";}
-					if(expression == "v.dragOverClass"){return {trim : function() { }}}
-					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() { }}}
-					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
-				},
-				set : function(expression, value){
-					if(expression == "v.theClass"){}
-				}
-			};
+			var event = Test.Stubs.Aura.GetEvent();
+			var dropComponent = Test.Stubs.Aura.GetComponent({
+				"v.types":"move", 
+				"v.dragOverClass": "",
+				"v.dragOverAccessibilityClass":"",
+				"v.class":""}, {}, {
+					"getEvent": function(eventName) {
+						if(eventName == "dragEnter") {
+							return event;
+						}
+					}
+			});
 			var targetEvent = {
 				target : expectedRenderingComponent,
 				dataTransfer : {effectAllowed : "move", dropEffect : null}
@@ -60,19 +54,54 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 				}
 			 }));
 			 var expected = {
-				 dropComponent : targetComponent,
+				 dropComponent : dropComponent,
 				 dropComponentTarget : expectedRenderingComponent,
 				 isInAccessibilityMode : false
 			 };
 			 var actual;
-			 var fired;
 			 //Act
 			 auraMock(function(){
-				 targetHelper.handleDragEnter(targetComponent, targetEvent);
+				 targetHelper.handleDragEnter(dropComponent, targetEvent);
+				 actual = event.getParams();
 			 });
 			 //Assert
 			 Assert.Equal(expected, actual);
-			 Assert.True(fired);
+		}
+		
+		[Fact]
+        function testDragEventIsFired(){
+			//Arrange
+			var expectedRenderingComponent = "someComponent";
+			var actual;
+
+			var event = Test.Stubs.Aura.GetEvent();
+			var dropComponent = Test.Stubs.Aura.GetComponent({
+				"v.types":"move", 
+				"v.dragOverClass": "",
+				"v.dragOverAccessibilityClass":"",
+				"v.class":""}, {}, {
+					"getEvent": function(eventName) {
+						if(eventName == "dragEnter") {
+							return event;
+						}
+					}
+			});
+			var domEvent = {
+				target : expectedRenderingComponent,
+				dataTransfer : {effectAllowed : "move", dropEffect : null}
+			};
+			var auraMock = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({},{
+				util : {
+					isEmpty : function(value) {return true;}
+				}
+			 }));
+
+			 //Act
+			 auraMock(function(){
+				 targetHelper.handleDragEnter(dropComponent, domEvent);
+			 });
+			 //Assert
+			 Assert.Equal(1, event.fire.Calls.length);
 		}
 	}
 	
@@ -110,6 +139,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			//Arrange
 			var expectedEffectAllowed = "all";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
+
 			//Act
 			var result;
 			mock$A(function() {
@@ -119,9 +149,29 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 					});
 				});
 			});
+
+			//Assert
+			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
+		}
+
+		[Fact]
+        function testResultDropzoneTypeIsInvalid(){
+			//Arrange
+			var expectedEffectAllowed = "all";
+			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
+
+			//Act
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
+
 			//Assert
 			Assert.False(result);
-			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
 		}
 		
 		[Fact]
@@ -129,6 +179,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			//Arrange
 			var expectedEffectAllowed = "match";
 			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
+
 			//Act
 			var result;
 			mock$A(function() {
@@ -138,9 +189,29 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 					});
 				});
 			});
+
+			//Assert
+			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
+		}
+		
+		[Fact]
+        function testResultDropzoneTypeMatchIsInvalid(){
+			//Arrange
+			var expectedEffectAllowed = "match";
+			targetEvent.dataTransfer.effectAllowed = expectedEffectAllowed;
+
+			//Act
+			var result;
+			mock$A(function() {
+				setTimeoutMock(function() {
+					fireDragOverMock(function() {
+						result = targetHelper.handleDragOver(targetComponent, targetEvent);
+					});
+				});
+			});
+
 			//Assert
 			Assert.False(result);
-			Assert.Equal(targetEvent.dataTransfer.dropEffect, expectedEffectAllowed);
 		}
 		
 		[Fact]
@@ -187,22 +258,17 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		function testDragEventParams(){
 			//Arrange
 			var expectedRenderingComponent = "someComponent";
-			var dragEvent = {
-				setParams : function(arg){actual = arg;},
-				fire : function(){fired = true;}
-			};
+			var dragEvent = Test.Stubs.Aura.GetEvent();
 			var targetComponent = {
 				getEvent : function(expression){
 					if(expression == "dragLeave"){return dragEvent;}
 				},
 				get : function(expression){
-					if(expression == "v.class"){return {trim : function() {return {trim : function() { }}}}}
-					if(expression == "v.dragOverClass"){return {trim : function() {}}}
-					if(expression == "v.dragOverAccessibilityClass"){return {trim : function() {}}}
+					if(expression == "v.class"){return "";}
+					if(expression == "v.dragOverClass"){return "";}
+					if(expression == "v.dragOverAccessibilityClass"){return "";}
 				},
-				set : function(expression, value){
-					if(expression == "v.theClass"){}
-				}
+				set : function(expression, value){}
 			};
 			var targetEvent = {
 				target : expectedRenderingComponent
@@ -222,10 +288,51 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			//Act
 			auraMock(function(){
 				targetHelper.handleDragLeave(targetComponent, targetEvent);
+				actual = dragEvent.getParams();
 			});
 			//Assert
 			Assert.Equal(expected, actual);
-			Assert.True(fired);
+		}
+		
+		[Fact]
+		function handleDragLeaveFiresDragLeaveEvent(){
+			//Arrange
+			var expectedRenderingComponent = "someComponent";
+			var dragEvent = Test.Stubs.Aura.GetEvent();
+			var targetComponent = {
+				getEvent : function(expression){
+					if(expression == "dragLeave"){return dragEvent;}
+				},
+				get : function(expression){
+					if(expression == "v.class"){return "";}
+					if(expression == "v.dragOverClass"){return "";}
+					if(expression == "v.dragOverAccessibilityClass"){return "";}
+				},
+				set : function(expression, value){}
+			};
+			var targetEvent = {
+				target : expectedRenderingComponent
+			};
+			var auraMock = Mocks.GetMock(Object.Global(), "$A", Stubs.GetObject({},{
+				util : {
+					isEmpty : function(value) {return true;}
+				}
+			}));
+			var fired;
+			var actual;
+			var expected = {
+				dropComponent : targetComponent,
+				dropComponentTarget : expectedRenderingComponent,
+				isInAccessibilityMode : false
+			};
+			
+			//Act
+			auraMock(function(){
+				targetHelper.handleDragLeave(targetComponent, targetEvent);
+			});
+
+			//Assert
+			Assert.Equal(1, dragEvent.fire.Calls.length);
 		}
 	}
 	
@@ -319,7 +426,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		[Fact]
 		function testResultDropzoneHasNonSupportedType(){
 			//Arrange
-			supportTypes = "copy";
+			var supportTypes = "copy";
 			var result;
 			//Act
 			auraMock(function(){
@@ -330,7 +437,7 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 		}
 		
 		[Fact]
-		function testSupportedTypeWithIE(){
+		function testSupportedTypeWithIEUsesJSONParse(){
 			//Arrange
 			supportTypes = expectedOperationType;
 			var auraMock = Mocks.GetMock(Object.Global(), "$A", {
@@ -363,6 +470,38 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			});
 			//Assert
 			Assert.True(parseFired);
+		}		
+		[Fact]
+		function testSupportedTypeWithIE(){
+			//Arrange
+			supportTypes = expectedOperationType;
+			var auraMock = Mocks.GetMock(Object.Global(), "$A", {
+				getCmp : function(value){
+					return dragComponent;},
+				componentService : {
+					getRenderingComponentForElement:function(value){
+						return expectedRenderingComponent;
+					}
+				},
+				util : {
+					forEach : function(value, func){},
+					isUndefinedOrNull : function(expression) {return true;},
+					isEmpty : function(value) {return true;},
+					isIE : true
+				}
+			});
+			var mockJSON = Mocks.GetMock(Object.Global(), "JSON", {
+				parse : function(expression){
+					return {"aura/id" : "someId"}
+				}
+			});
+			//Act
+			auraMock(function(){
+				mockJSON(function(){
+					targetHelper.handleDrop(targetComponent, targetEventIE);
+				});
+			});
+			//Assert
 			Assert.True(parsedText);
 		}
 		
@@ -384,7 +523,6 @@ Test.Components.Ui.Dropzone.HelperTest = function(){
 			});
 			//Assert
 			Assert.Equal(expected, actual);
-			Assert.True(fired);
 		}
 	}
 	

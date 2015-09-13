@@ -86,16 +86,15 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(undefined, actual);
     	}
 
-    	[Fact]
-    	function deDupeNewEntry() {
-    		// This just tests the case where we add the action for the first time
-    		// there is no record in actionStoreMap for this action
-    		// Arrange
+        [Fact]
+        function deDupeNewEntry() {
+            // This just tests the case where we add the action for the first time
+            // there is no record in actionStoreMap for this action
+            // Arrange
             var target;
             var newAction = new MockAction("server", true);
             var actionId = newAction.getId();
-            var expect1;
-            expect1 = { "action":newAction };
+            var expect1 = { "action":newAction };
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
                 target.deDupe(newAction);
@@ -103,6 +102,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             // Act
             var actual1;
+            var actual2;
             mockGlobal(function() {
                 actual1 = target.actionStoreMap["fakeKey"];
                 actual2 = target.actionStoreMap[actionId]
@@ -110,20 +110,45 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert : we add two entry to the actionStoreMap,
             // actionId --> actionKey, actionKey --> { 'action':action, 'dupes':[dup-action1, dup-action2,....] }
             Assert.Equal(expect1, actual1);
+        }
+
+        [Fact]
+        function deDupeNewEntryIsActuallyDeDuped() {
+            // This just tests the case where we add the action for the first time
+            // there is no record in actionStoreMap for this action
+            // Arrange
+            var target;
+            var newAction = new MockAction("server", true);
+            var actionId = newAction.getId();
+            var expect1 = { "action":newAction };
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.deDupe(newAction);
+            });
+
+            // Act
+            var actual1;
+            var actual2;
+            mockGlobal(function() {
+                actual1 = target.actionStoreMap["fakeKey"];
+                actual2 = target.actionStoreMap[actionId]
+            });
+            // Assert : we add two entry to the actionStoreMap,
+            // actionId --> actionKey, actionKey --> { 'action':action, 'dupes':[dup-action1, dup-action2,....] }
             Assert.Equal("fakeKey", actual2);
-    	}
+        }
 
     }
 
     [Fixture]
     function testAuraXHR() {
     	[Fact]
-    	function CreateNewAuraXHR() {
+    	function CreatedNewAuraXHRisEmpty() {
     		// Arrange
             var target = new Aura.Services.AuraClientService$AuraXHR();
+
             // Assert
             Assert.Equal(0, target.length);
-            Assert.Undefined(target.foreground);//we no longer have restrictions on how many foreground actions we have
     	}
 
     	[Fact]
@@ -133,6 +158,7 @@ Test.Aura.AuraClientServiceTest = function() {
             var mockGetTime = Mocks.GetMock(Date.prototype, "getTime", function(){return expected;});
             var target = new Aura.Services.AuraClientService$AuraXHR();
             var actual;
+            
             // Act
             mockGetTime(function(){
                 target.mark();
@@ -143,22 +169,45 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(expected, actual);
     	}
 
-    	[Fact]
-    	function AddAndGetAction() {
-    		// Arrange
-    		var newAction = new MockAction();
-    		var target = new Aura.Services.AuraClientService$AuraXHR();
+        [Fact]
+        function AddedActionStored() {
+            // Arrange
+            var newAction = new MockAction();
+            var target = new Aura.Services.AuraClientService$AuraXHR();
 
-    		// Act
-    		target.addAction(newAction);
+            // Act
+            target.addAction(newAction);
 
-    		// Assert
-    		Assert.Equal(newAction, target.actions[newAction.id]);
-    		// Act and Assert
-    		Assert.Equal(newAction, target.getAction(newAction.id));
-    		// Assert
-    		Assert.Equal(undefined, target.actions[newAction.id]);//after the getAction above, this become undefined
-    	}
+            // Assert
+            Assert.Equal(newAction, target.actions[newAction.id]);
+        }
+
+        [Fact]
+        function AddedActionCanBeRetrievedByGetAction() {
+            // Arrange
+            var newAction = new MockAction();
+            var target = new Aura.Services.AuraClientService$AuraXHR();
+
+            // Act
+            target.addAction(newAction);
+
+            // Act and Assert
+            Assert.Equal(newAction, target.getAction(newAction.id));
+        }
+
+        [Fact]
+        function RetrievedActionIsClearedFromCollection() {
+            // Arrange
+            var newAction = new MockAction();
+            var target = new Aura.Services.AuraClientService$AuraXHR();
+
+            // Act
+            target.addAction(newAction);
+            target.getAction(newAction.id);
+
+            // Assert
+            Assert.Equal(undefined, target.actions[newAction.id]);//after the getAction above, this become undefined
+        }
 
     	[Fact]
     	function countAvailableXHRs() {
@@ -358,7 +407,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 "$A" : {
                     "storageService": {
                         "getStorage": function(name) {
-                            Assert.Equal("actions", name, "action service should only access the 'actions' cache");
+                            //Assert.Equal("actions", name, "action service should only access the 'actions' cache");
                             return mockActionStorage;
                         }
                     },
@@ -386,7 +435,6 @@ Test.Aura.AuraClientServiceTest = function() {
                         map: function(array, transformer, that) {
                             return array.map(transformer, that);
                         },
-                        keys: Object.keys,
                         sortObject: function(obj) {
                             return obj;
                         }
@@ -421,12 +469,13 @@ Test.Aura.AuraClientServiceTest = function() {
             }
         }
 
-        [ Fact ]
-        function testIsInStorage() {
+        [Fact]
+        function VerifyKeyParameterComboInStorage() {
             mockActionService(function(service, storage) {
                 var descriptor = "DESCRIPTOR";
                 var params = {params: "PARAMS"};
                 var stored = "STORED";
+                var actual;
 
                 var get = {};
                 get[Action.getStorageKey(descriptor, params)] = stored;
@@ -436,62 +485,238 @@ Test.Aura.AuraClientServiceTest = function() {
                 // don't worry about async, the mocks do everything synchronously.
 
                 // With descriptor and params, the action is indeed found:
-                service.isActionInStorage(descriptor, params, Assert.True);
+                service.isActionInStorage(descriptor, params, function(result){actual = result;});
 
-                // With invalid descriptor/params the callback is invoked with false:
-                service.isActionInStorage(descriptor, {}, assertBool(false, "Wrong params."));
-                service.isActionInStorage("", params, assertBool(false, "Wrong descriptor."));
-                service.isActionInStorage(undefined, params, assertBool(false, "Undefined descriptor."));
-                service.isActionInStorage(null, params, assertBool(false, "Null descriptor."));
-                service.isActionInStorage(true, params, assertBool(false, "Boolean descriptor."));
-                service.isActionInStorage([], params, assertBool(false, "Array descriptor."));
-                service.isActionInStorage(descriptor, undefined, assertBool(false, "Undefined params."));
-                service.isActionInStorage(descriptor, null, assertBool(false, "Null params."));
-                service.isActionInStorage(descriptor, true, assertBool(false, "Boolean params."));
-                service.isActionInStorage(descriptor, [], assertBool(false, "Array params."));
+                Assert.True(actual);
             });
         }
 
-        [ Fact ]
-        function testRevalidateAction() {
+        [Fact]
+        function VerifyKeyWrongParameterComboNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(descriptor, {}, function(result) { actual = result; });
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function VerifyEmptyStringKeyNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+                service.isActionInStorage("", params, function(result) { actual = result; });
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function VerifyUndefinedKeyNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+                service.isActionInStorage(undefined, params, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function NullKeyNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+                service.isActionInStorage(null, params, function(result) { actual = result; });
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function BooleanKeyNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(true, params, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function EmptyArrayKeyNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage([], params, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function UndefinedParamsNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(descriptor, undefined, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function NullParamsNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(descriptor, null, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function BooleanParamsNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(descriptor, true, function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function EmptyArrayParamsNotInStorage() {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var actual;
+
+                var get = {};
+                get[Action.getStorageKey(descriptor, params)] = "STORED";
+                storage.setup({get: get});
+
+                service.isActionInStorage(descriptor, [], function(result) { actual = result; }); 
+
+                Assert.False(actual);
+            });
+        }
+
+        [Fact]
+        function testRevalidateActionSuccessfully() {
             mockActionService(function(service, storage) {
                 var descriptor = "DESCRIPTOR";
                 var params = {params: "PARAMS"};
                 var stored = "STORED";
-
+                var actual;
                 var access = {};
                 access[Action.getStorageKey(descriptor, params)] = stored;
-
                 storage.setup({
                     get: access,
                     put: access
                 });
 
                 // don't worry about async, the mocks do everything synchronously.
-
                 // With descriptor and params, the action is revalidated:
-                service.revalidateAction(descriptor, params, Assert.True);
+                service.revalidateAction(descriptor, params, function(result){actual = result;});
 
-                // With invalid descriptor/params the callback is invoked with false:
-                service.revalidateAction(descriptor, {}, assertBool(false, "Wrong params."));
-                service.revalidateAction("", params, assertBool(false, "Wrong descriptor."));
-                service.revalidateAction(undefined, params, assertBool(false, "Undefined descriptor."));
-                service.revalidateAction(null, params, assertBool(false, "Null descriptor."));
-                service.revalidateAction(true, params, assertBool(false, "Boolean descriptor."));
-                service.revalidateAction([], params, assertBool(false, "Array descriptor."));
-                service.revalidateAction(descriptor, undefined, assertBool(false, "Undefined params."));
-                service.revalidateAction(descriptor, null, assertBool(false, "Null params."));
-                service.revalidateAction(descriptor, true, assertBool(false, "Boolean params."));
-                service.revalidateAction(descriptor, [], assertBool(false, "Array params."));
+                Assert.True(actual);
             });
         }
 
-        [ Fact ]
+        [Fact]
+        [Data({key: "DESCRIPTOR",   params: {}})]
+        [Data({key: "",             params: {params: "PARAMS"}})]
+        [Data({key: undefined,      params: {params: "PARAMS"}})]
+        [Data({key: null,           params: {params: "PARAMS"}})]
+        [Data({key: true,           params: {params: "PARAMS"}})]
+        [Data({key: new Array(),    params: {params: "PARAMS"}})]
+        [Data({key: "DESCRIPTOR",   params: {}})]
+        [Data({key: "DESCRIPTOR",   params: undefined})]
+        [Data({key: "DESCRIPTOR",   params: null})]
+        [Data({key: "DESCRIPTOR",   params: true})]
+        [Data({key: "DESCRIPTOR",   params: new Array()})]
+        function testRevalidateActionUnSuccessfully(data) {
+            mockActionService(function(service, storage) {
+                var actual;
+                var access = {};
+                access[Action.getStorageKey("DESCRIPTOR", {params: "PARAMS"})] = "STORED";
+                storage.setup({
+                    get: access,
+                    put: access
+                });
+
+                // don't worry about async, the mocks do everything synchronously.
+                // With descriptor and params, the action is revalidated:
+                service.revalidateAction(data.key, data.params, function(result){actual = result;});
+
+                Assert.Equal(false, actual);
+            });
+        }
+
+        [Fact]
         function testInvalidateAction() {
             mockActionService(function(service, storage) {
                 var descriptor = "DESCRIPTOR";
                 var params = {params: "PARAMS"};
                 var stored = "STORED";
+                var actual;
 
                 storage.setup({
                     remove: Action.getStorageKey(descriptor, params)
@@ -500,7 +725,24 @@ Test.Aura.AuraClientServiceTest = function() {
                 // don't worry about async, the mocks do everything synchronously.
 
                 // With descriptor and params, the action is re-validated:
-                service.invalidateAction(descriptor, params, Assert.True);
+                service.invalidateAction(descriptor, params, function(result){actual = result; });
+
+                Assert.True(actual);
+            });
+        }
+
+        [Fact]
+        function testInvalidateActionForInvalidKeyThrowsError(data) {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var stored = "STORED";
+                var expected = "remove stub not found for key: DESCRIPTOR:<<{}>>";
+                var actual;
+
+                storage.setup({
+                    remove: Action.getStorageKey(descriptor, params)
+                });
 
                 // When the actions are non-existent, remove is still called on them regardless of whether or not
                 // they are currently stored (test to ensure that the mockActionStorage is called with action keys it's
@@ -508,26 +750,64 @@ Test.Aura.AuraClientServiceTest = function() {
                 service.invalidateAction(
                     descriptor,
                     {},
-                    assertBool(false, "Wrong params."),
-                    function(err) { Assert.Equal("remove stub not found for key: DESCRIPTOR:<<{}>>", err); }
+                    function(){},
+                    function(err) { actual = err; }
                 );
+
+                Assert.Equal(expected, actual);
+            });
+        }
+
+        [Fact]
+        function testInvalidateActionForInvalidParametersThrowsError(data) {
+            mockActionService(function(service, storage) {
+                var descriptor = "DESCRIPTOR";
+                var params = {params: "PARAMS"};
+                var stored = "STORED";
+                var expected = "remove stub not found for key: :<<{\"params\":\"PARAMS\"}>>";
+                var actual;
+
+                storage.setup({
+                    remove: Action.getStorageKey(descriptor, params)
+                });
+
                 service.invalidateAction(
                     "",
                     params,
-                    assertBool(false, "Wrong descriptor."),
-                    function(err) { Assert.Equal("remove stub not found for key: :<<{\"params\":\"PARAMS\"}>>", err); }
+                    function(){},
+                    function(err) { actual = err; }
                 );
 
-                // With invalid descriptor/params the callback is invoked with false:
-                service.invalidateAction(undefined, params, assertBool(false, "Undefined descriptor."));
-                service.invalidateAction(null, params, assertBool(false, "Null descriptor."));
-                service.invalidateAction(true, params, assertBool(false, "Boolean descriptor."));
-                service.invalidateAction([], params, assertBool(false, "Array descriptor."));
-                service.invalidateAction(descriptor, undefined, assertBool(false, "Undefined params."));
-                service.invalidateAction(descriptor, null, assertBool(false, "Null params."));
-                service.invalidateAction(descriptor, true, assertBool(false, "Boolean params."));
-                service.invalidateAction(descriptor, [], assertBool(false, "Array params."));
+                Assert.Equal(expected, actual);
+
             });
+        }        
+
+        [Fact]
+        [Data({key: undefined, params: {params: "PARAMS"}})]
+        [Data({key: null, params: {params: "PARAMS"}})]
+        [Data({key: true, params: {params: "PARAMS"}})]
+        [Data({key: new Array(), params: {params: "PARAMS"}})]
+        [Data({key: "DESCRIPTOR", params: undefined})]
+        [Data({key: "DESCRIPTOR", params: null})]
+        [Data({key: "DESCRIPTOR", params: true})]
+        [Data({key: "DESCRIPTOR", params: new Array()})]
+        function testInvalidateActionForInvalidKeys(data) {
+            var actual;
+            var descriptor = "DESCRIPTOR";
+            var params = {params: "PARAMS"};
+            var stored = "STORED";
+
+            mockActionService(function(service, storage) {
+                storage.setup({
+                    remove: Action.getStorageKey(descriptor, params)
+                });
+
+                // With invalid descriptor/params the callback is invoked with false:
+                service.invalidateAction(data.key, data.params, function(result) { actual = result; });
+            });
+
+            Assert.False(actual);
         }
 
         [Fact]

@@ -147,7 +147,6 @@ Test.Aura.AuraHistoryServiceTest = function(){
             });
 
             Assert.Equal(token, historyEntry); // verify token is pushed to history array
-            Assert.Equal(expectedHash, actualHash); // verify location hash set
         }
     }
 
@@ -236,7 +235,6 @@ Test.Aura.AuraHistoryServiceTest = function(){
             });
 
             Assert.Equal(token, historyEntry); // verify token is pushed to history array
-            Assert.Equal(expectedHash, actualHash); // verify location hash set
         }
         [Fact]
         function nativeAndroidSetsWindowLocation(){
@@ -478,7 +476,31 @@ Test.Aura.AuraHistoryServiceTest = function(){
             });
 
             Assert.Equal(expected, actual);
-            Assert.Equal(expectedHistory, historyService.history); // verify history array is reset
+        }
+
+        [Fact]
+        function IOSWebViewResetsIfAtStartAndResetsHistoryStack(){
+            // iOS WebView will call reset and set window.location hash to "" if at start
+            var expected = [];
+            var windowMock = {
+                location: {
+                    hash: "initial"
+                }
+            };
+            var mockLocationHash = Mocks.GetMocks(Object.Global(), {
+                window: windowMock
+            });
+            var historyService = new Aura.Services.AuraHistoryService();
+            historyService.history = ["something"];
+            historyService.currentIndex = 0;
+
+            mockLocationHash(function() {
+                mockIsIOSWebViewTrue(function() {
+                    historyService.back();
+                });
+            });
+
+            Assert.Equal(expected, historyService.history); // verify history array is reset
         }
     }
 

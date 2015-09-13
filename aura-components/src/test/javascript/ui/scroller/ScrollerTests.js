@@ -172,19 +172,19 @@ Test.Components.Ui.Scroller.ScrollerTest=function(){
 			Assert.True(scroller.scroll==='vertical');
 		}
 
-		[Fact, Skip("Might need exception handling?")]
-		function ScrollerNoWrapper(){
-			var actualException,
-				expectedException='some exception';
+		// 
+		// function ScrollerNoWrapper(){
+		// 	var actualException,
+		// 		expectedException='some exception';
 
-			windowMock(function(){
-				actualException=Record.Exception(function(){
-					new window.Scroller();
-				});
-			});
+		// 	windowMock(function(){
+		// 		actualException=Record.Exception(function(){
+		// 			new window.Scroller();
+		// 		});
+		// 	});
 
-			Assert.Equal(expectedException,actualException);
-		}
+		// 	Assert.Equal(expectedException,actualException);
+		// }
         
         [Fixture]
         function TestScrollerMathsAndCalculations(){

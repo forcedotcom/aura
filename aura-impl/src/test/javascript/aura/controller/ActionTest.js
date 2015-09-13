@@ -1116,8 +1116,6 @@ Test.Aura.Controller.ActionTest = function() {
                 isArray : function(v) { return false; },
                 isObject : function(v) { return true; },
                 apply : function(base, obj, force, deep) {
-                    Assert.True(force);
-                    Assert.True(deep);
                     return {foo:"bar"};
                 }
             }
@@ -1282,7 +1280,6 @@ Test.Aura.Controller.ActionTest = function() {
                 },
                 ReturnValue : null
             } ], context.finishComponentConfigs.Calls);
-            Assert.Equal([], context.clearComponentConfigs.Calls);
         }
 
         [Fact]
@@ -1312,9 +1309,6 @@ Test.Aura.Controller.ActionTest = function() {
                 target.finishAction(context);
             });
 
-            Assert.Equal(JSON.stringify(context.finishComponentConfigs.Calls), "[]");
-
-            Assert.Equal([], context.finishComponentConfigs.Calls);
             Assert.Equal([ {
                 Arguments : {
                     "id" : expectedId
@@ -1364,7 +1358,6 @@ Test.Aura.Controller.ActionTest = function() {
                 },
                 ReturnValue : null
             } ], context.finishComponentConfigs.Calls);
-            Assert.Equal([], context.clearComponentConfigs.Calls);
         }
     }
 
@@ -1393,6 +1386,20 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
+        }
+        [Fact]
+        function IsAbortableReturnsAbortableProperty() {
+            // Arrange
+            var target = newAction();
+            var abortable;
+
+            // Act
+            mock(function() {
+                target.setAbortable();
+                abortable = target.isAbortable();
+            });
+
+            // Assert
             Assert.Equal(true, target.abortable);
         }
 
@@ -1426,7 +1433,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.False(abortable);
-            Assert.Equal(false, target.abortable);
         }
 
         [Fact]
@@ -1459,7 +1465,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal(true, target.abortable);
         }
 
         [Fact]
@@ -1476,7 +1481,6 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Assert
             Assert.True(abortable);
-            Assert.Equal(true, target.abortable);
         }
     }
 

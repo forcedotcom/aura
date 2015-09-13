@@ -34,9 +34,7 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 	var targetHelper;	
 	
     [Fixture]
-    function render(){   
-    	
-    	var message = '';
+    function render(){
     	
     	var targetComponent={
 			get:function(value){
@@ -77,8 +75,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
@@ -116,8 +112,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
@@ -161,8 +155,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
@@ -205,8 +197,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
@@ -250,64 +240,146 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, actual.innerText);
             Assert.Equal(expected, actual.textContent);
         }
         
         [Fact]
-        function TestError(){
-        	// Arrange
-        	var expected = 'Invalid format attribute';    
-        	var actual;        	
-        	
-        	var mockFormat={
-				format:function(num){
-					if(num == targetValue) return targetValue;
-				}
-			}		
-			
-        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isNumber: function(num) { if(num == targetValue)return true;},
-					isString: function(num) { if(num == targetValue)return false;},
-					isEmpty: function(f) { if(f == targetFormat)return false;}
-	            },
-	            get: function(val){
-	            	if(val == "$Locale.decimal") return targetDecimal;
-	            	if(val == "$Locale.grouping") return targetGrouping;
-	            	if(val == "$Locale.currencyFormat") return targetFormat;	            	
-	            },
-	            localizationService: {
-	            	getNumberFormat: function(f, s) { if(f == targetFormat && 
-	            										 s.currencyCode == targetCurrencyCode &&
-	            										 s.currency == targetCurrencySymbol &&
-	            										 s.decimalSeparator == targetDecimal &&
-	            										 s.groupingSeparator == targetGrouping)  throw new Error();}	            	
-	            },	            	            
-	            log: function(e){
-	            	message = 'Error';
-	            }
-	        });										
+        function TestErrorInLocalizationServiceGetsLogged(){
+            // Arrange
+            var expected = new Error();    
+            var actual;         
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw expected;}                    
+                },                              
+                log: function(e){
+                    actual = e;
+                }
+            });                                     
 
             // Act
-        	mockUtil(function(){
-				mockSuper(function(){
-					actual = targetRenderer.render(targetComponent, targetHelper);
-				});
-			});
+            mockUtil(function(){
+                mockSuper(function(){
+                    targetRenderer.render(targetComponent, targetHelper);
+                });
+            });
 
             // Assert
-            Assert.Equal(message, 'Error');
-            Assert.Equal(expected, actual.innerText);
+            Assert.Equal(expected, actual);
+        }
+        
+        [Fact]
+        function TestErrorInLocalizationServiceRendersErrorMessage(){
+            // Arrange
+            var expected = 'Invalid format attribute';    
+            var actual;         
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw new Error();}                    
+                },                              
+                log: function(e){}
+            });                                     
+
+            // Act
+            mockUtil(function(){
+                mockSuper(function(){
+                    actual = targetRenderer.render(targetComponent, targetHelper);
+                });
+            });
+
+            // Assert
             Assert.Equal(expected, actual.textContent);
+        }
+        
+        [Fact]
+        function TestErrorInLocalizationServiceRendersErrorMessageForIE(){
+            // Arrange
+            var expected = 'Invalid format attribute';    
+            var actual;         
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw new Error();}                    
+                },                              
+                log: function(e){}
+            });                                     
+
+            // Act
+            mockUtil(function(){
+                mockSuper(function(){
+                    actual = targetRenderer.render(targetComponent, targetHelper);
+                });
+            });
+
+            // Assert
+            Assert.Equal(expected, actual.innerText);
         }
     }
     
     [Fixture]
-    function rerender(){    
-    	
-    	var message = '';
+    function rerender(){
     	    	    	    	    	    	    	
     	var targetElement={
 			innerText:'',
@@ -359,8 +431,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
 			targetRenderer.rerender(targetComponent, targetHelper);
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
     	
@@ -382,8 +452,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
         	});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -426,8 +494,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
         	});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -474,8 +540,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
         	});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -515,8 +579,6 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
         	});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
@@ -557,54 +619,133 @@ Test.Components.Ui.OutputCurrency.RendererTest = function(){
         	});
 
             // Assert
-            Assert.Equal(message, '');
-            Assert.Equal(expected, targetElement.innerText);
             Assert.Equal(expected, targetElement.textContent);
         }
         
         [Fact]
-        function TestError(){
-        	// Arrange
-        	var expected = 'Invalid format attribute';            	        	
-        	
-        	var mockFormat={
-				format:function(num){
-					if(num == targetValue) return targetValue;
-				}
-			}		
-			
-        	var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
-				util: {   
-					isNumber: function(num) { if(num == targetValue)return true;},
-					isString: function(num) { if(num == targetValue)return false;},
-					isEmpty: function(f) { if(f == targetFormat)return false;}
-	            },
-	            get: function(val){
-	            	if(val == "$Locale.decimal") return targetDecimal;
-	            	if(val == "$Locale.grouping") return targetGrouping;
-	            	if(val == "$Locale.currencyFormat") return targetFormat;	            	
-	            },
-	            localizationService: {
-	            	getNumberFormat: function(f, s) { if(f == targetFormat && 
-	            										 s.currencyCode == targetCurrencyCode &&
-	            										 s.currency == targetCurrencySymbol &&
-	            										 s.decimalSeparator == targetDecimal &&
-	            										 s.groupingSeparator == targetGrouping)  throw new Error();}	            	
-	            },	            	            
-	            log: function(e){
-	            	message = 'Error';
-	            }
-	        });										
+        function ErrorInLocalizationLogsError(){
+            // Arrange
+            var expected = new Error();       
+            var actual;                   
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw expected;}                    
+                },                              
+                log: function(e){
+                    actual = e;
+                }
+            });                                     
 
             // Act
-        	mockUtil(function(){
-    			targetRenderer.rerender(targetComponent, targetHelper);
-        	});
+            mockUtil(function(){
+                targetRenderer.rerender(targetComponent, targetHelper);
+            });
 
             // Assert
-            Assert.Equal(message, 'Error');
-            Assert.Equal(expected, targetElement.innerText);
+            Assert.Equal(expected, actual);
+        }      
+
+        [Fact]
+        function ErrorInLocalizationRendersErrorMessage(){
+            // Arrange
+            var expected = 'Invalid format attribute';                          
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw new Error();}                    
+                },                              
+                log: function(e){}
+            });                                     
+
+            // Act
+            mockUtil(function(){
+                targetRenderer.rerender(targetComponent, targetHelper);
+            });
+
+            // Assert
             Assert.Equal(expected, targetElement.textContent);
+        }
+
+        [Fact]
+        function ErrorInLocalizationRendersErrorMessageForIE(){
+            // Arrange
+            var expected = 'Invalid format attribute';                          
+            
+            var mockFormat={
+                format:function(num){
+                    if(num == targetValue) return targetValue;
+                }
+            }       
+            
+            var mockUtil = Mocks.GetMock(Object.Global(), "$A", {                                
+                util: {   
+                    isNumber: function(num) { if(num == targetValue)return true;},
+                    isString: function(num) { if(num == targetValue)return false;},
+                    isEmpty: function(f) { if(f == targetFormat)return false;}
+                },
+                get: function(val){
+                    if(val == "$Locale.decimal") return targetDecimal;
+                    if(val == "$Locale.grouping") return targetGrouping;
+                    if(val == "$Locale.currencyFormat") return targetFormat;                    
+                },
+                localizationService: {
+                    getNumberFormat: function(f, s) { if(f == targetFormat && 
+                                                         s.currencyCode == targetCurrencyCode &&
+                                                         s.currency == targetCurrencySymbol &&
+                                                         s.decimalSeparator == targetDecimal &&
+                                                         s.groupingSeparator == targetGrouping)  throw new Error();}                    
+                },                              
+                log: function(e){}
+            });                                     
+
+            // Act
+            mockUtil(function(){
+                targetRenderer.rerender(targetComponent, targetHelper);
+            });
+
+            // Assert
+            Assert.Equal(expected, targetElement.innerText);
         }
     }
 }

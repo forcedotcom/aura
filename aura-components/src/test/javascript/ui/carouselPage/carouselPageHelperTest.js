@@ -29,7 +29,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     	[Fact]
     	function PageSelectedAddsCorrectCSS(){
     		// Arrange
-    		expected = "addClass";
+    		var expected = "addClass";
 
     		var targetComponent = {
                 set:function(){},
@@ -75,7 +75,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
 				}
 			}));
 
-    		actual = "";
+    		var actual = "";
 
     		// Act
     		mockAura(function(){
@@ -89,7 +89,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     	[Fact]
     	function PageUnSelectedAddsCorrectCSS(){
     		// Arrange
-    		expected = "removeClass";
+    		var expected = "removeClass";
 
     		var targetComponent = {
                 set:function(){},
@@ -126,7 +126,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
 				}
 			}));
 
-    		actual = "";
+    		var actual = "";
 
     		// Act
     		mockAura(function(){
@@ -156,7 +156,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     			getParam : function(param) {return true;}
     		};
 
-    		actual = false;
+    		var actual = false;
 
     		// Act
     		targetHelper.updatePage(targetComponent, targetEvent);
@@ -180,7 +180,7 @@ Test.Components.Ui.Carousel.CarouselPageHelperTest=function(){
     			getParam : function(param) {return true;}
     		};
 
-    		actual = false;
+    		var actual = false;
 
     		// Act
     		targetHelper.updatePage(targetComponent, targetEvent);

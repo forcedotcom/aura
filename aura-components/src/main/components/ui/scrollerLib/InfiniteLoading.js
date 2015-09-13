@@ -110,7 +110,7 @@ function (w) {
         _triggerInfiniteLoadingDataProvider: function () {
             var self            = this,
                 ilDataProvider  = this.opts.infiniteLoadingConfig.dataProvider,
-                callback        = function () {
+                callback        = function() {                    
                     self._infiniteLoadingTriggerCallback.apply(self, arguments);
                 };
 

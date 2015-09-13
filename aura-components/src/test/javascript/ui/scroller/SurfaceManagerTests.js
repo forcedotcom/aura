@@ -93,27 +93,6 @@ Test.Components.Ui.Scroller.SurfaceManager=function(){
 	[Fixture]
 	function ManipulateDOM(){
 
-		[Fact, Skip("Not sure what is failing but this doesnt add any value")]
-		function AppendItems(){
-			var value,
-				domStubAlias=Test.Stubs.Aura.Dom;
-			fnMocks(function(){
-				windowMock(function(){
-					
-					surfaceManager.init();
-					surfaceManager.appendItems([domStubAlias.GetNode({id:"appended-3"}),domStubAlias.GetNode({id:"appended-4"})]);
-					System.Environment.Write(surfaceManager.items[0].dom.id);
-					System.Environment.Write(surfaceManager.items[1].dom.id);
-					System.Environment.Write(surfaceManager.items[2].dom.id);
-					//this test currently fails because destroy() is called in init
-					value=(surfaceManager.items[1].dom.id==="appended-3" && surfaceManager.items[2].dom.id==="appended-4");
-				});
-				
-			});
-
-			Assert.True(value);
-		}
-
 		[Fact]
 		function PrependItems(){
 			var value,

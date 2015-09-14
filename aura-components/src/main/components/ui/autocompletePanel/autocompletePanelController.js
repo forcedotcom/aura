@@ -15,30 +15,11 @@
  */
 ({
 
-	handleZIndex: function(cmp) {
+	handleZIndex: function(cmp, evt, helper) {
 		cmp.getElement().style.zIndex = cmp.get('v.zIndex');
 	},
 
 	handleReferenceElement: function(cmp, evt, helper) {
-		
-		var elem = cmp.getElement();
-		var referenceElem = cmp.get('v.referenceElement');
-		elem.offsetHeight;
-		if(!cmp.positionConstraint) {
-			cmp.positionConstraint = helper.lib.panelPositioning.createRelationship({
-	            element:elem,
-	            target:referenceElem,
-	            appendToBody: true,
-	            align: 'left top',
-	            targetAlign: 'left bottom'
-        	});
-		}
-
-		//some kind of race condtion here, look at tomorrow, brain failing
-		helper.lib.panelPositioning.reposition();
-		setTimeout(function() {
-			helper.lib.panelPositioning.reposition();
-		}, 100);
-		
+		helper.handleReferenceElement(cmp);
 	}
-})// eslint-disable-line semi
+})

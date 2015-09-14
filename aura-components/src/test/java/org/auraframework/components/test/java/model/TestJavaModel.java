@@ -332,6 +332,11 @@ public class TestJavaModel {
     }
 
     @AuraEnabled
+    public String getEmptyString() {
+        return "";
+    }
+    
+    @AuraEnabled
     public String getString() {
         return "Model";
     }

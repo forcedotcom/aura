@@ -25,10 +25,18 @@
     <aura:attribute name="Infinity" type="double"/>
     <aura:attribute name="NegativeInfinity" type="double"/>
     <aura:attribute name="NaN" type="double"/>
-
+    
+    <aura:attribute name="nullObj" type="Object"/>
+    <aura:attribute name="nullList" type="List"/>
     <aura:attribute name="object" type="Object"/>
+    
+    <aura:attribute name="map" type="Map" default = "{ key1: 'zero', key2: 0, key3: { key4: 0 } }"/>
 
-    <aura:attribute name="list" type="List"/>
+    <aura:attribute name="list" type="List" default='1,2,3'/>
+    <aura:attribute name="listWithNull" type="List"/>
+    <aura:attribute name="listWithList" type="List"/>
+    <aura:attribute name="listWithNested4Layers" type="List"/>
+    <aura:attribute name="listWithLoop" type="List"/>
 
     <aura:attribute name="label0" type="String"/>
     <aura:attribute name="label1" type="String"/>
@@ -123,13 +131,13 @@
     <expressionTest:test expression="{!v.NaN ? 'yes' : 'no'}" exprText="v.NaN ? 'yes' : 'no'" expected="'no'"/>
 
     <!-- add -->
+    <expressionTest:test expression="{!3146431.43266 + 937.1652}" exprText="3146431.43266 + 937.1652" expected="3147368.59786"/>
     <expressionTest:test expression="{!0 + 0}" exprText="0 + 0" expected="0"/>
-    <expressionTest:test expression="{!add(m.integer, 2.0)}" exprText="add(m.integer, 2.0)" expected="413"/>
-    <expressionTest:test expression="{!concat(4.1,v.integer)}" exprText="concat(4.1,v.integer)" expected="11.1"/>
     <expressionTest:test expression="{!0 + 'x'}" exprText="0 + 'x'" expected="'0x'"/>
     <expressionTest:test expression="{!'a' + v.double}" exprText="'a' + v.double" expected="'a3.1'"/>
     <expressionTest:test expression="{!'a' + 'x'}" exprText="'a' + 'x'" expected="'ax'"/>
     <expressionTest:test expression="{!3 + ''}" exprText="3 + ''" expected="'3'"/>
+    <expressionTest:test expression="{!'' + 3}" exprText="3 + ''" expected="'3'"/>
     <expressionTest:test expression="{!m.emptyString + '3'}" exprText="m.emptyString + '3'" expected="'3'"/>
     <expressionTest:test expression="{!'3' + '3'}" exprText="'3' + '3'" expected="'33'"/>
     <expressionTest:test expression="{!v.Infinity + 2}" exprText="v.Infinity + 2" expected="Infinity"/>
@@ -140,6 +148,26 @@
     <expressionTest:test expression="{!'100' + v.NaN}" exprText="'100' + v.NaN" expected="'100NaN'"/>
     <expressionTest:test expression="{!m.date + 5}" exprText="m.date + 5" expected="'2004-09-23T16:30:00.000Z5'"/>
     <expressionTest:test expression="{!m.date + '8'}" exprText="m.date + '8'" expected="'2004-09-23T16:30:00.000Z8'"/>
+    <expressionTest:test expression="{!v.nullObj + 1}" exprText="v.nullObj + 1" expected="1"/>
+    <expressionTest:test expression="{!v.nullObj + 'b'}" exprText="v.nullObj + 'b'" expected="'b'"/>
+    <expressionTest:test expression="{!v.nullObj + 2.5}" exprText="v.nullObj + 2.5" expected="2.5"/>
+    <expressionTest:test expression="{!'b' + v.nullObj}" exprText="'b' + v.nullObj" expected="'b'"/>
+    <expressionTest:test expression="{!v.nullObj + v.nullObj}" exprText="v.nullObj + v.nullObj" expected="''"/>
+    <expressionTest:test expression="{!'' + (-0.0)}" exprText="'' + (-0.0)" expected="'0'"/>
+    <expressionTest:test expression="{!v.nullList + 'a'}" exprText="v.nullList + 'a'" expected="'a'"/>
+    <expressionTest:test expression="{!v.list + 'a'}" exprText="v.list + 'a'" expected="'1,2,3a'"/>
+    <expressionTest:test expression="{!v.listWithNull + ''}" exprText="v.listWithNull + ''" expected="',a'"/>
+    <expressionTest:test expression="{!v.listWithList + ''}" exprText="v.listWithList + ''" expected="',a,,b,c'"/>
+    
+    <expressionTest:test expression="{!v.listWithNested4Layers + ''}" exprText="v.listWithNested4Layers + ''" expected="'6,7,4,5,2,3,0,1,b'"/>
+    <expressionTest:test expression="{!v.listWithLoop + ''}" exprText="v.listWithLoop + ''" expected="'0,1,'"/>
+    
+    <expressionTest:test expression="{!v.map + ''}" exprText="v.map + ''" expected="'[object Object]'"/>
+    
+    <!-- concat() behaves the same as add() -->
+    <expressionTest:test expression="{!add(m.integer, 2.0)}" exprText="add(m.integer, 2.0)" expected="413"/>
+    <expressionTest:test expression="{!concat(4.1,v.integer)}" exprText="concat(4.1,v.integer)" expected="11.1"/>
+    
 
     <!-- subtract -->
     <expressionTest:test expression="{!3 - 1}" exprText="3 - 1" expected="2"/>

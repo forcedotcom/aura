@@ -106,7 +106,6 @@
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>
-        <xunit.js.auraImpl>${basedir}/src/main/resources/</xunit.js.auraImpl>
     </properties>
     <build>
         <resources>

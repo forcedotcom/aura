@@ -42,16 +42,26 @@
         <selenium.version>2.45.0</selenium.version>
         <!-- xUnit properties:
           xunit.js.testPath the path to an individual test to run
-          xunit.js.auraImpl the path to the aura implementation libraries (if not unpacked, override)
           xunit.js.engine the engine to use.
         -->
         <xunit.js.testPath>${project.basedir}/src/test/javascript</xunit.js.testPath>
-        <xunit.js.auraImpl>${project.build.directory}/tools/src/main/resources/</xunit.js.auraImpl>
         <xunit.js.report>${project.build.directory}/surefire-reports/TEST-xunit.xml</xunit.js.report>
         <xunit.js.engine>rhino</xunit.js.engine>
         <xunit.js.format>junit</xunit.js.format>
         <xunit.js.verbose>false</xunit.js.verbose>
+        <xunit.js.coverage>false</xunit.js.coverage>
     </properties>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <url>http://repo1.maven.org/maven2/</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>Sonatype repository</id>
+            <name>Sonatype's Maven repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <repositories>
         <repository>
             <snapshots>
@@ -598,71 +608,9 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>unpack-xunit</id>
-                            <phase>disabled</phase>
-                            <goals>
-                                <goal>unpack</goal>
-                            </goals>
-                            <configuration>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>org.auraframework</groupId>
-                                        <artifactId>aura-util</artifactId>
-                                        <type>test-jar</type>
-                                        <overWrite>true</overWrite>
-                                        <outputDirectory>${project.build.directory}</outputDirectory>
-                                        <includes>tools/**</includes>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>unpack-auraImpl</id>
-                            <phase>disabled</phase>
-                            <goals>
-                                <goal>unpack</goal>
-                            </goals>
-                            <configuration>
-                                <artifactItems>
-                                    <artifactItem>
-                                        <groupId>org.auraframework</groupId>
-                                        <artifactId>aura-impl</artifactId>
-                                        <type>test-jar</type>
-                                        <overWrite>true</overWrite>
-                                        <outputDirectory>${xunit.js.auraImpl}</outputDirectory>
-                                        <includes>tools/src/main/resources/**</includes>
-                                    </artifactItem>
-                                </artifactItems>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>2.7</version>
                     <executions>
-                        <execution>
-                            <id>copy-xunit</id>
-                            <phase>disabled</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>${aura.home}/aura-util/src/test</directory>
-                                        <includes>
-                                            <include>tools/xUnit/*</include>
-                                        </includes>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
                         <execution>
                             <id>copy-jstest</id>
                             <phase>disabled</phase>
@@ -728,6 +676,14 @@
                                                 <arg value="/verbose:${xunit.js.verbose}" />
                                                 <arg value="/dependency:${basedir}/../aura-util/src/test/tools/xUnit/dependencies/" />
                                                 <arg value="${xunit.js.testPath}" />
+                                                <!-- jscover instrumentation args -->
+                                                <if>
+                                                    <equals arg1="${xunit.js.coverage}" arg2="true" />
+                                                    <then>
+                                                        <arg value="/coverage:${xunit.js.coverage}" />
+                                                        <arg value="/logFile:target/xunitjs/jscoverage.json" />
+                                                    </then>
+                                                </if>
                                             </java>
                                         </case>
                                         <default>
@@ -990,36 +946,61 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>com.github.tntim96</groupId>
+                    <artifactId>jscover-file-maven-plugin</artifactId>
+                    <version>1.0.16-SNAPSHOT</version>
+                    <executions>
+                        <execution>
+                            <id>instrument-javascript-resources</id>
+                            <phase>disabled</phase>
+                            <goals>
+                                <goal>instrument</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
+                        <reportDir>${project.parent.basedir}/target/${project.artifactId}</reportDir>
+                        <testDirectory>src/test</testDirectory>
+                        <branchCoverageMinimum>100</branchCoverageMinimum>
+                        <functionCoverageMinimum>100</functionCoverageMinimum>
+                        <lineCoverageMinimum>100</lineCoverageMinimum>
+                        <excludeArgs>
+                            <excludeArg>--exclude=src/main/java</excludeArg>
+                            <excludeArg>--exclude=target</excludeArg>
+                        </excludeArgs>
+                        <instrumentPathArgs>
+                            <arg>--no-instrument=src/test</arg>
+                        </instrumentPathArgs>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.tntim96</groupId>
+                    <artifactId>jscover-report-maven-plugin</artifactId>
+                    <version>1.0.16-SNAPSHOT</version>
+                    <executions>
+                        <execution>
+                            <id>generate-cobertura-xml</id>
+                            <phase>disabled</phase>
+                            <goals>
+
+                                <goal>format</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <!--Configuration for format goal-->
+                        <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
+                        <reportDir>${project.parent.basedir}/${project.artifactId}/target/xunitjs</reportDir>
+                        <coberturaXML>true</coberturaXML>
+                        <lCOV>true</lCOV>
+                    </configuration>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
     <profiles>
-        <profile>
-            <id>m2e</id>
-            <activation>
-                <property>
-                    <name>m2e.version</name>
-                </property>
-            </activation>
-            <build>
-            	<plugins>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-dependency-plugin</artifactId>
-	                    <executions>
-	                        <execution>
-	                            <id>unpack-xunit</id>
-	                            <phase>disabled</phase>
-	                        </execution>
-	                        <execution>
-	                            <id>unpack-auraImpl</id>
-	                            <phase>disabled</phase>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-            	</plugins>
-            </build>
-        </profile>
         <profile>
             <id>version</id>
             <activation>

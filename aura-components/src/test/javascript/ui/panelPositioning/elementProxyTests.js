@@ -75,6 +75,9 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 	function getMockElement(id, dims, computedStyle) {
 		var el = new MockElement(dims, null, computedStyle);
 		el.id = id;
+		el.parentNode = {
+			tagName: 'body'
+		}
 		return el;
 	}
 
@@ -274,6 +277,20 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 			proxy.bake();
 
 			Assert.False(proxy.isDirty());
+		}
+
+	}
+
+	[Fixture]
+	function isInDom() {
+
+		[Fact]
+		function documentFragmentNotInDom() {
+			var el = getMockElement("foo");
+			delete el.parentNode.tagName;
+			var actual = positioningNS.isInDom(el)
+			
+			Assert.Equal(false, actual);
 		}
 	}
 

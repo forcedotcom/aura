@@ -17,4 +17,6 @@
 -->
 <aura:event type="COMPONENT" support="GA" description="Indicates that an option in a list gets selected.">
     <aura:attribute name="option" type="Aura.Component[]" description="The option component selected."/>
+    <aura:attribute name="isHeader" type="Boolean" default="false" description="True if the selected option is the header option"/>
+    <aura:attribute name="isFooter" type="Boolean" default="false" description="True if the selected option is the footer option"/>
 </aura:event>

@@ -100,7 +100,9 @@
     handleSelectOption: function(component, event) {
         var optionSelectEvt = component.get("e.selectListOption");
         optionSelectEvt.setParams({
-            option: event.getParam("option")
+            option: event.getParam("option"),
+            isHeader: event.getParam("isHeader")==true,
+            isFooter: event.getParam("isFooter")==true
         });
         optionSelectEvt.fire();
     },

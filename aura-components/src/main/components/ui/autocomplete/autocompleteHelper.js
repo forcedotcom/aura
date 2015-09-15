@@ -93,8 +93,18 @@
     },
 
     handleEnterkeyOnList: function(component, list) {
-        var pEvent = list.get("e.pressOnHighlighted");
-        pEvent.fire();
+        if (list.get("v.headerSelected")) {
+            var optionSelectEvt = component.get("e.selectListOption");
+            optionSelectEvt.setParams({ option:  component.get("v.listHeader"), isHeader: true  });
+            optionSelectEvt.fire();
+        } else if (list.get("v.footerSelected")) {
+            var optionSelectEvt = component.get("e.selectListOption");
+            optionSelectEvt.setParams({ option:  component.get("v.listFooter"), isFooter: true  });
+            optionSelectEvt.fire();
+        } else {
+            var pEvent = list.get("e.pressOnHighlighted");
+            pEvent.fire();
+        }
     },
 
     handleEnterKeyOnInput: function(component, input) {

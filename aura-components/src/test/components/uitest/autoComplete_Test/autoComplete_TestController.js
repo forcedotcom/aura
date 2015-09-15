@@ -17,6 +17,10 @@
     handleInputChangeAutoComplete: function(cmp, event, helper) {
         helper.handleInputChange(cmp, event, "autoComplete");
     },
+
+    handleInputChangeAutoCompleteHeaderFooter: function(cmp, event, helper) {
+        helper.handleInputChange(cmp, event, "autoCompleteHeaderFooter");
+    },
     
     handleKeyDown: function(cmp, event, helper) {
     	cmp.find("outputLabel").set("v.value", "KeyDown Event Fired");
@@ -49,9 +53,13 @@
     handleInputChangeToggle: function(cmp, event, helper) {
         helper.handleInputChange(cmp, event, "autoCompleteToggle");
     },
-    
+
     handleSelectOptionAutoComplete: function(cmp, event, helper) {
-    	helper.handleSelectOption(cmp, event, "autoComplete");
+        helper.handleSelectOption(cmp, event, "autoComplete");
+    },
+
+    handleSelectOptionAutoCompleteHeaderFooter: function(cmp, event, helper) {
+        helper.handleSelectOption(cmp, event, "autoCompleteHeaderFooter");
     },
     
     handleSelectOptionNoData: function(cmp, event, helper) {
@@ -81,9 +89,13 @@
     handleSelectOptionToggle: function(cmp, event, helper) {
         helper.handleSelectOption(cmp, event, "autoCompleteToggle");
     },
-    
+
     handleInputChangeAutoCompleteMatchDone: function(cmp, event, helper) {
-    	helper.handleMatchDone(cmp, event, "autoComplete");
+        helper.handleMatchDone(cmp, event, "autoComplete");
+    },
+
+    handleInputChangeAutoCompleteMatchDoneHeaderFooter: function(cmp, event, helper) {
+        helper.handleMatchDone(cmp, event, "autoCompleteHeaderFooter");
     },
     
     handleInputChangeNoDataMatchDone: function(cmp, event, helper) {

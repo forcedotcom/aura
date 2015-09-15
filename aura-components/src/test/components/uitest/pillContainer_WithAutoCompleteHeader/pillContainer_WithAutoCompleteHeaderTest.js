@@ -62,6 +62,7 @@
         this._fireInputchange(autocomplete, value);
 
         this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);
+        this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
         return textInput;
     },

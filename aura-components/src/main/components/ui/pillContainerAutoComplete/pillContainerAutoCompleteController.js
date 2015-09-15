@@ -25,6 +25,9 @@
     },
 
     onSelect: function (component, event, helper) {
+        if (event.getParam("isHeader")||event.getParam("isFooter")) {
+            return;
+        }
         var optionCmp = event.getParam("option");
 
         var onItemSelected = component.getEvent("onItemSelected");
@@ -42,11 +45,6 @@
             list.set("v.visible", false);
         }
 
-// JBUCH: THERE IS NO v.selectListOption, IT'S AN EVENT! AND WE'RE ALREADY HANDLING THAT EVENT IN THIS METHOD, SEE LINE 19
-//        var onSelect = superComponent.get('v.selectListOption');
-//        if (onSelect) {
-//            $A.enqueueAction(onSelect);
-//        }
     },
 
     focus: function(component, event, helper) {

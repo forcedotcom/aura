@@ -23,9 +23,29 @@
 
     handleClick: function(component, event, helper) {
         var targetCmp = helper.getEventSourceOptionComponent(component, event);
+        if (targetCmp) {
+            var selectEvt = component.get("e.selectListOption");
+            selectEvt.setParams({
+                option: targetCmp
+            });
+            selectEvt.fire();
+        }
+    },
+
+    handleHeaderClick: function(component, event, helper) {
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
-            option: targetCmp
+            option: component.get("v.listHeader")[0],
+            isHeader: true
+        });
+        selectEvt.fire();
+    },
+
+    handleFooterClick: function(component, event, helper) {
+        var selectEvt = component.get("e.selectListOption");
+        selectEvt.setParams({
+            option: component.get("v.listFooter")[0],
+            isFooter: true
         });
         selectEvt.fire();
     },

@@ -394,6 +394,16 @@
                 <artifactId>mongo-java-driver</artifactId>
                 <version>3.0.2</version>
             </dependency>
+            <dependency>
+                <groupId>com.github.tntim96</groupId>
+                <artifactId>jscover-file-maven-plugin</artifactId>
+                <version>1.0.16-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tntim96</groupId>
+                <artifactId>jscover-report-maven-plugin</artifactId>
+                <version>1.0.16-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>
@@ -677,13 +687,8 @@
                                                 <arg value="/dependency:${basedir}/../aura-util/src/test/tools/xUnit/dependencies/" />
                                                 <arg value="${xunit.js.testPath}" />
                                                 <!-- jscover instrumentation args -->
-                                                <if>
-                                                    <equals arg1="${xunit.js.coverage}" arg2="true" />
-                                                    <then>
-                                                        <arg value="/coverage:${xunit.js.coverage}" />
-                                                        <arg value="/logFile:target/xunitjs/jscoverage.json" />
-                                                    </then>
-                                                </if>
+                                                <arg value="/coverage:${xunit.js.coverage}" />
+                                                <arg value="/logFile:target/xunitjs/jscoverage.json" />
                                             </java>
                                         </case>
                                         <default>
@@ -694,12 +699,12 @@
                                         <case value="xml">
                                             <echo>Generating test report</echo>
                                             <xslt in="${project.build.directory}/xunitjs/rawresults.xml" out="${xunit.js.report}" style="${basedir}/target/tools/xUnit/junit.xsl" />
-                                            <echo>Test report completed: ${xunit.js.report}</echo>i
+                                            <echo>Test report completed: ${xunit.js.report}</echo>
                                         </case>
                                         <case value="junit">
                                             <echo>Generating test report in junit format</echo>
                                             <copy file="${project.build.directory}/xunitjs/rawresults.xml" tofile="${xunit.js.report}" />
-                                            <echo>Test report completed: ${xunit.js.report}</echo>i
+                                            <echo>Test report completed: ${xunit.js.report}</echo>
                                         </case>
                                         <default>
                                             <echo>output in: "${project.build.directory}/xunitjs/rawresults.xml"</echo>

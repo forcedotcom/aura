@@ -52,7 +52,7 @@ Test.Tools.Aura.Output.OutputStrategy.JUnit = function () {
         writeErrors(output);
         output.push('\n</testsuite>\n');
         var parameters=System.Environment.GetParameters();
-        if(parameters.named.logfile){
+        if(parameters.named.logfile && parameters.named.logfile.indexOf('.json') === -1){
             System.IO.File.SaveFile(parameters.named.logfile,output.join(''));
         }else{
             System.Environment.Write(output.join(''));

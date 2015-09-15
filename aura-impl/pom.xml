@@ -202,28 +202,6 @@
             </build>
         </profile>
         <profile>
-            <id>m2eAuraImpl</id>
-            <activation>
-                <property>
-                    <name>m2e.version</name>
-                </property>
-            </activation>
-            <build>
-            	<plugins>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-resources-plugin</artifactId>
-	                    <executions>
-	                        <execution>
-	                            <id>copy-xunit</id>
-	                            <phase>generate-sources</phase>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-            	</plugins>
-            </build>
-        </profile>
-        <profile>
             <id>runSinglexunitTest</id>
             <activation>
                 <property>
@@ -243,16 +221,6 @@
             </activation>
             <build>
                 <plugins>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-dependency-plugin</artifactId>
-	                    <executions>
-	                        <execution>
-	                            <id>unpack-xunit</id>
-	                            <phase>generate-test-resources</phase>
-	                        </execution>
-	                    </executions>
-	                </plugin>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>
@@ -309,6 +277,47 @@
                             <execution>
                                 <id>grunt-build</id>
                                 <phase>pre-clean</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>xunit.js.coverage</id>
+            <properties>
+                <xunit.js.testPath>${user.dir}/target/${project.artifactId}/src/test/javascript</xunit.js.testPath>
+                <xunit.js.format>jscover</xunit.js.format>
+                <xunit.js.coverage>true</xunit.js.coverage>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.tntim96</groupId>
+                        <artifactId>jscover-file-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>instrument-javascript-resources</id>
+                                <phase>process-test-classes</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>xunit.js</id>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.tntim96</groupId>
+                        <artifactId>jscover-report-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-cobertura-xml</id>
+                                <phase>verify</phase>
                             </execution>
                         </executions>
                     </plugin>

@@ -99,7 +99,7 @@
         <chromedriver.url>http://chromedriver.storage.googleapis.com/{version}/{artifactId}_{classifier}.zip</chromedriver.url>
         <chromedriver.version>2.15</chromedriver.version>
         <jetty.spawn>true</jetty.spawn>
-        <jetty.resources>${basedir}/src/test/resources/htdocs</jetty.resources>
+        <jetty.resources>${basedir}/../aura/src/main/webapp</jetty.resources>
         <aura.build.id />
         <aura.home>${basedir}/..</aura.home>
         <screenshots.baseurl>file://${screenshots.directory}</screenshots.baseurl>

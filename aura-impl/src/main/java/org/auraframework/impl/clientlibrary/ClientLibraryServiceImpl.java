@@ -38,17 +38,17 @@ import org.auraframework.throwable.NoContextException;
 import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
-//import com.google.common.cache.Cache;
-//import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import aQute.bnd.annotation.component.Component;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 
 /**
  * Service for including external client libraries (CSS or JS)
  */
 @Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class ClientLibraryServiceImpl implements ClientLibraryService {
 
 

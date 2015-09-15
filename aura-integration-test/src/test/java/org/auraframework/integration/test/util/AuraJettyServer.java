@@ -49,7 +49,7 @@ public class AuraJettyServer extends Server {
     }
 
     private AuraJettyServer(String host, int port, String contextPath) {
-        String tmpPath = System.getProperty("java.io.tmpdir") + "/webapp";
+        String tmpPath = System.getProperty("java.io.tmpdir") + "/src/main/webapp";
         File tmpDir = new File(tmpPath);
         if (!tmpDir.exists()) {
             tmpDir.mkdirs();
@@ -64,8 +64,8 @@ public class AuraJettyServer extends Server {
         setConnectors(new Connector[] { connector });
 
         WebAppContext context = new WebAppContext();
-        context.setDefaultsDescriptor(Aura.class.getResource("/aura/http/WEB-INF/webdefault.xml").toString());
-        context.setDescriptor(Aura.class.getResource("/aura/http/WEB-INF/web.xml").toString());
+            context.setDefaultsDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/webdefault.xml").toString());
+        context.setDescriptor(Aura.class.getResource("/aura/webapp/WEB-INF/web.xml").toString());
         context.setContextPath(contextPath);
         context.setParentLoaderPriority(true);
         context.setTempDirectory(tmpDir);

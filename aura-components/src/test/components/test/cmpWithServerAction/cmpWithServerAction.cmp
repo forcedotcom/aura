@@ -8,4 +8,5 @@
                  action="{!c.updateTextWithStringFromServerController}">
         <aura:attribute name="setStorableAction" type="Boolean" default="true"/>
     </aura:method>
+    <aura:method name="updateTextWithCallingDescriptor" action="{!c.updateTextWithCallingDescriptor}"/>
 </aura:component>

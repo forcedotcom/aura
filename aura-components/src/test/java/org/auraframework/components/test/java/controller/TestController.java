@@ -20,6 +20,8 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.instance.Action;
 import org.auraframework.instance.Component;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
@@ -57,6 +59,17 @@ public class TestController {
         Map<String, Object> m = Maps.newHashMap();
         m.put("string", Lists.newArrayList(s));
         return Aura.getInstanceService().getInstance("iterationTest:basicIteration", ComponentDef.class, m);
+    }
+
+    @AuraEnabled
+    public static String currentCallingDescriptor() {
+        Action currentAction = Aura.getContextService().getCurrentContext().getCurrentAction();
+        DefDescriptor<ComponentDef> defDescr = currentAction.getCallingDescriptor();
+        String qualifiedName = null;
+        if(defDescr != null) {
+            qualifiedName = defDescr.getQualifiedName();;
+        }
+        return qualifiedName;
     }
 
     @AuraEnabled

@@ -29,15 +29,21 @@
 		}
 		
 		if (cmp.get("v.panelFooter").length == 0 || forceCreate) {
-			var defaultCustomFooter = $A.newCmp({
+			var defaultCustomFooter = [$A.newCmp({
 	    		componentDef: "markup://ui:outputText",
 	    		attributes: {
 	    			values: {
 	    				"class": "defaultCustomPanelFooter",
 	    				value: "This is a default custom panel footer"
 	    			}
-	    		}
-			});
+	    		}}), $A.newCmp({
+    			componentDef: "markup://ui:button",
+	    		attributes: {
+	    			values: {
+	    				"class": "defaultCustomPanelFooterBtn",
+	    				label: "a button"
+	    			}
+	    	}})];
 			cmp.set("v.panelFooter", defaultCustomFooter);
 		}
 	}

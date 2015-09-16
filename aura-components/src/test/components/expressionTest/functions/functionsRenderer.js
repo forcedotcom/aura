@@ -24,6 +24,33 @@
         cmp.set("v.NegativeInfinity", -Infinity);
         cmp.set("v.NaN", NaN);
         cmp.set("v.object", {});
+        cmp.set("v.nullObj", null);
+        cmp.set("v.nullList", null);
+        
+        cmp.get("v.listWithNull").push(null);
+        cmp.get("v.listWithNull").push('a');
+        
+        cmp.get("v.listWithList").push(null);
+        cmp.get("v.listWithList").push('a');
+        cmp.get("v.listWithList").push(cmp.get("v.nullList"));
+        cmp.get("v.listWithList").push('b');
+        cmp.get("v.listWithList").push('c');
+        
+        var lst0 = [0,1];
+        var lst1 = [2,3];
+        lst1.push(lst0);
+        var lst2 = [4,5];
+        lst2.push(lst1);
+        var lst3 = [6,7];
+        lst3.push(lst2);
+        lst3.push('b');
+        cmp.set("v.listWithNested4Layers", lst3);
+
+        
+        var lst0 = [0,1]
+        lst0.push(lst0);
+        cmp.set("v.listWithLoop", lst0)
+        
 
         cmp.set("v.label0", "Hello");
         cmp.set("v.label1", "Hello {0}");

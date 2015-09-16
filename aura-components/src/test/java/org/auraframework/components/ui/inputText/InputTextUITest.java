@@ -71,7 +71,8 @@ public class InputTextUITest extends WebDriverTestCase {
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD,
             BrowserType.SAFARI, BrowserType.IPHONE })
     // Change event not picked up on IOS devices
-    public void testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
+    // Flapper: W-2755040
+    public void _testUpdateOnAttributeWithLabelsForNonIosAndroidDevice() throws Exception {
         doTestUpdateOnAttributeForNonIosAndroidDevice(TEST_CMP_WITH_LABELS);
     }
 

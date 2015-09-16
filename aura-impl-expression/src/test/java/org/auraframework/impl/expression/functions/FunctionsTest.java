@@ -35,6 +35,7 @@ import static org.auraframework.impl.expression.functions.MultiFunctions.LESS_TH
 import static org.auraframework.impl.expression.functions.UtilFunctions.EMPTY;
 import static org.auraframework.impl.expression.functions.UtilFunctions.FORMAT;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -56,104 +57,157 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         return f.evaluate(Lists.newArrayList(args));
     }
 
-    // ADD
+    /* ADD 
+     * we try to make sure ADD() on java side give us the same output as add() on JS side
+     * tests on js side are in expressionTest/functions.cmp
+     * here every test function (more or less) is a equivalent to a test cmp (expressionTest:test) in function.cmp.
+     * 'skip' in the comment means we cannot test the same thing on the other side
+     * 'diff' means js side give us different output
+     * just fyi: m.integer = 411; v.integer=7; v.double=3.1; v.doubleString="2.1"; v.string="Component"; v.list=[1,2,3]
+              v.emptyString"="";  v.Infinity=Infinity; v.NegativeInfinity=-Infinity; v.NaN=NaN; v.object={};
+    
+    Note: Add has two keys : 'add' and 'concat', they are the same, that's why we have test like this on JS side
+    <expressionTest:test expression="{!concat(4.1,v.integer)}" exprText="concat(4.1,v.integer)" expected="11.1"/>
+    I don't see people using concat, why we have two anyway
+   */
 
+    //<expressionTest:test expression="{!m.date + 5}" exprText="m.date + 5" expected="'2004-09-23T16:30:00.000Z5'"/>
+    //diff : on JS side we actually resolve the date, here we just output [object Object]
+    public void testAddDateAndInt() throws Exception {
+    	Date d = new Date(1095957000000L);
+    	assertEquals("[object Object]5", evaluate(ADD, d, 5));
+    }
+    
+    //<expressionTest:test expression="{!m.date + '8'}" exprText="m.date + '8'" expected="'2004-09-23T16:30:00.000Z8'"/>
+    //diff : on JS side we actually resolve the date, here we just output [object Object]
+    public void testAddDateAndString() throws Exception {
+    	Date d = new Date(1095957000000L);
+    	assertEquals("[object Object]8", evaluate(ADD, d, "8"));
+    }
+    
+    //<expressionTest:test expression="{!3146431.43266 + 937.1652}" exprText="3146431.43266 + 937.1652" expected="3147368.59786"/>
     public void testAddTwoDoubles() throws Exception {
         assertEquals(3146431.43266 + 937.1652, evaluate(ADD, 3146431.43266, 937.1652));
     }
 
+    //<expressionTest:test expression="{!'a' + 'x'}" exprText="'a' + 'x'" expected="'ax'"/>
+    //<expressionTest:test expression="{!'3' + '3'}" exprText="'3' + '3'" expected="'33'"/>
+    //<expressionTest:test expression="{!m.emptyString + '3'}" exprText="m.emptyString + '3'" expected="'3'"/>
     public void testAddTwoStrings() throws Exception {
         assertEquals("12", evaluate(ADD, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!add(m.integer, 2.0)}" exprText="add(m.integer, 2.0)" expected="413"/>
     public void testAddIntAndDouble() throws Exception {
         assertEquals(314 + 3146431.43266, evaluate(ADD, 314, 3146431.43266));
     }
 
+    //<expressionTest:test expression="{!0 + 0}" exprText="0 + 0" expected="0"/>
     public void testAddTwoInts() throws Exception {
         assertEquals(235639, evaluate(ADD, 314, 235325));
     }
 
+    //<expressionTest:test expression="{!1 + v.NaN}" exprText="1 + v.NaN" expected="NaN"/>
+    public void testAddIntAndNaN() throws Exception {
+        assertEquals(Double.NaN, evaluate(ADD, 314, Double.NaN));
+    }
+
+    //skip: we don't support Number.MAX_VALUE in markup
+    public void testAddOverflow() throws Exception {
+        assertEquals(Double.MAX_VALUE, evaluate(ADD, Double.MAX_VALUE, 2.0));
+    }
+
+    //<expressionTest:test expression="{!'a' + v.double}" exprText="'a' + v.double" expected="'a3.1'"/>
+    public void testAddStringAndDouble() throws Exception {
+        assertEquals("0937.1652", evaluate(ADD, "0", 937.1652));
+    }
+
+    //<expressionTest:test expression="{!0 + 'x'}" exprText="0 + 'x'" expected="'0x'"/>
+    public void testAddZeroAndString() throws Exception {
+        assertEquals("01", evaluate(ADD, 0, "1"));
+    }
+
+    //<expressionTest:test expression="{!3 + ''}" exprText="3 + ''" expected="'3'"/>
+    public void testAddIntAndEmptyString() throws Exception {
+        assertEquals("314", evaluate(ADD, 314, ""));
+    }
+
+    //<expressionTest:test expression="{!'' + 3}" exprText="3 + ''" expected="'3'"/>
+    public void testAddEmptyStringAndInt() throws Exception {
+        assertEquals("314", evaluate(ADD, "", 314));
+    }
+    
+    //<expressionTest:test expression="{!v.Infinity + 2}" exprText="v.Infinity + 2" expected="Infinity"/>
     public void testAddInfinityAndInt() throws Exception {
         assertEquals(Double.POSITIVE_INFINITY, evaluate(ADD, Double.POSITIVE_INFINITY, 235325));
         assertEquals(Double.POSITIVE_INFINITY, evaluate(ADD, Float.POSITIVE_INFINITY, 235325));
     }
 
+   //<expressionTest:test expression="{!v.Infinity + v.NegativeInfinity}" exprText="v.Infinity + v.NegativeInfinity" expected="NaN"/>
     public void testAddInfinityAndNegativeInfinity() throws Exception {
         assertEquals(Double.NaN, evaluate(ADD, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY));
         assertEquals(Double.NaN, evaluate(ADD, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY));
     }
 
-    public void testAddIntAndNaN() throws Exception {
-        assertEquals(Double.NaN, evaluate(ADD, 314, Double.NaN));
-    }
-
-    public void testAddOverflow() throws Exception {
-        assertEquals(Double.MAX_VALUE, evaluate(ADD, Double.MAX_VALUE, 2.0));
-    }
-
-    public void testAddStringAndDouble() throws Exception {
-        assertEquals("0937.1652", evaluate(ADD, "0", 937.1652));
-    }
-
-    public void testAddZeroAndString() throws Exception {
-        assertEquals("01", evaluate(ADD, 0, "1"));
-    }
-
-    public void testAddIntAndEmptyString() throws Exception {
-        assertEquals("314", evaluate(ADD, 314, ""));
-    }
-
-    public void testAddEmptyStringAndInt() throws Exception {
-        assertEquals("314", evaluate(ADD, "", 314));
-    }
-
+    //<expressionTest:test expression="{!v.Infinity + 'AndBeyond'}" exprText="v.Infinity + 'AndBeyond'" expected="'InfinityAndBeyond'"/>
     public void testAddInfinityAndString() throws Exception {
         assertEquals("InfinityAndBeyond", evaluate(ADD, Double.POSITIVE_INFINITY, "AndBeyond"));
     }
 
+    //<expressionTest:test expression="{!'To' + v.NegativeInfinity}" exprText="'To' + v.NegativeInfinity" expected="'To-Infinity'"/>
     public void testAddStringAndNegativeInfinity() throws Exception {
         assertEquals("Random-Infinity", evaluate(ADD, "Random", Double.NEGATIVE_INFINITY));
     }
 
+    
+    //<expressionTest:test expression="{!'100' + v.NaN}" exprText="'100' + v.NaN" expected="'100NaN'"/>
     public void testAddStringAndNaN() throws Exception {
         assertEquals("1NaN", evaluate(ADD, "1", Double.NaN));
     }
 
+    //<expressionTest:test expression="{!v.nullObj + 1}" exprText="v.nullObj + 1" expected="1"/>
     public void testAddNullAndInt() throws Exception {
         assertEquals(1, evaluate(ADD, null, 1));
     }
 
+    //diff: <expressionTest:test expression="{!v.nullObj + 'b'}" exprText="v.nullObj + 'b'" expected="'b'"/>
     public void testAddNullAndString() throws Exception {
         assertEquals("nullb", evaluate(ADD, null, "b"));
     }
-
-    public void testAddNullAndDouble() throws Exception {
-        assertEquals(2.5, evaluate(ADD, null, 2.5));
-    }
-
+    
+    //diff: <expressionTest:test expression="{!'b' + !v.nullObj}" exprText="'b' + v.nullObj" expected="'b'"/>
     public void testAddStringAndNull() throws Exception {
         assertEquals("cnull", evaluate(ADD, "c", null));
     }
 
+    //<expressionTest:test expression="{!v.nullObj + 2.5}" exprText="v.nullObj + 2.5" expected="2.5"/>
+    public void testAddNullAndDouble() throws Exception {
+        assertEquals(2.5, evaluate(ADD, null, 2.5));
+    }
+
+    //diff: <expressionTest:test expression="{!v.nullObj + v.nullObj}" exprText="v.nullObj + v.nullObj" expected="''"/>
     public void testAddTwoNulls() throws Exception {
         assertEquals(0, evaluate(ADD, null, null));
     }
 
+    //diff: <expressionTest:test expression="{!'' + (-0.0)}" exprText="'' + (-0.0)" expected="'0'"/>
     public void testAddStringAndNegativeZero() throws Exception {
     	assertEquals("-0", evaluate(ADD, "", -0.0));
     }
 
+    //<expressionTest:test expression="{!v.nullList + 'a'}" exprText="v.nullObj + 'a'" expected="'a'"/>
     public void testAddListNullAndString() throws Exception {
         List<Object> nullList = Lists.newArrayList();
         nullList.add(null);
         assertEquals("a", evaluate(ADD, nullList, "a"));
     }
 
+    //<expressionTest:test expression="{!v.list + 'a'}" exprText="v.list + 'a'" expected="'1,2,3a'"/>
     public void testAddList123AndString() throws Exception {
         assertEquals("1,2,3a", evaluate(ADD, Lists.newArrayList(1, 2, 3), "a"));
     }
 
+    //<expressionTest:test expression="{!v.listWithNull + ''}" exprText="v.listWithNull + ''" expected="',a'"/>
     public void testAddListNullStringAndEmptyString() throws Exception {
         List<Object> list = Lists.newArrayList();
         list.add(null);
@@ -161,6 +215,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(",a", evaluate(ADD, list, ""));
     }
 
+    //diff: <expressionTest:test expression="{!v.listWithList + ''}" exprText="v.listWithList + ''" expected="'a,,b,c'"/>
     public void testAddNestedListNullStringAndEmptyString() throws Exception {
         List<Object> list = Lists.newArrayList();
         List<Object> nested = Lists.newArrayList();
@@ -171,6 +226,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("a,b,c", evaluate(ADD, list, ""));
     }
 
+    //diff: <expressionTest:test expression="{!v.listWithNested4Layers + ''}" exprText="v.listWithNested4Layers + ''" expected="'6,7,4,5,2,3,0,1,b'"/>
     public void testAddTooDeep() throws Exception {
         List<Object> list = Lists.newArrayList();
         List<Object> nested = Lists.newArrayList();
@@ -188,6 +244,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("a,Too Deep,b,c", evaluate(ADD, list, ""));
     }
 
+    //diff: <expressionTest:test expression="{!v.listWithLoop + ''}" exprText="v.listWithLoop + ''" expected="'0,1,'"/>
     public void testAddLoop() throws Exception {
         List<Object> list = Lists.newArrayList();
         List<Object> nested = Lists.newArrayList();
@@ -197,6 +254,7 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("a,a,Too Deep", evaluate(ADD, list, ""));
     }
 
+    //<expressionTest:test expression="{!v.map + ''}" exprText="v.map + ''" expected="'[object Object]'"/>
     public void testAddMapAndEmptyString() throws Exception {
         Map<Object,Object> map = Maps.newHashMap();
         map.put("a", null);

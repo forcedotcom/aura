@@ -25,10 +25,10 @@
 		
 		return dom;
 	},
-	afterRender: function (cmp, hlp) {
+	afterRender: function () {
 		this.superAfterRender();
     },
-    unrender: function (cmp, hlp) {
+    unrender: function () {
         this.superUnrender();
     }
 })// eslint-disable-line semi

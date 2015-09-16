@@ -567,7 +567,7 @@
 
 		if (pageIndex > 0 && pageIndex <= pages.length && prevSelectedPage !== pageIndex) {
 			//show all pages in between before scrolling for better UI experience
-			var from = prevSelectedPage == -1 ? pageIndex : (prevSelectedPage < pageIndex ? ++prevSelectedPage : --prevSelectedPage);
+			var from = prevSelectedPage === -1 ? pageIndex : (prevSelectedPage < pageIndex ? ++prevSelectedPage : --prevSelectedPage);
 			//save the pageIndex, so that it won't be hide by the callback in the timer, which could cause flickering and performance issue
 			this.setSelectedPage(cmp, pageIndex);
 			this.showPages(cmp, from, pageIndex);
@@ -640,7 +640,7 @@
 		var navContainer = cmp.find('navContainer');
 		var indicators = navContainer ? navContainer.get('v.body') : null;
 
-		return cmp.get('v.continuousFlow') != true && indicators ? indicators[0] : null;
+		return cmp.get('v.continuousFlow') !== true && indicators ? indicators[0] : null;
 	},
 
 	getScroller : function(cmp) {
@@ -649,7 +649,7 @@
 
 	getSnap : function(cmp) {
 		var id = cmp.getGlobalId().replace(';', '_').replace(':', '-');
-		return cmp.get('v.continuousFlow') != true ? 'section.snap-class-' + id + '' : null;
+		return cmp.get('v.continuousFlow') !== true ? 'section.snap-class-' + id + '' : null;
 	},
 
 	/**

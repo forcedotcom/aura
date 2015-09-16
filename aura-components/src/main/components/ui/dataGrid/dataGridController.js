@@ -57,10 +57,8 @@
 	},
 
 	// TODO: clean up
-	handleColumnSortChange: function (cmp, evt, helper) {
+	handleColumnSortChange: function (cmp, evt) {
 		if (evt) {
-			var concrete = cmp.getConcreteComponent();
-
 			cmp.getSuper().set('v.sortBy', evt);
 		}
 	},

@@ -120,7 +120,6 @@
     handleListExpand: function(component, event) {
         var usePanel = component.get('v.usePanel');
         var panel = component.find('panel');
-        var zIndex;
         
         if(usePanel) {
             panel.set('v.visible', true);

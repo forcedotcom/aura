@@ -178,8 +178,11 @@ AuraStorage.prototype.put = function(key, value) {
     // Ignore all the extras in the item object below
     var size = $A.util.estimateSize(key) + $A.util.estimateSize(value);
     if (size > this.maxSize) {
-        this.remove(key, true);
-        return Promise["reject"](new Error("AuraStorage.put() cannot store an item over the max size of " + this.maxSize));
+        var maxSize = this.maxSize;
+        var finalReject = function() {
+            return Promise["reject"](new Error("AuraStorage.put() cannot store an item over the max size of " + maxSize));
+        };
+        return this.remove(key, true).then(finalReject, finalReject);
     }
 
     var now = new Date().getTime();

@@ -877,6 +877,11 @@ AuraClientService.prototype.setConnected = function(isConnected) {
 
 /**
  * Saves the CSRF token to the Actions storage. Does not block nor report success or failure.
+ *
+ * This storage operate uses the adapter directly instead of AuraStorage because the specific
+ * token key is used in mobile (hybrid) devices to obtain the token without the isolation and
+ * even before Aura initialization.
+ *
  * @returns {Promise} Promise that resolves with the current CSRF token value.
  */
 AuraClientService.prototype.saveTokenToStorage = function() {

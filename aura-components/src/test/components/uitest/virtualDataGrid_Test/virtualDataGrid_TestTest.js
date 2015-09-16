@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 ({
+	browsers: ["-IE7","-IE8"],
+	DOM    : 0,
+    ITEMS  : 1,
+    doNotWrapInAuraRun : true,
+    
     /**
      *  Test virtual data grid is loaded with fixed header.
      */
     testFixedHeader : {
-        browsers: ["-IE7","-IE8"],
         attributes : {"testFixedHeader" : true},
         test : function(cmp) {
             var dataGrid = $A.test.getElementByClass("uiVirtualDataGrid");
@@ -35,21 +39,161 @@
     },
 
     testRowEventHandlerCalledOnClick: {
-        browsers: ["-IE7","-IE8"],
-        test: [
-           function(cmp) {
-               cmp._initialText = $A.test.getText(cmp.find("grid").getElement().getElementsByTagName("td")[0]);
-               var firstGridRow = cmp.find("grid").getElement().getElementsByTagName("td")[0];
-               var div = firstGridRow.getElementsByTagName("div")[0];
-               // Event handler defined on div so must click there
-               div.focus();
-               $A.test.clickOrTouch(div); 
-           },
-           function(cmp) {
-               var actualText = $A.test.getText(cmp.find("grid").getElement().getElementsByTagName("td")[0]);
-               // click handler appends exclamation mark to current text
-               $A.test.assertEquals(cmp._initialText+"!", actualText, "Click event handler not called for virtualDataGrid row");
-           }
-       ]
+        test: [function(cmp) {
+    	   cmp._initialText = $A.test.getText(cmp.find("grid").getElement().getElementsByTagName("td")[0]);
+           var firstGridRow = cmp.find("grid").getElement().getElementsByTagName("td")[0];
+           var div = firstGridRow.getElementsByTagName("div")[0];
+           // Event handler defined on div so must click there
+           div.focus();
+           $A.test.clickOrTouch(div); 
+       },
+       function(cmp) {
+           var actualText = $A.test.getText(cmp.find("grid").getElement().getElementsByTagName("td")[0]);
+           // click handler appends exclamation mark to current text
+           $A.test.assertEquals(cmp._initialText+"!", actualText, "Click event handler not called for virtualDataGrid row");
+       }]
+    },
+    
+    /**
+     * Insert item into grid
+     */
+    testInsertItems : {
+        test : [function(cmp){
+        	this.getRowElements(cmp, 100);
+        	this.setValue(cmp, "index", 1);
+            this.setValue(cmp, "count", 2);
+            this.pressInsertButton(cmp);
+            this.waitForGridUpdated(102);
+        }, function(cmp) {
+        	var elements = this.getRowElements(cmp, 102);
+        	// check dom
+        	$A.test.assertEquals("Mary Jane1", $A.test.getText(elements[this.DOM][1].children[0]), "Insert failed (dom check): Element at index 1 incorrect");
+            // check items
+            $A.test.assertEquals("Mary Jane1", elements[this.ITEMS][1].name, "Insert failed (items check): Element at index 1 incorrect");
+        }]
+    },
+    
+    /**
+     * Insert a large amount of elements, remove only a portion of it and see how v.items reacts
+     */
+    testStaggeredInsertionRemove : {
+        test : [function(cmp){
+            this.setValue(cmp, "index", 50);
+            this.setValue(cmp, "count", 20);
+            this.pressInsertButton(cmp);
+            this.waitForGridUpdated(120);
+        }, function(cmp) {
+        	var elements = this.getRowElements(cmp, 120);
+        	// check dom
+            $A.test.assertEquals("Mary Jane50", $A.test.getText(elements[this.DOM][50].children[0]), "Insert failed (dom check): Element at index 50 incorrect");
+            // check items
+            $A.test.assertEquals("Mary Jane50", elements[this.ITEMS][50].name, "Insert failed (items check): Element at index 50 incorrect");
+        }, function(cmp) {
+            this.setValue(cmp, "index", 50);
+            this.setValue(cmp, "count", 10);
+            this.pressRemoveButton(cmp);
+            this.waitForGridUpdated(110)
+        }, function(cmp) {
+        	var elements = this.getRowElements(cmp, 110);
+        	// check dom
+            $A.test.assertEquals("Mary Jane60", $A.test.getText(elements[this.DOM][50].children[0]), "Insert failed (dom check): Element at index 50 incorrect");
+            // check items
+            $A.test.assertEquals("Mary Jane60", elements[this.ITEMS][50].name, "Insert failed (items check): Element at index 50 incorrect");
+        }]
+    },
+    
+    /**
+     * Fire the DataGrid provider to verify that v.items is overwritten. Replace all data in grid
+     */
+    testVirtualDataGridProviderFire : {
+    	test : [function(cmp){
+    		// veirfy inital count
+        	this.getRowElements(cmp, 100);
+        	this.pressFireDataProviderButton(cmp);
+            this.waitForGridUpdated(10);
+        }, function(cmp) {
+        	var elements = this.getRowElements(cmp, 10);
+        	// check dom
+            $A.test.assertEquals("John Doe 11", $A.test.getText(elements[this.DOM][0].children[0]), "Insert failed (dom check): Element at index 0 incorrect");
+            // check items
+            $A.test.assertEquals("John Doe 11", elements[this.ITEMS][0].name, "Insert failed (items check): Element at index 0 incorrect");
+        }]
+    },
+    
+    /**
+     * Append item
+     */
+    testAppendItem : {
+    	test : [function(cmp){
+    		// veirfy inital count
+        	this.getRowElements(cmp, 100);
+        	this.pressAddRowButton(cmp);
+            this.waitForGridUpdated(101);
+        }, function(cmp) {
+        	var elements = this.getRowElements(cmp, 101);
+        	// check dom
+            $A.test.assertEquals("Peter Parker 1", $A.test.getText(elements[this.DOM][100].children[0]), "Insert failed (dom check): Element at index 0 incorrect");
+            // check items
+            $A.test.assertEquals("Peter Parker 1", elements[this.ITEMS][100].name, "Insert failed (items check): Element at index 0 incorrect");
+        }]
+    },
+    
+    setValue : function(cmp, cmpName, value){
+        cmp.find(cmpName).set("v.value", value);
+    },
+    
+    pressInsertButton : function(cmp) {
+    	cmp.find("insert").get("e.press").fire();
+    },
+    
+    pressRemoveButton : function(cmp) {
+    	cmp.find("remove").get("e.press").fire();
+    },
+    
+    pressAddRowButton : function(cmp) {
+    	cmp.find("addRow").get("e.press").fire();
+    },
+    
+    pressFireDataProviderButton : function(cmp) {
+    	cmp.find("fireDP").get("e.press").fire();
+    },
+    
+    pressRefreshButton : function(cmp) {
+    	cmp.find("refreshGrid").get("e.press").fire();
+    },
+    
+    getRowElements : function(cmp, colCount){
+        var tbody = document.getElementsByTagName("tbody")[0];
+        var trs = this.getOnlyTrs(tbody.children);
+        var itemsInBody = this.getGridAttribute(cmp, "items");
+
+        $A.test.assertEquals(colCount, trs.length, "The total amount of items on the page are incorrect");
+        $A.test.assertEquals(colCount, itemsInBody.length, "The total amount of elements in v.items is incorrect");
+
+        return [trs, itemsInBody];
+    },
+    
+    getOnlyTrs : function(elements){
+    	var elementArray = [];
+    	
+	     for(var i = 0; i < elements.length; i++){
+	        if(elements[i].tagName != "!"){
+	        	elementArray.push(elements[i]);
+	        }
+	     }
+    	return elementArray;
+    },
+    
+    getGridAttribute : function( cmp, attributeName){
+        return cmp.find("grid").get("v."+attributeName);
+    },
+    
+    waitForGridUpdated : function(itemsCount) {
+    	var that = this;
+    	$A.test.addWaitForWithFailureMessage(itemsCount, function(){
+        	var tbody = document.getElementsByTagName("tbody")[0];
+            var trs = that.getOnlyTrs(tbody.children);
+    		return trs.length;
+		}, "Number of items expected is incorrect.");
     }
 })

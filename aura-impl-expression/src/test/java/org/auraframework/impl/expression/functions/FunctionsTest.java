@@ -262,86 +262,115 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("[object Object]", evaluate(ADD, map, ""));
     }
 
-    // EQUALS
+    /* EQUALS
+     * 
+     * 
+    <expressionTest:test expression="{!(1/0) == (2/0)}" exprText="(1/0) == (2/0)" expected="true"/>
+    <expressionTest:test expression="{!m.integer == 411}" exprText="m.integer == 411" expected="true"/>
+    <expressionTest:test expression="{!m.integerString == 511}" exprText="m.integerString == 511" expected="false"/>
+    <expressionTest:test expression="{!m.integerString == '511'}" exprText="m.integerString == '511'" expected="true"/>
+    
+      <expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
+     */
 
+    //<expressionTest:test expression="{!2 == 2.0}" exprText="2 == 2.0" expected="true"/>
     public void testEqualsSameIntAndDouble() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, 2, 2.0));
     }
 
+    //<expressionTest:test expression="{!2 == '2'}" exprText="2 == '2'" expected="false"/>
+    public void testEqualsSameIntAndString() throws Exception {
+        assertEquals(Boolean.FALSE, evaluate(EQUALS, 2, "2"));
+    }
+    
+    //<expressionTest:test expression="{!'bum' == 'bum'}" exprText="'bum' == 'bum'" expected="true"/>
     public void testEqualsSameString() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, "bum", "bum"));
     }
 
+    //<expressionTest:test expression="{!'Bum' == 'bum'}" exprText="'Bum' == 'bum'" expected="false"/>
     public void testEqualsStringsDifferentCapitalization() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, "Bum", "bum"));
     }
 
+    //<expressionTest:test expression="{!1 == 3}" exprText="1 == 3" expected="false"/>
     public void testEqualsDifferentInts() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, 1, 3));
     }
 
+    //<expressionTest:test expression="{!true == false}" exprText="true == false" expected="false"/>
     public void testEqualsDifferentBooleans() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, Boolean.TRUE, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!false eq false}" exprText="false eq false" expected="true"/>
+    //<expressionTest:test expression="{!equals(false, false)}" exprText="equals(false, false)" expected="true"/>
     public void testEqualsSameBooleans() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Boolean.FALSE, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!'' == false}" exprText="'' == false" expected="false"/>
     public void testEqualsEmptyStringAndFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, "", Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!v.Infinity == v.Infinity}" exprText="v.Infinity == v.Infinity" expected="true"/>
     public void testEqualsPositiveInfinity() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY));
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
     }
 
+    //<expressionTest:test expression="{!v.NegativeInfinity == v.NegativeInfinity}" exprText="v.NegativeInfinity == v.NegativeInfinity" expected="true"/>
     public void testEqualsNegativeInfinity() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY));
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY));
     }
 
+    //<expressionTest:test expression="{!v.Infinity == v.NegativeInfinity}" exprText="v.Infinity == v.NegativeInfinity" expected="false"/>
     public void testEqualsPositiveAndNegativeInfinity() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY));
         assertEquals(Boolean.FALSE, evaluate(EQUALS, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY));
     }
 
+    //skip: JS only has one infinity, for both float and double
+    //<expressionTest:test expression="{!m.infinityFloat == m.infinity}" exprText="m.infinityFloat == m.infinity" expected="true"/>
     public void testEqualsDoubleInfinityAndFloatInfinity() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, Double.POSITIVE_INFINITY, Float.POSITIVE_INFINITY));
     }
 
+    //<expressionTest:test expression="{!m.naN == v.NaN}" exprText="m.naN == v.NaN" expected="false"/>
+    //<expressionTest:test expression="{!m.naN == m.naN}" exprText="m.naN == m.naN" expected="false"/>
     public void testEqualsNaN() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, Double.NaN, Double.NaN));
     }
-
-    public void testEqualsStringNullAndNull() throws Exception {
-        assertEquals(Boolean.FALSE, evaluate(EQUALS, "null", null));
-    }
-
+    
+    //<expressionTest:test expression="{!v.nullObj == true}" exprText="v.nullObj == true" expected="false"/>
     public void testEqualsNullAndBooleanTrue() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, Boolean.TRUE));
     }
 
+    //<expressionTest:test expression="{!v.nullObj == false}" exprText="v.nullObj == false" expected="false"/>
     public void testEqualsNullAndBooleanFalse() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, Boolean.FALSE));
     }
 
+    // ?
     public void testEqualsNullAndEmptyString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, ""));
     }
 
+    // ?
     public void testEqualsNullAndZero() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, 0));
     }
 
+    //<expressionTest:test expression="{!v.nullObj == null}" exprText="v.nullObj == null" expected="true"/>
     public void testEqualsNullAndNull() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, null, null));
     }
 
-    public void testEqualsNullAndStringNull() throws Exception {
-        assertEquals(Boolean.FALSE, evaluate(EQUALS, null, "null"));
-    }
+    //skip: we don't parse Date here on Java side.
+    //<expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
 
     // NOTEQUALS
 

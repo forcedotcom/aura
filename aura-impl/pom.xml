@@ -314,6 +314,9 @@
                     <plugin>
                         <groupId>com.github.tntim96</groupId>
                         <artifactId>jscover-report-maven-plugin</artifactId>
+                        <configuration>
+                            <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
+                        </configuration>
                         <executions>
                             <execution>
                                 <id>generate-cobertura-xml</id>

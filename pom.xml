@@ -688,7 +688,7 @@
                                                 <arg value="${xunit.js.testPath}" />
                                                 <!-- jscover instrumentation args -->
                                                 <arg value="/coverage:${xunit.js.coverage}" />
-                                                <arg value="/logFile:target/xunitjs/jscoverage.json" />
+                                                <arg value="/logFile:../target/${project.artifactId}/jscoverage.json" />
                                             </java>
                                         </case>
                                         <default>
@@ -989,15 +989,12 @@
                             <id>generate-cobertura-xml</id>
                             <phase>disabled</phase>
                             <goals>
-
                                 <goal>format</goal>
                             </goals>
                         </execution>
                     </executions>
                     <configuration>
-                        <!--Configuration for format goal-->
-                        <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
-                        <reportDir>${project.parent.basedir}/${project.artifactId}/target/xunitjs</reportDir>
+                        <reportDir>${project.parent.basedir}/target/${project.artifactId}</reportDir>
                         <coberturaXML>true</coberturaXML>
                         <lCOV>true</lCOV>
                     </configuration>

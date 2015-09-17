@@ -862,9 +862,10 @@ Aura.Utils.Util.prototype.urlDecode = function(url){
  * Manipulate the properties of the querystring portion of a url.
  * @param {String} url Any url to manipulate, if it doesn't have a question mark in it. Any hash remains not affected.
  * @param {Object} params Map of key->value's to set in the url. Set key to null to remove it from the url.
+ * @param {Boolean} encoded True if params are alredy encoded and prevent re-encoding.
  * @export
  */
-Aura.Utils.Util.prototype.generateUrl = function(url, params) {
+Aura.Utils.Util.prototype.generateUrl = function(url, params, encoded) {
     if (this.isString(url) && this.isObject(params)) {
         var pieces = url.split("?");
         var query = pieces[1] || "";
@@ -882,7 +883,7 @@ Aura.Utils.Util.prototype.generateUrl = function(url, params) {
             if (params.hasOwnProperty(k1)) {
                 var v1 = params[k1];
                 if (v1 > "") {
-                    map[k1] = encodeURIComponent(params[k1]);
+                    map[k1] = encoded ? params[k1] : encodeURIComponent(params[k1]);
                 } else {
                     delete map[k1];
                 }

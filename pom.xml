@@ -51,17 +51,6 @@
         <xunit.js.verbose>false</xunit.js.verbose>
         <xunit.js.coverage>false</xunit.js.coverage>
     </properties>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>central</id>
-            <url>http://repo1.maven.org/maven2/</url>
-        </pluginRepository>
-        <pluginRepository>
-            <id>Sonatype repository</id>
-            <name>Sonatype's Maven repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <repositories>
         <repository>
             <snapshots>
@@ -397,12 +386,12 @@
             <dependency>
                 <groupId>com.github.tntim96</groupId>
                 <artifactId>jscover-file-maven-plugin</artifactId>
-                <version>1.0.16-SNAPSHOT</version>
+                <version>1.0.16</version>
             </dependency>
             <dependency>
                 <groupId>com.github.tntim96</groupId>
                 <artifactId>jscover-report-maven-plugin</artifactId>
-                <version>1.0.16-SNAPSHOT</version>
+                <version>1.0.16</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -8,4 +8,4 @@ install:
 #- export https_proxy='http://public-proxy1-0-crd.data.sfdc.net:8080'
 script:
 - mvn clean install -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml
-- mvn post-integration-test -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml -Pubuntu12 -Pdesktop -DskipUnitTests -DrunIntTests -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.reusebrowser=true -DskipJsDoc -Dwebdriver.timeout.getdriver=30 -DtestThreadCount=2
+#- mvn post-integration-test -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml -Pubuntu12 -Pdesktop -DskipUnitTests -DrunIntTests -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.reusebrowser=true -DskipJsDoc -Dwebdriver.timeout.getdriver=30 -DtestThreadCount=2

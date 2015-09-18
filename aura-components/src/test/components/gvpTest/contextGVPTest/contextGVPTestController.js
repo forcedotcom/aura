@@ -1,13 +1,10 @@
 ({
-	updateGvpValue: function(cmp, event, helper) {
-		// $A.test.addCleanup(function(){
-		//     var action = cmp.get("c.setContextVPValue");
-		//     action.setParams(event.getParams());
-		//     $A.test.callServerAction(action, true);
-		// });
-
-	    var action = cmp.get("c.setContextVPValue");
-	    action.setParams(event.getParam("arguments"));
-		$A.enqueueAction(action);
-	}
+    /**
+     * Fire an action to set the value of a GVP on the server.
+     */
+    updateGvpValue: function(cmp, event, helper) {
+        var action = cmp.get("c.setContextVPValue");
+        action.setParams(event.getParam("arguments"));
+        $A.enqueueAction(action);
+    }
 })

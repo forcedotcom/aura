@@ -533,10 +533,20 @@ public class TestJavaModel {
     public Number getInfinity() {
         return Double.POSITIVE_INFINITY;
     }
+    
+    @AuraEnabled
+    public Number getInfinityFloat() {
+        return Float.POSITIVE_INFINITY;
+    }
 
     @AuraEnabled
     public Number getNegativeInfinity() {
         return Double.NEGATIVE_INFINITY;
+    }
+    
+    @AuraEnabled
+    public Number getNegativeInfinityFloat() {
+        return Float.NEGATIVE_INFINITY;
     }
 
     @AuraEnabled

@@ -19,7 +19,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.auraframework.def.design.*;
+import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignDef;
+import org.auraframework.def.design.DesignItemsDef;
+import org.auraframework.def.design.DesignLayoutAttributeDef;
+import org.auraframework.def.design.DesignLayoutComponentDef;
+import org.auraframework.def.design.DesignLayoutDef;
+import org.auraframework.def.design.DesignOptionDef;
+import org.auraframework.def.design.DesignSectionDef;
+import org.auraframework.def.design.DesignTemplateDef;
+import org.auraframework.def.design.DesignTemplateRegionDef;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonSerializable;
@@ -110,13 +119,13 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TYPE(TypeDef.class), //
         STYLE(StyleDef.class), //
         FLAVORED_STYLE(FlavoredStyleDef.class), //
-        FLAVOR_ASSORTMENT(FlavorAssortmentDef.class), //
+        FLAVORS(FlavorsDef.class), //
         FLAVOR_DEFAULT(FlavorDefaultDef.class), //
         FLAVOR_INCLUDE(FlavorIncludeDef.class), //
-        FLAVORS(FlavorsDef.class), //
+        FLAVOR_BUNDLE(FlavorBundleDef.class, true), //
         TOKEN(TokenDef.class), //
         TOKENS(TokensDef.class, true), //
-        TOKENS_IMPORT(TokensImport.class), //
+        TOKENS_IMPORT(TokensImportDef.class), //
         TOKEN_DESCRIPTOR_PROVIDER(TokenDescriptorProviderDef.class), //
         TOKEN_MAP_PROVIDER(TokenMapProviderDef.class), //
         DOCUMENTATION(DocumentationDef.class), //

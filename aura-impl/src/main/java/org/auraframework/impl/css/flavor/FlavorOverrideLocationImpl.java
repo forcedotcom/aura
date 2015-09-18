@@ -26,7 +26,7 @@ import com.google.common.base.Optional;
 
 public final class FlavorOverrideLocationImpl implements FlavorOverrideLocation {
     private final DefDescriptor<FlavoredStyleDef> descriptor;
-    private final Optional<String> condition;
+    private final String condition;
 
     public FlavorOverrideLocationImpl(DefDescriptor<FlavoredStyleDef> descriptor) {
         this(descriptor, null);
@@ -34,7 +34,7 @@ public final class FlavorOverrideLocationImpl implements FlavorOverrideLocation 
 
     public FlavorOverrideLocationImpl(DefDescriptor<FlavoredStyleDef> descriptor, String condition) {
         this.descriptor = checkNotNull(descriptor, "descriptor cannot be null");
-        this.condition = Optional.fromNullable(condition);
+        this.condition = condition;
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class FlavorOverrideLocationImpl implements FlavorOverrideLocation 
 
     @Override
     public Optional<String> getCondition() {
-        return condition;
+        return Optional.fromNullable(condition);
     }
 
     @Override

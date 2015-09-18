@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.css.ResolveStrategy;
-import org.auraframework.css.TokenOptimizer;
+import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
@@ -61,10 +61,10 @@ public interface StyleAdapter extends AuraAdapter {
      * @param style The {@link StyleDef} descriptor of the CSS file being parsed. This is used to determine which
      *            namespace-default {@link TokensDef} to use.
      * @param strategy An indication of how this provider is going to be used.
-     * @param overrides The {@link TokenOptimizer} containing the overrides.
+     * @param overrides The {@link TokenCache} containing the overrides.
      */
     TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
-            TokenOptimizer overrides);
+            TokenCache overrides);
 
     /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.

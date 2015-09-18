@@ -406,7 +406,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         RENDERER(RendererDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         STYLE(StyleDef.class, Format.CSS, DefDescriptor.CSS_PREFIX, "."),
         FLAVOR_STYLE(FlavoredStyleDef.class, Format.CSS, DefDescriptor.CUSTOM_FLAVOR_PREFIX, "."),
-        FLAVOR_ASSORTMENT(FlavorAssortmentDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
+        FLAVOR_ASSORTMENT(FlavorsDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         TESTSUITE(TestSuiteDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         DOCUMENTATION(DocumentationDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         TOKENS(TokensDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),

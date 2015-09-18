@@ -22,12 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.css.StyleContext;
-import org.auraframework.css.TokenOptimizer;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.TokensDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Event;
@@ -510,65 +507,32 @@ public interface AuraContext {
      */
     void serializeAsPart(Json json) throws IOException;
 
-    /**
-     * TODONM remove
-     *
-     * Prepends all app-specified {@link TokensDef} defs to this context.
-     * <p>
-     * The {@link TokensDef}s will be prepended <em>before</em> all {@link TokensDef}s added with
-     * {@link #appendTokensDescriptor(DefDescriptor)}. This should only be called at most once per context instance.
-     * <p>
-     * <b>This is usually only called internally by the framework.</b> If you need to specify an override, most like you
-     * want {@link #appendTokensDescriptor(DefDescriptor)} instead.
-     */
-    void addAppTokensDescriptors();
 
     /**
-     * TODONM remove
-     *
-     * Explicitly appends a {@link TokensDef} override after other currently specified {@link TokensDef}s. This will
-     * also be after any {@link TokensDef}s on the current application.
-     *
-     * @param tokenListDescriptor The override tokens.
-     * @throws QuickFixException If there was a problem loading/validating/etc... the descriptor.
+     * Sets the {@link StyleContext} based on the values of this context instance. This is usually only called during
+     * serialization of the CSS url. Should be called at most once per request.
      */
-    void appendTokensDescriptor(DefDescriptor<TokensDef> tokenListDescriptor) throws QuickFixException;
+    void setStyleContext();
 
     /**
-     * TODONM move to appdef
-     *
-     * Gets the list of overrides explicitly specified to this context. These are the tokens that are used to "override"
-     * the default token values.
-     * <p>
-     * While usually the token overrides are specified on the application tag itself, in some situations the overrides
-     * may be directly specified to this context, e.g., in some usages of the integration service.
-     * <p>
-     * The application's overrides are not implicitly included in this result by default. However, note that the
-     * application's overrides are explicitly added to the context at one point during the request (See
-     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these <em>will</em> be included during
-     * the actual CSS request itself. See {@link #addAppTokensDescriptors()}.
-     */
-    TokenOptimizer getTokenOptimizer();
-
-    /**
-     * Sets the {@link StyleContext}.
-     * 
-     * @param styleContext The style context instance.
+     * Sets the {@link StyleContext}. Should be called at most once per request.
      */
     void setStyleContext(StyleContext styleContext);
 
     /**
-     * Sets the {@link StyleContext} from a config map. The map must follow a specific format. Most of the time you
-     * should be using {@link #setStyleContext(StyleContext)} instead.
-     * 
+     * Sets the {@link StyleContext} from a config map. The map must follow a specific format. This is usually only
+     * called during the request for the CSS stylesheet content. Should be called at most once per request.
+     *
      * @param config The config map.
      */
     void setStyleContext(Map<String, Object> config);
 
     /**
-     * Gets the {@link StyleContext}.
-     * 
+     * Gets the {@link StyleContext}. The conditions under which this method can be called are particular-- make sure
+     * you understand before usage.
+     *
      * @return The {@link StyleContext} (never null, creates a new instance if necessary.
+     * @throws IllegalStateException if the context has not already been set!
      */
     StyleContext getStyleContext();
 

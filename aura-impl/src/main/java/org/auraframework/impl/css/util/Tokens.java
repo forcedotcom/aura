@@ -15,9 +15,14 @@
  */
 package org.auraframework.impl.css.util;
 
+import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
+import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.system.DefDescriptorImpl;
+import org.auraframework.system.AuraContext;
+
+import com.google.common.base.Optional;
 
 /**
  * Utilities for working with CSS tokens.
@@ -32,5 +37,21 @@ public final class Tokens {
     public static DefDescriptor<TokensDef> namespaceDefaultDescriptor(DefDescriptor<?> descriptor) {
         String fmt = String.format("%s:%sNamespace", descriptor.getNamespace(), descriptor.getNamespace());
         return DefDescriptorImpl.getInstance(fmt, TokensDef.class);
+    }
+
+    /**
+     * FIXMENM: doc Gets the list of overrides explicitly specified to this context. These are the tokens that are used
+     * to "override" the default token values.
+     * <p>
+     * While usually the token overrides are specified on the application tag itself, in some situations the overrides
+     * may be directly specified to this context, e.g., in some usages of the integration service.
+     * <p>
+     * The application's overrides are not implicitly included in this result by default. However, note that the
+     * application's overrides are explicitly added to the context at one point during the request (See
+     * {@link AuraBaseServlet#getStyles()}). Effectively this means that these <em>will</em> be included during the
+     * actual CSS request itself. See {@link #addAppTokensDescriptors()}.
+     */
+    public static Optional<TokenCache> getTokenOverrides(AuraContext context) {
+        return null;
     }
 }

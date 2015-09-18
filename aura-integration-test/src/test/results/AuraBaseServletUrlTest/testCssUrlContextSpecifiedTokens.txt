@@ -1,1 +1,0 @@
-/l/{"mode":"UTEST","fwuid":"#FAKEUID#","tokens":["markup://test:fakeTokens","markup://test:fakeTokens2","markup://test:fakeTokens3"],"styleContext":{"c":"other"},"test":"org.auraframework.integration.test.http.AuraBaseServletUrlTest.testCssUrlContextSpecifiedTokens"}/app.css

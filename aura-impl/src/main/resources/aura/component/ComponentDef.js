@@ -163,8 +163,8 @@ function ComponentDef(config) {
         this.dynamicallyFlavorable = config["dynamicallyFlavorable"];
     }
 
-    if (config["defaultFlavors"]) { // for applications
-        this.defaultFlavors = new FlavorAssortmentDef(config["defaultFlavors"]);
+    if (config["flavorOverrides"]) { // for applications
+        this.flavorOverrides = new FlavorsDef(config["flavorOverrides"]);
     }
 
     this.attributeDefs = new AttributeDefSet(config["attributeDefs"],this.descriptor.getNamespace());
@@ -373,7 +373,7 @@ ComponentDef.prototype.getDefaultFlavor = function() {
         if (appDesc) {
             var appDef = $A.componentService.getDef(appDesc, true);
             if (appDef) { // might be null if there's a problem loading the app
-                var defaults = appDef.getDefaultFlavors();
+                var defaults = appDef.getFlavorOverrides();
                 if (defaults) {
                     override = defaults.getFlavor(this.descriptor);
                     if (override === "{!remove}") {
@@ -417,11 +417,11 @@ ComponentDef.prototype.hasFlavorableChild = function() {
 /**
  * Gets the set of default flavor overrides.
  *
- * @returns {FlavorAssortmentDef}
+ * @returns {FlavorsDef}
  * @export
  */
-ComponentDef.prototype.getDefaultFlavors = function() {
-    return this.defaultFlavors;
+ComponentDef.prototype.getFlavorOverrides = function() {
+    return this.flavorOverrides;
 };
 
 /**

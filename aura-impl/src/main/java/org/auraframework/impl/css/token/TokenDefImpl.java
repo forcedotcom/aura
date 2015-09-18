@@ -16,6 +16,7 @@
 package org.auraframework.impl.css.token;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.auraframework.def.TokenDef;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -26,24 +27,35 @@ import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
+import com.salesforce.omakase.data.Property;
 
 public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements TokenDef {
     private static final String INVALID_NAME = "Invalid token name: '%s'";
     private static final String MISSING_VALUE = "Missing required attribute 'value'";
+    private static final String UNKNOWN_PROPERTY = "Unknown CSS property '%s'";
     private static final long serialVersionUID = 344237166606014917L;
 
     private final Object value;
+    private final Set<String> allowedProperties;
     private final int hashCode;
 
     public TokenDefImpl(Builder builder) {
         super(builder);
         this.value = builder.value;
+        this.allowedProperties = AuraUtil.immutableSet(builder.allowedProperties);
         this.hashCode = AuraUtil.hashCode(descriptor, location, value);
     }
 
     @Override
     public Object getValue() {
         return value;
+    }
+
+    @Override
+    public Set<String> getAllowedProperties() {
+        return allowedProperties;
     }
 
     @Override
@@ -67,6 +79,13 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         // must have a value
         if (value == null) {
             throw new InvalidDefinitionException(MISSING_VALUE, getLocation());
+        }
+
+        // properties must be recognized
+        for (String property : allowedProperties) {
+            if (Property.lookup(property) == null) {
+                throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
+            }
         }
     }
 
@@ -97,7 +116,8 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             super(TokenDef.class);
         }
 
-        Object value;
+        private Object value;
+        private Set<String> allowedProperties;
 
         @Override
         public TokenDefImpl build() {
@@ -109,5 +129,10 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
             return this;
         }
 
+        public Builder setAllowedProperties(String allowedProperties) {
+            Iterable<String> split = Splitter.on(",").omitEmptyStrings().trimResults().split(allowedProperties.toLowerCase());
+            this.allowedProperties = Sets.newHashSet(split);
+            return this;
+        }
     }
 }

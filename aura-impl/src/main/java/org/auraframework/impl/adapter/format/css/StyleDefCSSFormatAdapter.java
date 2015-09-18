@@ -23,13 +23,11 @@ import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
 import org.auraframework.css.FlavorOverrideLocator;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.FlavorOverridePlugin;
 import org.auraframework.system.AuraContext;
@@ -64,6 +62,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
         for (BaseStyleDef def : values) {
             if (def != null) {
                 if (overrides != null && def instanceof FlavoredStyleDef) {
+                    // TODONM fixthis
                     // for flavor css, enable the flavor mapping plugin which removes CSS based on flavor overrides
                     DefDescriptor<FlavoredStyleDef> desc = ((FlavoredStyleDef) def).getDescriptor();
 
@@ -82,8 +81,8 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
     private FlavorOverrideLocator getFlavorOverrides() throws QuickFixException {
         AuraContext ctx = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> top = ctx.getLoadingApplicationDescriptor();
-        if (top != null && top.getDefType() == DefType.APPLICATION) {
-            DefDescriptor<FlavorAssortmentDef> flavors = ((ApplicationDef) top.getDef()).getAppFlavors();
+        if (top != null) {
+            DefDescriptor<FlavorsDef> flavors = top.getDef().getFlavorOverrides();
             if (flavors != null) {
                 FlavorOverrideLocator overrides = flavors.getDef().computeOverrides();
                 if (!overrides.isEmpty()) {

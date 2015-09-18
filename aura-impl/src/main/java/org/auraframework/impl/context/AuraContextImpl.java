@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.context;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,19 +32,14 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.css.MutableTokenOptimizer;
 import org.auraframework.css.StyleContext;
-import org.auraframework.css.TokenOptimizer;
-import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.EventType;
-import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.token.StyleContextImpl;
-import org.auraframework.impl.css.token.TokenOptimizerImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.BaseComponent;
@@ -64,7 +62,6 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializationContext;
 import org.auraframework.util.json.JsonSerializers.NoneSerializer;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -286,8 +283,6 @@ public class AuraContextImpl implements AuraContext {
     private final boolean isDebugToolEnabled;
 
     private InstanceStack fakeInstanceStack;
-
-    private MutableTokenOptimizer tokens = new TokenOptimizerImpl();
 
     private StyleContext styleContext;
 
@@ -667,50 +662,28 @@ public class AuraContextImpl implements AuraContext {
     }
 
     @Override
-    public void addAppTokensDescriptors() {
-        DefDescriptor<? extends BaseComponentDef> desc = getLoadingApplicationDescriptor();
-        if (desc != null && desc.getDefType() == DefType.APPLICATION) {
-            @SuppressWarnings("unchecked")
-            DefDescriptor<ApplicationDef> appDesc = (DefDescriptor<ApplicationDef>) desc;
-            try {
-                ApplicationDef app = Aura.getDefinitionService().getDefinition(appDesc);
-                if (app != null) {
-                    // the app tokens conceptually precedes tokens explicitly added to the context.
-                    // this is important for the "last declared tokens def wins" contract
-                    tokens.prependAll(app.getTokenDescriptors());
-                }
-            } catch (QuickFixException qfe) {
-                // either the app or a dependency is invalid, nothing we can do about getting the tokens in that case.
-            }
-        }
-    }
-
-    @Override
-    public void appendTokensDescriptor(DefDescriptor<TokensDef> descriptor) throws QuickFixException {
-        tokens.append(descriptor);
-    }
-
-    @Override
-    public TokenOptimizer getTokenOptimizer() {
-        return tokens;
+    public void setStyleContext() {
+        setStyleContext(StyleContextImpl.build(this));
     }
 
     @Override
     public void setStyleContext(StyleContext styleContext) {
-        this.styleContext = styleContext;
+        // it's important that this is only set once, so that get returns a consistent value
+        checkState(this.styleContext == null, "StyleContext should only be set once per request");
+        this.styleContext = checkNotNull(styleContext, "styleContext cannot be null");
     }
 
     @Override
     public void setStyleContext(Map<String, Object> config) {
+        // it's important that this is only set once, so that get returns a consistent value
+        checkState(this.styleContext == null, "StyleContext should only be set once per request");
         this.styleContext = StyleContextImpl.build(config);
     }
 
     @Override
     public StyleContext getStyleContext() {
         if (styleContext == null) {
-            // in most cases this should not be null by the time it is requested. If it is null then there could
-            // potentially be a consistency problem with the requested vs. served css.
-            styleContext = StyleContextImpl.build(this);
+            setStyleContext();
         }
         return styleContext;
     }
@@ -859,23 +832,10 @@ public class AuraContextImpl implements AuraContext {
                 }
             }
             if (style == EncodingStyle.Css) {
-                // TODONM remove this
-                TokenOptimizer tokens = getTokenOptimizer();
-                if (!tokens.isEmpty()) {
-                    List<String> stringed = Lists.newArrayList();
-                    for (DefDescriptor<TokensDef> desc : tokens) {
-                        stringed.add(desc.getQualifiedName());
-                    }
-                    json.writeMapEntry("tokens", stringed);
+                // add contextual CSS information
+                if (styleContext == null) {
+                    setStyleContext();
                 }
-
-                // add a unique id for map-provided tokens, for client-side cache-busting
-                Optional<String> tokensUid = tokens.getActiveDynamicTokensUid();
-                if (tokensUid.isPresent()) {
-                    json.writeMapEntry("tokensUid", tokensUid.get());
-                }
-
-                // add other contextual CSS information
                 json.writeMapEntry("styleContext", getStyleContext());
             }
 

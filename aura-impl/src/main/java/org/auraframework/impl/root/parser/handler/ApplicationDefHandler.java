@@ -16,13 +16,18 @@
 package org.auraframework.impl.root.parser.handler;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
-import org.auraframework.impl.css.util.Tokens;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -34,7 +39,6 @@ import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -116,33 +120,18 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             builder.isOnePageApp = false;
         }
 
-        String tokens = getAttributeValue(ATTRIBUTE_TOKENS);
-        if (tokens != null) {
-            // an empty string is a valid value, and it means don't use any token overrides.
-            // this is a way to opt-out of the implicit default (below)
-            if (!AuraTextUtil.isNullEmptyOrWhitespace(tokens)) {
-                for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokens)) {
-                    builder.appendTokensDescriptor(DefDescriptorImpl.getInstance(name, TokensDef.class));
-                }
-            }
+        // this should be in base component handler, but if we automatically add it from there it results
+        // in the flavor CSS always being included in app.css (from the dependencies). We only want it if
+        // the cmp is top-level. need to figure out something better.
+        String flavorOverrides = getAttributeValue(ATTRIBUTE_FLAVOR_OVERRIDES);
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(flavorOverrides)) {
+            builder.setFlavorOverrides(DefDescriptorImpl.getInstance(flavorOverrides, FlavorsDef.class));
         } else {
-            // the implicit tokens override for an app is the namespace-default tokens, if it exists
-            DefDescriptor<TokensDef> namespaceTokens = Tokens.namespaceDefaultDescriptor(defDescriptor);
-            if (namespaceTokens.exists()) {
-                builder.appendTokensDescriptor(namespaceTokens);
-            }
-        }
-
-        String defaultFlavors = getAttributeValue(ATTRIBUTE_DEFAULT_FLAVORS);
-        if (!AuraTextUtil.isNullEmptyOrWhitespace(defaultFlavors)) {
-            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getInstance(defaultFlavors, FlavorAssortmentDef.class);
-            builder.setFlavorAssortmentDescriptor(flavors);
-        } else {
-            // see if there is a flavor assortment file in the app bundle
-            DefDescriptor<FlavorAssortmentDef> flavors = DefDescriptorImpl.getAssociateDescriptor(builder.getDescriptor(),
-                    FlavorAssortmentDef.class, DefDescriptor.MARKUP_PREFIX);
+            // see if there is a flavors file in the bundle
+            DefDescriptor<FlavorsDef> flavors = DefDescriptorImpl.getAssociateDescriptor(
+                    builder.getDescriptor(), FlavorsDef.class, DefDescriptor.MARKUP_PREFIX);
             if (flavors.exists()) {
-                builder.setFlavorAssortmentDescriptor(flavors);
+                builder.setFlavorOverrides(flavors);
             }
         }
     }
@@ -173,16 +162,15 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
     private static final String ATTRIBUTE_APPCACHE_ENABLED = "useAppcache";
     private static final String ATTRIBUTE_ADDITIONAL_APPCACHE_URLS = "additionalAppCacheURLs";
     private static final String ATTRIBUTE_IS_ONE_PAGE_APP = "isOnePageApp";
-    private static final String ATTRIBUTE_TOKENS = "tokens";
-    private static final String ATTRIBUTE_DEFAULT_FLAVORS = "defaultFlavors";
+    private static final String ATTRIBUTE_FLAVOR_OVERRIDES = "flavorOverrides";
 
     private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
-            .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS).add(ATTRIBUTE_TEMPLATE)
+            .add(ATTRIBUTE_APPCACHE_ENABLED, ATTRIBUTE_ADDITIONAL_APPCACHE_URLS)
+            .add(ATTRIBUTE_TEMPLATE)
             .addAll(BaseComponentDefHandler.ALLOWED_ATTRIBUTES).build();
 
     private static final Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>().add(
-            ATTRIBUTE_PRELOAD, ATTRIBUTE_LOCATION_CHANGE_EVENT,
-            ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_TOKENS, ATTRIBUTE_DEFAULT_FLAVORS)
+            ATTRIBUTE_PRELOAD, ATTRIBUTE_LOCATION_CHANGE_EVENT, ATTRIBUTE_IS_ONE_PAGE_APP, ATTRIBUTE_FLAVOR_OVERRIDES)
             .addAll(ALLOWED_ATTRIBUTES)
             .addAll(BaseComponentDefHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
             .build();

@@ -15,13 +15,15 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.util.*;
-
-import aQute.bnd.annotation.component.Component;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.StyleAdapter;
-import org.auraframework.css.*;
+import org.auraframework.css.ResolveStrategy;
+import org.auraframework.css.TokenCache;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -31,6 +33,8 @@ import org.auraframework.impl.css.token.TokenValueProviderImpl;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.salesforce.omakase.plugin.Plugin;
+
+import aQute.bnd.annotation.component.Component;
 
 @Component(provide = AuraServiceProvider.class)
 public class StyleAdapterImpl implements StyleAdapter {
@@ -44,7 +48,8 @@ public class StyleAdapterImpl implements StyleAdapter {
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy) {
         switch (strategy) {
         case RESOLVE_NORMAL:
-            return getTokenValueProvider(style, strategy, Aura.getContextService().getCurrentContext().getTokenOptimizer());
+            TokenCache overrides = Aura.getContextService().getCurrentContext().getStyleContext().getTokens();
+            return getTokenValueProvider(style, strategy, overrides);
         case RESOLVE_DEFAULTS:
         case PASSTHROUGH:
             return getTokenValueProvider(style, strategy, null);
@@ -55,7 +60,7 @@ public class StyleAdapterImpl implements StyleAdapter {
 
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
-            TokenOptimizer overrides) {
+            TokenCache overrides) {
         return new TokenValueProviderImpl(style, overrides, strategy);
     }
 

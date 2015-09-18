@@ -168,8 +168,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case TOKENS:
             case DESIGN:
             case SVG:
+            case FLAVOR_BUNDLE:
             case FLAVORS:
-            case FLAVOR_ASSORTMENT:
                 Type tag = TypeParser.parseTag(qualifiedName);
                 if (tag != null) {
                     // default the prefix to 'markup'

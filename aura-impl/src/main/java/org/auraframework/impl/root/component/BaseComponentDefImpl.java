@@ -20,12 +20,44 @@ import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.AttributeDefRef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DependencyDef;
+import org.auraframework.def.EventHandlerDef;
+import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.ImportDef;
+import org.auraframework.def.InterfaceDef;
+import org.auraframework.def.MethodDef;
+import org.auraframework.def.ModelDef;
+import org.auraframework.def.ProviderDef;
+import org.auraframework.def.RegisterEventDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.RequiredVersionDef;
+import org.auraframework.def.ResourceDef;
+import org.auraframework.def.RootDefinition;
+import org.auraframework.def.SVGDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.root.AttributeDefRefImpl;
@@ -38,11 +70,17 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -59,7 +97,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final DefDescriptor<T> extendsDescriptor;
     private final DefDescriptor<ComponentDef> templateDefDescriptor;
     private final DefDescriptor<StyleDef> styleDescriptor;
-    private final DefDescriptor<FlavoredStyleDef> flavorDescriptor;
+    private final DefDescriptor<FlavoredStyleDef> flavoredStyleDescriptor;
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
@@ -82,8 +120,11 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     private final List<DependencyDef> dependencies;
     private final List<ClientLibraryDef> clientLibraries;
-    private final boolean hasFlavorableChild;
+
+    private final List<DefDescriptor<TokensDef>> tokenOverrides;
+    private final DefDescriptor<FlavorsDef> flavorOverrides;
     private final String defaultFlavor;
+    private final boolean hasFlavorableChild;
     private final boolean dynamicallyFlavorable;
 
     private String clientComponentClass;
@@ -114,7 +155,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.eventHandlers = AuraUtil.immutableList(builder.eventHandlers);
         this.imports = AuraUtil.immutableList(builder.imports);
         this.styleDescriptor = builder.styleDescriptor;
-        this.flavorDescriptor = builder.flavorDescriptor;
+        this.flavoredStyleDescriptor = builder.flavoredStyleDescriptor;
         this.rendererDescriptors = builder.rendererDescriptors;
         this.helperDescriptors = builder.helperDescriptors;
         this.resourceDescriptors = builder.resourceDescriptors;
@@ -128,8 +169,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.whitespaceBehavior = builder.whitespaceBehavior;
         this.designDefDescriptor = builder.designDefDescriptor;
         this.svgDefDescriptor = builder.svgDefDescriptor;
-        this.hasFlavorableChild = builder.hasFlavorableChild;
+        this.tokenOverrides = AuraUtil.immutableList(builder.tokenOverrides);
+        this.flavorOverrides = builder.flavorOverrides;
         this.defaultFlavor = builder.defaultFlavor;
+        this.hasFlavorableChild = builder.hasFlavorableChild;
         this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
@@ -553,8 +596,8 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             dependencies.add(styleDescriptor);
         }
 
-        if (flavorDescriptor != null) {
-            dependencies.add(flavorDescriptor);
+        if (flavoredStyleDescriptor != null) {
+            dependencies.add(flavoredStyleDescriptor);
         }
 
         if (templateDefDescriptor != null) {
@@ -573,6 +616,14 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             for (ImportDef imported : imports) {
                 dependencies.add(imported.getDescriptor());
             }
+        }
+
+        if (tokenOverrides != null) {
+            dependencies.addAll(tokenOverrides);
+        }
+
+        if (flavorOverrides != null) {
+            dependencies.add(flavorOverrides);
         }
 
         for (DependencyDef dep : this.dependencies) {
@@ -758,7 +809,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
     @Override
     public FlavoredStyleDef getFlavoredStyleDef() throws QuickFixException {
-        return flavorDescriptor == null ? null : flavorDescriptor.getDef();
+        return flavoredStyleDescriptor == null ? null : flavoredStyleDescriptor.getDef();
     }
 
     @Override
@@ -937,7 +988,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                  */
 
                 json.writeMapEntry("styleDef", getStyleDef());
-                if (flavorDescriptor != null) {
+                if (flavoredStyleDescriptor != null) {
                     json.writeMapEntry("flavoredStyleDef", getFlavoredStyleDef());
                 }
 
@@ -1003,6 +1054,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
                 if (subDefs != null) {
                     json.writeMapEntry("subDefs", subDefs.values());
+                }
+
+                if (flavorOverrides != null) {
+                    json.writeMapEntry("flavorOverrides", flavorOverrides.getDef());
                 }
 
                 String defaultFlavorToSerialize = getDefaultFlavorOrImplicit();
@@ -1160,10 +1215,31 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
+    public List<DefDescriptor<TokensDef>> getTokenOverrides() {
+        return tokenOverrides;
+    }
+
+    @Override
+    public DefDescriptor<FlavorsDef> getFlavorOverrides() {
+        return flavorOverrides;
+    }
+
+    @Override
+    public String getDefaultFlavorOrImplicit() throws QuickFixException {
+        if (defaultFlavor == null
+                && flavoredStyleDescriptor != null
+                && flavoredStyleDescriptor.getDef().getFlavorNames().contains("default")
+                && (hasFlavorableChild() || isDynamicallyFlavorable())) {
+            return "default";
+        }
+
+        return defaultFlavor;
+    }
+
+    @Override
     public boolean hasFlavorableChild() {
         return hasFlavorableChild;
     }
-
 
     @Override
     public boolean inheritsFlavorableChild() throws QuickFixException {
@@ -1179,35 +1255,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     }
 
     @Override
-    public String getDefaultFlavor() {
-        return defaultFlavor;
-    }
-
-    @Override
-    public String getDefaultFlavorOrImplicit() throws QuickFixException {
-        if (defaultFlavor == null
-                && flavorDescriptor != null
-                && flavorDescriptor.getDef().getFlavorNames().contains("default")
-                && (hasFlavorableChild() || isDynamicallyFlavorable())) {
-            return "default";
-        }
-
-        return defaultFlavor;
-    }
-
-    @Override
-    public Set<String> getAllFlavorNames() throws QuickFixException {
-        Set<String> allFlavorNames = new HashSet<>();
-        if (flavorDescriptor != null) {
-            allFlavorNames.addAll(flavorDescriptor.getDef().getFlavorNames());
-        }
-        if (extendsDescriptor != null) {
-            allFlavorNames.addAll(extendsDescriptor.getDef().getAllFlavorNames());
-        }
-        return allFlavorNames;
-    }
-
-    @Override
     public boolean isDynamicallyFlavorable() throws QuickFixException {
         if (dynamicallyFlavorable) {
             return true;
@@ -1216,6 +1263,18 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             return extendsDescriptor.getDef().isDynamicallyFlavorable();
         }
         return false;
+    }
+
+    @Override
+    public Set<String> getAllFlavorNames() throws QuickFixException {
+        Set<String> allFlavorNames = new HashSet<>();
+        if (flavoredStyleDescriptor != null) {
+            allFlavorNames.addAll(flavoredStyleDescriptor.getDef().getFlavorNames());
+        }
+        if (extendsDescriptor != null) {
+            allFlavorNames.addAll(extendsDescriptor.getDef().getAllFlavorNames());
+        }
+        return allFlavorNames;
     }
 
     public static abstract class Builder<T extends BaseComponentDef> extends
@@ -1234,7 +1293,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         public DefDescriptor<T> extendsDescriptor;
         public DefDescriptor<ComponentDef> templateDefDescriptor;
         public DefDescriptor<StyleDef> styleDescriptor;
-        public DefDescriptor<FlavoredStyleDef> flavorDescriptor;
+        public DefDescriptor<FlavoredStyleDef> flavoredStyleDescriptor;
         public DefDescriptor<DesignDef> designDefDescriptor;
         public DefDescriptor<SVGDef> svgDefDescriptor;
         public List<DefDescriptor<RendererDef>> rendererDescriptors;
@@ -1254,8 +1313,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         List<DependencyDef> dependencies;
         public List<ClientLibraryDef> clientLibraries;
         private RenderType renderType;
-        private boolean hasFlavorableChild;
+        private List<DefDescriptor<TokensDef>> tokenOverrides;
+        private DefDescriptor<FlavorsDef> flavorOverrides;
         private String defaultFlavor;
+        private boolean hasFlavorableChild;
         private boolean dynamicallyFlavorable;
 
         @Override
@@ -1397,14 +1458,40 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         @Override
-        public Builder<T> setHasFlavorableChild(boolean hasFlavorableChild) {
-            this.hasFlavorableChild = hasFlavorableChild;
+        public BaseComponentDefBuilder<T> setTokenOverrides(String tokenOverrides) {
+            if (this.tokenOverrides == null) {
+                this.tokenOverrides = new ArrayList<>();
+            }
+            for (String name : Splitter.on(',').trimResults().omitEmptyStrings().split(tokenOverrides)) {
+                this.tokenOverrides.add(DefDescriptorImpl.getInstance(name, TokensDef.class));
+            }
+            return this;
+        }
+
+        @Override
+        public BaseComponentDefBuilder<T> setTokenOverride(DefDescriptor<TokensDef> tokenOverride) {
+            if (this.tokenOverrides == null) {
+                this.tokenOverrides = new ArrayList<>();
+            }
+            this.tokenOverrides.add(tokenOverride);
+            return this;
+        }
+
+        @Override
+        public BaseComponentDefBuilder<T> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides) {
+            this.flavorOverrides = flavorOverrides;
             return this;
         }
 
         @Override
         public Builder<T> setDefaultFlavor(String defaultFlavor) {
             this.defaultFlavor = defaultFlavor;
+            return this;
+        }
+
+        @Override
+        public Builder<T> setHasFlavorableChild(boolean hasFlavorableChild) {
+            this.hasFlavorableChild = hasFlavorableChild;
             return this;
         }
 
@@ -1496,6 +1583,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
         if (documentationDescriptor != null) {
             ret.add(documentationDescriptor);
+        }
+        if (flavorOverrides != null) {
+            ret.add(flavorOverrides);
         }
         return ret;
     }

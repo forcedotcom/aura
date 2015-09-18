@@ -23,7 +23,7 @@ import org.auraframework.css.FlavorOverrideLocation;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.impl.css.util.Flavors;
 import org.auraframework.impl.css.util.Styles;
@@ -38,14 +38,14 @@ import com.salesforce.omakase.plugin.DependentPlugin;
 import com.salesforce.omakase.plugin.conditionals.Conditionals;
 
 /**
- * Enables removing flavor styles that have been overridden via an app's {@link FlavorAssortmentDef}.
+ * Enables removing flavor styles that have been overridden via an app's {@link FlavorsDef}.
  * <p>
  * More specifically, this takes a {@link FlavorOverrideLocator} that specifies which {@link FlavoredStyleDef} contains
  * the styling for a particular named flavor and component. If the given {@link FlavoredStyleDef} doesn't match then the
  * relevant CSS is removed.
  *
  * @see FlavorOverrideLocator
- * @see FlavorAssortmentDef
+ * @see FlavorsDef
  * @see FlavorPlugin
  */
 public final class FlavorOverridePlugin implements DependentPlugin {

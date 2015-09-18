@@ -317,8 +317,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             case TOKENS:
             case TOKENS_IMPORT:
             case TOKEN:
+            case FLAVOR_BUNDLE:
             case FLAVORS:
-            case FLAVOR_ASSORTMENT:
             case FLAVOR_INCLUDE:
             case FLAVOR_DEFAULT:
             case DESIGN:

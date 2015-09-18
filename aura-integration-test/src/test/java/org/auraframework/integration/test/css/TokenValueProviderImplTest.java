@@ -25,7 +25,7 @@ import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokenDescriptorProvider;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.StyleTestCase;
-import org.auraframework.impl.css.token.TokenOptimizerImpl;
+import org.auraframework.impl.css.token.TokenCacheImpl;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Annotations.Provider;
@@ -276,6 +276,6 @@ public class TokenValueProviderImplTest extends StyleTestCase {
 
     private TokenValueProvider setupOverride(DefDescriptor<StyleDef> def, List<DefDescriptor<TokensDef>> overrides)
             throws QuickFixException {
-        return new TokenValueProviderImpl(def, new TokenOptimizerImpl(overrides), ResolveStrategy.RESOLVE_NORMAL);
+        return new TokenValueProviderImpl(def, new TokenCacheImpl(overrides), ResolveStrategy.RESOLVE_NORMAL);
     }
 }

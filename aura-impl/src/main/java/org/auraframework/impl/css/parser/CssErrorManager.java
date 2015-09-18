@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.css.parser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -25,7 +26,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.throwable.quickfix.StyleParserException;
 
-import com.google.common.collect.Lists;
 import com.salesforce.omakase.ast.Syntax;
 import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
@@ -36,8 +36,8 @@ import com.salesforce.omakase.parser.ParserException;
  */
 final class CssErrorManager implements ErrorManager {
     private final Mode mode = Aura.getContextService().getCurrentContext().getMode();
-    private final List<QuickFixException> wrappedExceptions = Lists.newArrayList();
-    private final List<String> messages = Lists.newArrayList();
+    private final List<QuickFixException> wrappedExceptions = new ArrayList<>();
+    private final List<String> messages = new ArrayList<>();
     private final String resourceName;
 
     /**

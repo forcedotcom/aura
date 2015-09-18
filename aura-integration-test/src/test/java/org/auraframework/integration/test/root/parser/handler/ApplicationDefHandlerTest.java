@@ -19,7 +19,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
@@ -102,15 +102,15 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         }
     }
 
-    public void testReadTokensAttribute() throws QuickFixException {
+    public void testReadTokenOverridesAttribute() throws QuickFixException {
         DefDescriptor<TokensDef> desc = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        String src = String.format("<aura:application tokens=\"%s\"></aura:application>",
+        String src = String.format("<aura:application tokenOverrides=\"%s\"></aura:application>",
                 desc.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, app.getDef().getTokenDescriptors().size());
-        assertEquals(desc, app.getDef().getTokenDescriptors().get(0));
+        assertEquals(1, app.getDef().getTokenOverrides().size());
+        assertEquals(desc, app.getDef().getTokenOverrides().get(0));
     }
 
     public void testReadTokensAttributeMultiple() throws QuickFixException {
@@ -118,33 +118,33 @@ public class ApplicationDefHandlerTest extends AuraImplTestCase {
         DefDescriptor<TokensDef> t2 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
         DefDescriptor<TokensDef> t3 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
 
-        String src = String.format("<aura:application tokens=\"%s, %s, %s\"></aura:application>",
+        String src = String.format("<aura:application tokenOverrides=\"%s, %s, %s\"></aura:application>",
                 t1.getDescriptorName(), t2.getDescriptorName(), t3.getDescriptorName());
 
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(3, app.getDef().getTokenDescriptors().size());
-        assertEquals(t1, app.getDef().getTokenDescriptors().get(0));
-        assertEquals(t2, app.getDef().getTokenDescriptors().get(1));
-        assertEquals(t3, app.getDef().getTokenDescriptors().get(2));
+        assertEquals(3, app.getDef().getTokenOverrides().size());
+        assertEquals(t1, app.getDef().getTokenOverrides().get(0));
+        assertEquals(t2, app.getDef().getTokenOverrides().get(1));
+        assertEquals(t3, app.getDef().getTokenOverrides().get(2));
     }
 
-    public void testReadDefaultFlavorsAttribute() throws QuickFixException {
-        DefDescriptor<FlavorAssortmentDef> fa = addSourceAutoCleanup(FlavorAssortmentDef.class, "<aura:flavors></aura:flavors>");
+    public void testReadFlavorOverridesAttribute() throws QuickFixException {
+        DefDescriptor<FlavorsDef> fa = addSourceAutoCleanup(FlavorsDef.class, "<aura:flavors></aura:flavors>");
 
-        String src = String.format("<aura:application defaultFlavors=\"%s\"></aura:application>",
+        String src = String.format("<aura:application flavorOverrides=\"%s\"></aura:application>",
                 fa.getDescriptorName());
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
-        assertEquals(fa, app.getDef().getAppFlavors());
+        assertEquals(fa, app.getDef().getFlavorOverrides());
     }
 
-    public void testFindsDefaultFlavorsInBundleNoAttributeSpecified() throws QuickFixException {
-        DefDescriptor<FlavorAssortmentDef> fa = addSourceAutoCleanup(FlavorAssortmentDef.class, "<aura:flavors></aura:flavors>");
+    public void testFindsDefaultFlavorOverridesInBundleNoAttributeSpecified() throws QuickFixException {
+        DefDescriptor<FlavorsDef> fa = addSourceAutoCleanup(FlavorsDef.class, "<aura:flavors></aura:flavors>");
 
         DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getAssociateDescriptor(fa, ApplicationDef.class,
                 DefDescriptor.MARKUP_PREFIX);
         addSourceAutoCleanup(app, String.format("<aura:application></aura:application>"));
 
-        assertEquals(fa, app.getDef().getAppFlavors());
+        assertEquals(fa, app.getDef().getFlavorOverrides());
     }
 }

@@ -38,9 +38,10 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
     protected static final String TAG = "aura:token";
     private static final String ATTRIBUTE_NAME = "name";
     private static final String ATTRIBUTE_VALUE = "value";
+    private static final String ATTRIBUTE_PROPERTY = "property";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_DESCRIPTION);
+            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PROPERTY, ATTRIBUTE_DESCRIPTION);
 
     private final TokenDefImpl.Builder builder = new TokenDefImpl.Builder();
     private String value;
@@ -73,7 +74,14 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
             error("Missing required attribute 'name' on %s", TAG);
         }
         builder.setDescriptor(DefDescriptorImpl.getInstance(name, TokenDef.class));
+
         value = getAttributeValue(ATTRIBUTE_VALUE);// value (to be set on builder later, cuz it might throw a QFE)
+
+        String allowedProperties = getAttributeValue(ATTRIBUTE_PROPERTY); // comma-separated list of property names
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(allowedProperties)) {
+            builder.setAllowedProperties(allowedProperties);
+        }
+
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
     }
 

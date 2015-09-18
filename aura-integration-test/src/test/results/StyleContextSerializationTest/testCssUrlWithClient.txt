@@ -1,0 +1,1 @@
+/l/{"mode":"UTEST","app":"#REPLACED#","fwuid":"#FAKEUID#","styleContext":{"c":"webkit"},"test":"org.auraframework.integration.test.css.StyleContextSerializationTest.testCssUrlWithClient"}/app.css

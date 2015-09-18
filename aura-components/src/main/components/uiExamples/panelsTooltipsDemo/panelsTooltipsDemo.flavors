@@ -16,5 +16,5 @@
 
 -->
 <aura:flavors>
-    <aura:use source="uiExamples:panelsTooltipsDemo" />
+    <aura:include source="uiExamples:panelsTooltipsDemo" />
 </aura:flavors>

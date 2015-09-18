@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.TokenOptimizer;
 import org.auraframework.css.StyleContext;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -192,6 +191,19 @@ public class ServerServiceImpl implements ServerService {
             keyBuilder.append(trueConditionsKey);
         }
 
+        // tokens uid. The app tokens are in the app dependencies and thus part of appuid, however we need
+        // a distinct uid because one of the descriptors may be provided. this can be further optimized by only adding
+        // a uid for provided descriptors only though.
+        Optional<String> tokensUid = styleContext.getTokens().getDescriptorsUid();
+        if (tokensUid.isPresent()) {
+            keyBuilder.append(":").append(tokensUid.get());
+        }
+
+        // TODONM: If a tokens def uses a map-provider it will affect the css key too. Current idea is to cache a
+        // "pre-evaluated" version of the CSS (but still ordered and concatenated). Another idea is to defer cache to
+        // fileforce, etc... once a map-provider is involved. right now we skip the cache, so until this is address
+        // map-providers shouldn't be used.
+
         keyBuilder.append("$");
 
         // minified or not
@@ -203,25 +215,11 @@ public class ServerServiceImpl implements ServerService {
         final String uid = context.getUid(appDesc);
         keyBuilder.append(uid);
 
-        // tokens uid (tokens specified directly to the context (not on the app) need to be considered)
-        final TokenOptimizer tokens = context.getTokenOptimizer();
-        Optional<String> tokensUid = tokens.getDescriptorsUid();
-        if (tokensUid.isPresent()) {
-            keyBuilder.append(":").append(tokensUid.get());
-        }
-
-        // 2) TODONM: If a tokens def uses a map-provider it will affect the css key too. Current idea is to cache a
-        // "pre-evaluated"
-        // version of the CSS (but still ordered and concatenated). Until this is addressed map-providers shouldn't be
-        // used. Another idea is to defer cache to fileforce, etc... once a map-provider is involved. (actually right
-        // now
-        // we are skipping the cache, but when we stop doing that then this needs to be addressed
-
         final String key = keyBuilder.toString();
         context.setPreloading(true);
 
         String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
-        boolean skipCache = tokens.hasDynamicTokens(); // for now, skip caching css with dynamic var overrides
+        final boolean skipCache = styleContext.getTokens().hasDynamicTokens(); // TODONM undo this cache skipping
 
         if (cached == null || skipCache) {
             Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);

@@ -21,12 +21,7 @@ import static org.auraframework.impl.css.parser.plugin.TokenFunctionRefiner.NORM
 import java.io.IOException;
 import java.util.Set;
 
-import org.auraframework.Aura;
-import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
-import org.auraframework.def.BaseStyleDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.AbstractTerm;
@@ -51,7 +46,7 @@ public final class TokenFunctionPlugin implements SyntaxPlugin {
 
     private final TokenFunctionRefiner refiner;
 
-    private TokenFunctionPlugin(TokenValueProvider provider) throws QuickFixException {
+    public TokenFunctionPlugin(TokenValueProvider provider) {
         refiner = new TokenFunctionRefiner(provider);
     }
 
@@ -95,16 +90,6 @@ public final class TokenFunctionPlugin implements SyntaxPlugin {
         if (empty.group().size() > 1) {
             em.report(ErrorLevel.FATAL, empty, String.format(MSG, empty.textualValue()));
         }
-    }
-
-    /** This will collect all token function references but will leave them unevaluated in the CSS */
-    public static TokenFunctionPlugin passthrough(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
-        return new TokenFunctionPlugin(Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH));
-    }
-
-    /** This will resolve all token function references */
-    public static TokenFunctionPlugin resolving(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
-        return new TokenFunctionPlugin(Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL));
     }
 
     @Subscribable

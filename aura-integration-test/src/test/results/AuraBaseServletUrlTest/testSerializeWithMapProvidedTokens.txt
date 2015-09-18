@@ -1,1 +1,0 @@
-/l/{"mode":"UTEST","app":"#REPLACED#","fwuid":"#FAKEUID#","tokens":["markup://test:fakeTokensWithMapProvider","markup://test:fakeTokens3"],"tokensUid":"4yo4Xi5U6nLqDwehxfxHRQ","styleContext":{"c":"other"},"test":"org.auraframework.integration.test.http.AuraBaseServletUrlTest.testSerializeWithMapProvidedTokens"}/app.css

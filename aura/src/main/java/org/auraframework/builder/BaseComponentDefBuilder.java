@@ -21,12 +21,15 @@ import org.auraframework.def.BaseComponentDef.WhitespaceBehavior;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.SVGDef;
 import org.auraframework.def.StyleDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.def.design.DesignDef;
 
 /**
@@ -63,11 +66,25 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
     BaseComponentDefBuilder<T> addClientLibrary(ClientLibraryDef clientLibrary);
 
     /**
-     * Specifies that this component has a child component def ref (e.g., html element) that has aura:flavorable.
+     * Specifies the token descriptors.
      *
-     * @see FlavoredStyleDef
+     * @param tokenOverrides Comma-separated list of token descriptors.
      */
-    BaseComponentDefBuilder<T> setHasFlavorableChild(boolean hasFlavorableChild);
+    BaseComponentDefBuilder<T> setTokenOverrides(String tokenOverrides);
+
+    /**
+     * Same as {@link #setTokenOverrides(String)}.
+     *
+     * @param tokenOverride The {@link TokensDef} descriptor.
+     */
+    BaseComponentDefBuilder<T> setTokenOverride(DefDescriptor<TokensDef> tokenOverride);
+
+    /**
+     * Specifies the {@link FlavorsDef} descriptor.
+     *
+     * @param flavorOverride The {@link FlavorsDef} descriptor.
+     */
+    BaseComponentDefBuilder<T> setFlavorOverrides(DefDescriptor<FlavorsDef> flavorOverrides);
 
     /**
      * Specifies the default flavor (the name of a flavor in the component bundle flavor def).
@@ -76,6 +93,13 @@ public interface BaseComponentDefBuilder<T extends BaseComponentDef> extends Roo
      * @see FlavoredStyleDef
      */
     BaseComponentDefBuilder<T> setDefaultFlavor(String defaultFlavor);
+
+    /**
+     * Specifies that this component has a child component def ref (e.g., html element) that has aura:flavorable.
+     *
+     * @see FlavoredStyleDef
+     */
+    BaseComponentDefBuilder<T> setHasFlavorableChild(boolean hasFlavorableChild);
 
     /**
      * Specifies whether this component is dynamically flavorable.

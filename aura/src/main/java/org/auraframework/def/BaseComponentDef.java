@@ -146,6 +146,29 @@ public interface BaseComponentDef extends RootDefinition {
     Set<ResourceDef> getResourceDefs() throws QuickFixException;
 
     /**
+     * Gets the application-wide token overrides.
+     */
+    List<DefDescriptor<TokensDef>> getTokenOverrides();
+
+    /**
+     * Gets the application-wide default flavor override.
+     */
+    DefDescriptor<FlavorsDef> getFlavorOverrides();
+
+    /**
+     * Gets the default flavor name, or if an explicit defaultFlavor is not specified, and a {@link FlavoredStyleDef}
+     * exists in the bundle with a flavor named "default", then "default" will be returned.
+     * <p>
+     * WARNING: This method may potentially load a {@link FlavoredStyleDef}. Do not call in places where loading a
+     * definition may be inappropriate (e.g., in a validateDefinition impl).
+     *
+     * @return The default flavor if specified, or the implicit default flavor "default" if defined, or null if neither
+     *         apply.
+     * @throws QuickFixException If there is a problem loading the flavor def.
+     */
+    String getDefaultFlavorOrImplicit() throws QuickFixException;
+
+    /**
      * Returns true if this component has a child component def ref html element that has aura:flavorable. To check
      * whether a parent component has a flavorable child, use {@link #inheritsFlavorableChild()} instead (or as well).
      *
@@ -161,26 +184,11 @@ public interface BaseComponentDef extends RootDefinition {
     boolean inheritsFlavorableChild() throws QuickFixException;
 
     /**
-     * Returns the explicitly specified default flavor name.
+     * Returns true if this component or any super component has the dynamicallyFlavorable attribute set as true.
      *
-     * @see FlavoredStyleDef
-     *
-     * @return The default flavor, or null if none specified.
+     * @throws QuickFixException If there is a problem loading the parent def.
      */
-    String getDefaultFlavor();
-
-    /**
-     * The same as {@link #getDefaultFlavor()}, except if an explicit defaultFlavor is not specified, and a
-     * {@link FlavoredStyleDef} exists in the bundle with a flavor named "default", then "default" will be returned.
-     * <p>
-     * WARNING: This method may potentially load a {@link FlavoredStyleDef}. Do not call in places where loading a definition
-     * may be inappropriate (e.g., in a validateDefinition impl).
-     *
-     * @return The default flavor if specified, or the implicit default flavor "default" if defined, or null if neither
-     *         apply.
-     * @throws QuickFixException If there is a problem loading the flavor def.
-     */
-    String getDefaultFlavorOrImplicit() throws QuickFixException;
+    boolean isDynamicallyFlavorable() throws QuickFixException;
 
     /**
      * Gets the set of defined flavor names in this component and all parent components.
@@ -189,13 +197,6 @@ public interface BaseComponentDef extends RootDefinition {
      * @throws QuickFixException If there is a problem loading a flavor or parent def.
      */
     Set<String> getAllFlavorNames() throws QuickFixException;
-
-    /**
-     * Returns true if this component or any super component has the dynamicallyFlavorable attribute set as true.
-     *
-     * @throws QuickFixException If there is a problem loading the parent def.
-     */
-    boolean isDynamicallyFlavorable() throws QuickFixException;
 
     /**
      * Get the generated JavaScript class for this component.

@@ -93,10 +93,6 @@ public final class FlavoredStyleDefImpl extends AbstractStyleDef<FlavoredStyleDe
 
         AuraContext context = Aura.getContextService().getCurrentContext();
         if (!context.isPreloading() && !context.isPreloaded(getDescriptor())) {
-            // TODONM: revisit this after removing tokens from aura context
-            if (context.getTokenOptimizer().isEmpty()) {
-                context.addAppTokensDescriptors();
-            }
             json.writeMapEntry("code", getCode());
         }
         json.writeMapEnd();

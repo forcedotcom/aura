@@ -15,30 +15,40 @@
  */
 package org.auraframework.css;
 
+import java.util.Set;
+
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.system.Client;
 import org.auraframework.util.json.JsonSerializable;
-
-import com.google.common.collect.ImmutableSet;
 
 /**
  * Information about the current context relevant to CSS parsing.
  */
 public interface StyleContext extends JsonSerializable {
     /**
-     * Gets the client type (e.g., "webkit" or"ie7"). See {@link Client#getType()}. This is lower-cased.
+     * Gets the client type (e.g., "webkit" or"ie7"). See {@link Client#getType()}. Always lower-case.
      */
     String getClientType();
 
     /**
      * Gets all true conditions. This includes named conditions (e.g., client type) and any other specified true
      * conditions.
+     *
+     * @return an ImmutableSet.
      */
-    ImmutableSet<String> getAllTrueConditions();
+    Set<String> getAllTrueConditions();
 
     /**
      * Gets the unnamed true conditions only (from {@link StyleAdapter#getExtraTrueConditions()}. This does <b>not</b>
      * include named true conditions like {@link #getClientType()}.
+     *
+     * @return an ImmutableSet.
      */
-    ImmutableSet<String> getExtraTrueConditionsOnly();
+    Set<String> getExtraTrueConditionsOnly();
+
+    /**
+     * Gets the {@link TokenCache} containing the token overrides from the application (or an empty {@link TokenCache}
+     * if the application doesn't have token overrides specified).
+     */
+    TokenCache getTokens();
 }

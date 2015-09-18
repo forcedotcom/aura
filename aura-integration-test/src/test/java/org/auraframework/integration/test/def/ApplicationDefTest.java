@@ -22,7 +22,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.root.component.BaseComponentDefTest;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -126,51 +125,18 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
     }
 
     /** verify that we set tokens explicitly set on the tokens tag */
-    public void testExplicitTokens() throws QuickFixException {
+    public void testExplicitTokenOverrides() throws QuickFixException {
         DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
-        String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
+        String src = String.format("<aura:application tokenOverrides=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
-        assertEquals(1, desc.getDef().getTokenDescriptors().size());
-        assertEquals(tokens, desc.getDef().getTokenDescriptors().get(0));
-    }
-
-    /** verify that we set the implicit namespace default app overrides */
-    public void testImplicitTokenOverrides() throws QuickFixException {
-        DefDescriptor<TokensDef> dummy = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
-
-        DefDescriptor<TokensDef> nsTokens = DefDescriptorImpl.getInstance(
-                String.format("%s:%sNamespace", dummy.getNamespace(), dummy.getNamespace()), TokensDef.class);
-        addSourceAutoCleanup(nsTokens, "<aura:tokens></aura:tokens>");
-
-        String src = "<aura:application/>";
-        DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(
-                String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
-                ApplicationDef.class);
-        addSourceAutoCleanup(desc, src);
-        assertEquals(1, desc.getDef().getTokenDescriptors().size());
-        assertEquals(nsTokens, desc.getDef().getTokenDescriptors().get(0));
-    }
-
-    /** an empty value for the tokens attr means that you don't want any token overrides, even the implicit one */
-    public void testTokensAttrIsEmptyString() throws QuickFixException {
-        DefDescriptor<TokensDef> dummy = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
-
-        DefDescriptor<TokensDef> nsTokens = DefDescriptorImpl.getInstance(
-                String.format("%s:%sNamespace", dummy.getNamespace(), dummy.getNamespace()), TokensDef.class);
-        addSourceAutoCleanup(nsTokens, "<aura:tokens></aura:tokens>");
-
-        String src = "<aura:application tokens=''/>";
-        DefDescriptor<ApplicationDef> desc = DefDescriptorImpl.getInstance(
-                String.format("%s:%s", dummy.getNamespace(), getAuraTestingUtil().getNonce(getName())),
-                ApplicationDef.class);
-        addSourceAutoCleanup(desc, src);
-        assertTrue(desc.getDef().getTokenDescriptors().isEmpty());
+        assertEquals(1, desc.getDef().getTokenOverrides().size());
+        assertEquals(tokens, desc.getDef().getTokenOverrides().get(0));
     }
 
     /** verify tokens descriptor is added to dependency set */
     public void testTokensAddedToDeps() throws QuickFixException {
         DefDescriptor<TokensDef> tokens = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
-        String src = String.format("<aura:application tokens=\"%s\"/>", tokens.getDescriptorName());
+        String src = String.format("<aura:application tokenOverrides=\"%s\"/>", tokens.getDescriptorName());
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         Set<DefDescriptor<?>> deps = Sets.newHashSet();
@@ -180,7 +146,7 @@ public class ApplicationDefTest extends BaseComponentDefTest<ApplicationDef> {
 
     /** verify tokens descriptor ref is validated */
     public void testInvalidTokensRef() throws QuickFixException {
-        String src = String.format("<aura:application tokens=\"%s\"/>", "wall:maria");
+        String src = String.format("<aura:application tokenOverrides=\"%s\"/>", "wall:maria");
         DefDescriptor<ApplicationDef> desc = addSourceAutoCleanup(ApplicationDef.class, src);
 
         try {

@@ -25,8 +25,8 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.FlavorAssortmentDef;
 import org.auraframework.def.FlavoredStyleDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -124,7 +124,7 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     /** gets the parsed output of the given style. This ensures the application explicit tokens are registered */
     public String getParsedCssUseAppTokens(DefDescriptor<? extends BaseStyleDef> styleDesc) throws QuickFixException {
         // ensures app's tokens are added to the context
-        Aura.getContextService().getCurrentContext().addAppTokensDescriptors();
+        // create style context?
         return styleDesc.getDef().getCode();
     }
 
@@ -209,19 +209,19 @@ public abstract class StyleTestCase extends AuraImplTestCase {
     }
 
     /** adds a flavor assortment def */
-    public DefDescriptor<FlavorAssortmentDef> addFlavorAssortment(CharSequence src) {
-        return addSourceAutoCleanup(FlavorAssortmentDef.class, src.toString(), getNs1() + ":" + "fa");
+    public DefDescriptor<FlavorsDef> addFlavorAssortment(CharSequence src) {
+        return addSourceAutoCleanup(FlavorsDef.class, src.toString(), getNs1() + ":" + "fa");
     }
 
     /** adds a flavor assortment def to the "other" namespace */
-    public DefDescriptor<FlavorAssortmentDef> addFlavorAssortmentOtherNamespace(CharSequence src) {
-        return addSourceAutoCleanup(FlavorAssortmentDef.class, src.toString(), getNs2() + ":" + "fa");
+    public DefDescriptor<FlavorsDef> addFlavorAssortmentOtherNamespace(CharSequence src) {
+        return addSourceAutoCleanup(FlavorsDef.class, src.toString(), getNs2() + ":" + "fa");
     }
 
     /** adds a flavor assortment with the given source to the same bundle as the context app */
-    public DefDescriptor<FlavorAssortmentDef> addContextAppFlavorAssortment(CharSequence src) {
+    public DefDescriptor<FlavorsDef> addContextAppFlavorAssortment(CharSequence src) {
         String fmt = String.format("%s:%s", ns1, "testApp");
-        DefDescriptor<FlavorAssortmentDef> faDesc = Aura.getDefinitionService().getDefDescriptor(fmt, FlavorAssortmentDef.class);
+        DefDescriptor<FlavorsDef> faDesc = Aura.getDefinitionService().getDefDescriptor(fmt, FlavorsDef.class);
         return addSourceAutoCleanup(faDesc, src.toString());
     }
 

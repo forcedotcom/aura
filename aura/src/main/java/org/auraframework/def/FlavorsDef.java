@@ -15,16 +15,38 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.service.DefinitionService;
+import java.util.List;
+
+import org.auraframework.css.FlavorOverrideLocator;
+import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * Currently a marker interface (actual files/resources of this type won't exist), representing the "main" definition of
- * bundles containing custom {@link FlavoredStyleDef}s.
+ * Represents a flavors def, used for app-level overrides of default flavors.
  * <p>
- * This marker interface is needed because a proper DefType/Definition is required for the bundle param in
- * {@link DefinitionService#getDefDescriptor(String, Class, DefDescriptor)}) and similar methods.
+ * These are {@code <aura:flavors>} tags that contain {@code <aura:flavor>} inner tags.
  */
 public interface FlavorsDef extends RootDefinition {
     @Override
     DefDescriptor<FlavorsDef> getDescriptor();
+
+    /**
+     * Gets the list of specified {@link FlavorIncludeDef}s, in order of declaration.
+     */
+    List<FlavorIncludeDef> getFlavorIncludeDefs();
+
+    /**
+     * Gets the list of specified {@link FlavorDefaultDef}s, in order of declaration.
+     */
+    List<FlavorDefaultDef> getFlavorDefaultDefs();
+
+    /**
+     * Computes a {@link FlavorOverrideLocator}. This mapping contains info on which flavors should replace the standard ones.
+     * <p>
+     * If multiple {@link FlavorIncludeDef}s contain entries for the same flavor name and component, only the last one
+     * to do so will be utilized.
+     *
+     * @return The {@link FlavorOverrideLocator} instance.
+     * @throws QuickFixException If there was a problem loading a flavored style def.
+     */
+    FlavorOverrideLocator computeOverrides() throws QuickFixException;
 }

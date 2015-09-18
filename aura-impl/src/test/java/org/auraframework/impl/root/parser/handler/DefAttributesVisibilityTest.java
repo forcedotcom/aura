@@ -48,7 +48,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
     protected <D extends Definition> DefDescriptor<D> getDescriptor(boolean privileged, Class<D> clazz) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
         String prefix;
-        
+
         if (privileged) {
             prefix = StringSourceLoader.DEFAULT_NAMESPACE + ":";
         } else {
@@ -83,8 +83,8 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
                         "additionalAppCacheURLs", "controller", "model", "apiVersion", "abstract", "extensible",
                         "extends", "template");
             privilegedAttrs = Sets.newHashSet("preload", "locationChangeEvent", "isOnePageApp",
-                        "tokens", "render", "provider", "style", "helper", "renderer", "whitespace",
-                        "support", "defaultFlavor", "defaultFlavors", "dynamicallyFlavorable");
+                    "render", "provider", "style", "helper", "renderer", "whitespace",
+                    "support", "tokenOverrides", "flavorOverrides", "defaultFlavor", "dynamicallyFlavorable");
             super.setUp();
         }
 
@@ -102,9 +102,10 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
         @Override
         public void setUp() throws Exception {
             publicAttrs = Sets.newHashSet("access", "description", "implements", "controller",
-            		"model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
+                    "model", "apiVersion", "abstract", "extensible", "extends", "isTemplate");
             privilegedAttrs = Sets.newHashSet("render", "template", "provider", "style", "helper",
-                "renderer", "whitespace", "support", "defaultFlavor", "dynamicallyFlavorable");
+                    "renderer", "whitespace", "support", "tokenOverrides", "defaultFlavor",
+                    "dynamicallyFlavorable");
             super.setUp();
         }
 
@@ -125,7 +126,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet("support");
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             return new EventDefHandler(getDescriptor(privileged, EventDef.class), null, null);
@@ -143,7 +144,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet("support", "provider");
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             return new InterfaceDefHandler(getDescriptor(privileged, InterfaceDef.class), null, null);
@@ -161,7 +162,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet("serializeTo");
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             ApplicationDefHandler parentHandler;
@@ -181,7 +182,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet();
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             ApplicationDefHandler parentHandler;
@@ -201,7 +202,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet();
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             ApplicationDefHandler parentHandler;
@@ -221,7 +222,7 @@ public abstract class DefAttributesVisibilityTest extends AuraImplTestCase {
             privilegedAttrs = Sets.newHashSet();
             super.setUp();
         }
-       
+
         @Override
         protected XMLHandler<?> getHandler(boolean privileged) {
             ApplicationDefHandler parentHandler;

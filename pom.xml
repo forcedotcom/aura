@@ -724,7 +724,7 @@
                                                 <jvmarg value="-Daura.home=${basedir}/.." />
                                                 <arg value="${basedir}/../aura-util/src/test/tools/xUnit/xUnit.js.Console.js" />
                                                 <arg value="/output:${xunit.js.format}" />
-                                                <arg value="/strict:false" />
+                                                <arg value="/strict:true" />
                                                 <arg value="/verbose:${xunit.js.verbose}" />
                                                 <arg value="/dependency:${basedir}/../aura-util/src/test/tools/xUnit/dependencies/" />
                                                 <arg value="${xunit.js.testPath}" />

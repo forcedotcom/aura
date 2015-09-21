@@ -17,5 +17,18 @@
             }
         });
         $A.enqueueAction(a);
+    },
+
+    updateTextWithCallingDescriptor: function(cmp, evt, helper) {
+        var a = cmp.get("c.currentCallingDescriptor");
+        a.setCallback(this, function(result){
+            if(result.getState() === "SUCCESS") {
+                cmp.set("v.text", result.getReturnValue());
+                cmp.set("v.actionDone", true);
+            } else if(state === "INCOMPLETE" || state === "ERROR") {
+                throw new $A.auraError("Failed to get Calling Descriptor from server: "+response.getError());
+            }
+        });
+        $A.enqueueAction(a);
     }
 })

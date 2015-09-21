@@ -122,21 +122,22 @@
     },
 
     /**
-     * test for W-2717580
-     * Verify calling descriptor in server action is null when the calling component is not versioned.
+     * Verify calling descriptor is set when the server action is called by a root component
      */
-    _testCallingDescriptorIsNullWhenNonVersioned: {
+    testCallingDescriptorWhenRootComponentSendServerAction: {
         test: [
             function(cmp) {
                 var action = cmp.get("c.getContextAccessVersion");
                 action.setCallback(cmp, function(a) {
                     $A.test.assertEquals("SUCCESS", a.getState());
+                    // verify version is null since it's root component
                     $A.test.assertNull(a.getReturnValue());
                 });
                 $A.enqueueAction(action);
                 $A.test.addWaitFor(true, function() {return $A.test.areActionsComplete([action]);});
             },
             function(cmp) {
+                var expect = cmp.getDef().getDescriptor().getQualifiedName();
                 var callbackCalled = false;
                 var action = cmp.get("c.currentCallingDescriptor");
                 action.setCallback(cmp, function(a) {
@@ -144,7 +145,8 @@
                     // When server side controller is in a different namespace than the component,
                     // we still need to send calling descriptor, which is the current component
                     // instead of parent, since it can define the version of the controller.
-                    // $A.test.assertNull(a.getReturnValue());
+                    // verify calling descriptor is testing component
+                    $A.test.assertEquals(expect, a.getReturnValue());
                     callbackCalled = true;
                 });
                 $A.enqueueAction(action);
@@ -174,6 +176,27 @@
                 var expect = targetComponent.getDef().getDescriptor().getQualifiedName();
                 $A.test.assertEquals(expect, targetComponent.get("v.text"),
                         "Calling component should be " + expect);
+            }
+        ]
+    },
+
+   /**
+     * test for W-2717580
+     * Verify calling descriptor in server action is null when the calling component is not versioned.
+     * Test component does NOT has require version declaration for test namespace.
+     */
+    testCallingDescriptorIsNullWhenNonVersioned: {
+        test: [
+            function(cmp) {
+                var targetComponent = cmp.find("test_cmpWithServerAction");
+                targetComponent.updateTextWithCallingDescriptor();
+
+                $A.test.addWaitFor(true, function(){return targetComponent.get("v.actionDone")});
+            },
+            function(cmp) {
+                var targetComponent = cmp.find("test_cmpWithServerAction");
+                $A.test.assertNull(targetComponent.get("v.text"),
+                        "Calling component should be null.");
             }
         ]
     },

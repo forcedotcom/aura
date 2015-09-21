@@ -51,6 +51,7 @@ import org.auraframework.impl.svg.parser.SVGParser;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
 import org.auraframework.system.SourceWriter;
+import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.Maps;
 
@@ -134,8 +135,8 @@ public class ParserFactory {
         @SuppressWarnings("unchecked")
         Parser<D> parser = (Parser<D>)parsers.get(new ParserKey(format, desc.getDefType()));
         if (parser == null) {
-            throw new RuntimeException("unable to find a parser for format "+format
-                    +", for descriptor "+desc+" of type "+desc.getDefType());
+            throw new AuraRuntimeException("Unable to find a parser for format " + format
+                    + ", for descriptor " + desc + " of type " + desc.getDefType());
         }
         return parser;
     }

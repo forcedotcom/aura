@@ -35,6 +35,9 @@
     	helper.createVirtualRows(cmp);
         helper.markDirty(cmp); // So we go into the rerender
     },
+    handleHeadersChange: function (cmp) {
+    	cmp._updateResizer = true;
+    },
     handleColumnsChange: function (cmp, event, helper) {
         var concreteCmp = cmp.getConcreteComponent(),
             isExtended  = concreteCmp !== cmp;
@@ -114,6 +117,21 @@
     	if (sortBy) {
     		helper.updateSortData(cmp, sortBy);
     	}
+    },
+    
+    /**
+     * Direct method to resize all the comments on the grid. Requires that
+     * v.enableResizableColumns is true.
+     */
+    resizeColumns : function(cmp, evt, helper) {
+    	var widths = evt.getParam('arguments').widths;
+    	
+    	if (!cmp._colResizer) {
+    		// We don't have a resizer yet
+    		return;
+    	}
+    	
+    	helper.resizeColumns(cmp, widths);
     },
     
     /*

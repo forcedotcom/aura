@@ -17,3 +17,85 @@
 	display: block;
 	overflow: auto;
 }
+
+.THIS.resizable-cols {
+	display: block;
+	table-layout:fixed;
+}
+
+.THIS.resizable-cols .handle {
+    display: inline-block;
+    position: relative;
+    flex: none;
+    text-align:left;
+}
+
+.THIS.resizable-cols .handle:hover{
+	cursor:col-resize;
+}
+
+.THIS.resizable-cols th .resize-button {
+    height: 100%;
+    position: absolute;
+    right: 0;
+    opacity: 0;
+    cursor: col-resize;
+    display: inline-block;
+}
+
+.THIS.resizable-cols th .resize-button:hover {
+	opacity: 1;
+}
+
+.THIS.indicator {
+	position: absolute;
+	opacity: 0;
+	cursor: col-resize;
+	user-select:none;
+}
+
+.THIS.indicator.active {
+	opacity: 1;
+}
+
+.THIS.resizable-cols .handle [type="range"] {
+	width: 1px;
+    height: 1px;
+    border: 0;
+    clip: rect(0 0 0 0);
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+}
+
+.THIS.resizable-cols .handle [type="range"]:focus ~ .resize-button {
+	opacity: 1;
+}
+
+.THIS.resizable-cols .handle [type="range"]:focus ~ .resize-button .column-divider,
+.THIS.indicator .column-divider {
+	position: absolute;
+    height: 100vh;
+}
+
+.THIS.resizable-cols.resizing {
+	user-select: none;
+	cursor: col-resize;
+}
+
+.THIS.resizable-cols th .header-wrapper {
+	display: flex;
+    position: relative;
+    align-items: stretch;
+}
+
+.THIS.resizable-cols th .content {
+    flex-grow: 1;
+    box-flex: 1;
+}
+
+.THIS.resizable-cols th div,
+.THIS.resizable-cols th span {
+	box-sizing: border-box;
+}

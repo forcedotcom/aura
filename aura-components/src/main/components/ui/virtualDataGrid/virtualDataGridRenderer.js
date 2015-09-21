@@ -35,6 +35,11 @@
     	if (cmp.get("v.fixedHeader")) {
     		helper.initializeFixedHeader(cmp);
     	}
+    	
+    	if (cmp.get("v.enableResizableColumns")) {
+    		helper.enableColumnResizer(cmp);
+    	}
+    	
         this.superAfterRender();
     },
     rerender: function (cmp, helper) {
@@ -56,6 +61,11 @@
         if (cmp.get("v.fixedHeader")) {
     		helper.updateSizesForFixedHeader(cmp);
     	}
+        
+        if (cmp.get("v.enableResizableColumns") && cmp._updateResizer) {
+        	helper.updateColumnResizer(cmp);
+        	cmp._updateResizer = null;
+        }
     },
     unrender: function (cmp, helper) {
         helper.destroyTemplates(cmp);

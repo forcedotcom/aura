@@ -25,7 +25,7 @@
     <aura:dependency resource="markup://ui:inputDefaultError" type="COMPONENT"/>
 
     <aura:attribute name="disableDoubleClicks"    type="Boolean"          default="false"                   description="Disables double clicking the component within 350ms"/>
-    <aura:attribute name="showErrors"             type="Boolean"          default="true"                    description="Show the error component"/>
+    <aura:attribute name="showErrors"             type="Boolean"          default="true"                    description="Shows the error component in compound fields. If set to true and errors exist, displays the errors using inputCmp.set(&quot;v.errors&quot;, errors)."/>
     <aura:attribute name="errors"                 type="Object[]"                                           description="The list of errors to be displayed."/>
     <aura:attribute name="errorComponent"         type="Aura.Component[]"                                   description="A component that displays any error messages, such as validation errors, associated with the input field."/>
     <aura:attribute name="type"                   type="String"                                             description="Specifies the input type. Possible values: button, checkbox, file, hidden, image, password, radio, reset, submit, text, textarea. Corresponds to the type attribute of the rendered HTML input element. Override type in a component that extends this component to set it to a different HTML input type."/>

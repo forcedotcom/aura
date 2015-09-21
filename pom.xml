@@ -943,7 +943,7 @@
                 <plugin>
                     <groupId>com.github.tntim96</groupId>
                     <artifactId>jscover-file-maven-plugin</artifactId>
-                    <version>1.0.16-SNAPSHOT</version>
+                    <version>1.0.16</version>
                     <executions>
                         <execution>
                             <id>instrument-javascript-resources</id>
@@ -972,7 +972,7 @@
                 <plugin>
                     <groupId>com.github.tntim96</groupId>
                     <artifactId>jscover-report-maven-plugin</artifactId>
-                    <version>1.0.16-SNAPSHOT</version>
+                    <version>1.0.16</version>
                     <executions>
                         <execution>
                             <id>generate-cobertura-xml</id>

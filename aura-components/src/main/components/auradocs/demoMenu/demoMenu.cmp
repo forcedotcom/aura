@@ -21,7 +21,7 @@
             <ui:menuTriggerLink aura:id="trigger" label="Single selection with actionable menu item"/>
             <ui:menuList class="actionMenu" aura:id="actionMenu">
                 <aura:iteration items="{!v.status}" var="s">
-                    <ui:actionMenuItem value="{!s}" label="{!s}" click="{!c.updateTriggerLabel}"/>
+                    <ui:actionMenuItem label="{!s}" click="{!c.updateTriggerLabel}"/>
                 </aura:iteration>
             </ui:menuList>
         </ui:menu>
@@ -30,7 +30,7 @@
         <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="Multiple selection"/>
            <ui:menuList aura:id="checkboxMenu" class="checkboxMenu">
             <aura:iteration items="{!v.status}" var="s">
-                <ui:checkboxMenuItem value="{!s}" label="{!s}"/>
+                <ui:checkboxMenuItem label="{!s}"/>
                 </aura:iteration>
             </ui:menuList>
         </ui:menu>
@@ -41,7 +41,7 @@
 	            <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="Select a status"/>
 	            <ui:menuList class="radioMenu" aura:id="radioMenu">
                     <aura:iteration items="{!v.status}" var="s">
-    	                <ui:radioMenuItem label="{!s}" value="{!s}"/>
+    	                <ui:radioMenuItem label="{!s}"/>
                     </aura:iteration>
 	            </ui:menuList>
 	        </ui:menu>

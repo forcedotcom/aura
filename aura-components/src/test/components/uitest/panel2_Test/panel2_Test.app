@@ -82,11 +82,16 @@
 		customizeCloseAction="{!v.testCustomizeCloseAction}"
 	/>
 	
-	<ui:panelManager2>
-		<aura:set attribute="registeredPanels">
-		    <ui:panel alias="panel"/>
-            <ui:modal alias="modal"/>
-        </aura:set>
-    </ui:panelManager2>
+	 <section class="managerContainers">
+    <div class="manager">
+        <ui:panelManager2 aura:id="pm" useSharedContainer="true">
+            <aura:set attribute="registeredPanels">
+                    <ui:panel alias="panel"/>
+                    <ui:modal alias="modal"/>
+            </aura:set>
+        </ui:panelManager2>
+        <ui:containerManager/>
+    </div>
+     </section>
 		
 </aura:application>

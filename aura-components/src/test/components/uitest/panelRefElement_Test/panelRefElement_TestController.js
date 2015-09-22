@@ -53,5 +53,35 @@
     			}
     		}}));
     	
+    },
+
+    onSelectChange: function(cmp){
+        var select = cmp.find('directions');
+        var direction = select.get('v.value');
+        var body = $A.newCmp({componentDef: "markup://ui:outputRichText",
+            attributes: {
+                values: {
+                    value: "<div class=\"panel-bd\">Panel Body</div>"
+                }
+            }});
+        
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                referenceElement: cmp.find('directions-holder').getElement(),
+                showCloseButton: false,
+                closeOnClickOut: true,
+                useTransition: true,
+                body  : body,
+                direction: direction,
+                showPointer: false,
+                animation: 'pop'
+            },
+            onDestroy: function (panel) {
+                // btn.set('v.selected', false);
+            }
+
+        }).fire();
     }
 })

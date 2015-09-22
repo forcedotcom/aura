@@ -18,7 +18,7 @@
 
 <aura:component>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
+    <aura:attribute name="directions" type="String[]" default="north,east,west,south,northwest,southwest,northeast,southeast"/>
 	<div>
 		<ui:outputText class="title" value="Panel Reference Element Tester"/> 	
 	</div>
@@ -29,7 +29,15 @@
     	<ui:outputText aura:id="refElement1" class="refElement1" value="RefElem1"/>
     </div>
     <div>
-    	<ui:button aura:id="refElement2" class="refElement2" label="RefElem2" press="{!c.openPanel}"/>                  	          
+    	<ui:button aura:id="refElement2" class="refElement2" label="RefElem2" press="{!c.openPanel}"/>
+    </div>
+
+    <div class="select" aura:id="directions-holder">
+        <ui:inputSelect aura:id="directions" label="Directions" change="{!c.onSelectChange}">
+        <aura:iteration items="{!v.directions}" var="direction">
+             <ui:inputSelectOption text="{!direction}" label="{!direction}"/>
+        </aura:iteration>
+        </ui:inputSelect>
     </div>
 
     <section class="manager">

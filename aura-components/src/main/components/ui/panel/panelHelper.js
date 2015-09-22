@@ -187,16 +187,24 @@
 
         var direction = cmp.get('v.direction'), 
             showPointer = cmp.get('v.showPointer'),
-            align, 
+            align,
+            pad = cmp.get('v.pad'),
             targetAlign, 
             pointer,
             bbDirections,
+            boundingElement,
             pointerPad;
         
         cmp.getElement().classList.add('positioned');
         cmp.getElement().classList.add(direction);
         if(showPointer) {
             pointer = cmp.find('pointer').getElement();
+        }
+
+        boundingElement = cmp.get('v.boundingElement');
+
+        if(!boundingElement) {
+            boundingElement = window;
         }
 
         switch (direction) {
@@ -234,8 +242,48 @@
                     bottom:true
                 };
                 break;
+            case 'southeast':
+                align = 'left top';
+                targetAlign = 'right bottom';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
+            case 'southwest':
+                align = 'right top';
+                targetAlign = 'left bottom';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
+            case 'northwest':
+                align = 'right bottom';
+                targetAlign = 'left top';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
+            case 'northeast':
+                align = 'left bottom';
+                targetAlign = 'right top';
+                bbDirections = {
+                    top:true,
+                    bottom:true
+                };
+                break;
         }
-        
+
+        if(cmp.get('v.advanced')) {
+            align = cmp.get('v.align');
+            targetAlign = cmp.get('v.targetAlign');
+        }
+
+        if(cmp.get('v.inside')) {
+            align = targetAlign;
+        }
         if(!cmp.constraints) {
             cmp.constraints = [];
             cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
@@ -244,11 +292,11 @@
                 align:align,
                 targetAlign: targetAlign,
                 enable: true,
-                pad: 15
+                pad: pad
             }));
             cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                 element:cmp.getElement(),
-                target:window,
+                target: boundingElement,
                 type: 'bounding box',
                 enable: true,
                 pad: 20

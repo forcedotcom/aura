@@ -1,0 +1,59 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<aura:component>
+    <aura:import library="ui:panelPositioningLib" property="positioningLib" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <div class="vp">
+        <h1>Panel Positioning</h1>
+        <div class="make-panel">
+            <form>
+                <ui:inputSelect aura:id="direction" label="Direction">
+                    <ui:inputSelectOption text="north"/>
+                    <ui:inputSelectOption text="east"/>
+                    <ui:inputSelectOption text="west"/>
+                    <ui:inputSelectOption text="south"/>
+                    <ui:inputSelectOption text="northwest"/>
+                    <ui:inputSelectOption text="northeast"/>
+                    <ui:inputSelectOption text="southeast"/>
+                    <ui:inputSelectOption text="southwest"/>
+                </ui:inputSelect>
+                <ui:inputCheckbox label="Use Advanced" value="false" aura:id="isAdvanced" />
+                <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />
+                <ui:inputText aura:id="align" label="Align" value="left bottom" />
+                <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
+                <ui:inputNumber aura:id="pad" label="pad" value="15"  />
+                <ui:button label="GO!" press="{!c.handlePress}"/>
+            </form>
+        </div>
+        <div class="big-target" aura:id="bigTarget">
+            <div aura:id="handle" class="handle" onmousedown="{!c.handleMouseDown}"/>
+        </div>
+        <div class="little-target" aura:id="littleTarget">
+            <a onclick="{!c.handleClick}" href="#">Little Target</a>
+        </div>
+    </div>
+    <div class="manager">
+        <ui:panelManager2 aura:id="pm">
+            <aura:set attribute="registeredPanels">
+                    <ui:panel alias="panel"/>
+                    <ui:modal alias="modal"/>
+            </aura:set>
+        </ui:panelManager2>
+    </div>
+</aura:component>

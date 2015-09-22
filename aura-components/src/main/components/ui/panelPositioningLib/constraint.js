@@ -177,9 +177,10 @@ function(w) {
                 break;
 
             default:
+                console.error('no constraint expression for', type);
                 this._exp = function() {
-                    console.error('no constraint expression for', type);
-                }
+                    // no op
+                };
          }
          
 

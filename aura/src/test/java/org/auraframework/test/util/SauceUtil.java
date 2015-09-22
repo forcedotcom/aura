@@ -46,7 +46,7 @@ public final class SauceUtil {
         return defVal;
     }
 
-    private static final boolean TUNNEL_SELENIUM_COMMANDS_THROUGH_SAUCE_CONNECT = false;
+    private static final boolean TUNNEL_SELENIUM_COMMANDS_THROUGH_SAUCE_CONNECT = Boolean.parseBoolean(System.getProperty("sauce.SeleniumCommandThruSauceConnect", "false"));
     static final String SAUCELABS_SERVER_URL = "saucelabs.com";
     private static final String SAUCE_USERNAME = System.getProperty("sauce.username", "[sauce.username undefined]");
     private static final String SAUCE_ACCESS_KEY = System.getProperty("sauce.access.key",

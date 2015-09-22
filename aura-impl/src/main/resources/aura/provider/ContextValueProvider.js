@@ -96,7 +96,12 @@ ContextValueProvider.prototype.merge = function(values) {
             //     value["value"] = old["value"]; 
             // }
             if(value.hasOwnProperty("value")) {
-                if(value["originalValue"] === this.values[key].value) {
+                if(!this.values.hasOwnProperty(key)) {
+                    if(value.hasOwnProperty("originalValue")) {
+                        delete value["originalValue"];
+                    }
+                    this.values[key] = value;
+                } else if(value["originalValue"] === this.values[key].value) {
                     delete value["originalValue"];
                     this.values[key] = value;
                 }
@@ -141,7 +146,7 @@ ContextValueProvider.prototype.set = function(key, value) {
     var gv = this.values[key];
     //var oldValue = this.extract(gv);
     if (gv && gv["writable"]) {
-        gv["value"] = value;
+        gv["value"] = value === null ? undefined : value;
     } else {
         throw new Error("Attempting to set a read only global item '" + key + "'");
     }

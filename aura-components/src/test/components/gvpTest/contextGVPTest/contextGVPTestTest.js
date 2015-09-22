@@ -1,5 +1,55 @@
-({
-    /**
+({    
+    // FIXME: this currently fails
+    testSetNullOnClientThenSetOnServer: {
+        test: [function(cmp) {
+            var expected = null;
+            $A.set("$Global.isVoiceOver", expected);
+
+             $A.test.addWaitFor("", function() {
+                return cmp.find("data").getElement().textContent;
+            });
+        },
+        function(cmp) {
+            var expected = "afterNull";
+            cmp.updateGvpValue("isVoiceOver", expected);
+
+             $A.test.addWaitFor(expected, function() {
+                return cmp.find("data").getElement().textContent;
+            });
+        }]
+    },
+
+    testSetNullOnServerDoesNotAffectClientValue: {
+        test: [function(cmp) {
+            var expected = "newValue";
+            
+            cmp.updateGvpValue("isVoiceOver", expected);
+            
+            $A.test.addWaitFor(expected, function() {
+                return cmp.find("data").getElement().textContent;
+            });
+        },
+        function(cmp) {
+            var expected = null;
+            cmp.updateGvpValue("isVoiceOver", expected);
+
+            // Value does not change so just wait for all actions to complete
+            $A.test.addWaitFor(false, $A.test.isActionPending, function() {
+                $A.test.assertEquals("newValue", cmp.find("data").getElement().textContent,
+                    "Setting GVP to null on server should not affect client value");
+            });
+        },
+        function(cmp) {
+            var expected = "afterNull";
+            cmp.updateGvpValue("isVoiceOver", expected);
+
+             $A.test.addWaitFor(expected, function() {
+                return cmp.find("data").getElement().textContent;
+            });
+        }]
+    },
+
+   /**
      * Update GVP value on the server. We update the value twice here to verify the server correctly tracks the value
      * changes and serialization of the value between the client and server does not mess up the value.
      */

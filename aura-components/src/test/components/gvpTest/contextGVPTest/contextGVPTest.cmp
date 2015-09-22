@@ -5,7 +5,7 @@
 		<aura:attribute type="String" name="value"/>
 	</aura:method>
 
-	<div aura:id="data">{!$Global.isVoiceOver}</div>
+	<div aura:id="isVoiceOver">{!$Global.isVoiceOver}</div>
 	<div aura:id="dynamicTypeSize">{!$Global.dynamicTypeSize}</div>
 	<div aura:id="insertion"/>
 </aura:component>

@@ -1,51 +1,83 @@
 ({    
-    // FIXME: this currently fails
     testSetNullOnClientThenSetOnServer: {
-        test: [function(cmp) {
+        test: [
+        function setGvpToNullOnClient(cmp) {
             var expected = null;
             $A.set("$Global.isVoiceOver", expected);
 
-             $A.test.addWaitFor("", function() {
-                return cmp.find("data").getElement().textContent;
+            // Setting GVP to null should clear value on client
+            $A.test.addWaitFor("", function() {
+                return cmp.find("isVoiceOver").getElement().textContent;
             });
         },
-        function(cmp) {
+        function setGvpToValueOnServer(cmp) {
             var expected = "afterNull";
             cmp.updateGvpValue("isVoiceOver", expected);
 
              $A.test.addWaitFor(expected, function() {
-                return cmp.find("data").getElement().textContent;
+                return cmp.find("isVoiceOver").getElement().textContent;
             });
         }]
     },
 
     testSetNullOnServerDoesNotAffectClientValue: {
-        test: [function(cmp) {
+        test: [
+        function setGvpToValueOnServer(cmp) {
             var expected = "newValue";
             
             cmp.updateGvpValue("isVoiceOver", expected);
             
             $A.test.addWaitFor(expected, function() {
-                return cmp.find("data").getElement().textContent;
+                return cmp.find("isVoiceOver").getElement().textContent;
             });
         },
-        function(cmp) {
+        function setGvpToNullOnServer(cmp) {
             var expected = null;
             cmp.updateGvpValue("isVoiceOver", expected);
 
             // Value does not change so just wait for all actions to complete
             $A.test.addWaitFor(false, $A.test.isActionPending, function() {
-                $A.test.assertEquals("newValue", cmp.find("data").getElement().textContent,
+                $A.test.assertEquals("newValue", cmp.find("isVoiceOver").getElement().textContent,
                     "Setting GVP to null on server should not affect client value");
             });
         },
-        function(cmp) {
+        function setGvpToAnotherValueOnServer(cmp) {
             var expected = "afterNull";
             cmp.updateGvpValue("isVoiceOver", expected);
 
              $A.test.addWaitFor(expected, function() {
-                return cmp.find("data").getElement().textContent;
+                return cmp.find("isVoiceOver").getElement().textContent;
             });
+        }]
+    },
+
+    testRegisterAndSetGvpOnServer: {
+        test: [
+        function registerAndSetGvpOnServer(cmp) {
+            var thiscmp = cmp;
+            cmp._gvpName = "testRegisterAndSetGvpOnServer";
+
+            $A.test.addCleanup(function(){
+                var a = thiscmp.get("c.unregisterContextVPValue");
+                a.setParams({ name : cmp._gvpName });
+                $A.test.callServerAction(a, true);
+            });
+
+            var a = cmp.get("c.registerAndSetContextVPValue");
+            a.setParams({
+                name : cmp._gvpName,
+                writable : true,
+                defaultValue : "defaultValue",
+                value: "newValue"
+            });
+            $A.enqueueAction(a);
+            
+            $A.test.addWaitFor(true, function() {
+                return $A.test.areActionsComplete([a]);
+            });
+        },
+        function verifyGvpValueOnClient(cmp) {
+            $A.test.assertEquals("newValue", $A.get("$Global")[cmp._gvpName]);
         }]
     },
 

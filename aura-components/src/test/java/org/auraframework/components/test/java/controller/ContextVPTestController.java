@@ -48,4 +48,15 @@ public class ContextVPTestController {
         Map<String, GlobalValue> values = AuraPrivateAccessor.get(AuraContextImpl.class, "allowedGlobalValues");
         values.remove(name);
     }
+
+    /**
+     * Register and set a GVP. Combine both actions into a single method since actions fired on the client are not
+     * guaranteed to be executed in a certain order and we need to register the GVP before setting it.
+     */
+    @AuraEnabled
+    public static void registerAndSetContextVPValue(@Key("name") String name, @Key("writable") boolean writable,
+            @Key("defaultValue") Object defaultValue, @Key("value") Object value) {
+        Aura.getContextService().registerGlobal(name, writable, defaultValue);
+        Aura.getContextService().getCurrentContext().setGlobalValue(name, value);
+    }
 }

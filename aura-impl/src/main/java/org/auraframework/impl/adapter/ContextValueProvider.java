@@ -21,12 +21,13 @@ import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TypeDef;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.instance.AuraValueProviderType;
-import org.auraframework.instance.GlobalValueProvider;
-import org.auraframework.instance.ValueProviderType;
+import org.auraframework.instance.*;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Maps;
 
 
 /**
@@ -83,8 +84,15 @@ public class ContextValueProvider implements GlobalValueProvider {
         if (context == null) {
             Aura.getContextService().getAllowedGlobals();
         }
+        
+        Predicate<AuraContext.GlobalValue> isNonNullFilter = new Predicate<AuraContext.GlobalValue>() {
+            @Override
+        	public boolean apply(AuraContext.GlobalValue globalValue) {
+        		return globalValue.getValue() != null;
+        	}
+        };
 
-        return context.getGlobals();
+        return Maps.filterValues(context.getGlobals(), isNonNullFilter);
     }
 
 }

@@ -127,6 +127,47 @@
  		}
  	},
 
+    /**
+     * Verify behavior when 'timeFormat' attribute is not set.
+     * Also checks for default 'langLocale'
+     */
+    testDefaultTimeFormat: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timezone:'GMT'},
+        test: function(cmp){
+            this.checkInputTimeValue(cmp, '4:30 PM');
+        }
+    },
+
+    /**
+     * Verify behavior when 'timeFormat' attribute is assigned an empty string.
+     */
+    testEmptyTimeFormat: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'', timezone:'GMT'},
+        test: function(cmp){
+            this.checkInputTimeValue(cmp, '4:30:00 PM');
+        }
+    },
+
+    /**
+     * Verify behavior when 'timeFormat' attribute is assigned a garbage value.
+     */
+    testInvalidTimeFormat: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'KKKKKK', timezone:'GMT'},
+        test: [function(cmp){
+            this.checkInputTimeValue(cmp, 'KKKKKK');
+        }]
+    },
+
+    /**
+     * Verify behavior when 'timeFormat' attribute is assigned a garbage value.
+     */
+    testValidTimeFormat: {
+        attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'HH:mm', timezone:'GMT'},
+        test: [function(cmp){
+            this.checkInputTimeValue(cmp, '16:30');
+        }]
+    },
+
  	testInvalidDateTimeInput: {
 		browsers: ['DESKTOP'],
 		attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'HH:mm', timezone: 'GMT'},
@@ -329,5 +370,12 @@
 		retDate += " " + this.twoDigitFormat(mod) + timeSep + this.twoDigitFormat(someDate.getMinutes());
     	}
     	return retDate;
+    },
+
+    checkInputTimeValue: function(cmp, expectedValue) {
+        var inputTimeCmp = cmp.find("dateTimePickerTest").find("inputTime").getElement();
+        var actualValue = $A.util.getElementAttributeValue(inputTimeCmp, "value");
+        $A.test.assertEquals(expectedValue, actualValue, "Time value is not as expected!");
     }
 })
+

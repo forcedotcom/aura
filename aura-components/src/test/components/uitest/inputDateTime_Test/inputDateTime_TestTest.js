@@ -215,6 +215,55 @@
 			 }
 		 }
 	 },
+	 
+	 /**
+	  * Clear date without clearing time
+	  */
+	 testClearDate: {
+		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
+		 test: function(cmp){
+			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+			 var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+			 var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+
+			 inputDateElement.value = "";
+			 $A.test.fireDomEvent(inputDateElement, "change");
+			 aura.test.assertEquals("2015-10-23T16:30:00.000Z", cmp.get("v.value"), "Date and time should not be reset");
+		 }
+	 },
+	 
+	 /**
+	  * Clear time without clearing date
+	  */
+	 testClearTime: {
+		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
+		 test: function(cmp){
+			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+			 var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+			 var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+
+			 inputTimeElement.value = "";
+			 $A.test.fireDomEvent(inputTimeElement, "change");
+			 aura.test.assertEquals("2015-10-23T12:00:00.000Z", cmp.get("v.value"), "Time should be reset");
+		 }
+	 },
+	 
+	 /**
+	  * Clear date and time
+	  */
+	 testClearDateAndTime: {
+		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
+		 test: function(cmp){
+			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+			 var inputDateElement = inputDateTimeCmp.find("inputDate").getElement();
+			 var inputTimeElement = inputDateTimeCmp.find("inputTime").getElement();
+
+			 inputDateElement.value = "";
+			 inputTimeElement.value = "";
+			 $A.test.fireDomEvent(inputDateElement, "change");
+			 aura.test.assertEquals("", cmp.get("v.value"), "value should be empty");
+		 }
+	 },
 
     /**
      * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because

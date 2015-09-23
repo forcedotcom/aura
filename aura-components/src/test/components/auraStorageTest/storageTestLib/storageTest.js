@@ -15,7 +15,7 @@
  */
 
 function storageTest () {
-    function dieDieDie(cmp, thing) {
+    function dieDie(cmp, thing) {
         var string;
         if (typeof thing === "string") {
             string = thing;
@@ -205,7 +205,7 @@ function storageTest () {
         testSetItemOverMaxSize_stage1: function(cmp, storage) {
             var completed = false;
             var result = "";
-            var sizeTooBig = (storage.getMaxSize() + 1) * 1000;
+            var sizeTooBig = (storage.getMaxSize() + 1) * 1024;
             var expected = "AuraStorage.put() cannot store an item over the max size of " + (storage.getMaxSize() * 1024);
 
             storage.put("overSize", { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
@@ -478,8 +478,6 @@ function storageTest () {
             $A.test.assertTrue(acceptable, "expected (" + expected + ") and actual (" + actual + ") not within acceptable range (" + range + ")");
         },
 
-        appendLine: function(cmp, text) {
-            append(cmp, text);
-        }
+        appendLine: append
     };
 }

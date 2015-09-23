@@ -114,6 +114,18 @@ AuraStorageService.prototype.registerAdapter = function(config) {
 };
 
 /**
+ * Whether an adapter is registered
+ *
+ * @param {String} name adapter name
+ * @memberOf AuraStorageService
+ * @returns {boolean} whether adapter is registered
+ * @export
+ */
+AuraStorageService.prototype.isRegisteredAdapter = function(name) {
+    return this.adapters[name] !== undefined;
+};
+
+/**
  * Returns an adapter's configuration.
  *
  * @param {String} adapter name of the adapter

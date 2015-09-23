@@ -103,7 +103,7 @@ public interface AuraContext {
     boolean isDebugToolEnabled = false;
 
     enum Format {
-        MANIFEST, CSS, JS, JSON, HTML, SVG;
+        MANIFEST, CSS, JS, JSON, HTML, SVG, ENCRYPTIONKEY
     }
 
     enum Authentication {

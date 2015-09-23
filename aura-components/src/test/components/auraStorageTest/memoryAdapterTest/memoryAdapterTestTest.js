@@ -59,7 +59,6 @@
 
     testSizeOneObject : {
         test : function(cmp) {
-            debugger;
             var that = this;
             var completed = false;
             that.storage.put("key1", { "value" : { "alpha" : "beta", "gamma" : "delta" } })

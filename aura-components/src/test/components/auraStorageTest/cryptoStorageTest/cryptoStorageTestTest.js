@@ -1,6 +1,8 @@
 ({
     // IndexedDb not supported in IE < 10
-    browsers:["-IE7", "-IE8", "-IE9"],
+    // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
+    // same exclusions as IndexedDB tests
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
@@ -9,13 +11,6 @@
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
-
-        // provide an encryption key
-        var config = $A.storageService.getAdapterConfig('crypto');
-        var buffer = new ArrayBuffer(32);
-        var view = new Uint8Array(buffer);
-        view.set(new Array(32).join("1")); // the actual key
-        config.adapterClass.setKey(buffer);
     },
 
     testSizeInitial: {
@@ -120,7 +115,6 @@
         }
     },
 
-    // TODO: fails because of bad size calculation
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
@@ -130,11 +124,23 @@
         }]
     },
 
-    // TODO: "TypeError: Converting circular structure to JSON {stack: (...), message: "Converting circular structure to JSON"}"
-    //       in CryptoAdapter.objectToArrayBuffer --> JSON.stringify
-    testTwistedObject:{
-        test:function(cmp){
-            cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
+    testJsonErrorRejectsPut:{
+        test: function (cmp) {
+            var completed = false;
+            var stuff = { "a": 2 };
+            stuff["b"] = stuff;
+
+            this.storage.put("testTwistedObject", stuff)
+                .then(function() { return storage.get("testTwistedObject"); })
+                .then(function() {
+                    var fail = "Expecting JSON stringify error. JSON should NOT be able to encode circular references";
+                    $A.test.fail(fail);
+                }, function(e) {
+                    cmp.helper.lib.storageTest.appendLine(cmp, e.message);
+                    completed = true;
+                });
+
+            $A.test.addWaitFor(true, function() { return completed; });
         }
     },
 
@@ -150,7 +156,6 @@
         }
     },
 
-    // TODO: fails because of bad size calculation
     testValueTooLarge: {
         test:[ function(cmp) {
                 var completed = false;
@@ -203,7 +208,6 @@
         }
     },
 
-    // TODO: fails because of bad size calculation
     testClear:{
         test:[function(cmp){
             cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
@@ -222,7 +226,6 @@
     /**
      * Store an item in the database and reload the page (iframe) to verify data is persisted.
      */
-    // TODO: fails because reload uses different key so storage is wiped out (should get key from server)
     testReloadPage: {
         test: [
         function loadComponentInIframe(cmp) {
@@ -230,7 +233,7 @@
             cmp._frameLoaded = false;
             cmp._expected = "expected value";
             var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/persistentStorageCmp.cmp?secure=true&value="+cmp._expected;
+            frame.src = "/auraStorageTest/persistentStorage.app?secure=true&value="+cmp._expected;
             frame.scrolling = "auto";
             frame.id = "myFrame";
             $A.util.on(frame, "load", function(){
@@ -243,6 +246,7 @@
         },
         function resetDatabase(cmp) {
             var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            iframeCmp.setEncryptionKey(new Array(32).join("1"));
             iframeCmp.resetStorage();
             $A.test.addWaitFor(true, function() {
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Resetting";
@@ -266,6 +270,8 @@
         },
         function getItemFromDatabase(cmp) {
             var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            // same encryption key
+            iframeCmp.setEncryptionKey(new Array(32).join("1"));
             iframeCmp.getFromStorage();
             $A.test.addWaitFor(true, function() {
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
@@ -278,6 +284,69 @@
             var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
             iframeCmp.deleteStorage();
         }]
+    },
+
+    /**
+     * When the encryption key provided cannot decrypt the sentinel entry, we should clear storage
+     */
+    testDifferentEncryptKeysShouldClearStorage: {
+        test: [
+            function loadComponentInIframe(cmp) {
+                $A.test.setTestTimeout(60000);
+                cmp._frameLoaded = false;
+                cmp._expected = "expected value";
+                var frame = document.createElement("iframe");
+                frame.src = "/auraStorageTest/persistentStorage.app?secure=true&value="+cmp._expected;
+                frame.scrolling = "auto";
+                frame.id = "myFrame";
+                $A.util.on(frame, "load", function(){
+                    cmp._frameLoaded = true;
+                });
+                var content = cmp.find("iframeContainer");
+                $A.util.insertFirst(frame, content.getElement());
+
+                this.waitForIframeLoad(cmp);
+            },
+            function resetDatabase(cmp) {
+                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+                iframeCmp.setEncryptionKey(new Array(32).join("1"));
+                iframeCmp.resetStorage();
+                $A.test.addWaitFor(true, function() {
+                    return $A.util.getText(iframeCmp.find("status").getElement()) !== "Resetting";
+                }, function() {
+                    $A.test.assertEquals("Done Resetting", $A.util.getText(iframeCmp.find("status").getElement()));
+                });
+            },
+            function addItemToDatabase(cmp) {
+                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+                iframeCmp.addToStorage();
+                $A.test.addWaitFor(true, function() {
+                    return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
+                }, function() {
+                    $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
+                });
+            },
+            function reloadFrame(cmp) {
+                cmp._frameLoaded = false;
+                document.getElementById("myFrame").contentWindow.location.reload();
+                this.waitForIframeLoad(cmp);
+            },
+            function verifyNoItemWithDifferentKey(cmp) {
+                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+                // Provide different key
+                iframeCmp.setEncryptionKey(new Array(32).join("Z"));
+                iframeCmp.getFromStorage();
+                $A.test.addWaitFor(true, function() {
+                    return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
+                }, function() {
+                    var actual = $A.util.getText(iframeCmp.find("output").getElement());
+                    $A.test.assertEquals("undefined", actual, "Got unexpected item from storage after page reload");
+                });
+            },
+            function cleanupDatabase(cmp) {
+                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+                iframeCmp.deleteStorage();
+            }]
     },
 
     waitForIframeLoad: function(cmp) {

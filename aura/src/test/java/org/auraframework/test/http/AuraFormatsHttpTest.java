@@ -51,6 +51,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
         FORMAT_CONTENTTYPE.put(Format.CSS, "text/css;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.MANIFEST, "text/cache-manifest;charset=" + AuraBaseServlet.UTF_ENCODING);
         FORMAT_CONTENTTYPE.put(Format.SVG, "image/svg+xml;charset=" + AuraBaseServlet.UTF_ENCODING);
+        FORMAT_CONTENTTYPE.put(Format.ENCRYPTIONKEY, "text/plain;charset=" + AuraBaseServlet.UTF_ENCODING);
     }
 
     public AuraFormatsHttpTest(String name) {
@@ -124,6 +125,7 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
             case CSS:// No implementation for this format
             case SVG:// No implementation for this format
             case MANIFEST:// No implementation for this format
+            case ENCRYPTIONKEY:// No implementation for this format
                 break;
             default:
                 fail(String.format("A new format value (%s) was added, update this test", format));
@@ -190,6 +192,11 @@ public class AuraFormatsHttpTest extends AuraHttpTestCase {
                 // But the response should still be in SVG mime type
                 modeAndPreload = "{'mode':'DEV','app':'preloadTest:test_IDontExist'}";
                 url = "/l/" + AuraTextUtil.urlencode(modeAndPreload) + "/resources.svg";
+                getOnAuraResourceServlet(format, url);
+                break;
+            case ENCRYPTIONKEY:
+                // Valid preload namespace
+                url = "/l/" + AuraTextUtil.urlencode("{}") + "/app.encryptionkey";
                 getOnAuraResourceServlet(format, url);
                 break;
             default:

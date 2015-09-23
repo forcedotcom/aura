@@ -284,7 +284,7 @@
             cmp._frameLoaded = false;
             cmp._expected = "expected value";
             var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/persistentStorageCmp.cmp?secure=false&value="+cmp._expected;
+            frame.src = "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected;
             frame.scrolling = "auto";
             frame.id = "myFrame";
             $A.util.on(frame, "load", function(){

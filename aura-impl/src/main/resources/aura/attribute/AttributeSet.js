@@ -60,7 +60,7 @@ AttributeSet.prototype.hasAttribute = function(name) {
  * @protected
  *
  */
-AttributeSet.prototype.getDef = function(key, component) {
+AttributeSet.getDef = function(key, component) {
     var def=[];
     var target=component.getConcreteComponent?component.getConcreteComponent():component;
     while(target){
@@ -92,7 +92,7 @@ AttributeSet.prototype.get = function(key, component) {
         path=key.split('.');
         attribute=path[0];
     }
-    var defs=this.getDef(attribute,component);
+    var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0], defs[1])){
         // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
@@ -176,7 +176,7 @@ AttributeSet.prototype.set = function(key, value, component) {
         path=key.split('.');
         attribute=path[0];
     }
-    var defs=this.getDef(attribute,component);
+    var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0],defs[1])){
         // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
         $A.warning("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");

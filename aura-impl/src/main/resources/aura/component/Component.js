@@ -1571,7 +1571,13 @@ Component.prototype.getFlavor = function() {
  */
 Component.prototype.render = function() {
     var superComponent = this.getSuper();
-    return superComponent ? superComponent["render"]() : undefined;
+    if(superComponent){
+        var context=$A.getContext();
+        context.setCurrentAccess(superComponent);
+        var result=superComponent["render"]();
+        context.releaseCurrentAccess();
+        return result;
+    }
 };
 
 /**
@@ -1582,7 +1588,13 @@ Component.prototype.render = function() {
  */
 Component.prototype.rerender = function() {
     var superComponent = this.getSuper();
-    return superComponent ? superComponent["rerender"]() : undefined;
+    if(superComponent){
+        var context=$A.getContext();
+        context.setCurrentAccess(superComponent);
+        var result=superComponent["rerender"]();
+        context.releaseCurrentAccess();
+        return result;
+    }
 };
 
 /**
@@ -1593,7 +1605,13 @@ Component.prototype.rerender = function() {
  */
 Component.prototype.afterRender = function() {
     var superComponent = this.getSuper();
-    return superComponent ? superComponent["afterRender"]() : undefined;
+    if(superComponent){
+        var context=$A.getContext();
+        context.setCurrentAccess(superComponent);
+        var result=superComponent["afterRender"]();
+        context.releaseCurrentAccess();
+        return result;
+    }
 };
 
 /**
@@ -1604,7 +1622,13 @@ Component.prototype.afterRender = function() {
  */
 Component.prototype.unrender = function() {
     var superComponent = this.getSuper();
-    return superComponent ? superComponent["unrender"]() : undefined;
+    if(superComponent){
+        var context=$A.getContext();
+        context.setCurrentAccess(superComponent);
+        var result=superComponent["unrender"]();
+        context.releaseCurrentAccess();
+        return result;
+    }
 };
 
 /**
@@ -1770,7 +1794,7 @@ Component.prototype.setupSuper = function(configAttributes, localCreation) {
             var facets=this.componentDef.getFacets();
             if(facets) {
                 for (var i = 0; i < facets.length; i++) {
-                    var facetDef=this.attributeSet.getDef(facets[i]["descriptor"],this.componentDef);
+                    var facetDef=AttributeSet.getDef(facets[i]["descriptor"],this.componentDef);
                     if(!$A.clientService.allowAccess(facetDef[0],facetDef[1])) {
                         // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
                         $A.warning("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
@@ -1855,13 +1879,15 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         if ($A.componentService.isConfigDescriptor(value)) {
             value = value["value"];
         }
+        if (!setByDefault[attribute]){
+            var def=AttributeSet.getDef(attribute,cmp.getDef());
+            if(!$A.clientService.allowAccess(def[0],def[1])) {
+                // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
+                $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+                // #end
 
-        if (!setByDefault[attribute]&&!$A.clientService.allowAccess(attributeDef,cmp)) {
-            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-            $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
-            // #end
-
-            continue;
+                continue;
+            }
         }
 
         if (isFacet) {
@@ -2220,8 +2246,8 @@ Component.prototype.injectComponent = function(config, cmp, localCreation) {
 
     var componentDef = this.componentDef;
     if ((componentDef.isAbstract() || componentDef.getProviderDef()) && !this.concreteComponentId) {
-
-        var act = $A.getContext().getCurrentAction();
+        var context=$A.getContext();
+        var act = context.getCurrentAction();
         if (act) {
             // allow the provider to re-use the path of the current component without complaint
             act.reactivatePath();
@@ -2263,7 +2289,9 @@ Component.prototype.injectComponent = function(config, cmp, localCreation) {
         var providerDef = componentDef.getProviderDef();
         if (providerDef) {
             // use it
+            context.setCurrentAccess(cmp);
             providerDef.provide(cmp, localCreation, setProvided);
+            context.releaseCurrentAccess();
         } else {
             var partialConfig = this.partialConfig;
             $A.assert(partialConfig,

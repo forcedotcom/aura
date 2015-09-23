@@ -2603,16 +2603,17 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                     //}
                     // Not a privileged namespace or explicitly set to PUBLIC
                     var targetNamespace=definition.getDescriptor().getNamespace();
-                    return currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace;
-                }else{
-                    // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
-                    return definition.isInstanceOf("aura:application") ||
-                    // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
-                    // This check allows components to be loaded directly in the browser in DEV/TEST
-                     !(context&&context.getCurrentAccess()) ||
-                    // #end
-                    false;
+                    if(currentAccess===component || accessNamespace===targetNamespace || accessFacetNamespace===targetNamespace){
+                        return true;
+                    }
                 }
+                // JBUCH: HACK: THIS DELIGHTFUL BLOCK IS BECAUSE OF LEGACY UNAUTHENTICATED/AUTHENTICATED ABUSE OF ACCESS ATTRIBUTE. COOL.
+                return definition.isInstanceOf("aura:application") ||
+                // #if {"excludeModes" : ["PRODUCTION","PRODUCTIONDEBUG"]}
+                // This check allows components to be loaded directly in the browser in DEV/TEST
+                 !(context&&context.getCurrentAccess()) ||
+                // #end
+                false;
         }
     }
     return false;

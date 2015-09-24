@@ -106,7 +106,6 @@
     </dependencies>
     <properties>
         <aura.home>${basedir}/..</aura.home>
-        <xunit.js.auraImpl>${basedir}/src/main/resources/</xunit.js.auraImpl>
     </properties>
     <build>
         <resources>
@@ -203,28 +202,6 @@
             </build>
         </profile>
         <profile>
-            <id>m2eAuraImpl</id>
-            <activation>
-                <property>
-                    <name>m2e.version</name>
-                </property>
-            </activation>
-            <build>
-            	<plugins>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-resources-plugin</artifactId>
-	                    <executions>
-	                        <execution>
-	                            <id>copy-xunit</id>
-	                            <phase>generate-sources</phase>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-            	</plugins>
-            </build>
-        </profile>
-        <profile>
             <id>runSinglexunitTest</id>
             <activation>
                 <property>
@@ -244,16 +221,6 @@
             </activation>
             <build>
                 <plugins>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-dependency-plugin</artifactId>
-	                    <executions>
-	                        <execution>
-	                            <id>unpack-xunit</id>
-	                            <phase>generate-test-resources</phase>
-	                        </execution>
-	                    </executions>
-	                </plugin>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
                         <executions>

@@ -31,7 +31,7 @@
         return dom;
 
     },
-	afterRender: function (cmp, helper) {
+	afterRender: function (cmp) {
         this.superAfterRender();
 	},
     rerender: function (cmp, helper) {
@@ -50,7 +50,7 @@
         }
         container.appendChild(fragment);
     },
-    unrender: function (cmp, helper) {
+    unrender: function (cmp) {
         cmp._shape.destroy();
         this.superUnrender();
     }

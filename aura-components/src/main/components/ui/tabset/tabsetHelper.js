@@ -95,7 +95,7 @@
     //=============================Private Functions==============================
     fireBeforeActiveEvent: function (cmp, params, target) {
         var activate = true;
-        var target = target || cmp;
+        target = target || cmp;
         var callback = function (doActivate) {
             activate = doActivate;
         };
@@ -229,10 +229,11 @@
         var tabs = [], tabIds = [], tabItemConfigs = [], tabNames = [],
         //default active tab to first tab
             activeTab = 0;
+        var i;
 
         // get all instances of ui:tab in the body
         var body = cmp.getConcreteComponent().get('v.body');
-        for (var i = 0; i < body.length; i++) {
+        for (i = 0; i < body.length; i++) {
             if (body[i].isInstanceOf("aura:iteration")) {
                 if (!$A.util.getBooleanValue(body[i].get("v.loaded"))) {
                     body[i].addHandler("iterationComplete", cmp, "{!c.onInit}");
@@ -241,7 +242,7 @@
             }
         }
         var tabCmps = this.getTabComponents(body);
-        for (var i = 0, len = tabCmps.length; i < len; i++) {
+        for (i = 0, len = tabCmps.length; i < len; i++) {
             var tab = tabCmps[i],
                 id = tab.getGlobalId(),
                 name = tab.get("v.name");
@@ -268,7 +269,7 @@
     /**
      * @private
      */
-    createTabComponent: function (cmp, tabConfig, callback, async) {
+    createTabComponent: function (cmp, tabConfig, callback) {
         // TODO: Use createComponent in here instead
 
         var cd, config;
@@ -302,7 +303,7 @@
         attrDefs.each(function (def) {
             var name = def.getDescriptor().getName();
             //don't want to pass the body to tabItems
-            if (name != "body") {
+            if (name !== "body") {
                 values[name] = tab.get("v." + name);
             }
         });
@@ -405,7 +406,6 @@
                 return tab;
             },
             removeTab: function (index) {
-                var total = this.tabIds.length;
                 if ($A.util.isNumber(index) && index >= 0 && index < this.tabIds.length) {
                     var id = this.tabIds.splice(index, 1);
                     var tab = this.tabComponents[id[0]];

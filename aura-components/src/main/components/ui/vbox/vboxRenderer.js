@@ -30,7 +30,7 @@
             var foundNonComment = false;
             for(var i=0;i<center.length;i++){
                 var el = center[i];
-                if(el.nodeType !== 8 && (el.nodeType !== 3 || aura.util.trim(el.nodeValue).length > 0)){
+                if(el.nodeType !== 8 && (el.nodeType !== 3 || $A.util.trim(el.nodeValue).length > 0)){
                     if(foundNonComment){
                         onlyOne = false;
                     }
@@ -86,7 +86,7 @@
         helper.updateContainer(component);
     },
 
-    unrender: function(component, helper) {
+    unrender: function(component) {
         $A.unrender(component.get("v.north"));
         $A.unrender(component.get("v.body"));
         $A.unrender(component.get("v.south"));

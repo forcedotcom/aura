@@ -18,7 +18,7 @@
 	/**
 	 * Handler for event that's fired programatically
 	 */
-	activateMenu: function(cmp, evt, helper) {
+	activateMenu: function(cmp, evt) {
 		if (evt.getParam) {
 			cmp.find("menuList").set("v.focusItemIndex", evt.getParam("index"));
 		}
@@ -54,7 +54,7 @@
 	/**
 	 * Handler for a hover on a menu item.
 	 */
-	onHover: function(cmp, evt, helper) {
+	onHover: function(cmp, evt) {
 		// Don't do anything on hover.
 		evt.stopPropagation();
 	},

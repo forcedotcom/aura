@@ -24,13 +24,13 @@
 	/**
 	 * Handler for event that's fired when user clicks on tab to activate
 	 */
-	onTabActivated: function(cmp, evt, helper) {
+	onTabActivated: function(cmp) {
 		if($A.util.getBooleanValue("v.active")) {
 		    cmp.get('e.onActivate').fire();
 		}
 	},
 	
-	close: function(cmp, evt, helper) {
+	close: function(cmp, evt) {
 		cmp.get("e.onClose").fire();
 		$A.util.squash(evt, true);
 	},

@@ -38,7 +38,7 @@
         event.getParam("callback")(modelNodes.concat(treeNodes));
     },
     
-    onActiveNodeChange : function(cmp, event) {
+    onActiveNodeChange : function(cmp) {
         var activeNode = cmp.get("v.activeNode");
         $A.assert(activeNode.isInstanceOf("ui:treeNode"));
         

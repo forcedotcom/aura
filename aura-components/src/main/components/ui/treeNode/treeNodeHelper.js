@@ -146,15 +146,16 @@
             };
 
             helper.PrintVisitor.prototype.accept = function(node) {
+            	/*eslint-disable no-console*/
                 console.log(node.get('v.title') + " - " + this.level);
             };
 
-            helper.PrintVisitor.prototype.visit = function(node) {
+            helper.PrintVisitor.prototype.visit = function() {
                 this.level += 1;
                 return true;
             };
 
-            helper.PrintVisitor.prototype.endVisit = function(node) {
+            helper.PrintVisitor.prototype.endVisit = function() {
                 this.level -= 1;
             };
         }
@@ -176,11 +177,11 @@
              * Use this visitor when the visitation need not be stateful or
              * conditional.
              */
-            helper.ApplyVisitor = function(funcToApply) {
-                this.funcToApply = funcToApply;
+            helper.ApplyVisitor = function(functionToApply) {
+                this.funcToApply = functionToApply;
             };
 
-            helper.ApplyVisitor.prototype.visit = function(node) {
+            helper.ApplyVisitor.prototype.visit = function() {
                 return true;
             };
 
@@ -188,7 +189,7 @@
                 this.funcToApply(node);
             };
 
-            helper.ApplyVisitor.prototype.endVisit = function(node) {
+            helper.ApplyVisitor.prototype.endVisit = function() {
             };
         }
         return new helper.ApplyVisitor(funcToApply);
@@ -215,7 +216,7 @@
                 node.set("v.expanded", false);
             };
 
-            helper.CollapseVisitor.prototype.endVisit = function(node) {
+            helper.CollapseVisitor.prototype.endVisit = function() {
             };
         }
         return new helper.CollapseVisitor();

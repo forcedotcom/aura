@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender : function(cmp, helper){
+    afterRender : function(cmp){
         //set id attribute for aria-controls
     	cmp.find("tabBody").getElement().setAttribute("id", cmp.getConcreteComponent().getGlobalId());
         this.superAfterRender();

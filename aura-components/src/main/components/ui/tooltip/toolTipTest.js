@@ -19,8 +19,8 @@
 	testInterface: {
 		 attributes : {tooltipBody : 'hello world'},
 		 test: function (component) {
-		 	aura.test.assertNotUndefinedOrNull(component.hide);
-		 	aura.test.assertNotUndefinedOrNull(component.show);
+		 	$A.test.assertNotUndefinedOrNull(component.hide);
+		 	$A.test.assertNotUndefinedOrNull(component.show);
 		 }
 	}
 });

@@ -18,10 +18,10 @@
     convertFrom24To12: function(component, hours) {
         var amPmCmp = component.find("ampm");
         if (amPmCmp) {
-            if (hours == 0) { // 12am
+            if (hours === 0) { // 12am
                 amPmCmp.set("v.value", "am");
                 return 12;
-            } else if (hours == 12) { // 12pm
+            } else if (hours === 12) { // 12pm
                 amPmCmp.set("v.value", "pm");
                 return 12;
             }
@@ -83,8 +83,8 @@
         } else {
             var amPmCmp = component.find("ampm");
             if (amPmCmp) {
-                var isPm = amPmCmp.get("v.value") == "pm";
-                if (hours == 12) { // 12am and 12pm
+                var isPm = amPmCmp.get("v.value") === "pm";
+                if (hours === 12) { // 12am and 12pm
                 	component.set("v.hours", isPm ? 12 : 0);
                 } else {
                 	component.set("v.hours", isPm ? parseInt(hours) + 12 : hours);

@@ -18,8 +18,8 @@
     activateTab: function (cmp, index, focus) {
         var tabItems = this.getTabItems(cmp);
         if ($A.util.isNumber(index) && tabItems[index]) {
-        	if (cmp.get("v.useOverflowMenu") && index != (tabItems.length - 1) 
-        			&& this.isInOverflow(cmp, index) && focus != false) {
+        	if (cmp.get("v.useOverflowMenu") && index !== (tabItems.length - 1) 
+        			&& this.isInOverflow(cmp, index) && focus !== false) {
         		this.updateOverflowTab(cmp, index);
         	}
         	
@@ -120,7 +120,7 @@
                 }
             }
             
-            if (overflowData && index == len - 1) {
+            if (overflowData && index === len - 1) {
             	tabItems[index].get("e.activateTab").setParams({"active" : true, "index" : overflowMenuIndex}).fire();
             } else {
             	cmp.get('e.onTabActivated').setParams({"index": index, "oldTab": oldTab}).fire();
@@ -228,7 +228,7 @@
 			
 			tabCache[key] = i;
 			
-			if (i != startIndex) {
+			if (i !== startIndex) {
 				tabItems[i].set("v.hidden", true);
 				menuItems.push(this.createMenuItem(key, title));
 			}
@@ -262,7 +262,7 @@
 			oldTab = tabItems[oldIndex],
 			newTab = tabItems[index];
 		
-		if (index != oldIndex) {
+		if (index !== oldIndex) {
 			var overflowTab = tabItems[tabItems.length - 1];
 			
 			this.swapOverflowTabs(cmp, overflowTab, oldTab, newTab);
@@ -286,7 +286,7 @@
 			menuList = overflowTab.get("v.menuItems");
 		
 		menuList = menuList.filter(function(menuItem) {
-			return menuItem.id != self.getTabName(newTab);
+			return menuItem.id !== self.getTabName(newTab);
 		});
 		
 		menuList.splice(0, 0, self.createMenuItemFromTab(oldTab));
@@ -298,7 +298,7 @@
 	 * Private helper methods
 	 */
 	toggleTab : function(tab, condition) {
-		if (condition == undefined) {
+		if (condition === undefined) {
 			condition = !tab.get("v.hidden");
 		}
 		
@@ -326,5 +326,5 @@
 	
 	createMenuItem : function(id, label) {
 		return {id : id, label : label};
-	},
+	}
 })// eslint-disable-line semi

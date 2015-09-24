@@ -756,5 +756,59 @@
                 </plugins>
             </build>
         </profile>
+        <!-- profile for js code coverage for aura-impl -->
+        <profile>
+            <id>xunit.js.coverage.auraImpl</id>
+            <properties>
+                <module.name>aura-impl</module.name>
+                <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>
+                <xunit.js.currentModule>${module.name}</xunit.js.currentModule>
+                <xunit.js.isStrict>false</xunit.js.isStrict>
+                <xunit.js.format>jscover</xunit.js.format>
+                <xunit.js.coverage>true</xunit.js.coverage>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.tntim96</groupId>
+                        <artifactId>jscover-file-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>instrument-javascript-resources</id>
+                                <phase>process-test-classes</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
+                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
+                            <testDirectory>${project.parent.basedir}/${module.name}/src/test</testDirectory>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>xunit.js</id>
+                                <phase>test</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.tntim96</groupId>
+                        <artifactId>jscover-report-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-cobertura-xml</id>
+                                <phase>verify</phase>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
+                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

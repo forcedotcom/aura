@@ -6,7 +6,7 @@ Test.Tools.Aura.BuildDirectory=String.TrimEnd(System.Environment&&System.Environ
 //ideally we would want to set the value for <workingDirectory>
 //correctly so that we do not need to append /target/
 if (System.Environment.GetParameters().named.coverage === "true") {
-    Test.Tools.Aura.BuildDirectory+="/target/";
+    Test.Tools.Aura.BuildDirectory+="/target/js-coverage";
     //jscover sets this on window which we do not have in xunit
     jscoverbeforeunload = true;
 }

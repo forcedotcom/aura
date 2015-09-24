@@ -50,6 +50,8 @@
         <xunit.js.format>junit</xunit.js.format>
         <xunit.js.verbose>false</xunit.js.verbose>
         <xunit.js.coverage>false</xunit.js.coverage>
+        <xunit.js.isStrict>true</xunit.js.isStrict>
+        <xunit.js.currentModule>${project.basedir}</xunit.js.currentModule>
     </properties>
     <repositories>
         <repository>
@@ -671,13 +673,13 @@
                                                 <jvmarg value="-Daura.home=${basedir}/.." />
                                                 <arg value="${basedir}/../aura-util/src/test/tools/xUnit/xUnit.js.Console.js" />
                                                 <arg value="/output:${xunit.js.format}" />
-                                                <arg value="/strict:true" />
+                                                <arg value="/strict:${xunit.js.isStrict}" />
                                                 <arg value="/verbose:${xunit.js.verbose}" />
                                                 <arg value="/dependency:${basedir}/../aura-util/src/test/tools/xUnit/dependencies/" />
                                                 <arg value="${xunit.js.testPath}" />
                                                 <!-- jscover instrumentation args -->
                                                 <arg value="/coverage:${xunit.js.coverage}" />
-                                                <arg value="/logFile:../target/${project.artifactId}/jscoverage.json" />
+                                                <arg value="/logFile:../aura-integration-test/target/js-coverage/${xunit.js.currentModule}/jscoverage.json" />
                                             </java>
                                         </case>
                                         <default>
@@ -954,9 +956,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
-                        <reportDir>${project.parent.basedir}/target/${project.artifactId}</reportDir>
-                        <testDirectory>src/test</testDirectory>
                         <branchCoverageMinimum>100</branchCoverageMinimum>
                         <functionCoverageMinimum>100</functionCoverageMinimum>
                         <lineCoverageMinimum>100</lineCoverageMinimum>
@@ -983,7 +982,6 @@
                         </execution>
                     </executions>
                     <configuration>
-                        <reportDir>${project.parent.basedir}/target/${project.artifactId}</reportDir>
                         <coberturaXML>true</coberturaXML>
                         <lCOV>true</lCOV>
                     </configuration>

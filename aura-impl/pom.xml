@@ -283,49 +283,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>xunit.js.coverage</id>
-            <properties>
-                <xunit.js.testPath>${user.dir}/target/${project.artifactId}/src/test/javascript</xunit.js.testPath>
-                <xunit.js.format>jscover</xunit.js.format>
-                <xunit.js.coverage>true</xunit.js.coverage>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.tntim96</groupId>
-                        <artifactId>jscover-file-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>instrument-javascript-resources</id>
-                                <phase>process-test-classes</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>xunit.js</id>
-                                <phase>test</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.tntim96</groupId>
-                        <artifactId>jscover-report-maven-plugin</artifactId>
-                        <configuration>
-                            <srcDir>${project.parent.basedir}/${project.artifactId}</srcDir>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>generate-cobertura-xml</id>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>

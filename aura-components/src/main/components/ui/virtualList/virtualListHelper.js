@@ -76,8 +76,7 @@
         return container;
     },
     initializeTemplate: function (cmp) {
-        var self  = this,
-            tmpl  = cmp.get('v.itemTemplate')[0],
+        var tmpl  = cmp.get('v.itemTemplate')[0],
             ref   = cmp.get('v.itemVar'),
             ptv   = this._createPassthroughValue(cmp, ref),
             shape = $A.newCmp(tmpl, ptv);
@@ -174,8 +173,7 @@
         parent.replaceChild(newChild, oldChild);
     },
     _rerenderDirtyElement: function (cmp, item, oldElement) {
-        var container  = cmp._template,
-            listRoot   = this.getListBody(cmp),
+        var listRoot   = this.getListBody(cmp),
             items      = cmp._virtualItems,
             position   = this._findVirtualElementPosition(items, item, oldElement),
             newElement = this._generateVirtualItem(cmp, item);
@@ -209,7 +207,7 @@
             handlers  = [],
             shape     = cmp._shape,
             ptv       = cmp._ptv,
-            item;
+            item, targetCmp, actionHandler;
 
         while (target) {
             targetCmp = this._getRenderingComponentForElement(target);

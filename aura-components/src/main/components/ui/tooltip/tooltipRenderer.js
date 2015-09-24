@@ -51,7 +51,6 @@
 
     afterRender: function(component, helper) {
         var ret = this.superAfterRender();
-        var el;
         if(component.get('v.advanced')) {
             helper.makeTrigger(component);
         }

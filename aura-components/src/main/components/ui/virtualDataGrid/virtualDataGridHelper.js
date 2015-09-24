@@ -37,7 +37,7 @@
     reset: function (cmp) {
         this.initialize(cmp);
     },
-    verifyInterfaces: function (cmp) {
+    verifyInterfaces: function () {
         // TODO
     },
     initializeDataModel: function(cmp) {
@@ -99,7 +99,7 @@
     virtualRerender: function (cmp) {
         this.bootstrapVirtualGrid(cmp);
     },
-    onItemChange: function (ptv, evt) {
+    onItemChange: function (ptv) {
         if (!ptv.ignoreChanges) {
             ptv.dirty = true;
         }
@@ -181,7 +181,7 @@
             handlers  = [],
             ptv       = cmp._ptv,
             position,
-            item;
+            item, targetCmp, actionHandler;
 
         while (target) {
             targetCmp = this._getRenderingComponentForElement(target);
@@ -249,8 +249,7 @@
     	}
     },
     _rerenderDirtyElement: function (cmp, item, oldElement) {
-        var container = cmp._templateContainer,
-            listRoot  = this.getGridBody(cmp),
+        var listRoot  = this.getGridBody(cmp),
             items     = cmp._virtualItems,
             position  = this._findVirtualElementPosition(items, oldElement);
         
@@ -327,8 +326,7 @@
         }
         
         for (var i = 0; i < headers.length; i++) {
-            var headerColumn = headers[i],
-                name = headerColumn.get('v.name');
+            var headerColumn = headers[i];
             
             if (headerColumn.get('v.sortable')) {
                 headerColumn.set('v.onsortchange', handleSortTrigger);

@@ -32,7 +32,6 @@
         }
         var fadeInDuration     = component.get('v.fadeInDuration'),
 	        fadeOutDuration    = component.get('v.fadeOutDuration'),
-	        triggerClass       = component.get('v.triggerClass'),
 	        extraClass         = component.get('v.class'),
 	        delay              = component.get('v.delay'),
 	        direction          = component.get('v.direction'),
@@ -110,24 +109,22 @@
 		
 		var direction = component.get('v.direction');
 		
-		var allowFlips = $A.util.getBooleanValue(component.get('v.allowFlips'));
 		var target = component.getElement();
-		var boundingRect = target.getBoundingClientRect();
 		var ttWrapper = component.find('tooltipwrapper').getElement();
 
 
 		component.set('v.direction', direction);
 
-		['north', 'south', 'west' , 'east'].forEach(function(direction) {
-			component.constraints[direction].disable();
-			component.constraints[direction + '_pointer'].disable();
-			component.constraints[direction + 'pointerBox'].disable();
+		['north', 'south', 'west' , 'east'].forEach(function(directions) {
+			component.constraints[directions].disable();
+			component.constraints[directions + '_pointer'].disable();
+			component.constraints[directions + 'pointerBox'].disable();
 
 			// Manipulating classes directly to avoid re-render: 
-			ttWrapper.classList.remove(direction);
-			if(component.constraints[direction + 'PointerOverlap']) {
-				component.constraints[direction + 'PointerOverlap'].disable();
-				component.constraints[direction + 'pointerBox'].disable();
+			ttWrapper.classList.remove(directions);
+			if(component.constraints[directions + 'PointerOverlap']) {
+				component.constraints[directions + 'PointerOverlap'].disable();
+				component.constraints[directions + 'pointerBox'].disable();
 			}  
 		});
 
@@ -157,7 +154,6 @@
 		var target = component.getElement();
 		var lib = this.lib.panelPositioning;
 		var bbDirections;
-		var targetAlign, align;
 		var thisConstraint;
 		var classList = component.get('v.classList');
 		
@@ -329,7 +325,7 @@
 		return component._tooltip;
 	},
 
-	_doUpdatePosition: function(component) {
+	_doUpdatePosition: function() {
 		this.lib.panelPositioning.reposition();
 	},
 

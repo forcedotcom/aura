@@ -90,11 +90,11 @@
 		cmp.get("e.onTabClosed").setParams({"index": index}).fire();
 	},
 	
-	onTabHover: function(cmp, evt, helper) {
+	onTabHover: function(cmp, evt) {
 		cmp.getEvent("onTabHover").setParams(evt.getParams()).fire();
 	},
 	
-	onTabUnhover: function(cmp, evt, helper) {
+	onTabUnhover: function(cmp, evt) {
 		cmp.getEvent("onTabUnhover").setParams(evt.getParams()).fire();
 	}
 // eslint-disable-line semi

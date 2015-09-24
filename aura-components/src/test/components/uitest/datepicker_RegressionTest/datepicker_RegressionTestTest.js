@@ -352,27 +352,24 @@
                     function(){
                         //checking out on the time picker position
                         self.showTimepicker();
-
-
                         //assertion of time picker intial position
                         $A.test.addWaitForWithFailureMessage(
                             true,//expected value
                             function(){//actual value
                                 //get bounding rect of the datepicker
-                                var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
+                            	var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
                                 var rectTextbox = $A.test.select('.dateTime-inputTime input')[0].getBoundingClientRect();
-
-                                var actualTopDelta = rectTimePicker.top - rectTextbox.top;
-                                var actualLeftDelta = rectTimePicker.left - rectTextbox.left;
+                                //using parseInt as IE browser's add decimal pt's 
+                                var actualTopDelta = parseInt(rectTimePicker.top - rectTextbox.top);
+                                var actualLeftDelta = parseInt(rectTimePicker.left - rectTextbox.left);
 
                                 self.setDebugCmpAttribute(cmp, 'v.tpTopDelta', actualTopDelta);
                                 self.setDebugCmpAttribute(cmp, 'v.tpLeftDelta', actualLeftDelta);
-
                                 return actualTopDelta >= 0 && actualTopDelta <= ACCEPTABLE_DELTA &&
                                     actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
                             },
                             'Timepicker position is not aligned to the input textbox'//failureMessage
-                        );
+                        );	
                     }
                 );
             }

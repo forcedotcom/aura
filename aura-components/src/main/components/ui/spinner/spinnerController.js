@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    toggleSpinner: function (cmp, event, helper) {
+    toggleSpinner: function (cmp, event) {
         var isVisible = event.getParam("isVisible");
         if (isVisible) {
             $A.util.removeClass(cmp.find("spinner").getElement(), "hideEl");

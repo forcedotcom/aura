@@ -25,7 +25,7 @@
         },function(cmp){
         	cmp.find("minutes").set("v.value", "100");
         	cmp.get("c.updateMinutes").runDeprecated({});
-        },function(cmp){
+        },function(){
         	$A.test.assertAccessible();
         }]
     },

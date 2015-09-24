@@ -52,7 +52,7 @@
         helper.createVirtualRows(cmp);
         helper.markDirty(cmp); // So we go into the rerender
     },
-    handleDataChange: function(cmp, evt, helper) {
+    handleDataChange: function(cmp, evt) {
     	cmp.set("v.items", evt.getParam("data"), cmp._initializing);
     },
     

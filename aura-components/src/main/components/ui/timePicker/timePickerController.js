@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	init: function(component, event, helper) {
+	init: function(component) {
 		var hourError = component.find("hourError");
 		var minError = component.find("minuteError");
 		
@@ -32,7 +32,7 @@
             hoursCmp.set("v.value", currentHourValue); 
             if (helper.validateHours(component)) {
                 if (amPmCmp) { // it must be in 12 hour format
-                    if (amPmCmp.get("v.value") == "am") {
+                    if (amPmCmp.get("v.value") === "am") {
                         component.set("v.hours", parseInt(currentHourValue));
                     } else {
                         component.set("v.hours", parseInt(currentHourValue) + 12);
@@ -48,7 +48,7 @@
         if (component.get("v.isValid") === true) {
             var hours = component.get("v.hours");
             if (amPmCmp) {
-                if (amPmCmp.get("v.value") == "am") {
+                if (amPmCmp.get("v.value") === "am") {
                     component.set("v.hours", parseInt(hours) - 12);
                 } else {
                     component.set("v.hours", parseInt(hours) + 12);

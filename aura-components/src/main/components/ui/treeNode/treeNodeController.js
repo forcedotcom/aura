@@ -73,7 +73,7 @@
      * @param helper
      *            the treeNodeHelper
      */
-    traverse : function(cmp, event, helper) {
+    traverse : function(cmp, event) {
         var visitor = event.getParam("visitor");
         var traverser = event.getParam("traverser");
         traverser.visitor = visitor;

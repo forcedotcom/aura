@@ -96,14 +96,14 @@ public class InputDateTimeUITest extends WebDriverTestCase {
 
     /**
      * Test flow:
-     * - Focus on input time box
-     * - Click
+     * - Click on input time box
      * - Check if inputTimePicker turns visible
      * @throws Exception
      */
     public void testTPClickToOpenWithEmptyInput() throws Exception {
         open(URL);
 
+        // clicking on input time box when it's empty should bring up timePicker
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         inputTimeBox.click();
         waitForElementAppear("TimePicker doesn't appear", By.cssSelector(TIME_PICKER_SEL));
@@ -120,9 +120,11 @@ public class InputDateTimeUITest extends WebDriverTestCase {
 
         clickToOpenTimePicker();
 
+        // focus is on timePicker, just press ENTER to select a time
         WebElement activeElement = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
         auraUITestingUtil.pressEnter(activeElement);
 
+        // after selecting a time, input time box should not be empty
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         String outputTime = inputTimeBox.getAttribute("value").trim();
         assertNotSame("Input time box should be set to some time values, but it's empty", outputTime, "");
@@ -144,11 +146,11 @@ public class InputDateTimeUITest extends WebDriverTestCase {
         outputTime = inputTimeBox.getAttribute("value").trim();
         assertEquals("Input time box is not empty initially", outputTime, "");
 
-        // open inputDate calendar
+        // open inputDate calendar and select a date
         inputDateIcon.click();
-        // select a date
         auraUITestingUtil.pressEnter(inputDateIcon);
 
+        // selecting a date should set the default time
         outputTime = inputTimeBox.getAttribute("value").trim();
         assertNotSame("Input time box should be set to some time values, but it's empty", outputTime, "");
     }
@@ -156,43 +158,69 @@ public class InputDateTimeUITest extends WebDriverTestCase {
     /**
      * Test flow
      * - set initial time
-     * - move to the next time value and see it's the right value
-     * - move back to the previous time value and see it's the old value
+     * - move to the previous time value and see it's the right value
      * @throws Exception
      */
-    public void testTPUpDownArrows() throws Exception {
+    public void testTPUpArrow() throws Exception {
         open(URL);
 
+        // set initial time
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
-        // set initial time to use
-        inputTimeBox.sendKeys("1:00 PM");
-        // move down
-        selectTimePicker(inputTimeBox, TIME_PICKER_SEL, Keys.ARROW_DOWN, "1:30 PM");
-        // wait for it to disappear first
-        waitForElementDisappear("TimePicker should be hidden now!", By.cssSelector(TIME_PICKER_SEL));
-        // move up
-        selectTimePicker(inputTimeBox, TIME_PICKER_SEL, Keys.ARROW_UP, "1:00 PM");
+        inputTimeBox.sendKeys("1:30 PM");
+
+        // select the previous time
+        selectTimePicker(Keys.ARROW_UP, "1:00 PM");
     }
 
     /**
      * Test flow
      * - set initial time
      * - move to the next time value and see it's the right value
-     * - move back to the previous time value and see it's the old value
      * @throws Exception
      */
-    public void testTPLeftRightArrows() throws Exception {
+    public void testTPDownArrow() throws Exception {
         open(URL);
 
+        // set initial time
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
-        // set initial time to use
         inputTimeBox.sendKeys("1:00 PM");
-        // move down
-        selectTimePicker(inputTimeBox, TIME_PICKER_SEL, Keys.ARROW_RIGHT, "1:30 PM");
-        // wait for it to disappear first
-        waitForElementDisappear("TimePicker should be hidden now!", By.cssSelector(TIME_PICKER_SEL));
-        // move up
-        selectTimePicker(inputTimeBox, TIME_PICKER_SEL, Keys.ARROW_LEFT, "1:00 PM");
+
+        // select the next time
+        selectTimePicker(Keys.ARROW_DOWN, "1:30 PM");
+    }
+
+    /**
+     * Test flow
+     * - set initial time
+     * - move to the previous time value and see it's the right value
+     * @throws Exception
+     */
+    public void testTPLeftArrow() throws Exception {
+        open(URL);
+
+        // set initial time
+        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
+        inputTimeBox.sendKeys("1:30 PM");
+
+        // select the previous time
+        selectTimePicker(Keys.ARROW_LEFT, "1:00 PM");
+    }
+
+    /**
+     * Test flow
+     * - set initial time
+     * - move to the next time value and see it's the right value
+     * @throws Exception
+     */
+    public void testTPRightArrow() throws Exception {
+        open(URL);
+
+        // set initial time
+        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
+        inputTimeBox.sendKeys("1:00 PM");
+
+        // select the next time
+        selectTimePicker(Keys.ARROW_RIGHT, "1:30 PM");
     }
 
     /***********************************************************************************************
@@ -203,8 +231,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
      * Use arrow key to select the next time value on timePicker
      * @throws Exception
      */
-    private void selectTimePicker(WebElement inputTimeBox,
-            String timePickerSel, Keys arrow, String expectedTime) throws Exception {
+    private void selectTimePicker(Keys arrow, String expectedTime) throws Exception {
         clickToOpenTimePicker();
 
         // focus on timepicker and press arrow key
@@ -216,6 +243,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
         auraUITestingUtil.pressEnter(activeElem);
 
         // return the selected time value
+        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         String outputTime = inputTimeBox.getAttribute("value").trim();
         assertEquals("Time values should be the same, but they are different!",
                 expectedTime, outputTime);
@@ -257,7 +285,6 @@ public class InputDateTimeUITest extends WebDriverTestCase {
     private void checkTPFocusOnClosingWithKey(Keys key) {
         clickToOpenTimePicker();
 
-        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         // activeElement is timePicker now
         WebElement activeElement = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
 
@@ -267,6 +294,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
 
         // check if active element is the inputTimeBox
         activeElement = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
+        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
         assertEquals("Focus is not on input time box", activeElement, inputTimeBox);
     }
 }

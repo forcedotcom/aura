@@ -132,6 +132,7 @@
      * Also checks for default 'langLocale'
      */
     testDefaultTimeFormat: {
+		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timezone:'GMT'},
         test: function(cmp){
             this.checkInputTimeValue(cmp, '4:30 PM');
@@ -142,6 +143,7 @@
      * Verify behavior when 'timeFormat' attribute is assigned an empty string.
      */
     testEmptyTimeFormat: {
+		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'', timezone:'GMT'},
         test: function(cmp){
             this.checkInputTimeValue(cmp, '4:30:00 PM');
@@ -152,6 +154,7 @@
      * Verify behavior when 'timeFormat' attribute is assigned a garbage value.
      */
     testInvalidTimeFormat: {
+		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'KKKKKK', timezone:'GMT'},
         test: [function(cmp){
             this.checkInputTimeValue(cmp, 'KKKKKK');
@@ -159,9 +162,10 @@
     },
 
     /**
-     * Verify behavior when 'timeFormat' attribute is assigned a garbage value.
+     * Verify behavior when 'timeFormat' attribute is assigned a correct value.
      */
     testValidTimeFormat: {
+		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'HH:mm', timezone:'GMT'},
         test: [function(cmp){
             this.checkInputTimeValue(cmp, '16:30');
@@ -373,8 +377,8 @@
     },
 
     checkInputTimeValue: function(cmp, expectedValue) {
-        var inputTimeCmp = cmp.find("dateTimePickerTest").find("inputTime").getElement();
-        var actualValue = $A.util.getElementAttributeValue(inputTimeCmp, "value");
+        var inputTimeElement = cmp.find("dateTimePickerTest").find("inputTime").getElement();
+        var actualValue = $A.util.getElementAttributeValue(inputTimeElement, "value");
         $A.test.assertEquals(expectedValue, actualValue, "Time value is not as expected!");
     }
 })

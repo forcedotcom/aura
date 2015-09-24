@@ -18,7 +18,7 @@
     /*
      * Mobile devices are still using the old time picker.
      */
-    browsers: ['DESKTOP'],
+    browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
 
     /**
      * Passing interval as '' should set interval to the default value: 30
@@ -68,9 +68,11 @@
 
         // same errorMsg is used since both fails for the same reason
         var errorMsg = "Timepicker select list is incorrect!";
+
         // check timePicker list length
         $A.test.assertEquals(expectedIntervals.length, actualIntervals.length, errorMsg);
 
+        // check each value in timePicker
         for (var i = 0; i < expectedIntervals.length; i++) {
             var expectedInterval = expectedIntervals[i];
             var actualInterval = $A.test.getText(actualIntervals[i]);
@@ -79,6 +81,9 @@
         }
     },
 
+    /**
+     * Generate an array of time values
+     */
     generateTimeIntervals: function(interval, timeFormat, locale){
         var date = new Date();
         var timevals = [];

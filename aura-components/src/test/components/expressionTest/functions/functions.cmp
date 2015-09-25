@@ -86,12 +86,16 @@
     <expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
 
     <!-- notequals -->
+    <expressionTest:test expression="{!false != false}" exprText="false != false" expected="false"/>
     <expressionTest:test expression="{!true != false}" exprText="true != false" expected="true"/>
     <expressionTest:test expression="{!m.booleanFalse ne false}" exprText="m.booleanFalse ne false" expected="false"/>
     <expressionTest:test expression="{!notequals(false, m.booleanTrue)}" exprText="notequals(false, m.booleanTrue)" expected="true"/>
     <expressionTest:test expression="{!2 != '2'}" exprText="2 != '2'" expected="true"/>
     <expressionTest:test expression="{!0 != false}" exprText="0 != false" expected="true"/>
     <expressionTest:test expression="{!v.NaN != v.NaN}" exprText="v.NaN != v.NaN" expected="true"/>
+    <expressionTest:test expression="{!v.nullObj != v.nullObj}" exprText="v.nullObj != v.nullObj" expected="false"/>
+    <expressionTest:test expression="{!v.nullObj != false}" exprText="v.nullObj != false" expected="true"/>
+    
 
     <!-- and -->
     <expressionTest:test expression="{!true &amp;&amp; false}" exprText="true &amp;&amp; false" expected="false"/>
@@ -133,6 +137,9 @@
     <!-- ternary -->
     <expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>
     <expressionTest:test expression="{!false ? 'yes' : 'no'}" exprText="false ? 'yes' : 'no'" expected="'no'"/>
+    <expressionTest:test expression="{!true ? v.nullObj : 'no'}" exprText="true ? null : 'no'" expected="null"/>
+    <expressionTest:test expression="{!false ? 'yes' : v.nullObj}" exprText="false ? 'yes' : null" expected="null"/>
+    <expressionTest:test expression="{!v.nullObj ? 'yes' : 'no'}" exprText="null ? 'yes' : null" expected="'no'"/>
     <expressionTest:test expression="{!if(true, 'yes')}" exprText="if(true, 'yes')" expected="'yes'"/>
     <expressionTest:test expression="{!if(false, 'yes')}" exprText="if(false, 'yes')" expected="''"/>
     <expressionTest:test expression="{!if(true, 'yes', 'no')}" exprText="if(true, 'yes', 'no')" expected="'yes'"/>
@@ -140,6 +147,7 @@
     <expressionTest:test expression="{!0 ? 'yes' : 'no'}" exprText="0 ? 'yes' : 'no'" expected="'no'"/>
     <expressionTest:test expression="{!2.1 ? 'yes' : 'no'}" exprText="2.1 ? 'yes' : 'no'" expected="'yes'"/>
     <expressionTest:test expression="{!'0' ? 'yes' : 'no'}" exprText="'0' ? 'yes' : 'no'" expected="'yes'"/>
+    <expressionTest:test expression="{!'true' ? 'yes' : 'no'}" exprText="'true' ? 'yes' : 'no'" expected="'yes'"/>
     <expressionTest:test expression="{!'false' ? 'yes' : 'no'}" exprText="'false' ? 'yes' : 'no'" expected="'yes'"/>
     <expressionTest:test expression="{!'' ? 'yes' : 'no'}" exprText="'' ? 'yes' : 'no'" expected="'no'"/>
     <expressionTest:test expression="{!v.NaN ? 'yes' : 'no'}" exprText="v.NaN ? 'yes' : 'no'" expected="'no'"/>

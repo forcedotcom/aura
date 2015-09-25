@@ -262,17 +262,9 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals("[object Object]", evaluate(ADD, map, ""));
     }
 
-    /* EQUALS
-     * 
-     * 
-    <expressionTest:test expression="{!(1/0) == (2/0)}" exprText="(1/0) == (2/0)" expected="true"/>
-    <expressionTest:test expression="{!m.integer == 411}" exprText="m.integer == 411" expected="true"/>
-    <expressionTest:test expression="{!m.integerString == 511}" exprText="m.integerString == 511" expected="false"/>
-    <expressionTest:test expression="{!m.integerString == '511'}" exprText="m.integerString == '511'" expected="true"/>
-    
-      <expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
-     */
-
+    /* 
+     * EQUALS
+     */    
     //<expressionTest:test expression="{!2 == 2.0}" exprText="2 == 2.0" expected="true"/>
     public void testEqualsSameIntAndDouble() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, 2, 2.0));
@@ -354,12 +346,12 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, Boolean.FALSE));
     }
 
-    // ?
+    //<expressionTest:test expression="{!v.nullObj == ''}" exprText="v.nullObj == ''" expected="false"/>
     public void testEqualsNullAndEmptyString() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, ""));
     }
 
-    // ?
+    //<expressionTest:test expression="{!v.nullObj == 0}" exprText="v.nullObj == 0" expected="false"/>
     public void testEqualsNullAndZero() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(EQUALS, null, 0));
     }
@@ -369,84 +361,137 @@ public class FunctionsTest extends AuraImplExpressionTestCase {
         assertEquals(Boolean.TRUE, evaluate(EQUALS, null, null));
     }
 
+    //skip: integer and string from model only apply to JS side
+    //<expressionTest:test expression="{!m.integer == 411}" exprText="m.integer == 411" expected="true"/>
+    //<expressionTest:test expression="{!m.integerString == 511}" exprText="m.integerString == 511" expected="false"/>
+    //<expressionTest:test expression="{!m.integerString == '511'}" exprText="m.integerString == '511'" expected="true"/>
+
     //skip: we don't parse Date here on Java side.
     //<expressionTest:test expression="{!m.date == '2004-09-23T16:30:00.000Z'}" exprText="m.date == '2004-09-23T16:30:00.000Z'" expected="true"/>
+    
+    //skip: Java will error out "/ by zero" if we do 1/0
+    //<expressionTest:test expression="{!(1/0) == (2/0)}" exprText="(1/0) == (2/0)" expected="true"/>
 
-    // NOTEQUALS
+    /*
+     *  NOTEQUALS
+     */
 
+    //<expressionTest:test expression="{!true != false}" exprText="true != false" expected="true"/>
     public void testNotEqualsDifferentBooleans() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, Boolean.FALSE, Boolean.TRUE));
     }
 
+    //skip: value from modle only apply to JS side
+    //<expressionTest:test expression="{!notequals(false, m.booleanTrue)}" exprText="notequals(false, m.booleanTrue)" expected="true"/>
+    //<expressionTest:test expression="{!m.booleanFalse ne false}" exprText="m.booleanFalse ne false" expected="false"/>
+    
+    //<expressionTest:test expression="{!flase  != false}" exprText="false != false" expected="false"/>
     public void testNotEqualsSameBoolean() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOTEQUALS, Boolean.FALSE, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!0 != '0'}" exprText="0 != '0'" expected="true"/>
     public void testNotEqualsZeroAndStringZero() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, 0, "0"));
     }
 
+    //<expressionTest:test expression="{!0 != false}" exprText="0 != false" expected="true"/>
     public void testNotEqualsZeroAndBoolean() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, 0, Boolean.FALSE));
     }
 
+    //<expressionTest:test expression="{!v.NaN != v.NaN}" exprText="v.NaN != v.NaN" expected="true"/>
     public void testNotEqualsTwoNaNs() throws Exception {
         assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, Double.NaN, Double.NaN));
     }
 
+    //<expressionTest:test expression="{!v.nullObj != v.nullObj}" exprText="v.nullObj != v.nullObj" expected="false"/>
     public void testNotEqualsTwoNulls() throws Exception {
         assertEquals(Boolean.FALSE, evaluate(NOTEQUALS, null, null));
     }
+    
+    //<expressionTest:test expression="{!v.nullObj != false}" exprText="v.nullObj != false" expected="true"/>
+    public void tesNotEqualstNullFalse() throws Exception {
+    	assertEquals(Boolean.TRUE, evaluate(NOTEQUALS, null, false));
+    }
 
-    // TERNARY
-
+    /* 
+     * TERNARY
+     */
+    //<expressionTest:test expression="{!if(true, 'yes')}" exprText="if(true, 'yes')" expected="'yes'"/>
+    public void testTernaryTwoParameterTrue() throws Exception {
+        assertEquals("1", evaluate(TERNARY, Boolean.TRUE, "1"));
+    }
+    
+    //diff: <expressionTest:test expression="{!if(false, 'yes')}" exprText="if(false, 'yes')" expected="''"/>
+    public void testTernaryTwoParameterFalse() throws Exception {
+        assertEquals(null, evaluate(TERNARY, Boolean.FALSE, "1"));
+    }
+    
+    //<expressionTest:test expression="{!true ? 'yes' : 'no'}" exprText="true ? 'yes' : 'no'" expected="'yes'"/>
     public void testTernaryTrueReturnString() throws Exception {
         assertEquals("1", evaluate(TERNARY, Boolean.TRUE, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!false ? 'yes' : 'no'}" exprText="false ? 'yes' : 'no'" expected="'no'"/>
     public void testTernaryFalseReturnString() throws Exception {
         assertEquals("2", evaluate(TERNARY, Boolean.FALSE, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!true ? v.nullObj : 'no'}" exprText="true ? null : 'no'" expected="null"/>
     public void testTernaryTrueReturnNull() throws Exception {
         assertEquals(null, evaluate(TERNARY, Boolean.TRUE, null, "2"));
     }
 
+    //<expressionTest:test expression="{!false ? 'yes' : v.nullObj}" exprText="false ? 'yes' : null" expected="null"/>
     public void testTernaryFalseReturnNull() throws Exception {
         assertEquals(null, evaluate(TERNARY, Boolean.FALSE, "1", null));
     }
 
+    //<expressionTest:test expression="{!v.nullObj ? 'yes' : 'no'}" exprText="null ? 'yes' : null" expected="'no'"/>
     public void testTernaryNull() throws Exception {
         assertEquals("2", evaluate(TERNARY, null, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!'true' ? 'yes' : 'no'}" exprText="'true' ? 'yes' : 'no'" expected="'yes'"/>
     public void testTernaryStringTrue() throws Exception {
         assertEquals("1", evaluate(TERNARY, "true", "1", "2"));
     }
 
+    // <expressionTest:test expression="{!0 ? 'yes' : 'no'}" exprText="0 ? 'yes' : 'no'" expected="'no'"/>
     public void testTernaryZero() throws Exception {
         assertEquals("2", evaluate(TERNARY, 0, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!2.1 ? 'yes' : 'no'}" exprText="2.1 ? 'yes' : 'no'" expected="'yes'"/>
     public void testTernaryDouble() throws Exception {
         assertEquals("1", evaluate(TERNARY, 3146431.43266, "1", "2"));
     }
 
+    //<expressionTest:test expression="{!'0' ? 'yes' : 'no'}" exprText="'0' ? 'yes' : 'no'" expected="'yes'"/>
     public void testTernaryStringZero() throws Exception {
         assertEquals("1", evaluate(TERNARY, "0", "1", "2"));
     }
 
+    //<expressionTest:test expression="{!'false' ? 'yes' : 'no'}" exprText="'false' ? 'yes' : 'no'" expected="'yes'"/>
     public void testTernaryStringFalse() throws Exception {
         assertEquals("1", evaluate(TERNARY, "false", "1", "2"));
     }
 
+    //<expressionTest:test expression="{!'' ? 'yes' : 'no'}" exprText="'' ? 'yes' : 'no'" expected="'no'"/>
     public void testTernaryEmptyString() throws Exception {
         assertEquals("2", evaluate(TERNARY, "", "1", "2"));
     }
 
+    //<expressionTest:test expression="{!v.NaN ? 'yes' : 'no'}" exprText="v.NaN ? 'yes' : 'no'" expected="'no'"/>
     public void testTernaryNaN() throws Exception {
         assertEquals("2", evaluate(TERNARY, Double.NaN, "1", "2"));
     }
+    
+    // Skip
+    // <expressionTest:test expression="{!if(true, 'yes', 'no')}" exprText="if(true, 'yes', 'no')" expected="'yes'"/>
+    // <expressionTest:test expression="{!if(false, 'yes', 'no')}" exprText="if(false, 'yes', 'no')" expected="'no'"/>
+   
 
     // SUBTRACT
 

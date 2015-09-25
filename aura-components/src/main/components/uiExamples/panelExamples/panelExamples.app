@@ -31,6 +31,7 @@
                 <a aura:id="notification" onclick="{!c.openNotification}">Notification</a>
             </nav>
         </header>
+
         <div class="controls">
             <ui:button label="Create panelType: panel, flavor: custom" class='customer-header-button' press="{!c.createPanelWithHeader}"/>
             <ui:button label="Create panelType: panel, flavor: full screen" press="{!c.createFullPanel}"/>
@@ -38,17 +39,20 @@
             <ui:button label="Create panelType: modal, flavor: large" press="{!c.createLargeModal}"/>
             <ui:button label="Update content after panel created" press="{!c.lazyLoadPanel}"/>
         </div>
-        <footer>
-        </footer>
+
+        <footer/>
+
     </section>
 
-    <section class="manager">
-        <ui:panelManager2 aura:id="pm">
+    <section class="managerContainers">
+        <ui:panelManager2 aura:id="pm" useSharedContainer="true">
             <aura:set attribute="registeredPanels">
                 <ui:panel alias="panel"/>
                 <ui:modal alias="modal"/>
             </aura:set>
         </ui:panelManager2>
+
+        <ui:containerManager/>
     </section>
 
 </aura:application>

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 ({
-    PANELS_ZOFFSET  : 100, // Default z-index start
-    PANELS_ZINDEX   : 0,   // z-index counter
 	PANELS_DEF      : {},  // Definitions of registered panels 
     PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
     PANELS_STACK    : [],  // The Panel Stack ordering
     PANELS_INSTANCE : {},  // Registered instances
 
-
 	initialize: function(cmp) {
+        var containerManager = this.cmLib.containerManager;
+        var sharedContainer  = cmp.get('v.useSharedContainer');
+
+        this.containerManager = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
         this.initializeRegisteredPanels(cmp);
     },
 
@@ -31,13 +32,7 @@
     * @private
     */
     initializeRegisteredPanels: function (cmp, newPanels) {
-        var panels = newPanels || cmp.get('v.registeredPanels') || [];
-        for (var i = 0; i < panels.length; ++i) {
-            var panel = panels[i];
-            var alias = panel.attributes.values.alias;
-            var name  = alias && alias.value || panel.componentDef.descriptor.split(':').pop();
-            this.PANELS_DEF[name] = panel;
-        }
+        this.containerManager.registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
     },
 
     /*
@@ -45,46 +40,35 @@
     * @public
     */
     createPanel: function (cmp, config) {
-        var panelType   = config.panelType,
-            panelDef    = panelType && this.PANELS_DEF[panelType],
-            panelConfig = config.panelConfig || {};
-
-        $A.assert(panelDef, 'No def for panelType :' + panelType);
+        var panelConfig      = config.panelConfig || {};
         var referenceElement = panelConfig.referenceElement;
+
         panelConfig.referenceElement = null;
 
-
         // Create panel instance
-        var panel = this.createPanelInstance(cmp, panelDef, panelConfig);
-        if(referenceElement) {
+        var panel = this.createPanelInstance(cmp, config);
+
+        if (referenceElement) {
             panel.set('v.referenceElement', referenceElement);
         }
 
         // Save instance config
         this.PANELS_INSTANCE[panel.getGlobalId()] = {
             panel           : panel,
-            zIndex          : panel._zIndex,
             destroyCallback : config.onDestroy
         };
 
         // Set owner
         this.setPanelOwner(panel, config.owner);
 
+        // Render
+        this.renderPanelInstance(cmp, panel, config);
+
         // Stack panel
         this.stackPanel(panel);
 
-        // Render
-        this.renderPanel(cmp, panel);
-
         if (config.onCreate) {
             config.onCreate(panel);
-        }
-
-        if (config.visible) {
-            config.onBeforeShow && config.onBeforeShow(panel);
-            panel.show(function (t) {
-                config.onAfterShow && config.onAfterShow(panel);
-            });
         }
     },
     /*
@@ -110,6 +94,7 @@
             
             owner = !$A.util.isEmpty(previousBody) ? previousBody[0].getGlobalId() : null;
         }
+
         this.PANELS_OWNER[panel.getGlobalId()] = owner;
     },
 
@@ -117,9 +102,11 @@
     * Stack a panel in our internal structures
     */
     stackPanel: function (panel) {
+        var stackManager = this.smLib.stackManager;
+
         this.PANELS_ZINDEX++;
         this.PANELS_STACK.push(panel);
-        panel._zIndex = this.PANELS_ZOFFSET + this.PANELS_ZINDEX;
+        stackManager.bringToFront(panel);
     },
 
     /* 
@@ -134,17 +121,17 @@
     * Create panel instance
     * @private
     */
-    createPanelInstance: function (cmp, panelDef, config) {
-        var mergedDef = $A.util.apply({}, panelDef, true, true);
-        mergedDef.flavor = config.flavor;
-        //flavor is not an attribute
-        delete config.flavor;
-        $A.util.apply(mergedDef.attributes.values, config); // merge panel config with DefRef
-        var panel = $A.newCmp(mergedDef, cmp),/*cmp:AVP*/
-            header  = panel.get('v.header'),
-            body  = panel.get('v.body'),
+    createPanelInstance: function (cmp, config) {
+        var panel = this.containerManager.createContainer({
+                containerType          : config.panelType,
+                containerConfig        : config.panelConfig,
+                containerValueProvider : cmp
+        });
+
+        var header  = panel.get('v.header'),
+            body    = panel.get('v.body'),
             footer  = panel.get('v.footer'),
-            avp;
+            avp, i, length;
 
         if (!$A.util.isEmpty(body)) {
             body[0].setAttributeValueProvider(panel);
@@ -152,13 +139,14 @@
         } else {
             avp = panel;
         }
+
         if (!$A.util.isEmpty(header)) {
-            for (var i = 0, length = header.length; i < length; i++) {
+            for (i = 0, length = header.length; i < length; i++) {
                 header[i].setAttributeValueProvider(avp);
             }
         }
         if (!$A.util.isEmpty(footer)) {
-            for (var i = 0, length = footer.length; i < length; i++) {
+            for (i = 0, length = footer.length; i < length; i++) {
                 footer[i].setAttributeValueProvider(avp);
             }
         }
@@ -174,15 +162,15 @@
 
         var activeElement = document.activeElement;
 
-        if(activeElement) {
+        if (activeElement) {
             cmp.returnFocus = activeElement;
         }
 
         $A.assert(panelObj, 'Couldnt find instance to show');
-        //de-active all other panels except the one currently shown
+
+        // de-active all other panels except the one currently shown
         this.deactivateAllPanelInstances(cmp, panel);
     },
-
 
      /*
     * Destroy panel instance
@@ -190,8 +178,6 @@
     */
     destroyPanelInstance: function (cmp, config) {
         var stack      = this.PANELS_STACK,
-            container  = cmp.find('container'),
-            children   = container.get('v.body'),
             panelParam = config.panelInstance,
             panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
             panelObj   = this.PANELS_INSTANCE[panelId],
@@ -200,22 +186,24 @@
 
         $A.assert(panelObj, 'Couldnt find instance to destroy');
         $A.assert(index > -1, 'Couldnt find the reference in the stack');
-        
-        delete this.PANELS_OWNER[panelId];
 
         stack.splice(index, 1);
-        children.splice(index, 1);
-        container.set('v.body', children, true);
-        panel.destroy();
 
-        if(cmp.returnFocus) {
+        this.containerManager.destroyContainer(panel);
+
+        delete this.PANELS_OWNER[panelId];
+        delete this.PANELS_INSTANCE[panelId];
+
+        if (cmp.returnFocus) {
             cmp.returnFocus.focus();
         }
+
         // Notify the destroy
         config.onDestroy && config.onDestroy();
         if (panelObj.destroyCallback) {
             panelObj.destroyCallback(panelId);
         }
+
         this.activateNextPanel(cmp);
     },
 
@@ -254,16 +242,8 @@
     * so we can send it back synchronously to the user
     * @private
     */
-    renderPanel: function (cmp, panel) {
-        var container = cmp.find('container'),
-            children  = container.get('v.body'),
-            dom       = container.getElement();
-
-        $A.render(panel, dom);
-        $A.afterRender(panel);
-        children.push(panel);
-        panel.getElement().style.cssText += ' z-index:' + panel._zIndex;
-        container.set('v.body', children, true/*dont mark it dirty for rendering*/);
+    renderPanelInstance: function (cmp, panel, config) {
+        this.containerManager.renderContainer(panel, config);
     },
     notifyPanelContent: function (content, config) {
         var validInterface = config.typeOf ? content.isInstanceOf(config.typeOf) : true,
@@ -275,8 +255,7 @@
     },
     broadcastNotify: function (cmp, source, config) {
         var scope         = config.scope,
-            currentTarget = config.currentTarget || this.getContainerPanelId(source), // CurrentTarget might have been set by the panel.
-            		                                                                  // If not, we try to find it
+            currentTarget = config.currentTarget || this.getContainerPanelId(source),
             stack         = this.PANELS_STACK,
             owner         = this.PANELS_OWNER[currentTarget],
             panel, content, i;
@@ -285,7 +264,7 @@
 
         if (scope === 'all') {
             for (i = stack.length - 1; i >= 0; --i) {
-                panel   = stack[i];
+                panel = stack[i];
                 if (currentTarget !== panel.getGlobalId()) { // Dont notify itself
                 	content = panel.get('v.body')[0];
                     this.notifyPanelContent(content, config);
@@ -303,7 +282,6 @@
             }
         }
     },
-
     getContainerPanelId: function (source) {
         var provider = source;
         while (provider) {

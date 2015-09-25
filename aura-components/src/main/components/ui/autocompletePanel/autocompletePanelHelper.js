@@ -45,7 +45,7 @@
         }
 
         if(!computedStyle) {
-            return;
+            return null;
         }
 
         var overflow = computedStyle['overflow-y'];
@@ -105,7 +105,7 @@
 
         var scrollableParent = this._getScrollableParent(referenceElem);
         var self = this;
-        this._handleScroll = function(e) {
+        this._handleScroll = function() {
             self.lib.panelPositioning.reposition(); 
         };
 
@@ -131,4 +131,4 @@
 			elem.style.opacity = 1;
 		});
 	}
-})
+})// eslint-disable-line semi

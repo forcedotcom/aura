@@ -88,4 +88,4 @@
 					"Number of loading component should be set to 0.");
     	}
     }
-})
+})// eslint-disable-line semi

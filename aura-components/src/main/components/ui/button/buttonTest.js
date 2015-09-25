@@ -133,6 +133,7 @@
 
             $A.test.assertEquals('clear', $A.test.getText(component.find("div").getElement()), "New label not rerendered");
             $A.test.assertTrue(component.find("button").getElement().disabled, "Button was not rerendered in disabled state");
+
             for(var i in component.find('button').getElement().children){
                 var child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
@@ -150,4 +151,4 @@
         }
     }
 
-})
+})// eslint-disable-line semi

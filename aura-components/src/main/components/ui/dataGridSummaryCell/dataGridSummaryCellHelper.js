@@ -17,8 +17,7 @@
 	initialize: function (cmp) {
 		var value = cmp.get('v.value'),
 			outputComponentDefRef = cmp.get('v.outputComponent')[0],
-			priv_outputComponent = cmp.get('v.priv_outputComponent'),
-			valueProvider = {};
+			priv_outputComponent = cmp.get('v.priv_outputComponent');
 
 		if (outputComponentDefRef) {
 			if (!outputComponentDefRef.attributes) { 
@@ -47,7 +46,6 @@
 		var items		= cmp.get('v.items'),
 			column		= cmp.get('v.column'),
 			type 		= cmp.get('v.type'), 
-			aggregate	= 0,
 			fn 			= this['aggregate_' + type.toLowerCase()];
 
 		if (fn) {
@@ -73,7 +71,7 @@
 		}
 	},
 
-	isValid: function (value) {
+	isValid: function () {
 		return true;
 	},
 

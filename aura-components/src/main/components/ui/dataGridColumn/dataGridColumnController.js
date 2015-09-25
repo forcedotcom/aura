@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	init: function (cmp, evt) {
+	init: function (cmp) {
 		var concrete = cmp.getConcreteComponent(),
 			hlp = concrete.getDef().getHelper();
 
@@ -34,7 +34,7 @@
 		helper.updateNameRef(cmp);
 	},
 	
-	handleDisabledChange: function(cmp, evt, helper) {
+	handleDisabledChange: function(cmp) {
 		var disabled = cmp.get("v.disabled");
 		
 		if (disabled) {

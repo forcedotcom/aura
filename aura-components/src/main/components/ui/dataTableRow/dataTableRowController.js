@@ -20,8 +20,8 @@
     rowPress : function(cmp, e){
         var el = cmp.getElement();
         var target = e.target;
-        while(el != target){
-            if(target.tagName == "A"){
+        while(el !== target){
+            if(target.tagName === "A"){
                 return;
             }
             target = target.parentNode;

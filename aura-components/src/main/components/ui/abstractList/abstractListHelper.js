@@ -126,7 +126,7 @@
      * ui:infiniteList implements removal utilizing 'timeout', 'animate', and 'callback'.
      * Do NOT change this function - override with custom logic instead.
      */
-    removeItem: function (component, array, index, timeout, animate, callback) {
+    removeItem: function (component, array, index, timeout, animate) {
         component.set('v.items', array);
     },
 

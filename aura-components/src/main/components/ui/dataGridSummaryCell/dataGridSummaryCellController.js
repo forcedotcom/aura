@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 ({
-	init: function (cmp, evt, hlp) {
+	init: function (cmp) {
 		var helper = cmp.getConcreteComponent().getDef().getHelper();
 		helper.calculate(cmp);
 		helper.initialize(cmp);
 	},
 
-	handleItemsChange: function (cmp, evt, hlp) {
+	handleItemsChange: function (cmp) {
 		var helper = cmp.getConcreteComponent().getDef().getHelper();
 		helper.calculate(cmp);
 	}

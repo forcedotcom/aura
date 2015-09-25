@@ -15,11 +15,11 @@
  */
 ({
 
-	handleZIndex: function(cmp, evt, helper) {
+	handleZIndex: function(cmp) {
 		cmp.getElement().style.zIndex = cmp.get('v.zIndex');
 	},
 
 	handleReferenceElement: function(cmp, evt, helper) {
 		helper.handleReferenceElement(cmp);
 	}
-})
+})// eslint-disable-line semi

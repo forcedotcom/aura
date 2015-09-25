@@ -21,7 +21,7 @@
 		hlp.handleItemsChange(cmp, evt.getParams());
 	},
 
-	handleWrite: function (cmp, evt) {
+	handleWrite: function (cmp) {
 		var concrete = cmp.getConcreteComponent(),
 			hlp      = concrete.getDef().getHelper();
 			

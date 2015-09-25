@@ -266,6 +266,20 @@
 	 */ 
 	// TODO rework, internal set doesn't work in preventing duplicates
 	setSelectedItems: function (cmp, value, rows) {
+    
+        /**
+         * @return {Array} The selected row items on the grid.
+         */
+        function retrieveSelected(selectedCache, items) {
+            var selected = [];
+            for (var index in selectedCache) {
+                if (selectedCache[index]) {
+                    selected.push(items[index]);
+                }
+            }
+            return selected;
+        }
+
 		var concrete = cmp.getConcreteComponent(),
 			rowData = concrete._rowData,
 			selectionData = concrete._selectionData;
@@ -284,22 +298,9 @@
 			selectedItems = rows ? retrieveSelected(selectionData.selectedIndexes, items) : (value ? items : []);
 		cmp.set("v.selectedItems", selectedItems);
 		
-		var isSelectAll = (selectedItems.length == items.length);
+		var isSelectAll = (selectedItems.length === items.length);
 		for (var i = 0; i < selectionData.selectionColumns.length; i++) {
 			selectionData.selectionColumns[i].set("v.selectAll", isSelectAll);
-		}
-		
-		/**
-		 * @return {Array} The selected row items on the grid.
-		 */
-		function retrieveSelected(selectedCache, items) {
-			var selected = [];
-			for (var index in selectedCache) {
-				if (selectedCache[index]) {
-					selected.push(items[index]);
-				}
-			}
-			return selected;
 		}
 	},
 
@@ -318,7 +319,7 @@
 	 */
 	updateColumnAttributes: function(cmp) {
 		var concrete = cmp.getConcreteComponent();
-		this.updateColumns(concrete, 'disabled', (concrete._rowData.length == 0));
+		this.updateColumns(concrete, 'disabled', (concrete._rowData.length === 0));
 	},
     
     /**
@@ -478,7 +479,7 @@
 	},
 
 	// TODO rename to something more accurate
-	resize: function (concrete, length) {
+	resize: function (concrete) {
 		var self = this,
 			items = concrete.get('v.items') || [],
 			itemsLength = items.length,
@@ -751,7 +752,7 @@
 		for (var i=0; i<attributes.length; i++) {
 			var attr = attributes[i];
 			
-			if (attr.name == 'disabled') {
+			if (attr.name === 'disabled') {
 				rowData.vp.set("disabled", attr.value);
 			}
 		}

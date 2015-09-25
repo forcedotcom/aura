@@ -58,5 +58,4 @@
 
         return classList.join(' ');
     }
-// eslint-disable-line semi
-})
+})// eslint-disable-line semi

@@ -23,7 +23,6 @@
             var optionCmp = iters[i];
             if (optionCmp.get("v.visible") === true && optionCmp.get("v.highlighted") === true) {
                 return i;
-                break;
             }
         }
         return -1;
@@ -375,7 +374,7 @@
     matchText: function(component, items) {
         var action = component.get("v.matchFunc");
         if (action) {
-            action.setCallback(this, function(result) {
+            action.setCallback(this, function() {
                 //@dval: Refactor all this nonsense:
                 // - it should not be an action but js function
                 // - it should not have the responsability to set the items directly

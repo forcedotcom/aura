@@ -83,15 +83,6 @@
     	concrete.set('v.items', data);
     },
 
-    /**
-	 * Implement logic in concrete.
-	 *
-	 * @param {Component} concrete component
-	 */
-    handleDataChange: function (concrete, data) {
-    	concrete.set('v.items', data);
-    },
-
 	/**
 	 * Implement logic in concrete.
 	 *
@@ -116,7 +107,7 @@
 	 * @param {Component} AbstractDataGrid component
 	 * @param {Object} params from ui:dataGridInsert
 	 */
-	handleAddRemove: function (cmp) {
+	handleAddRemove: function () {
 		$A.error('Unimplemented function in abstractDataGridHelper');
 	}
 })// eslint-disable-line semi

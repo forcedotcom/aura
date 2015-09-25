@@ -7,5 +7,6 @@ install:
 #- export http_proxy='http://public-proxy1-0-crd.data.sfdc.net:8080'
 #- export https_proxy='http://public-proxy1-0-crd.data.sfdc.net:8080'
 script:
-- mvn clean install -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml
+- mvn clean install -Dhttp.proxyHost=public-proxy1-0-crd.data.sfdc.net -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="*.salesforce.com|10.*" -Dmaven.wagon.http.ssl.insecure=true --settings ./.travis/settings.xml
+#- mvn clean install -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml
 #- mvn post-integration-test -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml -Pubuntu12 -Pdesktop -DskipUnitTests -DrunIntTests -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.reusebrowser=true -DskipJsDoc -Dwebdriver.timeout.getdriver=30 -DtestThreadCount=2

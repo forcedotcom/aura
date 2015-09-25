@@ -3,7 +3,7 @@
     <proxies>
         <proxy>
             <host>public-proxy1-0-crd.data.sfdc.net</host>
-            <nonProxyHosts>*.salesforce.com</nonProxyHosts>
+            <nonProxyHosts>*.salesforce.com|10.*</nonProxyHosts>
         </proxy>
     </proxies>
     <servers>
@@ -36,7 +36,7 @@
             <repositories>
                 <repository>
                     <id>snapshots</id>
-                    <url>https://nexus.soma.salesforce.com/nexus/content/repositories/snapshots/</url>
+                    <url>https://10.230.201.225/nexus/content/repositories/snapshots/</url>
                     <snapshots>
                         <checksumPolicy>fail</checksumPolicy>
                         <updatePolicy>interval:10</updatePolicy>
@@ -50,7 +50,7 @@
         <mirror>
             <id>nexus</id>
             <mirrorOf>*,!core,!sfdc.sharedlibs,!snapshots</mirrorOf>
-            <url>https://nexus.soma.salesforce.com/nexus/content/groups/public/</url>
+            <url>https://10.230.201.225/nexus/content/groups/public/</url>
         </mirror>
     </mirrors>
 </settings>

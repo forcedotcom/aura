@@ -17,4 +17,4 @@
     afterRender: function (cmp, helper) {
         helper.smLib.stackManager.setStackingContextRoot(cmp);
     }
-})
+})// eslint-disable-line semi

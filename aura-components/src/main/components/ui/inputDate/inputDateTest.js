@@ -22,7 +22,7 @@
             aura.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'format' attribute is not assigned a value.
      */
@@ -33,24 +33,24 @@
             aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
 	testEmptyFormat:{
 	    attributes : {displayDatePicker:'true', value: '2012-09-10', format: ''},
-	    test: function(cmp){	        
-	        var inputDateStr = cmp.find("inputText").getElement().value;	        
+	    test: function(cmp){
+	        var inputDateStr = cmp.find("inputText").getElement().value;
     		aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'format' attribute is assigned a garbage value.
      */
 	testInvalidFormat:{
 	    attributes : {displayDatePicker:'true', format: 'KKKKKK'},
-	    test: [function(cmp){			
+	    test: [function(cmp){
 	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
 	    }, function(cmp){
 	        var inputDateStr = cmp.find("inputText").getElement().value;
@@ -58,7 +58,7 @@
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
-    
+
     /**
      * Verify behavior when 'langLocale' attribute is not assigned a value.
      */
@@ -69,7 +69,7 @@
             aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' attribute is assigned a different value.
      */
@@ -80,7 +80,7 @@
             aura.test.assertEquals("Septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' attribute is not assigned an empty string.
      */
@@ -91,7 +91,7 @@
             aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-    
+
     /**
      * Verify behavior when 'langLocale' attribute is not assigned an invalid value.
      */
@@ -102,7 +102,7 @@
             aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
-       
+
 	/**
      * Verify behavior of Today() with default 'format' value.
      */
@@ -132,7 +132,7 @@
     		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
-    
+
     /**
      * Test input date picker with label set.
      */
@@ -145,5 +145,5 @@
     		aura.test.assertNotNull(datePicker, "datePicker not present");
     	}
     }
-        
-})
+
+})// eslint-disable-line semi

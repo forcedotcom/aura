@@ -290,4 +290,4 @@
             $A.test.assertEquals("e4", $A.test.getText(ul.children[2]));
         } ]
     }
-})
+})// eslint-disable-line semi

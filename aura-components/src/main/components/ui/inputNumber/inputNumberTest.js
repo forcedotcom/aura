@@ -328,4 +328,4 @@
            $A.test.assertEquals('0,22.70', value, "Element: Value not formatted correctly.");
        }]
    }
-})
+})// eslint-disable-line semi

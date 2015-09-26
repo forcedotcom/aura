@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({    
-    render: function(component, helper) {
+({
+    render: function(component) {
         var ret = this.superRender();
-                
+
         // Component registration
         $A.dragAndDropService.register([component.get("v.type")], component);
-        
+
         return ret;
     },
-    
-    unrender: function(component, helper) {
+
+    unrender: function(component) {
     	// Component deregistration
     	$A.dragAndDropService.deregister([component.get("v.type")], component);
-    	
+
     	this.superUnrender();
     }
 })// eslint-disable-line semi

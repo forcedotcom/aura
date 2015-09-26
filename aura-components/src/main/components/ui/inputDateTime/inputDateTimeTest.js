@@ -92,7 +92,7 @@
 	        aura.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputDate").getElement().value;
 	        	var timezone = $A.get("$Locale.timezone");
-	        	if(timezone  == "GMT"){
+	        	if(timezone  === "GMT"){
 					if (this.isViewDesktop()) {
 						var inputTimeStr  = cmp.find("inputTime").getElement().value;
 						aura.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used default timezone.");
@@ -101,7 +101,7 @@
 	    				aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used default timezone.");
 					}
 	        	}
-	        	else if(timezone  == "America/Los_Angeles"){
+	        	else if(timezone  === "America/Los_Angeles"){
 					if (this.isViewDesktop()) {
 						var inputTimeStr  = cmp.find("inputTime").getElement().value;
 						aura.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used default timezone.");
@@ -378,4 +378,4 @@
 	isViewDesktop : function(){
 		return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
 	}
-})
+})// eslint-disable-line semi

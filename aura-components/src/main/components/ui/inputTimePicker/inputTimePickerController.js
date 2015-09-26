@@ -18,7 +18,7 @@
         helper.selectTime(component, event);
     },
 
-    handleMouseover: function(component, event, helper) {
+    handleMouseover: function(component, event) {
         var elem = event.target || event.srcElement;
         if (!$A.util.isUndefinedOrNull(elem)) {
             elem.focus();

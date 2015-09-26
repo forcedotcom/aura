@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+    afterRender: function(component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.displayDates(component);
         return this.superAfterRender();
     },
 
-    rerender: function(component, helper) {
+    rerender: function(component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.displayDates(component);
         return this.superRerender();

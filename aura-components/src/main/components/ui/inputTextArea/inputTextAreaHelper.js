@@ -26,7 +26,7 @@
                 elem.value = "";
             } else {
                 if (value !== elem.value) {
-                    if (document.activeElement == elem) {
+                    if (document.activeElement === elem) {
                         var selectionStart = elem.selectionStart;
                         var selectionEnd = elem.selectionEnd;
                         elem.value = value;

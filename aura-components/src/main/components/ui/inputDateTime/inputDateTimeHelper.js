@@ -397,10 +397,10 @@
     },
 
     isDesktopMode: function(component) {
-        return $A.get("$Browser.formFactor") == "DESKTOP" &&
+        return $A.get("$Browser.formFactor") === "DESKTOP" &&
                 !component.get("v.useSingleInput");
     },
-    
+
     parseDateTimeInput: function(isUTC, component, dateValue, timeValue) {
         if ($A.util.isEmpty(dateValue)) {
             return null;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, event, helper) {
+    doInit: function(component) {
         var format = component.get("v.format");
         if ($A.util.isEmpty(format)) {
             format = $A.get("$Locale.dateFormat");
@@ -27,29 +27,29 @@
         }
     },
 
-    clickStart: function(component, event, helper) {
+    clickStart: function(component, event) {
         event.preventDefault();
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.openStartDatePicker(component);
     },
 
-    clickEnd: function(component, event, helper) {
+    clickEnd: function(component, event) {
         event.preventDefault();
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.openEndDatePicker(component);
     },
 
-    openStartDatePicker: function(component, event, helper) {
+    openStartDatePicker: function(component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.openStartDatePicker(component);
     },
 
-    openEndDatePicker: function(component, event, helper) {
+    openEndDatePicker: function(component) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
         _helper.openEndDatePicker(component);
     },
 
-    setValue: function(component, event, helper) {
+    setValue: function(component, event) {
         var _helper = component.getConcreteComponent().getDef().getHelper();
         var dateValue = event.getParam("value");
 

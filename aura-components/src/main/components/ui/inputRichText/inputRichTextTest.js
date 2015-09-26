@@ -15,7 +15,7 @@
  */
 ({
 	browsers:["-ANDROID_PHONE","-ANDROID_TABLET"],
-	
+
 	ckeButtons:{
 		bold: "cke_button__bold_icon",
 		italic: "cke_button__italic_icon",
@@ -49,7 +49,7 @@
 		redo: "cke_button__redo_icon",
 		find: "cke_button__find_icon",
 		replace: "cke_button__replace_icon",
-		selectAll: "cke_button__selectall",		
+		selectAll: "cke_button__selectall",
 		link: "cke_button__link_icon",
 		unlink: "cke_button__unlink_icon",
 		anchor: "cke_button__anchor_icon",
@@ -73,14 +73,14 @@
 		specialChar: "cke_button__specialchar_icon",
 		pageBreak: "cke_button__pagebreak_icon"
 	},
-	
+
 	ckeDefaultButtons:{
 		bold: "cke_button__bold_icon",
 		italic: "cke_button__italic_icon",
 		bulletList: "cke_button__bulletedlist_icon",
 		numberList: "cke_button__numberedlist_icon"
 	},
-	
+
 	ckeBasicButtons:{
 		bold: "cke_button__bold_icon",
 		italic: "cke_button__italic_icon",
@@ -96,7 +96,7 @@
 		bulletList: "cke_button__bulletedlist_icon",
 		numberList: "cke_button__numberedlist_icon"
 	},
-	
+
 	ckeStandardButtons:{
 		bold: "cke_button__bold_icon",
 		italic: "cke_button__italic_icon",
@@ -116,7 +116,7 @@
 		font: "cke_combo__font",
 		fontSize: "cke_combo__fontsize"
 	},
-	
+
 	ckeEmailButtons:{
 		font: "cke_combo__font",
 		fontSize: "cke_combo__fontsize",
@@ -131,74 +131,74 @@
 		bulletList: "cke_button__bulletedlist_icon",
 		numberList: "cke_button__numberedlist_icon"
 	},
-	
+
 	ckeCustomButtons:{
 		font: "cke_combo__font",
 		fontSize: "cke_combo__fontsize"
 	},
 
-	
+
     /**
      * Test basic tool bar is loaded.
      */
     testToolbarTypeBasic:{
     	attributes : {toolbar: "basic"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(component) {
+    	}, function() {
     		this.assertButtonsOnToolBar(this.ckeBasicButtons);
     	}]
     },
-    
+
     /**
      * Test full tool bar is loaded.
      */
     testToolbarTypeFull:{
     	attributes : {toolbar: "full"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(components) {
+    	}, function() {
     		this.assertButtonsOnToolBar(this.ckeButtons);
     	}]
     },
-    
+
     /**
      * Test standard tool bar is loaded.
      */
     testToolbarTypeStandard:{
     	attributes : {toolbar: "standard"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(components) {
+    	}, function() {
     		this.assertButtonsOnToolBar(this.ckeStandardButtons);
     	}]
     },
-    
+
     /**
      * Test email tool bar is loaded.
      */
     testToolbarTypeEmail:{
     	attributes : {toolbar: "email"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(components) {
+    	}, function() {
     		this.assertButtonsOnToolBar(this.ckeEmailButtons);
     	}]
     },
-    
+
     /**
      * Test default tool bar is loaded.
      */
     // TODO : @ctatlah - uncomment after john pushes fix
     _testToolbarTypeDefault:{
     	attributes : {toolbar: ""},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(components) {
+    	}, function() {
     		this.assertButtonsOnToolBar(this.ckeDefaultButtons);
     	}]
     },
-    
+
 
 
     /**
@@ -209,9 +209,9 @@
             toolbar : "custom",
             customToolbarConfig : '[{"name" : "format", "items" : ["Font","FontSize"]}]'
         },
-        test : [ function(component) {
+        test : [ function() {
             this.assertRichTextInitalized();
-        }, function(components) {
+        }, function() {
             this.assertButtonsOnToolBar(this.ckeCustomButtons);
         } ]
     },
@@ -224,9 +224,9 @@
             toolbar : "custom",
             customToolbarConfig : ""
         },
-        test : [ function(component) {
+        test : [ function() {
             this.assertRichTextInitalized();
-        }, function(components) {
+        }, function() {
             this.assertButtonsOnToolBar(this.ckeBasicButtons);
         } ]
     },
@@ -238,9 +238,9 @@
         attributes : {
             toolbar : "custom"
         },
-        test : [ function(component) {
+        test : [ function() {
             this.assertRichTextInitalized();
-        }, function(components) {
+        }, function() {
             this.assertButtonsOnToolBar(this.ckeBasicButtons);
         } ]
     },
@@ -253,47 +253,47 @@
             toolbar : "custom",
             customToolbarConfig : false
         },
-        test : [ function(component) {
+        test : [ function() {
             this.assertRichTextInitalized();
-        }, function(components) {
+        }, function() {
             this.assertButtonsOnToolBar(this.ckeBasicButtons);
         } ]
     },
-    
+
     /**
      * Valid toolbar location value. ckeditor is loaded with toolbar in proper place bottom.
      */
     testToolbarLocationBottom:{
     	attributes : {toolbarLocation: "outerspace"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(component) {
+    	}, function() {
     		this.assertToolbarPresent(false);
     	}]
     },
-    
+
     /**
      * Invalid toolbar location value. ckeditor is loaded but no toolbar present.
      */
     testToolbarLocationInvalid:{
     	attributes : {toolbarLocation: "outerspace"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
-    	}, function(component) {
+    	}, function() {
     		this.assertToolbarPresent(false);
     	}]
     },
-    
+
     /**
      * Disable richText.
      */
     testDisableRichText:{
     	attributes : {isRichText: false},
-    	test : function(component) {
+    	test : function() {
     		this.assertCkeEditorPresent(false);
     	}
     },
-    
+
     /**
      * Test invalid dimensions.
      * Exclude IE 7, 8 since they don't support negative dimensions
@@ -301,7 +301,7 @@
     testRichTextInvalidDimensions:{
         browsers: ["-IE7", "-IE8"],
         attributes : {width: -100, height:-10},
-        test : function(component) {
+        test : function() {
             // just verify ckeditor loaded
             this.assertRichTextInitalized();
         }
@@ -312,21 +312,21 @@
      */
     testRichTextContent:{
     	attributes : {value: "<h3 style='color:red;'><span style='font-family:courier new,courier,monospace;'><span style='font-size:8px;'>test content</span></span></h3>"},
-    	test : [function(component) {
+    	test : [function() {
     		this.assertRichTextInitalized();
     	}, function(component) {
     		var content = component.get("v.value");
-    		$A.test.assertNotNull(content, 
+    		$A.test.assertNotNull(content,
     			"Content should be present (note: can not verify styling)");
-    	}]    }, 
-    
+    	}]    },
+
     assertRichTextInitalized : function() {
     	$A.test.addWaitFor(true, function(){
     		return !$A.util.isUndefinedOrNull(
     			$A.test.getElementByClass("cke_wysiwyg_frame"));
 		});
     },
-    
+
     assertCkeEditorPresent : function(isPresent) {
     	var elem = $A.test.getElementByClass("cke_wysiwyg_frame");
     	if (isPresent) {
@@ -335,7 +335,7 @@
     		$A.test.assertNull(elem, "There should be NO ck editor");
     	}
     },
-    
+
     assertToolbarPresent : function(isPresent) {
     	var elem = $A.test.getElementByClass("cke_toolbox");
     	if (isPresent) {
@@ -344,7 +344,7 @@
     		$A.test.assertNull(elem, "Toolbar should NOT be present");
     	}
     },
-    
+
     assertButtonsOnToolBar : function(expectedButtons) {
     	for (var b in this.ckeButtons) {
     		// if button is not in expected list verify its not present else
@@ -356,15 +356,15 @@
     		}
     	}
     },
-    
+
     assertButtonPresent : function(button, isPresent) {
     	var elem = $A.test.getElementByClass(button);
     	if (isPresent) {
-    		$A.test.assertNotNull(elem, 
+    		$A.test.assertNotNull(elem,
     			button + " button in toolbar should be present");
     	} else {
-    		$A.test.assertNull(elem, 
+    		$A.test.assertNull(elem,
     			button + " button in toolbar should NOT be present");
     	}
     }
-})
+})// eslint-disable-line semi

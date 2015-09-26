@@ -228,12 +228,12 @@
         if (component.get('v.closeOnClickOut')) {
             var keyCode = event.keyCode;
             var elem = event.target || event.srcElement;
-            if (keyCode == 9 && event.shiftKey == true) { // shift + tab
+            if (keyCode === 9 && event.shiftKey === true) { // shift + tab
                 if ($A.util.hasClass(elem, 'prevMonth')) {
                     $A.util.squash(event, true);
                     this.hide(component, true);
                 }
-            } else if (keyCode == 27) { // Esc key is pressed
+            } else if (keyCode === 27) { // Esc key is pressed
                 this.hide(component, true);
             }
         }
@@ -304,7 +304,7 @@
         return ret;
     },
 
-    handleWinResize: function(component, e) {
+    handleWinResize: function(component) {
         if (!component || !component.isValid()) {
             return;
         }
@@ -383,7 +383,7 @@
                     //attaching to the body causes the date to lose focus so we need to add the focus back
                     self.focusDate(component);
                 });
-                
+
             } else {
                 var viewPort = $A.util.getWindowSize();
                 if (!$A.util.isUndefinedOrNull(referenceElem)) {
@@ -393,7 +393,7 @@
 
                     // Vertical alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8
-                    var height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                    var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
                     var scrollY = document.documentElement.scrollTop;
                     if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
                         if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
@@ -407,7 +407,7 @@
 
                     // Horizontal alignment
                     // getBoundingClientRect method does not return height and width in IE7 and Ie8
-                    var width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+                    var width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
                     if (referenceElemRect.right < width) {
                         elem.style.left = document.documentElement.scrollLeft + "px";
                     } else {
@@ -543,7 +543,7 @@
     },
 
     updateMonthYear: function(component, value) {
-        var isDesktop = $A.get("$Browser.formFactor") == "DESKTOP";
+        var isDesktop = $A.get("$Browser.formFactor") === "DESKTOP";
         if (!isDesktop) { // mobile
             this.updateMobileMonthYear(component, value);
             return;
@@ -572,7 +572,7 @@
         }
     },
 
-    updateMobileMonthYear: function(component, value) {
+    updateMobileMonthYear: function(component) {
         var grid = component.find("grid");
         if (grid) {
             var m = grid.get("v.month");
@@ -620,7 +620,7 @@
             component.positionConstraint.destroy();
             delete component.positionConstraint;
         }
-        if ($A.get("$Browser.formFactor") == "DESKTOP" && shouldFocusReferenceElem) {
+        if ($A.get("$Browser.formFactor") === "DESKTOP" && shouldFocusReferenceElem) {
             var referenceElem = component.get("v.referenceElement");
             if (!$A.util.isUndefinedOrNull(referenceElem)) {
                 referenceElem.focus();

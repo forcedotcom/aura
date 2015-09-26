@@ -31,7 +31,7 @@
         } else {
             this.scrollToSelectedTime(component);
         }
-        
+
     },
 
     selectTime: function(component, event) {
@@ -54,7 +54,7 @@
 
     hide: function(component, shouldFocusReferenceElem) {
         component.set("v.visible", false);
-        if ($A.get("$Browser.formFactor") == "DESKTOP" && shouldFocusReferenceElem) {
+        if ($A.get("$Browser.formFactor") === "DESKTOP" && shouldFocusReferenceElem) {
             var referenceElem = component.get("v.referenceElement");
             if (!$A.util.isUndefinedOrNull(referenceElem)) {
                 referenceElem.focus();
@@ -79,7 +79,7 @@
                 for (var minutes = 0; minutes < 60; minutes+=minIncrement) {
                     date.setHours(hour, minutes);
                     var displayValue = $A.localizationService.formatTime(date, timeFormat, langLocale);
-                    var selected = currentHour == hour && currentMinutes == minutes;
+                    var selected = currentHour === hour && currentMinutes === minutes;
                     this.appendListElement(listElem, displayValue, hour, minutes, selected);
                 }
             }
@@ -119,7 +119,7 @@
         return false;
     },
 
-    appendListElement: function(listElem, displayValue, hourValue, minuteValue, selected) {
+    appendListElement: function(listElem, displayValue, hourValue, minuteValue) {
         var entry = document.createElement('li');
         entry.appendChild(document.createTextNode(displayValue));
         // set localId to double digit hour/minute in 24h format, e.g. 2330
@@ -143,13 +143,13 @@
 
                 var mod = minutes % interval,
                     quotient = Math.floor(minutes / interval);
-                if (mod == 0) {
+                if (mod === 0) {
                     closestMinute = minutes;
                 } else {
                     var multiplier = mod < interval / 2 ? quotient : quotient + 1;
                     closestMinute = multiplier * interval;
                     if (closestMinute >= 60) {
-                        if (hours == 23) {
+                        if (hours === 23) {
                             closestMinute -= interval;
                         } else {
                             closestMinute = 0;
@@ -204,7 +204,7 @@
                     } else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
                         event.preventDefault();
                         helper.setFocusToPreviousItem(component, event);
-                    } else if (event.keyCode == 9 && event.shiftKey == true) {  // shift tab
+                    } else if (event.keyCode === 9 && event.shiftKey === true) {  // shift tab
                         $A.util.squash(event, true);
                         helper.hide(component, true);
                     } else if (event.keyCode === 27) {  // Esc key
@@ -212,7 +212,7 @@
                         helper.hide(component, true);
                     } else if (event.keyCode === 9) {   // Tab key
                         helper.hide(component, true);
-                    } else if (event.keyCode == 32 || event.keyCode == 13) {  // space bar or enter
+                    } else if (event.keyCode === 32 || event.keyCode === 13) {  // space bar or enter
                         event.preventDefault();
                         helper.selectTime(component, event);
                     }

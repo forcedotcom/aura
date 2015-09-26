@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 ({
-	clearValue: function(component, event, helper) {
+	clearValue: function(component) {
 		component.set("v.value", "");
 	},
 
-	click: function(component, event, helper) {
+	click: function(component, event) {
         event.preventDefault();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayDatePicker(component);
     },
 
-    doInit: function(component, event, helper) {
+    doInit: function(component) {
     	// only add the placeholder when there is no date picker opener.
-        if ($A.get("$Browser.formFactor") == "DESKTOP" && !component.get("v.displayDatePicker")) {
+        if ($A.get("$Browser.formFactor") === "DESKTOP" && !component.get("v.displayDatePicker")) {
             var concreteCmp = component.getConcreteComponent();
             var format = concreteCmp.get("v.format");
             if (!format) {
@@ -37,7 +37,7 @@
         }
     },
 
-    openDatePicker: function(component, event, helper) {
+    openDatePicker: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
         _helper.displayDatePicker(component);
@@ -51,7 +51,7 @@
         }
     },
 
-    setValue: function(component, event, helper) {
+    setValue: function(component, event) {
         var dateValue = event.getParam("value");
         if (dateValue) {
             component.set("v.value", dateValue);

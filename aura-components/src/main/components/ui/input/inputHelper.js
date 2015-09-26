@@ -25,7 +25,7 @@
             }
             var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
             var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";
-            var labelDisplay = labelPositionAttribute != "hidden";
+            var labelDisplay = labelPositionAttribute !== "hidden";
             var requiredIndicator = labelDisplay && component.get("v.required") ? component.get("v.requiredIndicator") : null;
             var labelComponent = $A.newCmp({
                     componentDef: {descriptor: 'markup://ui:label'},
@@ -38,9 +38,9 @@
                         title: component.get("v.labelTitle"),
                         requiredIndicator: requiredIndicator}}},
                     component );
-            if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
+            if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                 innerBody.unshift(labelComponent);
-            } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom' || labelPositionAttribute == 'hidden') {
+            } else if (labelPositionAttribute === 'right' || labelPositionAttribute === 'bottom' || labelPositionAttribute === 'hidden') {
                 innerBody.push(labelComponent);
             }
             var divComponent = $A.newCmp({
@@ -60,10 +60,10 @@
 
     resetLabelPosition : function (component) {
         var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
-        if (labelPositionAttribute == 'hidden') {
+        if (labelPositionAttribute === 'hidden') {
             var labelComponent = component.find("inputLabel");
             if (!$A.util.isUndefinedOrNull(labelComponent)) {
-                labelComponent.set("v.labelDisplay", labelPositionAttribute != "hidden");
+                labelComponent.set("v.labelDisplay", labelPositionAttribute !== "hidden");
             }
             return;
         }
@@ -85,9 +85,9 @@
 
             if (label) {
                 label.set("v.labelDisplay", labelPositionAttribute != "hidden");
-                if (labelPositionAttribute == 'left' || labelPositionAttribute == 'top') {
+                if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                     htmlBody.unshift(label);
-                } else if (labelPositionAttribute == 'right' || labelPositionAttribute == 'bottom') {
+                } else if (labelPositionAttribute === 'right' || labelPositionAttribute === 'bottom') {
                     htmlBody.push(label);
                 }
                 body[0].set("v.body", htmlBody);
@@ -345,7 +345,7 @@
         var isSupported = (_eventName in el);
         if (!isSupported) {
             el.setAttribute(_eventName, 'return;');
-            isSupported = typeof el[_eventName] == 'function';
+            isSupported = typeof el[_eventName] === 'function';
         }
         $A.util.removeElement(el);
         return (this.isEventSupported.cache[eventName] = isSupported);

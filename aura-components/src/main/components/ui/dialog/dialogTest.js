@@ -21,12 +21,12 @@
     		aura.test.assertTrue(aura.test.contains(cls,"mask hidden"), "isModal is set to true, but does not have the class associated with it");
         }
     },
-    
+
     testDialogIsModalFalse:{
         attributes : {description:'test', title:'this is a great title', isModal:'false'},
 	test: function(cmp){
-	        var obj = cmp.find("mask");  
+	        var obj = cmp.find("mask");
     		aura.test.assertTrue($A.util.isUndefinedOrNull(obj), "isModal is set to false, but contains the class as though it was set to true");
         }
     }
-})
+})// eslint-disable-line semi

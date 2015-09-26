@@ -37,7 +37,7 @@
         concreteHelper.updateErrorElement(component);
     },
 
-    rerender: function(component, helper) {
+    rerender: function(component) {
 
         // Allow override of helper methods.
         var concreteCmp = component.getConcreteComponent();

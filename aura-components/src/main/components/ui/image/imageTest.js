@@ -104,7 +104,7 @@
         failOnWarning: true,
         auraWarningsExpectedDuringInit: ["\"alt\" attribute should not be empty for informational image"],
         attributes: {imageType: 'informational'},
-        test: function (cmp) {
+        test: function () {
             // This is testing component "init" which is already tested above (auraWarningsExpectedDuringInit).
         }
     },
@@ -112,14 +112,14 @@
         failOnWarning: true,
         auraWarningsExpectedDuringInit: ["\"alt\" attribute should be empty for decorative image"],
         attributes: {imageType: 'decorative', alt: 'Company'},
-        test: function (cmp) {
+        test: function () {
             // This is testing component "init" which is already tested above (auraWarningsExpectedDuringInit).
         }
     },
 
     testDecorativeImageTypeWithoutAltText: {
         attributes: {imageType: 'decorative'},
-        test: function (cmp, action) {
+        test: function (cmp) {
             var imgElement = cmp.find("body").getElement().firstChild;
             $A.test.assertTrue($A.test.isInstanceOfImageElement(imgElement), "Expected to see a image element.");
         }
@@ -163,4 +163,4 @@
             $A.test.assertEquals("Help Accessibility", imgElement.alt, "Expected alt text for the image element.");
         }
     }
-})
+})// eslint-disable-line semi

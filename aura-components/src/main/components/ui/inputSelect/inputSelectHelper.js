@@ -73,7 +73,7 @@
             optionsPack = this.getOptionsWithStrategy(cmp),
             selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
 
-        if (optionsPack.options.length == 0) {
+        if (optionsPack.options.length === 0) {
             cmp._initOptionsFromValue = true;
             return;
         }
@@ -94,7 +94,7 @@
             newValues = [valueOrEmpty];
         }
 
-        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !(isMultiple && value == "")) {
+        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !(isMultiple && value === "")) {
             this.updateValueFromOptions(cmp, optionsPack);
         } else {
             cmp._suspendChangeHandlers = true;
@@ -169,7 +169,7 @@
                 if ($A.util.isUndefinedOrNull(val)) {
                 	continue;
                 }
-                var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] == val.toString();
+                var selectOption = (newValues.length > 1 && newValues.indexOf(val) > -1) || newValues[0] === val.toString();
 
                 found = found || selectOption;
                 option.selected = selectOption;
@@ -306,58 +306,58 @@
      */
     renderOptions: function(cmp, options) {
     	var fragment = document.createDocumentFragment();
-    	
+
     	for (var i = 0; i < options.length; ++i) {
     		var optionElement = document.createElement('option');
             fragment.appendChild(this.updateOptionElement(cmp, options[i], optionElement));
     	}
-    	
+
     	return fragment;
     },
-    
+
     updateOptionElement: function(cmp, option, optionElement) {
     	var internalText = this.getInternalText(option);
     	// Check/update label
     	//IE9,10,11 is complaining because we're reading "label" attribute before writing to it
     	var isIEBrowser = $A.get("$Browser").isIE11 || $A.get("$Browser").isIE10 || $A.get("$Browser").isIE9;
-    	if (isIEBrowser) { 
-    		optionElement.label = option.label || internalText; 
-    	}// End IE11 workaround 
-    	else if (optionElement.label != option.label || optionElement.label != internalText) {
+    	if (isIEBrowser) {
+    		optionElement.label = option.label || internalText;
+    	}// End IE11 workaround
+    	else if (optionElement.label !== option.label || optionElement.label !== internalText) {
     		optionElement.label = option.label || internalText;
     	}
-    	
+
     	// Check/update value
-    	if (optionElement.value != option.value) {
+    	if (optionElement.value !== option.value) {
     		optionElement.value = option.value;
     		if ($A.util.isUndefined(option.value)) {
     			$A.warning("Option with label '" + option.label + "' in select component " + cmp.getGlobalId() + " has an undefined value.");
     		}
     	}
-    	
+
     	// Check/update class
-    	if (optionElement.getAttribute("class") != option["class"]) {
+    	if (optionElement.getAttribute("class") !== option["class"]) {
     		optionElement.setAttribute("class", option["class"]);
     	}
-    	
+
     	// Check/update selected
-    	if (optionElement.selected != option.selected) {
+    	if (optionElement.selected !== option.selected) {
 	    	optionElement.selected = option.selected ? "selected" : undefined;
 	    }
-    	
+
     	// Check/update disabled
-    	if (optionElement.disabled != option.disabled) {
+    	if (optionElement.disabled !== option.disabled) {
 	    	optionElement.disabled = option.disabled ? "disabled" : undefined;
 	    }
-    	
+
     	// Check/update internalText
-    	if (optionElement.textContent != internalText) {
+    	if (optionElement.textContent !== internalText) {
     		$A.util.setText(optionElement, internalText);
     	}
-    	
+
     	return optionElement;
     },
-    
+
     getInternalText: function(option) {
     	return ($A.util.isEmpty(option.label) ? option.value : option.label) || '';
     }

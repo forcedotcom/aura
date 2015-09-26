@@ -17,26 +17,26 @@
 	handleDragStart: function (component, event, helper) {
 		helper.handleDragStart(component, event);
 	},
-	
+
 	handleDragEnd: function (component, event, helper) {
 		helper.handleDragEnd(component, event);
 	},
-	
+
 	handleKeyPress: function (component, event, helper) {
 		helper.handleKeyPress(component, event);
 	},
-	
+
 	handleDropComplete: function (component, event, helper) {
 		helper.handleDropComplete(component, event);
 	},
-	
-	setDropStatus: function (component, event, helper) {
+
+	setDropStatus: function (component, event) {
 		var params = event.getParam("arguments");
 		if (component.$dragOperation$) {
 			component.$dragOperation$.$dropOperationStatus$.setDropStatus(params.isSuccessful);
 		}
 	},
-	
+
 	fireDragEnd: function (component, event, helper) {
 		var params = event.getParam("arguments");
 		var target = $A.util.isUndefinedOrNull(params.target) ? component.getElement() : params.target;

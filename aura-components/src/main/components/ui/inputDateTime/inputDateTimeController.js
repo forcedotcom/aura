@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 ({
-	clearValue: function(component, event, helper) {
+	clearValue: function(component) {
 		component.set("v.value", "");
 	},
 
 	click: function(component, event, helper) {
         event.preventDefault();
         var concreteCmp = component.getConcreteComponent();
-        var _helper = concreteCmp.getDef().getHelper();
         helper.displayDatePicker(concreteCmp);
     },
 

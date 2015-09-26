@@ -24,37 +24,37 @@
                 cellCmp.addHandler("blur", component, "c.handleBlur");
             }
         }
-        
+
         // Set the first day of week
         helper.updateNameOfWeekDays(component);
     },
-    
+
     focus: function(component, event, helper) {
         helper.setFocus(component);
     },
-    
-    handleBlur: function(component, event, helper) {
+
+    handleBlur: function(component, event) {
         var source = event.getSource();
         if (source) {
-            source.set("v.ariaSelected", false);            
+            source.set("v.ariaSelected", false);
         }
     },
-    
+
     handleClick: function(component, event, helper) {
         helper.selectDate(component, event);
     },
-    
-    handleFocus: function(component, event, helper) {
+
+    handleFocus: function(component, event) {
         var source = event.getSource();
         if (source) {
-            source.set("v.ariaSelected", true);            
+            source.set("v.ariaSelected", true);
         }
     },
-    
+
     handleKeydown: function(component, event, helper) {
         helper.handleKeydown(component, event);
     },
-    
+
     updateCalendar: function(component, event, helper) {
         var date = component.get("v.date");
         if (!date) {

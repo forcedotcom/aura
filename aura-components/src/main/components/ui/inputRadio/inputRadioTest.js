@@ -32,7 +32,7 @@
     		aura.test.assertFalse(component.find("radio").getElement().disabled, "Element not correctly enabled");
     	}
     },
-    
+
     /**
      * Verify radio button is clickable
      */
@@ -45,4 +45,4 @@
     		aura.test.assertTrue(radioElement.checked, "Radio Element was not clickable");
     	}
     }
-})
+})// eslint-disable-line semi

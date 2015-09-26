@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 ({
-	render: function (cmp, hlp) {
+	render: function (cmp) {
 		var body = this.superRender();
 
-		// Append datePicker directly to the body. 
+		// Append datePicker directly to the body.
 		// This allows the absolute positions to be calculated appropriately.
 		document.body.appendChild(body[0]);
 

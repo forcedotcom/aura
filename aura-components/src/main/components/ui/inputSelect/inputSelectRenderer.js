@@ -16,23 +16,23 @@
 ({
 	afterRender: function(cmp, helper) {
 		var options = cmp.get("v.options");
-		
+
 		if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
 			var optionElements = helper.renderOptions(cmp, options);
-			
+
 			cmp.find("select").getElement().appendChild(optionElements);
 		}
 
 		this.superAfterRender();
 	},
-	
+
 	rerender: function(cmp, helper) {
 		var options = cmp.get("v.options");
-		
+
 		if (!$A.util.isEmpty(options) || $A.util.isEmpty(cmp.get("v.body"))) {
 			var select = cmp.find("select").getElement();
 			var optionElements = select.children;
-			
+
 			// Remove extra option elements
 			while (optionElements.length > options.length) {
 				select.removeChild(optionElements[options.length]);
@@ -47,13 +47,12 @@
 
 			// Create new option elements for the remaining options and add them to the DOM
 			if (index < options.length) {
-				var fragment = document.createDocumentFragment();
 				var newElements = helper.renderOptions(cmp, options.slice(index));
-				
+
 				cmp.find("select").getElement().appendChild(newElements);
 			}
 		}
-		
+
 		this.superRerender();
 	}
 })// eslint-disable-line semi

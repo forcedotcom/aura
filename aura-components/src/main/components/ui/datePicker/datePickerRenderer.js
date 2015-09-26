@@ -67,7 +67,7 @@
 
         var isAndroid = $A.get("$Browser.isAndroid");
 
-        if (isAndroid == true) {
+        if (isAndroid === true) {
             var f = function(e) {
                 helper.handleWinResize(component, e);
             };
@@ -79,11 +79,11 @@
         }
     },
 
-    unrender: function(component, helper) {
+    unrender: function(component) {
         if(component.positionConstraint) {
             component.positionConstraint.destroy();
             delete component.positionConstraint;
-        }  
-        this.superUnrender();  
+        }
+        this.superUnrender();
     }
 })// eslint-disable-line semi

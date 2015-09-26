@@ -17,33 +17,33 @@
     testDialogButtonsConfirm:{
         attributes : {defaultButtons:"confirm"},
 	test: function(cmp){
-	        var conf = cmp.find("confirmButton");  
+	        var conf = cmp.find("confirmButton");
     		$A.test.assertDefined(conf, "defaultButtons attribute is set to confirm, but does not acknowledge it by showing the confrimButton");
         }
     },
     testDialogButtonsCancel:{
 	attributes : {defaultButtons:"cancel"},
 	test: function(cmp){
-	        var can = cmp.find("cancelButton");  
+	        var can = cmp.find("cancelButton");
 	        $A.test.assertDefined(can, "defaultButtons attribute is set to cancel, but does not acknowledge it by showing the cancelButton");
         }
     },
     testDialogButtonsBoth:{
 	attributes : {defaultButtons:"both"},
 	test: function(cmp){
-	        var conf = cmp.find("confirmButton");    
-	        var can = cmp.find("cancelButton");  
+	        var conf = cmp.find("confirmButton");
+	        var can = cmp.find("cancelButton");
 	        $A.test.assertDefined(conf, "defaultButtons attribute is set to both, but does not show the confrimButton");
 	        $A.test.assertDefined(can, "defaultButtons attribute is set to both, but does not show the cancelButton");
         }
     },
     testDialogButtonsNone:{
 	test: function(cmp){
-	        var conf = cmp.find("confirmButton");    
-	        var can = cmp.find("cancelButton"); 
+	        var conf = cmp.find("confirmButton");
+	        var can = cmp.find("cancelButton");
     		aura.test.assertTrue($A.util.isUndefinedOrNull(conf), "defaultButtons attribute is set to None, but is showing confrimButton");
     		aura.test.assertTrue($A.util.isUndefinedOrNull(can), "defaultButtons attribute is set to None, but is showing cancelButton");
         }
     }
 
-})
+})// eslint-disable-line semi

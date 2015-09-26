@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+    afterRender: function(component) {
         return this.superAfterRender();
     },
 
@@ -27,7 +27,7 @@
                 shouldRender = true;
             }
         });
-        
+
         if (shouldRender) {
             helper.renderGrid(component);
             this.superRerender();

@@ -98,7 +98,7 @@
 		}
     },
 
-	isLibraryLoaded: function(cmp) {
+	isLibraryLoaded: function() {
 		return typeof CKEDITOR !== "undefined";
 	},
 
@@ -156,7 +156,7 @@
 		}
 	},
 
-	getLocale : function(cmp) {
+	getLocale : function() {
 		return $A.get("$Locale.langLocale");
 	},
 

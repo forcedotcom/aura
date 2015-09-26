@@ -60,7 +60,7 @@
 	    helper.goToPrevYear(component);
 	},
 
-	goToPrevMonth: function(component, event, helper) {
+	goToPrevMonth: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
         if (e) {
@@ -69,7 +69,7 @@
         }
     },
 
-    goToNextMonth: function(component, event, helper) {
+    goToNextMonth: function(component) {
         var grid = component.find("grid");
         var e = grid.get("e.updateCalendar");
         if (e) {
@@ -90,8 +90,8 @@
         var domEvent = event.getParam("domEvent");
         if (domEvent) {
             var keycode = domEvent.keyCode;
-            if (keycode == 9) {
-                if (domEvent.shiftKey == true) { // Tab + shift
+            if (keycode === 9) {
+                if (domEvent.shiftKey === true) { // Tab + shift
                     domEvent.preventDefault();
                     helper.focusDate(component);
                 } else { // Tab
@@ -116,7 +116,7 @@
         }
     },
 
-    handleTouchMove: function(component, event, helper) {
+    handleTouchMove: function(component, event) {
         event.preventDefault();
         event.stopPropagation();
         var touch;
@@ -135,7 +135,7 @@
         }
     },
 
-    handleTouchStart: function(component, event, helper) {
+    handleTouchStart: function(component, event) {
         var touch = event.changedTouches[0];
         // record the ID to ensure it's the same finger on a multi-touch device
         component._onTouchStartId = touch.identifier;

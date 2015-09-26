@@ -145,10 +145,10 @@
         var jsDate1 = this.getDateFromString(date1),
             jsDate2 = this.getDateFromString(date2);
 
-        if (jsDate1.getFullYear() != jsDate2.getFullYear()) {
+        if (jsDate1.getFullYear() !== jsDate2.getFullYear()) {
             return jsDate1.getFullYear() - jsDate2.getFullYear();
         } else {
-            if (jsDate1.getMonth() != jsDate2.getMonth()) {
+            if (jsDate1.getMonth() !== jsDate2.getMonth()) {
                 return jsDate1.getMonth() - jsDate2.getMonth();
             } else {
                 return jsDate1.getDate() - jsDate2.getDate();

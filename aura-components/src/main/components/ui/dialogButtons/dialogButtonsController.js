@@ -19,7 +19,7 @@
     /**
      * Validates the "defaultButtons" attribute.
      */
-    doInit : function(cmp, evt, hlp) {
+    doInit : function(cmp) {
 
         var choice = cmp.get("v.defaultButtons");
 

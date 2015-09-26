@@ -52,14 +52,14 @@
 		helper.handleOnCancel(cmp);
 	},
 
-	onMenuExpand: function(cmp, evt, helper) {
+	onMenuExpand: function(cmp) {
 		var action = cmp.get('v.onOpen');
         if (action) {
         	action.runDeprecated();
         }
 	},
 
-	onMenuCollapse: function(cmp, evt, helper) {
+	onMenuCollapse: function(cmp) {
 		var action = cmp.get('v.onCancel');
         if (action) {
         	action.runDeprecated();
@@ -84,8 +84,8 @@
 		}
 		helper.setVisible(cmp, visible);
 	},
-	
-	refresh: function(cmp, evt, helper) {
+
+	refresh: function(cmp) {
 		cmp._needUpdate = true;
 	},
 

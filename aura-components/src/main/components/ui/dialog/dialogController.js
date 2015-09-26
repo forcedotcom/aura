@@ -20,7 +20,7 @@
      * Validates the "ariaRole", "buttons", and "width" attributes. Also
      * associates the buttons with their parent dialog.
      */
-    doInit : function(cmp, evt, hlp) {
+    doInit : function(cmp) {
         var buttonFacet = cmp.get("v.buttons"),
             role        = cmp.get("v.ariaRole"),
             width       = cmp.get("v.width"),
@@ -61,7 +61,7 @@
      * the dialog. Fires the application-level event ui:closeDialog, setting the
      * 'confirmClicked' attribute to false.
      */
-    close : function(cmp, evt, hlp) {
+    close : function(cmp) {
 
         var closeEvent = $A.get("e.ui:closeDialog");
 

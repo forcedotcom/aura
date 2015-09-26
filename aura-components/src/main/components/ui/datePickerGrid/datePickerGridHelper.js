@@ -59,10 +59,10 @@
     },
 
     dateCompare: function(date1, date2) {
-        if (date1.getFullYear() != date2.getFullYear()) {
+        if (date1.getFullYear() !== date2.getFullYear()) {
             return date1.getFullYear() - date2.getFullYear();
         } else {
-            if (date1.getMonth() != date2.getMonth()) {
+            if (date1.getMonth() !== date2.getMonth()) {
                 return date1.getMonth() - date2.getMonth();
             } else {
                 return date1.getDate() - date2.getDate();
@@ -127,7 +127,7 @@
         // the 1st of the given month
         var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // In Java, week day is 1 - 7
         var startDay = d.getDay();
-        while (startDay != firstDayOfWeek) {
+        while (startDay !== firstDayOfWeek) {
             d.setDate(d.getDate() - 1);
             startDay = d.getDay();
         }
@@ -141,15 +141,15 @@
                 var tdClassName = "",
                     trClassName = "";
 
-                if (dayOfWeek == 0 || dayOfWeek == 6) {
+                if (dayOfWeek === 0 || dayOfWeek === 6) {
                     className = "weekend";
                 } else {
                     className = "weekday";
                 }
-                if (d.getMonth() == month - 1 || d.getFullYear() == year - 1) {
+                if (d.getMonth() === month - 1 || d.getFullYear() === year - 1) {
                     className += " prevMonth";
                     tdClassName = "disabled-text";
-                } else if (d.getMonth() == month + 1 || d.getFullYear() == year + 1) {
+                } else if (d.getMonth() === month + 1 || d.getFullYear() === year + 1) {
                     tdClassName = "disabled-text";
                     className += " nextMonth";
                 }
@@ -211,7 +211,7 @@
         return (window.event) ? e.srcElement : e.target;
     },
 
-    goToFirstOfMonth: function(component, localId) {
+    goToFirstOfMonth: function(component) {
         var date = new Date(component.get("v.year"), component.get("v.month"), 1);
         var targetId = date.getDay();
         var targetCellCmp = component.find(targetId);
@@ -219,7 +219,7 @@
         component.set("v.date", 1);
     },
 
-    goToLastOfMonth: function(component, localId) {
+    goToLastOfMonth: function(component) {
         var date = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
         var targetCellCmp = this.findDateComponent(component, date);
         if (targetCellCmp) {
@@ -234,7 +234,7 @@
         var cellCmp = component.find(localId);
         var date = new Date(currentYear, currentMonth, cellCmp.get("v.label"));
         var targetDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + deltaDays);
-        if (targetDate.getFullYear() != currentYear || targetDate.getMonth() != currentMonth) {
+        if (targetDate.getFullYear() !== currentYear || targetDate.getMonth() !== currentMonth) {
             component.set("v.year", targetDate.getFullYear());
             component.set("v.month", targetDate.getMonth());
             component.set("v.date", targetDate.getDate());
@@ -258,45 +258,44 @@
         var cellCmp = event.getSource();
         var keyCode = event.getParam("keyCode");
         var shiftKey = event.getParam("shiftKey");
-        var ctrlKey = event.getParam("ctrlKey");
         var domEvent = event.getParam("domEvent");
         var localId = cellCmp.getLocalId();
 
-        if (keyCode == 39) {  // right arrow key
+        if (keyCode === 39) {  // right arrow key
             domEvent.preventDefault();
             this.handleArrowKey(component, localId, 1);
-        } else if (keyCode == 37) { // left arrow key
+        } else if (keyCode === 37) { // left arrow key
             domEvent.preventDefault();
             this.handleArrowKey(component, localId, -1);
-        } else if (keyCode == 38) { // up arrow key
+        } else if (keyCode === 38) { // up arrow key
             domEvent.preventDefault();
             this.handleArrowKey(component, localId, -7);
-        } else if (keyCode == 40) { // down arrow key
+        } else if (keyCode === 40) { // down arrow key
             domEvent.preventDefault();
             this.handleArrowKey(component, localId, 7);
-        } else if (keyCode == 9 && shiftKey == true) { // Tab + shift
+        } else if (keyCode === 9 && shiftKey === true) { // Tab + shift
             //component.get("e.hide").fire();
-        } else if (keyCode == 9 && shiftKey != true) { // Tab
+        } else if (keyCode === 9 && shiftKey !== true) { // Tab
             if (!component.get("v.hasTime")) {
                 this.fireHideEvent(component);
             }
-        } else if (keyCode == 33 && shiftKey == true) { // Page Up + shift
+        } else if (keyCode === 33 && shiftKey === true) { // Page Up + shift
             this.changeCalendar(component, localId, 0, -1);
-        } else if (keyCode == 34 && shiftKey == true) { // Page Down + shift
+        } else if (keyCode === 34 && shiftKey === true) { // Page Down + shift
             this.changeCalendar(component, localId, 0, 1);
-        } else if (keyCode == 32) { // space bar
+        } else if (keyCode === 32) { // space bar
             this.handleSpaceBar(component, event);
-        } else if (keyCode == 36) { // Home key
+        } else if (keyCode === 36) { // Home key
             domEvent.stopPropagation();
             this.goToFirstOfMonth(component, localId);
-        } else if (keyCode == 35) { // End key
+        } else if (keyCode === 35) { // End key
             domEvent.stopPropagation();
             this.goToLastOfMonth(component, localId);
-        } else if (keyCode == 33 && shiftKey != true) { // Page Up
+        } else if (keyCode === 33 && shiftKey !== true) { // Page Up
             this.changeCalendar(component, localId, -1, 0);
-        } else if (keyCode == 34 && shiftKey != true) { // Page Down
+        } else if (keyCode === 34 && shiftKey !== true) { // Page Down
             this.changeCalendar(component, localId, 1, 0            );
-        } else if (keyCode == 27) { // ESC
+        } else if (keyCode === 27) { // ESC
             domEvent.stopPropagation();
             this.fireHideEvent(component);
         }
@@ -387,7 +386,7 @@
 
 
         // remove the row class only before styling the first day of that week
-        if (dayOfWeek == 0) {
+        if (dayOfWeek === 0) {
             $A.util.removeClass(tdNode.parentElement, "has-multi-row-selection");
         }
     },

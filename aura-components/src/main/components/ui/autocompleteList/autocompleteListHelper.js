@@ -18,7 +18,7 @@
      * Find out the current highlighted option.
      * @return the index of the highlighted component; -1 if no opton is highlighted now.
      */
-    findHighlightedOptionIndex: function(iters) {
+    findHighlightedOptionIndex: function (iters) {
         for (var i = 0; i < iters.length; i++) {
             var optionCmp = iters[i];
             if (optionCmp.get("v.visible") === true && optionCmp.get("v.highlighted") === true) {
@@ -31,7 +31,7 @@
     /**
      * Notify that the matching is done.
      */
-    fireMatchDoneEvent: function(component, items) {
+    fireMatchDoneEvent: function (component, items) {
         var size = 0;
         for (var i = 0; i < items.length; i++) {
             if (items[i].visible === true) {
@@ -47,7 +47,7 @@
         }
     },
 
-    getEventSourceOptionComponent: function(component, event) {
+    getEventSourceOptionComponent: function (component, event) {
         //option could be a compound component so look for the right option
         var element = event.target || event.srcElement;
         var targetCmp;
@@ -62,34 +62,11 @@
         return targetCmp;
     },
 
-    getNextVisibleOption: function(iters, k) {
-        var next = -1;
-        var start = k >= iters.length - 1 ? 0 : k + 1;
-        for (var i = start; i < iters.length; i++) {
-            var optionCmp = iters[i];
-            if (optionCmp.get("v.visible") === true) {
-                next = i;
-                break;
-            }
-        }
-        
-        if (next < 0) { // If no visible is found below the current highlighted,  let's start from top.
-            for (var j = 0; j < k; j++) {
-                var optCmp = iters[j];
-                if (optCmp.get("v.visible") === true) {
-                    next = j;
-                    break;
-                }
-            }
-        }
-        return next;
-    },
-
-    getOnClickEndFunction : function(component) {
+    getOnClickEndFunction: function (component) {
         if ($A.util.isUndefined(component._onClickEndFunc)) {
             var helper = this;
             var i;
-            var f = function(event) {
+            var f = function (event) {
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var clickEndEvent;
 
@@ -150,7 +127,7 @@
         return component._onClickEndFunc;
     },
 
-    getOnClickEventProp: function(prop) {
+    getOnClickEventProp: function (prop) {
         // create the cache
         if ($A.util.isUndefined(this.getOnClickEventProp.cache)) {
             this.getOnClickEventProp.cache = {};
@@ -174,10 +151,10 @@
         return this.getOnClickEventProp.cache[prop];
     },
 
-    getOnClickStartFunction: function(component) {
+    getOnClickStartFunction: function (component) {
         if ($A.util.isUndefined(component._onClickStartFunc)) {
             var helper = this;
-            var f = function(event) {
+            var f = function (event) {
                 if (helper.getOnClickEventProp("isTouchDevice")) {
                     var touch = event.changedTouches[0];
                     // record the ID to ensure it's the same finger on a multi-touch device
@@ -194,44 +171,22 @@
         return component._onClickStartFunc;
     },
 
-    getPrevVisibleOption: function(iters, k) {
-        var prev = iters.length;
-        var start = k <= 0 ? iters.length - 1 : k - 1;
-        for (var i = start; i >= 0; i--) {
-            var optionCmp = iters[i];
-            if (optionCmp.get("v.visible") === true) {
-                prev = i;
-                break;
-            }
-        }
-        if (prev >= iters.length) { // If no visible is found above the current highlighted,  let's start from bottom.
-            for (var j = iters.length - 1; j > k; j--) {
-                var optCmp = iters[j];
-                if (optCmp.get("v.visible") === true) {
-                    prev = j;
-                    break;
-                }
-            }
-        }
-        return prev;
-    },
-
-    handleDataChange: function(component, event) {
+    handleDataChange: function (component, event) {
         var concreteCmp = component.getConcreteComponent();
 
         // Refactor this component:
         // We want to update the internal v.items, but without udating iteration just yet
         // since customer might have thir own matchText function
-        concreteCmp.set("v.items", event.getParam("data"), true/*ignore changes, dont notify*/); 
+        concreteCmp.set("v.items", event.getParam("data"), true/*ignore changes, dont notify*/);
 
         this.matchText(concreteCmp, event.getParam("data"));
     },
 
-    handleEsckeydown: function(component) {
+    handleEsckeydown: function (component) {
         component.set("v.visible", false);
     },
 
-    handleKeydown: function(component, event) {
+    handleKeydown: function (component, event) {
         var keyCode = event.keyCode;
         if (keyCode === 39 || keyCode === 40) {  // right or down arrow key
             event.preventDefault();
@@ -247,26 +202,171 @@
         }
     },
 
-    handleListHighlight: function(component, event) {
+    handleListHighlight: function (component, event) {
         var activeIndex = -1;
-        var iterCmp = component.find("iter");
-        if (iterCmp) {
-            var iters = iterCmp.get("v.body");
-            var highlightedIndex = this.findHighlightedOptionIndex(iters);
-            var index = event.getParam("activeIndex");
-            if (index < 0) { // highlight previous visible option
-                activeIndex = highlightedIndex < 0 ? this.getPrevVisibleOption(iters, iters.length)
-                                                   : this.getPrevVisibleOption(iters, highlightedIndex);
+        var selectedSection = this.createKeyboardTraversalList(component);
+        if (selectedSection) {
+            var direction = event.getParam("activeIndex");
+            selectedSection.deselect();
+            if (direction < 0) { // highlight previous visible option
+                selectedSection = selectedSection.decrement();
             } else { // highlight next visible option
-                activeIndex = highlightedIndex < 0 ? this.getNextVisibleOption(iters, -1)
-                                                   : this.getNextVisibleOption(iters, highlightedIndex);
+                selectedSection = selectedSection.increment();
             }
-            if (activeIndex >= 0 && activeIndex < iters.length && activeIndex !== highlightedIndex) {
-                if (highlightedIndex >= 0) {
-                    iters[highlightedIndex].set("v.highlighted", false);
+            selectedSection.select(component);
+        }
+    },
+
+    /* create a keyboard traversal list to simplify the logic of handling up/down keystrokes on the list */
+    /* looks like this:  [header] <-> [items] <-> [footer] where header and footer are optional */
+    createKeyboardTraversalList: function (component) {
+        var selectedSection = null;
+        var topSection = null;
+        var bottomSection = null;
+        var self = this;
+
+        //create section for autocomplete list rows
+        var itemsSection = this._createKeyboardTraversalItemsSection(component);
+        var iterCmp = component.find("iter");
+        if (!iterCmp) {
+            return null;
+        }
+        itemsSection.iters = iterCmp.get("v.body");
+        itemsSection.originalIndex = itemsSection.highlightedIndex = this.findHighlightedOptionIndex(itemsSection.iters);
+        itemsSection.previous = itemsSection.next = topSection = bottomSection = itemsSection;
+        if (itemsSection.highlightedIndex > -1) {
+            selectedSection = itemsSection;
+        }
+
+        //create section for autocomplete header
+        var header = this.getHeader(component);
+        if (header && component.get("v.showListHeader")) {
+            var headerSection = this._createBasicKeyboardTraversalSection();
+            headerSection.deselect = function () {
+                component.set("v.headerSelected", false);
+                $A.util.removeClass(header, "highlighted");
+            };
+            headerSection.select = function () {
+                component.set("v.headerSelected", true);
+                $A.util.addClass(header, "highlighted");
+                self.updateAriaAttributesFromIdAttribute(component, header);
+            };
+            headerSection.next = headerSection.previous = itemsSection;
+            topSection = itemsSection.next = itemsSection.previous = headerSection;
+            if (!selectedSection && component.get("v.headerSelected")) {
+                selectedSection = headerSection;
+            }
+        }
+
+        //create section for autocomplete footer
+        var footer = this.getFooter(component);
+        if (footer && component.get("v.showListFooter")) {
+            var footerSection = this._createBasicKeyboardTraversalSection();
+            footerSection.deselect = function () {
+                component.set("v.footerSelected", false);
+                $A.util.removeClass(footer, "highlighted");
+            };
+            footerSection.select = function () {
+                component.set("v.footerSelected", true);
+                $A.util.addClass(footer, "highlighted");
+                self.updateAriaAttributesFromIdAttribute(component, footer);
+            };
+            footerSection.next = topSection;
+            footerSection.previous = itemsSection;
+            bottomSection = itemsSection.next = topSection.previous = footerSection;
+            if (!selectedSection && component.get("v.footerSelected")) {
+                selectedSection = footerSection;
+            }
+        }
+
+        //create an empty section for when nothing is selected
+        if (!selectedSection) {
+            selectedSection = this._createBasicKeyboardTraversalSection();
+            selectedSection.previous = bottomSection;
+            selectedSection.next = topSection;
+        }
+        return selectedSection;
+    },
+
+    _createBasicKeyboardTraversalSection: function () {
+        return {
+            increment: function () {
+                return this.next.incrementedTo();
+            },
+            decrement: function () {
+                return this.previous.decrementedTo();
+            },
+            incrementedTo: function () {
+                return this;
+            },
+            decrementedTo: function () {
+                return this;
+            },
+            deselect: function () { /*do nothing*/
+            },
+            select: function () {  /*do nothing*/
+            }
+        };
+    },
+
+    _createKeyboardTraversalItemsSection: function (cmp) {
+        var self = this;
+        return {
+            increment: function () {
+                var resultSection = this;
+                this.highlightedIndex++;
+                if (this.originalIndex != this.highlightedIndex) { //avoid infinite looping
+                    if (this.highlightedIndex >= this.iters.length) {
+                        this.highlightedIndex = -1;
+                        resultSection = this.next.incrementedTo();
+                    } else if (!this.iters[this.highlightedIndex].get("v.visible")) {
+                        resultSection = this.incrementedTo();
+                    }
+                } else {
+                    resultSection = this.next.incrementedTo();
                 }
-                
-                var highlightedCmp = iters[activeIndex];
+                return resultSection;
+            },
+
+            decrement: function () {
+                var resultSection = this;
+                if (this.highlightedIndex == -1) {
+                    this.highlightedIndex = this.iters.length;
+                }
+                this.highlightedIndex--;
+                if (this.originalIndex != this.highlightedIndex) { //avoid infinite looping
+                    if (this.highlightedIndex < 0) {
+                        this.highlightedIndex = -1;
+                        resultSection = this.previous.decrementedTo();
+                    } else if (!this.iters[this.highlightedIndex].get("v.visible")) {
+                        resultSection = this.decrementedTo();
+                    }
+                } else {
+                    resultSection = this.previous.decrementedTo();
+                }
+                return resultSection;
+            },
+
+            incrementedTo: function () {
+                return this.increment();
+            },
+
+            decrementedTo: function () {
+                return this.decrement();
+            },
+
+            deselect: function () {
+                if (this.highlightedIndex != -1) {
+                    this.iters[this.highlightedIndex].set("v.highlighted", false);
+                }
+            },
+
+            select: function () {
+                if (this.highlightedIndex == -1) {
+                    $A.warning("Can't select item without index");
+                    return;
+                }
+                var highlightedCmp = this.iters[this.highlightedIndex];
                 highlightedCmp.set("v.highlighted", true);
                 var highlightedElement = highlightedCmp.getElement();
                 if (highlightedElement) {
@@ -276,12 +376,52 @@
                         highlightedElement.scrollIntoView(false);
                     }
                 }
-                this.updateAriaAttributes(component, highlightedCmp);
+                self.updateAriaAttributes(cmp, highlightedCmp);
             }
+
+        };
+    },
+
+    addHeaderAndFooterClassesAndAttributes: function (component) {
+        var header = this._getComponentByAttribute(component, "v.listHeader");
+        if (header && header.getElement()) {
+            $A.util.addClass(header, "lookup__header");
+            header.getElement().setAttribute("id", header.getGlobalId());
+            header.getElement().setAttribute("role", "option");
+        }
+        var footer = this._getComponentByAttribute(component, "v.listFooter");
+        if (footer && footer.getElement()) {
+            $A.util.addClass(footer, "lookup__footer");
+            footer.getElement().setAttribute("id", footer.getGlobalId());
+            footer.getElement().setAttribute("role", "option");
         }
     },
 
-    handlePressOnHighlighted: function(component) {
+    getHeader: function (component) {
+        return this._getComponentByAttribute(component, "v.listHeader");
+    },
+
+    getFooter: function (component) {
+        return this._getComponentByAttribute(component, "v.listFooter");
+    },
+
+    _getComponentElementByAttribute: function (component, attribute) {
+        return this._getComponentByAttribute(component, attribute).getElement();
+    },
+
+    _getComponentByAttribute: function (component, attribute) {
+        var resultCmp = component.get(attribute);
+        if ($A.util.isEmpty(resultCmp)) {
+            return false;
+        }
+        if ($A.util.isArray(resultCmp)) {
+            resultCmp = resultCmp[0];
+        }
+        return resultCmp;
+    },
+
+
+    handlePressOnHighlighted: function (component) {
         var iterCmp = component.find("iter");
         if (iterCmp) {
             var iters = iterCmp.get("v.body");
@@ -297,11 +437,11 @@
         }
     },
 
-    handleTabkeydown: function(component) {
+    handleTabkeydown: function (component) {
         component.set("v.visible", false);
     },
-    
-    hasVisibleOption : function(items) {
+
+    hasVisibleOption: function (items) {
         var hasVisibleOption = false;
         for (var i = 0; i < items.length; i++) {
             if (items[i].visible === true) {
@@ -309,7 +449,7 @@
                 break;
             }
         }
-        
+
         return hasVisibleOption;
     },
 
@@ -318,15 +458,15 @@
      * @param {Object} obj
      * @returns {Boolean} True if the object is an HTMLElement object, or false otherwise.
      */
-    isHTMLElement: function(obj) {
+    isHTMLElement: function (obj) {
         if (typeof HTMLElement === "object") {
             return obj instanceof HTMLElement;
         } else {
-            return typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName==="string";
+            return typeof obj === "object" && obj.nodeType === 1 && typeof obj.nodeName === "string";
         }
     },
 
-    matchFunc: function(component, items) {
+    matchFunc: function (component, items) {
         items = items || component.get('v.items');
         var keyword = component.get("v.keyword");
         var propertyToMatch = component.get("v.propertyToMatch");
@@ -351,7 +491,7 @@
         }
     },
 
-    matchFuncDone: function(component, items) {
+    matchFuncDone: function (component, items) {
         items = items || component.get('v.items');
         this.fireMatchDoneEvent(component, items);
         this.toggleListVisibility(component, items);
@@ -360,18 +500,18 @@
         // Finally we update the v.items so iteration can 
         // create the final items here.
         component.set("v.items", items);
-        
+
         //this.updateEmptyListContent(component);
         //JBUCH: HALO: HACK: WTF: FIXME THIS WHOLE COMPONENT
-        var itemCmps=component.find("iter").get("v.body");
-        for(var i=0;i<itemCmps.length;i++){
-            $A.util.toggleClass(itemCmps[i],"force");
+        var itemCmps = component.find("iter").get("v.body");
+        for (var i = 0; i < itemCmps.length; i++) {
+            $A.util.toggleClass(itemCmps[i], "force");
         }
 
 
     },
 
-    matchText: function(component, items) {
+    matchText: function (component, items) {
         var action = component.get("v.matchFunc");
         if (action) {
             action.setCallback(this, function() {
@@ -391,20 +531,32 @@
         }
     },
 
-    toggleListVisibility: function(component, items) {
-        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) &&
-                !$A.util.isEmpty(component.get("v.keyword")); 
+    toggleListVisibility: function (component, items) {
+        var showEmptyListContent = !$A.util.isEmpty(component.get("v.emptyListContent")) && !$A.util.isEmpty(component.get("v.keyword"));
 
         var hasVisibleOption = this.hasVisibleOption(items);
-        
+
         // Should no longer be necessary, as the class attribute is now adds "visible" if v.visible is true.
         //var list = component.find("list");
         //$A.util.toggleClass(list, "visible", hasVisibleOption);
-        
+
         component.set("v.visible", hasVisibleOption || showEmptyListContent);
     },
 
-    updateAriaAttributes: function(component, highlightedCmp) {
+    updateAriaAttributesFromIdAttribute: function (component, highlightedCmp) {
+        var highlightedElement = highlightedCmp.getElement();
+        if (highlightedElement) {
+            var updateAriaEvt = component.get("e.updateAriaAttributes");
+            if (updateAriaEvt) {
+                updateAriaEvt.setParams({
+                    attrs: { "aria-activedescendant": highlightedElement.getAttribute("id") }
+                });
+                updateAriaEvt.fire();
+            }
+        }
+    },
+
+    updateAriaAttributes: function (component, highlightedCmp) {
         var updateAriaEvt = component.get("e.updateAriaAttributes");
         if (updateAriaEvt) {
             var obj = {
@@ -416,16 +568,16 @@
             updateAriaEvt.fire();
         }
     },
-    
+
     updateEmptyListContent: function (component) {
         var visible = component.getConcreteComponent().get("v.visible");
         var items = component.getConcreteComponent().get("v.items");
         var hasVisibleOption = this.hasVisibleOption(items);
-        
+
         $A.util.toggleClass(component, "showEmptyContent", visible && !hasVisibleOption);
     },
-    
-    showLoading:function (component, visible) {
+
+    showLoading: function (component, visible) {
         $A.util.toggleClass(component, "loading", visible);
 
         // Originally, no loading indicator was shown. Making it only appear when specified in the facet.

@@ -96,6 +96,10 @@
     padding:3px 9px;
 }
 
+.THIS--lookup .lookup__footer.highlighted, .THIS--lookup .lookup__header.highlighted {
+    background-color:#0683C5;
+}
+
 .THIS--lookup .lookup__item a.mouseovered {
     background-color: #A9D0F5;
 }

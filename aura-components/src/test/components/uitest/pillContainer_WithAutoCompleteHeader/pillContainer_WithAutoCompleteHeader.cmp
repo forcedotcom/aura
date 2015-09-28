@@ -4,7 +4,7 @@
     <ui:pillContainer aura:id="pillContainer">
         <aura:set attribute="pillInput">
             <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row">
-                <aura:set attribute="header">
+                <aura:set attribute="listHeader">
                     <ui:inputSelect aura:id="select" change="{!c.onSelectChange}">
                         <ui:inputSelectOption text="Even" label="Even"/>
                         <ui:inputSelectOption text="Odd"  label="Odd"/>

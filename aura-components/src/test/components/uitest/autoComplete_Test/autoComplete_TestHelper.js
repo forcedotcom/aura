@@ -26,19 +26,27 @@
     },
 
     handleSelectOption: function(cmp, event, autoCompleteCmpName) {
-    	var optionCmp = event.getParam("option");
-    	var accCmp = cmp.find(autoCompleteCmpName);
-        var input = accCmp.find("input");
-        var list = accCmp.find("list");
-        var value = "";
+        var label = cmp.find("autoCompleteSelectedEventResult");
+        if (event.getParam("isHeader")) {
+            label.set("v.value","header");
+        } else if (event.getParam("isFooter")) {
+            label.set("v.value","footer");
+        } else {
+            var optionCmp = event.getParam("option");
+            var accCmp = cmp.find(autoCompleteCmpName);
+            var input = accCmp.find("input");
+            var list = accCmp.find("list");
+            var value = "";
 
-        if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
-        	value = optionCmp.get("v.value");
-        } else if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
-        	value = optionCmp.get("v.label");
+            if (optionCmp.isInstanceOf("uitest:autoComplete_CustomTemplate")) {
+                value = optionCmp.get("v.value");
+            } else if (optionCmp.isInstanceOf("ui:autocompleteOption")) {
+                value = optionCmp.get("v.label");
+            }
+            input.set("v.value", value);
+            list.set("v.visible", false);
+            label.set("v.value",value);
         }
-        input.set("v.value", value);
-        list.set("v.visible", false);
     },
 
     handleMatchDone: function(cmp, event, autoCompleteCmpName) {

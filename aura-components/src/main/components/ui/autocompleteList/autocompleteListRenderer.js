@@ -18,6 +18,7 @@
         this.superAfterRender();
         helper.updateEmptyListContent(component);
         helper.setUpEvents(component);
+        helper.addHeaderAndFooterClassesAndAttributes(component);
     },
     rerender : function(component, helper){
         this.superRerender();

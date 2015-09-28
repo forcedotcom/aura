@@ -62,7 +62,6 @@
         if (!columnsDefs) {
             return;
         }
-
         var itemVar     = cmp.get('v.itemVar'),
             templates   = cmp._templates,
             ptv         = this._createPassthroughValue(cmp, itemVar);
@@ -173,6 +172,11 @@
         return htmlCmp.isInstanceOf("aura:html")&&htmlCmp.get("v.HTMLAttributes")["on"+eventType];
     },
     _eventDelegator: function (cmp, e) {
+
+        if(!cmp.isValid()) {
+            return;
+        }
+
          var type     = e.type,
             target    = e.target,
             child     = e.target,

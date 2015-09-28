@@ -66,7 +66,7 @@
         // verify background color is correct, based on severity attribute
         var cStyle = this.getComputedStyle(rootDiv);
         var backgroundColor = cStyle ? cStyle['background-color'] || cStyle['backgroundColor'] : null;
-        if (backgroundColor && backgroundColor.indexOf("#") == 0) {
+        if (backgroundColor && backgroundColor.indexOf("#") === 0) {
         	backgroundColor = this.hexToRGB(backgroundColor);
         }
         
@@ -153,4 +153,4 @@
 	
       	return window.getComputedStyle(element);      
      }
-})
+})// eslint-disable-line semi

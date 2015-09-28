@@ -157,4 +157,4 @@
             aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
         }
     }
-})
+})// eslint-disable-line semi

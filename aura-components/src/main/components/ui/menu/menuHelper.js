@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    handleRefresh: function(component, event) {
+    handleRefresh: function(component) {
         var menuList = this.getTargetComponent(component);
         if (menuList) {
             menuList.get("e.refresh").fire();

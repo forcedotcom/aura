@@ -312,7 +312,6 @@
         if (elem) {
             var origWinHeight = component._windowSize.height;
             var currWinHeight = $A.util.getWindowSize().height;
-            var elemRect = elem.getBoundingClientRect();
             if (currWinHeight < origWinHeight - 20) { // soft keyboard up
                 elem.style.top = currWinHeight - origWinHeight + "px";
             } else {
@@ -337,7 +336,7 @@
                 var scrollerElem = scrollerDivCmp ? scrollerDivCmp.getElement() : null;
                 if (scrollerElem) { // Set scroller div height to make it scrollable.
                     var isAndroid = $A.get("$Browser.isAndroid");
-                    if (isAndroid == true) {
+                    if (isAndroid === true) {
                         scrollerElem.style.height = component._windowSize.height + "px";
                     } else {
                         scrollerElem.style.height = $A.util.getWindowSize().height + "px";
@@ -345,11 +344,11 @@
                 }
 
             // Scoping this to desktop to prevent regressions
-            } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") == "DESKTOP") {
+            } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
 
                 var scrollableParent = this._getScrollableParent(elem);
                 var self = this;
-                this._handleScroll = function(e) {
+                this._handleScroll = function() {
                     self.lib.panelPositioning.reposition();
                 };
 

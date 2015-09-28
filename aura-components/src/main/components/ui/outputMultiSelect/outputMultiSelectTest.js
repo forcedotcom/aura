@@ -29,4 +29,4 @@
             aura.test.assertEquals('foo', $A.test.getText(component.find('span').getElement()), "Multiselect failed to display a single entry.");
         }
     }
-})
+})// eslint-disable-line semi

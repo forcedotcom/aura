@@ -24,23 +24,6 @@
             $A.test.assertUndefinedOrNull(cmp.find('body').getElement().getElementsByTagName("a")[0], 'By default there should be no link on the image.');
         }
     },
-    testGetImageElementWithoutAnchor: {
-        attributes: {src: '/auraFW/resources/aura/auralogo.png', imageType: 'decorative'},
-        test: function (cmp) {
-            this.checkImageMatches(cmp, '/auraFW/resources/aura/auralogo.png');
-        }
-    },
-
-    testGetImageElementWithAnchor: {
-        attributes: {
-            src: '/auraFW/resources/aura/auralogo.png',
-            href: 'http://www.salesforce.com',
-            imageType: 'decorative'
-        },
-        test: function (cmp) {
-            this.checkImageMatches(cmp, '/auraFW/resources/aura/auralogo.png');
-        }
-    },
     testImageOnly: {
         attributes: {src: '/auraFW/resources/aura/auralogo.png', imageType: 'decorative'},
         test: function (cmp) {

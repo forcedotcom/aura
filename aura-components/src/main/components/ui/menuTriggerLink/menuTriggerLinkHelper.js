@@ -43,7 +43,7 @@
         this.fireMenuTriggerPress(concreteCmp);
     },
 
-    fireMenuTriggerPress: function(component, index) {
+    fireMenuTriggerPress: function(component) {
         component.get("e.menuTriggerPress").fire();
     }
 

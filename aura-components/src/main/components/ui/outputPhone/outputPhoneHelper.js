@@ -21,8 +21,8 @@
 
         var value = cmp.get("v.value") || "";
 
-        var isCallable = $A.get("$Browser.formFactor") == 'PHONE' &&
-            !$A.util.isEmpty(value) && !value.match(/[a-zA-Z]/g) && value.indexOf("*") == -1 && value.indexOf("#") == -1;
+        var isCallable = $A.get("$Browser.formFactor") === 'PHONE' &&
+            !$A.util.isEmpty(value) && !value.match(/[a-zA-Z]/g) && value.indexOf("*") === -1 && value.indexOf("#") === -1;
 
         var phoneNumberNode = bodyElement;
 
@@ -54,7 +54,7 @@
             return rawPhoneNumber;
         }
 
-        if (rawPhoneNumber.length == 0 || rawPhoneNumber[0] == '+') {
+        if (rawPhoneNumber.length === 0 || rawPhoneNumber[0] === '+') {
             // don't format it
             return rawPhoneNumber;
         }
@@ -105,7 +105,7 @@
 
         // Assumes that a US/Canada phone number has exactly 10 digits without the +1 international prefix,
         // If the size does not match, no formatting is done on the string
-        if (count != 10 || formattedPhoneNumber.length > 40) {
+        if (count !== 10 || formattedPhoneNumber.length > 40) {
             // un-recognized, so don't format
             return rawPhoneNumber;
         } else {

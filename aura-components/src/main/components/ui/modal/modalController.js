@@ -63,5 +63,5 @@
         	helper.unsetOverflow(cmp);
         }
         helper.lib.panelLibCore.handleNotify(cmp, event, helper);
-    },
+    }
 })// eslint-disable-line semi

@@ -25,7 +25,7 @@
     lastPage:function (component, domEvent, helper) {
     	var currentPage = parseInt(component.get("v.currentPage"), 10);
     	var pageCount = parseInt(component.get("v.pageCount"), 10);
-    	if (currentPage == pageCount) {
+    	if (currentPage === pageCount) {
     		return;
     	}
         var targetPage = pageCount;
@@ -34,7 +34,7 @@
     nextPage:function (component, domEvent, helper) {
     	var currentPage = parseInt(component.get("v.currentPage"), 10);
     	var pageCount = parseInt(component.get("v.pageCount"), 10);
-    	if (currentPage == pageCount) {
+    	if (currentPage === pageCount) {
     		return;
     	}
         var targetPage = Math.min(currentPage+1, pageCount);

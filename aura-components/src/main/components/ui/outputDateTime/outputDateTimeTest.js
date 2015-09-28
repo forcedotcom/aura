@@ -150,10 +150,10 @@
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		var timezone = $A.get("$Locale.timezone");
-        		if(timezone  == "GMT"){
+        		if(timezone === "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
-	        	else if(timezone  == "America/Los_Angeles"){
+	        	else if(timezone === "America/Los_Angeles"){
 	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else{// For any other time zone we just make sure it has some value
@@ -192,10 +192,10 @@
         test: function(component){
         	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		var timezone = $A.get("$Locale.timezone");
-        		if(timezone  == "GMT"){
+        		if(timezone === "GMT"){
 	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
-	        	else if(timezone  == "America/Los_Angeles"){
+	        	else if(timezone == "America/Los_Angeles"){
 	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else{// For any other time zone we just make sure it has some value
@@ -217,4 +217,4 @@
       }
     }
 
-})
+})// eslint-disable-line semi

@@ -84,7 +84,7 @@
             }
 
             if (label) {
-                label.set("v.labelDisplay", labelPositionAttribute != "hidden");
+                label.set("v.labelDisplay", labelPositionAttribute !== "hidden");
                 if (labelPositionAttribute === 'left' || labelPositionAttribute === 'top') {
                     htmlBody.unshift(label);
                 } else if (labelPositionAttribute === 'right' || labelPositionAttribute === 'bottom') {

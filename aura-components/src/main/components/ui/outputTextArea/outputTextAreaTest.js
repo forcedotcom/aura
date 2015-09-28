@@ -38,4 +38,4 @@
             aura.test.assertEquals('', $A.test.getText(span.getElement()));
         }
     }
-})
+})// eslint-disable-line semi

@@ -23,5 +23,4 @@
         helper.validate(component);
         return this.superRerender();
     }
- // eslint-disable-line semi
- })
+ })// eslint-disable-line semi

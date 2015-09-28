@@ -143,6 +143,5 @@
 		var dropzone = event.getParam("selectedItem").get("v.value");
 		this.fireDrop([dropzone], component.get("v.draggables"));
 		this.$isDropPerformed$ = true;
-	}    
-// eslint-disable-line semi
-})
+	}
+})// eslint-disable-line semi

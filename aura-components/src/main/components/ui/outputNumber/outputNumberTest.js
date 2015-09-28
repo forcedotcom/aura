@@ -204,4 +204,4 @@
             aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     }
-})
+})// eslint-disable-line semi

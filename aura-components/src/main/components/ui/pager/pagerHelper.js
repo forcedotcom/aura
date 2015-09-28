@@ -40,7 +40,7 @@
 		}
 
 		var pageSize = parseInt(component.get("v.pageSize"), 10);
-		if (pageSize == targetPageSize) {
+		if (pageSize === targetPageSize) {
 			return false;
 		}
 
@@ -76,7 +76,7 @@
 		if (pageSize > 0) {
 			var pageCount = component.get("v.pageCount");
 			var newPageCount = Math.ceil(totalItems / pageSize);
-			if (!isNaN(newPageCount) && pageCount != newPageCount) {
+			if (!isNaN(newPageCount) && pageCount !== newPageCount) {
 				component.set("v.pageCount", newPageCount);
 			}
 		} else {

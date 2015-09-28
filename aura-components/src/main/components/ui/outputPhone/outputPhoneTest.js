@@ -36,7 +36,7 @@
     testLinkOnPhone: {
         attributes: {value: '+1 (415) 867-5309'},
         test: function (component) {
-            if ($A.get("$Browser.formFactor") == "PHONE") {
+            if ($A.get("$Browser.formFactor") === "PHONE") {
                 aura.test.assertEquals('tel:+1(415)867-5309', unescape(this.getAnchor(component).href), "Link not correct");
             }
         }
@@ -96,7 +96,7 @@
     testValueWithWhitespaces: {
         attributes: {value: '   555-1234   '},
         test: function (component) {
-            if ($A.get("$Browser.formFactor") == "PHONE") {
+            if ($A.get("$Browser.formFactor") === "PHONE") {
                 var body = component.getElement();
                 aura.test.assertTrue(aura.test.contains($A.test.getText(body), '555-1234'), "Visible phone number not correct");
                 aura.test.assertEquals('tel:555-1234', this.getAnchor(component).href, "Link not correct");
@@ -146,4 +146,4 @@
         return component.getElement().firstChild;
     }
 
-})
+})// eslint-disable-line semi

@@ -19,6 +19,6 @@
     	if (trigger) {
     		var action = trigger.get("c.focus");
     		action.runDeprecated();
-    	};
+    	}
     }
 })// eslint-disable-line semi

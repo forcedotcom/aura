@@ -95,4 +95,4 @@
             $A.test.assertEquals(null, component.getElement(), "unexpected elements");
         }
     }
-})
+})// eslint-disable-line semi

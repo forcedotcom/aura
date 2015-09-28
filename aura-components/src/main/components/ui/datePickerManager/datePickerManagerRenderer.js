@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	render: function (cmp) {
+	render: function () {
 		var body = this.superRender();
 
 		// Append datePicker directly to the body.

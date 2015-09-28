@@ -172,7 +172,7 @@
 			var dataTransfer = {};
 			
 			try {
-				var auraId = event.dataTransfer.getData("aura/id");
+				auraId = event.dataTransfer.getData("aura/id");
 				if (auraId) {
 					var dataTransferTypes = event.dataTransfer.types;
 					for (var i = 0; i < dataTransferTypes.length; i++) {
@@ -187,7 +187,7 @@
 				}
 			} catch (e) {
 				// This is IE case
-				var dataTransfer = JSON.parse(event.dataTransfer.getData("Text"));
+				dataTransfer = JSON.parse(event.dataTransfer.getData("Text"));
 				auraId = dataTransfer["aura/id"];
 				delete dataTransfer["aura/id"];
 			}
@@ -243,5 +243,4 @@
 		// reset onDragOver class
 		this.resetCssClass(component);
 	}
-// eslint-disable-line semi
-})
+})// eslint-disable-line semi

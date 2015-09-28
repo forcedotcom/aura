@@ -137,7 +137,7 @@
     	return component._keyboardEventHandler;
     },
 
-    handleEsckeydown: function(component, event) {
+    handleEsckeydown: function(component) {
         component.getConcreteComponent().get("e.doClose").fire();
         // put the focus back to menu trigger
         this.setFocusToTrigger(component);
@@ -204,7 +204,7 @@
     /**
      * Dismiss the menu when tab key is pressed.
      */
-    handleTabkeydown: function(component, event) {
+    handleTabkeydown: function(component) {
 		var closeOnTab = component.get('v.closeOnTabKey');
         var concreteComponent = component.getConcreteComponent();
         if (concreteComponent && closeOnTab) {
@@ -253,8 +253,8 @@
               var c = children[i];
               //TODO: should use boolean flag such as singleSelect or multiSelect instead of checking for ui:radioMenuItem
               if (c.isInstanceOf("ui:radioMenuItem") &&
-                  $A.util.getBooleanValue(c.get("v.selected")) &&
-                  c.getGlobalId() != selectedItem.getGlobalId()) {
+                      $A.util.getBooleanValue(c.get("v.selected")) &&
+                      c.getGlobalId() !== selectedItem.getGlobalId()) {
                   c.set("v.selected", false);
                   break;
               }

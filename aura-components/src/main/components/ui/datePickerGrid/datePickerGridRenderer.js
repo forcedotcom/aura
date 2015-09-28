@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component) {
+    afterRender: function() {
         return this.superAfterRender();
     },
 

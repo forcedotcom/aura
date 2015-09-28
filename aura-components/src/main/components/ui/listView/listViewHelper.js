@@ -15,19 +15,21 @@
  */
 ({
     addEvents : function(component, events) {
-        if (events != undefined) {
+        if (events !== undefined) {
             var dispatcher = component.getEventDispatcher();
             for ( var x in events) {
                 // TODO: AURA: HACK: Need a way to copy events properly.
-                if (events.hasOwnProperty(x))
+                if (events.hasOwnProperty(x)) {
                     dispatcher[x] = events[x];
+                }
             }
         }
     },
 
     buildColumns : function(component, templates, listHeader) {
-        if (!templates)
+        if (!templates) {
             templates = {};
+        }
         var allColumns = [];
         var attributes = null;
         var columns = null;
@@ -70,17 +72,20 @@
                 attributes.body = attributes.title;
                 // If no tooltip is specified for the column, use the text
                 // content of the title for the header tooltip
-                if (!skipMap.tooltip)
+                if (!skipMap.tooltip) {
                     attributes.tooltip = this.getTextContent(attributes.title);
+                }
                 else {
                     // If the tooltip is a delayed expression, use the text
                     // content of the title for the header tooltip
-                    if (this.getExpression(skipMap.tooltip))
+                    if (this.getExpression(skipMap.tooltip)) {
                         attributes.tooltip = this.getTextContent(attributes.title);
+                    }
                     // Otherwise, use the value that was specified for both
                     // headers and data cells
-                    else
+                    else {
                         attributes.tooltip = skipMap.tooltip;
+                    }
                 }
                 attributes.column = {
                     template : template
@@ -107,7 +112,7 @@
 
                 // Restore attributes for use in row fields and preserve
                 // unwrapped attributes on template
-                for ( var x in skipMap) {
+                for (var x in skipMap) {
                     attributes[x] = skipMap[x];
                 }
                 template.attributes = attributes;
@@ -136,8 +141,9 @@
         var templates = this.getColumnTemplates(component);
 
         // Or create them from the first row of data
-        if (!templates)
+        if (!templates) {
             templates = this.generateColumns(component);
+        }
 
         // Build THEAD component tree with only listViewColumnHeader types
         this.buildColumns(component, templates, component.find("listView:header"));
@@ -159,11 +165,10 @@
         var index = 0;
         var items = component.get("v.items");
         var itemCount = items ? items.length : 0;
-        var listId = component.get("v.id");
         var rows = [];
         var rowTooltip = component.get("v.rowTooltip");
 
-        if (itemCount == 0) {
+        if (itemCount === 0) {
             // Draw Empty Message
             buildEmptyMessage(this);
         } else {
@@ -206,23 +211,26 @@
             }
             for (var i = 0; i < blockSize && index < itemCount; i++, index++) {
                 item = items[index];
-                if (!item)
+                if (!item) {
                     continue;
+                }
                 rowClass = this.getRowClass(component, index);
                 var columns = [];
                 for (var c = 0; c < dataTemplateCount; c++) {
                     // We need to work with the concrete component to set all of
                     // the concrete attributes
                     var template = dataTemplates[c].getConcreteComponent();
-                    if (!template)
+                    if (!template) {
                         continue;
+                    }
 
                     // Take the unwrapped attributes we stored while building
                     // columns and modify them for row field
                     var attributes = template.attributes;
                     var tooltip = attributes.tooltip;
-                    if (attributes.title == template.title)
+                    if (attributes.title === template.title) {
                         delete attributes.title;
+                    }
                     delete attributes.id;
                     attributes.column = {
                         template : template
@@ -244,8 +252,9 @@
                     // Run all specified formatters on field and set the content
                     // and tooltip of the cell
                     var content = this.formatContent(template, item, attributes.fieldName, items, index, attributes.formatters);
-                    if (!attributes.tooltip && !rowTooltip)
+                    if (!attributes.tooltip && !rowTooltip) {
                         attributes.tooltip = this.getTextContent(content);
+                    }
                     attributes.body = content;
                     attributes.markup = content;
 
@@ -278,8 +287,9 @@
             }
 
             // If there are more rows, queue next chunk
-            if (index < itemCount)
+            if (index < itemCount) {
                 this.setImmediate(buildRowBlock);
+            }
 
             listBody.set("v.body", rows);
 
@@ -288,12 +298,13 @@
             // If the final item/block has been drawn, reset container height to
             // allow proper overflow and fire the items ready event
             if (index >= itemCount - 1) {
-                if (listBody.getElement())
+                if (listBody.getElement()) {
                     listBody.getElement().style.height = 'auto';
+                }
                 this.fireEvent(component, component, "onitemsready", "PopulatedList");
 
                 // DEBUG: Performance Marker
-                             }
+            }
         }
     },
 
@@ -348,14 +359,14 @@
     formatColumnName : function(columnName) {
         if (!columnName)
             return '';
-        if (columnName.length == 1)
+        if (columnName.length === 1)
             return columnName.toUpperCase();
         return columnName.charAt(0).toUpperCase() + columnName.substr(1).replace(/\B([A-Z])/g, " $1");
     },
 
     formatContent : function(columnTemplate, dataItem, fieldName, items, index, formatters) {
         var content = dataItem[fieldName];
-        if (content == null)
+        if (content === null)
             content = this.resolveObject(dataItem, fieldName);
         if (formatters) {
             // Loop over formatters in order, modifying the content each time
@@ -378,7 +389,7 @@
             for (var column in item) {
                 // Only generate columns for first level properties that are not
                 // methods
-                if (!item.hasOwnProperty(column) || typeof (item[column]) == "function")
+                if (!item.hasOwnProperty(column) || typeof (item[column]) === "function")
                     continue;
                 var template = this.generateComponent("ui:listViewColumn", {
                     fieldName : column,
@@ -396,7 +407,7 @@
     generateComponent : function(type, attributes, events) {
         var component = $A.componentService.newComponentDeprecated({
             componentDef : {
-                descriptor : (type.indexOf('://') == -1 ? "markup://" : '') + type
+                descriptor : (type.indexOf('://') === -1 ? "markup://" : '') + type
             },
             attributes : {
                 values : attributes
@@ -424,25 +435,32 @@
 
     getColumnTemplates : function(component, listId, columnTemplates, dataTemplates, colSpans, headers, depth, nextId) {
         // Create recursion pointer constructs for first level call
-        if (!columnTemplates)
+        if (!columnTemplates) {
             columnTemplates = [];
+        }
 
-        if (!colSpans)
+        if (!colSpans) {
             colSpans = [];
+        }
 
-        if (!dataTemplates)
+        if (!dataTemplates) {
             dataTemplates = [];
+        }
 
-        if (!depth)
+        if (!depth) {
             depth = 0;
+        }
 
-        if (!nextId)
+        if (!nextId) {
             nextId = 0;
+        }
 
-        if (!headers)
+        if (!headers) {
             headers = [];
-        else
+        }
+        else {
             component.set("v.headers", headers.join(' '));
+        }
 
         if (!listId) {
             var table = component.find("listView:table");
@@ -457,8 +475,9 @@
 
         if (listViewColumns.length > 0) {
             // Iterate over child templates at the current depth
-            if (!columnTemplates[depth])
+            if (!columnTemplates[depth]) {
                 columnTemplates[depth] = [];
+            }
             var childColumns = [];
             var currentHeaders = headers.length;
             for (var i = 0; i < listViewColumns.length; i++) {
@@ -526,8 +545,9 @@
             TD : 1
         });
         // prevent events from firing on the empty message
-        if ($A.util.hasClass(targets.column, "emptyMessage"))
+        if ($A.util.hasClass(targets.column, "emptyMessage")) {
             targets.column = null;
+        }
         targets.row = this.getTarget(targets.column, listViewElement, {
             TR : 1
         });
@@ -561,15 +581,16 @@
             TFOOT : "Foot",
             TABLE : "List"
         };
-        if (target && target.getElement)
+        if (target && target.getElement) {
             target = target.getElement();
+        }
         var type = target && target.tagName;
         type = typeMap[type] || type;
         return type;
     },
 
     getExpression : function(value) {
-        var isExpression = value && aura.util.isString(value) && value.indexOf("{"+"#") == 0 && value.lastIndexOf("}") == value.length - 1;
+        var isExpression = value && aura.util.isString(value) && value.indexOf("{"+"#") === 0 && value.lastIndexOf("}") === value.length - 1;
         if (isExpression) {
             return value.substring(2, value.length - 1);
         }
@@ -580,8 +601,9 @@
         var params = {};
         var paramDefs = component.getDef().getAttributeDefs();
         for ( var def in paramDefs) {
-            if (paramDefs.hasOwnProperty(def))
+            if (paramDefs.hasOwnProperty(def)) {
                 params[def] = component.getParam(def);
+            }
         }
         return params;
     },
@@ -589,13 +611,14 @@
     getRowClass : function(component, index) {
         var rowClass = component.get("v.rowClass") || '';
         var rowClassAlternate = component.get("v.alternateRowClass") || rowClass;
-        return (index % 2) == 1 ? rowClassAlternate : rowClass;
+        return (index % 2) === 1 ? rowClassAlternate : rowClass;
     },
 
     getTarget : function(target, limit, matches) {
         while (target && target != limit) {
-            if (matches[target.tagName])
+            if (matches[target.tagName]) {
                 return target;
+            }
             target = target.parentNode;
         }
         return null;
@@ -606,19 +629,23 @@
         // level components
         var text = '';
         if (facet) {
-            if ($A.util.isString(facet))
+            if ($A.util.isString(facet)) {
                 text = this.decodeHtml(facet);
+            }
             else {
                 var body = null;
-                if ($A.util.isArray(facet))
+                if ($A.util.isArray(facet)) {
                     body = facet;
-                else
+                }
+                else {
                     body = facet.get && facet.get("v.body");
+                }
                 if (body && body.length) {
                     for (var i = 0; i < body.length; i++) {
                         text += this.getTextContent(body[i]);
                     }
-                } else {
+                }
+                else {
                     text += this.decodeHtml(facet.get && facet.get("v.value") || facet || '');
                 }
             }
@@ -627,8 +654,9 @@
     },
 
     parseExpressions : function(component, attributes) {
-        if (!component || !attributes)
+        if (!component || !attributes) {
             return;
+        }
         for ( var field in attributes) {
             if (attributes.hasOwnProperty(field)) {
                 var value = attributes[field];
@@ -662,7 +690,7 @@
             qualifiedPaths = qualifiedPaths.split(",");
             for (var i = 0; i < qualifiedPaths.length; i++) {
                 target = this.resolveObject(window, qualifiedPaths[i]);
-                if (typeof (target) == "function") {
+                if (typeof (target) === "function") {
                     objects.push(target);
                 }
             }

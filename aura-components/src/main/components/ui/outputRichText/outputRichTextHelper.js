@@ -38,7 +38,7 @@
             if ($A.util.isIE && !attributes[i].specified) {
                 continue;
             }
-            if (attributes[i].nodeName.substring(0, 2) == "on") { // event handler
+            if (attributes[i].nodeName.substring(0, 2) === "on") { // event handler
                 attributes[i].nodeValue = null;
             }
         }
@@ -54,9 +54,9 @@
         var supportedAttrs = this.getSupportedAttributes(component);
         
         try {
-            var sanitizedValue = this.lib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs})
+            var sanitizedValue = this.lib.DOMPurify.sanitize(value, {ALLOWED_TAGS: supportedTags, ALLOWED_ATTR: supportedAttrs});
             
-            if (sanitizedValue != value) {
+            if (sanitizedValue !== value) {
                 component.set("v.value", sanitizedValue);
             }
         } catch (e) {
@@ -66,7 +66,7 @@
     },
     
     validateElement: function(element, supportedTags) {
-        if (element.nodeType == 3) { // text node
+        if (element.nodeType === 3) { // text node
             return;
         }
         if (element.tagName && supportedTags.indexOf(element.tagName.toLowerCase()) < 0) {
@@ -82,7 +82,7 @@
             for (var i = 0; i < len; i++) {
                 this.validateElement(nodes[i], supportedTags);
                 if (len > nodes.length) { // the current element is removed
-                    len = nodes.length
+                    len = nodes.length;
                     i--;
                 }
             }
@@ -108,5 +108,4 @@
     	return supportedAttrs ? supportedAttrs.replace(/ /g,'').toLowerCase().split(",")
     						  : this.SUPPORTED_ATTRS;
     }
- // eslint-disable-line semi 
-})
+})// eslint-disable-line semi

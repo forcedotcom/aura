@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    afterRender: function(component, helper) {
+    afterRender: function(component) {
         var ret = this.superAfterRender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
@@ -22,7 +22,7 @@
         return ret; 
     },
     
-    rerender: function(component, helper) {
+    rerender: function(component) {
         var ret = this.superRerender();
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();

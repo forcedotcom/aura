@@ -153,4 +153,4 @@
 			$A.test.assertEquals('<br>a<br>b<br>', tags, "Failed to convert \r\n\ and \n into <br>");
         }
     }
-})
+})// eslint-disable-line semi

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render: function outputNumberRender(cmp, helper) {
+    render: function outputNumberRender(cmp) {
         var span = this.superRender()[0];
         var f = cmp.get("v.format");
         var num = cmp.get("v.value");
@@ -55,7 +55,7 @@
         return span;
     },
 
-    rerender: function outputNumberRerenderer(cmp, helper) {
+    rerender: function outputNumberRerenderer(cmp) {
         if (cmp.isDirty("v.value") || cmp.isDirty("v.format") || cmp.isDirty("v.currencyCode") || cmp.isDirty("v.currencySymbol")) {
         	var formatted = '';
             var f = cmp.get("v.format");
@@ -96,5 +96,4 @@
             span.getElement().textContent = span.getElement().innerText = formatted;
         }
     }
- // eslint-disable-line semi
- })
+ })// eslint-disable-line semi

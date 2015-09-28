@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render: function outputPercentRender(cmp, helper) {
+    render: function outputPercentRender(cmp) {
         var span = this.superRender()[0];
         var f = cmp.get("v.format");
         var num = cmp.get("v.value");
@@ -43,7 +43,7 @@
         return span;
     },
 
-    rerender: function outputPercentRerenderer(cmp, helper) {
+    rerender: function outputPercentRerenderer(cmp) {
         var val = cmp.get("v.value");
         var f = cmp.get("v.format");
         var formatted = '';
@@ -71,5 +71,4 @@
         var span = cmp.find("span");
         span.getElement().textContent = span.getElement().innerText = formatted;
     }
- // eslint-disable-line semi
- })
+ })// eslint-disable-line semi

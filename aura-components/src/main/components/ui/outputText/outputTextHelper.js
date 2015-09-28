@@ -20,9 +20,9 @@
 			return;
 		}
 	
-		if (typeof textValue == 'number') {
+		if (typeof textValue === 'number') {
 			containerEl.appendChild(document.createTextNode(textValue));
-		} else	if (typeof textValue == 'string' && textValue.length > 0) {			
+		} else	if (typeof textValue === 'string' && textValue.length > 0) {			
 			textValue = textValue.replace(/(\r\n|\r|(\\r\\n)|\\r|\\n)/g, '\n');
 			//workaround for closure compiles "*" into unicode in some context;
 			var wildCard = '*';
@@ -31,7 +31,7 @@
 			
 			if (textValue === '\n') {
 				containerEl.appendChild(document.createElement('br'));
-			} else if (!parts || parts.length == 1) {
+			} else if (!parts || parts.length === 1) {
 				containerEl.appendChild(document.createTextNode(textValue));
 			} else {
 				var len = parts.length;
@@ -49,7 +49,7 @@
 	},
 	
 	removeChildren : function(element) {
-		if (element && element.nodeType == 1) {
+		if (element && element.nodeType === 1) {
 			var child = element.firstChild, nextChild;
 	
 			while (child) {

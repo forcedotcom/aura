@@ -56,5 +56,4 @@
             }
         });
     }
- // eslint-disable-line semi
-})
+})// eslint-disable-line semi

@@ -59,4 +59,4 @@
             aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
       }]
     }
-})
+})// eslint-disable-line semi

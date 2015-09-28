@@ -121,7 +121,7 @@
 	 * @param {Event} event - HTML DOM event
 	 * @return Map<String, String> the data transfer
 	 */
-	getDataTransfer: function(component, event) {
+	getDataTransfer: function(component) {
 		return component.get("v.dataTransfer");
 	},
 	
@@ -317,7 +317,7 @@
 			"setDropCompleteStatus": function(status) { this["dropComplete"] = status; },
 			"getDragEndStatus": function() { return this["dragEnd"]; },
 			"getDropStatus": function() { return this["dropSuccessful"]; },
-			"getDropCompleteStatus": function() { return this["dropComplete"]; },
+			"getDropCompleteStatus": function() { return this["dropComplete"]; }
 		};
 	},
 	
@@ -325,12 +325,11 @@
 	 * Make this component exiting drag operation.
 	 * @param {Aura.Component} component - this component
 	 */
-	exitDragOperation: function(component, isInAccessibilityMode) {
+	exitDragOperation: function(component) {
 		// reset onDrag class
 		this.resetCssClass(component);
 		
 		// Set aria-describe
 		component.set("v.ariaGrabbed", false);
 	}
-// eslint-disable-line semi
-})
+})// eslint-disable-line semi

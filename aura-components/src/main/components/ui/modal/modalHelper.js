@@ -83,7 +83,6 @@
             }
         };
 
-        var self = this;
         if(useTransition) {
             setTimeout(function() {
                 panel.style.opacity = 1;
@@ -204,7 +203,7 @@
         this.unsetOverflow(cmp);
     },
     
-    unsetOverflow: function(cmp) {
+    unsetOverflow: function() {
     	 // remove overflow changes only when it's the last modal that's opened
         var openedMasks = document.querySelectorAll('.uiModal .modal-glass.fadein');
         if(openedMasks.length === 1 && !$A.util.isUndefinedOrNull(this.global._originalOverflowStyle)) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component, helper) {
+    doInit: function(component) {
         // trimming whitespaces
         var value = component.get('v.value');
         component.set('v.value', $A.util.trim((value)));

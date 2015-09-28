@@ -36,7 +36,7 @@
             function TypeSetOnEventParams(component){
                 var expected = "columnType";
                 var helper = this.getHelper(component);
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.type; }, fire:function(){}};
                 });
                 var actual = null;
@@ -53,7 +53,7 @@
                 var helper = this.getHelper(component);
                 var data = {};
                 var domEvent = {};
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.source;}, fire:function(){}};
                 });
                 var actual = null;
@@ -70,7 +70,7 @@
                 var helper = this.getHelper(component);
                 var data = {};
                 var domEvent = expected;
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.event; }, fire:function(){}};
                 });
                 var actual = null;
@@ -87,7 +87,7 @@
                 var helper = expected;
                 var data = {};
                 var domEvent = { domEvent: true };
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.helper; }, fire:function(){}};
                 });
                 var actual = null;
@@ -103,7 +103,7 @@
                 var helper = this.getHelper(component);
                 var data = expected;
                 var domEvent = { domEvent: true };
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.data;}, fire:function(){}};
                 });
                 var actual = null;
@@ -116,7 +116,7 @@
             },
             function EventIsFired(component){
                 var helper = this.getHelper(component);
-                var mockWhile = this.getMock(component, "getEvent", function(eventName){
+                var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(){}, fire:function(){ actual = true; }};
                 });
                 var actual = null;
@@ -176,4 +176,4 @@
             }
         };
     }
-})
+})// eslint-disable-line semi

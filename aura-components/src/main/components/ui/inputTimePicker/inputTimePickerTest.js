@@ -96,4 +96,4 @@
         }
         return timevals;
     }
-})
+})// eslint-disable-line semi

@@ -74,7 +74,7 @@
 			}
 			var indx = 0;
 			for (var i=0; i<items.length; i++) {
-				if (typeof items[i].isSortable == 'undefined' || items[i].isSortable == true) {
+				if (typeof items[i].isSortable === 'undefined' || items[i].isSortable === true) {
 					fieldName = items[i].fieldName;
 					label = items[i].label;
 					
@@ -210,10 +210,9 @@
 		var ret = [];
 		if ($A.util.isString(sortBy)) {
 			sortBy = sortBy.split(',');
-			var fieldName;
 			for (var i=0; i<sortBy.length; i++) {
 				//fieldName starts with "-" prefix means descending
-	    		if (sortBy[i].indexOf(this.CONSTANTS.DESC_PREFIX) != -1) {
+	    		if (sortBy[i].indexOf(this.CONSTANTS.DESC_PREFIX) !== -1) {
 	    			var fn = sortBy[i].substring(1); 
 	    			ret.push({fieldName: fn, ascending: false});
 	    		} else {
@@ -247,7 +246,6 @@
 	updateSortOrder : function(cmp) {
 		var selectedItems = this.getSelectedMenuItems(cmp);
 		if (selectedItems && selectedItems.length > 0) {
-			var values = [];
 			for (var i=0; i<selectedItems.length; i++) {
 				cmp._sortOrderMap[selectedItems[i].fieldName].order = selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC;
 			}
@@ -283,7 +281,7 @@
 		if (selectedItems && selectedItems.length > 0) {
 			var item;
 			for (var i = 0; i < selectedItems.length; i++) {
-				if (typeof selectedItems[i].index != 'undefined') {
+				if (typeof selectedItems[i].index !== 'undefined') {
 					item = menuItems[selectedItems[i].index];
 					if (item) {
 						item.set('v.selected', true);
@@ -360,7 +358,7 @@
 	getOrientationChangeHandler : function(cmp) {
 		if (!cmp._orientationChange) {
 			var helper = this;		
-			cmp._orientationChange = function(event) {
+			cmp._orientationChange = function() {
 				helper.updateSize(cmp);
 			};
 		}
@@ -375,8 +373,7 @@
 			cmp._keydownHandler = function(event) {
 		        switch (event.keyCode) {
 		            case 9: // tab key, keep focus inside the dialog
-		            	var container = cmp.find('sorterContainer').getElement(),
-		    			currentFocus = document.activeElement,
+		    			var currentFocus = document.activeElement,
 		    			shiftPressed = event.shiftKey,
 		    			applyBtn = cmp.find('set').getElement();  	
 	                    if (currentFocus === applyBtn && !shiftPressed) {
@@ -406,7 +403,7 @@
 	    return false;
     },
     
-    unrender: function(cmp) {
+    unrender: function() {
     	var containerEl = document.getElementById(this.CONSTANTS.CONTAINER_ELEMENT_ID);
     	if (containerEl) {
     		$A.util.removeElement(containerEl);

@@ -182,8 +182,6 @@
 				toolbarLocation : toolbarLocation,
 				toolbarCanCollapse : false,
 				resize_enabled : false,
-				forcePasteAsPlainText : false,
-	    		forceSimpleAmpersand : true,
 	    		/*
 	    	     * Deactivate:
 	    	     * - The Element path component (RTE's "status bar")

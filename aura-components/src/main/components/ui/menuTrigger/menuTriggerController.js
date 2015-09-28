@@ -34,7 +34,7 @@
         }
     },
 
-    focus: function(component, event, helper) {
+    focus: function(component) {
         var concreteCmp = component.getConcreteComponent();
         //var concreteHelper = concreteCmp.helper || concreteCmp.getDef().getHelper();
         var concreteHelper = concreteCmp.helper;

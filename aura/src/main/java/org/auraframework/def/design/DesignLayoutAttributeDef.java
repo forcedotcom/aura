@@ -23,6 +23,6 @@ public interface DesignLayoutAttributeDef extends Definition {
      * @return The name of the item, may be null
      */
     @Override
-    public String getName();
+    String getName();
 
 }

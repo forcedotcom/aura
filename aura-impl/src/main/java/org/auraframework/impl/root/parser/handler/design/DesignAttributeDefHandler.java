@@ -17,6 +17,7 @@ package org.auraframework.impl.root.parser.handler.design;
 
 import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.impl.design.DesignAttributeDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
@@ -116,12 +117,20 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
-        error("Found unexpected tag %s", getTagName());
+        String tag = getTagName();
+        if (isInPrivilegedNamespace() && DesignAttributeDefaultDefHandler.TAG.equalsIgnoreCase(tag)) {
+            DesignAttributeDefaultDef def = new DesignAttributeDefaultDefHandler(getParentHandler(), xmlReader, source).getElement();
+            builder.setDefault(def);
+        } else {
+            error("Found unexpected tag %s", getTagName());
+        }
     }
 
     @Override
     protected void handleChildText() throws XMLStreamException, QuickFixException {
-        error("No literal text allowed in attribute design definition");
+        if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
+            error("No literal text allowed in attribute design definition");
+        }
     }
 
     @Override

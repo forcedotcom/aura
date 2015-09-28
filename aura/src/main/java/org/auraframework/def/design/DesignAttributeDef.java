@@ -23,21 +23,21 @@ public interface DesignAttributeDef extends Definition {
      * 
      * @return whether the attribute requires a value at design time.
      */
-    public boolean isRequired();
+    boolean isRequired();
 
     /**
      * Get the attribute design time read only flag
      * 
      * @return whether the attribute is read only at design time
      */
-    public boolean isReadOnly();
+    boolean isReadOnly();
 
     /**
      * Get the special type for this design attribute.
      * 
      * @return the special type, may be null
      */
-    public String getType();
+    String getType();
 
     /**
      * Get the name of the attribute this attribute has a dependency on. This is necessary for tracking relationships
@@ -45,7 +45,7 @@ public interface DesignAttributeDef extends Definition {
      * 
      * @return the name of the dependency, may be null
      */
-    public String getDependsOn();
+    String getDependsOn();
 
     /**
      * Get the attribute's datasource. This can include a comma separated list of values or class describing the data
@@ -53,28 +53,28 @@ public interface DesignAttributeDef extends Definition {
      * 
      * @return the attribute's datasource, may be null
      */
-    public String getDataSource();
+    String getDataSource();
 
     /**
      * Get the minimum value allowed for attributes.
      * 
      * @return the minimum value, may be null
      */
-    public String getMin();
+    String getMin();
 
     /**
      * Get the maximum value allowed for attributes.
      * 
      * @return the maximum value, may be null
      */
-    public String getMax();
+    String getMax();
 
     /**
      * Get the localized title of the attribute.
      * 
      * @return the localized title, may be null
      */
-    public String getLabel();
+    String getLabel();
 
     /**
      * Localized placeholder text for the attribute. This is the ghosted text in textfields and textareas before you
@@ -82,7 +82,7 @@ public interface DesignAttributeDef extends Definition {
      * 
      * @return the localized placeholder text, may be null
      */
-    public String getPlaceholderText();
+    String getPlaceholderText();
 
 
     /**
@@ -90,24 +90,32 @@ public interface DesignAttributeDef extends Definition {
      * Can be used to override the components attribute default
      * @return the default value, may be null
      */
-    public String getDefaultValue();
+    String getDefaultValue();
+
+
+    /**
+     * Returns a attribute default def if one is specified. This allows using component definitions as the default
+     * over string based defaults.
+     * @return null if no attribute default is present else a instance of DesignAttributeDefaultDef
+     */
+    DesignAttributeDefaultDef getAttributeDefault();
 
     /**
      * Returns the minimum api this attribute should show up in during design time.
      * @return the minimum api, may be null
      */
-    public String getMinApi();
+    String getMinApi();
 
     /**
      * Gets the maximum api this attribute should show up in during design time.
      * @return the maximum api, may be null
      */
-    public String getMaxApi();
+    String getMaxApi();
 
     /**
      * Whether this attribute can be translated externally.
      * @return whether this attribute is translatable
      */
-    public boolean isTranslatable();
+    boolean isTranslatable();
 
 }

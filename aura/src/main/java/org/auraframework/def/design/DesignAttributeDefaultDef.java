@@ -15,14 +15,16 @@
  */
 package org.auraframework.def.design;
 
+import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.Definition;
 
-import java.util.Set;
+import java.util.List;
 
-public interface DesignItemsDef extends Definition {
+public interface DesignAttributeDefaultDef extends Definition {
+
     /**
-     * Returns a set of sections, each section contains a set of items.
-     * @return a set of designItem
+     * Returns a list of valid component refs that are listed.
+     * @return A non null list. Empty is there are no components
      */
-    Set<DesignLayoutItemDef> getItems();
+    List<ComponentDefRef> getComponentRefs();
 }

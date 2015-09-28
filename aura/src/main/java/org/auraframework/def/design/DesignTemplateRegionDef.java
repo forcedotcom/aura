@@ -23,7 +23,7 @@ import java.util.Set;
 
 public interface DesignTemplateRegionDef extends Definition {
     @Override
-    public DefDescriptor<DesignTemplateRegionDef> getDescriptor();
+    DefDescriptor<DesignTemplateRegionDef> getDescriptor();
 
     /**
      * Get a set of allowed aura interfaces for the region. A component included within the region must implement at
@@ -31,5 +31,5 @@ public interface DesignTemplateRegionDef extends Definition {
      * 
      * @return set of allowed interface descriptors, may be empty.
      */
-    public Set<DefDescriptor<InterfaceDef>> getAllowedInterfaces();
+    Set<DefDescriptor<InterfaceDef>> getAllowedInterfaces();
 }

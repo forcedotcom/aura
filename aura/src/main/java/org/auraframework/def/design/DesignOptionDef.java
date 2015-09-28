@@ -22,17 +22,17 @@ public interface DesignOptionDef extends Definition {
      * Get the name of the option
      * @return a string, will not be null
      */
-    public String getKey();
+    String getKey();
 
     /**
      * Get the value of the option
      * @return a string value, can be null
      */
-    public String getValue();
+    String getValue();
 
     /**
      * Get the value of the access attribute
      * @return a string value, can be null
      */
-    public String getAccessString();
+    String getAccessString();
 }

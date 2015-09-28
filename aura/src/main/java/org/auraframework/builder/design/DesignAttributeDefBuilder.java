@@ -17,6 +17,7 @@ package org.auraframework.builder.design;
 
 import org.auraframework.builder.DefBuilder;
 import org.auraframework.def.design.DesignAttributeDef;
+import org.auraframework.def.design.DesignAttributeDefaultDef;
 
 public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef, DesignAttributeDef> {
     public DesignAttributeDefBuilder setName(String name);
@@ -40,6 +41,8 @@ public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef
     public DesignAttributeDefBuilder setPlaceholderText(String placeholder);
 
     public DesignAttributeDefBuilder setDefault(String defaultValue);
+
+    public DesignAttributeDefBuilder setDefault(DesignAttributeDefaultDef defaultValue);
 
     public DesignAttributeDefBuilder setMinApi(String minApi);
 

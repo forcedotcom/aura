@@ -15,11 +15,11 @@
  */
 package org.auraframework.def.design;
 
-import java.util.List;
-import java.util.Map;
-
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RootDefinition;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -36,7 +36,7 @@ public interface DesignDef extends RootDefinition {
      *
      * @return a map of attribute design definitions
      */
-    public Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> getAttributeDesignDefs();
+    Map<DefDescriptor<DesignAttributeDef>, DesignAttributeDef> getAttributeDesignDefs();
 
     /**
      * Retrieve an attribute design definition by name.
@@ -45,34 +45,34 @@ public interface DesignDef extends RootDefinition {
      *
      * @return the attribute design definition
      */
-    public DesignAttributeDef getAttributeDesignDef(String name);
+    DesignAttributeDef getAttributeDesignDef(String name);
 
 
     /**
      * Get a layout based on name, If no name was provided it will be an empty string
      * @return A layout with the given name, can be null if no layout exists
      */
-    public Map<String, DesignLayoutDef> getDesignLayoutDefs();
+    Map<String, DesignLayoutDef> getDesignLayoutDefs();
 
     /**
      * Returns the default template (with no name or name="")
      * @return the default design layout
      */
-    public DesignLayoutDef getDefaultDesignLayoutDef();
+    DesignLayoutDef getDefaultDesignLayoutDef();
 
     /**
      * Get the value of a option given its name
      * @param key the name of the option
      * @return a string of the value. Can be null if no value is provided or no option is defined with name
      */
-    public List<DesignOptionDef> getOption(String key);
+    List<DesignOptionDef> getOption(String key);
 
     /**
      * Get the simple label for this design definition. May be null.
      *
      * @return the label, may be null
      */
-    public String getLabel();
+    String getLabel();
 
     /**
      * Return the design template definition. The design template definition will describe which interfaces are allowed
@@ -80,5 +80,5 @@ public interface DesignDef extends RootDefinition {
      *
      * @return the design template definition, may be null
      */
-    public DesignTemplateDef getDesignTemplateDef();
+    DesignTemplateDef getDesignTemplateDef();
 }

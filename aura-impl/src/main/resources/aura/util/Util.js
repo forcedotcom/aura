@@ -835,30 +835,6 @@ Aura.Utils.Util.prototype.removeElement = function(element) {
 };
 
 /**
- * Decodes the URL by replacing the encoded text with the character that it represents.
- *
- * @param {String} url The URL string to be decoded.
- * @returns {Object} The decoded URL.
- * @export
- */
-Aura.Utils.Util.prototype.urlDecode = function(url){
-    var ret = {};
-    var pairs = url.split("&");
-    var position;
-    var pair;
-    for (var i = 0; i < pairs.length; i++) {
-        pair = pairs[i];
-        position = pair.indexOf("=");
-        if(position === -1) {
-            ret[pair] = undefined;
-        } else {
-            ret[pair.substring(0, position)] = decodeURIComponent(pair.substring(position+1));
-        }
-    }
-    return ret;
-};
-
-/**
  * Manipulate the properties of the querystring portion of a url.
  * @param {String} url Any url to manipulate, if it doesn't have a question mark in it. Any hash remains not affected.
  * @param {Object} params Map of key->value's to set in the url. Set key to null to remove it from the url.

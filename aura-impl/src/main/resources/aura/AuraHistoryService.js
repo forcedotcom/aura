@@ -29,7 +29,7 @@ function AuraHistoryService() {
 /**
  * Sets the new location. For example, <code>$A.services.history.set("search")</code> sets the location to <code>#search</code>.
  * Otherwise, use <code>$A.services.layout.changeLocation()</code> to override existing URL parameters.
- * 
+ *
  * Native Android browser doesn't completely support pushState so we force hash method for it
  * IOS7 UIWebView also has weirdness when using appcache and history so force onhashchange as well
  *
@@ -125,17 +125,17 @@ AuraHistoryService.prototype.replace = function(token) {
 
 /**
  * Parses the location. A token can be used here.
- * <p>Example:</p> 
+ * <p>Example:</p>
  * <code>token == "newLayout";<br /> $A.historyService.get().token;</code>
- * 
+ *
  * @memberOf AuraHistoryService
  * @public
  * @export
  */
 AuraHistoryService.prototype.get = function() {
-    // 
-    // Windows phone doesn't save the hash after navigating backwards. 
-    // So get it from the history state. 
+    //
+    // Windows phone doesn't save the hash after navigating backwards.
+    // So get it from the history state.
     //
     var token = this.getLocationHash() || (window.history["state"] && window.history["state"]["hash"]) || "";
     return this.parseLocation(token);
@@ -169,7 +169,7 @@ AuraHistoryService.prototype.back = function() {
 
 /**
  * Sets the title of the document.
- * 
+ *
  * @param {String} title The new title
  * @memberOf AuraHistoryService
  * @public
@@ -181,7 +181,7 @@ AuraHistoryService.prototype.setTitle = function(title) {
 
 /**
  * Loads the next URL in the history list. Standard JavaScript <code>history.go()</code> method.
- * 
+ *
  * @memberOf AuraHistoryService
  * @public
  * @export
@@ -333,13 +333,36 @@ AuraHistoryService.prototype.parseLocation = function(location) {
 
         var token = location.substring(0, position);
         var querystring = location.substring(position+1);
-        var decoded = $A.util.urlDecode(querystring);
+        var decoded = this.parseQueryString(querystring);
             decoded["token"] = token;
             decoded["querystring"] = querystring;
         return decoded;
     } else {
         return {"token" : location, "querystring": "" };
     }
+};
+
+
+/**
+ * Parses a query string into an object. It supports values in query string containing '='.
+ * @param {String} querystring the query string part of the URL, the portion after '?'.
+ * @private
+ */
+AuraHistoryService.prototype.parseQueryString = function(querystring) {
+    var ret = {};
+    var pairs = querystring.split("&");
+    var position;
+    var pair;
+    for (var i = 0; i < pairs.length; i++) {
+        pair = pairs[i];
+        position = pair.indexOf("=");
+        if(position === -1) {
+            ret[pair] = undefined;
+        } else {
+            ret[pair.substring(0, position)] = decodeURIComponent(pair.substring(position+1));
+        }
+    }
+    return ret;
 };
 
 /**
@@ -350,7 +373,7 @@ AuraHistoryService.prototype.parseLocation = function(location) {
 AuraHistoryService.prototype.getLocationHash = function() {
     var href = window.location["href"];
     var hashPosition = href.indexOf("#");
-    if(hashPosition === -1) { 
+    if(hashPosition === -1) {
         return "";
     }
 

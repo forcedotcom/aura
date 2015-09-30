@@ -3004,7 +3004,9 @@ System.EnvironmentStrategy.Rhino=function(){
 
     // IEnvironmentStrategy members
     this.Execute=function(command,parameters,voidOutput){
-        return runCommand.apply(Object.Global(),[command].concat(parameters))+'';
+        var options={output:''};
+        runCommand.apply(Object.Global(),[command].concat(parameters, options));
+        return options.output;
     };
 
     this.Exit=function(errorCode){

@@ -14,25 +14,43 @@
  * limitations under the License.
  */
 ({
-    testAttributeAccess:function(component, event, helper){
+    /**
+     * Get attribute from self and create a text component with it.
+     */
+    testAttributeAccess: function(component, event, helper){
         var attributeName="v."+component.get("v.testType");
         $A.createComponent("aura:text",{"value":component.get(attributeName)},function(label){
             component.find("local").set("v.body",label);
         });
     },
 
-    testRemoteAttributeAccess:function(component, event, helper){
+    /**
+     * Get attribute from a component in a different namespace and create a text component with it.
+     */
+    testRemoteAttributeAccess: function(component, event, helper){
         var attributeName="v."+component.get("v.testType");
         $A.createComponent("aura:text",{"value":component.find("remote").get(attributeName)},function(label){
             component.find("local").set("v.body",label);
         });
     },
 
-    testComponentAccess:function(component, event, helper){
-
+    testComponentAccess: function(component, event, helper){
+        var callback = function(newCmp) {
+            component.set("v.output", newCmp);
+            component.set("v.testDone", true);
+        };
+        $A.createComponent(component.get("v.testType"), {}, callback);
     },
 
-    testEventAccess:function(component, event, helper){
-
+    testEventAccess: function(component, event, helper){
+        var eventName = "e." + component.get("v.testType");
+        var event = component.get(eventName);
+        component.set("v.output", event);
+    },
+    
+    testRemoteEventAccess: function(component, event, helper){
+        var eventName = "e." + component.get("v.testType");
+        var event = component.find("remote").get(eventName);
+        component.set("v.output", event);
     }
 })

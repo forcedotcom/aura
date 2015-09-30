@@ -15,13 +15,11 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT"
-            extends="ui:command"
-            access="GLOBAL"
-            description="Test Global Event.">
+<aura:component access="GLOBAL" extensible="true">
+    <aura:attribute name="attr" type="String" default="PRIVATE" access="PRIVATE"/>
+    <aura:attribute name="attrDefault" type="String" default="default"/>
+    {!v.attr}
 
-    <aura:attribute name="Private" type="String" access="PRIVATE" default="PRIVATE"/>
-    <aura:attribute name="Public" type="String" access="PUBLIC" default="PUBLIC"/>
-    <aura:attribute name="Internal" type="String" access="INTERNAL" default="INTERNAL"/>
-    <aura:attribute name="Global" type="String" access="GLOBAL" default="GLOBAL"/>
-</aura:event>
+    <br/>
+    {!v.body}
+</aura:component>

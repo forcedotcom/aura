@@ -15,36 +15,32 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" description="An abstract component that provides a basic layout for the ui:list component.">
-    <aura:attribute name="testType" type="String"/>
+<aura:component access="GLOBAL">
+    <aura:attribute name="testType" type="String" description="A generic string holder used by the controller to find components, attributes, and events to test access checks"/>
+    <aura:attribute name="output" type="Object" />
+    <aura:attribute name="testDone" type="Boolean" default="false" />
 
     <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
-    <aura:attribute name="Public" type="String" access="PUBLIC" description="private" default="PUBLIC"/>
-    <aura:attribute name="Internal" type="String" access="INTERNAL" description="private" default="INTERNAL"/>
-    <aura:attribute name="Global" type="String" access="GLOBAL" description="private" default="GLOBAL"/>
+    <aura:attribute name="Public" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
+    <aura:attribute name="Internal" type="String" access="INTERNAL" description="internal" default="INTERNAL"/>
+    <aura:attribute name="Global" type="String" access="GLOBAL" description="global" default="GLOBAL"/>
 
-    <aura:registerEvent name="globalGlobalEvent" type="auraTest:accessGlobalEvent" access="GLOBAL"/>
-    <aura:registerEvent name="internalGlobalEvent" type="auraTest:accessGlobalEvent" access="INTERNAL"/>
-    <aura:registerEvent name="privateGlobalEvent" type="auraTest:accessGlobalEvent" access="PRIVATE"/>
+    <aura:registerEvent name="globalEvent" type="auratest:accessGlobalEvent"/>
+    <aura:registerEvent name="publicEvent" type="auratest:accessPublicEvent"/>
+    <aura:registerEvent name="internalEvent" type="auratest:accessInternalEvent"/>
+    <aura:registerEvent name="privateEvent" type="auratest:accessPrivateEvent"/>
 
-    <aura:registerEvent name="globalInternalEvent" type="auraTest:accessInternalEvent" access="GLOBAL"/>
-    <aura:registerEvent name="internalInternalEvent" type="auraTest:accessInternalEvent" access="INTERNAL"/>
-    <aura:registerEvent name="privateInternalEvent" type="auraTest:accessInternalEvent" access="PRIVATE"/>
-
-    <aura:registerEvent name="globalPrivateEvent" type="auraTest:accessPrivateEvent" access="GLOBAL"/>
-    <aura:registerEvent name="internalPrivateEvent" type="auraTest:accessPrivateEvent" access="INTERNAL"/>
-    <aura:registerEvent name="privatePrivateEvent" type="auraTest:accessPrivateEvent" access="PRIVATE"/>
-
-    <div aura:id="local">
+    <div aura:id="local" class="outputDiv">
         {!v.Private}<br/>
         {!v.Public}<br/>
         {!v.Internal}<br/>
         {!v.Global}<br/>
     </div>
-    <test:accessAttributes aura:id="remote"/>
+    <componentTest:accessAttributes aura:id="remote"/>
 
-    <ui:button aura:id="testAttributes" label="testAttributeAccess" press="{!c.testAttributeAccess}"></ui:button>
-    <ui:button aura:id="testRemoteAttributes" label="testAttributeAccess" press="{!c.testRemoteAttributeAccess}"></ui:button>
-    <ui:button aura:id="testEvent" label="testEventAccess" press="{!c.testEventAccess}"></ui:button>
-    <ui:button aura:id="testComponent" label="testComponentAccess" press="{!c.testComponentAccess}"></ui:button>
+    <ui:button aura:id="testAttributes" label="testAttributeAccess" press="{!c.testAttributeAccess}"/>
+    <ui:button aura:id="testRemoteAttributes" label="testRemoteAttributeAccess" press="{!c.testRemoteAttributeAccess}"/>
+    <ui:button aura:id="testEvent" label="testEventAccess" press="{!c.testEventAccess}"/>
+    <ui:button aura:id="testRemoteEvent" label="testRemoteEventAccess" press="{!c.testRemoteEventAccess}"/>
+    <ui:button aura:id="testComponent" label="testComponentAccess" press="{!c.testComponentAccess}"/>
 </aura:component>

@@ -39,4 +39,6 @@ public interface MockConfigAdapter extends ConfigAdapter, MockBean {
     void setValidateCSRFTokenException(RuntimeException exception);
 
     void setCSRFToken(String token);
+
+    void setUnprivilegedNamespace(String namespace);
 }

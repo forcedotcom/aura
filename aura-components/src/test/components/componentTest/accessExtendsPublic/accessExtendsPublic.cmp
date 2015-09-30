@@ -13,15 +13,8 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
+    <div>componentTest:accessExtendsPublic</div>
 -->
-<aura:event type="COMPONENT"
-            extends="ui:command"
-            access="GLOBAL"
-            description="Test Global Event.">
-
-    <aura:attribute name="Private" type="String" access="PRIVATE" default="PRIVATE"/>
-    <aura:attribute name="Public" type="String" access="PUBLIC" default="PUBLIC"/>
-    <aura:attribute name="Internal" type="String" access="INTERNAL" default="INTERNAL"/>
-    <aura:attribute name="Global" type="String" access="GLOBAL" default="GLOBAL"/>
-</aura:event>
+<aura:component access="GLOBAL" extends="auratest:accessPublicComponent">
+    <ui:outputText value="componentTest:accessExtendsPublic"/>
+</aura:component>

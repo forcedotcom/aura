@@ -26,8 +26,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.Aura;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.perf.PerfWebDriverUtil;
@@ -55,14 +57,14 @@ import com.google.gson.Gson;
 public class PerfExecutorTest extends WebDriverTestCase {
 
     private static final Logger logger = Logger.getLogger(PerfExecutorTest.class.getSimpleName());
-    private DefDescriptor<ComponentDef> def;
+    private DefDescriptor<BaseComponentDef> def;
     private PerfConfig config;
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
     private String dbURI;
-    private static String DEFAULT_DB_URI = "mongodb://fjunod-wsl4:27017";
+    private static String DEFAULT_DB_URI = "mongodb://localhost:27017";
     
-    public PerfExecutorTest(DefDescriptor<ComponentDef> def, PerfConfig config, String db) {
+    public PerfExecutorTest(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
     	super("perf_" + def.getDescriptorName());
         this.def = def;
         this.config = config;
@@ -124,13 +126,13 @@ public class PerfExecutorTest extends WebDriverTestCase {
 		return componentsDir;
     }
     
-    private void loadComponent(String url, DefDescriptor<ComponentDef> descriptor) throws MalformedURLException,
+    private void loadComponent(String url, DefDescriptor<BaseComponentDef> descriptor) throws MalformedURLException,
     URISyntaxException {
 
         openTotallyRaw(url);
 
         // wait for component loaded or aura error message
-        final By componentRendered = By.cssSelector("div[class*='container performanceRunner testFinish']");
+        final By componentRendered = By.cssSelector(".perfTestFinish");
         final By auraErrorMessage = By.id("auraErrorMessage");
         ExpectedCondition<By> condition = prepareCondition(componentRendered, auraErrorMessage);
         By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
@@ -165,7 +167,12 @@ public class PerfExecutorTest extends WebDriverTestCase {
         return condition;
     }
 
-    private String generateUrl (DefDescriptor<ComponentDef> descriptor, PerfConfig config, Mode mode) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    private String generateUrl (DefDescriptor<BaseComponentDef> descriptor, PerfConfig config, Mode mode) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+    	
+    	if (descriptor.getDefType() == DefType.APPLICATION) { 
+    		return "/" + descriptor.getNamespace() + "/" + descriptor.getName() + ".app?aura.mode=" + mode;
+    	}
+    	
         String relativeUrl = "/performance/runner.app?";
         Map<String, String> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName());
 
@@ -183,7 +190,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
         }
     }
 
-    private void runWithPerfApp(DefDescriptor<ComponentDef> descriptor, PerfConfig config) throws Exception {
+    private void runWithPerfApp(DefDescriptor<BaseComponentDef> descriptor, PerfConfig config) throws Exception {
         try {
             Mode mode = Mode.STATS;
             setupContext(mode, AuraContext.Format.JSON, descriptor);
@@ -225,7 +232,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
         }
     }
 
-    public DefDescriptor<ComponentDef> getComponentDef(){
+    public DefDescriptor<BaseComponentDef> getComponentDef(){
         return def;
     }
 

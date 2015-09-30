@@ -77,6 +77,8 @@ public final class PerfRunsCollector {
         medianRunMetrics.setJSProfilerData(bestMatch.getJSProfilerData());
         medianRunMetrics.setHeapSnapshot(bestMatch.getHeapSnapshot());
         medianRunMetrics.setMetricsServiceTransaction(bestMatch.getMetricsServiceTransaction());
+        medianRunMetrics.setCommonMetrics(bestMatch.getCommonMetrics());
+        medianRunMetrics.setCustomMetrics(bestMatch.getCustomMetrics());
 
         LOG.info("median run was run " + medianRunNumber + '/' + allMetricsRuns.size());
         return medianRunMetrics;

@@ -29,7 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
@@ -48,15 +48,15 @@ public final class PerfConfigUtil {
     private static final Logger LOG = Logger.getLogger(PerfConfigUtil.class.getSimpleName());
     private static final String CONFIG_FILE = "/config.json";
     
-    public Map<DefDescriptor<ComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
+    public Map<DefDescriptor<BaseComponentDef>, PerfConfig> getComponentTestsToRun(List<String> namespaces) {
         // Establish Aura Context before fetching all component defs
         ContextService contextService = establishAuraContext();
 
         // Iterate through each component def and load config from the associated config.json
-        Set<DefDescriptor<ComponentDef>> defs = getComponentDefs(namespaces);
-        Map<DefDescriptor<ComponentDef>, PerfConfig> configMap = new HashMap<>();
+        Set<DefDescriptor<BaseComponentDef>> defs = getComponentDefs(namespaces);
+        Map<DefDescriptor<BaseComponentDef>, PerfConfig> configMap = new HashMap<>();
 
-        for(DefDescriptor<ComponentDef> def : defs){
+        for(DefDescriptor<BaseComponentDef> def : defs){
             PerfConfig componentConfig = loadConfigMapping(def);
             configMap.put(def, componentConfig);
         }
@@ -68,10 +68,10 @@ public final class PerfConfigUtil {
         return configMap;
     }
 
-    private Set<DefDescriptor<ComponentDef>> getComponentDefs(List<String> namespaces) {
+    private Set<DefDescriptor<BaseComponentDef>> getComponentDefs(List<String> namespaces) {
         if (skipComponentPerfTests()) return null;
 
-        Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
+        Set<DefDescriptor<BaseComponentDef>> defs = new HashSet<>();
         for (String namespace : namespaces) {
             try {
                 defs.addAll(getComponentDefsInNamespace(namespace));
@@ -87,7 +87,7 @@ public final class PerfConfigUtil {
      * @param def
      * @return
      */
-    private String resolveComponentDirPath(DefDescriptor<ComponentDef> def) {
+    private String resolveComponentDirPath(DefDescriptor<BaseComponentDef> def) {
         String fileName;
         File moduleDir;
         String componentsDir = null;
@@ -109,7 +109,7 @@ public final class PerfConfigUtil {
         return componentsDir;
     }
 
-    private PerfConfig loadConfigMapping(DefDescriptor<ComponentDef> def) {
+    private PerfConfig loadConfigMapping(DefDescriptor<BaseComponentDef> def) {
     	// TODO, if config params per component is unavailable, use a global config .
     	BufferedReader br = null;
     	String componentPath = null;
@@ -150,18 +150,27 @@ public final class PerfConfigUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private Set<DefDescriptor<ComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
-        Set<DefDescriptor<ComponentDef>> defs = new HashSet<>();
+    private Set<DefDescriptor<BaseComponentDef>> getComponentDefsInNamespace(String namespace) throws QuickFixException {
+        Set<DefDescriptor<BaseComponentDef>> defs = new HashSet<>();
         DefinitionService definitionService = Aura.getDefinitionService();
 
-        Set<DefDescriptor<?>> descriptors;
-        descriptors = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
+        Set<DefDescriptor<?>> descriptorsCmp; 
+        Set<DefDescriptor<?>> descriptorsApp;
+        descriptorsCmp = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.COMPONENT));
+        descriptorsApp = definitionService.find(new DescriptorFilter("markup://*" + namespace + ":*", DefType.APPLICATION));
 
-        for (DefDescriptor<?> descriptor : descriptors) {
+        for (DefDescriptor<?> descriptor : descriptorsCmp) {
             if (descriptor.getDefType().equals(DefType.COMPONENT)) {
-                defs.add(((DefDescriptor<ComponentDef>) descriptor));
+                defs.add((DefDescriptor<BaseComponentDef>)descriptor);
             }
         }
+        
+        for (DefDescriptor<?> descriptor : descriptorsApp) {
+            if (descriptor.getDefType().equals(DefType.APPLICATION)) {
+            	defs.add((DefDescriptor<BaseComponentDef>)descriptor);
+            }
+        }
+        
         return defs;
     }
 }

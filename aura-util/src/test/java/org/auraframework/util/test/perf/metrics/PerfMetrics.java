@@ -80,6 +80,8 @@ public final class PerfMetrics {
     private Map<String, ?> jsProfilerData;
     private Map<String, ?> heapSnapshot;
     private JSONObject metricsServiceTransaction;
+    private JSONObject commonMetrics;
+    private JSONObject customMetrics;
 
     public PerfMetrics() {
     }
@@ -113,6 +115,29 @@ public final class PerfMetrics {
     }
     public void setMetricsServiceTransaction(Map<String, ?> transaction) {
         this.metricsServiceTransaction = new JSONObject(transaction);
+    }
+    
+    public void setCommonMetrics(Map<String, ?> transaction) {
+    	this.commonMetrics = new JSONObject(transaction);
+    }
+    
+    public void setCommonMetrics(JSONObject subMetrics) {
+    	this.commonMetrics = subMetrics;
+    }
+    
+    public void setCustomMetrics(Map<String, ?> transaction) {
+    	this.customMetrics = new JSONObject(transaction);
+    }
+    public void setCustomMetrics(JSONObject subMetrics) {
+    	this.customMetrics = subMetrics;
+    }
+    
+    public JSONObject getCommonMetrics() {
+    	return this.commonMetrics;
+    }
+    
+    public JSONObject getCustomMetrics() {
+    	return this.customMetrics;
     }
 
     public JSONObject getMetricsServiceTransaction() {

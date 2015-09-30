@@ -288,22 +288,33 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
     // round if needed using HALF_UP
     if (this.maxFractionDigits < charArray.length - decimalPos) {
         var rounderIndex = decimalPos + this.maxFractionDigits;
-        var round = charArray[rounderIndex] >= "5";
-        charArray = charArray.slice(0, rounderIndex);
-        while (round && rounderIndex > 0) {
-            var c = charArray[--rounderIndex];
-            if (c !== "9") {
-                charArray[rounderIndex] = String.fromCharCode(c.charCodeAt(0) + 1);
-                // done rounding
-                round = false;
-            } else {
-                charArray[rounderIndex] = Aura.Utils.NumberFormat.ZERO;
+        // Modification from the original, if we remove a bunch of zeros from the
+        // number, rounderIndex can be less than zero. This means we need to just ignore
+        // the contents of our array, and make sure that we haven't walked out too far for our
+        // min fraction digits.
+        if (rounderIndex >= 0) {
+            var round = charArray[rounderIndex] >= "5";
+            charArray = charArray.slice(0, rounderIndex);
+            while (round && rounderIndex > 0) {
+                var c = charArray[--rounderIndex];
+                if (c !== "9") {
+                    charArray[rounderIndex] = String.fromCharCode(c.charCodeAt(0) + 1);
+                    // done rounding
+                    round = false;
+                } else {
+                    charArray[rounderIndex] = Aura.Utils.NumberFormat.ZERO;
+                }
             }
-        }
-        // might need an extra 1 at the beginning
-        if (round) {
-            charArray.unshift("1");
-            decimalPos++;
+            // might need an extra 1 at the beginning
+            if (round) {
+                charArray.unshift("1");
+                decimalPos++;
+            }
+        } else {
+            charArray=[];
+            if (-decimalPos > this.minFractionDigits) {
+                decimalPos = -this.minFractionDigits;
+            }
         }
     }
     

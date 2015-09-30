@@ -29,4 +29,6 @@
     		aura.test.assertTrue($A.util.isUndefinedOrNull(obj), "isModal is set to false, but contains the class as though it was set to true");
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi */
+})
+/*eslint-enable semi */

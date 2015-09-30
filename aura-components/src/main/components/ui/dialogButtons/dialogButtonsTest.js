@@ -41,9 +41,10 @@
 	test: function(cmp){
 	        var conf = cmp.find("confirmButton");
 	        var can = cmp.find("cancelButton");
-    		aura.test.assertTrue($A.util.isUndefinedOrNull(conf), "defaultButtons attribute is set to None, but is showing confrimButton");
-    		aura.test.assertTrue($A.util.isUndefinedOrNull(can), "defaultButtons attribute is set to None, but is showing cancelButton");
+    		$A.test.assertTrue($A.util.isUndefinedOrNull(conf), "defaultButtons attribute is set to None, but is showing confrimButton");
+    		$A.test.assertTrue($A.util.isUndefinedOrNull(can), "defaultButtons attribute is set to None, but is showing cancelButton");
         }
     }
-
-})// eslint-disable-line semi
+/*eslint-disable semi */
+})
+/*eslint-enable semi */

@@ -2253,10 +2253,6 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
     };
 
     /** @export */
-    Aura.Utils.Util.prototype.errorBasedOnMode = function(msg) {
-        $A.error(msg);
-    };
-    /** @export */
     Aura.Utils.Util.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
             this.includeScript.cache = {};

@@ -385,7 +385,8 @@ Test.Aura.LoggerTest = function() {
         var mockAction = {
                 setAbortable: function() {},
                 setParams: function() {},
-                setCallback: function() {}
+                setCallback: function() {},
+                setCaboose: function() {}
             };
 
         var mockDeps = Mocks.GetMock(Object.Global(), "$A", {

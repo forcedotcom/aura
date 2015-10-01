@@ -2005,11 +2005,11 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
                 // the client didn't request the action response but the server sent it so
                 // a component is priming the actions cache. if the response isn't success
                 // (which should never happen) then skip processing the action
-                action = this.buildFakeAction(response);
-
-                if (action.getState() !== "SUCCESS") {
+                if (response["state"] !== "SUCCESS") {
                     continue;
                 }
+
+                action = this.buildStorableServerAction(response);
             }
             if (!action) {
                 throw new $A.auraError("Unable to find an action for "+response["id"]+": "+response);
@@ -2025,13 +2025,12 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             }
         } catch (e) {
             $A.logger.auraErrorHelper(e, action);
-            $A.error(e);
+            $A.error("Error processing action response", e);
         }
     }
+};
 
-     };
-
-AuraClientService.prototype.buildFakeAction = function(response) {
+AuraClientService.prototype.buildStorableServerAction = function(response) {
     var action = null;
     if (response["storable"]) {
         //

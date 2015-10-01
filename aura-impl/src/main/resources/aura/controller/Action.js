@@ -342,6 +342,7 @@ Action.prototype.getDef = function() {
  * @export
  */
 Action.prototype.setParams = function(config) {
+    $A.assert($A.util.isObject(config), "setParams() must be passed an object.");
     var paramDefs = this.paramDefs;
     for ( var key in paramDefs) {
         this.params[key] = config[key];

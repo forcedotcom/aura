@@ -52,10 +52,12 @@ Test.Aura.Controller.ActionTest = function() {
                 util: {
                     isFunction: function(value) {
                         return typeof value === "function";
-                    }
-                }
+                    },
+                    isObject: function(obj) {}
+                },
+                assert: function() {}
             },
-            "Action": Aura.Controller.Action        
+            "Action": Aura.Controller.Action
     });
 
     [ Fixture ]

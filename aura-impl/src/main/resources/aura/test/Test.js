@@ -2102,6 +2102,14 @@ JsonTestInstance.prototype.orderedEncode = function(obj) {
 };
 
 /**
+ * Passthrough to JSON decode utility for tests.
+ * @export
+ */
+JsonTestInstance.prototype.decode = function(obj, refSupport) {
+    return $A.util.json.decode(obj, refSupport);
+};
+
+/**
  * @export
  * @private
  * @memberof Test

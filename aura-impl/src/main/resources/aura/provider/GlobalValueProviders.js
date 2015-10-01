@@ -53,7 +53,7 @@
     this.loadFromStorage(function() {
         that.load(gvp);
         if (initCallback) {
-            initCallback();
+            initCallback(that);
         }
     });
 }

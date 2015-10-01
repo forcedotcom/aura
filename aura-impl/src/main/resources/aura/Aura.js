@@ -533,14 +533,27 @@ AuraInstance.prototype.initAsync = function(config) {
     // we don't handle components that come back here. This is used in the case where there
     // are none.
     //
-    $A.context = new Aura.Context.AuraContext(config["context"], function() {
+    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
+        // This juicy tidbit is for the sync version.
+        $A.context = context;
         $A.clientService.initHost(config["host"]);
+        $A.setLanguage();
         $A.metricsService.initialize();
         $A.clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
             $A.metricsService.bootstrapMark("metadataReady");
             $A.initPriv(resp);
         }, config["deftype"]);
     });
+};
+
+/**
+ * Set the language for the HTML document.
+ *
+ * This must be called after the context is initialized and we have our GVPs set up.
+ */
+AuraInstance.prototype.setLanguage = function() {
+    var lang = $A.get("$Locale.userLocalLang") || "en";
+    document["getElementsByTagName"]("html")[0]["setAttribute"]("lang", lang);
 };
 
 /**
@@ -558,6 +571,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         $A.clientService.initHost(config["host"], config["sid"]);
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"]);
+        $A.setLanguage();
         this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
         $A.context.setCurrentAction(null);

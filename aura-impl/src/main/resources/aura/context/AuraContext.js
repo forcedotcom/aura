@@ -52,9 +52,12 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     }
     $A.util.apply(config["globalValueProviders"],$A.globalValueProviders);
 
-    this.globalValueProviders = new Aura.Provider.GlobalValueProviders(config["globalValueProviders"], function() {
+    this.globalValueProviders = new Aura.Provider.GlobalValueProviders(config["globalValueProviders"], function(gvps) {
         var i, defs;
         
+        // Don't ask.... You just kinda have to love this....
+        that.globalValueProviders = gvps;
+        that.contextGlobals = that.globalValueProviders.getValueProvider("Global");
         // Careful now, the def is null, this fake action sets up our paths.
         that.currentAction = new Action(null, ""+that.num, null, null, false, null, false);
         
@@ -82,10 +85,9 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
         that.joinComponentConfigs(config["components"], that.currentAction.getId());
 
         if (initCallback) {
-            initCallback();
+            initCallback(that);
         }
     });
-    this.contextGlobals = this.globalValueProviders.getValueProvider("Global");
 };
 
 /**

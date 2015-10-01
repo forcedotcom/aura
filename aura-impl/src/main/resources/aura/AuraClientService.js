@@ -266,9 +266,15 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         // instead of JSON. There is no real hope of dealing with it,
         // so just flag an error, and carry on.
         //
-        $A.error(text);
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        $A.error("Communication error, invalid JSON: " + text);
+        ret["message"] = "Communication error, invalid JSON: " + text;
+        // #end
+        // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        $A.error("Communication error, please retry or reload the page");
+        ret["message"] = "Communication error, please retry or reload the page";
+        // #end
         ret["status"] = "ERROR";
-        ret["message"] = text;
     }
 
     //

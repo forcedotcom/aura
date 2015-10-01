@@ -189,6 +189,7 @@ Logger.prototype.reportError = function(e, action, id){
     // mode only or similar?
     var reportAction = $A.get("c.aura://ComponentController.reportFailedAction");
     reportAction.setAbortable(false);
+    reportAction.setCaboose();
     reportAction.setParams({
         "failedAction": action,
         "failedId": id,

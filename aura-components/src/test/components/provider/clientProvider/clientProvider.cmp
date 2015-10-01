@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component render="client" provider="js://provider.clientProvider">
-    <aura:attribute name="value" type="String"/>
+<aura:component render="client" provider="js://provider.clientProvider" access="GLOBAL">
+    <aura:attribute name="value" type="String" access="GLOBAL"/>
 </aura:component>

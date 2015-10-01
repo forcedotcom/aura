@@ -16,6 +16,8 @@
 
 -->
 <aura:component access="GLOBAL" extensible="true">
+    <aura:attribute name="output" type="String"/>
+
     <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="Public" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="Internal" type="String" access="INTERNAL" description="internal" default="INTERNAL"/>
@@ -25,6 +27,11 @@
     <aura:registerEvent name="publicEvent" type="auratest:accessPublicEvent"/>
     <aura:registerEvent name="internalEvent" type="auratest:accessInternalEvent"/>
     <aura:registerEvent name="privateEvent" type="auratest:accessPrivateEvent"/>
+
+    <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
+    <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
+    <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>
+    <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
 
     <div>
         {!v.Private}<br/>

@@ -16,5 +16,5 @@
 
 -->
 <aura:component access="Global">
-    <div>auratest:accessGlobalComponent</div>
+    <div class="accessGlobalComponent">auratest:accessGlobalComponent</div>
 </aura:component>

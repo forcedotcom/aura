@@ -47,10 +47,76 @@
         var event = component.get(eventName);
         component.set("v.output", event);
     },
-    
+
     testRemoteEventAccess: function(component, event, helper){
         var eventName = "e." + component.get("v.testType");
         var event = component.find("remote").get(eventName);
         component.set("v.output", event);
+    },
+
+    testSetNonExistentAttribute: function(component, event, helper) {
+        component.set("v.iDontExist", "value");
+        var value = component.get("v.iDontExist");
+        component.set("v.output", value);
+    },
+
+    testSetNonExistentRemoteAttribute: function(component, event, helper) {
+        component.find("remote").set("v.iDontExist", "value");
+        var value = component.find("remote").get("v.iDontExist");
+        component.set("v.output", value);
+    },
+
+    globalMethod: function(component, event, helper) {
+        component.set("v.output", "globalMethod");
+    },
+
+    publicMethod: function(component, event, helper) {
+        component.set("v.output", "publicMethod");
+    },
+
+    internalMethod: function(component, event, helper) {
+        component.set("v.output", "internalMethod");
+    },
+
+    privateMethod: function(component, event, helper) {
+        component.set("v.output", "privateMethod");
+    },
+
+    testMethods: function(component, event, helper) {
+        var access = event.getParam('arguments').accessLevel;
+        switch(access) {
+        case "GLOBAL":
+            component.globalMethod();
+            break;
+        case "PUBLIC":
+            component.publicMethod();
+            break;
+        case "INTERNAL":
+            component.internalMethod();
+            break;
+        case "PRIVATE":
+            component.privateMethod();
+            break;
+        }
+    },
+    
+    testRemoteMethodAccess: function(component, event, helper) {
+        var access = component.get("v.testType");
+        var remote = component.find("remote");
+        switch(access) {
+        case "GLOBAL":
+            remote.globalMethod();
+            break;
+        case "PUBLIC":
+            remote.publicMethod();
+            break;
+        case "INTERNAL":
+            remote.internalMethod();
+            break;
+        case "PRIVATE":
+            remote.privateMethod();
+            break;
+        }
+        
     }
 })

@@ -141,7 +141,7 @@ public class ComponentXMLParserTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component defaultFlavor='test'></aura:component>", "myID", Format.XML);
         ComponentDef cd = parser.parse(descriptor, source);
-        assertEquals("test", cd.getDefaultFlavor());
+        assertEquals("test", cd.getDefaultFlavorOrImplicit());
     }
 
     public void testIsDynamicallyFlavorable() throws Exception {

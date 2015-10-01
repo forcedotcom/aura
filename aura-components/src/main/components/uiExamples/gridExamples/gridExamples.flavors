@@ -16,5 +16,5 @@
 
 -->
 <aura:flavors>
-    <aura:use source="uiExamples:flavors" />
+    <aura:include source="uiExamples:flavors" />
 </aura:flavors>

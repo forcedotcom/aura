@@ -475,13 +475,6 @@ public abstract class AuraBaseServlet extends HttpServlet {
         ret.addAll(getClientLibraryUrls(context, ClientLibraryDef.Type.CSS));
 
         StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-
-        // add app tokens to the context. we do this here so that when the context is serialized below it includes the
-        // app tokens. This ensures ALL applicable token defs are part of the url, making client-side caching more
-        // predictable
-        // TODONM remove this, as we don't need to have tokens specified via AuraContext anymore, just the app
-        context.addAppTokensDescriptors();
-
         defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Css));
         defs.append("/app.css");
         ret.add(defs.toString());

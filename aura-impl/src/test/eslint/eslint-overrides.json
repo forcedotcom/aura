@@ -36,7 +36,7 @@
     "AttributeSet": true,
     "ActionReferenceValue": true,
     "FlavorDefaultDef": true,
-    "FlavorAssortmentDef": true,
+    "FlavorsDef": true,
     "FunctionCallValue": true,
     "Component": true,
     "ComponentDef": true,

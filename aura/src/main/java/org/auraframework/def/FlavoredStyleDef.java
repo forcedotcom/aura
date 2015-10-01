@@ -51,7 +51,13 @@ public interface FlavoredStyleDef extends BaseStyleDef {
      */
     Set<String> getFlavorNames();
 
+    /**
+     * Gets the CSS annotations (special CSS comments) for each flavor.
+     */
     Map<String, FlavorAnnotation> getFlavorAnnotations();
 
+    /**
+     * Gets the CSS annotation (special CSS comment) for a particular flavor.
+     */
     Optional<FlavorAnnotation> getFlavorAnnotation(String name);
 }

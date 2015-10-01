@@ -35,7 +35,7 @@ import org.auraframework.util.AuraTextUtil;
 import com.google.common.collect.ImmutableSet;
 
 public class FlavorIncludeDefHandler<P extends RootDefinition> extends ParentedTagHandler<FlavorIncludeDef, P> {
-    protected static final String TAG = "aura:use";
+    protected static final String TAG = "aura:include";
     private static final String ATTRIBUTE_SOURCE = "source";
 
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_SOURCE, ATTRIBUTE_DESCRIPTION);

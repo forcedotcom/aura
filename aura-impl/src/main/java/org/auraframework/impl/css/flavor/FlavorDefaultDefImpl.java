@@ -29,7 +29,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.FlavorAssortmentDef;
+import org.auraframework.def.FlavorsDef;
 import org.auraframework.def.FlavorDefaultDef;
 import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.RootDefinition;
@@ -168,9 +168,9 @@ public class FlavorDefaultDefImpl extends DefinitionImpl<FlavorDefaultDef> imple
         AuraContext ctx = Aura.getContextService().getCurrentContext();
         DefDescriptor<?> dd = ctx != null ? ctx.getCurrentCallingDescriptor() : null;
 
-        if (dd != null && dd.getDefType() == DefType.FLAVOR_ASSORTMENT) { // fixme!
+        if (dd != null && dd.getDefType() == DefType.FLAVORS) { // fixme!
             try {
-                FlavorOverrideLocator mapping = ((FlavorAssortmentDef) dd.getDef()).computeOverrides();
+                FlavorOverrideLocator mapping = ((FlavorsDef) dd.getDef()).computeOverrides();
 
                 json.writeMapBegin();
 

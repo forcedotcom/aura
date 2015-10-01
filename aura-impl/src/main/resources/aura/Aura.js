@@ -86,7 +86,7 @@ window['$A'] = {};
 
 // -- Flavors -----------------------------------------------------------
 // #include aura.flavors.FlavorDefaultDef
-// #include aura.flavors.FlavorAssortmentDef
+// #include aura.flavors.FlavorsDef
 
 // -- Value -------------------------------------------------------------
 // #include aura.value.PropertyReferenceValue

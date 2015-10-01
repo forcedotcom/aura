@@ -123,7 +123,7 @@ public class DescriptorFileMapper {
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
         addExtension(".svg", NameFormat.BUNDLE, "markup", DefType.SVG, Format.SVG);
-        addExtension(".flavors", NameFormat.BUNDLE, "markup", DefType.FLAVOR_ASSORTMENT, Format.XML);
+        addExtension(".flavors", NameFormat.BUNDLE, "markup", DefType.FLAVORS, Format.XML);
 
         addExtension("Controller.js", NameFormat.BUNDLE, "js", DefType.CONTROLLER, Format.JS);
         addExtension("Renderer.js", NameFormat.BUNDLE, "js", DefType.RENDERER, Format.JS);
@@ -134,7 +134,7 @@ public class DescriptorFileMapper {
         addExtension("Test.js", NameFormat.BUNDLE, "js", DefType.TESTSUITE, Format.JS);
         addExtension(".js", NameFormat.BUNDLED_EXTRA, "js", DefType.INCLUDE, Format.JS, DefType.LIBRARY);
 
-        addExtension(".css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS, DefType.FLAVORS);
+        addExtension(".css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS, DefType.FLAVOR_BUNDLE);
         addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
         addExtension(".css", NameFormat.BUNDLE, "templateCss", DefType.STYLE, Format.TEMPLATE_CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "templateCss", DefType.RESOURCE, Format.TEMPLATE_CSS);

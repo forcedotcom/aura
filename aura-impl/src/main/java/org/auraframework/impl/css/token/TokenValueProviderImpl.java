@@ -17,14 +17,17 @@ package org.auraframework.impl.css.token;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.css.ResolveStrategy;
-import org.auraframework.css.TokenOptimizer;
+import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
@@ -46,8 +49,8 @@ import com.google.common.base.Optional;
 public final class TokenValueProviderImpl implements TokenValueProvider {
     private static final String MALFORMED = "Invalid number of parts in token reference, for token function argument '%s'";
 
+    private final TokenCache overrides;
     private final DefDescriptor<TokensDef> namespaceDefault;
-    private final TokenOptimizer overrides;
     private final ResolveStrategy strategy;
 
     /**
@@ -58,16 +61,51 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
      * @param strategy The indication of how token resolution is being handled (if in doubt about this, use
      *            {@link ResolveStrategy#RESOLVE_NORMAL}).
      */
-    public TokenValueProviderImpl(DefDescriptor<? extends BaseStyleDef> style, TokenOptimizer overrides, ResolveStrategy strategy) {
+    public TokenValueProviderImpl(DefDescriptor<? extends BaseStyleDef> style, TokenCache overrides, ResolveStrategy strategy) {
         checkNotNull(style, "style cannot be null");
-        this.namespaceDefault = Tokens.namespaceDefaultDescriptor(style);
         this.overrides = overrides;
+        this.namespaceDefault = Tokens.namespaceDefaultDescriptor(style);
         this.strategy = strategy;
     }
 
-    @Override
-    public ResolveStrategy getResolveStrategy() {
-        return strategy;
+    /**
+     * Gets an expression representing the given reference. If simply trying to evaluate a string reference, prefer
+     * {@link #getValue(String, Location)} instead.
+     *
+     * @param expression The string input source (should not be quoted).
+     * @param location The location of the reference in the source code.
+     *
+     * @return A new expression representing the given reference.
+     *
+     * @throws AuraValidationException
+     */
+    private static Expression getExpression(String expression, Location location) throws AuraValidationException {
+        return AuraImpl.getExpressionAdapter().buildExpression(expression, location);
+    }
+
+    /**
+     * Gets a token from the global space, first checking overrides, otherwise the namespace-default tokens.
+     *
+     * @return The token value.
+     */
+    private Optional<Object> getGlobalToken(PropertyReference reference) throws QuickFixException {
+        Optional<Object> value = Optional.absent();
+
+        // check from an override
+        if (overrides != null) {
+            value = overrides.getToken(reference.getRoot());
+            if (value.isPresent()) {
+                return value;
+            }
+        }
+
+        // check namespace-default
+        value = namespaceDefault.getDef().getToken(reference.getRoot());
+        if (!value.isPresent()) {
+            throw new TokenValueNotFoundException(reference.getRoot(), namespaceDefault, reference.getLocation());
+        }
+
+        return value;
     }
 
     @Override
@@ -92,29 +130,6 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
         }
 
         return value.get();
-    }
-
-    /**
-     * Gets a token from the global space, first checking overrides, otherwise the namespace-default tokens.
-     */
-    private Optional<Object> getGlobalToken(PropertyReference reference) throws QuickFixException {
-        Optional<Object> value = Optional.absent();
-
-        // check from an override
-        if (overrides != null) {
-            value = overrides.getValue(reference.getRoot());
-            if (value.isPresent()) {
-                return value;
-            }
-        }
-
-        // check namespace-default
-        value = namespaceDefault.getDef().getToken(reference.getRoot());
-        if (!value.isPresent()) {
-            throw new TokenValueNotFoundException(reference.getRoot(), namespaceDefault, reference.getLocation());
-        }
-
-        return value;
     }
 
     @Override
@@ -143,18 +158,42 @@ public final class TokenValueProviderImpl implements TokenValueProvider {
         return names;
     }
 
-    /**
-     * Gets an expression representing the given reference. If simply trying to evaluate a string reference, prefer
-     * {@link #getValue(String, Location)} instead.
-     *
-     * @param expression The string input source (should not be quoted).
-     * @param location The location of the reference in the source code.
-     *
-     * @return A new expression representing the given reference.
-     *
-     * @throws AuraValidationException
-     */
-    private static Expression getExpression(String expression, Location location) throws AuraValidationException {
-        return AuraImpl.getExpressionAdapter().buildExpression(expression, location);
+    @Override
+    // TODONM TESTME
+    public Set<List<TokenDef>> extractTokenDefs(String expression) throws QuickFixException {
+        checkNotNull(expression, "expression cannot be null");
+
+        Set<PropertyReference> propRefs = new HashSet<>();
+        getExpression(expression, null).gatherPropertyReferences(propRefs);
+
+        Set<List<TokenDef>> defs = new HashSet<>();
+        for (PropertyReference ref : propRefs) {
+            List<TokenDef> list = new ArrayList<>();
+
+            // check from override
+            if (overrides != null) {
+                Optional<TokenDef> overrideDef = overrides.getRelevantTokenDef(ref.getRoot());
+                if (overrideDef.isPresent()) {
+                    list.add(overrideDef.get());
+                }
+            }
+
+            // check namespace default
+            Optional<TokenDef> defaultDef = namespaceDefault.getDef().getTokenDef(ref.getRoot());
+            if (defaultDef.isPresent()) {
+                list.add(defaultDef.get());
+            }
+
+            if (!list.isEmpty()) {
+                defs.add(list);
+            }
+        }
+
+        return defs;
+    }
+
+    @Override
+    public ResolveStrategy getResolveStrategy() {
+        return strategy;
     }
 }

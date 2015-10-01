@@ -40,7 +40,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.TokensDef;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.InvalidParamException;
@@ -52,8 +51,6 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonReader;
 
@@ -173,19 +170,6 @@ public class AuraContextFilter implements Filter {
                 }
             }
             context.setFrameworkUID((String) configMap.get("fwuid"));
-
-            @SuppressWarnings("unchecked")
-            List<String> tokens = (List<String>) configMap.get("tokens");
-            if (tokens != null) {
-                try {
-                    DefinitionService ds = Aura.getDefinitionService();
-                    for (String desc : tokens) {
-                        context.appendTokensDescriptor(ds.getDefDescriptor(desc, TokensDef.class));
-                    }
-                } catch (QuickFixException e) {
-                    throw new AuraRuntimeException(e);
-                }
-            }
 
             @SuppressWarnings("unchecked")
             Map<String, Object> styleContext = (Map<String, Object>) configMap.get("styleContext");

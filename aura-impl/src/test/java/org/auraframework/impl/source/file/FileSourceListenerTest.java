@@ -137,7 +137,7 @@ public class FileSourceListenerTest extends UnitTestCase {
     }
 
     public void testSourceChangedFlavorAssortment() throws Exception {
-        assertSourceChangedCalled("markup", "ui", "baseFlavors", DefDescriptor.DefType.FLAVOR_ASSORTMENT,
+        assertSourceChangedCalled("markup", "ui", "baseFlavors", DefDescriptor.DefType.FLAVORS,
                 "/some/awesome/ui/baseFlavors/baseFlavors.flavors");
     }
 

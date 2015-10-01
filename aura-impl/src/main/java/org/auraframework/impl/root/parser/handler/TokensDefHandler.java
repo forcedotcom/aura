@@ -30,7 +30,7 @@ import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokenDescriptorProviderDef;
 import org.auraframework.def.TokenMapProviderDef;
 import org.auraframework.def.TokensDef;
-import org.auraframework.def.TokensImport;
+import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -133,14 +133,14 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             }
             builder.addTokenDef(def);
 
-        } else if (TokensImportHandler.TAG.equalsIgnoreCase(tag)) {
+        } else if (TokensImportDefHandler.TAG.equalsIgnoreCase(tag)) {
             // imports must come before tokens. This is mainly for simplifying the token lookup implementation, while still
             // matching the most common expected usages of imports vs. declared tokens.
             if (!builder.tokens().isEmpty()) {
-                error("tag %s must come before all declared tokens", TokensImportHandler.TAG);
+                error("tag %s must come before all declared tokens", TokensImportDefHandler.TAG);
             }
 
-            TokensImport def = new TokensImportHandler<>(this, xmlReader, source).getElement();
+            TokensImportDef def = new TokensImportDefHandler<>(this, xmlReader, source).getElement();
             if (builder.imports().contains(def.getImportDescriptor())) {
                 error("Duplicate import %s", def.getName());
             }

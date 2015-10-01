@@ -20,7 +20,6 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.impl.css.parser.CssPreprocessor.ParserConfiguration;
 import org.auraframework.impl.css.parser.CssPreprocessor.ParserResult;
 import org.auraframework.impl.css.style.StyleDefImpl;
 import org.auraframework.impl.css.util.Styles;
@@ -55,30 +54,29 @@ public final class StyleParser implements Parser<StyleDef> {
 
     @Override
     public StyleDef parse(DefDescriptor<StyleDef> descriptor, Source<StyleDef> source) throws QuickFixException {
-        ParserConfiguration parserConfig = CssPreprocessor
+        String className = Styles.buildClassName(descriptor);
+
+        boolean shouldValidate = validate
+                && !descriptor.getName().toLowerCase().endsWith("template")
+                && Aura.getConfigAdapter().validateCss();
+
+        ParserResult result = CssPreprocessor
                 .initial()
                 .source(source.getContents())
                 .resourceName(source.getSystemId())
-                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()));
-
-        String className = Styles.buildClassName(descriptor);
+                .allowedConditions(Iterables.concat(ALLOWED_CONDITIONS, Aura.getStyleAdapter().getExtraAllowedConditions()))
+                .componentClass(className, shouldValidate)
+                .tokens(descriptor)
+                .parse();
 
         StyleDefImpl.Builder builder = new StyleDefImpl.Builder();
         builder.setDescriptor(descriptor);
         builder.setLocation(source.getSystemId(), source.getLastModified());
         builder.setClassName(className);
         builder.setOwnHash(source.getHash());
-        boolean shouldValidate = validate
-            && !descriptor.getName().toLowerCase().endsWith("template")
-            && Aura.getConfigAdapter().validateCss();
-
-        ParserResult result = parserConfig
-                .componentClass(className, shouldValidate)
-                .tokens(descriptor)
-                .parse();
-
         builder.setContent(result.content());
         builder.setTokenExpressions(result.expressions());
+
         return builder.build();
     }
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.css.TokenOptimizer;
+import org.auraframework.css.StyleContext;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
@@ -45,15 +45,14 @@ import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.instance.ValueProviderType;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.GlobalValue;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.InvalidExpressionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonSerializable;
@@ -64,6 +63,7 @@ import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.mockito.Mockito;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -372,72 +372,19 @@ public class AuraContextImplTest extends AuraImplTestCase {
         assertEquals(cmpDesc, cntx.getApplicationDescriptor());
     }
 
-    public void testAddAppTokensDescriptors() throws Exception {
+    public void testStyleContext() throws Exception {
         DefDescriptor<TokensDef> t = addSourceAutoCleanup(TokensDef.class, "<aura:tokens></aura:tokens>");
-        String src = String.format("<aura:application access='unauthenticated' tokens='%s'/>", t.getDescriptorName());
+        String src = String.format("<aura:application access='unauthenticated' tokenOverrides='%s'/>", t.getDescriptorName());
         DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, src);
 
         AuraContext ctx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON,
                 Authentication.UNAUTHENTICATED, app);
 
-        ctx.addAppTokensDescriptors();
-
-        TokenOptimizer descriptors = ctx.getTokenOptimizer();
-        assertEquals(1, descriptors.size());
-        assertEquals(t, descriptors.get(0));
-    }
-
-    public void testGetTokensDescriptors() throws Exception {
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED);
-
-        DefDescriptor<TokensDef> t1 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
-        DefDescriptor<TokensDef> t2 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
-        DefDescriptor<TokensDef> t3 = addSourceAutoCleanup(TokensDef.class, "<aura:tokens/>");
-        ctx.appendTokensDescriptor(t1);
-        ctx.appendTokensDescriptor(t2);
-        ctx.appendTokensDescriptor(t3);
-
-        TokenOptimizer explicit = ctx.getTokenOptimizer();
-        assertEquals(explicit.get(0), t1);
-        assertEquals(explicit.get(1), t2);
-        assertEquals(explicit.get(2), t3);
-    }
-
-    public void testSerializeWithTokens() throws Exception {
-        // this app specifies test:fakeTokens
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
-
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-
-        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
-        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokensWithMapProvider", TokensDef.class));
-        ctx.addAppTokensDescriptors();
-        ctx.setFrameworkUID("#FAKEUID#");
-        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Css);
-        res = AuraTextUtil.urldecode(res);
-        // expected order
-        // "test:fakeTokens" (app specified comes first)
-        // "test:fakeTokens2" (explicit order)
-        // "test:fakeTokensWithMapProvider" (explicit order)
-        // also expect the vars hash to be present
-        goldFileJson(res);
-    }
-
-    public void testSerializeWithTokensHasNonce() throws Exception {
-        DefDescriptor<ApplicationDef> app = DefDescriptorImpl.getInstance("test:fakeTokensApp", ApplicationDef.class);
-
-        AuraContext ctx = Aura.getContextService()
-                .startContext(Mode.UTEST, Format.JSON, Authentication.UNAUTHENTICATED, app);
-
-        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokens2", TokensDef.class));
-        ctx.appendTokensDescriptor(DefDescriptorImpl.getInstance("test:fakeTokensWithMapProvider", TokensDef.class));
-        ctx.addAppTokensDescriptors();
-        String res = ctx.getEncodedURL(AuraContext.EncodingStyle.Css);
-        res = AuraTextUtil.urldecode(res);
-        assertTrue("Tokens encoded URL must have framework UID",
-                res.indexOf(Aura.getConfigAdapter().getAuraFrameworkNonce()) > 0);
+        ctx.setStyleContext();
+        StyleContext sc = ctx.getStyleContext();
+        assertNotNull(sc);
+        assertEquals(1, sc.getTokens().size());
+        assertEquals(t, Iterables.get(sc.getTokens(), 0));
     }
 
     /**
@@ -612,11 +559,12 @@ public class AuraContextImplTest extends AuraImplTestCase {
     public void testGetAccessVersion() throws Exception {
         AuraContext ctx = Aura.getContextService().startContext(Mode.PROD, Format.JSON, Authentication.AUTHENTICATED);
         String descr = "java://org.auraframework.components.test.java.controller.VersionTestController/ACTION$getContextAccessVersion";
-        Action action = (Action) Aura.getInstanceService().getInstance(descr,ActionDef.class);
+        Action action = (Action) Aura.getInstanceService().getInstance(descr, ActionDef.class);
         action.setCallingDescriptor("markup://auratest:requireWithServerAction");
         action.setCallerVersion("2.0");
         ctx.setCurrentAction(action);
-        ctx.setApplicationDescriptor(Aura.getDefinitionService().getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
+        ctx.setApplicationDescriptor(
+                Aura.getDefinitionService().getDefDescriptor("markup://componentTest:versionInServer", ComponentDef.class));
 
         String version = ctx.getAccessVersion();
         assertEquals("2.0", version);
@@ -651,7 +599,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         private String prefix;
         private boolean refSupport;
         private Map<String, ?> data;
-        
+
         @Override
         public Object getValue(PropertyReference key) throws QuickFixException {
             throw new UnsupportedOperationException("Not expecting to getValue");
@@ -696,9 +644,9 @@ public class AuraContextImplTest extends AuraImplTestCase {
             return data;
         }
     }
-    
+
     /**
-     * GVP with refSupport should serialize reference IDs of data that supports references. 
+     * GVP with refSupport should serialize reference IDs of data that supports references.
      */
     public void testSerializeGlobalValueProviderWithRefSupport() throws Exception {
         TestValueProvider provider = new TestValueProvider();
@@ -715,13 +663,13 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
-        
+
         String res = JsonEncoder.serialize(ctx, serCtx);
         goldFileJson(res);
     }
 
     /**
-     * GVP without refSupport should serialize data, that supports references, as-is (without reference IDs). 
+     * GVP without refSupport should serialize data, that supports references, as-is (without reference IDs).
      */
     public void testSerializeGlobalValueProviderWithoutRefSupport() throws Exception {
         TestValueProvider provider = new TestValueProvider();
@@ -738,13 +686,13 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
-        
+
         String res = JsonEncoder.serialize(ctx, serCtx);
         goldFileJson(res);
     }
 
     /**
-     * GVP with refSupport should handle data without references. 
+     * GVP with refSupport should handle data without references.
      */
     public void testSerializeGlobalValueProviderWithRefSupportWithoutAReference() throws Exception {
         TestValueProvider provider = new TestValueProvider();
@@ -761,11 +709,11 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
-        
+
         String res = JsonEncoder.serialize(ctx, serCtx);
         goldFileJson(res);
     }
-    
+
     /**
      * GVPs with mixed refSupport should handle respective data with and without references. Note: ordering of
      * serialized providers is not guaranteed, but should be consistent.
@@ -803,7 +751,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         AuraContext ctx = new AuraContextImpl(mode, mdr, null, Format.JSON, Authentication.AUTHENTICATED, serCtx,
                 globalProviders, false);
         ctx.setFrameworkUID("#FAKEUID#");
-        
+
         String res = JsonEncoder.serialize(ctx, serCtx);
         goldFileJson(res);
     }

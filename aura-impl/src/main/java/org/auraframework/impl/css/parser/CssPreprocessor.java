@@ -21,7 +21,9 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.css.FlavorAnnotation;
+import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.StyleContext;
+import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.FlavoredStyleDef;
@@ -29,6 +31,7 @@ import org.auraframework.impl.css.parser.plugin.FlavorCollectorPlugin;
 import org.auraframework.impl.css.parser.plugin.FlavorPlugin;
 import org.auraframework.impl.css.parser.plugin.SelectorScopingPlugin;
 import org.auraframework.impl.css.parser.plugin.TokenFunctionPlugin;
+import org.auraframework.impl.css.parser.plugin.TokenPropertyValidationPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -62,12 +65,12 @@ public final class CssPreprocessor {
         return new ParserConfiguration(false);
     }
 
-    /** For parsing contextual css, skips syntax validations and static rework, uses client from the current context */
+    /** For parsing contextual css, skips syntax validations and static rework, uses current {@link StyleContext} */
     public static ParserConfiguration runtime() {
         return runtime(Aura.getContextService().getCurrentContext().getStyleContext());
     }
 
-    /** For parsing contextual css, skips syntax validations and static rework, uses given client type */
+    /** For parsing contextual css, skips syntax validations and static rework, uses given {@link StyleContext} */
     public static ParserConfiguration runtime(StyleContext styleContext) {
         return new ParserConfiguration(true).styleContext(styleContext);
     }
@@ -128,8 +131,17 @@ public final class CssPreprocessor {
         }
 
         /** enables aura tokens */
-        public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) throws QuickFixException {
-            plugins.add(runtime ? TokenFunctionPlugin.resolving(style) : TokenFunctionPlugin.passthrough(style));
+        public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) {
+            if (runtime) {
+                // This will resolve all token function references
+                TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
+                plugins.add(new TokenFunctionPlugin(tvp));
+            } else {
+                // This will collect all token function references but will leave them unevaluated in the CSS
+                TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
+                plugins.add(new TokenFunctionPlugin(tvp));
+                plugins.add(new TokenPropertyValidationPlugin(tvp));
+            }
             return this;
         }
 

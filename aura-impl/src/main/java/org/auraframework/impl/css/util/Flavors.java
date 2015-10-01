@@ -26,7 +26,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.FlavoredStyleDef;
-import org.auraframework.def.FlavorsDef;
+import org.auraframework.def.FlavorBundleDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
@@ -66,7 +66,7 @@ public final class Flavors {
             String namespace, String bundle) {
         // find the bundle (this file doesn't have to exist, we just need the marker)
         String fmt = String.format("markup://%s:%s", namespace, bundle);
-        DefDescriptor<FlavorsDef> bundleDesc = DefDescriptorImpl.getInstance(fmt, FlavorsDef.class);
+        DefDescriptor<FlavorBundleDef> bundleDesc = DefDescriptorImpl.getInstance(fmt, FlavorBundleDef.class);
 
         // find the flavored style file. The dash is expected to be in the name so that we can infer the cmp descriptor
         String file = flavored.getNamespace() + "-" + flavored.getName();

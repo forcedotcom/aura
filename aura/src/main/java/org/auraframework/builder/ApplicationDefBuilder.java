@@ -15,21 +15,9 @@
  */
 package org.auraframework.builder;
 
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
 
 /**
  */
 public interface ApplicationDefBuilder extends BaseComponentDefBuilder<ApplicationDef> {
-
-    /**
-     * Specifies a {@link TokensDef} as an override across the whole application. Tokens specified in this def will
-     * override default tokens values throughout all components used in the application.
-     *
-     */
-    ApplicationDefBuilder appendTokensDescriptor(DefDescriptor<TokensDef> descriptor);
-
-    /**
-     * Specifies the {@link FlavorAssortmentDef} containing the flavors to use as defaults.
-     */
-    ApplicationDefBuilder setFlavorAssortmentDescriptor(DefDescriptor<FlavorAssortmentDef> flavors);
 }

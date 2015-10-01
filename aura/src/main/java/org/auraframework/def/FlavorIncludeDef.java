@@ -21,7 +21,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import com.google.common.collect.Table;
 
 /**
- * {@code <aura:use>} tags inside of {@link FlavorAssortmentDef}s.
+ * {@code <aura:include>} tags inside of {@link FlavorsDef}s.
  */
 public interface FlavorIncludeDef extends Definition {
     @Override

@@ -35,14 +35,4 @@ public interface ApplicationDef extends BaseComponentDef {
     List<String> getAdditionalAppCacheURLs() throws QuickFixException;
 
     Boolean isOnePageApp() throws QuickFixException;
-
-    /**
-     * Gets the application-wide token overrides, if present.
-     */
-    List<DefDescriptor<TokensDef>> getTokenDescriptors();
-
-    /**
-     * Gets the {@link FlavorAssortmentDef} representing the default flavor overrides and replacements.
-     */
-    DefDescriptor<FlavorAssortmentDef> getAppFlavors();
 }

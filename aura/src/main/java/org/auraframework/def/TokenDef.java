@@ -15,6 +15,8 @@
  */
 package org.auraframework.def;
 
+import java.util.Set;
+
 /**
  * Used inside of {@link TokensDef}s.
  * <p>
@@ -28,4 +30,10 @@ public interface TokenDef extends Definition {
      * Gets the value of the token. This may be a String, Integer, etc... but it might also be an expression.
      */
     Object getValue();
+
+    /**
+     * Gets the set of allowed properties, or an empty set if any property is allowed.
+     * @return an ImmutableSet of property names.
+     */
+    Set<String> getAllowedProperties();
 }

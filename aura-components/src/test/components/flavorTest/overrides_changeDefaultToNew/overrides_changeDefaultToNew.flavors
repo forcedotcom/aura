@@ -1,4 +1,4 @@
 <aura:flavors>
-    <aura:use source="flavorTestAlt:overridesTestFlavors"/>
+    <aura:include source="flavorTestAlt:overridesTestFlavors"/>
     <aura:flavor component="flavorTest:overrides_x_all" default="amazing"/>
 </aura:flavors>

@@ -35,11 +35,12 @@ import com.salesforce.omakase.broadcast.annotation.Observe;
 import com.salesforce.omakase.plugin.Plugin;
 
 /**
- * Unit tests for {@link StyleAdapterImpl}.
+ * Functional tests for {@link StyleAdapterImpl}.
  */
 public class StyleAdapterImplTest extends StyleTestCase {
     private ServiceLoader locator;
     private Observer observer;
+    private StyleDefCSSFormatAdapter format;
 
     public StyleAdapterImplTest(String name) {
         super(name);
@@ -50,6 +51,7 @@ public class StyleAdapterImplTest extends StyleTestCase {
     public void setUp() throws Exception {
         super.setUp();
         locator = ServiceLocatorMocker.spyOnServiceLocator();
+        format = new StyleDefCSSFormatAdapter();
     }
 
     @Override
@@ -63,8 +65,8 @@ public class StyleAdapterImplTest extends StyleTestCase {
         when(locator.get(StyleAdapter.class)).thenReturn(adapter);
 
         DefDescriptor<StyleDef> desc = addStyleDef(".THIS{color:red}");
-        StyleDef def = desc.getDef();
 
+        StyleDef def = desc.getDef();
         assertEquals("expected plugin to run at compilation", 1, observer.count);
 
         def.getCode();
@@ -76,8 +78,8 @@ public class StyleAdapterImplTest extends StyleTestCase {
         when(locator.get(StyleAdapter.class)).thenReturn(adapter);
 
         DefDescriptor<StyleDef> desc = addStyleDef(".THIS{color:red}");
-        StyleDef def = desc.getDef();
 
+        StyleDef def = desc.getDef();
         assertEquals("expected plugin to run at compilation", 1, observer.count);
 
         def.getCode();
@@ -91,16 +93,14 @@ public class StyleAdapterImplTest extends StyleTestCase {
         DefDescriptor<StyleDef> desc1 = addStyleDef(".THIS{color:red}");
         DefDescriptor<StyleDef> desc2 = addStyleDef(".THIS{color:red}");
         DefDescriptor<StyleDef> desc3 = addStyleDef(".THIS{color:red}");
+
         desc1.getDef();
         desc2.getDef();
         desc3.getDef();
-
         assertEquals("did not expect plugin to run at runtime", 0, observer.count);
 
-        StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-        cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef(), desc3.getDef()),
-                new StringBuilder());
-
+        ArrayList<StyleDef> list = Lists.newArrayList(desc1.getDef(), desc2.getDef(), desc3.getDef());
+        format.writeCollection(list, new StringBuilder());
         assertEquals("expected the same plugin instance to once for each styledef", 3, observer.count);
     }
 

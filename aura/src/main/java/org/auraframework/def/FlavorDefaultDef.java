@@ -35,7 +35,7 @@ public interface FlavorDefaultDef extends Definition {
      * The flavor name must exist either as a standard flavor within the component's bundle, or as an entry in the given
      * mapping for it to be included in this map (with the exception of non-glob/single-component matches).
      *
-     * @param mapping The mapping of flavor overrides (see {@link FlavorAssortmentDef}).
+     * @param mapping The mapping of flavor overrides (see {@link FlavorsDef}).
      * @return The mapping from component to flavor name.
      * @throws QuickFixException If there's a problem loading a {@link FlavoredStyleDef}.
      */

@@ -41,7 +41,7 @@ import org.auraframework.impl.root.parser.ComponentXMLParser;
 import org.auraframework.impl.root.parser.DesignXMLParser;
 import org.auraframework.impl.root.parser.DocumentationXMLParser;
 import org.auraframework.impl.root.parser.EventXMLParser;
-import org.auraframework.impl.root.parser.FlavorAssortmentXMLParser;
+import org.auraframework.impl.root.parser.FlavorsXMLParser;
 import org.auraframework.impl.root.parser.InterfaceXMLParser;
 import org.auraframework.impl.root.parser.LibraryXMLParser;
 import org.auraframework.impl.root.parser.NamespaceXMLParser;
@@ -94,7 +94,7 @@ public class ParserFactory {
         parsers.put(new ParserKey(Format.XML, DefType.DESIGN), new DesignXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.DOCUMENTATION), new DocumentationXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.EVENT), new EventXMLParser());
-        parsers.put(new ParserKey(Format.XML, DefType.FLAVOR_ASSORTMENT), new FlavorAssortmentXMLParser());
+        parsers.put(new ParserKey(Format.XML, DefType.FLAVORS), new FlavorsXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.INTERFACE), new InterfaceXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.LIBRARY), new LibraryXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.NAMESPACE), new NamespaceXMLParser());

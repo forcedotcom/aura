@@ -16,7 +16,6 @@
 package org.auraframework.impl.controller;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
+import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -33,6 +33,7 @@ import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.css.parser.plugin.TokenExpression;
 import org.auraframework.impl.css.parser.plugin.TokenFunction;
+import org.auraframework.impl.css.token.StyleContextImpl;
 import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
@@ -159,20 +160,13 @@ public final class DynamicStylingController {
     private static String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<StyleDef>> styles)
             throws QuickFixException {
 
-        // give the context all of the tokens to apply.
+        // custom style context to include our one-off token descriptors
         AuraContext context = Aura.getContextService().getCurrentContext();
-        checkState(context.getTokenOptimizer().isEmpty(), "Did not expect any tokens to be in the context yet");
-
-        for (DefDescriptor<TokensDef> descriptor : tokens) {
-            context.appendTokensDescriptor(descriptor);
-        }
+        StyleContext styleContext = StyleContextImpl.build(context, tokens);
+        context.setStyleContext(styleContext);
 
         // figure out which token we will be utilizing
-        Set<String> tokenNames = context.getTokenOptimizer().getNames();
-
-        // the app may specify tokens other than the namespace default, and if so we need to make sure it's in the
-        // context so that css token resolve will use it. but we don't want the token names from this in the list above.
-        context.addAppTokensDescriptors();
+        Set<String> tokenNames = styleContext.getTokens().getNames(tokens);
 
         // pre-filter style defs
         // 1: skip over any styles without expressions

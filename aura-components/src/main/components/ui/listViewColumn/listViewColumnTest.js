@@ -31,7 +31,7 @@
                     helper.fireEvent(component, expected);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function TypeSetOnEventParams(component){
                 var expected = "columnType";
@@ -45,7 +45,7 @@
                     helper.fireEvent(component, "eventName", expected);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ContextSourceSetOnEventParams(component){
@@ -62,7 +62,7 @@
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ContextEventSetOnEventParams(component){
@@ -79,7 +79,7 @@
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
 
             function ContextHelperSetOnEventParams(component){
@@ -96,7 +96,7 @@
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function DataSetOnEventParams(component){
                 var expected = {};
@@ -112,7 +112,7 @@
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function EventIsFired(component){
                 var helper = this.getHelper(component);
@@ -125,7 +125,7 @@
                     helper.fireEvent(component, "eventName");
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             }
         ]
     },
@@ -176,4 +176,6 @@
             }
         };
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

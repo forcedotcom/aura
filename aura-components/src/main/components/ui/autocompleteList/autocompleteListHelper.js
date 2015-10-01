@@ -203,7 +203,6 @@
     },
 
     handleListHighlight: function (component, event) {
-        var activeIndex = -1;
         var selectedSection = this.createKeyboardTraversalList(component);
         if (selectedSection) {
             var direction = event.getParam("activeIndex");
@@ -315,7 +314,7 @@
             increment: function () {
                 var resultSection = this;
                 this.highlightedIndex++;
-                if (this.originalIndex != this.highlightedIndex) { //avoid infinite looping
+                if (this.originalIndex !== this.highlightedIndex) { //avoid infinite looping
                     if (this.highlightedIndex >= this.iters.length) {
                         this.highlightedIndex = -1;
                         resultSection = this.next.incrementedTo();
@@ -330,11 +329,11 @@
 
             decrement: function () {
                 var resultSection = this;
-                if (this.highlightedIndex == -1) {
+                if (this.highlightedIndex === -1) {
                     this.highlightedIndex = this.iters.length;
                 }
                 this.highlightedIndex--;
-                if (this.originalIndex != this.highlightedIndex) { //avoid infinite looping
+                if (this.originalIndex !== this.highlightedIndex) { //avoid infinite looping
                     if (this.highlightedIndex < 0) {
                         this.highlightedIndex = -1;
                         resultSection = this.previous.decrementedTo();
@@ -356,13 +355,13 @@
             },
 
             deselect: function () {
-                if (this.highlightedIndex != -1) {
+                if (this.highlightedIndex !== -1) {
                     this.iters[this.highlightedIndex].set("v.highlighted", false);
                 }
             },
 
             select: function () {
-                if (this.highlightedIndex == -1) {
+                if (this.highlightedIndex === -1) {
                     $A.warning("Can't select item without index");
                     return;
                 }

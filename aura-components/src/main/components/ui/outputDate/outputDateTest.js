@@ -20,7 +20,7 @@
     testDefaultFormat: {
         attributes: {value : '2004-09-23'},
         test: function(component){
-            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            $A.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testDefaultFormatWithBefore1970: {
         attributes: {value : '1935-04-10'},
         test: function(component){
-            aura.test.assertEquals("Apr 10, 1935", $A.test.getText(component.find('span').getElement()), "Incorrect date");
+            $A.test.assertEquals("Apr 10, 1935", $A.test.getText(component.find('span').getElement()), "Incorrect date");
         }
     },
     /**
@@ -38,7 +38,7 @@
     testEmptyStringValue: {
         attributes: {value : ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
         }
     },
     /**
@@ -49,7 +49,7 @@
         test: function(component){
         	component.set('v.value', undefined);
         	$A.rerender(component);
-        	aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
+        	$A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
         }
     },
     /**
@@ -58,7 +58,7 @@
     testInvalidValue: {
         attributes: {value : 'cornholio'},
         test: function(component){
-            aura.test.assertEquals("cornholio", $A.test.getText(component.find('span').getElement()), "Display the original value if it is not a valid date value.");
+            $A.test.assertEquals("cornholio", $A.test.getText(component.find('span').getElement()), "Display the original value if it is not a valid date value.");
         }
     },
 
@@ -68,7 +68,7 @@
     testEmptyStringForFormat:{
         attributes: {value : '2004-09-23', format: ''},
         test:function(component){
-            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should use use Aura default format.");
+            $A.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date format, should use use Aura default format.");
         }
     },
 
@@ -78,7 +78,7 @@
     testFormat: {
         attributes: {value : '2004-09-23', format: 'MM dd yyyy'},
         test: function(component){
-            aura.test.assertEquals("09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date format in display.");
+            $A.test.assertEquals("09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date format in display.");
       }
     },
     /**
@@ -91,7 +91,7 @@
     testAllPossibleFormats: {
         attributes: {value : '2004-09-23', format: 'yyyy MMMM EEEE DDD ww'},
         test: function(component){
-            aura.test.assertEquals("2004 September Thursday 267 39", $A.test.getText(component.find('span').getElement()), "Incorrect date format in display.");
+            $A.test.assertEquals("2004 September Thursday 267 39", $A.test.getText(component.find('span').getElement()), "Incorrect date format in display.");
       }
     },
 
@@ -101,7 +101,7 @@
     testInvalidFormat: {
         attributes: {value : '2004-09-23', format: 'bb'},
         test: function(component){
-            aura.test.assertEquals("bb", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
+            $A.test.assertEquals("bb", $A.test.getText(component.find('span').getElement()), "Expected the garbage format value.");
       }
     },
 
@@ -111,7 +111,7 @@
     testDefaultLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMMM d, yyyy'},
         test: function(component){
-            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
       }
     },
 
@@ -121,7 +121,7 @@
     testLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'fr'},
         test: function(component){
-            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
       }
     },
 
@@ -131,10 +131,10 @@
     testChangeLangLocale: {
         attributes: {value : '2004-09-23', format: 'MMM d, yyyy', langLocale: 'en'},
         test: function(component){
-            aura.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("Sep 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
             component.set("v.langLocale", "fr");
             $A.rerender(component);
-            aura.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("sept. 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
       }
     },
 
@@ -144,7 +144,7 @@
     testEmptyLangLocale:{
         attributes: {value : '2004-09-23', format: 'MMMM d, yyyy', langLocale: ''},
         test:function(component){
-            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
         }
     },
 
@@ -154,7 +154,9 @@
     testInvalidLangLocale:{
         attributes: {value : '2004-09-23', format: 'MMMM d, yyyy', langLocale: 'xx'},
         test:function(component){
-            aura.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
+            $A.test.assertEquals("September 23, 2004", $A.test.getText(component.find('span').getElement()), "Dates are not the same and they should be");
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

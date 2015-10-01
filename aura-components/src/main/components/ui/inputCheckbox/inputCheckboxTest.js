@@ -24,7 +24,7 @@
     testDisabled: {
         attributes : {disabled: true},
         test: function(component){
-            aura.test.assertTrue(component.find("checkbox").getElement().disabled, "Element not correctly disabled");
+            $A.test.assertTrue(component.find("checkbox").getElement().disabled, "Element not correctly disabled");
         }
     },
     /**
@@ -33,7 +33,7 @@
     testNotDisabled: {
         attributes : {disabled: false},
         test: function(component){
-            aura.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
+            $A.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
         }
     },
     /**
@@ -42,7 +42,7 @@
     testName: {
         attributes : {name: "checkboxName"},
         test: function(component){
-            aura.test.assertEquals("checkboxName", component.find("checkbox").getElement().name, "Name attribute not correctly set");
+            $A.test.assertEquals("checkboxName", component.find("checkbox").getElement().name, "Name attribute not correctly set");
         }
     },
     /**
@@ -51,7 +51,7 @@
     testSelectedValue: {
         attributes : {value: true},
         test: function(component){
-            aura.test.assertTrue(component.find("checkbox").getElement().checked, "Element not correctly selected");
+            $A.test.assertTrue(component.find("checkbox").getElement().checked, "Element not correctly selected");
         }
     },
     /**
@@ -60,7 +60,7 @@
     testUnselectedValue: {
         attributes : {value: false},
         test: function(component){
-            aura.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
+            $A.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
         }
     },
     /**
@@ -68,7 +68,7 @@
      */
     testType: {
         test: function(component){
-            aura.test.assertEquals("checkbox", component.find("checkbox").getElement().type, "Type attribute not correctly set");
+            $A.test.assertEquals("checkbox", component.find("checkbox").getElement().type, "Type attribute not correctly set");
         }
     },
 
@@ -81,7 +81,7 @@
     /*testText: {
         attributes : {text: "my value"},
         test: function(component){
-            aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Text attribute not correctly set");
+            $A.test.assertEquals("my value", component.find("checkbox").getElement().value, "Text attribute not correctly set");
             this.verifyLabel(component, "my value");
         }
     },*/
@@ -93,7 +93,7 @@
     /*testLabel: {
         attributes : {text:"my value", label : "I want a pony"},
         test: function(component){
-            aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
+            $A.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
             this.verifyLabel(component, "I want a pony");
         }
     },*/
@@ -103,18 +103,18 @@
     testRerender:{
         attributes : {disabled: false, text: "my value", value: false, label: "I'm broken, fix me"},
         test:[function(component){
-            aura.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
-            aura.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
-            aura.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
+            $A.test.assertEquals("my value", component.find("checkbox").getElement().value, "Value attribute not correctly set");
+            $A.test.assertFalse(component.find("checkbox").getElement().disabled, "Element not correctly enabled");
+            $A.test.assertFalse(component.find("checkbox").getElement().checked, "Element not correctly unselected");
         }, function(component){
             component.set('v.disabled', true);
             component.set('v.text', 'your value');
             component.set('v.value', true);
             component.set('v.label', "I want a pony");
         }, function(component){
-            aura.test.assertEquals("your value", component.find("checkbox").getElement().value, "After rerender, value attribute not correctly set with new value");
-            aura.test.assertTrue(component.find("checkbox").getElement().disabled, "After rerender, element not disabled");
-            aura.test.assertTrue(component.find("checkbox").getElement().checked, "After rerender, element not correctly selected");
+            $A.test.assertEquals("your value", component.find("checkbox").getElement().value, "After rerender, value attribute not correctly set with new value");
+            $A.test.assertTrue(component.find("checkbox").getElement().disabled, "After rerender, element not disabled");
+            $A.test.assertTrue(component.find("checkbox").getElement().checked, "After rerender, element not correctly selected");
             //TODO: W-1150831, W-943203
             //this.verifyLabel(component, "I want a pony");
         }]
@@ -125,9 +125,9 @@
     testSelecting:{
         attributes : {value: false},
         test:function(component){
-            aura.test.assertFalse(component.find("checkbox").getElement().checked, "Element should be unselected initially");
+            $A.test.assertFalse(component.find("checkbox").getElement().checked, "Element should be unselected initially");
             component.find("checkbox").getElement().click();
-            aura.test.assertTrue(component.find("checkbox").getElement().checked, "Element not correctly selected");
+            $A.test.assertTrue(component.find("checkbox").getElement().checked, "Element not correctly selected");
         }
     },
 
@@ -135,9 +135,11 @@
     // W-943203
     verifyLabel: function(component, expectedLabel){
         var elements = component.getElements();
-        aura.test.assertTrue($A.test.isInstanceofInputElement(elements[0]), "Input element not found");
-        aura.test.assertTrue($A.test.isInstanceOfText(elements[1]), "Label not found with checkbox");
-        aura.test.assertEquals(expectedLabel, $A.test.getText(elements[1]), "Label attribute not correctly set");
+        $A.test.assertTrue($A.test.isInstanceofInputElement(elements[0]), "Input element not found");
+        $A.test.assertTrue($A.test.isInstanceOfText(elements[1]), "Label not found with checkbox");
+        $A.test.assertEquals(expectedLabel, $A.test.getText(elements[1]), "Label attribute not correctly set");
     }
 
-})// eslint-disable-line semi
+/*eslint-disable semi */
+})
+/*eslint-enable semi */

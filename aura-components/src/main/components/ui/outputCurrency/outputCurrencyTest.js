@@ -21,7 +21,7 @@
     	attributes: {value : -123},
         test: function(component){
         	var val = $A.test.getText(component.find('span').getElement());
-        	aura.test.assertEquals("-$123.00", val, "Negative values not displayed correctly: '(value)' or '-value'. Actual is '" + val + "'");
+        	$A.test.assertEquals("-$123.00", val, "Negative values not displayed correctly: '(value)' or '-value'. Actual is '" + val + "'");
         }
     },
     /**
@@ -30,7 +30,7 @@
     testFractionalValue:{
         attributes: {value : .5},
         test: function(component){
-            aura.test.assertEquals('$0.50', $A.test.getText(component.find('span').getElement()), "Fractional values should be displayed in 0.XX format.");
+            $A.test.assertEquals('$0.50', $A.test.getText(component.find('span').getElement()), "Fractional values should be displayed in 0.XX format.");
         }
     },
     /**
@@ -39,7 +39,7 @@
     testValue: {
         attributes : {value : 123},
         test: function(component){
-            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Positive value attribute not displayed correctly");
+            $A.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Positive value attribute not displayed correctly");
         }
     },
     /**
@@ -50,7 +50,7 @@
     _testEmptyStringValue: {
         attributes : {value : ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Should have displayed empty span.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Should have displayed empty span.");
         }
     },
     /**
@@ -60,7 +60,7 @@
     _testNonNumericValue: {
         attributes : {value : 'foo'},
         test: function(component){
-            aura.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
+            $A.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
         }
     },
 
@@ -70,7 +70,7 @@
     _testNonCharCurrencyCode: {
         attributes : {value : 123, currencyCode: 123.4},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
+            $A.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
         }
     },
     /**
@@ -79,7 +79,7 @@
     _testInvalidCurrencyCode: {
         attributes : {value : 123, currencyCode : 'ABC'},
         test: function(component){
-            aura.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
+            $A.test.assertEquals('The currencyCode attribute must be a valid ISO 4217 currency code', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message");
         }
     },
     /**
@@ -88,7 +88,7 @@
     testDefaultCurrencyCode: {
         attributes : {value : 123},
         test: function(component){
-            aura.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
+            $A.test.assertEquals('$123.00', $A.test.getText(component.find('span').getElement()), "Should have used USD as default currency code.");
         }
     },
     /**
@@ -97,7 +97,7 @@
     testCurrencyCodeGBP: {
         attributes : {value : 123, currencyCode : 'GBP'},
         test: function(component){
-            aura.test.assertEquals('GBP123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
+            $A.test.assertEquals('GBP123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencyCode is specified");
         }
     },
     /**
@@ -108,7 +108,7 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 123, currencySymbol : '£'},
         test: function(component){
-            aura.test.assertEquals('£123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencySymbol is specified");
+            $A.test.assertEquals('£123.00', $A.test.getText(component.find('span').getElement()), "Text not correct when currencySymbol is specified");
         }
     },
     /**
@@ -119,7 +119,7 @@
     testCurrencyCodeINR_NumberGrouping: {
         attributes : {value : 121212000.54, currencyCode : 'INR'},
         test: function(component){
-            aura.test.assertEquals('INR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Should follow three digit grouping regardless of currency.");
+            $A.test.assertEquals('INR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Should follow three digit grouping regardless of currency.");
         }
     },
     /**
@@ -130,7 +130,7 @@
     testCurrencyCodeEUR_CommaDecimalSeperator: {
         attributes : {value : 121212000.54, currencyCode : 'EUR'},
         test: function(component){
-            aura.test.assertEquals('EUR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Show follow US locale since outputCurrency is not locale aware.");
+            $A.test.assertEquals('EUR121,212,000.54', $A.test.getText(component.find('span').getElement()), "Show follow US locale since outputCurrency is not locale aware.");
         }
     },
     /**
@@ -141,7 +141,7 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
+            $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and pads with zeros.");
         }
     },
     /**
@@ -152,7 +152,7 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890.7654321, format : '¤#,##0.0000'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.7654', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
+            $A.test.assertEquals('$1,234,567,890.7654', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
     },
     /**
@@ -163,7 +163,7 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890.7654521, format : '¤#,##0.0000'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.7655', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
+            $A.test.assertEquals('$1,234,567,890.7655', $A.test.getText(component.find('span').getElement()), "Value not displayed correctly when fractionDigits is specified and truncates.");
         }
     },
     /**
@@ -175,7 +175,7 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 123.45, format : '¤#'},
         test: function(component){
-            aura.test.assertEquals('$123', $A.test.getText(component.find('span').getElement()), "fractionDigits should be allowed to take value of 0.");
+            $A.test.assertEquals('$123', $A.test.getText(component.find('span').getElement()), "fractionDigits should be allowed to take value of 0.");
         }
     },
 
@@ -185,7 +185,7 @@
     testBigDecimal:{
         attributes : {value : '1234567890123456789012345678901234567890.12'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890,123,456,789,012,345,678,901,234,567,890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
+            $A.test.assertEquals('$1,234,567,890,123,456,789,012,345,678,901,234,567,890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
         }
     },
 
@@ -197,10 +197,10 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.value", 1234567890.1234);
             $A.rerender(component);
-            aura.test.assertEquals('$1,234,567,890.1234', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('$1,234,567,890.1234', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
 
@@ -212,10 +212,10 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
-        	aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+        	$A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.value", 1234567890);
             $A.rerender(component);
-            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
 
@@ -227,10 +227,10 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.format", "¤#,##0.00");
             $A.rerender(component);
-            aura.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+            $A.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     },
 
@@ -242,10 +242,10 @@
         browsers: ["-IE7","-IE8","-IE9","-IE10"],
         attributes : {value : 1234567890, format : '¤#,##0.0000'},
         test: function(component){
-        	aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+        	$A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.format", "¤#,##0.0000");
             $A.rerender(component);
-            aura.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+            $A.test.assertEquals('$1,234,567,890.0000', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     },
 
@@ -255,10 +255,10 @@
     testUpdateCurrencySymbol: {
         attributes : {value : 1234567890, currencySymbol : '$'},
         test: function(component){
-            aura.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('$1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.currencySymbol", '£');
             $A.rerender(component);
-            aura.test.assertEquals('£1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('£1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
 
@@ -268,10 +268,12 @@
     testUpdateCurrencyCode: {
         attributes : {value : 1234567890, currencyCode : 'USD'},
         test: function(component){
-            aura.test.assertEquals('USD1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('USD1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.currencyCode", 'GBP');
             $A.rerender(component);
-            aura.test.assertEquals('GBP1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('GBP1,234,567,890.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

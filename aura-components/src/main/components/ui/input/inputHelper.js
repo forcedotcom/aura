@@ -325,7 +325,10 @@
         // fill the cache by checking if an new input of "type" comes out with that type
         var test = document.createElement("input");
         test.setAttribute("type", type);
-        return (this.isHTML5Input.cache[type] = (test.type === type));
+
+        var isSameType = (test.type === type);
+        this.isHTML5Input.cache[type] = isSameType;
+        return isSameType;
     },
 
     isEventSupported: function(eventName) {
@@ -348,7 +351,8 @@
             isSupported = typeof el[_eventName] === 'function';
         }
         $A.util.removeElement(el);
-        return (this.isEventSupported.cache[eventName] = isSupported);
+        this.isEventSupported.cache[eventName] = isSupported;
+        return isSupported;
     },
 
     setAttribute: function(cmp, attr) {

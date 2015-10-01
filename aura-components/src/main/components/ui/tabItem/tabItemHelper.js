@@ -35,5 +35,4 @@
 		event.setParams(params);
 		event.fire();
 	}
-// eslint-disable-line semi
-})
+})// eslint-disable-line semi

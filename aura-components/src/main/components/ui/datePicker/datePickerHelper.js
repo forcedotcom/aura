@@ -274,7 +274,7 @@
         todayCmp.set("v.label", todayLabel);
     },
 
-    getNormalizedLang: function(component) {
+    getNormalizedLang: function() {
         var ret = 'en';
         var lang = [];
         var token = "";
@@ -347,7 +347,6 @@
             } else if (!$A.util.isUndefinedOrNull(referenceElem) && $A.get("$Browser.formFactor") === "DESKTOP") {
 
                 var scrollableParent = this._getScrollableParent(elem);
-                var self = this;
                 this._handleScroll = function() {
                     self.lib.panelPositioning.reposition();
                 };
@@ -385,9 +384,9 @@
 
             } else {
                 var viewPort = $A.util.getWindowSize();
+                var elemRect = elem.getBoundingClientRect();
                 if (!$A.util.isUndefinedOrNull(referenceElem)) {
                     $A.util.attachToDocumentBody(component.getElement());
-                    var elemRect = elem.getBoundingClientRect();
                     var referenceElemRect = referenceElem.getBoundingClientRect();
 
                     // Vertical alignment
@@ -416,8 +415,6 @@
                     //attaching to the body causes the date to lose focus so we need to add the focus back
                     this.focusDate(component);
                 } else {
-                    var elemRect = elem.getBoundingClientRect();
-
                     if (elemRect.bottom > viewPort.height) { // no enough space below
                         elem.style.top = 0 - (elemRect.bottom - viewPort.height) + "px"; // Move it up a bit
                     }

@@ -32,7 +32,7 @@
         }
     },
 
-    handleHeaderClick: function(component, event, helper) {
+    handleHeaderClick: function(component) {
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
             option: component.get("v.listHeader")[0],
@@ -41,7 +41,7 @@
         selectEvt.fire();
     },
 
-    handleFooterClick: function(component, event, helper) {
+    handleFooterClick: function(component) {
         var selectEvt = component.get("e.selectListOption");
         selectEvt.setParams({
             option: component.get("v.listFooter")[0],

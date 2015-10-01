@@ -17,93 +17,93 @@
     testDir: {
         attributes: {dir: 'rtl', label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('rtl', component.find("link").getElement().dir, "Dir attribute not correct");
+            $A.test.assertEquals('rtl', component.find("link").getElement().dir, "Dir attribute not correct");
         }
     },
 
     testDirMissing: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('ltr', component.find("link").getElement().dir, "Dir attribute not set to default");
+            $A.test.assertEquals('ltr', component.find("link").getElement().dir, "Dir attribute not set to default");
         }
     },
 
     testDirDirty: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertEquals('ltr', component.find("link").getElement().dir, "Dir attribute not set to default");
+            $A.test.assertEquals('ltr', component.find("link").getElement().dir, "Dir attribute not set to default");
             component.set("v.dir", "rtl");
         }, function (component) {
-            aura.test.assertEquals('rtl', component.find("link").getElement().dir, "Dir attribute not updated");
+            $A.test.assertEquals('rtl', component.find("link").getElement().dir, "Dir attribute not updated");
         }]
     },
 
     testDisabled: {
         attributes: {disabled: true, label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "disabled"), "Disabled class not correctly added");
+            $A.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "disabled"), "Disabled class not correctly added");
         }
     },
 
     testDisabledMissing: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertFalse($A.util.hasClass(component.find("link").getElement(), "disabled"), "Should not be disabled by default");
+            $A.test.assertFalse($A.util.hasClass(component.find("link").getElement(), "disabled"), "Should not be disabled by default");
         }
     },
 
     testDisabledDirty: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertFalse($A.util.hasClass(component.find("link").getElement(), "disabled"), "Should not be disabled by default");
+            $A.test.assertFalse($A.util.hasClass(component.find("link").getElement(), "disabled"), "Should not be disabled by default");
             component.set("v.disabled", "true");
         }, function (component) {
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "disabled"), "Disabled class not added correctly");
+            $A.test.assertTrue($A.util.hasClass(component.find("link").getElement(), "disabled"), "Disabled class not added correctly");
         }]
     },
 
     testValue: {
         attributes: {label: 'link', value: 'https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top'},
         test: function (component) {
-            aura.test.assertTrue(aura.test.contains(component.find("link").getElement().href, 'https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top'), "href attribute not correct");
+            $A.test.assertTrue($A.test.contains(component.find("link").getElement().href, 'https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top'), "href attribute not correct");
         }
     },
 
     testValueOnlyFragment: { // for layouts
         attributes: {label: 'link', value: '#top'},
         test: function (component) {
-            aura.test.assertEquals('javascript:void(0/*#top*/);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+            $A.test.assertEquals('javascript:void(0/*#top*/);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
         }
     },
 
     testValueOnlyParams: {
         attributes: {label: 'link', value: '?you=lost&me=found'},
         test: function (component) {
-            aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'), '?you=lost&me=found'), "href attribute not correct");
+            $A.test.assertTrue($A.test.contains(component.find("link").getElement().getAttribute('href'), '?you=lost&me=found'), "href attribute not correct");
         }
     },
 
     testValueEmpty: {
         attributes: {label: 'link', value: ''},
         test: function (component) {
-            aura.test.assertEquals('javascript:void(0);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+            $A.test.assertEquals('javascript:void(0);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
         }
     },
 
     testValueMailto: {
         attributes: {label: 'link', value: 'mailto:friend@salesforce.com'},
         test: function (component) {
-            aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'), 'mailto:friend@salesforce.com'), "href attribute not correct");
+            $A.test.assertTrue($A.test.contains(component.find("link").getElement().getAttribute('href'), 'mailto:friend@salesforce.com'), "href attribute not correct");
         }
     },
 
     testValueDirty: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'), 'www.salesforce.com'), "href attribute not correct");
+            $A.test.assertTrue($A.test.contains(component.find("link").getElement().getAttribute('href'), 'www.salesforce.com'), "href attribute not correct");
             component.set("v.value", "www.database.com");
         }, function (component) {
-            aura.test.assertTrue(aura.test.contains(component.find("link").getElement().getAttribute('href'), 'www.database.com'), "href attribute not updated");
+            $A.test.assertTrue($A.test.contains(component.find("link").getElement().getAttribute('href'), 'www.database.com'), "href attribute not updated");
         }]
     },
 
@@ -132,94 +132,94 @@
     testIconClassMissing: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals(0, component.find("link").getElement().getElementsByTagName("img").length, "Nested image should not be output without iconClass");
+            $A.test.assertEquals(0, component.find("link").getElement().getElementsByTagName("img").length, "Nested image should not be output without iconClass");
         }
     },
 
     testIconClassEmpty: {
         attributes: {iconClass: '', label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals(0, component.find("link").getElement().getElementsByTagName("img").length, "Nested image should not be output without iconClass");
+            $A.test.assertEquals(0, component.find("link").getElement().getElementsByTagName("img").length, "Nested image should not be output without iconClass");
         }
     },
 
     testIconClass: {
         attributes: {iconClass: 'myIcon', label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "IconClass not correctly added");
+            $A.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "IconClass not correctly added");
         }
     },
 
     testIconClassDirty: {
         attributes: {iconClass: 'myIcon', label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "IconClass not correctly added");
+            $A.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "IconClass not correctly added");
             component.set("v.iconClass", "someIconClass");
         }, function (component) {
-            aura.test.assertFalse($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "Original iconClass not removed");
-            aura.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "someIconClass"), "New iconClass not correctly added");
+            $A.test.assertFalse($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "myIcon"), "Original iconClass not removed");
+            $A.test.assertTrue($A.util.hasClass(component.find("link").getElement().getElementsByTagName("img")[0], "someIconClass"), "New iconClass not correctly added");
         }]
     },
 
     testLabel: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
+            $A.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelEmpty: {
         attributes: {label: '', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
+            $A.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelMissing: {
         attributes: {value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
+            $A.test.assertEquals('', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
         }
     },
 
     testLabelDirty: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
+            $A.test.assertEquals('link', $A.test.getText(component.find('link').getElement()), "Label attribute not correct");
             component.set("v.label", "updated link");
         }, function (component) {
-            aura.test.assertEquals('updated link', $A.test.getText(component.find('link').getElement()), "Label attribute not updated");
+            $A.test.assertEquals('updated link', $A.test.getText(component.find('link').getElement()), "Label attribute not updated");
         }]
     },
 
     testTitle: {
         attributes: {title: 'hover me', label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('hover me', component.find("link").getElement().title, "Title attribute not correct");
+            $A.test.assertEquals('hover me', component.find("link").getElement().title, "Title attribute not correct");
         }
     },
 
     testTitleEmpty: {
         attributes: {title: '', label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals('', component.find("link").getElement().title, "Title attribute not correct");
+            $A.test.assertEquals('', component.find("link").getElement().title, "Title attribute not correct");
         }
     },
 
     testTitleMissing: {
         attributes: {label: 'link', value: 'www.salesforce.com'},
         test: function (component) {
-            aura.test.assertEquals("", component.find("link").getElement().getAttribute('title'), "Title attribute not correct");
+            $A.test.assertEquals("", component.find("link").getElement().getAttribute('title'), "Title attribute not correct");
         }
     },
 
     testTitleDirty: {
         attributes: {title: 'hover me', label: 'link', value: 'www.salesforce.com'},
         test: [function (component) {
-            aura.test.assertEquals('hover me', component.find("link").getElement().title, "Title attribute not correct");
+            $A.test.assertEquals('hover me', component.find("link").getElement().title, "Title attribute not correct");
             component.set("v.title", "check again");
         }, function (component) {
-            aura.test.assertEquals('check again', component.find("link").getElement().title, "Title attribute not updated");
+            $A.test.assertEquals('check again', component.find("link").getElement().title, "Title attribute not updated");
         }]
     },
 
@@ -233,7 +233,7 @@
         test: function (component) {
             var icon = component.getElement().getElementsByTagName("img")[0];
             var alt = icon.getAttribute("alt");
-            aura.test.assertEquals('', alt, "Alt is set incorrectly");
+            $A.test.assertEquals('', alt, "Alt is set incorrectly");
 
         }
     },
@@ -243,7 +243,7 @@
         test: function (component) {
             var icon = component.getElement().getElementsByTagName("img")[0];
             var alt = icon.getAttribute('alt');
-            aura.test.assertEquals(alt, "Alt Should exist", "Alt is set incorrectly");
+            $A.test.assertEquals(alt, "Alt Should exist", "Alt is set incorrectly");
 
         }
     },
@@ -261,7 +261,7 @@
         attributes: {fixURL: true, label: "link", value: "http://www.salesforce.com:9090/home/home.jsp"},
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            aura.test.assertEquals("http://www.salesforce.com:9090/home/home.jsp", component.find("link").getElement().href, "href attribute not correct");
+            $A.test.assertEquals("http://www.salesforce.com:9090/home/home.jsp", component.find("link").getElement().href, "href attribute not correct");
         }
     },
 
@@ -274,7 +274,7 @@
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
 
-            aura.test.assertEquals("https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top", component.find("link").getElement().href, "href attribute not correct");
+            $A.test.assertEquals("https://www.salesforce.com:8080/home/home.jsp?chatter=off&tasks=on#top", component.find("link").getElement().href, "href attribute not correct");
         }
     },
 
@@ -282,7 +282,7 @@
         attributes: {fixURL: true, label: "link", value: "ftp://www.salesforce.com:6060/images"},
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            aura.test.assertEquals("ftp://www.salesforce.com:6060/images", component.find("link").getElement().href, "href attribute not correct");
+            $A.test.assertEquals("ftp://www.salesforce.com:6060/images", component.find("link").getElement().href, "href attribute not correct");
         }
     },
 
@@ -291,7 +291,7 @@
         attributes: {fixURL: true, label: "link", value: "mailto:friend@salesforce.com"},
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            aura.test.assertEquals("http://mailto:friend@salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
+            $A.test.assertEquals("http://mailto:friend@salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     },
 
@@ -300,7 +300,7 @@
         attributes: {fixURL: true, label: "link", value: "#top"},
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            aura.test.assertEquals("http://#top", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
+            $A.test.assertEquals("http://#top", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     },
 
@@ -308,8 +308,9 @@
         attributes: {fixURL: true, label: "link", value: "www.salesforce.com"},
         browsers : ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPAD", "-IPHONE"],
         test: function (component) {
-            aura.test.assertEquals("http://www.salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
+            $A.test.assertEquals("http://www.salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     }
-
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

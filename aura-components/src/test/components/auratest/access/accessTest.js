@@ -323,5 +323,82 @@
                        });
            }
        ]
+   },
+
+   testSetNonExistentAttribute: {
+       test: function(cmp) {
+           cmp.testSetNonExistentAttribute();
+           $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
+                   + " component that do not exist");
+       }
+   },
+
+   testSetNonExistentRemoteAttribute: {
+       test: function(cmp) {
+           cmp.testSetNonExistentRemoteAttribute();
+           $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
+                   + " component that do not exist");
+       }
+   },
+
+   testAuraMethodAccess: {
+       test: [
+       function canAccessGlobalMethod(cmp) {
+           cmp.testMethods("GLOBAL");
+           $A.test.assertEquals("globalMethod", cmp.get("v.output"));
+       },
+       function canAccessPublicMethod(cmp) {
+           cmp.testMethods("PUBLIC");
+           $A.test.assertEquals("publicMethod", cmp.get("v.output"));
+       },
+       function canAccessInternalMethod(cmp) {
+           cmp.testMethods("INTERNAL");
+           $A.test.assertEquals("internalMethod", cmp.get("v.output"));
+       },
+       function canAccessGlobalMethod(cmp) {
+           cmp.testMethods("PRIVATE");
+           $A.test.assertEquals("privateMethod", cmp.get("v.output"));
+       }]
+   },
+
+   testCanAccessRemoteGlobalMethod: {
+       attributes: {
+           "testType": "GLOBAL"
+       },
+       test: function(cmp) {
+           cmp.find("testRemoteMethods").getElement().click();
+           $A.test.assertEquals("globalMethod", cmp.find("remote").get("v.output"));
+       }
+   },
+
+   testCanAccessRemotePublicMethod: {
+       attributes: {
+           "testType": "PUBLIC"
+       },
+       test: function(cmp) {
+           cmp.find("testRemoteMethods").getElement().click();
+           $A.test.assertEquals("publicMethod", cmp.find("remote").get("v.output"));
+       }
+   },
+
+   testCanAccessRemoteInternalMethod: {
+       attributes: {
+           "testType": "INTERNAL"
+       },
+       test: function(cmp) {
+           cmp.find("testRemoteMethods").getElement().click();
+           $A.test.assertEquals("internalMethod", cmp.find("remote").get("v.output"));
+       }
+   },
+
+   // TODO(W-2769153): Should not be able to access facet's private method
+   _testCanNotAccessRemotePrivateMethod: {
+       attributes: {
+           "testType": "PRIVATE"
+       },
+       test: function(cmp) {
+           cmp.find("testRemoteMethods").getElement().click();
+           $A.test.assertUndefined(cmp.find("remote").get("v.output"));
+       }
    }
 })

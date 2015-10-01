@@ -20,6 +20,12 @@
     <aura:attribute name="output" type="Object" />
     <aura:attribute name="testDone" type="Boolean" default="false" />
 
+    <aura:method name="testSetNonExistentAttribute" action="{!c.testSetNonExistentAttribute}"/>
+    <aura:method name="testSetNonExistentRemoteAttribute" action="{!c.testSetNonExistentRemoteAttribute}"/>
+    <aura:method name="testMethods" action="{!c.testMethods}">
+        <aura:attribute name="accessLevel" type="String"/>
+    </aura:method>
+
     <aura:attribute name="Private" type="String" access="PRIVATE" description="private" default="PRIVATE"/>
     <aura:attribute name="Public" type="String" access="PUBLIC" description="public" default="PUBLIC"/>
     <aura:attribute name="Internal" type="String" access="INTERNAL" description="internal" default="INTERNAL"/>
@@ -29,6 +35,11 @@
     <aura:registerEvent name="publicEvent" type="auratest:accessPublicEvent"/>
     <aura:registerEvent name="internalEvent" type="auratest:accessInternalEvent"/>
     <aura:registerEvent name="privateEvent" type="auratest:accessPrivateEvent"/>
+
+    <aura:method name="globalMethod" action="{!c.globalMethod}" access="GLOBAL"/>
+    <aura:method name="publicMethod" action="{!c.publicMethod}" access="PUBLIC"/>
+    <aura:method name="internalMethod" action="{!c.internalMethod}" access="INTERNAL"/>
+    <aura:method name="privateMethod" action="{!c.privateMethod}" access="PRIVATE"/>
 
     <div aura:id="local" class="outputDiv">
         {!v.Private}<br/>
@@ -43,4 +54,5 @@
     <ui:button aura:id="testEvent" label="testEventAccess" press="{!c.testEventAccess}"/>
     <ui:button aura:id="testRemoteEvent" label="testRemoteEventAccess" press="{!c.testRemoteEventAccess}"/>
     <ui:button aura:id="testComponent" label="testComponentAccess" press="{!c.testComponentAccess}"/>
+    <ui:button aura:id="testRemoteMethods" label="testRemoteMethodAccess" press="{!c.testRemoteMethodAccess}"/>
 </aura:component>

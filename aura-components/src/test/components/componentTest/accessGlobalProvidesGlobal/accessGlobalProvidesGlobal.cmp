@@ -13,8 +13,10 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
+    <div>componentTest:accessExtendsPublic</div>
 -->
-<aura:component access="INTERNAL">
-    <div class="accessInternalComponent">auratest:accessInternalComponent</div>
+<aura:component>
+    <aura:dependency resource="auratest:accessGlobalComponent" type="COMPONENT"/>
+
+    <provider:clientProvider value="{componentDef:'markup://auratest:accessGlobalComponent'}"/>
 </aura:component>

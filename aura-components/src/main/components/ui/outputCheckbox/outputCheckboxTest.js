@@ -19,7 +19,7 @@
         attributes : {value : true},
         test: function(component){
         	var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
         }
     },
 
@@ -28,7 +28,7 @@
         attributes : {value : false},
         test: function(component){
             var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
         }
     },
 
@@ -37,12 +37,12 @@
         attributes : {value : false},
         test: [function(component){
             var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
 
             component.set("v.value",true);
         }, function(component){
             var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
         }]
     },
 
@@ -51,12 +51,14 @@
         attributes : {value : true},
         test: [function(component){
             var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "checked"), "missing class: checked");
 
             component.set("v.value",false);
         }, function(component){
             var expectedElem = component.find("img1").getElement().getElementsByTagName("img")[0];
-            aura.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
+            $A.test.assertTrue($A.util.hasClass(expectedElem, "unchecked"), "missing class: unchecked");
       }]
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

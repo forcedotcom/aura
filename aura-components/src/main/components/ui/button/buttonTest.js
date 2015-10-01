@@ -134,16 +134,17 @@
             $A.test.assertEquals('clear', $A.test.getText(component.find("div").getElement()), "New label not rerendered");
             $A.test.assertTrue(component.find("button").getElement().disabled, "Button was not rerendered in disabled state");
 
-            for(var i in component.find('button').getElement().children){
-                var child = component.find('button').getElement().children[i];
+            var i, child;
+            for(i in component.find('button').getElement().children){
+                child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
                 	$A.test.assertTrue(child.src.indexOf('/auraFW/resources/aura/images/clear.png')!==-1, "Button not rerendered with specified icon img");
                 }
             }
             $A.renderingService.rerender(component);
 
-            for(var i in component.find('button').getElement().children){
-                var child = component.find('button').getElement().children[i];
+            for(i in component.find('button').getElement().children){
+                child = component.find('button').getElement().children[i];
                 if($A.test.isInstanceOfImageElement(child)){
                     $A.test.fail("There should be no image element for the button");
                 }
@@ -151,4 +152,6 @@
         }
     }
 
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

@@ -124,9 +124,8 @@
                     collector[index]=itemComponents;
                     if(++currentCall===expectedCalls){
                         var components=[];
-                        var i;
-                        for(i=0;i<collector.length;i++){
-                            components=components.concat(collector[i]);
+                        for(var j=0; j<collector.length; j++){
+                            components=components.concat(collector[j]);
                         }
                         completeHandler(component,components);
                     }

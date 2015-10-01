@@ -62,5 +62,4 @@
         var span = cmp.find("span");
         span.getElement().textContent = span.getElement().innerText = formatted;
     }
- // eslint-disable-line semi
- })
+ })// eslint-disable-line semi

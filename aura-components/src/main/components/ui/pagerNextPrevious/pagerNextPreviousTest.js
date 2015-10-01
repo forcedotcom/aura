@@ -145,4 +145,6 @@
         	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
     }
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

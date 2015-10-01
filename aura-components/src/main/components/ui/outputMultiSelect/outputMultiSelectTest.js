@@ -20,13 +20,15 @@
     testEmptyValue:{
         attributes : {value: ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "When value is initialized to an empty string, nothing should be shown.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "When value is initialized to an empty string, nothing should be shown.");
         }
     },
     testSingleEntry:{
         attributes : {value: 'foo'},
         test: function(component){
-            aura.test.assertEquals('foo', $A.test.getText(component.find('span').getElement()), "Multiselect failed to display a single entry.");
+            $A.test.assertEquals('foo', $A.test.getText(component.find('span').getElement()), "Multiselect failed to display a single entry.");
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

@@ -18,7 +18,7 @@
 	attributes : {description:'test', title:'this is a great title', isModal:'true'},
 	test: function(cmp){
 	        var cls = cmp.find("mask").getElement().className;
-    		aura.test.assertTrue(aura.test.contains(cls,"mask hidden"), "isModal is set to true, but does not have the class associated with it");
+    		$A.test.assertTrue($A.test.contains(cls,"mask hidden"), "isModal is set to true, but does not have the class associated with it");
         }
     },
 
@@ -26,7 +26,7 @@
         attributes : {description:'test', title:'this is a great title', isModal:'false'},
 	test: function(cmp){
 	        var obj = cmp.find("mask");
-    		aura.test.assertTrue($A.util.isUndefinedOrNull(obj), "isModal is set to false, but contains the class as though it was set to true");
+    		$A.test.assertTrue($A.util.isUndefinedOrNull(obj), "isModal is set to false, but contains the class as though it was set to true");
         }
     }
 /*eslint-disable semi */

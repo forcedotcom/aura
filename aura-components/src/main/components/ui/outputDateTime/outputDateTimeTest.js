@@ -20,7 +20,7 @@
     testEmptyStringValue: {
         attributes: {value: ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expected an empty span.");
         }
     },
 
@@ -30,7 +30,7 @@
     testInvalidValue: {
         attributes: {value: 'cornholio'},
         test: function(component){
-            aura.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
+            $A.test.assertEquals("Invalid date time value", $A.test.getText(component.find('span').getElement()), "Value must be an ISO8601-formatted string or a number of milliseconds from Epoch.");
         }
     },
 
@@ -40,8 +40,8 @@
     testEmptyFormat:{
         attributes: {value : '2004-09-23T16:30:00.000Z', format: '', langLocale: 'en', timezone: 'GMT'},
         test:function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("Sep 23, 2004 4:30:00 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format.");
         	});
         }
     },
@@ -52,8 +52,8 @@
     testFormat: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'Z ss:mm:HH MM dd yyyy', langLocale: 'en', timezone: 'GMT'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("+00:00 00:30:16 09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("+00:00 00:30:16 09 23 2004", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
         	});
       }
     },
@@ -64,8 +64,8 @@
     testInvalidFormat: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'cornoio', langLocale: 'en', timezone: 'GMT'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("cornoio", $A.test.getText(component.find('span').getElement()), "Invalid pattern character is output as it is.");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("cornoio", $A.test.getText(component.find('span').getElement()), "Invalid pattern character is output as it is.");
         	});
       }
     },
@@ -76,8 +76,8 @@
     testLanguage: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         test: function(component){
-            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-                aura.test.assertEquals("9/24/04 12:30 凌晨", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+            $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                $A.test.assertEquals("9/24/04 12:30 凌晨", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
             });
 
         }
@@ -90,11 +90,11 @@
     	attributes: {value : '2004-09-23T16:30:00.000Z', format: 'M/dd/yy h:mm A', langLocale: 'zh_CN', timezone: 'Asia/Shanghai'},
         doNotWrapInAuraRun : true,
         test: function(component){
-            aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-                aura.test.assertEquals("9/24/04 12:30 凌晨", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+            $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+                $A.test.assertEquals("9/24/04 12:30 凌晨", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
                 component.set("v.langLocale", "en");
                 $A.rerender(component);
-                aura.test.assertEquals("9/24/04 12:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
+                $A.test.assertEquals("9/24/04 12:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect formatted datetime string.");
             });
 
         }
@@ -106,10 +106,10 @@
     testDefaultLangLocale:{
 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT'},
 	test: function(component){
-	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	    		$A.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
 	        });
         }
     },
@@ -120,10 +120,10 @@
     testEmptyStringLangLocale:{
 	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: ''},
 	test: function(component){
-	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	    		$A.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
 	        });
         }
     },
@@ -134,10 +134,10 @@
     testInvalidLangLocale:{
  	attributes : {value:'2004-09-23T16:30:00.000Z', timezone: 'GMT', langLocale: 'kk'},
 	test: function(component){
-	        aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+	        $A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
 	        	var outputDateStr  = $A.test.getText(component.find('span').getElement());
 		        var dt            = 'Sep 23, 2004 4:30:00 PM';
-	    		aura.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
+	    		$A.test.assertEquals(dt, outputDateStr, "Should have used Default langLocale.");
 	        });
         }
     },
@@ -148,16 +148,16 @@
     testEmptyStringForTimeZone:{
         attributes: {value: '2004-09-23T16:30:00.000Z', timezone: '', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		var timezone = $A.get("$Locale.timezone");
         		if(timezone === "GMT"){
-	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+	        		$A.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone === "America/Los_Angeles"){
-	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+	        		$A.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else{// For any other time zone we just make sure it has some value
-	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
+	        		$A.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
 	        	}
         	});
         }
@@ -169,8 +169,8 @@
     testTimezoneByCity: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/New_York', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 12:30 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("9/23/04 12:30 PM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to use specified timezone");
         	});
       }
     },
@@ -178,8 +178,8 @@
     testTimezoneObeysDayLightSaving: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'America/Los_Angeles', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Incorrect date/time, failed to recognize that timezone has Daylight saving in effect.");
         	});
       }
     },
@@ -190,16 +190,16 @@
     testInvalidTimezone: {
         attributes: {value : '2004-09-23T16:30:00.000Z', timezone: 'sasquatch', format: 'M/dd/yy h:mm A', langLocale: 'en'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
         		var timezone = $A.get("$Locale.timezone");
         		if(timezone === "GMT"){
-	        		aura.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+	        		$A.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else if(timezone == "America/Los_Angeles"){
-	        		aura.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
+	        		$A.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else{// For any other time zone we just make sure it has some value
-	        		aura.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
+	        		$A.test.assertTrue($A.test.getText(component.find('span').getElement()).length > 0, "Should have used default as default timezone.");
 	        	}
         	});
         }
@@ -211,10 +211,12 @@
     testMillisecondInFormat: {
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'MM-dd-yyyy HH:mm:ss.SSS', langLocale: 'en', timezone: 'GMT'},
         test: function(component){
-        	aura.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
-        		aura.test.assertEquals("09-23-2004 16:30:00.000", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
+        	$A.test.addWaitFor(true, function(){return $A.test.getText(component.find('span').getElement()).length > 0;},function(){
+        		$A.test.assertEquals("09-23-2004 16:30:00.000", $A.test.getText(component.find('span').getElement()), "Incorrect date/time format in display.");
         	});
       }
     }
 
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

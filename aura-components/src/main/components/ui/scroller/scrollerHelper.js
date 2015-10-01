@@ -384,5 +384,4 @@
 
        delete component._scroller;
     }
- // eslint-disable-line semi
- })
+ })// eslint-disable-line semi

@@ -326,14 +326,15 @@
 
             var currentId = parseInt(source.getLocalId(),10);
             var currentDate = source.get("v.label");
+            var targetDate;
             if (currentId < firstDateId) { // previous month
-                var targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
+                targetDate = new Date(component.get("v.year"), component.get("v.month") - 1, currentDate);
                 component.set("v.year", targetDate.getFullYear());
                 component.set("v.month", targetDate.getMonth());
                 component.set("v.date", targetDate.getDate());
                 this.updateTitle(component, targetDate.getMonth(), targetDate.getFullYear());
             } else if (currentId > lastDateId) { // next month
-                var targetDate = new Date(component.get("v.year"), component.get("v.month") + 1, currentDate);
+                targetDate = new Date(component.get("v.year"), component.get("v.month") + 1, currentDate);
                 component.set("v.year", targetDate.getFullYear());
                 component.set("v.month", targetDate.getMonth());
                 component.set("v.date", targetDate.getDate());

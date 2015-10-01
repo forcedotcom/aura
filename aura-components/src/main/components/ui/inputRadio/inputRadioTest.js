@@ -20,7 +20,7 @@
     testDisabled: {
         attributes : {disabled: true},
         test: function(component){
-            aura.test.assertTrue(component.find("radio").getElement().disabled, "Element not correctly disabled");
+            $A.test.assertTrue(component.find("radio").getElement().disabled, "Element not correctly disabled");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testNotDisabled: {
     	attributes : {disabled: false},
     	test: function(component){
-    		aura.test.assertFalse(component.find("radio").getElement().disabled, "Element not correctly enabled");
+    		$A.test.assertFalse(component.find("radio").getElement().disabled, "Element not correctly enabled");
     	}
     },
 
@@ -40,9 +40,11 @@
     	browsers : ["-IPHONE", "-IPAD"],
     	attributes : {name: "testRadio"},
     	test: function(component){
-    		radioElement = component.find("radio").getElement();
+    		var radioElement = component.find("radio").getElement();
     		$A.test.clickOrTouch(radioElement);
-    		aura.test.assertTrue(radioElement.checked, "Radio Element was not clickable");
+    		$A.test.assertTrue(radioElement.checked, "Radio Element was not clickable");
     	}
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

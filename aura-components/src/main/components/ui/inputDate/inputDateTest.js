@@ -19,7 +19,7 @@
         attributes : {displayDatePicker: 'true', value: '2012-09-10', format: 'MM/dd/yyyy'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -30,7 +30,7 @@
         attributes : {displayDatePicker: 'true', value: '2012-09-10'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -41,7 +41,7 @@
 	    attributes : {displayDatePicker:'true', value: '2012-09-10', format: ''},
 	    test: function(cmp){
 	        var inputDateStr = cmp.find("inputText").getElement().value;
-    		aura.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
+    	    $A.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -55,7 +55,7 @@
 	    }, function(cmp){
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('KKKKKK');
-    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
@@ -66,7 +66,7 @@
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -77,7 +77,7 @@
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("Septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("Septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -88,7 +88,7 @@
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: ''},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -99,7 +99,7 @@
         attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'xx'},
         test: function(cmp){
             var inputDateStr = cmp.find("inputText").getElement().value;
-            aura.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
+            $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
@@ -114,7 +114,7 @@
 	    }, function(cmp){
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('MMM DD, YYYY');
-    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
@@ -129,7 +129,7 @@
 	    }, function(cmp){
 	        var inputDateStr = cmp.find("inputText").getElement().value;
 	        var dt           = moment().format('DD/MM/YYYY');
-    		aura.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
@@ -140,10 +140,11 @@
     	attributes: {displayDatePicker: 'true', label: 'my date cmp'},
     	test: function(cmp){
     		var datePickerOpener = cmp.find("datePickerOpener");
-    		aura.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");
+    	    $A.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");
     		var datePicker = cmp.find("datePicker");
-    		aura.test.assertNotNull(datePicker, "datePicker not present");
+    	    $A.test.assertNotNull(datePicker, "datePicker not present");
     	}
     }
-
-})// eslint-disable-line semi
+/*eslint-disable semi */
+})
+/*eslint-enable semi */

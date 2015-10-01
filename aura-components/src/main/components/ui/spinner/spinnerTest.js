@@ -45,4 +45,6 @@
 			$A.test.assertTrue($A.util.hasClass(spinner.getElement(), 'hideEl'));
 		}
 	}
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

@@ -229,7 +229,7 @@
         var tabs = [], tabIds = [], tabItemConfigs = [], tabNames = [],
         //default active tab to first tab
             activeTab = 0;
-        var i;
+        var i, len;
 
         // get all instances of ui:tab in the body
         var body = cmp.getConcreteComponent().get('v.body');

@@ -284,9 +284,10 @@
 			rowData = concrete._rowData,
 			selectionData = concrete._selectionData;
 		
+        var i;
 		// Apply the value either to the specified rows or to all rows depending on whether the rows parameter was defined
 		var rowsLength = rows ? rows.length : rowData.length;
-		for (var i = 0; i < rowsLength; i++) {
+		for (i = 0; i < rowsLength; i++) {
 			var index = rows ? rows[i] : i;
 			
 			rowData[index].vp.set("selected", value);
@@ -299,7 +300,7 @@
 		cmp.set("v.selectedItems", selectedItems);
 		
 		var isSelectAll = (selectedItems.length === items.length);
-		for (var i = 0; i < selectionData.selectionColumns.length; i++) {
+		for (i = 0; i < selectionData.selectionColumns.length; i++) {
 			selectionData.selectionColumns[i].set("v.selectAll", isSelectAll);
 		}
 	},
@@ -353,10 +354,16 @@
 	 */
 	// TODO: revisit this function
 	shiftRowData: function(concrete, index, count, remove) {
+
+        function destroyComponent(cmp) {
+            cmp.destroy(true);
+        }
+
 		var rowData = concrete._rowData,
 			args = [index, remove ? count : 0],
+            components,
 			columnData;
-		
+
 		if (!remove) {
 			for (var i=0; i<count; i++) {
 				args.push(null);
@@ -366,9 +373,7 @@
 				columnData = rowData[index + i].columnData;
 				for (var j=0; j<columnData.length; j++) {
 					components = columnData[j].components;
-					$A.util.forEach(components, function(cmp) {
-						cmp.destroy(true);
-					});
+					$A.util.forEach(components, destroyComponent);
 				}
 			}
 		}
@@ -502,7 +507,7 @@
 	
 	//TODO MERGE: Check merge
 	updateValueProvidersFromItems: function (concrete) {
-		var items = concrete.get('v.items') || [];
+		var items = concrete.get('v.items') || [],
 			tbody = concrete.find("tbody").getElement();
 		
         for(var i=0;i<items.length;i++){
@@ -513,12 +518,14 @@
             rowData.vp.set('index',i);
             rowData.vp.set('disabled', false);
             
-            for(var j=0;j<rowData.classes.length;j++) {
+            var j;
+
+            for(j=0;j<rowData.classes.length;j++) {
             	$A.util.toggleClass(rowElement, rowData.classes[j], false);
             }
             rowData.classes = [];
             
-            for(var j=0;j<rowData.columnData.length;j++){
+            for(j=0;j<rowData.columnData.length;j++){
                 var columnData=rowData.columnData[j];
                 var columns=columnData.components;
                 for(var c=0;c<columns.length;c++){
@@ -619,20 +626,23 @@
 	 * @param {function (Component)} callback A callback. Not using promises due to high volume.
 	 */
 	createAndRenderCell: function (concrete, cdrs, vp, element, components, callback) {
-		var resolved = 0;
+
+        function setupComponent(out) {
+            components.push(out);
+
+            $A.render(out, element);	// Most of the performance hits here
+            $A.afterRender(out);
+
+            if (callback && (++resolved === cdrs.length)) {
+                callback();
+            }
+        }
+
+        var resolved = 0;
 
 		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
 			var cdr = cdrs[cdrIndex];
-			$A.componentService.newComponentAsync(this, function (out) {
-				components.push(out);
-
-				$A.render(out, element);	// Most of the performance hits here
-				$A.afterRender(out);
-
-				if (callback && (++resolved === cdrs.length)) {
-					callback();
-				}
-			}, cdr, vp);
+			$A.componentService.newComponentAsync(this, setupComponent, cdr, vp);
 		}
 	},
 	
@@ -816,7 +826,7 @@
 			batchedCmps = [];
 		
 		for (var i=0; i<count; i++) {
-			columnData = rowDataArray[rowIndex + i].columnData;
+			var columnData = rowDataArray[rowIndex + i].columnData;
 			for (var j=0; j<columnData.length; j++) {
 				var components = columnData[j].components;
 				if (batch && components) {

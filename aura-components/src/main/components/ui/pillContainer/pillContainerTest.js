@@ -30,4 +30,6 @@
     		);
         }]
     }
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

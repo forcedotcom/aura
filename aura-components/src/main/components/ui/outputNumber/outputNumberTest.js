@@ -20,7 +20,7 @@
     testNegativeValue:{
         attributes: {value : -123},
         test: function(component){
-            aura.test.assertEquals('-123', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
+            $A.test.assertEquals('-123', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
         }
     },
     /**
@@ -29,7 +29,7 @@
     testNegativeValueWithNegativeFormat:{
         attributes: {value : -123.936, format:"#.0#;(#.0#)"},
         test: function(component){
-            aura.test.assertEquals('(123.94)', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
+            $A.test.assertEquals('(123.94)', $A.test.getText(component.find('span').getElement()), "Negative values not displayed correctly.");
         }
     },
     /**
@@ -38,7 +38,7 @@
     testValue: {
         attributes : {value : 123},
         test: function(component){
-            aura.test.assertEquals('123', $A.test.getText(component.find('span').getElement()), "Positive value attribute not correct");
+            $A.test.assertEquals('123', $A.test.getText(component.find('span').getElement()), "Positive value attribute not correct");
         }
     },
     /**
@@ -49,7 +49,7 @@
     _testEmptyStringValue: {
         attributes : {value : ''},
         test: function(component){
-            aura.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expect to see an empty span.");
+            $A.test.assertEquals('', $A.test.getText(component.find('span').getElement()), "Expect to see an empty span.");
         }
     },
     /**
@@ -59,7 +59,7 @@
     _testNonNumericValue: {
         attributes : {value : 'foo'},
         test: function(component){
-            aura.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
+            $A.test.assertEquals('The value attribute must be assigned a numeric value', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
         }
     },
     /**
@@ -68,7 +68,7 @@
     testDefaultDecimalPrecision: {
         attributes : {value : 123.450},
         test: function(component){
-            aura.test.assertEquals('123.45', $A.test.getText(component.find('span').getElement()), "Value not displayed as expected when format is not specified.");
+            $A.test.assertEquals('123.45', $A.test.getText(component.find('span').getElement()), "Value not displayed as expected when format is not specified.");
         }
     },
     /**
@@ -77,7 +77,7 @@
     testEmptyStringFormat: {
         attributes : {value : 123.450, format : ''},
         test: function(component){
-            aura.test.assertEquals('123.45', $A.test.getText(component.find('span').getElement()), "Value not displayed as expected when format is a empty string.");
+            $A.test.assertEquals('123.45', $A.test.getText(component.find('span').getElement()), "Value not displayed as expected when format is a empty string.");
         }
     },
     /**
@@ -86,7 +86,7 @@
     testInvalidFormat  : {
         attributes : {value : 123.450, format : ',,'},
         test: function(component){
-            aura.test.assertEquals('Invalid format attribute', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
+            $A.test.assertEquals('Invalid format attribute', $A.test.getText(component.find('span').getElement()), "Should have displayed an error message.");
         }
     },
     /**
@@ -95,7 +95,7 @@
     testRoundingLotsOfNines: {
         attributes : {value : 999999.9, format : '#,##0'},
         test: function(component){
-            aura.test.assertEquals('1,000,000', $A.test.getText(component.find('span').getElement()), "Nines were not rounded up correctly");
+            $A.test.assertEquals('1,000,000', $A.test.getText(component.find('span').getElement()), "Nines were not rounded up correctly");
         }
     },
     /**
@@ -104,7 +104,7 @@
     testRoundingLotsOfNinesAndZeroPadding: {
         attributes : {value : 999999.9, format : '00000000'},
         test: function(component){
-            aura.test.assertEquals('01000000', $A.test.getText(component.find('span').getElement()), "Nines were not round up correctly");
+            $A.test.assertEquals('01000000', $A.test.getText(component.find('span').getElement()), "Nines were not round up correctly");
         }
     },
     /**
@@ -113,7 +113,7 @@
     testFormat2DecimalPlaces_RoundUp: {
         attributes : {value : 3.1459, format : '.00'},
         test: function(component){
-            aura.test.assertEquals('3.15', $A.test.getText(component.find('span').getElement()), "Decimal part of value was not rounded up based on format.");
+            $A.test.assertEquals('3.15', $A.test.getText(component.find('span').getElement()), "Decimal part of value was not rounded up based on format.");
         }
     },
     /**
@@ -122,7 +122,7 @@
     testFormat2DecimalPlaces_RoundDown: {
         attributes : {value : 3.14159, format : '.00'},
         test: function(component){
-            aura.test.assertEquals('3.14', $A.test.getText(component.find('span').getElement()), "Decimal part of value was not rounded down based on format.");
+            $A.test.assertEquals('3.14', $A.test.getText(component.find('span').getElement()), "Decimal part of value was not rounded down based on format.");
         }
     },
     /**
@@ -131,7 +131,7 @@
     testFormatDoesNotRestrictIntegerValue: {
         attributes : {value : 22.7, format : '0.0'},
         test: function(component){
-            aura.test.assertEquals('22.7', $A.test.getText(component.find('span').getElement()), "Should have displayed full value but was probably truncated.");
+            $A.test.assertEquals('22.7', $A.test.getText(component.find('span').getElement()), "Should have displayed full value but was probably truncated.");
         }
     },
     /**
@@ -140,7 +140,7 @@
     testAppendingZeroToMatchFormat: {
         attributes : {value : 22.7, format : '.000'},
         test: function(component){
-            aura.test.assertEquals('22.700', $A.test.getText(component.find('span').getElement()), "Should have appended two zeros to match format.");
+            $A.test.assertEquals('22.700', $A.test.getText(component.find('span').getElement()), "Should have appended two zeros to match format.");
         }
     },
     /**
@@ -149,7 +149,7 @@
     testBigDecimal:{
         attributes : {value : '1234567890123456789012345678901234567890.12', format : '.00'},
         test: function(component){
-            aura.test.assertEquals('1234567890123456789012345678901234567890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
+            $A.test.assertEquals('1234567890123456789012345678901234567890.12', $A.test.getText(component.find('span').getElement()), "Unexpected value.");
         }
     },
 
@@ -159,10 +159,10 @@
     testUpdateValue: {
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.value", 49322);
             $A.rerender(component);
-            aura.test.assertEquals('4,93,22.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('4,93,22.00', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
 
@@ -172,10 +172,10 @@
     testUpdateValueWithSame: {
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.value", 22.7);
             $A.rerender(component);
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after changed");
         }
     },
 
@@ -185,10 +185,10 @@
     testUpdateFormat: {
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.format", "meh #.#");
             $A.rerender(component);
-            aura.test.assertEquals('meh 22.7', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+            $A.test.assertEquals('meh 22.7', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     },
 
@@ -198,10 +198,12 @@
     testUpdateFormatWithSame: {
         attributes : {value : 22.7, format : '##,#0,00.00#####'},
         test: function(component){
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not formatted correctly");
             component.set("v.format", "##,#0,00.00#####");
             $A.rerender(component);
-            aura.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
+            $A.test.assertEquals('0,22.70', $A.test.getText(component.find('span').getElement()), "Value not updated after format changed");
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

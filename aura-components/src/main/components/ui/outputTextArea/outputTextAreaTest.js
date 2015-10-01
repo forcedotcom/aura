@@ -23,8 +23,8 @@
         test:function(cmp){
             var span = cmp.find('span');
             //Make sure a span tag is used for outputTextArea. Failure might mean breaking styling of third party app
-            aura.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
-            aura.test.assertEquals('Salesforce.com, ....some literature about the company.', $A.test.getText(span.getElement()));
+            $A.test.assertEquals('SPAN', span.getElement().tagName, "OutputTextArea is expected to use a span tag to display value.");
+            $A.test.assertEquals('Salesforce.com, ....some literature about the company.', $A.test.getText(span.getElement()));
         }
     },
     /**
@@ -34,8 +34,10 @@
         attributes:{value : ''},
         test:function(cmp){
             var span = cmp.find('span');
-            aura.test.assertNotNull(span);
-            aura.test.assertEquals('', $A.test.getText(span.getElement()));
+            $A.test.assertNotNull(span);
+            $A.test.assertEquals('', $A.test.getText(span.getElement()));
         }
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

@@ -27,7 +27,7 @@
 
                 component.get("c.changeHandler").runDeprecated(domEvent);
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
             function CallsHelperFireEvent(component) {
                 var domEvent = { target: { checked: null } };
@@ -40,7 +40,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertTrue(actual);
+                $A.test.assertTrue(actual);
             },
             function ComponentPassedToFireEvent(component){
                 var expected = component;
@@ -54,7 +54,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function EventNamePassedToFireEvent(component){
                 var expected = "onchange";
@@ -68,7 +68,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function EventCategoryPassedToFireEvent(component){
                 var expected = "checkbox";
@@ -82,7 +82,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function RawDomEventPassedToFireEvent(component){
                 var domEvent = { target: { checked: null } };
@@ -96,7 +96,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             },
             function CheckedInformationPassedToFireEvent(component){
                 var expected = true;
@@ -110,7 +110,7 @@
                     component.get("c.changeHandler").runDeprecated(domEvent);
                 });
 
-                aura.test.assertEquals(expected, actual);
+                $A.test.assertEquals(expected, actual);
             }
         ]
     },
@@ -140,4 +140,6 @@
             }
         };
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext.Authentication;
@@ -68,26 +68,26 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
 
     private void init() throws Exception {
         perfConfigUtil = new PerfConfigUtil();
-        Map<DefDescriptor<ComponentDef>, PerfConfig> tests = discoverTests();
+        Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests = discoverTests();
         runTests(tests);
     }
 
     @Override
-    public void runTests(Map<DefDescriptor<ComponentDef>, PerfConfig> tests) throws Exception {
+    public void runTests(Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests) throws Exception {
         // Map component def to component config options.
-        for (Map.Entry<DefDescriptor<ComponentDef>, PerfConfig> entry : tests.entrySet()) {
+        for (Map.Entry<DefDescriptor<BaseComponentDef>, PerfConfig> entry : tests.entrySet()) {
             addTest(new ComponentSuiteTest(entry.getKey(), entry.getValue()));
         }
     }
 
     @Override
-    public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests() {
+    public Map<DefDescriptor<BaseComponentDef>, PerfConfig> discoverTests() {
         return perfConfigUtil.getComponentTestsToRun(getNamespaces());
     }
     
-    public List<DefDescriptor<ComponentDef>> getComponentDefs(Map<DefDescriptor<ComponentDef>, PerfConfig> configMap) {
-        List<DefDescriptor<ComponentDef>> defs = new ArrayList<>();
-        for (DefDescriptor<ComponentDef> def : configMap.keySet())
+    public List<DefDescriptor<BaseComponentDef>> getComponentDefs(Map<DefDescriptor<BaseComponentDef>, PerfConfig> configMap) {
+        List<DefDescriptor<BaseComponentDef>> defs = new ArrayList<>();
+        for (DefDescriptor<BaseComponentDef> def : configMap.keySet())
             defs.add(def);
         return defs;
     }
@@ -101,8 +101,8 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
     }
 
     private class ComponentSuiteTest extends TestSuite {
-        ComponentSuiteTest(DefDescriptor<ComponentDef> descriptor, final PerfConfig config) {
-            super(descriptor.getName());
+        ComponentSuiteTest(DefDescriptor<BaseComponentDef> defDescriptor, final PerfConfig config) {
+            super(defDescriptor.getName());
             ContextService contextService = establishAuraContext();
             TestInventory inventory = ServiceLocator.get().get(TestInventory.class, "auraTestInventory");
             Vector<Class<? extends Test>> testClasses = inventory.getTestClasses(Type.PERFCMP);
@@ -111,7 +111,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
                 try {
                     Constructor<? extends Test> constructor = testClass.getConstructor(DefDescriptor.class,
                             PerfConfig.class, String.class);
-                    PerfExecutorTest test = (PerfExecutorTest) constructor.newInstance(descriptor, config, DB_INSTANCE);
+                    PerfExecutorTest test = (PerfExecutorTest) constructor.newInstance(defDescriptor, config, DB_INSTANCE);
                     test.setPerfMetricsComparator(new PerfMetricsComparator() {
                         @Override
                         protected int getAllowedVariability(String metricName) {
@@ -122,7 +122,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
                             return super.getAllowedVariability(metricName);
                         }
                     });
-                    addTest(patchPerfComponentTestCase(test, descriptor));
+                    addTest(patchPerfComponentTestCase(test, defDescriptor));
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "exception instantiating " + testClass.getName(), e);
                 } finally {
@@ -156,7 +156,7 @@ public class PerfEngineTest extends TestSuite implements PerfTestFramework {
      * @throws Exception
      */
 	protected TestCase patchPerfComponentTestCase(PerfExecutorTest test,
-			DefDescriptor<ComponentDef> descriptor) throws Exception {
+			DefDescriptor<BaseComponentDef> descriptor) throws Exception {
 		test.setExplicitGoldResultsFolder(resolveGoldFilePath(test));
 		return test;
 	}

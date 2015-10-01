@@ -1,9 +1,9 @@
 function PerfRunner(COQL, Memory) {
     var TIMESTAMP = (console && console.timeStamp) ? console.timeStamp.bind(console) : function () {};
 
-    return (function () {
+    var PerfRunnerInstance = (function () {
         var CONFIG = {},
-            classFinishTest = 'testFinish',
+            classFinishTest = 'perfTestFinish',
             componentReady  = false,
             setupComplete   = false,
             runInProgress   = false,
@@ -33,7 +33,7 @@ function PerfRunner(COQL, Memory) {
                 return this;
             },
             getContainerDOM: function () {
-                return this.containerDOM || this.containerComponent && this.containerComponent.getElement();
+                return this.containerDOM || (this.containerComponent && this.containerComponent.getElement()) || document.body;
             },
             setConfig: function (config) {
                 $A.assert(config.componentConfig, 'Setup: componentConfig is required');
@@ -157,6 +157,8 @@ function PerfRunner(COQL, Memory) {
                 }); // sync
 
                 this.setCommonMetric('finalComponentCount', $A.componentService.countComponents());
+                this.setCommonMetric('testDuration', transaction.duration);
+
                 if (COQL.enabled) {
                     this.results.coql = COQL.getResults('end', 'start');
                 }
@@ -172,16 +174,16 @@ function PerfRunner(COQL, Memory) {
                 var asyncRun     = false,
                     immediateRun = false,
                     wrapperTest  = this.component,
-                    finishRun    = (function () {this._finish();}).bind(this),
+                    finishRun    = (function (c) {this._finish(c);}).bind(this),
                     doneObject   = {
                         async: function () {
                             asyncRun = true;
                             return function done() {
-                                finishRun();
+                                finishRun.apply(this, arguments);
                             };
                         },
-                        immediate: function () {
-                            immediateRun = true;
+                        immediate: function (callback) {
+                            immediateRun = callback || true;
                         }
                     }, runner;
 
@@ -196,28 +198,32 @@ function PerfRunner(COQL, Memory) {
 
                 // After this check if the run is async or manual (inmediate)
                 if (immediateRun && !asyncRun) {
-                    finishRun();
+                    finishRun(immediateRun);
                 }
             },
-            _finish: function () {
+            _finish: function (postProcessing) {
                 runInProgress = false;
                 this.stopMetricsCollection();
-                this.postProcessing();
+                this.postProcessing(postProcessing);
 
                 var dom = this.getContainerDOM();
                 if (dom) {
                     $A.util.addClass(dom, classFinishTest);
                 }
             },
-            postProcessing: function () {
+            postProcessing: function (postProcessing) {
                 var wrapperTest = this.component;
                 if (wrapperTest && wrapperTest.postProcessing) {
                     wrapperTest.postProcessing(this.results);
                 }
+
+                if (postProcessing && typeof postProcessing === 'function') {
+                    postProcessing(this.results);
+                }
             },
-            finish: function () {
+            finish: function (postProcessing) {
                 $A.assert(runInProgress, 'No run in progress');
-                this._finish();
+                this._finish(postProcessing);
             },
             getResults: function () {
                 $A.assert(!runInProgress, 'A run hasn\'t finish yet');
@@ -225,4 +231,7 @@ function PerfRunner(COQL, Memory) {
             }
         };
     }());
+
+    $A.PerfRunner = PerfRunnerInstance;
+    return PerfRunnerInstance;
 }

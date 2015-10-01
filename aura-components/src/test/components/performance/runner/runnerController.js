@@ -1,7 +1,5 @@
 ({
     init: function (cmp, event, helper) {
-        // Expose library
-        $A.PerfRunner = helper.lib.PerfRunner;
         $A.PerfRunner.setContainer(cmp.find('container'));
     },
 

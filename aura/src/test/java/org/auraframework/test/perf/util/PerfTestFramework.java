@@ -17,6 +17,7 @@ package org.auraframework.test.perf.util;
 
 import java.util.Map;
 
+import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 
@@ -30,8 +31,8 @@ import org.auraframework.def.DefDescriptor;
  */
 public interface PerfTestFramework {
 
-    public Map<DefDescriptor<ComponentDef>, PerfConfig> discoverTests();
+    public Map<DefDescriptor<BaseComponentDef>, PerfConfig> discoverTests();
 
-    public void runTests(Map<DefDescriptor<ComponentDef>, PerfConfig> tests) throws Exception;
+    public void runTests(Map<DefDescriptor<BaseComponentDef>, PerfConfig> tests) throws Exception;
 
 }

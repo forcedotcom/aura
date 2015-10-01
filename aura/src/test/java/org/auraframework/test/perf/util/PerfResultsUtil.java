@@ -81,9 +81,12 @@ public final class PerfResultsUtil {
                 MongoCollection<Document> runs = db.getCollection("testRun");
                 JSONObject json = metrics.toJSONObject();
                 Document doc = Document.parse(json.toString());
+                
                 doc.append("timeline", traceLog);
                 doc.append("testName", test);
                 doc.append("transaction", Document.parse((metrics.getMetricsServiceTransaction()).toString()));
+                doc.append("commonMetrics", Document.parse((metrics.getCommonMetrics()).toString()));
+                doc.append("customMetrics", Document.parse((metrics.getCustomMetrics()).toString()));
                 doc.append("run", RUN_TIME);
                 runs.insertOne(doc);
             }

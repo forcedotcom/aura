@@ -55,8 +55,11 @@ public class PerfMetricsUtil {
         // Get the median metrics after all the runs.
         PerfMetrics metrics = test.getPerfRunsCollector().getMedianMetrics();
         PerfMetrics median = test.getPerfRunsCollector().getMedianRun();
-        metrics.setDevToolsLog(median.getDevToolsLog());
+        
         metrics.setMetricsServiceTransaction(median.getMetricsServiceTransaction());
+        metrics.setDevToolsLog(median.getDevToolsLog());
+        metrics.setCommonMetrics(median.getCommonMetrics());
+        metrics.setCustomMetrics(median.getCustomMetrics());
 
         // Write the results into file
         //String resultsFileName = writeResults(metrics);
@@ -155,11 +158,23 @@ public class PerfMetricsUtil {
     	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
     	metrics.setMetricsServiceTransaction(transactionMap);
 	}
+    
+    private void handleCommonMetrics(PerfMetrics metrics, String name) {
+    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
+    	metrics.setCommonMetrics(transactionMap);
+	}
+    
+    private void handleCustomMetrics(PerfMetrics metrics, String name) {
+    	Map<String, Map<String, Long>> transactionMap = auraStats.get(name);
+    	metrics.setCustomMetrics(transactionMap);
+	}
 
     private void prepareAuraMetrics(PerfMetrics metrics) {
         if (auraStats != null) {
         	handleCoqlMetrics(metrics, "coql");
         	handleMetricsServiceTransaction(metrics, "transaction");
+        	handleCommonMetrics(metrics, "commonMetrics");
+        	handleCustomMetrics(metrics, "customMetrics");
         }
     }
 

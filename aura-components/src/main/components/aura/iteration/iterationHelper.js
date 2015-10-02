@@ -17,6 +17,7 @@
     createBody: function (component) {
         component.set("v.loaded", false);
         component._itemInfo = [];
+        var helper=this;
         this.buildBody(component,
             function createBodyItem(cmp, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
                 this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, true, forceServer, callback);

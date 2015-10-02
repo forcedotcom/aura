@@ -27,7 +27,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Application;
 import org.auraframework.instance.Component;
 import org.auraframework.service.InstanceService;
@@ -62,10 +61,10 @@ public class ApplicationDefEmbeddedHTMLFormatAdapter extends EmbeddedHTMLFormatA
             Map<String, Object> attributes = Maps.newHashMap();
 
             StringBuilder sb = new StringBuilder();
-            writeHtmlStyles(AuraServlet.getStyles(), sb);
+            writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
             attributes.put("auraStyleTags", sb.toString());
             sb.setLength(0);
-            writeHtmlScripts(AuraServlet.getScripts(), sb);
+            writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context), sb);
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
                 attributes.put("auraInlineStyle", styleDefDesc.getDef().getCode());

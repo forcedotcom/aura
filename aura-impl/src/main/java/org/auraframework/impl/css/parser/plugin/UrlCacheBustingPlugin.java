@@ -16,7 +16,6 @@
 package org.auraframework.impl.css.parser.plugin;
 
 import org.auraframework.Aura;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Mode;
 
 import com.salesforce.omakase.ast.declaration.UrlFunctionValue;
@@ -34,10 +33,40 @@ public final class UrlCacheBustingPlugin implements Plugin {
                 && Aura.getContextService().getCurrentContext().getMode() != Mode.DEV;
     }
 
+    // For testing.
+    public UrlCacheBustingPlugin(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Rework
     public void rework(UrlFunctionValue value) {
+        // This is very fragile.
         if (enabled && value.url().startsWith("/") && value.url().indexOf("aura.cb") == -1) {
-            value.url(AuraBaseServlet.addCacheBuster(value.url()));
+            value.url(addCacheBuster(value.url()));
         }
     }
+
+    /**
+     * Internal routine to bust the cache.
+     *
+     * This is actually a bit fragile, and maybe should use a proper parser.
+     */
+    private String addCacheBuster(String url) {
+        String uri = url;
+        if (uri == null) {
+            return null;
+        }
+        int hashLoc = uri.indexOf('#');
+        String hash = "";
+        if (hashLoc >= 0) {
+            hash = uri.substring(hashLoc);
+            uri = uri.substring(0, hashLoc);
+        }
+        StringBuilder sb = new StringBuilder(uri);
+        sb.append((uri.contains("?")) ? "&" : "?");
+        sb.append("aura.cb=");
+        sb.append(Aura.getConfigAdapter().getBuildTimestamp());
+        return sb.toString() + hash;
+    }
+
 }

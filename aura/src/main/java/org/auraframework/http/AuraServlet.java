@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
+import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
@@ -45,14 +46,15 @@ import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
+import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.SystemErrorException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
-
 import com.google.common.collect.Maps;
 
 /**
@@ -103,6 +105,8 @@ public class AuraServlet extends AuraBaseServlet {
 
     // FIXME: is this really a good idea?
     private final static StringParam nocacheParam = new StringParam("nocache", 0, false);
+
+    private ManifestUtil manifestUtil = new ManifestUtil();
 
     @Override
     public void init() throws ServletException {
@@ -179,10 +183,17 @@ public class AuraServlet extends AuraBaseServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         DefinitionService definitionService;
+        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         AuraContext context;
         String tagName;
         DefType defType;
 
+        //
+        // Pre-hook
+        //
+        if (servletUtil.actionServletGetPre(request, response)) {
+            return;
+        }
         //
         // Initial setup. This should never fail.
         //
@@ -198,7 +209,7 @@ public class AuraServlet extends AuraBaseServlet {
             // at this point we simply broke.
             //
             Aura.getExceptionAdapter().handleException(re);
-            send404(request, response);
+            servletUtil.send404(request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -225,24 +236,58 @@ public class AuraServlet extends AuraBaseServlet {
 
             Mode mode = context.getMode();
             if (!isValidDefType(defType, mode)) {
-                send404(request, response);
+                servletUtil.send404(request, response);
                 return;
             }
 
             defDescriptor = definitionService.getDefDescriptor(tagName,
                     defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
         } catch (RequestParam.InvalidParamException ipe) {
-            handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
         } catch (RequestParam.MissingParamException mpe) {
-            handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (Throwable t) {
-            handleServletException(new SystemErrorException(t), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
         
         internalGet(request, response, defDescriptor, context, definitionService);
+    }
+
+    private boolean shouldCacheHTMLTemplate(HttpServletRequest request) {
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        try {
+            DefDescriptor<? extends BaseComponentDef> appDefDesc = context.getLoadingApplicationDescriptor();
+            if (appDefDesc != null && appDefDesc.getDefType().equals(DefType.APPLICATION)) {
+                Boolean isOnePageApp = ((ApplicationDef) appDefDesc.getDef()).isOnePageApp();
+                if (isOnePageApp != null) {
+                    return isOnePageApp.booleanValue();
+                }
+            }
+        } catch (QuickFixException e) {
+            throw new AuraRuntimeException(e);
+        }
+        return !manifestUtil.isManifestEnabled(request);
+    }
+
+    protected DefDescriptor<?> setupQuickFix(AuraContext context) {
+        DefinitionService ds = Aura.getDefinitionService();
+        MasterDefRegistry mdr = context.getDefRegistry();
+
+        try {
+            DefDescriptor<ComponentDef> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
+            String uid = mdr.getUid(null, qfdesc);
+            context.setPreloadedDefinitions(mdr.getDependencies(uid));
+            return qfdesc;
+        } catch (QuickFixException death) {
+            //
+            // DOH! something is seriously wrong, just die!
+            // This should _never_ happen, but if you muck up basic aura stuff, it might.
+            //
+            throw new AuraError(death);
+        }
     }
 
     protected <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
@@ -251,6 +296,7 @@ public class AuraServlet extends AuraBaseServlet {
             throws ServletException, IOException {
         // Knowing the app, we can do the HTTP headers, so of which depend on
         // the app in play, so we couldn't do this earlier.
+        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         setBasicHeaders(defDescriptor, request, response);
         T def;
 
@@ -269,10 +315,10 @@ public class AuraServlet extends AuraBaseServlet {
             // Whoops. we need to set up our preloads correctly here.
             //
             setupQuickFix(context);
-            handleServletException(qfe, true, context, request, response, false);
+            servletUtil.handleServletException(qfe, true, context, request, response, false);
             return;
         } catch (Throwable t) {
-            handleServletException(t, false, context, request, response, false);
+            servletUtil.handleServletException(t, false, context, request, response, false);
             return;
         }
 
@@ -293,9 +339,9 @@ public class AuraServlet extends AuraBaseServlet {
             @SuppressWarnings("unchecked")
             Class<T> clazz = (Class<T>) def.getDescriptor().getDefType().getPrimaryInterface();
             String formatAdapter = formatAdapterParam.get(request);
-			serializationService.write(def, getComponentAttributes(request), clazz, out, formatAdapter);
+            serializationService.write(def, getComponentAttributes(request), clazz, out, formatAdapter);
         } catch (Throwable e) {
-            handleServletException(e, false, context, request, response, true);
+            servletUtil.handleServletException(e, false, context, request, response, true);
         } finally {
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION_AURA);
             loggingService.stopTimer(LoggingService.TIMER_SERIALIZATION);
@@ -312,7 +358,7 @@ public class AuraServlet extends AuraBaseServlet {
     }
 
     protected boolean isValidDefType(DefType defType, Mode mode) {
-        return (defType == DefType.APPLICATION || defType == DefType.COMPONENT);
+        return Aura.getServletUtilAdapter().isValidDefType(defType, mode);
     }
 
     private Map<String, Object> getComponentAttributes(HttpServletRequest request) {
@@ -375,10 +421,17 @@ public class AuraServlet extends AuraBaseServlet {
         ContextService contextService = Aura.getContextService();
         ServerService serverService = Aura.getServerService();
         AuraContext context = contextService.getCurrentContext();
+        ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         response.setCharacterEncoding(UTF_ENCODING);
         boolean written = false;
         setNoCache(response);
 
+        //
+        // Pre-hook
+        //
+        if (servletUtil.actionServletPostPre(request, response)) {
+            return;
+        }
         try {
             if (context.getFormat() != Format.JSON) {
                 throw new AuraRuntimeException("Invalid request, post must use JSON");
@@ -443,19 +496,26 @@ public class AuraServlet extends AuraBaseServlet {
             out.write(CSRF_PROTECT);
             serverService.run(message, context, out, attributes);
         } catch (RequestParam.InvalidParamException ipe) {
-            handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;
         } catch (RequestParam.MissingParamException mpe) {
-            handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(mpe), false, context, request, response, false);
             return;
         } catch (JsonParseException jpe) {
-            handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
+            servletUtil.handleServletException(new SystemErrorException(jpe), false, context, request, response, false);
         } catch (Exception e) {
-            handleServletException(e, false, context, request, response, written);
+            servletUtil.handleServletException(e, false, context, request, response, written);
         }
     }
 
     protected void sendPost404(HttpServletRequest request, HttpServletResponse response) {
         throw new NoAccessException("Missing required perms, or tried to access inaccessible namespace.");
+    }
+
+    /**
+     * @param manifestUtil the manifestUtil to set
+     */
+    public void setManifestUtil(ManifestUtil manifestUtil) {
+        this.manifestUtil = manifestUtil;
     }
 }

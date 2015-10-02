@@ -51,7 +51,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         WebElement div = findDomElement(By.cssSelector("div[class~='identifier']"));
         String divCss = div.getCssValue("background-color");
         assertEquals("CSS not loaded from combinable resource", "rgba(255, 0, 0, 1)", divCss);
-
     }
 
     /**

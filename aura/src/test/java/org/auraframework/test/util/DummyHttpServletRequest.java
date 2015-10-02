@@ -60,7 +60,7 @@ public class DummyHttpServletRequest implements HttpServletRequest {
     
     @Override
     public Object getAttribute(String name) {
-        return null;
+        return this.requestUri;
     }
 
     @Override

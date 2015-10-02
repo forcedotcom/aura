@@ -27,7 +27,6 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
-import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.adapter.StyleAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
@@ -133,9 +132,10 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
     }
 
     private void goldFileAppCssUrl() throws Exception {
+        AuraContext ctx = Aura.getContextService().getCurrentContext();
         String url = null;
 
-        for (String style : AuraBaseServlet.getStyles()) {
+        for (String style : Aura.getServletUtilAdapter().getStyles(ctx)) {
             if (style.endsWith("app.css")) {
                 url = style;
                 break;
@@ -150,7 +150,6 @@ public class StyleContextSerializationTest extends AuraImplTestCase {
         url = AuraTextUtil.urldecode(url);
 
         // replace app descriptor, which is generated
-        AuraContext ctx = Aura.getContextService().getCurrentContext();
         DefDescriptor<? extends BaseComponentDef> desc = ctx.getLoadingApplicationDescriptor();
         if (desc != null) {
             url = url.replaceFirst(desc.getDescriptorName(), "#REPLACED#");

@@ -24,8 +24,8 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.TestSuiteDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.instance.Component;
+import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -45,16 +45,17 @@ public class TestSuiteDefHTMLFormatAdapter extends HTMLFormatAdapter<TestSuiteDe
     @Override
     public void write(TestSuiteDef value, Map<String, Object> attributes, Appendable out) throws IOException,
             QuickFixException {
+        AuraContext context = Aura.getContextService().getCurrentContext();
         Map<String, Object> attribs = Maps.newHashMap();
         attribs.put("autoInitialize", "false");
         attribs.put("bodyClass", " ");
 
         StringBuilder sb = new StringBuilder();
-        writeHtmlStyles(AuraServlet.getStyles(), sb);
+        writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
         attribs.put("auraStyleTags", sb.toString());
 
         sb = new StringBuilder();
-        writeHtmlScripts(AuraServlet.getScripts(), sb);
+        writeHtmlScripts(Aura.getServletUtilAdapter().getScripts(context), sb);
         attribs.put("auraScriptTags", sb.toString());
 
         sb = new StringBuilder();

@@ -82,8 +82,7 @@ public class AuraContextFilter implements Filter {
     protected static final AuraTestFilter testFilter = new AuraTestFilter();
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException,
-    IOException {
+    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws ServletException, IOException {
 
         if (Aura.getContextService().isEstablished()) {
             LOG.error("Aura context was not released correctly! New context will NOT be created.");
@@ -122,8 +121,7 @@ public class AuraContextFilter implements Filter {
         }
     }
 
-    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
-    ServletException {
+    protected AuraContext startContext(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
 
         Format f = format.get(request);
@@ -279,8 +277,7 @@ public class AuraContextFilter implements Filter {
         return m;
     }
 
-    private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request,
-            Map<String, Object> configMap) {
+    private DefDescriptor<? extends BaseComponentDef> getAppParam(HttpServletRequest request, Map<String, Object> configMap) {
         String appName = null;
         String cmpName = null;
 

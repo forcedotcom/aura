@@ -27,7 +27,6 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
-import org.auraframework.http.AuraServlet;
 import org.auraframework.http.ManifestUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
@@ -47,6 +46,7 @@ import com.google.common.collect.Maps;
  */
 @ThreadSafe
 public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentDef> extends HTMLFormatAdapter<T> {
+    private ManifestUtil manifestUtil = new ManifestUtil();
 
     @Override
     public void write(T value, Map<String, Object> componentAttributes, Appendable out) throws IOException {
@@ -61,10 +61,11 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
             writeHtmlStyles(new ArrayList<>(Arrays.asList(Aura.getConfigAdapter().getResetCssURL())), sb);
             attributes.put("auraResetCss", sb.toString());
 
-            sb.setLength(0);
-            writeHtmlStyles(AuraServlet.getStyles(), sb);
-            attributes.put("auraStyleTags", sb.toString());
             AuraContext context = Aura.getContextService().getCurrentContext();
+
+            sb.setLength(0);
+            writeHtmlStyles(Aura.getServletUtilAdapter().getStyles(context), sb);
+            attributes.put("auraStyleTags", sb.toString());
 
             DefDescriptor<StyleDef> styleDefDesc = templateDef.getStyleDescriptor();
             if (styleDefDesc != null) {
@@ -84,16 +85,16 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
                 attributes.put("defaultBodyClass", "");
                 attributes.put("autoInitialize", "false");
             } else {
-                if (ManifestUtil.isManifestEnabled()) {
-                    attributes.put("manifest", ManifestUtil.getManifestUrl());
+                if (manifestUtil.isManifestEnabled()) {
+                    attributes.put("manifest", manifestUtil.getManifestUrl());
                 }
 
                 sb.setLength(0);
-                writeHtmlScripts(AuraServlet.getBaseScripts(context), sb);
+                writeHtmlScripts(Aura.getServletUtilAdapter().getBaseScripts(context), sb);
                 attributes.put("auraBaseScriptTags", sb.toString());
 
                 sb.setLength(0);
-                writeHtmlScripts(AuraServlet.getNamespacesScripts(context), true, sb);
+                writeHtmlScripts(Aura.getServletUtilAdapter().getNamespacesScripts(context), true, sb);
                 attributes.put("auraNamespacesScriptTags", sb.toString());
 
                 if(mode != Mode.PROD && mode != Mode.PRODDEBUG &&
@@ -119,6 +120,13 @@ public abstract class BaseComponentDefHTMLFormatAdapter<T extends BaseComponentD
         } catch (QuickFixException e) {
             throw new AuraRuntimeException(e);
         }
+    }
+
+    /**
+     * @param manifestUtil the manifestUtil to set
+     */
+    public void setManifestUtil(ManifestUtil manifestUtil) {
+        this.manifestUtil = manifestUtil;
     }
 
 }

@@ -34,7 +34,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
     	"Date": {
-    		getTime : function() {
+    		now : function() {
     			return "today is a good day";
     		}
     	},
@@ -142,32 +142,14 @@ Test.Aura.AuraClientServiceTest = function() {
 
     [Fixture]
     function testAuraXHR() {
-    	[Fact]
-    	function CreatedNewAuraXHRisEmpty() {
-    		// Arrange
+        [Fact]
+        function CreatedNewAuraXHRisEmpty() {
+            // Arrange
             var target = new Aura.Services.AuraClientService$AuraXHR();
 
             // Assert
             Assert.Equal(0, target.length);
-    	}
-
-    	[Fact]
-    	function MarkAuraXHR() {
-    		// Arrange
-            var expected = "today is a good day";
-            var mockGetTime = Mocks.GetMock(Date.prototype, "getTime", function(){return expected;});
-            var target = new Aura.Services.AuraClientService$AuraXHR();
-            var actual;
-            
-            // Act
-            mockGetTime(function(){
-                target.mark();
-                actual = target.time;
-            });
-
-            // Assert
-            Assert.Equal(expected, actual);
-    	}
+        }
 
         [Fact]
         function AddedActionStored() {
@@ -209,9 +191,9 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(undefined, target.actions[newAction.id]);//after the getAction above, this become undefined
         }
 
-    	[Fact]
-    	function countAvailableXHRs() {
-    		// Arrange
+        [Fact]
+        function countAvailableXHRs() {
+            // Arrange
             var target;
             mockGlobal(function() {
                 target = new Aura.Services.AuraClientService();
@@ -219,7 +201,7 @@ Test.Aura.AuraClientServiceTest = function() {
 
             // Assert
             Assert.Equal(4, target.countAvailableXHRs());
-    	}
+        }
     };
 
     [Fixture]
@@ -1021,7 +1003,7 @@ Test.Aura.AuraClientServiceTest = function() {
         var requestedToResolve = [];
         var mocksForDecode = Mocks.GetMocks(Object.Global(), {
             "Date" : {
-                getTime : function() {
+                now : function() {
                     return "today is a good day";
                 }
             },

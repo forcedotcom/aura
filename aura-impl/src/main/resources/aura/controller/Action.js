@@ -1069,10 +1069,9 @@ Action.prototype.isStorable = function() {
 /**
  * Sets this action as a 'caboose'.
  *
- * This is only relevant for server side actions, and will cause the action to never initiate
- * an XHR request. This action will not be sent to the server until there is some other action
- * that would cause a server round-trip. This can be a little dangerous, as the this will queue
- * forever if nothing goes to the server.
+ * This is only relevant for server side actions. 
+ * This action will not be sent to the server until there is some other action
+ * that would cause a server round-trip or after 60s since last send.
  *
  * @public
  * @export

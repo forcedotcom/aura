@@ -25,7 +25,6 @@ Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.marker = 0;
     this.request = undefined;
     this.actions = {};
-    this.time = undefined;
     this.transactionId = undefined;
 };
 
@@ -35,16 +34,6 @@ Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
 Aura.Services.AuraClientService$AuraXHR.prototype.reset = function() {
     this.request = undefined;
     this.actions = {};
-    this.time = undefined;
-};
-
-/**
- * 'progress' the XHR.
- *
- * We set a failsafe timeout here.
- */
-Aura.Services.AuraClientService$AuraXHR.prototype.mark = function() {
-    this.time = new Date().getTime();
 };
 
 /**
@@ -148,6 +137,7 @@ AuraClientService = function AuraClientService () {
     this.finishedInitDefs = false;
     this.protocols={"layout":true};
     this.namespaces={};
+    this.lastSendTime = Date.now();
 
     // token storage key should not be changed because external client may query independently
     this._tokenStorageKey = "$AuraClientService.token$";
@@ -643,9 +633,6 @@ AuraClientService.prototype.getAvailableXHR = function(isBackground) {
         return null;
                 }
     var auraXHR = this.availableXHRs.pop();
-    if (auraXHR) {
-        auraXHR.mark();
-        }
     return auraXHR;
 };
 
@@ -1595,7 +1582,10 @@ AuraClientService.prototype.sendActionXHRs = function() {
         transactionId = this.lastTransactionId;
     }
 
-    if (foreground.length > caboose) {
+    // either group caboose with at least one non-caboose foreground
+    // or send all caboose after 60s since last send
+    if (foreground.length > caboose ||
+        (caboose > 0 && Date.now() - this.lastSendTime > 60000)) {
         auraXHR = this.getAvailableXHR(false);
         if (auraXHR) {
             auraXHR.transactionId = transactionId;
@@ -1825,10 +1815,12 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         auraXHR.request["send"]();
     }
 
+    // legacy code, spinner actually relies on the waiting event, need a proper fix
     setTimeout(function() {
         $A.get("e.aura:waiting").fire();
     }, 1);
 
+    this.lastSendTime = Date.now();
     return true;
 };
 

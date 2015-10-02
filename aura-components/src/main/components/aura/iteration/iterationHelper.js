@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 ({
-    createBody: function (component) {
+    createBody: function (component, localCreation) {
         component.set("v.loaded", false);
         component._itemInfo = [];
         var helper=this;
         this.buildBody(component,
             function createBodyItem(cmp, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
-                this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, true, forceServer, callback);
+                this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, localCreation, forceServer, callback);
             },
             function createBodyComplete(cmp, components){
             	cmp.set("v.body", components, true);
             	cmp.set("v.loaded",true);
             	cmp.get("e.iterationComplete").fire({operation:"Initialize"});
+                var queued=cmp._queueUpdate;
+                cmp._queueUpdate=false;
+                if(queued){
+                    helper.updateBody(cmp);
+                }
             }
         );
     },
@@ -99,10 +104,11 @@
                 cmp.set("v.body", components);
                 cmp.set("v.loaded",true);
                 cmp.get("e.iterationComplete").fire({operation:"Update"});
-                if(cmp._queueUpdate){
+                var queued=cmp._queueUpdate;
+                cmp._queueUpdate=false;
+                if(queued){
                     helper.updateBody(cmp);
                 }
-                cmp._queueUpdate=false;
             }
         );
     },

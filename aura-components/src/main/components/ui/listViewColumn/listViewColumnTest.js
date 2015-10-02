@@ -19,13 +19,13 @@
     testHelperFireEvent: {
         test: [
             function GettingEventFromComponent(component){
+                var actual = null;
                 var expected = "eventName";
                 var helper = this.getHelper(component);
                 var mockWhile = this.getMock(component, "getEvent", function(eventName){
                     actual = eventName;
                     return { setParams:function(){}, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, expected);
@@ -34,12 +34,12 @@
                 $A.test.assertEquals(expected, actual);
             },
             function TypeSetOnEventParams(component){
+                var actual = null;
                 var expected = "columnType";
                 var helper = this.getHelper(component);
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.type; }, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName", expected);
@@ -49,6 +49,7 @@
             },
 
             function ContextSourceSetOnEventParams(component){
+                var actual = null;
                 var expected = component;
                 var helper = this.getHelper(component);
                 var data = {};
@@ -56,7 +57,6 @@
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.source;}, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
@@ -66,6 +66,7 @@
             },
 
             function ContextEventSetOnEventParams(component){
+                var actual = null;
                 var expected = { domEvent: true };
                 var helper = this.getHelper(component);
                 var data = {};
@@ -73,7 +74,6 @@
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.event; }, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
@@ -83,6 +83,7 @@
             },
 
             function ContextHelperSetOnEventParams(component){
+                var actual = null;
                 var expected = this.getHelper(component);
                 var helper = expected;
                 var data = {};
@@ -90,7 +91,6 @@
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.context.helper; }, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
@@ -99,6 +99,7 @@
                 $A.test.assertEquals(expected, actual);
             },
             function DataSetOnEventParams(component){
+                var actual = null;
                 var expected = {};
                 var helper = this.getHelper(component);
                 var data = expected;
@@ -106,7 +107,6 @@
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(params){ actual = params.data;}, fire:function(){}};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName", "type", domEvent, data);
@@ -115,11 +115,11 @@
                 $A.test.assertEquals(expected, actual);
             },
             function EventIsFired(component){
+                var actual = null;
                 var helper = this.getHelper(component);
                 var mockWhile = this.getMock(component, "getEvent", function(){
                     return { setParams:function(){}, fire:function(){ actual = true; }};
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     helper.fireEvent(component, "eventName");

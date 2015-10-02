@@ -119,12 +119,13 @@
         if (cmp._suspendChangeHandlers) {
             return;
         }
+        optionsPack = optionsPack || this.getOptionsWithStrategy(cmp);
 
         var value = cmp.get("v.value"),
             isMultiple = $A.util.getBooleanValue(cmp.get("v.multiple")),
-            optionsPack = optionsPack || this.getOptionsWithStrategy(cmp),
             selectedOptions = optionsPack.strategy.getSelected(optionsPack.options);
         var optionValue = selectedOptions.join(this.optionSeparator);
+
         if (selectedOptions.length === 0 || value !== optionValue) {
             if (!isMultiple && selectedOptions.length === 0) {
                 optionValue = optionsPack.strategy.getValue(optionsPack.options, 0);

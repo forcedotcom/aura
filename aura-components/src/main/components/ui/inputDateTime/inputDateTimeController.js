@@ -70,11 +70,12 @@
     },
 
     setValue: function(component, event, helper) {
-        if (helper.isDesktopMode(component)) {
-            var dateValue = event.getParam("value"),
-                selectedHours = event.getParam("hours"),
-                selectedMinutes = event.getParam("minutes");
 
+        var dateValue = event.getParam("value"),
+            selectedHours = event.getParam("hours"),
+            selectedMinutes = event.getParam("minutes");
+
+        if (helper.isDesktopMode(component)) {
             var hasNewDate = !$A.util.isUndefinedOrNull(dateValue),
                 hasNewTime = !$A.util.isUndefinedOrNull(selectedHours) && !$A.util.isUndefinedOrNull(selectedMinutes);
 
@@ -104,9 +105,6 @@
                 }
             }
 
-            var dateValue = event.getParam("value");
-            var selectedHours = event.getParam("hours");
-            var selectedMinutes = event.getParam("minutes");
             var newDate = $A.localizationService.parseDateTimeUTC(dateValue, "YYYY-MM-DD", langLocale);
 
             var targetTime = Date.UTC(newDate.getUTCFullYear(),

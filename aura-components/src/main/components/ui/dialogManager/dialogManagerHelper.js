@@ -140,7 +140,7 @@
      */
     getKeydownHandler : function(dialog, isModal, firstFocusable, event) {
 
-        if (!event) { var event = window.event; }
+        if (!event) { event = window.event; }
 
         var closeButton  = dialog.find("closeButton").getElement(),
             shiftPressed = event.shiftKey,
@@ -187,7 +187,7 @@
      */
     getClickHandler : function(dialog, clickOutToClose, event) {
 
-        if (!event) { var event = window.event; }
+        if (!event) { event = window.event; }
 
         var target        = event.target || event.srcElement,
             container     = dialog.find("outer").getElement(),

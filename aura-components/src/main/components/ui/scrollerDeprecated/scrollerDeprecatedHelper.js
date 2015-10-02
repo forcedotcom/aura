@@ -197,7 +197,7 @@
 					iScroll.prototype._getEventBuster = function(scroller) {
 						if (!this._eventBuster) {
 							this._eventBuster = function(e) {
-								if (scroller._transitionCanceled && scroller.distX == 0 && scroller.distY == 0) {
+								if (scroller._transitionCanceled && scroller.distX === 0 && scroller.distY === 0) {
 									$A.util.squash(e, true);
 									scroller._resetPos(200);
 								}
@@ -233,7 +233,7 @@
 
 						onBeforeScrollStart : function(e) {
 							var target = e.target.nodeName.toLowerCase();
-							if ("input" != target && "textarea" != target && "select" != target) {
+							if ("input" !== target && "textarea" !== target && "select" !== target) {
 								e.preventDefault();
 							}
 
@@ -437,7 +437,7 @@
 			fields : "globalId as id, def.descriptor.namespace as namespace, def.descriptor.name as name",
 			from : "component",
 			where : function(row) {
-				return row.namespace == 'ui' && row.name == 'scroller';
+				return row.namespace === 'ui' && row.name === 'scroller';
 			}
 		});
 
@@ -515,8 +515,9 @@
 
 			RESIZE_EV = 'onorientationchange' in window ? 'orientationchange' : 'resize', START_EV = hasTouch ? 'touchstart' : 'mousedown', MOVE_EV = hasTouch ? 'touchmove'
 					: 'mousemove', END_EV = hasTouch ? 'touchend' : 'mouseup', CANCEL_EV = hasTouch ? 'touchcancel' : 'mouseup', TRNEND_EV = (function() {
-				if (vendor === false)
+				if (vendor === false) {
 					return false;
+				}
 
 				var transitionEnd = {
 					'' : 'transitionend',
@@ -546,7 +547,7 @@
 			iScroll = function(el, options) {
 				var that = this, i;
 
-				that.wrapper = typeof el == 'object' ? el : doc.getElementById(el);
+				that.wrapper = typeof el === 'object' ? el : doc.getElementById(el);
 				that.wrapper.style.overflow = 'hidden';
 				that.scroller = that.wrapper.children[0];
 				that.RESIZE_EV = RESIZE_EV;
@@ -609,8 +610,9 @@
 				};
 
 				// User defined options
-				for (i in options)
+				for (i in options) {
 					that.options[i] = options[i];
+				}
 
 				// Set starting position
 				that.x = that.options.x;
@@ -634,16 +636,19 @@
 				that.scroller.style[transitionProperty] = that.options.useTransform ? cssVendor + 'transform' : 'top left';
 				that.scroller.style[transitionDuration] = '0';
 				that.scroller.style[transformOrigin] = '0 0';
-				if (that.options.useTransition)
+				if (that.options.useTransition) {
 					that.scroller.style[transitionTimingFunction] = 'cubic-bezier(0.33,0.66,0.66,1)';
+				}
 
-				if (that.options.useTransform)
+				if (that.options.useTransform) {
 					that.scroller.style[transform] = 'translate(' + that.x + 'px,' + that.y + 'px)' + translateZ;
-				else
+				} else {
 					that.scroller.style.cssText += ';position:absolute;top:' + that.y + 'px;left:' + that.x + 'px';
+				}
 
-				if (that.options.useTransition)
+				if (that.options.useTransition) {
 					that.options.fixedScrollbar = true;
+				}
 
 				that.refresh(true);
 
@@ -653,16 +658,17 @@
 				$A.util.on(that.wrapper, END_EV, that._getEventBuster(that), true); //capture phase
 
 				if (!hasTouch) {
-					if (that.options.wheelAction != 'none') {
+					if (that.options.wheelAction !== 'none') {
 						that._bind('DOMMouseScroll');
 						that._bind('mousewheel');
 					}
 				}
 
-				if (that.options.checkDOMChanges)
+				if (that.options.checkDOMChanges) {
 					that.checkDOMTime = setInterval(function() {
 						that._checkDOMChanges();
 					}, 500);
+				}
 			};
 
 			// Prototype
@@ -684,9 +690,9 @@
 
 					switch (e.type) {
 					case START_EV:
-						if (!hasTouch && e.button !== 0)
+						if (!hasTouch && e.button !== 0) {
 							return;
-
+						}
 						that._start(e);
 						break;
 					case MOVE_EV:
@@ -711,8 +717,9 @@
 
 				_checkDOMChanges : function() {
 					if (this.moved || this.zoomed || this.animating
-							|| (this.scrollerW == this.scroller.offsetWidth * this.scale && this.scrollerH == this.scroller.offsetHeight * this.scale))
+							|| (this.scrollerW === this.scroller.offsetWidth * this.scale && this.scrollerH === this.scroller.offsetHeight * this.scale)) {
 						return;
+					}
 
 					this.refresh();
 				},
@@ -722,8 +729,9 @@
 
 					if (!that[dir + 'Scrollbar']) {
 						if (that[dir + 'ScrollbarWrapper']) {
-							if (hasTransform)
+							if (hasTransform) {
 								that[dir + 'ScrollbarIndicator'].style[transform] = '';
+							}
 							that[dir + 'ScrollbarWrapper'].parentNode.removeChild(that[dir + 'ScrollbarWrapper']);
 							that[dir + 'ScrollbarWrapper'] = null;
 							that[dir + 'ScrollbarIndicator'] = null;
@@ -736,12 +744,13 @@
 						// Create the scrollbar wrapper
 						bar = doc.createElement('div');
 
-						if (that.options.scrollbarClass)
+						if (that.options.scrollbarClass) {
 							bar.className = that.options.scrollbarClass + dir.toUpperCase();
-						else
+						} else {
 							bar.style.cssText = 'position:absolute;z-index:100;'
-									+ (dir == 'h' ? 'height:7px;bottom:1px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:'
+									+ (dir === 'h' ? 'height:7px;bottom:1px;left:2px;right:' + (that.vScrollbar ? '7' : '2') + 'px' : 'width:7px;bottom:'
 											+ (that.hScrollbar ? '7' : '2') + 'px;top:2px;right:1px');
+						}
 
 						bar.style.cssText += ';pointer-events:none;' + cssVendor + 'transition-property:opacity;' + cssVendor + 'transition-duration:'
 								+ (that.options.fadeScrollbar ? '350ms' : '0') + ';overflow:hidden;opacity:' + (that.options.hideScrollbar ? '0' : '1');
@@ -753,20 +762,21 @@
 						bar = doc.createElement('div');
 						if (!that.options.scrollbarClass) {
 							bar.style.cssText = 'position:absolute;z-index:100;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.9);' + cssVendor
-									+ 'background-clip:padding-box;' + cssVendor + 'box-sizing:border-box;' + (dir == 'h' ? 'height:100%' : 'width:100%') + ';'
+									+ 'background-clip:padding-box;' + cssVendor + 'box-sizing:border-box;' + (dir === 'h' ? 'height:100%' : 'width:100%') + ';'
 									+ cssVendor + 'border-radius:3px;border-radius:3px';
 						}
 						bar.style.cssText += ';pointer-events:none;' + cssVendor + 'transition-property:' + cssVendor + 'transform;' + cssVendor
 								+ 'transition-timing-function:cubic-bezier(0.33,0.66,0.66,1);' + cssVendor + 'transition-duration:0;' + cssVendor
 								+ 'transform: translate(0,0)' + translateZ;
-						if (that.options.useTransition)
+						if (that.options.useTransition) {
 							bar.style.cssText += ';' + cssVendor + 'transition-timing-function:cubic-bezier(0.33,0.66,0.66,1)';
+						}
 
 						that[dir + 'ScrollbarWrapper'].appendChild(bar);
 						that[dir + 'ScrollbarIndicator'] = bar;
 					}
 
-					if (dir == 'h') {
+					if (dir === 'h') {
 						that.hScrollbarSize = that.hScrollbarWrapper.clientWidth;
 						that.hScrollbarIndicatorSize = m.max(m.round(that.hScrollbarSize * that.hScrollbarSize / that.scrollerW), 8);
 						that.hScrollbarIndicator.style.width = that.hScrollbarIndicatorSize + 'px';
@@ -792,8 +802,9 @@
 				},
 
 				_pos : function(x, y) {
-					if (this.zoomed)
+					if (this.zoomed) {
 						return;
+					}
 
 					x = this.hScroll ? x : 0;
 					y = this.vScroll ? y : 0;
@@ -815,27 +826,30 @@
 				},
 
 				_scrollbarPos : function(dir, hidden) {
-					var that = this, pos = dir == 'h' ? that.x : that.y, size;
+					var that = this, pos = dir === 'h' ? that.x : that.y, size;
 
-					if (!that[dir + 'Scrollbar'])
+					if (!that[dir + 'Scrollbar']) {
 						return;
+					}
 
 					pos = that[dir + 'ScrollbarProp'] * pos;
 
 					if (pos < 0) {
 						if (!that.options.fixedScrollbar) {
 							size = that[dir + 'ScrollbarIndicatorSize'] + m.round(pos * 3);
-							if (size < 8)
+							if (size < 8) {
 								size = 8;
-							that[dir + 'ScrollbarIndicator'].style[dir == 'h' ? 'width' : 'height'] = size + 'px';
+							}
+							that[dir + 'ScrollbarIndicator'].style[dir === 'h' ? 'width' : 'height'] = size + 'px';
 						}
 						pos = 0;
 					} else if (pos > that[dir + 'ScrollbarMaxScroll']) {
 						if (!that.options.fixedScrollbar) {
 							size = that[dir + 'ScrollbarIndicatorSize'] - m.round((pos - that[dir + 'ScrollbarMaxScroll']) * 3);
-							if (size < 8)
+							if (size < 8) {
 								size = 8;
-							that[dir + 'ScrollbarIndicator'].style[dir == 'h' ? 'width' : 'height'] = size + 'px';
+							}
+							that[dir + 'ScrollbarIndicator'].style[dir === 'h' ? 'width' : 'height'] = size + 'px';
 							pos = that[dir + 'ScrollbarMaxScroll'] + (that[dir + 'ScrollbarIndicatorSize'] - size);
 						} else {
 							pos = that[dir + 'ScrollbarMaxScroll'];
@@ -844,26 +858,29 @@
 
 					that[dir + 'ScrollbarWrapper'].style[transitionDelay] = '0';
 					that[dir + 'ScrollbarWrapper'].style.opacity = hidden && that.options.hideScrollbar ? '0' : '1';
-					that[dir + 'ScrollbarIndicator'].style[transform] = 'translate(' + (dir == 'h' ? pos + 'px,0)' : '0,' + pos + 'px)') + translateZ;
+					that[dir + 'ScrollbarIndicator'].style[transform] = 'translate(' + (dir === 'h' ? pos + 'px,0)' : '0,' + pos + 'px)') + translateZ;
 				},
 
 				_start : function(e) {
 					var that = this, point = hasTouch ? e.touches[0] : e, matrix, x, y, c1, c2;
 					that._transitionCanceled = false;
 
-					if (that.options.onBeforeScrollStart)
+					if (that.options.onBeforeScrollStart) {
 						that.options.onBeforeScrollStart.call(that, e);
+					}
 
-					if (!that.enabled)
+					if (!that.enabled) {
 						return;
+					}
 
 					if (that.options.snap && that.animating) {
 		                // DCHASMAN skipping because we're animating a snap to page - w/out this much flickering and other weirdness ensues!!!
 		                return;
 		            }
 
-					if (that.options.useTransition || that.options.zoom)
+					if (that.options.useTransition || that.options.zoom) {
 						that._transitionTime(0);
+					}
 
 					that.moved = false;
 					that.animating = false;
@@ -900,17 +917,19 @@
 							y = +getComputedStyle(that.scroller, null).top.replace(/[^0-9-]/g, '');
 						}
 
-						if (x != that.x || y != that.y) {
-							if (that.options.useTransition)
+						if (x !== that.x || y !== that.y) {
+							if (that.options.useTransition) {
 								that._unbind(TRNEND_EV);
-							else
+							} else {
 								cancelFrame(that.aniTime);
+							}
 
 							that._transitionCanceled = true;
 							that.steps = [];
 							that._pos(x, y);
-							if (that.options.onScrollEnd)
+							if (that.options.onScrollEnd) {
 								that.options.onScrollEnd.call(that);
+							}
 						}
 					}
 
@@ -924,8 +943,9 @@
 
 					that.startTime = e.timeStamp || Date.now();
 
-					if (that.options.onScrollStart)
+					if (that.options.onScrollStart) {
 						that.options.onScrollStart.call(that, e);
+					}
 
 					that._bind(MOVE_EV, window);
 					that._bind(END_EV, window);
@@ -938,15 +958,16 @@
 				    var tagName = e.target.nodeName.toLowerCase();
 				    // ssun don't scroll if we are in a textarea since it is hard
 				    // to scroll the textarea and the page at the same time.
-                    if ("textarea" == tagName) {
+                    if ("textarea" === tagName) {
                         return;
                     }
 
 					var that = this, point = hasTouch ? e.touches[0] : e, deltaX = point.pageX - that.pointX, deltaY = point.pageY - that.pointY, newX = that.x
 							+ deltaX, newY = that.y + deltaY, c1, c2, scale, timestamp = e.timeStamp || Date.now();
 
-					if (that.options.onBeforeScrollMove)
+					if (that.options.onBeforeScrollMove) {
 						that.options.onBeforeScrollMove.call(that, e);
+					}
 
 					if (!e.ignorePreventDefault && e.defaultPrevented) {
 						return;
@@ -962,19 +983,22 @@
 
 						scale = 1 / that.touchesDistStart * that.touchesDist * this.scale;
 
-						if (scale < that.options.zoomMin)
+						if (scale < that.options.zoomMin) {
 							scale = 0.5 * that.options.zoomMin * Math.pow(2.0, scale / that.options.zoomMin);
-						else if (scale > that.options.zoomMax)
+						} else if (scale > that.options.zoomMax) {
 							scale = 2.0 * that.options.zoomMax * Math.pow(0.5, that.options.zoomMax / scale);
+						}
 
 						that.lastScale = scale / this.scale;
 
-						newX = this.originX - this.originX * that.lastScale + this.x, newY = this.originY - this.originY * that.lastScale + this.y;
+						newX = this.originX - this.originX * that.lastScale + this.x;
+						newY = this.originY - this.originY * that.lastScale + this.y;
 
 						this.scroller.style[transform] = 'translate(' + newX + 'px,' + newY + 'px) scale(' + scale + ')' + translateZ;
 
-						if (that.options.onZoom)
+						if (that.options.onZoom) {
 							that.options.onZoom.call(that, e);
+						}
 						return;
 					}
 
@@ -1021,15 +1045,17 @@
 						that.startY = that.y;
 					}
 
-					if (that.options.onScrollMove)
+					if (that.options.onScrollMove) {
 						that.options.onScrollMove.call(that, e);
+					}
 				},
 
 				_end : function(e) {
 					this._transitioning = false;
 
-					if (hasTouch && e.touches.length !== 0)
+					if (hasTouch && e.touches.length !== 0) {
 						return;
+					}
 
 					var that = this, point = hasTouch ? e.changedTouches[0] : e, target, ev, momentumX = {
 						dist : 0,
@@ -1041,8 +1067,9 @@
 
 					that.unbindTransientHandlers();
 
-					if (that.options.onBeforeScrollEnd)
+					if (that.options.onBeforeScrollEnd) {
 						that.options.onBeforeScrollEnd.call(that, e);
+					}
 
 					if (that.zoomed) {
 						scale = that.scale * that.lastScale;
@@ -1071,9 +1098,10 @@
 								// Double tapped
 								clearTimeout(that.doubleTapTimer);
 								that.doubleTapTimer = null;
-								if (that.options.onZoomStart)
+								if (that.options.onZoomStart) {
 									that.options.onZoomStart.call(that, e);
-								that.zoom(that.pointX, that.pointY, that.scale == 1 ? that.options.doubleTapZoom : 1);
+								}
+								that.zoom(that.pointX, that.pointY, that.scale === 1 ? that.options.doubleTapZoom : 1);
 								if (that.options.onZoomEnd) {
 									setTimeout(function() {
 										that.options.onZoomEnd.call(that, e);
@@ -1085,10 +1113,10 @@
 
 									// Find the last touched element
 									target = point.target;
-									while (target.nodeType != 1)
+									while (target.nodeType !== 1)
 										target = target.parentNode;
 
-									if (target.tagName != 'SELECT' && target.tagName != 'INPUT' && target.tagName != 'TEXTAREA') {
+									if (target.tagName !== 'SELECT' && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
 										ev = doc.createEvent('MouseEvents');
 										ev.initMouseEvent('click', true, true, e.view, 1, point.screenX, point.screenY, point.clientX, point.clientY,
 												e.ctrlKey, e.altKey, e.shiftKey, e.metaKey, 0, null);
@@ -1101,8 +1129,9 @@
 
 						that._resetPos(400);
 
-						if (that.options.onTouchEnd)
+						if (that.options.onTouchEnd) {
 							that.options.onTouchEnd.call(that, e);
+						}
 						return;
 					}
 
@@ -1146,8 +1175,9 @@
 
 						that.scrollTo(m.round(newPosX), m.round(newPosY), newDuration);
 
-						if (that.options.onTouchEnd)
+						if (that.options.onTouchEnd) {
 							that.options.onTouchEnd.call(that, e);
+						}
 						return;
 					}
 
@@ -1155,22 +1185,24 @@
 					if (that.options.snap) {
 						distX = newPosX - that.absStartX;
 						distY = newPosY - that.absStartY;
-						if (m.abs(distX) < that.options.snapThreshold && m.abs(distY) < that.options.snapThreshold)
+						if (m.abs(distX) < that.options.snapThreshold && m.abs(distY) < that.options.snapThreshold) {
 							that.scrollTo(that.absStartX, that.absStartY, 200);
-						else {
+						} else {
 							snap = that._snap(that.x, that.y);
-							if (snap.x != that.x || snap.y != that.y)
+							if (snap.x !== that.x || snap.y !== that.y)
 								that.scrollTo(snap.x, snap.y, snap.time);
 						}
 
-						if (that.options.onTouchEnd)
+						if (that.options.onTouchEnd) {
 							that.options.onTouchEnd.call(that, e);
+						}
 						return;
 					}
 
 					that._resetPos(200);
-					if (that.options.onTouchEnd)
+					if (that.options.onTouchEnd) {
 						that.options.onTouchEnd.call(that, e);
+					}
 				},
 
 				_resetPos : function(time) {
@@ -1188,21 +1220,24 @@
 						resetY = that.maxScrollY;
 					}
 
-					if (resetX == that.x && resetY == that.y) {
+					if (resetX === that.x && resetY === that.y) {
 						if (that.moved) {
 							that.moved = false;
-							if (that.options.onScrollEnd)
+							if (that.options.onScrollEnd) {
 								that.options.onScrollEnd.call(that);
+							}
 						}
 
 						if (that.hScrollbar && that.options.hideScrollbar) {
-							if (vendor == 'webkit')
+							if (vendor === 'webkit') {
 								that.hScrollbarWrapper.style[transitionDelay] = '300ms';
+							}
 							that.hScrollbarWrapper.style.opacity = '0';
 						}
 						if (that.vScrollbar && that.options.hideScrollbar) {
-							if (vendor == 'webkit')
+							if (vendor === 'webkit') {
 								that.vScrollbarWrapper.style[transitionDelay] = '300ms';
+							}
 							that.vScrollbarWrapper.style.opacity = '0';
 						}
 
@@ -1226,24 +1261,28 @@
 						return;
 					}
 
-					if (that.options.wheelAction == 'zoom') {
+					if (that.options.wheelAction === 'zoom') {
 						deltaScale = that.scale * Math.pow(2, 1 / 3 * (wheelDeltaY ? wheelDeltaY / Math.abs(wheelDeltaY) : 0));
-						if (deltaScale < that.options.zoomMin)
+						if (deltaScale < that.options.zoomMin) {
 							deltaScale = that.options.zoomMin;
-						if (deltaScale > that.options.zoomMax)
+						}
+						if (deltaScale > that.options.zoomMax) {
 							deltaScale = that.options.zoomMax;
+						}
 
-						if (deltaScale != that.scale) {
-							if (!that.wheelZoomCount && that.options.onZoomStart)
+						if (deltaScale !== that.scale) {
+							if (!that.wheelZoomCount && that.options.onZoomStart) {
 								that.options.onZoomStart.call(that, e);
+							}
 							that.wheelZoomCount++;
 
 							that.zoom(e.pageX, e.pageY, deltaScale, 400);
 
 							setTimeout(function() {
 								that.wheelZoomCount--;
-								if (!that.wheelZoomCount && that.options.onZoomEnd)
+								if (!that.wheelZoomCount && that.options.onZoomEnd) {
 									that.options.onZoomEnd.call(that, e);
+								}
 							}, 400);
 						}
 
@@ -1253,15 +1292,17 @@
 					deltaX = that.x + wheelDeltaX;
 					deltaY = that.y + wheelDeltaY;
 
-					if (deltaX > 0)
+					if (deltaX > 0) {
 						deltaX = 0;
-					else if (deltaX < that.maxScrollX)
+					} else if (deltaX < that.maxScrollX) {
 						deltaX = that.maxScrollX;
+					}
 
-					if (deltaY > that.minScrollY)
+					if (deltaY > that.minScrollY) {
 						deltaY = that.minScrollY;
-					else if (deltaY < that.maxScrollY)
+					} else if (deltaY < that.maxScrollY) {
 						deltaY = that.maxScrollY;
+					}
 
 					if (that.maxScrollY < 0) {
 						that.scrollTo(deltaX, deltaY, 0);
@@ -1271,8 +1312,9 @@
 				_transitionEnd : function(e) {
 					var that = this;
 
-					if (e.target != that.scroller)
+					if (e.target !== that.scroller) {
 						return;
+					}
 
 					that._unbind(TRNEND_EV);
 
@@ -1287,8 +1329,9 @@
 				_startAni : function() {
 					var that = this, startX = that.x, startY = that.y, startTime = Date.now(), step, easeOut, animate;
 
-					if (that.animating)
+					if (that.animating) {
 						return;
+					}
 
 					if (!that.steps.length) {
 						that._resetPos(400);
@@ -1297,8 +1340,9 @@
 
 					step = that.steps.shift();
 
-					if (step.x == startX && step.y == startY)
+					if (step.x === startX && step.y === startY) {
 						step.time = 0;
+					}
 
 					that.animating = true;
 					that.moved = true;
@@ -1307,10 +1351,11 @@
 						that._transitionTime(step.time);
 						that._pos(step.x, step.y);
 						that.animating = false;
-						if (step.time)
+						if (step.time) {
 							that._bind(TRNEND_EV);
-						else
+						} else {
 							that._resetPos(0);
+						}
 						return;
 					}
 
@@ -1320,13 +1365,10 @@
 						if (now >= startTime + step.time) {
 							that._pos(step.x, step.y);
 							that.animating = false;
-							if (that.options.onAnimationEnd)
-								that.options.onAnimationEnd.call(that); // Execute
-																		// custom
-																		// code
-																		// on
-																		// animation
-																		// end
+							if (that.options.onAnimationEnd) {
+								// Execute custom code on animation end
+								that.options.onAnimationEnd.call(that);
+							}
 							that._startAni();
 							return;
 						}
@@ -1336,8 +1378,9 @@
 						newX = (step.x - startX) * easeOut + startX;
 						newY = (step.y - startY) * easeOut + startY;
 						that._pos(newX, newY);
-						if (that.animating)
+						if (that.animating) {
 							that.aniTime = nextFrame(animate);
+						}
 					};
 
 					animate();
@@ -1346,10 +1389,12 @@
 				_transitionTime : function(time) {
 					time += 'ms';
 					this.scroller.style[transitionDuration] = time;
-					if (this.hScrollbar)
+					if (this.hScrollbar) {
 						this.hScrollbarIndicator.style[transitionDuration] = time;
-					if (this.vScrollbar)
+					}
+					if (this.vScrollbar) {
 						this.vScrollbarIndicator.style[transitionDuration] = time;
+					}
 				},
 
 				_momentum : function(dist, time, maxDistUpper, maxDistLower, size) {
@@ -1386,7 +1431,7 @@
 						top -= el.offsetTop;
 					}
 
-					if (el != this.wrapper) {
+					if (el !== this.wrapper) {
 						left *= this.scale;
 						top *= this.scale;
 					}
@@ -1409,7 +1454,7 @@
 						}
 					}
 
-					if (page == that.currPageX && page > 0 && that.dirX < 0) {
+					if (page === that.currPageX && page > 0 && that.dirX < 0) {
 						page--;
 					}
 
@@ -1427,7 +1472,7 @@
 						}
 					}
 
-					if (page == that.currPageY && page > 0 && that.dirY < 0) {
+					if (page === that.currPageY && page > 0 && that.dirY < 0) {
 						page--;
 					}
 
@@ -1481,21 +1526,25 @@
 						that._unbind('mousewheel');
 					}
 
-					if (that.options.useTransition)
+					if (that.options.useTransition) {
 						that._unbind(TRNEND_EV);
+					}
 
-					if (that.options.checkDOMChanges)
+					if (that.options.checkDOMChanges) {
 						clearInterval(that.checkDOMTime);
+					}
 
-					if (that.options.onDestroy)
+					if (that.options.onDestroy) {
 						that.options.onDestroy.call(that);
+					}
 				},
 
 				refresh : function(doNotAnimate) {
 					var that = this, offset, i, l, els, pos = 0, page = 0;
 
-					if (that.scale < that.options.zoomMin)
+					if (that.scale < that.options.zoomMin) {
 						that.scale = that.options.zoomMin;
+					}
 					that.wrapperW = that.wrapper.clientWidth || 1;
 					that.wrapperH = that.wrapper.clientHeight || 1;
 
@@ -1507,8 +1556,9 @@
 					that.dirX = 0;
 					that.dirY = 0;
 
-					if (that.options.onRefresh)
+					if (that.options.onRefresh) {
 						that.options.onRefresh.call(that);
+					}
 
 					that.hScroll = that.options.hScroll && that.maxScrollX < 0;
 					that.vScroll = that.options.vScroll && (!that.options.bounceLock && !that.hScroll || that.scrollerH > that.wrapperH);
@@ -1521,7 +1571,7 @@
 					that.wrapperOffsetTop = -offset.top;
 
 					// Prepare snap
-					if (typeof that.options.snap == 'string') {
+					if (typeof that.options.snap === 'string') {
 						that.pagesX = [];
 						that.pagesY = [];
 						els = that.scroller.querySelectorAll(that.options.snap);
@@ -1539,8 +1589,9 @@
 							pos = pos - that.wrapperW;
 							page++;
 						}
-						if (that.maxScrollX % that.wrapperW)
+						if (that.maxScrollX % that.wrapperW) {
 							that.pagesX[that.pagesX.length] = that.maxScrollX - that.pagesX[that.pagesX.length - 1] + that.pagesX[that.pagesX.length - 1];
+						}
 
 						pos = 0;
 						page = 0;
@@ -1550,8 +1601,9 @@
 							pos = pos - that.wrapperH;
 							page++;
 						}
-						if (that.maxScrollY % that.wrapperH)
+						if (that.maxScrollY % that.wrapperH) {
 							that.pagesY[that.pagesY.length] = that.maxScrollY - that.pagesY[that.pagesY.length - 1] + that.pagesY[that.pagesY.length - 1];
+						}
 					}
 
 					// Prepare the scrollbars
@@ -1569,13 +1621,14 @@
 
 					that.stop();
 
-					if (!step.length)
+					if (!step.length) {
 						step = [ {
 							x : x,
 							y : y,
 							time : time,
 							relative : relative
 						} ];
+					}
 
 					for (i = 0, l = step.length; i < l; i++) {
 						if (step[i].relative) {
@@ -1595,8 +1648,9 @@
 				scrollToElement : function(el, time) {
 					var that = this, pos;
 					el = el.nodeType ? el : that.scroller.querySelector(el);
-					if (!el)
+					if (!el) {
 						return;
+					}
 
 					pos = that._offset(el);
 					pos.left += that.wrapperOffsetLeft;
@@ -1614,12 +1668,13 @@
 
 					time = time === undefined ? 400 : time;
 
-					if (that.options.onScrollStart)
+					if (that.options.onScrollStart) {
 						that.options.onScrollStart.call(that);
+					}
 
 					if (that.options.snap) {
-						pageX = pageX == 'next' ? that.currPageX + 1 : pageX == 'prev' ? that.currPageX - 1 : pageX;
-						pageY = pageY == 'next' ? that.currPageY + 1 : pageY == 'prev' ? that.currPageY - 1 : pageY;
+						pageX = pageX === 'next' ? that.currPageX + 1 : pageX === 'prev' ? that.currPageX - 1 : pageX;
+						pageY = pageY === 'next' ? that.currPageY + 1 : pageY === 'prev' ? that.currPageY - 1 : pageY;
 
 						pageX = pageX < 0 ? 0 : pageX > that.pagesX.length - 1 ? that.pagesX.length - 1 : pageX;
 						pageY = pageY < 0 ? 0 : pageY > that.pagesY.length - 1 ? that.pagesY.length - 1 : pageY;
@@ -1631,10 +1686,12 @@
 					} else {
 						x = -that.wrapperW * pageX;
 						y = -that.wrapperH * pageY;
-						if (x < that.maxScrollX)
+						if (x < that.maxScrollX) {
 							x = that.maxScrollX;
-						if (y < that.maxScrollY)
+						}
+						if (y < that.maxScrollY) {
 							y = that.maxScrollY;
+						}
 					}
 
 					that.scrollTo(x, y, time);
@@ -1661,10 +1718,11 @@
 				},
 
 				stop : function() {
-					if (this.options.useTransition)
+					if (this.options.useTransition) {
 						this._unbind(TRNEND_EV);
-					else
+					} else {
 						cancelFrame(this.aniTime);
+					}
 					this.steps = [];
 					this.moved = false;
 					this.animating = false;
@@ -1673,8 +1731,9 @@
 				zoom : function(x, y, scale, time) {
 					var that = this, relScale = scale / that.scale;
 
-					if (!that.options.useTransform)
+					if (!that.options.useTransform) {
 						return;
+					}
 
 					that.zoomed = true;
 					time = time === undefined ? 200 : time;
@@ -1700,8 +1759,9 @@
 			};
 
 			function prefixStyle(style) {
-				if (vendor === '')
+				if (vendor === '') {
 					return style;
+				}
 
 				style = style.charAt(0).toUpperCase() + style.substr(1);
 				return vendor + style;
@@ -1709,10 +1769,11 @@
 
 			dummyStyle = null; // for the sake of it
 
-			if (typeof exports !== 'undefined')
+			if (typeof exports !== 'undefined') {
 				exports.iScroll = iScroll;
-			else
+			} else {
 				window.iScroll = iScroll;
+			}
 
 		})(window, document);
 	}

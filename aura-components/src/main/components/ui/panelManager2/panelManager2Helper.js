@@ -212,7 +212,7 @@
      * @param cmp
      * @private
      */
-    activateNextPanel: function(cmp) {
+    activateNextPanel: function() {
         //find the panel to active
         for (var panel, i = this.PANELS_STACK.length - 1; i >= 0; i--) {
             panel = this.PANELS_STACK[i];
@@ -260,7 +260,7 @@
             owner         = this.PANELS_OWNER[currentTarget],
             panel, content, i;
 
-        $A.assert(!scope || (scope !== 'all' || scope !== 'owner' || scope != "self"), 'Invalid target (all || owner)');
+        $A.assert(!scope || (scope !== 'all' || scope !== 'owner' || scope !== "self"), 'Invalid target (all || owner)');
 
         if (scope === 'all') {
             for (i = stack.length - 1; i >= 0; --i) {

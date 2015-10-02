@@ -270,11 +270,11 @@
         /**
          * @return {Array} The selected row items on the grid.
          */
-        function retrieveSelected(selectedCache, items) {
+        function retrieveSelected(selectedCache, rowItems) {
             var selected = [];
             for (var index in selectedCache) {
                 if (selectedCache[index]) {
-                    selected.push(items[index]);
+                    selected.push(rowItems[index]);
                 }
             }
             return selected;
@@ -288,10 +288,10 @@
 		// Apply the value either to the specified rows or to all rows depending on whether the rows parameter was defined
 		var rowsLength = rows ? rows.length : rowData.length;
 		for (i = 0; i < rowsLength; i++) {
-			var index = rows ? rows[i] : i;
+			var j = rows ? rows[i] : i;
 			
-			rowData[index].vp.set("selected", value);
-			selectionData.selectedIndexes[index] = value;
+			rowData[j].vp.set("selected", value);
+			selectionData.selectedIndexes[j] = value;
 		}
 
 		// Set the selected items to 
@@ -627,6 +627,8 @@
 	 */
 	createAndRenderCell: function (concrete, cdrs, vp, element, components, callback) {
 
+        var resolved = 0;
+
         function setupComponent(out) {
             components.push(out);
 
@@ -637,8 +639,6 @@
                 callback();
             }
         }
-
-        var resolved = 0;
 
 		for (var cdrIndex = 0; cdrIndex < cdrs.length; cdrIndex++) {
 			var cdr = cdrs[cdrIndex];
@@ -656,7 +656,12 @@
 	 * @param {Booelan} cleanOldComponents
 	 */
 	renderTableRow: function(concrete, rowData, tr, cleanOldComponents) {
-		var self = this,
+		
+        function destroyComponent(cmp) {
+            cmp.destroy();
+        }        
+        
+        var self = this,
 			cellTemplates = concrete._cellTemplates,
 			td, cdrs, largerLength, resizeRowData;
 		
@@ -686,9 +691,7 @@
 				colData.elementRef = td;
 				
 				if (cleanOldComponents) {
-					$A.util.forEach(colData.components, function(cmp) {
-						cmp.destroy();
-					});
+					$A.util.forEach(colData.components, destroyComponent);
 					colData.components = [];
 				}
 				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, colData.components);

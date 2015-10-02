@@ -96,7 +96,7 @@
 	aggregate_sum: function (items, column) {
 		var sum = 0;
 
-		for(item in items){
+		for(var item in items){
             var num = parseFloat(item.get(column), 10);
             if (!isNaN(num)) {
                 sum += num;

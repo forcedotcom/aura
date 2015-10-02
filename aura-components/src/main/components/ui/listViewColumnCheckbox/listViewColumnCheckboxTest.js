@@ -17,24 +17,24 @@
     testControllerChangeHandler: {
         test: [
             function BubblingIsCanceled(component) {
+                var actual = null;
                 var domEvent = {
-                        cancelBubble: function() {
-                            actual = true;
+                    cancelBubble: function() {
+                        actual = true;
                     },
                     target: { checked: null }
                 };
-                var actual = null;
 
                 component.get("c.changeHandler").runDeprecated(domEvent);
 
                 $A.test.assertTrue(actual);
             },
             function CallsHelperFireEvent(component) {
+                var actual = false;
                 var domEvent = { target: { checked: null } };
                 var mockWhile = this.getHelperMock(component, "fireEvent", function(){
                     actual = true;
                 });
-                var actual = false;
 
                 mockWhile(function(){
                     component.get("c.changeHandler").runDeprecated(domEvent);
@@ -43,12 +43,12 @@
                 $A.test.assertTrue(actual);
             },
             function ComponentPassedToFireEvent(component){
+                var actual = false;
                 var expected = component;
                 var domEvent = { target: { checked: null } };
-                var mockWhile = this.getHelperMock(component, "fireEvent", function(component){
-                    actual = component;
+                var mockWhile = this.getHelperMock(component, "fireEvent", function(cmp){
+                    actual = cmp;
                 });
-                var actual = false;
 
                 mockWhile(function(){
                     component.get("c.changeHandler").runDeprecated(domEvent);
@@ -60,7 +60,7 @@
                 var expected = "onchange";
                 var domEvent = { target: { checked: null } };
                 var actual = null;
-                var mockWhile = this.getHelperMock(component, "fireEvent", function(component, eventName){
+                var mockWhile = this.getHelperMock(component, "fireEvent", function(cmp, eventName){
                     actual = eventName;
                 });
 
@@ -71,12 +71,12 @@
                 $A.test.assertEquals(expected, actual);
             },
             function EventCategoryPassedToFireEvent(component){
+                var actual = null;
                 var expected = "checkbox";
                 var domEvent = { target: { checked: null } };
-                var mockWhile = this.getHelperMock(component, "fireEvent", function(component, eventName, category){
+                var mockWhile = this.getHelperMock(component, "fireEvent", function(cmp, eventName, category){
                     actual = category;
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     component.get("c.changeHandler").runDeprecated(domEvent);
@@ -85,12 +85,12 @@
                 $A.test.assertEquals(expected, actual);
             },
             function RawDomEventPassedToFireEvent(component){
+                var actual = null;
                 var domEvent = { target: { checked: null } };
                 var expected = domEvent;
-                var mockWhile = this.getHelperMock(component, "fireEvent", function(component, eventName, category, rawDomEvent){
+                var mockWhile = this.getHelperMock(component, "fireEvent", function(cmp, eventName, category, rawDomEvent){
                     actual = rawDomEvent;
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     component.get("c.changeHandler").runDeprecated(domEvent);
@@ -99,12 +99,12 @@
                 $A.test.assertEquals(expected, actual);
             },
             function CheckedInformationPassedToFireEvent(component){
+                var actual = null;
                 var expected = true;
                 var domEvent = { target: { checked: expected } };
-                var mockWhile = this.getHelperMock(component, "fireEvent", function(component, eventName, category, rawDomEvent, data){
+                var mockWhile = this.getHelperMock(component, "fireEvent", function(cmp, eventName, category, rawDomEvent, data){
                     actual = data.checked;
                 });
-                var actual = null;
 
                 mockWhile(function(){
                     component.get("c.changeHandler").runDeprecated(domEvent);

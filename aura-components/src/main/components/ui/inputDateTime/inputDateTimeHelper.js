@@ -84,16 +84,18 @@
      * This can be overridden by extended component.
      */
     displayDateTime: function(component, dateDisplayValue, timeDisplayValue) {
+        var inputCmp,
+            elem;
         if (!$A.util.isUndefinedOrNull(dateDisplayValue)){
-            var inputCmp = component.find("inputDate");
-            var elem = inputCmp ? inputCmp.getElement() : null;
+            inputCmp = component.find("inputDate");
+            elem = inputCmp ? inputCmp.getElement() : null;
             if (elem) {
                 elem.value = $A.localizationService.translateToLocalizedDigits(dateDisplayValue);
             }
         }
         if (!$A.util.isUndefinedOrNull(timeDisplayValue)){
-            var inputCmp = component.find("inputTime");
-            var elem = inputCmp ? inputCmp.getElement() : null;
+            inputCmp = component.find("inputTime");
+            elem = inputCmp ? inputCmp.getElement() : null;
             if (elem) {
                 elem.value = $A.localizationService.translateToLocalizedDigits(timeDisplayValue);
             }
@@ -178,6 +180,8 @@
 
         var date = $A.localizationService.parseDateTimeISO8601(value);
 
+        var timezone = component.get("v.timezone");
+
         if (this.isDesktopMode(component)) {
             if (!$A.util.isUndefinedOrNull(date)) {
                 var dateFormat = component.get("v.dateFormat");
@@ -186,7 +190,6 @@
                 var timeFormat = component.get("v.timeFormat");
                 timeFormat = !$A.util.isUndefinedOrNull(timeFormat) ? timeFormat : $A.get("$Locale.timeFormat");
 
-                var timezone = component.get("v.timezone");
                 $A.localizationService.UTCToWallTime(date, timezone, function(walltime) {
                     try {
                         walltime = $A.localizationService.translateToOtherCalendar(walltime);
@@ -204,8 +207,6 @@
         } else {
             if (!$A.util.isUndefinedOrNull(date)) {
                 var format = component.get("v.format");
-                var langLocale = component.get("v.langLocale");
-                var timezone = component.get("v.timezone");
                 $A.localizationService.UTCToWallTime(date, timezone, function (walltime) {
                     try {
                         walltime = $A.localizationService.translateToOtherCalendar(walltime);

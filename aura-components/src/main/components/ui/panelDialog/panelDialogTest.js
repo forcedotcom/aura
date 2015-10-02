@@ -23,7 +23,7 @@
 		isModal : true
 	},
 
-	setUp: function(cmp) {
+	setUp: function() {
 		FORCE = {
 			getPrefix: function() {
 				return "webkit";
@@ -170,7 +170,7 @@
 		attributes: {
 			isVisible:true, 
 			'class': "testClass",
-			title: "test title",
+			title: "test title"
 		},
 	    test : function(cmp){
 

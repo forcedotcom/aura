@@ -195,7 +195,7 @@
         		if(timezone === "GMT"){
 	        		$A.test.assertEquals("9/23/04 4:30 PM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
-	        	else if(timezone == "America/Los_Angeles"){
+	        	else if(timezone === "America/Los_Angeles"){
 	        		$A.test.assertEquals("9/23/04 9:30 AM", $A.test.getText(component.find('span').getElement()), "Should have used default as default timezone.");
 	        	}
 	        	else{// For any other time zone we just make sure it has some value

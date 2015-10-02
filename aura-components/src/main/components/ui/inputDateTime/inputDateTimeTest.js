@@ -92,9 +92,9 @@
 	        $A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
 	        	var inputDateStr  = cmp.find("inputDate").getElement().value;
 	        	var timezone = $A.get("$Locale.timezone");
+                var inputTimeStr  = cmp.find("inputTime").getElement().value;
 	        	if(timezone  === "GMT"){
 					if (this.isViewDesktop()) {
-						var inputTimeStr  = cmp.find("inputTime").getElement().value;
 						$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used default timezone.");
 						$A.test.assertEquals("4:30 PM", inputTimeStr, "Should have used default timezone.");
 					} else {
@@ -103,7 +103,6 @@
 	        	}
 	        	else if(timezone  === "America/Los_Angeles"){
 					if (this.isViewDesktop()) {
-						var inputTimeStr  = cmp.find("inputTime").getElement().value;
 						$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used default timezone.");
 						$A.test.assertEquals("9:30 AM", inputTimeStr, "Should have used default timezone.");
 					} else {
@@ -113,7 +112,6 @@
 	        	else{// For any other time zone we just make sure it has some value
 	        		$A.test.assertTrue(inputDateStr.length > 0, "Should have used default timezone.");
 					if (this.isViewDesktop()) {
-						var inputTimeStr  = cmp.find("inputTime").getElement().value;
 						$A.test.assertTrue(inputTimeStr.length > 0, "Should have used default timezone.");
 					}
 	        	}
@@ -143,13 +141,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'GMT'},
 	test: function(cmp){
 	        $A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr  = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used Default langLocale.");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Should have used Default langLocale.");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");
 				}
 	        });
@@ -163,13 +160,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: '', timezone: 'GMT'},
 	test: function(cmp){
 	        $A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function() {
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used Default langLocale.");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Should have used Default langLocale.");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");
 				}
 	        });
@@ -183,13 +179,12 @@
  	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', langLocale: 'xx', timezone: 'GMT'},
 	test: function(cmp){
 	        $A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Should have used Default langLocale.");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Should have used Default langLocale.");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Should have used Default langLocale.");
 				}
 	        });
@@ -203,13 +198,12 @@
         attributes: {value : '2004-09-23T16:30:00.000Z', format: '', timezone: 'GMT'},
         test:function(cmp){
         	$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004", inputDateStr, "Incorrect date/time format.");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Incorrect date/time format.");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("Sep 23, 2004 4:30:00 PM", inputDateStr, "Incorrect date/time format.");
 				}
 			});
@@ -223,13 +217,12 @@
         attributes: {value : '2004-09-23T16:30:00.000Z', format: 'cornoio', dateFormat: 'cornoio', timeFormat: 'cornoio'},
         test: function(cmp){
         	$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("cornoio", inputDateStr, "Invalid pattern character is output as it is.");
 					var inputTimeStr  = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("cornoio", inputTimeStr, "Invalid pattern character is output as it is.");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("cornoio", inputDateStr, "Invalid pattern character is output as it is.");
 				}
         	});
@@ -286,13 +279,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', dateFormat: 'M/dd/yy', timeFormat:'h:mm A', timezone: 'GMT'},
 	test: function(cmp){
 			$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04", inputDateStr, "Dates are not the same and they should be");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Dates are not the same and they should be");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04 4:30 PM", inputDateStr, "Dates are not the same and they should be");
 				}
 			});
@@ -306,13 +298,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', dateFormat: 'M/dd/yy', timeFormat:'h:mm A', timezone: 'America/Los_Angeles'},
 	test: function(cmp){
 			$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04", inputDateStr, "Dates are not the same and they should be");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("9:30 AM", inputTimeStr, "Dates are not the same and they should be");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04 9:30 AM", inputDateStr, "Dates are not the same and they should be");
 				}
 			});
@@ -326,13 +317,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', format: 'M/dd/yy h:mm A', dateFormat: 'M/dd/yy', timeFormat:'h:mm A', timezone: 'America/New_York'},
 	test: function(cmp){
 			$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04", inputDateStr, "Dates are not the same and they should be");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("12:30 PM", inputTimeStr, "Dates are not the same and they should be");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("9/23/04 12:30 PM", inputDateStr, "Dates are not the same and they should be");
 				}
 			});
@@ -346,13 +336,12 @@
 	attributes : {value:'2004-09-23T16:30:00.000Z', displayDatePicker:'true', timezone: 'GMT', langLocale: 'fr'},
 	test: function(cmp){
 			$A.test.addWaitFor(true, function(){return cmp.find("inputDate").getElement().value.length > 0;},function(){
+                var inputDateStr = cmp.find("inputDate").getElement().value;
 				if (this.isViewDesktop()) {
-					var inputDateStr = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("sept. 23, 2004", inputDateStr, "Dates are not the same and they should be");
 					var inputTimeStr = cmp.find("inputTime").getElement().value;
 					$A.test.assertEquals("4:30 PM", inputTimeStr, "Dates are not the same and they should be");
 				} else {
-					var inputDateStr  = cmp.find("inputDate").getElement().value;
 					$A.test.assertEquals("sept. 23, 2004 4:30:00 PM", inputDateStr, "Dates are not the same and they should be");
 				}
 			});

@@ -63,9 +63,9 @@
                 attributes = this.getAttributes(template);
 
                 // Remove irrelevant attributes
-                for ( var x in skipMap) {
-                    skipMap[x] = attributes[x];
-                    delete attributes[x];
+                for (var i in skipMap) {
+                    skipMap[i] = attributes[i];
+                    delete attributes[i];
                 }
 
                 // Make modifications befitting header columns
@@ -153,30 +153,7 @@
     },
 
     buildRows : function(component, templates, listBody) {
-        if (!templates) {
-            templates = {};
-        }
-
-        var blockSize = component.get("v.blockSize");
-        var buildRowBlock = buildRowBlock.bind(this);
-        var containerSet = false;
-        var dataTemplates = templates.dataTemplates || [];
-        var dataTemplateCount = dataTemplates.length;
-        var index = 0;
-        var items = component.get("v.items");
-        var itemCount = items ? items.length : 0;
-        var rows = [];
-        var rowTooltip = component.get("v.rowTooltip");
-
-        if (itemCount === 0) {
-            // Draw Empty Message
-            buildEmptyMessage(this);
-        } else {
-            // DEBUG: Performance Marker
-                         // Start component chain to build items
-            buildRowBlock();
-        }
-
+        
         function buildEmptyMessage(helper) {
             var emptyMessage = helper.generateComponent("aura:unescapedHtml", {
                 value : component.get("v.emptyMessage")
@@ -195,7 +172,7 @@
             });
             listBody.set("v.body", [ row ]);
             helper.fireEvent(component, component, "onitemsready", "EmptyList");
-        }
+        }        
 
         function buildRowBlock() {
             var item = null;
@@ -262,7 +239,7 @@
                     var typeName = template.getDef().getDescriptor().getQualifiedName();
                     //JBUCH: HALO: FIXME: GIANT HACK
                     var setUrl=false;
-                    if(typeName=="markup://ui:listViewColumnEmail"){
+                    if(typeName === "markup://ui:listViewColumnEmail"){
                         if(!attributes["url"]||attributes["url"]==="mailto:"){
                             attributes["url"]=attributes["body"];
                             attributes["body"]=null;
@@ -306,18 +283,45 @@
                 // DEBUG: Performance Marker
             }
         }
+        
+        if (!templates) {
+            templates = {};
+        }
+
+        var blockSize = component.get("v.blockSize");
+        var containerSet = false;
+        var dataTemplates = templates.dataTemplates || [];
+        var dataTemplateCount = dataTemplates.length;
+        var index = 0;
+        var items = component.get("v.items");
+        var itemCount = items ? items.length : 0;
+        var rows = [];
+        var rowTooltip = component.get("v.rowTooltip");
+
+        buildRowBlock = buildRowBlock.bind(this);
+
+        if (itemCount === 0) {
+            // Draw Empty Message
+            buildEmptyMessage(this);
+        } else {
+            // DEBUG: Performance Marker
+                         // Start component chain to build items
+            buildRowBlock();
+        }
     },
 
     decodeHtml : function(htmlString) {
         // Create a floating node as our translation container
-        if (!this.translator)
+        if (!this.translator) {
             this.translator = document.createElement("div");
+        }
         var translator = this.translator;
         translator.innerHTML = htmlString;
         var textContent = translator.textContent || translator.innerText;
         // Remove the node reference after the current UI thread has finished.
-        if (this.decodeTimer)
+        if (this.decodeTimer) {
             clearTimeout(this.decodeTimer);
+        }
         this.decodeTimer = setTimeout(function() {
             this.translator = null;
         }.bind(this), 100);
@@ -357,17 +361,20 @@
     },
 
     formatColumnName : function(columnName) {
-        if (!columnName)
+        if (!columnName) {
             return '';
-        if (columnName.length === 1)
+        }
+        if (columnName.length === 1) {
             return columnName.toUpperCase();
+        }
         return columnName.charAt(0).toUpperCase() + columnName.substr(1).replace(/\B([A-Z])/g, " $1");
     },
 
     formatContent : function(columnTemplate, dataItem, fieldName, items, index, formatters) {
         var content = dataItem[fieldName];
-        if (content === null)
+        if (content === null) {
             content = this.resolveObject(dataItem, fieldName);
+        }
         if (formatters) {
             // Loop over formatters in order, modifying the content each time
             for (var i = 0; i < formatters.length; i++) {
@@ -389,8 +396,9 @@
             for (var column in item) {
                 // Only generate columns for first level properties that are not
                 // methods
-                if (!item.hasOwnProperty(column) || typeof (item[column]) === "function")
+                if (!item.hasOwnProperty(column) || typeof (item[column]) === "function") {
                     continue;
+                }
                 var template = this.generateComponent("ui:listViewColumn", {
                     fieldName : column,
                     title : $A.expressionService.create(component, this.formatColumnName(column))
@@ -590,7 +598,7 @@
     },
 
     getExpression : function(value) {
-        var isExpression = value && aura.util.isString(value) && value.indexOf("{"+"#") === 0 && value.lastIndexOf("}") === value.length - 1;
+        var isExpression = value && $A.util.isString(value) && value.indexOf("{"+"#") === 0 && value.lastIndexOf("}") === value.length - 1;
         if (isExpression) {
             return value.substring(2, value.length - 1);
         }
@@ -615,7 +623,7 @@
     },
 
     getTarget : function(target, limit, matches) {
-        while (target && target != limit) {
+        while (target && target !== limit) {
             if (matches[target.tagName]) {
                 return target;
             }
@@ -675,7 +683,7 @@
         var target = null;
         if (qualifiedPath && qualifiedPath.split) {
             var paths = qualifiedPath.split('.');
-            var target = base;
+            target = base;
             while (target && paths.length) {
                 target = target[paths.shift()];
             }

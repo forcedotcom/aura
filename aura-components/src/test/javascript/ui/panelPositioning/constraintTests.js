@@ -210,7 +210,7 @@ Test.Components.Ui.PanelPositioning.constraintTests=function(){
 			Assert.Equal(expected, element.left);
 		}
 
-				[Fact]
+		[Fact]
 		function targetCenterElementMiddle() {
 
 			var targetDims = {top:500, left:600, height: 200, width: 200};
@@ -246,6 +246,53 @@ Test.Components.Ui.PanelPositioning.constraintTests=function(){
 			Assert.Equal(expected, element.top);
 		}
 
+		[Fact]
+		function targetRightElementRightWithPad() {
+
+			var targetDims = {top:500, left:600, height: 200, width: 200};
+			var elementDims = {top:200, left:0, height: 100, width: 100};
+
+			var targetElement = getMockElement(targetDims);
+			var element = getMockElement(elementDims);
+
+			var myConstraint = new Constraint('right', {
+				element: element,
+				target: targetElement,
+				pad: 10,
+				targetAlign: 'right top'
+			});
+
+			var expected = (targetDims.left + targetDims.width - elementDims.width - 10);
+			myConstraint.updateValues();
+			myConstraint.reposition();
+
+			Assert.Equal(expected, element.left);
+
+		}
+
+		[Fact]
+		function targetTopElementTopWithPad() {
+
+			var elementDims = {top:200, left:0, height: 100, width: 100},
+				targetDims = {top:500, left:0, height: 200, with: 200};
+
+			var targetElement = getMockElement(targetDims);
+			var element = getMockElement(elementDims);
+
+			var myConstraint = new Constraint('top', {
+				element: element,
+				target: targetElement,
+				targetAlign: 'left top',
+				pad: 10
+			});
+
+			myConstraint.updateValues();
+			myConstraint.reposition();
+
+			var expected = targetDims.top + 10;
+
+			Assert.Equal(expected, element.top);
+		}
 
 	}
 

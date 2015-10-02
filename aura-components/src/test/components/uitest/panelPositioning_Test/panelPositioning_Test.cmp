@@ -38,6 +38,7 @@
                 <ui:inputText aura:id="align" label="Align" value="left bottom" />
                 <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
                 <ui:inputNumber aura:id="pad" label="pad" value="15"  />
+                <ui:inputNumber aura:id="padTop" label="padTop" value=""  />
                 <ui:button label="GO!" press="{!c.handlePress}"/>
             </form>
         </div>

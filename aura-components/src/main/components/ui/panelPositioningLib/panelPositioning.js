@@ -124,6 +124,7 @@ function (constraint, elementProxyFactory) {
          *                               default: position the element based on align and target align properties
          *                               bounding box: position the elment inside the target
          * @property {Number} config.pad A number (in pixels) to pad the constraint. (default is 0)
+         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint. 
          * @property {Boolean} config.enable If enable is false the constraint will have no effect. (default is true)
          * @property {String} config.align How to align the element being positioned. This can have one or two words the first specifies
          *                          the vertical alignment, the second the horizontal alignments.
@@ -150,7 +151,7 @@ function (constraint, elementProxyFactory) {
             var constraintList = [];
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
             $A.assert(config.target && (config.target === window || isDomNode(config.target)), 'Target is undefined or missing');
-            
+
             if(config.appendToBody) {
                 document.body.appendChild(config.element);
             }
@@ -159,8 +160,14 @@ function (constraint, elementProxyFactory) {
             config.target = elementProxyFactory.getElement(config.target);
             if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
                 var constraintDirections = config.align.split(/\s/);
+                var vertConfig = $A.util.copy(config);
+
+                //the vertical config is exactly the same, except if there is a topPad we use that value for pad
+                if(vertConfig.padTop !== undefined) {
+                    vertConfig.pad = vertConfig.padTop;
+                }
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
-                constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], config));
+                constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], vertConfig));
             } else {
                 constraintList.push(new Constraint(config.type, config));
             }

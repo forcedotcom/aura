@@ -43,9 +43,20 @@
     <aura:attribute name="targetAlign" type="String" default="top left" description="Where on the target to align the panel (advanced=true only)" />
     <aura:attribute name="pad" type="Integer" default="15" description="How much padding." />
 
+    <aura:attribute name="padTop" type="Integer" description="Seperate padding for top" />
+
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
+
     <aura:handler name="change" value="{!v.referenceElement}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.pad}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.padTop}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.align}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.targetAlign}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.advanced}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.inside}" action="{!c.onRefChange}" />
+    <aura:handler name="change" value="{!v.boundingElement}" action="{!c.onRefChange}" />
+
     <aura:attribute name="closeButton" type="Aura.Component[]" description="Replaces the default close button with a custom one" />
     
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>

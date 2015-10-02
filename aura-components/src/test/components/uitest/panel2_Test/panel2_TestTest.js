@@ -706,6 +706,122 @@
     	}]
     },
     
+    testPanelNorthWestPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testDirection" : "northwest"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelNorthEastPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testDirection" : "northeast"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelSouthEastPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testDirection" : "southeast"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelSouthWestPositionWithoutPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "southwest"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(false);
+    	}]
+    },
+    
+    testPanelNorthWestPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testShowPointer" : true,
+    		"testDirection" : "northwest"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelNorthEastPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testShowPointer" : true,
+    		"testDirection" : "northeast"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelSouthEastPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".createPanelBtnClass",
+    		"testShowPointer" : true,
+    		"testDirection" : "southeast"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
+    testPanelSouthWestPositionWithPointer: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testShowPointer" : true,
+    		"testDirection" : "southwest"},
+    	test: [function(cmp) {
+    		this.createPanel(cmp);
+    	}, function(cmp) {
+    		//just verify the panel displays without errors.
+    		this.waitForPanelDialogOpen();
+    	}, function(cmp) {
+    		this.verifyPointerPresent(true);
+    	}]
+    },
+    
     testPanelWestPositionWithPointer: {
     	attributes : {"testPanelType" : "panel", 
     		"testReferenceElementSelector" : ".appInput",

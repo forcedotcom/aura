@@ -22,6 +22,7 @@
     openNotification: function(cmp){
         var refEl = cmp.getElement().querySelector('.positioned-target');
         var body = $A.newCmp({componentDef: 'uiExamples:panelContent'});
+        var boundingEl = cmp.getElement().querySelector('.content.container');
         
         // toggling selected on the button
         // so the button is stateful
@@ -39,7 +40,8 @@
                 body  : body,
                 direction: 'south',
                 showPointer: true,
-                animation: 'pop'
+                animation: 'pop',
+                boundingElement: boundingEl
             },
             onDestroy: function (panel) {
                 btn.set('v.selected', false);

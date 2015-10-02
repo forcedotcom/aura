@@ -23,7 +23,7 @@
     },
 
     templateChange:function(component, evt, helper){
-        helper.createBody(component);
+        helper.createBody(component,false);
     },
 
     init: function(component, evt, helper) {
@@ -34,6 +34,6 @@
             component.set("v.body", [], true);
             component.set("v.template", bodyTemplate, true);
         }
-        helper.createBody(component);
+        helper.createBody(component,true);
     }
 })// eslint-disable-line semi

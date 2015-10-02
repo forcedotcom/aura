@@ -16,7 +16,7 @@
 ({
 	PANEL_TYPE : {DIALOG: "ui:panelDialog"},
     
-	initialize: function(cmp, event) {
+	initialize: function(cmp) {
         // store management state on the component
         cmp._active = null; // current visible panel instance
         cmp._stack = []; // stack of instantiated panels
@@ -66,7 +66,6 @@
             body = config.body,
             maxButtons = 2,
             headerButtons,
-            button,
             el;
 
         // is the panel still valid?
@@ -101,11 +100,11 @@
     	panel.get('c.update').run({ body: body, headerButtons: headerButtons });
     	var manager = this.getManager(cmp);
     	// if this is the active panel then set focus to the first focusable element
-    	if (panel == manager._active && panel.get('v.autoFocus') !== false) {
+    	if (panel === manager._active && panel.get('v.autoFocus') !== false) {
     		setTimeout(function() {
     			$A.run(function() {
 	    			if (panel.isValid()) {
-	    				focusables = self.getFocusables(panel);
+	    				var focusables = self.getFocusables(panel);
 	    				focusables.initial && focusables.initial.focus();
 	    			}
 
@@ -135,7 +134,7 @@
         	// are proper components
         	headerActions = headerActions.slice(0, maxButtons);
         	for (var i=0, len = headerActions.length; i < len; i++) {
-        		button = headerActions[i];
+        		var button = headerActions[i];
         		if ($A.util.isComponent(button)) {
         			headerButtons[i] = button;
         		}
@@ -159,7 +158,7 @@
         // event is fired on the heels of a showPanel event, the offline modal must be displayed).
         // The check below is now looser to allow cases that we can be absolutely sure are not double-click
         // related, that of which the two panels are of different types.
-        if (manager._transitioning == 'open') {
+        if (manager._transitioning === 'open') {
         	if (manager._transitioningInstance.isValid()) {
 	        	transitioningType = manager._transitioningInstance.getDef().getDescriptor().getQualifiedName();
 	        	transitioningIsModal = this.isModal(transitioningType); 
@@ -205,10 +204,7 @@
 
     // ui:createModal handler; creates PanelDialog cmp and inserts into dom
     createPanelDialog: function(cmp, config, callback) {
-        var helper = this,
-            actionList = config.body,
-            action, actionButton, button,
-            panel;
+        var actionList = config.body;
 
         // don't modify original config object; needed in testing code
         config = this._copy(config);
@@ -232,7 +228,7 @@
     },
     
     isModal: function(panelType) {
-    	return  panelType == 'markup://ui:panelDialog';
+    	return  panelType === 'markup://ui:panelDialog';
     },
     
     getCloseActionForModal: function(cmp) {

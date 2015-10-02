@@ -67,13 +67,14 @@
 		if (items && items.length > 0) {
 			//init sortOrderMap for default selected items
 			var filteredItems = [], sList = [], fieldName, label;
+            var i;
 			if (selectedItems) {
-				for (var i=0; i< selectedItems.length; i++) {
+				for (i=0; i< selectedItems.length; i++) {
 					cmp._sortOrderMap[selectedItems[i].fieldName] = {order: selectedItems[i].ascending ? this.CONSTANTS.ASC : this.CONSTANTS.DESC, selected: true};				
 				}
 			}
 			var indx = 0;
-			for (var i=0; i<items.length; i++) {
+			for (i=0; i<items.length; i++) {
 				if (typeof items[i].isSortable === 'undefined' || items[i].isSortable === true) {
 					fieldName = items[i].fieldName;
 					label = items[i].label;
@@ -333,10 +334,11 @@
     updateSize : function(cmp) {
     	var containerEl = cmp.find('sorterContainer').getElement(); 
 		var formfactor = $A.get("$Browser.formFactor");
+        var header = cmp.find('headerBar').getElement();
+        var menuListHeight;
 		if (formfactor !== 'DESKTOP') {
-			var viewPort = $A.util.getWindowSize(),
-				header = cmp.find('headerBar').getElement(),
-				menuListHeight = viewPort.height - header.offsetHeight;
+			var viewPort = $A.util.getWindowSize();
+            menuListHeight = viewPort.height - header.offsetHeight;
 			
 			//fill up the whole screen
 			$A.util.addClass(cmp.find('sorterContainer').getElement(), formfactor);
@@ -345,9 +347,8 @@
 			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
 		} else {
 			//update sorter menu size to fill up the rest of the screen with the menu list
-			var header = cmp.find('headerBar').getElement(),
-				menuListHeight = containerEl.offsetHeight - header.offsetHeight;
-			
+			menuListHeight = containerEl.offsetHeight - header.offsetHeight;
+
 			cmp.find('sorterMenuList').getElement().style.height = menuListHeight + 'px';
 		}
     },

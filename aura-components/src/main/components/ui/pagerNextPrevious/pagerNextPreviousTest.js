@@ -20,10 +20,10 @@
 	testFirstPage: {
         attributes : {currentPage : 1, pageSize : 10, totalItems: 50},
         test: function(cmp){
-        	first = cmp.find("pager:first").getElement();
-        	previous = cmp.find("pager:previous").getElement();
-        	next = cmp.find("pager:next").getElement();
-        	last = cmp.find("pager:last").getElement();
+        	var first = cmp.find("pager:first").getElement();
+        	var previous = cmp.find("pager:previous").getElement();
+        	var next = cmp.find("pager:next").getElement();
+        	var last = cmp.find("pager:last").getElement();
         	$A.test.assertTrue($A.util.hasClass(first,"off"), "first Link should be disable");
         	$A.test.assertTrue($A.util.hasClass(previous,"off"), "previous Link should be disable");
         	$A.test.assertFalse($A.util.hasClass(next,"off"), "next Link should be enable");
@@ -37,10 +37,10 @@
     testLastPage: {
         attributes : {currentPage : 5, pageSize : 10, totalItems: 50},
         test: function(cmp){
-        	first = cmp.find("pager:first").getElement();
-        	previous = cmp.find("pager:previous").getElement();
-        	next = cmp.find("pager:next").getElement();
-        	last = cmp.find("pager:last").getElement();
+        	var first = cmp.find("pager:first").getElement();
+        	var previous = cmp.find("pager:previous").getElement();
+        	var next = cmp.find("pager:next").getElement();
+        	var last = cmp.find("pager:last").getElement();
         	$A.test.assertFalse($A.util.hasClass(first,"off"), "first Link should be enable");
         	$A.test.assertFalse($A.util.hasClass(previous,"off"), "previous Link should be enable");
         	$A.test.assertTrue($A.util.hasClass(next,"off"), "next Link should be disable");
@@ -54,10 +54,10 @@
     testMiddlePage: {
         attributes : {currentPage : 3, pageSize : 10, totalItems: 50},
         test: function(cmp){
-        	first = cmp.find("pager:first").getElement();
-        	previous = cmp.find("pager:previous").getElement();
-        	next = cmp.find("pager:next").getElement();
-        	last = cmp.find("pager:last").getElement();
+        	var first = cmp.find("pager:first").getElement();
+        	var previous = cmp.find("pager:previous").getElement();
+        	var next = cmp.find("pager:next").getElement();
+        	var last = cmp.find("pager:last").getElement();
         	$A.test.assertFalse($A.util.hasClass(first,"off"), "first Link should be enable");
         	$A.test.assertFalse($A.util.hasClass(previous,"off"), "previous Link should be enable");
         	$A.test.assertFalse($A.util.hasClass(next,"off"), "next Link should be enable");
@@ -70,10 +70,10 @@
      */
     testWithoutPassingAttributesValues: {
         test: function(cmp){
-        	first = cmp.find("pager:first").getElement();
-        	previous = cmp.find("pager:previous").getElement();
-        	next = cmp.find("pager:next").getElement();
-        	last = cmp.find("pager:last").getElement();
+        	var first = cmp.find("pager:first").getElement();
+        	var previous = cmp.find("pager:previous").getElement();
+        	var next = cmp.find("pager:next").getElement();
+        	var last = cmp.find("pager:last").getElement();
         	$A.test.assertTrue($A.util.hasClass(first,"off"), "first Link should be disable");
         	$A.test.assertTrue($A.util.hasClass(previous,"off"), "previous Link should be disable");
         	$A.test.assertTrue($A.util.hasClass(next,"off"), "next Link should be disable");
@@ -84,10 +84,10 @@
     testFilterListWithJustOnePage: {
         attributes : {currentPage : 1, pageSize : 25 ,totalItems: 10},
         test: function(cmp){
-        	first = cmp.find("pager:first").getElement();
-        	previous = cmp.find("pager:previous").getElement();
-        	next = cmp.find("pager:next").getElement();
-        	last = cmp.find("pager:last").getElement();
+        	var first = cmp.find("pager:first").getElement();
+        	var previous = cmp.find("pager:previous").getElement();
+        	var next = cmp.find("pager:next").getElement();
+        	var last = cmp.find("pager:last").getElement();
         	$A.test.assertTrue($A.util.hasClass(first,"off"), "first Link should be disable");
         	$A.test.assertTrue($A.util.hasClass(previous,"off"), "previous Link should be disable");
         	$A.test.assertTrue($A.util.hasClass(next,"off"), "next Link should be disable");
@@ -100,7 +100,7 @@
      */
     testWithNegativeValues: {
         attributes : {currentPage : -1, pageSize : -25 ,totalItems: -10},
-        test: function(cmp){
+        test: function(){
         	//Should throw error: TODO: W-1562449
         }
     },
@@ -110,8 +110,8 @@
      */
     testDefaultPageSize: {
         test: function(cmp){
-        	pageSize = cmp.get('v.pageSize');
-        	aura.test.assertEquals(25, pageSize, "Default Page size should be 25");
+        	var pageSize = cmp.get('v.pageSize');
+        	$A.test.assertEquals(25, pageSize, "Default Page size should be 25");
         }
     },
 
@@ -121,28 +121,28 @@
     testCalculatedFieldsForFirstPage: {
     	attributes : {currentPage : 1, pageSize : 10, totalItems: 55},
         test: function(cmp){
-        	startIndex = cmp.get('v.startIndex');
-        	aura.test.assertEquals(1, startIndex + 1, "Index of the first item on the page should be 1");
+        	var startIndex = cmp.get('v.startIndex');
+        	$A.test.assertEquals(1, startIndex + 1, "Index of the first item on the page should be 1");
 
-            endIndex = cmp.get('v.endIndex');
-            aura.test.assertEquals(10, endIndex + 1, "Index of the last item on the page should be 10");
+            var endIndex = cmp.get('v.endIndex');
+            $A.test.assertEquals(10, endIndex + 1, "Index of the last item on the page should be 10");
 
-            pageCount = cmp.get('v.pageCount');
-        	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
+            var pageCount = cmp.get('v.pageCount');
+        	$A.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
     },
 
     testCalculatedFieldsForLastPage: {
     	attributes : {currentPage : 6, pageSize : 10, totalItems: 55},
         test: function(cmp){
-        	startIndex = cmp.get('v.startIndex');
-        	aura.test.assertEquals(51, startIndex + 1, "Index of the first item on the page should be 51");
+        	var startIndex = cmp.get('v.startIndex');
+        	$A.test.assertEquals(51, startIndex + 1, "Index of the first item on the page should be 51");
 
-            endIndex = cmp.get('v.endIndex');
-            aura.test.assertEquals(55, endIndex + 1, "Index of the last item on the page should be 55");
+            var endIndex = cmp.get('v.endIndex');
+            $A.test.assertEquals(55, endIndex + 1, "Index of the last item on the page should be 55");
 
-            pageCount = cmp.get('v.pageCount');
-        	aura.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
+            var pageCount = cmp.get('v.pageCount');
+        	$A.test.assertEquals(6, pageCount, "Total Number of pages should be 6");
         }
     }
 /*eslint-disable semi*/

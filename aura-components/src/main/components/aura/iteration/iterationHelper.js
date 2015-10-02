@@ -108,6 +108,20 @@
     },
 
     buildBody: function (component, itemHandler, completeHandler) {
+        
+        function getCollector(index){
+            return function(itemComponents){
+                collector[index]=itemComponents;
+                if(++currentCall===expectedCalls){
+                    var components=[];
+                    for(var j=0; j<collector.length; j++){
+                        components=components.concat(collector[j]);
+                    }
+                    completeHandler(component,components);
+                }
+            };
+        }
+        
         var items = component.get("v.items");
         var template = component.get("v.template");
         var startIndex = this.getStart(component);
@@ -120,18 +134,6 @@
             var templateValueProvider = component.getComponentValueProvider();
             var currentCall=0;
             var collector=[];
-            function getCollector(index){
-                return function(itemComponents){
-                    collector[index]=itemComponents;
-                    if(++currentCall===expectedCalls){
-                        var components=[];
-                        for(var j=0; j<collector.length; j++){
-                            components=components.concat(collector[j]);
-                        }
-                        completeHandler(component,components);
-                    }
-                };
-            }
             $A.pushCreationPath("body");
             for (var i = startIndex; i < endIndex; i++) {
                 $A.setCreationPathIndex(i);

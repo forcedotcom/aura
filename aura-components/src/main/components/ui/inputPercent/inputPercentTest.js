@@ -118,7 +118,7 @@
             $A.test.assertEquals('23%', value, "Element: Value not formatted correctly");
             component.set("v.value", 965.21);
         }, function(component){
-            value = component.getElement().value;
+            var value = component.getElement().value;
         	$A.test.assertEquals(965.21, component.get("v.value"), "Cmp: Value not formatted correctly");
             $A.test.assertEquals('965.21', value, "Element: Value not formatted correctly");
         }]

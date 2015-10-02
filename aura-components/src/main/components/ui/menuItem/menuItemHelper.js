@@ -45,7 +45,7 @@
      },
   
    fireSelectEvent: function(component, event, options) {
-    	var options = options || {};
+    	options = options || {};
         var e = component.getEvent("menuSelect");
         if (e) {
             e.setParams({

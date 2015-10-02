@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    init: function(cmp, event) {
+    init: function(cmp) {
     	var closeAction = cmp.get("v.closeAction");
         //handler for closeOnEsc and closeOnTabOut
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);

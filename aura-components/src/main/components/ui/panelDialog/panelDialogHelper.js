@@ -17,7 +17,7 @@
 	init: function(cmp, event) {
 		var self = this;
 		cmp._windowKeyHandler = function(e) {
-			if ((e || window.event).keyCode == 27) {
+			if ((e || window.event).keyCode === 27) {
 				if (cmp.isValid() && cmp.get('v.isVisible')) {
 					$A.util.squash(e);
 					self.hide(cmp, event);
@@ -27,8 +27,7 @@
 	},
 	
 	hide: function (cmp, event) {
-        var self       = this,
-            panel      = this._findContainedComponent(cmp, "panel").getElement(),
+        var panel      = this._findContainedComponent(cmp, "panel").getElement(),
             panelBody  = panel.querySelector('.body'),
             isModal    = cmp.get("v.isModal"),
             modalGlass = isModal ? this._findContainedComponent(cmp, "modal-glass").getElement(): null,
@@ -39,7 +38,7 @@
             animEnd    = this.getAnimationEndEventName(),
 
             //endAnimationCallback
-            finishHandler = function (e) {
+            finishHandler = function () {
                 $A.util.removeClass(panel, 'sliding');
                 $A.util.removeClass(panel, animName);
 
@@ -85,10 +84,7 @@
     },
     
     show: function (cmp) {
-        var self       = this,
-            panel      = this._findContainedComponent(cmp, "panel").getElement(),
-            panelBody  = panel.querySelector('.body'),
-            panelTitle = panel.querySelector('.titleBar'),
+        var panel      = this._findContainedComponent(cmp, "panel").getElement(),
             isModal    = cmp.get("v.isModal"),
             modalGlass = isModal ? this._findContainedComponent(cmp, "modal-glass").getElement(): null,
             removeAnim = cmp.get('v.animation') === 'none',
@@ -98,7 +94,7 @@
             animName   = 'movefrom' + cmp.get('v.animation'),
 
             //endAnimationHandler: cleanup all classes and events
-            finishHandler = function (e) {
+            finishHandler = function () {
                 $A.util.removeClass(panel, 'hidden');
                 $A.util.removeClass(panel, 'sliding');
                 $A.util.removeClass(panel, 'movefrombottom');
@@ -168,7 +164,7 @@
 
             // Vertical alignment
             // getBoundingClientRect method does not return height and width in IE7 and Ie8
-            var height = typeof panelElemRect.height != 'undefined' ? panelElemRect.height : panelElemRect.bottom - panelElemRect.top;
+            var height = typeof panelElemRect.height !== 'undefined' ? panelElemRect.height : panelElemRect.bottom - panelElemRect.top;
             var scrollY = document.documentElement.scrollTop;
             if ((viewPort.height - referenceElemRect.bottom) < height) { // no enough space below
                 if (referenceElemRect.top < height) { // no enough space above either. Put it in the middle then
@@ -182,7 +178,7 @@
 
             // Horizontal alignment
             // getBoundingClientRect method does not return height and width in IE7 and Ie8
-            var width = typeof panelElemRect.width != 'undefined' ? panelElemRect.width : panelElemRect.right - panelElemRect.left;
+            var width = typeof panelElemRect.width !== 'undefined' ? panelElemRect.width : panelElemRect.right - panelElemRect.left;
             var scrollX = document.documentElement.scrollLeft;
             if (viewPort.width - referenceElemRect.left < width) {
                 elem.style.left = referenceElemRect.right - width + scrollX +"px";
@@ -223,7 +219,7 @@
 	 * We need to pass a function instead of a regular Aura action because otherwise, when destroying the panel, 
 	 * Aura will remove the original Action as well.
 	*/
-    close: function (cmp, event) {
+    close: function (cmp) {
     	var closeAction = cmp.get('v.closeAction'),
     	    callbacks = cmp.get("v.callbacks");
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    render: function outputNumberRender(cmp, helper) {
+    render: function outputNumberRender(cmp) {
         var span = this.superRender()[0];
         var f = cmp.get("v.format");
         var num = cmp.get("v.value");
@@ -39,7 +39,7 @@
         return span;
     },
 
-    rerender: function outputNumberRerenderer(cmp, helper) {
+    rerender: function outputNumberRerenderer(cmp) {
         var val = cmp.get("v.value");
         var f = cmp.get("v.format");
         var formatted = '';

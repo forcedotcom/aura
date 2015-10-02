@@ -113,16 +113,16 @@
             var href = component.find("link").getElement().getAttribute('href');
             if ($A.util.supportsTouchEvents()) {
                 // prod mode doesn't have comment within void
-                $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#top*/);", "href attribute not correct");
+                $A.test.assertTrue(href === "javascript:void(0);" || href === "javascript:void(0/*#top*/);", "href attribute not correct");
             } else {
                 $A.test.assertEquals("#top", href, "href attribute not correct");
             }
             component.set("v.value", "#bottom");
         }, function (component) {
-            href = component.find("link").getElement().getAttribute('href');
+            var href = component.find("link").getElement().getAttribute('href');
             if ($A.util.supportsTouchEvents()) {
                 // prod mode doesn't have comment within void
-                $A.test.assertTrue(href == "javascript:void(0);" || href == "javascript:void(0/*#bottom*/);", "href attribute not correct");
+                $A.test.assertTrue(href === "javascript:void(0);" || href === "javascript:void(0/*#bottom*/);", "href attribute not correct");
             } else {
                 $A.test.assertEquals("#bottom", href, "href attribute not correct");
             }
@@ -252,7 +252,7 @@
         failOnWarning: true,
         auraWarningsExpectedDuringInit: ["\"alt\" attribute should not be empty"],
         attributes: {value: 'www.salesforce.com', iconClass: "somethingSomethingDarkSide"},
-        test: function (component) {
+        test: function () {
             // This is testing component "init" which is already tested above (auraWarningsExpectedDuringInit).
         }
     },

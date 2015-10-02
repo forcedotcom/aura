@@ -25,7 +25,7 @@
         }
 
     },
-    rerender: function (cmp, helper) {
+    rerender: function (cmp) {
 
         /*
         This is to prevent losing the "state"

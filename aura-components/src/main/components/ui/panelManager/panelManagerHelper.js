@@ -230,9 +230,9 @@
     isModal: function(panelType) {
     	return  panelType === 'markup://ui:panelDialog';
     },
-    
-    getCloseActionForModal: function(cmp) {
-    	return function(cmp) {
+
+    getCloseActionForModal: function() {
+    	return function() {
    		     // On close, fire event that can be handled by many observers.
    			 $A.get('e.ui:closePanel').fire();
     	};
@@ -372,6 +372,7 @@
         var manager = this.getManager(cmp),
             toDelete = manager._deleteQueue;
 
+        var iterator;
         while ((iterator = toDelete.shift())) {
             iterator();
         }
@@ -414,8 +415,7 @@
 
     // remove a single panel from the dom and invoke its destroy method
     _removePanel: function(cmp, panel) {
-        var self = this,
-            i, pos = -1,
+        var i, pos = -1,
             manager = this.getManager(cmp),
             panelId = panel.getGlobalId(),
             container = this._findContainer(cmp, 'container'),
@@ -446,7 +446,7 @@
     destroyPanel: function(cmp, event) {
         var params = event.getParams() || {},
         	manager = this.getManager(cmp),
-            panelId, config, stack, panel;
+            panelId, config, panel;
 
         // handling both new API and previous destroySliderPanel API for now
         if (params.instance) {
@@ -461,7 +461,6 @@
         }
 
         config = manager._panels[panelId];
-        stack = manager._stack;
         panel = panel || (config && config.panel);
         if (!panel) {
             // @todo: invalid state
@@ -484,7 +483,6 @@
     // remove all panels from the dom
     destroyAllPanels: function(cmp, event) {
         var self = this,
-            manager = this.getManager(cmp),
             container = this._findContainer(cmp, 'container'),
             body = container.get('v.body');
 
@@ -504,11 +502,9 @@
         return manager._active;
     },
 
-    // set the currently visible panel, update classes and aria-hidden attr on all panels 
+    // set the currently visible panel, update classes and aria-hidden attr on all panels
     setActiveInstance: function(cmp, panel) {
-        var self = this,
-            manager = this.getManager(cmp),
-            panelDom = panel && panel.getElement(),
+        var manager = this.getManager(cmp),
             panels = document.querySelectorAll('.dialog-wrapper > *');
 
         manager._active = panel;
@@ -529,7 +525,7 @@
             }
             this.bindKeyHandler(manager);
             //TODO: need to decouple the logic here
-            if (panel.get("v.isModal") === false && panel.get("v.closeOnClickOut") && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") == -1) {
+            if (panel.get("v.isModal") === false && panel.get("v.closeOnClickOut") && panel.getDef().getDescriptor().getQualifiedName().indexOf("panelSlider") === -1) {
                 this.bindClickHandler(manager);
             }
         } else {
@@ -546,7 +542,6 @@
      * TODO: Need to find a better way of updating the panel zIndex
      */
     _updateModalGlasszIndex: function(panelHelper, panel, stackIndex) {
-    	var el = null;
     	if (panelHelper && panelHelper["getModalGlassElement"]) {
     		var el = panelHelper["getModalGlassElement"](panel);
     		if (el) {
@@ -599,7 +594,7 @@
 
     isVisible: function(el) {
         while (el && el.style) {
-            if (window.getComputedStyle(el).display == 'none') {
+            if (window.getComputedStyle(el).display === 'none') {
                 return false;
             }
             el = el.parentNode;
@@ -670,7 +665,7 @@
                 isModal = active.get("v.isModal") !== false,
                 focusables;
 
-            if (active && event.keyCode == 9) {
+            if (active && event.keyCode === 9) {
                 focusables = self.getFocusables(active);
                 if (isModal) {
                     if (current === focusables.last && !shiftPressed) {
@@ -701,7 +696,6 @@
     },
 
     bindClickHandler: function(manager) {
-        var self = this;
 
         if (manager._clickHandler) {
             return;
@@ -759,12 +753,10 @@
     transitionEnd: function(cmp, event) {
         var manager = this.getManager(cmp),
             container = cmp.getElement(),
-            stack = manager._stack,
             actionDone = event.getParam('action'),
             panelId = event.getParam('panelId'),
             isTransient = event.getParam('isTransient'),
-            currentInstance = manager._transitioningInstance || $A.getCmp(panelId),
-            queuedAction;
+            currentInstance = manager._transitioningInstance || $A.getCmp(panelId);
 
         manager._transitioning = null;
         container.style.overflow = '';

@@ -18,7 +18,7 @@
         helper.fireHandleEvent(component, 'delete');
     },
 
-    getHandledDOMEvents: function(component) {
+    getHandledDOMEvents: function() {
         return ["click", "keydown", "mouseover"];
     },
 
@@ -34,7 +34,7 @@
         helper.setFocus(component);
     },
 
-    onIconError: function(component, event, helper) {
+    onIconError: function(component) {
         $A.util.addClass(component.find("icon").getElement(), 'invisible');
     }
 })// eslint-disable-line semi

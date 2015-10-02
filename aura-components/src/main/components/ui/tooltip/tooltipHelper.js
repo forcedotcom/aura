@@ -106,12 +106,10 @@
 
 		/* TODO this method talks to the DOM a lot because I wrote this before I
 			understood aura and is in general janky, please fix in 200: W-2726214 */
-		
-		var direction = component.get('v.direction');
-		
-		var target = component.getElement();
-		var ttWrapper = component.find('tooltipwrapper').getElement();
 
+		var direction = component.get('v.direction');
+
+		var ttWrapper = component.find('tooltipwrapper').getElement();
 
 		component.set('v.direction', direction);
 
@@ -120,17 +118,13 @@
 			component.constraints[directions + '_pointer'].disable();
 			component.constraints[directions + 'pointerBox'].disable();
 
-			// Manipulating classes directly to avoid re-render: 
+			// Manipulating classes directly to avoid re-render:
 			ttWrapper.classList.remove(directions);
 			if(component.constraints[directions + 'PointerOverlap']) {
 				component.constraints[directions + 'PointerOverlap'].disable();
 				component.constraints[directions + 'pointerBox'].disable();
-			}  
+			}
 		});
-
-		
-
-
 
 		component.constraints[direction].enable();
 		ttWrapper.classList.add(direction);
@@ -141,8 +135,6 @@
 		component.constraints[direction + 'pointerBox'].enable();
 		// classname must be set after constraints
         // for advanced tooltips to avoid positioning issues
-		
-		
 	},
 
 	buildTooltip: function(component) {
@@ -395,7 +387,15 @@
 		var trigger = component.get('v.trigger');
 		var disabled = component.get('v.disabled');
 		var node = component.getElement();
-		
+
+        function showComponent() {
+            self.show.call(self, component);
+        }
+
+        function hideComponent() {
+            self.hide.call(self, component);
+        }
+
 		if(!trigger || trigger === 'none') {
 			disabled = true;
 		}
@@ -410,32 +410,18 @@
 			var list = node.querySelectorAll('a,object,input,select,textarea,button,[tabindex]');
 
 			for (var i = 0; i < list.length; i++) {
-				list[i].addEventListener('focus', function() {
-					self.show.call(self, component);
-				});
-				list[i].addEventListener('blur', function() {
-					self.hide.call(self, component);
-				});
+				list[i].addEventListener('focus', showComponent);
+				list[i].addEventListener('blur', hideComponent);
 			}
 
-			node.addEventListener('focus', function() {
-				self.show.call(self, component);
-			});
-
-			node.addEventListener('blur', function() {
-				self.hide.call(self, component);
-			});
-
+			node.addEventListener('focus', showComponent);
+			node.addEventListener('blur', hideComponent);
 
 			if(trigger === 'hover') {
-				node.addEventListener(showTrigger, function() {
-					self.show.call(self, component);
-				});
-				node.addEventListener(hideTrigger, function() {
-					self.hide.call(self, component);
-				});
+				node.addEventListener(showTrigger, showComponent);
+				node.addEventListener(hideTrigger, hideComponent);
 			}
-			
+
 		}
 		component._trigger = node;
 		this.buildTooltip(component);

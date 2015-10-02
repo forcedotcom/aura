@@ -15,7 +15,7 @@
  */
 ({
 
-    init : function(cmp, event, helper) {
+    init : function(cmp) {
         var pillInput = cmp.get("v.pillInput");
         if (!$A.util.isEmpty(pillInput)) {
             pillInput[0].addHandler("onItemSelected", cmp, "c.onItemSelected");
@@ -69,13 +69,13 @@
         }
     },
 
-    onInputFocus: function(cmp, event, helper) {
+    onInputFocus: function(cmp) {
         $A.util.addClass(cmp.getElement(), 'focused');
         var element = cmp.find("list").getElement();
         element.scrollTop = element.scrollHeight;
     },
 
-    onInputBlur: function(cmp, event, helper) {
+    onInputBlur: function(cmp) {
         $A.util.removeClass(cmp.getElement(), 'focused');
         cmp.find("list").getElement().scrollTop = 0;
     },

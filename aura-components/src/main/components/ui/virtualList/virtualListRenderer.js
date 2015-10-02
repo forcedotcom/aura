@@ -31,7 +31,7 @@
         return dom;
 
     },
-	afterRender: function (cmp) {
+	afterRender: function () {
         this.superAfterRender();
 	},
     rerender: function (cmp, helper) {

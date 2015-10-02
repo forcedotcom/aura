@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 ({
-    focus: function(component, event, helper) {
+    focus: function(component) {
     	var concreteCmp = component.getConcreteComponent();
         //var _helper = concreteCmp.getDef().getHelper();
         var _helper = concreteCmp.helper;
         _helper.focus(concreteCmp);
     },
-    
+
     onClick : function(component, event) {
         var concreteCmp = component.getConcreteComponent();
         //var _helper = concreteCmp.getDef().getHelper();
@@ -34,7 +34,7 @@
     // TODO: Refactor this trigger
     // 1. Add interface for trigger
     // 2. Dont call directly the helper method instead of proxyfy to onClick
-    triggerInteraction: function (cmp, event, helper) {
+    triggerInteraction: function (cmp) {
          cmp.get('c.onClick').run();
     },
 

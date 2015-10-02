@@ -24,7 +24,7 @@
         helper.handleParameterChange(component, [{name:"keyword", value:event.getParam("value")}]);
     },
 
-    onSelect: function (component, event, helper) {
+    onSelect: function (component, event) {
         if (event.getParam("isHeader")||event.getParam("isFooter")) {
             return;
         }

@@ -153,7 +153,21 @@
     },
 
     buildRows : function(component, templates, listBody) {
-        
+
+        if (!templates) {
+            templates = {};
+        }
+
+        var blockSize = component.get("v.blockSize");
+        var containerSet = false;
+        var dataTemplates = templates.dataTemplates || [];
+        var dataTemplateCount = dataTemplates.length;
+        var index = 0;
+        var items = component.get("v.items");
+        var itemCount = items ? items.length : 0;
+        var rows = [];
+        var rowTooltip = component.get("v.rowTooltip");
+
         function buildEmptyMessage(helper) {
             var emptyMessage = helper.generateComponent("aura:unescapedHtml", {
                 value : component.get("v.emptyMessage")
@@ -283,20 +297,6 @@
                 // DEBUG: Performance Marker
             }
         }
-        
-        if (!templates) {
-            templates = {};
-        }
-
-        var blockSize = component.get("v.blockSize");
-        var containerSet = false;
-        var dataTemplates = templates.dataTemplates || [];
-        var dataTemplateCount = dataTemplates.length;
-        var index = 0;
-        var items = component.get("v.items");
-        var itemCount = items ? items.length : 0;
-        var rows = [];
-        var rowTooltip = component.get("v.rowTooltip");
 
         buildRowBlock = buildRowBlock.bind(this);
 
@@ -343,8 +343,9 @@
     },
 
     fireEvents : function(component, type, domEvent, eventParams) {
-        if (!eventParams)
+        if (!eventParams) {
             eventParams = {};
+        }
         var targets = this.getEventTargets(component, domEvent && domEvent.target);
         var targetType = this.getEventType(component, targets.column);
         switch (targetType) {

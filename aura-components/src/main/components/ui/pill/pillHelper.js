@@ -42,7 +42,7 @@
     fireHandleEvent : function(component, action) {
         var ev = component.getEvent("onHandledEvent");
 
-        params = {
+        var params = {
             id: component.get('v.id'),
             label: component.get('v.label'),
             action: action

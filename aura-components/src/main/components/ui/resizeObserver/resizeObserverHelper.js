@@ -84,6 +84,7 @@
 
     updateSize : function(component) {
         var resizer = this.getResizer();
+        var n;
         if (component.isValid() && resizer._resizer) {
             var id = component.getGlobalId();
             if ($A.util.isUndefined(resizer._resizerComponentSet[id])) {
@@ -95,7 +96,7 @@
 
                 // Initial set of all expected components that should be calling in
                 resizer._pendingUpdates = {};
-                for (var n in resizer._resizerComponentSet) {
+                for (n in resizer._resizerComponentSet) {
                     var c = resizer._resizerComponentSet[n];
                     if (c.isValid()) {
                         resizer._pendingUpdates[n] = c;
@@ -107,7 +108,7 @@
 
             // Check to see if all components have called in and we're ready to
             // actually perform the resizer() call
-            for (var n in resizer._pendingUpdates) {
+            for (n in resizer._pendingUpdates) {
                 return;
             }
 

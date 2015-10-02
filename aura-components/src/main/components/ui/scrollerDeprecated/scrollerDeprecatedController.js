@@ -18,7 +18,7 @@
         helper.refresh(component);
     },
 
-    locationChange: function(component, event) {
+    locationChange: function(component) {
 		var scroller = component._scroller;
 		if (!$A.util.isUndefined(scroller)) {
 			scroller.unbindTransientHandlers();

@@ -79,7 +79,6 @@
         return component._scroller;
     },
     setScollerInstance: function (component, scrollerInstance) {
-        var helper = this;
         component._scroller = scrollerInstance;
 
         // For debugging purposes...
@@ -239,8 +238,7 @@
         return corePlugins.concat(plugins);
     },
     _mapAuraScrollerOptions: function (component) {
-        var device                = $A.get('$Browser'),
-            cssTransition         = component.get('v.useCSSTransition'),
+        var cssTransition         = component.get('v.useCSSTransition'),
             canRefresh            = component.get('v.canRefresh'),
             canShowMore           = component.get('v.canShowMore'),
 
@@ -258,8 +256,7 @@
 
             // For now, default android and ios to use CSSTransitions
             useCSSTransition      = typeof cssTransition === "boolean" ? cssTransition : !gpuOptimization,
-            
-            snap                  = component.get('v.snapType'),
+
             debounce              = component.get('v.debounce'),
             bindToWrapper         = component.get('v.bindEventsToScroller'),
             plugins               = this._getPlugins(component),

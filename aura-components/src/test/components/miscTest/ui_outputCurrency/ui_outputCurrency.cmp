@@ -1,3 +1,0 @@
-<aura:component>
-  	 <ui:outputCurrency value="10.1"/>
-</aura:component> 

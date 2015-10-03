@@ -82,7 +82,7 @@
             cmp.set("v.items", items);
         }
 
-        if (items.length == maxAllowed) {
+        if (items.length === maxAllowed) {
             $A.util.addClass(cmp.getElement(), 'maxAllowed');
         } else {
             $A.util.removeClass(cmp.getElement(), 'maxAllowed');
@@ -207,7 +207,6 @@
                         //set the maximum height of the pill container based on maxLines attribute
                         var list = cmp.find("list");
                         var limitedHeight = pillHeight * maxLines;
-                        var scrollHeight = list.getElement().scrollHeight;
                         list.getElement().style.maxHeight = limitedHeight + "px";
 
                         //only show the Show More button if there's overflow

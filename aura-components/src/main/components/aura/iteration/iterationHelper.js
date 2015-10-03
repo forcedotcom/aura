@@ -17,7 +17,6 @@
     createBody: function (component, localCreation) {
         component.set("v.loaded", false);
         component._itemInfo = [];
-        var helper=this;
         this.buildBody(component,
             function createBodyItem(cmp, template, item, index, itemVar, indexVar, templateValueProvider, forceServer, callback) {
                 this.buildTemplate(cmp, template, item, index, itemVar, indexVar, templateValueProvider, localCreation, forceServer, callback);
@@ -114,7 +113,16 @@
     },
 
     buildBody: function (component, itemHandler, completeHandler) {
-        
+
+        var items = component.get("v.items");
+        var template = component.get("v.template");
+        var startIndex = this.getStart(component);
+        var endIndex = this.getEnd(component);
+        var expectedCalls=endIndex-startIndex;
+
+        var collector=[];
+        var currentCall=0;
+
         function getCollector(index){
             return function(itemComponents){
                 collector[index]=itemComponents;
@@ -127,19 +135,14 @@
                 }
             };
         }
-        
-        var items = component.get("v.items");
-        var template = component.get("v.template");
-        var startIndex = this.getStart(component);
-        var endIndex = this.getEnd(component);
-        var expectedCalls=endIndex-startIndex;
+
         if (items && items.length && template && template.length && expectedCalls > 0) {
             var itemVar = component.get("v.var");
             var indexVar = component.get("v.indexVar");
             var forceServer = component.get("v.forceServer");
             var templateValueProvider = component.getComponentValueProvider();
-            var currentCall=0;
-            var collector=[];
+
+
             $A.pushCreationPath("body");
             for (var i = startIndex; i < endIndex; i++) {
                 $A.setCreationPathIndex(i);

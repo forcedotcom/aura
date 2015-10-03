@@ -92,7 +92,7 @@
         }
     },
 
-    handleListExpand: function(component, event) {
+    handleListExpand: function(component) {
         var usePanel = component.get('v.usePanel');
         var pillListElement = this._getPillContainerListElement(component);
         if (pillListElement) {

@@ -233,7 +233,7 @@
 
 						onBeforeScrollStart : function(e) {
 							var target = e.target.nodeName.toLowerCase();
-							if ("input" !== target && "textarea" !== target && "select" !== target) {
+							if (target !== "input" && target !== "textarea" && target !== "select") {
 								e.preventDefault();
 							}
 
@@ -901,8 +901,9 @@
 						that.originX = m.abs(e.touches[0].pageX + e.touches[1].pageX - that.wrapperOffsetLeft * 2) / 2 - that.x;
 						that.originY = m.abs(e.touches[0].pageY + e.touches[1].pageY - that.wrapperOffsetTop * 2) / 2 - that.y;
 
-						if (that.options.onZoomStart)
+						if (that.options.onZoomStart) {
 							that.options.onZoomStart.call(that, e);
+						}
 					}
 
 					if (that.options.momentum) {
@@ -958,7 +959,7 @@
 				    var tagName = e.target.nodeName.toLowerCase();
 				    // ssun don't scroll if we are in a textarea since it is hard
 				    // to scroll the textarea and the page at the same time.
-                    if ("textarea" === tagName) {
+                    if (tagName === "textarea") {
                         return;
                     }
 
@@ -1087,8 +1088,9 @@
 						that.zoomed = false;
 						that.refresh();
 
-						if (that.options.onZoomEnd)
+						if (that.options.onZoomEnd) {
 							that.options.onZoomEnd.call(that, e);
+						}
 						return;
 					}
 
@@ -1113,8 +1115,9 @@
 
 									// Find the last touched element
 									target = point.target;
-									while (target.nodeType !== 1)
+									while (target.nodeType !== 1) {
 										target = target.parentNode;
+									}
 
 									if (target.tagName !== 'SELECT' && target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
 										ev = doc.createEvent('MouseEvents');
@@ -1144,16 +1147,19 @@
 						newPosX = that.x + momentumX.dist;
 						newPosY = that.y + momentumY.dist;
 
-						if ((that.x > 0 && newPosX > 0) || (that.x < that.maxScrollX && newPosX < that.maxScrollX))
+						if ((that.x > 0 && newPosX > 0) || (that.x < that.maxScrollX && newPosX < that.maxScrollX)) {
 							momentumX = {
 								dist : 0,
 								time : 0
 							};
-						if ((that.y > that.minScrollY && newPosY > that.minScrollY) || (that.y < that.maxScrollY && newPosY < that.maxScrollY))
+						}
+
+						if ((that.y > that.minScrollY && newPosY > that.minScrollY) || (that.y < that.maxScrollY && newPosY < that.maxScrollY)) {
 							momentumY = {
 								dist : 0,
 								time : 0
 							};
+						}
 					}
 
 					if (momentumX.dist || momentumY.dist) {
@@ -1189,8 +1195,9 @@
 							that.scrollTo(that.absStartX, that.absStartY, 200);
 						} else {
 							snap = that._snap(that.x, that.y);
-							if (snap.x !== that.x || snap.y !== that.y)
+							if (snap.x !== that.x || snap.y !== that.y) {
 								that.scrollTo(snap.x, snap.y, snap.time);
+							}
 						}
 
 						if (that.options.onTouchEnd) {

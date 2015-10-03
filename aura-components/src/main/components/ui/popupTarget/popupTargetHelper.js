@@ -99,7 +99,7 @@
                 
                 if (autoPosition && elemRect.bottom > viewPort.height) { // no enough space below
                 	// getBoundingClientRect method does not return height and width in IE7 and Ie8
-                	height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+                	height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
                 	elements.targetDiv.style.top = 0 - height + "px";
                 } else {
                     elements.targetDiv.style.top = "auto";
@@ -131,12 +131,12 @@
 	                viewPort = $A.util.getWindowSize();
 	                // Position menuList.
 		    		// Using scrollTop & scrollLeft for IE support; avoid window.scrollY & window.scrollX.
-	                scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop,
-	    			scrollLeft = (document.documentElement && document.documentElement.scrollLeft) || document.body.scrollLeft;
+	                var scrollTop = (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop;
+	    			var scrollLeft = (document.documentElement && document.documentElement.scrollLeft) || document.body.scrollLeft;
 
 	    		    // Vertical alignment
 	                // getBoundingClientRect method does not return height and width in IE7 and Ie8
-	                height = typeof elemRect.height != 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+	                height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
 	                if ((viewPort.height - triggerElementRect.bottom) < height) { // no enough space below
 	                	if (triggerElementRect.top < height) { // no enough space above either. Put it in the middle then
 	                		elements.targetDiv.style.top = scrollTop + "px";
@@ -149,7 +149,7 @@
 	                
 	                // Horizontal alignment
 	                // getBoundingClientRect method does not return height and width in IE7 and Ie8
-	                width = typeof elemRect.width != 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
+	                width = typeof elemRect.width !== 'undefined' ? elemRect.width : elemRect.right - elemRect.left;
 	                if (triggerElementRect.left < 0) {
 	                	elements.targetDiv.style.left = scrollLeft + "px";
 	                } else {
@@ -287,7 +287,9 @@
                 	clickEndEvent,
                 	touchIdFound,
                 	startX,
+                    startY,
                 	endX,
+                    endY,
                 	doIf = {
 	                	clickIsInsideTarget : helper.isElementInComponent(elements.target, event.target),
 	            		clickIsInsideTrigger : helper.isElementInComponent(elements.trigger, event.target),
@@ -342,8 +344,8 @@
     getWindowBlurHandler : function(component) {
         if ($A.util.isUndefined(component._windowBlurHandlerFunc)) {
         	var elements = this.getElementCache(component);
-        	
-        	component._windowBlurHandlerFunc = function (event) {
+
+        	component._windowBlurHandlerFunc = function () {
         		elements.target.set("v.visible", !elements.target.get("v.visible"));
         	};
         }
@@ -363,9 +365,8 @@
     
     isElementInComponent : function(component, targetElem) {
     	var currentNode = targetElem,
-    		componentElements,
-    		elements;
-    	
+    		componentElements;
+
     	if (!component || !targetElem) {
     		return false;
     	}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-	render : function(cmp, helper) {
+	render : function() {
 		return this.superRender();
 	}
 })// eslint-disable-line semi

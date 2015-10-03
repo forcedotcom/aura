@@ -364,12 +364,14 @@
             components,
 			columnData;
 
+		var i;
+
 		if (!remove) {
-			for (var i=0; i<count; i++) {
+			for (i=0; i<count; i++) {
 				args.push(null);
 			}
 		} else {
-			for (var i=0; i<count; i++) {	
+			for (i=0; i<count; i++) {
 				columnData = rowData[index + i].columnData;
 				for (var j=0; j<columnData.length; j++) {
 					components = columnData[j].components;

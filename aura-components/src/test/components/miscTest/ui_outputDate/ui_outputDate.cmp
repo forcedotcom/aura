@@ -1,3 +1,0 @@
-<aura:component>
-  	 <ui:outputDate value="1987-10-02"/>
-</aura:component> 

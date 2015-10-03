@@ -15,15 +15,16 @@
  */
 ({
     DELEGATED_EVENTS: [
-        'click',
-        'mouseover',
-        'mouseout',
-        'keypress',
-        'dragstart',
-        'dragend',
-        'dragenter',
-        'dragleave',
-        'focus'
+        { type: 'click', useCapture: false },
+        { type: 'mouseover', useCapture: false },
+        { type: 'mouseout', useCapture: false },
+        { type: 'keypress', useCapture: false },
+        { type: 'dragstart', useCapture: false },
+        { type: 'dragend', useCapture: false },
+        { type: 'dragenter', useCapture: false },
+        { type: 'dragleave', useCapture: false },
+        { type: 'focus', useCapture: true },
+        { type: 'blur', useCapture: true }
     ],
     initialize: function (cmp) {
         // Internal variables we use
@@ -158,7 +159,7 @@
             };
         
         for (var i = 0; i < events.length; i++) {
-            container.addEventListener(events[i], delegate, false);
+            container.addEventListener(events[i].type, delegate, events[i].useCapture);
         }
     },
     _findVirtualElementPosition: function (virtualElements, item, element) {

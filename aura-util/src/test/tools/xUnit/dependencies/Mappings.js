@@ -9,6 +9,7 @@ if (System.Environment.GetParameters().named.coverage === "true") {
     Test.Tools.Aura.BuildDirectory+="/target/js-coverage";
     //jscover sets this on window which we do not have in xunit
     jscoverbeforeunload = true;
+    window = {'jscoverage_report':true};
 }
 
 //Global Convenience Mappings

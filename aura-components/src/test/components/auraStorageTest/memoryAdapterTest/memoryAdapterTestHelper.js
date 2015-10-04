@@ -1,3 +1,3 @@
 ({
-    // Needed to use library
+    // Helper file needed to use library
 })

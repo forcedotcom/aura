@@ -19,17 +19,24 @@
 /**
  * @description The Javascript memory adapter for Aura Storage Service.
  * @constructor
- * @export
  */
 var MemoryAdapter = function MemoryAdapter(config) {
-    this.backingStore = {};
-    this.mru = [];
-    this.cachedSize = 0;
+    this.reset();
     this.maxSize = config["maxSize"];
+    this.instanceName = config["name"];
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
 };
 
 MemoryAdapter.NAME = "memory";
+
+/**
+ * Resets memory objects
+ */
+MemoryAdapter.prototype.reset = function() {
+    this.backingStore = {};
+    this.mru = [];
+    this.cachedSize = 0;
+};
 
 /**
  * Returns the name of memory adapter, "memory".
@@ -42,9 +49,6 @@ MemoryAdapter.prototype.getName = function() {
 /**
  * Returns an approximate size of the storage.
  * @returns {Promise} a promise that resolves with the size.
- //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	@export
- //#end
  */
 MemoryAdapter.prototype.getSize = function() {
     return Promise["resolve"](this.cachedSize);
@@ -72,9 +76,6 @@ MemoryAdapter.prototype.getItem = function(key) {
 /**
  * Gets all items from storage.
  * @returns {Promise} a promise that resolves with an array of all items in storage.
- //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-	@export
- //#end
  */
 MemoryAdapter.prototype.getAll = function() {
     var that = this;
@@ -177,9 +178,7 @@ MemoryAdapter.prototype.removeItem = function(key) {
 MemoryAdapter.prototype.clear = function() {
     var that = this;
     return new Promise(function(success) {
-        that.backingStore = {};
-        that.cachedSize = 0;
-
+        that.reset();
         success();
     });
 };
@@ -227,8 +226,8 @@ MemoryAdapter.prototype.evict = function(spaceNeeded) {
                     spaceReclaimed += itemRemoved.getSize();
 
                     if (that.debugLoggingEnabled) {
-                        var msg = ["MemoryAdapter.evict(): evicted", key, itemRemoved, spaceReclaimed].join(" ");
-                        $A.log(msg);
+                        var msg = ["evicted", key, itemRemoved, spaceReclaimed].join(" ");
+                        that.log(msg);
                     }
 
                     if(spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
@@ -242,16 +241,67 @@ MemoryAdapter.prototype.evict = function(spaceNeeded) {
     });
 };
 
-// #if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+
 /**
  * Gets the most-recently-used list.
  * @returns {Promise} a promise that results with the an array of keys representing the MRU.
- * @export
  */
 MemoryAdapter.prototype.getMRU = function() {
     return Promise["resolve"](this.mru);
 };
-// #end
+
+/**
+ * Log message if debug logging is enabled
+ */
+MemoryAdapter.prototype.log = function(msg, obj) {
+    if (this.debugLoggingEnabled) {
+        $A.log("MemoryAdapter '" + this.instanceName + "' " + msg + ":", obj);
+    }
+};
+
+/**
+ * Removes expired items
+ * @returns {Promise} when sweep completes
+ */
+MemoryAdapter.prototype.sweep = function() {
+    var that = this;
+    return this.getExpired().then(function (expired) {
+        // note: expired includes any key prefix. and it may
+        // include items with different key prefixes which
+        // we want to expire first. thus remove directly from the
+        // adapter to avoid re-adding the key prefix.
+
+        if (expired.length === 0) {
+            return;
+        }
+
+        var promiseSet = [];
+        var key;
+        for (var n = 0; n < expired.length; n++) {
+            key = expired[n];
+            that.log("sweep() - expiring item with key: " + key);
+            promiseSet.push(that.removeItem(key));
+        }
+
+        // When all of the remove promises have completed...
+        return Promise.all(promiseSet).then(
+            function () {
+                that.log("sweep() - complete");
+            },
+            function (err) {
+                that.log("Error while sweep() was removing items: " + err);
+            }
+        );
+    });
+};
+
+/**
+ * delete storage simply resets memory object
+ */
+MemoryAdapter.prototype.deleteStorage = function() {
+    this.reset();
+    return Promise["resolve"]();
+};
 
 Aura.Storage.MemoryAdapter = MemoryAdapter;
 
@@ -279,8 +329,6 @@ MemoryAdapter.Entry.prototype.getItem = function() {
 MemoryAdapter.Entry.prototype.getSize = function() {
     return this.size;
 };
-
-
 
 $A.storageService.registerAdapter({
     "name": MemoryAdapter.NAME,

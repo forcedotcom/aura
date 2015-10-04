@@ -12,22 +12,6 @@
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
     },
 
-    append:function(cmp, string) {
-        var helper = cmp.getDef().getHelper();
-        $A.run(function() { helper.appendLine(cmp, string); });
-    },
-
-    dieDieDie:function(cmp, thing) {
-        var string;
-        if (typeof thing === "string") {
-            string = thing;
-        } else {
-            string = thing.message;
-        }
-        this.append(cmp, string);
-        $A.test.fail(string);
-    },
-
     testSizeInitial: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testSizeInitial(this.storage);
@@ -45,8 +29,8 @@
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
                     true, false, 32768, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
-            cmp._die = function(error) { this.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { this.append(cmp, string); }.bind(this);
+            cmp._die = function(error) { cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
+            cmp._append = function(string) { cmp.helper.lib.storageTest.appendLine(cmp, string); }.bind(this);
         }, function(cmp){
             var completed = false;
 
@@ -300,7 +284,7 @@
             cmp._frameLoaded = false;
             cmp._expected = "expected value";
             var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/indexedDBCmp.cmp?value="+cmp._expected;
+            frame.src = "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected;
             frame.scrolling = "auto";
             frame.id = "myFrame";
             $A.util.on(frame, "load", function(){

@@ -31,6 +31,7 @@ import org.auraframework.http.resource.AppCss;
 import org.auraframework.http.resource.AppJs;
 import org.auraframework.http.resource.ClientLibraryCss;
 import org.auraframework.http.resource.ClientLibraryJs;
+import org.auraframework.http.resource.EncryptionKey;
 import org.auraframework.http.resource.Manifest;
 import org.auraframework.http.resource.ResourceSvg;
 import org.auraframework.system.AuraContext;
@@ -66,6 +67,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         addResource(new ClientLibraryCss());
         addResource(new Manifest());
         addResource(new ResourceSvg());
+        addResource(new EncryptionKey());
     }
 
     public void addResource(AuraResource resource) {
@@ -91,7 +93,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return resource;
             }
         }
-        System.out.println("ERROR: Unable to find resource for "+(last != null?last:fullName));
+        System.out.println("ERROR: Unable to find resource for " + (last != null ? last : fullName));
         return null;
     }
 

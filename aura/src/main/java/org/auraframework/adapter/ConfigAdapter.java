@@ -75,6 +75,18 @@ public interface ConfigAdapter extends AuraAdapter {
      */
     String getResetCssURL();
 
+    /**
+     * Returns URL of GET request for encryption key
+     * @return URL for encryption key
+     */
+    String getEncryptionKeyURL();
+
+    /**
+     * Returns encryption key for secure storage
+     * @return encryption key
+     */
+    String getEncryptionKey();
+
     boolean isPrivilegedNamespace(String namespace);
     Set<String> getPrivilegedNamespaces();
     String getDefaultNamespace();

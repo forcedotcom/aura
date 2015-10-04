@@ -57,8 +57,10 @@ var AuraStorage = function AuraStorage(config) {
     this.secure = !$A.util.isUndefinedOrNull(adapterConfig["secure"]) && adapterConfig["secure"];
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    this.adapter["getItem"] = this.adapter.getItem;
+    // for storage adapter testing
     this["adapter"] = this.adapter;
+    this.adapter["getItem"] = this.adapter.getItem;
+    this.adapter["getMRU"] = this.adapter.getMRU;
     //#end
 
     if (clearStorageOnInit === true) {
@@ -238,7 +240,10 @@ AuraStorage.prototype.sweep = function() {
 
     var that = this;
     if (this.adapter.sweep) {
-        this.adapter.sweep();
+        this.adapter.sweep().then(function() {
+            that.lastSweep = new Date().getTime();
+            $A.storageService.fireModified();
+        });
     } else {
         this.adapter.getExpired().then(function (expired) {
             // note: expired includes any key prefix. and it may

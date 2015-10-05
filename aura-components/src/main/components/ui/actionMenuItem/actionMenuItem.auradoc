@@ -27,7 +27,7 @@
         &lt;ui:menuTriggerLink aura:id="trigger" label="Opportunity Status"/>
         &lt;ui:menuList class="actionMenu" aura:id="actionMenu">
             &lt;aura:iteration items="{!v.status}" var="s">
-                &lt;ui:actionMenuItem value="{!s}" label="{!s}" click="{!c.doSomething}"/>
+                &lt;ui:actionMenuItem label="{!s}" click="{!c.doSomething}"/>
             &lt;/aura:iteration>
         &lt;/ui:menuList>
     &lt;/ui:menu></pre>

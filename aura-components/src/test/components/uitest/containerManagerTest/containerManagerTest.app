@@ -26,7 +26,7 @@
     <aura:import library="ui:stackManagerLib"     property="smLib" />
 
     <section class="viewport">
-        <ui:button label="Create panel" press="{!c.createPanel}"/>
+        <ui:button label="Create panel" aura:id="create" press="{!c.createPanel}"/>
     </section>
 
     <div class="reference">This is a reference element</div>

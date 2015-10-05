@@ -15,24 +15,21 @@
  */
 ({
 
-    globalRef: null,
-    globalPanelRefs : [],
+    //Test turning on shared container sets panels as child of container and sets zindexes accordingly
+    //Test turning off shared container sets panels as child of panel manager and sets zindexes accordingly
+    //Test public apis from stack manager bringToFront, sendToBack, setStackingContextRoot
+    //Test multiple panel managers with container manager together
 
-    setReferenceElement: function(id) {
-        this.globalRef = (id ? '#'+id : '.reference');
+    browsers: ["-IE7","-IE8"],
+
+    testUseSharedContainer: {
+        test: [function(cmp) {
+            $A.test.addWaitFor();
+            cmp.find("create").get("e.press").fire();
+        }, function(cmp) {
+
+        }]
     },
 
-    bringToFrontDelegate: function() {
-        var stackManager = this.smLib.stackManager;
-        stackManager.bringToFront(this.globalPanelRefs.pop());
-    },
-
-    turnOffSharedContainer: function() {
-        $A.find('pm').set('v.useSharedContainer', "false");
-    },
-
-    turnOnSharedContainer: function() {
-        $A.find('pm').set('v.useSharedContainer', "true");
-    }
 
 })

@@ -20,7 +20,7 @@
 		<p>
 			A <code>ui:outputNumber</code> component represents a number output that is rendered as an HTML <code>span</code> tag.
 			This component can be used with <code>ui:inputNumber</code>, which takes in a number input. 
-			<code>ui:outputNumber</code> retrieves the browser's locale information and displays the number in the given decimal format. 
+			<code>ui:outputNumber</code> retrieves the locale information and displays the number in the given decimal format. 
 			To display a number, you can use an attribute value and bind it to the <code>ui:outputNumber</code> component.
 		</p>
 		<pre>&lt;aura:attribute name="myNum" type="Decimal" default="10.10"/>

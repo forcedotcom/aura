@@ -17,7 +17,7 @@
 	 */
 	
 
-	_testPositioning: {
+	testPositioning: {
         test:  function(cmp) {
            	//trying 9 times since there 9 different positions to check at
         	this.checkEachPosition(cmp, 9);

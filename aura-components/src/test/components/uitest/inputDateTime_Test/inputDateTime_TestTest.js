@@ -132,7 +132,7 @@
      * Also checks for default 'langLocale'
      */
     testDefaultTimeFormat: {
-		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
+		browsers: ['DESKTOP'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timezone:'GMT'},
         test: function(cmp){
             this.checkInputTimeValue(cmp, '4:30 PM');
@@ -143,7 +143,7 @@
      * Verify behavior when 'timeFormat' attribute is assigned an empty string.
      */
     testEmptyTimeFormat: {
-		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
+        browsers: ['DESKTOP'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'', timezone:'GMT'},
         test: function(cmp){
             this.checkInputTimeValue(cmp, '4:30:00 PM');
@@ -154,7 +154,7 @@
      * Verify behavior when 'timeFormat' attribute is assigned a garbage value.
      */
     testInvalidTimeFormat: {
-		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
+        browsers: ['DESKTOP'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'KKKKKK', timezone:'GMT'},
         test: [function(cmp){
             this.checkInputTimeValue(cmp, 'KKKKKK');
@@ -165,7 +165,7 @@
      * Verify behavior when 'timeFormat' attribute is assigned a correct value.
      */
     testValidTimeFormat: {
-		browsers: ['IE9', 'IE10', 'IE11', 'FIREFOX', 'GOOGLECHROME', 'SAFARI'],
+        browsers: ['DESKTOP'],
         attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'HH:mm', timezone:'GMT'},
         test: [function(cmp){
             this.checkInputTimeValue(cmp, '16:30');
@@ -265,6 +265,7 @@
 	  * Clear date without clearing time
 	  */
 	 testClearDate: {
+        browsers: ['DESKTOP'],
 		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
 		 test: function(cmp){
 			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
@@ -281,6 +282,7 @@
 	  * Clear time without clearing date
 	  */
 	 testClearTime: {
+        browsers: ['DESKTOP'],
 		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
 		 test: function(cmp){
 			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
@@ -297,6 +299,7 @@
 	  * Clear date and time
 	  */
 	 testClearDateAndTime: {
+        browsers: ['DESKTOP'],
 		 attributes : {value:'2015-10-23T16:30:00.000Z', dateFormat:'MM-dd-yyyy', timeFormat:'hh:mm a', timezone:'GMT'},
 		 test: function(cmp){
 			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");

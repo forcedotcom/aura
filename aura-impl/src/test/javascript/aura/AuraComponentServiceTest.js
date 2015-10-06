@@ -32,11 +32,12 @@ Test.Aura.AuraComponentServiceTest = function(){
     };
     var Aura = {Component: {}, Services: {}};
 
-    //Mock the exp() function defined in Aura.js, this is originally used for exposing members using a export.js file
     Mocks.GetMocks(Object.Global(), {
         "AuraComponentService": function(){},
+        "ComponentDefRegistry": function(){},
         "Aura": Aura
     })(function(){
+        [Import("aura-impl/src/main/resources/aura/component/ComponentDefRegistry.js")]
         [Import("aura-impl/src/main/resources/aura/AuraComponentService.js")]
     });
 
@@ -386,4 +387,58 @@ Test.Aura.AuraComponentServiceTest = function(){
             Assert.Equal(expected, actual);
         }
     }
+
+    [Fixture]
+    function hasDefinition() {
+
+        var $Amock=Mocks.GetMock(Object.Global(),"$A",{
+            assert:function(condition,message){
+                if(!condition)throw message;
+            }
+        });
+
+        [Fact]
+        function NoDescriptorTypeInDefinitionAssumesMarkup() {
+            var descriptor = "prefix:name";
+            var definition = Test.Stubs.Aura.GetComponentDef(descriptor)
+            var actual;
+
+            $Amock(function() {
+                targetService.registry.componentDefs["markup://" + descriptor] = definition;
+                actual = targetService.hasDefinition(descriptor);
+            });
+            
+            Assert.True(actual);
+        }
+
+        [Fact]
+        function ReturnsTrueIfDefinitionIsPresentOnClient() {
+            var descriptor = "markup://prefix:name";
+            var definition = Test.Stubs.Aura.GetComponentDef(descriptor)
+            var actual;
+
+            $Amock(function() {
+                targetService.registry.componentDefs[descriptor] = definition;
+                actual = targetService.hasDefinition(descriptor);
+            });
+            
+            Assert.True(actual);
+
+        }
+
+        [Fact]
+        function ReturnsFalseIfDefinitionIsNotPresentOnClient() {
+            var descriptor = "markup://prefix:name";
+            var actual;
+
+            $Amock(function() {
+                targetService.registry.componentDefs[descriptor] = null;
+                actual = targetService.hasDefinition(descriptor);
+            });
+            
+            Assert.False(actual);
+        }
+    }
+
+
 }

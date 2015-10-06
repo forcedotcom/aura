@@ -175,9 +175,17 @@ AuraEventService.prototype.bubbleEvent = function(evt) {
 /**
  * Returns the new event.
  * @param {String} name The event object in the format namespace:component
+ * @param {Function} [callback] The function that gets executed when the get has succeeded. Since this could download the event def if it is not present you need the callback to get the definition.
  * @memberOf AuraEventService
  */
-AuraEventService.prototype.get = function(name) {
+AuraEventService.prototype.get = function(name, callback) {
+    var newEvent = this.newEvent(name);
+    if(callback) {
+        if(newEvent) {
+            return callback(newEvent);
+        }
+        return this.getDefinition(name, callback);
+    }
     return this.newEvent(name);
 };
 
@@ -245,6 +253,58 @@ AuraEventService.prototype.getEventDef = function(descriptor) {
 };
 
 /**
+ * Checks to see if the definition for the event currently reside on the client. 
+ * Could still exist on the server, we won't know that till we use a getDefinitiion call to try to retrieve it.
+ * This method is private, to use it, use $A.hasDefinition("e.prefix:name");
+ * @private
+ * @param  {String}  descriptor Event descriptor in the pattern prefix:name or markup://prefix:name.
+ * @return {Boolean}            True if the definition is present on the client.
+ */
+AuraEventService.prototype.hasDefinition = function(descriptor) {
+    $A.assert(typeof descriptor==="string", "'descriptor' must be a valid event descriptor, such as 'namespace:event'.");
+
+    if (descriptor.indexOf("://") < 0) {
+        descriptor = "markup://" + descriptor; // support shorthand
+    }
+
+    return this.savedEventConfigs.hasOwnProperty(descriptor) || !!this.registry.getDef(descriptor);
+};
+
+/**
+ * Get the event definition. If it is not available, contact the server to download it.
+ *
+ * This method is private, to utilize it's functionality you can use $A.getDefinition("e.prefix:name");
+ * 
+ * @private
+ * 
+ * @param  {String}  descriptor Event descriptor in the pattern prefix:name or markup://prefix:name.
+ * @param  {Function} callback  The function callback that gets executed with the definition. May go to the server first.
+ * @return undefined            Always use the callback to access the definition.
+ */
+AuraEventService.prototype.getDefinition = function(descriptor, callback) {
+    var def = this.getEventDef(descriptor);
+
+    if (def) {
+        callback(def);
+        return;
+    }
+
+    var action = $A.get("c.aura://ComponentController.getEventDef");
+    action.setParams({
+        "name": descriptor
+    });
+    action.setCallback(this, function (actionReponse) {
+        var definition = null;
+        if(actionReponse.getState() === "SUCCESS") {
+            definition = this.getEventDef(descriptor);
+        }
+        callback(definition);
+    });
+
+    $A.enqueueAction(action);
+};
+
+/**
  * Creates and returns EventDef from config
  * @param {Object} config The parameters for the event
  * @return {EventDef} The event definition.
@@ -283,7 +343,6 @@ AuraEventService.prototype.hasHandlers = function(name) {
     return !$A.util.isUndefined(this.eventDispatcher[name]);
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 /**
  * Returns the qualified name of all events known to the registry.
  * Available in DEV mode only.
@@ -293,6 +352,7 @@ AuraEventService.prototype.getRegisteredEvents = function() {
     return Object.keys(this.registry.eventDefs);
 };
 
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
 /**
  * Whether there are pending events
  * Available in DEV mode only.

@@ -474,7 +474,9 @@ function AuraInstance () {
 
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
-
+    this["hasDefinition"] = this.hasDefinition; 
+    this["getDefinition"] = this.getDefinition;
+    this["getDefinitions"] = this.getDefinitions;
 
     var services = this.services;
 
@@ -1033,6 +1035,113 @@ AuraInstance.prototype.addValueProvider=function(type,valueProvider){
         $A.assert(this.globalValueProviders[type]==null,"$A.addValueProvider(): '"+type+"' has already been registered.");
         this.globalValueProviders[type]=valueProvider;
     }
+};
+
+/**
+ * Gets the event or component definition. If it is not currently on the client, we will access the server to attempt to retrieve it.
+ * 
+ * @public
+ * 
+ * @param  {String}   descriptor Descriptor in the pattern prefix:name or markup://prefix:name. Use e.prefix:name, or markup://e.prefix:name for an event definition.
+ * @param  {Function} callback   Function whos first parameter is the requested definition if it exists. Otherwise the first parameter is null.
+ * @return undefined
+ */
+AuraInstance.prototype.getDefinition = function(descriptor, callback) {
+    $A.assert($A.util.isString(descriptor), "'descriptor' must be an event or component descriptor such as 'prefix:name' or 'e.prefix:name'.");
+    $A.assert($A.util.isFunction(callback), "'callback' must be a valid function.");
+
+    if(descriptor.indexOf("e.") !== -1) {
+        return this.eventService.getDefinition(descriptor, callback);
+    }
+    return this.componentService.getDefinition(descriptor, callback);
+};
+
+/**
+ * Similar to $A.getDefinition() will retrieve an array of definitions at one time. Optimal if you expect them not to be available on the client.
+ * @public
+ * @param  {Array}   descriptors An Array of Descriptors in the format expected by $A.getDefinition() can be a mix of events and component descriptors.
+ * @param  {Function} callback   Function whos first parameter is an array of the definitions requested. Some definitions may be null, which are those definitions you don't have access to or did not exist.
+ * @return undefined             Always use the callback to access the definitions you requested.
+ */
+AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
+    $A.assert($A.util.isArray(descriptors), "'descriptors' must be an array of definition descriptors to retrieve.");
+    $A.assert($A.util.isFunction(callback), "'callback' must be a valid function.");
+
+    var pendingMap = {};
+    var returnDefinitions = [];
+    var requestDefinitions = [];
+    var descriptor;
+    var def;
+    var isEvent;
+    for(var c=0,length=descriptors.length;c<length;c++) {
+        descriptor = descriptors[c];
+        if(descriptor && descriptor.indexOf("e.") !== -1) {
+            descriptor = descriptor.replace("e.", "");
+            isEvent = true;
+            def =this.eventService.getEventDef(descriptor);
+        } else {
+            def = this.componentService.getDef(descriptor);
+            isEvent = false;
+        }
+        if(def) {
+            returnDefinitions[c] = def;
+        } else {
+            // Detect without access checks to see if 
+            if((isEvent && !this.eventService.hasDefinition(descriptor)) || (!isEvent && !this.componentService.getComponentDef(descriptor))) {
+                requestDefinitions.push(descriptors[c]);
+                pendingMap[descriptor] = {
+                    "position": c,
+                    "isEvent": isEvent
+                };
+            } else {
+                returnDefinitions[c] = null;                
+            }
+        }
+    }
+
+    if(!requestDefinitions.length) {
+        callback(returnDefinitions);
+    } else {
+        var action = $A.get("c.aura://ComponentController.getDefinitions");
+        action.setParams({
+            "names": requestDefinitions
+        });
+        action.setCallback(this, function () {
+            //$A.assert(action.getState() === 'SUCCESS', "Definition '" + descriptor + "' was not found on the client or the server.");
+            // We use getDef at the moment so we do the access check.
+            //executeCallbackcallback(this.getDef(descriptor));
+            //var returnValue = action.getReturnValue();
+            var pendingInfo;
+            for(var requestedDescriptor in pendingMap) {
+                if(pendingMap.hasOwnProperty(requestedDescriptor)) {
+                    pendingInfo = pendingMap[requestedDescriptor];
+                    if(pendingInfo["isEvent"]) {
+                        returnDefinitions[pendingInfo["position"]] = this.eventService.getEventDef(requestedDescriptor);
+                    } else {
+                        returnDefinitions[pendingInfo["position"]] = this.componentService.getDef(requestedDescriptor);
+                    }
+                }
+            }
+            callback(returnDefinitions);
+        });
+
+        $A.enqueueAction(action);
+    }
+};
+
+/**
+ * Detect if a definition is present on the client. May still exist on the server.
+ * @public
+ * @param  {String}   descriptor Descriptor in the pattern prefix:name. Use e.prefix:name for an event definition.
+ * @return {Boolean}             True if the definition is present on the client.
+ */
+AuraInstance.prototype.hasDefinition = function(descriptor) {
+    $A.assert($A.util.isString(descriptor), "'descriptor' must be an event or component descriptor such as 'prefix:name' or 'e.prefix:name'.");
+    
+    if(descriptor.indexOf("e.") !== -1) {
+        return this.eventService.hasDefinition(descriptor);
+    }
+    return this.componentService.hasDefinition(descriptor);
 };
 
 // #include aura.util.PerfShim

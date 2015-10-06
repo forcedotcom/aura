@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.controller;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,8 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
+import org.auraframework.def.EventDef;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.java.controller.JavaAction;
 import org.auraframework.impl.javascript.controller.JavascriptPseudoAction;
 import org.auraframework.instance.Action;
@@ -160,6 +163,29 @@ public class ComponentController {
     @AuraEnabled
     public static ComponentDef getComponentDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
         DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor(name, ComponentDef.class);
+        return Aura.getDefinitionService().getDefinition(desc);
+    }
+
+    @AuraEnabled
+    public static List<RootDefinition> getDefinitions(@Key(value = "names", loggable = true) List<String> names) throws QuickFixException {
+    	if(names == null) {
+    		return Collections.emptyList();
+    	}
+    	List<RootDefinition> returnDefs = Lists.newArrayListWithCapacity(names.size());
+        for(String name : names) {
+        	if(name.contains("e.")) {
+        		returnDefs.add(getEventDef(name));
+        	} else {
+        		returnDefs.add(getComponentDef(name));
+        	}
+        }
+        return returnDefs;
+    }
+
+    @AuraEnabled
+    public static EventDef getEventDef(@Key(value = "name", loggable = true) String name) throws QuickFixException {
+    	final String descriptorName = name.replace("e.", "");
+        DefDescriptor<EventDef> desc = Aura.getDefinitionService().getDefDescriptor(descriptorName, EventDef.class);
         return Aura.getDefinitionService().getDefinition(desc);
     }
 

@@ -21,7 +21,7 @@
  * @export
  */
 function AuraComponentService () {
-    this.registry = new ComponentDefRegistry();
+    this.registry = new Aura.Component.ComponentDefRegistry();
     this.controllerDefRegistry = new ControllerDefRegistry();
     this.actionDefRegistry = new ActionDefRegistry();
     this.modelDefRegistry = new ModelDefRegistry();
@@ -748,6 +748,66 @@ AuraComponentService.prototype.index = function(component){
 };
 
 /**
+ * Checks to see if the definition for the component currently reside on the client and the context has access to it. 
+ * Could still exist on the server, we won't know that till we use a getDefinition call to try to retrieve it.
+ * 
+ * This method is private, to use it, use $A.hasDefinition("prefix:name");
+ * 
+ * @private
+ * @param  {String}  descriptor Component descriptor in the pattern prefix:name or markup://prefix:name.
+ * @return {Boolean}            True if the definition is present on the client.
+ */
+AuraComponentService.prototype.hasDefinition = function(descriptor) {
+    $A.assert(typeof descriptor==="string", "'descriptor' must be a valid event descriptor, such as 'prefix:name'");
+
+    if (descriptor.indexOf("://") < 0) {
+        descriptor = "markup://" + descriptor; // support shorthand
+    }
+
+    return !!this.registry.getDef(descriptor);
+};
+
+
+/**
+ * Get the component definition. If it is not available will go to the server to retrieve it.
+ *
+ * This method is private, to utilize it, you should use $A.getDefinition("prefix:markup");
+ *
+ * @private
+ * 
+ * @param  {String}   descriptor Component descriptor in the pattern prefix:name or markup://prefix:name.
+ * @param  {Function} callback   Function that is passed the definition. The definition may be NULL if either the definition does not exist, or you do not have access to it.
+ * @return undefined             Always use the callback to access the returned definition.
+ */
+AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
+    var def = this.getComponentDef(descriptor);
+
+    if (def) {
+        if(!$A.clientService.allowAccess(def)) {
+            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
+            $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
+            // #end
+            callback(null);
+            return;
+        }
+        callback(def);
+        return;
+    }
+
+    var action = $A.get("c.aura://ComponentController.getComponentDef");
+    action.setParams({
+        "name": descriptor
+    });
+    action.setCallback(this, function (actionResponse) {
+        $A.assert(actionResponse.getState() === 'SUCCESS', "Component Definition '" + descriptor + "' was not found on the client or the server.");
+        // We use getDef at the moment so we do the access check.
+        callback(this.getDef(descriptor));
+    });
+
+    $A.enqueueAction(action);
+};
+
+/**
  * Gets the component definition from the registry for internal use, without access checks.
  *
  * @param {String|Object} descriptor The descriptor (<code>markup://ui:scroller</code>) or other component attributes that are provided during its initialization.
@@ -783,6 +843,7 @@ AuraComponentService.prototype.getComponentDef = function(descriptor) {
  *
  * @public
  * @export
+ * @deprecated use getDefinition(descriptor, callback) instead, it will go to the server if the definition is not present on the client.
  */
 AuraComponentService.prototype.getDef = function(descriptor) {
     var def = this.getComponentDef(descriptor);

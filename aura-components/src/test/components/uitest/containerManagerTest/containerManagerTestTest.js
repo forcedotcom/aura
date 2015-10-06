@@ -15,13 +15,6 @@
  */
 ({
 
-    //Test turning on shared container sets panels as child of container and sets zindexes accordingly
-    //Test turning off shared container sets panels as child of panel manager and sets zindexes accordingly
-    //Test public apis from stack manager bringToFront, sendToBack, setStackingContextRoot
-    //Test multiple panel managers with container manager together
-    //Destroy a panel and assert zindex shuffle
-    //Garbage connection on destroy all panels
-
     browsers: ["-IE7","-IE8"],
 
     testUseSharedContainer: {

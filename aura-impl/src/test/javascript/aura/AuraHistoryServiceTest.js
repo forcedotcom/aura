@@ -26,7 +26,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
     (function(){
         [Import("aura-impl/src/main/resources/aura/AuraHistoryService.js")]
     });
-    
+
     var mockIsIOSWebViewTrue = Mocks.GetMock(Object.Global(), "$A", {
         util: {
             isIOSWebView: function() {
@@ -74,7 +74,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var expected = "#" + token;
             var actual;
             var mockPushState = Mocks.GetMocks(Object.Global(), {
-                window: { 
+                window: {
                     history: {
                         pushState: function(state, title, url){
                             actual = url;
@@ -300,7 +300,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
         function ReturnsFalseIfIOS7WebView() {
             var historyService = new Aura.Services.AuraHistoryService();
 
-            var actual; 
+            var actual;
             mockUserAgentChromeAndroid(function() {
                 mockIsIOSWebViewTrue(function() {
                     actual = historyService.usePushState();
@@ -314,7 +314,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
         function ReturnsFalseIfNativeAndroid() {
             var historyService = new Aura.Services.AuraHistoryService();
 
-            var actual; 
+            var actual;
             mockUserAgentNativeAndroid(function() {
                 mockIsIOSWebViewFalse(function() {
                     actual = historyService.usePushState();
@@ -328,13 +328,13 @@ Test.Aura.AuraHistoryServiceTest = function(){
         function ReturnsTrueIfChromeAndroid() {
             var historyService = new Aura.Services.AuraHistoryService();
 
-            var actual; 
+            var actual;
             mockUserAgentChromeAndroid(function() {
                 mockIsIOSWebViewFalse(function() {
                     actual = historyService.usePushState();
                 });
             });
- 
+
             Assert.True(actual);
         }
     }
@@ -347,7 +347,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var actual = "initial";
             var expected = 1;
             var mockHistory = Mocks.GetMocks(Object.Global(), {
-                window: { 
+                window: {
                     history: {
                         go: function(param){
                             actual = param;
@@ -403,7 +403,7 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var actual = "initial";
             var expected = -1;
             var mockHistory = Mocks.GetMocks(Object.Global(), {
-                window: { 
+                window: {
                     history: {
                         go: function(param){
                             actual = param;
@@ -507,27 +507,6 @@ Test.Aura.AuraHistoryServiceTest = function(){
     [Fixture]
     function parseLocation() {
 
-        var mockUrlDecode = Mocks.GetMock(Object.Global(), "$A", {
-            "util": {
-                urlDecode: function(url) {
-                    var ret = {};
-                    var pairs = url.split("&");
-                    var position;
-                    var pair;
-                    for (var i = 0; i < pairs.length; i++) {
-                        pair = pairs[i];
-                        position = pair.indexOf("=");
-                        if(position === -1) {
-                            ret[pair] = undefined;
-                        } else {
-                            ret[pair.substring(0, position)] = decodeURIComponent(pair.substring(position+1));
-                        }
-                    }
-                    return ret;
-                }
-            }
-        });
-
         [Fact]
         function ParsesHashWithPoundSignIncluded() {
             var location = "#key=value";
@@ -555,11 +534,8 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var location = "#hash?key=value?key2=value2&key3=value3";
             var historyService = new Aura.Services.AuraHistoryService();
             var expected = { "key":"value?key2=value2", "key3":"value3", "token": "hash", "querystring": "key=value?key2=value2&key3=value3" };
-            var actual;
 
-            mockUrlDecode(function() {
-                actual = historyService.parseLocation(location);    
-            });
+            var actual = historyService.parseLocation(location);
 
             Assert.Equal(expected, actual);
         }
@@ -569,16 +545,13 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var location = "#hash?key=&key2";
             var historyService = new Aura.Services.AuraHistoryService();
             var expected = { "token":"hash", "querystring":"key=&key2", "key":"", "key2":undefined };
-            var actual;
 
-            mockUrlDecode(function() {
-                actual = historyService.parseLocation(location);    
-            });
+            var actual = historyService.parseLocation(location);
 
             Assert.Equal(expected, actual);
         }
     }
-    
+
     [Fixture]
     function getLocationHash() {
         [Fact]
@@ -593,17 +566,17 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHref = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            
+
             var historyService = new Aura.Services.AuraHistoryService();
-            
+
             var actual;
             mockLocationHref(function() {
                 actual = historyService.getLocationHash();
-            });  
-            
+            });
+
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function LocationEmptyHash() {
             var expected = "#";
@@ -616,17 +589,17 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHref = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            
+
             var historyService = new Aura.Services.AuraHistoryService();
-            
+
             var actual;
             mockLocationHref(function() {
                 actual = historyService.getLocationHash();
-            });  
-            
+            });
+
             Assert.Equal(expected, actual);
         }
-        
+
         [Fact]
         function LocationNoHash() {
             var expected = "";
@@ -639,15 +612,15 @@ Test.Aura.AuraHistoryServiceTest = function(){
             var mockLocationHref = Mocks.GetMocks(Object.Global(), {
                 window: windowMock
             });
-            
+
             var historyService = new Aura.Services.AuraHistoryService();
-            
+
             var actual;
             mockLocationHref(function() {
                 actual = historyService.getLocationHash();
-            });  
-            
+            });
+
             Assert.Equal(expected, actual);
         }
-    }    
+    }
 }

@@ -330,7 +330,7 @@ Test.Aura.Util.UtilTest = function() {
             Assert.Equal(expected, actual);
         }
 
-        
+
         [Fact]
         function testMergeSingleArrayIsUnchanged() {
             var expected = [0, 1, 2, 3, 4, 5, 6, 7, 8];
@@ -359,7 +359,7 @@ Test.Aura.Util.UtilTest = function() {
 
             auraMock(function() {
                 actual = Record.Exception(function(){
-                    new Aura.Utils.Util().merge({}, [0], [1, 2]);                    
+                    new Aura.Utils.Util().merge({}, [0], [1, 2]);
                 })
             });
 
@@ -373,10 +373,10 @@ Test.Aura.Util.UtilTest = function() {
 
             auraMock(function() {
                 actual = Record.Exception(function(){
-                    new Aura.Utils.Util().merge([0], {}, [1, 2]);                    
+                    new Aura.Utils.Util().merge([0], {}, [1, 2]);
                 })
             });
-            
+
             Assert.Equal(expected, actual);
         }
 
@@ -384,10 +384,10 @@ Test.Aura.Util.UtilTest = function() {
         function testMergeErrorOnNonArrayAtEnd() {
             var expected = "Merge takes only arrays as arguments.";
             var actual;
-            
+
             auraMock(function() {
                 actual = Record.Exception(function(){
-                    new Aura.Utils.Util().merge([0], [1, 2], {});                    
+                    new Aura.Utils.Util().merge([0], [1, 2], {});
                 })
             });
 
@@ -832,43 +832,6 @@ Test.Aura.Util.UtilTest = function() {
 
                 Assert.Equal(0, found);
             });
-        }
-    }
-
-    [Fixture]
-    function urlDecode() {
-
-        [Fact]
-        function parsesKeyValuePairs() {
-            var data = "key=value&key2=value2";
-            var expected = { "key": "value", "key2": "value2" };
-            var actual;
-
-            actual = targetUtil.urlDecode(data);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function parsesKeyValueValuePairs() {
-            var data = "key=value=valid&key2=value2";
-            var expected = { "key": "value=valid", "key2": "value2" };
-            var actual;
-
-            actual = targetUtil.urlDecode(data);
-
-            Assert.Equal(expected, actual);
-        }
-
-        [Fact]
-        function parsesKeyValueKeyPairs() {
-            var data = "key=value&key2";
-            var expected = { "key": "value", "key2": undefined };
-            var actual;
-
-            actual = targetUtil.urlDecode(data);
-
-            Assert.Equal(expected, actual);
         }
     }
 

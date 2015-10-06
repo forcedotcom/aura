@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -125,10 +124,6 @@ public class ClientLibraryDefHandler<P extends RootDefinition> extends ParentedT
     @Override
     public String getHandledTag() {
         return TAG;
-    }
-
-    @Override
-    public void writeElement(ClientLibraryDef def, Appendable out) throws IOException {
     }
 
     @Override

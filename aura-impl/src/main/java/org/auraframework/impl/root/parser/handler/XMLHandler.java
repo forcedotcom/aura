@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -83,8 +82,6 @@ public abstract class XMLHandler<T extends Definition> {
      * @throws QuickFixException
      */
     public abstract T getElement() throws XMLStreamException, QuickFixException;
-
-    public abstract void writeElement(T def, Appendable out) throws IOException;
 
     public abstract String getHandledTag();
 

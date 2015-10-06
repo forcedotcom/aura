@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignSectionDef;
@@ -27,16 +31,17 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class DesignSectionDefHandler extends ParentedTagHandler<DesignSectionDef, DesignDef> {
     public static final String TAG = "design:section";
     private static final String ATTRIBUTE_NAME = "name";
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
     private DesignSectionDefImpl.Builder builder = new DesignSectionDefImpl.Builder();
+
+    public DesignSectionDefHandler() {
+        super();
+    }
 
     public DesignSectionDefHandler(ContainerTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -71,11 +76,6 @@ public class DesignSectionDefHandler extends ParentedTagHandler<DesignSectionDef
         }
     }
 
-
-    @Override
-    public void writeElement(DesignSectionDef def, Appendable out) throws IOException {
-
-    }
 
     @Override
     public Set<String> getAllowedAttributes() {

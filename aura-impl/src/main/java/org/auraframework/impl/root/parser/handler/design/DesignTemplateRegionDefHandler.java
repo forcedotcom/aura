@@ -15,16 +15,15 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignTemplateRegionDef;
-import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.design.DesignTemplateRegionDefImpl;
 import org.auraframework.impl.root.parser.handler.ParentedTagHandler;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
@@ -44,6 +43,10 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME, ATTRIBUTE_INTERFACES);
 
     private final DesignTemplateRegionDefImpl.Builder builder = new DesignTemplateRegionDefImpl.Builder();
+
+    public DesignTemplateRegionDefHandler() {
+        super();
+    }
 
     public DesignTemplateRegionDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
             Source<?> source) {
@@ -98,9 +101,4 @@ public class DesignTemplateRegionDefHandler extends ParentedTagHandler<DesignTem
     protected DesignTemplateRegionDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
-    @Override
-    public void writeElement(DesignTemplateRegionDef def, Appendable out) throws IOException {
-    }
-
 }

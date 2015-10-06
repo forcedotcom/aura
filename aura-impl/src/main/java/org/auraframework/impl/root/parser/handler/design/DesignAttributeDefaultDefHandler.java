@@ -15,6 +15,9 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
@@ -24,10 +27,6 @@ import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
 
 /**
  * Handler for design attribute default
@@ -58,11 +57,6 @@ public class DesignAttributeDefaultDefHandler extends ParentedTagHandler<DesignA
         if (!AuraTextUtil.isNullEmptyOrWhitespace(xmlReader.getText())) {
             error("No literal text allowed in attribute default definition");
         }
-    }
-
-    @Override
-    public void writeElement(DesignAttributeDefaultDef def, Appendable out) throws IOException {
-
     }
 
     @Override

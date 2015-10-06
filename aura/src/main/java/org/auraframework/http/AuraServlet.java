@@ -46,9 +46,7 @@ import org.auraframework.service.ServerService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.Message;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
@@ -272,24 +270,6 @@ public class AuraServlet extends AuraBaseServlet {
         return !manifestUtil.isManifestEnabled(request);
     }
 
-    protected DefDescriptor<?> setupQuickFix(AuraContext context) {
-        DefinitionService ds = Aura.getDefinitionService();
-        MasterDefRegistry mdr = context.getDefRegistry();
-
-        try {
-            DefDescriptor<ComponentDef> qfdesc = ds.getDefDescriptor("auradev:quickFixException", ComponentDef.class);
-            String uid = mdr.getUid(null, qfdesc);
-            context.setPreloadedDefinitions(mdr.getDependencies(uid));
-            return qfdesc;
-        } catch (QuickFixException death) {
-            //
-            // DOH! something is seriously wrong, just die!
-            // This should _never_ happen, but if you muck up basic aura stuff, it might.
-            //
-            throw new AuraError(death);
-        }
-    }
-
     protected <T extends BaseComponentDef> void internalGet(HttpServletRequest request,
             HttpServletResponse response, DefDescriptor<T> defDescriptor, AuraContext context,
             DefinitionService definitionService)
@@ -310,13 +290,6 @@ public class AuraServlet extends AuraBaseServlet {
             if (!context.isTestMode() && !context.isDevMode()) {
                 assertAccess(def);
             }
-        } catch (QuickFixException qfe) {
-            //
-            // Whoops. we need to set up our preloads correctly here.
-            //
-            setupQuickFix(context);
-            servletUtil.handleServletException(qfe, true, context, request, response, false);
-            return;
         } catch (Throwable t) {
             servletUtil.handleServletException(t, false, context, request, response, false);
             return;

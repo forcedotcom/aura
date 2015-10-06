@@ -15,32 +15,23 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.EventDef;
 import org.auraframework.def.FlavorsDef;
 import org.auraframework.impl.root.DependencyDefImpl;
 import org.auraframework.impl.root.application.ApplicationDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.Component;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 
 public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDef, ApplicationDefImpl.Builder> {
 
@@ -133,22 +124,6 @@ public class ApplicationDefHandler extends BaseComponentDefHandler<ApplicationDe
             if (flavors.exists()) {
                 builder.setFlavorOverrides(flavors);
             }
-        }
-    }
-
-    @Override
-    public void writeElement(ApplicationDef def, Appendable out) throws IOException {
-        try {
-            Map<String, Object> attributes = Maps.newHashMap();
-            attributes.put("def", def);
-            InstanceService instanceService = Aura.getInstanceService();
-            DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveApplication",
-                    ComponentDef.class);
-            Component tmpl = instanceService.getInstance(tmplDesc, attributes);
-            Aura.getRenderingService().render(tmpl, out);
-        } catch (QuickFixException x) {
-            throw new AuraError(x);
         }
     }
 

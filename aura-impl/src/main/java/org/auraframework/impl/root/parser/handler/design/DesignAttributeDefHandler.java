@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
@@ -27,10 +31,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttributeDef, DesignDef> {
     public static final String TAG = "design:attribute";
@@ -63,8 +64,11 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
 
     private final DesignAttributeDefImpl.Builder builder = new DesignAttributeDefImpl.Builder();
 
-    // TODO implement tool specific properties
+    public DesignAttributeDefHandler() {
+        super();
+    }
 
+    // TODO implement tool specific properties
     public DesignAttributeDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
                                      Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -147,9 +151,4 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
     protected DesignAttributeDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
-    @Override
-    public void writeElement(DesignAttributeDef def, Appendable out) throws IOException {
-    }
-
 }

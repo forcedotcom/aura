@@ -24,6 +24,6 @@ public class ClientLibraryException extends QuickFixException {
     private static final long serialVersionUID = 288798091014190582L;
 
     public ClientLibraryException(String message, Location location) {
-        super(message, location, (AuraQuickFix[]) null);
+        super(message, location);
     }
 }

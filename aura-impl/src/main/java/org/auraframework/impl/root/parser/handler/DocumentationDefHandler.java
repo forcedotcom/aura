@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Set;
 
@@ -104,10 +103,6 @@ public class DocumentationDefHandler extends RootTagHandler<DocumentationDef> {
     @Override
     protected DocumentationDef createDefinition() throws QuickFixException {
         return builder.build();
-    }
-
-    @Override
-    public void writeElement(DocumentationDef def, Appendable out) throws IOException {
     }
 
     String getNextId() {

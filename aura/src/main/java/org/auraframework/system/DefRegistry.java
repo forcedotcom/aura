@@ -75,6 +75,7 @@ public interface DefRegistry<T extends Definition> extends Serializable {
 
     /**
      * Save the given definition back to appropriate source location.
+     * @Deprecated
      */
     void save(T def);
 

@@ -18,7 +18,6 @@ package org.auraframework.test.perf.util;
 import java.util.Map;
 
 import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 
 /**

@@ -17,13 +17,38 @@ package org.auraframework.tools.definition;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.annotation.Nonnull;
+
 import org.auraframework.Aura;
-import org.auraframework.impl.root.parser.XMLWriter;
+import org.auraframework.impl.root.parser.handler.ApplicationDefHandler;
+import org.auraframework.impl.root.parser.handler.AttributeDefHandler;
+import org.auraframework.impl.root.parser.handler.AttributeDefRefHandler;
+import org.auraframework.impl.root.parser.handler.ComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.DependencyDefHandler;
+import org.auraframework.impl.root.parser.handler.EventDefHandler;
+import org.auraframework.impl.root.parser.handler.EventHandlerDefHandler;
+import org.auraframework.impl.root.parser.handler.ImportDefHandler;
+import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
+import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
+import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
+import org.auraframework.impl.root.parser.handler.MethodDefHandler;
+import org.auraframework.impl.root.parser.handler.NamespaceDefHandler;
+import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
+import org.auraframework.impl.root.parser.handler.TokensDefHandler;
 import org.auraframework.impl.root.parser.handler.XMLHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignAttributeDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignItemsDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignLayoutAttributeDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignLayoutComponentDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignLayoutDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignOptionDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignSectionDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignTemplateDefHandler;
+import org.auraframework.impl.root.parser.handler.design.DesignTemplateRegionDefHandler;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -56,25 +81,85 @@ public class RegistryAndSystemTagsJsonSerializer {
         }
     }
 
+    /**
+     * Get a handler for a tag.
+     *
+     * This routine is rather bogus, but will work until we have a better way.
+     */
+    @SuppressWarnings("rawtypes")
+    private static XMLHandler<?> getHandler(@Nonnull String tag) {
+        if (tag.equals(ApplicationDefHandler.TAG)) {
+            return new ApplicationDefHandler();
+        } else if (tag.equals(AttributeDefHandler.TAG)) {
+            return new AttributeDefHandler();
+        } else if (tag.equals(ComponentDefHandler.TAG)) {
+            return new ComponentDefHandler();
+        } else if (tag.equals(EventDefHandler.TAG)) {
+            return new EventDefHandler();
+        } else if (tag.equals(InterfaceDefHandler.TAG)) {
+            return new InterfaceDefHandler();
+        } else if (tag.equals(EventHandlerDefHandler.TAG)) {
+            return new EventHandlerDefHandler();
+        } else if (tag.equals(ImportDefHandler.TAG)) {
+            return new ImportDefHandler();
+        } else if (tag.equals(MethodDefHandler.TAG)) {
+            return new MethodDefHandler();
+        } else if (tag.equals(RegisterEventHandler.TAG)) {
+            return new RegisterEventHandler();
+        } else if (tag.equals(AttributeDefRefHandler.TAG)) {
+            return new AttributeDefRefHandler();
+        } else if (tag.equals(DependencyDefHandler.TAG)) {
+            return new DependencyDefHandler();
+        } else if (tag.equals(NamespaceDefHandler.TAG)) {
+            return new NamespaceDefHandler();
+        } else if (tag.equals(TokensDefHandler.TAG)) {
+            return new TokensDefHandler();
+        } else if (tag.equals(DesignDefHandler.TAG)) {
+            return new DesignDefHandler();
+        } else if (tag.equals(DesignAttributeDefHandler.TAG)) {
+            return new DesignAttributeDefHandler();
+        } else if (tag.equals(DesignTemplateDefHandler.TAG)) {
+            return new DesignTemplateDefHandler();
+        } else if (tag.equals(DesignTemplateRegionDefHandler.TAG)) {
+            return new DesignTemplateRegionDefHandler();
+        } else if (tag.equals(DesignLayoutDefHandler.TAG)) {
+            return new DesignLayoutDefHandler();
+        } else if (tag.equals(DesignSectionDefHandler.TAG)) {
+            return new DesignSectionDefHandler();
+        } else if (tag.equals(DesignItemsDefHandler.TAG)) {
+            return new DesignItemsDefHandler();
+        } else if (tag.equals(DesignLayoutAttributeDefHandler.TAG)) {
+            return new DesignLayoutAttributeDefHandler();
+        } else if (tag.equals(DesignOptionDefHandler.TAG)) {
+            return new DesignOptionDefHandler();
+        } else if (tag.equals(DesignLayoutComponentDefHandler.TAG)) {
+            return new DesignLayoutComponentDefHandler();
+        } else if (tag.equals(LibraryDefHandler.TAG)) {
+            return new LibraryDefHandler();
+        } else if (tag.equals(IncludeDefRefHandler.TAG)) {
+            return new IncludeDefRefHandler();
+        }
+        return null;
+    }
+
     private static void loadMetadataForSystemComponents(
             Map<String, Map<String, Map<String, Map<String, String>>>> components) {
-        XMLWriter xmlWriter = new XMLWriter();
-        Collection<XMLHandler<?>> specialComps = xmlWriter.getHandlers().values();
         Map<String, Map<String, Map<String, String>>> component;
         Map<String, Map<String, String>> componentDetails;
-        for (XMLHandler<?> specialComp : specialComps) {
-            String compName = specialComp.getHandledTag();
+        for (String tag : XMLHandler.SYSTEM_TAGS) {
+        //for (XMLHandler<?> specialComp : specialComps) {
+            XMLHandler<?> handler = getHandler(tag);
             // some handlers don't really have a TAG..
-            if (XMLHandler.SYSTEM_TAGS.contains(compName)) {
+            if (handler != null) {
                 component = new TreeMap<>();
                 componentDetails = new TreeMap<>();
-                for (String attribute : specialComp.getAllowedAttributes()) {
+                for (String attribute : handler.getAllowedAttributes()) {
                     Map<String, String> attributeProps = new TreeMap<>();
                     attributeProps.put(RegistryJsonSerializer.TYPE_KEY, "Object");
                     componentDetails.put(attribute, attributeProps);
                 }
                 component.put(RegistryJsonSerializer.ATTRIBUTES_KEY, componentDetails);
-                components.put(compName, component);
+                components.put(tag, component);
             }
         }
     }

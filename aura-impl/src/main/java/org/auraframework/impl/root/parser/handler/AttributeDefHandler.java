@@ -169,10 +169,6 @@ public class AttributeDefHandler<P extends RootDefinition> extends ParentedTagHa
     }
 
     @Override
-    public void writeElement(AttributeDefImpl def, Appendable out) {
-    }
-
-    @Override
     protected boolean allowPrivateAttribute() {
         return true;
     }

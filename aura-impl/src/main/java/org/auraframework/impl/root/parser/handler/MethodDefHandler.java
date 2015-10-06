@@ -137,12 +137,7 @@ public class MethodDefHandler<P extends RootDefinition> extends ParentedTagHandl
     }
 
     @Override
-    public void writeElement(MethodDef def, Appendable out) {
+    protected boolean allowPrivateAttribute() {
+        return true;
     }
-
-    @Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
-
 }

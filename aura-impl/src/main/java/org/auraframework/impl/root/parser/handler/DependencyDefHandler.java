@@ -91,10 +91,6 @@ public class DependencyDefHandler<P extends RootDefinition> extends ParentedTagH
     }
 
     @Override
-    public void writeElement(DependencyDef def, Appendable out) {
-    }
-
-    @Override
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         error("Dependency cannot have a child tag");
     }

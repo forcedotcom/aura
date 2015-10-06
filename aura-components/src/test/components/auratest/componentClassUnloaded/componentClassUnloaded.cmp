@@ -16,7 +16,5 @@
 
 -->
 <aura:component>
-    <aura:attribute name="def" type="java://org.auraframework.def.ApplicationDef"/><![CDATA[<aura:application>]]>
-    TODO: {!v.def.descriptor.namespace}:{!v.def.descriptor.name}
-<![CDATA[</aura:application>]]>
+    This component should have to be fetched from the server.
 </aura:component>

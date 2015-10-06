@@ -197,10 +197,4 @@ public class ComponentDefRefHandler<P extends RootDefinition> extends ParentedTa
         // ones we know it doesn't handle. #W-690036
         return true;
     }
-
-    @Override
-    public void writeElement(ComponentDefRef def, Appendable out) {
-        // TODO Auto-generated method stub
-
-    }
 }

@@ -25,7 +25,7 @@ public class AttributeNotFoundException extends QuickFixException {
     private static final long serialVersionUID = 1068164156618526671L;
 
     public AttributeNotFoundException(DefDescriptor<?> descriptor, String attName, Location l) {
-        super(getMessage(descriptor, attName), l, new CreateAttributeQuickFix(descriptor, attName));
+        super(getMessage(descriptor, attName), l);
     }
 
     private static String getMessage(DefDescriptor<?> descriptor, String attName) {

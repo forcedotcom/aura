@@ -83,7 +83,7 @@
 	//get a component with server dependency via $A.createComponent
 	testCreateComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="markup://auradev:quickFixButton"; 
+			var type="markup://auratest:componentClassUnloaded"; 
 			var attributes = null;
 			var done = false;
 			var newComponent;
@@ -144,7 +144,7 @@
 	
 	testNewComponentServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="markup://auradev:quickFixButton";
+			var type="markup://auratest:componentClassUnloaded";
 			var config = {
 	                componentDef: type,
 	            }
@@ -190,7 +190,7 @@
 	
 	testNewComponentDeprecatedServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-        	var type="markup://auradev:quickFixButton";
+        	var type="markup://auratest:componentClassUnloaded";
 			var config = {
 	                componentDef: type,
 	            }
@@ -233,7 +233,7 @@
 	
 	testNewComponentAsyncServerDependencyReturnCorrectType : {
 		test: function(testCmp) {
-			var type="markup://auradev:quickFixButton";
+			var type="markup://auratest:componentClassUnloaded";
 			var done = false;
 			var newComponent;
 			$A.test.addWaitForWithFailureMessage(true,

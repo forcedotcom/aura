@@ -82,27 +82,22 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
         builder.setAttName(name);
         
         try {
-			builder.setAccess(readAccessAttribute());
-		} catch (InvalidAccessValueException e) {
-			builder.setParseError(e);
-		}
-	}
-
-	@Override
-	protected boolean allowPrivateAttribute() {
-		return true;
-	}
-	
-	@Override
-	protected RegisterEventDefImpl createDefinition() throws QuickFixException {
-        return builder.build();
-	}
-	
-    //TODO this could be pushed to the superclass... It is currently empty in all subclasses of ContainerTagHandler
-    @Override
-    public void writeElement(RegisterEventDefImpl def, Appendable out) {
+            builder.setAccess(readAccessAttribute());
+        } catch (InvalidAccessValueException e) {
+            builder.setParseError(e);
+        }
     }
 
+    @Override
+    protected boolean allowPrivateAttribute() {
+        return true;
+    }
+	
+    @Override
+    protected RegisterEventDefImpl createDefinition() throws QuickFixException {
+        return builder.build();
+    }
+	
     @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
@@ -113,16 +108,13 @@ public class RegisterEventHandler<P extends RootDefinition> extends ParentedTagH
         return TAG;
     }
 
-	@Override
-	protected void handleChildTag() throws XMLStreamException,
-			QuickFixException {
+    @Override
+    protected void handleChildTag() throws XMLStreamException, QuickFixException {
         error("No children allowed for %s tag", TAG);
-	}
+    }
 
-	@Override
-	protected void handleChildText() throws XMLStreamException,
-			QuickFixException {
+    @Override
+    protected void handleChildText() throws XMLStreamException, QuickFixException {
         error("No literal text allowed in %s tag", TAG);
-	}
-
+    }
 }

@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignOptionDef;
 import org.auraframework.impl.design.DesignOptionDefImpl;
@@ -26,10 +30,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class DesignOptionDefHandler extends ParentedTagHandler<DesignOptionDef, DesignDef> {
     public static final String TAG = "design:option";
@@ -38,6 +39,10 @@ public class DesignOptionDefHandler extends ParentedTagHandler<DesignOptionDef, 
     private static final Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_KEY, ATTRIBUTE_VALUE, ATTRIBUTE_ACCESS);
 
     private DesignOptionDefImpl.Builder builder = new DesignOptionDefImpl.Builder();
+
+    public DesignOptionDefHandler() {
+        super();
+    }
 
     public DesignOptionDefHandler(ContainerTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -69,11 +74,6 @@ public class DesignOptionDefHandler extends ParentedTagHandler<DesignOptionDef, 
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             error("No literal text allowed in attribute design definition");
         }
-    }
-
-    @Override
-    public void writeElement(DesignOptionDef def, Appendable out) throws IOException {
-
     }
 
     @Override

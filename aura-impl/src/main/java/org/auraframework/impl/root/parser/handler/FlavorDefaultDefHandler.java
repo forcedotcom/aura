@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -114,9 +113,5 @@ public class FlavorDefaultDefHandler<P extends RootDefinition> extends ParentedT
         }
 
         return builder.build();
-    }
-
-    @Override
-    public void writeElement(FlavorDefaultDef def, Appendable out) throws IOException {
     }
 }

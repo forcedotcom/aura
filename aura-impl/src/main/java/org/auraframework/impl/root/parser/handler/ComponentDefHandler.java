@@ -15,26 +15,18 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.root.component.ComponentDefImpl;
-import org.auraframework.instance.Component;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.InstanceService;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 
 /**
  */
@@ -87,21 +79,4 @@ public class ComponentDefHandler extends BaseComponentDefHandler<ComponentDef, C
     protected void handleChildTag() throws XMLStreamException, QuickFixException {
         super.handleChildTag();
     }
-
-    @Override
-    public void writeElement(ComponentDef def, Appendable out) throws IOException {
-        try {
-            Map<String, Object> attributes = Maps.newHashMap();
-            attributes.put("def", def);
-            InstanceService instanceService = Aura.getInstanceService();
-            DefinitionService definitionService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = definitionService.getDefDescriptor("auradev:saveComponent",
-                    ComponentDef.class);
-            Component tmpl = instanceService.getInstance(tmplDesc, attributes);
-            Aura.getRenderingService().render(tmpl, out);
-        } catch (QuickFixException x) {
-            throw new AuraError(x);
-        }
-    }
-    
 }

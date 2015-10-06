@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -94,11 +93,4 @@ public class RequiredVersionDefHandler<P extends RootDefinition> extends Parente
 			throws QuickFixException {
 		return builder.build();
 	}
-
-	@Override
-	public void writeElement(RequiredVersionDefImpl def, Appendable out)
-			throws IOException {
-		// Nothing to write.
-	}
-
 }

@@ -101,8 +101,4 @@ public class AttributeDefRefHandler<P extends RootDefinition> extends ParentedTa
         children.addAll(tokenizeChildText());
     }
 
-    @Override
-    public void writeElement(AttributeDefRefImpl def, Appendable out) {
-    }
-
 }

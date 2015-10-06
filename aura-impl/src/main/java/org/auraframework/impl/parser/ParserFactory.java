@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.parser;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 import org.auraframework.def.DefDescriptor;
@@ -24,10 +23,6 @@ import org.auraframework.def.Definition;
 import org.auraframework.impl.css.parser.FlavoredStyleParser;
 import org.auraframework.impl.css.parser.ResourceCSSParser;
 import org.auraframework.impl.css.parser.StyleParser;
-import org.auraframework.impl.java.writer.JavaScriptWriter;
-import org.auraframework.impl.java.writer.JavaWriter;
-import org.auraframework.impl.java.writer.SVGWriter;
-import org.auraframework.impl.java.writer.StyleWriter;
 import org.auraframework.impl.javascript.parser.JavascriptControllerParser;
 import org.auraframework.impl.javascript.parser.JavascriptHelperParser;
 import org.auraframework.impl.javascript.parser.JavascriptIncludeParser;
@@ -46,11 +41,9 @@ import org.auraframework.impl.root.parser.InterfaceXMLParser;
 import org.auraframework.impl.root.parser.LibraryXMLParser;
 import org.auraframework.impl.root.parser.NamespaceXMLParser;
 import org.auraframework.impl.root.parser.TokensXMLParser;
-import org.auraframework.impl.root.parser.XMLWriter;
 import org.auraframework.impl.svg.parser.SVGParser;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Parser.Format;
-import org.auraframework.system.SourceWriter;
 import org.auraframework.throwable.AuraRuntimeException;
 
 import com.google.common.collect.Maps;
@@ -85,7 +78,6 @@ public class ParserFactory {
     };
 
     private static Map<ParserKey, Parser<?>> parsers = Maps.newHashMap();
-    private static EnumMap<Format, SourceWriter> writers = new EnumMap<>(Format.class);
 
     static {
         parsers.put(new ParserKey(Format.SVG, DefType.SVG), SVGParser.getInstance());
@@ -113,13 +105,6 @@ public class ParserFactory {
         parsers.put(new ParserKey(Format.JS, DefType.RENDERER), new JavascriptRendererParser());
         parsers.put(new ParserKey(Format.JS, DefType.RESOURCE), new JavascriptResourceParser());
         parsers.put(new ParserKey(Format.JS, DefType.TESTSUITE), new JavascriptTestSuiteParser());
-
-        writers.put(Format.XML, XMLWriter.getInstance());
-        writers.put(Format.JAVA, JavaWriter.getInstance());
-        writers.put(Format.JS, JavaScriptWriter.getInstance());
-        writers.put(Format.CSS, StyleWriter.getInstance());
-        writers.put(Format.TEMPLATE_CSS, StyleWriter.getInstance());
-        writers.put(Format.SVG, SVGWriter.getInstance());
     }
 
     /**
@@ -139,9 +124,5 @@ public class ParserFactory {
                     + ", for descriptor " + desc + " of type " + desc.getDefType());
         }
         return parser;
-    }
-
-    public static SourceWriter getWriter(Format format) {
-        return writers.get(format);
     }
 }

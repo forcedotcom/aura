@@ -18,19 +18,16 @@ package org.auraframework.impl.root;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.parser.ParserFactory;
 import org.auraframework.impl.source.SourceFactory;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.system.CacheableDefFactory;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceWriter;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -104,29 +101,10 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
 
     @Override
     public void save(RootDefinition def) {
-        Source<?> source = sourceFactory.getSource(def.getDescriptor());
-        if (source == null) {
-            throw new AuraRuntimeException("Cannot find location to save definition.");
-        }
-        // Before saving a new definition, clear the old definition in the
-        // source.
-        source.clearContents();
-        SourceWriter writer = ParserFactory.getWriter(source.getFormat());
-        writer.write(def, source);
     }
 
     @Override
     public void synchronize(RootDefinition def) {
-        DefDescriptor<?> descriptor = def.getDescriptor();
-        if (descriptor.getDefType() == DefType.COMPONENT) {
-            DefDescriptor<ComponentDef> javaDescriptor = DefDescriptorImpl.getAssociateDescriptor(descriptor,
-                    ComponentDef.class, "java");
-            Source<?> source = sourceFactory.getSource(javaDescriptor);
-            if (source != null) {
-                SourceWriter writer = ParserFactory.getWriter(source.getFormat());
-                writer.write(def, source);
-            }
-        }
     }
 
     @Override

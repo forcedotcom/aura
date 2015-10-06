@@ -76,7 +76,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
 
     private final Lock rLock;
-    private final Lock wLock;
 
     private final Cache<DefDescriptor<?>, Boolean> existsCache;
     private final Cache<DefDescriptor<?>, Optional<? extends Definition>> defsCache;
@@ -119,7 +118,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         this.delegateRegistries = delegate;
         this.original = original;
         this.rLock = acs.getReadLock();
-        this.wLock = acs.getWriteLock();
         this.existsCache = acs.getExistsCache();
         this.defsCache = acs.getDefsCache();
         this.depsCache = acs.getDepsCache();
@@ -1205,18 +1203,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         return def;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <D extends Definition> void save(@Nonnull D def) {
-        wLock.lock();
-        try {
-            getRegistryFor((DefDescriptor<D>) def.getDescriptor()).save(def);
-            invalidate(def.getDescriptor());
-        } finally {
-            wLock.unlock();
-        }
-    }
-
     @Override
     public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
         boolean cacheable;
@@ -1441,22 +1427,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
         return filtered;
-    }
-
-    @Override
-    public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
-        defs.clear();
-        if (localDescs != null) {
-            localDescs.clear();
-        }
-        localDependencies.clear();
-        if (shouldCache(descriptor)) {
-            depsCache.invalidateAll();
-            defsCache.invalidateAll();
-            existsCache.invalidateAll();
-            descriptorFilterCache.invalidateAll();
-        }
-        return false;
     }
 
     private String getKey(DependencyEntry de, DefDescriptor<?> descriptor, String key) {

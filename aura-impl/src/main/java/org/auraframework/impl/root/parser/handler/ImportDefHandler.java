@@ -90,11 +90,6 @@ public class ImportDefHandler extends XMLHandler<ImportDefImpl> {
     }
 
     @Override
-    public void writeElement(ImportDefImpl def, Appendable out) {
-        // Do nothing
-    }
-
-    @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }

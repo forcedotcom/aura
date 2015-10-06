@@ -15,16 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import org.auraframework.Aura;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
 import org.auraframework.def.TokenDescriptorProviderDef;
@@ -34,23 +30,19 @@ import org.auraframework.def.TokensImportDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.Component;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**
  * Handler for aura:tokens tags.
  */
 public final class TokensDefHandler extends RootTagHandler<TokensDef> {
-    protected static final String TAG = "aura:tokens";
+    public static final String TAG = "aura:tokens";
     private static final String ATTRIBUTE_EXTENDS = "extends";
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_MAP_PROVIDER = "mapProvider";
@@ -168,18 +160,5 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
         builder.setLocation(startLocation);
 
         return builder.build();
-    }
-
-    @Override
-    public void writeElement(TokensDef def, Appendable out) throws IOException {
-        try {
-            Map<String, Object> attributes = ImmutableMap.<String, Object>of("def", def);
-            DefinitionService defService = Aura.getDefinitionService();
-            DefDescriptor<ComponentDef> tmplDesc = defService.getDefDescriptor("auradev:saveTokenList", ComponentDef.class);
-            Component tmpl = Aura.getInstanceService().getInstance(tmplDesc, attributes);
-            Aura.getRenderingService().render(tmpl, out);
-        } catch (QuickFixException x) {
-            throw new AuraError(x);
-        }
     }
 }

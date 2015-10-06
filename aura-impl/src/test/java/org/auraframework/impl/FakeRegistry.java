@@ -68,11 +68,6 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public <D extends Definition> void save(D def) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public <D extends Definition> boolean exists(DefDescriptor<D> descriptor) {
         throw new UnsupportedOperationException();
     }
@@ -98,11 +93,6 @@ public class FakeRegistry implements MasterDefRegistry {
     @Override
     public Map<DefDescriptor<?>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads) {
         return null;
-    }
-
-    @Override
-    public <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor) {
-        return false;
     }
 
     @Override

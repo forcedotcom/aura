@@ -74,13 +74,13 @@ public class LoggingContextImpl implements LoggingContext {
             }
             for (Map.Entry<String, Timer> timerEntry : timers.entrySet()) {
                 Long timeSinceMark = timerEntry.getValue().getTimeSince(actionName);
-                if (timeSinceMark != null && timeSinceMark > 0L) {
+                if (timeSinceMark > 0L) {
                     actionStatsMap.put(timerEntry.getKey(), timeSinceMark);
                 }
             }
             for (Map.Entry<String, Counter> counterEntry : counters.entrySet()) {
                 Long countSinceMark = counterEntry.getValue().getCountSince(actionName);
-                if (countSinceMark != null && countSinceMark > 0L) {
+                if (countSinceMark > 0L) {
                     actionStatsMap.put(counterEntry.getKey(), countSinceMark);
                 }
             }

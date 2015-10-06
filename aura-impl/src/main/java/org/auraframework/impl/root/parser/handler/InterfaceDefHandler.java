@@ -174,11 +174,6 @@ public class InterfaceDefHandler extends RootTagHandler<InterfaceDef> {
     }
 
     @Override
-    public void writeElement(InterfaceDef def, Appendable out) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     protected RootDefinitionBuilder<InterfaceDef> getBuilder() {
         return builder;
     }

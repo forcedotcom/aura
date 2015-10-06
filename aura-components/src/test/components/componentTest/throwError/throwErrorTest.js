@@ -16,17 +16,17 @@
 ({
 	setUp: function() {
         this._expectErrorReRender = 
-        	"rerender threw an error in 'markup://componentTest:throwError' : caught \"error from re-render\"";
+        	"rerender threw an error in 'markup://componentTest:throwError'";
         this._expectErrorUnRender =
-        	"Unrender threw an error in markup://componentTest:throwError : caught \"error from un-render\"";
+        	"Unrender threw an error in markup://componentTest:throwError";
         this._expectErrorReRenderInner =
-        	"rerender threw an error in 'markup://componentTest:throwErrorInner' : caught \"error from re-render[inner]\"";
+        	"rerender threw an error in 'markup://componentTest:throwErrorInner'";
         this._expectErrorUnRenderInner =
-        	"Unrender threw an error in markup://componentTest:throwErrorInner : caught \"error from un-render[inner]\"";
+        	"Unrender threw an error in markup://componentTest:throwErrorInner";
     },
     
 	//This test check the case when we throw error from this cmp's JS re-render
-    testReRenderThrowError: {
+    _testReRenderThrowError: {
     	attributes: {"throwErrorFromReRender": true},
         test: [
             function(cmp){
@@ -55,8 +55,11 @@
     	attributes: {"throwErrorFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError(this._expectErrorUnRender);
-            	$A.unrender(cmp);
+                try {
+                    $A.unrender(cmp);
+                } catch (e) {
+                    $A.test.assertEquals(this._expectErrorUnRender, e.message);
+                }
             }, function(cmp) {
             	cmp.set("v.throwErrorFromUnRender", false);
             }
@@ -64,7 +67,7 @@
     },
     
     //This test check the case where inner cmp throws error from its JS re-render
-    testReRenderInnerThrowError: {
+    _testReRenderInnerThrowError: {
     	attributes: {"throwErrorInnerFromReRender": true},
         test: [
             function(cmp){
@@ -82,8 +85,11 @@
     	attributes: {"throwErrorInnerFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError(this._expectErrorUnRenderInner);
-            	$A.unrender(cmp.find("innerCmp"));
+                try {
+                    $A.unrender(cmp.find("innerCmp"));
+                } catch (e) {
+                    $A.test.assertEquals(this._expectErrorUnRenderInner, e.message);
+                }
             }, function(cmp) {
             	cmp.set("v.throwErrorInnerFromUnRender", false);
             }
@@ -92,7 +98,7 @@
     
     //This test check when both this cmp and the inner one throw error from JS re-render
     //notice that we throw from the innerCmp first, unlike testInnerCmpCreatedAsyncReRenderBothThrowError
-    testReRenderBothThrowError: {
+    _testReRenderBothThrowError: {
     	attributes: {"throwErrorInnerFromReRender": true, "throwErrorFromReRender": true},
         test: [
             function(cmp){
@@ -114,10 +120,13 @@
     	attributes: {"throwErrorInnerFromUnRender": true, "throwErrorFromUnRender": true},
         test: [
             function(cmp){
-            	$A.test.expectAuraError(this._expectErrorUnRender);
             	//now unrender this cmp
             	//we can choose to unrender innerCmp here, if we do that, the innerCmp's un-render will get hit, but the outer one won't
-            	$A.unrender(cmp);
+                try {
+                    $A.unrender(cmp);
+                } catch (e) {
+                    $A.test.assertEquals(this._expectErrorUnRender, e.message);
+                }
             }, function(cmp) {
             	//we need to unset throwErrorFromReRender, or the cmp will get re-rendered again when this test finish
             	cmp.set("v.throwErrorFromReRender", false);
@@ -127,7 +136,7 @@
     
     //This test create a cmp (Async) then insert it into throwError.cmp, change the newCmp's attribute, trigger the re-render
     //then verify the error is thrown from newCmp
-    testInnerCmpCreatedAsyncReRenderThrowError : {
+    _testInnerCmpCreatedAsyncReRenderThrowError : {
     	test: [
     	       function(cmp) {
     	    	   $A.componentService.newComponentAsync(this, function(newCmp){
@@ -175,11 +184,14 @@
                        }
                    });
     	       }, function(cmp) {
-    	    	   $A.test.expectAuraError(this._expectErrorUnRenderInner);
     	    	   var newCmpLst = cmp.get('v.newCmp');
     	           $A.test.assertEquals(1,newCmpLst.length);
     	           var newCmp = newCmpLst[0];
-    	           $A.unrender(newCmp);
+                   try {
+                        $A.unrender(newCmp);
+                   } catch (e) {
+                        $A.test.assertEquals(this._expectErrorUnRenderInner, e.message);
+                   }
     	       },  function(cmp) {
     	    	   var newCmpLst = cmp.get('v.newCmp');
     	           $A.test.assertEquals(1,newCmpLst.length);
@@ -192,7 +204,7 @@
     //This test create a newCmp (Async), insert it into throwError.cmp. then change attribute in throwError.cmp and newCmp.
     //Notice#1: the inserting itself will trigger re-render of throwError cmp, which will throw the error
     //Notice#2: the throwError re-render is hit before the newCmp one, unlike testReRenderBothThrowError
-    testInnerCmpCreatedAsyncReRenderBothThrowError : {
+    _testInnerCmpCreatedAsyncReRenderBothThrowError : {
     	attributes: {"throwErrorFromReRender": true},
     	test: [
     	       function(cmp) {
@@ -255,8 +267,11 @@
                        }
                    });
     	       }, function(cmp) {
-    	    	   $A.test.expectAuraError(this._expectErrorUnRender);
-    	    	   $A.unrender(cmp);
+                   try {
+                        $A.unrender(cmp);
+                   } catch (e) {
+                        $A.test.assertEquals(this._expectErrorUnRender, e.message);
+                   }
     	       },  function(cmp) {
     	    	   cmp.set("v.throwErrorFromUnRender", false);
     	    	   var newCmpLst = cmp.get('v.newCmp');

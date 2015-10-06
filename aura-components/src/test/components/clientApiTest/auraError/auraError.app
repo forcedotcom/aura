@@ -24,8 +24,8 @@
 
     <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
 
-    <ui:button label="Throw Aura Error" press="{!c.throwAuraError}" class="auraErrorButton" />
+    <ui:button label="Throw Error" press="{!c.throwError}" class="errorButton" />
     <ui:button label="Failing Assert" press="{!c.failAssert}" class="assertButton" />
     <ui:button label="Throw Friendly Error" press="{!c.throwFriendlyError}" class="friendlyErrorButton" />
-    <ui:button label="Throw Aura Error with errorCode" press="{!c.throwErrorWithCode}" class="errorCodeButton" />
+    <ui:button label="Throw Friendly Error with errorCode" press="{!c.throwErrorWithCode}" class="errorCodeButton" />
 </aura:application>

@@ -83,7 +83,8 @@
 	 * Do not set tag attributes on html component.
 	 * W-1538544
 	 */
-	testTagNotSet: {
+	// auraErrorsExpectedDuringInit is not supported.
+	_testTagNotSet: {
 	    auraErrorsExpectedDuringInit:["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
 	    attributes:{testNoTagAttr:true},
 	    	test: function(component){
@@ -97,7 +98,8 @@
 	 * Set tag attribute on html component to an undefined value.
 	 * W-1538544 
 	 */
-	testUndefinedTagAttr: {
+	// auraErrorsExpectedDuringInit is not supported.
+	_testUndefinedTagAttr: {
 	    auraErrorsExpectedDuringInit : ["Undefined tag attribute for", "Undefined tag attribute for", "Undefined tag attribute for"],
 	    attributes:{testUndefinedTagAttr:true},
 		test: function(component){

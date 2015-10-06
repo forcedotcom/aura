@@ -199,13 +199,14 @@
     testClientProvidedServerDependent: {
         attributes:{ newDescriptor:"markup://provider:clientProvider", newAttributes:"{value:\"{componentDef:'markup://provider:cmpWithModel',attributes:{value:'secondThing'}}\"}"},
         test:function(cmp){
-            $A.test.expectAuraError("Assertion Failed!: Client provided component cannot have server dependencies: markup://provider:cmpWithModel : undefined");
-            $A.run(function(){
-                cmp.get('c.createComponent').runDeprecated();
-            });
-            var error = $A.test.getAuraErrorMessage();
-            $A.test.assertTrue(error.indexOf("Client provided component cannot have server dependencies") != -1,
-                "Incorrect error message when creating client provided server dependent component");
+            try {
+                $A.run(function(){
+                    cmp.get('c.createComponent').runDeprecated();
+                });
+            } catch (e) {
+                $A.test.assertTrue(e.message.indexOf("Client provided component cannot have server dependencies") != -1,
+                    "Incorrect error message when creating client provided server dependent component");
+            }
         }
     }
 })

@@ -161,12 +161,8 @@
             e.fire();
         } else {
             this.showLoading(component, false);
-            this.handleError(component, "Index is out of bounds for list's data provider trigger.");
+            component.getConcreteComponent()._refreshing = false;
+            throw new $A.auraError("Index is out of bounds for list's data provider trigger.");
         }
-    },
-
-    handleError: function(cmp, errorMsg) {
-        cmp.getConcreteComponent()._refreshing = false;
-        $A.error(errorMsg);
     }
 })// eslint-disable-line semi

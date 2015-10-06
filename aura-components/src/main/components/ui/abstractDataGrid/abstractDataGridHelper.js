@@ -71,7 +71,7 @@
 	 * @param {Component} AbstractDataGrid component
 	 */
     deriveItemShape: function () {
-    	$A.error('Unimplemented function in abstractDataGridHelper');
+    	throw new $A.auraError('Unimplemented function in abstractDataGridHelper');
     },
 
     /**
@@ -89,7 +89,7 @@
 	 * @param {Component} AbstractDataGrid component
 	 */
 	handleModeChange: function () {
-		$A.error('Unimplemented function in abstractDataGridHelper');
+		throw new $A.auraError('Unimplemented function in abstractDataGridHelper');
 	},
 
 	/**
@@ -98,7 +98,7 @@
 	 * @param {Component} concrete component
 	 */
 	handleSortByChange: function () {
-		$A.error('Unimplemented function in abstractDataGridHelper');
+		throw new $A.auraError('Unimplemented function in abstractDataGridHelper');
 	},
 
 	/**
@@ -108,6 +108,6 @@
 	 * @param {Object} params from ui:dataGridInsert
 	 */
 	handleAddRemove: function () {
-		$A.error('Unimplemented function in abstractDataGridHelper');
+		throw new $A.auraError('Unimplemented function in abstractDataGridHelper');
 	}
 })// eslint-disable-line semi

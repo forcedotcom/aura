@@ -66,9 +66,7 @@ AuraStorageService.prototype.getStorages = function() {
  * @export
  */
 AuraStorageService.prototype.initStorage = function(name, persistent, secure, maxSize, defaultExpiration, defaultAutoRefreshInterval, debugLoggingEnabled, clearStorageOnInit, version) {
-    if (this.storages[name]) {
-        $A.error("Storage named '" + name + "' already exists!");
-    }
+    $A.assert(!this.storages[name], "Storage named '" + name + "' already exists!");
 
     var adapter = this.createAdapter(this.selectAdapter(persistent, secure), name, maxSize, debugLoggingEnabled);
 
@@ -104,12 +102,7 @@ AuraStorageService.prototype.initStorage = function(name, persistent, secure, ma
  */
 AuraStorageService.prototype.registerAdapter = function(config) {
     var name = config["name"];
-
-    if (this.adapters[name]) {
-        $A.error("AuraStorageService.registerAdapter() adapter '" + name + "' already registered!");
-        return;
-    }
-
+    $A.assert(!this.adapters[name], "AuraStorageService.registerAdapter() adapter '" + name + "' already registered!");
     this.adapters[name] = config;
 };
 
@@ -151,9 +144,7 @@ AuraStorageService.prototype.getAdapterConfig = function(adapter) {
  */
 AuraStorageService.prototype.createAdapter = function(adapter, name, maxSize, debugLoggingEnabled) {
     var config = this.adapters[adapter];
-    if (!config) {
-        $A.error("AuraStorageService.createAdapter() unknown adapter '" + adapter + "'!");
-    }
+    $A.assert(config, "AuraStorageService.createAdapter() unknown adapter '" + adapter + "'!");
 
     var AdapterClass = config["adapterClass"];
 
@@ -196,7 +187,7 @@ AuraStorageService.prototype.selectAdapter = function(persistent, secure) {
     }
 
     if (candidates.length === 0) {
-        $A.error("AuraStorageService.selectAdapter() unable to find a secure adapter implementation!");
+        $A.warning("AuraStorageService.selectAdapter() unable to find a secure adapter implementation!");
         return null;
     }
 

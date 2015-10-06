@@ -25,7 +25,7 @@
                 if (action.getState() === "SUCCESS") {
                     retValue = action.getReturnValue();
                 } else {
-                    $A.error("Action failed: " + name);
+                    throw new $A.auraError("Action failed: " + name);
                 }
                 //var output =  cmp.find("outputValue").get("v.value");
                 var output =  cmp.find("outputValue").get("v.value");

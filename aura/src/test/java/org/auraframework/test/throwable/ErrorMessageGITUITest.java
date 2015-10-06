@@ -56,12 +56,6 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
                 findDomElement(ERROR_MASK_LOCATOR), false);
     }
 
-    public void testFriendlyErrorFiresSystemError() throws Exception {
-        open("/clientApiTest/auraError.app");
-        findDomElement(By.cssSelector(".friendlyErrorButton")).click();
-        waitForCondition("return $A.getRoot().get('v.systemErrorHandled')");
-    }
-
     public void testFriendlyErrorDisplaysErrorIfNotHandled_DevMode() throws Exception {
         open("/clientApiTest/auraError.app?setFriendlyErrorHandled=false", Mode.DEV);
         findDomElement(By.cssSelector(".friendlyErrorButton")).click();
@@ -95,14 +89,14 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
 
     public void testAuraError_DevMode() throws Exception {
         open("/clientApiTest/auraError.app", Mode.DEV);
-        findDomElement(By.cssSelector(".auraErrorButton")).click();
+        findDomElement(By.cssSelector(".errorButton")).click();
         assertDisplayedErrorMessage("Controller Error Test");
         assertStacktracePresent();
     }
 
     public void testAuraError_ProdMode() throws Exception {
         open("/clientApiTest/auraError.app", Mode.PROD);
-        findDomElement(By.cssSelector(".auraErrorButton")).click();
+        findDomElement(By.cssSelector(".errorButton")).click();
         assertDisplayedErrorMessage("[Message from customized handler]");
         assertDisplayedErrorMessage("Controller Error Test");
         assertNoStacktracePresent();
@@ -110,7 +104,7 @@ public class ErrorMessageGITUITest extends WebDriverTestCase {
 
     public void testAuraErrorHandledByDefaultHandler() throws Exception {
         open("/clientApiTest/auraError.app?handleSystemErrorEvent=false", Mode.DEV);
-        findDomElement(By.cssSelector(".auraErrorButton")).click();
+        findDomElement(By.cssSelector(".errorButton")).click();
         assertNotDisplayedErrorMessage("[Message from customized handler]");
         assertDisplayedErrorMessage("Controller Error Test");
         assertStacktracePresent();

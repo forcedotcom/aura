@@ -400,19 +400,23 @@ Test.Aura.Controller.ActionTest = function() {
         [Fact]
         function ThrowsErrorWhenNameIsInvalid() {
             // Arrange
-            var stubbedError = Stubs.GetMethod("msg", null);
             var name = "someInvalidName";
             var expected = "Action.setCallback(): Invalid callback name '" + name + "'";
+            var actual;
 
             // Act
             mockActionDependencies(function(){
+                $A.auraError = function(message) {actual = message; }
                 var target = new Aura.Controller.Action();
-                $A.error = stubbedError;
-                target.setCallback(null, function(){}, name);
-            });            
+                try {
+                    target.setCallback(null, function(){}, name);
+                } catch (e) {
+                    // ignore
+                }
+            });
 
             // Assert
-            Assert.Equal(expected, stubbedError.Calls[0].Arguments.msg);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]
@@ -478,9 +482,13 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockActionDependencies(function(){
-                $A.error = function(msg){ actual = msg; };
+                $A.assert = function(condition, message) { if(!condition) actual = message; }
                 var target = new Aura.Controller.Action();
-                target.setCallback(undefined, undefined, "bogus");
+                try {
+                    target.setCallback(undefined, undefined, "bogus");
+                } catch (e) {
+                    // ignore
+                }
             })
 
             // Assert
@@ -525,6 +533,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockContext(function() {
+                $A.assert = function() {};
                 target.setAllAboardCallback(expectedScope, expectedCallback);
             });
 

@@ -733,10 +733,11 @@ AuraInstance.prototype.getCallback = function(callback) {
             return callback.apply(this,Array.prototype.slice.call(arguments));
         } catch (e) {
             // Should we even allow 'nested'?
-            if (nested) {
+            // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their own custom experience.
+            if (nested || e instanceof $A.auraFriendlyError) {
                 throw e;
             } else {
-                $A.error("Uncaught error in "+name, e);
+                throw new $A.auraError("Uncaught error in "+name, e);
             }
         } finally {
             $A.clientService.popStack(name);
@@ -911,10 +912,11 @@ AuraInstance.prototype.run = function(func, name) {
     try {
         return func();
     } catch (e) {
-        if (nested) {
+        // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their own custom experience.
+        if (nested || e instanceof $A.auraFriendlyError) {
             throw e;
         } else {
-            $A.error("Uncaught error in "+name, e);
+            throw (e instanceof $A.auraError) ? e : new $A.auraError("Uncaught error in "+name, e);
         }
     } finally {
         $A.services.client.popStack(name);

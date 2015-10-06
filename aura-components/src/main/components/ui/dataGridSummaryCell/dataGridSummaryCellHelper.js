@@ -67,7 +67,7 @@
 			}
 		}
 		else {
-			$A.error('Unsupported aggregate function.');
+			throw new $A.auraError('Unsupported aggregate function.');
 		}
 	},
 

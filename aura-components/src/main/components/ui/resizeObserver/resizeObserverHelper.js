@@ -77,7 +77,7 @@
         if (!$A.util.isUndefined(resizer._resizerComponentSet)) {
             var id = component.getGlobalId();
             if (!(delete resizer._resizerComponentSet[id])) {
-                $A.error("os:resizeObserver.remove() called with unregistered component " + id);
+                throw new $A.auraError("os:resizeObserver.remove() called with unregistered component " + id);
             }
         }
     },

@@ -80,36 +80,6 @@ TestInstance.prototype.clearExpected = function(pre, expected) {
 };
 
 /**
- * Register a global error handler to catch uncaught javascript errors.
- * 
- * @ignore
- */
-window.onerror = (function() {
-    var origHandler = window.onerror;
-    /** @inner */
-    var newHandler = function(msg, url, line) {
-        var error = {
-            message : "Uncaught js error: " + msg
-        };
-        if (url) {
-            error["url"] = url;
-        }
-        if (line) {
-            error["line"] = line;
-        }
-        TestInstance.prototype.errors.push(error);
-    };
-
-    if (origHandler) {
-        return function() {
-            return origHandler.apply(this, arguments) || newHandler.apply(this, arguments);
-        };
-    } else {
-        return newHandler;
-    }
-})();
-
-/**
  * Used to keep track of errors happening in test modes.
  * 
  * @private
@@ -308,11 +278,15 @@ TestInstance.prototype.continueWhenReady = function() {
             }
         }
     } catch (e) {
-        if (this.lastStage) {
-            e["lastStage"] = this.lastStage;
+        if (e instanceof $A.auraError) {
+            throw e;
+        } else {
+            if (this.lastStage) {
+                e["lastStage"] = this.lastStage;
+            }
+            this.logError("Test error", e);
+            this.doTearDown();
         }
-        this.logError("Test error", e);
-        this.doTearDown();
     }
 };
 

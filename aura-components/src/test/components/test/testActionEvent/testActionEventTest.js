@@ -104,12 +104,12 @@
                        eventParamName:"msg",
                        eventParamValue:"foo!" },
         test: function(cmp){
-        	//Override aura.error() with custom verification because the error messages are different depending on ExceptionAdapter.
-        	$A.test.overrideFunction($A, "error", 
+        	//Override aura.warning() with custom verification because the error messages are different depending on ExceptionAdapter.
+        	$A.test.overrideFunction($A, "warning", 
         			function(dispMsg) {
         				$A.test.assertTrue(
-        						dispMsg.indexOf("An internal server error has occurred")===0 || 
-        						dispMsg.indexOf("Unable to process your request")===0,
+                                dispMsg.indexOf("An internal server error has occurred") > -1 ||
+        						dispMsg.indexOf("Unable to process your request") > -1,
         						"display message doesn't have key words we expect, message we got:"+dispMsg);
         				$A.message(dispMsg);
         			});
@@ -118,11 +118,11 @@
                     false,
                     $A.test.isActionPending,
                     function () {
-                    	$A.test.assertTrue(
-	                		$A.test.getAuraErrorMessage().
-	                		indexOf("org.auraframework.throwable.AuraRuntimeException: "+
-                				"org.auraframework.throwable.quickfix.DefinitionNotFoundException: " +
-                				"No EVENT named markup://test:testActionEventEventNonExistant found")!=-1, "Failed to see quick fix exception message");
+                        $A.test.assertTrue(
+                           $A.test.getAuraErrorMessage().
+                           indexOf("org.auraframework.throwable.AuraRuntimeException: "+
+                               "org.auraframework.throwable.quickfix.DefinitionNotFoundException: " +
+                               "No EVENT named markup://test:testActionEventEventNonExistant found")!=-1, "Failed to see quick fix exception message");
                     }
                 );
         }

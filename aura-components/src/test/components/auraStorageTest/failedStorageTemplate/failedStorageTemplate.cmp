@@ -45,7 +45,7 @@
 
             // create the magic "actions" store. the requested attributes (notably persistence) will
             // cause our mock adapter to be selected
-            $A.storageService.initStorage("actions", true, true, 2048, 200, 300, true, true);
+            $A.storageService.initStorage("actions", true, true, 4096, 200, 300, true, true);
         </script>
     </aura:set>
 

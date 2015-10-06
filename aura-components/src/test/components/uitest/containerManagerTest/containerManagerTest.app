@@ -18,7 +18,7 @@
 
 <aura:application>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-
+    <aura:attribute name="useContainer" type="Boolean" default="false"/>
     <aura:dependency resource="markup://uiExamples:modalContent" type="COMPONENT"/>
     <aura:dependency resource="markup://uiExamples:panelHeader" type="COMPONENT"/>
     <aura:dependency resource="markup://uiExamples:panelFooter" type="COMPONENT"/>
@@ -31,12 +31,12 @@
 
     <div class="reference">This is a reference element</div>
 
-    <ui:panelManager2 aura:id="pm" useSharedContainer="true">
+    <ui:panelManager2 aura:id="pm" useSharedContainer="{!v.useContainer}">
         <aura:set attribute="registeredPanels">
             <ui:panel alias="panel"/>
             <ui:modal alias="modal"/>
         </aura:set>
     </ui:panelManager2>
-    <ui:containerManager/>
+    <ui:containerManager aura:id="cm"/>
 
 </aura:application>

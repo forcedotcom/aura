@@ -16,7 +16,6 @@
 ({
     init: function (cmp, event, helper) {
         cmp.bodyCounter = 0;
-        helper.setReferenceElement();
     },
 
     createPanel: function(cmp, event, helper) {
@@ -27,7 +26,7 @@
             panelType   :'panel',
             visible: true,
             panelConfig : {
-                referenceElementSelector: helper.globalRef,
+                'class': 'shift',
                 showPointer: true,
                 useTransition: false,
                 showCloseButton: true,
@@ -45,14 +44,9 @@
                 $A.log('panel created ' + panel);
                 var panelEl = panel.getElement();
                 panelEl.id = 'panel_'+cmp.bodyCounter;
-                helper.setReferenceElement(panelEl.id);
-
-                if(helper.globalPanelRefs.length >= 1) {
-                    helper.bringToFrontDelegate();
-                }
+                panelEl.style.marginLeft = (30 * cmp.bodyCounter) + 'px';
                 helper.globalPanelRefs.push(panel);
             }
-
         }).fire();
     },
 

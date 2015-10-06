@@ -19,17 +19,187 @@
     //Test turning off shared container sets panels as child of panel manager and sets zindexes accordingly
     //Test public apis from stack manager bringToFront, sendToBack, setStackingContextRoot
     //Test multiple panel managers with container manager together
+    //Destroy a panel and assert zindex shuffle
+    //Garbage connection on destroy all panels
 
     browsers: ["-IE7","-IE8"],
 
     testUseSharedContainer: {
-        test: [function(cmp) {
-            $A.test.addWaitFor();
-            cmp.find("create").get("e.press").fire();
-        }, function(cmp) {
+        attributes: {"useContainer": true},
+        test: function(cmp) {
+            var containerManager = cmp.find("cm").getElement();
+            var button = cmp.find("create").getElement();
+            var i = 1;
+            while(i <= 5) {
+                button.click();
+                i++;
+            }
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return ($A.test.select(".uiPanel").length === 5);
+            }, "Failed to create 5 panels.", function() {
+                cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
+                    var panelEl = panel.getElement();
+                    $A.test.assertEquals(containerManager, panelEl.parentNode,
+                        "Failed to match parentNode for panel id: " + panelEl.id);
 
+                    $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
+                        "Incorrect z-index value for panel id: " + panelEl.id);
+                });
+            });
+        }
+    },
+
+    testDoesNotUseSharedContainer: {
+        attributes: {"useContainer": false},
+        test: function(cmp) {
+            var panelManager = cmp.find("pm").getElement();
+            var button = cmp.find("create").getElement();
+            var i = 1;
+            while(i <= 5) {
+                button.click();
+                i++;
+            }
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return ($A.test.select(".uiPanel").length === 5);
+            }, "Failed to create 5 panels.", function() {
+                cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
+                    var panelEl = panel.getElement();
+
+                    $A.test.assertEquals(panelManager, panelEl.parentNode,
+                        "Failed to match parentNode for panel id: " + panelEl.id);
+
+                    $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
+                        "Incorrect z-index value for panel id: " + panelEl.id);
+                });
+            });
+        }
+    },
+
+    testStackManager: {
+        attributes: {"useContainer": "true"},
+        test: [function(cmp) {
+            var button = cmp.find("create").getElement();
+            var i = 1;
+            while(i <= 5) {
+                button.click();
+                i++;
+            }
+            //initial   panel_id => zIndex
+            //panel_1 => 1  panelRefs[0]
+            //panel_2 => 2  panelRefs[1]
+            //panel_3 => 3  panelRefs[2]
+            //panel_4 => 4  panelRefs[3]
+            //panel_5 => 5  panelRefs[4]
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return ($A.test.select(".uiPanel").length === 5);
+            }, "Failed to create 5 panels.");
+        }, function(cmp) {
+            var panelRefs = cmp.getDef().getHelper().globalPanelRefs;
+            var containerManager = cmp.find("cm").getElement();
+            var length = panelRefs.length;
+
+            //after sendToBack
+            //reverse loop
+            //panel_5 => 5   =>sendToBack    0,1,2,3,4
+            //panel_4 => 4   =>sendToBack    0,1,2,3
+            //panel_3 => 3   =>sendToBack    0,1,2
+            //panel_2 => 2   =>sendToBack    0,1
+            //panel_1 => 1   =>sendToBack    0
+            panelRefs.slice(0,5).reverse().forEach(function(panel) {
+                var panelEl = panel.getElement();
+                cmp.getDef().getHelper().smLib.stackManager.sendToBack(panelEl);
+            });
+            panelRefs.forEach(function(panel, index) {
+                var panelEl = panel.getElement();
+                $A.test.assertEquals(index, parseInt(panelEl.style.zIndex),
+                    "(sendToBack) Incorrect z-index value for panel id: " + panelEl.id);
+            });
+
+            //after bringToFront
+            //regular loop
+            //panel_1 => 1   =>bringToFront    5
+            //panel_2 => 2   =>bringToFront    5,6
+            //panel_3 => 3   =>bringToFront    5,6,7
+            //panel_4 => 4   =>bringToFront    5,6,7,8
+            //panel_5 => 5   =>bringToFront    5,6,7,8,9
+            panelRefs.forEach(function(panel) {
+                var panelEl = panel.getElement();
+                cmp.getDef().getHelper().smLib.stackManager.bringToFront(panelEl);
+            });
+
+            panelRefs.forEach(function(panel, index) {
+                var panelEl = panel.getElement();
+                $A.test.assertEquals((index+length), parseInt(panelEl.style.zIndex),
+                    "(bringToFront) Incorrect z-index value for panel id: " + panelEl.id);
+            });
+        }, function(cmp) {
+            var panelRefs = cmp.getDef().getHelper().globalPanelRefs;
+            var panel_2 = panelRefs[1];
+
+            //delete panel_2 and assert newly assigned zIndexes
+            var globalId = panel_2.getGlobalId();
+            var destroyedId = panel_2.destroy();
+
+            //1 - 5, 3-7, 4-8, 5-9
+            //this might be a bug, since z-index did not get re-computed when
+            //an intermediate panel was destroyed
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return true;
+            }, "Failed to destroy panel", function(){
+                panelRefs.splice(1,1);
+
+                var temp;
+                temp = panelRefs[0].getElement();
+                $A.test.assertEquals(parseInt(temp.style.zIndex), 5,
+                    "Incorrect zIndex for panel id:" + temp.id);
+                temp = panelRefs[1].getElement();
+                $A.test.assertEquals(parseInt(temp.style.zIndex), 7,
+                    "Incorrect zIndex for panel id:" + temp.id);
+                temp = panelRefs[2].getElement();
+                $A.test.assertEquals(parseInt(temp.style.zIndex), 8,
+                    "Incorrect zIndex for panel id:" + temp.id);
+                temp = panelRefs[3].getElement();
+                $A.test.assertEquals(parseInt(temp.style.zIndex), 9,
+                    "Incorrect zIndex for panel id:" + temp.id);
+            });
         }]
     },
+
+    testGarbageCollection: {
+        attributes: {"useContainer": "true"},
+        test: [function(cmp) {
+            var button = cmp.find("create").getElement();
+            var queryString = $A.getQueryStatement().from("component")
+                .field("descriptor", "getDef().getDescriptor().toString()")
+                .groupBy("descriptor");
+
+            var i = 1;
+            while(i <= 5) {
+                button.click();
+                i++;
+            }
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return ($A.test.select(".uiPanel").length === 5);
+            }, "Failed to create 5 panels.");
+
+            $A.test.assertEquals(5, queryString.query().groups['markup://ui:panel'].length, "Incorrect initial component count");
+        }, function(cmp) {
+            var containerManager = cmp.find("cm");
+            var queryString = $A.getQueryStatement().from("component")
+                .field("descriptor", "getDef().getDescriptor().toString()")
+                .groupBy("descriptor");
+
+            //destroy container manager
+            var globalId = containerManager.getGlobalId();
+            var destroyedId = containerManager.destroy();
+            $A.test.addWaitForWithFailureMessage(globalId, function(){
+                return (destroyedId);
+            }, "Failed to destroy containerManager");
+
+            var actual = queryString.query().groups['markup://ui:panel'];
+            $A.test.assertUndefined(actual, "Failed to destroy the panels contained in containerManager");
+        }]
+    }
 
 
 })

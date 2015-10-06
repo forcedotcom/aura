@@ -28,8 +28,7 @@
     background-color: #8AC007;
 }
 
-.THIS.reference {
-    background-color: #0683C5;
-    position: relative;
-    top: 400px;
+.THIS .shift {
+    border: 1px solid blue;
+    margin-top: 100px;
 }

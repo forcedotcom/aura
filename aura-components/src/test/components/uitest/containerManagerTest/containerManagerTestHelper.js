@@ -15,24 +15,6 @@
  */
 ({
 
-    globalRef: null,
-    globalPanelRefs : [],
-
-    setReferenceElement: function(id) {
-        this.globalRef = (id ? '#'+id : '.reference');
-    },
-
-    bringToFrontDelegate: function() {
-        var stackManager = this.smLib.stackManager;
-        stackManager.bringToFront(this.globalPanelRefs.pop());
-    },
-
-    turnOffSharedContainer: function() {
-        $A.find('pm').set('v.useSharedContainer', "false");
-    },
-
-    turnOnSharedContainer: function() {
-        $A.find('pm').set('v.useSharedContainer', "true");
-    }
+    globalPanelRefs : []
 
 })

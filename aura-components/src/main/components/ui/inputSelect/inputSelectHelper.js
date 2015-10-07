@@ -64,7 +64,7 @@
     /**
      * Updates all options' "selected" attributes in the select element, based on the semicolon-delimited newValue string
      */
-    updateOptionsFromValue: function (cmp) {
+    updateOptionsFromValue: function (cmp, createNewOptions) {
         if (cmp._suspendChangeHandlers) {
             return;
         }
@@ -94,7 +94,7 @@
             newValues = [valueOrEmpty];
         }
 
-        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues) && !(isMultiple && value === "")) {
+        if (!optionsPack.strategy.updateOptions(cmp, optionsPack.options, newValues, createNewOptions) && !(isMultiple && value === "")) {
             this.updateValueFromOptions(cmp, optionsPack);
         } else {
             cmp._suspendChangeHandlers = true;
@@ -161,7 +161,7 @@
     optionsStrategy: {
 
         // If an option is in newValues, we want to select it
-        updateOptions: function (cmp, options, newValues) {
+        updateOptions: function (cmp, options, newValues, createNewOptions) {
             var found = false;
 
             for (var i = 0; i < options.length; i++) {
@@ -174,6 +174,16 @@
 
                 found = found || selectOption;
                 option.selected = selectOption;
+            }
+
+            if (!found && createNewOptions) {
+                for (var i=0; i<newValues.length; i++) {
+                    options.unshift({
+                        label: newValues[i],
+                        value: newValues[i],
+                        selected: true
+                    });
+                }
             }
 
             return found;

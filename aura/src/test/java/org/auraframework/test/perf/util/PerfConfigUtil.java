@@ -18,7 +18,6 @@ package org.auraframework.test.perf.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,7 +57,9 @@ public final class PerfConfigUtil {
 
         for(DefDescriptor<BaseComponentDef> def : defs){
             PerfConfig componentConfig = loadConfigMapping(def);
-            configMap.put(def, componentConfig);
+            if(componentConfig!=null) {
+            	configMap.put(def, componentConfig);
+            }
         }
 
         if (contextService.isEstablished()) {
@@ -99,12 +100,8 @@ public final class PerfConfigUtil {
             } else {
                 componentsDir =  AuraFiles.Core.getPath() + "/aura-components/src/test/components";
             }
-        } catch (QuickFixException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+        	LOG.log(Level.WARNING, "Error finding component dir path for component: " + def.getNamespace() + "/" + def.getName());
         }
         return componentsDir;
     }
@@ -130,7 +127,8 @@ public final class PerfConfigUtil {
 		    	br = new BufferedReader(new FileReader(fullPath));
 	        }
 		} catch (Exception e) {
-			throw new RuntimeException("Component Config file missing at: " + componentDirPath, e);
+			LOG.log(Level.WARNING, "Component Config file missing at: " + componentDirPath + ". Cannot load component perf test for: " + componentPath, e);
+			return null;
 		}
         Gson gson = new Gson();
         PerfConfig config = gson.fromJson(br, PerfConfig.class);

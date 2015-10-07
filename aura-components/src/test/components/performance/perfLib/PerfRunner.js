@@ -157,7 +157,10 @@ function PerfRunner(COQL, Memory) {
                 }); // sync
 
                 this.setCommonMetric('finalComponentCount', $A.componentService.countComponents());
-                this.setCommonMetric('testDuration', transaction.duration);
+                
+                if (transaction) {
+                	this.setCommonMetric('testDuration', transaction.duration);
+                }
 
                 if (COQL.enabled) {
                     this.results.coql = COQL.getResults('end', 'start');

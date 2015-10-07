@@ -19,73 +19,49 @@
 
     testUseSharedContainer: {
         attributes: {"useContainer": true},
-        test: function(cmp) {
+        test: [function(cmp) {
+            this.createPanels(5, cmp);
+        }, function(cmp) {
             var containerManager = cmp.find("cm").getElement();
-            var button = cmp.find("create").getElement();
-            var i = 1;
-            while(i <= 5) {
-                button.click();
-                i++;
-            }
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                return ($A.test.select(".uiPanel").length === 5);
-            }, "Failed to create 5 panels.", function() {
-                cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
-                    var panelEl = panel.getElement();
-                    $A.test.assertEquals(containerManager, panelEl.parentNode,
-                        "Failed to match parentNode for panel id: " + panelEl.id);
+            cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
+                var panelEl = panel.getElement();
+                $A.test.assertEquals(containerManager, panelEl.parentNode,
+                    "Failed to match parentNode for panel id: " + panelEl.id);
 
-                    $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
-                        "Incorrect z-index value for panel id: " + panelEl.id);
-                });
+                $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
+                    "Incorrect z-index value for panel id: " + panelEl.id);
             });
-        }
+        }]
     },
 
     testDoesNotUseSharedContainer: {
         attributes: {"useContainer": false},
-        test: function(cmp) {
+        test: [function(cmp) {
+            this.createPanels(5, cmp);
+        }, function(cmp) {
             var panelManager = cmp.find("pm").getElement();
-            var button = cmp.find("create").getElement();
-            var i = 1;
-            while(i <= 5) {
-                button.click();
-                i++;
-            }
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                return ($A.test.select(".uiPanel").length === 5);
-            }, "Failed to create 5 panels.", function() {
-                cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
-                    var panelEl = panel.getElement();
+            cmp.getDef().getHelper().globalPanelRefs.forEach(function(panel, index){
+                var panelEl = panel.getElement();
 
-                    $A.test.assertEquals(panelManager, panelEl.parentNode,
-                        "Failed to match parentNode for panel id: " + panelEl.id);
+                $A.test.assertEquals(panelManager, panelEl.parentNode,
+                    "Failed to match parentNode for panel id: " + panelEl.id);
 
-                    $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
-                        "Incorrect z-index value for panel id: " + panelEl.id);
-                });
+                $A.test.assertEquals((index+1), parseInt(panelEl.style.zIndex),
+                    "Incorrect z-index value for panel id: " + panelEl.id);
             });
-        }
+        }]
     },
 
     testStackManager: {
         attributes: {"useContainer": "true"},
         test: [function(cmp) {
-            var button = cmp.find("create").getElement();
-            var i = 1;
-            while(i <= 5) {
-                button.click();
-                i++;
-            }
             //initial   panel_id => zIndex
             //panel_1 => 1  panelRefs[0]
             //panel_2 => 2  panelRefs[1]
             //panel_3 => 3  panelRefs[2]
             //panel_4 => 4  panelRefs[3]
             //panel_5 => 5  panelRefs[4]
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                return ($A.test.select(".uiPanel").length === 5);
-            }, "Failed to create 5 panels.");
+            this.createPanels(5, cmp);
         }, function(cmp) {
             var panelRefs = cmp.getDef().getHelper().globalPanelRefs;
             var containerManager = cmp.find("cm").getElement();
@@ -134,8 +110,8 @@
             var destroyedId = panel_2.destroy();
 
             //1 - 5, 3-7, 4-8, 5-9
-            //this might be a bug, since z-index did not get re-computed when
-            //an intermediate panel was destroyed
+            //after you destroy panel_2, z-indexes will get recomputed
+            //only if you call sendToBack or bringToFront
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return true;
             }, "Failed to destroy panel", function(){
@@ -161,20 +137,11 @@
     testGarbageCollection: {
         attributes: {"useContainer": "true"},
         test: [function(cmp) {
-            var button = cmp.find("create").getElement();
+            this.createPanels(5, cmp);
+        }, function (cmp) {
             var queryString = $A.getQueryStatement().from("component")
                 .field("descriptor", "getDef().getDescriptor().toString()")
                 .groupBy("descriptor");
-
-            var i = 1;
-            while(i <= 5) {
-                button.click();
-                i++;
-            }
-            $A.test.addWaitForWithFailureMessage(true, function() {
-                return ($A.test.select(".uiPanel").length === 5);
-            }, "Failed to create 5 panels.");
-
             $A.test.assertEquals(5, queryString.query().groups['markup://ui:panel'].length, "Incorrect initial component count");
         }, function(cmp) {
             var containerManager = cmp.find("cm");
@@ -192,7 +159,17 @@
             var actual = queryString.query().groups['markup://ui:panel'];
             $A.test.assertUndefined(actual, "Failed to destroy the panels contained in containerManager");
         }]
+    },
+
+    createPanels: function(count, cmp) {
+        var button = cmp.find("create").getElement();
+        var i = 1;
+        while(i <= count) {
+            button.click();
+            i++;
+        }
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            return ($A.test.select(".uiPanel").length === 5);
+        }, "Failed to create panels.");
     }
-
-
 })

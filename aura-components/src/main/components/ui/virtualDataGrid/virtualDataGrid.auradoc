@@ -36,6 +36,7 @@
             {!item.id}
             {!item.name}
         &lt;/aura:set>
+    &lt;/ui:virtualDataGrid>
 &lt;/aura:component></pre>
 		</p>
 		<p>This client-side controller code sets data for the <code>columns</code> attribute, which can be done in an <code>init</code> handler.

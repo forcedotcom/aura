@@ -13,200 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 ({
-    init : function(cmp, evt, helper) {
-        
-        
- 
+    init: function() {
 
     },
 
-    destroy: function(cmp, evt, helper) {
-        cmp.southConstraint.destroy();
-        cmp.eastConstraint.destroy();
-        cmp.westConstraint.destroy();
-        cmp.northConstraint.destroy();
-        cmp.bbConstraint.destroy();
-        cmp.pointerConstraint.destroy(); 
-        cmp.pointerConstraint2.destroy();
-        cmp.pointerConstraint3.destroy();
+    handleMouseDown: function(cmp, evt, helper) {
+        helper.handleMouseDown(cmp, evt);
     },
 
-    goNorth: function(cmp, evt, helper) {
-    	cmp.southConstraint.disable();
-        cmp.eastConstraint.disable();
-        cmp.westConstraint.disable();
-    	cmp.northConstraint.enable();
-    	helper.lib.panelPositioning.reposition();
+    handleChange: function(cmp, evt, helper) {
+        var advanced = evt.source.get('v.value');
+        cmp.set('v.advanced', advanced);
     },
 
-    goSouth: function(cmp, evt, helper) {
-    	cmp.northConstraint.disable();
-        cmp.eastConstraint.disable();
-        cmp.westConstraint.disable();
-    	cmp.southConstraint.enable();
+    handlePress: function(cmp, evt, helper) {
+        var advanced = cmp.get('v.advanced');
+        var body = $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '<div class="panel-content">This is the panel</div>'}}})
+        var bigTarget = cmp.find('bigTarget').getElement();
+        var littleTarget = cmp.find('littleTarget').getElement();
+        var value = cmp.find('direction').get('v.value');
+        var pad = parseInt(cmp.find('pad').get('v.value'),10);
+        var padTop = cmp.find('padTop').get('v.value');
+        var isInside;
+        isInside = cmp.find('isInside').get('v.value');
 
-    	helper.lib.panelPositioning.reposition();
-    },
+        var panelConfig ={
+            referenceElement: isInside ? bigTarget : littleTarget,
+            showCloseButton: false,
+            closeOnClickOut: true,
+            useTransition: false,
+            body  : body,
+            direction: value,
+            showPointer: false,
+            boundingElement: isInside ? window : bigTarget,
+            inside: isInside,
+            pad: pad,
+            padTop: padTop !== undefined ? parseInt(padTop, 10) : undefined
+        };
 
-    goEast: function(cmp, evt, helper) {
-        cmp.northConstraint.disable();
-        cmp.southConstraint.disable();
-        cmp.westConstraint.disable();
-        cmp.eastConstraint.enable();
-        helper.lib.panelPositioning.reposition();
-        
-    },
+        if(cmp.find('isAdvanced').get('v.value')) {
+            delete panelConfig.direction;
+            panelConfig.advanced = true;
+            panelConfig.align = cmp.find('align').get('v.value');
+            panelConfig.targetAlign = cmp.find('targetAlign').get('v.value');
+        }
 
-    goWest: function(cmp, evt, helper) {
-    	cmp.northConstraint.disable();
-        cmp.southConstraint.disable();
-        cmp.eastConstraint.disable();
-        cmp.westConstraint.enable();
-        helper.lib.panelPositioning.reposition();
-    },
-
-    toggleBox: function(cmp, evt, helper) {
-    	var toggle = cmp.find('stayinwindow');
-    	if(toggle.get('v.value')) {
-    		cmp.bbConstraint.enable();
-    	} else {
-    		cmp.bbConstraint.disable();
-    	}
-    	helper.lib.panelPositioning.reposition();
-    },
-
-    mousedownHandler: function(cmp, evt, helper) {
-
-    	var lib = helper.lib.panelPositioning;
-    
-    	var el = cmp.find('draggable').getElement();
-    	var panel = cmp.find('panel').getElement();
-        var pointer = cmp.find('pointer').getElement();
-		var bb = cmp.find('bb').getElement();    	
-        var pinned = cmp.find('insidePanel').getElement();
-        var pinBox = cmp.find('insideBox').getElement();
-
-    	if(!cmp.northConstraint) {
-    		cmp.northConstraint = lib.createRelationship({
-				element:panel,
-				target:el,
-				align:'center bottom',
-				targetAlign: 'center top',
-				
-				enable: true,
-				pad: 15
-			});
-
-			cmp.southConstraint = lib.createRelationship({
-				element:panel,
-				target:el,
-				align:'center top',
-				targetAlign: 'center bottom',
-				
-				enable: false,
-				pad: 15
-			});
-
-            cmp.eastConstraint = lib.createRelationship({
-                element:panel,
-                target:el,
-                align:'left top',
-                targetAlign:'right top',
-                
-                enable: false,
-                pad: 0
-            });
-
-            cmp.westConstraint = lib.createRelationship({
-                element:panel,
-                target:el,
-                align:'right center',
-                targetAlign:'left center',
-                
-                enable: false,
-                pad: 15
-            });
-
-            cmp.bbConstraint = lib.createRelationship({
-                element:panel,
-                target:bb,
-                type: 'bounding box',
-                
-                enable: true,
-                pad: 15,
-                boxDirections: {
-                	left: true,
-                	right: true,
-                	top: true,
-                	bottom: true
-                }
-            });
-
-
-			cmp.pointerConstraint = lib.createRelationship({
-				element:pointer,
-				target:el,
-				align: 'center bottom',
-				targetAlign: 'center top',
-				pad: 2
-
-			});
-
-
-            cmp.pointerConstraint2 = lib.createRelationship({
-				element:pointer,
-				target:panel,
-				pad: 10,
-				type:'bounding box'
-
-			});
-
-			cmp.pointerConstraint3 = lib.createRelationship({
-				element:pointer,
-				target:panel,
-				type:'below',
-				pad: -10
-			});
-
-            cmp.pinConstraint = lib.createRelationship({
-                element:pinned,
-                target:pinBox,
-                align: 'right top',
-                targetAlign: 'right top'
-            });
-
-            cmp.pinBbConstraint = lib.createRelationship({
-                element:pinned,
-                target:window,
-                type: 'bounding box',
-                enable: true,
-                boxDirections: {
-                    left: false,
-                    right: false,
-                    top: true,
-                    bottom: true
-                }
-            });
-
-
-    	}
-
-    	panel.style.visibility = 'visible';
-
-    	function handleUp() {
-    		document.removeEventListener('mouseup', handleUp);
-    		document.removeEventListener('mousemove', handleMove)
-    	}
-
-    	function handleMove(e) {
-    		el.style.top = e.pageY + 'px';
-    		el.style.left = e.pageX + 'px';
-    		lib.reposition();
-    	}
-
-    	document.addEventListener('mouseup', handleUp);
-    	document.addEventListener('mousemove', handleMove);
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : panelConfig
+        }).fire();
     }
 })

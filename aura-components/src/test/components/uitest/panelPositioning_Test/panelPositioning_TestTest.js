@@ -161,7 +161,7 @@
 	 			var t = cmp.find('littleTarget').getElement();
 
 	 			var actual = Math.round(p.getBoundingClientRect().left) == Math.round(t.getBoundingClientRect().left);
-	 			$A.test.assert(true, 'left should be aligned');
+	 			$A.test.assert(actual, 'left should be aligned');
 	 		});
 
 
@@ -175,6 +175,50 @@
 	                targetAlign: 'left top',
 	                align: 'left top',
 	                pad:0,
+	                showPointer: false,
+	                boundingElement: window
+	        }, function(panel) {
+	        	setTimeout(function(){
+	        		myPanel = panel;
+	        	},5);
+	        	
+	        });	 	
+	    }
+	 },
+
+	 testTopPad: {
+	 	test: function(cmp) {
+	 		var myPanel = null;
+	 		var littleTarget = cmp.find('littleTarget').getElement();
+			var body = $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '<div class="panel-content">Woooooo</div>'}}});
+
+	 		$A.test.addWaitFor(true, function() {
+	 			return !!myPanel;
+	 		}, function() {
+
+	 			var p = myPanel.getElement();
+	 			var t = cmp.find('littleTarget').getElement();
+
+	 			var actual = Math.ceil(p.getBoundingClientRect().top) == Math.ceil(t.getBoundingClientRect().top + 5);
+	 			$A.test.assert(actual, 'top should be padded by 5px');
+
+	 			actual = Math.round(p.getBoundingClientRect().left) == Math.round(t.getBoundingClientRect().left);
+	 			$A.test.assert(actual, 'left should be aligned');
+
+	 		});
+
+
+	        this.makePanel({
+	                referenceElement: littleTarget,
+	                showCloseButton: false,
+	                closeOnClickOut: true,
+	                useTransition: false,
+	                body  : body,
+	                advanced: true,
+	                targetAlign: 'left top',
+	                align: 'left top',
+	                pad: 0,
+	                padTop: 5, 
 	                showPointer: false,
 	                boundingElement: window
 	        }, function(panel) {

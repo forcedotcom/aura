@@ -189,6 +189,7 @@
             showPointer = cmp.get('v.showPointer'),
             align,
             pad = cmp.get('v.pad'),
+            padTop = cmp.get('v.padTop'),
             targetAlign, 
             pointer,
             bbDirections,
@@ -292,7 +293,8 @@
                 align:align,
                 targetAlign: targetAlign,
                 enable: true,
-                pad: pad
+                pad: pad,
+                padTop: padTop
             }));
             cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
                 element:cmp.getElement(),

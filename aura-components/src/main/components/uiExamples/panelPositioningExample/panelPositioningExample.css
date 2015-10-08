@@ -13,87 +13,121 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.dragger,
-.THIS.panel,
-.THIS.pointer, 
-.THIS .pointer {
-	z-index: 1;
-	position: absolute;
-	top: 0px;
-	left: 0px;
-	padding: 40px;
-	margin:0;
-	border-radius: 5px;
-	background: #fff;
-	box-shadow: 5px 5px 5px rgba(0,0,0,0.5);
-    border: 3px solid black;
-    transform-origin: top left;
-}
-
-.THIS.inside-box {
-	height:800px;
-	width: 400px;
-	display: block;
-	background: red;
-	margin-top: 350px;
-	margin-left: 800px;
-}
-
-.THIS.dragger {
-	width: 200px;
-	-webkit-user-select: none;
+.THIS.vp {
+	margin: 0;
+	padding: 0;
 	user-select: none;
 }
 
-.THIS.panel {
-	width: 100px;
+.THIS .make-panel{
+	margin: 10px;
+	width: 400px;
 }
 
-.THIS.mark {
-	z-index: 1;
+.THIS .make-panel .disabled {
+	opacity: 0.5;
+}
+
+.THIS .advanced {
+	border: 1px solid #ccc;
+	padding: 10px;
+}
+
+.THIS .advanced legend {
+	font-size: .7em;
+	color: #ccc;
+}
+
+.THIS .panel-content {
+	padding: 5px;
+}
+
+.THIS.manager {
 	position: absolute;
 	top: 0;
-	left: 200px;
-	height: 100%;
-	width: 1px;
-	background: black;
+	left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
-.THIS.pointer,
-.THIS .pointer  {
-	z-index: 10;
-	position: absolute;
-	left: 0px;
-	top:0px;
-	width: 10px;
-	height: 10px;
-	padding: 0;
-	border-radius: 0;
-	-webkit-transform-origin: 50% 50%;
-	transform-origin: 50% 50%;
-	-webkit-transform: rotate(45deg);
-	transform: rotate(45deg);
+.THIS h1 {
+	font-size: 24px
 }
 
-.THIS.pointer::after {
-	content:'';
-	z-index: 11;
+.THIS .big-target {
 	position: absolute;
-	top: -7px;
-	left: -14px;
-	width: 25px;
-	height: 14px;
-	padding: 0;
-	border-radius: 0;
-	background: #fff;
-	transform: rotate(-45deg);
-}
-
-.THIS.bb {
-	position: absolute;
-	left: 10px;
 	top: 200px;
-	width: 600px;
-	height: 600px;
-	background: green;
+	left:100px;
+	height: 500px;
+	width: 500px;
+	background: #eee;
+}
+
+.THIS .big-target .handle {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 5px;
+	width: 5px;
+	background: red;
+	cursor: move;
+}
+
+.THIS .little-target {
+	position: absolute;
+	top: 350px;
+	left: 250px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	padding: 4px;
+}.THIS.vp {
+	margin: 0;
+	padding: 0;
+	user-select: none;
+}
+
+.THIS .panel-content {
+	padding: 5px;
+}
+
+.THIS.manager {
+	position: absolute;
+	top: 0;
+	left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.THIS h1 {
+	font-size: 24px
+}
+
+.THIS .big-target {
+	position: absolute;
+	top: 200px;
+	left:100px;
+	height: 500px;
+	width: 500px;
+	background: #eee;
+}
+
+.THIS .big-target .handle {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 5px;
+	width: 5px;
+	background: red;
+	cursor: move;
+}
+
+.THIS .little-target {
+	position: absolute;
+	top: 350px;
+	left: 250px;
+	border-radius: 5px;
+	border: 1px solid #ccc;
+	padding: 4px;
 }

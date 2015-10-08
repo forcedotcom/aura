@@ -34,7 +34,7 @@ function(w) {
         this._el = conf.element; 
         this._targetElement = conf.target;
         this._inputDirection = 'top';
-        this.destoyed = false;
+        this.destroyed = false;
 
         var pad = conf.pad || 0;
 

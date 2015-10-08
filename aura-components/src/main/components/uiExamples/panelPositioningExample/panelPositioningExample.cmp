@@ -15,30 +15,59 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
-    
-    <aura:import library="ui:panelPositioningLib" property="lib" />
-    <div aura:id="draggable" onmousedown="{!c.mousedownHandler}" class="dragger">
-    	<div class="hello">Drag this thing around</div>
-        <p>
-            <ui:button class="btn" label="North" press="{!c.goNorth}"></ui:button>
-            <ui:button class="btn" label="South" press="{!c.goSouth}"></ui:button>
-            <ui:button class="btn" label="East" press="{!c.goEast}"></ui:button>
-            <ui:button class="btn" label="West" press="{!c.goWest}"></ui:button>
-            <ui:button class="btn" label="Destroy all Constraints" press="{!c.destroy}"></ui:button>
-        </p>
-         <p><ui:inputCheckbox aura:id="stayinwindow" label="Stay in window?" value="true" change="{!c.toggleBox}"/></p>
 
+<aura:component>
+    <aura:import library="ui:panelPositioningLib" property="positioningLib" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:attribute name="advanced" default="false" type="Boolean" />
+    <div class="vp">
+        <h1>Panel Positioning</h1>
+        <div class="make-panel">
+            <form>
+                <fieldset class="simple">
+                <div class="{!v.advanced ? 'disabled' : ''}">
+                <ui:inputSelect disabled="{!v.advanced}" aura:id="direction" label="Direction">
+                    <ui:inputSelectOption text="north"/>
+                    <ui:inputSelectOption text="east"/>
+                    <ui:inputSelectOption text="west"/>
+                    <ui:inputSelectOption text="south"/>
+                    <ui:inputSelectOption text="northwest"/>
+                    <ui:inputSelectOption text="northeast"/>
+                    <ui:inputSelectOption text="southeast"/>
+                    <ui:inputSelectOption text="southwest"/>
+                </ui:inputSelect>
+                </div>
+                <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />
+                
+                <ui:inputNumber aura:id="pad" label="pad" value="15"  />
+                <ui:inputNumber aura:id="padTop" label="padTop" value=""  />
+                </fieldset>
+                <ui:inputCheckbox change="{!c.handleChange}" label="Use Advanced" value="false" aura:id="isAdvanced" />
+                
+                <aura:if isTrue="{!v.advanced}">
+                    <fieldset class="advanced">
+                        <legend>Advanced</legend>
+                    <ui:inputText aura:id="align" label="Align" value="left bottom" />
+                    <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
+                     </fieldset>
+                </aura:if>
+               
+                <ui:button label="GO!" press="{!c.handlePress}"/>
+            </form>
+        </div>
+        <div class="big-target" aura:id="bigTarget">
+            <div aura:id="handle" class="handle" onmousedown="{!c.handleMouseDown}"/>
+        </div>
+        <div class="little-target" aura:id="littleTarget">
+            <a onclick="{!c.handleClick}" href="#">Little Target</a>
+        </div>
     </div>
-    <div aura:id="bb" class="bb"></div>
-    <div aura:id="insideBox" class="inside-box"></div>
-    <div aura:id="insidePanel" class="inside-panel panel">
-        <p>I am pinned</p>
-    </div>
-    
-    <div aura:id="panel" id="panel" class="panel" style="visibility: hidden">
-        <p>I am centered</p>
-        <div aura:id="pointer" id="pointer" class="pointer"></div>
+    <div class="manager">
+        <ui:panelManager2 aura:id="pm">
+            <aura:set attribute="registeredPanels">
+                    <ui:panel alias="panel"/>
+                    <ui:modal alias="modal"/>
+            </aura:set>
+        </ui:panelManager2>
     </div>
 </aura:component>

@@ -58,6 +58,7 @@
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
+                                         value="{!v.value}"
                                          autocompleteButton="{!v.autocompleteButton}"/>
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input" 
@@ -68,6 +69,7 @@
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
+                                         value="{!v.value}"
                                          autocompleteButton="{!v.autocompleteButton}"/>
         </aura:set>
     </aura:if>

@@ -34,6 +34,6 @@
     },
     postProcessing: function (cmp, event, helper) {
         var results = event.getParam('arguments').results;
-        console.log(results);
+        console.log('PostProcessing Results: ', results);
     }
 })

@@ -96,7 +96,7 @@ public class AuraContextImplTest extends AuraImplTestCase {
         context.setClientLoaded(clientLoaded);
         ds.updateLoaded(null);
 
-        assertEquals("\"markup://preloadTest:dependenciesApp\"", JsonEncoder.serialize(appDef));
+        assertEquals("{\"descriptor\":\"markup://preloadTest:dependenciesApp\"}", JsonEncoder.serialize(appDef));
     }
 
     /**

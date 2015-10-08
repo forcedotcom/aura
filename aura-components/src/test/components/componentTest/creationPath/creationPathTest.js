@@ -158,7 +158,6 @@
             $A.test.addWaitForWithFailureMessage(false, function(){return $A.util.isUndefined(cmp.find("iterinst"))}, "iteration is still empty");
         }, function(cmp) {
         	this.assertCreationPath(cmp.find("iterinst"), "client created");
-            this.assertCreationPath(cmp.find("iterinst").find("output"), "client created");
         }]
     },
 
@@ -177,7 +176,6 @@
             this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/*[0]/*[0]/$/*[0]");
             
             this.assertCreationPath(cmp.find("iterinst")[1], "client created");
-            this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "client created");
         }]
     },
 
@@ -198,11 +196,6 @@
             this.assertCreationPath(cmp.find("iterinst")[0].find("output"), "/*[0]/$/*[3]/*[0]/*[0]/$/*[0]");
             this.assertCreationPath(cmp.find("iterinst")[1], "/*[0]/$/*[3]/*[1]/*[0]");
             this.assertCreationPath(cmp.find("iterinst")[1].find("output"), "/*[0]/$/*[3]/*[1]/*[0]/$/*[0]");
-            
-            this.assertCreationPath(cmp.find("iterinst")[2], "client created");
-            this.assertCreationPath(cmp.find("iterinst")[2].find("output"), "client created");
-            this.assertCreationPath(cmp.find("iterinst")[3], "client created");
-            this.assertCreationPath(cmp.find("iterinst")[3].find("output"), "client created");
         }]
     },
     

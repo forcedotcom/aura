@@ -1,7 +1,9 @@
 {
   "s":1,
   "v":{
-    "componentDef":"markup://test:test_LocChng_CompositeComponent",
+    "componentDef":{
+      "descriptor":"markup://test:test_LocChng_CompositeComponent"
+    },
     "creationPath":"/*[1]"
   }
 }

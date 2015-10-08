@@ -49,7 +49,15 @@ Test.Aura.Component.ComponentTest=function(){
                 error:function(message){throw new Error(message)},
                 getContext:function(){return {
                     getAccessVersion:function(){},
-                    getCurrentAction:function(){return null}                
+                    getCurrentAction:function(){
+                        return {
+                            topPath: function () {},
+                            getNextGlobalId: function () {}, 
+                            getId: function () {},
+                            getCurrentPath: function () {}
+                        };
+                    },
+                    containsComponentConfig: function () { return true;}
                 }},
                 componentService:{
                     get:function(){},

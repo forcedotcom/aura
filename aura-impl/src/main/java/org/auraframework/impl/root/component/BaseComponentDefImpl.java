@@ -954,7 +954,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return this.clientComponentClass;
     }
 
-    /**
+    /**	
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
      */
@@ -965,7 +965,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             boolean preloaded = context.isPreloaded(getDescriptor());
             boolean preloading = context.isPreloading();
             if (preloaded) {
-                json.writeValue(descriptor);
+            	json.writeMapBegin();
+                json.writeMapEntry("descriptor", descriptor);
+                json.writeMapEnd();
             } else {
                 json.writeMapBegin();
                 json.writeValue(getAccess());

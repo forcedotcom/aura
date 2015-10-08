@@ -21,6 +21,6 @@
     },
     postProcessing: function (cmp, event) {
         var results = event.getParam('arguments').results;
-        console.log(results);
+        console.log('testDuration', results.commonMetrics.testDuration);
     }
 })

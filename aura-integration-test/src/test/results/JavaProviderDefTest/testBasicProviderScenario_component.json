@@ -1,7 +1,9 @@
 {
   "s":1,
   "v":{
-    "componentDef":"markup://test:test_Provider_Component",
+    "componentDef":{
+      "descriptor":"markup://test:test_Provider_Component"
+    },
     "creationPath":"/*[2]"
   }
 }

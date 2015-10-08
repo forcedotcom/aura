@@ -1,7 +1,9 @@
 {
   "s":1,
   "v":{
-    "componentDef":"markup://test:child1",
+    "componentDef":{
+      "descriptor":"markup://test:child1"
+    },
     "creationPath":"/*[0]",
     "attributes":{
       "s":2,

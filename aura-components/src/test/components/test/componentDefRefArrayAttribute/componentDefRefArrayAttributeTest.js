@@ -35,7 +35,7 @@
                 $A.test.assertTrue($A.util.isObject(value));
                 $A.test.assertFalse($A.util.isComponent(value)); // Assert it's not an instance.
                 $A.test.assertTrue(value.componentDef !== undefined);
-                $A.test.assertEquals("markup://ui:button", value.componentDef);
+                $A.test.assertEquals("markup://ui:button", value.componentDef.descriptor);
                 //construct it.
                 $A.componentService.newComponentAsync(
                     this,

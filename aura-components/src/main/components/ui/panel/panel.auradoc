@@ -81,7 +81,7 @@ closeAction: function(panel) {
         To set a padding between the two, set <code>pad : 30</code>, where 30 is the padding in pixels. The target (referenceElement) can also be the viewport.
         A padding can be added using <code>pad</code> and <code>padTop</code>.</p>
 		<pre>$A.get('e.ui:createPanel').setParams({
-    panelType   :'panel',
+    panelType: 'panel',
     visible: true,
     panelConfig : {
         referenceElement: target,
@@ -93,9 +93,10 @@ closeAction: function(panel) {
 		<h4>Aligning your Target Using Advanced Positioning</h4>
         <p>With advanced positioning, instead of using <code>direction</code>, specify the alignments using <code>align</code> and <code>targetAlign</code>.
         For example, you can position the panel on top of the target. Set <code>advanced: true</code>, and specify the alignments.
+        The <code>direction</code> attribute is ignored when advanced positioning is used.
 		</p>
 		<pre>$A.get('e.ui:createPanel').setParams({
-    panelType   :'panel',
+    panelType: 'panel',
     visible: true,
     panelConfig : {
         referenceElement: target,
@@ -103,12 +104,27 @@ closeAction: function(panel) {
         targetAlign : 'left top',
         align : 'left top',
         body  : body,
-    pad : 0
+        pad : 0
     }
 }).fire();</pre>
 	<p>Let's see how advanced positioning further differs from using the direction attribute. When you set <code>direction</code> to north, the panel is center aligned at the north of the target. 
 	Using advanced positioning, you can vertically align the panel and target by setting <code>targetAlign : 'left top'</code> and <code>align : 'left bottom'</code>.
 	</p>
+	<h4>Using a Bounding Element</h4>
+	<p>A bounding element keeps the panel within the element. The default bounding element is the window. The child component must be bound within the parent component.
+	 If a bounding element is used, the panel is positioned in relation to the bounding element. For example, setting <code>direction</code> to <code>east</code> positions the panel at the east of the bounding element and within it.
+	</p>
+	<pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'panel',
+    visible: true,
+    panelConfig : {
+        referenceElement: bigTarget,
+        boundingElement: window,
+        direction: 'east',
+        body  : body,
+    pad : 30
+    }
+}).fire();</pre>
      </aura:description>
    
   <aura:example name="panelPositioning" ref="uiExamples:panelPositioningExample" label="Positioning Panels using the panelPositioning Library">

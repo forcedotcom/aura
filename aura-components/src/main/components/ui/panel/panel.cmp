@@ -34,16 +34,16 @@
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="If true, sets the panel as the first focusable element. The default is true."/>
     <aura:attribute name="referenceElementSelector" type="String" description="A selector representing the reference element to position relative to. If the selector resolves to mutiple elements the first one will be used." />
     <aura:attribute name="referenceElement" type="Object" description="The reference node to which this dialog should be positioned." />
-    <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel" />
+    <aura:attribute name="direction" type="String" default="north" description="The direction to position the panel. The default is north. Valid values: north, east, west, south, northwest, northeast, southeast, southwest" />
     <aura:attribute name="showPointer" type="Boolean" default="false" description="If true, shows a pointer that points to the referenceElement. The default is false." />
-    <aura:attribute name="boundingElement" type="Object" description="an element to keep the panel within, default is the window" />
-    <aura:attribute name="inside" type="Boolean" default="false" description="Position the element inside the target"/>
-    <aura:attribute name="advanced" type="Boolean" default="false" description="Use advanced positioning. If chosen direction and inside attributes will be ignored" />
-    <aura:attribute name="align" type="String" default="top left" description="Where to align the panel (advanced=true only)" />
-    <aura:attribute name="targetAlign" type="String" default="top left" description="Where on the target to align the panel (advanced=true only)" />
-    <aura:attribute name="pad" type="Integer" default="15" description="How much padding." />
+    <aura:attribute name="boundingElement" type="Object" description="An element to keep the panel within. The default is the window." />
+    <aura:attribute name="inside" type="Boolean" default="false" description="Position the element inside the target. The default it false."/>
+    <aura:attribute name="advanced" type="Boolean" default="false" description="Use advanced positioning. If chosen direction and inside attributes will be ignored. The default is false." />
+    <aura:attribute name="align" type="String" default="top left" description="The alignment of the panel, when advanced is set to true only. Supports a horizontal and vertical value combination. Horizontal values: right, left, center. Vertical values: top, bottom." />
+    <aura:attribute name="targetAlign" type="String" default="top left" description="The alignment for the panel on the target, when advanced is set to true only. Supports a horizontal and vertical value combination similar to the align attribute." />
+    <aura:attribute name="pad" type="Integer" default="15" description="The padding in pixels between the panel and target element." />
 
-    <aura:attribute name="padTop" type="Integer" description="Seperate padding for top" />
+    <aura:attribute name="padTop" type="Integer" description="The vertical padding in pixels." />
 
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>

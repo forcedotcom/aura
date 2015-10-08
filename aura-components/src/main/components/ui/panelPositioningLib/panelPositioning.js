@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-function (constraint, elementProxyFactory) {
+function (constraint, elementProxyFactory, win) {
     'use strict';
-    var w = window;
+
+    var ALIGN_REGEX = /^(left|right|center)\s(top|bottom|center)$/;
+
+    var w = win || window;
 
     var Constraint = constraint.Constraint;
-
     var bakeOff = elementProxyFactory.bakeOff;
 
     var repositionScheduled = false;
@@ -57,7 +59,7 @@ function (constraint, elementProxyFactory) {
         // if reposition is called twice within one frame
         // we only run this once
         if(!repositionScheduled) {
-            window.requestAnimationFrame(function() {
+            w.requestAnimationFrame(function() {
                 repositionScheduled = false;
 
                 // this must be executed in order or constraints
@@ -140,7 +142,6 @@ function (constraint, elementProxyFactory) {
          *                                               element references. 
          */
     	createRelationship: function(config) {
-
             if(!eventsBound) {
                 bindEvents();
             }
@@ -149,16 +150,25 @@ function (constraint, elementProxyFactory) {
             var el = config.element;
     		var targ = config.target;
             var constraintList = [];
+
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
-            $A.assert(config.target && (config.target === window || isDomNode(config.target)), 'Target is undefined or missing');
+            $A.assert(config.target && (config.target === w || isDomNode(config.target)), 'Target is undefined or missing');
 
             if(config.appendToBody) {
                 document.body.appendChild(config.element);
             }
 
+            if(config.align) {
+                $A.assert(!!config.align.match(ALIGN_REGEX), 'Invalid align string');
+            }
+            if(config.targetAlign) {
+                $A.assert(!!config.targetAlign.match(ALIGN_REGEX), 'Invalid targetAlign string');
+            }
+
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
+
                 var constraintDirections = config.align.split(/\s/);
                 var vertConfig = $A.util.copy(config);
 
@@ -166,8 +176,10 @@ function (constraint, elementProxyFactory) {
                 if(vertConfig.padTop !== undefined) {
                     vertConfig.pad = vertConfig.padTop;
                 }
+
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
                 constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], vertConfig));
+
             } else {
                 constraintList.push(new Constraint(config.type, config));
             }

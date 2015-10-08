@@ -90,7 +90,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
         open(URL);
         String inputAutoComplete = "autoCompleteUpdateOn";
         String expr = auraUITestingUtil.prepareReturnStatement(auraUITestingUtil.getFindAtRootExpr(inputAutoComplete)
-                + ".find('input').get('v.value')");
+                + ".get('v.value')");
         String autoCompleteText = (String) auraUITestingUtil.getEval(expr);
         assertNull("Auto complete Text for input should be undefined", autoCompleteText);
         WebDriver driver = getDriver();

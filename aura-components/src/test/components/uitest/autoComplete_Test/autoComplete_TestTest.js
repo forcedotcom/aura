@@ -23,7 +23,7 @@
 	        $A.test.clickOrTouch(listAnchors[1]);
 	    }, function(cmp){
 	        //assert
-	        var actual = cmp.find("autoComplete").find("input").find("txt").getElement().value;
+	    	var actual = cmp.find("autoComplete").get("v.value");
 	        var expected = "hello world2"
 	        $A.test.assertEquals(expected, actual, "List element in autocompleteList is not clickable!");
 	    }]
@@ -180,7 +180,7 @@
 	},
 	
 	_validateItemSelected: function(cmp, id, expectedText) {
-		var actual = cmp.find(id).find("input").find("txt").getElement().value;
+		var actual = cmp.find(id).get("v.value")
 		$A.test.assertEquals(expectedText, actual, "Expected item not selected");
 	},
 

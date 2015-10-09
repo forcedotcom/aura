@@ -38,14 +38,13 @@ function AuraLocalizationService() {
 
 /**
  * Formats a number with the default number format.
- * <p>Example:</p>
- * <pre>
- * //Returns 0.146
- * $A.localizationService.formatNumber(0.14566);
- * </pre>
  * @param {Number} number The number to be formatted.
  * @return {Number} The formatted number
  * @memberOf AuraLocalizationService
+ * @example 
+ * var num = 10000;
+ * // Returns 10,000
+ * var formatted = $A.localizationService.formatNumber(num);
  * @public
  * @export
  * @platform
@@ -56,14 +55,13 @@ AuraLocalizationService.prototype.formatNumber = function(number) {
 
 /**
  * Returns a formatted percentage number based on the default percentage format.
- * <p>Example:</p>
- * <pre>
- * //Returns 15%
- * $A.localizationService.formatPercent(0.14566);
- * </pre>
  * @param {Number} number The number to be formatted.
  * @return {Number} The formatted percentage
  * @memberOf AuraLocalizationService
+ * @example
+ * var num = 0.54;
+ * // Returns 54%
+ * var formatted = $A.localizationService.formatPercent(num);
  * @public
  * @export
  * @platform
@@ -74,14 +72,13 @@ AuraLocalizationService.prototype.formatPercent = function(number) {
 
 /**
  * Returns a currency number based on the default currency format.
- * <p>Example:</p>
- * <pre>
- * //Returns $0.15
- * $A.localizationService.formatCurrency(0.14566);
- * </pre>
  * @param {Number} number The currency number to be formatted.
  * @return {Number} The formatted currency
  * @memberOf AuraLocalizationService
+ * @example
+ * var curr = 123.45;
+ * // Returns $123.45
+ * $A.localizationService.formatCurrency(curr);
  * @public
  * @export
  * @platform
@@ -93,18 +90,17 @@ AuraLocalizationService.prototype.formatCurrency = function(number) {
 
 /**
  * Returns a NumberFormat object.
- * <p>Example:</p>
- * <pre>var f = cmp.get("v.format");
- * var num = cmp.get("v.value");
- * var nf = $A.localizationService.getNumberFormat(f);
- * var formatted = nf.format(num);
- * //If format is not provided, the default locale is used
- * var formatted = $A.localizationService.formatNumber(num);
- * </pre>
  * @param {String} format The number format. <code>format=".00"</code> displays the number followed by two decimal places.
  * @param {String} symbols
  * @return {Number} The number format
  * @memberOf AuraLocalizationService
+ * @example 
+ * var f = $A.get("$Locale.numberFormat");
+ * var num = 10000
+ * var nf = $A.localizationService.getNumberFormat(f);
+ * var formatted = nf.format(num);
+ * // Returns 10,000
+ * var formatted = $A.localizationService.formatNumber(num);
  * @public
  * @export
  * @platform
@@ -115,13 +111,11 @@ AuraLocalizationService.prototype.getNumberFormat = function(format, symbols) {
 
 /**
  * Returns the default NumberFormat object.
- * <p>Example:</p>
- * <pre>
- * //Returns 20,000.123
- * $A.localizationService.getDefaultNumberFormat().format(20000.123);
- * </pre>
  * @return {Number} The number format returned by <code>$Locale.numberFormat</code>.
  * @memberOf AuraLocalizationService
+ * @example
+ * // Returns 20,000.123
+ * $A.localizationService.getDefaultNumberFormat().format(20000.123);
  * @public
  * @export
  * @platform
@@ -136,13 +130,11 @@ AuraLocalizationService.prototype.getDefaultNumberFormat = function() {
 
 /**
  * Returns the default percentage format.
- * <p>Example:</p>
- * <pre>
- * //Returns 20%
- * $A.localizationService.getDefaultPercentFormat().format(0.20);
- * </pre>
  * @return {Number} The percentage format returned by <code>$Locale.percentFormat</code>.
  * @memberOf AuraLocalizationService
+ * @example
+ * // Returns 20%
+ * $A.localizationService.getDefaultPercentFormat().format(0.20);
  * @public
  * @export
  * @platform
@@ -156,13 +148,11 @@ AuraLocalizationService.prototype.getDefaultPercentFormat = function() {
 
 /**
  * Returns the default currency format.
- * <p>Example:</p>
- * <pre>
- * //Returns $20,000.00
- * $A.localizationService.getDefaultCurrencyFormat().format(20000);
- * </pre>
  * @return {Number} The currency format returned by <code>$Locale.currencyFormat</code>.
  * @memberOf AuraLocalizationService
+ * @example
+ * // Returns $20,000.00
+ * $A.localizationService.getDefaultCurrencyFormat().format(20000); 
  * @public
  * @export
  * @platform
@@ -181,6 +171,10 @@ AuraLocalizationService.prototype.getDefaultCurrencyFormat = function() {
  * @return {String} A duration object
  * @memberOf AuraLocalizationService
  * @public
+ * @example
+ * var dur = $A.localizationService.duration(1, 'day');
+ * // Returns "a day"
+ * var length = $A.localizationService.displayDuration(dur);
  * @export
  * @platform
  */
@@ -194,6 +188,10 @@ AuraLocalizationService.prototype.displayDuration = function(d, noSuffix) {
  * @return {Number} The length of time in days.
  * @memberOf AuraLocalizationService
  * @public
+ * @example
+ * var dur = $A.localizationService.duration(24, 'hour');
+ * // Returns 1
+ * var length = $A.localizationService.displayDurationInDays(dur);
  * @export
  * @platform
  */
@@ -206,6 +204,10 @@ AuraLocalizationService.prototype.displayDurationInDays = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in hours.
  * @memberOf AuraLocalizationService
+ * @example 
+ * var dur = $A.localizationService.duration(2, 'day');
+ * // Returns 48
+ * var length = $A.localizationService.displayDurationInHours(dur);
  * @public
  * @export
  * @platform
@@ -219,6 +221,10 @@ AuraLocalizationService.prototype.displayDurationInHours = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in milliseconds.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(1, 'hour');
+ * // Returns 3600000
+ * var length = $A.localizationService.displayDurationInMilliseconds(dur);
  * @public
  * @export
  * @platform
@@ -232,6 +238,10 @@ AuraLocalizationService.prototype.displayDurationInMilliseconds = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in minutes.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(1, 'hour');
+ * // Returns 60
+ * var length = $A.localizationService.displayDurationInMinutes(dur);
  * @public
  * @export
  * @platform
@@ -245,6 +255,10 @@ AuraLocalizationService.prototype.displayDurationInMinutes = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in months.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(60, 'day');
+ * // Returns 1.971293
+ * var length = $A.localizationService.displayDurationInMonths(dur);
  * @public
  * @export
  * @platform
@@ -258,6 +272,10 @@ AuraLocalizationService.prototype.displayDurationInMonths = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in seconds.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(60, 'minutes');
+ * // Returns 3600
+ * var length = $A.localizationService.displayDurationInSeconds(dur);
  * @public
  * @export
  * @platform
@@ -271,6 +289,10 @@ AuraLocalizationService.prototype.displayDurationInSeconds = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The length of time in years.
  * @memberOf AuraLocalizationService
+ * example 
+ * var dur = $A.localizationService.duration(6, 'month');
+ * // Returns 0.5
+ * var length = $A.localizationService.displayDurationInYears(dur);
  * @public
  * @export
  * @platform
@@ -285,6 +307,9 @@ AuraLocalizationService.prototype.displayDurationInYears = function(d) {
  * @param {String} unit The unit of measurement of time
  * @return {Object} A duration object
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(1, 'day');
+ * // dur._days returns 1
  * @public
  * @export
  * @platform
@@ -299,6 +324,11 @@ AuraLocalizationService.prototype.duration = function(num, unit) {
  * @param {String} unit The unit of time in year, month, week, day, hour, minute or second
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns the time at the end of the day
+ * // in the format "Fri Oct 09 2015 23:59:59 GMT-0700 (PDT)"
+ * var day = $A.localizationService.endOf(d, 'day')
  * @public
  * @export
  * @platform
@@ -314,6 +344,10 @@ AuraLocalizationService.prototype.endOf = function(date, unit) {
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return A formatted and localized date string
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns date in the format "Oct 9, 2015"
+ * $A.localizationService.formatDate(d);
  * @public
  * @export
  * @platform
@@ -338,6 +372,10 @@ AuraLocalizationService.prototype.formatDate = function(date, formatString, loca
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return A formatted and localized date string
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns date in UTC in the format "Oct 9, 2015"
+ * $A.localizationService.formatDateUTC(d);
  * @public
  * @export
  * @platform
@@ -362,6 +400,10 @@ AuraLocalizationService.prototype.formatDateUTC = function(date, formatString, l
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return A formatted and localized datetime string
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns datetime in the format "Oct 9, 2015 9:00:00 AM"
+ * $A.localizationService.formatDateTime(d);
  * @public
  * @export
  * @platform
@@ -385,6 +427,10 @@ AuraLocalizationService.prototype.formatDateTime = function(date, formatString, 
  * @param {String} formatString A Java format string. The default is from LocaleValueProvider.
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return A formatted and localized datetime string
+ * @example
+ * var d = new Date();
+ * // Returns datetime in UTC in the format "Oct 9, 2015 4:00:00 PM"
+ * $A.localizationService.formatDateTimeUTC(d);
  * @public
  * @export
  * @platform
@@ -409,6 +455,10 @@ AuraLocalizationService.prototype.formatDateTimeUTC = function(date, formatStrin
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return A formatted and localized time string
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns a date in the format "9:00:00 AM"
+ * var now = $A.localizationService.formatTime(d);
  * @public
  * @export
  * @platform
@@ -433,6 +483,10 @@ AuraLocalizationService.prototype.formatTime = function(date, formatString, loca
  * @param {String} locale A Java locale string. The default is from LocaleValueProvider.
  * @return a formatted and localized time string
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * // Returns time in UTC in the format "4:00:00 PM"
+ * $A.localizationService.formatTimeUTC(d);
  * @public
  * @export
  * @platform
@@ -455,6 +509,10 @@ AuraLocalizationService.prototype.formatTimeUTC = function(date, formatString, l
  * @param {Duration} d The duration object returned by this.duration
  * @return {Number} The number of days in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(48, 'hour');
+ * // Returns 2, the number of days for the given duration
+ * $A.localizationService.getDaysInDuration(dur);
  * @public
  * @export
  * @platform
@@ -468,6 +526,10 @@ AuraLocalizationService.prototype.getDaysInDuration = function(d) {
  * @param {Duration} d The duration object returned by this.duration
  * @return {Number} The number of hours in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(60, 'minute');
+ * // Returns 1, the number of hours in the given duration
+ * $A.localizationService.getHoursInDuration(dur);
  * @public
  * @export
  * @platform
@@ -512,6 +574,13 @@ AuraLocalizationService.prototype.getToday = function(timezone, callback) {
  * @param {Function} callback A function to be called after the "today" value is obtained
  * @return {String} the ISO8601 date string (yyyy-MM-dd).
  * @memberOf AuraLocalizationService
+ * @example
+ * var timezone = $A.get("$Locale.timezone");
+ * var d = new Date();
+ * // Returns the date string in the format "2015-10-9"
+ * $A.localizationService.getDateStringBasedOnTimezone(timezone, d, function(today){
+ *    console.log(today);
+ * });
  * @public
  * @export
  * @platform
@@ -544,6 +613,10 @@ AuraLocalizationService.prototype.getMillisecondsInDuration = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The number of minutes in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(60, 'second');
+ * // Returns 1, the number of minutes in the given duration
+ * $A.localizationService.getMinutesInDuration(dur);
  * @public
  * @export
  * @platform
@@ -557,6 +630,10 @@ AuraLocalizationService.prototype.getMinutesInDuration = function(d) {
  * @param thisration object returned by localizationService.duration
  * @return {Number} The number of months in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(70, 'day');
+ * // Returns 2, the number of months in the given duration
+ * $A.localizationService.getMonthsInDuration(dur);
  * @public
  * @export
  * @platform
@@ -570,6 +647,10 @@ AuraLocalizationService.prototype.getMonthsInDuration = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The number of seconds in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(3000, 'millisecond');
+ * // Returns 3
+ * $A.localizationService.getSecondsInDuration(dur);
  * @public
  * @export
  * @platform
@@ -583,6 +664,10 @@ AuraLocalizationService.prototype.getSecondsInDuration = function(d) {
  * @param {Duration} d The duration object returned by localizationService.duration
  * @return {Number} The number of years in d.
  * @memberOf AuraLocalizationService
+ * @example
+ * var dur = $A.localizationService.duration(24, 'month');
+ * // Returns 2
+ * $A.localizationService.getYearsInDuration(dur);
  * @public
  * @export
  * @platform
@@ -596,6 +681,10 @@ AuraLocalizationService.prototype.getYearsInDuration = function(d) {
  * @param {String} datetime pattern string
  * @return {Boolean} Returns true if it uses period time view.
  * @memberOf AuraLocalizationService
+ * @example 
+ * var d = new Date();
+ * // Returns false
+ * $A.localizationService.isPeriodTimeView(d);
  * @public
  * @export
  * @platform
@@ -627,6 +716,11 @@ AuraLocalizationService.prototype.isPeriodTimeView = function(pattern) {
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is after date2, or false otherwise.
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * var day = $A.localizationService.endOf(d, 'day');
+ * // Returns false, since d is before day
+ * $A.localizationService.isAfter(d, day);
  * @public
  * @export
  * @platform
@@ -643,6 +737,11 @@ AuraLocalizationService.prototype.isAfter = function(date1, date2, unit) {
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is before date2, or false otherwise.
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new Date();
+ * var day = $A.localizationService.endOf(d, 'day');
+ * // Returns true, since d is before day
+ * $A.localizationService.isBefore(d, day);
  * @public
  * @export
  * @platform
@@ -659,6 +758,13 @@ AuraLocalizationService.prototype.isBefore = function(date1, date2, unit) {
  *                 By default, millisecond is used.
  * @return {Boolean} Returns true if date1 is the same as date2, or false otherwise.
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = new date();
+ * var day = $A.localizationService.endOf(d, 'day');
+ * // Returns false
+ * $A.localizationService.isSame(d, day, 'hour');
+ * // Returns true
+ * $A.localizationService.isSame(d, day, 'day');
  * @public
  * @export
  * @platform
@@ -721,6 +827,10 @@ AuraLocalizationService.prototype.parseDateTimeISO8601 = function(dateTimeString
  * @param {Boolean} set to true to turn off moment's forgiving parsing and use strict validation
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = "2015-10-9";
+ * // Returns "Thu Oct 08 2015 17:00:00 GMT-0700 (PDT)"
+ * $A.localizationService.parseDateTimeUTC(d);
  * @public
  * @export
  * @platform
@@ -745,6 +855,10 @@ AuraLocalizationService.prototype.parseDateTimeUTC = function(dateTimeString, ta
  * @param {String} unit Year, month, week, day, hour, minute or second
  * @return {Date} A JavaScript Date object
  * @memberOf AuraLocalizationService
+ * @example
+ * var d = "2015-10-9";
+ * // Returns "Thu Oct 01 2015 00:00:00 GMT-0700 (PDT)"
+ * $A.localizationService.startOf(d, 'month');
  * @public
  * @export
  * @platform
@@ -758,6 +872,10 @@ AuraLocalizationService.prototype.startOf = function(date, unit) {
  * @param {Date} date a Date object
  * @return {String} An ISO8601 string to represent passed in Date object.
  * @memberOf AuraLocalizationService
+ * @example 
+ * var d = new Date();
+ * // Returns "2015-10-09T20:47:17.590Z"
+ * $A.localizationService.toISOString(d);
  * @public
  * @export
  * @platform
@@ -883,6 +1001,17 @@ AuraLocalizationService.prototype.translateToOtherCalendar = function(date) {
  * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
  * @param {Function} callback A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
+ * @example
+ * // Provides locale information
+ * var format = $A.get("$Locale.timeFormat");
+ * format = format.replace(":ss", "");
+ * var langLocale = $A.get("$Locale.langLocale");
+ * var timezone = $A.get("$Locale.timezone");
+ * var d = new Date();
+ * $A.localizationService.UTCToWallTime(d, timezone, function(walltime) {
+ *    // Returns the local time without the seconds, for example, 9:00 PM 
+ *    displayValue = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
+ * })
  * @public
  * @export
  * @platform
@@ -916,6 +1045,10 @@ AuraLocalizationService.prototype.UTCToWallTime = function(date, timezone, callb
  * @param {String} timezone A time zone id based on the java.util.TimeZone class, for example, America/Los_Angeles
  * @param {Function} callback A function to be called after the conversion is done
  * @memberOf AuraLocalizationService
+ * @example
+ * $A.localizationService.WallTimeToUTC(d, timezone, function(walltime) {
+ *     displayDate = $A.localizationService.formatDateTimeUTC(walltime, format, langLocale);
+ * })
  * @public
  * @export
  * @platform

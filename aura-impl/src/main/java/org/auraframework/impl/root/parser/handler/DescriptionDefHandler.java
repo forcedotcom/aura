@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -81,9 +80,5 @@ public class DescriptionDefHandler<P> extends ParentedTagHandler<DescriptionDefI
         builder.setDescription(body.toString());
         
         return builder.build();
-    }
-
-    @Override
-    public void writeElement(DescriptionDefImpl def, Appendable out) throws IOException {
     }
 }

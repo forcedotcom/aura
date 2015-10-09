@@ -15,8 +15,11 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.builder.RootDefinitionBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
@@ -35,10 +38,8 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
     public static final String TAG = "design:component";
@@ -143,10 +144,6 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
     @Override
     protected DesignDef createDefinition() throws QuickFixException {
         return builder.build();
-    }
-
-    @Override
-    public void writeElement(DesignDef def, Appendable out) throws IOException {
     }
 
     String getNextId() {

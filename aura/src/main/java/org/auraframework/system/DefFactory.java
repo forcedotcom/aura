@@ -62,6 +62,7 @@ public interface DefFactory<D extends Definition> {
 
     /**
      * Save the given definition back to appropriate primary source location.
+     * @Deprecated
      */
     void save(D def);
 

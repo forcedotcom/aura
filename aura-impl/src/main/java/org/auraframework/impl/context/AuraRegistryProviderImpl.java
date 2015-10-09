@@ -30,7 +30,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
-import org.auraframework.impl.css.style.StyleDefFactory;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
 import org.auraframework.impl.java.provider.*;
@@ -283,9 +282,9 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                         DefType.RESOURCE));
                 regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
                         DefType.INCLUDE));
-                regBuild.add(createDefRegistry(new StyleDefFactory(markupSourceFactory),
-                        EnumSet.of(DefType.STYLE, DefType.RESOURCE),
-                        Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX)));
+                regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
+                        DefType.STYLE));
+                regBuild.add(createStyleRegistry(markupSourceFactory));
                 regBuild.add(createDefRegistry(new CacheableDefFactoryImpl<FlavoredStyleDef>(markupSourceFactory),
                         EnumSet.of(DefType.FLAVORED_STYLE),
                         Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX)));
@@ -330,6 +329,12 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         } else {
             return ret;
         }
+    }
+
+    private static <T extends Definition> DefRegistry<T> createStyleRegistry(SourceFactory sourceFactory) {
+        CacheableDefFactoryImpl<T> factory = new CacheableDefFactoryImpl<>(sourceFactory);
+        return createDefRegistry(factory, EnumSet.of(DefType.STYLE, DefType.RESOURCE),
+                        Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX));
     }
 
     private static <T extends Definition> DefRegistry<T> createJavascriptRegistry(SourceFactory sourceFactory,

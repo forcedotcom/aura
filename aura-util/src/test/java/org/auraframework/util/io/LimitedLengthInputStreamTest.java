@@ -451,19 +451,19 @@ public class LimitedLengthInputStreamTest extends UnitTestCase {
 
     public void testBadConstruction() throws Exception {
         try {
-            new LimitedLengthInputStream(null, 1, null);
+            new LimitedLengthInputStream(null, 1, null).close();
             fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
         try {
-            new LimitedLengthInputStream(new ByteArrayInputStream(new byte[] { 1 }), -1, null);
+            new LimitedLengthInputStream(new ByteArrayInputStream(new byte[] { 1 }), -1, null).close();
             fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
         try {
-            new LimitedLengthInputStream(null, -1, null);
+            new LimitedLengthInputStream(null, -1, null).close();
             fail();
         } catch (IllegalArgumentException e) {
             // Expected

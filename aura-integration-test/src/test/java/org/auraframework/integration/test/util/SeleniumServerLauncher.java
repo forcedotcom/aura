@@ -77,7 +77,7 @@ public class SeleniumServerLauncher {
         boolean isUp = false;
         for (int tries = 0; !isUp && tries < 10; tries++) {
             try {
-                new Socket(host, port);
+                new Socket(host, port).close();
                 isUp = true;
             } catch (Exception e) {
             }

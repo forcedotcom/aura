@@ -21,16 +21,13 @@ import org.auraframework.system.Location;
  * Aura Compile-time exception for when RHS of Access= attribute is invalid
  */
 public class InvalidAccessValueException extends AuraValidationException {
+    private static final long serialVersionUID = 5096592723442968967L;
 
-	private static final long serialVersionUID = 5096592723442968967L;
+    public InvalidAccessValueException(String message, Location l) {
+        super(message, l);
+    }
 
-	public InvalidAccessValueException(String message, Location l,
-			AuraQuickFix... quickFixes) {
-		super(message, l, quickFixes);
-	}
-
-	public InvalidAccessValueException(String msg) {
-		super(msg);
-	}
-
+    public InvalidAccessValueException(String msg) {
+        super(msg);
+    }
 }

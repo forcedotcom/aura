@@ -153,13 +153,6 @@ public interface DefinitionService extends AuraService, SourceListener {
     Set<DefDescriptor<?>> find(DescriptorFilter matcher) throws QuickFixException;
 
     /**
-     * Save the given Definition back to source code.
-     *
-     * @throws QuickFixException
-     */
-    void save(Definition def) throws QuickFixException;
-
-    /**
      * update the set of loaded descriptors, and validate.
      *
      * @param loading the descriptor that we are loading if any.

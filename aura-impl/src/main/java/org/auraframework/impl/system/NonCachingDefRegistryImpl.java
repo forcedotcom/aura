@@ -67,7 +67,6 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
 
     @Override
     public void save(T def) {
-        factory.save(def);
     }
 
     @Override

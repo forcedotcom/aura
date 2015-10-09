@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -103,7 +102,4 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
             error("No literal text allowed in %s tag", TAG);
         }
     }
-
-    @Override
-    public void writeElement(TokenDef def, Appendable out) throws IOException {}
 }

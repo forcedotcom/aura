@@ -15,57 +15,22 @@
  */
 package org.auraframework.throwable.quickfix;
 
-import java.io.IOException;
-import java.util.List;
-
-import org.auraframework.Aura;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Location;
 import org.auraframework.throwable.AuraException;
-import org.auraframework.throwable.AuraExceptionUtil;
-import org.auraframework.util.json.Json;
-import org.auraframework.util.json.JsonSerializable;
-
-import com.google.common.collect.ImmutableList;
 
 /**
  * An exception that contains a list of potential automated fixes for the
  * problem, which the client code or user can choose from and invoke before
  * retrying the original action that threw this Exception.
  */
-public abstract class QuickFixException extends AuraException implements JsonSerializable {
+public abstract class QuickFixException extends AuraException {
     private static final long serialVersionUID = 2050170532486579614L;
-    private final List<AuraQuickFix> quickFixes;
 
-    public QuickFixException(String message, Location l, AuraQuickFix... quickFixes) {
+    public QuickFixException(String message, Location l) {
         super(message, l, null, null);
-        this.quickFixes = (quickFixes == null) ? null : ImmutableList.copyOf(quickFixes);
     }
 
-    public QuickFixException(String message, Location l, Throwable cause, AuraQuickFix... quickFixes) {
+    public QuickFixException(String message, Location l, Throwable cause) {
         super(message, l, cause, null);
-        this.quickFixes = (quickFixes == null) ? null : ImmutableList.copyOf(quickFixes);
-    }
-
-    /**
-     * @return Returns the quickFixes.
-     */
-    public List<AuraQuickFix> getQuickFixes() {
-        return quickFixes;
-    }
-
-    @Override
-    public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("message", getMessage());
-        if (Aura.getContextService().isEstablished()) {
-            Mode mode = Aura.getContextService().getCurrentContext().getMode();
-            if (mode != Mode.PROD && mode != Mode.PRODDEBUG) {
-                json.writeMapEntry("stack", AuraExceptionUtil.getStackTrace(this));
-                json.writeMapEntry("location", getLocation());
-            }
-        }
-        json.writeMapEntry("quickFixes", getQuickFixes());
-        json.writeMapEnd();
     }
 }

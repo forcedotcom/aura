@@ -33,7 +33,7 @@ public final class TokenValueNotFoundException extends AuraValidationException {
     }
 
     public TokenValueNotFoundException(String name, DefDescriptor<TokensDef> descriptor, Location location) {
-        super(getMessage(checkNotNull(name), descriptor), location, new CreateTokenQuickFix(descriptor, name));
+        super(getMessage(checkNotNull(name), descriptor), location);
     }
 
     private static String getMessage(String variable, DefDescriptor<TokensDef> descriptor) {

@@ -24,16 +24,11 @@ public class StyleParserException extends AuraValidationException {
 
     private static final long serialVersionUID = -4506420478822192802L;
 
-    public StyleParserException(String message, Location l, Throwable cause, AuraQuickFix... quickFixes) {
-        super(message, l, cause, quickFixes);
-    }
-
-    public StyleParserException(String message, Location l, AuraQuickFix... quickFixes) {
-        super(message, l, quickFixes);
+    public StyleParserException(String message, Location l, Throwable cause) {
+        super(message, l, cause);
     }
 
     public StyleParserException(String message, Location l) {
-        this(message, l, (AuraQuickFix[]) null);
+        super(message, l);
     }
-
 }

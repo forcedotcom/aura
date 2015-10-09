@@ -94,11 +94,6 @@ public class LibraryDefHandler extends RootTagHandler<LibraryDef> {
     }
 
     @Override
-    public void writeElement(LibraryDef def, Appendable out) {
-        // Do nothing.
-    }
-
-    @Override
     protected RootDefinitionBuilder<LibraryDef> getBuilder() {
         return builder;
     }

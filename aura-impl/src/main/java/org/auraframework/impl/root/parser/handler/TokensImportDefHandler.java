@@ -17,7 +17,6 @@ package org.auraframework.impl.root.parser.handler;
 
 import static org.auraframework.impl.root.parser.handler.RootTagHandler.ATTRIBUTE_DESCRIPTION;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -85,7 +84,4 @@ public class TokensImportDefHandler<P extends RootDefinition> extends ParentedTa
     protected TokensImportDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
-    @Override
-    public void writeElement(TokensImportDef def, Appendable out) throws IOException {}
 }

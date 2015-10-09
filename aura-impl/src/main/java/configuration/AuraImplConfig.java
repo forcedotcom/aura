@@ -58,7 +58,6 @@ import org.auraframework.impl.adapter.format.css.ThrowableCSSFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ApplicationHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.AuraContextHTMLFormatAdapter;
-import org.auraframework.impl.adapter.format.html.AuraQuickFixExceptionHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ComponentDefHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.ComponentHTMLFormatAdapter;
 import org.auraframework.impl.adapter.format.html.TestSuiteDefHTMLFormatAdapter;
@@ -336,11 +335,6 @@ public class AuraImplConfig {
     @Impl
     public static FormatAdapter<?> throwableHTMLFormatAdapter() {
         return new ThrowableHTMLFormatAdapter();
-    }
-
-    @Impl
-    public static FormatAdapter<?> auraQuickFixExceptionHTMLFormatAdapter() {
-        return new AuraQuickFixExceptionHTMLFormatAdapter();
     }
 
     @Impl

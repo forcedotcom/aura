@@ -15,6 +15,12 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
+import java.util.Collections;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignItemsDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
@@ -27,17 +33,15 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Set;
-
 public class DesignItemsDefHandler extends ParentedTagHandler<DesignItemsDef, DesignDef>{
     public final static String TAG = "design:layoutitems";
     private final static String ATTRIBUTE_NAME = "name";
 
     private DesignItemsDefImpl.Builder builder = new DesignItemsDefImpl.Builder();
+
+    public DesignItemsDefHandler() {
+        super();
+    }
 
     public DesignItemsDefHandler(ContainerTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -75,11 +79,6 @@ public class DesignItemsDefHandler extends ParentedTagHandler<DesignItemsDef, De
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             error("No literal text allowed in attribute design definition");
         }
-    }
-
-    @Override
-    public void writeElement(DesignItemsDef def, Appendable out) throws IOException {
-
     }
 
     @Override

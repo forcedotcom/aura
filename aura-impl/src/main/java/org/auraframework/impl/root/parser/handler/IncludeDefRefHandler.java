@@ -124,11 +124,6 @@ public class IncludeDefRefHandler extends XMLHandler<IncludeDefRefImpl> {
     }
 
     @Override
-    public void writeElement(IncludeDefRefImpl def, Appendable out) {
-        // Never writes. Do nothing.
-    }
-
-    @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }

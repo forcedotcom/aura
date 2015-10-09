@@ -16,15 +16,20 @@
 package org.auraframework.integration.test.system;
 
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nonnull;
@@ -33,26 +38,47 @@ import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.adapter.RegistryAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.NamespaceDef;
+import org.auraframework.def.RendererDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.instance.BaseComponent;
-import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.service.CachingService;
+import org.auraframework.service.ContextService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.Location;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
+import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.NoAccessException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.mockito.Mock;
@@ -446,11 +472,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
     }
 
     public void testGetUidLocalDef() throws Exception {
+        DefDescriptor<ComponentDef> desc = Aura.getDefinitionService().getDefDescriptor("twiddledee:twiddledumb", ComponentDef.class);
+        ComponentDef def = Mockito.mock(ComponentDef.class);
+        Mockito.when(def.getDescriptor()).thenReturn(desc);
+
         MasterDefRegistryImplOverride registry = getDefRegistry(false);
-        ComponentDef def = Mockito.spy(registry.getDef(DefDescriptorImpl.getInstance("aura:component",
-                ComponentDef.class)));
-        registry.invalidate(null); // clear any cached results from the preceding getDef call
-        registry = getDefRegistry(false);
         registry.addLocalDef(def);
         assertNotNull(registry.getUid(null, def.getDescriptor()));
     }
@@ -460,7 +486,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistryImplOverride registry1 = getDefRegistry(false);
         String uid1 = registry1.getUid(null, cmpDesc);
         MasterDefRegistryImplOverride registry2 = getDefRegistry(false);
-        registry2.invalidate(null);
         String uid2 = registry2.getUid(null, cmpDesc);
         assertEquals("Expected same UID for def from separate registry instances", uid1, uid2);
     }
@@ -565,7 +590,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // spy on MDR
         final MasterDefRegistryImplOverride registry = getDefRegistry(true);
-        registry.invalidate(null);
         spyOnDefs(registry);
 
         // get def UID to trigger compileDef, etc.
@@ -600,7 +624,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         // spy on MDR's registries to spy on defs
         final MasterDefRegistryImplOverride registry = getDefRegistry(true);
-        registry.invalidate(null);
         spyOnDefs(registry);
         registry.addLocalDef(def);
 
@@ -782,80 +805,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                 checkDependenciesContains(deps, depCmpDesc1.getQualifiedName()));
         assertTrue("Explicitly declared dependency on top level component not found",
                 checkDependenciesContains(deps, depCmpDesc2.getQualifiedName()));
-    }
-
-    /**
-     * Verify that the file source listener picks up a newly created file and sends out a notification to clear the
-     * proper caches.
-     */
-    // TODO(W-1589052): UnAdaptable since breaks when trying to write/delete files from jars
-    @UnAdaptableTest
-    @ThreadHostileTest("changes test namespace")
-    public void testSourceChangeClearsCachesInDevMode() throws Exception {
-        // Make sure we're in Dev mode.
-        ContextService contextService = Aura.getContextService();
-        if (contextService.isEstablished()) {
-            contextService.endContext();
-        }
-        contextService.startContext(Mode.DEV, Format.JSON, Authentication.AUTHENTICATED);
-
-        MasterDefRegistryImplOverride mdr = getDefRegistry(false);
-        DefDescriptor<ComponentDef> cmpDesc = Aura.getDefinitionService().getDefDescriptor("test:deleteMeAfterTest",
-                ComponentDef.class);
-
-        // Make sure it's actually in the caches
-        mdr.getDef(cmpDesc);
-
-        // Get the UID before adding the file since getUid() messes with caches
-        String uid = mdr.getUid(null, cmpDesc);
-
-        // Tell test to delete added component and directory files at end of test
-        Source<?> source = mdr.getSource(cmpDesc);
-        File f = new File(source.getUrl().replace("file:", ""));
-        deleteFileOnTeardown(f);
-        deleteFileOnTeardown(f.getParentFile());
-
-        // Save file to filesystem and wait for source change to clear caches
-        BuilderService builderService = Aura.getBuilderService();
-        ComponentDef def = builderService.getComponentDefBuilder().setDescriptor(cmpDesc).build();
-        Aura.getDefinitionService().save(def);
-
-        // Make sure we actually have something to clear from the cache before verifying it's not in there.
-        // if (!isInDefsCache(cmpDesc, mdr)) {
-        // fail("Test setup failure: def not added to MasterDefRegistry cache");
-        // }
-        assertNotCached(cmpDesc, mdr, uid);
-    }
-
-    /**
-     * Wait for MasterDefRegistry and CachingDefRegistry caches to be cleared after a source change.
-     */
-    private void assertNotCached(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImplOverride mdr, String uid)
-            throws Exception {
-        long startTime = System.nanoTime();
-        long timeoutInMilliseconds = 10000;
-        long intervalInMilliseconds = 100;
-
-        while (TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime) < timeoutInMilliseconds) {
-            if (isMdrCacheCleared(cmpDesc, mdr, uid)) {
-                return;
-            }
-            Thread.sleep(intervalInMilliseconds);
-        }
-        fail("Caches did not clear within " + (timeoutInMilliseconds / 1000) + " seconds after a source change");
-    }
-
-    /**
-     * Return true if DefDescriptor has been removed from MasterDefRegistry static cache. This does not take into
-     * account the non-static local cache.
-     */
-    private boolean isMdrCacheCleared(DefDescriptor<ComponentDef> cmpDesc, MasterDefRegistryImplOverride mdr, String uid)
-            throws Exception {
-        Cache<String, DependencyEntry> dependencies = AuraPrivateAccessor.get(mdr, "depsCache");
-        String key = AuraPrivateAccessor.invoke(mdr, "makeGlobalKey", uid, cmpDesc);
-        Object cacheReturn = dependencies.getIfPresent(key);
-
-        return cacheReturn == null && !isInDefsCache(cmpDesc, mdr);
     }
 
     /**
@@ -1427,18 +1376,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        mdr.getDef(privilegedCmp);
-        assertTrue(isInDepsCache(privilegedCmp, mdri));
-        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
-        assertFalse(isInDepsCache(privilegedRoot, mdri));
 
-        mdr.invalidate(DefDescriptorImpl.getInstance("aura:component", ComponentDef.class)); // invalidate the world
-        mdr.getDef(unprivilegedCmp);
-        assertFalse(isInDepsCache(privilegedCmp, mdri));
-        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
-        assertFalse(isInDepsCache(privilegedRoot, mdri));
-
-        mdr.invalidate(DefDescriptorImpl.getInstance("aura:component", ComponentDef.class)); // invalidate the world
         try {
             mdr.getDef(privilegedRoot);
             fail("Shouldn't be able to have a privileged cmp depend on an unprivileged cmp");
@@ -1448,6 +1386,18 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
                             "No COMPONENT named %s found",
                             unprivilegedCmp.getQualifiedName()));
         }
+
+        mdr.getDef(unprivilegedCmp);
+        assertFalse(isInDepsCache(privilegedCmp, mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
+        assertFalse(isInDepsCache(privilegedRoot, mdri));
+
+
+        mdr.getDef(privilegedCmp);
+        assertTrue(isInDepsCache(privilegedCmp, mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
+        assertFalse(isInDepsCache(privilegedRoot, mdri));
+
     }
 
     public void testJavaProtocolIsCached() throws Exception {
@@ -1705,8 +1655,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
 
         @Override
         public void save(TypeDef def) {
-            Mockito.verify(wLock, Mockito.times(1)).lock();
-            Mockito.verify(wLock, Mockito.never()).unlock();
         }
 
         @Override
@@ -1792,40 +1740,22 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
      * Test getDef to ensure locking is minimized.
      *
      * This asserts that within an MDR we only lock once for any number of getDef calls for a single def.
+     *
+     * FIXME: this should not hit the caching service.
      */
     public void testGetDefLocking() throws Exception {
         LockTestInfo lti = null;
 
         lti = new LockTestInfo();
         try {
-            assertEquals(lti.reg.def, lti.mdr.getDef(lti.reg.desc));
+            Definition d = lti.mdr.getDef(lti.reg.desc);
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
             Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
-            assertEquals(lti.reg.def, lti.mdr.getDef(lti.reg.desc));
+            assertEquals(d, lti.mdr.getDef(lti.reg.desc));
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
             Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
             Mockito.verify(lti.wLock, Mockito.never()).lock();
             Mockito.verify(lti.wLock, Mockito.never()).unlock();
-        } finally {
-            lti.clear();
-        }
-    }
-
-    /**
-     * Test save to ensure locking is minimized.
-     *
-     * This asserts that within an MDR we lock with a write lock for a save.
-     */
-    public void testSaveLocking() throws Exception {
-        LockTestInfo lti = null;
-
-        lti = new LockTestInfo();
-        try {
-            lti.mdr.save(lti.reg.def);
-            Mockito.verify(lti.wLock, Mockito.times(1)).lock();
-            Mockito.verify(lti.wLock, Mockito.times(1)).unlock();
-            Mockito.verify(lti.rLock, Mockito.never()).lock();
-            Mockito.verify(lti.rLock, Mockito.never()).unlock();
         } finally {
             lti.clear();
         }

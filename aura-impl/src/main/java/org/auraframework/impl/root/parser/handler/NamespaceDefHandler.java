@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +39,10 @@ public class NamespaceDefHandler extends RootTagHandler<NamespaceDef> {
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of();
 
     private final NamespaceDefImpl.Builder builder = new NamespaceDefImpl.Builder();
+
+    public NamespaceDefHandler() {
+        super();
+    }
 
     public NamespaceDefHandler(DefDescriptor<NamespaceDef> defDescriptor, Source<?> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
@@ -174,10 +177,4 @@ public class NamespaceDefHandler extends RootTagHandler<NamespaceDef> {
     protected NamespaceDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
-    @Override
-    public void writeElement(NamespaceDef def, Appendable out) throws IOException {
-
-    }
-
 }

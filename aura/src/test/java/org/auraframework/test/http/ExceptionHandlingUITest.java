@@ -106,11 +106,6 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
         assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
     }
 
-    private void assertQuickFixStacktrace(String messageStartsWith, String... causeStartsWith) throws Exception {
-        String actual = auraUITestingUtil.getQuickFixCause().replaceAll("\\s+", " ");
-        assertStacktraceCommon(actual, messageStartsWith, causeStartsWith);
-    }
-
     private void assertStacktraceCommon(String actual, String messageStartsWith, String... causeStartsWith)
             throws Exception {
         if (!actual.contains(messageStartsWith)) {
@@ -137,7 +132,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * QuickFix displayed if provider throws during instantiation.
+     * Error displayed if provider throws during instantiation.
      */
     public void testCmpProviderThrowsDuringInstantiation() throws Exception {
         setDevContextWithoutConfig();
@@ -145,7 +140,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 InterfaceDef.class,
                 "<aura:interface provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'></aura:interface>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertQuickFixStacktrace(
+        assertStacktrace(
                 "java.lang.RuntimeException: that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.",
                 "(TestProviderThrowsDuringInstantiation.java:");
     }
@@ -162,13 +157,13 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * QuickFix displayed if provider throws during instantiation.
+     * Error displayed if provider throws during instantiation.
      */
     public void testAppProviderThrowsDuringInstantiation() throws Exception {
         setDevContextWithoutConfig();
         openRaw(getAppUrl(
                 "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
-        assertQuickFixStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
+        assertStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
     }
 
     /**
@@ -243,7 +238,7 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 ComponentDef.class,
                 "<aura:component renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation'></aura:component>");
         openRaw(getAppUrl("", String.format("<%s:%s/>", cdd.getNamespace(), cdd.getName())));
-        assertQuickFixStacktrace(
+        assertStacktrace(
                 "java.lang.RuntimeException: invisible me at org.auraframework.impl.renderer.sampleJavaRenderers.TestRendererThrowsDuringInstantiation.",
                 "(TestRendererThrowsDuringInstantiation.java:");
     }
@@ -290,9 +285,9 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
                 "<aura:application '></aura:application>");
         openRaw(String.format("/%s/%s.app", add.getNamespace(), add.getName()));
         // Verifying common bits of parser (sjsxp vs woodstox) error
-        assertQuickFixStacktrace("org.auraframework.throwable.AuraUnhandledException:");
-        assertQuickFixStacktrace(String.format("markup://%s:%s:", add.getNamespace(), add.getName()));
-        assertQuickFixStacktrace("[2,19]");
+        assertStacktrace("org.auraframework.throwable.AuraUnhandledException:");
+        assertStacktrace(String.format("markup://%s:%s:", add.getNamespace(), add.getName()));
+        assertStacktrace("[2,19]");
     }
 
     /**
@@ -301,8 +296,8 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     public void testControllerThrowsWithFileName() throws Exception {
         String fileName = "auratest/parseError";
         openRaw(fileName + ".cmp");
-        assertQuickFixStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
-        assertQuickFixStacktrace("auratest/parseError/parseErrorController.js");
+        assertStacktrace("org.auraframework.throwable.AuraRuntimeException: ");
+        assertStacktrace("auratest/parseError/parseErrorController.js");
     }
 
     /**

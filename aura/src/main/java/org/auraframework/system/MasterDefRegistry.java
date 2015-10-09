@@ -69,11 +69,6 @@ public interface MasterDefRegistry {
     <D extends Definition> D getRawDef(DefDescriptor<D> descriptor) throws QuickFixException;
 
     /**
-     * Save the given definition back to appropriate source location.
-     */
-    <D extends Definition> void save(D def);
-
-    /**
      * Given a descriptor that contains search patterns or wildcards, return a
      * set of Descriptors for all existing Definitions who have source that
      * exists. Does not compile the definitions if they were not already
@@ -137,15 +132,6 @@ public interface MasterDefRegistry {
      * @return the full set of loaded definitions not included in the preload.
      */
     Map<DefDescriptor<? extends Definition>, Definition> filterRegistry(Set<DefDescriptor<?>> preloads);
-
-    /**
-     * Invalidate a descriptor in the cache.
-     *
-     * This method is only definitive for the local cache. See the class comment.
-     *
-     * @param descriptor the descriptor.
-     */
-    <T extends Definition> boolean invalidate(DefDescriptor<T> descriptor);
 
     /**
      * Get the UID associated with a descriptor.

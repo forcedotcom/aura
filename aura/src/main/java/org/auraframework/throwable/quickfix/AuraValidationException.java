@@ -22,12 +22,12 @@ import org.auraframework.system.Location;
 public abstract class AuraValidationException extends QuickFixException {
     private static final long serialVersionUID = -7041778809350433164L;
 
-    public AuraValidationException(String message, Location l, AuraQuickFix... quickFixes) {
-        super(message, l, quickFixes);
+    public AuraValidationException(String message, Location l) {
+        super(message, l);
     }
 
-    public AuraValidationException(String message, Location l, Throwable cause, AuraQuickFix... quickFixes) {
-        super(message, l, cause, quickFixes);
+    public AuraValidationException(String message, Location l, Throwable cause) {
+        super(message, l, cause);
     }
 
     public AuraValidationException(String msg) {

@@ -24,12 +24,8 @@ public class SVGParserException extends AuraValidationException {
 
     private static final long serialVersionUID = 6972143087324977978L;
 
-    public SVGParserException(String message, Location l, AuraQuickFix... quickFixes) {
-        super(message, l, quickFixes);
-    }
-
     public SVGParserException(String message, Location l) {
-        this(message, l, (AuraQuickFix[]) null);
+        super(message, l);
     }
 
     public SVGParserException(String message) {

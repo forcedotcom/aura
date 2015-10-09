@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -108,7 +107,4 @@ public class ExampleDefHandler<P extends RootDefinition> extends ParentedTagHand
 
         return builder.build();
     }
-
-    @Override
-    public void writeElement(ExampleDefImpl def, Appendable out) throws IOException {}
 }

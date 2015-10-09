@@ -15,7 +15,6 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.io.IOException;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
@@ -41,6 +40,10 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_NAME);
 
     private final DesignTemplateDefImpl.Builder builder = new DesignTemplateDefImpl.Builder();
+
+    public DesignTemplateDefHandler() {
+        super();
+    }
 
     public DesignTemplateDefHandler(RootTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader,
             Source<?> source) {
@@ -96,9 +99,4 @@ public class DesignTemplateDefHandler extends ParentedTagHandler<DesignTemplateD
     protected DesignTemplateDef createDefinition() throws QuickFixException {
         return builder.build();
     }
-
-    @Override
-    public void writeElement(DesignTemplateDef def, Appendable out) throws IOException {
-    }
-
 }

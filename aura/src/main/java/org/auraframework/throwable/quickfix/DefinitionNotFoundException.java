@@ -31,27 +31,13 @@ public class DefinitionNotFoundException extends AuraValidationException {
     private static final String messageFormat = "No %s named %s found";
 
     public DefinitionNotFoundException(DefDescriptor<?> descriptor, Location l) {
-        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()), l, getFixes(descriptor));
+        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()), l);
         this.descriptor = descriptor;
     }
 
     public DefinitionNotFoundException(DefDescriptor<?> descriptor, Location l, String usedAt) {
-        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()) + " : " + usedAt, l,
-                getFixes(descriptor));
+        super(getMessage(descriptor.getDefType(), descriptor.getQualifiedName()) + " : " + usedAt, l);
         this.descriptor = descriptor;
-    }
-
-    private static AuraQuickFix[] getFixes(DefDescriptor<?> descriptor) {
-        switch (descriptor.getDefType()) {
-        case COMPONENT:
-            return new AuraQuickFix[] { new CreateComponentDefQuickFix(descriptor) };
-        case APPLICATION:
-            return new AuraQuickFix[] { new CreateApplicationDefQuickFix(descriptor) };
-        case TOKENS:
-            return new AuraQuickFix[] { new CreateTokensDefQuickFix(descriptor) };
-        default:
-            return null;
-        }
     }
 
     public DefinitionNotFoundException(DefDescriptor<?> descriptor) {

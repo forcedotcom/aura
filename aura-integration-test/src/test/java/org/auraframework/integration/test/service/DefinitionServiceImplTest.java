@@ -288,7 +288,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
-        context.getDefRegistry().invalidate(cmpDesc);
 
         DefDescriptor<?> clientDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String clientUid = context.getDefRegistry().getUid(null, clientDesc);
@@ -315,7 +314,6 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                 laxSecurityApp);
         DefDescriptor<?> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
         String uid = context.getDefRegistry().getUid(null, cmpDesc);
-        context.getDefRegistry().invalidate(cmpDesc);
 
         Map<DefDescriptor<?>, String> loaded = context.getLoaded();
         assertNull("Parent should not be loaded initially", loaded.get(cmpDesc));

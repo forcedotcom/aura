@@ -104,11 +104,6 @@ public class EventHandlerDefHandler extends XMLHandler<EventHandlerDefImpl> {
     }
 
     @Override
-    public void writeElement(EventHandlerDefImpl def, Appendable out) {
-        // TODO
-    }
-
-    @Override
     public Set<String> getAllowedAttributes() {
         return ALLOWED_ATTRIBUTES;
     }

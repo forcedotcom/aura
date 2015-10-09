@@ -16,7 +16,11 @@
 package org.auraframework.impl.root.parser.handler.design;
 
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Set;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.auraframework.def.design.DesignDef;
 import org.auraframework.def.design.DesignLayoutAttributeDef;
 import org.auraframework.impl.design.DesignLayoutAttributeDefImpl;
@@ -27,10 +31,7 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import java.io.IOException;
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLayoutAttributeDef, DesignDef>{
     public final static String TAG = "design:layoutattribute";
@@ -39,6 +40,10 @@ public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLa
     private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ITEM_ATTRIBUTE);
 
     private DesignLayoutAttributeDefImpl.Builder builder = new DesignLayoutAttributeDefImpl.Builder();
+
+    public DesignLayoutAttributeDefHandler() {
+        super();
+    }
 
     public DesignLayoutAttributeDefHandler(ContainerTagHandler<DesignDef> parentHandler, XMLStreamReader xmlReader, Source<?> source) {
         super(parentHandler, xmlReader, source);
@@ -72,11 +77,6 @@ public class DesignLayoutAttributeDefHandler extends ParentedTagHandler<DesignLa
         if (!AuraTextUtil.isNullEmptyOrWhitespace(text)) {
             error("No literal text allowed in attribute design definition");
         }
-    }
-
-    @Override
-    public void writeElement(DesignLayoutAttributeDef def, Appendable out) throws IOException {
-
     }
 
     @Override

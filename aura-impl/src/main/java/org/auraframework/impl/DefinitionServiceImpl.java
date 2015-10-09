@@ -158,18 +158,6 @@ public class DefinitionServiceImpl implements DefinitionService {
         return context.getDefRegistry().find(matcher);
     }
 
-    @Override
-    public void save(Definition def) throws QuickFixException {
-        MasterDefRegistry defRegistry = Aura.getContextService().getCurrentContext().getDefRegistry();
-
-        ContextService contextService = Aura.getContextService();
-        contextService.assertEstablished();
-
-        def.validateDefinition();
-
-        defRegistry.save(def);
-    }
-
     /**
      * Take in the information off the context and sanitize, populating dependencies.
      *

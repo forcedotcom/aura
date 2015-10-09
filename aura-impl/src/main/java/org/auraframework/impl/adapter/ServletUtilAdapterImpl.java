@@ -35,7 +35,6 @@ import org.auraframework.adapter.ExceptionAdapter;
 import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
@@ -165,9 +164,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     return;
                 }
             } else if (mappedEx instanceof QuickFixException) {
-                if (quickfix && !isProductionMode(context.getMode())) {
-                    map = false;
-                } else {
+                if (isProductionMode(context.getMode())) {
                     //
                     // In production environments, we want wrap the quick-fix. But be a little careful here.
                     // We should never mark the top level as a quick-fix, because that means that we gack
@@ -560,30 +557,14 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 return mdr.getDependencies(oosUid);
             }
         } catch (QuickFixException qfe) {
-            DefDescriptor<ComponentDef> qfeDescriptor;
-
             //
             // A quickfix exception means that we couldn't compile something.
             // In this case, we still want to preload things, but we want to preload
             // quick fix values, note that we force NoCache here.
             //
             this.setNoCache(response);
-
-            qfeDescriptor = definitionService.getDefDescriptor("markup://auradev:quickFixException",
-                    ComponentDef.class);
-            context.setLoadingApplicationDescriptor(qfeDescriptor);
-            String qfeUid;
-            try {
-                qfeUid = mdr.getUid(null, qfeDescriptor);
-            } catch (QuickFixException death) {
-                //
-                // Ok, we really can't handle this here, so just punt. This means that
-                // the quickfix display is broken, and whatever we try will give us grief.
-                //
-                response.sendError(HttpServletResponse.SC_NOT_FOUND);
-                return null;
-            }
-            return mdr.getDependencies(qfeUid);
+            this.handleServletException(qfe, true, context, request, response, true);
+            return null;
         }
         this.setLongCache(response);
         if (uid == null) {

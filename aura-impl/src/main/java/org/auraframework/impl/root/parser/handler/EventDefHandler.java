@@ -127,11 +127,6 @@ public class EventDefHandler extends RootTagHandler<EventDef> {
     }
 
     @Override
-    public void writeElement(EventDef def, Appendable out) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     protected RootDefinitionBuilder<EventDef> getBuilder() {
         return builder;
     }

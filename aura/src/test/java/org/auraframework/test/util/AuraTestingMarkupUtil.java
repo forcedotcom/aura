@@ -18,7 +18,7 @@ package org.auraframework.test.util;
 
 public class AuraTestingMarkupUtil {
 	
-	protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
+    protected final static String baseApplicationTag = "<aura:application %s>%s</aura:application>";
     protected final static String baseComponentTag = "<aura:component %s>%s</aura:component>";
 	
     protected final static String attributeStringMarkup = "<aura:attribute name=%s type='String'/>";

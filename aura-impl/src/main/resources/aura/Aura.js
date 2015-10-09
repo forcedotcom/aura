@@ -404,6 +404,7 @@ function AuraInstance () {
     this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
     this.deferAction               = this.clientService.deferAction.bind(this.clientService);
     this.deferPendingActions       = this.clientService.deferPendingActions.bind(this.clientService);
+    this.runAfterInit               = this.clientService.runAfterInitDefs.bind(this.clientService);
 
     this.render                    = this.renderingService.render.bind(this.renderingService);
     this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
@@ -428,15 +429,15 @@ function AuraInstance () {
      * @public
      */
     this.pushCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.pushCreationPath(creationPath);
+        }
+        act.pushCreationPath(creationPath);
     };
 
 
@@ -447,15 +448,15 @@ function AuraInstance () {
      * @public
      */
     this.popCreationPath = function(creationPath) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.popCreationPath(creationPath);
+        }
+        act.popCreationPath(creationPath);
     };
 
     /**
@@ -465,18 +466,19 @@ function AuraInstance () {
      * @public
      */
     this.setCreationPathIndex = function(idx) {
-    	var ctx = this.getContext();
-    	if (!ctx) {
+        var ctx = this.getContext();
+        if (!ctx) {
             return;
-    	}
-    	var act = ctx.getCurrentAction();
-    	if (!act) {
+        }
+        var act = ctx.getCurrentAction();
+        if (!act) {
             return;
-    	}
-    	act.setCreationPathIndex(idx);
+        }
+        act.setCreationPathIndex(idx);
     };
 
-    //	Google Closure Compiler Symbol Exports
+    //  Google Closure Compiler Symbol Exports
+    this["runAfterInit"] = this.runAfterInit;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
     this["renderingService"] = this.renderingService;
@@ -563,10 +565,10 @@ function AuraInstance () {
         event : 'aura:clientRedirect',
         "globalId" : "Aura",
         "handler" : function(evt) {
-        	var url = evt.getParam('url');
-        	if (url != null) {
-        		window.location = url;
-        	}
+            var url = evt.getParam('url');
+            if (url != null) {
+                window.location = url;
+            }
         }
     });
 
@@ -603,6 +605,16 @@ AuraInstance.prototype.getCurrentTransactionId = function() { return undefined; 
  */
 AuraInstance.prototype.initAsync = function(config) {
     Aura.bootstrapMark("initAsync");
+
+    //
+    // This hook is to allow for reloading after aura is initialized, including
+    // any storage setup, as we may well have to clear persistent storage.
+    //
+    this.clientService.reloadPointPassed = true;
+    if (this.clientService.reloadFunction) {
+        this.clientService.reloadFunction();
+        return;
+    }
 
     var regexpDetectURLProcotolSegment = /^(.*?:)?\/\//;
 
@@ -667,10 +679,15 @@ AuraInstance.prototype.setLanguage = function() {
 /**
  * Initializes Aura with context info but without retrieving component from server. Used for synchronous initialization.
  *
+ * Whoever named this function should be shot, but I won't rename for now. Eventually we want to use
+ * startApplication, and make it either auto-require app.js or have the caller load app.js and then invoke
+ * startApplication with the data.
+ *
  * @param {Object} config The configuration attributes
  * @param {Boolean} useExisting
  * @param {Boolean} doNotInitializeServices Set to true if the History service should not be initialized, or false if
- * 	 it should. Defaults to true for Aura Integration Service.
+ *   it should. Defaults to true for Aura Integration Service.
+ * @public
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
     config = $A.util.json.resolveRefsObject(config);
@@ -685,7 +702,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         $A.context.setCurrentAction(null);
     } else {
         // Use the existing context and just join the new context into it
-        // FIXME: is this used? it won't do the right thing if there are components.
+        // FIXME: This is used by integration service, and will not work correctly with components.
         $A.getContext()['merge'](config["context"]);
     }
 };

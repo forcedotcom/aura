@@ -25,6 +25,7 @@ import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.LoggingService;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraExceptionUtil;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -66,12 +67,12 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     }
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         LoggingService loggingService = Aura.getLoggingService();
         loggingService.stopTimer(LoggingService.TIMER_AURA);
         loggingService.startTimer("java");
         try {
-            renderer.render(component, out);
+            renderer.render(component, rc);
             loggingService.incrementNum("JavaCallCount");
         } catch (Exception e) {
             throw AuraExceptionUtil.wrapExecutionException(e, this.location);

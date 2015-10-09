@@ -18,6 +18,7 @@ package org.auraframework.integration;
 import java.io.IOException;
 import java.util.Map;
 
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -51,7 +52,7 @@ public interface Integration {
      * @throws IOException
      * @throws QuickFixException
      */
-    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+    void injectComponentHtml(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
                          Appendable out, boolean useAsync)
             throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
 
@@ -60,7 +61,42 @@ public interface Integration {
      *
      * @see #injectComponent(String, java.util.Map, String, String, Appendable)
      */
-    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+    void injectComponentHtml(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
                          Appendable out)
+            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
+
+    /**
+     * Inject a component using a render context.
+     *
+     * Generates a &lt;script&gt; tag that will correctly embed an instance of an
+     * Aura component bound to the DOM element identified by localDomId.
+     *
+     * @param tag
+     *            Fully qualified (namespace:name) name of the Aura component.
+     * @param attributes
+     *            A map of the component's attributes as key/value pairs.
+     * @param localId
+     *            The user-provided locally unique ID of this component
+     *            that can be used with $A.getRoot().find(localId).
+     * @param locatorDomId
+     *            The DOM identifier for the element that will be used as the
+     *            parent of the component's elements.
+     * @param renderContext
+     *            context for injection script content.
+     * @param useAsync use asynchonous component call instead of HTML config
+     * @throws UnsupportedUserAgentException
+     * @throws AuraRuntimeException
+     * @throws IOException
+     * @throws QuickFixException
+     */
+    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                         RenderContext out, boolean useAsync)
+            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
+
+    /**
+     * Inject a component using a render context.
+     */
+    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                         RenderContext out)
             throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
 }

@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -26,7 +27,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 public class PlaceholderRenderer implements Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         throw new UnsupportedOperationException("Don't know how to build a placeholder yet");
     }
 }

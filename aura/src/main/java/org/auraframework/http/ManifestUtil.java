@@ -272,24 +272,4 @@ public class ManifestUtil {
         addManifestCookie(response, cookieString, SHORT_EXPIRE_SECONDS);
         return true;
     }
-
-    /**
-     * get the manifest URL.
-     *
-     * This routine will simply return the string, it does not check to see if the manifest is
-     * enabled first.
-     *
-     * @return a string for the manifest URL.
-     */
-    public String getManifestUrl() throws QuickFixException {
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        String contextPath = context.getContextPath();
-        String ret = "";
-
-        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
-        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Bare));
-        defs.append("/app.manifest");
-        ret = defs.toString();
-        return ret;
-    }
 }

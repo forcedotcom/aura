@@ -21,8 +21,10 @@ import org.auraframework.Aura;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
+import org.auraframework.impl.system.RenderContextImpl;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.service.RenderingService;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -38,7 +40,7 @@ public class RenderingServiceImpl implements RenderingService {
     private static final long serialVersionUID = 1663840391180454913L;
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws QuickFixException, IOException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws QuickFixException, IOException {
         Aura.getContextService().assertEstablished();
 
         BaseComponent<?, ?> renderable = null;
@@ -63,7 +65,51 @@ public class RenderingServiceImpl implements RenderingService {
             throw new AuraRuntimeException(String.format("No local RendererDef found for %s", component));
         }
 
-        rendererDef.render(renderable, out);
+        rendererDef.render(renderable, rc);
     }
 
+    /**
+     * Handy class to do nothing.
+     */
+    private static class NullAppender implements Appendable {
+        @Override
+        public Appendable append(CharSequence csq) throws IOException {
+            return this;
+        }
+
+        @Override
+        public Appendable append(CharSequence csq, int start, int end) throws IOException {
+            return this;
+        }
+
+        @Override
+        public Appendable append(char c) throws IOException {
+            return this;
+        }
+    }
+
+    @Override
+    public void render(BaseComponent<?, ?> component, Appendable standard, Appendable script)
+            throws QuickFixException, IOException {
+        if (standard == null) {
+            standard = new NullAppender();
+        }
+        if (script == null) {
+            script = new NullAppender();
+        }
+        RenderContext rc = new RenderContextImpl(standard, script);
+        this.render(component, rc);
+    }
+
+    @Override
+    public void render(BaseComponent<?, ?> component, Appendable out) throws QuickFixException, IOException {
+        this.render(component, out, null);
+    }
+
+    @Override
+    public RenderContext render(BaseComponent<?, ?> component) throws QuickFixException, IOException {
+        RenderContext rc = new RenderContextImpl(new StringBuilder(), new StringBuilder());
+        this.render(component, rc);
+        return rc;
+    }
 }

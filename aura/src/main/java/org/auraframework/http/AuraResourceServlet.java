@@ -16,7 +16,6 @@
 package org.auraframework.http;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 
 import javax.servlet.*;
@@ -25,7 +24,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.http.resource.*;
+import org.auraframework.http.resource.AppCss;
+import org.auraframework.http.resource.AppJs;
+import org.auraframework.http.resource.EncryptionKey;
+import org.auraframework.http.resource.InlineJs;
+import org.auraframework.http.resource.Manifest;
+import org.auraframework.http.resource.ResourceSvg;
+import org.auraframework.http.resource.TemplateHtml;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraResource;
 
@@ -48,8 +53,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
     private static final long serialVersionUID = -3642790050433142397L;
     public static final String ORIG_REQUEST_URI = "aura.origRequestURI";
 
-    private static ServletContext servletContext;
-
     private final Map<String,AuraResource> nameToResource = Maps.newHashMap();
 
     public AuraResourceServlet() {
@@ -58,6 +61,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
         addResource(new Manifest());
         addResource(new ResourceSvg());
         addResource(new EncryptionKey());
+        addResource(new InlineJs());
+        addResource(new TemplateHtml());
     }
 
     public void addResource(AuraResource resource) {
@@ -86,7 +91,6 @@ public class AuraResourceServlet extends AuraBaseServlet {
                 return resource;
             }
         }
-        System.out.println("ERROR: Unable to find resource for " + (last != null ? last : fullName));
         return null;
     }
 
@@ -111,30 +115,8 @@ public class AuraResourceServlet extends AuraBaseServlet {
         }
         
         resource.setContentType(response);
-        
-        setBasicHeaders(context.getApplicationDescriptor(), request, response);
+        servletUtil.setCSPHeaders(context.getApplicationDescriptor(), request, response);
         
         resource.write(request, response, context);
-    }
-
-    public static boolean isResourceLocallyAvailable(String resourceURI) {
-        if (resourceURI != null && resourceURI.startsWith("/") && servletContext != null) {
-            try {
-                URI uri = URI.create(resourceURI);
-                if (uri != null) {
-                    ServletContext c = servletContext.getContext(uri.getPath());
-                    if (c != null && c.getResource(uri.getPath()) != null) {
-                        return true;
-                    }
-                }
-            } catch (Exception e) {
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public void init(ServletConfig config) {
-        servletContext = config.getServletContext();
     }
 }

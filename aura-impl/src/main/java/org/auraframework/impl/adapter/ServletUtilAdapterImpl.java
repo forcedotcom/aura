@@ -17,29 +17,40 @@ package org.auraframework.impl.adapter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import aQute.bnd.annotation.component.Component;
-
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
-import org.auraframework.adapter.*;
-import org.auraframework.def.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ContentSecurityPolicy;
+import org.auraframework.adapter.ExceptionAdapter;
+import org.auraframework.adapter.ServletUtilAdapter;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.CSP;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.*;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.throwable.*;
+import org.auraframework.system.AuraResource;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.throwable.AuraUnhandledException;
+import org.auraframework.throwable.ClientOutOfSyncException;
+import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -48,12 +59,8 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-/**
- * Work to make this class final.
- *
- * @author kgray
- * @since 202
- */
+import aQute.bnd.annotation.component.Component;
+
 @Component (provide=AuraServiceProvider.class)
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ContextService contextSerivce = Aura.getContextService();
@@ -283,10 +290,11 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public List<String> getScripts(AuraContext context) throws QuickFixException {
+    public List<String> getScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+            throws QuickFixException {
         List<String> ret = Lists.newArrayList();
-        ret.addAll(getBaseScripts(context));
-        ret.addAll(getNamespacesScripts(context));
+        ret.addAll(getBaseScripts(context, attributes));
+        ret.addAll(getFrameworkScripts(context, safeInlineJs, attributes));
         return ret;
     }
 
@@ -325,7 +333,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * Get the set of base scripts for a context.
      */
     @Override
-    public List<String> getBaseScripts(AuraContext context) throws QuickFixException {
+    public List<String> getBaseScripts(AuraContext context, Map<String,Object> attributes) throws QuickFixException {
         Set<String> ret = Sets.newLinkedHashSet();
 
         String html5ShivURL = configAdapter.getHTML5ShivURL();
@@ -342,18 +350,38 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
         return new ArrayList<>(ret);
     }
 
+
+    private void addAttributes(StringBuilder builder, Map<String,Object> attributes) {
+        //
+        // This feels a lot like a hack.
+        //
+        if (attributes != null && !attributes.isEmpty()) {
+            builder.append("?aura.attributes=");
+            builder.append(AuraTextUtil.urlencode(JsonEncoder.serialize(attributes, false, false)));
+        }
+    }
     /**
      * Get the set of base scripts for a context.
      */
     @Override
-    public List<String> getNamespacesScripts(AuraContext context) throws QuickFixException {
+    public List<String> getFrameworkScripts(AuraContext context, boolean safeInlineJs, Map<String,Object> attributes)
+        throws QuickFixException {
         String contextPath = context.getContextPath();
         List<String> ret = Lists.newArrayList();
+        StringBuilder defs;
 
-        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+        if (safeInlineJs) {
+            defs = new StringBuilder(context.getContextPath()).append("/l/");
+            defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
+            defs.append("/inline.js");
+            addAttributes(defs, attributes);
+            ret.add(defs.toString());
+        }
+
+
+        defs = new StringBuilder(contextPath).append("/l/");
         defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Normal));
         defs.append("/app.js");
-
         ret.add(defs.toString());
 
         return ret;
@@ -572,6 +600,27 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
             uid = context.getUid(appDesc);
         }
         return mdr.getDependencies(uid);
+    }
+
+    /**
+     * get the manifest URL.
+     *
+     * This routine will simply return the string, it does not check to see if the manifest is
+     * enabled first.
+     *
+     * @return a string for the manifest URL.
+     */
+    @Override
+    public String getManifestUrl(AuraContext context, Map<String,Object> attributes) {
+        String contextPath = context.getContextPath();
+        String ret = "";
+
+        StringBuilder defs = new StringBuilder(contextPath).append("/l/");
+        defs.append(context.getEncodedURL(AuraContext.EncodingStyle.Bare));
+        defs.append("/app.manifest");
+        addAttributes(defs, attributes);
+        ret = defs.toString();
+        return ret;
     }
 
     /**

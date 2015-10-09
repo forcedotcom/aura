@@ -46,7 +46,7 @@ public class AuraResourceRewriteFilter implements Filter {
     private static final String uriPattern = "/auraResource?%s=%s&%s=%s&%s=%s";
     private static final String lookupPattern = "&%s=%s";
 
-    private static final Pattern pattern = Pattern.compile("^/l/([^/]*)/(?:([^/]*)/)?(app|resources).?(.*)$");
+    private static final Pattern pattern = Pattern.compile("^/l/([^/]*)/(?:([^/]*)/)?(.*?)[.]([^.]*)$");
 
     @Override
     public void destroy() {

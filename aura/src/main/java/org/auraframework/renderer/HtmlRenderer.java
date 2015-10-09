@@ -26,6 +26,7 @@ import org.auraframework.def.Renderer;
 import org.auraframework.expression.Expression;
 import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -35,9 +36,19 @@ public class HtmlRenderer implements Renderer {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         String tag = (String) component.getAttributes().getValue("tag");
         String id = component.getLocalId();
+        List<Component> body = (List<Component>) component.getAttributes().getValue("body");
+        boolean script = (tag != null && tag.equals("script") && body != null && body.size() > 0);
+
+        if (script) {
+            rc.pushScript();
+            componentRenderer.render(component, rc);
+            rc.popScript();
+            return;
+        }
+        Appendable out = rc.getCurrent();
         out.append('<');
         out.append(tag);
 
@@ -85,10 +96,9 @@ public class HtmlRenderer implements Renderer {
             out.append('"');
         }
 
-        List<Component> body = (List<Component>) component.getAttributes().getValue("body");
         if (body != null && body.size() > 0) {
             out.append('>');
-            componentRenderer.render(component, out);
+            componentRenderer.render(component, rc);
             out.append("</");
             out.append(tag);
             out.append('>');

@@ -25,11 +25,12 @@ import org.auraframework.instance.BaseComponent;
 import org.auraframework.instance.Component;
 import org.auraframework.instance.Wrapper;
 import org.auraframework.service.RenderingService;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class ExpressionRenderer implements Renderer {
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
 
         RenderingService renderingService = Aura.getRenderingService();
 
@@ -53,19 +54,19 @@ public class ExpressionRenderer implements Renderer {
                 // would cause problems.
                 escaped = escaped.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
             }
-            out.append(escaped);
+            rc.getCurrent().append(escaped);
         } else if (value instanceof List) {
             List<?> kids = (List<?>) value;
             for (Object kid : kids) {
                 if (kid instanceof BaseComponent) {
-                    renderingService.render((BaseComponent<?, ?>) kid, out);
+                    renderingService.render((BaseComponent<?, ?>) kid, rc);
                 } else if (kid instanceof ComponentDefRef) {
                     Component cmp = ((ComponentDefRef) kid).newInstance(component);
-                    renderingService.render(cmp, out);
+                    renderingService.render(cmp, rc);
                 }
             }
         } else if (value != null) {
-            out.append(value.toString());
+            rc.getCurrent().append(value.toString());
         }
     }
 }

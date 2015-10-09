@@ -20,12 +20,13 @@ import java.io.IOException;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.AttributeSet;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class InitRenderer implements Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable appendable)
+    public void render(BaseComponent<?, ?> component, RenderContext renderContext)
             throws IOException, QuickFixException {
 
         AttributeSet attributes = component.getAttributes();
@@ -44,13 +45,15 @@ public class InitRenderer implements Renderer {
             version = "";
         }
 
-        appendable.append("<script nonce='LockerServiceTemporaryNonce'>\n");
+        renderContext.pushScript();
+
         String script = String.format(
                 "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
                 name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(),
                 defaultAutoRefreshInterval.longValue(),
                 debugLoggingEnabled, clearStorageOnInit, version);
-        appendable.append(script);
-        appendable.append("</script>\n");
+        renderContext.getCurrent().append(script);
+
+        renderContext.popScript();
     }
 }

@@ -21,10 +21,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
-import org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer;
-import org.auraframework.instance.Component;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 
@@ -61,27 +58,6 @@ public class RendererDefTest extends AuraImplTestCase {
         assertTrue(defObj instanceof Map);
         assertNull("Component definitions of components which use java renderers should not have a renderer def",
                 ((Map<?, ?>) defObj).get("rendererDef"));
-    }
-
-    /**
-     * Verify the serialized form of Component instance when java renderers are
-     * used.
-     * 
-     * @expectedResults Rendering section found in component instance.
-     * @throws Exception
-     */
-    public void testComponentInstanceDefWhenRendererIsJava() throws Exception {
-        Component component = Aura.getInstanceService().getInstance("test:test_SimpleJavaRenderer", ComponentDef.class,
-                null);
-        // Convert the instance to a format that is used by the client
-        String defInJson = JsonEncoder.serialize(component, false, true);
-        // Convert back to the object, just like the client does in javascript
-        Object defObj = new JsonReader().read(defInJson);
-        assertTrue(defObj instanceof Map);
-        assertNotNull("Component Instance of components which use java renderers should have a rendering section",
-                ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
-        assertEquals("Component markup seen in Component instance does not match the markup in Java Renderer",
-                TestSimpleRenderer.htmlOutput, ((Map<?, ?>) ((Map<?, ?>) defObj).get(Json.ApplicationKey.VALUE.toString())).get("rendering"));
     }
 
     /**

@@ -18,6 +18,7 @@ package org.auraframework.service;
 import java.io.IOException;
 
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -34,11 +35,31 @@ public interface RenderingService extends AuraService {
      * Renders a {@link Component} or {@link Application} server-side. Will fail
      * with a AuraRuntimeException if any components are encountered that do not
      * have a local (server-side) renderer.
+     *
+     * Scripts will not be rendered in this case.
      * 
      * @param component The Component or Application to render.
-     * @param out The Appendable where the rendering should be written.
+     * @param out The Appendable where the standard rendering should be written.
      * @throws QuickFixException
      * @throws IOException if the appendable throws one.
      */
     void render(BaseComponent<?, ?> component, Appendable out) throws QuickFixException, IOException;
+    
+    /**
+     * Renders a {@link Component} or {@link Application} server-side. Will fail
+     * with a AuraRuntimeException if any components are encountered that do not
+     * have a local (server-side) renderer.
+     * 
+     * @param component The Component or Application to render.
+     * @param standard The Appendable where the standard rendering should be written.
+     * @param script The Appendable where the script rendering should be written.
+     * @throws QuickFixException
+     * @throws IOException if the appendable throws one.
+     */
+    void render(BaseComponent<?, ?> component, Appendable standard, Appendable script)
+        throws QuickFixException, IOException;
+
+    RenderContext render(BaseComponent<?,?> component) throws QuickFixException, IOException;
+    
+    void render(BaseComponent<?,?> component, RenderContext context) throws QuickFixException, IOException;
 }

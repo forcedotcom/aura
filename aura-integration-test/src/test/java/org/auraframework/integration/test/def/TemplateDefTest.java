@@ -258,7 +258,7 @@ public class TemplateDefTest extends AuraImplTestCase {
 
         StringBuffer sb = new StringBuffer();
         Component template = Aura.getInstanceService().getInstance(scriptTagInBodyOfTemplate);
-        Aura.getRenderingService().render(template, sb);
+        Aura.getRenderingService().render(template, sb, null);
         String result = sb.toString();
 
         // Using pattens here because in java 1.7 we get attributes rendered one way, in 1.8 we get a different way.

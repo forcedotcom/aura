@@ -20,13 +20,14 @@ import java.util.Map;
 
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 public class RendererWithExtendedApp extends AbstractRendererForTestingIntegrationService implements
         Renderer {
 
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
         String desc = (String) component.getAttributes().getValue("desc");
         @SuppressWarnings("unchecked")
         Map<String, Object> attr = (Map<String, Object>) component.getAttributes().getValue("attrMap");
@@ -35,11 +36,12 @@ public class RendererWithExtendedApp extends AbstractRendererForTestingIntegrati
         Boolean useAsync = (Boolean) component.getAttributes().getValue("useAsync");
         //one way to inject handler for event fired from injected component is to append it to out here -- clickHandler__t and changeHandler__t
         //another way is to put the script directly into application(aisAsyncApp.app) markup -- click2Handler__t
-        out.append("<script>"
-                + "function clickHandler__t(event){document._clickHandlerCalled = true; document.__clickEvent=event;}\n"
-                + "function changeHandler__t(event){document._changeHandlerCalled = 'Custom JS Code'; document.__changeEvent=event;}"
-                + "</script>");
+        Appendable out = rc.getCurrent();
+        out.append("<script>");
+        out.append("function clickHandler__t(event){document._clickHandlerCalled = true; document.__clickEvent=event;}\n"
+                + "function changeHandler__t(event){document._changeHandlerCalled = 'Custom JS Code'; document.__changeEvent=event;}");
 
+        out.append("</script>");
         out.append(String.format("<div id='%s' style='border: 1px solid black'/>", placeholder));
 
         injectComponent(desc, attr, localId, placeholder, out, useAsync, "auratest:aisAsyncApp");

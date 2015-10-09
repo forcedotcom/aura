@@ -15,18 +15,13 @@
  */
 package org.auraframework.integration.test.renderer;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Renderer;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.java.renderer.JavaRendererDef;
 import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
 import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.BaseComponent;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
@@ -76,24 +71,6 @@ public class JavaRendererDefFactoryTest extends AuraImplTestCase {
         } catch (Exception e) {
             checkExceptionStart(e, DefinitionNotFoundException.class,
                     "No RENDERER named java://ClassNotFound found");
-        }
-    }
-
-    /**
-     * Verify that Renderer interface declares method with correct properties. Renderer interface will be implemented by
-     * all Renderers.
-     * 
-     * @throws Exception
-     */
-    public void testRendererInterfaceProperties() throws Exception {
-        try {
-            Method renderMethod = Renderer.class.getMethod("render", BaseComponent.class, Appendable.class);
-            assertTrue("render method on Renderer interface should be declared public.",
-                    Modifier.isPublic(renderMethod.getModifiers()));
-        } catch (NoSuchMethodException e) {
-            // The interface org.auraframework.def.Renderer should declare a render method to be overriden by
-            // Java renderers.
-            fail("Renderer interface does not declare a render method.");
         }
     }
 

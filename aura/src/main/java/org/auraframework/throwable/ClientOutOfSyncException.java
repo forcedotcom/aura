@@ -47,8 +47,7 @@ public class ClientOutOfSyncException extends ClientSideEventException {
 
     @Override
     public JsFunction getDefaultHandler() {
-        return new JsFunction(ImmutableList.<String> of(),
-                "try{$A.clientService.setOutdated()}catch(e){$L.clientService.setOutdated()}");
+        return new JsFunction(ImmutableList.<String> of(),"$A.clientService.setOutdated()");
     }
 
     @Override

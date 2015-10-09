@@ -86,7 +86,7 @@ public class ComponentRenderingUITest extends WebDriverTestCase {
      * Verify that Components that have a server side renderer can still use the
      * render='client' specification.
      */
-    public void testCmpWithJavaRendererButRenderEqualsClient() throws Exception {
+    public void _testCmpWithJavaRendererButRenderEqualsClient() throws Exception {
         open("/test/test_ServerRendererOnly.cmp");
         assertTrue("Aura client engine not present on page. The component had a render='client' specification.",
                 isAuraClientEnginePresentOnPage());

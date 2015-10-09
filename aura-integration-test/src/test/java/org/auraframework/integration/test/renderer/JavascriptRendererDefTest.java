@@ -24,6 +24,8 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
+import org.auraframework.impl.system.RenderContextImpl;
+import org.auraframework.system.RenderContext;
 
 /**
  * Test class to verify implementation of JavascriptRendererDef.
@@ -54,8 +56,11 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
      */
     public void testThrownExceptionWhenUsingJSRendererLocally() throws Exception {
         RendererDef rendererDef = (new JavascriptRendererDef.Builder()).build();
+        StringWriter sw = new StringWriter();
+        RenderContext rc = new RenderContextImpl(sw, null);
+        
         try {
-            rendererDef.render(null, new StringWriter());
+            rendererDef.render(null, rc);
             fail("UnsupportedOperationException should be thrown when calling client render() in local.");
         } catch (Exception e) {
             checkExceptionFull(e, UnsupportedOperationException.class, null);

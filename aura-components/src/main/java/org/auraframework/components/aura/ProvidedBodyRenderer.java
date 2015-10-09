@@ -20,6 +20,7 @@ import org.auraframework.Aura;
 import org.auraframework.def.ComponentDefRefArray;
 import org.auraframework.def.Renderer;
 import org.auraframework.instance.BaseComponent;
+import org.auraframework.system.RenderContext;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -30,18 +31,18 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  */
 public class ProvidedBodyRenderer implements Renderer {
     @Override
-    public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-    	ComponentDefRefArray bodyAttribute = component.getAttributes().getValue("body", ComponentDefRefArray.class);
+    public void render(BaseComponent<?, ?> component, RenderContext rc) throws IOException, QuickFixException {
+        ComponentDefRefArray bodyAttribute = component.getAttributes().getValue("body", ComponentDefRefArray.class);
         if (bodyAttribute == null) {
-        	return;
+            return;
         }
         
         // Loop over all the items in the body, which is a ComponentDefRefArray
         // If you find a ComponentInstance, render that instance
         for (Object bodyComponent : bodyAttribute.getList()) {
-        	if(bodyComponent instanceof BaseComponent) {
-        		Aura.getRenderingService().render((BaseComponent<?, ?>)bodyComponent, out);
-        	}
+            if(bodyComponent instanceof BaseComponent) {
+                Aura.getRenderingService().render((BaseComponent<?, ?>)bodyComponent, rc);
+            }
         }
         return;
     }

@@ -194,6 +194,9 @@ AuraClientService = function AuraClientService () {
     //
     this.optionClientSynchronous = true;
 
+    this.reloadFunction = undefined;
+    this.reloadPointPassed = false;
+
     this.handleAppCache();
 
 };
@@ -335,13 +338,13 @@ AuraClientService.prototype.decode = function(response, noStrip, timedOut) {
             var appCache = window.applicationCache;
             if (appCache && (appCache.status === appCache.IDLE || appCache.status > appCache.DOWNLOADING)) {
                 try {
-                    appCache.update();
+                appCache.update();
                 } catch (ignore) {
                     //
                     // not sure what we should do here. but since this seems to only happen in corner cases
                     // we'll ignore this one for now.
                     //
-                }
+            }
             }
             return ret;
         } else if (resp["exceptionEvent"] === true) {
@@ -704,6 +707,10 @@ AuraClientService.prototype.isDevMode = function() {
  * Clears actions and ComponentDefStorage stores then reloads the page.
  */
 AuraClientService.prototype.dumpCachesAndReload = function() {
+    if (this.reloadFunction) {
+        return;
+    }
+    this.reloadFunction = function() {
     // reload even if storage clear fails
     var actionStorage = Action.getStorage();
     var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
@@ -729,6 +736,10 @@ AuraClientService.prototype.dumpCachesAndReload = function() {
             window.location.reload(true);
         }
     );
+    };
+    if (this.reloadPointPassed) {
+        this.reloadFunction();
+    }
 };
 
 AuraClientService.prototype.handleAppCache = function() {
@@ -861,14 +872,14 @@ AuraClientService.prototype.setOutdated = function() {
         // an appcache, but appcache.update() will fail (The only known way to reproduce is to use chrome dev
         // tools and disable caching.
         try {
-            appCache.update();
+        appCache.update();
         } catch (e) {
             //
             // whoops. something is inconsistent, but we don't really want to hard fail.
             // so, instead, try a different route.
             //
             this.dumpCachesAndReload();
-        }
+    }
     }
 };
 

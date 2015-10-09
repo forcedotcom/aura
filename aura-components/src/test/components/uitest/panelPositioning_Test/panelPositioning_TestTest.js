@@ -147,7 +147,7 @@
 	 there are unit tests on the library that test the details,
 	 this just needs to make sure the values are properly passed through
 	  */
-	 testAdvanced: {
+	 _testAdvanced: {
 	 	test: function(cmp) {
 	 		var myPanel = null;
 	 		var littleTarget = cmp.find('littleTarget').getElement();
@@ -159,9 +159,8 @@
 
 	 			var p = myPanel.getElement();
 	 			var t = cmp.find('littleTarget').getElement();
-
-	 			var actual = Math.round(p.getBoundingClientRect().left) == Math.round(t.getBoundingClientRect().left);
-	 			$A.test.assert(actual, 'left should be aligned');
+	 			var actual = Math.floor(p.getBoundingClientRect().right) == Math.floor(t.getBoundingClientRect().right);
+	 			$A.test.assert(actual, 'right should be aligned');
 	 		});
 
 
@@ -171,9 +170,10 @@
 	                closeOnClickOut: true,
 	                useTransition: false,
 	                body  : body,
-	                advanced: true,
-	                targetAlign: 'left top',
-	                align: 'left top',
+	                advancedConfig: {
+	                	targetAlign: 'right top',
+	                	align: 'right top'
+	                },
 	                pad:0,
 	                showPointer: false,
 	                boundingElement: window
@@ -214,11 +214,12 @@
 	                closeOnClickOut: true,
 	                useTransition: false,
 	                body  : body,
-	                advanced: true,
-	                targetAlign: 'left top',
-	                align: 'left top',
+	                advancedConfig: {
+	                	targetAlign: 'left top',
+		                align: 'left top',
+		                vertPad: 5
+	                },
 	                pad: 0,
-	                padTop: 5, 
 	                showPointer: false,
 	                boundingElement: window
 	        }, function(panel) {

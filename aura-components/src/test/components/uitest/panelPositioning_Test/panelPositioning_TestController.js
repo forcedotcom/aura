@@ -36,9 +36,10 @@
 
         if(cmp.find('isAdvanced').get('v.value')) {
             delete panelConfig.direction;
-            panelConfig.advanced = true;
-            panelConfig.align = cmp.find('align').get('v.value');
-            panelConfig.targetAlign = cmp.find('targetAlign').get('v.value');
+            panelConfig.advancedConfig = {
+                align: cmp.find('align').get('v.value'),
+                targetAlign: cmp.find('targetAlign').get('v.value')
+            };
         }
 
 		$A.get('e.ui:createPanel').setParams({

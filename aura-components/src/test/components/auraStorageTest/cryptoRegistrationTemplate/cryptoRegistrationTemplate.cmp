@@ -1,5 +1,5 @@
 <aura:component isTemplate="true" extends="aura:template">
     <aura:set attribute="auraPreInitBlock">
-        <auraStorage:crypto />
+        <auraStorage:crypto debugLoggingEnabled="true"/>
     </aura:set>
 </aura:component>

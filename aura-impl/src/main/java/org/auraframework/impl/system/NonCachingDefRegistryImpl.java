@@ -56,17 +56,8 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
     }
 
     @Override
-    public Set<DefDescriptor<T>> find(DefDescriptor<T> matcher) {
-        return factory.find(matcher);
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         return factory.find(matcher);
-    }
-
-    @Override
-    public void save(T def) {
     }
 
     @Override

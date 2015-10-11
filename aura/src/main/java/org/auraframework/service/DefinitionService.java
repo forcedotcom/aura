@@ -131,18 +131,6 @@ public interface DefinitionService extends AuraService, SourceListener {
     MasterDefRegistry getDefRegistry();
 
     /**
-     * Given a {@link DefDescriptor} that contains search patterns or wildcards,
-     * return a set of Descriptors for all existing Definitions who have source
-     * that exists. Does not compile the definitions if they were not already
-     * compiled, and does not guarantee that they can compile.
-     *
-     * @deprecated Replaced by {@link #find(DescriptorFilter)}
-     * @throws QuickFixException
-     */
-    @Deprecated
-    <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) throws QuickFixException;
-
-    /**
      * Given a string that contains search patterns or wildcards, return a set
      * of Descriptors for all existing Definitions who have source that exists.
      * Does not compile the definitions if they were not already compiled, and

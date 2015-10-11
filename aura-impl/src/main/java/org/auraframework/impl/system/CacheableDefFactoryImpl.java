@@ -63,11 +63,6 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
     }
 
     @Override
-    public Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
-        return sourceFactory.find(matcher);
-    }
-
-    @Override
     public boolean hasFind() {
         return true;
     }

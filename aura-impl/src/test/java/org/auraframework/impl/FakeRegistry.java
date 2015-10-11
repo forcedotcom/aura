@@ -46,11 +46,6 @@ public class FakeRegistry implements MasterDefRegistry {
     }
 
     @Override
-    public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
-        return null;
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         return null;
     }

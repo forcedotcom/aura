@@ -42,22 +42,8 @@ public abstract class DefFactoryImpl<D extends Definition> implements DefFactory
     }
 
     @Override
-    public Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void save(D def) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void synchronize(D def) {
     }
 
     @Override

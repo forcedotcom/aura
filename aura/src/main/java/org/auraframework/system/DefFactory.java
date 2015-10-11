@@ -45,14 +45,6 @@ public interface DefFactory<D extends Definition> {
     boolean hasFind();
 
     /**
-     * Given a descriptor that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that
-     * exists. Does not compile the definitions if they were not already
-     * compiled, and does not guarantee that they can compile.
-     */
-    Set<DefDescriptor<D>> find(DefDescriptor<D> matcher);
-
-    /**
      * Given a string that contains search patterns or wildcards, return a set
      * of Descriptors for all existing Definitions who have source that exists.
      * Does not compile the definitions if they were not already compiled, and
@@ -61,23 +53,14 @@ public interface DefFactory<D extends Definition> {
     Set<DefDescriptor<?>> find(DescriptorFilter matcher);
 
     /**
-     * Save the given definition back to appropriate primary source location.
-     * @Deprecated
-     */
-    void save(D def);
-
-    /**
      * Returns true if the source related to the descriptor exists. Does not
      * compile the definition, and does not guarantee that it can compile.
      */
     boolean exists(DefDescriptor<D> descriptor);
 
     /**
-     * Saves alternate representations of the Component (like generated java
-     * classes)
+     * Get the source for a descriptor.
      */
-    void synchronize(D def);
-
     Source<D> getSource(DefDescriptor<D> descriptor);
 
     /**

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function (w) {
+function lib(w) {
     'use strict';
     w || (w = window);
 

@@ -23,7 +23,7 @@
 /*
  * Modified and adapted for use as a component library
  */
-function() {
+function lib() {
     'use strict';
 
     var DOMPurify = {};

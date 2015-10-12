@@ -25,7 +25,7 @@ import org.auraframework.util.resource.ResourceLoader;
 public interface ConfigAdapter extends AuraAdapter {
 
     boolean isTestAllowed();
-    
+
     boolean isProduction();
 
     boolean isSysAdmin();
@@ -60,7 +60,7 @@ public interface ConfigAdapter extends AuraAdapter {
     boolean validateCss();
 
     String getHTML5ShivURL();
-    
+
     String getAvailableTimezone(String timezone);
 
     /**
@@ -82,7 +82,8 @@ public interface ConfigAdapter extends AuraAdapter {
     String getEncryptionKeyURL();
 
     /**
-     * Returns encryption key for secure storage
+     * Returns the encryption key for the Crypto Adapter. The key must be a
+     * JSON parseable array of numbers.
      * @return encryption key
      */
     String getEncryptionKey();
@@ -91,7 +92,7 @@ public interface ConfigAdapter extends AuraAdapter {
     Set<String> getPrivilegedNamespaces();
     String getDefaultNamespace();
 	boolean isUnsecuredPrefix(String prefix);
-	
+
 	@Deprecated
 	boolean isUnsecuredNamespace(String namespace);
 
@@ -99,7 +100,7 @@ public interface ConfigAdapter extends AuraAdapter {
 	void removePrivilegedNamespace(String namespace);
 
 	boolean isDocumentedNamespace(String namespace);
-	
+
 	boolean isCacheablePrefix(String prefix);
 
 	/**

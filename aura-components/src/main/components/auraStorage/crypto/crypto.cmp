@@ -19,6 +19,9 @@
     support="BETA"
     renderer="java://org.auraframework.components.aura.CryptoAdapterRegistrationRenderer"
     description="Initializes CryptoAdapter for secure, persistent storage. Also sends GET request for encryption key.">
+
+    <aura:attribute name="debugLoggingEnabled" type="Boolean" default="false" description="Set to true to enable debug logging with $A.log()."/>
+
     <!--
         This component is used to config the Aura Storage Service crypto adapter. It
         is done in the auraPreInitBlock of the template so a model or action isn't

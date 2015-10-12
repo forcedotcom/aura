@@ -4,15 +4,25 @@
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
         CryptoAdapter.register();
+        if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
+            $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
+        }
+
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
 
-        window.setTimeout(function () {
+        // provide an invalid key to force CryptoAdapter into fallback mode (which uses memory adapter internally)
+        CryptoAdapter.setKey("invalid");
+    },
 
-            // INVALID key so key setup will fail and these tests will use memory storage as alternative
-
-            CryptoAdapter.setKey("nope");
-        }, (Math.floor(Math.random() * 800) + 10));
+    testFallbackModeReported: {
+        test:[function(cmp){
+            // do a get so next test stage is run after adapter finishes initializing
+            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+        },
+        function(cmp){
+            $A.test.assertFalse(this.storage.adapter.isCrypto(), "CryptoAdapter should be in fallback mode");
+        }]
     },
 
     testSizeInitial: {
@@ -56,61 +66,61 @@
             cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         }
     },
-    
+
     testGetUndefinedValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
         }
     },
-    
+
     testGetBooleanTrueValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
         }
     },
-    
+
     testGetZeroValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
         }
     },
-    
+
     testGetSimpleStringValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
         }
     },
-    
+
     testGetEmptyObjectValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
         }
     },
-    
+
     testGetBasicObjectValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
         }
     },
-    
+
     testGetEmptyArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetBasicArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetBigArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetMultiByteStringValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);

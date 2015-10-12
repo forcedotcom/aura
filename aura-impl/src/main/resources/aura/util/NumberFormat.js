@@ -15,10 +15,10 @@
  */
 /*jslint sub : true */
 /**
- * Format is a string using the java format pattern (e.g. #,##0.0). Note that this does not handle quoted 
+ * Format is a string using the java format pattern (e.g. #,##0.0). Note that this does not handle quoted
  * special characters or exponents.
  * Symbols is an optional map of localized symbols to use, otherwise it will use the current locale's symbols
- * 
+ *
  * @constructor
  * @export
  */
@@ -42,7 +42,7 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
     this.hasNegativePattern = false;
     this.negativePrefix = null;
     this.negativeSuffix = null;
-    
+
     var parsePhase = 0; // start
     var prefixEnd = 0;
     var suffixStart = format.length;
@@ -51,7 +51,7 @@ Aura.Utils.NumberFormat = function NumberFormat(format, symbols) {
     var rightNumbers = 0;
     var group = -1;
     var decimal = false;
-    
+
     var posPattern, negPattern;
     var split = format.indexOf(";");
     if (split !== -1) {
@@ -206,7 +206,7 @@ Aura.Utils.NumberFormat.prototype.checkForSpecialChar = function(c) {
     }
 };
 
-/** 
+/**
  * Replaces currency markers with the local currency symbol.
  * @private
  */
@@ -317,7 +317,7 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
             }
         }
     }
-    
+
     var prefix = this.prefix;
     var suffix = this.suffix;
     if (negative && this.hasNegativePattern) {
@@ -325,7 +325,7 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
         suffix = this.negativeSuffix;
     }
     var result = [];
-    
+
     if (negative && !this.hasNegativePattern) {
         // if there is no negative pattern, append '-' for negative numbers
         result.push("-");
@@ -340,7 +340,7 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
         charArray.unshift(Aura.Utils.NumberFormat.ZERO);
         decimalPos++;
     }
-    
+
     // format the integral part
     if (this.groupingDigits <= 0 || decimalPos <= this.groupingDigits) {
         // no need for grouping
@@ -365,11 +365,18 @@ Aura.Utils.NumberFormat.prototype.format = function(number) {
         for (i = fracLength; i < this.minFractionDigits; i++) {
             result.push(this.symbols["zeroDigit"]);
         }
+        // removing trailing zeros when fraction length is longer than min fraction length.
+        for (i = fracLength; i > this.minFractionDigits && result[result.length-1] === '0'; i--) {
+            result.pop();
+        }
+        if(result[result.length - 1] === this.symbols["decimalSeparator"]) {
+            result.pop();
+        }
     }
-    
+
     if (suffix) {
         result.push(suffix);
     }
-    
+
     return result.join("");
 };

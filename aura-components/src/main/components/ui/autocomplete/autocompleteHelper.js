@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({  
+({
 	/**
 	 * Map from the element aria attributes to the component attribute names
 	 * since attributes with hyphens currently don't work inside expressions.
-	 * 
+	 *
 	 * TODO: This needs to live somewhere more accessible to most components
 	 * that deal with aria attributes.
 	 */
 	ariaAttributeMap: {
-		aria-expanded : "ariaExpanded",
-		aria-activedescendant : "ariaActiveDescendant"
+		"aria-expanded": "ariaExpanded",
+		"aria-activedescendant": "ariaActiveDescendant"
 	},
-	
+
     fetchData: function(component, event) {
         // Show loading indicator
         var listCmp = component.find("list");

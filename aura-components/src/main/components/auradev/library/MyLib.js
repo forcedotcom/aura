@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(MyDependency) {
+function lib(MyDependency) {
     return {
         getValue: function() {
             return "Imported MyLib (and " + MyDependency.getValue() + ")";

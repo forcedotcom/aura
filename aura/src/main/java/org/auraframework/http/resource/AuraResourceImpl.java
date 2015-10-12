@@ -43,6 +43,11 @@ public abstract class AuraResourceImpl implements AuraResource {
     }
 
     @Override
+    public void setContentType(HttpServletResponse response) {
+    	response.setContentType( this.servletUtilAdapter.getContentType(this.format) );
+    }
+    
+    @Override
     public abstract void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException;
 
     @Override

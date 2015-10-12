@@ -18,11 +18,13 @@ package org.auraframework.integration.test.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +48,7 @@ import org.auraframework.test.util.AuraTestCase;
 import org.auraframework.test.util.DummyHttpServletRequest;
 import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
+import org.eclipse.jetty.io.ByteArrayBuffer;
 
 /**
  * Simple (non-integration) test case for {@link AuraResourceServlet}, most useful for exercising hard-to-reach error
@@ -67,15 +70,20 @@ public class AuraResourceServletTest extends AuraTestCase {
         AuraPrivateAccessor.invoke(servlet, "doGet", request, response);
     }
 
-    public void testWriteManifestNoAccessError() throws Exception {
+    
+    /**
+     * verify we response SC_NOT_FOUND when getting app.manifest where manifest is not enabled
+     * @throws Exception
+     */
+    public void testWriteManifestException() throws Exception {
         // Start a context to fetch manifests; the other details don't matter
         // much 'cause we'll error out. Then try to fetch one, with that error:
         Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.MANIFEST,
-                AuraContext.Authentication.UNAUTHENTICATED);
+                AuraContext.Authentication.AUTHENTICATED);
 
         HttpServletRequest request = new DummyHttpServletRequest("app.manifest") {
             @Override
-            // This is the method that's going to cause the simulated failure.
+            //This will throw exception from ManifestUtil.isManifestEnabled
             public String getHeader(String name) {
                 if ("user-agent".equals(name)) {
                     throw new SimulatedErrorException();
@@ -529,6 +537,8 @@ public class AuraResourceServletTest extends AuraTestCase {
             }
         }
     }
+    
+    
 
     private static class MyDummyHttpServletResponse extends DummyHttpServletResponse {
         StringWriter stringWriter = new StringWriter();

@@ -73,6 +73,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
      * "Long" pages (such as resources and cached HTML templates) expire in 45 days. We also use this to "pre-expire"
      * no-cache pages, setting their expiration a month and a half into the past for user agents that don't understand
      * Cache-Control: no-cache.
+     * Same as auraBaseServlet.java
      */
     protected static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     protected static final String UTF_ENCODING = "UTF-8";

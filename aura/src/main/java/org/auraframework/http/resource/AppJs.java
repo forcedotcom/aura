@@ -55,5 +55,6 @@ public class AppJs extends AuraResourceImpl {
     public void setServerService(ServerService serverService) {
         this.serverService = serverService;
     }
+
 }
 

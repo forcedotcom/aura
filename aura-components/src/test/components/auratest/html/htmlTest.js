@@ -294,5 +294,11 @@
             // If the following handler was bound (unexpectedly), it should throw an error when executed
             component.find("hasBadOnClickHandler").getElement().click();
         }
+    },
+    
+    testLangSetOnDocumentHtml : {
+        test : function(component) {
+            $A.test.assertEquals("en", document.getElementsByTagName("html")[0].lang);
+        }
     }
 })

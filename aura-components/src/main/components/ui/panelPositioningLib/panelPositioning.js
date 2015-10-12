@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function (constraint, elementProxyFactory) {
+function lib(constraint, elementProxyFactory) {
     'use strict';
     var w = window;
 

@@ -18,13 +18,13 @@
 		 var elem = evt.getSource().getElement();
 		 var selected = elem.textContent;
 		 resultCmp = cmp.find("radioResult");
-		 resultCmp.set("v.value", selected);		 
+		 resultCmp.set("v.value", selected);
 	 },
-	 
+
 	 onGroup: function(cmp, evt) {
 		 var elem = evt.getSource().getElement();
 		 var selected = elem.textContent;
 		 resultCmp = cmp.find("radioGroupResult");
 		 resultCmp.set("v.value", selected);
 	 }
-}
+})

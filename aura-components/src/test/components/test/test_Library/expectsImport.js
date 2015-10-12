@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(importedFunction) {
+function lib(importedFunction) {
     return function() {
     	return "IMPORTS1:" + importedFunction();
     }

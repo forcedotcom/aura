@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function (w) {
+function lib(w) {
   w || (w = window);
   
   if (!(typeof w.Element === "undefined" || "classList" in document.documentElement)) {

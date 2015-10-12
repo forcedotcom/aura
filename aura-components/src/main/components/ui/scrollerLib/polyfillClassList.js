@@ -15,7 +15,7 @@
  */
 // jshint ignore: start
 // POLYFILL CLASSLIST (https://github.com/remy/polyfills/blob/master/classList.js)
-function (w) {
+function lib(w) {
   w || (w = window);
   
   if (!(typeof w.Element === "undefined" || "classList" in document.documentElement)) {

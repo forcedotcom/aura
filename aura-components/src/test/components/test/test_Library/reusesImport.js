@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(reusedImport) {
+function lib(reusedImport) {
     return function() {
     	return "REUSED:" + reusedImport();
     }

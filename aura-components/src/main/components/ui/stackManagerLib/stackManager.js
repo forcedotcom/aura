@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function () {
+function lib() {
     // -- Utils
     function getElement(item) {
         var cmp = $A.util.isString(item) ? $A.getCmp(item) : $A.util.isComponent(item) ? item : null;

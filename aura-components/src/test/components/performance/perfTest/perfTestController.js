@@ -7,7 +7,7 @@
         // var finish = done.async();
         // ...
         // finish();
-    },  
+    },
     /*
     * This needs to be implemented
     * for all instances of performanceTest
@@ -17,4 +17,4 @@
         // Optional postProcessing
         // var results = event.getParam('arguments').results;
     }
-})2
+})

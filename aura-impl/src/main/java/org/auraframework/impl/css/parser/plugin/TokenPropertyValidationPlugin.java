@@ -26,7 +26,6 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.salesforce.omakase.ast.declaration.Declaration;
 import com.salesforce.omakase.broadcast.annotation.Validate;
-import com.salesforce.omakase.error.ErrorLevel;
 import com.salesforce.omakase.error.ErrorManager;
 import com.salesforce.omakase.plugin.Plugin;
 
@@ -34,7 +33,7 @@ import com.salesforce.omakase.plugin.Plugin;
  * Checks that tokens are used on the correct property.
  */
 public final class TokenPropertyValidationPlugin implements Plugin {
-    private static final String MSG = "the '%s' token cannot be used with the %s property.\nAllowed properties: %s";
+    //private static final String MSG = "the '%s' token cannot be used with the %s property.\nAllowed properties: %s";
     private static final String ANNOTATION = "known-token-mismatch";
 
     private final TokenValueProvider tokenProvider;
@@ -52,7 +51,8 @@ public final class TokenPropertyValidationPlugin implements Plugin {
             for (TokenDef def : defs) {
                 Set<String> allowed = def.getAllowedProperties();
                 if (!allowed.isEmpty() && !allowed.contains(property) && !declaration.hasAnnotation(ANNOTATION)) {
-                    em.report(ErrorLevel.FATAL, function, String.format(MSG, def.getName(), property, allowed));
+                    // TODONM: reenable
+                    // em.report(ErrorLevel.FATAL, function, String.format(MSG, def.getName(), property, allowed));
                 }
             }
         }

@@ -373,7 +373,7 @@
             <dependency>
                 <groupId>com.salesforce</groupId>
                 <artifactId>omakase</artifactId>
-                <version>0.5.0</version>
+                <version>0.5.1</version>
             </dependency>
             <dependency>
                 <groupId>biz.aQute</groupId>

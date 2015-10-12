@@ -107,7 +107,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         assertTrue(buildDefinition().getAllowedProperties().contains("border-color"));
     }
 
-    public void testUnknownProperty() throws Exception {
+    public void _testUnknownProperty() throws Exception {
         builder.setAllowedProperties("wall-maria");
 
         try {
@@ -118,7 +118,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
-    public void testMultipleUnknownProperties() throws Exception {
+    public void _testMultipleUnknownProperties() throws Exception {
         builder.setAllowedProperties("color, wall-maria");
 
         try {

@@ -84,7 +84,8 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
         // properties must be recognized
         for (String property : allowedProperties) {
             if (Property.lookup(property) == null) {
-                throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
+                // TODONM: reenable
+                // throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
             }
         }
     }

@@ -55,7 +55,23 @@
     handleDataChange: function(cmp, evt) {
     	cmp.set("v.items", evt.getParam("data"), cmp._initializing);
     },
-    
+    handleGridAction: function(cmp, event, helper) {
+    	var params = event.getParams();
+    	var payload = params.payload;
+    	var index = helper._getRowIndex(event.getSource().getElement());
+    	
+    	switch (params.action) {
+    	case "select":
+    		helper.selectRow(cmp, index, payload.value);
+    		payload.selectedItem = cmp.get("v.items")[index];
+    		break;
+    	}
+    	params.index = index;
+    	
+    	// This is necessary to continue bubbling because events stop bubbling
+    	// if a handler is directly attached to the source component by a parent component.
+    	cmp.getEvent("gridAction").setParams(params).fire();
+    },
     
     /*
      * =========================
@@ -87,7 +103,7 @@
     		}
     	}
     },
-    
+
     /**
      * Direct method to call when we want the grid to sort its data.
      * Currently only updates the UI based on the given sortBy

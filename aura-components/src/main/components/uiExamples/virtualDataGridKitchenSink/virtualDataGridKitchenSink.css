@@ -62,3 +62,7 @@
 	width: 128px;
 }
 
+.THIS tr.selected {
+	background-color: #CCC;
+}
+

@@ -20,6 +20,7 @@
     <aura:attribute name="labelOnlyButtonPressedMessage" type="String" default="Label only button NOT yet pressed"/>
     <aura:attribute name="iconOnlyButtonPressedMessage" type="String" default="Icon only button NOT yet pressed"/>
 	<aura:attribute name="isDomEventSet" type="boolean" default="{!false}"/>
+	<aura:attribute name="numTimesToPerform" type="Integer" default="2" description="Number of times to perform mouseover/mouseout/focus/blur etc."/>
 	
     <ui:button class="Icon_and_label" label='Icon and label' disabled='false' press="{!c.handleIconAndLabel}" iconImgSrc="/auraFW/resources/aura/images/checkbox_checked.gif" accesskey="i"/>
     <br/>
@@ -34,4 +35,18 @@
     <ui:outputText class='Icon_only' value='{!v.iconOnlyButtonPressedMessage}'/>
     <br/>
     <ui:button class="testDomEventBtn" label="testDomEvent" press="{!c.checkDomEventSet}"/>
+
+    <br/><br/>
+
+    <ui:outputText value="Mouseover : "/>
+    <ui:outputText aura:id="mouseoverCounter" value="0"/><br/>
+    <ui:outputText value="Mouseout : "/>
+    <ui:outputText aura:id="mouseoutCounter" value="0"/><br/>
+    <ui:outputText value="Focus : "/>
+    <ui:outputText aura:id="focusCounter" value="0"/><br/>
+    <ui:outputText value="Blur : "/>
+    <ui:outputText aura:id="blurCounter" value="0"/><br/>
+    <ui:button aura:id="statefulBtn" stateful="true" mouseover="{!c.mouseoverfn}" mouseout="{!c.mouseoutfn}" focus="{!c.focusfn}" blur="{!c.blurfn}" label="Stateful Button" press="{!c.selected}">
+    	<ui:button aura:id="insidebtn" stateful="false" label="Inside Button"/>
+    </ui:button>
 </aura:component>

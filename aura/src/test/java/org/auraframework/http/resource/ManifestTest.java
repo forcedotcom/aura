@@ -16,6 +16,7 @@
 
 package org.auraframework.http.resource;
 
+import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
@@ -50,7 +51,7 @@ public class ManifestTest extends UnitTestCase {
      * Format is API!.
      */
     public void testFormat() {
-        assertEquals(Format.JS, new Manifest().getFormat());
+        assertEquals(Format.MANIFEST, new Manifest().getFormat());
     }
 
     /**
@@ -137,7 +138,7 @@ public class ManifestTest extends UnitTestCase {
         Mockito.when(manifestUtil.checkManifestCookie(request, response)).thenReturn(true);
 
         manifest.write(request, response, context);
-
+        
         // This is mocked.
         Mockito.verify(manifestUtil, Mockito.times(1)).isManifestEnabled(request);
         Mockito.verify(manifestUtil, Mockito.times(1)).checkManifestCookie(request, response);
@@ -152,5 +153,33 @@ public class ManifestTest extends UnitTestCase {
         Mockito.verifyNoMoreInteractions(servletUtilAdapter);
         Mockito.verifyNoMoreInteractions(response);
         Mockito.verifyNoMoreInteractions(manifestUtil);
+    }
+    
+    /**
+     * Verify that we set the correct contentType to response
+     */
+    public void testSetContentType() {
+    	Manifest manifest = new Manifest();
+    	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+    	manifest.setServletUtilAdapter(servletUtilAdapter);
+    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.MANIFEST))
+        .thenReturn("text/cache-manifest");
+    	DummyHttpServletResponse response = new DummyHttpServletResponse() {
+            String contentType = "defaultType";
+
+            @Override
+            public String getContentType() {
+                return this.contentType;
+            }
+
+            @Override
+            public void setContentType(String contentType) {
+                this.contentType = contentType;
+            }
+        };
+    	
+    	manifest.setContentType(response);
+    	
+    	assertEquals("text/cache-manifest", response.getContentType());
     }
 }

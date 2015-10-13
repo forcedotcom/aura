@@ -43,4 +43,8 @@ public class EncryptionKey extends AuraResourceImpl {
         servletUtilAdapter.setNoCache(response);
         response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
     }
+    
+    public void setConfigAdapter(ConfigAdapter configAdapter) {
+    	this.configAdapter = configAdapter;
+    }
 }

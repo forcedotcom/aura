@@ -16,6 +16,7 @@
 
 package org.auraframework.http.resource;
 
+import org.auraframework.test.util.DummyHttpServletResponse;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mockito;
 
@@ -130,5 +131,34 @@ public class AppJsTest extends UnitTestCase {
         //
         Mockito.verifyNoMoreInteractions(serverService);
         Mockito.verifyNoMoreInteractions(servletUtilAdapter);
+    }
+    
+    /**
+     * Verify that we set the correct contentType to response
+     */
+    public void testSetContentType() {
+    	AppJs appJs = new AppJs();
+    	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
+    	appJs.setServletUtilAdapter(servletUtilAdapter);
+    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.JS))
+        .thenReturn("text/javascript");
+    	
+    	DummyHttpServletResponse response = new DummyHttpServletResponse() {
+            String contentType = "defaultType";
+
+            @Override
+            public String getContentType() {
+                return this.contentType;
+            }
+
+            @Override
+            public void setContentType(String contentType) {
+                this.contentType = contentType;
+            }
+        };
+    	
+    	appJs.setContentType(response);
+    	
+    	assertEquals("text/javascript", response.getContentType());
     }
 }

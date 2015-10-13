@@ -169,7 +169,9 @@ public class AppCacheManifestHttpTest extends AuraHttpTestCase {
         String expectedContentType = String.format("%s;charset=%s", AuraBaseServlet.MANIFEST_CONTENT_TYPE,
                 AuraBaseServlet.UTF_ENCODING);
         Header[] contentTypeHeaders = response.getHeaders(HttpHeaders.CONTENT_TYPE);
+        System.out.println("expectedContentType:"+expectedContentType+", contentTypeHeaders:");
         for (Header header : contentTypeHeaders) {
+        	System.out.println("header:"+header.getValue());
             if (expectedContentType.equals(header.getValue().replaceAll("\\s", ""))) {
                 return;
             }

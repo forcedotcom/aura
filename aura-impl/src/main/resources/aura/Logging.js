@@ -39,7 +39,19 @@
 
         if (window["console"]) {
             var console = window["console"];
-            if (console["group"]) {
+            var filter = level === "WARNING" ? "warn" : level.toLowerCase();
+            if (console[filter]) {
+                if (!$A.util.isUndefinedOrNull(error)) {
+                    console[filter](error);
+                } else {
+                    console[filter](message);
+                }
+                if (trace) {
+                    for ( var j = 0; j < trace.length; j++) {
+                        console[filter](trace[j]);
+                    }
+                }
+            } else if (console["group"]) {
                 console["group"](logMsg);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console["debug"](error);

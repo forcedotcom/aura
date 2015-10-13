@@ -99,7 +99,7 @@
                     watch_done = true;
                 }
             };
-            cb_handle = $A.test.addPrePostSendCallback(action, preSendCallback, undefined);
+            cb_handle = $A.test.addPreSendCallback(action, preSendCallback);
             $A.test.addWaitFor(true, function() { return watch_done; });
 
             //now enqueue the action
@@ -532,7 +532,7 @@
                        //we only need to do this callback once, once we are done, remove it
                        $A.test.removePrePostSendCallback(cb_handle2);
                    }
-                   var cb_handle2 = $A.test.addPrePostSendCallback(a1, preSendCallback, undefined );
+                   var cb_handle2 = $A.test.addPreSendCallback(a1, preSendCallback);
                    var postSendCallback = function(actions, actionToWatch) {
                       if(actionToWatch) {
                     	  //push TransactionId forward
@@ -543,9 +543,9 @@
 	                      );
                       }
                       //we only need to do this callback once, once we are done, remove it
-                      $A.test.removePrePostSendCallback(cb_handle);
+                      $A.test.removePreSendCallback(cb_handle);
                   }
-                  var cb_handle = $A.test.addPrePostSendCallback(a1, undefined, postSendCallback );
+                  var cb_handle = $A.test.addPostSendCallback(a1, postSendCallback);
                   //let's make sure a1 & a2 did finish
                   $A.test.addWaitForWithFailureMessage(true, function() { return $A.test.areActionsComplete([a1,a2]); }, 
                 		  "a1&a2 finish",

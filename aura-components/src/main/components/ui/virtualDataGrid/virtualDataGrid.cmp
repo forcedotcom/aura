@@ -26,6 +26,8 @@
         <aura:attribute name="items" type="Object"/>
     </aura:method>
     
+    <aura:registerEvent name="gridAction" type="ui:gridAction" description="Notifies listeners when actions were triggered by grid cells"/>
+    
     <aura:method name="sort">
     	<aura:attribute name="sortBy" type="String"/>
     </aura:method>

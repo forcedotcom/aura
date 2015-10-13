@@ -32,6 +32,7 @@
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.currentPage}" action="{!c.handleCurrentPageChange}"/>
+    <aura:handler name="gridAction" event="ui:gridAction" action="{!c.handleGridEvents}"/>
 
 	<div class="container">
 		<div class="header">
@@ -50,6 +51,7 @@
 				<ui:dataGridColumn name="who.name" 		label="Name"/>
 				<ui:dataGridColumn name="what.name" 	label="Related To"/>
 				<ui:dataGridColumn name="activityDate" 	label="Due Date"/>
+				<ui:dataGridColumn name=""				label="Selection"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
@@ -58,13 +60,14 @@
 				<ui:outputText value="{!item.who.name}"/>
 				<ui:outputText value="{!item.what.name}"/>
 				<ui:outputText value="{!item.activityDate}"/>
+				<uiExamples:gridActionCell />
 			</aura:set>
 			
 			<aura:set attribute="dataModel">
 				<uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
 															sortBy="{!v.sortBy}"
-															totalItems="2000"
-															pageSize="2000"
+															totalItems="400"
+															pageSize="400"
 															throwError="{!v.provideNoData}"/>
 			</aura:set>
 		</ui:virtualDataGrid>

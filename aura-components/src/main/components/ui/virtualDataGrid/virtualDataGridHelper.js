@@ -68,6 +68,10 @@
 
         for (var i = 0; i < columnsDefs.length; i++) {
             templates.push($A.newCmp(columnsDefs[i], ptv));
+            
+            if (templates[i].isInstanceOf("ui:hasGridEvents")) {
+            	templates[i].addHandler("gridAction", cmp, "c.handleGridAction");
+            }
         }
 
         cmp._ptv = ptv;
@@ -212,14 +216,13 @@
         }
 
          if (item) {
-            // Seting up the event with some custom properties
+            // Setting up the event with some custom properties
             e.templateItem = item;
             e.templateElement = target;
             if (child && position !== -1) {
                 // we try to put the right html on the virtual component
                 templates[position].getElement = function () { return child.firstChild; };
             }
-
 
             // Setting up the component with the current item
             ptv.set(ref, item, true);
@@ -258,12 +261,12 @@
             position  = this._findVirtualElementPosition(items, oldElement);
         
         if (!$A.util.isUndefinedOrNull(position)) {
-        	var rendered  = this._generateVirtualRow(cmp, item);
+        	var rendered  = this._generateVirtualRow(cmp, item, position);
         	items[position] = rendered;
             this._replaceDOMElement(listRoot, rendered, oldElement);
         }
     },
-    _generateVirtualRow: function (cmp, item) {
+    _generateVirtualRow: function (cmp, item, index) {
         var rowTmpl = cmp._rowTemplate,
             itemVar = cmp.get('v.itemVar'),
             ptv     = cmp._ptv,
@@ -277,9 +280,10 @@
 
         // Snapshot the DOM
         clonedRow = rowTmpl.cloneNode(true);
-
+        
         // Attach the data to the element
         this._attachItemToElement(clonedRow, item);
+        this._attachIndexToElement(clonedRow, index);
 
         return clonedRow;
     },
@@ -289,13 +293,27 @@
      _attachItemToElement: function (dom, item) {
         dom._data = item;
     },
+    _attachIndexToElement: function (dom, index) {
+    	dom._index = index;
+    },
+    _getRowIndex: function(el) {
+    	while (el) {
+    		var index = parseInt(el._index, 10);
+    		
+    		if (index > -1) {
+    			return parseInt(index, 10);
+    		}
+    		el = el.parentNode;
+    	}
+    	return -1;
+    },
     appendVirtualRows: function (cmp, items) {
         $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
         var fragment  = document.createDocumentFragment(),
             container = this.getGridBody(cmp);
 
         for (var i = 0; i < items.length; i++) {
-            var virtualItem = this._generateVirtualRow(cmp, items[i]);
+            var virtualItem = this._generateVirtualRow(cmp, items[i], i);
             cmp._virtualItems.push(virtualItem);
             fragment.appendChild(virtualItem);
         }
@@ -309,10 +327,17 @@
         if (items && items.length) {
             $A.metricsService.markStart(this.NS, this.NAME + ".createVirtualRows", {auraid : cmp.getGlobalId()});
             for (var i = 0; i < items.length; i++) {
-                cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i]));
+                cmp._virtualItems.push(this._generateVirtualRow(cmp, items[i], i));
             }
             $A.metricsService.markEnd(this.NS, this.NAME + ".createVirtualRows");
         }        
+    },
+    
+    selectRow: function(cmp, index, value) {
+    	var row = cmp._virtualItems[index];
+    	
+    	var op = value ? 'add' : 'remove';
+    	row.classList[op]('selected');
     },
     
     /*

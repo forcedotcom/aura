@@ -241,15 +241,14 @@
 			
 			tabItems.push(newMenuTab);
 			cmp.find("tabItemsContainer").set("v.body", tabItems);
-			cmp.find("tabItemsContainer").rerender(); // Workaround for tabs not rerendering and updating their 'hidden' status
 		});
 
 		cmp.set("v.overflowData", {
+					initialized : true,
 					tabCache : tabCache,
 					overflowTabIndex : startIndex,
 					startIndex : startIndex
 		});
-
 	},
 	
 	/**
@@ -294,6 +293,14 @@
 		overflowTab.set("v.menuItems", menuList);
 	},
 
+	/**
+	 * Checks if the overflow menu has been initialized
+	 */
+	overflowIsInitialized: function(cmp) {
+		var overflowData = cmp.get("v.overflowData");
+		return overflowData && overflowData.initialized;
+	},
+	
 	/**
 	 * Private helper methods
 	 */

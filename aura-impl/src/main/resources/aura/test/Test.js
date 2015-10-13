@@ -1779,9 +1779,6 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  * one of preSendCallback and postSendCallback can be null, but not both of them
  * @return a handle(a PrePostConfig object) to remove the callback later (only needed if the first parameter:action is empty).
  *
- * TODO: Lin to remove public access to this api 
- * @export 
- * @function Test#addPrePostSendCallback
  */
 TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallback, postSendCallback) {
 	if ( (!preSendCallback)&&(!postSendCallback) ) {
@@ -1810,14 +1807,9 @@ TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallbac
 /**
  * Add a pre send callback.
  *
- * This function allows a test to insert a hook either pre or post send of XHR.
- *
- * Note that for the post XHR callback the XHR has actually not been 'sent', but actions are serialized
- * and put in the actual request, so changing actions will have no effect at that point.
- *
+ * This function allows a test to insert a hook pre send of XHR.
  * @param action the action to watch for (undefined/null means any action)
  * @param preSendCallback the hook function for before send.
- * one of preSendCallback and postSendCallback can be null, but not both of them
  * @return a handle to remove the callback (only needed if the first parameter:action is empty).
  *
  * @export
@@ -1833,14 +1825,13 @@ TestInstance.prototype.addPreSendCallback = function (action, preSendCallback) {
 /**
  * Add a post send callback.
  *
- * This function allows a test to insert a hook either pre or post send of XHR.
+ * This function allows a test to insert a hook post send of XHR.
  *
  * Note that for the post XHR callback the XHR has actually not been 'sent', but actions are serialized
  * and put in the actual request, so changing actions will have no effect at that point.
  *
  * @param action the action to watch for (undefined/null means any action)
  * @param postSendCallback the hook function for after send.
- * one of preSendCallback and postSendCallback can be null, but not both of them
  * @return a handle to remove the callback (only needed if the first parameter:action is empty).
  *
  * @export
@@ -1895,7 +1886,7 @@ TestInstance.prototype.removePostSendCallback = function (handle) {
 /**
  * Add a callback right before we decode response
  * @export
- * @function Test#removePreSendCallback
+ * @function Test#addPreDecodeCallback
  */
 TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
 	if(!preDecodeCallback) {
@@ -1904,11 +1895,21 @@ TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
 	return this.addPrePostDecodeCallback(preDecodeCallback, null);
 };
 
+/**
+ * Add a callback right after we decode response
+ * @export
+ * @function Test#addPostDecodeCallback
+ */
+TestInstance.prototype.addPostDecodeCallback = function (postDecodeCallback) {
+	if(!postDecodeCallback) {
+		throw new Error("addPostDecodeCallback: callback cannot be null");
+	}
+	return this.addPrePostDecodeCallback(null, postDecodeCallback);
+};
+
 
 /**
- * Add a callback right before we decode response
- * @export
- * @function Test#removePreSendCallback
+ * Add a callback before/after decode response
  */
 TestInstance.prototype.addPrePostDecodeCallback = function (preDecodeCallback, postDecodeCallback) {
 	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback, postDecodeCallback);

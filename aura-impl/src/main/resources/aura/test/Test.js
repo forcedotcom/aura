@@ -38,7 +38,7 @@ TestInstance = function() {
     this.blockBackground = 0;
     this.sentXHRCount = 0;
     this.prePostSendConfigs = [];
-    this.preDecodeConfigs = [];
+    this.prePostDecodeConfigs = [];
     this.installOverride();
 };
 
@@ -1707,8 +1707,11 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
 };
 
 /**
- * Override decode so that we can fail out packets.
- *
+ * Override decode. 
+ * The callback before Decode take response in, you can make a copy of it, made some modification, then return your response.
+ * The callback after Decode take the result of decode (see AuraClientService.decode for what's inside), at this point, we 
+ * don't modify response.
+ * 
  * @private
  * @function Test#decodeOverride
  */
@@ -1718,36 +1721,48 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     }
     //run callbacks
     var cb_config;
-    var processing = this.preDecodeConfigs;
+    var processing = this.prePostDecodeConfigs;
+    var post_callbacks = [];
     //we cannot modify the original reponse, however, we can make a copy, modify it, then later feed decode() with that copy
     var oldResponse = response;
     var newResponse; var i;
     if(processing) {
-    	this.preDecodeConfigs = [];
+    	this.prePostDecodeConfigs = [];
 	    for (i = 0; i < processing.length; i++) {
 	        cb_config = processing[i];
-	        if (cb_config && cb_config.preDecodeCallback) {
-	        	newResponse = cb_config.preDecodeCallback(oldResponse);
-	        	oldResponse = newResponse;
+	        if (cb_config) {
+	        	if(cb_config.preDecodeCallback) {
+		        	newResponse = cb_config.preDecodeCallback(oldResponse);
+		        	oldResponse = newResponse;
+	        	}
+	        	if(cb_config.postDecodeCallback) {
+	        		post_callbacks.push(cb_config);
+	        	}
 	        }
 	    }
 
     }
     //now feed decode() with our copy of response
-    return config["fn"].call(config["scope"], oldResponse, noStrip);
+    var res = config["fn"].call(config["scope"], oldResponse, noStrip);
+    for (i = 0; i < post_callbacks.length; i++) {
+    	post_callbacks[i].postDecodeCallback(res);
+    }
+    
+    return res;
 };
 
 /**
- * A simple structure to hold values.
+ * A simple structure to hold action and callbacks.
  *
  * @struct
  * @private
  */
-TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSendCallback, preDecodeCallback) {
+TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSendCallback, preDecodeCallback, postDecodeCallback) {
     this.action = action;
     this.preSendCallback = preSendCallback;
     this.postSendCallback = postSendCallback;
     this.preDecodeCallback = preDecodeCallback;
+    this.postDecodeCallback = postDecodeCallback;
 };
 
 /**
@@ -1762,9 +1777,10 @@ TestInstance.prototype.PrePostConfig = function (action, preSendCallback, postSe
  * @param preSendCallback the hook function for before send.
  * @param postSendCallback the hook function for after send.
  * one of preSendCallback and postSendCallback can be null, but not both of them
- * @return a handle to remove the callback (only needed if the first parameter:action is empty).
+ * @return a handle(a PrePostConfig object) to remove the callback later (only needed if the first parameter:action is empty).
  *
- * @export
+ * TODO: Lin to remove public access to this api 
+ * @export 
  * @function Test#addPrePostSendCallback
  */
 TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallback, postSendCallback) {
@@ -1792,8 +1808,55 @@ TestInstance.prototype.addPrePostSendCallback = function (action, preSendCallbac
 };
 
 /**
+ * Add a pre send callback.
+ *
+ * This function allows a test to insert a hook either pre or post send of XHR.
+ *
+ * Note that for the post XHR callback the XHR has actually not been 'sent', but actions are serialized
+ * and put in the actual request, so changing actions will have no effect at that point.
+ *
+ * @param action the action to watch for (undefined/null means any action)
+ * @param preSendCallback the hook function for before send.
+ * one of preSendCallback and postSendCallback can be null, but not both of them
+ * @return a handle to remove the callback (only needed if the first parameter:action is empty).
+ *
+ * @export
+ * @function Test#addPreSendCallback
+ */
+TestInstance.prototype.addPreSendCallback = function (action, preSendCallback) {
+	if (!preSendCallback) {
+		throw new Error("TestInstance.addPreSendCallback: callback must be not-null");
+	}
+	return this.addPrePostSendCallback(action, preSendCallback, null);
+};
+
+/**
+ * Add a post send callback.
+ *
+ * This function allows a test to insert a hook either pre or post send of XHR.
+ *
+ * Note that for the post XHR callback the XHR has actually not been 'sent', but actions are serialized
+ * and put in the actual request, so changing actions will have no effect at that point.
+ *
+ * @param action the action to watch for (undefined/null means any action)
+ * @param postSendCallback the hook function for after send.
+ * one of preSendCallback and postSendCallback can be null, but not both of them
+ * @return a handle to remove the callback (only needed if the first parameter:action is empty).
+ *
+ * @export
+ * @function Test#addPostSendCallback
+ */
+TestInstance.prototype.addPostSendCallback = function (action, postSendCallback) {
+	if (!postSendCallback) {
+		throw new Error("TestInstance.addPostSendCallback: callback must be not-null");
+	}
+	return this.addPrePostSendCallback(action, null, postSendCallback);
+};
+
+/**
  * Remove a previously added callback.
  *
+ *TODO: Lin to remove public access to this api
  * @export
  * @function Test#removePrePostSendCallback
  */
@@ -1809,31 +1872,78 @@ TestInstance.prototype.removePrePostSendCallback = function (handle) {
 };
 
 /**
+ * Remove a previously added callback.
+ *
+ * @export
+ * @function Test#removePreSendCallback
+ */
+TestInstance.prototype.removePreSendCallback = function (handle) {
+    this.removePrePostSendCallback(handle);
+};
+
+/**
+ * Remove a previously added callback.
+ *
+ * @export
+ * @function Test#removePostSendCallback
+ */
+TestInstance.prototype.removePostSendCallback = function (handle) {
+	this.removePrePostSendCallback(handle);
+};
+
+
+/**
  * Add a callback right before we decode response
  * @export
+ * @function Test#removePreSendCallback
  */
 TestInstance.prototype.addPreDecodeCallback = function (preDecodeCallback) {
 	if(!preDecodeCallback) {
 		throw new Error("addPreDecodeCallback: callback cannot be null");
 	}
+	return this.addPrePostDecodeCallback(preDecodeCallback, null);
+};
 
-	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback);
-	this.preDecodeConfigs.push(config);
+
+/**
+ * Add a callback right before we decode response
+ * @export
+ * @function Test#removePreSendCallback
+ */
+TestInstance.prototype.addPrePostDecodeCallback = function (preDecodeCallback, postDecodeCallback) {
+	var config = new TestInstance.prototype.PrePostConfig(null, null, null, preDecodeCallback, postDecodeCallback);
+	this.prePostDecodeConfigs.push(config);
 	return config;
 };
 
 /**
  * Remove a previously added callback
- * @export
  */
-TestInstance.prototype.removePreDecodeCallback = function (handle) {
+TestInstance.prototype.removePrePostDecodeCallback = function (handle) {
     var i;
-    for (i = 0; i < this.preDecodeConfigs.length; i++) {
-        if (this.preDecodeConfigs[i] === handle) {
-            this.preDecodeConfigs.splice(i, 1);
+    for (i = 0; i < this.prePostDecodeConfigs.length; i++) {
+        if (this.prePostDecodeConfigs[i] === handle) {
+            this.prePostDecodeConfigs.splice(i, 1);
             return;
         }
     }
+};
+
+/**
+ * Remove a previously added callback
+ * @export
+ * @function Test#removePostDecodeCallback
+ */
+TestInstance.prototype.removePostDecodeCallback = function (handle) {
+   this.removePrePostDecodeCallback(handle);
+};
+/**
+ * Remove a previously added callback
+ * @export
+ * @function Test#removePreDecodeCallback
+ */
+TestInstance.prototype.removePreDecodeCallback = function (handle) {
+	this.removePrePostDecodeCallback(handle);
 };
 
 /**

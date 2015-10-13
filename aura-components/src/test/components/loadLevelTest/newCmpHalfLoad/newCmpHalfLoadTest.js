@@ -89,7 +89,7 @@
                 if (action) {
                 	receiverCmp.destroy();
                 	//because we are watching all actions, once we are done, need to remove the callback handler
-                    $A.test.removePrePostSendCallback(cb_handle);
+                    $A.test.removePreSendCallback(cb_handle);
                     $A.test.addWaitForWithFailureMessage(true, 
                     		function() { return $A.test.areActionsComplete([action]); },
                     		"Action we are watching didn't finish"
@@ -102,7 +102,7 @@
                 	$A.test.expectAuraError(errmsg);
                 }
             };
-            cb_handle = $A.test.addPrePostSendCallback(undefined, preSendCallback, undefined );
+            cb_handle = $A.test.addPreSendCallback(undefined, preSendCallback );
             $A.test.addWaitFor(true, function() { return destroy_done; });
 
             //now run the action

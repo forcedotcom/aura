@@ -33,5 +33,33 @@
     	} else {
     		cmp.set("v.isDomEventSet", true);
     	}
+    },
+    
+    selected : function(cmp, event){
+        var mybtn = cmp.find("statefulBtn");
+        if(mybtn.get("v.selected") === false)
+        	mybtn.set("v.selected", true);
+        else
+        	mybtn.set("v.selected", false);
+    },
+    mouseoverfn : function(cmp, event){
+    	var val = $A.util.getText(cmp.find("mouseoverCounter").getElement());
+    	val++;
+    	$A.util.setText(cmp.find("mouseoverCounter").getElement(), val);
+    },
+    mouseoutfn : function(cmp, event){
+    	var val = $A.util.getText(cmp.find("mouseoutCounter").getElement());
+    	val++;
+    	$A.util.setText(cmp.find("mouseoutCounter").getElement(), val);
+    },
+    focusfn : function(cmp, event){
+    	var val = $A.util.getText(cmp.find("focusCounter").getElement());
+    	val++;
+    	$A.util.setText(cmp.find("focusCounter").getElement(), val);
+    },
+    blurfn : function(cmp, event){
+    	var val = $A.util.getText(cmp.find("blurCounter").getElement());
+    	val++;
+    	$A.util.setText(cmp.find("blurCounter").getElement(), val);
     }
 })

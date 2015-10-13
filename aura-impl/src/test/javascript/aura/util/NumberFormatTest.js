@@ -65,6 +65,25 @@ Test.Aura.Util.NumberFormatTest=function() {
         }
 
         [Fact]
+        function formatZero() {
+            var format = "0.##";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "0.00";
+            var expected = "0";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         function formatPositiveWithPrecision() {
             var format = "0.00#";
             var symbols = {"decimalSeparator": ".",
@@ -116,6 +135,120 @@ Test.Aura.Util.NumberFormatTest=function() {
                            "zeroDigit": "0" };
             var value = "0.00000001";
             var expected = "0.00";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatSmallPositiveWithRoundup() {
+            var format = "0.######";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "0.0000016";
+            var expected = "0.000002";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatNegativeWithFraction() {
+            var format = "0.#####";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "-0.0000100222";
+            var expected = "-0.00001";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatWhenLeadingZerosLessThanMaxFractionDigits() {
+            var format = "0.###";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "0.010";
+            var expected = "0.01";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatWhenLeadingZerosMoreThanMaxFractionDigits() {
+            var format = "0.###";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "0.0001";
+            var expected = "0";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatWhenLeadingZerosMoreThanMinFractionDigits() {
+            var format = "0.0";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "0.0001";
+            var expected = "0.0";
+            var result;
+
+            auraMock(function() {
+                var target = new Aura.Utils.NumberFormat(format, symbols);
+                result = target.format(value);
+            });
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        function formatWhenLeadingZerosLessThanMinFractionDigits() {
+            var format = "0.000";
+            var symbols = {"decimalSeparator": ".",
+                           "groupingSeparator": ",",
+                           "currency": "$",
+                           "currencyCode": "USD",
+                           "zeroDigit": "0" };
+            var value = "-0.01";
+            var expected = "-0.010";
             var result;
 
             auraMock(function() {

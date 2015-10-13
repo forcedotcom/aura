@@ -19,10 +19,25 @@
  * @description The crypto adapter for Aura Storage Service.
  *
  * This adapter provides AES-CBC encryption, using the browser Web Cryptography API
- * (https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html#dfn-GlobalCrypto),
- * on top of the IndexedDB adapter.
+ * (https://dvcs.w3.org/hg/webcrypto-api/raw-file/tip/spec/Overview.html#dfn-GlobalCrypto)
+ * with a server-provided key, persisting into the IndexedDB adapter.
  *
- * TODO - this adapter should work with any persistent adapter, not just IndexedDB.
+ * Unlike other storage adapters this adapter does not automatically register itself. Use
+ * &lt;auraStorage:crypto/&gt; in the &lt;auraPreInitBlock/&gt; section of the app's template
+ * to register this adapter. Doing so guarantees that CryptoAdapter.setKey() will be invoked
+ * with a server-provided cryptographic key.
+ *
+ * Please note:
+ * 1. If the runtime environment doesn't support the Web Cryptography API the adapter is not
+ *    registered.
+ * 2. After registration and before a cryptographic key isprovided, all crypto adapters
+ *    enter an initialization stage. Get, put, and remove operations are queued until
+ *    the key is set. If a key is never provided then the operations appear paused. It's
+ *    thus paramount to always provide a key. &lt;auraStorage:crypto/&gt; ensures this
+ *    happens.
+ * 3. If an invalid cryptographic key is provided, the adapter automatically falls
+ *    back to the memory adapter to provide secure but non-persistent storage.
+ *
  * @constructor
  * @export
  */
@@ -41,13 +56,11 @@ var CryptoAdapter = function CryptoAdapter(config) {
 
     this.config = config;
 
-    // default storage is indexeddb
+    // default storage is indexeddb (alternative is memory adapter)
     this.adapter = new Aura.Storage.IndexedDBAdapter(config);
-    // alternative is memory when crypto and key issues occur
-    this.alternative = new Aura.Storage.MemoryAdapter(config);
     this.mode = CryptoAdapter.NAME;
 
-    // async initialize. if it completes successfully, process the queue
+    // async initialize. if it completes successfully, process the queue;
     // otherwise reject the pending operations.
     var that = this;
     this.initialize().then(
@@ -75,7 +88,7 @@ CryptoAdapter.IV_LENGTH = 16;
 CryptoAdapter.SENTINEL = "cryptoadapter";
 
 /** The Web Cryptography API */
-CryptoAdapter.engine = window["crypto"]["subtle"] || window["crypto"]["webkitSubtle"];
+CryptoAdapter.engine = window["crypto"] && (window["crypto"]["subtle"] || window["crypto"]["webkitSubtle"]);
 
 
 /** Promise that resolves with the per-application encryption key. */
@@ -94,6 +107,8 @@ CryptoAdapter.key = new Promise(function(resolve, reject) {
  */
 CryptoAdapter["setKey"] = function(key) {
     // note: @export is configured only for prototypes so must use array syntax to avoid mangling
+    // note: because this is not instance specific there's no config indicating verbosity, so
+    //       always log with $A.log directly
 
     var resolve = CryptoAdapter._keyResolve;
     var reject = CryptoAdapter._keyReject;
@@ -111,14 +126,14 @@ CryptoAdapter["setKey"] = function(key) {
         ["encrypt", "decrypt"]  // allowed operations
     ).then(
         function(key) {
-            // it's possible for key generation to fail, which we treat as a fatal
+            // it's possible for key import to fail, which we treat as a fatal
             // error. all pending and future operations will fail.
             if (!key) {
                 var log = "CryptoAdapter crypto.importKey() returned no key, rejecting";
                 $A.log(log);
                 reject(new Error(log));
             }
-
+            $A.log("CryptoAdapter crypto.importKey() successfully imported key");
             resolve(key);
         },
         function(err) {
@@ -138,25 +153,37 @@ CryptoAdapter["register"] = function() {
     // unfortunately adapter registration must be synchronous otherwise the adapter is not available in
     // time for aura's boot cycle and thus the "actions" store. so manually check https (production) and
     // localhost (dev).
+    //
     // moreover, indexeddb needs to be useable (browser implemented properly) in order to use crypto so we
-    // first check for indexeddb. When both are unavailable or unusable, memory storage will become the default.
-    if ($A.storageService.isRegisteredAdapter('indexeddb')) {
-        if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
-            var secure = window.location.href.indexOf('https') === 0 || window.location.hostname === "localhost";
-            if (secure && window["crypto"] && (window["crypto"]["subtle"] || window["crypto"]["webkitSubtle"])) {
-                $A.storageService.registerAdapter({
-                    "name": CryptoAdapter.NAME,
-                    "adapterClass": CryptoAdapter,
-                    "secure": true,
-                    "persistent": true
-                });
-            }
-        } else {
-            $A.log("CryptoAdapter already registered.");
-        }
-    } else {
-        $A.log("CryptoAdapter cannot be registered because it requires IndexedDB.");
+    // first check for indexeddb. when both are unavailable or unusable, memory storage will become the default.
+
+    if ($A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
+        $A.warning("CryptoAdapter already registered");
+        return;
     }
+
+    if (!$A.storageService.isRegisteredAdapter(Aura.Storage.IndexedDBAdapter.NAME)) {
+        $A.warning("CryptoAdapter cannot register because it requires IndexedDB");
+        return;
+    }
+
+    var secure = window.location.href.indexOf('https') === 0 || window.location.hostname === "localhost";
+    if (!secure) {
+        $A.warning("CryptoAdapter cannot register because it requires a secure origin");
+        return;
+    }
+
+    if (!CryptoAdapter.engine) {
+        $A.warning("CryptoAdapter cannot register because it requires Web Cryptography API");
+        return;
+    }
+
+    $A.storageService.registerAdapter({
+        "name": CryptoAdapter.NAME,
+        "adapterClass": CryptoAdapter,
+        "secure": true,
+        "persistent": true
+    });
 };
 
 
@@ -176,21 +203,19 @@ CryptoAdapter.prototype.initialize = function() {
             // it's possible for key generation to fail, which we treat as a fatal
             // error. all pending and future operations will fail.
             if (!key) {
-                that.log("CryptoAdapter.key resolved with no key.");
-                return Promise["reject"]();
+                var log = "CryptoAdapter.key resolved with no key.";
+                that.log(log);
+                throw new Error(log); // move to reject state
             }
             that.key = key;
         },
         function(err) {
-            that.log("CryptoAdapter.key rejected.", err);
-            return Promise["reject"]();
+            var log = "CryptoAdapter.key rejected: " + err;
+            that.log(log);
+            throw new Error(log); // maintain reject state
         }
     ).then(
         function() {
-            // indexeddb will be the backing storage at this point as the key was retrieved
-            // release alternative memory storage
-            that.alternative = undefined;
-
             // check if existing data can be decrypted
             return new Promise(function(resolve, reject) {
                 that.log("Checking encryption key status");
@@ -204,12 +229,11 @@ CryptoAdapter.prototype.initialize = function() {
                 }
             );
         },
-
         function() {
-            that.log("Using memory storage instead.");
-            that.mode = "memory";
-            that.adapter = that.alternative;
-            return Promise["resolve"]();
+            that.log("Falling back to memory storage.");
+            that.mode = Aura.Storage.MemoryAdapter.NAME; // "memory";
+            that.adapter = new Aura.Storage.MemoryAdapter(that.config);
+            // do not throw an error so the promise moves to resolve state
         }
     ).then(
         function() {
@@ -218,13 +242,21 @@ CryptoAdapter.prototype.initialize = function() {
     );
 };
 
+/**
+ * Gets whether the crypto adapter is running in standard mode (secure and persistent) or fallback
+ * mode (secure and not persistent).
+ *
+ * @returns {Boolean} True if the adapter is secure and persistent; false if the adapter is secure
+ * and not persistent.
+ * @export
+ */
 CryptoAdapter.prototype.isCrypto = function() {
     return this.mode === CryptoAdapter.NAME;
 };
 
 /**
  * Runs the stored queue of requests.
- * @param {Boolean} readyState - true if the adapter is ready; false if the adapter is in permanent error state.
+ * @param {Boolean} readyState true if the adapter is ready; false if the adapter is in permanent error state.
  * @private
  */
 CryptoAdapter.prototype.executeQueue = function(readyState) {
@@ -261,7 +293,8 @@ CryptoAdapter.prototype.getInitializationError = function() {
 /**
  * Enqueues a function to execute.
  * @param {function} execute the function to execute.
- * @return {Promise} a promise.
+ * @returns {Promise} a promise.
+ * @private
  */
 CryptoAdapter.prototype.enqueue = function(execute) {
     var that = this;
@@ -279,7 +312,7 @@ CryptoAdapter.prototype.enqueue = function(execute) {
     }
 
     // adapter is ready so execute immediately
-    return new Promise(function(success, error) { execute(success, error); });
+    return new Promise(function(resolve, reject) { execute(resolve, reject); });
 };
 
 
@@ -295,7 +328,7 @@ CryptoAdapter.prototype.getSize = function() {
 /**
  * Retrieves an item from storage
  * @param {String} key storage key for item to retrieve
- * @returns {Promise} Promise with item
+ * @returns {Promise} a promise that resolves with the item or null if not found.
  */
 CryptoAdapter.prototype.getItem = function(key) {
     var that = this;
@@ -308,7 +341,8 @@ CryptoAdapter.prototype.getItem = function(key) {
 /**
  * Retrieves an item from storage
  * @param {String} key storage key for item to retrieve
- * @returns {Promise} Promise with item
+ * @returns {Promise} a promise that resolves with the item or null if not found.
+ * @private
  */
 CryptoAdapter.prototype.getItemInternal = function(key, resolve, reject) {
     var that = this;
@@ -338,7 +372,7 @@ CryptoAdapter.prototype.getItemInternal = function(key, resolve, reject) {
 /**
  * Decrypts a stored cached entry.
  * @param {CryptoAdapter.Entry} value the cache entry to decrypt
- * @return {Promise} a promise that resolves with the decrypted item.
+ * @returns {Promise} a promise that resolves with the decrypted item.
  * The object consists of {value: *, isExpired: Boolean}.
  * @private
  */
@@ -543,7 +577,7 @@ CryptoAdapter.prototype.clear = function() {
 /**
  * Gets the set of expired items.
  *
- * @return {Promise} a promise that will resolve when the operation finishes.
+ * @returns {Promise} a promise that will resolve when the operation finishes.
  */
 CryptoAdapter.prototype.sweep = function() {
     return this.adapter.sweep();
@@ -552,7 +586,7 @@ CryptoAdapter.prototype.sweep = function() {
 
 /**
  * Deletes this store.
- * @return {Promise} promise that deletes this store.
+ * @returns {Promise} promise that deletes this store.
  */
 CryptoAdapter.prototype.deleteStorage = function() {
     return this.adapter.deleteStorage();
@@ -565,7 +599,9 @@ CryptoAdapter.prototype.deleteStorage = function() {
  */
 CryptoAdapter.prototype.log = function (msg, obj) {
     if (this.debugLoggingEnabled) {
-        $A.log("CryptoAdapter '" + this.instanceName + "' " + msg + ":", obj);
+        $A.log("CryptoAdapter" +
+                (this.mode === CryptoAdapter.NAME ? "" : " (fallback mode)") +
+                " '" + this.instanceName + "' " + msg, obj);
     }
 };
 

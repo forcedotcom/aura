@@ -51,7 +51,7 @@ public class ManifestTest extends UnitTestCase {
      * Format is API!.
      */
     public void testFormat() {
-        assertEquals(Format.JS, new Manifest().getFormat());
+        assertEquals(Format.MANIFEST, new Manifest().getFormat());
     }
 
     /**
@@ -162,8 +162,8 @@ public class ManifestTest extends UnitTestCase {
     	Manifest manifest = new Manifest();
     	ServletUtilAdapter servletUtilAdapter = Mockito.mock(ServletUtilAdapter.class);
     	manifest.setServletUtilAdapter(servletUtilAdapter);
-    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.JS))
-        .thenReturn("text/javascript");
+    	Mockito.when(servletUtilAdapter.getContentType(AuraContext.Format.MANIFEST))
+        .thenReturn("text/cache-manifest");
     	DummyHttpServletResponse response = new DummyHttpServletResponse() {
             String contentType = "defaultType";
 
@@ -180,6 +180,6 @@ public class ManifestTest extends UnitTestCase {
     	
     	manifest.setContentType(response);
     	
-    	assertEquals("text/javascript", response.getContentType());
+    	assertEquals("text/cache-manifest", response.getContentType());
     }
 }

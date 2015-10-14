@@ -16,12 +16,17 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" extends="ui:popupTrigger" description="A link that triggers a dropdown menu.">
+
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
+
     <aura:registerevent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
+
+    <aura:registerEvent access="GLOBAL" name="blur" type="ui:blur" description="The event fired when the user moves off from the trigger."/>
+    <aura:registerEvent access="GLOBAL" name="focus" type="ui:focus" description="The event fired when the user focuses on the trigger."/>
 
     <aura:set attribute="trigger">
         <div aura:id="menuTrigger">
-            <a aura:id="link" aria-haspopup="true" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
+            <a aura:id="link" onblur="{!c.onblur}" onfocus="{!c.onfocus}" aria-haspopup="true" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
                 <aura:if isTrue="{!v.body.length == 0}">
                     {!v.label}
                     <aura:set attribute="else">

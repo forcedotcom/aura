@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+    onblur: function(component, event, helper) {
+        component.get("e.blur").fire();
+    },
+
+    onfocus: function(component, event, helper) {
+        component.get("e.focus").fire();
+    },
+
     onClick: function(component, event, helper) {
         if (event && $A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
             $A.util.squash(event);

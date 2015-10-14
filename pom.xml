@@ -137,7 +137,7 @@
             <dependency>
                 <groupId>org.auraframework</groupId>
                 <artifactId>aura-spring</artifactId>
-                <version>0.3068-SNAPSHOT</version>
+                <version>0.3122-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.auraframework</groupId>

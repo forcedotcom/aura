@@ -17,7 +17,6 @@ package org.auraframework.http.resource;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
 import org.auraframework.system.AuraContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 public class EncryptionKey extends AuraResourceImpl {
 
     private ConfigAdapter configAdapter = Aura.getConfigAdapter();
-    private ServletUtilAdapter servletUtilAdapter = Aura.getServletUtilAdapter();
 
     public EncryptionKey() {
         super("app.encryptionkey", AuraContext.Format.HTML, false);
@@ -40,6 +38,8 @@ public class EncryptionKey extends AuraResourceImpl {
     @Override
     public void write(HttpServletRequest request, HttpServletResponse response, AuraContext context) throws IOException {
         String key = configAdapter.getEncryptionKey();
+        System.out.println("RESPONSE="+response);
+        System.out.println("OUTPUTSTREAM="+response.getOutputStream());
         servletUtilAdapter.setNoCache(response);
         response.getOutputStream().write(key.getBytes(StandardCharsets.UTF_8));
     }

@@ -173,17 +173,17 @@
         test : [
             function(cmp) {
                 // fire first foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore1;RESUME fore1.chain;WAIT fore1;COPY;", "fore1"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore1;RESUME MultipleForeground.fore1.chain;WAIT MultipleForeground.fore1;COPY;", "fore1"));
             }, function(cmp) {
             	// fire 2nd foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT fore1.chain;APPEND fore2;RESUME fore2.chain; WAIT fore2;COPY;", "fore2"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT MultipleForeground.fore1.chain;APPEND fore2;RESUME MultipleForeground.fore2.chain; WAIT MultipleForeground.fore2;COPY;", "fore2"));
             }, function(cmp) {
             	// fire 3rd foreground action that waits for trigger
-                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT fore2.chain; APPEND fore3;RESUME fore3.chain; WAIT fore3;COPY;", "fore3"));
+                $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "WAIT MultipleForeground.fore2.chain; APPEND fore3;RESUME MultipleForeground.fore3.chain; WAIT MultipleForeground.fore3;COPY;", "fore3"));
             }, function(cmp) {
                 // send a 4th action that should release the first one.
                 $A.enqueueAction(this.getActionAndLog(cmp, "c.execute",
-                        "WAIT fore3.chain; APPEND fore4;READ;APPEND fore4.4;RESUME fore1;RESUME fore2;RESUME fore3", "fore4"));
+                        "WAIT MultipleForeground.fore3.chain; APPEND fore4;READ;APPEND fore4.4;RESUME MultipleForeground.fore1;RESUME MultipleForeground.fore2;RESUME MultipleForeground.fore3", "fore4"));
                
             }, function(cmp) {
                  this.addWaitForLogRace(cmp, 0, 3, "fore1: SUCCESS fore4.4");

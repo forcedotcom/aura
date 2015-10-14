@@ -74,7 +74,10 @@ public class AuraResourceServlet extends AuraBaseServlet {
         this.nameToResource.put(resource.getName(), resource);
     }
 
-    protected AuraResource findResource(AuraContext context, String fullName) {
+    /*
+     * we pass in context, just in case someone overriding this function might want to use it.
+     */
+    protected AuraResource findResource(String fullName, AuraContext context) {
         if (fullName == null) {
             return null;
         }
@@ -107,7 +110,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setCharacterEncoding(AuraBaseServlet.UTF_ENCODING);
         AuraContext context = Aura.getContextService().getCurrentContext();
-        AuraResource resource = findResource(context, (String)request.getAttribute(ORIG_REQUEST_URI));
+        AuraResource resource = findResource((String)request.getAttribute(ORIG_REQUEST_URI), context);
         ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         if (resource == null) {
             servletUtil.send404(request, response);
@@ -116,8 +119,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         if (servletUtil.resourceServletGetPre(request, response, resource)) {
             return;
         }
-        AuraContext.Format format = context.getFormat();
-        response.setContentType(getContentType(format));
+        resource.setContentType(response);
         setBasicHeaders(context.getApplicationDescriptor(), request, response);
         if (resource.isCSRFProtect()) {
             try {

@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 ({
+	handleGridEvents : function(cmp, evt, helper) {
+		if (evt.getParam("action") === 'select') {
+			var index = evt.getParam("index");
+			var payload = evt.getParam("payload");
+			var prefix = payload.value ? 'Selected' : 'Deselected';
+			
+			alert(prefix + ' ' + payload.selectedItem.subject + ' @ ' + index);
+		} else {
+			alert(evt);
+		}
+	},
 	init : function(cmp, evt, helper) {
 		$A.metricsService.enablePlugins();
 		helper.generateColumnConfigs(cmp);

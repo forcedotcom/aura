@@ -113,7 +113,7 @@
     
     /**
      * This test is similar as the one above, the main difference is we create&enqueue a server action(getComponents) 
-     * in the test, this allow us to watch *that* action only via addPrePostSendCallback, instead of watching 
+     * in the test, this allow us to watch *that* action only via addPreSendCallback, instead of watching 
      * all actions
      * 
      * ask receiverCmp(newCmpWithValueProvider) to replace its body with couple new component(auratest:text) 
@@ -156,7 +156,7 @@
                     $A.test.expectAuraError(errorMsg);
                 }
             };
-            cb_handle = $A.test.addPrePostSendCallback(action, preSendCallback, undefined);
+            cb_handle = $A.test.addPreSendCallback(action, preSendCallback);
             $A.test.addWaitFor(true, function() { return destroy_done; });
 
             //now enqueue the action

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-function lib(constraint, elementProxyFactory) {
+function lib(constraint, elementProxyFactory, win) {
     'use strict';
-    var w = window;
+
+    var ALIGN_REGEX = /^(left|right|center)\s(top|bottom|center)$/;
+
+    var w = win || window;
 
     var Constraint = constraint.Constraint;
-
     var bakeOff = elementProxyFactory.bakeOff;
 
     var repositionScheduled = false;
@@ -57,7 +59,7 @@ function lib(constraint, elementProxyFactory) {
         // if reposition is called twice within one frame
         // we only run this once
         if(!repositionScheduled) {
-            window.requestAnimationFrame(function() {
+            w.requestAnimationFrame(function() {
                 repositionScheduled = false;
 
                 // this must be executed in order or constraints
@@ -77,14 +79,14 @@ function lib(constraint, elementProxyFactory) {
                 }
 
                 elementProxyFactory.bakeOff();
-                
+
                 if(callback) {
                     callback();
                 }
             });
             repositionScheduled = true;
         }
-            
+
     }
 
     // throttled to once every 10ms
@@ -95,7 +97,7 @@ function lib(constraint, elementProxyFactory) {
         if(!timeoutHandler) {
             timeoutHandler = setTimeout(reposition, 10);
         }
-        
+
     }
 
     function bindEvents() {
@@ -120,27 +122,26 @@ function lib(constraint, elementProxyFactory) {
          * @param  {Object} config
          * @property {HTMLElement} config.element The element being positioned
          * @property {HTMLElement} config.target The target element
-         * @property {Sring} config.type The type of constraint, options: 
+         * @property {Sring} config.type The type of constraint, options:
          *                               default: position the element based on align and target align properties
          *                               bounding box: position the elment inside the target
          * @property {Number} config.pad A number (in pixels) to pad the constraint. (default is 0)
-         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint. 
+         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint.
          * @property {Boolean} config.enable If enable is false the constraint will have no effect. (default is true)
          * @property {String} config.align How to align the element being positioned. This can have one or two words the first specifies
          *                          the vertical alignment, the second the horizontal alignments.
          *                          acceptable values: right, left, center
          * @property {String} config.targetAlign where on the target to align to.
-         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body 
+         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body
          *                                               (removed from current context)
-         * 
+         *
          * @return {Object} constraintHandle
          * @property {Function} constraintHandle.disable Disable the constraint
          * @property {Function} constraintHandle.enable Enable the constraint
-         * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up 
-         *                                               element references. 
+         * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up
+         *                                               element references.
          */
     	createRelationship: function(config) {
-
             if(!eventsBound) {
                 bindEvents();
             }
@@ -149,16 +150,25 @@ function lib(constraint, elementProxyFactory) {
             var el = config.element;
     		var targ = config.target;
             var constraintList = [];
+
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
-            $A.assert(config.target && (config.target === window || isDomNode(config.target)), 'Target is undefined or missing');
+            $A.assert(config.target && (config.target === w || isDomNode(config.target)), 'Target is undefined or missing');
 
             if(config.appendToBody) {
                 document.body.appendChild(config.element);
             }
 
+            if(config.align) {
+                $A.assert(!!config.align.match(ALIGN_REGEX), 'Invalid align string');
+            }
+            if(config.targetAlign) {
+                $A.assert(!!config.targetAlign.match(ALIGN_REGEX), 'Invalid targetAlign string');
+            }
+
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
+
                 var constraintDirections = config.align.split(/\s/);
                 var vertConfig = $A.util.copy(config);
 
@@ -166,25 +176,27 @@ function lib(constraint, elementProxyFactory) {
                 if(vertConfig.padTop !== undefined) {
                     vertConfig.pad = vertConfig.padTop;
                 }
+
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
                 constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], vertConfig));
+
             } else {
                 constraintList.push(new Constraint(config.type, config));
             }
-           
-            
+
+
 
 
             constraints = constraints.concat(constraintList);
-            
-            
+
+
     		return (function() {
 
 
                 return {
 
                     disable: function() {
-                        
+
                         constraintList.forEach(function(constraint) {
                             constraint.detach();
                         });
@@ -209,5 +221,5 @@ function lib(constraint, elementProxyFactory) {
 
     	reposition: reposition
     };
-    
+
 }

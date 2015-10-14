@@ -19,7 +19,7 @@
 <aura:documentation>
     <aura:description>
         <p><code>ui:​panel</code>​ represents a panel that's modal or non-modal. A modal panel doesn't allow any other interaction on the screen when the panel is opened.
-        A non-modal panel can be full screen or non full screen. You can control the positioning of the panel relative to an element.
+        Panels can be full screen or non-full screen. You can control the positioning of the panel relative to an element.
         In non full screen mode, the panel aligns to the center of a parent DOM container and closes when you click outside the boundaries of the panel.
         </p>
         <p>Include one instance of <code>ui:panelManager2</code> to handle and control visibility of all panels in your component or app.
@@ -75,136 +75,58 @@ closeAction: function(panel) {
     action: 'closePanel',
     payload: {callback: yourCallback}
 }).fire();</pre>
-	<p>The following API methods are available on the <code>ui:panelType</code> interface.</p>
-	<table>
-        <thead>
-		    <tr>
-		      <th>Method</th>
-		      <th>Description</th>
-		    </tr>
-		  </thead>
-		  <tr>
-		    <td>show()</td>
-		    <td>Makes the panel visible.</td>
-		  </tr>
-		  <tr>
-		    <td>hide()</td>
-		    <td>Hides the panel from view.</td>
-		  </tr>
-		  <tr>
-		    <td>update()</td>
-		    <td>Updates the body of the panel.</td>
-		  </tr>
-		  <tr>
-		  	<td>close()</td>
-		  	<td>Hides and destroys the panel.</td>
-		  </tr>
-		  <tr>
-		  	<td>setActive()</td>
-		  	<td>Sets the panel as active or inactive.</td>
-		  </tr>
-		</table>
      
         <h4>Positioning Panels</h4>
-        <p>Position your panels using the <code>ui:panelPositioningLib</code> library, which creates positioning constraints for elements.</p> 
-<pre>//Import library
-&lt;aura:import library="ui:panelPositioningLib" property="lib" /></pre>
-         <p>Two types of constraints are supported:
-        <code>default</code> and <code>bounding box</code>. A <code>default</code> constraint positions the element relative to the target.
-        </p>
-        <p>
-        A <code>bounding box</code> constraint keeps the element within the target. Elements can have multiple constraints, and a positioning element can also be a target element.
-        To create a constraint, call <code>positioningLib.createRelationship(config)</code> with the configuration options below.</p>
-        <table>
-        <thead>
-		    <tr>
-		      <th>Name</th>
-		      <th>Type</th>
-		      <th>Description</th>
-		    </tr>
-		  </thead>
-		  <tr>
-		    <td>config.element</td>
-		    <td>HTMLElement</td>
-		    <td>The element being positioned</td>
-		  </tr>
-		  <tr>
-		    <td>config.target</td>
-		    <td>HTMLElement</td>
-		    <td>The target element</td>
-		  </tr>
-		  <tr>
-		    <td>config.type</td>
-		    <td>String</td>
-		    <td>The target element</td>
-		  </tr>
-		  <tr>
-		  	<td>config.pad</td>
-		  	<td>Number</td>
-		  	<td>A number (in pixels) to pad the constraint. The default is 0.</td>
-		  </tr>
-		  <tr>
-		  	<td>config.enable</td>
-		  	<td>Boolean</td>
-		  	<td>Determines if the constraint is enabled. The default is true.</td>
-		  </tr>
-		  <tr>
-			  <td>config.align</td>
-			  <td>String</td>
-			  <td>The horizontal and vertical alignments of the element. For example, <code>'center bottom'</code>. Horizontal values: right, left, center. Vertical values: top, bottom.</td>
-		</tr>
-		<tr>
-			<td>config.targetAlign</td>
-			<td>String</td>
-			<td>The alignment relative to the target. For example, <code>'right center'</code>. To position an element west of a target element, set <code>targetAlign</code> to <code>'left center'</code> and <code>align</code> to <code>'right center'</code>.</td>
-		</tr>
-		<tr>
-			<td>config.boxDirections</td>
-			<td>Object</td>
-			<td>An object that defines which sides of the box are enabled. Properties are top, right, left and bottom. All are booleans. By default top and bottom are false and left and bottom are true.</td> 
-		</tr>
-		<tr>
-			<td>constraintHandle.disable</td>
-			<td>function</td>
-			<td>Disables the constraint</td>
-		</tr>
-		<tr>
-			<td>constraintHandle.enable</td>
-			<td>function</td>
-			<td>Enables the constraint</td>
-		</tr>
-		<tr>
-			<td>constraintHandle.destroy</td>
-			<td>function</td>
-			<td>Destroys the constraint, cleaning up element references.</td>
-		</tr>
-		</table>
-		<p>This example sets up a constraint that positions an element north of a target element.</p>		
-<pre>var lib = helper.lib.panelPositioning;
-var el = cmp.find('myDiv').getElement();
-var panel = cmp.find('panel').getElement();
-lib.createRelationship({
-	element:panel,
-	target:el,
-	align:'center bottom',
-	targetAlign: 'center top',
-	pad: 15
-});</pre>     
-    <p>Multiple constraints are applied in the order they are added. If a later constraint conflicts with an earlier constraint, the later constraint will take precedence.   
-    </p>
-    <h4>Repositioning Methods</h4>
-    <p><b>reposition()</b></p>
-    <p>When the window is resized or scrolled, the library automatically updates the position of the constrained element. You can use <code>reposition()</code> to force the position of all elements to be updated.
-    Repositioning might take slightly longer if you have a large number of elements.</p>
-    <p><b>disable()</b></p>
-    <p>To temporarily disable a constraint, call <code>disable().</code></p>
-    <p><b>enable()</b></p>
-    <p>If you have disabled a constraint, you can enable it using <code>enable()</code>.</p>
-    <p><b>destroy()</b></p>
-    <p>When you are finished with a constraint, use <code>destroy()</code> to destroy it.</p>
+        <p>Position a panel in relation to a target element by using the direction attribute.To position a panel at the north of the target element, set <code>direction : north</code>. 
+        To set a padding between the two, set <code>pad : 30</code>, where 30 is the padding in pixels. The target (referenceElement) can also be the viewport.
+        A padding can be added using <code>pad</code> and <code>padTop</code>.</p>
+		<pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'panel',
+    visible: true,
+    panelConfig : {
+        referenceElement: target,
+        direction: 'north',
+        body  : body,
+        pad : 30
+    }
+}).fire();</pre>
+		<h4>Aligning your Target Using Advanced Positioning</h4>
+        <p>With advanced positioning, instead of using <code>direction</code>, specify the alignments using <code>align</code> and <code>targetAlign</code>.
+        For example, you can position the panel on top of the target. Set <code>advanced: true</code>, and specify the alignments.
+        The <code>direction</code> attribute is ignored when advanced positioning is used.
+		</p>
+		<pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'panel',
+    visible: true,
+    panelConfig : {
+        referenceElement: target,
+        advanced: true,
+        targetAlign : 'left top',
+        align : 'left top',
+        body  : body,
+        pad : 0
+    }
+}).fire();</pre>
+	<p>Let's see how advanced positioning further differs from using the direction attribute. When you set <code>direction</code> to north, the panel is center aligned at the north of the target. 
+	Using advanced positioning, you can vertically align the panel and target by setting <code>targetAlign : 'left top'</code> and <code>align : 'left bottom'</code>.
+	</p>
+	<h4>Using a Bounding Element</h4>
+	<p>A bounding element keeps the panel within the element. The default bounding element is the window. The child component must be bound within the parent component.
+	 If a bounding element is used, the panel is positioned in relation to the bounding element. For example, setting <code>direction</code> to <code>east</code> positions the panel at the east of the bounding element and within it.
+	</p>
+	<pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'panel',
+    visible: true,
+    panelConfig : {
+        referenceElement: bigTarget,
+        boundingElement: window,
+        direction: 'east',
+        body  : body,
+    pad : 30
+    }
+}).fire();</pre>
+	<p>For examples, see the <a href="/uiExamples/panelPositioningExample.cmp">Panel Positioning Demo</a>.</p>
      </aura:description>
    
-  <aura:example name="panelPositioning" ref="uiExamples:panelPositioningExample" label="Positioning Panels using the panelPositioning Library">
-    	<p></p>
-	   </aura:example>
+ 
 </aura:documentation>

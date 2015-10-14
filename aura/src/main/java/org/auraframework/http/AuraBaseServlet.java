@@ -47,6 +47,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
      * "Long" pages (such as resources and cached HTML templates) expire in 45 days. We also use this to "pre-expire"
      * no-cache pages, setting their expiration a month and a half into the past for user agents that don't understand
      * Cache-Control: no-cache.
+     * This is the same as ServletUtilAdapterImpl.java
      */
     public static final long LONG_EXPIRE = 45 * SHORT_EXPIRE;
     public static final String UTF_ENCODING = "UTF-8";
@@ -156,18 +157,22 @@ public abstract class AuraBaseServlet extends HttpServlet {
         return Aura.getServletUtilAdapter().getStyles(Aura.getContextService().getCurrentContext());
     }
 
+    @Deprecated
     public static List<String> getBaseScripts(AuraContext context) throws QuickFixException {
         return Aura.getServletUtilAdapter().getBaseScripts(context);
     }
 
+    @Deprecated
     public static List<String> getNamespacesScripts(AuraContext context) throws QuickFixException {
         return Aura.getServletUtilAdapter().getNamespacesScripts(context);
     }
 
+    @Deprecated
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Aura.getServletUtilAdapter().send404(request, response);
     }
 
+    @Deprecated
     public void handleServletException(Throwable t, boolean quickfix, AuraContext context,
             HttpServletRequest request, HttpServletResponse response,
             boolean written) throws IOException {

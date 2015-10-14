@@ -43,4 +43,6 @@ public interface AuraResource {
      * Do we need protection from CSRF?.
      */
     boolean isCSRFProtect();
+
+	void setContentType(HttpServletResponse response);
 }

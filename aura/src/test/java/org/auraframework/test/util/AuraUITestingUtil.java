@@ -138,10 +138,10 @@ public class AuraUITestingUtil {
         //register the custom callback
         switch(stressActionTiming) {
             case PRESEND: 
-                jsScript += "var cb_handle = $A.test.addPrePostSendCallback(undefined, customCallback, undefined);";
+                jsScript += "var cb_handle = $A.test.addPreSendCallback(undefined, customCallback);";
                 break;
             case POSTSEND:
-                jsScript += "var cb_handle = $A.test.addPrePostSendCallback(undefined, undefined, customCallback);";
+                jsScript += "var cb_handle = $A.test.addPostSendCallback(undefined, customCallback);";
                 break;
             //we need different customCallback for this case PREDECODE:
             //jsScript += "var cb_handle = $A.test.addPreDecodeCallback(customCallback);";

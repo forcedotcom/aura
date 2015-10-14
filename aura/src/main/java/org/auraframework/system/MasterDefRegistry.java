@@ -69,14 +69,6 @@ public interface MasterDefRegistry {
     <D extends Definition> D getRawDef(DefDescriptor<D> descriptor) throws QuickFixException;
 
     /**
-     * Given a descriptor that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that
-     * exists. Does not compile the definitions if they were not already
-     * compiled, and does not guarantee that they can compile.
-     */
-    <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher);
-
-    /**
      * Given a string that contains search patterns or wildcards, return a set
      * of Descriptors for all existing Definitions who have source that exists.
      * Does not compile the definitions if they were not already compiled, and

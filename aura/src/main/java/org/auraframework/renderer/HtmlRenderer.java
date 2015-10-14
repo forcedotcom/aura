@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.auraframework.Aura;
 import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDefRef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Renderer;
 import org.auraframework.expression.Expression;
@@ -37,35 +36,6 @@ public class HtmlRenderer implements Renderer {
     @SuppressWarnings("unchecked")
     @Override
     public void render(BaseComponent<?, ?> component, Appendable out) throws IOException, QuickFixException {
-        List<Object> markup = (List<Object>) component.getAttributes().getValue("markup");
-        if (markup != null) {
-            for (int i = 0; i < markup.size(); i++) {
-                Object section = markup.get(i);
-                if (section instanceof String) {
-                    out.append((String) section);
-                } else if (section != null && section instanceof Expression) {
-                    section = ((Expression) section).evaluate(component.getAttributes().getValueProvider());
-
-                    if (section != null) {
-
-                        if (section instanceof List) {
-                            for (Object obj : (List<?>) section) {
-                                if (obj instanceof ComponentDefRef) {
-                                    ComponentDefRef cdr = (ComponentDefRef) obj;
-                                    Component cmp = cdr.newInstance(component.getAttributes().getValueProvider());
-                                    Aura.getRenderingService().render(cmp, out);
-                                } else if (obj instanceof Component) {
-                                    Aura.getRenderingService().render((Component) obj, out);
-                                }
-                            }
-                        } else {
-                            out.append(section.toString());
-                        }
-                    }
-                }
-            }
-            return;
-        }
         String tag = (String) component.getAttributes().getValue("tag");
         String id = component.getLocalId();
         out.append('<');

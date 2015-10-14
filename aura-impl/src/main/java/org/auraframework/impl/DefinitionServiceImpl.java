@@ -142,15 +142,6 @@ public class DefinitionServiceImpl implements DefinitionService {
     }
 
     @Override
-    @Deprecated
-    public <D extends Definition> Set<DefDescriptor<D>> find(DefDescriptor<D> matcher) {
-        Aura.getContextService().assertEstablished();
-
-        AuraContext context = Aura.getContextService().getCurrentContext();
-        return context.getDefRegistry().find(matcher);
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Aura.getContextService().assertEstablished();
 

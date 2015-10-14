@@ -17,12 +17,8 @@
  */
 package org.auraframework.impl.admin;
 
-import org.auraframework.impl.AuraImpl;
-import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
-import org.auraframework.system.AuraContext;
-import org.auraframework.system.DefRegistry;
 
 /**
  * @since 0.0.177
@@ -31,11 +27,6 @@ import org.auraframework.system.DefRegistry;
 public class AdminController {
     @AuraEnabled
     public static void clearAllRegistries() {
-        AuraContext c = AuraImpl.getContextAdapter().getCurrentContext();
-        MasterDefRegistryImpl mdr = (MasterDefRegistryImpl) c.getDefRegistry();
-        DefRegistry<?>[] regs = mdr.getAllRegistries();
-        for (DefRegistry<?> r : regs) {
-            r.clear();
-        }
+        // FIXME: this has not worked in a while.
     }
 }

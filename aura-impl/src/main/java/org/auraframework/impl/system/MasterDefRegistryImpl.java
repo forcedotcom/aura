@@ -15,7 +15,11 @@
  */
 package org.auraframework.impl.system;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.CheckForNull;
@@ -25,12 +29,24 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.*;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DefinitionAccess;
+import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.LoggingService;
-import org.auraframework.system.*;
+import org.auraframework.system.AuraContext;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.DependencyEntry;
+import org.auraframework.system.Location;
+import org.auraframework.system.MasterDefRegistry;
+import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -39,7 +55,10 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Overall Master definition registry implementation, there be dragons here.
@@ -276,102 +295,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
 
-        return matched;
-    }
-
-    @Override
-    @Nonnull
-    public <D extends Definition> Set<DefDescriptor<D>> find(@Nonnull DefDescriptor<D> matcher) {
-        Set<DefDescriptor<D>> matched;
-        if (matcher.getNamespace().equals("*")) {
-            matched = new LinkedHashSet<>();
-            String qualifiedNamePattern = null;
-            switch (matcher.getDefType()) {
-            case CONTROLLER:
-            case TESTSUITE:
-            case MODEL:
-            case RENDERER:
-            case HELPER:
-            case STYLE:
-            case FLAVORED_STYLE:
-            case TYPE:
-            case RESOURCE:
-            case PROVIDER:
-            case TOKEN_DESCRIPTOR_PROVIDER:
-            case INCLUDE:
-            case TOKEN_MAP_PROVIDER:
-                qualifiedNamePattern = "%s://%s.%s";
-                break;
-            case ATTRIBUTE:
-            case REQUIRED_VERSION:
-            case TESTCASE:
-            case APPLICATION:
-            case COMPONENT:
-            case INTERFACE:
-            case EVENT:
-            case LIBRARY:
-            case DOCUMENTATION:
-            case NAMESPACE:
-            case TOKENS:
-            case TOKENS_IMPORT:
-            case TOKEN:
-            case FLAVOR_BUNDLE:
-            case FLAVORS:
-            case FLAVOR_INCLUDE:
-            case FLAVOR_DEFAULT:
-            case DESIGN:
-            case ATTRIBUTE_DESIGN:
-            case DESIGN_TEMPLATE:
-            case DESIGN_TEMPLATE_REGION:
-            case SVG:
-                qualifiedNamePattern = "%s://%s:%s";
-                break;
-            case ACTION:
-            case DESCRIPTION:
-            case EXAMPLE:
-            case INCLUDE_REF:
-                // TODO: FIXME
-                throw new AuraRuntimeException(String.format("Find on %s defs not supported.", matcher.getDefType()
-                        .name()));
-            default:
-                break;
-            }
-            rLock.lock();
-            try {
-                for (String namespace : delegateRegistries.getAllNamespaces()) {
-                    String qualifiedName = String.format(qualifiedNamePattern,
-                            matcher.getPrefix() != null ? matcher.getPrefix() : "*", namespace,
-                                    matcher.getName() != null ? matcher.getName() : "*");
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<D> namespacedMatcher = (DefDescriptor<D>) DefDescriptorImpl.getInstance(
-                            qualifiedName,
-                            matcher.getDefType().getPrimaryInterface());
-                    DefRegistry<D> registry = getRegistryFor(namespacedMatcher);
-                    if (registry != null) {
-                        matched.addAll(registry.find(namespacedMatcher));
-                    }
-                }
-            } finally {
-                rLock.unlock();
-            }
-        } else {
-            rLock.lock();
-            try {
-                matched = getRegistryFor(matcher).find(matcher);
-            } finally {
-                rLock.unlock();
-            }
-        }
-        if (localDescs != null) {
-            DescriptorFilter filter = new DescriptorFilter(matcher.getQualifiedName());
-            for (DefDescriptor<? extends Definition> desc : localDescs) {
-                if (filter.matchDescriptor(desc)) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<D> localDesc = (DefDescriptor<D>) desc;
-                    matched.add(localDesc);
-                }
-            }
-        }
         return matched;
     }
 

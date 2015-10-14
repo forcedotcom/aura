@@ -125,7 +125,7 @@ closeAction: function(panel) {
     pad : 30
     }
 }).fire();</pre>
-	<p>For examples, see the <a href="/uiExamples/panelPositioningExample.cmp">Panel Positioning Demo</a>.</p>
+	<p>For examples, see the <a href="/uiExamples/panelPositioningExample.cmp?aura.mode=DEV">Panel Positioning Demo</a>.</p>
      </aura:description>
    
  

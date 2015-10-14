@@ -64,7 +64,7 @@ public class ListSorterUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    public void testEscOfListSorter() throws MalformedURLException, URISyntaxException {
+    public void _testEscOfListSorter() throws MalformedURLException, URISyntaxException {
         verifyTabOutAndEscBehaviour(Keys.ESCAPE, false);
     }
 

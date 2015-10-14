@@ -417,17 +417,15 @@
     },
 
     testOverflow: {
-        test:[function(cmp) {
+        test:function(cmp) {
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
             cmp._storage = $A.storageService.initStorage("memory-testOverflow",
-                    false, true, 5500, 2000, 3000, true, true);
+                    false, true, 5000, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("memory-testOverflow"); });
 
-            cmp.helper.lib.storageTest.testOverflow_stage1(cmp, cmp._storage);
-        }, function(cmp) {
-            cmp.helper.lib.storageTest.testOverflow_stage2(cmp, cmp._storage);
-        }]
+            cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
+        }
     },
 
     testClear:{

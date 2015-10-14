@@ -130,12 +130,28 @@
         }
     },
 
+    testCacheMiss: {
+        test: function(cmp) {
+            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+        }
+    },
+
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
         },
         function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
+        }]
+    },
+
+    testReplaceExistingWithEntryTooLarge: {
+        test: [
+        function putItemThenReplaceWithEntryTooLarge(cmp) {
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, this.storage);
+        },
+        function getItem(cmp) {
+            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, this.storage);
         }]
     },
 
@@ -180,11 +196,17 @@
             }]
     },
 
-    // testOverflow: memory doesn't need overflow test
-
     testGetAll: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+        }
+    },
+
+    testOverflow: {
+        test: function(cmp) {
+            var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
+            $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
+            cmp.helper.lib.storageTest.testOverflow(cmp, storage);
         }
     },
 
@@ -197,7 +219,9 @@
         }]
     },
 
-    testStorageInfo: {
+    // FIXME: This test is verifying the wrong thing. Storage is memory so not persistent. Persistence and secure checks
+    //        need to pushed down to the adapter instead of at the storage service layer.
+    _testStorageInfo: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, true);
         }

@@ -43,11 +43,17 @@
     	test : function(cmp) {
     	    var foo = $A.storageService.initStorage("foo", false, true, 100, 200, 300, true, true);
 
-                $A.test.expectAuraError("Storage named 'foo' already exists!");
+            try {
                 var foo2 = $A.storageService.initStorage("foo", false, true, 100, 200, 300, true, true);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: Storage named 'foo' already exists! : false", e.message);
+            }
 
-                $A.test.expectAuraError("Storage named 'foo' already exists!");
+            try {
                 var foo3 = $A.storageService.initStorage("foo", true, true, 10, 20, 30, true, true)
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: Storage named 'foo' already exists! : false", e.message);
+            }
     	}
     },
 

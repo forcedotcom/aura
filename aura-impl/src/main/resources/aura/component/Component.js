@@ -1658,9 +1658,7 @@ Component.prototype.getVersionInternal = function() {
 };
 
 Component.prototype.getValueProvider = function(key) {
-    if (!$A.util.isString(key)) {
-        $A.error("Component.getValueProvider(): 'key' must be a valid String.");
-    }
+    $A.assert($A.util.isString(key), "Component.getValueProvider(): 'key' must be a valid String.");
     return this.valueProviders[key.toLowerCase()];
 };
 
@@ -1767,7 +1765,7 @@ Component.prototype.createComponentStack = function(facets,valueProvider,localCr
                 // newComponentDeprecated("ui:button", {label: "Foo"});
 
                 // JBUCH: HALO: TODO: VERIFY THIS IS NEVER HIT
-                $A.error("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
+                throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
             }
         }
         if (action) {
@@ -2001,7 +1999,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
             $A.log("Configs at error");
             $A.log(config);
             $A.log(partialConfig);
-            $A.error("Mismatch at " + this.globalId
+            throw new $A.auraError("Mismatch at " + this.globalId
                 + " client expected " + configCD
                 + " but got original " + partialConfigO
                 + " providing " + partialConfigCD + " from server "
@@ -2012,7 +2010,7 @@ Component.prototype.validatePartialConfig=function(config, partialConfig){
             $A.log("Configs at error");
             $A.log(config);
             $A.log(partialConfig);
-            $A.error("Mismatch at " + this.globalId
+            throw new $A.auraError("Mismatch at " + this.globalId
                 + " client expected " + configCD + " but got "
                 + partialConfigCD + " from server "
                 +" for creationPath = "+this.creationPath);
@@ -2223,10 +2221,7 @@ Component.prototype.doIndex = function(cmp) {
             valueProvider=valueProvider.getComponent();
         }
 
-        if(!valueProvider){
-            $A.error("No attribute value provider defined for component " + cmp);
-        }
-
+        $A.assert(valueProvider, "No attribute value provider defined for component " + cmp);
         valueProvider.index(localId, this.globalId);
     }
 };

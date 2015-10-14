@@ -19,7 +19,7 @@
 	     if (stringAttr) {
 	    	 cmp.set("v.outputStringAttr",stringAttr+", return from hasAttr");
 	     } else {
-	    	 $A.error("did not get the value from stringAttr");
+	    	 throw new $A.auraError("did not get the value from stringAttr");
 	     }
 	},
 	
@@ -29,10 +29,10 @@
 			if(paramArray.length >= 0) {//array
 				cmp.set("v.outputStringAttr","paramArray: "+paramArray.join()+", return from noAttr");
 			} else {//object
-				$A.error("This should not happen as we don't have attributes at all");
+				throw new $A.auraError("This should not happen as we don't have attributes at all");
 			}
 		} else {//undefined
-			$A.error("Did not get the argument");//cmp.set("v.outputStringAttr", "return from noAttr")
+			throw new $A.auraError("Did not get the argument");//cmp.set("v.outputStringAttr", "return from noAttr")
 		}
 	},
 	
@@ -42,7 +42,7 @@
 	     if (stringAttr) {
 	    	 cmp.set("v.outputStringAttr",stringAttr+", return from withActionHasAttr");
 	     } else {
-	    	 $A.error("did not get the value from stringAttr");
+	    	 throw new $A.auraError("did not get the value from stringAttr");
 	     }
 	},
 	
@@ -53,7 +53,7 @@
 	
 	//this function is not suppose to get called, as we pass in different action-name(funcNoAttr) to the method
 	withActionNoAttr : function(cmp, event, helper) {
-		$A.error("we are calling withActionNoAttr, instead of passed in action");
+		throw new $A.auraError("we are calling withActionNoAttr, instead of passed in action");
 	},
 	
 	methodFromInterface : function(cmp, event, helper) {
@@ -62,7 +62,7 @@
 	    if (stringAttr2) {
 	    	cmp.set("v.outputStringAttr",stringAttr2+", return from methodFromInterface");
 	    } else {
-	    	 $A.error("did not get the value from stringAttr2");
+	    	 throw new $A.auraError("did not get the value from stringAttr2");
 	     }
 	}
 	

@@ -65,11 +65,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
         }
         // JBUCH: HALO: TODO: END REMOVE ME
 
-        if(!$A.util.isComponent(cmp)) {
-            $A.error("AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
-            components[i] = undefined;
-            continue;
-        }
+        $A.assert($A.util.isComponent(cmp), "AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
         if (cmp.isValid()) {
             $A.getContext().setCurrentAccess(cmp);
             var renderedElements = cmp["render"]();
@@ -127,25 +123,20 @@ AuraRenderingService.prototype.rerender = function(components) {
             var renderedElements=[];
             var addExistingElements=visited[id];
             if(!visited[id]) {
-                if (cmp.isRendered()) {
-                    var rerenderedElements = undefined;
-                    try {
-                        context.setCurrentAccess(cmp);
-                        rerenderedElements=cmp["rerender"]();
-                        context.releaseCurrentAccess();
-                    } catch (e) {
-                        $A.error("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
-                        // we fall through here, and put whatever the component gives us in the set.
-                        // This may not be ideal, but it is not clear what we should do.
-                    }
+                $A.assert(cmp.isRendered(), "Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.");
+                var rerenderedElements = undefined;
+                try {
+                    context.setCurrentAccess(cmp);
+                    rerenderedElements=cmp["rerender"]();
+                    context.releaseCurrentAccess();
+                } catch (e) {
+                    throw new $A.auraError("rerender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                } finally {
                     if(rerenderedElements!=undefined){//eslint-disable-line eqeqeq
                         renderedElements=renderedElements.concat(rerenderedElements);
                     }else{
                         addExistingElements=true;
                     }
-                } else {
-                    $A.error("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.");
-                    continue;
                 }
                 visited[id] = true;
             }
@@ -191,10 +182,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
     var context=$A.getContext();
     for(var i=0;i<components.length;i++){
         var cmp = components[i];
-        if(!$A.util.isComponent(cmp)){
-            $A.error("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
-            continue;
-        }
+        $A.assert($A.util.isComponent(cmp), "AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
         if(cmp.isValid()) {
             try {
                 context.setCurrentAccess(cmp);
@@ -203,7 +191,7 @@ AuraRenderingService.prototype.afterRender = function(components) {
             } catch (e) {
                 // The after render routine threw an error, so we should
                 //  (a) log the error
-                $A.error("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
+                throw new $A.auraError("afterRender threw an error in '"+cmp.getDef().getDescriptor().toString()+"'", e);
                 //  (b) mark the component as possibly broken.
                 //  FIXME: keep track of component stability
             }
@@ -258,11 +246,12 @@ AuraRenderingService.prototype.unrender = function(components) {
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);
                     } catch (e) {
-                        $A.error("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
-                    }
-                    cmp.setRendered(false);
-                    if (visited) {
-                        visited[cmp.getGlobalId()] = true;
+                        throw new $A.auraError("Unrender threw an error in "+cmp.getDef().getDescriptor().toString(), e);
+                    } finally {
+                        cmp.setRendered(false);
+                        if (visited) {
+                            visited[cmp.getGlobalId()] = true;
+                        }
                     }
                 }
             } finally {
@@ -288,15 +277,11 @@ AuraRenderingService.prototype.unrender = function(components) {
  * @param {Object} facet the component or array of components to store.
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
-    if(!$A.util.isComponent(component)) {
-        $A.error("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
-    }
+    $A.assert($A.util.isComponent(component), "Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
-    if(!$A.util.isArray(facet)) {
-        $A.error("Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.");
-    }
+    $A.assert($A.util.isArray(facet), "Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.");
     component._facetInfo=facet.slice(0);
 };
 
@@ -305,9 +290,7 @@ AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
  * @memberOf AuraRenderingService
  */
 AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
-    if(!$A.util.isComponent(component)) {
-        $A.error("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
-    }
+    $A.assert($A.util.isComponent(component), "Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
@@ -651,9 +634,8 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
         //KRIS: HALO:
         // Somehow we did over 1000 rerenderings. Not just 1000 components, but one
         // component caused a rerender that caused a rerender, and on and on for 1000 times.
-        if(!maxiterations) {
-            $A.error("Max Callstack Exceeded: Rerendering loop resulted in to many rerenderings.");
-        }
+        $A.assert(maxiterations, "Max Callstack Exceeded: Rerendering loop resulted in to many rerenderings.");
+
         // #if {"modes" : ["PTEST","STATS"]}
         if (allRerendered.length) {
             cmpsWithWhy["renderingTime"] = (new Date()).getTime() - startTime;

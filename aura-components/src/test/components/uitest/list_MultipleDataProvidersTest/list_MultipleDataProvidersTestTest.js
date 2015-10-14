@@ -95,9 +95,12 @@
 			// waiting for intial items of list to load.
 			this.waitForItems(cmp, 25);
 		}, function(cmp) {
-		    $A.test.expectAuraError("Index is out of bounds for list's data provider trigger.");
 			// get data from another provider.
-			this.pushButton(cmp, "btnIndex", 25);
+			try {
+				this.pushButton(cmp, "btnIndex", 25);
+			} catch (e) {
+				$A.test.assertEquals("Index is out of bounds for list's data provider trigger.", e.message);
+			}
 		}, function(cmp) {
 			// verify data didnt change.
 			this.verifyItems(cmp, this.expectedDataProvider1Data);

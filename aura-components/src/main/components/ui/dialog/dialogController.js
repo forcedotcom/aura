@@ -28,7 +28,7 @@
 
         // validate the aria role is one of the allowed values
         if (role !== "dialog" && role !== "alertdialog") {
-            $A.error("The 'ariaRole' attribute of a ui:dialog component " +
+            throw new $A.auraError("The 'ariaRole' attribute of a ui:dialog component " +
                      "must be one of the following case-sensitive values: " +
                      "dialog, alertdialog");
         }
@@ -41,7 +41,7 @@
                 if (buttonFacet[i].isInstanceOf("ui:dialogButtons")) {
                     buttonFacet[i].set("v._parentDialog", cmp);
                 } else {
-                    $A.error("The 'buttons' attribute of a ui:dialog component" +
+                    throw new $A.auraError("The 'buttons' attribute of a ui:dialog component" +
                              "must be of type ui:dialogButtons");
                 }
             }
@@ -49,7 +49,7 @@
 
         // validate the width attribute is one of the allowed values
         if (width !== "small" && width !== "medium" && width !== "large" && width !== "auto") {
-            $A.error("The 'width' attribute of a ui:dialog component must be one of " +
+            throw new $A.auraError("The 'width' attribute of a ui:dialog component must be one of " +
                      "the following case-sensitive values: small, medium, large, auto");
         }
 

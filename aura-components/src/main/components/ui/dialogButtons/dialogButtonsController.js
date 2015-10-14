@@ -24,7 +24,7 @@
         var choice = cmp.get("v.defaultButtons");
 
         if (choice !== "cancel" && choice !== "confirm" && choice !== "none" && choice !== "both") {
-            $A.error("The 'defaultButtons' attribute of a ui:dialogButtons " +
+            throw new $A.auraError("The 'defaultButtons' attribute of a ui:dialogButtons " +
                      "component must be one of the following case-sensitive " +
                      "values: cancel, confirm, both, none");
         }

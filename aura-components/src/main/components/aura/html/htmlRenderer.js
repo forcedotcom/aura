@@ -17,7 +17,7 @@
 	render : function(component, helper) {
 		var tag = component.get("v.tag");
 		if ($A.util.isUndefinedOrNull(tag)) {
-			$A.error("Undefined tag attribute for " + component.getGlobalId());
+			throw new $A.auraError("Undefined tag attribute for " + component.getGlobalId());
 		}
 
 		var HTMLAttributes = component.get("v.HTMLAttributes");

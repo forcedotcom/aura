@@ -190,7 +190,6 @@
      */
     testInvalidComponentError: {
         test: function(cmp) {
-            $A.test.expectAuraError("Invalid component");
             var textCmp = cmp.find("textInOuterFacet");
             var globalId = textCmp.getGlobalId();
             $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === -1,
@@ -198,9 +197,11 @@
             textCmp.destroy();
             $A.test.assertTrue(textCmp.toString().indexOf("InvalidComponent") === 0,
                     "Component prototype was not swapped with InvalidComponent after being destroyed.");
-            textCmp.set("v.value", "New value");
-            var errorMsg = $A.test.getAuraErrorMessage();
-            this.verifyInvalidComponentErrorMessage(errorMsg, "set", "v.value,New value", "markup://aura:text", globalId);
+            try {
+                textCmp.set("v.value", "New value");
+            } catch (e) {
+                this.verifyInvalidComponentErrorMessage(e.message, "set", "v.value,New value", "markup://aura:text", globalId);
+            }
         }
     },
 

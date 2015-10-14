@@ -298,7 +298,7 @@ Action.prototype.complete = function() {
         if ($A.clientService.inAuraLoop()) {
             throw e;
         } else {
-            $A.error("Action.complete: Failed during completion callback", e);
+            throw new $A.auraError("Action.complete: Failed during completion callback", e);
         }
     }
 };
@@ -430,14 +430,10 @@ Action.prototype.getComponent = function() {
  * @export
  */
 Action.prototype.setCallback = function(scope, callback, name) {
-    if (!$A.util.isFunction(callback)) {
-        $A.error("Action.setCallback(): callback for '"+name+"' must be a function");
-        return;
-    }
+    $A.assert($A.util.isFunction(callback), "Action.setCallback(): callback for '"+name+"' must be a function");
     if (name !== undefined && name !== "ALL" && name !== "SUCCESS" && name !== "ERROR" && name !== "INCOMPLETE"
             && name !== "ABORTED") {
-        $A.error("Action.setCallback(): Invalid callback name '" + name + "'");
-        return;
+        throw new $A.auraError("Action.setCallback(): Invalid callback name '" + name + "'");
     }
     var context=$A.getContext();
     if(context&&context.getCurrentAccess()&&$A.clientService.inAuraLoop()) {
@@ -494,10 +490,7 @@ Action.prototype.setCallback = function(scope, callback, name) {
  * @export
  */
 Action.prototype.setAllAboardCallback = function(scope, callback) {
-    if (!$A.util.isFunction(callback)) {
-        $A.error("Action 'All Aboard' callback should be a function");
-        return;
-    }
+    $A.assert($A.util.isFunction(callback), "Action 'All Aboard' callback should be a function");
     var that = this;
 
     /**
@@ -639,17 +632,6 @@ Action.prototype.getReturnValue = function() {
  * Each error object has a message field.
  * In any mode except PROD mode, each object also has a stack field, which is a list
  * describing the execution stack when the error occurred.
- *
- * For example, to log any errors:
- * <pre><code>var errors = action.getError();
- * if (errors)  {
- *     $A.log("Errors", errors);
- *     if (errors[0] && errors[0].message) {
- *         $A.error("Error message: " + errors[0].message);
- *     }
- * } else {
- *     $A.error("Unknown error");
- * }</code></pre>
  *
  * @public
  * @platform
@@ -887,10 +869,11 @@ Action.prototype.finishAction = function(context) {
     // reset before potential throw
     $A.showErrors(oldDisplayFlag);
     if (error) {
-        if ($A.clientService.inAuraLoop()) {
+        // no need to wrap AFE with auraError as customers who throw AFE would want to handle it with their own custom experience.
+        if ($A.clientService.inAuraLoop() || error instanceof $A.auraFriendlyError) {
             throw error;
         } else {
-            $A.error("Error ", error);
+            throw new $A.auraError("Error ", error);
         }
     }
 };
@@ -911,7 +894,7 @@ Action.prototype.abort = function() {
         if ($A.clientService.inAuraLoop()) {
             throw e;
         } else {
-            $A.error("Failed during aborted callback", e);
+            throw new $A.auraError("Failed during aborted callback", e);
         }
     } finally {
         $A.log("ABORTED: "+this.getStorageKey());

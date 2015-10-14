@@ -57,9 +57,9 @@
                 break;
             }
             if (!newItems[i].hasOwnProperty("label")) {
-                $A.error("Can't insert pill. New pill items must have label property.");
+                throw new $A.auraError("Can't insert pill. New pill items must have label property.");
             }
-            else if (!this._itemExists(curItems, newItems[i])) {
+            if (!this._itemExists(curItems, newItems[i])) {
                 itemsIsUpdated = true;
                 curItems.push(newItems[i]);
                 cmp.get("e.pillInserted").fire();

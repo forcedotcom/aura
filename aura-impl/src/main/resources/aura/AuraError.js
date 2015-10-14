@@ -30,7 +30,7 @@ function AuraError() {
     this.stackTrace = "";
     this.errorCode  = "";
 
-    function AuraErrorInternal(message) {
+    function AuraErrorInternal(message, innerError) {
         // for IE8
         function getName(method) {
             var funcStr = method.toString();
@@ -76,11 +76,12 @@ function AuraError() {
         if (message == null) {
             message = '';
         }
-        var error = new Error(message);
+
+        var error = innerError || new Error(message);
         error.name = this.name;
         this.lineNumber = error.lineNumber;
         this.number = error.number;
-        this.message = message;
+        this.message = error.message || message;
         this.stackTrace = getStackTrace(error);
     }
 

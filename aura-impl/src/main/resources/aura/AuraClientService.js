@@ -257,11 +257,9 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         // so just flag an error, and carry on.
         //
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        $A.error("Communication error, invalid JSON: " + text);
         ret["message"] = "Communication error, invalid JSON: " + text;
         // #end
         // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        $A.error("Communication error, please retry or reload the page");
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
@@ -291,11 +289,9 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         // event...
         if ($A.util.isUndefinedOrNull(resp)) {
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            $A.error("Communication error, invalid JSON: " + text);
             ret["message"] = "Communication error, invalid JSON: " + text;
             // #end
             // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-            $A.error("Communication error, please retry or reload the page");
             ret["message"] = "Communication error, please retry or reload the page";
             // #end
             ret["status"] = "ERROR";
@@ -321,19 +317,15 @@ AuraClientService.prototype.decode = function(response, noStrip) {
             // !!!!!!!!!!HACK ALERT!!!!!!!!!!
             //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             if (resp["message"] && resp["stack"]) {
-                $A.error(resp["message"] + "\n" + resp["stack"]);
                 ret["message"] = resp["message"] + "\n" + resp["stack"];
             } else {
-                $A.error("Communication error, invalid JSON: " + text);
                 ret["message"] = "Communication error, invalid JSON: " + text;
             }
             // #end
             // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
             if (resp["message"]) {
-                $A.error(resp["message"]);
                 ret["message"] = resp["message"];
             } else {
-                $A.error("Communication error, please retry or reload the page");
                 ret["message"] = "Communication error, please retry or reload the page";
             }
             // #end
@@ -351,11 +343,9 @@ AuraClientService.prototype.decode = function(response, noStrip) {
     var responseMessage = $A.util.json.decode(text);
     if ($A.util.isUndefinedOrNull(responseMessage)) {
         //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        $A.error("Communication error, invalid JSON: " + text);
         ret["message"] = "Communication error, invalid JSON: " + text;
         // #end
         // #if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        $A.error("Communication error, please retry or reload the page");
         ret["message"] = "Communication error, please retry or reload the page";
         // #end
         ret["status"] = "ERROR";
@@ -417,8 +407,7 @@ AuraClientService.prototype.throwExceptionEvent = function(resp) {
         try {
             $A.util.json.decodeString(resp["defaultHandler"])(values);
         } catch (e) {
-            $A.error("Error in defaultHandler for event: " + descriptor, e);
-            throw e;
+            throw new $A.auraError("Error in defaultHandler for event: " + descriptor, e);
         }
     }
 };
@@ -471,11 +460,8 @@ AuraClientService.prototype.isDisconnectedOrCancelled = function(response) {
  * @private
  */
 AuraClientService.prototype.getCurrentTransactionId = function() {
-    if (!this.inAuraLoop()) {
-        $A.error("AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
-        return null;
-    }
-        return this.currentTransactionId;
+    $A.assert(this.inAuraLoop(), "AuraClientService.getCurrentTransasctionId(): Unable to get transaction ID outside aura loop");
+    return this.currentTransactionId;
 };
 
 /**
@@ -490,16 +476,10 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
     var tid = undefined;
 
     if (abortableId !== undefined) {
-        if (!this.inAuraLoop()) {
-            $A.error("AuraClientService.setCurrentTransasctionId(): Unable to set abortable ID outside aura loop");
-            return;
-        }
-        tid = parseInt(abortableId, 10);
+        $A.assert(this.inAuraLoop(), "AuraClientService.setCurrentTransasctionId(): Unable to set abortable ID outside aura loop");
 
-        if (!(tid <= this.nextTransactionId)) {
-            $A.error("AuraClientService.setCurrentTransactionId(): invalid transaction id: "+tid);
-            return;
-        }
+        tid = parseInt(abortableId, 10);
+        $A.assert(tid <= this.nextTransactionId, "AuraClientService.setCurrentTransactionId(): invalid transaction id: "+tid);
         if (tid > this.lastTransactionId) {
             this.lastTransactionId = tid;
         }
@@ -575,8 +555,7 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
         }
     } catch (e) {
         $A.logger.auraErrorHelper(e, action);
-        // FIXME: we should not be calling $A.error here.
-        $A.error(e);
+        throw e;
     }
 };
 
@@ -948,7 +927,7 @@ AuraClientService.prototype.init = function(config, token, container) {
     //
     // not on in dev modes to preserve stacktrace in debug tools
     // Why? - goliver
-    // I think this should be done in all cases, the $A.error can be more
+    // I think this should be done in all cases, the error can be more
     // instructive than an uncaught exception.
     //
     //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -972,8 +951,7 @@ AuraClientService.prototype.init = function(config, token, container) {
         // not on in dev modes to preserve stacktrace in debug tools
         //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     } catch (e) {
-        $A.error("Error during init", e);
-        throw e;
+        throw new $A.auraError("Error during init", e);
     }
     //#end
 };
@@ -1137,8 +1115,10 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                 //
                 if (loaded === false || force) {
                     err = err || "";
-                    $A.error("Aura.loadComponent(): Failed to initialize application.\n" + err);
-                } else if (!loaded) {
+                    throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                }
+
+                if (!loaded) {
                     loaded = false;
                 }
             };
@@ -1270,9 +1250,7 @@ AuraClientService.prototype.popStack = function(name) {
 
     if (this.auraStack.length > 0) {
         lastName = this.auraStack.pop();
-        if (lastName !== name) {
-            $A.error("Broken stack: popped "+lastName+" expected "+name+", stack = "+this.auraStack);
-        }
+        $A.assert(lastName === name, "Broken stack: popped "+lastName+" expected "+name+", stack = "+this.auraStack);
     } else {
         $A.warning("Pop from empty stack");
     }
@@ -1282,7 +1260,7 @@ AuraClientService.prototype.popStack = function(name) {
         try {
             this.process();
         } catch (e) {
-            $A.error("AuraClientService.popStack: error in processing", e);
+            throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.popStack: error in processing", e);
         }
         this.auraStack.pop();
         this.nextTransactionId += 1;
@@ -1644,7 +1622,7 @@ AuraClientService.prototype.finishProcessing = function() {
     try {
         $A.renderingService.rerenderDirty();
         } catch (e) {
-        $A.logger.auraErrorHelper(e);
+        throw e;
         } finally {
         this.clearInCollection();
         if (this.actionsQueued.length > 0) {
@@ -1920,7 +1898,7 @@ AuraClientService.prototype.receive = function(auraXHR) {
         }
         this.fireDoneWaiting();
     } catch (e) {
-        $A.error("AuraClientService.receive action callback failed", e);
+        throw (e instanceof $A.auraError) ? e : new $A.auraError("AuraClientService.receive action callback failed", e);
     } finally {
         this.auraStack.pop();
         this.releaseXHR(auraXHR);
@@ -1945,6 +1923,7 @@ AuraClientService.prototype.processErrors = function(auraXHR, errorMessage) {
         if (actions.hasOwnProperty(id)) {
             action = actions[id];
             var error = new Error(errorMessage);
+            $A.warning("Error in the server action response:" + errorMessage);
             action.markError($A.getContext(), [error]);
         }
     }
@@ -2025,7 +2004,7 @@ AuraClientService.prototype.processResponses = function(auraXHR, responseMessage
             }
         } catch (e) {
             $A.logger.auraErrorHelper(e, action);
-            $A.error("Error processing action response", e);
+            throw (e instanceof $A.auraError) ? e : new $A.auraError("Error processing action response", e);
         }
     }
 };

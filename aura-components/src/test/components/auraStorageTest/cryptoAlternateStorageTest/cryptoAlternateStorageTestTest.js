@@ -1,6 +1,9 @@
 ({
     // When crypto key retrieval fails, we use memory storage as alternative
 
+    // Must be run on https or localhost otherwise CryptoAdapter will not register
+    labels : [ "UnAdaptableTest" ],
+
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
         CryptoAdapter.register();

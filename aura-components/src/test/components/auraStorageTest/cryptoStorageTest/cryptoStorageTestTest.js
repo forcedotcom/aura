@@ -4,8 +4,9 @@
     // same exclusions as IndexedDB tests
     browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
-    // Test modifies/deletes the persistent database
-    labels : [ "threadHostile" ],
+    // threadHostile - test modifies/deletes the persistent database.
+    // UnAdaptableTest - must be run on https or localhost otherwise CryptoAdapter will not register
+    labels : [ "threadHostile", "UnAdaptableTest" ],
 
     setUp : function(cmp) {
         if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {

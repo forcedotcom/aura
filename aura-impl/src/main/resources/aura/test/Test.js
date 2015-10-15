@@ -15,10 +15,10 @@
  */
 /*jslint evil:true, sub:true */
 
+
 /**
- * @class Test
  * @classdesc Utility functions for component testing, accessible using $A.test.
- * @constructor
+ * @constructor Test
  */
 TestInstance = function() {
     this.waits = [];

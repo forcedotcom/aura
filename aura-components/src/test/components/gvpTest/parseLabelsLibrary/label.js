@@ -1,4 +1,4 @@
-function () {
+function lib() {
 //
 // $Label.Section2.library
 //

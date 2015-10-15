@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function (elementProxy, win) {
+function lib(elementProxy, win) {
     'use strict';
     var w = win || window; // window injected for testing
 

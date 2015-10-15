@@ -157,7 +157,7 @@
     },
 
     testValidTimeFor24HourWithInitValsBoundaryAtBegin : {
-        attributes : {"is24HourFormat" : true, "hours" : 00,"minutes" : 00},
+        attributes : {"is24HourFormat" : true, "hours" : 0,"minutes" : 0},
         test : function(cmp) {
             var hours = cmp.find("hours").get("v.value");
             $A.test.assertEquals("0",""+hours, "The item in the hours textbox was not correctly converted from 24hours correctly");
@@ -169,7 +169,7 @@
 
     //Test Boundary Cases for period
     testValidTimeForPeriodWithInitValsBoundaryAtBegin : {
-        attributes : {"is24HourFormat" : false,"hours" : 01,"minutes" : 00},
+        attributes : {"is24HourFormat" : false,"hours" : 1,"minutes" : 0},
         test : function(cmp) {
             var hours = cmp.find("hours").get("v.value");
             $A.test.assertEquals("1","" + hours, "The item in the hours textbox was not correctly converted from to 24hours correctly");
@@ -181,7 +181,7 @@
     },
 
     testValidTimeForPeriodWithInitValsBoundaryAtEnd : {
-        attributes : {"is24HourFormat" : false,"hours" : 12,"minutes" : 01},
+        attributes : {"is24HourFormat" : false,"hours" : 12,"minutes" : 1},
         test : function(cmp) {
             var hours = cmp.find("hours").get("v.value");
             $A.test.assertEquals("12","" + hours, "The item in the hours textbox was not correctly converted from to 24hours correctly");

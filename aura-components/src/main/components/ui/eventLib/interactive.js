@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function () {    
-	
+function lib() {
+
 	var lib = {
 		/**
 	     * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler

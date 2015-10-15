@@ -18,7 +18,7 @@
  // https://github.com/davidtheclark/tabbable
  // https://github.com/davidtheclark/focus-trap
 
-function () {
+function lib() {
     var trap;
     var tabbableNodes;
     var previouslyFocused;

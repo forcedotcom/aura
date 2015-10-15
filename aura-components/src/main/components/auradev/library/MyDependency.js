@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(jsfile) {
+function lib(jsfile) {
     return {
         getValue: function() {
             return "MyDependency And Externally: " + jsfile.getValue();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function (constraint, elementProxyFactory, win) {
+function lib(constraint, elementProxyFactory, win) {
     'use strict';
 
     var ALIGN_REGEX = /^(left|right|center)\s(top|bottom|center)$/;
@@ -79,14 +79,14 @@ function (constraint, elementProxyFactory, win) {
                 }
 
                 elementProxyFactory.bakeOff();
-                
+
                 if(callback) {
                     callback();
                 }
             });
             repositionScheduled = true;
         }
-            
+
     }
 
     // throttled to once every 10ms
@@ -97,7 +97,7 @@ function (constraint, elementProxyFactory, win) {
         if(!timeoutHandler) {
             timeoutHandler = setTimeout(reposition, 10);
         }
-        
+
     }
 
     function bindEvents() {
@@ -122,24 +122,24 @@ function (constraint, elementProxyFactory, win) {
          * @param  {Object} config
          * @property {HTMLElement} config.element The element being positioned
          * @property {HTMLElement} config.target The target element
-         * @property {Sring} config.type The type of constraint, options: 
+         * @property {Sring} config.type The type of constraint, options:
          *                               default: position the element based on align and target align properties
          *                               bounding box: position the elment inside the target
          * @property {Number} config.pad A number (in pixels) to pad the constraint. (default is 0)
-         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint. 
+         *  * @property {Number} config.topPad A number (in pixels) to pad only top top constraint.
          * @property {Boolean} config.enable If enable is false the constraint will have no effect. (default is true)
          * @property {String} config.align How to align the element being positioned. This can have one or two words the first specifies
          *                          the vertical alignment, the second the horizontal alignments.
          *                          acceptable values: right, left, center
          * @property {String} config.targetAlign where on the target to align to.
-         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body 
+         * @property {Boolean} config.appendToDom If true, config.element will be appended to document.body
          *                                               (removed from current context)
-         * 
+         *
          * @return {Object} constraintHandle
          * @property {Function} constraintHandle.disable Disable the constraint
          * @property {Function} constraintHandle.enable Enable the constraint
-         * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up 
-         *                                               element references. 
+         * @property {Function} constraintHandle.destroy Destroy the constraint, cleaning up
+         *                                               element references.
          */
     	createRelationship: function(config) {
             if(!eventsBound) {
@@ -183,20 +183,20 @@ function (constraint, elementProxyFactory, win) {
             } else {
                 constraintList.push(new Constraint(config.type, config));
             }
-           
-            
+
+
 
 
             constraints = constraints.concat(constraintList);
-            
-            
+
+
     		return (function() {
 
 
                 return {
 
                     disable: function() {
-                        
+
                         constraintList.forEach(function(constraint) {
                             constraint.detach();
                         });
@@ -221,5 +221,5 @@ function (constraint, elementProxyFactory, win) {
 
     	reposition: reposition
     };
-    
+
 }

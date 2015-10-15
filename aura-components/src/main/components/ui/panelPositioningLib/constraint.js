@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function(w) {
+function lib(w) {
       var transformFunctions = {
         center: function(inp, targetBox, elementBox) {
             return inp + 0.5 * targetBox.width; 

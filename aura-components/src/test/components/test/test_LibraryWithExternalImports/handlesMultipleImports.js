@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function() {
+function lib() {
 	var imports = Array.prototype.slice.call(arguments, 0);
     return function() {
     	var ret = "EXT_MULTIPLE1:";

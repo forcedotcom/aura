@@ -49,7 +49,7 @@ public class ComponentClassErrorUITest extends WebDriverTestCase {
     // create componentClassParent.cmp in controller dynamically, expect it to error out from render
     public void testDynamicCreatedCmpErrorOutFromRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.render";
-        String expectErrorMessage = "ReferenceError: blahFromParentRerender is not defined";
+        String expectErrorMessage = "blahFromParentRerender is not defined";
         runTestDynamicCreatedCmpErrorOutFrom("markup://auratest:componentClassParent", "errorOutFromRender_Parent",
                 ".uiButton_createCmp", expectErrorMessage, expectLocation);
     }
@@ -65,14 +65,14 @@ public class ComponentClassErrorUITest extends WebDriverTestCase {
     // load componentClassParent.cmp, error out from its re-render
     public void testParentErrorOutFromReRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.rerender";
-        String expectErrorMessage = "ReferenceError: blahFromParentReRerender is not defined";
+        String expectErrorMessage = "blahFromParentReRerender is not defined";
         runTestParentErrorOutFrom("errorOutFromReRender_Parent", ".uiButtonParent", expectErrorMessage, expectLocation);
     }
 
     // load componentClassParent.cmp, error out from its after-render
     public void testParentErrorOutFromAfterRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.afterRender";
-        String expectErrorMessage = "ReferenceError: blahFromParentAfterRerender is not defined";
+        String expectErrorMessage = "blahFromParentAfterRerender is not defined";
         runTestParentErrorOutFrom("errorOutFromAfterRender_Parent", "", expectErrorMessage, expectLocation);
     }
 

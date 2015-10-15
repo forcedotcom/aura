@@ -128,8 +128,7 @@
     canHaveBody: function (component) {
         var tag = component.get("v.tag");
         if ($A.util.isUndefinedOrNull(tag)) {
-            $A.error("Undefined tag attribute for " + component.getGlobalId());
-            return true;
+            throw new $A.auraError("Undefined tag attribute for " + component.getGlobalId());
         }
         return !this.BODYLESS_TAGS[tag.toLowerCase()];
     },

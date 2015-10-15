@@ -50,8 +50,7 @@ ControllerDef.prototype.getDescriptor = function(){
 ControllerDef.prototype.getActionDef = function(key){
     var action = this.actionDefs[key];
     if (!action) {
-        $A.error("Unable to find '"+key+"' on '"+this.descriptor+"'.");
-        throw Error("Unable to find '"+key+"' on '"+this.descriptor+"'.");
+        throw new $A.auraError("Unable to find '"+key+"' on '"+this.descriptor+"'.");
     }
     return action;
 };

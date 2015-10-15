@@ -56,11 +56,6 @@ public abstract class DefRegistryImpl<T extends Definition> implements DefRegist
     }
 
     @Override
-    public void clear() {
-        // nothing to do
-    }
-    
-    @Override
     public boolean isStatic() {
         return false;
     };

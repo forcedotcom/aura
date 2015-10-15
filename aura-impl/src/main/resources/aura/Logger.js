@@ -181,7 +181,7 @@ Logger.prototype.auraErrorHelper = function(e, action){
 };
 
 Logger.prototype.reportError = function(e, action, id){
-    if (e["reported"]) {
+    if (!e || e["reported"]) {
         return;
     }
     // Post the action failure to the server, where we can keep track of it for bad client code.

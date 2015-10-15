@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 ({
-    throwAuraError: function(cmp) {
-        throw new $A.auraError("Controller Error Test");
+    throwError: function(cmp) {
+        throw new Error("Controller Error Test");
     },
 
     failAssert: function(cmp) {
@@ -52,7 +52,7 @@
     },
 
     throwErrorWithCode: function(cmp) {
-        var error = new $A.auraError("Error With Code Test");
+        var error = new $A.auraFriendlyError("Error With Code Test");
         error["errorCode"] = cmp.get("v.errorCode");
         throw error;
     }

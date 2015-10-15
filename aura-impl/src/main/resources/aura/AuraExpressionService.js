@@ -259,8 +259,7 @@ AuraExpressionService.prototype.resolve = function(expression, container, rawVal
             for(var key in target){
                 if(target.hasOwnProperty(key) && key.toLowerCase() === searchkey) {
                     // You can't include container and target in the error, as it will json serialize it and causes a max iteration exception.
-                    $A.error("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
-                    return null;
+                    throw new $A.auraError("Possible Case Sensitivity Issue: Expression '" + expression + "' on segment '" + segment + "'. Possible you meant '" + key + "'");
                 }
             }
         }

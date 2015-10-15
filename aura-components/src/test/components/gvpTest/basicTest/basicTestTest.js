@@ -17,15 +17,21 @@
 	
 	testSetNotSupported: {
     	test: function(cmp) {
-    		$A.test.expectAuraError("Unable to set value for key '$Label.whatever.anything'. Value provider does not implement 'set(key, value)'. : false");
-    		$A.set("$Label.whatever.anything","new value");
+            try {
+                $A.set("$Label.whatever.anything","new value");
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: Unable to set value for key '$Label.whatever.anything'. Value provider does not implement 'set(key, value)'. : false", e.message);
+            }
     	}
     },
     
     testSetNoValueProvider: {
     	test: function(cmp) {
-    		$A.test.expectAuraError("Unable to set value for key '$Bla.whatever.anything'. No value provider was found for '$Bla'. : false");
-    		$A.set("$Bla.whatever.anything","new value");
+            try {
+                $A.set("$Bla.whatever.anything","new value");
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: Unable to set value for key '$Bla.whatever.anything'. No value provider was found for '$Bla'. : false", e.message);
+            }
     	}
     },
     

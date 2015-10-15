@@ -65,15 +65,12 @@
      */
     testGetNonExistentAction : {
         test : function(cmp) {
-            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'";
-            $A.test.expectAuraError(errorMsg); // Expect error from explicit $A.error call when looking for actionDef
+            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'.";
             try {
                 var action = cmp.get("c.notHereCaptain");
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");
             } catch (e) {
-                // We also expect a javascript error to be thrown since $A.error does not stop code execution
-                $A.test.assertTrue(e.message.indexOf(errorMsg) !== -1, "Javascript error not thrown with expected "
-                        + "message. Expected <" + errorMsg + ">, but got: <" + e.message + ">");
+                $A.test.assertEquals(errorMsg, e.message);
             }
         }
     },

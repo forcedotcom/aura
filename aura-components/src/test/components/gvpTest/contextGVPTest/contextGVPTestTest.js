@@ -206,8 +206,11 @@
 
     testServerRegistersNewValue : {
         test : [ function(cmp) {
-            $A.test.expectAuraError("Attempting to retrieve an unknown global item 'aNewValue'. Global items must be pre-registered and have a default value");
-            $A.get("$Global.aNewValue");
+            try {
+                $A.get("$Global.aNewValue");
+            } catch (e) {
+                $A.test.assertEquals("Attempting to retrieve an unknown global item 'aNewValue'. Global items must be pre-registered and have a default value", e.message);
+            }
         }, function(cmp) {
             var valueName = "aNewValue";
             var defaultValue = "just a default";

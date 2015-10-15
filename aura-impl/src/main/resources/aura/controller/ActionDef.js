@@ -55,8 +55,7 @@ function ActionDef(config) {
         try {
             this.meth = $A.util.json.decodeString(config["code"]);
         } catch (e) {
-            $A.error(config["code"], e);
-            throw e;
+            throw new $A.auraError(config["code"], e);
         }
     }
 }

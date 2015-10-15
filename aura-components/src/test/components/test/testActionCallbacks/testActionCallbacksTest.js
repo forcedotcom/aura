@@ -102,8 +102,11 @@
     },
     assertSetCallbackThrowsError : function(cmp, callbackArg, name, errorMessage, failureMsg){
         var action = cmp.get("c.getString");
-        $A.test.expectAuraError(errorMessage);
-        action.setCallback(cmp, callbackArg, name);
+        try {
+          action.setCallback(cmp, callbackArg, name);
+        } catch (e) {
+          $A.test.assertTrue(e.message.indexOf(errorMessage) > -1);
+        }
     },
 
     /**

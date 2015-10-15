@@ -47,39 +47,54 @@
     	test: [function(component){
         	var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Custom', cgvp);
-            $A.test.expectAuraError("$A.addValueProvider(): '$Custom' has already been registered. : false");
-        	$A.addValueProvider('$Custom', cgvp);
+            try {
+                $A.addValueProvider('$Custom', cgvp);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: $A.addValueProvider(): '$Custom' has already been registered. : false", e.message);
+            }
         }]
     },
     
     testAddValueProvider_InvalidType: {
     	test: [function(component){
-    		$A.test.expectAuraError("$A.addValueProvider(): 'type' must be a valid String.");
         	var cgvp = new CustomGlobalValueProvider();
-            $A.addValueProvider({}, cgvp);
+            try {
+                $A.addValueProvider({}, cgvp);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: $A.addValueProvider(): 'type' must be a valid String. : false", e.message);
+            }
         }]
     },
     
     testAddValueProvider_InvalidName: {
     	test: [function(component){
-    		$A.test.expectAuraError("$A.addValueProvider(): 'type' must start with '$'.");
         	var cgvp = new CustomGlobalValueProvider();
-            $A.addValueProvider('Something', cgvp);
+            try {
+                $A.addValueProvider('Something', cgvp);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: $A.addValueProvider(): 'type' must start with '$'. : false", e.message);
+            }
         }]
     },
     
     testAddValueProvider_AuraReserved: {
     	test: [function(component){
-    		$A.test.expectAuraError("$A.addValueProvider(): '$Browser' is a reserved valueProvider.");
         	var cgvp = new CustomGlobalValueProvider();
-            $A.addValueProvider('$Browser', cgvp);
+            try {
+                $A.addValueProvider('$Browser', cgvp);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: $A.addValueProvider(): '$Browser' is a reserved valueProvider. : false", e.message);
+            }
         }]
     },
     
     testAddValueProvider_ValueProviderMissing: {
     	test: [function(component){
-    		$A.test.expectAuraError("$A.addValueProvider(): 'valueProvider' is required.");
-            $A.addValueProvider('$Custom', null);
+            try {
+                $A.addValueProvider('$Custom', null);
+            } catch (e) {
+                $A.test.assertEquals("Assertion Failed!: $A.addValueProvider(): 'valueProvider' is required. : false", e.message);
+            }
         }]
     },
     

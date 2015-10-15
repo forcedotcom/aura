@@ -56,15 +56,6 @@ public interface DefRegistry<T extends Definition> extends Serializable {
     boolean hasFind();
 
     /**
-     * Given a descriptor that contains search patterns or wildcards, return a
-     * set of Descriptors for all existing Definitions who have source that
-     * exists. Does not compile the definitions if they were not already
-     * compiled, and does not guarantee that they can compile.
-     */
-    @Nonnull
-    Set<DefDescriptor<T>> find(@Nonnull DefDescriptor<T> matcher);
-
-    /**
      * Given a string that contains search patterns or wildcards, return a set
      * of Descriptors for all existing Definitions who have source that exists.
      * Does not compile the definitions if they were not already compiled, and
@@ -72,12 +63,6 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      */
     @Nonnull
     Set<DefDescriptor<?>> find(@Nonnull DescriptorFilter matcher);
-
-    /**
-     * Save the given definition back to appropriate source location.
-     * @Deprecated
-     */
-    void save(T def);
 
     /**
      * Returns true if the source related to the descriptor exists. Does not
@@ -113,11 +98,6 @@ public interface DefRegistry<T extends Definition> extends Serializable {
      */
     @CheckForNull
     Source<T> getSource(DefDescriptor<T> descriptor);
-
-    /**
-     * Clear this registry of all defs it might be storing
-     */
-    void clear();
 
     /**
      * return true if the caller can cache the value.

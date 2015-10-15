@@ -332,7 +332,7 @@ InvalidComponent.prototype.raiseInvalidComponentError = function(func, args) {
         error += ", " + this._componentDef + " [" + this._globalId + "]";
     }
 
-    $A.error(error);
+    throw new $A.auraError(error);
 };
 
 Aura.Component.InvalidComponent = InvalidComponent;

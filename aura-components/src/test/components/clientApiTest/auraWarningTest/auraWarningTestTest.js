@@ -108,7 +108,9 @@
      */
     getAvailableConsole: function() {
         var availableConsole;
-        if (window["console"] && window["console"]["debug"]) {
+        if (window["console"] && window["console"]["warn"]) {
+            availableConsole = "warn";
+        } else if (window["console"] && window["console"]["debug"]) {
             availableConsole = "debug";
         } else if (window["console"] && window["console"]["log"]) {
             availableConsole = "log";

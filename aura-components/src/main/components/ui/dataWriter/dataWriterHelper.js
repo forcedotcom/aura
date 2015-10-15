@@ -34,7 +34,7 @@
 			item = items[i];
 
 			if (!item || !item.operation) {
-				return $A.error('Invalid data format. Specify the desired operation.');
+				throw new $A.auraError('Invalid data format. Specify the desired operation.');
 			}
 
 			if (defaultFields) {
@@ -74,6 +74,6 @@
 	 * @params {Function} callback optional callback to invoker of write operation function (error, response)
 	 */
 	write: function (concrete, cfg, callback) {
-		$A.error('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
+		throw new $A.auraError('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
 	}
 })// eslint-disable-line semi

@@ -59,7 +59,7 @@
      * NOTE: displayMap.cmp has attributes refer to receiverCmp's attribute(v.stringAttribute) twice, 
      * once we kill newCmpWithValueProvider, it will error out during encoding actions for request
      */
-    testCmpCreatedByFetchingMapFromServer:{
+    _testCmpCreatedByFetchingMapFromServer:{
         attributes:{ 
             receiverCmp: "loadLevelTest:newCmpWithValueProvider",
             receiverCmpAuraId: "receiverCmp",

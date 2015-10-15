@@ -416,9 +416,8 @@ Test.Aura.Controller.ActionDefTest = function() {
 						actionType : "CLIENT",
 						code : expected
 					};
-					var error = new Error("errorMessage");
-	                var actual;
-					var stubbedLogger = Stubs.GetMethod("msg", "error", null);
+					var error = new Error(expected);
+					var actual;
 					var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
 						util : {
 							json : {
@@ -427,21 +426,26 @@ Test.Aura.Controller.ActionDefTest = function() {
 								}
 							}
 						},
-						error : stubbedLogger
+						auraError : function(message, err) {
+							actual = message;
+						}
 					});
 
-					// Act
-					mockAuraUtil(function() {
-	                    Record.Exception(function() {
-	                        new Aura.Controller.ActionDef(config);
-	                    });
-	                });
+					try {
+						// Act
+						mockAuraUtil(function() {
+							Record.Exception(function() {
+								new Aura.Controller.ActionDef(config);
+							});
+						});
+					} catch (e) {
+						// do nothing, this is just for not exposing the thrown exception.
+					}
 
 					// Assert
-					Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.msg);
+					Assert.Equal(expected, actual);
 				}
 
-				
 				[Fact]
 				function LogsDecodeAndSpecifyErrorMessage() {
 					// Arrange
@@ -450,7 +454,7 @@ Test.Aura.Controller.ActionDefTest = function() {
 						code : "decodable"
 					};
 					var expected = new Error("expected");
-					var stubbedLogger = Stubs.GetMethod("msg", "error", null);
+					var actual
 					var mockAuraUtil = Mocks.GetMock(Object.Global(), "$A", {
 						util : {
 							json : {
@@ -459,18 +463,24 @@ Test.Aura.Controller.ActionDefTest = function() {
 								}
 							}
 						},
-						error : stubbedLogger
+						auraError : function(message, err) {
+							actual = err;
+						}
 					});
 
 					// Act
-					mockAuraUtil(function() {
-	                    Record.Exception(function() {
-	                        new Aura.Controller.ActionDef(config);
-	                    });
-	                });
+					try {
+						mockAuraUtil(function() {
+							Record.Exception(function() {
+								new Aura.Controller.ActionDef(config);
+							});
+						});
+					} catch (e) {
+						// do nothing, this is just for not exposing the thrown exception.
+					}
 
 					// Assert
-					Assert.Equal(expected, stubbedLogger.Calls[0].Arguments.error);
+					Assert.Equal(expected, actual);
 				}
 
 			}

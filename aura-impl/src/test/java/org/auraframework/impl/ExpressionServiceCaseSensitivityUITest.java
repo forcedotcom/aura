@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 
 /**
@@ -36,12 +37,9 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      */
     public void testGetNestedAttribute() throws Exception {
         open("/attributesTest/caseSensitivity.app", Mode.DEV);
-        auraUITestingUtil.getEval("$A.getRoot().get('v.map.Fruit');");
-        auraUITestingUtil
-                .waitForElementTextContains(
-                        By.id("auraErrorMessage"),
-                        "Possible Case Sensitivity Issue: Expression 'map.Fruit' on segment 'Fruit'. Possible you meant 'fruit'",
-                        true);
+        String expected = "Possible Case Sensitivity Issue: Expression 'map.Fruit' on segment 'Fruit'. Possible you meant 'fruit'";
+        Object actual = auraUITestingUtil.getEval("try { $A.getRoot().get('v.map.Fruit'); } catch (e) { return e.message; }");
+        Assert.assertEquals(expected, actual);
     }
 
     /**
@@ -50,12 +48,9 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      */
     public void testGetNonExistentNestedAttribute() throws Exception {
         open("/attributesTest/caseSensitivity.app", Mode.DEV);
-        auraUITestingUtil.getEval("$A.getRoot().get('v.map.Fruit.blah');");
-        auraUITestingUtil
-                .waitForElementTextContains(
-                        By.id("auraErrorMessage"),
-                        "Possible Case Sensitivity Issue: Expression 'map.Fruit.blah' on segment 'Fruit'. Possible you meant 'fruit'",
-                        true);
+        String expected = "Possible Case Sensitivity Issue: Expression 'map.Fruit.blah' on segment 'Fruit'. Possible you meant 'fruit'";
+        Object actual = auraUITestingUtil.getEval("try { $A.getRoot().get('v.map.Fruit.blah'); } catch (e) { return e.message; }");
+        Assert.assertEquals(expected, actual);
     }
 
     /**
@@ -64,12 +59,9 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      */
     public void testSetNestedAttribute() throws Exception {
         open("/attributesTest/caseSensitivity.app", Mode.DEV);
-        auraUITestingUtil.getEval("$A.getRoot().set('v.map.Fruit', 'orange');");
-        auraUITestingUtil
-                .waitForElementTextContains(
-                        By.id("auraErrorMessage"),
-                        "Possible Case Sensitivity Issue: Expression 'map.Fruit' on segment 'Fruit'. Possible you meant 'fruit'",
-                        true);
+        String expected = "Possible Case Sensitivity Issue: Expression 'map.Fruit' on segment 'Fruit'. Possible you meant 'fruit'";
+        Object actual = auraUITestingUtil.getEval("try { $A.getRoot().set('v.map.Fruit', 'orange'); } catch (e) {return e.message; }");
+        Assert.assertEquals(expected, actual);
     }
 
     /**
@@ -78,12 +70,9 @@ public class ExpressionServiceCaseSensitivityUITest extends WebDriverTestCase {
      */
     public void testSetNewNestedAttribute() throws Exception {
         open("/attributesTest/caseSensitivity.app", Mode.DEV);
-        auraUITestingUtil.getEval("$A.getRoot().set('v.map.Fruit.blah', 'orange');");
-        auraUITestingUtil
-                .waitForElementTextContains(
-                        By.id("auraErrorMessage"),
-                        "Possible Case Sensitivity Issue: Expression 'map.Fruit.blah' on segment 'Fruit'. Possible you meant 'fruit'",
-                        true);
+        String expected = "Possible Case Sensitivity Issue: Expression 'map.Fruit.blah' on segment 'Fruit'. Possible you meant 'fruit'";
+        Object actual = auraUITestingUtil.getEval("try { $A.getRoot().set('v.map.Fruit.blah', 'orange'); } catch (e) { return e.message; }");
+        Assert.assertEquals(expected, actual);
     }
 
     /**

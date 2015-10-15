@@ -36,7 +36,6 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
 
     private static final long serialVersionUID = 1L;
     protected final Map<DefDescriptor<T>, T> defs;
-    private static final String WILD = "*";
     private transient SourceFactory sourceFactory = null;
 
     public StaticDefRegistryImpl(Set<DefType> defTypes, Set<String> prefixes, Set<String> namespaces, Collection<T> defs) {
@@ -69,23 +68,6 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     }
 
     @Override
-    public Set<DefDescriptor<T>> find(DefDescriptor<T> matcher) {
-        String namespace = matcher.getNamespace();
-        String prefix = matcher.getPrefix();
-        DefType defType = matcher.getDefType();
-        Set<DefDescriptor<T>> ret = new HashSet<>();
-        for (DefDescriptor<T> key : defs.keySet()) {
-
-            if (defType == key.getDefType() && key.getPrefix().equalsIgnoreCase(prefix)
-                    && (namespace.equalsIgnoreCase(WILD) || namespace.equalsIgnoreCase(key.getNamespace()))) {
-
-                ret.add(key);
-            }
-        }
-        return ret;
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<>();
 
@@ -95,11 +77,6 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
             }
         }
         return ret;
-    }
-
-    @Override
-    public void save(T def) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

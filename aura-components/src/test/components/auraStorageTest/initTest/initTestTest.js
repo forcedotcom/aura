@@ -45,7 +45,8 @@
      * not allow dups using $A.storageService.initStorage()? we do not allow dup
      * named auraStorage:init in templates?
      */
-    testDuplicateNamedStorage : {
+    // auraErrorsExpectedDuringInit is not supported.
+    _testDuplicateNamedStorage : {
         auraErrorsExpectedDuringInit : ["Storage named 'dupNamedStorage' already exists!"],
         attributes : {
             dupNamedStorage : true

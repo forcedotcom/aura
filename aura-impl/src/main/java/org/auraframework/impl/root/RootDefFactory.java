@@ -28,9 +28,7 @@ import org.auraframework.impl.system.DefFactoryImpl;
 import org.auraframework.system.CacheableDefFactory;
 import org.auraframework.system.Parser;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.AuraTextUtil;
 
 /**
  * Creates new ComponentDefs from source or cache.
@@ -81,15 +79,6 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
     }
 
     @Override
-    public Set<DefDescriptor<RootDefinition>> find(DefDescriptor<RootDefinition> matcher) {
-        if (AuraTextUtil.isNullEmptyOrWhitespace(matcher.getNamespace())) {
-            throw new AuraRuntimeException(String.format("Empty or malformed namespace in: %s",
-                    matcher.getQualifiedName()));
-        }
-        return sourceFactory.find(matcher);
-    }
-
-    @Override
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         return sourceFactory.find(matcher);
     }
@@ -97,14 +86,6 @@ public final class RootDefFactory extends DefFactoryImpl<RootDefinition> impleme
     @Override
     public Set<String> getNamespaces() {
         return sourceFactory.getNamespaces();
-    }
-
-    @Override
-    public void save(RootDefinition def) {
-    }
-
-    @Override
-    public void synchronize(RootDefinition def) {
     }
 
     @Override

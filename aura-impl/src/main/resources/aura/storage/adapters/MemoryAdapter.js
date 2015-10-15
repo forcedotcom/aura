@@ -134,8 +134,14 @@ MemoryAdapter.prototype.setItem = function(key, item, size) {
             spaceNeeded = itemSize + that.cachedSize - that.maxSize;
 
         that.backingStore[key] = new MemoryAdapter.Entry(item, size);
+
         // Update the MRU
+        var index = that.mru.indexOf(key);
+        if (index > -1) {
+            that.mru.splice(index, 1);
+        }
         that.mru.push(key);
+
         that.cachedSize += itemSize;
 
         // async evict

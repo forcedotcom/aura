@@ -101,22 +101,6 @@ public final class SourceFactory {
         return loader.getSource(descriptor);
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Definition> Set<DefDescriptor<T>> find(DefDescriptor<T> matcher) {
-
-        String namespace = matcher.getNamespace();
-        Class<T> primaryInterface = (Class<T>) matcher.getDefType().getPrimaryInterface();
-        if (WILD.equals(namespace)) {
-            Set<DefDescriptor<T>> ret = new HashSet<>();
-            for (String ns : namespaces) {
-                ret.addAll(find(primaryInterface, matcher.getPrefix(), ns));
-            }
-            return ret;
-        } else {
-            return find(primaryInterface, matcher.getPrefix(), namespace);
-        }
-    }
-
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = new HashSet<>();
 
@@ -142,15 +126,6 @@ public final class SourceFactory {
             }
         }
         return ret;
-    }
-
-    private <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
-        LoaderKey key = new LoaderKey(namespace, prefix);
-        SourceLoader loader = loaders.get(key);
-        if (loader == null) {
-            throw new AuraRuntimeException(String.format("Loader not found for %s", key));
-        }
-        return loader.find(primaryInterface, prefix, namespace);
     }
 
     private static class LoaderKey {
@@ -213,5 +188,4 @@ public final class SourceFactory {
             return this.prefix;
         }
     }
-
 }

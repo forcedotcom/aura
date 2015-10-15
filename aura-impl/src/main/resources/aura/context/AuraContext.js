@@ -426,7 +426,7 @@ Aura.Context.AuraContext.prototype.internalClear = function(actionId, logit) {
         this.componentConfigs = {};
     } else if (logit) {
         $A.log("leftover configs ", ccs);
-        $A.error("leftover configs");
+        throw new $A.auraError("leftover configs");
     }
     return removed;
 };

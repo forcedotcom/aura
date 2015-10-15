@@ -93,16 +93,18 @@ Test.Aura.AuraRenderingServiceTest = function(){
     };
 
     var getMockAuraInfo = function(shouldBeComponent) {
-        var stubbedLogger = Stubs.GetMethod("msg", "error", null);
         return {
-            "stubbedLogger":stubbedLogger,
             "mock":Mocks.GetMock(Object.Global(), "$A", {
                 getContext:function(){return context;},
-                util : {
+                util: {
                     isComponent : function() { return shouldBeComponent; },
-                    isArray : function(obj) { return obj instanceof Array; },
+                    isArray : function(obj) { return obj instanceof Array; }
                 },
-                error : stubbedLogger
+                assert: function(condition, message) {
+                    if (!condition) {
+                        throw new Error(message);
+                    }
+                }
             })
         };
     };
@@ -195,10 +197,14 @@ Test.Aura.AuraRenderingServiceTest = function(){
             var actual;
 
             // Act
-            mockAuraInfo.mock(function() {
-                target.afterRender("bad");
-                actual = mockAuraInfo.stubbedLogger.Calls[0].Arguments.msg;
-            });
+            try {
+                mockAuraInfo.mock(function() {
+                    target.afterRender("bad");
+                });
+            } catch (e) {
+                actual = e.message;
+            }
+
 
             Assert.Equal(expected, actual);
 

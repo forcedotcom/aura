@@ -39,7 +39,19 @@
 
         if (window["console"]) {
             var console = window["console"];
-            if (console["group"]) {
+            var filter = level === "WARNING" ? "warn" : level.toLowerCase();
+            if (console[filter]) {
+                if (!$A.util.isUndefinedOrNull(error)) {
+                    console[filter](error);
+                } else {
+                    console[filter](message);
+                }
+                if (trace) {
+                    for ( var j = 0; j < trace.length; j++) {
+                        console[filter](trace[j]);
+                    }
+                }
+            } else if (console["group"]) {
                 console["group"](logMsg);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console["debug"](error);
@@ -114,7 +126,7 @@
     });
     //#end
 
-    $A.logger.subscribe("ERROR", function(level, message, e) {
+    function handleError(message, e) {
         var dispMsg = message;
         var evtArgs = {"message":dispMsg,"error":null,"auraError":null};
 
@@ -125,7 +137,7 @@
                 e["handled"] = true;
             }
 
-            if (e instanceof $A.auraError) {
+            if (e["name"] === "AuraError") {
                 var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
                 var displayMessage = e.message || e.name;
                 //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
@@ -134,7 +146,7 @@
                 dispMsg = $A.util.format(format, displayMessage, e.errorCode+"");
             }
 
-            if (e instanceof $A.auraFriendlyError) {
+            if (e["name"] === "AuraFriendlyError") {
                 evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
             }
             else {
@@ -150,5 +162,29 @@
                 $A.message(dispMsg);
             }
         }
+    }
+
+    $A.logger.subscribe("ERROR", function(level, message, e) {
+        handleError(message, e);
     });
+
+    window.onerror = (function() {
+        var existing = window.onerror;
+        var newHandler = function(message, url, line, col, err) {
+            if ($A.initialized) {
+                $A.logger.reportError(err);
+            }
+
+            handleError(message, err);
+            return true;
+        };
+
+        return function() {
+            if (existing) {
+                existing.apply(this, arguments);
+            }
+
+            return newHandler.apply(this, arguments);
+        };
+    })();
 })();

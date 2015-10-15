@@ -15,10 +15,10 @@
  */
 /*jslint evil:true, sub:true */
 
+
 /**
- * @class Test
  * @classdesc Utility functions for component testing, accessible using $A.test.
- * @constructor
+ * @constructor Test
  */
 TestInstance = function() {
     this.waits = [];
@@ -2231,6 +2231,40 @@ $A["test"] = new TestInstance();
 
 $A.logger.subscribe("WARNING", $A["test"].auraWarning.bind($A["test"]));
 $A.logger.subscribe("ERROR", $A["test"].auraError.bind($A["test"]));
+
+/**
+ * Register a global error handler to catch uncaught javascript errors.
+ * 
+ * @ignore
+ */
+window.onerror = (function() {
+    var origHandler = window.onerror;
+    /** @inner */
+    var newHandler = function(msg, url, line, col, e) {
+        if (e && e["name"] === "AuraError") {
+            $A["test"].auraError.call($A["test"], "ERROR", msg);
+            return true;
+        } else {
+            var error = {
+                message : "Uncaught js error: " + msg
+            };
+            if (url) {
+                error["url"] = url;
+            }
+            if (line) {
+                error["line"] = line;
+            }
+            TestInstance.prototype.errors.push(error);
+        }
+    };
+
+    return function() {
+        if (origHandler) {
+            origHandler.apply(this, arguments);
+        }
+        return newHandler.apply(this, arguments);
+    };
+})();
 
 /**
  * Should try to remove this hack

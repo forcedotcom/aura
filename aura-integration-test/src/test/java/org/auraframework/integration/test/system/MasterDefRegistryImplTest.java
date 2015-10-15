@@ -1611,13 +1611,11 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         public DefDescriptor<TypeDef> desc;
         public TypeDef def;
         private final Lock rLock;
-        private final Lock wLock;
 
         public FakeRegistry(Lock rLock, Lock wLock) {
             this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
             this.def = new FakeTypeDef(desc);
             this.rLock = rLock;
-            this.wLock = wLock;
         }
 
         @Override
@@ -1636,25 +1634,12 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         @Override
-        public Set<DefDescriptor<TypeDef>> find(DefDescriptor<TypeDef> matcher) {
-            Mockito.verify(rLock, Mockito.times(1)).lock();
-            Mockito.verify(rLock, Mockito.never()).unlock();
-            Set<DefDescriptor<TypeDef>> found = Sets.newHashSet();
-            found.add(desc);
-            return found;
-        }
-
-        @Override
         public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
             Mockito.verify(rLock, Mockito.times(1)).lock();
             Mockito.verify(rLock, Mockito.never()).unlock();
             Set<DefDescriptor<?>> found = Sets.newHashSet();
             found.add(desc);
             return found;
-        }
-
-        @Override
-        public void save(TypeDef def) {
         }
 
         @Override
@@ -1688,12 +1673,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         @Override
         public Source<TypeDef> getSource(DefDescriptor<TypeDef> descriptor) {
             return null;
-        }
-
-        @Override
-        public void clear() {
-            Mockito.verify(wLock, Mockito.times(1)).lock();
-            Mockito.verify(wLock, Mockito.never()).unlock();
         }
 
         @Override
@@ -1752,26 +1731,6 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
             Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
             assertEquals(d, lti.mdr.getDef(lti.reg.desc));
-            Mockito.verify(lti.rLock, Mockito.times(1)).lock();
-            Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
-            Mockito.verify(lti.wLock, Mockito.never()).lock();
-            Mockito.verify(lti.wLock, Mockito.never()).unlock();
-        } finally {
-            lti.clear();
-        }
-    }
-
-    /**
-     * Test find(desc) to ensure locking is minimized.
-     *
-     * This asserts that within an MDR we only lock once for a call to find.
-     */
-    public void testFindDescLocking() throws Exception {
-        LockTestInfo lti = null;
-
-        lti = new LockTestInfo();
-        try {
-            lti.mdr.find(lti.reg.desc);
             Mockito.verify(lti.rLock, Mockito.times(1)).lock();
             Mockito.verify(lti.rLock, Mockito.times(1)).unlock();
             Mockito.verify(lti.wLock, Mockito.never()).lock();

@@ -30,6 +30,7 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.auraframework.Aura;
 import org.auraframework.integration.test.util.AuraJettyServer;
+import org.auraframework.test.util.SauceUtil;
 import org.auraframework.util.test.configuration.TestServletConfig;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
@@ -55,7 +56,7 @@ public class JettyTestServletConfig implements TestServletConfig {
             host = connector.getHost();
             if (host == null) {
                 try {
-                    host = InetAddress.getLocalHost().getCanonicalHostName();
+                    host = getHost();
                 } catch (UnknownHostException e) {
                     LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";
@@ -68,7 +69,7 @@ public class JettyTestServletConfig implements TestServletConfig {
             host = System.getProperty("jetty.host");
             if (host == null) {
                 try {
-                    host = InetAddress.getLocalHost().getCanonicalHostName();
+                    host = getHost();
                 } catch (UnknownHostException e) {
                     LOG.log(Level.WARNING, e.toString(), e);
                     host = "localhost";
@@ -77,6 +78,13 @@ public class JettyTestServletConfig implements TestServletConfig {
         }
         baseUrl = new URL("http", host, port, "/");
         LOG.info("BaseUrl: " + baseUrl);
+    }
+
+    private String getHost() throws UnknownHostException {
+        if (SauceUtil.areTestsRunningOnSauce()) {
+            return InetAddress.getLocalHost().getCanonicalHostName();
+        }
+        return "localhost";
     }
 
     @Override

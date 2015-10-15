@@ -56,6 +56,7 @@
      * Automation for W-1446345
      */
     testActionScopedGlobalID:{
+        labels: ["flapper"],
         test:[function(cmp){
             cmp._testName = "testActionScopedGlobalID";
             var a = cmp.get("c.resetCounter");

@@ -5,11 +5,15 @@ Test.Tools.Aura.Output.OutputStrategy.JsCover = function () {
     this.OutputLevel="";
 
     this.Prologue=function(){
+
     };
 
     this.Epilogue=function(){
+        //System.Environment.Write("\n <<<<<<<<<<<<<<<<<<<< "+"\n");
         if(typeof(_$jscoverage)=="undefined")throw new Error("No jscoverage instrumentation found.");
         var parameters = System.Environment.GetParameters();
+        //System.Environment.Write("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+parameters.named.logfile+"\n");
+        //System.Environment.Write("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"+parameters.named.coverage+"\n");
         if (parameters.named.coverage === "true" && parameters.named.logfile) {
             System.IO.File.SaveFile(parameters.named.logfile, new System.Script.ObjectSerializer().Serialize(_$jscoverage));
         } else {

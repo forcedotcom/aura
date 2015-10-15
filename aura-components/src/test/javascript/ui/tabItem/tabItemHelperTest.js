@@ -24,26 +24,26 @@ Test.Components.Ui.TabItem = function() {
     });
     
     // -- HELPER FUNCTIONS -- //
-    
+
     // Sets up and returns a mock event object that has both the setParams() function and the fire() function mocked out.
     // When setParams() is called it checks to see if the param passed in is equal to the tabItemComponentMock and if so
     // it sets the relevant attribute on that object to true. When fire() is called it adds the name of the event that was
-    // fired to an array stored in the tabItemComponentMock. 
+    // fired to an array stored in the tabItemComponentMock.
 	function getEventMock(component, eventName) {
     	return {
     		setParams : function(params){
     			component.paramsSetByEvents[eventName] = params;
     			return this;
     		},
-    		fire : function() { 
+    		fire : function() {
     			component.firedEvents.push(eventName);
     		}
     	}
     }
-	
+
 	// Sets up a mock "tabItem" component with the specified getEvent() function as well as a couple additional attributes that
 	// are used by the event mock's functions in a way such that we are able to later determine the nature of the target function's
-	// interactions with the given event object. 
+	// interactions with the given event object.
     function getTabItemComponentMock() {
 		return {
 			paramsSetByEvents : {},
@@ -53,32 +53,32 @@ Test.Components.Ui.TabItem = function() {
 			}
 		}
     }
-    
+
     // -- TESTS -- //
-    
+
     [Fixture]
     function testHandleHoverEvent(){
-        
+
         [Fact]
-        function HandleHoverEventFiresSpecifiedEvent() {   
+        function HandleHoverEventFiresSpecifiedEvent() {
             // ARRANGE -- setup aura and component mocks
-            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});
             var tabItemComponentMock = getTabItemComponentMock();
             var eventName = "testEvent";
-            
+
             // ACT -- call target function with mocked data
             auraMock(function(){
                targetHelper.handleHoverEvent(tabItemComponentMock, eventName);
             });
-            
+
             // ASSERT -- make sure that the event was fired ... and with the proper params
             Assert.Contains(tabItemComponentMock.firedEvents, eventName);
-        } 
+        }
 
         [Fact]
-        function HandleHoverEventStoresEventParameters() {   
+        function HandleHoverEventStoresEventParameters() {
             // ARRANGE -- setup aura and component mocks
-            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});       
+            var auraMock = Mocks.GetMock( Object.Global(), "$A", {});
             var tabItemComponentMock = getTabItemComponentMock();
             var eventName = "testEvent";
             var actual;
@@ -88,10 +88,10 @@ Test.Components.Ui.TabItem = function() {
                 targetHelper.handleHoverEvent(tabItemComponentMock, eventName);
                 actual = tabItemComponentMock.paramsSetByEvents[eventName];
             });
-            
+
             // ASSERT -- make sure that the event was fired ... and with the proper params
             Assert.Equal(tabItemComponentMock, actual.tabComponent);
-        } 
+        }
 
     }
 }

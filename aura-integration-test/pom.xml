@@ -756,7 +756,7 @@
                 </plugins>
             </build>
         </profile>
-        <!-- profile for js code coverage for aura-impl -->
+        <!-- profile for js code coverage for aura-impl xunit tests -->
         <profile>
             <id>xunit.js.coverage.auraImpl</id>
             <properties>
@@ -810,6 +810,7 @@
                 </plugins>
             </build>
         </profile>
+        <!-- profile for js code coverage for aura-components xunit tests -->
         <profile>
             <id>xunit.js.coverage.auraComponents</id>
             <properties>

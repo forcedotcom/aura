@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.auraframework.Aura;
+import org.auraframework.AuraConfiguration;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.clientlibrary.ClientLibraryService;
 import org.auraframework.def.ApplicationDef;
@@ -54,6 +55,8 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public ClientLibraryServiceImplTest(String name) {
         super(name);
+        // start spring context for injected ClientLibraryService
+        getAuraTestingUtil().startSpringContext(AuraConfiguration.class);
     }
 
     @Override

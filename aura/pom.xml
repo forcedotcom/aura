@@ -15,6 +15,10 @@
         </dependency>
         <dependency>
             <groupId>org.auraframework</groupId>
+            <artifactId>aura-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.auraframework</groupId>
             <artifactId>aura-util</artifactId>
         </dependency>
         <dependency>
@@ -22,6 +26,10 @@
             <artifactId>aura-util</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -61,6 +69,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.uiautomation</groupId>
             <artifactId>ios-client</artifactId>
             <scope>test</scope>
@@ -94,8 +106,8 @@
                 <targetPath>META-INF</targetPath>
             </resource>
             <resource>
-                <directory>src/main/http/WEB-INF</directory>
-                <targetPath>aura/http/WEB-INF</targetPath>
+                <directory>src/main/webapp/WEB-INF</directory>
+                <targetPath>aura/webapp/WEB-INF</targetPath>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>

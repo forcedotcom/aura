@@ -127,12 +127,12 @@
                     <scanIntervalSeconds>${scanInterval}</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
                     <stopPort>${jetty.port.stop}</stopPort>
-                    <webAppSourceDirectory>${aura.home}/aura-integration-test/src/test/resources/htdocs</webAppSourceDirectory>
+                    <webAppSourceDirectory>${aura.home}/aura/src/main/webapp</webAppSourceDirectory>
                     <webAppConfig>
                         <contextPath>/</contextPath>
-                        <descriptor>${aura.home}/aura/src/main/http/WEB-INF/web.xml</descriptor>
-                        <defaultsDescriptor>${aura.home}/aura/src/main/http/WEB-INF/webdefault.xml</defaultsDescriptor>
-						<extraClasspath>${aura.home}/aura-resources/target/classes;${aura.home}/aura-util/test/results/;${aura.home}/aura-util/test/testdata/;${aura.home}/aura/test/results/;${aura.home}/aura/test/testdata/;${aura.home}/aura-impl/test/results/;${aura.home}/aura-impl/test/testdata/;${additionalClasspaths}</extraClasspath>
+                        <descriptor>${aura.home}/aura/src/main/webapp/WEB-INF/web.xml</descriptor>
+                        <defaultsDescriptor>${aura.home}/aura/src/main/webapp/WEB-INF/webdefault.xml</defaultsDescriptor>
+                        <extraClasspath>${aura.home}/aura-resources/target/classes;${aura.home}/aura-util/test/results/;${aura.home}/aura-util/test/testdata/;${aura.home}/aura/test/results/;${aura.home}/aura/test/testdata/;${aura.home}/aura-impl/test/results/;${aura.home}/aura-impl/test/testdata/;${additionalClasspaths}</extraClasspath>
                     </webAppConfig>
                     <useTestClasspath>true</useTestClasspath>
                     <systemProperties>

@@ -21,6 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Aura specific annotations.
+ *
+ * Moved from aura module to prevent cyclical dependency between aura and aura-spring
+ * aura-annotations module could be a possibility.
  */
 public interface Annotations {
 	
@@ -30,7 +34,7 @@ public interface Annotations {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface BackgroundAction {
+    @interface BackgroundAction {
     }
 
     /**
@@ -43,42 +47,42 @@ public interface Annotations {
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface CabooseAction {
+    @interface CabooseAction {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface AuraEnabled {
+    @interface AuraEnabled {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.PARAMETER)
-    public @interface Key {
+    @interface Key {
         String value();
         boolean loggable() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface Controller {
+    @interface Controller {
         boolean useAdapter() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface Model {
+    @interface Model {
         boolean useAdapter() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
-    public @interface Provider {
+    @interface Provider {
         boolean useAdapter() default false;
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    public @interface Type {
+    @interface Type {
         String value();
     }
 }

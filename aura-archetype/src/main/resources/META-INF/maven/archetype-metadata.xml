@@ -11,6 +11,7 @@
         <include>**/*.html</include>
         <include>**/*.app</include>
         <include>**/*.holder</include>
+        <include>**/*.properties</include>
       </includes>
     </fileSet>
     <fileSet filtered="true" packaged="true">

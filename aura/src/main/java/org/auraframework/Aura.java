@@ -51,11 +51,23 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.ServiceLocator;
 import org.auraframework.util.adapter.SourceControlAdapter;
 
+import javax.inject.Inject;
+
+import org.auraframework.annotations.Annotations.ServiceComponent;
+
 /**
  * Entry point for accessing Aura services
  */
+@ServiceComponent
 public class Aura {
     private static final Log log = LogFactory.getLog(Aura.class);
+
+    private static ClientLibraryService clientLibraryService;
+
+    @Inject
+    public void setClientLibraryService(ClientLibraryService cls) {
+        clientLibraryService = cls;
+    }
 
     /**
      * Get the Builder Service: for constructing your own {@link Definition}
@@ -195,9 +207,8 @@ public class Aura {
      * Gets {@link ClientLibraryService}: service for including external client libraries (CSS or JS)
      */
     public static ClientLibraryService getClientLibraryService() {
-        return Aura.get(ClientLibraryService.class);
+        return clientLibraryService;
     }
-
     
     /**
      * Gets the caching service: a general service for setting and getting arbitrary blobs based on a key

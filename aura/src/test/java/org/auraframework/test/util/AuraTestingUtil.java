@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
 
 import org.auraframework.Aura;
+import org.auraframework.AuraConfiguration;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
@@ -42,6 +43,7 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class AuraTestingUtil {
     public static final long CACHE_CLEARING_TIMEOUT_SECS = 60;
@@ -372,6 +374,17 @@ public class AuraTestingUtil {
         }
         sb.setCharAt(3, flip);
         return sb.toString();
+    }
+
+    /**
+     * Starts spring application context with provided annotated configuration class
+     *
+     * @param configurationClass annotated spring configuration class
+     */
+    public void startSpringContext(Class<?> configurationClass) {
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+        applicationContext.register(configurationClass);
+        applicationContext.refresh();
     }
 
 }

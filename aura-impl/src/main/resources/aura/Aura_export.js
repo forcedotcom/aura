@@ -33,7 +33,6 @@ AuraInstance.prototype["set"] = AuraInstance.prototype.set;
 AuraInstance.prototype["assert"] = AuraInstance.prototype.assert;
 AuraInstance.prototype["userAssert"] = AuraInstance.prototype.userAssert;
 AuraInstance.prototype["log"] = AuraInstance.prototype.log;
-AuraInstance.prototype["logf"] = AuraInstance.prototype.logf;
 AuraInstance.prototype["trace"] = AuraInstance.prototype.trace;
 
 // Perf

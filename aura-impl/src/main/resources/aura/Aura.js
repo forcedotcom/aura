@@ -154,7 +154,6 @@ window['$A'] = {};
 // #include aura.AuraClientService
 // #include aura.AuraComponentContext
 // #include aura.AuraComponentService
-// #include aura.AuraSerializationService
 // #include aura.AuraRenderingService
 // #include aura.AuraExpressionService
 // #include aura.AuraHistoryService
@@ -218,7 +217,6 @@ function AuraInstance () {
 
     this.clientService        = new Aura.Services.AuraClientService();
     this.componentService     = new Aura.Services.AuraComponentService();
-    this.serializationService = new Aura.Services.AuraSerializationService();
     this.renderingService     = new Aura.Services.AuraRenderingService();
     this.expressionService    = new Aura.Services.AuraExpressionService();
     this.historyService       = new Aura.Services.AuraHistoryService();
@@ -430,7 +428,6 @@ function AuraInstance () {
     this["setCurrentTransactionId"] = this.setCurrentTransactionId;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
-    this["serializationService"] = this.serializationService;
     this["renderingService"] = this.renderingService;
     this["expressionService"] = this.expressionService;
     this["historyService"] = this.historyService;
@@ -961,18 +958,6 @@ AuraInstance.prototype.userAssert = function(condition, msg) {
  */
 AuraInstance.prototype.log = function(value, error) {
     this.logger.info(value, error);
-};
-
-/**
- *  Logs to the browser's JavaScript console if it is available.
- *  This method doesn't log in PROD or PRODDEBUG modes.
- */
-AuraInstance.prototype.logf = function() {
-    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    if (window["console"]) {
-        window["console"]["log"].apply(window["console"], arguments);
-    }
-    //#end
 };
 
 /**

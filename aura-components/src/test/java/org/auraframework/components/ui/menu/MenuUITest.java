@@ -28,6 +28,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
@@ -412,15 +413,19 @@ public class MenuUITest extends WebDriverTestCase {
      * set
      * 
      * @throws MalformedURLException
-     * @throws URISyntaxException TODO: Uncomment test once W-2235117 is fixed
+     * @throws URISyntaxException
      */
-    public void testMenuPostionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
+    @Flapper
+    public void testMenuPositionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_ATTACHTOBODY_APP);
+
+        // Verify menulist and trigger are properly aligned
         String menuItem3 = "actionItemAttachToBody3";
         WebDriver driver = this.getDriver();
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         // Need to make the screen bigger so WebDriver doesn't need to scroll
         driver.manage().window().setSize(new Dimension(1366, 768));
+        waitForWindowResize(1366, 768);
         String trigger = "triggerAttachToBody";
         String menuList = "actionMenuAttachToBody";
         String triggerGlobalId = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(trigger);
@@ -429,8 +434,10 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menu = driver.findElement(By.className(menuList));
         menuLabel.click();
         assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
-        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+        waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
                 "Menu List is not positioned correctly when the menuList rendered on the page");
+
+        // Select menu item and verify still aligned
         String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId, "left");
         actionItem3.click();
         String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil
@@ -438,12 +445,33 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick,
                 triggerLeftPosAfterClickOnItem2);
 
+        // Resize window with menulist open and verify realigns properly
         menuLabel.click();
-        int currentWidth = driver.manage().window().getSize().width;
-        int currentHeight = driver.manage().window().getSize().height;
-        driver.manage().window().setSize(new Dimension(currentWidth - 200, currentHeight - 100));
-        verifyMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
+        int newWidth = driver.manage().window().getSize().width - 200;
+        int newHeight = driver.manage().window().getSize().height - 100;
+        driver.manage().window().setSize(new Dimension(newWidth, newHeight));
+        waitForWindowResize(newWidth, newHeight);
+        waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
                 "Menu List is not positioned correctly after the resize");
+    }
+
+    /**
+     * Wait for the current window to have expected dimensions.
+     * 
+     * @param width Expected width of the current window.
+     * @param height Expected height of the current window.
+     */
+    private void waitForWindowResize(final int width, final int height) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                Dimension current = getDriver().manage().window().getSize();
+                if (current.width == width && current.height == height) {
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -453,10 +481,26 @@ public class MenuUITest extends WebDriverTestCase {
      * @param menuList
      * @param failureMessage
      */
-    private void verifyMenuPositionedCorrectly(String trigger, String menuList, String failureMessage) {
-        String triggerLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(trigger, "left");
-        String menuListLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(menuList, "left");
-        assertEquals(failureMessage, triggerLeftPos, menuListLeftPos);
+    private void waitForMenuPositionedCorrectly(final String trigger, final String menuList, String failureMessage) {
+        auraUITestingUtil.waitUntilWithCallback(
+                new ExpectedCondition<Boolean>() {
+                    @Override
+                    public Boolean apply(WebDriver d) {
+                        String triggerLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(trigger, "left");
+                        String menuListLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(menuList, "left");
+                        return triggerLeftPos.equals(menuListLeftPos);
+                    }
+                }, new ExpectedCondition<String>() {
+                    @Override
+                    public String apply(WebDriver d) {
+                        String triggerLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(trigger, "left");
+                        String menuListLeftPos = auraUITestingUtil.getBoundingRectPropOfElement(menuList, "left");
+                        return "Trigger left position is <" + triggerLeftPos + "> and menu list left position is <"
+                                + menuListLeftPos + ">";
+                    }
+                },
+                getAuraUITestingUtil().getTimeout(),
+                failureMessage);
     }
 
     /*

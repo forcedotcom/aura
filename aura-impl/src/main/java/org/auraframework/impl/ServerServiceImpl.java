@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
@@ -171,7 +172,7 @@ public class ServerServiceImpl implements ServerService {
     }
 
     @Override
-    public void writeAppCss(Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
+    public void writeAppCss(final Set<DefDescriptor<?>> dependencies, Writer out) throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
         Mode mode = context.getMode();
 
@@ -218,22 +219,31 @@ public class ServerServiceImpl implements ServerService {
         final String key = keyBuilder.toString();
         context.setPreloading(true);
 
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key);
+        String cached = null;
         final boolean skipCache = styleContext.getTokens().hasDynamicTokens(); // TODONM undo this cache skipping
-
-        if (cached == null || skipCache) {
-            Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
-            StringBuffer sb = new StringBuffer();
-            Aura.getSerializationService().writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
-            cached = sb.toString();
-
-            if (!skipCache) {
-                context.getDefRegistry().putCachedString(uid, appDesc, key, cached);
-            }
+        if (skipCache) {
+        	cached = getAppCssString(dependencies);
+        } else {
+        	cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+            	new Callable<String>() {
+	        		@Override
+					public String call() throws Exception {
+	        			return getAppCssString(dependencies);
+	        		}
+        		}
+			);
         }
+
         if (out != null) {
             out.append(cached);
         }
+    }
+
+    private String getAppCssString(Set<DefDescriptor<?>> dependencies) throws QuickFixException, IOException {
+        Collection<BaseStyleDef> orderedStyleDefs = filterAndLoad(BaseStyleDef.class, dependencies, null);
+        StringBuffer sb = new StringBuffer();
+        Aura.getSerializationService().writeCollection(orderedStyleDefs, BaseStyleDef.class, sb, "CSS");
+    	return sb.toString();
     }
 
     @Override
@@ -253,7 +263,7 @@ public class ServerServiceImpl implements ServerService {
         DefDescriptor<? extends BaseComponentDef> appDesc = context.getLoadingApplicationDescriptor();
 
         // verify the app has access to the svg
-        SVGDef svgDef = svg.getDef();
+        final SVGDef svgDef = svg.getDef();
         context.getDefRegistry().assertAccess(appDesc, svgDef);
 
         // svg uid
@@ -263,25 +273,57 @@ public class ServerServiceImpl implements ServerService {
         final String key = keyBuilder.toString();
         context.setPreloading(true);
 
-        String cached = context.getDefRegistry().getCachedString(uid, svg, key);
+        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        	new Callable<String>() {
+        		@Override
+				public String call() throws Exception {
+        			return getAppSvgString(svgDef);
+        		}
+        	}
+		);
 
-        if (cached == null) {
-            StringBuffer sb = new StringBuffer();
-            Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
-            cached = sb.toString();
-            context.getDefRegistry().putCachedString(uid, svg, key, cached);
-        }
         out.append(cached);
     }
 
+    private String getAppSvgString(SVGDef svgDef) throws QuickFixException, IOException {
+        StringBuffer sb = new StringBuffer();
+        Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
+        return sb.toString();
+    }
+
     @Override
-    public void writeDefinitions(Set<DefDescriptor<?>> dependencies, Writer out)
+    public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
 
         Mode mode = context.getMode();
         final boolean minify = !mode.prettyPrint();
         final String mKey = minify ? "MIN:" : "DEV:";
+
+        context.setPreloading(true);
+        DefDescriptor<?> appDesc = context.getLoadingApplicationDescriptor();
+        final String uid = context.getUid(appDesc);
+        final String key = "JS:" + mKey + uid;
+
+        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
+        	new Callable<String>() {
+        		@Override
+				public String call() throws Exception {
+        			return getDefinitionsString(dependencies, key, minify);
+        		}
+        	}
+		);
+
+        if (out != null) {
+            out.append(cached);
+        }
+    }
+
+    private String getDefinitionsString (Set<DefDescriptor<?>> dependencies, String key, boolean minify)
+    		throws QuickFixException, IOException {
+
+    	Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
+
         //
         // create a temp buffer in case anything bad happens while we're processing this.
         // don't want to end up with a half a JS init function
@@ -291,101 +333,84 @@ public class ServerServiceImpl implements ServerService {
         // middle of serialization.
         //
 
-        context.setPreloading(true);
-        DefDescriptor<?> applicationDescriptor = context.getLoadingApplicationDescriptor();
-        final String uid = context.getUid(applicationDescriptor);
-        final String key = "JS:" + mKey + uid;
-        String cached = context.getDefRegistry().getCachedString(uid, applicationDescriptor, key);
+        StringBuilder sb = new StringBuilder();
 
-        // DCHASMAN TODO Remove this temp testing hack before committing the mods!!!!
-        //cached = null;
+        // Now write the component shape specific classes
+        BaseComponentDef componentComponentDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
 
-        if (cached == null) {
+        final ClientComponentClass auraComponentCientClass = new ClientComponentClass(componentComponentDef);
+        auraComponentCientClass.writeComponentClass(sb);
 
-            Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
+        //String classOutput;
+        ClientComponentClass clientComponentClass;
+        AuraContext context = Aura.getContextService().getCurrentContext();
+        MasterDefRegistry masterDefRegistry = context.getDefRegistry();
+        for (BaseComponentDef def : defs) {
+            if (def != componentComponentDef) {
+                clientComponentClass = new ClientComponentClass(def);
+                clientComponentClass.writeComponentClass(sb);
 
-            StringBuilder sb = new StringBuilder();
-
-            // Now write the component shape specific classes
-            BaseComponentDef componentComponentDef = Aura.getDefinitionService().getDefinition("aura:component", ComponentDef.class);
-
-            final ClientComponentClass auraComponentCientClass = new ClientComponentClass(componentComponentDef);
-            auraComponentCientClass.writeComponentClass(sb);
-
-            //String classOutput;
-            ClientComponentClass clientComponentClass;
-            MasterDefRegistry masterDefRegistry = Aura.getContextService().getCurrentContext().getDefRegistry();
-            for (BaseComponentDef def : defs) {
-                if (def != componentComponentDef) {
-                    clientComponentClass = new ClientComponentClass(def);
-                    clientComponentClass.writeComponentClass(sb);
-
-                    // We've generated this class component, do not output it as part of the component def.
-                    masterDefRegistry.setComponentClassLoaded(def.getDescriptor(), true);
-                }
+                // We've generated this class component, do not output it as part of the component def.
+                masterDefRegistry.setComponentClassLoaded(def.getDescriptor(), true);
             }
-
-            sb.append("$A.clientService.initDefs({");
-
-            // append component definitions
-            sb.append("componentDefs:");
-            Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
-            sb.append(",");
-
-            // append namespaces. for now. *sigh*
-            sb.append("namespaces:");
-            JsonEncoder.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(), sb, context.getJsonSerializationContext());
-            sb.append(",");
-
-            // append event definitions
-            sb.append("eventDefs:");
-            Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
-            Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
-            sb.append(",");
-
-            // append library definitions
-            sb.append("libraryDefs:");
-            Collection<LibraryDef> libraries = filterAndLoad(LibraryDef.class, dependencies, null);
-            Aura.getSerializationService().writeCollection(libraries, LibraryDef.class, sb, "JSON");
-            sb.append(",");
-
-            //
-            // append controller definitions
-            // Dunno how this got to be this way. The code in the Format adaptor was twisted and stupid,
-            // as it walked the namespaces looking up the same descriptor, with a string.format that had
-            // the namespace but did not use it. This ends up just getting a single controller.
-            //
-            sb.append("controllerDefs:");
-            Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
-            Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
-
-            sb.append("});\n\n");
-
-            cached = sb.toString();
-
-            // only use closure compiler in prod mode, due to compile cost
-            if (minify) {
-                StringWriter sw = new StringWriter();
-                List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_SIMPLE.compress(cached, sw, key);
-                if (errors == null || errors.isEmpty()) {
-                    // For now, just use the non-compressed version if we can't get
-                    // the compression to work.
-                    cached = sw.toString();
-                } else {
-                    // if unable to compress, add error comments to the end.
-                    // ONLY if not production instance
-                    if (!Aura.getConfigAdapter().isProduction()) {
-                        sb.append(commentedJavascriptErrors(errors));
-                    }
-                    cached = sb.toString();
-                }
-            }
-            context.getDefRegistry().putCachedString(uid, applicationDescriptor, key, cached);
         }
 
-        if (out != null) {
-            out.append(cached);
+        sb.append("$A.clientService.initDefs({");
+
+        // append component definitions
+        sb.append("componentDefs:");
+        Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
+        sb.append(",");
+
+        // append namespaces. for now. *sigh*
+        sb.append("namespaces:");
+        JsonEncoder.serialize(Aura.getConfigAdapter().getPrivilegedNamespaces(), sb, context.getJsonSerializationContext());
+        sb.append(",");
+
+        // append event definitions
+        sb.append("eventDefs:");
+        Collection<EventDef> events = filterAndLoad(EventDef.class, dependencies, null);
+        Aura.getSerializationService().writeCollection(events, EventDef.class, sb, "JSON");
+        sb.append(",");
+
+        // append library definitions
+        sb.append("libraryDefs:");
+        Collection<LibraryDef> libraries = filterAndLoad(LibraryDef.class, dependencies, null);
+        Aura.getSerializationService().writeCollection(libraries, LibraryDef.class, sb, "JSON");
+        sb.append(",");
+
+        //
+        // append controller definitions
+        // Dunno how this got to be this way. The code in the Format adaptor was twisted and stupid,
+        // as it walked the namespaces looking up the same descriptor, with a string.format that had
+        // the namespace but did not use it. This ends up just getting a single controller.
+        //
+        sb.append("controllerDefs:");
+        Collection<ControllerDef> controllers = filterAndLoad(ControllerDef.class, dependencies, ACF);
+        Aura.getSerializationService().writeCollection(controllers, ControllerDef.class, sb, "JSON");
+
+        sb.append("});\n\n");
+
+        String output = sb.toString();
+
+        // only use closure compiler in prod mode, due to compile cost
+        if (minify) {
+            StringWriter sw = new StringWriter();
+            List<JavascriptProcessingError> errors = JavascriptWriter.CLOSURE_SIMPLE.compress(output, sw, key);
+            if (errors == null || errors.isEmpty()) {
+                // For now, just use the non-compressed version if we can't get
+                // the compression to work.
+            	output = sw.toString();
+            } else {
+                // if unable to compress, add error comments to the end.
+                // ONLY if not production instance
+                if (!Aura.getConfigAdapter().isProduction()) {
+                    sb.append(commentedJavascriptErrors(errors));
+                }
+            }
         }
+
+        return output;
     }
 
     @Override

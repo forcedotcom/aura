@@ -15,11 +15,14 @@
  */
 package org.auraframework.impl.system;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.locks.Lock;
 
 import javax.annotation.CheckForNull;
@@ -55,6 +58,7 @@ import org.auraframework.util.text.GlobMatcher;
 import org.auraframework.util.text.Hash;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -1366,6 +1370,38 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
+    	if (shouldCache(descriptor)) {
+	        DependencyEntry de = localDependencies.get(uid);
+	
+	        if (de != null) {
+	        	try {
+	        		return stringsCache.get(getKey(de, descriptor, key), loader);
+	    		} catch (ExecutionException e) {
+	    			// Don't interfere if the callable caused these exceptions.
+	    		    Throwables.propagateIfInstanceOf(e.getCause(), IOException.class);
+	    		    Throwables.propagateIfInstanceOf(e.getCause(), QuickFixException.class);
+	    		    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
+	    		    Throwables.propagate(e);
+	    		}
+	        }
+        } 
+    	
+    	// When caching is bypassed, execute the loader directly.
+    	try {
+			return loader.call();
+		} catch (Exception e) {
+			// Don't interfere if the call caused these exceptions.
+		    Throwables.propagateIfInstanceOf(e, IOException.class);
+		    Throwables.propagateIfInstanceOf(e, QuickFixException.class);
+		    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
+		    Throwables.propagate(e);
+		}
+    	
+    	return null;
     }
 
     @Override

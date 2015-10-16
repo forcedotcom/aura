@@ -1521,6 +1521,15 @@ AuraClientService.prototype.finishCollection = function() {
     }
 };
 
+AuraClientService.prototype.shouldSendOutForegroundActions = function( foregroundActions, cabooseCount ) {
+	if(foregroundActions.length > cabooseCount ||
+		(cabooseCount > 0 && Date.now() - this.lastSendTime > 60000) ) {
+		return true;
+	} else {
+		return false;
+	}
+};
+
 /**
  * Send actions.
  *
@@ -1562,8 +1571,7 @@ AuraClientService.prototype.sendActionXHRs = function() {
 
     // either group caboose with at least one non-caboose foreground
     // or send all caboose after 60s since last send
-    if (foreground.length > caboose ||
-        (caboose > 0 && Date.now() - this.lastSendTime > 60000)) {
+    if( this.shouldSendOutForegroundActions(foreground, caboose) ) {
         auraXHR = this.getAvailableXHR(false);
         if (auraXHR) {
             auraXHR.transactionId = transactionId;

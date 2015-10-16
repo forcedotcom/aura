@@ -35,7 +35,7 @@ Test.Aura.AuraClientServiceTest = function() {
     var mockGlobal = Mocks.GetMocks(Object.Global(), {
     	"Date": {
     		now : function() {
-    			return "today is a good day";
+    			return 70000;
     		}
     	},
         "$A": {
@@ -68,6 +68,27 @@ Test.Aura.AuraClientServiceTest = function() {
         Aura: Aura
     });
 
+    [Fixture]
+    function testSendOutCabooseAction() {
+    	[Fact]
+    	function returnsTrueWhen60sPass() {
+    		// Arrange
+    		 var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.lastSendTime = 0;
+            });
+    		// Act
+            var actual;
+            mockGlobal(function() {
+                actual = target.shouldSendOutForegroundActions([], 1);
+            });
+            // Assert : we send out caboose action if it has been longer then 60s since last send
+            Assert.Equal(true, actual);
+    	}
+    }
+    
+    
     [Fixture]
     function testDupes() {
     	[Fact]

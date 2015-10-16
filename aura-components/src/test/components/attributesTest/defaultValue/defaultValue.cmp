@@ -16,6 +16,7 @@
 
 -->
 <aura:component extensible="true" render="client">
+	<attributesTest:attributeTypes aura:id="x" typeSet="['1',1,1]"/>
     <aura:attribute type="String" name="strAttributeWithNoDefaultValue" />
     <aura:attribute type="String" name="strAttributeWithDefaultValue" default="Aura"/>
     {!v.strAttributeWithDefaultValue}

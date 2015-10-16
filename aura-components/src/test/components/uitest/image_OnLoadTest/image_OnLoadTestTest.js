@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 ({
-	checkImageMatches: function(cmp, expectedSrc){
-		var imgElement = cmp.find("image").getElement().firstChild;
-		var imgSrcOutput = cmp.find("outputStatus").get("v.value");
-    	$A.test.assertTrue($A.util.stringEndsWith(imgElement.src, expectedSrc), "Expected src should be "+ expectedSrc +" by default");
-    	//check image was passed as a parameter to the action
-    	$A.test.assertTrue($A.util.stringEndsWith(imgSrcOutput, expectedSrc), "Expected src should be "+ expectedSrc +" by default after onload is fired");
+    checkImageMatches : function(cmp, expectedSrc) {
+        var imgElement = cmp.find("image").getElement().firstChild;
+        $A.test.assertTrue($A.util.stringEndsWith(imgElement.src, expectedSrc), "Expected src should be " + expectedSrc
+                + " by default");
+        // check image was passed as a parameter to the action
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            return $A.util.stringEndsWith(cmp.find("outputStatus").get("v.value"), expectedSrc)
+        }, "Expected src should be " + expectedSrc + " by default after onload is fired");
     },
-    
+
     /**
-     * Test case for when the image is done loading, 
-     * passes the image loaded as a parameter to the action.
-     * Bug: W-2509320
+     * Test case for when the image is done loading, passes the image loaded as a parameter to the action. Bug:
+     * W-2509320
      */
-    testImageOnLoadPassesParams:{
-    	 test: [function(cmp) {
-        	var defaultSrc = "/auraFW/resources/aura/s.gif";
-        	expectedSrc = "/auraFW/resources/aura/auralogo.png";
-        	this.checkImageMatches(cmp, defaultSrc);
-        	$A.test.clickOrTouch(cmp.find("loadButton").getElement());
-        	$A.test.addWaitForWithFailureMessage(true, function(){return $A.util.stringEndsWith(cmp.find("outputStatus").get("v.value"), expectedSrc);}, "Expected image src should be "+ expectedSrc +" after pressing button");
-		}, function(cmp){
+    testImageOnLoadPassesParams : {
+        test : [ function(cmp) {
+            var defaultSrc = "/auraFW/resources/aura/s.gif";
+            this.checkImageMatches(cmp, defaultSrc);
+        }, function(cmp) {
+            $A.test.clickOrTouch(cmp.find("loadButton").getElement());
+        }, function(cmp) {
+            var expectedSrc = "/auraFW/resources/aura/auralogo.png";
             this.checkImageMatches(cmp, expectedSrc);
-        }]
+        } ]
     }
 })

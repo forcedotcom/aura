@@ -820,4 +820,4 @@
             el.fireEvent("onkeydown", eventObj);
         }
     }
-});
+})

@@ -122,7 +122,9 @@
     	attributes: { testMediaSource: true },
     	test: [function(cmp) {
     		var ele = document.getElementById('videoSameDomain');
-    		$A.test.assertTrue($A.test.contains(ele.currentSrc, "auraFW/resources/aura/videos/Test6.mp4"), "video fail to load");
+    		$A.test.addWaitForWithFailureMessage(true, function() {
+                return $A.test.contains(ele.currentSrc, "auraFW/resources/aura/videos/Test6.mp4")
+            }, "video failed to load");
     	}
     	]
     }

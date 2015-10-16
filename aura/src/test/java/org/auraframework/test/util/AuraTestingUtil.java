@@ -20,8 +20,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nullable;
@@ -31,16 +29,13 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
-import org.auraframework.service.DefinitionService;
+import org.auraframework.http.AuraTestFilter;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
-import org.auraframework.system.SourceListener;
-import org.auraframework.system.SourceListener.SourceMonitorEvent;
-import org.auraframework.test.source.StringSourceLoader;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
@@ -209,45 +204,8 @@ public class AuraTestingUtil {
      * @param defs the Definitions to be cleared from any caches
      * @throws InterruptedException
      */
-    public static <T extends Definition> void clearCachedDefs(Collection<T> defs) throws Exception {
-        if (defs == null || defs.isEmpty()) {
-            return;
-        }
-
-        // Get the Descriptors for the provided Definitions
-        final DefinitionService definitionService = Aura.getDefinitionService();
-        final Set<DefDescriptor<?>> cached = Sets.newHashSet();
-        for (T def : defs) {
-            if (def != null) {
-                cached.add(def.getDescriptor());
-            }
-        }
-
-        // Wait for the change notifications to get processed. We expect listeners to get processed in the order in
-        // which they subscribe.
-        final CountDownLatch latch = new CountDownLatch(cached.size());
-        SourceListener listener = new SourceListener() {
-            private Set<DefDescriptor<?>> descriptors = Sets.newHashSet(cached);
-
-            @Override
-            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-                if (descriptors.remove(source)) {
-                    latch.countDown();
-                }
-                if (descriptors.isEmpty()) {
-                    definitionService.unsubscribeToChangeNotification(this);
-                }
-            }
-        };
-        definitionService.subscribeToChangeNotification(listener);
-        for (DefDescriptor<?> desc : cached) {
-            definitionService.onSourceChanged(desc, SourceMonitorEvent.CHANGED, null);
-        }
-        if (!latch.await(CACHE_CLEARING_TIMEOUT_SECS, TimeUnit.SECONDS)) {
-            throw new AuraRuntimeException(String.format(
-                    "Timed out after %s seconds waiting for cached Aura definitions to clear: %s",
-                    CACHE_CLEARING_TIMEOUT_SECS, defs));
-        }
+    public static <T extends Definition> void clearCachedDefs(Collection<T> defs) {
+        AuraTestFilter.clearCachedDefs(defs);
     }
 
     private void markForCleanup(DefDescriptor<?> desc) {

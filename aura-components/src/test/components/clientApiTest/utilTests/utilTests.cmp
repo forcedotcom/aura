@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
     <p>JS tests to validate Util.js</p>
 
     <div aura:id="aDiv" data-test-data='divtestdata'>In div</div>

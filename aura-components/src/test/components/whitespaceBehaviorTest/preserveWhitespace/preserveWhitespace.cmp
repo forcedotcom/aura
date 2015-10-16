@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component whitespace="preserve" render="server">
+<aura:component whitespace="preserve" render="client">
     {!true}     {!false}
     <div aura:id="divText">
         {!true}     {!false}

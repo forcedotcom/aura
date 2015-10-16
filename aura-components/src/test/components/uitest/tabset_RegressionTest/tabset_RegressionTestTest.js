@@ -522,4 +522,4 @@
             optionalMessage + ' size="' + size + '" should be === 0'
         );
     }
-});
+})

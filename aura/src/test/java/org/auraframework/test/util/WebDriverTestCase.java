@@ -47,14 +47,11 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.Definition;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.test.TestContextAdapter;
 import org.auraframework.test.perf.PerfResultsUtil;
 import org.auraframework.test.perf.PerfWebDriverUtil;
 import org.auraframework.test.perf.metrics.PerfMetricsCollector;
@@ -168,21 +165,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             browserType = ":BROWSER" + this.currentBrowserType.name();
         }
         return browserType;
-    }
-
-    public void addMocksToTestContextLocalDef(Collection<Definition> mocks) throws Throwable {
-        if (mocks != null && !mocks.isEmpty()) {
-            TestContextAdapter testContextAdapter = Aura.get(TestContextAdapter.class);
-            if (testContextAdapter != null) {
-                if (this.currentBrowserType != null)
-                {
-                    String testName = getQualifiedName();
-                    testContextAdapter.getTestContext(testName);
-                    Aura.get(TestContextAdapter.class).getTestContext().getLocalDefs().addAll(mocks);
-                }
-            }
-            AuraTestingUtil.clearCachedDefs(mocks);
-        }
     }
 
     /**

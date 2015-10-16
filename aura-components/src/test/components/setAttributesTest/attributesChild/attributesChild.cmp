@@ -1,5 +1,4 @@
-<aura:component extends="setAttributesTest:attributesParent">
-
+<aura:component extends="setAttributesTest:attributesParent" render="client">
     <aura:set attribute="city" value="Seattle (default child)"/>
     <aura:set attribute="state" value="Washington (default child)"/>
 
@@ -7,5 +6,4 @@
         <div>{!v.city}</div>
         <div>{!v.state}</div>
     </aura:set>
-
 </aura:component>

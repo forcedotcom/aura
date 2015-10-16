@@ -105,6 +105,7 @@
         <webdriver.chrome.driver>${aura.home}/aura-integration-test/bin/chromedriverlauncher</webdriver.chrome.driver>
         <webdriver.reusebrowser>true</webdriver.reusebrowser>
         <webdriver.browser.type>GOOGLECHROME</webdriver.browser.type> <!-- refer to org.auraframework.test.WebDriverUtil.BrowserType enums for valid values -->
+		<webdriver.timeout>30</webdriver.timeout>
         <sauce.record.video>false</sauce.record.video>
         <sauce.record.screenshots>false</sauce.record.screenshots>
         <screenshots.directory>${project.build.directory}/screenshots</screenshots.directory>
@@ -166,6 +167,10 @@
                         <systemProperty>
                             <name>webdriver.browser.type</name>
                             <value>${webdriver.browser.type}</value>
+                        </systemProperty>
+                        <systemProperty>
+                            <name>webdriver.timeout</name>
+                            <value>${webdriver.timeout}</value>
                         </systemProperty>
                         <systemProperty>
                             <name>java.io.tmpdir</name>

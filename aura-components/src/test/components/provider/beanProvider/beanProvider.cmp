@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component provider="java://org.auraframework.impl.java.provider.TestBeanProvider">
+<aura:component render="client" provider="java://org.auraframework.impl.java.provider.TestBeanProvider">
 </aura:component>

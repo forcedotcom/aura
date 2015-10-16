@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component abstract="true" provider="java://org.auraframework.impl.java.provider.TestJavaProviderSettingAttributeValues">
+<aura:component abstract="true" render="client" provider="java://org.auraframework.impl.java.provider.TestJavaProviderSettingAttributeValues">
         <aura:attribute name="a1" type="String"/>
         <aura:attribute name="a3" type="String"/>
         <aura:attribute name="a2" type="String"/>

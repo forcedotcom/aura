@@ -189,7 +189,10 @@
     testShowMoreHidden: {
         test: function (cmp) {
             this._getInput(cmp).getElement().blur();
-            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return that._isDisplayNone($A.test.select(".showMore")[0])
+            }, "\"show more\" button should not exist");
         }
     },
 

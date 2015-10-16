@@ -28,7 +28,7 @@
         }
     },
 
-    runTest: function (cmp) {
+    runTest : function (cmp) {
         var frame = cmp.find("content").getElement().firstChild;
         var win = frame.contentWindow ? frame.contentWindow : frame.contentDocument.window;
         try {
@@ -47,13 +47,12 @@
             }
         }
         cmp._startTime = new Date().getTime();
-        win.aura.test.run(cmp.get("v.case.name"), cmp.get("v.suite.code"), 10, cmp.get("v.case.quickFixException"));
         cmp.getDef().getHelper().displayResults(cmp, win);
     },
 
-    displayResults: function (cmp, win) {
-        if (!win.aura.test.isComplete()) {
-            setTimeout(function () {
+    displayResults : function(cmp, win){
+        if(!win.$A || !win.$A.test || !win.$A.test.isComplete()){
+            setTimeout(function(){
                 cmp.getDef().getHelper().displayResults(cmp, win);
             }, 50);
             return;

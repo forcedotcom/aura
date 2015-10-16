@@ -387,46 +387,46 @@ Aura.Utils.Util.prototype.copy = function(value){
  */
 Aura.Utils.Util.prototype.compareValues = function(expected, actual){
     var result={
-        match:true,
-        reasons:[]
+        "match":true,
+        "reasons":[]
     };
     if(this.isArray(expected)){
         if(!this.isArray(actual)){
-            result.reasons.push({index:-1,reason:"Actual was not an Array."});
-            result.match=false;
+            result["reasons"].push({index:-1,reason:"Actual was not an Array."});
+            result["match"]=false;
         }else {
             var length = Math.max(expected.length, actual.length);
             for (var i = 0; i < length; i++) {
                 if (expected[i] !== actual[i]) {
-                    result.reasons.push({index: i, reason: "Mismatch at position " + i + "."});
-                    result.match = false;
+                    result["reasons"].push({index: i, reason: "Mismatch at position " + i + "."});
+                    result["match"] = false;
                 }
             }
         }
     }else if(this.isObject(expected)){
         if(!this.isObject(actual)){
-            result.reasons.push({index:-1,reason:"Actual was not an Object."});
-            result.match=false;
+            result["reasons"].push({index:-1,reason:"Actual was not an Object."});
+            result["match"]=false;
         }
         var keyMap={};
         for(var expectedKey in expected){
             keyMap[expectedKey]=true;
             if(expected[expectedKey]!==actual[expectedKey]){
-                result.reasons.push({index: expectedKey, reason: "Mismatch at key " + expectedKey + "."});
-                result.match = false;
+                result["reasons"].push({index: expectedKey, reason: "Mismatch at key " + expectedKey + "."});
+                result["match"] = false;
             }
         }
         for(var actualKey in actual){
             if(keyMap[actualKey]){
                 continue;
             }
-            result.reasons.push({index: actualKey, reason: "Found new key " + actualKey + "."});
-            result.match = false;
+            result["reasons"].push({index: actualKey, reason: "Found new key " + actualKey + "."});
+            result["match"] = false;
         }
     }else{
         if(expected!==actual){
-            result.reasons.push({index:-1,reason:"Literal value mismatch."});
-            result.match=false;
+            result["reasons"].push({index:-1,reason:"Literal value mismatch."});
+            result["match"] = false;
         }
     }
     return result;

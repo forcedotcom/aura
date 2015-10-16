@@ -196,6 +196,7 @@ public class MenuUITest extends WebDriverTestCase {
     }
 
     // Test case for W-2181713
+    @Flapper
     public void testActionMenuAttachToBodySet() throws MalformedURLException, URISyntaxException {
         testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP, "");
     }

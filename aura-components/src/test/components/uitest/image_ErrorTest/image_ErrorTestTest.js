@@ -17,8 +17,9 @@
     testBrokenImageWithOnError:{
         test : function(cmp) {
             var imageElement = cmp.find("image1").getElement();
-            var isHidden = $A.util.hasClass(imageElement,"hide");
-            $A.test.assertTrue(isHidden);
+            $A.test.addWaitFor(true, function() {
+                return $A.util.hasClass(imageElement, "hide")
+            });
         }
     },
 

@@ -1,4 +1,4 @@
-<aura:component>
+<aura:component render="client">
   <div aura:id="data">{!$Global.dynamicTypeSize}</div>
   <div aura:id="insertion" />
 </aura:component>

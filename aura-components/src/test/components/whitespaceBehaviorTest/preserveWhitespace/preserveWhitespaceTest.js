@@ -33,7 +33,7 @@
             $A.test.assertTrue(this.isWhitespace($A.test.getText(cmpElems[6]), "Newline should be present after div."));
 
             // check whitespace within div            
-            aura.test.assertNotNull(divText.match(/\n?        true     false\n?    /), "Div text does not contain proper whitespace.");
+            $A.test.assertNotNull(divText.match(/\n?        true     false\n?    /), "Div text does not contain proper whitespace.");
         }
     }
 })

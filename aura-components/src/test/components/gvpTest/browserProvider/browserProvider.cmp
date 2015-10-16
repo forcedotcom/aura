@@ -1,2 +1,2 @@
-<aura:component>
+<aura:component render="client">
 </aura:component>

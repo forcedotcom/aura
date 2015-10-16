@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
     <div aura:id="setup"/>
     <div aura:id="container" id="container">
         <div aura:id="auraDiv" id="domDiv">my text</div>

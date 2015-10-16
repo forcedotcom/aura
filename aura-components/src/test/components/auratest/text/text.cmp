@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
     <aura:attribute name="value" type="String" />
     <aura:attribute name="truncate" type="Integer"/>
     <aura:attribute name="ellipsis" type="Boolean" default="true"/>

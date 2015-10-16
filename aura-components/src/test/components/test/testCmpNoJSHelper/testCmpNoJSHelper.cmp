@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component>
+<aura:component render="client">
 	<!-- this is a bare component extends/implement nothing -->
 </aura:component>

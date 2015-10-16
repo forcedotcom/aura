@@ -241,6 +241,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
      * This is kept just in case. Also, SAFARI doesn't allow tabbing into the calendar
      * icon, so if this is used, need to exclude SAFARI.
      */
+    @SuppressWarnings("unused")
     private void tabToOpenTimePicker() {
         // use input time box to tab into calendar icon
         WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));

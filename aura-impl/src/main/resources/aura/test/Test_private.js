@@ -142,7 +142,7 @@ TestInstance.prototype.doTearDown = function() {
         this.logError("Error during cleanup", ce);
     }
     try {
-        if (this.suite["tearDown"]) {
+        if (this.suite && this.suite["tearDown"]) {
             if (this.doNotWrapInAuraRun) {
                 this.suite["tearDown"].call(this.suite, this.cmp);
             } else {

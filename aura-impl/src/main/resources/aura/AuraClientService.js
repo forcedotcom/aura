@@ -1521,6 +1521,9 @@ AuraClientService.prototype.finishCollection = function() {
     }
 };
 
+/**
+ * @private
+ */
 AuraClientService.prototype.shouldSendOutForegroundActions = function( foregroundActions, cabooseCount ) {
 	if(foregroundActions.length > cabooseCount ||
 		(cabooseCount > 0 && Date.now() - this.lastSendTime > 60000) ) {

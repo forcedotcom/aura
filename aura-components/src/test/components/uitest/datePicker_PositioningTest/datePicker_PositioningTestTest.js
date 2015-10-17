@@ -1,92 +1,215 @@
 ({
 
-	testDummy : {
-		test : function(cmp) {
-			
-		}
-	},
 	/**
 	 * Test Flow:
 	 * For each position:
-	 * 1. Check if datepicker is closed
-	 * 2. Click on calendar icon in inputDate to open datePicker
-	 * 3. Wait for datePicker to open
-	 * 4. Check if datePicker is positioned below the inputDate and aligned to its left margin
-	 * 5. Click on random date
-	 * 6. Click on forward button and wait for the position of inputDate to be updated
+	 * 1. Set the inputDate at the correct position on screen
+	 * 2. Check if datepicker is closed initially
+	 * 3. Click on calendar icon in inputDate to open datePicker
+	 * 4. Wait for datePicker to open
+	 * 5. Check if datePicker is positioned below the inputDate and aligned to its left margin
 	 */
+
+	testDPPositioningAtPos1 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "1");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos2 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "2");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos3 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "3");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos4 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "4");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos5 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "5");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
 	
-
-	testPositioning: {
-        test:  function(cmp) {
-           	//trying 9 times since there 9 different positions to check at
-        	this.checkEachPosition(cmp, 9);
-        }  
-    },
-	    
-    checkEachPosition : function(cmp, numberOfTries) {
-    	var self = this;
-
-    	self.checkDatePickerClosed(cmp, function(){
-    		self.openDatePicker(cmp, function(){
-    			if (numberOfTries > 1){
-					numberOfTries--;
-
-	    			self.goForward(cmp, function(){
-						self.checkEachPosition(cmp, numberOfTries);
-	    			}); 
-	    		}
-    		});	
-    	});
-    },
-
-	checkDatePickerClosed : function(cmp, callback) {
+	testDPPositioningAtPos6 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "6");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos7 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "7");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos8 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "8");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	testDPPositioningAtPos9 : {
+		test : [
+		        function(cmp) {
+		        	this.setPosition(cmp, "9");
+		        },
+		        function(cmp) {
+		        	this.verifyDatePickerIsClosed(cmp);
+		        },
+		        function (cmp) {
+		        	this.openDatePicker(cmp);
+		        },
+		        function (cmp) {
+		        	this.verifyDatePickerPositioning(cmp);
+		        }
+		        ]
+	},
+	
+	setPosition : function(cmp, position) {
+		 var newClass = "pos" + position;
+		 var inputDateDiv = cmp.find('inputDateDiv').getElement();
+		 cmp.find("pos1").set('v.value', "Position 1");
+		 
+		 cmp.set('v.pos', position);		
+		 cmp.find(newClass).set('v.value', '');
+		 $A.util.swapClass(inputDateDiv, "pos1", newClass);
+	},
+	
+	verifyDatePickerIsClosed : function (cmp) {
 		var datePicker = cmp.find('inputDate').find('datePicker').getElement();
 		$A.test.addWaitForWithFailureMessage(false, function(){
 			return $A.util.hasClass(datePicker,"visible");
-		},"datePicker didn't close", callback);
+		},"datePicker didn't close");
 	},
 	
-	openDatePicker : function(cmp, callback) {
-		var epsilon = 2;
+	openDatePicker : function(cmp) {
+		
 		var calendarIcon = $A.test.select('.datePicker-openIcon')[0];
 		$A.test.clickOrTouch(calendarIcon);
 		
 		$A.test.addWaitForWithFailureMessage(true, function(){		
-	        var inputDateDiv = cmp.find('inputDateDiv').getElement();
 	        var datePicker = cmp.find('inputDate').find('datePicker').getElement();
-		    
-		    //check if datePicker has opened up
 		    if(($A.util.hasClass(datePicker,"visible"))) {
-	            var windowDimensions = $A.util.getWindowSize();
-	            var datePickerRect = datePicker.getBoundingClientRect();
-	            var inputDateRect = cmp.find('inputDate').getElement().getBoundingClientRect();
-
-	            // check if datePicker is positioned immediately below inputDate and if its left margin is aligned to left margin of inputDate
-	            if(((datePickerRect.top + epsilon) >= inputDateRect.bottom) && ((datePickerRect.top - epsilon) <= inputDateRect.bottom)
-	            		&& (datePickerRect.left + epsilon >= 0)
-	            		&& (datePickerRect.top + epsilon >= 0)
-	            		&& (datePickerRect.left + epsilon >= inputDateRect.left) && (datePickerRect.left - epsilon <= inputDateRect.left)){
+	          return true;
+	        }   
+		    return false;
+   		}, "Date Picker not visible or was not visible at the correct position");
+	},
+	
+	verifyDatePickerPositioning : function(cmp) {
+		
+		var datePicker = cmp.find('inputDate').find('datePicker').getElement();
+	    var datePickerRect = datePicker.getBoundingClientRect();
+	    var inputDateRect = cmp.find('inputDate').getElement().getBoundingClientRect();
+	        
+		$A.test.addWaitForWithFailureMessage(true, function(){	
+			//this is the accepted delta in the positioning of the datePicker with respect to the inputDate
+			var epsilon = 15;
+	     
+		    datePickerRect = datePicker.getBoundingClientRect();
+		    inputDateRect = cmp.find('inputDate').getElement().getBoundingClientRect();
+		    
+	        // check if datePicker is positioned immediately below inputDate and if its left margin is aligned to left margin of inputDate
+	        if(((datePickerRect.top + epsilon) >= inputDateRect.bottom) && ((datePickerRect.top - epsilon) <= inputDateRect.bottom)
+	         && (datePickerRect.left + epsilon >= 0)
+	         && (datePickerRect.top + epsilon >= 0)
+	         && (datePickerRect.left + epsilon >= inputDateRect.left) && (datePickerRect.left - epsilon <= inputDateRect.left)){
 	            	return true;
 	        	}	
 	        return false;
-	        }          
-   		}, "Date Picker not visible or was not visible at the correct position", callback);
-	},
-	
-	goForward : function(cmp,callback) {
-		var previousRect = $A.test.select('form.uiInputDate input')[0].getBoundingClientRect();
-		var randomDate = $A.test.getElementByClass('uiDayInMonthCell')[0];
-		$A.test.clickOrTouch(randomDate);
-
-		var forward = cmp.find('forwardBtn').getElement();  
-		$A.test.clickOrTouch(forward);
-		
-		//wait for inputDate to move forward and update its position
-		$A.test.addWaitForWithFailureMessage(true, function(){
-				var curRect = $A.test.select('form.uiInputDate input')[0].getBoundingClientRect();
-				return previousRect.top !== curRect.top || previousRect.left !== curRect.left;
-			},'inputDate has not updated its position', callback);
-	},
+	                  
+   		}, "Date Picker not visible or was not visible at the correct position. **DEBUG INFO**:\n datePickerTop=" + datePickerRect.top + "; inputDateBottom=" + inputDateRect.bottom + "; datePickerLeft=" + datePickerRect.left+ "; inputDateLeft=" + inputDateRect.left +"\n");
+	}
 
 })

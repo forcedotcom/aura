@@ -7,3 +7,4 @@ Conventions:
    * Read http://coding.smashingmagazine.com/2012/11/05/writing-fast-memory-efficient-javascript/
  * Testing:
    * Watch (long): http://www.youtube.com/watch?v=JjqKQ8ezwKQ&list=SPSIUOFhnxEiCODb8XQB-RUQ0RGNZ2yW7d&index=13
+ 

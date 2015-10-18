@@ -92,7 +92,7 @@
             var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1],
                 previousBody = previousPanel && previousPanel.get('v.body');
             
-            owner = !$A.util.isEmpty(previousBody) ? previousBody[0].getGlobalId() : null;
+            owner = $A.util.isEmpty(previousBody) ? panel.getGlobalId() : previousBody[0].getGlobalId();
         }
 
         this.PANELS_OWNER[panel.getGlobalId()] = owner;

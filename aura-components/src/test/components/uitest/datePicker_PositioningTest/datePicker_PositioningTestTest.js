@@ -11,6 +11,7 @@
 	 */
 
 	testDPPositioningAtPos1 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "1");
@@ -27,6 +28,7 @@
 		        ]
 	},
 	testDPPositioningAtPos2 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "2");
@@ -43,6 +45,7 @@
 		        ]
 	},
 	testDPPositioningAtPos3 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "3");
@@ -59,6 +62,7 @@
 		        ]
 	},
 	testDPPositioningAtPos4 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "4");
@@ -75,6 +79,7 @@
 		        ]
 	},
 	testDPPositioningAtPos5 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "5");
@@ -92,6 +97,7 @@
 	},
 	
 	testDPPositioningAtPos6 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "6");
@@ -108,6 +114,7 @@
 		        ]
 	},
 	testDPPositioningAtPos7 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "7");
@@ -124,6 +131,7 @@
 		        ]
 	},
 	testDPPositioningAtPos8 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "8");
@@ -140,6 +148,7 @@
 		        ]
 	},
 	testDPPositioningAtPos9 : {
+		browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
 		test : [
 		        function(cmp) {
 		        	this.setPosition(cmp, "9");

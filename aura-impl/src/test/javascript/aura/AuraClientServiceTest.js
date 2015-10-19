@@ -69,7 +69,7 @@ Test.Aura.AuraClientServiceTest = function() {
     });
 
     [Fixture]
-    function testSendOutCabooseAction() {
+    function testSendOutForegroundActions() {
     	[Fact]
     	function returnsTrueWhen60sPass() {
     		// Arrange
@@ -84,6 +84,25 @@ Test.Aura.AuraClientServiceTest = function() {
                 actual = target.shouldSendOutForegroundActions([], 1);
             });
             // Assert : we send out caboose action if it has been longer then 60s since last send
+            Assert.Equal(true, actual);
+    	}
+    	
+    	[Fact]
+    	function returnsTrueMoreForegroundThanCaboose() {
+    		// Arrange
+    		var target;
+            mockGlobal(function() {
+                target = new Aura.Services.AuraClientService();
+                target.lastSendTime = Date.now();//make sure we won't send it out because of 60s has passed
+            });
+    		// Act
+            var actual;
+            var action1 = new MockAction("server", true);
+            var action2 = new MockAction("server", true);
+            mockGlobal(function() {
+                actual = target.shouldSendOutForegroundActions([action1, action2], 1);
+            });
+            // Assert : we send out caboose action if there are more foreground actions than caboose ones
             Assert.Equal(true, actual);
     	}
     }

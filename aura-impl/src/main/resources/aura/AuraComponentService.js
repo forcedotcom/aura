@@ -198,7 +198,8 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
     var configItem = {
         "componentDef" : type.toString(),
         "attributes"   : { "values" : attributes || null },
-        "localId"      : (attributes && attributes["aura:id"]) || null
+        "localId"      : (attributes && attributes["aura:id"]) || null,
+        "flavor"       : (attributes && attributes["aura:flavor"]) || null
     };
 
     var configObj = this.getComponentConfigs(configItem);
@@ -654,6 +655,7 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
                 merging[mkey] = attributes[mkey];
             }
             returnedConfig["localId"] = config["localId"];
+            returnedConfig["flavor"] = config["flavor"];
 
             try {
                 newComp = $A.newCmpDeprecated(returnedConfig, avp, false);

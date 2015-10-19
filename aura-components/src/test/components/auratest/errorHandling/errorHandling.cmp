@@ -1,0 +1,99 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component controller="java://org.auraframework.components.test.java.controller.TestController">
+    <aura:attribute name="requiredAttribute" type="String" required="true"/>
+    <aura:attribute name="message" type="String"/>
+    <aura:attribute name="error" type="String"/>
+
+    <!-- set false when testing default handler-->
+    <aura:attribute name="handleSystemError" type="Boolean" default="false"/>
+
+    <aura:attribute name="throwErrorFromInit" type="Boolean" default="false" />
+    <aura:attribute name="throwErrorFromRender" type="boolean" default="false"/>
+    <aura:attribute name="throwErrorFromRerender" type="Boolean" default="false" />
+    <aura:attribute name="throwErrorFromAfterRender" type="Boolean" default="false" />
+    <aura:attribute name="throwErrorFromUnrender" type="Boolean" default="false" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.init}"/>
+    <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
+
+    <aura:import library="auratest:errorHandlingLib" property="ErrorHandlingLib"/>
+
+    <table class="errorFromCmpTable">
+    <caption> Errors from Component:</caption>
+    <tr>
+        <td>Throw Error from Component Client Controller: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromClientController}"
+                     class="errorFromClientControllerButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error from Component Server Action Callback: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromServerActionCallback}"
+                     class="errorFromServerActionCallbackButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error from createComponent Callback in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromCreateComponentCallback}"
+                     class="errorFromCreateComponentCallbackButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error from Function Wrapped in GetCallback in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromFunctionWrappedInGetCallback}"
+                     class="errorFromFunctionWrappedInGetCallbackButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error from Library Code in Component: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromLibraryCode}"
+                     class="errorFromLibraryCodeButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error From Component Rerender: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromRerender}"
+                     class="errorFromRerenderButton"/>
+        </td>
+    </tr>
+    <tr>
+        <td>Throw Error From Component Unrender: </td>
+        <td>
+          <ui:button label="Throw"
+                     press="{!c.throwErrorFromUnrender}"
+                     class="errorFromUnrenderButton"/>
+        </td>
+    </tr>
+    </table>
+
+    <div id="cmpErrorOutput"> {!v.message} </div>
+
+</aura:component>

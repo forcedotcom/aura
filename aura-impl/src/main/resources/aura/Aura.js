@@ -465,7 +465,7 @@ function AuraInstance () {
 
     this["auraError"] = this.auraError;
     this["auraFriendlyError"] = this.auraFriendlyError;
-    this["hasDefinition"] = this.hasDefinition; 
+    this["hasDefinition"] = this.hasDefinition;
     this["getDefinition"] = this.getDefinition;
     this["getDefinitions"] = this.getDefinitions;
 
@@ -644,6 +644,7 @@ AuraInstance.prototype.finishInit = function() {
  * @param {String} msg The error message to be displayed to the user.
  * @param {Error} [e] The error object to be displayed to the user.
  * @platform
+ * @deprecated throw new Error(msg) instead
  */
 AuraInstance.prototype.error = function(msg, e){
     this.logger.error(msg, e);
@@ -1018,9 +1019,9 @@ AuraInstance.prototype.addValueProvider=function(type,valueProvider){
 
 /**
  * Gets the event or component definition. If it is not currently on the client, we will access the server to attempt to retrieve it.
- * 
+ *
  * @public
- * 
+ *
  * @param  {String}   descriptor Descriptor in the pattern prefix:name or markup://prefix:name. Use e.prefix:name, or markup://e.prefix:name for an event definition.
  * @param  {Function} callback   Function whos first parameter is the requested definition if it exists. Otherwise the first parameter is null.
  * @return undefined
@@ -1065,7 +1066,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
         if(def) {
             returnDefinitions[c] = def;
         } else {
-            // Detect without access checks to see if 
+            // Detect without access checks to see if
             if((isEvent && !this.eventService.hasDefinition(descriptor)) || (!isEvent && !this.componentService.getComponentDef(descriptor))) {
                 requestDefinitions.push(descriptors[c]);
                 pendingMap[descriptor] = {
@@ -1073,7 +1074,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
                     "isEvent": isEvent
                 };
             } else {
-                returnDefinitions[c] = null;                
+                returnDefinitions[c] = null;
             }
         }
     }
@@ -1116,7 +1117,7 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
  */
 AuraInstance.prototype.hasDefinition = function(descriptor) {
     $A.assert($A.util.isString(descriptor), "'descriptor' must be an event or component descriptor such as 'prefix:name' or 'e.prefix:name'.");
-    
+
     if(descriptor.indexOf("e.") !== -1) {
         return this.eventService.hasDefinition(descriptor);
     }

@@ -1,0 +1,3 @@
+<aura:library description="For error handling tests">
+    <aura:include name="ErrorService" />
+</aura:library>

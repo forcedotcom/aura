@@ -640,34 +640,6 @@ public class AuraUITestingUtil {
     }
 
     /**
-     * Get the quick fix title.
-     */
-    public String getQuickFixTitle() {
-        WebElement toolBar = driver.findElement(By.className("toolbar"));
-        if (toolBar == null) {
-            // This is actually ok, as the box is not rendered if the cause is not present
-            // In this case return an empty string.
-            return "";
-        }
-        return toolBar.getText();
-    }
-
-    /**
-     * Get any 'cause' message from a quick fix exception
-     *
-     * @return the quick fix cause exception.
-     */
-    public String getQuickFixCause() {
-        WebElement errorBox = driver.findElement(By.className("causeWrapper"));
-        if (errorBox == null) {
-            // This is actually ok, as the box is not rendered if the cause is not present
-            // In this case return an empty string.
-            return "";
-        }
-        return errorBox.getText();
-    }
-
-    /**
      * @return true if Aura framework has loaded
      */
     public boolean isAuraFrameworkReady() {

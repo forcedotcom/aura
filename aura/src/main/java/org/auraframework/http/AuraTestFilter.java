@@ -134,7 +134,14 @@ public class AuraTestFilter implements Filter {
         // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         HttpServletRequest request = (HttpServletRequest) req;
         if ("GET".equals(request.getMethod())) {
-            String path = request.getRequestURI().substring(request.getContextPath().length());
+            String contextPath = request.getContextPath();
+            String uri = request.getRequestURI();
+            String path;
+            if (uri.startsWith(contextPath)) {
+                path = uri.substring(contextPath.length());
+            } else {
+                path = uri;
+            }
             Matcher matcher = AuraRewriteFilter.DESCRIPTOR_PATTERN.matcher(path);
             if (matcher.matches()) {
                 // Extract the target component since AuraContext usually does not have the app descriptor set yet.

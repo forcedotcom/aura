@@ -1,0 +1,411 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+({
+    testGetDefinitionReturnsUndefined:{
+        test:function(){
+            var actual = $A.getDefinition("aura:text", function(definition){});
+            $A.test.assertUndefined(actual);
+        }
+    },
+
+    testGetComponentDefinitionWithShortDescriptor:{
+        test: function(){
+            var descriptor = "aura:text";
+            var expected = "markup://aura:text";
+
+            $A.getDefinition(descriptor, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof ComponentDef,
+                        "Definition should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+            });
+        }
+    },
+
+    testGetComponentDefinitionWithFullDescriptor:{
+        test: function(){
+            var expected = "markup://aura:text";
+
+            $A.getDefinition(expected, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof ComponentDef,
+                        "Definition should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+            });
+        }
+    },
+
+    testGetComponentDefinitionFromServer:{
+        test: function(){
+            var expected = "markup://ui:button";
+            var actionComplete = false;
+
+            $A.getDefinition(expected, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof ComponentDef,
+                        "Definition should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testDefinitionIsNullForUnkownComponent:{
+        test: function(){
+            var actionComplete = false;
+
+            $A.getDefinition("unknown:unknown", function(definition) {
+                $A.test.assertNull(definition);
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetEventDefinitionWithShortDescriptor:{
+        test: function(){
+            var descriptor = "e.aura:valueChange";
+            var expected = "markup://aura:valueChange";
+
+            $A.getDefinition(descriptor, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof EventDef,
+                        "Definition should be a instance of EventDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+            });
+        }
+    },
+
+    testGetEventDefinitionWithFullDescriptor:{
+        test: function(){
+            var descriptor = "markup://e.aura:valueChange";
+            var expected = "markup://aura:valueChange";
+
+            $A.getDefinition(descriptor, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof EventDef,
+                        "Definition should be a instance of EventDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+            });
+        }
+    },
+
+    testGetEventDefinitionFromServer:{
+        test: function(){
+            var descriptor = "e.clientApiTest:getDefinitionTestEvent";
+            var expected = "markup://clientApiTest:getDefinitionTestEvent";
+            var actionComplete = false;
+
+            $A.getDefinition(descriptor, function(definition) {
+                $A.test.assertNotUndefinedOrNull(definition, "Definition should be an object.");
+                $A.test.assertTrue(definition instanceof EventDef,
+                        "Definition should be a instance of EventDef, but actual is " +
+                        definition.constructor.name);
+                $A.test.assertEquals(expected, definition.getDescriptor().getQualifiedName());
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testDefinitionIsNullForUnkownEvent: {
+        test: function(){
+            var actionComplete = false;
+
+            $A.getDefinition("e.unknown:unknown", function(definition) {
+                $A.test.assertNull(definition);
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetDefinitionFromServerWhenOffline: {
+        test:function(cmp) {
+            var actionComplete = false;
+            $A.test.setServerReachable(false);
+
+            $A.getDefinition("ui:button", function(definition) {
+                $A.test.setServerReachable(true);
+                $A.test.assertNull(definition);
+                actionComplete = true;
+            });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetMultipleDefinitionsAllFromClient:{
+        test:function(cmp) {
+
+            $A.getDefinitions([
+                    "aura:text",
+                    "markup://aura:label"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[0] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[1] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:label", definition.getDescriptor().getQualifiedName());
+                });
+        }
+    },
+
+    testGetMultipleDefinitionsAllFromServer:{
+        test:function(cmp) {
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "ui:button",
+                    "ui:inputCheckbox"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[0] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
+
+                    definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[1] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://ui:inputCheckbox", definition.getDescriptor().getQualifiedName());
+
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetMultipleDefinitionsFromClientAndServer:{
+        test:function(cmp) {
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "aura:text",
+                    "ui:button"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[0] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    var definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[1] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
+
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetMultipleDefinitionsWithDuplicateDescriptors:{
+        test:function(cmp) {
+
+            $A.getDefinitions([
+                    "aura:text",
+                    "aura:text",
+                    "aura:text"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[0] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    var definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[1] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    var definition = definitions[2];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                        "definitions[2] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                        "definitions[2] should be a instance of ComponentDef, but actual is " +
+                        definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+                });
+        }
+    },
+
+    testGetMultipleEventDefinitions: {
+        test:function(cmp) {
+            $A.getDefinitions([
+                    "e.aura:valueChange",
+                    "e.aura:titleChange"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof EventDef,
+                            "definitions[0] should be a instance of EventDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:valueChange", definition.getDescriptor().getQualifiedName());
+
+                    definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition,
+                            "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof EventDef,
+                            "definitions[1] should be a instance of EventDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:titleChange", definition.getDescriptor().getQualifiedName());
+                });
+        }
+    },
+
+    // Verify getting a mix of component and event definitions
+    testGetMultipleComponentAndEventDefinitions: {
+        test:function(cmp) {
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "aura:text",
+                    "ui:button",
+                    "e.clientApiTest:getDefinitionTestEvent"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                            "definitions[0] should be a instance of ComponentDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    definition = definitions[1];
+                    $A.test.assertNotUndefinedOrNull(definition, "definitions[1] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                            "definitions[1] should be a instance of ComponentDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://ui:button", definition.getDescriptor().getQualifiedName());
+
+                    definition = definitions[2];
+                    $A.test.assertNotUndefinedOrNull(definition, "definitions[2] should be an object.");
+                    $A.test.assertTrue(definition instanceof EventDef,
+                            "definitions[2] should be a instance of EventDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://clientApiTest:getDefinitionTestEvent", definition.getDescriptor().getQualifiedName());
+
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetMultipleUnknownDescriptors: {
+        test:function(){
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "unknown1:unknown1",
+                    "unknown2:unknown2"
+                ], function(definitions) {
+                    $A.test.assertNull(definitions[0], "definitions[0] should be null.");
+                    $A.test.assertNull(definitions[1], "definitions[1] should be null.");
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testGetMultipleDefinitionsContainUnknownDescriptor: {
+        test:function(){
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "aura:text",
+                    "unknown:unknown",
+                    "e.unknown:unknownEvt"
+                ], function(definitions) {
+                    var definition = definitions[0];
+                    $A.test.assertNotUndefinedOrNull(definition, "definitions[0] should be an object.");
+                    $A.test.assertTrue(definition instanceof ComponentDef,
+                            "definitions[0] should be a instance of ComponentDef, but actual is " +
+                            definition.constructor.name);
+                    $A.test.assertEquals("markup://aura:text", definition.getDescriptor().getQualifiedName());
+
+                    $A.test.assertNull(definitions[1], "definition[1] should be null.");
+                    $A.test.assertNull(definitions[2], "definition[2] should be null.");
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true, function(){ return actionComplete; });
+        }
+    },
+
+    testOnlyCallsCallbackOnceWhenGettingMutipleDefinitions: {
+        test:function(){
+            var expected = 1;
+            var actual = 0;
+            var actionComplete = false;
+
+            $A.getDefinitions([
+                    "ui:button",
+                    "aura:text",
+                    "e.clientApiTest:getDefinitionTestEvent"
+                ], function(definitions) {
+                    actual++;
+                    actionComplete = true;
+                });
+
+            $A.test.addWaitFor(true,
+                    function(){ return actionComplete; },
+                    function() {$A.test.assertEquals(expected, actual)}
+                );
+        }
+    }
+
+})

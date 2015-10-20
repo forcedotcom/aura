@@ -253,7 +253,7 @@ AuraEventService.prototype.getEventDef = function(descriptor) {
 };
 
 /**
- * Checks to see if the definition for the event currently reside on the client. 
+ * Checks to see if the definition for the event currently reside on the client.
  * Could still exist on the server, we won't know that till we use a getDefinitiion call to try to retrieve it.
  * This method is private, to use it, use $A.hasDefinition("e.prefix:name");
  * @private
@@ -274,15 +274,16 @@ AuraEventService.prototype.hasDefinition = function(descriptor) {
  * Get the event definition. If it is not available, contact the server to download it.
  *
  * This method is private, to utilize it's functionality you can use $A.getDefinition("e.prefix:name");
- * 
+ *
  * @private
- * 
+ *
  * @param  {String}  descriptor Event descriptor in the pattern prefix:name or markup://prefix:name.
  * @param  {Function} callback  The function callback that gets executed with the definition. May go to the server first.
  * @return undefined            Always use the callback to access the definition.
  */
 AuraEventService.prototype.getDefinition = function(descriptor, callback) {
-    var def = this.getEventDef(descriptor);
+    var descriptorName = descriptor.replace('e.', '');
+    var def = this.getEventDef(descriptorName);
 
     if (def) {
         callback(def);
@@ -291,12 +292,12 @@ AuraEventService.prototype.getDefinition = function(descriptor, callback) {
 
     var action = $A.get("c.aura://ComponentController.getEventDef");
     action.setParams({
-        "name": descriptor
+        "name": descriptorName
     });
     action.setCallback(this, function (actionReponse) {
         var definition = null;
         if(actionReponse.getState() === "SUCCESS") {
-            definition = this.getEventDef(descriptor);
+            definition = this.getEventDef(descriptorName);
         }
         callback(definition);
     });

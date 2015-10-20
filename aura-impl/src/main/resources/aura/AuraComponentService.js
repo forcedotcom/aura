@@ -50,7 +50,7 @@ function AuraComponentService () {
     this.flavorable    = "auraFlavorable";
     this.renderedBy    = "auraRenderedBy";
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
-    
+
     // We delay the creation of the definition of a class till it's requested.
     // The function that creates the component class is a classConstructorExporter
     this.classConstructorExporter = {};
@@ -113,7 +113,7 @@ AuraComponentService.prototype.createDescriptorConfig = function(descriptor) {
  * Counts all the components currently created in the application.
  * @example
  * var count = $A.componentService.countComponents();
- * 
+ *
  * @public
  * @platform
  * @export
@@ -133,9 +133,9 @@ AuraComponentService.prototype.getRenderingComponentForElement = function(elemen
     var ret;
 
     if ($A.util.isUndefinedOrNull(element)) {
-        return null; 
+        return null;
     }
-    
+
     if ($A.util.hasDataAttribute(element, this.renderedBy)) {
         var id = $A.util.getDataAttribute(element, this.renderedBy);
         ret = this.get(id);
@@ -171,7 +171,7 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
 };
 
 /**
- * Create a component from a type and a set of attributes. 
+ * Create a component from a type and a set of attributes.
  * It accepts the name of a type of component, a map of attributes,
  * and a callback to notify callers.
  *
@@ -184,7 +184,7 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
  * $A.createComponent("aura:text",{value:'Hello World'}, function(auraTextComponent, status, statusMessagesList){
  *      // auraTextComponent is an instance of aura:text containing the value Hello World
  * });
- * 
+ *
  * @public
  * @platform
  * @function
@@ -252,10 +252,10 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  * Create an array of components from a list of types and attributes.
  * It accepts a list of component names and attribute maps, and a callback
  * to notify callers.
- * 
+ *
  * @param {Array} components The list of components to create, e.g. <code>["ui:button",{"press":component.getReference("c.handlePress")}]</code>
  * @param {Function} callback The method to call, to which it returns the newly created components.
- * 
+ *
  * @example $A.createComponents([
  *      ["aura:text",{value:'Hello'}],
  *      ["ui:button",{label:'Button'}],
@@ -266,7 +266,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  *      // 1 - Button Component with label Button
  *      // 2 - Text component containing World
  *  });
- * 
+ *
  * @public
  * @platform
  * @function
@@ -318,7 +318,7 @@ AuraComponentService.prototype.newComponent = function(config, attributeValuePro
  * creates a <code>ui:inputText</code> component.
  * @param {Object} config Use config to pass in your component definition and attributes. Supports lazy or exclusive loading by passing in "load": "LAZY" or "load": "EXCLUSIVE"
  * @param {Object} attributeValueProvider The value provider for the attributes
- * 
+ *
  * @platform
  * @function
  * @deprecated use createComponent instead
@@ -772,11 +772,11 @@ AuraComponentService.prototype.index = function(component){
 };
 
 /**
- * Checks to see if the definition for the component currently reside on the client and the context has access to it. 
+ * Checks to see if the definition for the component currently reside on the client and the context has access to it.
  * Could still exist on the server, we won't know that till we use a getDefinition call to try to retrieve it.
- * 
+ *
  * This method is private, to use it, use $A.hasDefinition("prefix:name");
- * 
+ *
  * @private
  * @param  {String}  descriptor Component descriptor in the pattern prefix:name or markup://prefix:name.
  * @return {Boolean}            True if the definition is present on the client.
@@ -792,13 +792,13 @@ AuraComponentService.prototype.hasDefinition = function(descriptor) {
  * This method is private, to utilize it, you should use $A.getDefinition("prefix:markup");
  *
  * @private
- * 
+ *
  * @param  {String}   descriptor Component descriptor in the pattern prefix:name or markup://prefix:name.
  * @param  {Function} callback   Function that is passed the definition. The definition may be NULL if either the definition does not exist, or you do not have access to it.
  * @return undefined             Always use the callback to access the returned definition.
  */
 AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
-    var def = this.getComponentDef(descriptor);
+    var def = this.getComponentDef(this.createDescriptorConfig(descriptor));
 
     if (def) {
         if(!$A.clientService.allowAccess(def)) {
@@ -816,9 +816,13 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
     action.setParams({ "name": descriptor });
 
     action.setCallback(this, function (actionResponse) {
-        $A.assert(actionResponse.getState() === 'SUCCESS', "Component Definition '" + descriptor + "' was not found on the client or the server.");
-        // We use getDef at the moment so we do the access check.
-        callback(this.getDef(descriptor));
+        if(actionResponse.getState() === 'SUCCESS') {
+            // We use getDef at the moment so we do the access check.
+            callback(this.getDef(descriptor));
+        } else {
+            callback(null);
+        }
+
     });
 
     $A.enqueueAction(action);
@@ -1216,7 +1220,7 @@ AuraComponentService.prototype.isConfigDescriptor = function(config) {
 AuraComponentService.prototype.saveComponentConfig = function(config) {
     var componentDescriptor = this.getDescriptorFromConfig(config);
     if (this.savedComponentConfigs[componentDescriptor]) {
-        return;    
+        return;
     }
 
     this.savedComponentConfigs[componentDescriptor] = config;

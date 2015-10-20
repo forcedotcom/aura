@@ -523,7 +523,7 @@ function AuraInstance () {
 AuraInstance.prototype.initAsync = function(config) {
 
     // Context is created async because of the GVPs go though async storage checks
-    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {         
+    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
 
         $A.context = context;
         $A.clientService.initHost(config["host"]);
@@ -1067,7 +1067,9 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
             returnDefinitions[c] = def;
         } else {
             // Detect without access checks to see if
-            if((isEvent && !this.eventService.hasDefinition(descriptor)) || (!isEvent && !this.componentService.getComponentDef(descriptor))) {
+            if((isEvent && !this.eventService.hasDefinition(descriptor)) ||
+                    (!isEvent && !this.componentService.getComponentDef(this.componentService.createDescriptorConfig(descriptor)))) {
+
                 requestDefinitions.push(descriptors[c]);
                 pendingMap[descriptor] = {
                     "position": c,
@@ -1096,9 +1098,9 @@ AuraInstance.prototype.getDefinitions = function(descriptors, callback) {
                 if(pendingMap.hasOwnProperty(requestedDescriptor)) {
                     pendingInfo = pendingMap[requestedDescriptor];
                     if(pendingInfo["isEvent"]) {
-                        returnDefinitions[pendingInfo["position"]] = this.eventService.getEventDef(requestedDescriptor);
+                        returnDefinitions[pendingInfo["position"]] = this.eventService.getEventDef(requestedDescriptor) || null;
                     } else {
-                        returnDefinitions[pendingInfo["position"]] = this.componentService.getDef(requestedDescriptor);
+                        returnDefinitions[pendingInfo["position"]] = this.componentService.getDef(requestedDescriptor) || null;
                     }
                 }
             }

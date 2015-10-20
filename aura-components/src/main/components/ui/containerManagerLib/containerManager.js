@@ -53,7 +53,8 @@ function lib() { //eslint-disable-line no-unused-vars
                 var panels = containersDefs || [];
                 for (var i = 0; i < panels.length; ++i) {
                     var panel = panels[i];
-                    var alias = panel.attributes.values.alias;
+                    panel.attributes = panel.attributes || {values:{}};
+                    var alias = panel.attributes && panel.attributes.values.alias;
                     var name  = alias && alias.value || panel.componentDef.descriptor.split(':').pop();
                     if (!CONTAINERS_DEF[name]) {
                         CONTAINERS_DEF[name] = panel;    

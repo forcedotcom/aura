@@ -19,9 +19,8 @@
 	 * Handler for event that's fired programatically
 	 */
 	activateMenu: function(cmp, evt) {
-		if (evt.getParam) {
-			cmp.find("menuList").set("v.focusItemIndex", evt.getParam("index"));
-		}
+		var params = evt.getParam('arguments');
+		cmp.find("menuList").set("v.focusItemIndex", params.index);
 		cmp.find("menu").get("e.popupTriggerPress").fire();
 	},
 	

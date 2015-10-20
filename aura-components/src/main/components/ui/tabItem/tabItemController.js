@@ -18,27 +18,28 @@
 	/**
 	 * Handler for event that's fired programatically
 	 */
-	activateTab: function(cmp, evt, helper) {
-		helper.setActive(cmp, evt.getParam("active"), evt.getParam("focus"));
+	setActive: function(cmp, evt, helper) {
+		var params = evt.getParam('arguments');
+		helper.setActive(cmp, params.active, params.focus);
 	},
 	/**
 	 * Handler for event that's fired when user clicks on tab to activate
 	 */
 	onTabActivated: function(cmp) {
 		if($A.util.getBooleanValue("v.active")) {
-		    cmp.get('e.onActivate').fire();
+			cmp.get('e.onActivate').fire();
 		}
 	},
-	
+
 	close: function(cmp, evt) {
 		cmp.get("e.onClose").fire();
 		$A.util.squash(evt, true);
 	},
-	
+
 	onTabHover: function(cmp, evt, helper) {
 		helper.handleHoverEvent(cmp, 'onTabHover');
 	},
-	
+
 	onTabUnhover: function(cmp, evt, helper) {
 		helper.handleHoverEvent(cmp, 'onTabUnhover');
 	}

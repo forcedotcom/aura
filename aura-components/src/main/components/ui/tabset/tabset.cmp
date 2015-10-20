@@ -22,22 +22,20 @@
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated. The default is false." />
 
     <aura:attribute name="useOverflowMenu" type="Boolean" default="false" description="Provides an overflow menu if set to true. Set barWidth and tabItemWidth to determine the number of overflow items. For example, if barWidth is 600 and tabItemWidth is 200, then the number of visible tabs is 3 and the third contains overflow items. The default is false."/>
-    <aura:attribute name="barWidth" type="Integer" description="The total width of the tabs in pixels."/>
-    <aura:attribute name="tabItemWidth" type="Integer" description="The width of each tab in pixels."/>
     <aura:attribute name="overflowLabel" type="String" default="More" description="The text label that appears on the label. The default is &quot;More&quot;."/>
 
-<!--
-    <aura:method name="addTab" description="Add new tab.">
-        <aura:attribute name="index" type="Integer"/>
-    </aura:method>
-    <aura:method name="removeTab" description="Remove a tab.">
-        <aura:attribute name="index" type="Integer"/>
-    </aura:method>
-    <aura:method name="activateTab" description="Activate a tab.">
-        <aura:attribute name="index" type="Integer"/>
-    </aura:method>
-    <aura:method name="getActiveTab" description="Get the currently active tab."/>
--->
+    <!--
+        <aura:method name="addTab" description="Add new tab.">
+            <aura:attribute name="index" type="Integer"/>
+        </aura:method>
+        <aura:method name="removeTab" description="Remove a tab.">
+            <aura:attribute name="index" type="Integer"/>
+        </aura:method>
+        <aura:method name="activateTab" description="Activate a tab.">
+            <aura:attribute name="index" type="Integer"/>
+        </aura:method>
+        <aura:method name="getActiveTab" description="Get the currently active tab."/>
+    -->
 
     <!-- These should be aura methods instead -->
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="Add new tab to the component." />
@@ -54,15 +52,15 @@
     <aura:handler name="removeTab" action="{!c.removeTab}" />
     <aura:handler name="activateTab" action="{!c.activateTab}" />
     <aura:handler name="getActiveTab" action="{!c.getActiveTab}" />
-    
+
     <aura:dependency resource="markup://ui:tab" type="COMPONENT"/>
     <aura:dependency resource="markup://ui:tabItem" type="COMPONENT"/>
 
     <div class="{!v.class}" aura:id="tabContainer" aura:flavorable="true">
         <ui:tabBar aura:id="tabBar" tabs="{!v.tabItems}"
-           onTabActivated="{!c.onTabActivated}" onTabClosed="{!c.onTabClosed}"
-           useOverflowMenu="{!v.useOverflowMenu}" barWidth="{!v.barWidth}"
-           tabItemWidth="{!v.tabItemWidth}" overflowLabel="{!v.overflowLabel}"/>
+                   onTabActivated="{!c.onTabActivated}" onTabClosed="{!c.onTabClosed}"
+                   useOverflowMenu="{!v.useOverflowMenu}"
+                   overflowLabel="{!v.overflowLabel}"/>
 
         {!v.body}
     </div>

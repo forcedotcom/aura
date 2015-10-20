@@ -17,22 +17,21 @@
 -->
 <aura:component description="A list wrapper for tabs in a ui:tabset component">
     <aura:attribute name="tabs" type="List" description="List of tab configurations." />
+    <aura:attribute name="tabHeaders" type="Aura.Component[]" access="PRIVATE" />
     <aura:attribute name="class" type="String" description="CSS class" />
-    
+
     <aura:attribute name="useOverflowMenu" type="Boolean" default="false"
-    	description="Determines whether the tab bar should use an overflow menu. If true, and the total width of the tab items exceeds the specified bar width, a menu will be shown that includes the tabs that do not fit. Use in conjunction with barWidth and tabItemWidth"/>
+                    description="Determines whether the tab bar should use an overflow menu. If true, and the total width of the tab items exceeds the specified bar width, a menu will be shown that includes the tabs that do not fit. Use in conjunction with barWidth and tabItemWidth"/>
     <aura:attribute name="overflowLabel" type="String" default="More" description="Label to use for the overflow menu trigger."/>
-    <aura:attribute name="barWidth" type="Integer" description="Max fixed width of the tab bar, in pixels. Used for calculating how many tabs overflow. This attribute should reflect the width applied by the CSS."/>
-    <aura:attribute name="tabItemWidth" type="Integer" description="Fixed width of each tab item, in pixels. Used for calculating how many tabs overflow. This attribute should reflect the width applied by the CSS."/>
-    <aura:attribute name="overflowData" type="Object" access="PRIVATE" description="Internal object used to store overflow information"/>
-    
+    <aura:attribute name="overflowData" type="Map" default="{}" access="PRIVATE" description="Internal object used to store overflow information"/>
+
     <aura:registerevent name="setActive" type="ui:tabsetEvent" description="This event is fired from parent component to activate a tab item."/>
     <aura:registerevent name="addTab" type="ui:tabsetEvent" description="This event is fired from parent component to add a tab item." />
     <aura:registerevent name="closeTab" type="ui:tabsetEvent" description="This event is fired from parent component to close a tab item." />
     <aura:registerevent name="onTabClosed" type="ui:tabsetEvent" description="This event is fired when the close icon is clicked." />
     <aura:registerevent name="onTabActivated" type="ui:tabsetEvent" description="This event is fired when the tab item is clicked." />
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
-    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." /> 
+    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
 
     <aura:handler name="setActive" action="{!c.setActive}" />
     <aura:handler name="addTab" action="{!c.addTab}" />
@@ -40,11 +39,17 @@
 
     <aura:dependency resource="markup://ui:tabItem" />
     <aura:dependency resource="markup://ui:tabOverflowMenuItem" />
-    <aura:dependency resource="markup://aura:html" type="COMPONENT"/>
-    <aura:dependency resource="markup://ui:updateSize" type="EVENT"/>
+
+    <aura:if isTrue="{!v.useOverflowMenu}">
+        <ui:resizeObserver onresize="{!c.onResize}"/>
+    </aura:if>
 
     <div class="{!v.class}" aura:id="div" role="application tablist">
-	    <ul class="tabs__nav" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">
-	    </ul>
-	</div>
+        <ul class="tabs__nav" aura:id="tabItemsContainer" role="presentation" onkeydown="{!c.onKeyDown}">
+            {!v.tabHeaders}
+            <aura:if isTrue="{!v.useOverflowMenu}">
+                <ui:tabOverflowMenuItem aura:id="overflowMenu" title="{!v.overflowLabel}" onTabSelection="{!c.onOverflowSelection}" />
+            </aura:if>
+        </ul>
+    </div>
 </aura:component>

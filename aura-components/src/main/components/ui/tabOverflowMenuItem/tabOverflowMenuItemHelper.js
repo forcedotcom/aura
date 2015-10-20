@@ -16,7 +16,7 @@
 
 ({
 	handleHoverEvent: function(cmp, eventName) {
-		var event = cmp.getEvent(eventName);		
+		var event = cmp.getEvent(eventName);
 		// Set this tabItem component as a param in the event
 		var params = {
 			tabComponent : cmp
@@ -24,7 +24,7 @@
 		event.setParams(params);
 		event.fire();
 	},
-	
+
 	// TODO: possible to separate this out while still using similar scoping?
 	updateMenuItems : function(cmp) {
 		var self = this,
@@ -32,16 +32,16 @@
 			newMenuItems = cmp.get("v.menuItems"),
 			count = newMenuItems.length,
 			menuItemCache = this.getMenuItemCache(cmp);
-		
+
 		var callback = function(newMenuItem) {
 			count--;
 			newMenuItem.autoDestroy(false);
 			newMenuItem.addHandler("click", cmp, "c.onMenuSelection");
 			newMenuItem.addHandler("mouseover", cmp, "c.onHover");
-			
+
 			menuItems.push(newMenuItem);
 			menuItemCache[newMenuItem.get("v.id")] = newMenuItem;
-			
+
 			if (count === 0) {
 				self.updateMenuList(cmp, menuItems);
 			}
@@ -52,7 +52,7 @@
 		for (var i = 0; i < newMenuItems.length; i++) {
 			var id = newMenuItems[i].id,
 				title = newMenuItems[i].label;
-			
+
 			if (!menuItemCache[id]) {
 				$A.createComponent("ui:actionMenuItem", {
 					"label" : title || id,
@@ -63,26 +63,28 @@
 				count--;
 			}
 		}
-		
+
 		if (count === 0) {
 			this.updateMenuList(cmp, menuItems);
 		}
-		
+
 		cmp.set("v.menuItemCache", menuItemCache, true);
 	},
-	
+
 	getMenuItemCache: function(cmp) {
 		return cmp.get("v.menuItemCache") || {};
 	},
-	
+
 	updateMenuList: function(cmp, menuItems) {
-		cmp.find('menuList').set("v.body", menuItems);
-		cmp.find('menuList').get("e.refresh").fire();
+		if (cmp.isValid()) {
+			cmp.find('menuList').set("v.body", menuItems);
+			cmp.find('menuList').get("e.refresh").fire();
+		}
 	},
-	
+
 	/**
 	 * Fire an event to activate the specified tab.
-	 * 
+	 *
 	 * @param {Component} cmp
 	 * @param {String} name
 	 * @param {Number} index
@@ -90,15 +92,15 @@
 	 */
 	triggerTab: function(cmp, name, index, focus) {
 		var params = {
-				name : name,
-				index : index,
-				focus : focus
+			name : name,
+			index : index,
+			focus : focus
 		};
-		
+
 		if (focus) {
 			cmp.set("v.focusedItemName", null, true);
 		}
-		
+
 		cmp.get("e.onTabSelection").setParams(params).fire();
 	}
 })// eslint-disable-line semi

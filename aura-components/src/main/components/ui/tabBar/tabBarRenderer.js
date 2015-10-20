@@ -19,16 +19,12 @@
         helper.setTabItems(cmp);
         return this.superRender();
     },
-    
+
     afterRender: function(cmp, helper) {
-    	if (cmp.get("v.useOverflowMenu")) {
-    		var maxTabs = helper.calculateMaxTabs(cmp),
-    			startIndex = helper.calculateOverflowStartIndex(cmp, maxTabs);
-    		if (startIndex > -1 && !helper.overflowIsInitialized(cmp)) {
-    			helper.initializeOverflowData(cmp, startIndex);
-    		}
-    	}
-    	return this.superAfterRender();
+        if (cmp.get("v.useOverflowMenu")) {
+            helper.initializeOverflowData(cmp);
+        }
+        this.superAfterRender();
     },
 
     rerender: function (cmp, helper) {

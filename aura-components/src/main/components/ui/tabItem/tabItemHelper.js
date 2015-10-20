@@ -19,20 +19,38 @@
         cmp.set("v.active", active);
 
         if (active) {
-            var itemEl = cmp.find("tabItem").getElement();
+            var itemEl = this.getTabItemElement(cmp);
             if (itemEl && focus) {
                 itemEl.focus();
             }
         }
-	},
-	
-	handleHoverEvent: function(cmp, eventName) {
-		var event = cmp.getEvent(eventName);		
-		// Set this tabItem component as a param in the event
-		var params = {
-			tabComponent : cmp
-		};
-		event.setParams(params);
-		event.fire();
-	}
+    },
+
+    getTabItemElement: function (cmp) {
+        var p = cmp;
+        var id = "tabItem";
+        var container = cmp.find(id);
+        while (!container && p.isInstanceOf("ui:tabItem")) {
+            p = p.getSuper();
+            container = p.find(id);
+        }
+        return container ? container.getElement() : null;
+    },
+
+    handleHoverEvent: function (cmp, eventName) {
+        var event = cmp.getEvent(eventName);
+        // Set this tabItem component as a param in the event
+        var params = {
+            tabComponent: cmp
+        };
+        event.setParams(params);
+        event.fire();
+    },
+
+    initWidth: function (cmp) {
+        var el = cmp.getElement();
+        var style = window.getComputedStyle(el, '');
+        var width = parseFloat(style.marginLeft) + parseFloat(style.marginRight) + el.offsetWidth;
+        $A.util.setDataAttribute(el, "original-width", width);
+    }
 })// eslint-disable-line semi

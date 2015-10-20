@@ -41,7 +41,7 @@
         </ui:tabset>
         
         <h1>Basic tabs with Overflow</h1>
-        <ui:tabset aura:id="overflowTabs" class="tabset overflowTabset" lazyRenderTabs="{!true}" useOverflowMenu="true" barWidth="600" tabItemWidth="200">
+        <ui:tabset aura:id="overflowTabs" class="tabset overflowTabset" lazyRenderTabs="{!true}" useOverflowMenu="true">
         	<ui:tab title="Short Text">
                 <a href="http://salesforce.com">Salesforce.com</a>
                 <ui:inputText label="My Input Text" value="" placeholder="input text here" />

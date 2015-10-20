@@ -16,40 +16,45 @@
 
 -->
 <aura:component description="A tab that is rendered by the ui:tabBar component for its overflow menu">
-	<aura:attribute name="class" type="String" description="The class to apply to the tab item"/>
-	<aura:attribute name="title" type="String" description="The text to display on the tab."/>
+    <aura:attribute name="class" type="String" description="The class to apply to the tab item"/>
+    <aura:attribute name="title" type="String" description="The text to display on the tab."/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="iconClass" type="String" description="The CSS style used to display the icon on the tab."/>
     <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
-    
+
     <aura:attribute name="menuItems" type="Object[]" description="List of objects that represent the menu items to be generated. Should be of the form {id: String, label: String}"/>
     <aura:attribute name="menuItemCache" type="Object" access="PRIVATE" />
     <aura:attribute name="focusedItemName" type="String" access="PRIVATE" />
 
-	<aura:registerEvent name="activateTab" type="ui:tabsetEvent" description="The event is fired to activate the tab."/>
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
-    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." /> 
+    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
     <aura:registerEvent name="onTabSelection" type="ui:tabsetEvent" description="The event is fired when a tab from the overflow menu is selected."/>
-     
-    <aura:handler name="activateTab" action="{!c.activateMenu}" />
+
+    <aura:dependency resource="markup://ui:actionMenuItem" />
+
+    <aura:method name="setActive" action="{!c.activateMenu}" access="PUBLIC" description="Set the tab item to active or inactive">
+        <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
+        <aura:attribute name="index" type="Integer" description="which menu item to focuse."/>
+    </aura:method>
+
     <aura:handler name="change" value="{!v.menuItems}" action="{!c.updateMenuItems}"/>
-    
+
     <li aura:id="li" class="{!v.class + ' tabs__item'}" role="presentation">
-	    <ui:menu aura:id="menu">
-	    	<ui:menuTrigger aura:id="trigger">
-	    		<a class="tabHeader" aura:id="tabItem"
-           			onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onblur="{!c.onTabUnhover}"
-            		aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" tabindex="-1" role="tab">
-            		<span>{!v.title}</span>
-            		<span class="{!v.iconClass}">{!v.icon}</span>
-            	</a>
-	    	</ui:menuTrigger>
-	    	<ui:tabOverflowMenuList aura:id="menuList" menuFocusChange="{!c.focusChange}" menuCollapse="{!c.onCollapse}"
-	   				forwardWrap="{!c.handleForwardWrap}" reverseWrap="{!c.handleReverseWrap}">
-	    		
-	    	</ui:tabOverflowMenuList>
-	    </ui:menu>
+        <ui:menu aura:id="menu">
+            <ui:menuTrigger aura:id="trigger">
+                <a class="tabHeader" aura:id="tabItem"
+                   onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onblur="{!c.onTabUnhover}"
+                   aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" tabindex="-1" role="tab">
+                    <span class="title">{!v.title}</span>
+                    <span class="{!v.iconClass}">{!v.icon}</span>
+                </a>
+            </ui:menuTrigger>
+            <ui:tabOverflowMenuList aura:id="menuList" menuFocusChange="{!c.focusChange}" menuCollapse="{!c.onCollapse}"
+                                    forwardWrap="{!c.handleForwardWrap}" reverseWrap="{!c.handleReverseWrap}">
+
+            </ui:tabOverflowMenuList>
+        </ui:menu>
     </li>
-     
+
 </aura:component>

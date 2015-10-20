@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 .THIS {
-    list-style: none;
-    white-space: nowrap;
+	list-style: none;
+	white-space: nowrap;
+	display: table-cell;
 }
 
 .THIS a {
-    display: block;
-    text-decoration: none;
+	display: block;
+	text-decoration: none;
 }
 
 .THIS .close {

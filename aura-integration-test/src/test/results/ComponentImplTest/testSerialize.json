@@ -1,7 +1,9 @@
 {
   "s":1,
   "v":{
-    "componentDef":"markup://test:parent",
+    "componentDef":{
+      "descriptor":"markup://test:parent"
+    },
     "creationPath":"/*[0]"
   }
 }

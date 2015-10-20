@@ -208,6 +208,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["mode"] !== this.getMode()) {
         throw new Error("[Mode mismatch] Expected '" + this.getMode() + "' instead tried to merge mode '" + otherContext["mode"] + "'");
     }
+
     if ($A.util.isUndefinedOrNull(this.fwuid)) {
         this.fwuid = otherContext["fwuid"];
     }
@@ -217,7 +218,7 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     this.globalValueProviders.merge(otherContext["globalValueProviders"]);
     $A.localizationService.init();
     
-    if(otherContext["libraryDefs"]) {
+    if (otherContext["libraryDefs"]) {
         defs = otherContext["libraryDefs"];
         for (i = 0; i < defs.length; i++) {
             $A.componentService.createLibraryDef(defs[i]);
@@ -227,13 +228,13 @@ Aura.Context.AuraContext.prototype.merge = function(otherContext) {
     if (otherContext["componentDefs"]) {
         defs = otherContext["componentDefs"];
         for (i = 0; i < defs.length; i++) {
-            // only create when component def is an object with descriptor key
             // there are occasions when defs are just references (descriptor name)
             if (defs[i]["descriptor"]) {
-                $A.componentService.createDef(defs[i]);
+                $A.componentService.createComponentDef(defs[i]);
             }
         }
     }
+
     if (otherContext["eventDefs"]) {
         defs = otherContext["eventDefs"];
         for (i = 0; i < defs.length; i++) {

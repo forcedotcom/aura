@@ -27,10 +27,8 @@
 function ComponentDef(config) {
     var descriptor = new DefDescriptor(config["descriptor"]);
     this.descriptor = descriptor;
-    if (config["hasServerDeps"]) {
-        this.hasRemoteDeps = true;
-    }
-    this.access=config[Json.ApplicationKey.ACCESS];
+    this.hasRemoteDeps = config["hasServerDeps"] || false;
+    this.access = config[Json.ApplicationKey.ACCESS];
     delete config[Json.ApplicationKey.ACCESS];
 
     this.superDef = this.initSuperDef(config["superDef"]);
@@ -651,18 +649,11 @@ ComponentDef.prototype.getLayouts = function() {
  */
 ComponentDef.prototype.initSuperDef = function(config) {
     if (config) {
-        var descriptor = config;
-        if (config["descriptor"]) {
-            descriptor = config["descriptor"];
-        }
-        // config could either be for a new component or for an existing def so we need to check first
-        var sDef = $A.componentService.getComponentDef(descriptor);
-        if (!sDef) {
-            sDef = $A.componentService.createDef(config);
-        }
-        $A.assert(sDef, "Super def undefined for " + this.descriptor + " value = " + descriptor);
+        var sDef = $A.componentService.createComponentDef(config);
+        $A.assert(sDef, "Super def undefined for " + this.descriptor + " value = " + config["descriptor"]);
         return sDef;
     }
+
     return null;
 };
 

@@ -64,10 +64,11 @@ public class PreloadNameSpaceHttpTest extends AuraHttpTestCase {
         Map<String, Object> action = (Map<String, Object>) actions.get(0);
         Map<String, Object> returnValue = (Map<String, Object>) action.get("returnValue");
         Map<String, Object> value = (Map<String, Object>) returnValue.get(Json.ApplicationKey.VALUE.toString());
-        String componentDef = (String)value.get("componentDef");
+        Map<String, Object> def = (Map<String, Object>) value.get("componentDef");
+        String descriptor = (String) def.get("descriptor");
 
         // Verify that Descriptor was the only value sent back as part of the componentDef
-        assertEquals(componentDef, "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
+        assertEquals(descriptor, "markup://preloadTest:test_Preload_Cmp_SameNameSpace");
     }
 
     /**

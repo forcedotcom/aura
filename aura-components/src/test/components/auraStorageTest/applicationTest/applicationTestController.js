@@ -14,7 +14,7 @@
             {
                 'components': [], // components is undefined instead is real response
                 'returnValue': {
-                    'componentDef': "markup://auraStorageTest:applicationTest",
+                    'componentDef': { "descriptor" : "markup://auraStorageTest:applicationTest"},
                     'creationPath': "/*[0]"
                 },
                 'storage': {

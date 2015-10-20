@@ -327,7 +327,11 @@ BaseComponent<D, I> {
             // This is 'case normalizing', as the client is actually case
             // sensitive for descriptors (ugh!).
             //
-            json.writeMapEntry("componentDef", def.getDescriptor());
+            json.writeMapKey("componentDef");
+        	json.writeMapBegin();
+        	json.writeMapEntry("descriptor", def.getDescriptor());
+        	json.writeMapEnd();
+            
             if (!descriptor.equals(originalDescriptor)) {
                 json.writeMapEntry("original", originalDescriptor);
             }

@@ -97,24 +97,21 @@ window['$A'] = {};
 // #include aura.value.ExpressionFunctions
 
 // -- Model -------------------------------------------------------------
-// #include aura.model.ModelDefRegistry
 // #include aura.model.ValueDef
 // #include aura.model.ModelDef
 // #include aura.model.Model
 
 // -- Component ---------------------------------------------------------
-// #include aura.component.ComponentDefRegistry
+// #include aura.component.ComponentDefStorage
 // #include aura.component.Component
 // #include aura.component.InvalidComponent
 // #include aura.component.ComponentDef
 
 // -- Renderer ----------------------------------------------------------
 // #include aura.renderer.RendererDef
-// #include aura.renderer.RendererDefRegistry
 
 // -- Provider ----------------------------------------------------------
 // #include aura.provider.ProviderDef
-// #include aura.provider.ProviderDefRegistry
 // #include aura.provider.GlobalValueProviders
 // #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
@@ -122,7 +119,6 @@ window['$A'] = {};
 // #include aura.provider.ContextValueProvider
 
 // -- Helper -------------------------------------------------------------
-// #include aura.helper.HelperDefRegistry
 // #include aura.helper.HelperDef
 
 // -- Library ------------------------------------------------------------
@@ -137,8 +133,6 @@ window['$A'] = {};
 // #include aura.controller.ActionDef
 // #include aura.controller.Action
 // #include aura.controller.ControllerDef
-// #include aura.controller.ControllerDefRegistry
-// #include aura.controller.ActionDefRegistry
 
 // -- Attribute ----------------------------------------------------------
 // #include aura.attribute.AttributeDef
@@ -531,20 +525,16 @@ function AuraInstance () {
  */
 AuraInstance.prototype.initAsync = function(config) {
 
-    //
-    // we don't handle components that come back here. This is used in the case where there
-    // are none.
-    //
-    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {
-        // This juicy tidbit is for the sync version.
+    // Context is created async because of the GVPs go though async storage checks
+    $A.context = new Aura.Context.AuraContext(config["context"], function(context) {         
+
         $A.context = context;
         $A.clientService.initHost(config["host"]);
         $A.setLanguage();
+
         $A.metricsService.initialize();
-        $A.clientService.loadComponent(config["descriptor"], config["attributes"], function(resp) {
-            $A.metricsService.bootstrapMark("metadataReady");
-            $A.initPriv(resp);
-        }, config["deftype"]);
+
+        $A.clientService.loadComponent(config["descriptor"], config["attributes"], $A.initPriv, config["deftype"]);
     });
 };
 
@@ -596,30 +586,32 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
  * @private
  */
 AuraInstance.prototype.initPriv = function(config, token, container, doNotInitializeServices) {
+    $A.metricsService.bootstrapMark("metadataReady"); // we have loaded the app tree from the server
+
     if (!$A["hasErrors"]) {
-        var cmp = $A.clientService["init"](config, token, container ? $A.util.getElement(container) : null);
-        $A.setRoot(cmp);
+        var app = $A.clientService["init"](config, token, $A.util.getElement(container));
+        $A.setRoot(app);
 
         if (!$A.initialized) {
             // restore component definitions from AuraStorage into memory
-            $A.componentService.registry.restoreAllFromStorage();
+            $A.componentService.restoreDefsFromStorage();
 
             // add default handler to aura:systemError event
             $A.eventService.addHandler({
                 'event': 'aura:systemError',
-                'globalId': cmp.getGlobalId(),
+                'globalId': app.getGlobalId(),
                 'handler': function(event) {
                     if (event["handled"]) {
                         return;
                     }
 
                     $A.message(event.getParam("message"));
-
                     event["handled"] = true;
                  }});
 
             $A.initialized = true;
         }
+
         $A.finishInit();
 
         // After App initialization is done

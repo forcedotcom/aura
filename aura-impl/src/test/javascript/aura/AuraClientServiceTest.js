@@ -907,12 +907,10 @@ Test.Aura.AuraClientServiceTest = function() {
         var mockLocation = { reload: function() {} };
 
         var mockComponentService = {
-            registry: {
-                clearStorage: function() {
-                    componentDefsClearCalled = true;
-                    return {
-                        then: function() {}
-                    }
+            clearDefsFromStorage: function() {
+                componentDefsClearCalled = true;
+                return {
+                    then: function() {}
                 }
             }
         };

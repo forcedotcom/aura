@@ -35,6 +35,7 @@ function Component(config, localCreation, creatingPrototype) {
         return;
     }
 
+
     // setup some basic things
     this.concreteComponentId = config["concreteComponentId"];
     this.shouldAutoDestroy=true;
@@ -59,7 +60,6 @@ function Component(config, localCreation, creatingPrototype) {
 
     if (act) {
         var currentPath = act.topPath();
-
         if (config["creationPath"]) {
             //
             // This is a server side config, so we need to sync ourselves with it.
@@ -71,7 +71,6 @@ function Component(config, localCreation, creatingPrototype) {
             this.creationPath = act.forceCreationPath(config["creationPath"]);
             forcedPath = true;
         } else if (!context.containsComponentConfig(currentPath) && !!localCreation) {
-
             // skip creation path if the current top path is not in server returned
             // componentConfigs and localCreation
 
@@ -84,6 +83,7 @@ function Component(config, localCreation, creatingPrototype) {
 
     // create the globally unique id for this component
     this.setupGlobalId(config["globalId"], localCreation);
+
 
     var partialConfig;
     if (this.creationPath && this.creationPath !== "client created") {
@@ -111,22 +111,21 @@ function Component(config, localCreation, creatingPrototype) {
     // sets this components definition, preferring partialconfig if it exists
     this.setupComponentDef(this.partialConfig || config);
 
-    // join attributes from partial config and config, preferring
-    // partial when overlapping
-    var configAttributes = {"values":{}};
+    // join attributes from partial config and config, preferring partial when overlapping
+    var configAttributes = { "values": {} };
+
     if (config["attributes"]) {
-        $A.util.apply(configAttributes["values"], config["attributes"]["values"],true);
+        $A.util.apply(configAttributes["values"], config["attributes"]["values"], true);
         configAttributes["valueProvider"] = config["attributes"]["valueProvider"] || config["valueProvider"];
     }
+
     if (partialConfig && partialConfig["attributes"]) {
-        $A.util.apply(configAttributes["values"],partialConfig["attributes"]["values"],true);
+        $A.util.apply(configAttributes["values"], partialConfig["attributes"]["values"], true);
         // NOTE: IT USED TO BE SOME LOGIC HERE TO OVERRIDE THE VALUE PROVIDER BECAUSE OF PARTIAL CONFIGS
         // IF WE RUN INTO ISSUES AT SOME POINT AFTER HALO, LOOK HERE FIRST!
     }
-    if(!configAttributes["values"]){
-        configAttributes["values"] = {};
-    }
-    if(!configAttributes["facetValueProvider"]){
+
+    if (!configAttributes["facetValueProvider"]) {
         configAttributes["facetValueProvider"] = this;
     }
 
@@ -135,7 +134,7 @@ function Component(config, localCreation, creatingPrototype) {
     this.facetValueProvider = configAttributes["facetValueProvider"];
 
     // initialize attributes
-    this.setupAttributes(this, configAttributes, localCreation);
+    this.setupAttributes(this, configAttributes);
 
     // instantiates this components model
     this.setupModel(config["model"], this);
@@ -143,8 +142,7 @@ function Component(config, localCreation, creatingPrototype) {
     // create all value providers for this component m/v/c etc.
     this.setupValueProviders(config["valueProviders"]);
 
-    // runs component provider and replaces this component with the
-    // provided one
+    // runs component provider and replaces this component with the provided one
     this.injectComponent(config, this, localCreation);
 
     // instantiates this components methods
@@ -178,14 +176,11 @@ function Component(config, localCreation, creatingPrototype) {
         act.releaseCreationPath(this.creationPath);
     }
 
-
     this._destroying = false;
-
     this.fire("init");
 }
 
-Component.currentComponentId=0;
-
+Component.currentComponentId = 0;
 
 Component.prototype.nextGlobalId = function(localCreation) {
     if (!localCreation) {
@@ -208,18 +203,14 @@ Component.prototype.nextGlobalId = function(localCreation) {
     }
 };
 
-
 /**
  * The globally unique id of this component
  */
 Component.prototype.setupGlobalId = function(globalId, localCreation) {
-    if (!globalId || !localCreation) {
-        globalId = this.nextGlobalId(localCreation);
-    }
+    globalId = globalId || this.nextGlobalId(localCreation);
 
-    var old = $A.componentService.get(globalId);
-    if (old) {
-        $A.log("Component.setupGlobalId: globalId already in use: '"+globalId+"'.");
+    if ($A.componentService.get(globalId)) {
+        $A.log("Component.setupGlobalId: globalId already in use: '" + globalId + "'.");
     }
 
     this.globalId = globalId;
@@ -1732,8 +1723,8 @@ Component.prototype.setupComponentDef = function(config) {
     this.componentDef = componentDef;
 };
 
-Component.prototype.createComponentStack = function(facets,valueProvider,localCreation){
-    var facetStack={};
+Component.prototype.createComponentStack = function(facets, valueProvider){
+    var facetStack = {};
     for (var i = 0; i < facets.length; i++) {
         var facet = facets[i];
         var facetName = facet["descriptor"];
@@ -1746,25 +1737,34 @@ Component.prototype.createComponentStack = function(facets,valueProvider,localCr
         if (action) {
             action.pushCreationPath(facetName);
         }
-        var components=[];
+        var components = [];
         for (var index = 0; index < facetConfig.length; index++) {
             var config = facetConfig[index];
-
             if (config instanceof Component) {
                 components.push(config);
             } else if (config && config["componentDef"]) {
                 if (action) {
                     action.setCreationPathIndex(index);
                 }
+
                 $A.getContext().setCurrentAccess(valueProvider);
-                components.push($A.componentService["newComponentDeprecated"](config, (config["attributes"]&&config["attributes"]["valueProvider"])||valueProvider, localCreation, true));
+
+                var facetConfigAttr = { "values": {} };
+                var facetConfigClone = $A.util.apply({}, config);
+
+                if (facetConfigClone["attributes"]) {
+                    $A.util.apply(facetConfigAttr["values"], config["attributes"]["values"], true);
+                } else {
+                    facetConfigClone["attributes"] = {};
+                }
+
+                facetConfigAttr["valueProvider"] = (config["attributes"] && config["attributes"]["valueProvider"]) || valueProvider;
+                facetConfigClone["attributes"] = facetConfigAttr;
+                
+                components.push($A.componentService.createComponentPriv(facetConfigClone));
                 $A.getContext().releaseCurrentAccess();
             } else {
-                // KRIS: HALO:
-                // This is hit, when you create a newComponentDeprecated and use raw values, vs configs on the attribute values.
-                // newComponentDeprecated("ui:button", {label: "Foo"});
-
-                // JBUCH: HALO: TODO: VERIFY THIS IS NEVER HIT
+                // KRIS: HALO: This is hit, when you create a newComponentDeprec and use raw values, vs configs on the attribute values.
                 throw new $A.auraError("Component.createComponentStack: invalid config. Expected component definition, found '"+config+"'.");
             }
         }
@@ -1777,23 +1777,24 @@ Component.prototype.createComponentStack = function(facets,valueProvider,localCr
 };
 
 
-Component.prototype.setupSuper = function(configAttributes, localCreation) {
+Component.prototype.setupSuper = function(configAttributes) {
     var superDef = this.componentDef.getSuperDef();
+
     if (superDef) {
-        var superConfig = {};
-        var superDefConfig = {};
-        superDefConfig["descriptor"] = superDef.getDescriptor();
-        superConfig["componentDef"] = superDefConfig;
+        var superConfig     = {};
+        var superAttributes = {};
+
+        superConfig["componentDef"] = { "descriptor" : superDef.getDescriptor().toString() };
         superConfig["concreteComponentId"] = this.concreteComponentId || this.globalId;
 
-        var superAttributes = {};
-        if(configAttributes) {
-            superAttributes["values"]={}; // configAttributes["values"]||{};
-            var facets=this.componentDef.getFacets();
-            if(facets) {
+        if (configAttributes) {
+            superAttributes["values"] = {};
+            var facets = this.componentDef.getFacets();
+
+            if (facets) {
                 for (var i = 0; i < facets.length; i++) {
-                    var facetDef=AttributeSet.getDef(facets[i]["descriptor"],this.componentDef);
-                    if(!$A.clientService.allowAccess(facetDef[0],facetDef[1])) {
+                    var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
+                    if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
                         // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
                         $A.warning("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
                         // #end
@@ -1802,13 +1803,17 @@ Component.prototype.setupSuper = function(configAttributes, localCreation) {
                     superAttributes["values"][facets[i]["descriptor"]] = facets[i]["value"];
                 }
             }
+
             superAttributes["events"] = configAttributes["events"];
             superAttributes["valueProvider"] = configAttributes["facetValueProvider"];
         }
+
         superConfig["attributes"] = superAttributes;
+
         $A.pushCreationPath("super");
         $A.getContext().setCurrentAccess(this);
-        this.setSuperComponent($A.componentService["newComponentDeprecated"](superConfig, null, localCreation, true));
+
+        this.setSuperComponent($A.componentService.createComponentPriv(superConfig));
         $A.getContext().releaseCurrentAccess();
         $A.popCreationPath("super");
     }
@@ -1873,7 +1878,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         var isFacet = attributeDef.getTypeDefDescriptor() === "aura://Aura.Component[]";
         var isDefRef = attributeDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]";
 
-// JBUCH: HALO: TODO: WHY DO WE NEED/ALLOW THIS?
+        // JBUCH: HALO: TODO: WHY DO WE NEED/ALLOW THIS?
         if ($A.componentService.isConfigDescriptor(value)) {
             value = value["value"];
         }

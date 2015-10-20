@@ -1,7 +1,9 @@
 {
   "s":1,
   "v":{
-    "componentDef":"markup://test:test_Provider_providerImpl3",
+    "componentDef":{
+      "descriptor":"markup://test:test_Provider_providerImpl3"
+    },
     "original":"markup://test:test_Provider_Interface",
     "creationPath":"/*[0]",
     "attributes":{

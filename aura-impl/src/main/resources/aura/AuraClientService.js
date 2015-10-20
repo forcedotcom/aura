@@ -721,7 +721,7 @@ AuraClientService.prototype.handleAppCache = function() {
         }
 
         // reload even if storage clear fails
-        $A.componentService.registry.clearStorage().then(
+        $A.componentService.clearDefsFromStorage().then(
             function() { window.location.reload(true); },
             function() { window.location.reload(true); }
         );
@@ -938,13 +938,10 @@ AuraClientService.prototype.init = function(config, token, container) {
             this._token = token;
         }
 
-        var component = $A.componentService["newComponentDeprecated"](config, null, false, true);
+        var component = $A.componentService.createComponentPriv(config);
         $A.getContext().setCurrentAccess(component);
-
-
         $A.renderingService.render(component, container || document.body);
         $A.renderingService.afterRender(component);
-
 
         return component;
 
@@ -1064,23 +1061,20 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             $A.log("AuraClientService.loadComponent(): failed to load token: " + err);
         }
     );
+
     this.runAfterInitDefs(function () {
         $A.run(function () {
-            var desc = new DefDescriptor(descriptor);
-            var tag = desc.getNamespace() + ":" + desc.getName();
-
+            var desc   = new DefDescriptor(descriptor);
+            var tag    = desc.getNamespace() + ":" + desc.getName();
             var method = defType === "APPLICATION" ? "getApplication" : "getComponent";
             var action = $A.get("c.aura://ComponentController." + method);
 
-            if(acs._useBootstrapCache) {
-                action.setStorable({
-                    "refresh": 0
-                });
+            if (acs._useBootstrapCache) {
+                action.setStorable({ "refresh": 0 });
             } else {
-                action.setStorable({
-                    "ignoreExisting": true
-                });
+                action.setStorable({ "ignoreExisting": true });
             }
+
             //
             // No, really, do not abort this. The setStorable above defaults this
             // to be abortable, but, even though nothing should ever trigger an action
@@ -1089,12 +1083,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             //
             action.setAbortable(false);
 
-            action.setParams({
-                "name": tag,
-                "attributes": attributes,
-                "chainLoadLabels": true
-            });
-
+            action.setParams({ "name": tag, "attributes": attributes, "chainLoadLabels": true });
             //
             // we use stored and loaded here to track the various race conditions and prevent
             // them.
@@ -1105,8 +1094,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
             // * loaded truthy means we have initialized.
             //
             var stored = false;
-            var loaded = undefined;
             var storage = Action.prototype.getStorage();
+            var loaded;
 
             var failCallback = function (force, err) {
                 //

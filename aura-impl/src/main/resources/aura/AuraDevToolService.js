@@ -70,22 +70,22 @@ var AuraDevToolService = function() {
                 return flattenRegistry($A.services.component.indexes.globalId);
             },
             "componentDef" : function(){
-                return flattenRegistry($A.services.component.registry.componentDefs);
+                return flattenRegistry($A.services.component.componentDefRegistry);
             },
             "controllerDef" : function(){
-                return flattenRegistry($A.services.component.controllerDefRegistry.controllerDefs);
+                return flattenRegistry($A.services.component.controllerDefRegistry);
             },
             "modelDef" : function(){
-                return flattenRegistry($A.services.component.modelDefRegistry.modelDefs);
+                return flattenRegistry($A.services.component.modelDefRegistry);
             },
             "providerDef" : function(){
-                return flattenRegistry($A.services.component.providerDefRegistry.providerDefs);
+                return flattenRegistry($A.services.component.providerDefRegistry);
             },
             "rendererDef" : function(){
-                return flattenRegistry($A.services.component.rendererDefRegistry.rendererDefs);
+                return flattenRegistry($A.services.component.rendererDefRegistry);
             },
             "helperDef" : function(){
-                return flattenRegistry($A.services.component.helperDefRegistry.helperDefs);
+                return flattenRegistry($A.services.component.helperDefRegistry);
             }
 //#if {"modes" : ["STATS"]}
             ,

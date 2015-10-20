@@ -1098,7 +1098,7 @@ AuraComponentService.prototype.createHelperDef = function(componentDef, librarie
  * @returns {Object} library from registry
  * @private
  */
-AuraComponentService.prototype.getLibraryDef = function(descriptor, libraryDef){
+AuraComponentService.prototype.getLibraryDef = function(descriptor) {
     return this.libraryDefRegistry.getDef(descriptor);
 };
 

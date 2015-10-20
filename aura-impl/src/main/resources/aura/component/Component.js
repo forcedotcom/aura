@@ -1723,7 +1723,7 @@ Component.prototype.setupComponentDef = function(config) {
     this.componentDef = componentDef;
 };
 
-Component.prototype.createComponentStack = function(facets, valueProvider, localCreation){
+Component.prototype.createComponentStack = function(facets, valueProvider){
     var facetStack = {};
     for (var i = 0; i < facets.length; i++) {
         var facet = facets[i];
@@ -1777,7 +1777,7 @@ Component.prototype.createComponentStack = function(facets, valueProvider, local
 };
 
 
-Component.prototype.setupSuper = function(configAttributes, localCreation) {
+Component.prototype.setupSuper = function(configAttributes) {
     var superDef = this.componentDef.getSuperDef();
 
     if (superDef) {

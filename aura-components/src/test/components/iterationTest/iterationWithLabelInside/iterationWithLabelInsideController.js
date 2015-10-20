@@ -15,9 +15,9 @@
  */
 ({
     dataChange : function (cmp) {
-        $A.logf("cmp data change "+cmp.getGlobalId());
+        $A.log("cmp data change "+cmp.getGlobalId());
     },
     onDestroy : function (cmp) {
-        $A.logf("cmp destroy"+cmp.getGlobalId());
+        $A.log("cmp destroy"+cmp.getGlobalId());
     }
 })

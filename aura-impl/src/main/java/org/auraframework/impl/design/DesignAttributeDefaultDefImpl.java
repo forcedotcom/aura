@@ -32,6 +32,8 @@ import java.util.List;
  * Used to define a facet attributes default markup.
  */
 public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttributeDefaultDef> implements DesignAttributeDefaultDef {
+    private static final long serialVersionUID = 7728564360281471637L;
+
     private final List<ComponentDefRef> defaultFacet;
 
     protected DesignAttributeDefaultDefImpl(Builder builder) {

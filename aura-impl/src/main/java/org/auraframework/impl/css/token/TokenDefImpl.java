@@ -34,7 +34,6 @@ import com.salesforce.omakase.data.Property;
 public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements TokenDef {
     private static final String INVALID_NAME = "Invalid token name: '%s'";
     private static final String MISSING_VALUE = "Missing required attribute 'value'";
-    private static final String UNKNOWN_PROPERTY = "Unknown CSS property '%s'";
     private static final long serialVersionUID = 344237166606014917L;
 
     private final Object value;

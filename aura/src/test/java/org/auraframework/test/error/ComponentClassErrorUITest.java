@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.integration.test.components;
+package org.auraframework.test.error;
 
 import java.util.List;
 

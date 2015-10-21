@@ -51,6 +51,10 @@
         });
     },
     
+    getRidOfWhiteSpace : function(string) {
+    	return string.replace(/\s+/gm, '').replace(/^ | $/gm, '');
+    },
+    
     /**
      * test click on add before
      */
@@ -58,14 +62,17 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
                     var newText = this.getNewListTextAfterAddBefore("purple blue green yellow orange red", 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to front of default list not showing up in DOM.");
+                    newText = this.getRidOfWhiteSpace(newText);
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                    function() {
+                    	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                        var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                        return that.getRidOfWhiteSpace(outputDivText) === newText ;
+                    },
+                    "list with new items added to front of default list not showing up in DOM."
+                    );
                 } ]
     },
 
@@ -77,6 +84,7 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
+                    //replace this waitForBodyUpdate to addWaitForXXX like other test when enable this one
                     this.waitForBodyUpdate(cmp);
                 },
                 function(cmp) {
@@ -95,14 +103,16 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
-                    var newText = this.getNewListTextAfterAddInside("purple blue green", "yellow orange red", 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to middle of default list not showing up in DOM.");
+                    var newText = this.getRidOfWhiteSpace(this.getNewListTextAfterAddInside("purple blue green", "yellow orange red", 1));
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === newText ;
+                            },
+                            "list with new items added to middle of default list not showing up in DOM."
+                            );
                 } ]
     },
 
@@ -113,14 +123,16 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
-                    var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red", 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to end of default list not showing up in DOM.");
+                    var newText = this.getRidOfWhiteSpace(this.getNewListTextAfterAddAfter("purple blue green yellow orange red", 1))
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === newText ;
+                            },
+                            "list with new items added to end of default list not showing up in DOM."
+                     );
                 } ]
     },
 
@@ -132,6 +144,7 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
+                    //replace this waitForBodyUpdate to addWaitForXXX like other test when enable this one
                     this.waitForBodyUpdate(cmp);
                 },
                 function(cmp) {
@@ -151,89 +164,137 @@
         test : [
                 function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
                     var newText = this.getNewListTextAfterAddAfter("purple blue green yellow orange red", 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to end of list #1 not showing up in DOM.");
-                    this.shareTextBetweenTests = newText;
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to end of list #1 not showing up in DOM.",
+                            function() {
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
+                },
+                function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
                     var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to end of list #2 not showing up in DOM.");
-                    this.shareTextBetweenTests = newText;
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to end of list #2 not showing up in DOM.",
+                            function() {
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
+                },
+                function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
                     var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to beginning of list #1 not showing up in DOM.");
-                    this.shareTextBetweenTests = newText;
-                    $A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
-                    this.waitForBodyUpdate(cmp);
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to beginning of list #1 not showing up in DOM.",
+                            function() {
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
                 },
                 function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                    $A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
                     var oldText = this.shareTextBetweenTests;
                     // "ultra-violet 1 ultra-violet 2 purple blue green", no space after green
                     var oldText1 = oldText.substr(0, oldText.indexOf('yellow') - 1);
                     // "yellow orange red infra-red 1 infra-red 2 infra-red 1 infra-red 2", no space before yellow
                     var oldText2 = oldText.substr(oldText.indexOf('yellow'), oldText.length);
                     var newText = this.getNewListTextAfterAddInside(oldText1, oldText2, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to middle of list #1 not showing up in DOM.");
-                    // shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue
-                    // green g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2
-                    this.shareTextBetweenTests = newText;
-                    $A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
-                    this.waitForBodyUpdate(cmp);
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to middle of list #1 not showing up in DOM.",
+                            function() {
+                            	// shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue
+                                // green g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
                 },
                 function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                    $A.test.clickOrTouch(cmp.find("buttonAddInside").getElement());
                     var oldText = this.shareTextBetweenTests;
                     // "ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue green g-y 2 g-y 1"
                     var oldText1 = oldText.substr(0, oldText.indexOf('yellow') - 1);
                     // "yellow orange red infra-red 1 infra-red 2"
                     var oldText2 = oldText.substr(oldText.indexOf('yellow'), oldText.length);
                     var newText = this.getNewListTextAfterAddInside(oldText1, oldText2, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to middle of list #2 not showing up in DOM.");
-                    // shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue
-                    // green g-y 2 g-y 1 g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2
-                    this.shareTextBetweenTests = newText;
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to middle of list #2 not showing up in DOM.",
+                            function() {
+                            	// shareTextBetweenTests = ultra-violet 1 ultra-violet 2 ultra-violet 1 ultra-violet 2 purple blue
+                                // green g-y 2 g-y 1 g-y 2 g-y 1 yellow orange red infra-red 1 infra-red 2
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
+                },
+                function(cmp) {
                     $A.test.clickOrTouch(cmp.find("buttonAddAfter").getElement());
-                    this.waitForBodyUpdate(cmp);
-                },
-                function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
                     var newText = this.getNewListTextAfterAddAfter(this.shareTextBetweenTests, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to end of list #3 not showing up in DOM.");
-                    this.shareTextBetweenTests = newText;
-                    $A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
-                    this.waitForBodyUpdate(cmp);
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to end of list #3 not showing up in DOM.",
+                            function() {
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
                 },
                 function(cmp) {
-                    var ele_outputDiv = $A.test.getElementByClass("outputDiv");
-                    var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                    $A.test.clickOrTouch(cmp.find("buttonAddBefore").getElement());
                     var newText = this.getNewListTextAfterAddBefore(this.shareTextBetweenTests, 1);
-                    $A.test.assertEqualsIgnoreWhitespace(newText, outputDivText,
-                            "list with new items added to beginning of list #2 not showing up in DOM.");
-                    this.shareTextBetweenTests = newText;
-                } ]
+                    var that = this;
+                    $A.test.addWaitForWithFailureMessage(true,
+                            function() {
+                            	var ele_outputDiv = $A.test.getElementByClass("outputDiv");
+                                var outputDivText = $A.util.getText(ele_outputDiv[0]);
+                                return that.getRidOfWhiteSpace(outputDivText) === 
+                                	that.getRidOfWhiteSpace(newText) ;
+                            },
+                            "list with new items added to beginning of list #2 not showing up in DOM.",
+                            function() {
+                            	this.shareTextBetweenTests = newText;
+                            }
+                     );
+                }
+                ]
     }
 })

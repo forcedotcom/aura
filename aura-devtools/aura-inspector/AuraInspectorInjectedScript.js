@@ -240,8 +240,10 @@
         }
 
         function output(data) {
-            var toJSON = Component.prototype.toJSON;
+            var componentToJSON = Component.prototype.toJSON;
+            var invalidComponentToJSON = InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
+            delete InvalidComponent.prototype.toJSON;
 
             var json = JSON.stringify(data, function(key, value){
                 if($A.util.isComponent(value)) {
@@ -252,7 +254,8 @@
                 return value;
             });
 
-            Component.prototype.toJSON = toJSON;
+            Component.prototype.toJSON = componentToJSON;
+            InvalidComponent.prototype.toJSON = invalidComponentToJSON;
 
             return json;
         }

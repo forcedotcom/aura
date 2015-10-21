@@ -180,6 +180,14 @@ public class ComponentJSTest extends TestSuite {
             return suite.getUrl(defType) + "?aura.jstestrun=" + caseDef.getName();
         }
 
+        /**
+         * The URL for loading the test within the aurajstest:jstest app.  Used primarily by test:runner.
+         */
+        public String getAppUrl() {
+            DefType defType = caseDef.getDefType();
+            return suite.getUrl(defType) + "?aura.jstest=" + caseDef.getName();
+        }
+
         @Override
         public String getQualifiedName() {
             String btype = getBrowserTypeString();

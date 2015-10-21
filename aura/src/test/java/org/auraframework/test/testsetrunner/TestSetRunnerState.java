@@ -183,7 +183,7 @@ public class TestSetRunnerState {
 
                 String url = "";
                 if (t instanceof ComponentTestCase) {
-                    url = ((ComponentTestCase) t).getUrl();
+                    url = ((ComponentTestCase) t).getAppUrl();
                 }
 
                 if (t instanceof PerfExecutorTest) {

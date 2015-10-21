@@ -95,6 +95,7 @@ public class MockingUtil {
      * @return the Definition created from the provided markup
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     public <D extends Definition> D mockDefMarkup(DefDescriptor<D> descriptor, String markup) throws Exception {
         Parser<D> parser = ParserFactory.getParser(Parser.Format.XML, descriptor);
         D def = parser.parse(descriptor,

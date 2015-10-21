@@ -26,7 +26,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.auraframework.Aura;
 import org.auraframework.http.AuraBaseServlet;
 import org.auraframework.system.AuraContext.Format;
-import org.auraframework.test.client.UserAgent;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;

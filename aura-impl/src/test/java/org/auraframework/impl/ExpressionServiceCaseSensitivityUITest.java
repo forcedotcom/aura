@@ -18,7 +18,6 @@ package org.auraframework.impl;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.junit.Assert;
-import org.openqa.selenium.By;
 
 /**
  * Tests to verify case sensitivity

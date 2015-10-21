@@ -65,9 +65,10 @@ AuraInstance.prototype["qhelp"] = AuraInstance.prototype.qhelp;
 // this much simpler and cleaner, including allowing us to not have separate functions for replace and restore
 // it could all be done with two sets of instance/name pairs (1) plain names, (2) bound names.
 //
+
 Aura.OverrideMap = function OverrideMap() {
     this.map = {
-        "enqueueAction":new Aura.Utils.Override($A.clientService, $A.clientService.enqueueAction, false,
+        "enqueueAction" : new Aura.Utils.Override($A.clientService, $A.clientService.enqueueAction, false,
             function(bound) {
                 $A.enqueueAction = bound;
                 $A["enqueueAction"] = bound;
@@ -79,58 +80,83 @@ Aura.OverrideMap = function OverrideMap() {
                 $A["enqueueAction"] = bound;
                 $A.clientService.enqueueAction = orig;
                 $A.clientService["enqueueAction"] = orig;
-            }),
-        "ClientService.decode":new Aura.Utils.Override($A.clientService, $A.clientService.decode, false,
+            }
+        ),
+
+        "ClientService.decode" : new Aura.Utils.Override($A.clientService, $A.clientService.decode, false,
             function(bound) {
                 $A.clientService.decode = bound;
             },
             function(orig) {
                 $A.clientService.decode = orig;
-            }),
-        "ClientService.send":new Aura.Utils.Override($A.clientService, $A.clientService.send, false,
+            }
+        ),
+
+        "ClientService.send" : new Aura.Utils.Override($A.clientService, $A.clientService.send, false,
             function(bound) {
                 $A.clientService.send = bound;
             },
             function(orig) {
                 $A.clientService.send = orig;
-            }),
-        "ClientService.receive":new Aura.Utils.Override($A.clientService, $A.clientService.receive, false,
+            }
+        ),
+
+        "ClientService.receive" : new Aura.Utils.Override($A.clientService, $A.clientService.receive, false,
             function(bound) {
                 $A.clientService.receive = bound;
             },
             function(orig) {
                 $A.clientService.receive = orig;
-            }),
-        "ClientService.processResponses":new Aura.Utils.Override($A.clientService, $A.clientService.processResponses, false,
+            }
+        ),
+
+    "ComponentService.createComponentPriv" : new Aura.Utils.Override($A.componentService, $A.componentService.createComponentPriv, false,
+            function(bound) {
+                $A.componentService.createComponentPriv = bound;
+            },
+            function(orig) {
+                $A.componentService.createComponentPriv = orig;
+            }
+        ),
+
+        "ClientService.processResponses" : new Aura.Utils.Override($A.clientService, $A.clientService.processResponses, false,
             function(bound) {
                 $A.clientService.processResponses = bound;
             },
             function(orig) {
                 $A.clientService.processResponses = orig;
-            }),
-        "ClientService.getAvailableXHR":new Aura.Utils.Override($A.clientService, $A.clientService.getAvailableXHR,
+            }
+        ),
+
+        "ClientService.getAvailableXHR" : new Aura.Utils.Override($A.clientService, $A.clientService.getAvailableXHR,
             false,
             function(bound) {
                 $A.clientService.getAvailableXHR = bound;
             },
             function(orig) {
                 $A.clientService.getAvailableXHR = orig;
-            }),
-        "Action.finishAction":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.finishAction, true,
+            }
+        ),
+
+        "Action.finishAction" : new Aura.Utils.Override(null, Aura.Controller.Action.prototype.finishAction, true,
             function(bound) {
                 Aura.Controller.Action.prototype.finishAction = bound;
             },
             function(orig) {
                 Aura.Controller.Action.prototype.finishAction = orig;
-            }),
-        "Action.abort":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.abort, true,
+            }
+        ),
+
+        "Action.abort" : new Aura.Utils.Override(null, Aura.Controller.Action.prototype.abort, true,
             function(bound) {
                 Aura.Controller.Action.prototype.abort = bound;
             },
             function(orig) {
                 Aura.Controller.Action.prototype.abort = orig;
-            }),
-        "Action.runDeprecated":new Aura.Utils.Override(null, Aura.Controller.Action.prototype.runDeprecated, true,
+            }
+        ),
+
+        "Action.runDeprecated" : new Aura.Utils.Override(null, Aura.Controller.Action.prototype.runDeprecated, true,
             function(bound) {
                 Aura.Controller.Action.prototype.runDeprecated = bound;
                 Aura.Controller.Action.prototype["runDeprecated"] = bound;
@@ -146,8 +172,10 @@ Aura.OverrideMap = function OverrideMap() {
                 // Not exported, so delete the public exposure.
                 delete Aura.Controller.Action.prototype["getComponent"];
 
-            }),
-        "Event.fire":new Aura.Utils.Override(null, Aura.Event.Event.prototype.fire, true,
+            }
+        ),
+
+        "Event.fire" : new Aura.Utils.Override(null, Aura.Event.Event.prototype.fire, true,
             function(bound) {
                 Aura.Event.Event.prototype.fire = bound;
                 Aura.Event.Event.prototype["fire"] = bound;
@@ -156,8 +184,7 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 Aura.Event.Event.prototype.fire = orig;
                 Aura.Event.Event.prototype["fire"] = orig;
-            })
-
+            }
+        )
     };
 };
-

@@ -214,7 +214,6 @@ function AuraInstance () {
      * @platform
      */
     this.localizationService  = new Aura.Services.AuraLocalizationService();
-
     this.clientService        = new Aura.Services.AuraClientService();
     this.componentService     = new Aura.Services.AuraComponentService();
     this.renderingService     = new Aura.Services.AuraRenderingService();
@@ -350,23 +349,28 @@ function AuraInstance () {
 
 
     // Doced at the source by the @borrows statements on the Aura class
-    this.enqueueAction = this.clientService.enqueueAction.bind(this.clientService);
-    this.deferAction = this.clientService.deferAction.bind(this.clientService);
-    this.render = this.renderingService.render.bind(this.renderingService);
-    this.rerender = this.renderingService.rerender.bind(this.renderingService);
-    this.unrender = this.renderingService.unrender.bind(this.renderingService);
-    this.afterRender = this.renderingService.afterRender.bind(this.renderingService);
-    this.getCmp = this.componentService.get.bind(this.componentService);
-    this.getComponent = this.componentService.getComponent.bind(this.componentService);
-    this.createComponent = this.componentService["createComponent"].bind(this.componentService);
-    this.createComponents = this.componentService["createComponents"].bind(this.componentService);
-    this.newCmp = this.componentService["newComponentDeprecated"].bind(this.componentService);
-    this.newCmpDeprecated = this.componentService["newComponentDeprecated"].bind(this.componentService);
-    this.newCmpAsync = this.componentService["newComponentAsync"].bind(this.componentService);
-    this.getEvt = this.eventService.newEvent.bind(this.eventService);
-    this.Component = Component;
-    this.getCurrentTransactionId = this.clientService.getCurrentTransactionId.bind(this.clientService);
-    this.setCurrentTransactionId = this.clientService.setCurrentTransactionId.bind(this.clientService);
+    this.Component                 = Component;
+
+    this.enqueueAction             = this.clientService.enqueueAction.bind(this.clientService);
+    this.deferAction               = this.clientService.deferAction.bind(this.clientService);
+    this.getCurrentTransactionId   = this.clientService.getCurrentTransactionId.bind(this.clientService);
+    this.setCurrentTransactionId   = this.clientService.setCurrentTransactionId.bind(this.clientService);
+
+    this.render                    = this.renderingService.render.bind(this.renderingService);
+    this.rerender                  = this.renderingService.rerender.bind(this.renderingService);
+    this.unrender                  = this.renderingService.unrender.bind(this.renderingService);
+    this.afterRender               = this.renderingService.afterRender.bind(this.renderingService);
+
+    this.getCmp                    = this.componentService.get.bind(this.componentService);
+    this.getComponent              = this.componentService.getComponent.bind(this.componentService);
+    this.createComponent           = this.componentService["createComponent"].bind(this.componentService);
+    this.createComponents          = this.componentService["createComponents"].bind(this.componentService);
+    this.newCmp                    = this.componentService["newComponentDeprecated"].bind(this.componentService);
+    this.newCmpDeprecated          = this.componentService["newComponentDeprecated"].bind(this.componentService);
+    this.newCmpAsync               = this.componentService["newComponentAsync"].bind(this.componentService);
+
+    this.createComponentFromConfig = this.componentService.createComponentFromConfig.bind(this.componentService);
+    this.getEvt                    = this.eventService.newEvent.bind(this.eventService);
 
     /**
      * Pushes current portion of attribute's creationPath onto stack
@@ -457,6 +461,7 @@ function AuraInstance () {
         //#end
     this["createComponent"] = this.createComponent;
     this["createComponents"] = this.createComponents;
+    this["createComponentFromConfig"] = this.createComponentFromConfig;
     this["newCmp"] = this.newCmp;
     this["newCmpDeprecated"] = this.newCmpDeprecated;
     this["newCmpAsync"] = this.newCmpAsync;

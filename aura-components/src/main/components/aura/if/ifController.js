@@ -18,15 +18,13 @@
         var bodyTemplate  = cmp.get("v.body");
         var isTrue        = $A.util.getBooleanValue(cmp.get("v.isTrue"));
         var template      = cmp.get("v.template");
-        var localCreation = true;
 
         if (bodyTemplate.length && !template.length) {
             cmp.set("v.template", bodyTemplate, true);
             cmp.set("v.body", [], true);
-            localCreation = false;
         }
 
-        var body = helper.createBody(cmp, isTrue, localCreation);
+        var body = helper.createBody(cmp, isTrue);
         cmp.set("v.body", body, true);
         cmp._truth = isTrue;
     },

@@ -1721,6 +1721,10 @@ Component.prototype.setupComponentDef = function(config) {
     var componentDef = $A.componentService.getDef(config["componentDef"]);
     $A.assert(componentDef, "componentDef is required");
     this.componentDef = componentDef;
+
+    if (config["original"]) { // We have to replace the abstractdef for the concrete one
+        this.replaceComponentClass(componentDef.getDescriptor().getQualifiedName());
+    }
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){
@@ -1947,12 +1951,18 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
             var cdrs=[];
             for(var i=0;i<value.length;i++){
                 // make a shallow clone of the cdr with the proper value provider set
-                var cdr = {};
-                cdr["componentDef"] = value[i]["componentDef"];
-                cdr["localId"] = value[i]["localId"];
-                cdr["flavor"] = value[i]["flavor"];
-                cdr["attributes"] = value[i]["attributes"];
-                cdr["valueProvider"] = value[i]["valueProvider"] || config["valueProvider"];
+                var cdrObj = value[i];
+                var cdr = {"attributes": { "values": {} } };
+                cdr["componentDef"] = cdrObj["componentDef"];
+                cdr["localId"] = cdrObj["localId"];
+                cdr["flavor"] = cdrObj["flavor"];
+
+                if (cdrObj["attributes"]) {
+                    $A.util.apply(cdr["attributes"]["values"], cdrObj["attributes"]["values"]);
+                }
+
+                cdr["attributes"]["valueProvider"] = (cdrObj["attributes"] && cdrObj["attributes"]["valueProvider"]) || config["valueProvider"];
+
 //JBUCH: HALO: TODO: SOMETHING LIKE THIS TO FIX DEFERRED COMPDEFREFS?
 //                    for(var x in cdr["attributes"]["values"]){
 //                        cdr["attributes"]["values"][x] = valueFactory.create(cdr["attributes"]["values"][x], null, config["valueProvider"]);
@@ -2242,6 +2252,23 @@ Component.prototype.doDeIndex = function(cmp) {
     }
 };
 
+
+Component.prototype.replaceComponentClass = function(descriptor) {
+    var classConstructor = $A.componentService.getComponentClass(descriptor);
+
+    if (classConstructor && this["constructor"] !== classConstructor) {
+        // Doesn't do a whole lot, but good for debugging, not sure what the stack trace looks like.
+        this["constructor"] = classConstructor;
+
+        // Reassign important members. Assign to both external reference, and internal reference
+        this["helper"]      = classConstructor.prototype["helper"];
+        this["render"]      = classConstructor.prototype["render"];
+        this["rerender"]    = classConstructor.prototype["rerender"];
+        this["afterRender"] = classConstructor.prototype["afterRender"];
+        this["unrender"]    = classConstructor.prototype["unrender"];
+    }
+};
+
 Component.prototype.injectComponent = function(config, cmp, localCreation) {
 
     var componentDef = this.componentDef;
@@ -2268,18 +2295,7 @@ Component.prototype.injectComponent = function(config, cmp, localCreation) {
             self.attributeSet.merge(attributes, realComponentDef.getAttributeDefs());
 
             // KRIS: IN THE MIDDLE OF THIS FOR PROVIDED COMPONENTS
-            var classConstructor =  $A.componentService.getComponentClass(realComponentDef.getDescriptor().getQualifiedName());
-            if (classConstructor && cmp["constructor"] !== classConstructor) {
-                // Doesn't do a whole lot, but good for debugging, not sure what the stack trace looks like.
-                cmp["constructor"] = classConstructor;
-
-                // Reassign important members. Assign to both external reference, and internal reference.
-                cmp["helper"] = classConstructor.prototype["helper"];
-                cmp["render"] = classConstructor.prototype["render"];
-                cmp["rerender"] = classConstructor.prototype["rerender"];
-                cmp["afterRender"] = classConstructor.prototype["afterRender"];
-                cmp["unrender"] = classConstructor.prototype["unrender"];
-            }
+            self.replaceComponentClass(realComponentDef.getDescriptor().getQualifiedName());
 
             self.setupModel(config["model"],cmp);
             self.valueProviders["m"]=self.model;

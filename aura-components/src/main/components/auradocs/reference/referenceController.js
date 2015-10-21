@@ -35,7 +35,7 @@
                 var ret = action.getReturnValue();
                 if(ret) {
                     var content = cmp.find("content");
-                    var newComponents = $A.componentService["newComponentDeprecated"](ret, null, false, true);
+                    var newComponents = $A.createComponentFromConfig(ret);
 
                     content.set("v.body", newComponents);
                 }

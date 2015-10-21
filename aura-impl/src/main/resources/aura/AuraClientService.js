@@ -2188,19 +2188,20 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
         }
 
         componentConfig["localId"] = localId;
-
-        var root = $A.getRoot();
-        var c = $A.componentService["newComponentDeprecated"](componentConfig, root);
+        componentConfig["attributes"]["valueProvider"] = $A.getRoot();
+        var c = $A.componentService.createComponentPriv(componentConfig);
 
         if (!errors) {
             // Wire up event handlers
             self.addComponentHandlers(c, config["actionEventHandlers"]);
         }
 
+        var root = $A.getRoot();
         var body = root.get("v.body");
         body.push(c);
+
         // Do not let Aura consider this initial setting into the surrogate app as a candiadate for rerendering
-        root.set("v.body",body,true);
+        root.set("v.body", body, true);
 
         $A.render(c, element);
 
@@ -2224,6 +2225,7 @@ AuraClientService.prototype.createIntegrationErrorConfig = function(errorText) {
         },
 
         "attributes" : {
+            "valueProvider": $A.getRoot(),
             "values" : {
                 "title" : "Aura Integration Service Error",
                 "severity" : "error",
@@ -2272,7 +2274,7 @@ AuraClientService.prototype.renderInjection = function(component, locator, actio
         // create same messaging as injectComponent
         var errorConfig = this.createIntegrationErrorConfig(error);
         errorConfig["localId"] = component.getLocalId();
-        component = $A.componentService["newComponentDeprecated"](errorConfig, $A.getRoot());
+        component = $A.componentService.createComponentPriv(errorConfig);
     }
 
     this.addComponentHandlers(component, actionEventHandlers);

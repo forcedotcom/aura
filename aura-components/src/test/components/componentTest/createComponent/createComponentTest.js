@@ -129,15 +129,16 @@
             // Set actual to non null to verify accidental negatives.
             var actual={};
             var actionComplete = false;
+            var statusComplete;
 
-            $A.createComponent("bogus:bogus",null,function(component){
-                actual=component;
+            $A.createComponent("bogus:bogus",null,function(component, status){
+                statusComplete = status;
                 actionComplete = true;
                 
             });
 
             $A.test.addWaitFor(true, function(){ return actionComplete; }, function() {
-                $A.test.assertNull(actual);
+                $A.test.assertEquals(statusComplete, "ERROR");
             });
         }
     },

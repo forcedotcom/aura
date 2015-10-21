@@ -244,53 +244,6 @@ Test.Aura.AuraClientServiceTest = function() {
         }
     };
 
-    [Fixture]
-    function testCreateIntegrationErrorConfig() {
-        [Fact]
-        function ReturnsErrorConfig() {
-            // Arrange
-            var target;
-            mockGlobal(function() {
-                target = new Aura.Services.AuraClientService();
-            });
-            var errorMsg = "Test Error Message";
-            // Act
-            var actual;
-            mockGlobal(function() {
-                actual = target.createIntegrationErrorConfig(errorMsg);
-            });
-            // Assert
-            var expected;
-            expected = {
-                    "componentDef" : {
-                        "descriptor" : "markup://ui:message"
-                    },
-
-                    "attributes" : {
-                        "values" : {
-                            "title" : "Aura Integration Service Error",
-                            "severity" : "error",
-                            "body" : [
-                                {
-                                    "componentDef" : {
-                                        "descriptor" : "markup://ui:outputText"
-                                    },
-
-                                    "attributes" : {
-                                        "values" : {
-                                            "value" : "mockedJson:"+errorMsg
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-            };
-            Assert.Equal(expected, actual);
-        }
-
-    }
-
     var id = 0;
 
     var MockAction = function(type, isStorable) {

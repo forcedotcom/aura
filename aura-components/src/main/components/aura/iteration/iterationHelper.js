@@ -157,32 +157,36 @@
 
     buildTemplate: function (component, template, item, index, itemVar, indexVar, templateValueProvider, localCreation, forceServer, callback) {
         $A.pushCreationPath("body");
-        var helper=this;
+        var helper = this;
+        var componentDefRef = template[0];
         var iterationValueProvider = null;
+
         function collector(templateComponents){
             helper.trackItem(component, item, index, templateComponents);
             callback(templateComponents);
         }
-        for (var i = 0; i < template.length; i++) {
-            $A.setCreationPathIndex(i);
-            var componentDefRef = template[i];
-            if (!componentDefRef.valueProvider) {
-                componentDefRef.valueProvider = templateValueProvider;
-            }
-            if (!iterationValueProvider) {
-                var itemValueProviders = {};
-                itemValueProviders[itemVar] = component.getReference("v.items[" + index + "]");
-                itemValueProviders[indexVar] = index;
-                iterationValueProvider = $A.expressionService.createPassthroughValue(itemValueProviders, componentDefRef.valueProvider);
-            }
-            if(localCreation){
-                var components=$A.componentService.newComponentDeprecated(template, iterationValueProvider, false, true);
+
+        if (componentDefRef) {
+            $A.setCreationPathIndex(0); // TODO: Creation path... needs to die soon...
+            var itemValueProviders = {};
+            itemValueProviders[itemVar] = component.getReference("v.items[" + index + "]");
+            itemValueProviders[indexVar] = index;
+            iterationValueProvider = $A.expressionService.createPassthroughValue(itemValueProviders, componentDefRef.attributes.valueProvider || templateValueProvider);
+
+            if (localCreation) {
+                var components = [];
+                for (var i = 0; i < template.length; i++) {
+                    template[i].attributes.valueProvider = iterationValueProvider;
+                    components.push($A.createComponentFromConfig(template[i]));
+                }
                 collector(components);
-            }else {
+
+            } else {
+                // TODO: @dval: remove all ocurrences of this deprecated method
                 $A.componentService.newComponentAsync(this, collector, template, iterationValueProvider, localCreation, false, forceServer);
             }
-            break;
         }
+
         $A.popCreationPath("body");
     },
 

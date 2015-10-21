@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.test.http;
+package org.auraframework.test.error;
 
 import org.auraframework.Aura;
 import org.auraframework.controller.java.ServletConfigController;

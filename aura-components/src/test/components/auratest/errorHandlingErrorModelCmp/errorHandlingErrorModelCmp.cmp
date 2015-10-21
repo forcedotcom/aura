@@ -15,6 +15,6 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.components.test.java.model.TestModelThrowsInGetter">
-    {!m.badThing}
+<aura:component render="client" model="java://org.auraframework.components.test.java.model.TestModelThrowsInGetter">
+   <div>Hi There!</div>
 </aura:component>

@@ -1,0 +1,11 @@
+.THIS th, .THIS td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 3px;
+    text-align: left;
+}
+
+.THIS caption {
+    font-size: 130%;
+    padding: 5px;
+}

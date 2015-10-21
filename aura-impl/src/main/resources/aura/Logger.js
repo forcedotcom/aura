@@ -80,6 +80,7 @@ Logger.prototype.assert = function(condition, assertMessage) {
  *
  * @param {String} msg error message
  * @param {Error} [e] error
+ * @deprecated
  * @export
  */
 Logger.prototype.error = function(msg, e){

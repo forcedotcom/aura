@@ -189,7 +189,8 @@
             showPointer = cmp.get('v.showPointer'),
             align,
             pad = cmp.get('v.pad'),
-            padTop = cmp.get('v.padTop'),
+            padTop = pad,
+            advancedConfig = cmp.get('v.advancedConfig'),
             targetAlign, 
             pointer,
             bbDirections,
@@ -208,79 +209,85 @@
             boundingElement = window;
         }
 
-        switch (direction) {
-            case 'north':
-                align = 'center bottom';
-                targetAlign = 'center top';
-                bbDirections = {
-                    left:true,
-                    right:true
-                };
-                break;
-            case 'south':
-                align = 'center top';
-                targetAlign = 'center bottom';
-                bbDirections = {
-                    left:true,
-                    right:true
-                };
-                break;
-            case 'west':
-                align = 'right center';
-                targetAlign = 'left center';
-                pointerPad = -15;
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
-            case 'east':
-                align = 'left center';
-                targetAlign = 'right center';
-                pointerPad = -15;
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
-            case 'southeast':
-                align = 'left top';
-                targetAlign = 'right bottom';
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
-            case 'southwest':
-                align = 'right top';
-                targetAlign = 'left bottom';
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
-            case 'northwest':
-                align = 'right bottom';
-                targetAlign = 'left top';
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
-            case 'northeast':
-                align = 'left bottom';
-                targetAlign = 'right top';
-                bbDirections = {
-                    top:true,
-                    bottom:true
-                };
-                break;
+        if(!advancedConfig) {
+
+            
+            switch (direction) {
+                case 'north':
+                    align = 'center bottom';
+                    targetAlign = 'center top';
+                    bbDirections = {
+                        left:true,
+                        right:true
+                    };
+                    break;
+                case 'south':
+                    align = 'center top';
+                    targetAlign = 'center bottom';
+                    bbDirections = {
+                        left:true,
+                        right:true
+                    };
+                    break;
+                case 'west':
+                    align = 'right center';
+                    targetAlign = 'left center';
+                    pointerPad = -15;
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+                case 'east':
+                    align = 'left center';
+                    targetAlign = 'right center';
+                    pointerPad = -15;
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+                case 'southeast':
+                    align = 'left top';
+                    targetAlign = 'right bottom';
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+                case 'southwest':
+                    align = 'right top';
+                    targetAlign = 'left bottom';
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+                case 'northwest':
+                    align = 'right bottom';
+                    targetAlign = 'left top';
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+                case 'northeast':
+                    align = 'left bottom';
+                    targetAlign = 'right top';
+                    bbDirections = {
+                        top:true,
+                        bottom:true
+                    };
+                    break;
+            }
         }
 
-        if(cmp.get('v.advanced')) {
-            align = cmp.get('v.align');
-            targetAlign = cmp.get('v.targetAlign');
+        if(advancedConfig) {
+            align = advancedConfig.align;
+            targetAlign = advancedConfig.targetAlign;
+            padTop = advancedConfig.vertPad;
         }
+
 
         if(cmp.get('v.inside')) {
             align = targetAlign;

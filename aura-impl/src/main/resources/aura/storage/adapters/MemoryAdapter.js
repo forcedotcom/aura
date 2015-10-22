@@ -122,7 +122,7 @@ MemoryAdapter.prototype.updateMRU = function(key) {
  */
 MemoryAdapter.prototype.setItem = function(key, item, size) {
     var that = this;
-    return new Promise(function(success, error) {
+    return new Promise(function(success) {
         // existing item ?
         var existingItem = that.backingStore[key],
             existingItemSize = 0;
@@ -283,7 +283,7 @@ MemoryAdapter.prototype.sweep = function() {
         // adapter to avoid re-adding the key prefix.
 
         if (expired.length === 0) {
-            return;
+            return Promise["resolve"]();
         }
 
         var promiseSet = [];

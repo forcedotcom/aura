@@ -55,7 +55,7 @@ PerfMetricsPlugin.prototype = {
 
         return config["fn"].apply(config["scope"], arguments);
     },
-    bind: function (metricsService) {
+    bind: function () {
         $A.installOverride("ClientService.processResponses", this.processResponsesOverride, this);
     },
     //#if {"excludeModes" : ["PRODUCTION"]}
@@ -63,7 +63,7 @@ PerfMetricsPlugin.prototype = {
         return markList;
     },
     // #end
-    unbind: function (metricsService) {
+    unbind: function () {
         $A.uninstallOverride("ClientService.processResponses", this.processResponsesOverride);
     }
 };

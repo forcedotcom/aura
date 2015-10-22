@@ -102,14 +102,14 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
     return config["fn"].apply(config["scope"], arguments);
 };
 
-TransportMetricsPlugin.prototype.bind = function (metricsService) {
+TransportMetricsPlugin.prototype.bind = function () {
     $A.installOverride("ClientService.send", this.sendOverride, this);
     $A.installOverride("ClientService.receive", this.receiveOverride, this);
 };
 
 //#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
-TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transactionConfig) {
+TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
     var procesedMarks = [];
     var queue = {};
     for (var i = 0; i < transportMarks.length; i++) {
@@ -131,7 +131,7 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks, transac
 };
 //#end
 
-TransportMetricsPlugin.prototype.unbind = function (metricsService) {
+TransportMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("ClientService.send", this.sendOverride);
     $A.uninstallOverride("ClientService.receive", this.receiveOverride);
 };

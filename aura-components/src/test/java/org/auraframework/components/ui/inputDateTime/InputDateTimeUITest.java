@@ -16,12 +16,10 @@
 
 package org.auraframework.components.ui.inputDateTime;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 
 /*
  * Mobile devices are still using the old time picker.
@@ -241,17 +239,17 @@ public class InputDateTimeUITest extends WebDriverTestCase {
      * This is kept just in case. Also, SAFARI doesn't allow tabbing into the calendar
      * icon, so if this is used, need to exclude SAFARI.
      */
-    @SuppressWarnings("unused")
-    private void tabToOpenTimePicker() {
-        // use input time box to tab into calendar icon
-        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
-        auraUITestingUtil.pressTab(inputTimeBox);
-
-        // active element should now be the calendar icon - hit enter to open time picker
-        WebElement activeElem = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
-        auraUITestingUtil.pressEnter(activeElem);
-        waitForTimePickerAppear();
-    }
+//    @SuppressWarnings("unused")
+//    private void tabToOpenTimePicker() {
+//        // use input time box to tab into calendar icon
+//        WebElement inputTimeBox = findDomElement(By.cssSelector(TIME_INPUT_BOX_SEL));
+//        auraUITestingUtil.pressTab(inputTimeBox);
+//
+//        // active element should now be the calendar icon - hit enter to open time picker
+//        WebElement activeElem = (WebElement)auraUITestingUtil.getEval(ACTIVE_ELEM);
+//        auraUITestingUtil.pressEnter(activeElem);
+//        waitForTimePickerAppear();
+//    }
 
     private void clickToOpenTimePicker() {
         // use input time box to tab into calendar icon and wait for timePicker

@@ -126,6 +126,17 @@
     });
     //#end
 
+    //#if {"modes" : ["PRODUCTIONDEBUG"]}
+    /**
+     * $A.warning() will log to console in proddebug
+     */
+    $A.logger.subscribe("WARNING", function(level, message, error) {
+        if(window["console"]){
+            window["console"].warn(level+": "+(message||error&&error.message));
+        }
+    });
+    //#end
+
     function handleError(message, e) {
         var dispMsg = message;
         var evtArgs = {"message":dispMsg,"error":null,"auraError":null};

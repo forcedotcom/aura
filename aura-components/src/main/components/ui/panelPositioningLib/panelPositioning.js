@@ -164,7 +164,7 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
             if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
-
+                $A.assert(config.align, 'Required align string missing');
                 var constraintDirections = config.align.split(/\s/);
                 var vertConfig = $A.util.copy(config);
 

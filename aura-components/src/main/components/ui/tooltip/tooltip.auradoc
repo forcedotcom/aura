@@ -18,7 +18,7 @@
 <aura:documentation>
 	<aura:description>
 		<p>
-		    A <code>ui:tooltip</code> component can be attached to any element or component, displaying textual information when you hover over the element.
+		    A <code>ui:tooltip</code> component can be attached to any element or component, displaying textual information when you hover over the element. Rich text and other markup are not currently supported in the tooltip body.
 		    Tooltips are useful when you want to provide contextual information on a form field. For example, you can display the tooltip when users hover over an icon or when a field is focused.
 		</p>
 <pre>&lt;ui:label for="inputField" label="This tooltip shows on field focus:"/>

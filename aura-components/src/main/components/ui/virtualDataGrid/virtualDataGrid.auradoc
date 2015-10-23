@@ -71,8 +71,14 @@ datagrid.appendItems(rowData);</pre>
 			<li><code>ui:dataGridSelectionColumn</code> - A column of checkboxes for individual and multiple row selection</li>
 			<li><code>ui:dataGridSummaryCell</code> - A value rendered in the table footer that computes a given column</li>
 		</ul>
-		You can use other <code>ui</code> components to represent your column data, such as <code>ui:outputText</code>.
+		You can use other <code>ui</code> components to represent your column data, such as <code>ui:outputText</code>. To propagate events from an action column, such as in row selections, fire the <code>ui:gridAction</code> event.
 		</p>
+		<pre>cmp.getEvent("gridAction").setParams({
+    action : 'select',
+    payload : {
+        value : newValue
+    }
+}).fire();</pre>
 	
 	</aura:description>	
 	
@@ -80,11 +86,16 @@ datagrid.appendItems(rowData);</pre>
 			<p>This example initializes rows of data using a client-side controller. Clicking <b>Add row</b> appends a new row to the table.</p>
 		</aura:example>
 		
+		<aura:example name="sortVirtualDataGridExample" ref="uitest:virtualDataGrid_onSortTest" label="Loading Data in a Client-Side Controller">
+			<p>This example enables sorting by column. The <code>ui:dataGridColumn</code> component handles the <code>onsort</code> event and handles it in the data provider's helper.
+			Click the column header to sort.</p>
+		</aura:example>
+		
 		<aura:example name="virtualDataGridExample" ref="uiExamples:virtualDataGridKitchenSink" label="Loading Data using a Data Provider">
     	<p>This example shows an implementation of <code>ui:virtualDataGrid</code> using a data provider, <code>uiExamples:dataGridKitchenSinkDataProvider</code>. 
     	The <code>init</code> handler initializes data in the columns. Clicking the <b>Change Columns</b> button replaces the last column with data from the first column.
     	Clicking the <b>Re-fire datagrid's provide</b> button loads the data in the columns by setting the <code>empty</code> attribute to <code>false</code> and firing the <code>provide</code> event.</p>
-    	<p></p>
+    	<p>The <b>Selection</b> columns contain checkboxes that fires the <code>ui:gridAction</code> event when clicked. This event notifies listeners that the row was selected.</p>
 	</aura:example>
 	
 </aura:documentation>

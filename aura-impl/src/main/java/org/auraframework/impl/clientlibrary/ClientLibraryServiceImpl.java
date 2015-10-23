@@ -16,33 +16,25 @@
 package org.auraframework.impl.clientlibrary;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import aQute.bnd.annotation.component.Component;
 
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
-import org.auraframework.clientlibrary.ClientLibraryResolver;
-import org.auraframework.clientlibrary.ClientLibraryResolverRegistry;
-import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.clientlibrary.Combinable;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ResourceDef;
+import org.auraframework.clientlibrary.*;
+import org.auraframework.def.*;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
-import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import aQute.bnd.annotation.component.Component;
-import org.auraframework.annotations.Annotations.ServiceComponent;
 
 /**
  * Service for including external client libraries (CSS or JS)
@@ -103,9 +95,6 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
             ClientLibraryResolver resolver = getResolver(clientLibrary);
             if (resolver != null) {
                 return clientLibrary.shouldCombine() && resolver.canCombine();
-            } else {
-                throw new ClientLibraryException("Client library must have resolver if url is blank: "
-                        + clientLibrary.getLibraryName(), clientLibrary.getLocation());
             }
         }
 

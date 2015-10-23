@@ -16,9 +16,7 @@
 package org.auraframework.integration.test.clientlibrary;
 
 import java.net.URLDecoder;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,23 +24,18 @@ import org.auraframework.Aura;
 import org.auraframework.AuraConfiguration;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
+import org.auraframework.def.*;
 import org.auraframework.def.ClientLibraryDef.Type;
-import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ClientLibraryResolverRegistryImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
-import org.auraframework.throwable.quickfix.ClientLibraryException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 
@@ -247,26 +240,26 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertFalse(clientLibraryService.canCombine(combinableURL));
     }
 
-    public void testLibraryDefWithUrlCanBeCombinedWithoutUsingResolver() throws Exception {
-        ClientLibraryDef combinableURL = vendor.makeClientLibraryDef("fooBar",
-                "js://clientLibraryTest.clientLibraryTest", Type.JS,
-                null, true, null, null);
-        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(combinableURL));
-        ClientLibraryDef unCombinableURL = vendor.makeClientLibraryDef("fooBar",
-                "js://clientLibraryTest.clientLibraryTest", Type.JS,
-                null, false, null, null);
-        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(unCombinableURL));
-        // TODO: If a library cannot be resolved, can it still be combined?
-
-        ClientLibraryDef blankURL = vendor.makeClientLibraryDef("fooBar", "", Type.JS,
-                null, true, null, null);
-        try {
-            clientLibraryService.canCombine(blankURL);
-            fail("Client library will blank url and no resolver should throw exception");
-        } catch (QuickFixException qfe) {
-            assertTrue(qfe instanceof ClientLibraryException);
-        }
-    }
+//    public void testLibraryDefWithUrlCanBeCombinedWithoutUsingResolver() throws Exception {
+//        ClientLibraryDef combinableURL = vendor.makeClientLibraryDef("fooBar",
+//                "js://clientLibraryTest.clientLibraryTest", Type.JS,
+//                null, true, null, null);
+//        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(combinableURL));
+//        ClientLibraryDef unCombinableURL = vendor.makeClientLibraryDef("fooBar",
+//                "js://clientLibraryTest.clientLibraryTest", Type.JS,
+//                null, false, null, null);
+//        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(unCombinableURL));
+//        // TODO: If a library cannot be resolved, can it still be combined?
+//
+//        ClientLibraryDef blankURL = vendor.makeClientLibraryDef("fooBar", "", Type.JS,
+//                null, true, null, null);
+//        try {
+//            clientLibraryService.canCombine(blankURL);
+//            fail("Client library will blank url and no resolver should throw exception");
+//        } catch (QuickFixException qfe) {
+//            assertTrue(qfe instanceof ClientLibraryException);
+//        }
+//    }
 
     public void testGetUrlsWithoutEstablishingContext() throws Exception {
         Aura.getContextService().endContext();
@@ -318,18 +311,18 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertRootComponentResourceUrl(appDesc, resourceUrl, Type.JS);
     }
 
-    public void testCaseSensitiveName() throws Exception {
-        Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
-        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
-                "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
-        try {
-            getClientLibraryUrls(appDesc, Type.CSS);
-            fail("Should have thrown exception for no resolver");
-        } catch (Exception e) {
-            checkExceptionFull(e, ClientLibraryException.class, "Client library must have resolver if url is blank: UIPerfCsS");
-        }
-    }
+//    public void testCaseSensitiveName() throws Exception {
+//        Aura.getContextService().endContext();
+//        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
+//        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+//                "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
+//        try {
+//            getClientLibraryUrls(appDesc, Type.CSS);
+//            fail("Should have thrown exception for no resolver");
+//        } catch (Exception e) {
+//            checkExceptionFull(e, ClientLibraryException.class, "Client library must have resolver if url is blank: UIPerfCsS");
+//        }
+//    }
 
     public void testDifferentModes() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(

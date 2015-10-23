@@ -585,7 +585,30 @@
             $A.util.toggleClass(list, "invisible", !visible);
         }
     },
-
+    
+    setDefaultHighlight: function(component) {
+    	var setDefaultHighlight = component.get("v.setDefaultHighlight");
+    	var visible = component.get("v.visible");
+    	if (setDefaultHighlight !== true || visible !== true) {
+    		return; 
+    	}
+    	var iterCmp = component.find("iter");
+    	if (iterCmp) {
+    		var iters = iterCmp.get("v.body");
+    		var found = false;
+    	    for (var i = 0; i < iters.length; i++) {
+                var optionCmp = iters[i];
+                if (found === false && optionCmp.get("v.visible") === true) {
+                    optionCmp.set("v.highlighted", true);
+                    this.updateAriaAttributes(component, optionCmp);
+                    found = true;
+                } else {
+                	optionCmp.set("v.highlighted", false);
+                }
+            }
+    	}
+    },
+    
     setUpEvents: function (component) {
         if (component.isRendered()) {
             var obj = {};

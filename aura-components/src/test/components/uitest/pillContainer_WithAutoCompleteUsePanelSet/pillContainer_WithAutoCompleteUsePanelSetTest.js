@@ -503,7 +503,6 @@
         var textInput = this._getInput(cmp);
         this._createPillUsingAutoCompleteList(cmp);
         
-        this._fireKeydownEvent(textInput, this.DOWNARROW_KEY);
         this._fireKeydownEvent(textInput, this.ENTER_KEY);
         return textInput;
     },

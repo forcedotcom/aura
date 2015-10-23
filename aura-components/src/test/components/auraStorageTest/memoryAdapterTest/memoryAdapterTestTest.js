@@ -263,6 +263,60 @@
         }
     },
 
+    /**
+     * Verify when we replace an item in storage the MRU is properly updated. This is to address a bug where items were
+     * added to the MRU twice rather than replaced and led to errors in the evict logic.
+     */
+    testAddKeyTwiceThenEvict: {
+        // Since evict is not part of the setItem chain, we rely on there not being a warning
+        failOnWarning: true,
+        test: function(cmp) {
+            var completed = false;
+            var that = this;
+            var key1 = "key1";
+
+            // This test relies on items of certain sizes relative to the storage max size added to the storage.
+            // getMaxSize() returns the size in KBs so to get the size of the array we want we take the maxSize, divide
+            // or subtract by the proportion we want, divide by 2 since SizeEstimator counts each character as 2 units,
+            // and finally multiple by 1024 to essentially convert back to bytes.
+            var maxSize = this.storage.getMaxSize();
+            var halfMaxSizeChunk = Math.floor(maxSize/2/2*1024);
+            var quarterMaxSizeChunk = Math.floor(halfMaxSizeChunk/2);
+            var almostMaxSizeChunk = Math.floor((maxSize-.1)/2*1024);
+
+            var chunk = new Array(quarterMaxSizeChunk).join("x");
+            this.storage.put(key1, chunk)
+            .then(function() {
+                // Use same key to verify MRU in adapter updates existing entry
+                var value = new Array(halfMaxSizeChunk).join("x");
+                return that.storage.put(key1, value);
+            })
+            .then(function() {
+                // Force previously added items to be evicted
+                var value = new Array(almostMaxSizeChunk).join("x");
+                return that.storage.put("forceEvict", value);
+            })
+            .then(function() {
+                // Force another eviction to verify no lingering references to first key we just evicted
+                var value = new Array(almostMaxSizeChunk).join("x");
+                return that.storage.put("forceEvictAgain", value);
+            })
+            .then(function() {
+                return that.storage.getAll();
+            })
+            .then(function(items) {
+                for (var i = 0; i < items.length; i++) {
+                    var item = items[i];
+                    $A.test.assertNotEquals(key1, item.key, "Original key not evicted from storage");
+                }
+                completed = true;
+            })
+            ["catch"](function(error) { $A.test.fail(error.toString()); });
+
+            $A.test.addWaitFor(true, function(){ return completed; });
+        }
+    },
+
     testGetMaxSize: {
         test:function(cmp) {
             cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 4);

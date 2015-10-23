@@ -145,7 +145,10 @@ MemoryAdapter.prototype.setItem = function(key, item, size) {
         that.cachedSize += itemSize;
 
         // async evict
-        that.evict(spaceNeeded);
+        that.evict(spaceNeeded)
+        .then(undefined, function(error) {
+            $A.warning("Failed to evict items from storage: " + error);
+        });
 
         success();
     });
@@ -219,28 +222,30 @@ MemoryAdapter.prototype.evict = function(spaceNeeded) {
     var that = this;
     var spaceReclaimed = 0;
 
-    return new Promise(function(success) {
+    return new Promise(function(success, reject) {
         if (spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
             success();
             return;
-        }
+        } 
 
         var pop = function() {
             var key = that.mru[0];
             that.removeItem(key)
                 .then(function(itemRemoved) {
-                    spaceReclaimed += itemRemoved.getSize();
+                        spaceReclaimed += itemRemoved.getSize();
 
-                    if (that.debugLoggingEnabled) {
-                        var msg = ["evicted", key, itemRemoved, spaceReclaimed].join(" ");
-                        that.log(msg);
-                    }
+                        if (that.debugLoggingEnabled) {
+                            var msg = ["evicted", key, itemRemoved, spaceReclaimed].join(" ");
+                            that.log(msg);
+                        }
 
-                    if(spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
-                        success();
-                    } else {
-                        pop();
-                    }
+                        if(spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
+                            success();
+                        } else {
+                            pop();
+                        }
+                })["catch"](function(error) {
+                    reject(error);
                 });
         };
         pop();

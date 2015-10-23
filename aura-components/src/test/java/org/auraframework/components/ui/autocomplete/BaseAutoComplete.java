@@ -219,7 +219,7 @@ public class BaseAutoComplete extends WebDriverTestCase {
         waitForAutoCompleteListVisible(list, true);
 
         // go to second option in list.
-        input.sendKeys(Keys.ARROW_DOWN + "" + Keys.ARROW_DOWN + "");
+        input.sendKeys(Keys.ARROW_DOWN + "");
         auraUITestingUtil.pressEnter(input);
         list = getAutoCompleteList(driver, AUTOCOMPLETE_COMPONENT.get("Generic"));
         waitForAutoCompleteListVisible(list, false);

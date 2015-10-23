@@ -187,7 +187,7 @@
 
     <div>Autocomplete with header and footer</div><br/>
     Selected event result: <ui:outputText aura:id="autoCompleteSelectedEventResult" value=""/> <br/><br/>
-    <ui:autocomplete usePanel="{!v.usePanel}" aura:id="autoCompleteHeaderFooter" optionVar="row"
+    <ui:autocomplete setDefaultHighlight="false" usePanel="{!v.usePanel}" aura:id="autoCompleteHeaderFooter" optionVar="row"
                      matchDone="{!c.handleInputChangeAutoCompleteMatchDoneHeaderFooter}"
                      inputChange="{!c.handleInputChangeAutoCompleteHeaderFooter}"
                      selectListOption="{!c.handleSelectOptionAutoCompleteHeaderFooter}">

@@ -633,7 +633,9 @@
 
                 //push this even to the end of the queue to ensure that the interation in the component body is complete
                 window.setTimeout($A.getCallback(function () {
-                    component.get("e.listExpand").fire();
+                    if (component.isValid()) {
+                        component.get("e.listExpand").fire();
+                    }
                 }, 0));
 
             }

@@ -50,6 +50,6 @@
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popup"
                 description="A dropdown menu list with a trigger that controls its visibility. Need to provide a menuTriggerLink and menuList component.">
 
-    <div aura:flavorable="true">{!v.body}</div>
+    {!v.body}
 
 </aura:component>

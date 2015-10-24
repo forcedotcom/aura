@@ -198,23 +198,15 @@
             }]
     },
 
-    //
-    // Overflow has some interesting problems, among them, we have a problem with
-    // races, because everything is done asynchronously. To avoid this, we use getAll to
-    // try to ensure that we are very likely to win any races by being the slowest one
-    // there. However, there is a chance that we will lose...
-    //
     testOverflow: {
-        test:[function(cmp) {
+        test:function(cmp) {
             // Due to differences in size calculation between adapters, pass in a storage with the correct size to
             // fill up the storage after 5 entries of a 512 character string.
-            cmp._storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
+            var storage = this.createStorage("crypto-store-overflow", 5000, 2000, 3000);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store-overflow"); });
 
-            cmp.helper.lib.storageTest.testOverflow_stage1(cmp, cmp._storage);
-        }, function(cmp) {
-            cmp.helper.lib.storageTest.testOverflow_stage2(cmp, cmp._storage);
-        }]
+            cmp.helper.lib.storageTest.testOverflow(cmp, storage);
+        }
     },
 
     testGetAll: {

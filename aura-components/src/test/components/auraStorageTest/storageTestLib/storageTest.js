@@ -355,65 +355,44 @@ function storageTest () {
             $A.test.addWaitFor(true, function() { return completed; });
         },
 
-        //
-        // Overflow has some interesting problems, among them, we have a problem with
-        // races, because everything is done asynchronously. To avoid this, we use getAll to
-        // try to ensure that we are very likely to win any races by being the slowest one
-        // there. However, there is a chance that we will lose...
-        //
-        testOverflow_stage1: function(cmp, storage) {
+
+        /**
+         * Fill storage up with multiple items until we go above the max size. Verify space is evicted from the storage
+         * so max size is not exceeded.
+         */
+        testOverflow: function(cmp, storage) {
             var die = function(error) { dieDie(cmp, error); }.bind(this);
             var completed = false;
             var chunk = new Array(512).join("x");
+            var keyLength = 14;
+            // When SizeEstimator calculates the size it gives a value of 2 per string character so to get the total
+            // size that will be added to storage we multiple 2 by the length of the chunk and key, times the number
+            // of rows (5) , divided by 1024 to convert to KB.
+            var totalSizeAdded = (chunk.length + keyLength) * 2 * 5 / 1024; 
+            var storageMax = storage.getMaxSize();
+            $A.test.assertTrue(storage.getMaxSize() < totalSizeAdded, "Test setup failure: storage being tested is too"
+                    + " large to properly test overflow");
 
-            storage.put("testOverflow.1", chunk)
-                .then(function() {
-                    return storage.put("testOverflow.2", chunk);
-                }).then(function() {
-                    return storage.put("testOverflow.3", chunk);
-                }).then(function() {
-                    return storage.put("testOverflow.4", chunk);
-                }).then(function() {
-                    return storage.put("testOverflow.5", chunk);
-                }).then(function() {
-                    return storage.getSize();
-                }).then(function(size) {
-                    append(cmp, "finished add, size = "+size);
-                    return storage.getAll();
-                }).then(function(result) {
-                    append(cmp, "get all finished, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        append(cmp, result[i]);
-                    }
-                    return storage.getSize();
-                }).then(function(size) {
-                    append(cmp, "post getAll size = "+size);
-                    completed = true;
-                })['catch'](die);
-            $A.test.addWaitFor(true, function() { return completed; });
-        },
-
-        testOverflow_stage2: function(cmp, storage) {
-            var die = function(error) { dieDie(cmp, error); }.bind(this);
-            var completed = false;
-            storage.getAll()
-                .then(function(result) {
-                    append(cmp, "Race 1, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        append(cmp, result[i]);
-                    }
-                    return storage.getAll();
-                }).then(function(result) {
-                    append(cmp, "Race 2, length="+result.length);
-                    for (var i = 0; i < result.length; i++) {
-                        append(cmp, result[i]);
-                    }
-                    return storage.getSize();
-                }).then(function(size) {
-                    append(cmp, "post getAll size = "+size);
-                    $A.assert(size < 5.3, "Size is too large");
-                    completed = true;
-                })['catch'](die);
+            Promise.all([
+                storage.put("testOverflow.1", chunk),
+                storage.put("testOverflow.2", chunk),
+                storage.put("testOverflow.3", chunk),
+                storage.put("testOverflow.4", chunk),
+                storage.put("testOverflow.5", chunk)
+            ])
+            .then(function() {
+                // IndexedDB has funky size calculation that doesn't properly get size until after a getAll
+                return storage.getAll();
+            })
+            .then(function(items) {
+                return storage.getSize();
+            })
+            .then(function(size) {
+                completed = true;
+                $A.test.assertTrue(size < storageMax, "Size of storage is over the max size- items not properly evicted"
+                        + " on overflow.");
+            })
+            ['catch'](die);
 
             $A.test.addWaitFor(true, function() { return completed; });
         },

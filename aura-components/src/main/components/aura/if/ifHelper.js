@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 ({
-    createBody: function(cmp, isTrue, localCreation) {
-        var body = [];
+    createBody: function(cmp, isTrue) {
+        var body  = [];
         var facet = isTrue ? cmp.get("v.template") : cmp.get("v.else");
         
         $A.pushCreationPath("body");
+        
         for (var i = 0, length = facet.length; i < length; i++) {
             $A.setCreationPathIndex(i);
             var cdr = facet[i];
-            var cmps = $A.componentService.newComponentDeprecated(cdr, cdr.valueProvider || cmp.getAttributeValueProvider(), !!localCreation, true);
-            body.push(cmps);
+
+            if (!cdr.attributes.valueProvider) {
+                cdr.attributes.valueProvider = cmp.getAttributeValueProvider();
+            }
+
+            body.push($A.componentService.createComponentFromConfig(cdr));
         }
         
         $A.popCreationPath("body");

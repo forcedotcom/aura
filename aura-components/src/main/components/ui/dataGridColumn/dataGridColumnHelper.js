@@ -27,7 +27,7 @@
 		var outputComponent = cmp.get('v.outputComponent')[0];
 
 		// Wire up default outputComponent if not explicitly set.
-		if (!outputComponent.attributes) {
+		if ($A.util.isEmpty(outputComponent.attributes.values)) {
 			this.wireComponentDefRef(cmp, outputComponent);
 		}
 	},

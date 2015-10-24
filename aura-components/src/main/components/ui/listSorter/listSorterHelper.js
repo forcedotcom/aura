@@ -31,16 +31,14 @@
 				trigger[0].set("v.label", triggerLabel);
 			}
 			trigger[0].addHandler('click', cmp, 'c.onOpen');
+
 		} else if (triggerLabel) {
-			var menuTrigger = $A.componentService.newComponentDeprecated({
-	            "componentDef" : {
-	            	"descriptor" : "markup://ui:menuTriggerLink"
-	            },
-	            "attributes" : {
-	            	"values" : {
-	            		"label": triggerLabel
-	            	}
-	            }});			
+			
+			var menuTrigger = $A.createComponentFromConfig({
+	            componentDef : { descriptor : "markup://ui:menuTriggerLink" },
+	            attributes : { values : { label: triggerLabel } } 
+	        });
+
 			menuTrigger.addHandler('click', cmp, 'c.onOpen');
 			cmp.set('v.trigger', menuTrigger);
 		}

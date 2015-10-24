@@ -59,7 +59,7 @@ AuraRenderingService.prototype.render = function(components, parent) {
         //KRIS: HALO: This might be for component configs.
         if (!$A.util.isComponent(cmp)) {
             // If someone passed a config in, construct it.
-            cmp = $A.componentService["newComponentDeprecated"](cmp, null, false, true);
+            cmp = $A.componentService.createComponentPriv(cmp);
             // And put the constructed component back into the array.
             components[i] = cmp;
         }

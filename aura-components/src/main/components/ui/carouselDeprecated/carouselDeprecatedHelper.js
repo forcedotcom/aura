@@ -102,19 +102,23 @@
 			for ( i = 0; i < pageModels.length; i++) {
 				page = pageModels[i];
 				//create new instance of carousePage and pass pageModel to it
-				 var component=$A.componentService.newComponentDeprecated({
-			            componentDef:{descriptor: 'markup://ui:carouselPage'},
-			            //page index starts with 1
-			            attributes:{values: {
-			            	'priv_visible' : isVisible,
-			            	'pageModel' : page,
-			            	'pageIndex' : i + 1,
-			            	'parent' : [cmp],
-			            	'priv_snap' : snap,
-			            	'priv_width' : cmp._width,
-			            	'priv_height' : pageHeight,
-			            	'priv_continuousFlow' : isContinuousFlow}}
-			        },null,true);
+				 var component= $A.createComponentFromConfig({
+			            componentDef : { 
+			            	descriptor : 'markup://ui:carouselPage'
+			            },
+			            attributes : {
+			            	values : {
+				            	'priv_visible' : isVisible,
+				            	'pageModel' : page,
+				            	'pageIndex' : i + 1,
+				            	'parent' : [cmp],
+				            	'priv_snap' : snap,
+				            	'priv_width' : cmp._width,
+				            	'priv_height' : pageHeight,
+				            	'priv_continuousFlow' : isContinuousFlow
+				            }
+				        }
+			        }, null, true);
                 component.autoDestroy(false);
 				pages.push(component);
 			}

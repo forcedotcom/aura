@@ -190,62 +190,35 @@ AuraComponentService.prototype.newComponentArray = function(config, attributeVal
  * @function
  * @export
  */
-AuraComponentService.prototype.createComponent = function(type, attributes, callback){
+AuraComponentService.prototype.createComponent = function(type, attributes, callback) {
     $A.assert($A.util.isString(type), "ComponentService.createComponent(): 'type' must be a valid String.");
-    $A.assert(!attributes||$A.util.isObject(attributes),"ComponentService.createComponent(): 'attributes' must be a valid Object.");
-    $A.assert($A.util.isFunction(callback),"ComponentService.createComponent(): 'callback' must be a Function pointer.");
+    $A.assert(!attributes || $A.util.isObject(attributes), "ComponentService.createComponent(): 'attributes' must be a valid Object.");
+    $A.assert($A.util.isFunction(callback), "ComponentService.createComponent(): 'callback' must be a Function pointer.");
 
-    var configItem = {
-        "componentDef" : type.toString(),
-        "attributes"   : { "values" : attributes || null },
-        "localId"      : (attributes && attributes["aura:id"]) || null,
-        "flavor"       : (attributes && attributes["aura:flavor"]) || null
+    var config = {
+        "componentDef" : this.createDescriptorConfig(type),
+        "attributes"   : { "values" : attributes },
+        "localId"      : attributes && attributes["aura:id"],
+        "flavor"       : (attributes && attributes["aura:flavor"])
     };
 
-    var configObj = this.getComponentConfigs(configItem);
-    var def = configObj["definition"];
-    var desc = configObj["descriptor"];
-    configItem = configObj["configuration"];
-
-    configItem["componentDef"] = { "descriptor": desc };
-
-    if (!def && desc.indexOf("layout://") === 0) {
-        // clear dynamic namespaces so that the server can send it back.
-        this.dynamicNamespaces = [];
-        // throw error instead of trying to requestComponent from server which is prohibited
-        throw new Error("Missing definition: " + desc);
-    }
+    return this.createComponentPrivAsync(config, callback);
+};
 
 
-    if (!def || def.hasRemoteDependencies()) {
-        var action = this.requestComponent(null, callback, configItem, null, 0, true);
-        // Abortable by default, but return the action so that customers can manipulate other settings.
-        action.setAbortable(true);
-        $A.enqueueAction(action);
-        return action;
-    } else {
-		var component=null;
-        var status="";
-        var message="";
-        try {
-			if($A.clientService.allowAccess(def)) {
-    	        component=this.createComponentInstance(configItem, true);
-				status="SUCCESS";
-        	}else{
-            	// #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-	            $A.warning("Access Check Failed! AuraComponentService.createComponent(): '"+(def&&def.getDescriptor().getQualifiedName())+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
-    	        // #end
-           		status="ERROR";
-				message="Unknown component '"+type+"'.";
-			}
-        } catch(e) {
-            status = "ERROR";
-            message = e.message;
-        }
-        callback(component, status, message);
-
-    }
-    return null;
+/**
+ * Create a component from a DefRef config
+ * It accepts the config Object to generate the tree
+ *
+ * @param {Object} config A map with the component tree configuration,
+ *
+ * @public
+ * @function
+ * @export
+ */
+AuraComponentService.prototype.createComponentFromConfig = function(config) {
+    $A.assert(config, "Config is required to create a component");
+    return this.createComponentPriv(config);
 };
 
 /**
@@ -940,7 +913,8 @@ AuraComponentService.prototype.getDefFromRelationship = function(descriptor, rel
     if (!def && relationshipMap[descriptor]) {
         var componentDefDescriptor = relationshipMap[descriptor];
         if (this.savedComponentConfigs[componentDefDescriptor]) {
-            def = this.getDef(componentDefDescriptor);
+            this.getDef(componentDefDescriptor);
+            return registry[descriptor];
         }
     }
     return def;
@@ -1266,6 +1240,7 @@ AuraComponentService.prototype.clearDefsFromStorage = function () {
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
+    var action;
     $A.assert(callback && typeof callback === 'function' , 'Callback');
 
     if (def && (!def.hasRemoteDependencies() || forceClientCreation)) {
@@ -1274,11 +1249,14 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
             throw new Error("Component class not found: " + descriptor);
         }
 
-        callback(new classConstructor(config, forceClientCreation));
-        return;
+        callback(new classConstructor(config, forceClientCreation), 'SUCCESS');
+        return action;
     }
 
-    $A.enqueueAction(this.requestComponent(this, callback, config));
+    action = this.requestComponent(this, callback, config);
+    action.setAbortable(true);
+    $A.enqueueAction(action);
+    return action;
 };
 
 AuraComponentService.prototype.createComponentPriv = function (config) {

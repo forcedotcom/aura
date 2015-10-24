@@ -124,51 +124,6 @@ Test.Aura.AuraComponentServiceTest = function(){
         }
 
         [Fact]
-        function ThrowsIfNoDefAndLayoutDescriptor() {
-            var desc = "layout://blah";
-            var expected="Missing definition: " + desc;
-            targetService.getComponentConfigs = function(config) {
-                return {
-                    "definition": null,
-                    "descriptor": desc,
-                    "configuration": config
-                }
-            };
-
-            var actual=Record.Exception(function(){
-                $Amock(function(){
-                    targetService.createComponent("test",null,function(){});
-                })
-            });
-
-            Assert.Equal(expected,actual);
-        }
-
-        [Fact]
-        function ClearsDynamicNamespacesIfNoDefAndLayoutDescriptor() {
-            var actual;
-            var expected = [];
-            var desc = "layout://blah";
-            targetService.getComponentConfigs = function(config) {
-                return {
-                    "definition": null,
-                    "descriptor": desc,
-                    "configuration": config
-                }
-            };
-            targetService.dynamicNamespaces = ["to be cleared"];
-
-            try {
-                $Amock(function(){
-                    targetService.createComponent("test",null,function(){});
-                });
-            } catch(e){}
-            actual = targetService.dynamicNamespaces;
-
-            Assert.Equal(expected,actual);
-        }
-
-        [Fact]
         function GetsComponentFromServerWhenNoDef() {
             var actual = false;
             targetService.getComponentConfigs = function(config) {

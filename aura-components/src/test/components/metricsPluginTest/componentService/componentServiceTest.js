@@ -16,8 +16,8 @@
         test: function(cmp) {
             var expected = "markup://aura:text";
             var config = {
-                    componentDef: expected,
-                    attributes: { values: { value: "fyiders" } }
+                componentDef : { descriptor: expected },
+                attributes : { values: { value: "fyiders" } }
             };
 
             $A.metricsService.disablePlugin("componentService");

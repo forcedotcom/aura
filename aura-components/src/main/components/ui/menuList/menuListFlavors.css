@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-.THIS .uiPopupTrigger {
-    position: relative;
-    display: inline-block;
-}
-
-.THIS .uiPopupTrigger a:hover,
-.THIS .uiPopupTrigger a:focus {
-    outline: 0;
-}
-
-.THIS .uiMenuSeparator {
-    border-top: 1px solid #cccccc;
-}
-
-.THIS .uiMenuList {
+.THIS {
     display: none;
     position: absolute;
     border-radius: 3px;
     background-color: #FFF;
     box-shadow: 0 1px 5px rgba(0, 0, 0, .75);
     z-index: 1;
+}
+
+.THIS .uiMenuSeparator {
+    border-top: 1px solid #cccccc;
 }
 
 .THIS .menu__header {
@@ -83,11 +73,11 @@
     background-color: transparent;
 }
 
-.THIS .uiMenuList.menu--nubbin-top {
+.THIS.menu--nubbin-top {
     margin-top: 0.5rem;
 }
 
-.THIS .uiMenuList.menu--nubbin-top:before {
+.THIS.menu--nubbin-top:before {
     width: 1rem;
     height: 1rem;
     position: absolute;
@@ -99,7 +89,7 @@
     margin-left: -0.5rem;
 }
 
-.THIS .uiMenuList.menu--nubbin-top:after {
+.THIS.menu--nubbin-top:after {
     width: 1rem;
     height: 1rem;
     position: absolute;
@@ -111,11 +101,11 @@
     margin-left: -0.5rem;
 }
 
-.THIS .uiMenuList.menu--nubbin-top:before {
+.THIS.menu--nubbin-top:before {
     background: white;
 }
 
-.THIS .uiMenuList.menu--nubbin-top:after {
+.THIS.menu--nubbin-top:after {
     background: white;
     box-shadow: -1px -1px 0 0 rgba(0, 0, 0, 0.16);
     z-index: -1;

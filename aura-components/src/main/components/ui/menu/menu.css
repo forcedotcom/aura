@@ -16,3 +16,13 @@
  .THIS {
      position: relative;
  }
+
+.THIS .uiPopupTrigger {
+    position: relative;
+    display: inline-block;
+}
+
+.THIS .uiPopupTrigger a:hover,
+.THIS .uiPopupTrigger a:focus {
+    outline: 0;
+}

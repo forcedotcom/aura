@@ -67,6 +67,14 @@ public interface StyleAdapter extends AuraAdapter {
             TokenCache overrides);
 
     /**
+     * Should return whether validation of token with property name (as defined in the token def) should be enabled for
+     * the given {@link StyleDef}.
+     *
+     * @param style The {@link StyleDef} descriptor of the CSS file being parsed.
+     */
+    boolean tokenPropertyValidation(DefDescriptor<? extends BaseStyleDef> style);
+
+    /**
      * Gets <em>additional</em> CSS {@link Plugin}s to run during the initial preprocessing phase of {@link StyleDef}s.
      * <p>
      * Any plugins specified here will run only when a {@link StyleDef} is initially parsed. This is the ideal phase to

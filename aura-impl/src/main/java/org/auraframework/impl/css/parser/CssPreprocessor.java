@@ -133,14 +133,18 @@ public final class CssPreprocessor {
         /** enables aura tokens */
         public ParserConfiguration tokens(DefDescriptor<? extends BaseStyleDef> style) {
             if (runtime) {
-                // This will resolve all token function references
+                // this will resolve all token function references
                 TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
                 plugins.add(new TokenFunctionPlugin(tvp));
             } else {
-                // This will collect all token function references but will leave them unevaluated in the CSS
+                // this will collect all token function references but will leave them unevaluated in the CSS
                 TokenValueProvider tvp = Aura.getStyleAdapter().getTokenValueProvider(style, ResolveStrategy.PASSTHROUGH);
                 plugins.add(new TokenFunctionPlugin(tvp));
-                plugins.add(new TokenPropertyValidationPlugin(tvp));
+
+                // validate tokens are used with allowed properties
+                if (Aura.getStyleAdapter().tokenPropertyValidation(style)) {
+                    plugins.add(new TokenPropertyValidationPlugin(tvp));
+                }
             }
             return this;
         }

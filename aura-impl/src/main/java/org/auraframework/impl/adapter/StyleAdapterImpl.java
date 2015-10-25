@@ -38,7 +38,6 @@ import aQute.bnd.annotation.component.Component;
 
 @Component(provide = AuraServiceProvider.class)
 public class StyleAdapterImpl implements StyleAdapter {
-
     @Override
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style) {
         return getTokenValueProvider(style, ResolveStrategy.RESOLVE_NORMAL);
@@ -62,6 +61,12 @@ public class StyleAdapterImpl implements StyleAdapter {
     public TokenValueProvider getTokenValueProvider(DefDescriptor<? extends BaseStyleDef> style, ResolveStrategy strategy,
             TokenCache overrides) {
         return new TokenValueProviderImpl(style, overrides, strategy);
+    }
+
+    @Override
+    public boolean tokenPropertyValidation(DefDescriptor<? extends BaseStyleDef> style) {
+        // validate all non-privileged namespaces. later can change this to include privileged as well.
+        return !Aura.getConfigAdapter().isPrivilegedNamespace(style.getNamespace());
     }
 
     @Override

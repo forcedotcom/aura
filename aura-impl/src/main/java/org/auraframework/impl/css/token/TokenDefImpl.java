@@ -28,12 +28,16 @@ import org.auraframework.util.json.Json;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.salesforce.omakase.data.Property;
 
 public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements TokenDef {
     private static final String INVALID_NAME = "Invalid token name: '%s'";
     private static final String MISSING_VALUE = "Missing required attribute 'value'";
+    private static final String UNKNOWN_PROPERTY = "Unknown CSS property '%s'";
+    private static final Set<String> EXTRA_PROPERTIES = ImmutableSet.of("box-flex");
+
     private static final long serialVersionUID = 344237166606014917L;
 
     private final Object value;
@@ -82,9 +86,8 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
 
         // properties must be recognized
         for (String property : allowedProperties) {
-            if (Property.lookup(property) == null) {
-                // TODONM: reenable
-                // throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
+            if (Property.lookup(property) == null && !EXTRA_PROPERTIES.contains(property)) {
+                throw new InvalidDefinitionException(String.format(UNKNOWN_PROPERTY, property), getLocation());
             }
         }
     }

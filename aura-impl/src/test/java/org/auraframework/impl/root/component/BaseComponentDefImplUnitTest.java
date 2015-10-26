@@ -119,6 +119,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     public void testValidateReferences() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;
+        this.modelDefDescriptor = null;
         setupTemplate(true);
         buildDefinition().validateReferences();
     }
@@ -173,6 +174,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", exprLocation));
         this.attributeDefs = ImmutableMap.of();
         setupTemplate(true);
+        modelDefDescriptor = null;
 
         try {
             buildDefinition().validateReferences();
@@ -188,6 +190,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     public void testTemplateMustBeTemplate() throws Exception {
         setupValidateReferences();
         this.extendsDescriptor = null;
+        this.modelDefDescriptor = null;
         setupTemplate(false);
         try {
             buildDefinition().validateReferences();
@@ -219,6 +222,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         this.expressionRefs = Sets.newHashSet();
         this.expressionRefs.add(new PropertyReferenceImpl("v.privateAttribute", null));
         this.attributeDefs = ImmutableMap.of(attrDesc, attrDef);
+        this.modelDefDescriptor = null;
 
         setupTemplate(true);
 

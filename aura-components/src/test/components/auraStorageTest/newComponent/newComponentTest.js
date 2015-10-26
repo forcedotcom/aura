@@ -112,7 +112,7 @@
             action2.setParams({testName : "testActionScopedGlobalID"});
             action2.setAbortable();
             action2.setCallback(cmp, function(action) {
-                    var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+                    var teamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
                     //Clear the old facet in team div & insert newly fetched components
                     cmp.find("Team").set("v.body", [teamFacet]);
                     //Update the page with action number
@@ -179,7 +179,7 @@
                     //Clear the old facet in players div
                     var newBody = []
                     for(var i=0;i<ret.length;i++){
-                        var playerFacet = $A.newCmpDeprecated(ret[i]);
+                        var playerFacet = $A.createComponentFromConfig(ret[i]);
                         newBody.push(playerFacet);
                     }
                     //Insert newly fetched components

@@ -21,7 +21,7 @@
 
     openPanel: function(cmp){
         var refEl = '.refElement2';
-        var body = $A.newCmp({componentDef: "markup://ui:outputText",
+        var body = $A.createComponentFromConfig({componentDef: { descriptor: "markup://ui:outputText"},
     		attributes: {
     			values: {
     				value: "First panel body\nClick on the ChangeRefElem button to change the reference element"
@@ -46,7 +46,7 @@
     	var panel = cmp.find("pm").find("panel");
     	var refElement1 = cmp.find("refElement1").getElement();
     	panel.set("v.referenceElement", refElement1);
-    	panel.set("v.body", $A.newCmp({componentDef: "markup://ui:outputText",
+    	panel.set("v.body", $A.createComponentFromConfig({componentDef: { descriptor: "markup://ui:outputText"},
     		attributes: {
     			values: {
     				value: "New panel body\nHere is some more text!"
@@ -58,7 +58,7 @@
     onSelectChange: function(cmp){
         var select = cmp.find('directions');
         var direction = select.get('v.value');
-        var body = $A.newCmp({componentDef: "markup://ui:outputRichText",
+        var body = $A.createComponentFromConfig({componentDef: { descriptor: "markup://ui:outputRichText" },
             attributes: {
                 values: {
                     value: "<div class=\"panel-bd\">Panel Body</div>"

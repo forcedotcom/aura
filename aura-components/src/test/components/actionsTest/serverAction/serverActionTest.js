@@ -350,7 +350,7 @@
                 action.setCallback(this, function(a) {
                     if (a.getState() === "SUCCESS") {
                         // Consume config to avoid warning/error
-                        $A.newCmpDeprecated(a.getReturnValue());
+                        $A.createComponentFromConfig(a.getReturnValue());
                     }
                 });
 

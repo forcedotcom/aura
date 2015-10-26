@@ -25,8 +25,7 @@
         action.setParams({ name: 'ui:image' });
 
         action.setCallback(this, function () {
-            console.log('Downloaded def: ', action.getReturnValue());
-            $A.newCmp(action.getReturnValue());
+            $A.createComponentFromConfig(action.getReturnValue());
             cmp.set('v.loaded', true);
             finishRun();
         });

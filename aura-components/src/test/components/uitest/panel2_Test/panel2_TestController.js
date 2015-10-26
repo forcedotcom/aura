@@ -27,8 +27,8 @@
 
 		// set panel's body
 		var panelBody;
-		panelBody = $A.newCmp({
-			componentDef : "markup://ui:outputText",
+		panelBody = $A.createComponentFromConfig({
+			componentDef : { descriptor: "markup://ui:outputText"},
 			attributes : {
 				values : {
 					value : "Body of panel created by clicking on app input"

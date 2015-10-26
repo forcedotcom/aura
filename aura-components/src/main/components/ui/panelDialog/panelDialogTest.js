@@ -92,31 +92,6 @@
     	}
 	},
 
-	getInnerComponent: function() {
-        return $A.componentService.newComponent({
-                componentDef: "markup://ui:inputTextArea",
-                attributes: {
-                    values: {
-                        value: "this is value",
-                        label: "input box",
-                        actionable: true,
-                        rows: 100
-                    }
-                }
-            });
-    },
-
-    getMockButton: function(label) {
-    	return $A.services.component.newComponent({
-            componentDef: "markup://ui:actionButton",
-            attributes: {
-                values: {
-                	action: {"label": label}
-                }
-            }
-        });
-    },
-
 	/*
 	* Modal is rendered
 	*/

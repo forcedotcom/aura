@@ -105,12 +105,12 @@
 
 		// set panel's body
 		var makeScrollable = cmp.get("v.makeScrollable");
-		var panelBody;
+		var panelBody = [];
 		if (makeScrollable) {
 			// body of panel is just a bunch of text
 			panelBody = $A
-					.newCmp({
-						componentDef : "markup://ui:outputText",
+					.createComponentFromConfig({
+						componentDef : {descriptor: "markup://ui:outputText"},
 						attributes : {
 							values : {
 								value : "Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com Salesforce.com "
@@ -119,8 +119,8 @@
 					});
 		} else if (cmp.get("v.nonScrollable")) {
 			// body of panel is just a bunch of text
-			panelBody = $A.newCmp({
-				componentDef : "markup://ui:outputText",
+			panelBody = $A.createComponentFromConfig({
+				componentDef : {descriptor: "markup://ui:outputText"},
 				attributes : {
 					values : {
 						value : "Salesforce.com Salesforce.com"
@@ -129,16 +129,17 @@
 			});
 		} else {
 			// body of panel is more interesting
-			panelBody = $A.newCmp([ {
-				componentDef : "markup://ui:outputText",
-				attributes : {
-					values : {
-						value : "New panel body"
-					}
-				}
-			}, {
-				componentDef : "markup://uitest:panel2_Tester"
-			} ]);
+			panelBody.push($A.createComponentFromConfig({
+                componentDef : {descriptor: "markup://ui:outputText"},
+                attributes : {
+                    values : {
+                        value : "New panel body"
+                    }
+                }
+            }));
+			panelBody.push($A.createComponentFromConfig({
+			    componentDef : { descriptor: "markup://uitest:panel2_Tester"}
+			}));
 		}
 		config["body"] = panelBody;
 

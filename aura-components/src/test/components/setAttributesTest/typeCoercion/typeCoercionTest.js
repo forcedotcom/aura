@@ -27,22 +27,21 @@
 			$A.test.assert($A.util.isArray(value), "Body was of the wrong type, it was of type " + typeof value);
 		}
 	},
-	
-	// Programmatic Create from Config
+
 	testProgrammaticCreateFromConfig: {
 		test: [
 		       function(cmp) {
-		    	   var created = this.newComponent("setAttributesTest:typeCoercion", { listAttribute: ["list1", "list2"] });
-		    	   var actual;
-		    	 
-		    	   actual = created.get("v.listAttribute");
-		    	   
-		    	   $A.test.assert($A.util.isArray(actual), "listAttribute was not set on the component as an array");
+		           var completed = false;
+		           $A.createComponent("setAttributesTest:typeCoercion", { listAttribute: ["list1", "list2"] }, function(newCmp) {
+		               var actual = newCmp.get("v.listAttribute");
+		               $A.test.assert($A.util.isArray(actual), "listAttribute was not set on the component as an array");
+		               completed = true;
+		           });
+		    	   $A.test.addWaitFor(true, function(){ return completed; });
 		       }
 		]
 	},
 
-	// Test File Attribute Set
 	testAttributeSetFromTest: {
 		attributes: {
 			stringAttribute: "string",
@@ -65,7 +64,7 @@
 		       }
 		]
 	},
-	
+
 	testAttributeSetFromTestArrayAttribute: {
 		attributes: {
 			// This is how it currently works, so we should probably make sure it continues to work
@@ -83,23 +82,5 @@
 		    	   $A.test.assertEquals(2, cmp.get("v.listAttribute").length, "listAttribute was not set to an array from the test attributes");
 		       }
 		]
-	},
-	
-	
-	
-	// HELPERS
-	
-	// Lots of cruft just to create a component 
-	newComponent: function(componentDef, attributeValues) {
-		if(componentDef.indexOf("markfup://") != 0) {
-			componentDef = "markup://" + componentDef;
-		}
-		
-		return $A.services.component.newComponent({
-            componentDef: componentDef,
-            attributes: {
-                values: attributeValues || {}
-            }
-        });
 	}
 })

@@ -53,16 +53,9 @@
                     break;
             }
 
-            var newCmp = $A.componentService.newComponent({
-                "componentDef" : "markup://ui:outputText",
-                "attributes": {
-                    "values": {
-                        "value": message
-                    }
-                }
+            $A.createComponent("ui:outputText", {"value": message}, function(newCmp) {
+                targetCmp.set("v.body", [newCmp]);
             });
-
-            targetCmp.set("v.body", [newCmp]);
         }
     }
 })

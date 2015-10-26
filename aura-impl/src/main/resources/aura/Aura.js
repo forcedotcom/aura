@@ -1126,7 +1126,7 @@ AuraInstance.prototype.hasDefinition = function(descriptor) {
     $A.assert($A.util.isString(descriptor), "'descriptor' must be an event or component descriptor such as 'prefix:name' or 'e.prefix:name'.");
 
     if(descriptor.indexOf("e.") !== -1) {
-        return this.eventService.hasDefinition(descriptor);
+        return this.eventService.hasDefinition(descriptor.replace("e.", ""));
     }
     return this.componentService.hasDefinition(descriptor);
 };

@@ -148,9 +148,9 @@
         test:function(cmp) {
             var actionComplete = false;
             $A.test.setServerReachable(false);
+            $A.test.addCleanup(function() {$A.test.setServerReachable(true);});
 
-            $A.getDefinition("ui:button", function(definition) {
-                $A.test.setServerReachable(true);
+            $A.getDefinition("ui:inputCheckbox", function(definition) {
                 $A.test.assertNull(definition);
                 actionComplete = true;
             });

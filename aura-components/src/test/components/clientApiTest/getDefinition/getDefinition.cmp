@@ -20,4 +20,23 @@
     <aura:dependency resource="markup://aura:label" type="COMPONENT"/>
     <aura:dependency resource="markup://aura:valueChange" type="EVENT"/>
     <aura:dependency resource="markup://aura:titleChange" type="EVENT"/>
+
+    <aura:attribute name="definitionNames" type="String[]" default=""/>
+    <aura:attribute name="complete" type="Boolean" default="false"/>
+
+    <ui:button label="Get Event Definition without Access" press="{!c.getEventDefinitionWithoutAccess}"
+            class="getEventDefinitionWithoutAccessButton"/>
+    <ui:button label="Get Component Definition without Access" press="{!c.getComponentDefinitionWithoutAccess}"
+            class="getComponentDefinitionWithoutAccessButton"/>
+    <ui:button label="Get Multiple Definitions without Access" press="{!c.getDefinitionsWithoutAccess}"
+            class="getDefinitionsWithoutAccessButton"/>
+
+    <br/>
+    Complete: <div id="complete">{!v.complete}</div>
+    <br/>
+    <div class="definitionNameOutput">
+        <aura:iteration items="{!v.definitionNames}" var="name" indexVar="index">
+            <div class="{!'element'+index}">{!name}</div>
+        </aura:iteration>
+    </div>
 </aura:component>

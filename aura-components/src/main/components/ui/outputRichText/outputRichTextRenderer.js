@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 ({
-    render: function(component, helper) {
-        helper.validate(component);
+    render: function(component) {
+        if (component) {
+            var concrete = component.getConcreteComponent();
+            var concreteHelper = concrete.getDef().getHelper();
+            concreteHelper.validate(component);
+        }
         return this.superRender();
     },
 
-    rerender: function(component, helper) {
-        helper.validate(component);
+    rerender: function(component) {
+        if (component) {
+            var concrete = component.getConcreteComponent();
+            var concreteHelper = concrete.getDef().getHelper();
+            concreteHelper.validate(component);
+        }
         return this.superRerender();
     }
  })// eslint-disable-line semi

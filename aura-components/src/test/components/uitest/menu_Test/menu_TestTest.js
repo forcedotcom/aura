@@ -540,6 +540,32 @@
         }
     },
 
+    /**
+     * Test to verify if focus event is triggered on focus
+     */
+    testFocusEvent: {
+        owner: 'smo',
+        test: [function(cmp) {
+            this.fireEvents(cmp, "focus", 2);
+        }, function(cmp) {
+            this.verifyCount(cmp, "focus", 2);
+        }]
+    },
+
+    /**
+     * Test to verify if blur event is triggered on blur
+     */
+    testblurEvent: {
+        owner: 'smo',
+        test: [function(cmp) {
+            this.fireEvents(cmp, "blur", 2);
+        }, function(cmp) {
+            this.verifyCount(cmp, "blur", 2);
+        }]
+    },
+
+    /****************** Helpers *********************/
+
     verifyMenuItemSelected: function (menuItem, message) {
         //Test case for W-1617363
         $A.test.assertDefined(menuItem.get('v.value'), "value of menuItem should be defined");
@@ -573,5 +599,17 @@
             function () {
                 return outputText.get('v.value')
             }, message);
+    },
+
+    fireEvents: function(cmp, evtName, count) {
+        var menuLinkEl = cmp.find("menuLink").getElement();
+        for (var i = 0; i < count; i++) {
+            $A.test.fireDomEvent(menuLinkEl, evtName);
+        }
+    },
+
+    verifyCount: function(cmp, evtName, count) {
+        $A.test.assertEquals(count, cmp.get("v." + evtName + "_counter"),
+                evtName + "event counter is not correct! Event might not be handled!");
     }
 })

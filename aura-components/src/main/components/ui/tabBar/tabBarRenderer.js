@@ -20,13 +20,6 @@
         return this.superRender();
     },
 
-    afterRender: function(cmp, helper) {
-        if (cmp.get("v.useOverflowMenu")) {
-            helper.initializeOverflowData(cmp);
-        }
-        this.superAfterRender();
-    },
-
     rerender: function (cmp, helper) {
         if (cmp.isDirty("v.tabs")) {
             helper.setTabItems(cmp);

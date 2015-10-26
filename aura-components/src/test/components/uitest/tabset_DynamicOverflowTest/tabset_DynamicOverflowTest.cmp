@@ -1,0 +1,62 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="numTabs" type="Integer" default="20"/>
+	<aura:attribute name="headerWidth" type="Integer" default="300"/>
+	<aura:attribute name="isCloseable" type="Boolean" default="false"/>
+	<aura:attribute name="isNestedTabs" type="Boolean" default="false"/>
+	<aura:attribute name="indexAddRemove" type="Integer" default="0"/>
+	<aura:attribute name="titleOfAddTab" type="String" default="Dynamic-"/>
+	<aura:attribute name="targetContainer" type="String" default="testTabContainer"/>
+	<aura:attribute name="newHeaderTitle" type="String"/>
+	<aura:attribute name="newHeaderTitleIndex" type="Integer"/>
+	
+	<aura:dependency resource="markup://ui:tabset" type="COMPONENT"/>
+	
+	<div aura:id="tabsetControlls" class="tabsetControlls">
+		<ui:inputNumber aura:id="inputNumTabs" label="Number of tabs to create" value="{!v.numTabs}"/>
+		<ui:inputNumber aura:id="inputHeaderWidth" label="Max Header Width" value="{!v.headerWidth}"/>
+		<ui:inputCheckbox aura:id="inputIsCloseable" label="Are tabs closeable" value="{!v.isCloseable}" click="{!c.toggleIsCloseable}"/>
+		<ui:inputCheckbox aura:id="inputIsNestedTabs" label="Are tabs nested" value="{!v.isNestedTabs}" click="{!c.toggleIsNestedTabs}"/>
+        <ui:button aura:id="btnCreateTabs" label="Create tabs" press="{!c.loadTabs}" />
+        <ui:button aura:id="btnCreateMultiTabsets" label="Create multiple tabsets" press="{!c.loadMultiTabsets}" />
+        <ui:button aura:id="btnCreateTabsetsForAutomation" label="Create tabsets for Automation" press="{!c.loadAutomationTabsets}" />
+	</div>
+	
+	<div aura:id="dynamicTabControlls" class="dynamicTabControlls">
+		<ui:inputText aura:id="inputTargetContainerAddRemove" label="Target container" value="{!v.targetContainer}" blur="{!c.updateTargetContainerAddRemove}"/>
+		<ui:inputNumber aura:id="inputDynamicTabIndex" label="Index to add/remove" value="{!v.indexAddRemove}"/>
+		<ui:inputText aura:id="inputDynamicTabTitle" label="Title of added tab" value="{!v.titleOfAddTab}"/>
+		<ui:button aura:id="btnAddTab" label="Add" press="{!c.addTab}"/>
+		<ui:button aura:id="btnRemoveTab" label="Remove" press="{!c.removeTab}"/>
+	</div>
+	
+	<div aura:id="testControlls" class="testControlls">
+		<ui:inputText aura:id="inputTargetContainerChangeTitle" label="Target container" value="{!v.targetContainer}" blur="{!c.updateTargetContainerChangeTitle}"/>
+		<ui:inputText aura:id="inputNewHeaderTitle" label="New Header Title" value="{!v.newHeaderTitle}"/>
+		<ui:inputNumber aura:id="inputNewHeaderTitleIndex" label="Index of New Header Title" value="{!v.newHeaderTitleIndex}"/>
+		<ui:button aura:id="btnChangeHeaderTitle" label="Dynamically change header Title" press="{!c.changeHeaderTitle}"/>
+	</div>
+	
+	<div aura:id="testTabContainer" class="testTabContainer"/>
+	<div aura:id="testTabContainerFixed" class="testTabContainerFixed"/>
+	<div aura:id="testTabContainer50" class="testTabContainer50"/>
+	<div aura:id="testTabContainer75" class="testTabContainer75"/>
+	<div aura:id="testTabContainerForAutomation" class="testTabContainerForAutomation"/>
+	
+</aura:component>

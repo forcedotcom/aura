@@ -15,7 +15,13 @@
  */
 
 ({
-	setActive: function(cmp, evt, helper) {
+	onInit: function(cmp, evt, helper) {
+        if (cmp.get("v.useOverflowMenu")) {
+            helper.initializeOverflowData(cmp);
+        }
+    },
+
+    setActive: function(cmp, evt, helper) {
 		var active = evt.getParam("active");
 		//workaround issue where Integer type is passed in as String
 		var index = parseInt(evt.getParam("index"));

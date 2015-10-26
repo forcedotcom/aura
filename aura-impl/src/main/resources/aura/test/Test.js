@@ -562,7 +562,11 @@ TestInstance.prototype.auraError = function(level, msg/* , error */) {
 };
 
 /**
- * Tell the test that we expect an error. Test will fail if expected error is not received.
+ * Warning- use this function with care. Tell the test that we expect an $A.auraError that occurs in a separate thread
+ * than the main test thread. Any errors occurring in the main test thread should be caught and verified in the test
+ * itself.
+ * 
+ * Test will fail if expected error is not received.
  *
  * @param {string}
  *            e The error message that we expect.
@@ -2251,7 +2255,12 @@ window.onerror = (function() {
     /** @inner */
     var newHandler = function(msg, url, line, col, e) {
         if (e && e["name"] === "AuraError") {
-            $A["test"].auraError.call($A["test"], "ERROR", msg);
+            try {
+                $A["test"].auraError.call($A["test"], "ERROR", msg);
+            } catch(err) {
+                // The error may have broken the test runner loop so tear down to guarantee the test is completed.
+                $A["test"].doTearDown();
+            }
             return true;
         } else {
             var error = {
@@ -2264,6 +2273,7 @@ window.onerror = (function() {
                 error["line"] = line;
             }
             TestInstance.prototype.errors.push(error);
+            $A["test"].doTearDown();
         }
     };
 

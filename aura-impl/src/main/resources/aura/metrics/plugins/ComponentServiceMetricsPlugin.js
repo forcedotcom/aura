@@ -63,7 +63,7 @@ ComponentServiceMetricsPlugin.prototype.createComponentOverride = function () {
     return ret;
 };
 
-ComponentServiceMetricsPlugin.prototype.bind = function (metricsService) {
+ComponentServiceMetricsPlugin.prototype.bind = function () {
     $A.installOverride("ComponentService.createComponentPriv", this.createComponentOverride, this);
 };
 
@@ -73,7 +73,6 @@ ComponentServiceMetricsPlugin.prototype.postProcess = function (componentMarks) 
     var procesedMarks = [];
     var stack = [];
     for (var i = 0; i < componentMarks.length; i++) {
-        var id = componentMarks[i]["context"]["descriptor"];
         var phase = componentMarks[i]["phase"];
         if (phase === 'start') {
             stack.push(componentMarks[i]);
@@ -90,7 +89,7 @@ ComponentServiceMetricsPlugin.prototype.postProcess = function (componentMarks) 
 };
 //#end	
 
-ComponentServiceMetricsPlugin.prototype.unbind = function (metricsService) {
+ComponentServiceMetricsPlugin.prototype.unbind = function () {
     $A.unInstallOverride("ComponentService.createComponentPriv", this.createComponentOverride);
 };
 

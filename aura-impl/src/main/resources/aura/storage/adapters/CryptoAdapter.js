@@ -103,9 +103,9 @@ CryptoAdapter.key = new Promise(function(resolve, reject) {
 
 /**
  * Sets the per-application encryption key.
- * @param {ArrayBuffer} raw - the raw bytes of the encryption key.
+ * @param {ArrayBuffer} rawKey - the raw bytes of the encryption key.
  */
-CryptoAdapter["setKey"] = function(key) {
+CryptoAdapter["setKey"] = function(rawKey) {
     // note: @export is configured only for prototypes so must use array syntax to avoid mangling
     // note: because this is not instance specific there's no config indicating verbosity, so
     //       always log with $A.log directly
@@ -120,7 +120,7 @@ CryptoAdapter["setKey"] = function(key) {
 
     CryptoAdapter.engine["importKey"](
         "raw",                  // format
-        key,                    // raw key as an ArrayBuffer
+        rawKey,                 // raw key as an ArrayBuffer
         CryptoAdapter.ALGO,     // algorithm of key
         false,                  // don't allow key export
         ["encrypt", "decrypt"]  // allowed operations

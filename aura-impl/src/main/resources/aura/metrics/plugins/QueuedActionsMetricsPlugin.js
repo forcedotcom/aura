@@ -110,7 +110,7 @@ QueuedActionsMetricsPlugin.prototype.markEnd = function(action) {
     };
 };
 
-QueuedActionsMetricsPlugin.prototype.bind = function (metricsService) {
+QueuedActionsMetricsPlugin.prototype.bind = function () {
     $A.installOverride("enqueueAction", this.enqueueActionOverride, this);
     $A.installOverride("Action.finishAction", this.actionFinishOverride, this);
     $A.installOverride("Action.abort", this.actionAbortOverride, this);
@@ -120,12 +120,10 @@ QueuedActionsMetricsPlugin.prototype.bind = function (metricsService) {
 /** @export */
 QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
     var processedMarks = [];
-    var bundle = [];
     var queue  = {};
-    var mark,i,j;
 
     // All this loops are to get all actions in the same bundle
-    for (i = 0; i < actionMarks.length; i++) {
+    for (var i = 0; i < actionMarks.length; i++) {
         var action = actionMarks[i];
         var id = action["context"]["id"];
         var phase = action["phase"];
@@ -158,7 +156,7 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
 };
 //#end
 
-QueuedActionsMetricsPlugin.prototype.unbind = function (metricsService) {
+QueuedActionsMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("enqueueAction", this.enqueueActionOverride);
     $A.uninstallOverride("Action.finishAction", this.actionFinishOverride);
     $A.uninstallOverride("Action.abort", this.actionAbortOverride);

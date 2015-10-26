@@ -26,7 +26,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
+/**
+ * WARNING this test is testing deprecated components. Usages of panelManager should be replaced with panelManager2
+ */
 @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
         BrowserType.IE7, BrowserType.IE8 })
 public class PanelModalOverlayUITest extends WebDriverTestCase {
@@ -35,12 +39,10 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     private final String PANELDIALOG_MODAL_BUTTON = ".panelDialogModalButton";
     private final String PANELDIALOG_NONMODAL_BUTTON = ".panelDialogNonModalButton";
     private final String PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON = ".panelDialogNonModalNonTransientButton";
-    private final String PANEL_OVERLAY_BUTTON = ".panelOverlayButton";
     private final String PANELDIALOG_MODAL_CMP = ".uiPanelDialog";
-    private final String PANEL_OVERLAY_CMP = ".uiPanelOverlay";
     private final String ACTIVE_ELEMENT = "return $A.test.getActiveElement()";
-    private final String ACTIVE_ELEMENT_TEXT = "return $A.test.getActiveElementText()";
     private final String ESC_BUTTON = ".closeBtn";
+    private final String ACTIVE_ELEMENT_TEXT = "return $A.test.getActiveElementText()";
     private final String NEWOVERLAY_BUTTON = ".pressOverlay";
     private final String INPUT_TEXT = ".inputText";
 
@@ -50,293 +52,214 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
 
     /**
      * [Accessibility] modal overlay dialog closing on Esc key. Test case for W-2396326
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPressEscKeyOnModalOverlayDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANELDIALOG_MODAL_BUTTON, PANELDIALOG_MODAL_CMP,
-                Keys.ESCAPE, false);
+    public void testPressEscKeyOnModalOverlayDialog() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_MODAL_BUTTON);
+        verifyOverlayActive();
+        pressEscapeOnActiveElement();
+        waitForElementAbsent(getDriver().findElement(By.cssSelector(PANELDIALOG_MODAL_CMP)));
+        verifyOverlayNotActive();
     }
 
     /**
      * [Accessibility] non-modal overlay dialog closing on Esc key. Test case for W-2396326
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPressEscKeyOnNonModalDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANELDIALOG_NONMODAL_BUTTON, PANELDIALOG_MODAL_CMP,
-                Keys.ESCAPE, false);
+    public void testPressEscKeyOnNonModalDialog() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        pressEscapeOnActiveElement();
+        waitForElementDisappear(By.cssSelector(PANELDIALOG_MODAL_CMP));
+        verifyOverlayNotActive();
     }
 
     /**
      * [Accessibility] non-modal overlay dialog with transient set to false should be closing on Esc key. Test case for
      * W-2396326
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPressEscKeyOnNonModalNonTransientDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON,
-                PANELDIALOG_MODAL_CMP, Keys.ESCAPE, false);
+    public void testPressEscKeyOnNonModalNonTransientDialog() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        pressEscapeOnActiveElement();
+        waitForElementAbsent(getDriver().findElement(By.cssSelector(PANELDIALOG_MODAL_CMP)));
+        verifyOverlayNotActive();
     }
 
     /**
      * [Accessibility] non-modal overlay dialog should not be closed when closeOnClickOut is not set to true Test case
      * for W-2518413
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPanelDialogWithCloseOnClickOutNotSet() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANELDIALOG_NONMODAL_BUTTON, PANELDIALOG_MODAL_CMP, null,
-                true);
+    public void testPanelDialogWithCloseOnClickOutNotSet() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        clickOutModal();
+        // Since panel stays open and active just try to wait for the click away to be fully processed
+        waitForActiveElementText("", "Active element never switched when clicking out of modal");
+        verifyOverlayActive();
     }
 
     /**
      * [Accessibility] non-modal overlay dialog should be closed when closeOnClickOut is set to true Test case for
      * W-2518413
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPanelDialogWithCloseOnClickOutSet() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON,
-                PANELDIALOG_MODAL_CMP, null, false);
-    }
-
-    /**
-     * [Accessibility] Panel overlay dialog - non Full screen should be closed on Esc key. Test case for W-2424490 TODO:
-     * uncomment the test once the bug is fixed.
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     */
-    public void _testPressEscKeyOnPanelOverlayDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(PANEL_OVERLAY_BUTTON, PANEL_OVERLAY_CMP, Keys.ESCAPE,
-                false);
-    }
-
-    /**
-     * Verify pressing ESC while modalOverlay dialog is opened should close the overlay
-     * 
-     * @param keyToBePressed
-     * @param isOverlayActiveAfterPressingESC
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    private void verifyPressEscKeyORClickOutOnModalAndNonModalOverlay(String button, String cmp, Keys keyToBePressed,
-            boolean isOverlayActiveAfterPressingESC) throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        // verifyTabOutAndEscBehaviour(Keys.ESCAPE, false);
+    public void testPanelDialogWithCloseOnClickOutSet() throws Exception {
         open(APP);
-        verifyOverlayActive(cmp, false);
-        openOverlay(button);
-        verifyOverlayActive(cmp, true);
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        if (keyToBePressed != null) {
-            activeElement.sendKeys(keyToBePressed);
-        }
-        else {
-            WebElement inputText = findDomElement(By.cssSelector(INPUT_TEXT));
-            inputText.click();
-        }
-        verifyOverlayActive(cmp, isOverlayActiveAfterPressingESC);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        clickOutModal();
+        waitForElementAbsent(getDriver().findElement(By.cssSelector(PANELDIALOG_MODAL_CMP)));
+        verifyOverlayNotActive();
     }
 
     /**
      * [Accessibility] Modal overlay dialog closes on pressing ESC button.
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPressEscButtonOnModalOverlayDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscButtonOnModalAndNonModalOverlay(PANELDIALOG_MODAL_BUTTON);
+    public void testPressEscButtonOnModalOverlayDialog() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_MODAL_BUTTON);
+        verifyOverlayActive();
+        findDomElement(By.cssSelector(ESC_BUTTON)).click();
+        waitForElementAbsent(getDriver().findElement(By.cssSelector(PANELDIALOG_MODAL_CMP)));
+        verifyOverlayNotActive();
     }
 
     /**
      * [Accessibility] non-modal overlay dialog closes on pressing ESC button.
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testPressEscButtonOnNonModalDialog() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyPressEscButtonOnModalAndNonModalOverlay(PANELDIALOG_NONMODAL_BUTTON);
-    }
-
-    /**
-     * Verify pressing ESC button with modal and non-modal Overlay dialog
-     * 
-     * @param button
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     */
-    private void verifyPressEscButtonOnModalAndNonModalOverlay(String button) throws MalformedURLException,
-            URISyntaxException, InterruptedException {
+    public void testPressEscButtonOnNonModalDialog() throws Exception {
         open(APP);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, false);
-        openOverlay(button);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, true);
-        WebElement escButton = findDomElement(By.cssSelector(ESC_BUTTON));
-        escButton.click();
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, false);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        findDomElement(By.cssSelector(ESC_BUTTON)).click();
+        waitForElementDisappear(By.cssSelector(PANELDIALOG_MODAL_CMP));
+        verifyOverlayNotActive();
     }
 
     /**
      * Test multiple overlay one above another on modal overlay should close all the overlay's when we press ESC on the
      * newest overlay
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testClickEscButtonClosesAllModalOverlays() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyClickEscButtonClosesAllModalNonModalOverlays(PANELDIALOG_MODAL_BUTTON, true, 2);
+    // TODO(W-2789664): Opening modal on top of first one then pressing escape causes error.
+    // "Invalid component tried calling function [get] with arguments [v.isModal], markup://ui:panelDialog [22:c]"
+    public void _testClickEscButtonClosesAllModalOverlays() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_MODAL_BUTTON);
+        verifyOverlayActive();
+        openNewOverlayOnTopOfExistingModalOverlay(2, true);
+        verifyOverlayActive();
+        pressEscapeOnActiveElement();
+        waitNumberOfPanelsInDom(1);
+        verifyOverlayNotActive();
     }
 
     /**
      * Test multiple overlay one above another on non-modal overlay should close all the overlay's when we press ESC on
      * the newest overlay
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException TODO: Once W-2521190 is fixed need to change the arogument from 1 to 2
      */
-    public void testClickEscButtonClosesAllNonModalOverlays() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyClickEscButtonClosesAllModalNonModalOverlays(PANELDIALOG_NONMODAL_BUTTON, true, 2);
-    }
-
-    /**
-     * verify multiple overlay one above another on modal or nonModal should close all the overlay's when we press ESC
-     * on the newest overlay
-     * 
-     * @param expOverlays
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
-     */
-    public void verifyClickEscButtonClosesAllModalNonModalOverlays(String button, boolean isTransient, int expOverlays)
-            throws MalformedURLException, URISyntaxException, InterruptedException {
+    // TODO(W-2789664): Opening modal on top of first one then pressing escape causes error.
+    // "Invalid component tried calling function [get] with arguments [v.isModal], markup://ui:panelDialog [22:c]"
+    public void _testClickEscButtonClosesAllNonModalOverlays() throws Exception {
         open(APP);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, false);
-        openOverlay(button);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, true);
-        String globalId1 = null;
-        if (!isTransient) {
-            List<WebElement> activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
-            globalId1 = activeOverlay.get(0).getAttribute("data-aura-rendered-by");
-        }
-        openNewOverlayOnTopOfExistingModalOverlay(expOverlays, isTransient);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, true);
-        if (!isTransient) {
-            List<WebElement> activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
-            String globalId2 = activeOverlay.get(0).getAttribute("data-aura-rendered-by");
-            // For transient set to false the cmp should use the prev instance, and no new cmp should be created
-            assertEquals("It should use old instance of panelDialog cmp for non transient panel Dialog", globalId1,
-                    globalId2);
-        }
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        activeElement.sendKeys(Keys.ESCAPE);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, false);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        openNewOverlayOnTopOfExistingModalOverlay(2, true);
+        verifyOverlayActive();
+        pressEscapeOnActiveElement();
+        waitNumberOfPanelsInDom(0);
+        verifyOverlayNotActive();
     }
 
     /**
      * verify multiple overlay one above another on nonModal non transient should close all the overlay's when we press
-     * ESC on the newest overlay
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException Test case for W-2518413
+     * ESC on the newest overlay Test case for W-2518413
      */
-    public void testClickEscButtonClosesAllNonModalNonTransientOverlays() throws MalformedURLException,
-            URISyntaxException, InterruptedException {
-        verifyClickEscButtonClosesAllModalNonModalOverlays(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON, false, 1);
+    public void testClickEscButtonClosesAllNonModalNonTransientOverlays() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON);
+        verifyOverlayActive();
+        List<WebElement> activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
+        String globalId1 = activeOverlay.get(0).getAttribute("data-aura-rendered-by");
+        openNewOverlayOnTopOfExistingModalOverlay(1, false);
+        verifyOverlayActive();
+        activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
+        String globalId2 = activeOverlay.get(0).getAttribute("data-aura-rendered-by");
+        // Cmp should use the prev instance and no new cmp should be created
+        assertEquals("It should use old instance of panelDialog cmp for non transient panel Dialog", globalId1,
+                globalId2);
+        pressEscapeOnActiveElement();
+        waitForElementAbsent(getDriver().findElement(By.cssSelector(PANELDIALOG_MODAL_CMP)));
+
+        verifyOverlayNotActive();
     }
 
     /**
      * Tabs on Modal overlay should do focus trapping and not close the overlay
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
      */
-    public void testModalOverlayDialogDoesFocusTrapping() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyFocusTrappingForModalAndNonModalDialog(PANELDIALOG_MODAL_BUTTON, true);
-    }
-
-    /*
-     * Tabs on nonModal overlay dialog should close the overlay and not trap the focus within the overlay
-     */
-    public void testNonModalOverlayDialogDoesNotDoFocusTrapping() throws MalformedURLException, URISyntaxException,
-            InterruptedException {
-        verifyFocusTrappingForModalAndNonModalDialog(PANELDIALOG_NONMODAL_BUTTON, false);
+    public void testModalOverlayDialogDoesFocusTrapping() throws Exception {
+        open(APP);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_MODAL_BUTTON);
+        verifyOverlayActive();
+        assertEquals("Button1 should be active element", "button 1", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
+        pressTabOnActiveElementAndWait("button 2");
+        pressTabOnActiveElementAndWait("open another overlay");
+        pressTabOnActiveElementAndWait("Close");
+        pressTabOnActiveElementAndWait("button 1");
+        verifyOverlayActive();
     }
 
     /**
-     * Verify pressing TAB key behavior for modal and nonModal overlay wrt to focus trapping
-     * 
-     * @param button
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     * @throws InterruptedException
+     * Tabs on nonModal overlay dialog should close the overlay and not trap the focus within the overlay
      */
-    private void verifyFocusTrappingForModalAndNonModalDialog(String button, Boolean isFocusTrapped)
-            throws MalformedURLException, URISyntaxException, InterruptedException {
+    public void testNonModalOverlayDialogDoesNotDoFocusTrapping()
+            throws MalformedURLException, URISyntaxException,
+            InterruptedException {
         open(APP);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, false);
-        openOverlay(button);
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, true);
+        verifyOverlayNotActive();
+        openOverlay(PANELDIALOG_NONMODAL_BUTTON);
+        verifyOverlayActive();
         assertEquals("Button1 should be active element", "button 1", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        activeElement.sendKeys(Keys.TAB);
-        assertEquals("Button1 should be active element", "button 2", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-        activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        activeElement.sendKeys(Keys.TAB);
-        activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        activeElement.sendKeys(Keys.TAB);
-        activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
-        activeElement.sendKeys(Keys.TAB);
-        if (isFocusTrapped) {
-            assertEquals("Button1 should be active element", "button 1", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-        }
-        else {
-            // Test case for W-2424553
-            // assertEquals("Show panel slider button should be active element", "Show panel slider",
-            // auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
-        }
-        verifyOverlayActive(PANELDIALOG_MODAL_CMP, isFocusTrapped);
+        pressTabOnActiveElementAndWait("button 2");
+        pressTabOnActiveElementAndWait("open another overlay");
+        pressTabOnActiveElementAndWait("Close");
+        pressTabOnActiveElement();
+        waitForElementDisappear(By.cssSelector(PANELDIALOG_MODAL_CMP));
+        verifyOverlayNotActive();
     }
 
-    private void openNewOverlayOnTopOfExistingModalOverlay(int expectedOverlay, boolean isTransient)
-            throws InterruptedException {
+    private void openNewOverlayOnTopOfExistingModalOverlay(final int expectedOverlays, boolean isTransient)
+            throws Exception {
         WebElement newOverlayButton = findDomElement(By.cssSelector(NEWOVERLAY_BUTTON));
         newOverlayButton.click();
-        pause(1000);
-        List<WebElement> modalOverlays = findDomElements(By.cssSelector(PANELDIALOG_MODAL_CMP));
-        assertEquals(String.format("Only %s active overlay should be opened at any point", expectedOverlay),
-                expectedOverlay, modalOverlays.size());
+        waitNumberOfPanelsInDom(expectedOverlays);
+
+    }
+
+    private void waitNumberOfPanelsInDom(final int expectedPanels) {
+        auraUITestingUtil
+                .waitUntil(
+                        new ExpectedCondition<Boolean>() {
+                            @Override
+                            public Boolean apply(WebDriver d) {
+                                List<WebElement> elements = findDomElements(By
+                                        .cssSelector(PANELDIALOG_MODAL_CMP));
+                                return elements.size() == expectedPanels;
+                            }
+                        },
+                        "After excape only " + expectedPanels + " panel(s) should be present in DOM");
     }
 
     /**
@@ -346,16 +269,15 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * @param isActive
      * @throws InterruptedException
      */
-    private void verifyOverlayActive(String overlayCmpLocator, boolean isActive) throws InterruptedException {
-        pause(1000);
-        List<WebElement> activeOverlay = getActiveOverlay(overlayCmpLocator);
-        if (isActive) {
-            assertNotNull("There should be one overlay active", activeOverlay);
-            assertEquals("Only 1 active overlay should be opened at any point", 1, activeOverlay.size());
-        }
-        else {
-            assertNull("No Overlay should be active currently", activeOverlay);
-        }
+    private void verifyOverlayActive() {
+        List<WebElement> activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
+        assertNotNull("There should be one overlay active", activeOverlay);
+        assertEquals("Only 1 active overlay should be opened at any point", 1, activeOverlay.size());
+    }
+
+    private void verifyOverlayNotActive() {
+        List<WebElement> activeOverlay = getActiveOverlay(PANELDIALOG_MODAL_CMP);
+        assertNull("No Overlay should be active currently", activeOverlay);
     }
 
     /**
@@ -378,14 +300,44 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * @param overlayLocator
      * @throws InterruptedException
      */
-    private void openOverlay(String overlayLocator) throws InterruptedException {
+    private void openOverlay(String buttonLocator) throws InterruptedException {
         WebDriver driver = this.getDriver();
-        WebElement modalOverlayButton = driver.findElement(By.cssSelector(overlayLocator));
+        WebElement modalOverlayButton = driver.findElement(By.cssSelector(buttonLocator));
         modalOverlayButton.click();
-        pause(5000);
+        waitForElementAppear(By.cssSelector(PANELDIALOG_MODAL_CMP));
     }
 
-    private void pause(long timeout) throws InterruptedException {
-        Thread.sleep(timeout);
+    private void pressEscapeOnActiveElement() {
+        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        activeElement.sendKeys(Keys.ESCAPE);
     }
+
+    private void pressTabOnActiveElementAndWait(final String expectedText) {
+        pressTabOnActiveElement();
+        waitForActiveElementText(expectedText, "Did not tab to expected location");
+    }
+
+    private void waitForActiveElementText(final String expectedText, String message) {
+        auraUITestingUtil
+                .waitUntil(
+                        new ExpectedCondition<Boolean>() {
+                            @Override
+                            public Boolean apply(WebDriver d) {
+                                String text = (String) auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT);
+                                return text.startsWith(expectedText);
+                            }
+                        },
+                        message);
+    }
+
+    private void pressTabOnActiveElement() {
+        WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
+        activeElement.sendKeys(Keys.TAB);
+    }
+
+    private void clickOutModal() {
+        WebElement inputText = findDomElement(By.cssSelector(INPUT_TEXT));
+        inputText.click();
+    }
+
 }

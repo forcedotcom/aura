@@ -2187,8 +2187,15 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
             componentConfig = self.createIntegrationErrorConfig(errors);
         }
 
-        componentConfig["localId"] = localId;
-        componentConfig["attributes"]["valueProvider"] = $A.getRoot();
+        var root = $A.getRoot();
+
+        $A.util.apply(componentConfig, { 
+            "localId" : localId,
+            "attributes" : { 
+                "valueProvider" : root 
+            } 
+        }, null, true);
+        
         var c = $A.componentService.createComponentPriv(componentConfig);
 
         if (!errors) {
@@ -2196,7 +2203,6 @@ AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, 
             self.addComponentHandlers(c, config["actionEventHandlers"]);
         }
 
-        var root = $A.getRoot();
         var body = root.get("v.body");
         body.push(c);
 

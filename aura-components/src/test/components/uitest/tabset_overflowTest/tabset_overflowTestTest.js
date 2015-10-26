@@ -514,6 +514,31 @@
         ]
     },
 
+    /**
+     * test to see if tabBar is only initialized once
+     * test flow: 
+     *     force tabBar to execute afterRender again and see if overflow menu
+     *     is rendered twice by counting number of overflow menu labels
+     */
+    testTabBarInitOnceOnly: {
+        owner: "smo",
+        browsers : ["-IE7","-IE8"],
+        attributes : {"renderItem" : "tabsetOverflow5"},
+        test: [
+            function(cmp) {
+                var tabBar = cmp.find("tabsetOverflow").getSuper().find("tabBar");
+                $A.renderingService.afterRender(tabBar);
+            },
+            function(cmp){
+                var tabsetElem = cmp.find("tabsetOverflow").getElement();
+                var overflowMenuTabCount = $A.test.select(this.CSS_SELECTOR.moreTabHeader).length;
+                $A.test.assertEquals(
+                    1, overflowMenuTabCount,
+                    "TabBar is initialized more than once, causing overflow menu rendered twice!"
+                );
+            }
+        ]
+    },
 
     /*************************************************************************************************************
      * HELPER FUNCTIONS

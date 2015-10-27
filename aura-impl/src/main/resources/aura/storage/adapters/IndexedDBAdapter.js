@@ -665,9 +665,9 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
 
 
 // Only register this adapter if the IndexedDB API is present
-// disable support for Safari because its implementation is not reliable in iframe.
+// disable support for Safari (including embedded Safari eg Outlook) because its implementation is not reliable in iframe.
 if (window.indexedDB &&
-    !(navigator.userAgent.indexOf("Safari") !== -1 && navigator.userAgent.indexOf("Chrome") === -1)) {
+    !(navigator.userAgent.indexOf("AppleWebKit") !== -1 && navigator.userAgent.indexOf("Chrome") === -1)) {
     $A.storageService.registerAdapter({
         "name": IndexedDBAdapter.NAME,
         "adapterClass": IndexedDBAdapter,

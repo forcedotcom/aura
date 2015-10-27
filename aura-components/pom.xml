@@ -354,7 +354,7 @@
                         <executions>
                             <execution>
                                 <id>copy-eslint-grunt</id>
-                                <phase>generate-test-resources</phase>
+                                <phase>pre-clean</phase>
                                 <goals>
                                     <goal>copy-resources</goal>
                                 </goals>
@@ -379,15 +379,15 @@
                         <executions>
                             <execution>
                                 <id>install-node-npm</id>
-                                <phase>process-test-resources</phase>
+                                <phase>pre-clean</phase>
                             </execution>
                             <execution>
                                 <id>npm-install</id>
-                                <phase>process-test-resources</phase>
+                                <phase>pre-clean</phase>
                             </execution>
                             <execution>
                                 <id>grunt-build</id>
-                                <phase>test</phase>
+                                <phase>pre-clean</phase>
                             </execution>
                         </executions>
                     </plugin>

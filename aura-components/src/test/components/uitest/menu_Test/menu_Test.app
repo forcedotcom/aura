@@ -21,6 +21,8 @@
     <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="true"/>
     <aura:attribute name="menuSelectFireCount" type="Integer" default="0" />
     <aura:attribute name="menuCondition" type="Boolean" default="true"/>
+    <aura:attribute name="focus_counter" type="Integer" default="0"/>
+    <aura:attribute name="blur_counter" type="Integer" default="0"/>
 
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Check Menu Position Test</h2>
@@ -379,6 +381,14 @@
             <ui:actionMenuItem label="Menu item"/>
           </ui:menuList>
       </ui:menu>
+    </div>
+    <hr/>
+    <div>
+        <h2>MenuTriggerLink focus and blur</h2>
+        <ui:menuTriggerLink aura:id="menuLink" label="MenuTriggerLink" focus="{!c.countFocus}" blur="{!c.countBlur}"/>
+
+        <p>Focus Counter: {!v.focus_counter}</p>
+        <p>Blur Counter: {!v.blur_counter}</p>
     </div>
     <hr/>
 </aura:application>

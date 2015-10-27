@@ -61,5 +61,15 @@
    },
    incrementMenuSelectFireCount : function(cmp, evt){
 	   cmp.set("v.menuSelectFireCount", cmp.get("v.menuSelectFireCount") + 1);
-   }
+   },
+   countFocus: function (cmp) {
+       var counterLabel = "v.focus_counter";
+       var focusCounter = cmp.get(counterLabel);
+       cmp.set(counterLabel, focusCounter + 1);
+   },
+   countBlur: function (cmp) {
+       var counterLabel = "v.blur_counter";
+       var blurCounter = cmp.get(counterLabel);
+       cmp.set(counterLabel, blurCounter + 1);
+   }   
 })

@@ -8,7 +8,7 @@
     },
 
 	handlePress: function(cmp, evt, helper) {
-		var body = $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '<div class="panel-content">Benjamin is a whale</div>'}}})
+		var body = $A.createComponentFromConfig({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '<div class="panel-content">Benjamin is a whale</div>'}}})
 		var bigTarget = cmp.find('bigTarget').getElement();
 		var littleTarget = cmp.find('littleTarget').getElement();
         var value = cmp.find('direction').get('v.value');

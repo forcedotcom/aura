@@ -32,7 +32,8 @@
  		var carousel = cmp.find("carousel2");
  		var pages = [];
  		for (var i=1; i<=10; i++){
- 			var page = $A.componentService.newComponentDeprecated({
+ 		    // Really these should be calls to $A.createComponent instead of $A.createComponentFromConfig
+ 			var page = $A.createComponentFromConfig({
 			            "componentDef" : {
 			            	"descriptor" : "markup://ui:carouselPage"
 			            },
@@ -46,7 +47,7 @@
 			            	}
 			            }
 			},null,true);
-			var pageCmp = $A.componentService.newComponent({
+			var pageCmp = $A.createComponentFromConfig({
 			            "componentDef" : {
 			            	"descriptor" : "markup://ui:outputText"
 			            },

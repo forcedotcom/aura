@@ -19,35 +19,31 @@
     },
 
     createPanel: function(cmp, event, helper) {
-
-        var header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
-
-        $A.get('e.ui:createPanel').setParams({
-            panelType   :'panel',
-            visible: true,
-            panelConfig : {
-                'class': 'shift',
-                showPointer: true,
-                useTransition: false,
-                showCloseButton: true,
-                header: header,
-                body  : $A.newCmp({
-                    componentDef : "markup://ui:outputText",
-                    attributes : {
-                        values : {
-                            value : (cmp.bodyCounter+=1)
-                        }
+        $A.createComponents([
+            ["uiExamples:panelHeader", {}],
+            ["ui:outputText", {value: (cmp.bodyCounter+=1)}]
+            ],
+            function(components, status, statusMessageList) {
+                $A.get('e.ui:createPanel').setParams({
+                    panelType   :'panel',
+                    visible: true,
+                    panelConfig : {
+                        'class': 'shift',
+                        showPointer: true,
+                        useTransition: false,
+                        showCloseButton: true,
+                        header: components[0],
+                        body  : components[1]
+                    },
+                    onCreate: function (panel) {
+                        $A.log('panel created ' + panel);
+                        var panelEl = panel.getElement();
+                        panelEl.id = 'panel_'+cmp.bodyCounter;
+                        panelEl.style.marginLeft = (30 * cmp.bodyCounter) + 'px';
+                        helper.globalPanelRefs.push(panel);
                     }
-                })
-            },
-            onCreate: function (panel) {
-                $A.log('panel created ' + panel);
-                var panelEl = panel.getElement();
-                panelEl.id = 'panel_'+cmp.bodyCounter;
-                panelEl.style.marginLeft = (30 * cmp.bodyCounter) + 'px';
-                helper.globalPanelRefs.push(panel);
-            }
-        }).fire();
+                }).fire();
+        });
     },
 
 })

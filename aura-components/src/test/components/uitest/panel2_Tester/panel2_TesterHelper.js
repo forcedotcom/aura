@@ -16,8 +16,8 @@
 ({
 	createHeaderFooterInstance : function(cmp, forceCreate) {
 		if (cmp.get("v.panelHeader").length == 0 || forceCreate) {
-			var defaultCustomHeader = $A.newCmp({
-	    		componentDef: "markup://ui:outputText",
+			var defaultCustomHeader = $A.createComponentFromConfig({
+	    		componentDef: { descriptor: "markup://ui:outputText" },
 	    		attributes: {
 	    			values: {
 	    				"class": "defaultCustomPanelHeader",
@@ -29,15 +29,15 @@
 		}
 		
 		if (cmp.get("v.panelFooter").length == 0 || forceCreate) {
-			var defaultCustomFooter = [$A.newCmp({
-	    		componentDef: "markup://ui:outputText",
+			var defaultCustomFooter = [$A.createComponentFromConfig({
+	    		componentDef: { descriptor: "markup://ui:outputText" },
 	    		attributes: {
 	    			values: {
 	    				"class": "defaultCustomPanelFooter",
 	    				value: "This is a default custom panel footer"
 	    			}
-	    		}}), $A.newCmp({
-    			componentDef: "markup://ui:button",
+	    		}}), $A.createComponentFromConfig({
+    			componentDef: { descriptor: "markup://ui:button" },
 	    		attributes: {
 	    			values: {
 	    				"class": "defaultCustomPanelFooterBtn",

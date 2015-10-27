@@ -39,7 +39,7 @@
                 "name" : "markup://gvpTest:dynamicTypeTest"
         });
         action.setCallback(this, function(a) {
-            var newCmp = $A.newCmpDeprecated(a.getReturnValue());
+            var newCmp = $A.createComponentFromConfig(a.getReturnValue());
             cmp.find("insertion").set("v.body", [ newCmp ])
             finished = true;
         }, "SUCCESS");

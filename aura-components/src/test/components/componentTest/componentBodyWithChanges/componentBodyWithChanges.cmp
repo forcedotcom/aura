@@ -16,6 +16,7 @@
 
 -->
 <aura:component render="client">
+    <aura:dependency resource="markup://ui:outputText" type="COMPONENT"/>
 
     <aura:attribute name="colors" type="List" default="purple,blue,green,yellow,orange,red"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>

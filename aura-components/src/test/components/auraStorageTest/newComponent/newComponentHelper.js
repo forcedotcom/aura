@@ -44,7 +44,7 @@
         aPlayer.setCallback(cmp, function(action) {
         	var body = [];
         	for(var i = 0; i< action.getReturnValue().length; i++) {
-        		var aPlayerFacet = $A.newCmpDeprecated(action.getReturnValue()[i]);
+        		var aPlayerFacet = $A.createComponentFromConfig(action.getReturnValue()[i]);
         		body.push(aPlayerFacet);
         	}
             cmp.find("Players").set("v.body", body);
@@ -62,7 +62,7 @@
         //First Action
         var aTeam = cmp.get("c.getBaseball");
         aTeam.setCallback(cmp, function(action) {
-            var aTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+            var aTeamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
             //Clear the old facet in team div & insert newly fetched components
             cmp.find("Team").set("v.body", [aTeamFacet]);
             //Update the page with action number
@@ -87,7 +87,7 @@
                 //First Action
                 var aTeam = cmp.get("c.getBaseball");
                 aTeam.setCallback(cmp, function(action) {
-                    var aTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+                    var aTeamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
                     //Clear the old facet in team div & insert newly fetched components
                     cmp.find("Team").set("v.body", [aTeamFacet]);
                     //Update the page with action number
@@ -104,7 +104,7 @@
                 //Second Action
                 var bTeam = cmp.get("c.getBaseball");
                 bTeam.setCallback(cmp, function(action) {
-                    var bTeamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+                    var bTeamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
                     cmp.find("Team2").set("v.body", [bTeamFacet]);
                     
                     //Update the page with action number
@@ -124,7 +124,7 @@
         var _testName = cmp._testName;
         var a = cmp.get("c.getBaseball");
         a.setCallback(cmp, function(action) {
-            var teamFacet = $A.newCmpDeprecated(action.getReturnValue()[0]);
+            var teamFacet = $A.createComponentFromConfig(action.getReturnValue()[0]);
             //Clear the old facet in team div & insert newly fetched components
             cmp.find("Team").set("v.body", [teamFacet]);
             //Update the page with action number
@@ -147,7 +147,7 @@
             //Clear the old facet in players div
             var newBody = [];
             for(var i=0;i<ret.length;i++){
-                var playerFacet = $A.newCmpDeprecated(ret[i]);
+                var playerFacet = $A.createComponentFromConfig(ret[i]);
                 newBody.push(playerFacet);
             }
             //Insert newly fetched components

@@ -18,6 +18,7 @@
 
 <aura:component>
     <aura:import library="ui:panelPositioningLib" property="positioningLib" />
+    <aura:dependency resource="aura:unescapedHtml" type="COMPONENT"/>
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <div class="vp">
         <h1>Panel Positioning</h1>

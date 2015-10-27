@@ -124,53 +124,7 @@
 			});
 		}
 	},
-	
-	testNewComponentReturnCorrectType : {
-		test: function(testCmp) {
-			var type="markup://aura:text";
-			var config = {
-	                componentDef: type,
-	                attributes: {
-	                    values: {
-	                        value: "something",
-	                    }
-	                }
-	            }
-			var newCmp = $A.componentService.newComponent(config);
-			var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-        	$A.test.assertTrue(newCmp instanceof cmpFromComponentClass);
-		}
-	},
-	
-	testNewComponentServerDependencyReturnCorrectType : {
-		test: function(testCmp) {
-			var type="markup://auratest:componentClassUnloaded";
-			var config = {
-	                componentDef: type,
-	            }
-			var newCmp = $A.componentService.newComponent(config);
-			testCmp.find("serverInParent").set("v.body", [newCmp]);
-			var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-			//for newCmp, first we will get a place holder, once the response from server arrived, we will get a real one
-			$A.test.addWaitForWithFailureMessage(true,
-        			function() { 
-						var placeholderBody = newCmp.get("v.body")[0];
-						if(placeholderBody) {
-							var qname = placeholderBody.getDef().getDescriptor().getQualifiedName();
-							return $A.test.contains(qname, type);
-						} else {
-							return false;
-						}
-					},
-					"placeholder didn't get replaced with real component we want",
-					function() {
-						var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-						$A.test.assertTrue(newCmp.get("v.body")[0] instanceof cmpFromComponentClass);
-					}
-			);
-		}
-	},
-	
+
 	testNewCmpFromConfigReturnCorrectType : {
 		test: function(testCmp) {
 			var type = "markup://aura:text";

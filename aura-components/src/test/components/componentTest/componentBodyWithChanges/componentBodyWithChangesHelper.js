@@ -1,8 +1,9 @@
 ({
     newComponent: function(cmp, item) {
-
-        var text = $A.componentService.newComponent({
-            'componentDef' : 'markup://ui:outputText',
+        // Ideally, this would use $A.createComponent instead of $A.createComponentFromConfig, this is not a good
+        // design for production code.
+        var text = $A.createComponentFromConfig({
+            'componentDef' : {descriptor: 'markup://ui:outputText'},
             'attributes': {
                 'values': {
                     'value': item.text
@@ -10,8 +11,8 @@
             }
         });
 
-        var div = $A.componentService.newComponent({
-            'componentDef' : 'markup://aura:html',
+        var div = $A.createComponentFromConfig({
+            'componentDef' : {descriptor: 'markup://aura:html'},
             'localId' : item.color,
             'attributes': {
                 'values': {

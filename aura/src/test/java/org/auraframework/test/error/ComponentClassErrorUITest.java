@@ -15,226 +15,262 @@
  */
 package org.auraframework.test.error;
 
-import java.util.List;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
 
-import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.system.AuraContext.Mode;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * ComponentClassErrorTest is mainly for verifying error message when we error out from component's helper/renderer
  */
-public class ComponentClassErrorUITest extends WebDriverTestCase {
+public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     public ComponentClassErrorUITest(String name) {
         super(name);
     }
 
-    // /////////////////////////////// test with dynamic created component starts /////////////////////////////////////
-
-    /*
-     * @param componentDef create this component dynamically
-     * @param webElementToClick click the button to create above component
-     * @param errorOutFrom where we want the component to error out?
-     */
-    public void runTestDynamicCreatedCmpErrorOutFrom(String componentDef, String errorOutFrom,
-            String webElementToClick, String expectErrorMessage, String expectLocation) throws Exception {
-        String url = "auratest/componentClassLifecycleTest.cmp?componentDef=" + componentDef + "&errorOutFrom="
-                + errorOutFrom;
-        runTestErrorOut(url, webElementToClick, expectErrorMessage, expectLocation);
-    }
-
+    /* Test with dynamic created component */
     // create componentClassParent.cmp in controller dynamically, expect it to error out from render
     public void testDynamicCreatedCmpErrorOutFromRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.render";
-        String expectErrorMessage = "blahFromParentRerender is not defined";
-        runTestDynamicCreatedCmpErrorOutFrom("markup://auratest:componentClassParent", "errorOutFromRender_Parent",
-                ".uiButton_createCmp", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentRerender is not defined";
+
+        String url = "/auratest/componentClassLifecycleTest.cmp?" +
+                "componentDef=markup://auratest:componentClassParent&" +
+                "errorOutFrom=errorOutFromRender_Parent";
+        open(url, Mode.DEV);
+        findDomElement(By.cssSelector(".uiButton_createCmp")).click();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
-    // /////////////////////////////// test with parent component starts /////////////////////////////////////
-
-    public void runTestParentErrorOutFrom(String errorOutFrom, String webElementToClick, String expectErrorMessage,
-            String expectLocation) throws Exception {
-        String url = "/auratest/componentClassParent.cmp?" + errorOutFrom + "=true";
-        runTestErrorOut(url, webElementToClick, expectErrorMessage, expectLocation);
-    }
-
+    /* Tests with parent component */
     // load componentClassParent.cmp, error out from its re-render
     public void testParentErrorOutFromReRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.rerender";
-        String expectErrorMessage = "blahFromParentReRerender is not defined";
-        runTestParentErrorOutFrom("errorOutFromReRender_Parent", ".uiButtonParent", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentReRerender is not defined";
+
+        String url = "/auratest/componentClassParent.cmp?errorOutFromReRender_Parent=true";
+        open(url, Mode.DEV);
+        findDomElement(By.cssSelector(".uiButtonParent")).click();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassParent.cmp, error out from its after-render
     public void testParentErrorOutFromAfterRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.afterRender";
-        String expectErrorMessage = "blahFromParentAfterRerender is not defined";
-        runTestParentErrorOutFrom("errorOutFromAfterRender_Parent", "", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentAfterRerender is not defined";
+
+        String url = "/auratest/componentClassParent.cmp?errorOutFromAfterRender_Parent=true";
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
-    // /////////////////////////////// test with grandChild component starts /////////////////////////////////////
-
-    public void runTestGrandChildClientErrorOutFrom(String errorOutFrom, String expectErrorMessage,
-            String expectLocation) throws Exception {
-        String url = "/auratest/componentClassGrandChildClientProvider.cmp?" + errorOutFrom + "=true";
-        runTestErrorOut(url, "", expectErrorMessage, expectLocation);
-    }
-
+    /* Tests with grandChild component */
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's render
     public void testGrandChildClientErrorOutFromParentRender() throws Exception {
         String expectLocation = "auratest$componentClassParent.render";
-        String expectErrorMessage = "ReferenceError: blahFromParentRerender is not defined";
-        runTestGrandChildClientErrorOutFrom("errorOutFromRender_Parent", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentRerender is not defined";
+        String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Parent=true";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassChild.cmp's render
     public void testGrandChildClientErrorOutFromChildRender() throws Exception {
         String expectLocation = "auratest$componentClassGrandChildClientProvider.render";
-        String expectErrorMessage = "ReferenceError: blahFromChildRerender is not defined";
-        runTestGrandChildClientErrorOutFrom("errorOutFromRender_Child", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildRerender is not defined";
+        String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Child=true";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     public void testGrandChildClientErrorOutFromParentHelper() throws Exception {
         String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromParentHelper is not defined";
-        runTestGrandChildClientErrorOutFrom("errorOutFromHelper_Parent", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentHelper is not defined";
+        String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Parent=true";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     public void testGrandChildClientErrorOutFromChildHelper() throws Exception {
         String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromChildHelper is not defined";
-        runTestGrandChildClientErrorOutFrom("errorOutFromHelper_Child", expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildHelper is not defined";
+        String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Child=true";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
-    /*
-     * call this to test out client or server provided component
-     * @param errorOutFrom : load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error
-     * out from helper/render/etc
-     */
-    public void runTestProvidedGrandChildClientErrorOutFromChild(String clientOrServer, String errorOutFrom,
-            String expectErrorMessage, String expectLocation) throws Exception {
-        String url = "/auratest/componentClass" + clientOrServer + "Provider.cmp?" +
-                "requestDescriptor=auratest:componentClassGrandChildServerProvider" +
-                "&requestAttributes={'" + errorOutFrom + "':true}";
-        runTestErrorOut(url, "", expectErrorMessage, expectLocation);
-    }
-
-    // //////////////////// test with client provided component starts /////////////////////////////////////
-
+    /* Test with client provided component */
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     public void testClientProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
-        String errorOutFrom = "errorOutFromHelper_Child";
         String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromChildHelper is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Client", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildHelper is not defined";
+
+        String url = "/auratest/componentClassClientProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromHelper_Child':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     public void testClientProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
-        String errorOutFrom = "errorOutFromHelper_Parent";
         String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromParentHelper is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Client", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentHelper is not defined";
+        String url = "/auratest/componentClassClientProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromHelper_Parent':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     public void testClientProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
-        String errorOutFrom = "errorOutFromRender_Child";
         String expectLocation = "auratest$componentClassChild.render";
-        String expectErrorMessage = "ReferenceError: blahFromChildRerender is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Client", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildRerender is not defined";
+
+        String url = "/auratest/componentClassClientProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromRender_Child':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's render
     public void testClientProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
-        String errorOutFrom = "errorOutFromRender_Parent";
         String expectLocation = "auratest$componentClassParent.render";
-        String expectErrorMessage = "ReferenceError: blahFromParentRerender is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Client", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentRerender is not defined";
+        String url = "/auratest/componentClassClientProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromRender_Parent':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
-    // ////////////////////test with server provided component starts/////////////////////////////////////
-
+    /* Tests with server provided component */
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     public void testServerProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
-        String errorOutFrom = "errorOutFromHelper_Child";
         String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromChildHelper is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Server", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildHelper is not defined";
+        String url ="/auratest/componentClassServerProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromHelper_Child':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     public void testServerProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
-        String errorOutFrom = "errorOutFromHelper_Parent";
         String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
-        String expectErrorMessage = "ReferenceError: blahFromParentHelper is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Server", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromParentHelper is not defined";
+        String url = "/auratest/componentClassServerProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromHelper_Parent':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     public void testServerProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
-        String errorOutFrom = "errorOutFromRender_Child";
         String expectLocation = "auratest$componentClassChild.render";
-        String expectErrorMessage = "ReferenceError: blahFromChildRerender is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Server", errorOutFrom, expectErrorMessage, expectLocation);
+        String expectContainedMessage = "blahFromChildRerender is not defined";
+        String url = "/auratest/componentClassServerProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromRender_Child':true}";
+
+        open(url, Mode.DEV, false);
+        auraUITestingUtil.waitForDocumentReady();
+
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
 
     // load componentClassGrandChildServerProvider through componentClassServerProvider.cmp, error out from
     // componentClassParent's render
     public void testServerProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
-        String errorOutFrom = "errorOutFromRender_Parent";
         String expectLocation = "auratest$componentClassParent.render";
-        String expectErrorMessage = "ReferenceError: blahFromParentRerender is not defined";
-        runTestProvidedGrandChildClientErrorOutFromChild("Server", errorOutFrom, expectErrorMessage, expectLocation);
-    }
+        String expectContainedMessage = "blahFromParentRerender is not defined";
+        String url = "/auratest/componentClassServerProvider.cmp?" +
+                "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
+                "requestAttributes={'errorOutFromRender_Parent':true}";
 
-    /*
-     * @param url load the url and trigger the error
-     * @param expectErrorMessage error message we expect
-     * @param expectLocation where we expect the error being throw from ? helper/render/etc
-     * @param webElementToClick we need to click on something to trigger the error
-     */
-    public void runTestErrorOut(String url, String webElementToClick, String expectErrorMessage, String expectLocation)
-            throws Exception {
-        openNoAura(url);
+        open(url, Mode.DEV, false);
         auraUITestingUtil.waitForDocumentReady();
-        if (webElementToClick.length() > 0) {
-            WebElement btn = findDomElement(By.cssSelector(webElementToClick));
-            btn.click();
-        }
-        List<WebElement> errorBoxes = getDriver().findElements(By.cssSelector(".auraForcedErrorBox"));
-        assertEquals("Renderer element found", 0, errorBoxes.size());
 
-        errorBoxes = auraUITestingUtil.waitUntil(new ExpectedCondition<List<WebElement>>() {
-            @Override
-            public List<WebElement> apply(WebDriver d) {
-                List<WebElement> errors = getDriver().findElements(By.cssSelector(".auraErrorBox"));
-                if (errors.size() > 0 && errors.get(0).isDisplayed()) {
-                    return errors;
-                }
-                return null;
-            }
-        });
-
-        assertNotNull(errorBoxes);
-        assertTrue("we are expecting one errorBox, but get " + errorBoxes.size() + " instead", errorBoxes.size() == 1);
-        String errorBoxText = errorBoxes.get(0).getText();
-        assertTrue("we are expecting error message :" + expectErrorMessage + "\n but get this instead:" + errorBoxText,
-                errorBoxText.contains(expectErrorMessage));
-        assertTrue("we are expecting error come from :" + expectLocation + "\n but get this instead:" + errorBoxText,
-                errorBoxText.contains(expectLocation));
+        String actualMessage = findErrorMessage();
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectContainedMessage));
+        assertThat("We expect error comes from " + expectLocation, actualMessage, containsString(expectLocation));
     }
+
 }

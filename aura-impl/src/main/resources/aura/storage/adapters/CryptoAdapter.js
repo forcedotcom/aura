@@ -30,7 +30,7 @@
  * Please note:
  * 1. If the runtime environment doesn't support the Web Cryptography API the adapter is not
  *    registered.
- * 2. After registration and before a cryptographic key isprovided, all crypto adapters
+ * 2. After registration and before a cryptographic key is provided, all crypto adapters
  *    enter an initialization stage. Get, put, and remove operations are queued until
  *    the key is set. If a key is never provided then the operations appear paused. It's
  *    thus paramount to always provide a key. &lt;auraStorage:crypto/&gt; ensures this
@@ -39,9 +39,8 @@
  *    back to the memory adapter to provide secure but non-persistent storage.
  *
  * @constructor
- * @export
  */
-var CryptoAdapter = function CryptoAdapter(config) {
+function CryptoAdapter(config) {
     this.instanceName = config["name"];
     this.debugLoggingEnabled = config["debugLoggingEnabled"];
     this.key = undefined;
@@ -72,11 +71,10 @@ var CryptoAdapter = function CryptoAdapter(config) {
             that.executeQueue(false);
         }
     );
-};
-
+}
 
 /** Name of adapter. */
-CryptoAdapter["NAME"] = "crypto";
+CryptoAdapter.NAME = "crypto";
 
 /** Encryption algorithm. */
 CryptoAdapter.ALGO = "AES-CBC";
@@ -156,7 +154,6 @@ CryptoAdapter["register"] = function() {
     //
     // moreover, indexeddb needs to be useable (browser implemented properly) in order to use crypto so we
     // first check for indexeddb. when both are unavailable or unusable, memory storage will become the default.
-
     if ($A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
         $A.warning("CryptoAdapter already registered");
         return;
@@ -248,11 +245,15 @@ CryptoAdapter.prototype.initialize = function() {
  *
  * @returns {Boolean} True if the adapter is secure and persistent; false if the adapter is secure
  * and not persistent.
- * @export
  */
 CryptoAdapter.prototype.isCrypto = function() {
     return this.mode === CryptoAdapter.NAME;
 };
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+//export isCrypto for tests
+CryptoAdapter.prototype["isCrypto"] = CryptoAdapter.prototype.isCrypto;
+//#end
 
 /**
  * Runs the stored queue of requests.
@@ -605,10 +606,6 @@ CryptoAdapter.prototype.log = function (msg, obj) {
     }
 };
 
-
-Aura.Storage.CryptoAdapter = CryptoAdapter;
-
-
 /**
  * @description The value object used in the backing store of the CryptoAdapter.
  * @constructor
@@ -622,3 +619,10 @@ CryptoAdapter.Entry.prototype.toString = function() {
     return $A.util.json.encode(this);
 };
 
+
+Aura.Storage.CryptoAdapter = CryptoAdapter;
+
+// export crypto adapter as $A.storageService.CryptoAdapter exposing effectively
+// only the non-mangled functions. not using @export because it exports the
+// constructor function which is not desired.
+AuraStorageService.prototype["CryptoAdapter"] = CryptoAdapter;

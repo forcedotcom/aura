@@ -1,7 +1,7 @@
 ({
     init: function(cmp) {
         var secure = cmp.get("v.secure");
-        CryptoAdapter.register();
+        $A.storageService.CryptoAdapter.register();
         cmp._storage = $A.storageService.initStorage("persistentStorageCmp", true, secure, 32768, 2000, 3000, true, false);
     },
 
@@ -22,7 +22,7 @@
             var buffer = new ArrayBuffer(32);
             var view = new Uint8Array(buffer);
             view.set(encryptionKey);
-            CryptoAdapter.setKey(buffer);
+            $A.storageService.CryptoAdapter.setKey(buffer);
         }
     },
 

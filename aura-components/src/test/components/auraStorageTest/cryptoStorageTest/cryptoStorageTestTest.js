@@ -9,7 +9,7 @@
     labels : [ "threadHostile", "UnAdaptableTest" ],
 
     setUp : function(cmp) {
-        if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
+        if (!$A.storageService.isRegisteredAdapter($A.storageService.CryptoAdapter.NAME)) {
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 

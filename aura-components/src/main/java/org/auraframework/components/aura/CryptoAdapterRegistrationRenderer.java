@@ -36,6 +36,7 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
             .append("<script>\n")
             .append("(function(){\n")
             .append(   debug ? "  $A.log('CryptoAdapter registering');\n" : "")
+            .append("  var CryptoAdapter = $A.storageService.CryptoAdapter;")
             .append("  CryptoAdapter.register();\n")
             .append("  if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {\n")
             .append(     debug ? "    $A.log('CryptoAdapter was not registered');\n" : "")

@@ -6,8 +6,8 @@
 
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
-        CryptoAdapter.register();
-        if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
+        $A.storageService.CryptoAdapter.register();
+        if (!$A.storageService.isRegisteredAdapter($A.storageService.CryptoAdapter.NAME)) {
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
@@ -15,7 +15,7 @@
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
 
         // provide an invalid key to force CryptoAdapter into fallback mode (which uses memory adapter internally)
-        CryptoAdapter.setKey("invalid");
+        $A.storageService.CryptoAdapter.setKey("invalid");
     },
 
     testFallbackModeReported: {

@@ -268,7 +268,8 @@ public class JavaControllerTest extends AuraImplTestCase {
             Aura.getInstanceService().getInstance(dd);
             fail("Expected DefinitionNotFoundException");
         } catch (DefinitionNotFoundException e) {
-            assertEquals("No CONTROLLER named java://goats found", e.getMessage());
+            assertTrue("Missing error message in "+e.getMessage(),
+                    e.getMessage().startsWith("No CONTROLLER named java://goats found"));
         }
         ControllerDef controller = getJavaController("java://org.auraframework.components.test.java.controller.TestController");
         Map<String, Object> empty = new HashMap<>();

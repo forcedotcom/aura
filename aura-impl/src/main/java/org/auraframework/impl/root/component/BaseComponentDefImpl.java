@@ -67,6 +67,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.AuraValueProviderType;
 import org.auraframework.instance.GlobalValueProvider;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
@@ -208,15 +209,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             }
         }
 
-        MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
-        if (modelDefDescriptor != null) {
-            mdr.assertAccess(this.descriptor, modelDefDescriptor.getDef());
-        }
-
-        for (DefDescriptor<ControllerDef> d : controllerDescriptors) {
-            mdr.assertAccess(this.descriptor, d.getDef());
-        }
-
         for (AttributeDefRef facet : this.facets) {
             facet.validateDefinition();
         }
@@ -352,12 +344,38 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
     }
 
+    private <X extends Definition> void checkAccess(DefDescriptor<X> descToCheck, MasterDefRegistry mdr)
+            throws QuickFixException {
+        // We should be able to do this, but tests are dependent on overrides here.
+        //X definition = mdr.getDef(descToCheck);
+        X definition = descToCheck.getDef();
+        if (definition == null) {
+            throw new DefinitionNotFoundException(descToCheck, getLocation());
+        }
+        mdr.assertAccess(descriptor, definition);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void validateReferences() throws QuickFixException {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        MasterDefRegistry mdr = definitionService.getDefRegistry();
+
         super.validateReferences();
         for (DependencyDef def : dependencies) {
             def.validateReferences();
+        }
+
+        for (DefDescriptor<InterfaceDef> intf : interfaces) {
+            checkAccess(intf, mdr);
+        }
+
+        if (modelDefDescriptor != null) {
+            checkAccess(modelDefDescriptor, mdr);
+        }
+
+        for (DefDescriptor<ControllerDef> d : controllerDescriptors) {
+            checkAccess(d, mdr);
         }
 
         for (AttributeDef att : this.attributeDefs.values()) {
@@ -386,6 +404,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
 
         if (templateDefDescriptor != null) {
+            // FIXME: this should be mdr.getDef(templateDefDescriptor);
             BaseComponentDef template = templateDefDescriptor.getDef();
             if (!template.isTemplate()) {
                 throw new InvalidDefinitionException(String.format(
@@ -397,7 +416,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             }
         }
 
-        MasterDefRegistry registry = Aura.getDefinitionService().getDefRegistry();
         if (extendsDescriptor != null) {
             T parentDef = extendsDescriptor.getDef();
 
@@ -433,7 +451,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                         extendsDescriptor), getLocation());
             }
 
-            registry.assertAccess(descriptor, parentDef);
+            mdr.assertAccess(descriptor, parentDef);
 
             SupportLevel support = getSupport();
             DefDescriptor<T> extDesc = extendsDescriptor;
@@ -448,15 +466,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
                 extDesc = (DefDescriptor<T>) extDef.getExtendsDescriptor();
             }
-        }
-
-        for (DefDescriptor<InterfaceDef> intf : interfaces) {
-            InterfaceDef interfaceDef = Aura.getDefinitionService().getDefinition(intf);
-            if (interfaceDef == null) {
-                throw new DefinitionNotFoundException(intf, getLocation());
-            }
-
-            registry.assertAccess(descriptor, interfaceDef);
         }
 
         for (RegisterEventDef def : events.values()) {
@@ -477,7 +486,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         for (ClientLibraryDef def : this.clientLibraries) {
             def.validateReferences();
-            registry.assertAccess(descriptor, def);
+            mdr.assertAccess(descriptor, def);
         }
 
         if (defaultFlavor != null) {

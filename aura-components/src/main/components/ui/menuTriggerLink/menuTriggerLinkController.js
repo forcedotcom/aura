@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 ({
-    onblur: function(component, event, helper) {
+    onblur: function(component) {
         component.get("e.blur").fire();
     },
 
-    onfocus: function(component, event, helper) {
+    onfocus: function(component) {
         component.get("e.focus").fire();
     },
 

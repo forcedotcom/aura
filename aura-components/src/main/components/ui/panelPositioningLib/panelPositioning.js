@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(constraint, elementProxyFactory, win) {
+function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-unused-vars
     'use strict';
 
     var ALIGN_REGEX = /^(left|right|center)\s(top|bottom|center)$/;
@@ -22,7 +22,6 @@ function lib(constraint, elementProxyFactory, win) {
     var w = win || window;
 
     var Constraint = constraint.Constraint;
-    var bakeOff = elementProxyFactory.bakeOff;
 
     var repositionScheduled = false;
 
@@ -93,7 +92,7 @@ function lib(constraint, elementProxyFactory, win) {
     // this is a fairly arbitrary number
     // that should still support 30fps updates
     // on most machines
-    function handleRepositionEvents(e) {
+    function handleRepositionEvents() {
         if(!timeoutHandler) {
             timeoutHandler = setTimeout(reposition, 10);
         }
@@ -106,7 +105,7 @@ function lib(constraint, elementProxyFactory, win) {
         eventsBound = true;
     }
 
-    function detachEvents() {
+    function detachEvents() { //eslint-disable-line no-unused-vars
         w.removeEventListener('resize', handleRepositionEvents);
         w.removeEventListener('scroll', handleRepositionEvents);
         eventsBound = false;
@@ -146,9 +145,6 @@ function lib(constraint, elementProxyFactory, win) {
                 bindEvents();
             }
 
-
-            var el = config.element;
-    		var targ = config.target;
             var constraintList = [];
 
             $A.assert(config.element && isDomNode(config.element), 'Element is undefined or missing');
@@ -196,15 +192,14 @@ function lib(constraint, elementProxyFactory, win) {
                 return {
 
                     disable: function() {
-
-                        constraintList.forEach(function(constraint) {
-                            constraint.detach();
+                        constraintList.forEach(function(constraintToDisable) {
+                            constraintToDisable.detach();
                         });
                     },
 
                     enable: function() {
-                        constraintList.forEach(function(constraint) {
-                            constraint.attach();
+                        constraintList.forEach(function(constraintToEnable) {
+                            constraintToEnable.attach();
                         });
                     },
 

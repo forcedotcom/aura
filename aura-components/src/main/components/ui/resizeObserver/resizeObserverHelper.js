@@ -45,6 +45,7 @@
                                 }
                             }
                         } catch (e) {
+                            return;
                         } finally {
                             resizer._resizing = false;
                         }

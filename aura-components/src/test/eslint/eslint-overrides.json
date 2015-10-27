@@ -19,7 +19,13 @@
     "AuraStyleService": true,
     "MetricsService": true,
     "AuraDevToolService": true,
-    "Component": true
+    "Component": true,
+    "CKEDITOR": true,
+    "FORCE": true,
+    "moment": true,
+    "exports": true,
+    "iScroll": true,
+    "unescape": true
   },
 
   "rules": {

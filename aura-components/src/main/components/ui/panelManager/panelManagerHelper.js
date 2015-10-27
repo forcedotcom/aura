@@ -171,7 +171,7 @@
         	}
         }
 
-        function callback(panel) {
+        function callback(panelToDisplay) {
             // give aura a chance to inject the new component into the dom
             setTimeout(function() {
             	$A.run(function() {
@@ -179,10 +179,10 @@
             		// otherwise we get race conditions when onCreate callback code tries to hide the dialog
             		// before it's started the show process.
 		            if (config.show) {
-                		self.openInstance(cmp, panel, config);
+                		self.openInstance(cmp, panelToDisplay, config);
 		            }
 		            if (config.callbacks && $A.util.isFunction(config.callbacks.onCreate)) {
-		                config.callbacks.onCreate(panel);
+		                config.callbacks.onCreate(panelToDisplay);
 		            }
             	});
             }, 0);
@@ -224,7 +224,7 @@
     },
     
     //Hook for subcomponent
-    beforeCreatePanel: function(cmp, config) {
+    beforeCreatePanel: function() {
     },
     
     isModal: function(panelType) {
@@ -462,9 +462,9 @@
 
         config = manager._panels[panelId];
         panel = panel || (config && config.panel);
-        if (!panel) {
+        // if (!panel) {
             // @todo: invalid state
-        }
+        // }
 
         // @todo: revisit this sequence when destroy events are added
         this.closeInstance(cmp, panel, {removeAnim: true});
@@ -481,7 +481,7 @@
     },
 
     // remove all panels from the dom
-    destroyAllPanels: function(cmp, event) {
+    destroyAllPanels: function(cmp) {
         var self = this,
             container = this._findContainer(cmp, 'container'),
             body = container.get('v.body');
@@ -534,7 +534,7 @@
         }
     },
     
-    afterSetActiveInstance: function(panel) {
+    afterSetActiveInstance: function() {
     	//template for  subcomponents
     },
     

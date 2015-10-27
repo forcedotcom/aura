@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(jsfile) {
+function lib(jsfile) { //eslint-disable-line no-unused-vars
     return {
         getValue: function() {
             return "MyDependency And Externally: " + jsfile.getValue();

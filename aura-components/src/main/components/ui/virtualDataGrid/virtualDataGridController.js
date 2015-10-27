@@ -119,8 +119,7 @@
     /*
     * DEPRECATED FROM OLD GRID
     */
-    handleRefresh: function (cmp, event, helper) {
-
+    handleRefresh: function () {
     },
     appendItems: function (cmp, event, helper) {
         var superCmp   = cmp.getSuper(),

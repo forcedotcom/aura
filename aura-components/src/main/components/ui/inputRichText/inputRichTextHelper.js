@@ -291,7 +291,7 @@
                             // parse into a JSON object
                             config = JSON.parse(config);
                             this.customToolbarConfig = config;
-                        } catch (e) {
+                        } catch (e) { // eslint-disable-line no-empty
                             // Use the default if there is an error
                             // Set in line 288 above
                         }
@@ -312,6 +312,8 @@
 		var editorInstance = this.getEditorInstance(cmp);
 		try {
 			editorInstance.destroy();
-		} catch (e) {}
+        } catch (e) {
+            return;
+        }
 	}
 })// eslint-disable-line semi

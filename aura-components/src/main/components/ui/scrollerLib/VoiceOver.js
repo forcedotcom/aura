@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
     // NAMESPACES
     var SCROLLER = w.__S || (w.__S = {}),
         HELPERS  = SCROLLER.helpers,
-        PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
-        SUPPORT  = SCROLLER.support;
+        PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {});
     
     function VoiceOver() {}
     
@@ -39,19 +38,18 @@ function lib(w) {
         },
         _createVoiceOverMarkup: function (config) {
             var self          = this,
-            	prevBtn, nextBtn, ptrBtn,
-                btnCls = 'scrollButton voiceOver ',
+            	prevBtn, nextBtn,
                 target         = this.wrapper;
-            
+
             if (this.scrollVertical) {
-                prevBtn = this._createButton(config.labelUp, 'top upButton', function(e){self._pageUp();});
-                nextBtn = this._createButton(config.labelDown, 'bottom downButton', function(e){self._pageDown();});
+                prevBtn = this._createButton(config.labelUp, 'top upButton', function(){self._pageUp();});
+                nextBtn = this._createButton(config.labelDown, 'bottom downButton', function(){self._pageDown();});
                 if (this.opts.pullToRefresh) {
-                    this._ptrBtn  = this._createButton(this.opts.pullToRefreshConfig.labelPull, 'top ptrButton', function(e){self.triggerPTR();});
+                    this._ptrBtn  = this._createButton(this.opts.pullToRefreshConfig.labelPull, 'top ptrButton', function(){self.triggerPTR();});
                 }
             } else {
-                prevBtn = this._createButton(config.labelLeft, 'leftButton', function(e){self._pageLeft();});
-                nextBtn = this._createButton(config.labelRight, 'rightButton', function(e){self._pageRight();});
+                prevBtn = this._createButton(config.labelLeft, 'leftButton', function(){self._pageLeft();});
+                nextBtn = this._createButton(config.labelRight, 'rightButton', function(){self._pageRight();});
             }
 
             this._enableVoiceOver = config.enable;

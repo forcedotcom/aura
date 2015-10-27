@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
      w || (w = window);
 
@@ -39,7 +39,7 @@ function lib(w) {
      * @return {Object}  An object representing the position in pixels
      *                      (top, left)
      */
-    function computeAbsPos(target) {
+    function computeAbsPos(target) { //eslint-disable-line no-unused-vars
         var val2;
         var val ={
             top: target.offsetTop,
@@ -111,47 +111,44 @@ function lib(w) {
      */
     ElementProxy.prototype.refresh = function() {
 
-        if(this.isDirty()) {
-            return;
-        }
+        if(!this.isDirty()) {
 
-        if(!this.checkNodeIsInDom) {
-            return this.release();
-        }
-
-        var box, x, scrollTop, scrollLeft;
-
-        if(typeof w.pageYOffset !== 'undefined') {
-            scrollTop = w.pageYOffset;
-            scrollLeft = w.pageXOffset;
-        } else {
-            scrollTop = w.scrollY;
-            scrollLeft = w.scrollX;
-        }
-        
-        
-        if(this._node !== w) {
-            //force paint
-            this._node.offsetHeight;
-            box = this._node.getBoundingClientRect();
-            for(x in box) {
-                this[x] = box[x];
+            if(!this.checkNodeIsInDom) {
+                return this.release();
             }
-            this.top = this.top + scrollTop;
-            this.bottom = this.top + box.height;
-            this.left = this.left + scrollLeft;
-            this.right = this.left + box.width;
-        } else {
-            box = {};
-            this.width = w.document.documentElement.clientWidth;
-            this.height = w.document.documentElement.clientHeight;
-            this.left = scrollLeft;
-            this.top = scrollTop;
-            this.right = w.document.documentElement.clientWidth + scrollLeft;
-            this.bottom = w.document.documentElement.clientHeight;
-        }
 
-        this._dirty = false;
+            var box, x, scrollTop, scrollLeft;
+
+            if(typeof w.pageYOffset !== 'undefined') {
+                scrollTop = w.pageYOffset;
+                scrollLeft = w.pageXOffset;
+            } else {
+                scrollTop = w.scrollY;
+                scrollLeft = w.scrollX;
+            }
+
+            if(this._node !== w) {
+                //force paint
+                this._node.offsetHeight;
+                box = this._node.getBoundingClientRect();
+                for(x in box) {
+                    this[x] = box[x];
+                }
+                this.top = this.top + scrollTop;
+                this.bottom = this.top + box.height;
+                this.left = this.left + scrollLeft;
+                this.right = this.left + box.width;
+            } else {
+                box = {};
+                this.width = w.document.documentElement.clientWidth;
+                this.height = w.document.documentElement.clientHeight;
+                this.left = scrollLeft;
+                this.top = scrollTop;
+                this.right = w.document.documentElement.clientWidth + scrollLeft;
+                this.bottom = w.document.documentElement.clientHeight;
+            }
+            this._dirty = false;
+        }
     };
 
     /**

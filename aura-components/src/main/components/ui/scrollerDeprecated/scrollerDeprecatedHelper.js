@@ -194,12 +194,12 @@
 					};
 
 					//Stop propagating the event to children if scrolling is canceled by tapping on the scroller while it's still scrolling
-					iScroll.prototype._getEventBuster = function(scroller) {
+					iScroll.prototype._getEventBuster = function(tappedScroller) {
 						if (!this._eventBuster) {
 							this._eventBuster = function(e) {
-								if (scroller._transitionCanceled && scroller.distX === 0 && scroller.distY === 0) {
+								if (tappedScroller._transitionCanceled && tappedScroller.distX === 0 && tappedScroller.distY === 0) {
 									$A.util.squash(e, true);
-									scroller._resetPos(200);
+									tappedScroller._resetPos(200);
 								}
 							};
 						}
@@ -224,7 +224,7 @@
 						useTransition : useTransition,
 
 						topOffset : pullDownOffset,
-						y : - (pullDownOffset + pullContentOffset),
+						y : -(pullDownOffset + pullContentOffset),
 
 						lockDirection : true,
 
@@ -441,9 +441,9 @@
 			}
 		});
 
-		function validate(predicate, message, component, errors) {
+		function validate(predicate, message, component, errorList) {
 			if (!predicate) {
-				errors.push(message + ' [' + component.toString() + ']');
+				errorList.push(message + ' [' + component.toString() + ']');
 			}
 		}
 

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
-    
+
+    var i;
     // jshint ignore: start
 
     // FOREACH polyfill
@@ -33,7 +34,7 @@ function lib(w) {
             }
 
             var thisArg = arguments.length >= 2 ? arguments[1] : void 0;
-            for (var i = 0; i < len; i++) {
+            for (i = 0; i < len; i++) {
                 if (i in t) {
                     fun.call(thisArg, t[i], i, t);
                 }
@@ -63,7 +64,7 @@ function lib(w) {
 
         supportTransition = false,
         supportTransform  = false,
-        property, prefix, i;
+        property, prefix;
 
     // TRANSITION SUPPORT
     if ('transition' in DOCUMENT_STYLE) {

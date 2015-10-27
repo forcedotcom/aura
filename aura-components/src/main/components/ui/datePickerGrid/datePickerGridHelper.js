@@ -273,7 +273,7 @@
         } else if (keyCode === 40) { // down arrow key
             domEvent.preventDefault();
             this.handleArrowKey(component, localId, 7);
-        } else if (keyCode === 9 && shiftKey === true) { // Tab + shift
+        //} else if (keyCode === 9 && shiftKey === true) { // Tab + shift
             //component.get("e.hide").fire();
         } else if (keyCode === 9 && shiftKey !== true) { // Tab
             if (!component.get("v.hasTime")) {

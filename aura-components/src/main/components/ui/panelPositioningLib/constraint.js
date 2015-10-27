@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(w) {
+function lib() { //eslint-disable-line no-unused-vars
       var transformFunctions = {
-        center: function(inp, targetBox, elementBox) {
+        center: function(inp, targetBox) {
             return inp + 0.5 * targetBox.width; 
         },
-        right: function(inp, targetBox, elementBox) {
+        right: function(inp, targetBox) {
             return inp + targetBox.width;
         },
-        left: function(inp, targetBox, elementBox) {
+        left: function(inp) {
             return inp;
         },
-        bottom: function(inp, targetBox, elementBox) {
+        bottom: function(inp, targetBox) {
             return inp + targetBox.height;
         }
     };
@@ -42,11 +42,11 @@ function lib(w) {
         var boxDirs = conf.boxDirections || {left:true, right: true};    
 
         // default is identity
-        this._transformX = function(inp, targetBox, elementBox) {
+        this._transformX = function(inp) {
             return inp;
         };
 
-        this._transformY = function(inp, targetBox, elementBox) {
+        this._transformY = function(inp) {
             return inp;
         };
 
@@ -74,12 +74,11 @@ function lib(w) {
 
                     return {
                         top: self._transformY(targetBox.top, targetBox, elementBox) - elementBox.height - pad
-                    }
-                }
+                    };
+                };
                 break;
 
             case 'center' :
-
                 this._exp = function(targetBox, elementBox) {
                     
                     return {
@@ -87,44 +86,42 @@ function lib(w) {
                     };
                 };
                 break;
+
             case 'middle' :
                 this._exp = function(targetBox, elementBox) {
                     return {
                         top: 0.5 * (2 * targetBox.top + targetBox.height - elementBox.height)
-                    }
-                }
+                    };
+                };
                 break;
+
             case 'left' :
                 this._exp = function(targetBox, elementBox) {
                     return {
                         left: self._transformX(targetBox.left, targetBox, elementBox) + pad
-                    }
-                }
+                    };
+                };
                 break;
 
             case 'right' :
-            
                 this._exp = function(targetBox, elementBox) {
-
                     return {
                         left: self._transformX(targetBox.left, targetBox, elementBox) - elementBox.width - pad
-                    }
-                }
+                    };
+                };
                 break;
-            case 'below' :
 
+            case 'below' :
                 this._exp = function(targetBox, elementBox) {
                     if(elementBox.top < targetBox.top + targetBox.height + pad) {
                         return {
                             top: targetBox.top + targetBox.height + pad
                         };
                     }
-                    
-                }
+                };
                 break;
 
             case 'bounding box':
-
                 this._exp = function(targetBox, elementBox) {
                     var retBox = {};
 
@@ -146,12 +143,10 @@ function lib(w) {
                     }
 
                     return retBox;
-
                 };
                 break;
 
             case 'inverse bounding box':
-
                 this._exp = function(targetBox, elementBox) {
                     var retBox = {};
 
@@ -172,22 +167,19 @@ function lib(w) {
                     }
 
                     return retBox;
-
                 };
                 break;
 
             default:
-                console.error('no constraint expression for', type);
+                console.error('no constraint expression for', type); //eslint-disable-line no-console
                 this._exp = function() {
                     // no op
                 };
          }
          
-
          if(conf && conf.enable === false) {
             this._disabled = true;
          } 
-        
     };
 
     /**
@@ -195,14 +187,14 @@ function lib(w) {
      */
     Constraint.prototype.detach = function() {
         this._disabled = true;
-    }
+    };
 
     /**
      * enable the constraint
      */
     Constraint.prototype.attach = function() {
         this._disabled = false;
-    }
+    };
 
     /**
      * update the values from the DOM
@@ -215,7 +207,7 @@ function lib(w) {
             this._pendingBox = this._exp(this._targetElement, this._el);
             
         }
-    }
+    };
 
     /**
      * Compute the new position
@@ -229,7 +221,7 @@ function lib(w) {
             }
         }
         
-    }
+    };
 
     /**
      * Compute the new position

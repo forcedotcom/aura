@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
@@ -48,8 +48,7 @@ function lib(w) {
         CLASS_ICON         = 'icon',
         CLASS_ERROR        = 'error',
         CLASS_LABEL        = 'label',
-        CLASS_SUBTITLE     = 'sub',
-        CLASS_PTR          = 'pullToRefresh';
+        CLASS_SUBTITLE     = 'sub';
     
     function PullToRefresh() {}
 
@@ -99,7 +98,7 @@ function lib(w) {
             ptr_container.className = 'pullToRefresh';
 
             if (this._nativePTR) {
-                ptr_container.addEventListener('click', function (e) {
+                ptr_container.addEventListener('click', function () {
                     self.triggerPTR();
                 });
             }
@@ -132,7 +131,6 @@ function lib(w) {
 
             HELPERS.bind(this.wrapper, 'touchmove', function (e) {
                 var point = e.touches ? e.touches[0] : e,
-                    x     = point.pageX - this.pointX,
                     y     = point.pageY - this.pointY;
 
                 if (this._iosTouching || (y > 0 && this.scroller.scrollTop === 0)) {
@@ -263,7 +261,7 @@ function lib(w) {
                 }   
             }
         },
-        _onScrollEndPTR: function (e) {
+        _onScrollEndPTR: function () {
             if (this._iosPTR && !this._ptrTriggered) {
                 this.forceTranslate = false;
             }

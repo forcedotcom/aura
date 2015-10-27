@@ -352,9 +352,9 @@
                 };
 
                 this._handleWheel = function(e) {
-                    var scrollableParent = self._getScrollableParent(elem);
-                    if(scrollableParent && scrollableParent.scrollTop) {
-                        scrollableParent.scrollTop += e.deltaY;
+                    var elScrollableParent = self._getScrollableParent(elem);
+                    if(elScrollableParent && elScrollableParent.scrollTop) {
+                        elScrollableParent.scrollTop += e.deltaY;
                     }
 
                 };

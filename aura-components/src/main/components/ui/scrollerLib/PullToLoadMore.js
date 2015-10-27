@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
 
     var SCROLLER = w.__S || (w.__S = {}),
         RAF      = w.requestAnimationFrame,
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
-        STYLES   = SCROLLER.styles,
         HELPERS  = SCROLLER.helpers,
         SUPPORT  = SCROLLER.support,
 
@@ -98,7 +97,7 @@ function lib(w) {
             ptl_container.appendChild(HELPERS.createLabel(CLASS_SUBTITLE, subtitleLabel));
 
             if (this._nativePTL) {
-                ptl_container.addEventListener('click', function (e) {
+                ptl_container.addEventListener('click', function () {
                     self.triggerPTL();
                 });
             }

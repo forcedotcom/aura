@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(MyDependency) {
+function lib(MyDependency) { //eslint-disable-line no-unused-vars
     return {
         getValue: function() {
             return "Imported MyLib (and " + MyDependency.getValue() + ")";
         }
-    }
+    };
 }

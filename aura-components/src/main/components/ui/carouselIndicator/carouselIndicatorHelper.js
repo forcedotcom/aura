@@ -72,9 +72,10 @@
     },
     _getPageNumber: function (e) {
         var root = e.currentTarget,
-            target;
-        
-        for (target = e.target; root !== target && target.className.indexOf('item') === -1; target = target.parentNode);
+            target = e.target;
+        while (root !== target && target.className.indexOf('item') === -1) {
+            target = target.parentNode;
+        }
         return $A.util.getDataAttribute(target,'index');
     },
     _handleEvent: function (cmp, e) {

@@ -86,7 +86,9 @@
     testValueEmpty: {
         attributes: {label: 'link', value: ''},
         test: function (component) {
+            /* eslint-disable no-script-url */
             $A.test.assertEquals('javascript:void(0);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+            /* eslint-enable no-script-url */
         }
     },
 
@@ -113,7 +115,9 @@
             var href = component.find("link").getElement().getAttribute('href');
             if ($A.util.supportsTouchEvents()) {
                 // prod mode doesn't have comment within void
+                /* eslint-disable no-script-url */
                 $A.test.assertTrue(href === "javascript:void(0);" || href === "javascript:void(0/*#top*/);", "href attribute not correct");
+                /* eslint-enable no-script-url */
             } else {
                 $A.test.assertEquals("#top", href, "href attribute not correct");
             }
@@ -122,7 +126,9 @@
             var href = component.find("link").getElement().getAttribute('href');
             if ($A.util.supportsTouchEvents()) {
                 // prod mode doesn't have comment within void
+                /* eslint-disable no-script-url */
                 $A.test.assertTrue(href === "javascript:void(0);" || href === "javascript:void(0/*#bottom*/);", "href attribute not correct");
+                /* eslint-enable no-script-url */
             } else {
                 $A.test.assertEquals("#bottom", href, "href attribute not correct");
             }

@@ -29,6 +29,75 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
         return focusUtil.getTabbableChildren(el);
     }
 
+    function updateTabbableNodes() {
+        tabbableNodes = tabbable(trap);
+    }
+
+    function checkClick(e) {
+        if (trap.contains(e.target)) {
+            return;
+        }
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }
+
+    function checkFocus(e) {
+        updateTabbableNodes();
+        if (trap.contains(e.target)){
+            return;
+        }
+        tabbableNodes[0].focus();
+    }
+
+    function checkKey(e) {
+        if (e.key === 'Tab' || e.keyCode === 9) {
+            e.preventDefault();
+            updateTabbableNodes();
+            var currentFocusIndex = tabbableNodes.indexOf(e.target);
+            var lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
+            var firstTabbableNode = tabbableNodes[0];
+            if (e.shiftKey) {
+                if (e.target === firstTabbableNode) {
+                    lastTabbableNode.focus();
+                    return;
+                }
+                tabbableNodes[currentFocusIndex - 1].focus(0);
+                return;
+            }
+            if (e.target === lastTabbableNode) {
+                firstTabbableNode.focus();
+                return;
+            }
+            tabbableNodes[currentFocusIndex + 1].focus();
+        }
+
+        if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
+            deactivate(); //eslint-disable-line no-use-before-define
+        }
+    }
+
+    function deactivate() {
+        if (!activeFocusTrap) {
+            return;
+        }
+        activeFocusTrap = false;
+
+        document.removeEventListener('focus', checkFocus, true);
+        document.removeEventListener('click', checkClick, true);
+        document.removeEventListener('touchend', checkClick, true);
+        document.removeEventListener('keydown', checkKey, true);
+
+        if (config.onDeactivate) {
+            config.onDeactivate();
+        }
+
+        if (!config.keyboardOnly) {
+            setTimeout(function() {
+                previouslyFocused.focus();
+            }, 0);
+        }
+    }
+
     function activate(element, options) {
         // There can be only one focus trap at a time
         if (activeFocusTrap) {
@@ -73,75 +142,6 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
             document.addEventListener('click', checkClick, true);
             document.addEventListener('touchend', checkClick, true);
         }
-    }
-
-    function deactivate() {
-        if (!activeFocusTrap) {
-            return;
-        }
-        activeFocusTrap = false;
-
-        document.removeEventListener('focus', checkFocus, true);
-        document.removeEventListener('click', checkClick, true);
-        document.removeEventListener('touchend', checkClick, true);
-        document.removeEventListener('keydown', checkKey, true);
-
-        if (config.onDeactivate) {
-            config.onDeactivate();
-        }
-
-        if (!config.keyboardOnly) {
-            setTimeout(function() {
-                previouslyFocused.focus();
-            }, 0);
-        }
-    }
-
-    function checkClick(e) {
-        if (trap.contains(e.target)) {
-            return;
-        }
-        e.preventDefault();
-        e.stopImmediatePropagation();
-    }
-
-    function checkFocus(e) {
-        updateTabbableNodes();
-        if (trap.contains(e.target)){
-            return;
-        }
-        tabbableNodes[0].focus();
-    }
-
-    function checkKey(e) {
-        if (e.key === 'Tab' || e.keyCode === 9) {
-            e.preventDefault();
-            updateTabbableNodes();
-            var currentFocusIndex = tabbableNodes.indexOf(e.target);
-            var lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
-            var firstTabbableNode = tabbableNodes[0];
-            if (e.shiftKey) {
-                if (e.target === firstTabbableNode) {
-                    lastTabbableNode.focus();
-                    return;
-                }
-                tabbableNodes[currentFocusIndex - 1].focus(0);
-                return;
-            }
-            if (e.target === lastTabbableNode) {
-                firstTabbableNode.focus();
-                return;
-            }
-            tabbableNodes[currentFocusIndex + 1].focus();
-        }
-
-        if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {
-            deactivate();
-        }
-    }
-
-    function updateTabbableNodes() {
-        tabbableNodes = tabbable(trap);
     }
 
     return {

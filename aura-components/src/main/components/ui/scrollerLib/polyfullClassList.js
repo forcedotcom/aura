@@ -97,15 +97,15 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
     window.DOMTokenList = DOMTokenList;
 
-    function defineElementGetter (obj, prop, getter) {
-            if (Object.defineProperty) {
-                    Object.defineProperty(obj, prop,{
-                            get : getter
-                    });
-            } else {                                        
-                    obj.__defineGetter__(prop, getter);
-            }
-    }
+    var defineElementGetter = function (obj, prop, getter) {
+      if (Object.defineProperty) {
+        Object.defineProperty(obj, prop,{
+          get : getter
+        });
+      } else {
+        obj.__defineGetter__(prop, getter);
+      }
+    };
 
     defineElementGetter(Element.prototype, 'classList', function () {
       return new DOMTokenList(this);                        

@@ -18,7 +18,7 @@
  // https://github.com/davidtheclark/tabbable
  // https://github.com/davidtheclark/focus-trap
 
-function lib() {
+function lib() { //eslint-disable-line no-unused-vars
     /**
      * Returns true if the given element "el" is not visible
      * @param {Element} el

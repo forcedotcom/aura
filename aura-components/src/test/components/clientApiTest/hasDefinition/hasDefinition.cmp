@@ -1,0 +1,4 @@
+<aura:component>
+    <aura:dependency resource="markup://aura:text" type="COMPONENT"/>
+    <aura:dependency resource="markup://aura:valueChange" type="EVENT"/>
+</aura:component>

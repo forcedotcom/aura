@@ -258,10 +258,10 @@
             // Create error component.
             $A.componentService.newComponentAsync(
                 this,
-                function(errorCmp) {
-                    component.set("v.errorComponent", errorCmp);
-                    var concreteHelper = component.getConcreteComponent().getDef().getHelper();
-                    concreteHelper.updateAriaDescribedBy(component, errorCmp.getGlobalId());
+                function(errorComponent) {
+                    component.set("v.errorComponent", errorComponent);
+                    var concreteCmpHelper = component.getConcreteComponent().getDef().getHelper();
+                    concreteCmpHelper.updateAriaDescribedBy(component, errorComponent.getGlobalId());
                 },
                 {
                     "componentDef": "markup://ui:inputDefaultError",

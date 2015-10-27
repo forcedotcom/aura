@@ -334,6 +334,7 @@
             		config.oldFocus.focus();
             	} catch (e) {
             		// Ignore these - invalid element or in IE7/8 trying to set focus to an invisible element
+                    return;
             	}
             }
         }

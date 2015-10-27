@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
 

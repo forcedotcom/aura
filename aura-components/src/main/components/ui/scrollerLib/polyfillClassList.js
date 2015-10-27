@@ -15,7 +15,7 @@
  */
 // jshint ignore: start
 // POLYFILL CLASSLIST (https://github.com/remy/polyfills/blob/master/classList.js)
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
   w || (w = window);
   
   if (!(typeof w.Element === "undefined" || "classList" in document.documentElement)) {

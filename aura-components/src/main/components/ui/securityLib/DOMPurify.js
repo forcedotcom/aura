@@ -23,7 +23,7 @@
 /*
  * Modified and adapted for use as a component library
  */
-function lib() {
+function lib() { //eslint-disable-line no-unused-vars
     'use strict';
 
     var DOMPurify = {};
@@ -363,6 +363,21 @@ function lib() {
     };
 
     /**
+     * _executeHook
+     * Execute user configurable hooks
+     *
+     * @param  {String} entryPoint  Name of the hook's entry point
+     * @param  {Node} currentNode
+     */
+    var _executeHook = function(entryPoint, currentNode, data) {
+        if (!hooks[entryPoint]) { return; }
+
+        hooks[entryPoint].forEach(function(hook) {
+            hook.call(DOMPurify, currentNode, data, CONFIG);
+        });
+    };
+
+    /**
      * _sanitizeElements
      * 
      * MODIFIED: removed protect annotation on:
@@ -398,7 +413,7 @@ function lib() {
                     && typeof currentNode.insertAdjacentHTML === 'function') {
                 try {
                     currentNode.insertAdjacentHTML('AfterEnd', currentNode.innerHTML);
-                } catch (e) {}
+                } catch (e) {} // eslint-disable-line no-empty
             }
             _forceRemove(currentNode);
             return true;
@@ -414,6 +429,11 @@ function lib() {
 
         return false;
     };
+    
+    var DATA_ATTR = /^data-[\w.\u00B7-\uFFFF-]/;
+    var IS_SCRIPT_OR_DATA = /^(?:\w+script|data):/i;
+    /* This needs to be extensive thanks to Webkit/Blink's behavior */
+    var ATTR_WHITESPACE = /[\x00-\x20\xA0\u1680\u180E\u2000-\u2029\u205f\u3000]/g;
 
     /**
      * _sanitizeAttributes
@@ -507,17 +527,13 @@ function lib() {
                 /* Handle invalid data-* attribute set by try-catching it */
                 try {
                     currentNode.setAttribute(name, value);
-                } catch (e) {}
+                } catch (e) {} // eslint-disable-line no-empty
             }
         }
 
         /* Execute a hook if present */
         _executeHook('afterSanitizeAttributes', currentNode, null);
     };
-    var DATA_ATTR = /^data-[\w.\u00B7-\uFFFF-]/;
-    var IS_SCRIPT_OR_DATA = /^(?:\w+script|data):/i;
-    /* This needs to be extensive thanks to Webkit/Blink's behavior */
-    var ATTR_WHITESPACE = /[\x00-\x20\xA0\u1680\u180E\u2000-\u2029\u205f\u3000]/g;
 
     /**
      * _sanitizeShadowDOM
@@ -552,21 +568,6 @@ function lib() {
 
         /* Execute a hook if present */
         _executeHook('afterSanitizeShadowDOM', fragment, null);
-    };
-
-    /**
-     * _executeHook
-     * Execute user configurable hooks
-     *
-     * @param  {String} entryPoint  Name of the hook's entry point
-     * @param  {Node} currentNode
-     */
-    var _executeHook = function(entryPoint, currentNode, data) {
-        if (!hooks[entryPoint]) { return; }
-
-        hooks[entryPoint].forEach(function(hook) {
-            hook.call(DOMPurify, currentNode, data, CONFIG);
-        });
     };
 
     /**
@@ -699,6 +700,6 @@ function lib() {
     DOMPurify.removeAllHooks = function() {
         hooks = [];
     };
-    
+
     return DOMPurify;
 }

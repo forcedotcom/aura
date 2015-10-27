@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib() {
+function lib() { //eslint-disable-line no-unused-vars
 
-	var lib = {
+	var lib = { //eslint-disable-line no-shadow, no-unused-vars
 		/**
 	     * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
 	     */
@@ -77,7 +77,7 @@ function lib() {
 	        	lib.fireEvent(component, event, helper);
 	        }
 	        
-	        if (event.type == "click" && component.get("v.disableDoubleClicks")) {
+	        if (event.type === "click" && component.get("v.disableDoubleClicks")) {
 	        	component._recentlyClicked = true;
 	        	window.setTimeout(function() { component._recentlyClicked = false; }, 350);
 	        }
@@ -89,7 +89,7 @@ function lib() {
 	     *
 	     * @param event must be a DOM event
 	     */
-	     fireEvent : function (component, event, helper) {
+	     fireEvent : function (component, event) {
 	    	 // As the result as another event
 	    	 // this component could become invalid, so guard just in-case
 	    	 if(component.isValid()) {
@@ -144,7 +144,7 @@ function lib() {
 	            } else {
 	                params[key] = DOMEvent[key];
 	            }
-	        };
+	        }
 	        e.setParams(params);
 	    },
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib() {
+function lib() { //eslint-disable-line no-unused-vars
     // -- Utils
     function getElement(item) {
         var cmp = $A.util.isString(item) ? $A.getCmp(item) : $A.util.isComponent(item) ? item : null;
@@ -115,8 +115,10 @@ function lib() {
     function moveUpOrDown(el, forceCreateStackingCtx, increment) {
         var stackingCtxEl = getStackingCtx(el);
         if (forceCreateStackingCtx && stackingCtxEl !== el.parentNode) {
+            /*eslint-disable no-undef*/
             if ($A.util.isFunction(createStackingCtx)) {
                 createStackingCtx(el.parentNode);
+            /*eslint-enable no-undef*/
             } else {
                 el.parentNode.style.position = 'relative';
                 el.parentNode.style.zIndex = 0;

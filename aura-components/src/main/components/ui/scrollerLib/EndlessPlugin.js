@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
@@ -38,7 +38,7 @@ function lib(w) {
         _setActiveOffset: function () {
             this.activeOffset = (this.scrollVertical ? this.wrapperHeight: this.wrapperWidth) - 5;
         },
-        _momentum: function (current, start, duration, lowerMargin, wrapperSize) {
+        _momentum: function (current, start, duration) {
             var velocity = this._getVelocity(current, start, duration),
                 momentum = this._computeMomentum(velocity, current);
             return momentum;
@@ -69,7 +69,7 @@ function lib(w) {
                 sizeNeeded    = this.wrapperSize + this.activeOffset,
                 heightSum     = 0,
                 i,j,
-                item, surface, height;
+                item, surface;
 
             for (i = 0; i < itemsSize && sizeNotCover; i++) {
                 item          = items[i];

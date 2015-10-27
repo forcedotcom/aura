@@ -150,7 +150,7 @@
     },
     
 	//Hook for subcomponent
-    beforeTransitionEnd: function(cmp) {
+    beforeTransitionEnd: function() {
     },
 
     position: function(cmp) {

@@ -163,8 +163,9 @@
         // If an option is in newValues, we want to select it
         updateOptions: function (cmp, options, newValues, createNewOptions) {
             var found = false;
+            var i;
 
-            for (var i = 0; i < options.length; i++) {
+            for (i = 0; i < options.length; i++) {
                 var option = options[i];
                 var val = option.value;
                 if ($A.util.isUndefinedOrNull(val)) {
@@ -177,7 +178,7 @@
             }
 
             if (!found && createNewOptions) {
-                for (var i=0; i<newValues.length; i++) {
+                for (i=0; i<newValues.length; i++) {
                     options.unshift({
                         label: newValues[i],
                         value: newValues[i],
@@ -210,7 +211,7 @@
         setOptionSelected: function (options, index, selected) {
             if (!$A.util.isUndefinedOrNull(options[index])) {
                 options[index].selected = selected;
-            } else {
+            // } else {
                 // TODO: somehow expose that the option couldn't be set.
             }
         },
@@ -246,7 +247,7 @@
         setOptionSelected: function (options, index, selected) {
             if (!$A.util.isUndefinedOrNull(options[index])) {
                 options[index].set("v.value", selected);
-            } else {
+            // } else {
                 // TODO: somehow expose that the option couldn't be set.
             }
         },

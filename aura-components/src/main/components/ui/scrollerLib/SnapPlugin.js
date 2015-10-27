@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
 
     var SCROLLER    = w.__S || (w.__S = {}), //NAMESPACE
         STATICS     = SCROLLER.constructor,
         PLUGINS     = SCROLLER.plugins || (SCROLLER.plugins = {}),
-        STYLES      = SCROLLER.styles,
         EASING      = STATICS.EASING,
         BOUNCE_BACK = 200,
         SNAP_SOFT   = 'soft',
-        SNAP_STICKY = 'sticky',
         SNAPSIZE_RATIO = 2,
         MAX_SNAP_TIME  = 600;
     
@@ -42,8 +40,8 @@ function lib(w) {
             this.initX = this.startX;
             this.initY = this.startY;
         },
-        _getNearesOffset: function (offset) {
-            var s = this.surfacesPositioned;
+        _getNearesOffset: function () {
+            // var s = this.surfacesPositioned;
         },
         _afterEnd: function () {
             var current, dest, time;
@@ -65,7 +63,7 @@ function lib(w) {
         _getSnapSize: function (vertical) {
             return  vertical ? this.itemHeight || this.wrapperHeight : this.itemWidth || this.wrapperWidth;
         },
-        _getSnapPosition: function (vertical) {
+        _getSnapPosition: function () {
             var current;
             if (this.scrollVertical) {
                 current  = {
@@ -90,7 +88,7 @@ function lib(w) {
                 return this._momentumSnapSticky.apply(this, arguments);
             }
         },
-        _momentumSnapSticky: function (current, start, duration, lowerMargin, wrapperSize) {
+        _momentumSnapSticky: function (current, start, duration) {
             var velocity = this._getVelocity(current, start, duration),
                 momentum = this._momentumSnapSoft.apply(this, arguments),
                 position = this._getSnapPosition(),

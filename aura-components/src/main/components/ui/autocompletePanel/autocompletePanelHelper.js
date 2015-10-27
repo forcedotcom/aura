@@ -110,9 +110,9 @@
         };
 
         this._handleWheel = function(e) {
-            var scrollableParent = self._getScrollableParent(referenceElem);
-            if(scrollableParent && typeof scrollableParent.scrollTop !== 'undefined') {
-                scrollableParent.scrollTop += e.deltaY;
+            var elScrollableParent = self._getScrollableParent(referenceElem);
+            if(elScrollableParent && typeof elScrollableParent.scrollTop !== 'undefined') {
+                elScrollableParent.scrollTop += e.deltaY;
             }
             
         };

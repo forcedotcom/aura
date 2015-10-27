@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
 
@@ -45,8 +45,7 @@ function lib(w) {
             );
         },
        _createInfiniteLoadingMarkup: function () {
-            var self         = this,
-                il_container = w.document.createElement('div'),
+            var il_container = w.document.createElement('div'),
                 label        = document.createElement('span'),
                 idleLabel    = this.opts.infiniteLoadingConfig.labelIdle;
 
@@ -143,7 +142,7 @@ function lib(w) {
             this._ilFetchingData = false;
         },
         // This check is done when surfaceManager is enabled
-        _checkItemsthreshold: function (action) {
+        _checkItemsthreshold: function () {
             if (this._ilNoMoreData || this._ilFetchingData) {
                 return;
             }

@@ -446,6 +446,10 @@
     removeItem: function (component, array, index, timeout, animate, callback) {
         var row;
 
+        function rm() {
+            component.set('v.items', array);
+        }
+
         // Animations require a specified timeout.
         if (animate && $A.util.isUndefinedOrNull(timeout)) {
             $A.warning("'animation' function specified to ui:infinteList WITHOUT the required timeout. Please specify a timeout in milliseconds.");
@@ -467,10 +471,6 @@
         }
         else {
             rm();
-        }
-
-        function rm() {
-            component.set('v.items', array);
         }
     },
 

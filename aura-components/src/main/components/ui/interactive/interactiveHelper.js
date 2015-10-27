@@ -124,10 +124,8 @@
     /**
      * This method is intended to be overridden by extended components to do event related stuff before the event gets fired.
      * For example, input component uses this method to update its value if the event is the "updateOn" event.
-     *
-     * @param event must be a DOM event
      */
-    preEventFiring : function(component, event){
+    preEventFiring : function(){
     },
 
     /**

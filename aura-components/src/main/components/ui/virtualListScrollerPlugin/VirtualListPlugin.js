@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
 
-    var SCROLLER = w.__S;
+    if (w.Scroller) {
+        var VirtualListPLugin = {
+            init: function () {
+                this.on('_initialize', this._initializeVirtualPlugin);
+            },
+            _initializeVirtualPlugin: function () {
+                console.log('>> initializing VirtualListPlugin'); //eslint-disable-line no-console
+            }
+        };
 
-    if (!w.Scroller) {
+        w.Scroller.registerPlugin('VirtualList', VirtualListPLugin);
+        return VirtualListPLugin;
+    } else {
         $A.warning('Error trying to register VirtualListPlugin: No Scroller var defined');
-        return;
     }
-
-    var VirtualListPLugin = {
-        init: function () {
-            this.on('_initialize', this._initializeVirtualPlugin);
-        },
-        _initializeVirtualPlugin: function () {
-            console.log('>> initializing VirtualListPlugin');
-        }
-    };
-
-
-
-    Scroller.registerPlugin('VirtualList', VirtualListPLugin);
-    return VirtualListPLugin;
 }

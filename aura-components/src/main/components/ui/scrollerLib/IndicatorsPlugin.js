@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
@@ -159,7 +159,6 @@ function lib(w) {
 
         _move: function (e) {
             var point     = e.touches ? e.touches[0] : e,
-                timestamp = NOW(),
                 deltaX, deltaY, newX, newY;
 
             e.preventDefault();
@@ -220,7 +219,7 @@ function lib(w) {
             y = this.scrollVertical  ? Math.round(y / this.sizeRatioY) : this.scroller.y;
 
             if (!this._rafPos) {
-                this._rafPos = RAF(function (t) {
+                this._rafPos = RAF(function () {
                     self._posRAF(x, y);
                 });
             }
@@ -268,8 +267,7 @@ function lib(w) {
         refresh: function () {
             this.transitionTime(0);
 
-            var scroller      = this.scroller,
-                wHeight       = this.wrapperHeight = this.wrapper.offsetHeight, // possible relayout
+            var wHeight       = this.wrapperHeight = this.wrapper.offsetHeight, // possible relayout
                 wWidth        = this.wrapperWidth  = this.wrapper.offsetWidth,
                 size          = this.scrollVertical ? wHeight : wWidth,
                 scrollSize    = Math.max(this.getVirtualScrollSize(), size),
@@ -391,7 +389,9 @@ function lib(w) {
                 this._createDefaultScrollbars(this.opts.scrollbars);
             }
             if (this.opts.indicators) {
-                this.opts.indicators.forEach(function (i) {self.addIndicator(i.el, i.config)});
+                this.opts.indicators.forEach(function (i) {
+                    self.addIndicator(i.el, i.config);
+                });
             }
 
             this._initVirtualScrollSize();                
@@ -434,7 +434,7 @@ function lib(w) {
         _transitionEasingIndicators: function (easing) {
             this._indicators.forEach(function (i) {i.transitionEasing(easing);});
         },
-        _createDefaultScrollbars: function (config) {
+        _createDefaultScrollbars: function () {
             var interactive = true,  // TODO:
                 customStyle = false, // Move those two as params
                 scrollbar   = this._createDefaultScrollbar(this.scrollVertical, interactive, customStyle);

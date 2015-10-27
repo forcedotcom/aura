@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(scrollUtil) {
+function lib(scrollUtil) { //eslint-disable-line no-unused-vars
     'use strict';
 
-    var lib = {
+    var lib = { //eslint-disable-line no-shadow, no-unused-vars
 
         validateAnimationName: function(animName) {
         	if(animName && animName.match(/^move(to|from)(bottom|top|left|right|center|pop)$/)) {
@@ -36,7 +36,7 @@ function lib(scrollUtil) {
                     initial: null,
                     first: null,
                     last: null
-                }
+                };
             }
             var els = containerEl.querySelectorAll('input,button,a,textarea,select'),
                 len = els.length,
@@ -96,7 +96,7 @@ function lib(scrollUtil) {
                 }
                 var event = e || window.event,
                     keyCode = event.keyCode;
-                if (keyCode == 27 && config.closeOnEsc) {
+                if (keyCode === 27 && config.closeOnEsc) {
                     //escape to close
                     $A.util.squash(e);
                     if ($A.util.isFunction(closeAction)) {
@@ -104,15 +104,16 @@ function lib(scrollUtil) {
                     } else {
                         cmp.close();
                     }
-                } else if (keyCode == 9) {
+                } else if (keyCode === 9) {
                     //close on tab out
                     var shiftPressed = event.shiftKey,
                         current = document.activeElement,
-                        el = cmp.getElement(),
                         focusables;
-                        if(el) {
-                            focusables = me.getFocusables(cmp.getElement());
-                        }
+
+                    el = cmp.getElement();
+                    if(el) {
+                        focusables = me.getFocusables(cmp.getElement());
+                    }
                         
                     if (focusables && config.trapFocus) {
                         if (current === focusables.last && !shiftPressed) {
@@ -144,7 +145,6 @@ function lib(scrollUtil) {
          * @returns {Function}
          */
         getMouseEventListener: function(panelCmp, config, closeAction) {
-            var self = this;
             return function(e) {
                 if (!panelCmp.isValid()) {
                     return;
@@ -198,7 +198,7 @@ function lib(scrollUtil) {
 
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = function (e) {
+            var finishHandler = function () {
 
                 if(!cmp.isValid()) {
                     return;
@@ -263,7 +263,7 @@ function lib(scrollUtil) {
             cmp.set('v.visible', false);
 
             //endAnimationHandler: cleanup all classes and events
-            var finishHandler = function (e) {
+            var finishHandler = function () {
 
                 // make sure the compoment is valid befdore  
                 // doining anything with it, because
@@ -272,10 +272,8 @@ function lib(scrollUtil) {
 
                     if (config.useTransition) {
                         panel.removeEventListener(animEl, finishHandler);
-                    
                     }                
 
-                
                     config.onFinish && config.onFinish();
                     setTimeout(function() {
                         $A.util.removeClass(panel, 'open');
@@ -325,11 +323,12 @@ function lib(scrollUtil) {
                        avp.setAttributeValueProvider(panel);
                     }
                     
+                    var i, length;
                     if (!$A.util.isEmpty(header)) {
                         if ($A.util.isComponent(header)) {
                             header.setAttributeValueProvider(avp);
                         } else {
-                            for (var i = 0, length = header.length; i < length; i++) {
+                            for (i = 0, length = header.length; i < length; i++) {
                                 header[i].setAttributeValueProvider(avp);
                             }
                         }
@@ -338,7 +337,7 @@ function lib(scrollUtil) {
                         if ($A.util.isComponent(header)) {
                             header.setAttributeValueProvider(avp);
                         } else {
-                            for (var i = 0, length = footer.length; i < length; i++) {
+                            for (i = 0, length = footer.length; i < length; i++) {
                                 footer[0].setAttributeValueProvider(avp);
                             }
                         }
@@ -359,7 +358,7 @@ function lib(scrollUtil) {
 	                if (params.typeOf === 'ui:destroyPanel' && !params.payload) {
 	                    params.payload = {
 	                        panelInstance: cmp.getGlobalId()
-	                    }
+	                    };
 	                }
 	                break;
 	            case 'closePanel':
@@ -426,7 +425,7 @@ function lib(scrollUtil) {
          */
         isVisible: function(el) {
             while (el && el.style) {
-                if (window.getComputedStyle(el).display == 'none') {
+                if (window.getComputedStyle(el).display === 'none') {
                     return false;
                 }
                 el = el.parentNode;
@@ -449,7 +448,7 @@ function lib(scrollUtil) {
         setFocus: function(cmp) {
             
             if(cmp.isValid()) {
-                var focusables, el;
+                var el;
 
                 el = cmp.getElement();
                 if(cmp.returnFocus) {

@@ -80,4 +80,6 @@
             $A.test.assertEquals(expected, actual);
         }
     }
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

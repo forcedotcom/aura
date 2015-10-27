@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib() {
+function lib() { //eslint-disable-line no-unused-vars
     var mouseWheelHandler = function (e) {
         var wrapper      = e.currentTarget;
         var scrollTop    = wrapper.scrollTop;

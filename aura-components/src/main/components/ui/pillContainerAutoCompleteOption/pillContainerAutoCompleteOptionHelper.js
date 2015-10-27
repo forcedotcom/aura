@@ -17,18 +17,18 @@
     /**
      * Override ui:autoCompleteOption.
      */
-    displayText : function(component, keyword) {
+    displayText : function() {
     },
 
     /**
      * Override ui:autoCompleteOption.
      */
-    handleMouseover : function(component) {
+    handleMouseover : function() {
     },
 
     /**
      * Override ui:autoCompleteOption.
      */
-    handleMouseout : function(component) {
+    handleMouseout : function() {
     }
 })// eslint-disable-line semi

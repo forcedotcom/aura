@@ -68,12 +68,8 @@
 
 	/**
 	 * Implement write logic in a concrete helper.
-	 *
-	 * @param {Component} concrete
-	 * @params {Object} cfg { operation => [] }
-	 * @params {Function} callback optional callback to invoker of write operation function (error, response)
 	 */
-	write: function (concrete, cfg, callback) {
+	write: function () {
 		throw new $A.auraError('Unimplemented function! dataWriterHelper#write should be implemented in a concrete helper.');
 	}
 })// eslint-disable-line semi

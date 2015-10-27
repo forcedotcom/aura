@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
@@ -40,7 +40,6 @@ function lib(w) {
         * constants won't be exposed as STATIC variables 
         * in the Scroller.
         */
-        ACTION_RESET         = 'reset',
         ACTION_LOCK          = 'lock',
         ACTION_GESTURE_START = 'gestureStart',
         ACTION_GESTURE_MOVE  = 'gestureMove',
@@ -321,7 +320,7 @@ function lib(w) {
         * @param cfg {Object} Scroller configuration object
         * @private
         */
-        _initializePlugins: function (cfg) {
+        _initializePlugins: function () {
             var userPlugins    = this.opts.plugins,
                 SurfaceManager = PLUGINS.SurfaceManager,
                 PullToRefresh  = PLUGINS.PullToRefresh,
@@ -374,7 +373,7 @@ function lib(w) {
 
             observer.observe(this.wrapper, config);
         },
-        _observedDOMChange: function (e) {
+        _observedDOMChange: function () {
             this.refresh(ACION_DOM_MUTATION);
         },
         /**
@@ -586,7 +585,7 @@ function lib(w) {
         * @method _iosScrollFixture
         * @private
         */
-        _iosScrollFixture: function (e) {
+        _iosScrollFixture: function () {
             if (this.scroller.scrollTop === 0) {
                 this.scroller.scrollTop = 1;
             }
@@ -603,8 +602,7 @@ function lib(w) {
                 eventType = action === 'bind' ? HELPERS.bind : HELPERS.unbind,
                 wrapper   = this.wrapper,
                 target    = this.opts.bindToWrapper ? wrapper : window,
-                pHandlers = false, // pointerHandlers flag
-                scroller  = this.scroller;
+                pHandlers = false; // pointerHandlers flag
 
             eventType(window, 'orientationchange', this);
             eventType(window, 'resize', this);
@@ -617,7 +615,7 @@ function lib(w) {
                 var scrollTarget = this.opts.gpuOptimization ? this.scroller : this.wrapper;
                 eventType(scrollTarget, 'scroll', this);
                 if (IS_IOS && !this.opts.pullToRefresh) {
-                    eventType(wrapper, 'touchstart', function (e) {self._iosScrollFixture.apply(self, arguments);});
+                    eventType(wrapper, 'touchstart', function () {self._iosScrollFixture.apply(self, arguments);});
                 }
                 return;
             }
@@ -704,8 +702,7 @@ function lib(w) {
         * @private
         */
         _hook: function (when, method, hookFn) {
-            var self         = this,
-                toHookMethod = this[method];
+            var toHookMethod = this[method];
             
             if (toHookMethod) {
                 if (when === HOOK_AFTER) {
@@ -844,7 +841,7 @@ function lib(w) {
         * @method _trackVelocity
         * @protected
         */
-        _trackVelocity: function (t) {
+        _trackVelocity: function () {
             var lastPos    = this._lastPosition,
                 currentPos = this.scrollVertical ? this.y : this.x,
                 elapsed    = 17, //ms between frames (RAF calss), hardcoded due to inconsistencies in different devices
@@ -1075,8 +1072,6 @@ function lib(w) {
             this._initiated = false;
 
             var duration = NOW() - this.startTime,
-                time     = 0,
-                bounce   = EASING.regular,
                 momentum;
 
             // If its outside the scrolling boundaries at this point (pos > 0 || pos < maxScroll),
@@ -1169,7 +1164,7 @@ function lib(w) {
             this.y = newY;
 
             if (!this._rafWheel) {
-                this._rafWheel = RAF(function (t) {
+                this._rafWheel = RAF(function () {
                     self._isScrolling = true;
                     self.distY = wheelDeltaY;
                     self.distX = wheelDeltaX;
@@ -1357,7 +1352,7 @@ function lib(w) {
         * @method _resetPosition
         * @protected
         */
-        _resetPosition: function (time, forceReset) {
+        _resetPosition: function (time) {
             time || (time = 0);
 
             var x = this.x,
@@ -1744,7 +1739,7 @@ function lib(w) {
                     PluginPrototype.init.call(this);
                 }
             } else {
-                console.log('Error adding plugin:', plugin);
+                console.log('Error adding plugin:', plugin); //eslint-disable-line no-console
             }
         },
 
@@ -1758,7 +1753,7 @@ function lib(w) {
         * @method scrollTo
         * @public
         */
-        scrollTo: function (x, y, time) {
+        scrollTo: function (x, y) {
             if (this.x !== x || this.y !== y) {
                 this._stopMomentum();
 

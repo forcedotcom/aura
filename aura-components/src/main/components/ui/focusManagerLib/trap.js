@@ -18,7 +18,7 @@
  // https://github.com/davidtheclark/tabbable
  // https://github.com/davidtheclark/focus-trap
 
-function lib(focusUtil) {
+function lib(focusUtil) { //eslint-disable-line no-unused-vars
     var trap;
     var tabbableNodes;
     var previouslyFocused;

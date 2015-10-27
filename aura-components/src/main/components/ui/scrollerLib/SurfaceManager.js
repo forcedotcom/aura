@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-function lib(w) {
+function lib(w) { //eslint-disable-line no-unused-vars
     'use strict';
     w || (w = window);
     
     var SCROLLER = w.__S || (w.__S = {}), //NAMESPACE
         PLUGINS  = SCROLLER.plugins || (SCROLLER.plugins = {}),
-        SUPPORT  = SCROLLER.support,
         STYLES   = SCROLLER.styles,
         HELPERS  = SCROLLER.helpers,
         RAF      = w.requestAnimationFrame,
@@ -93,7 +92,7 @@ function lib(w) {
                 domItems = Array.prototype.slice.call(this.scroller.children, skipPtr),
                 size     = domItems.length,
                 items    = [],
-                item, itemStyle, i;
+                item, i;
 
             if (size) {
                 for (i = 0; i < size; i++) {
@@ -117,7 +116,7 @@ function lib(w) {
                 sizeNeeded    = windowSize + 2 * this.activeOffset,
                 heightSum     = 0,
                 i = 0,
-                item, surface, height;
+                item, surface;
 
             for (; i < itemsSize && sizeNotCover; i++) {
                 item          = items[i];
@@ -386,10 +385,10 @@ function lib(w) {
         _updateAllowed: function (current) {
             return current.pos < 0 && ((this._isScrolling || Math.abs(current.dist) > 10));
         },
-        _recycleSurface: function (side) {
+        _recycleSurface: function () {
             return true;
         },
-        _getPosition: function (vertical) {
+        _getPosition: function () {
             if (this.scrollVertical) {
                 return {
                     pos  : this.y,
@@ -412,108 +411,103 @@ function lib(w) {
                     this._initializePositions();
                     this._setInfiniteScrollerSize();
                 }
-                return;
-            }
-
-            var self             = this,
-                current          = this._getPosition(),
-                nativeScroller   = this.opts.useNativeScroller,
-                boundaries       = this._getBoundaries(current.pos, current.size),
-                itemsLeft        = this._itemsLeft('bottom'),
-                // surfaces
-                topSurface       = this._positionedSurfacesFirst(),
-                topSurfaceEnd    = this._getSurfaceTotalOffset(topSurface),
-                bottomSurface    = this._positionedSurfacesLast(),
-                bottomSurfaceEnd = bottomSurface.offset,
-                // vars
-                yieldTask        = false,
-                inUse            = false,
-                surface, index, payload;
-
-            // Don't update anything is the move gesture is not large enough and we are not scrolling
-            if (!this._updateAllowed(current)) {
-                return;
-            }
-
-            // IF we are in the middle of an animation (_isScrolling: true), 
-            // AND there is no more items to swap
-            // AND the scroll position is beyond the scrollable area (+ 1/4 of the size)
-            // THEN: RESET POSITION
-            if (!nativeScroller && this._isScrolling && !itemsLeft && current.pos < (current.maxScroll - (current.size / 4))) {
-                this._isAnimating  = false;
-                this._isScrolling  = false;
-                this._stopMomentum();
-                RAF(function () {
-                    self._resetPosition(self.opts.bounceTime);
-                });
-            }
-            // Scrolling down
-            if (current.dist < 0) {
-                // PUSH | Add elements to the end when the last surface is inside the lowerBound limit.
-                while (this._itemsLeft('bottom') && bottomSurfaceEnd < boundaries.bottom && !inUse) {
-                    surface = this._positionedSurfacesPush();
-                    if (surface === bottomSurface) {
-                        inUse = true;
-                    } else {
-                        bottomSurface    = surface;
-                        bottomSurfaceEnd = bottomSurface.offset;
-                        yieldTask        = true;
-                        this._updateOffset();
-                    }
-                }
-                
-                if (yieldTask) {
-                    return this._setInfiniteScrollerSize();
-                }
-
-                // SHIFT | Remove elements from the top that are out of the upperBound region.
-                while (boundaries.top > topSurfaceEnd && this._recycleSurface('top')) {
-                    topSurface    = this._positionedSurfacesShift();
-                    topSurfaceEnd = this._getSurfaceTotalOffset(topSurface);
-                    yieldTask     = true;
-                }
-
-            // User is Scrolling up
             } else {
-                // UNSHIFT | Add elements on the beggining of the slist
-                while (topSurface.offset > boundaries.top && !inUse) {
-                    surface = this._positionedSurfacesUnshift();
-                    if (surface === topSurface) {
-                        inUse = true;
+                var self             = this,
+                    current          = this._getPosition(),
+                    nativeScroller   = this.opts.useNativeScroller,
+                    boundaries       = this._getBoundaries(current.pos, current.size),
+                    itemsLeft        = this._itemsLeft('bottom'),
+                    // surfaces
+                    topSurface       = this._positionedSurfacesFirst(),
+                    topSurfaceEnd    = this._getSurfaceTotalOffset(topSurface),
+                    bottomSurface    = this._positionedSurfacesLast(),
+                    bottomSurfaceEnd = bottomSurface.offset,
+                    // vars
+                    yieldTask        = false,
+                    inUse            = false,
+                    surface;
+
+                // Don't update anything if the move gesture is not large enough and we are not scrolling
+                if (this._updateAllowed(current)) {
+                    // IF we are in the middle of an animation (_isScrolling: true),
+                    // AND there is no more items to swap
+                    // AND the scroll position is beyond the scrollable area (+ 1/4 of the size)
+                    // THEN: RESET POSITION
+                    if (!nativeScroller && this._isScrolling && !itemsLeft && current.pos < (current.maxScroll - (current.size / 4))) {
+                        this._isAnimating  = false;
+                        this._isScrolling  = false;
+                        this._stopMomentum();
+                        RAF(function () {
+                            self._resetPosition(self.opts.bounceTime);
+                        });
+                    }
+                    // Scrolling down
+                    if (current.dist < 0) {
+                        // PUSH | Add elements to the end when the last surface is inside the lowerBound limit.
+                        while (this._itemsLeft('bottom') && bottomSurfaceEnd < boundaries.bottom && !inUse) {
+                            surface = this._positionedSurfacesPush();
+                            if (surface === bottomSurface) {
+                                inUse = true;
+                            } else {
+                                bottomSurface    = surface;
+                                bottomSurfaceEnd = bottomSurface.offset;
+                                yieldTask        = true;
+                                this._updateOffset();
+                            }
+                        }
+
+                        if (yieldTask) {
+                            return this._setInfiniteScrollerSize();
+                        }
+
+                        // SHIFT | Remove elements from the top that are out of the upperBound region.
+                        while (boundaries.top > topSurfaceEnd && this._recycleSurface('top')) {
+                            topSurface    = this._positionedSurfacesShift();
+                            topSurfaceEnd = this._getSurfaceTotalOffset(topSurface);
+                            yieldTask     = true;
+                        }
+
+                    // User is Scrolling up
                     } else {
-                        topSurface    = surface;
-                        topSurfaceEnd = this._getSurfaceTotalOffset(topSurface);
-                        yieldTask     = true;
+                        // UNSHIFT | Add elements on the beggining of the slist
+                        while (topSurface.offset > boundaries.top && !inUse) {
+                            surface = this._positionedSurfacesUnshift();
+                            if (surface === topSurface) {
+                                inUse = true;
+                            } else {
+                                topSurface    = surface;
+                                topSurfaceEnd = this._getSurfaceTotalOffset(topSurface);
+                                yieldTask     = true;
+                            }
+                        }
+
+                        if (yieldTask) {
+                            return this._setInfiniteScrollerSize();
+                        }
+
+                        // POP | Remove from the end
+                        while (bottomSurfaceEnd > boundaries.bottom && this._itemsLeft('top') && this._recycleSurface('bottom')) {
+                            bottomSurface = this._positionedSurfacesPop();
+                            bottomSurfaceEnd = bottomSurface.offset;
+                            yieldTask        = true;
+                        }
+                    }
+
+                    if (yieldTask) {
+                        return this._setInfiniteScrollerSize();
                     }
                 }
-                
-                if (yieldTask) {
-                    return this._setInfiniteScrollerSize();
-                }
-
-                // POP | Remove from the end
-                while (bottomSurfaceEnd > boundaries.bottom && this._itemsLeft('top') && this._recycleSurface('bottom')) {
-                    bottomSurface = this._positionedSurfacesPop();
-                    bottomSurfaceEnd = bottomSurface.offset;
-                    yieldTask        = true;
-                }
-            }
-
-            if (yieldTask) {
-                return this._setInfiniteScrollerSize();
             }
         },
         _setInfiniteScrollerSize: function () {
             var positioned = this.surfacesPositioned,
-                items      = this.items,
                 size       = this.scrollVertical ? this.wrapperHeight : this.wrapperWidth,
                 ptlEnabled = this.opts.pullToLoadMore && this._ptlIsEnabled(),
                 lastPos    = ptlEnabled ? positioned.length - 3 : positioned.length - 1,
                 last       = positioned[lastPos],
                 itemsSize  = this.getNumItems(),
-                itemsLeft  = 0, 
-                offset     = 0, 
-                ptrSize;
+                itemsLeft  = 0,
+                offset     = 0;
 
             if (last) {
                 itemsLeft = last.contentIndex < itemsSize - (ptlEnabled ? 2 : 1);
@@ -570,7 +564,7 @@ function lib(w) {
         resize: function () {
             var self = this;
             this._stopMomentum();
-            RAF(function (t) {
+            RAF(function () {
                 self._setWrapperSize();
                 self.refresh();
                 self._scrollTo(0, 0);
@@ -591,7 +585,7 @@ function lib(w) {
         _appendData: function (data) {
             var customAppended = this._getCustomAppendedElements(),
                 queue = [],
-                ptl, item, i, spacer;
+                item, i;
 
             for (i = 0; i < customAppended; i++) {
                 queue.push(this.items.pop());

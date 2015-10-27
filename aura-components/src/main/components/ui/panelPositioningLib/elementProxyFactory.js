@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-function lib(elementProxy, win) {
+function lib(elementProxy, win) { //eslint-disable-line no-unused-vars
     'use strict';
     var w = win || window; // window injected for testing
 

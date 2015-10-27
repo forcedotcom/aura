@@ -411,6 +411,6 @@
     /*
      * This method is here for components that extend this one to hook into keyboard events
      */
-    handleKeyboardEvent : function(component, event) {
+    handleKeyboardEvent : function() {
     }
 })// eslint-disable-line semi

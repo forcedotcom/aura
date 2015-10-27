@@ -22,7 +22,7 @@ public class Client {
     private final String userAgent;
 
     public enum Type {
-        WEBKIT, FIREFOX, IE6, IE7, IE8, IE9, IE10, IE11, OTHER
+        WEBKIT, FIREFOX, IE6, IE7, IE8, IE9, IE10, IE11, IE12, OTHER
     }
 
     private final Type type;
@@ -42,7 +42,7 @@ public class Client {
         ua = ua.trim().toLowerCase();
         if ((ua.contains("chrome") || ua.contains("safari") || 
                 (ua.contains("applewebkit") && (ua.contains("iphone") || ua.contains("ipad")))) // ios UIWebView
-                && !ua.contains("trident") // IE impersonates
+                && !ua.contains("trident") && !ua.contains("edge") // IE impersonates
         ) {
             type = Type.WEBKIT;
         } else if (ua.contains("firefox")) {
@@ -59,6 +59,8 @@ public class Client {
             type = Type.IE6;
         } else if (ua.contains("trident/7.0")) {
             type = Type.IE11;
+        } else if (ua.contains("edge/12")) {
+            type = Type.IE12;
         } else {
             type = Type.OTHER;
         }

@@ -51,6 +51,8 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.setItem = this.adapter.setItem || this.adapter["setItem"];
     this.adapter.getAll = this.adapter.getAll || this.adapter["getAll"];
     this.adapter.deleteStorage = this.adapter.deleteStorage || this.adapter["deleteStorage"];
+    this.adapter.isSecure = this.adapter.isSecure || this.adapter["isSecure"];
+    this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
 
     var adapterConfig = $A.storageService.getAdapterConfig(this.adapter.getName());
     this.persistent = !$A.util.isUndefinedOrNull(adapterConfig["persistent"]) && adapterConfig["persistent"];
@@ -318,6 +320,9 @@ AuraStorage.prototype.log = function() {
  * @export
  */
 AuraStorage.prototype.isPersistent = function() {
+    if (this.adapter.isPersistent) {
+        return this.adapter.isPersistent();
+    }
     return this.persistent;
 };
 
@@ -327,6 +332,9 @@ AuraStorage.prototype.isPersistent = function() {
  * @export
  */
 AuraStorage.prototype.isSecure = function() {
+    if (this.adapter.isSecure) {
+        return this.adapter.isSecure();
+    }
     return this.secure;
 };
 

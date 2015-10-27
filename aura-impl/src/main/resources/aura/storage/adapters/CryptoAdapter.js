@@ -250,10 +250,6 @@ CryptoAdapter.prototype.isCrypto = function() {
     return this.mode === CryptoAdapter.NAME;
 };
 
-//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-//export isCrypto for tests
-CryptoAdapter.prototype["isCrypto"] = CryptoAdapter.prototype.isCrypto;
-//#end
 
 /**
  * Runs the stored queue of requests.
@@ -592,6 +588,23 @@ CryptoAdapter.prototype.sweep = function() {
 CryptoAdapter.prototype.deleteStorage = function() {
     return this.adapter.deleteStorage();
 };
+
+
+/**
+ * @returns {Boolean} whether the adapter is secure.
+ */
+CryptoAdapter.prototype.isSecure = function() {
+    return true;
+};
+
+
+/**
+ * @returns {Boolean} whether the adapter is persistent.
+ */
+CryptoAdapter.prototype.isPersistent = function() {
+    return this.mode === CryptoAdapter.NAME;
+};
+
 
 
 /**

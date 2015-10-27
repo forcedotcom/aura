@@ -24,7 +24,7 @@
             cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         },
         function(cmp){
-            $A.test.assertTrue(this.storage.adapter.isCrypto(), "CryptoAdapter should not be in fallback mode");
+            $A.test.assertTrue(this.storage.isPersistent(), "CryptoAdapter should not be in fallback mode so is persistent");
         }]
     },
 

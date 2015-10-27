@@ -491,21 +491,34 @@
 		 * http://cubiq.org Released under MIT license, http://cubiq.org/license
 		 */
 		(function(window, doc) {
-			var m = Math, dummyStyle = doc.createElement('div').style, vendor = (function() {
-				var vendors = 't,webkitT,MozT,msT,OT'.split(','), t, i = 0, l = vendors.length;
 
-				for (; i < l; i++) {
-					t = vendors[i] + 'ransform';
-					if (t in dummyStyle) {
-						return vendors[i].substr(0, vendors[i].length - 1);
-					}
+			var m = Math, 
+                dummyStyle = doc.createElement('div').style, 
+                vendor = (function() {
+                    var vendors = 't,webkitT,MozT,msT,OT'.split(','), t, i = 0, l = vendors.length;
+
+                    for (; i < l; i++) {
+                        t = vendors[i] + 'ransform';
+                        if (t in dummyStyle) {
+                            return vendors[i].substr(0, vendors[i].length - 1);
+                        }
+                    }
+
+                    return false;
+                })(),
+                cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '';
+
+			function prefixStyle(style) {
+				if (vendor === '') {
+					return style;
 				}
 
-				return false;
-			})(), cssVendor = vendor ? '-' + vendor.toLowerCase() + '-' : '',
+				style = style.charAt(0).toUpperCase() + style.substr(1);
+				return vendor + style;
+			}
 
 			// Style properties
-			transform = prefixStyle('transform'), transitionProperty = prefixStyle('transitionProperty'), transitionDuration = prefixStyle('transitionDuration'), transformOrigin = prefixStyle('transformOrigin'), transitionTimingFunction = prefixStyle('transitionTimingFunction'), transitionDelay = prefixStyle('transitionDelay'),
+			var transform = prefixStyle('transform'), transitionProperty = prefixStyle('transitionProperty'), transitionDuration = prefixStyle('transitionDuration'), transformOrigin = prefixStyle('transformOrigin'), transitionTimingFunction = prefixStyle('transitionTimingFunction'), transitionDelay = prefixStyle('transitionDelay'),
 
 			// Browser capabilities
 			isAndroid = (/android/gi).test(navigator.appVersion), isIDevice = (/iphone|ipad/gi).test(navigator.appVersion), isTouchPad = (/hp-tablet/gi)
@@ -1433,9 +1446,11 @@
 				_offset : function(el) {
 					var left = -el.offsetLeft, top = -el.offsetTop;
 
-					while (el = el.offsetParent) {
+                    el = el.offsetParent;
+					while (el) {
 						left -= el.offsetLeft;
 						top -= el.offsetTop;
+                        el = el.offsetParent;
 					}
 
 					if (el !== this.wrapper) {
@@ -1764,15 +1779,6 @@
 					return !this.moved && !this.zoomed && !this.animating;
 				}
 			};
-
-			function prefixStyle(style) {
-				if (vendor === '') {
-					return style;
-				}
-
-				style = style.charAt(0).toUpperCase() + style.substr(1);
-				return vendor + style;
-			}
 
 			dummyStyle = null; // for the sake of it
 

@@ -69,13 +69,6 @@
         }
     },
 
-    testValueOnlyFragment: { // for layouts
-        attributes: {label: 'link', value: '#top'},
-        test: function (component) {
-            $A.test.assertEquals('javascript:void(0/*#top*/);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
-        }
-    },
-
     testValueOnlyParams: {
         attributes: {label: 'link', value: '?you=lost&me=found'},
         test: function (component) {
@@ -300,6 +293,14 @@
             $A.test.assertEquals("http://mailto:friend@salesforce.com", component.find("link").getElement().getAttribute("href"), "href attribute not correct");
         }
     },
+
+    
+    // testValueOnlyFragment: { // for layouts
+    //     attributes: {label: 'link', value: '#top'},
+    //     test: function (component) {
+    //         $A.test.assertEquals('javascript:void(0/*#top*/);', component.find("link").getElement().getAttribute('href'), "href attribute not correct");
+    //     }
+    // },
 
     // not expecting layout handling from SFDC URLs
     testValueOnlyFragment: {

@@ -147,20 +147,20 @@
 
 			contentCmp = $A.newCmp(config);
 			isLoadSuccessful = true;
+			this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
+			return isLoadSuccessful;
+
 		} else if (actionState === "INCOMPLETE") { // user is offline
-			if (isAlreadyLoaded) {
-				return;
-			}
-			cmpDef = {
-				componentDef: "markup://one:retryPanel",
-	            attributes: { values : { "retryAction" : [action] } }
-	        };
-	        contentCmp = $A.newCmp(cmpDef);
+			if (!isAlreadyLoaded) {
+				cmpDef = {
+					componentDef: "markup://one:retryPanel",
+	            	attributes: { values : { "retryAction" : [action] } }
+	        	};
+	        	contentCmp = $A.newCmp(cmpDef);
+	        	this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
+				return isLoadSuccessful;
+			}	
 		}
-		this.injectComponent(cmp, contentCmp, !isLoadSuccessful);
-
-
-		return isLoadSuccessful;
 	},
 	injectComponent: function (cmp, content, noMore) {
 		cmp.set('v.isContentLoaded', true);

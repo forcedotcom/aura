@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 ({
-	PANELS_DEF      : {},  // Definitions of registered panels 
-    PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
+	PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
     PANELS_STACK    : [],  // The Panel Stack ordering
     PANELS_INSTANCE : {},  // Registered instances
+    containerManager: [],  // a reference to containerManager
 
 	initialize: function(cmp) {
+		if (this.containerManager && this.containerManager.length > 0) { // to skip the redundant init from extended components 
+			return;
+		}
         var containerManager = this.cmLib.containerManager;
         var sharedContainer  = cmp.get('v.useSharedContainer');
 
-        this.containerManager = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
+        var cm = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
+        this.containerManager.push(cm);
         this.initializeRegisteredPanels(cmp);
     },
 
@@ -32,7 +36,7 @@
     * @private
     */
     initializeRegisteredPanels: function (cmp, newPanels) {
-        this.containerManager.registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
+        this.containerManager[0].registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
     },
 
     /*
@@ -79,7 +83,11 @@
         // TODO: Instead of assuming is the last one (which doesnt guarantee that is "active")
         // Change the logic on active to make sure we save that state internally
         var stack = this.PANELS_STACK;
-        callback(stack[stack.length - 1]);
+        var panel = stack[stack.length - 1];
+        if (panel && $A.util.isFunction(callback)) {
+            callback(panel);
+        }
+        return panel;
     },
     /*
     * Sets the context in which the panel is created
@@ -88,7 +96,7 @@
     */
     setPanelOwner: function (panel, givenOwner) {
         var owner = givenOwner;
-        if (!owner) {
+        if (!owner && this.PANELS_STACK.length > 0) {
             var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1],
                 previousBody = previousPanel && previousPanel.get('v.body');
             
@@ -122,7 +130,7 @@
     * @private
     */
     createPanelInstance: function (cmp, config) {
-        var panel = this.containerManager.createContainer({
+        var panel = this.containerManager[0].createContainer({
                 containerType          : config.panelType,
                 containerConfig        : config.panelConfig,
                 containerValueProvider : cmp
@@ -176,7 +184,7 @@
     * Destroy panel instance
     * @private
     */
-    destroyPanelInstance: function (cmp, config) {
+    destroyPanelInstance: function (cmp, config, doActivateNext) {
         var stack      = this.PANELS_STACK,
             panelParam = config.panelInstance,
             panelId    = $A.util.isComponent(panelParam) ? panelParam.getGlobalId() : panelParam,
@@ -189,7 +197,7 @@
 
         stack.splice(index, 1);
 
-        this.containerManager.destroyContainer(panel);
+        this.containerManager[0].destroyContainer(panel);
 
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
@@ -204,7 +212,9 @@
             panelObj.destroyCallback(panelId);
         }
 
-        this.activateNextPanel(cmp);
+        if (doActivateNext !== false) {
+            this.activateNextPanel(cmp);
+        }
     },
 
     /**
@@ -243,7 +253,7 @@
     * @private
     */
     renderPanelInstance: function (cmp, panel, config) {
-        this.containerManager.renderContainer(panel, config);
+        this.containerManager[0].renderContainer(panel, config);
     },
     notifyPanelContent: function (content, config) {
         var validInterface = config.typeOf ? content.isInstanceOf(config.typeOf) : true,

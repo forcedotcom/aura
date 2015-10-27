@@ -17,5 +17,6 @@
 -->
 <aura:library description="Panel helper functions">
     <aura:include name="stack" />
-    <aura:include name="trap" />
+    <aura:include name="trap" imports="focusUtil"/>
+    <aura:include name="focusUtil" />
 </aura:library>

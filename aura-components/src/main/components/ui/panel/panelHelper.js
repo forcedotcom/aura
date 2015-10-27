@@ -198,7 +198,8 @@
             pointerPad;
         
         cmp.getElement().classList.add('positioned');
-        cmp.getElement().classList.add(direction);
+
+        
         if(showPointer) {
             pointer = cmp.find('pointer').getElement();
         }
@@ -290,8 +291,35 @@
             align = advancedConfig.align;
             targetAlign = advancedConfig.targetAlign;
             padTop = advancedConfig.vertPad;
-        }
+            
+            // insane rules to figure out where to put the arrow
+            switch (align) {
+                case 'left top':
+                case 'left center':
+                    direction = 'east';
+                    break;
+                case 'right top':
+                case 'right center':
+                    direction = 'west';
+                    break;
+                case 'center top':
+                    direction = 'south';
+                    break;
+                case 'center center':
+                case 'left bottom':
+                case 'right bottom':
+                case 'center bottom':
+                    direction = 'north';
+                    break;
 
+            }
+
+            // special cases override above
+            if(align.match(/(^left|right)\stop$/) && targetAlign.match(/(^left|right|center)\sbottom$/)) {
+                direction = 'south';
+            } 
+        }
+        cmp.getElement().classList.add(direction);
 
         if(cmp.get('v.inside')) {
             align = targetAlign;
@@ -406,6 +434,35 @@
                         bottom: true
                     },
                     pad: 5
+                }));
+            }
+
+            if(pointer && direction === 'north') {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    type:'top',
+                    enable: true,
+                    targetAlign: 'center bottom',
+                    pad: -15
+                }));
+            } else if (pointer && direction === 'south') {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    type:'bottom',
+                    enable: true,
+                    targetAlign: 'center top',
+                    pad: -15
+                }));
+            } else if (pointer && direction === 'east') {
+                cmp.constraints.push(this.positioningLib.panelPositioning.createRelationship({
+                    element:pointer,
+                    target:cmp.getElement(),
+                    type:'right',
+                    enable: true,
+                    targetAlign: 'left bottom',
+                    pad: -15 //this is very specific. 
                 }));
             }
             

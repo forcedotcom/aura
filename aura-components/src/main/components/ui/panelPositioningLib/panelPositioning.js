@@ -157,22 +157,22 @@ function lib(constraint, elementProxyFactory, win) { //eslint-disable-line no-un
             if(config.align) {
                 $A.assert(!!config.align.match(ALIGN_REGEX), 'Invalid align string');
             }
-            if(config.targetAlign) {
+            if(!config.type && config.targetAlign) {
                 $A.assert(!!config.targetAlign.match(ALIGN_REGEX), 'Invalid targetAlign string');
             }
 
             config.element = elementProxyFactory.getElement(config.element);
             config.target = elementProxyFactory.getElement(config.target);
-            if(config.type !== 'bounding box' && config.type !== 'below'  && config.type !== 'inverse bounding box') {
+            if(!config.type) {
                 $A.assert(config.align, 'Required align string missing');
                 var constraintDirections = config.align.split(/\s/);
                 var vertConfig = $A.util.copy(config);
-
+                
                 //the vertical config is exactly the same, except if there is a topPad we use that value for pad
                 if(vertConfig.padTop !== undefined) {
                     vertConfig.pad = vertConfig.padTop;
                 }
-
+                
                 constraintList.push(new Constraint(directionMap.horiz[constraintDirections[0]], config));
                 constraintList.push(new Constraint(directionMap.vert[constraintDirections[1]], vertConfig));
 

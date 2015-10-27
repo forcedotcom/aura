@@ -296,6 +296,32 @@ Test.Components.Ui.PanelPositioning.constraintTests=function(){
 
 	}
 
+	[Fixture]
+	function specialPositioning() {
+
+		[Fact]
+		function below() {
+			var elementDims = {top:200, left:0, height: 100, width: 100},
+				targetDims = {top:500, left:0, height: 200, with: 200};
+
+			var targetElement = getMockElement(targetDims);
+			var element = getMockElement(elementDims);
+
+			var myConstraint = new Constraint('below', {
+				element: element,
+				target: targetElement,
+				pad: 0
+			});
+
+			myConstraint.updateValues();
+			myConstraint.reposition();
+
+			var expected = targetDims.top + targetDims.height;
+
+			Assert.Equal(expected, element.top);
+		}
+	}
+
 	
 
 };

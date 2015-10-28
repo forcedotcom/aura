@@ -175,7 +175,6 @@
         labels: ["flapper"],
         test : [
             function(cmp) {
-                $A.test.setTestTimeout(60000);
                 // fire first foreground action that waits for trigger
                 $A.enqueueAction(this.getActionAndLog(cmp, "c.execute", "APPEND fore1;RESUME MultipleForeground.fore1.chain;WAIT MultipleForeground.fore1;COPY;", "fore1"));
             }, function(cmp) {

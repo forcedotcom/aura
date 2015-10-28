@@ -19,16 +19,17 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.AuraResource;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
@@ -62,7 +63,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param response the outgoeing response
      * @return false if the request has already been handled
      */
-    boolean actionServletGetPre(HttpServletRequest request, HttpServletResponse response);
+    boolean actionServletGetPre(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
     /**
      * Hook for the beginning of 'POST' action requests.
@@ -71,7 +72,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param response the outgoeing response
      * @return false if the request has already been handled
      */
-    boolean actionServletPostPre(HttpServletRequest request, HttpServletResponse response);
+    boolean actionServletPostPre(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
     /**
      * Handle a servlet execption as well as we can.
@@ -90,7 +91,7 @@ public interface ServletUtilAdapter extends AuraAdapter {
     /**
      * Send a 404 page to the client.
      */
-    void send404(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void send404(ServletConfig config, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
     /**
      * Get the full set of scripts for the current context.

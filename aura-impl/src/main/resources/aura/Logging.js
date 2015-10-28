@@ -41,10 +41,9 @@
             var console = window["console"];
             var filter = level === "WARNING" ? "warn" : level.toLowerCase();
             if (console[filter]) {
+                console[filter](message);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console[filter](error);
-                } else {
-                    console[filter](message);
                 }
                 if (trace) {
                     for ( var j = 0; j < trace.length; j++) {
@@ -53,10 +52,9 @@
                 }
             } else if (console["group"]) {
                 console["group"](logMsg);
+                console["debug"](message);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console["debug"](error);
-                } else {
-                    console["debug"](message);
                 }
                 if (trace) {
                     console["group"]("stack");

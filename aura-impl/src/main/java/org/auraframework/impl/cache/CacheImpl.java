@@ -17,6 +17,8 @@ package org.auraframework.impl.cache;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.auraframework.adapter.LoggingAdapter;
 import org.auraframework.cache.Cache;
@@ -137,6 +139,11 @@ public class CacheImpl<K, T> implements Cache<K, T> {
     @Override
     public T getIfPresent(K key) {
         return cache.getIfPresent(key);
+    }
+
+    @Override
+    public T get(K key, Callable<T> loader) throws ExecutionException {
+        return cache.get(key, loader);
     }
 
     @Override

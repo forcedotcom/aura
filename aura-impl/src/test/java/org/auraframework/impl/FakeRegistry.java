@@ -15,9 +15,11 @@
  */
 package org.auraframework.impl;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -101,10 +103,16 @@ public class FakeRegistry implements MasterDefRegistry {
         return null;
     }
 
-    @Override
+	@Override
     public String getCachedString(String uid, DefDescriptor<?> descriptor, String key) {
         return null;
     }
+
+	@Override
+	public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader)
+			throws QuickFixException, IOException {
+		return null;
+	}    
 
     @Override
     public void putCachedString(String uid, DefDescriptor<?> descriptor, String key, String value) {

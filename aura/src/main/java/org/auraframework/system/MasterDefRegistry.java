@@ -15,9 +15,11 @@
  */
 package org.auraframework.system;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -158,6 +160,16 @@ public interface MasterDefRegistry {
      * @param key the key.
      */
     String getCachedString(String uid, DefDescriptor<?> descriptor, String key);
+
+    /**
+     * Get a named string from the cache for a cacheable definition.
+     *
+     * @param definition the definition.
+     * @throws QuickFixException
+     * @throws IOException 
+     */
+    String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) 
+    		throws QuickFixException, IOException;
 
     /**
      * Put a named string in the cache for a def.

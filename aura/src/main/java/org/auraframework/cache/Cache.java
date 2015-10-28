@@ -16,14 +16,15 @@
 package org.auraframework.cache;
 
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 
 public interface Cache<K,T> {
-	
-	// TODO - add a loader-based getter
-	//Optional<T> get(K key, Loader loader);
-	
+
 	T getIfPresent(K key);
+
+	T get(K key, Callable<T> loader) throws ExecutionException;
 
 	void put(K key, T data);
 
@@ -32,7 +33,7 @@ public interface Cache<K,T> {
 	void invalidate(K key);
 
 	void invalidate(Iterable<K> keys);
-	
+
 	void invalidateAll();
 
 	/**
@@ -42,11 +43,10 @@ public interface Cache<K,T> {
 	void invalidatePartial(String partial);
 
 	/**
-	 * returns a reference to the implementing cache - this should NEVER be 
+	 * returns a reference to the implementing cache - this should NEVER be
 	 * used for anything but admin and statistical access, specific to an implementation
 	 * @return
 	 */
 	Object getPrivateUnderlyingCache();
-
 
 }

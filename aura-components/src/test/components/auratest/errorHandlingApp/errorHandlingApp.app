@@ -18,6 +18,7 @@
 <aura:application access="unauthenticated" controller="java://org.auraframework.components.test.java.controller.TestController">
     <aura:attribute name="message" type="String"/>
     <aura:attribute name="error" type="String"/>
+    <aura:attribute name="eventHandled" type="Boolean" default="false"/>
 
     <!-- The following attributes can be passed in with url to perform tests -->
     <!-- set false when testing defult handler-->
@@ -116,6 +117,7 @@
     </tr>
     </table>
 
+    systemError Event is handled on App: <div id="eventHandledOnApp">{!v.eventHandled}</div>
     <div id="appErrorOutput"> {!v.message} </div>
 
     <br/><br/>

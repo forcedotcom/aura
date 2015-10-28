@@ -19,6 +19,7 @@
     <aura:attribute name="requiredAttribute" type="String" required="true"/>
     <aura:attribute name="message" type="String"/>
     <aura:attribute name="error" type="String"/>
+    <aura:attribute name="eventHandled" type="String" default="false"/>
 
     <!-- set false when testing default handler-->
     <aura:attribute name="handleSystemError" type="Boolean" default="false"/>
@@ -94,6 +95,7 @@
     </tr>
     </table>
 
+    systemError Event is handled on App: <div id="eventHandledOnCmp">{!v.eventHandled}</div>
     <div id="cmpErrorOutput"> {!v.message} </div>
 
 </aura:component>

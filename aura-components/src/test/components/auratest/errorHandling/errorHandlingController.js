@@ -9,6 +9,7 @@
         var auraError = event.getParam("auraError");
 
         cmp.set("v.message", message);
+        cmp.set("v.eventHandled", true);
 
         event["handled"] = true;
     },

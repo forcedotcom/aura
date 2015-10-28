@@ -226,7 +226,7 @@ MemoryAdapter.prototype.evict = function(spaceNeeded) {
         if (spaceReclaimed > spaceNeeded || that.mru.length <= 0) {
             success();
             return;
-        } 
+        }
 
         var pop = function() {
             var key = that.mru[0];
@@ -283,7 +283,7 @@ MemoryAdapter.prototype.sweep = function() {
         // adapter to avoid re-adding the key prefix.
 
         if (expired.length === 0) {
-            return Promise["resolve"]();
+            return;
         }
 
         var promiseSet = [];
@@ -295,7 +295,7 @@ MemoryAdapter.prototype.sweep = function() {
         }
 
         // When all of the remove promises have completed...
-        return Promise.all(promiseSet).then(
+        return Promise.all(promiseSet).then( //eslint-disable-line consistent-return
             function () {
                 that.log("sweep() - complete");
             },
@@ -313,9 +313,6 @@ MemoryAdapter.prototype.deleteStorage = function() {
     this.reset();
     return Promise["resolve"]();
 };
-
-Aura.Storage.MemoryAdapter = MemoryAdapter;
-
 
 /**
  * @description A cache entry in the backing store of the MemoryAdapter.
@@ -341,8 +338,12 @@ MemoryAdapter.Entry.prototype.getSize = function() {
     return this.size;
 };
 
+
 $A.storageService.registerAdapter({
     "name": MemoryAdapter.NAME,
     "adapterClass": MemoryAdapter,
     "secure": true
 });
+
+Aura.Storage.MemoryAdapter = MemoryAdapter;
+

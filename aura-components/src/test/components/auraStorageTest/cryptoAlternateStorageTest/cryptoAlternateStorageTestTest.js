@@ -6,8 +6,8 @@
 
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
-        CryptoAdapter.register();
-        if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {
+        $A.storageService.CryptoAdapter.register();
+        if (!$A.storageService.isRegisteredAdapter($A.storageService.CryptoAdapter.NAME)) {
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
@@ -15,7 +15,7 @@
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
 
         // provide an invalid key to force CryptoAdapter into fallback mode (which uses memory adapter internally)
-        CryptoAdapter.setKey("invalid");
+        $A.storageService.CryptoAdapter.setKey("invalid");
     },
 
     testFallbackModeReported: {
@@ -24,7 +24,7 @@
             cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         },
         function(cmp){
-            $A.test.assertFalse(this.storage.adapter.isCrypto(), "CryptoAdapter should be in fallback mode");
+            $A.test.assertFalse(this.storage.isPersistent(), "CryptoAdapter should be in fallback mode so not persistent");
         }]
     },
 
@@ -219,12 +219,14 @@
         }]
     },
 
-    // FIXME: This test is verifying the wrong thing. Storage is memory so not persistent. Persistence and secure checks
-    //        need to pushed down to the adapter instead of at the storage service layer.
-    _testStorageInfo: {
-        test: function(cmp) {
-            cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, true);
-        }
+    testStorageInfo: {
+        test:[function(cmp){
+            // do a get so next test stage is run after adapter finishes initializing
+            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+        },
+        function(cmp){
+            cmp.helper.lib.storageTest.testStorageInfo(this.storage, false, true);
+        }]
     },
 
     createStorage: function(name, maxSize, defaultExpiration, defaultAutoRefreshInterval) {

@@ -15,8 +15,9 @@
  */
 Function.RegisterNamespace("Test.Aura.Storage.Adapters");
 
-[Fixture]
+[Fixture, Skip("Rewrite")]
 Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
+    /*
     var Aura = {
             Storage: {
                 IndexedDBAdapter: function(){}
@@ -309,4 +310,5 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
             Assert.False(actual);
         }
     }
+    */
 }

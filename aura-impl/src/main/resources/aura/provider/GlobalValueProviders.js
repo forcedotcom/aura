@@ -121,8 +121,7 @@ GlobalValueProviders.prototype.getStorage = function () {
         return undefined;
     }
 
-    var config = $A.storageService.getAdapterConfig(storage.getName());
-    return config["persistent"] ? storage : undefined;
+    return storage.isPersistent() ? storage : undefined;
 };
 
 /**

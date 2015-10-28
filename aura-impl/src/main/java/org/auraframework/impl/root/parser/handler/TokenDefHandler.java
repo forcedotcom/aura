@@ -82,6 +82,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         }
 
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));
+        builder.setParentDescriptor(getParentDefDescriptor());
     }
 
     @Override

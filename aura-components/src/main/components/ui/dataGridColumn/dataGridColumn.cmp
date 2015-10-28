@@ -49,8 +49,7 @@
 	<aura:handler name="change" value="{!v.name}" action="{!c.updateNameRef}" description="Handles a change to the name attribute by updating the wiring between the component and the name attribute."/>
 	
 	<th scope="{!v.scope}" class="{! v.class + ' ' + (v.disabled ? 'disabled' : v.direction) }" title="{!v.title}"
-						   style="{! (v.width gt 0) ? 'min-width:' + v.width + 'px; max-width:' + v.width + 'px;' : ''}">
-		
+						   style="{! (v.width gt 0) ? 'width:' + v.width + 'px' : ''}">
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">
 			<a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
@@ -64,6 +63,6 @@
 			<aura:set attribute="else">
 				{!v.label}
 			</aura:set>
-		</aura:if>	
+		</aura:if>
 	</th>
 </aura:component>

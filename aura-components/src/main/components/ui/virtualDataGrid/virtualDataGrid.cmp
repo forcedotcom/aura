@@ -16,7 +16,7 @@
 
 -->
 <aura:component extensible="true" support="PROTO" description="">
-
+	<aura:import library="ui:virtualDataGridLib" property="lib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     
     <!-- This is deprecated, used in old grid, eventually this shoul be a <method> -->
@@ -24,6 +24,10 @@
     <aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
     <aura:method name="appendItems">
         <aura:attribute name="items" type="Object"/>
+    </aura:method>
+    
+    <aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
+    	<aura:attribute name="widths" type="Integer[]"/>
     </aura:method>
     
     <aura:registerEvent name="gridAction" type="ui:gridAction" description="Notifies listeners when actions were triggered by grid cells"/>
@@ -47,12 +51,18 @@
     <aura:attribute name="useRowHeaders"	type="Boolean"				default="false" description="Makes the first column of each row a header cell"/>
     <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description="Specifies whether the grid should use CSS to fix the header's position and scroll the table body"/>
     
+    <!-- Resizable Columns -->
+    <aura:attribute name="enableResizableColumns"	type="Boolean"		default="false" description="Enables the column resize plugin"/>
+    <aura:attribute name="resizableColumnsConfig"	type="Object"/>
+    
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <aura:handler name="change" value="{!v.items}"   action="{!c.handleItemsChange}"/>
     <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/> 
+	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
 
 	<aura:registerEvent name="onsort" type="ui:sort"/>
+	<aura:registerEvent name="onColumnResize" type="ui:resize"/>
 
     <table aura:id="table" class="{!v.class}" aura:flavorable="true">
         <thead aura:id="thead">

@@ -1,0 +1,52 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component>
+	<aura:attribute name="prevResize" type="Object" />
+	<aura:attribute name="initialWidths" type="Integer[]" default="[200, 400, 100]" />
+
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
+	<div class="container">
+		<ui:virtualDataGrid aura:id="grid" class="testGrid"
+			enableResizableColumns="true"
+			onColumnResize="{!c.onResize}">
+			
+			<aura:set attribute="headerColumns">
+				<ui:dataGridColumn name="id"		label="Id" sortable="true"/>
+				<ui:dataGridColumn name="name"	label="Name"/>
+				<ui:dataGridColumn name="grade" label="Grade"/>
+			</aura:set>
+			
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.grade}"/>
+			</aura:set>
+			
+			<aura:set attribute="dataModel">
+				<uitest:virtualDataGrid_dataProvider />
+			</aura:set>
+		</ui:virtualDataGrid>
+	</div>
+	
+	<div>
+		<ui:outputText value="{!'Column: ' + v.prevResize.src.label}"/> <br/>
+		<ui:outputText value="{!'Index: ' + v.prevResize.src.index}"/> <br />
+		<ui:outputText value="{!'Width: ' + v.prevResize.width}"/> 
+	</div>
+</aura:component>

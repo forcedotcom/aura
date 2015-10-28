@@ -361,18 +361,17 @@
         	 //Test case for W-2743289
         	 var headers = cmp.find("grid").getElement().getElementsByTagName("th");
         	 var thActualTittleArray = [];
-        	 var thActualMinMaxWidthArray = [];
+        	 //var thActualWidthArray = [];
         	 for(var i = 0; i < headers.length; i++){
         		 var title = $A.test.getElementAttributeValue(headers[i],"title");
-        		 var minWidth = $A.test.getStyle(headers[i],"min-width");
-        		 var maxWidth = $A.test.getStyle(headers[i],"max-width");
+        		 //var width = $A.test.getStyle(headers[i],"width");
         		 thActualTittleArray.push(title);
-        		 thActualMinMaxWidthArray.push("minWidth:"+minWidth+",maxWidth"+maxWidth);
+        		 //thActualWidthArray.push("width:"+width);
         	 }
         	 this.EXPECTED_2.push("");
         	 $A.test.assertEquals(this.EXPECTED_2.toString(), thActualTittleArray.toString() , "Table headers titles are not rendered correctly");
-        	 var expectedMinMaxWidth = ["minWidth:100px,maxWidth100px", "minWidth:100px,maxWidth100px", "minWidth:0px,maxWidthnone"];
-        	 $A.test.assertEquals(expectedMinMaxWidth.toString(), thActualMinMaxWidthArray.toString() , "Table headers min and max width not rendered correctly");
+        	 //var expectedWidth = ["width:100px", "width:100px", "width:92px"];
+        	 //$A.test.assertEquals(expectedWidth.toString(), thActualWidthArray.toString() , "Table headers min and max width not rendered correctly");
         	 
 		 }]
   }, 

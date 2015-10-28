@@ -62,7 +62,16 @@
 	width: 128px;
 }
 
+
 .THIS tr.selected {
 	background-color: #CCC;
 }
 
+.THIS table.testGrid {
+	table-layout:fixed;
+}
+
+.THIS table.testGrid td,
+.THIS table.testGrid th {
+	border: 1px solid black;
+}

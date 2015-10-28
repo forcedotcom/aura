@@ -17,7 +17,7 @@
     items: [
         {
             id: "0",
-            name: "Mary Scott",
+            name: "Mary Scott Fitzgerald",
             gender: "F",
             age: "7",
             grade: "2nd"

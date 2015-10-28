@@ -44,7 +44,7 @@
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
 		</div>
 	
-		<ui:virtualDataGrid aura:id="grid" aura:flavor="{!v.tableFlavor}" onsort="{!c.onsort}" fixedHeader="true" useRowHeaders="true">
+		<ui:virtualDataGrid aura:id="grid" class="longGrid" aura:flavor="{!v.tableFlavor}" onsort="{!c.onsort}" useRowHeaders="true" fixedHeader="true">
 			<aura:set attribute="headerColumns">
 				<ui:dataGridColumn name="id" 			label="Id"			sortable="true"/>
 				<ui:dataGridColumn name="subject" 		label="Subject"		sortable="true"/>
@@ -66,8 +66,8 @@
 			<aura:set attribute="dataModel">
 				<uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
 															sortBy="{!v.sortBy}"
-															totalItems="400"
-															pageSize="400"
+															totalItems="100"
+															pageSize="100"
 															throwError="{!v.provideNoData}"/>
 			</aura:set>
 		</ui:virtualDataGrid>

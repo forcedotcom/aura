@@ -404,6 +404,77 @@
             }
         }
     },
+    
+    /*
+     * Column Resizer Plugin
+     */
+    
+    enableColumnResizer : function(cmp) {
+    	$A.util.toggleClass(cmp, 'resizable-cols', true);
+    	var configs = cmp.get("v.resizableColumnsConfig") || {};
+    	configs.indicatorClasses = configs.indicatorClasses ? configs.indicatorClasses += ' uiVirtualDataGrid' : 'uiVirtualDataGrid';
+    	
+		var resizer = this.lib.columnResize.initializeColumnResizer(cmp.getElement(), configs);
+		
+		this.attachColResizerHandlers(cmp, resizer);
+		
+		cmp._colResizer = resizer;
+		this.updateResizerAccessibilityLabels(cmp);
+    },
+    
+    updateColumnResizer : function(cmp) {
+    	cmp._colResizer.updateColumns();
+    	this.updateResizerAccessibilityLabels(cmp);
+    },
+    
+    updateResizerAccessibilityLabels : function(cmp) {
+    	if (cmp._colResizer) {
+    		var columns = cmp.get("v.headerColumns");
+        	
+        	var labels = [];
+        	for (var i = 0; i < columns.length; i++) {
+        		labels[i] = columns[i].get("v.label");
+        	}
+        	
+        	cmp._colResizer.updateAccessibilityLabels(labels);
+    	}
+    },
+    
+    /**
+     * Configures the resizer after it's been created
+     */
+    attachColResizerHandlers: function(cmp, resizer) {  
+    	
+    	// Attach event handlers
+    	resizer.on('resize', $A.getCallback(function(resizeData) {
+    		if (cmp.isValid()) {
+    			var header = cmp.get("v.headerColumns")[resizeData.index];
+    			if (header) {
+    				header.set("v.width", resizeData.width);
+    			}
+    		}
+    	}));
+    	
+    	resizer.on('resize', $A.getCallback(function () {
+    		if (cmp.isValid()) {
+    			var resizeData = arguments[0];
+    			cmp.getEvent("onColumnResize").setParams({
+    				src : {
+    					colIndex : resizeData.index,
+    					column : cmp.get("v.headerColumns")[resizeData.index]
+    				},
+    				newSize : resizeData.width
+    			}).fire();
+    		}
+        }));
+    },
+    
+    resizeColumns : function(cmp, widths) {
+    	if (widths && widths.length > 0) {
+    		cmp._colResizer.resizeAll(widths);
+    	}
+    },
+    
     destroyTemplates: function (cmp) {
         var tmpls = cmp._templates;
         for (var i = 0; i < tmpls.length; ++i) {

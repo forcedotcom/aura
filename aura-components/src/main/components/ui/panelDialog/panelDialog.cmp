@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" description="A panel for dialogs. Use only one instance of ui:panelManager to manage your modal or non-modal dialogs.">
+<aura:component extensible="true" support="DEPRECATED" description="A panel for dialogs. Use only one instance of ui:panelManager to manage your modal or non-modal dialogs.">
 
     <aura:attribute name="closeOnClickOut" type="Boolean" default="false" description="Adds a listener to close the dialog when a user clicks outside the dialog"/>
     <aura:attribute name="showCloseButton" type="Boolean" default="true" description="Adds a close button in top right corner of the dialog"/>

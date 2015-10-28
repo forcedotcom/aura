@@ -24,8 +24,23 @@
         </p>
         <p>Include one instance of <code>ui:panelManager2</code> to handle and control visibility of all panels in your component or app.
          You can customize a panel's styling, header, body, footer. You can also customize the close button with your own logic.
+         You must register your panels using <code>ui:panelManager2</code> before you can create them.
         </p>
-        <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>. You must register your panels using <code>ui:panelManager2</code> before you can create them.</p>
+        <p>To create a modal, set the <code>panelType</code> attribute to <code>modal</code>.</p>
+        <pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'modal',
+    visible: true,
+    panelConfig: {
+        title: 'Modal Header',
+        body: body,
+        flavor: 'myFlavor',
+        footer: footer
+        },
+        onCreate: function(panel){
+            //do something
+        }
+    }).fire();</pre>
+        <p>This example creates a panel by using a custom header and firing <code>ui:createPanel</code>.</p>
 <pre>createPanelWithHeader: function (cmp, event, helper) {
     var body = $A.newCmp({componentDef: 'uiExamples:panelContent'}),
         header = $A.newCmp({componentDef: 'uiExamples:panelHeader'});
@@ -70,11 +85,14 @@ closeAction: function(panel) {
     myPanel.close();
  }</pre>
  
- 	<p>Alternatively, if you're configuring the panel from the context of the panel, use the <code>ui:notify</code> event.</p>
+ 	<p>Alternatively, if you're configuring the panel from the context of the panel, use the <code>ui:notify</code> event. This event is also useful
+ 	when you want to communicate with the panel manager to invoke another method on a component inside another panel.</p>
         <pre>cmp.get('e.notify').setParams({
     action: 'closePanel',
     payload: {callback: yourCallback}
 }).fire();</pre>
+	<p>In your component, register that it fires the event.</p>
+	<pre>&lt;aura:registerEvent name="notify" type="ui:notify"/></pre>
      
         <h4>Positioning Panels</h4>
         <p>Position a panel in relation to a target element by using the direction attribute.To position a panel at the north of the target element, set <code>direction : north</code>. 

@@ -18,6 +18,7 @@
 
 <aura:documentation>
     <aura:description>
+    	<p>Deprecated. Use <code>ui:panel</code> instead.</p>
     	<p><code>ui:panelDialog</code> supports two types of dialogs: non-modal and modal. A non-modal dialog is focusable simultaneously as the component or app that invoked it.
     	This type of dialog has the property <code>isModal="false"</code>. A modal dialog holds focus until the dialog is closed and has the property <code>isModal="true"</code>.</p>
     	<p>To customize the dialog body, create your own component and pass it in the <code>body</code> attribute, or create a component dynamically.

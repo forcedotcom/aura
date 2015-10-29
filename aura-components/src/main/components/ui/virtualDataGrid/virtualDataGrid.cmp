@@ -52,8 +52,8 @@
     <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description="Specifies whether the grid should use CSS to fix the header's position and scroll the table body"/>
     
     <!-- Resizable Columns -->
-    <aura:attribute name="enableResizableColumns"	type="Boolean"		default="false" description="Enables the column resize plugin"/>
-    <aura:attribute name="resizableColumnsConfig"	type="Object"/>
+    <aura:attribute name="enableResizableColumns"	type="Boolean"		default="false" description="Enables the column resize plugin. The default is false."/>
+    <aura:attribute name="resizableColumnsConfig"	type="Object" description="The column resize configuration. If not provided, the default configuration is used."/>
     
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
@@ -61,8 +61,8 @@
     <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/> 
 	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
 
-	<aura:registerEvent name="onsort" type="ui:sort"/>
-	<aura:registerEvent name="onColumnResize" type="ui:resize"/>
+	<aura:registerEvent name="onsort" type="ui:sort" description="The event fired when a column is sorted."/>
+	<aura:registerEvent name="onColumnResize" type="ui:resize" description="The event fired when a column is resized."/>
 
     <table aura:id="table" class="{!v.class}" aura:flavorable="true">
         <thead aura:id="thead">

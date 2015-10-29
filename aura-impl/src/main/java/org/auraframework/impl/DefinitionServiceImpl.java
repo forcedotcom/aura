@@ -21,21 +21,15 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
-import org.auraframework.def.ControllerDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.annotations.Annotations.ServiceComponent;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -43,15 +37,13 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 import com.google.common.collect.Sets;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * The public access to definitions inside Aura.
  *
  * This class manages all of the permissions checking and fetching of implementations
  * for consumers of aura definitions.
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class DefinitionServiceImpl implements DefinitionService {
     private static final long serialVersionUID = -2488984746420077688L;
     private static final ConcurrentLinkedQueue<WeakReference<SourceListener>> listeners = new ConcurrentLinkedQueue<>();

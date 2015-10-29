@@ -15,19 +15,12 @@
  */
 package org.auraframework.impl.source.resource;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.Definition;
-import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.PrivilegedNamespaceSourceLoader;
@@ -38,6 +31,8 @@ import org.auraframework.util.IOUtil;
 import org.auraframework.util.resource.ResourceLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -73,7 +68,15 @@ public class ResourceSourceLoader extends BaseSourceLoader implements Privileged
                     StringWriter sw = new StringWriter();
                     IOUtil.copyStream(reader, sw);
                     String list = sw.toString();
-                    files = AuraTextUtil.splitSimple(",", list, list.length()/10);
+                    files = AuraTextUtil.splitSimple(",", list, list.length() / 10);
+                } else {
+                    // TODO: local modification: read components from the classpath
+                    files = new ArrayList<>();
+                    PathMatchingResourcePatternResolver p = new PathMatchingResourcePatternResolver(resourceLoader);
+                    Resource[] res = p.getResources("classpath*:/" + resourcePrefix + "/*/*/*.*");
+                    for (Resource r : res) {
+                        files.add(r.getURL().toString());
+                    }
                 }
             } finally {
                 //

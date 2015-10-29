@@ -33,6 +33,7 @@
                     <ui:inputSelectOption text="northeast"/>
                     <ui:inputSelectOption text="southeast"/>
                     <ui:inputSelectOption text="southwest"/>
+                    <ui:inputSelectOption text="brokendirection"/>
                 </ui:inputSelect>
                 <ui:inputCheckbox label="Use Advanced" value="false" aura:id="isAdvanced" />
                 <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />

@@ -279,6 +279,10 @@
                         bottom:true
                     };
                     break;
+                default :
+                    if(direction) {
+                        $A.assert(direction.match(/(south|north)(west|east)$|^(east|west|north|south)$/), 'Invalid direction');
+                    }
             }
         }
 

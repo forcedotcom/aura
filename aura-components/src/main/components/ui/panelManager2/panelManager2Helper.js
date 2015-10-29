@@ -96,10 +96,12 @@
     */
     setPanelOwner: function (panel, givenOwner) {
         var owner = givenOwner;
-        if (!owner && this.PANELS_STACK.length > 0) {
-            var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1],
+        if (!owner) {
+            var previousBody = null;
+        	if (this.PANELS_STACK.length > 0) {
+                var previousPanel = this.PANELS_STACK[this.PANELS_STACK.length - 1];
                 previousBody = previousPanel && previousPanel.get('v.body');
-            
+        	}
             owner = $A.util.isEmpty(previousBody) ? panel.getGlobalId() : previousBody[0].getGlobalId();
         }
 

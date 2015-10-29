@@ -75,6 +75,10 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
 /** Name of the adapter */
 IndexedDBAdapter.NAME = "indexeddb";
 
+/** Log levels */
+IndexedDBAdapter.LOG_LEVEL = { INFO: 0, WARNING: 1 };
+
+
 /**
  * Returns the name of the adapter, "indexeddb".
  * @public
@@ -110,12 +114,12 @@ IndexedDBAdapter.prototype.initialize = function(version) {
     dbRequest.onerror = function(e) {
         // this means we have no storage.
         that.ready = false;
-        var message = "open() - Error opening DB";
-        message += (e.target.error && e.target.error.message) ? ": " + e.target.error.message : "";
-        that.log("initialize(): " + message);
+        var message = "initialize(): error opening DB";
+        message += (e.target.error && e.target.error.message) ? ": "+e.target.error.message : "";
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
     };
     dbRequest.onblocked = function(/*error*/) {
-        that.log("initialize() - blocked from opening DB, most likely by another open browser tab");
+        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "initialize(): blocked from opening DB, most likely by another open browser tab");
     };
 };
 
@@ -220,16 +224,16 @@ IndexedDBAdapter.prototype.sweep = function() {
  */
 IndexedDBAdapter.prototype.setupDB = function(event) {
     var db = event.target.result;
-    var self = this;
+    var that = this;
     this.db = db;
     this.db.onerror = function(e) {
-        self.log("setupDB(): error event received", e);
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, "setupDB(): error event received", e);
     };
     this.db.onabort = function(e) {
-        self.log("setupDB(): abort event received", e);
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, "setupDB(): abort event received", e);
     };
     this.db.onversionchange = function(e) {
-        self.log("setupDB(): onversionchanged event received", e);
+        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "setupDB(): onversionchanged event received", e);
         e.target.close();
     };
 
@@ -326,8 +330,11 @@ IndexedDBAdapter.prototype.getItemInternal = function(key, success, error) {
     var transaction = this.db.transaction([this.tableName], "readonly");
     var objectStore = transaction.objectStore(this.tableName);
     var objectStoreRequest = objectStore.get(key);
+    var that = this;
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.getItem: Transaction aborted: "+event.error));
+        var message = "getItemInternal(): transaction aborted for key "+key+": "+event.error;
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        error(new Error("IndexedDBAdapter."+message));
     };
     objectStoreRequest.onsuccess = function(event) {
         var item = event.target.result && event.target.result.item;
@@ -335,7 +342,9 @@ IndexedDBAdapter.prototype.getItemInternal = function(key, success, error) {
         success(item);
     };
     transaction.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.getItem: Transaction failed: "+event.error));
+        var message = "getItemInternal(): transaction error for key "+key+": "+event.error;
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        error(new Error("IndexedDBAdapter."+message));
     };
 };
 
@@ -384,10 +393,10 @@ IndexedDBAdapter.prototype.walkInternal = function(success, error, sendResult) {
         }
     };
     cursor.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.getAll: Transaction failed: " + event.error));
+        error(new Error("IndexedDBAdapter.getAll: Transaction failed: "+event.error));
     };
     cursor.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.getAll: Transaction aborted: " + event.error));
+        error(new Error("IndexedDBAdapter.getAll: Transaction aborted: "+event.error));
     };
 };
 
@@ -415,7 +424,7 @@ IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, success, 
     // maxSize check happens in AuraStorage.
     // TODO: refactor size calculations
     if (size > this.limitItem) {
-        error(new Error("IndexedDBAdapter.setItem(): Item larger than size limit of " + this.limitItem));
+        error(new Error("IndexedDBAdapter.setItem(): Item larger than size limit of "+this.limitItem));
         return;
     }
     if (size + this.sizeGuess + this.sizeErrorBar > this.limitSweepHigh || this.sizeErrorBar > this.limitError) {
@@ -427,14 +436,17 @@ IndexedDBAdapter.prototype.setItemInternal = function(key, item, size, success, 
 
     var objectStoreRequest = objectStore.put(storable);
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.setItem: Transaction aborted: " + event.error));
+        var message = "setItemInternal(): transaction aborted for key "+key+": "+event.error;
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        error(new Error("IndexedDBAdapter."+message));
     };
     objectStoreRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
-        that.log("setItemInternal(): DIED " + event.error);
-        error(new Error("IndexedDBAdapter.setItem: Transaction failed: " + event.error));
+        var message = "setItemInternal(): transaction error for key "+key+": "+event.error;
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        error(new Error("IndexedDBAdapter."+message));
     };
 };
 
@@ -450,13 +462,13 @@ IndexedDBAdapter.prototype.removeItemInternal = function(key, success, error) {
     this.updateSize(-this.sizeAvg, this.sizeAvg);
     var removeRequest = objectStore['delete'](key);
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.removeItem: Transaction aborted: " + event.error));
+        error(new Error("IndexedDBAdapter.removeItem: Transaction aborted: "+event.error));
     };
     removeRequest.onsuccess = function() {
         success();
     };
     transaction.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.removeItem: Transaction failed: " + event.error));
+        error(new Error("IndexedDBAdapter.removeItem: Transaction failed: "+event.error));
     };
 };
 
@@ -471,13 +483,13 @@ IndexedDBAdapter.prototype.clearInternal = function(success, error) {
     //FIXME: probably should do an object here.
     objectStore.clear();
     transaction.onabort = function(event) {
-        error(new Error("IndexedDBAdapter.clear: Transaction aborted: " + event.error));
+        error(new Error("IndexedDBAdapter.clear: Transaction aborted: "+event.error));
     };
     transaction.oncomplete = function() {
         success();
     };
     transaction.onerror = function(event) {
-        error(new Error("IndexedDBAdapter.clear: Transaction failed: " + event.error));
+        error(new Error("IndexedDBAdapter.clear: Transaction failed: "+event.error));
     };
     this.setSize(0, 0);
 };
@@ -497,7 +509,6 @@ IndexedDBAdapter.prototype.clearInternal = function(success, error) {
 IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error) {
     var now = new Date().getTime();
     if (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh) {
-        this.log("expireCache(): shortcircuiting sweep, last sweep = "+this.lastSweep+", time = "+now);
         if (success) {
             success();
         }
@@ -520,14 +531,14 @@ IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error)
         if (this.sizeGuess > this.limitSweepLow) {
             removeSize += this.sizeGuess-this.limitSweepLow;
         }
-        this.log("expireCache(): sweeping to remove " + removeSize);
+        this.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweeping to remove "+removeSize);
         cursor.onsuccess = function(event) {
             var icursor = event.target.result;
             if (icursor) {
                 var store = icursor.value;
                 if (store) {
                     if (store["expires"] < expireDate || expiredSize < removeSize) {
-                        that.log("expireCache(): sweep removing " + icursor.primaryKey);
+                        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "expireCache(): sweep removing "+icursor.primaryKey);
                         icursor['delete']();
                         expiredSize += store["size"];
                     } else {
@@ -592,7 +603,7 @@ IndexedDBAdapter.prototype.refreshSize = function(size, count) {
         this.sizeOutsideErrorBar += 1;
     }
 
-    this.log("refreshSize(): size calculation: current mistake = "+mistake+", avg mistake = "
+    this.log(IndexedDBAdapter.LOG_LEVEL.INFO, "refreshSize(): size calculation: current mistake = "+mistake+", avg mistake = "
         +(this.sizeMistake/this.sizeMistakeCount).toFixed(1)+", max mistake = "+this.sizeMistakeMax
         +", outside error bars = "+this.sizeOutsideErrorBar);
     this.setSize(size, count);
@@ -620,9 +631,10 @@ IndexedDBAdapter.prototype.setSize = function(size, count) {
  * Logs a message.
  * @private
  */
-IndexedDBAdapter.prototype.log = function (msg, obj) {
+IndexedDBAdapter.prototype.log = function (level, msg, obj) {
     if (this.debugLoggingEnabled) {
-        $A.log("IndexedDBAdapter '" + this.instanceName + "' " + msg + ":", obj);
+        level = level === IndexedDBAdapter.LOG_LEVEL.WARNING ? "warning" : "log";
+        $A[level]("IndexedDBAdapter '"+this.instanceName+"' "+msg+":", obj);
     }
 };
 
@@ -650,15 +662,17 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
 
     var dbRequest = window.indexedDB.deleteDatabase(this.instanceName);
     dbRequest.onerror = function() {
-        error(new Error("IndexedDBAdapter.deleteStorage: Database failed to be deleted"));
+        var message = "deleteStorageInternal(): delete database error";
+        that.log(IndexedDBAdapter.LOG_LEVEL.WARNING, message);
+        error(new Error("IndexedDBAdapter."+message));
     };
     dbRequest.onsuccess = function() {
-        that.log("deleteStorageInternal(): deleted successfully");
+        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "deleteStorageInternal(): deleted successfully");
         success();
     };
     dbRequest.onblocked = function(/*error*/) {
         // Cannot error here because IE may come to this callback before success
-        that.log("deleteStorageInternal(): blocked from being deleted");
+        that.log(IndexedDBAdapter.LOG_LEVEL.INFO, "deleteStorageInternal(): blocked from being deleted");
     };
 };
 

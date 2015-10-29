@@ -232,11 +232,9 @@ AuraStorage.prototype.remove = function(key, doNotFireModified) {
  * @private
  */
 AuraStorage.prototype.sweep = function() {
-
     // Do not sweep if we have lost our connection, we'll ignore expiration until sweeping resumes
     // OR if we've recently swept
     if (this._sweepingSuspended || ((new Date().getTime() - this.lastSweep) < (this.defaultExpiration / 60))) {
-        this.log("sweep() - skipping sweep");
         return;
     }
 

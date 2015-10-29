@@ -19,11 +19,16 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 
 /**
  * ComponentClassErrorTest is mainly for verifying error message when we error out from component's helper/renderer
+ * The tests check if the content of error message contains the error location. Different browser has different content
+ * for traceback. This is only for debugging, so only running the tests for Chrome for now.
  */
+@TargetBrowsers({ BrowserType.GOOGLECHROME })
 public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     public ComponentClassErrorUITest(String name) {

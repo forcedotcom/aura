@@ -418,17 +418,22 @@
 		
 		this.attachColResizerHandlers(cmp, resizer);
 		
-		cmp._colResizer = resizer;
+		cmp.getConcreteComponent()._colResizer = resizer;
 		this.updateResizerAccessibilityLabels(cmp);
     },
     
+    getResizer : function(cmp) {
+    	return cmp.getConcreteComponent()._colResizer;
+    },
+    
     updateColumnResizer : function(cmp) {
-    	cmp._colResizer.updateColumns();
+    	this.getResizer(cmp).updateColumns();
     	this.updateResizerAccessibilityLabels(cmp);
     },
     
     updateResizerAccessibilityLabels : function(cmp) {
-    	if (cmp._colResizer) {
+    	var resizer = this.getResizer(cmp);
+    	if (resizer) {
     		var columns = cmp.get("v.headerColumns");
         	
         	var labels = [];
@@ -436,7 +441,7 @@
         		labels[i] = columns[i].get("v.label");
         	}
         	
-        	cmp._colResizer.updateAccessibilityLabels(labels);
+        	resizer.updateAccessibilityLabels(labels);
     	}
     },
     

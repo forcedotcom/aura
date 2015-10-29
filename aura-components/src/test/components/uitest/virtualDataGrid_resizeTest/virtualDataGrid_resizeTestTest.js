@@ -17,9 +17,12 @@
 	browsers: ["-IE7","-IE8"],
 	
 	WIDTHS : {
-		initialWidths : [200, 400, 100],
-		smallerWidths : [100, 300, 75]
+		initialWidths  : [200, 400, 100],
+		smallerWidths  : [100, 300, 75],
+		smallestWidths : [50, 50, 50]
 	},
+	
+	COLUMNS : ["Id", "Name", "Grade"],
 	
 	testHandlesExist : {
 		test : function(cmp) {
@@ -32,17 +35,61 @@
 		}
 	},
 	
+	testResizeEvent : {
+		test : [function(cmp) {
+			cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
+		}, function(cmp) {
+			var prevResize = cmp.get("v.prevResize");
+			var lastIndex = this.COLUMNS.length - 1;
+			var columns = cmp.find("grid").getElement().querySelectorAll('th');
+			
+			$A.test.assertEquals(prevResize.src.label, this.COLUMNS[lastIndex], "Name of last resized column does not match");
+			$A.test.assertEquals(prevResize.src.index, lastIndex, "Index of last resized column does not match");
+			$A.test.assertEquals(prevResize.width, columns[lastIndex].clientWidth);
+		}]
+	},
+	
 	testProgrammaticResizing : {
 		test : [function(cmp) {
-			cmp.find("grid").resizeColumns([100, 300, 75]);
+			cmp.find("grid").resizeColumns(this.WIDTHS.smallerWidths);
 		}, function(cmp) {
 			var grid = cmp.find("grid");
-			var columns = grid.getElement().querySelector('th');
+			var columns = grid.getElement().querySelectorAll('th');
 			
 			for (var i=0; i<columns.length; i++) {
 				$A.test.assertEquals(columns[i].clientWidth, this.WIDTHS.smallerWidths[i], "Column " + i + " has an incorrect width.");
 			}
 			
+		}]
+	},
+	
+	testNegativeResizing : {
+		test : [function(cmp) {
+			cmp.find("grid").resizeColumns([-1, -1, -1]);
+		}, function(cmp) {
+			var grid = cmp.find("grid");
+			var columns = grid.getElement().querySelectorAll('th');
+			
+			for (var i=0; i<columns.length; i++) {
+				$A.test.assertTrue(columns[i].clientWidth >= this.WIDTHS.initialWidths[i],
+						"Column " + i + " should not have resized from " + this.WIDTHS.initialWidths[i] + " to " + columns[i].clientWidth + " since value was -1");
+			}
+		}
+		        
+		]
+	},
+	
+	testTinyResizing : {
+		test : [function(cmp) {
+			cmp.find("grid").resizeColumns([1, 1, 1]);
+		}, function(cmp) {
+			var grid = cmp.find("grid");
+			var columns = grid.getElement().querySelectorAll('th');
+			
+			for (var i=0; i<columns.length; i++) {
+				$A.test.assertTrue(columns[i].clientWidth >= this.WIDTHS.smallestWidths[i],
+						"Column " + i + " is smaller than the minWidth value: " + this.WIDTHS.smallestWidths[i]);
+			}
 		}]
 	}
 })

@@ -126,7 +126,7 @@
     resizeColumns : function(cmp, evt, helper) {
     	var widths = evt.getParam('arguments').widths;
     	
-    	if (!cmp._colResizer) {
+    	if (!helper.getResizer(cmp)) {
     		// We don't have a resizer yet
     		return;
     	}

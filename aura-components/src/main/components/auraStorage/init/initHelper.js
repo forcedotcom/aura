@@ -20,20 +20,6 @@
 
     init : function(cmp) {
         var debugLoggingEnabled = $A.util.getBooleanValue(cmp.get("v.debugLoggingEnabled"));
-
-        // Temporary query param support to allow one extra level of switch so I
-        // can turn on storage without enabling it for the world right now
-        var onlyUseStorageIfRequested = $A.util.getBooleanValue(cmp.get("v.requireUseStorageQueryParam"));
-        if (onlyUseStorageIfRequested) {
-            var useStorage = window.location.href.toLowerCase().indexOf("aura.usestorage=true") > 0;
-            if (!useStorage) {
-                if (debugLoggingEnabled) {
-                    $A.log("Not enabling Aura Storage because the requireUseStorageQueryParam was specified and aura.useStorage=true was not present in the URL query string");
-                }
-                return;
-            }
-        }
-
         var name = cmp.get("v.name");
         var defaultExpiration = parseInt(cmp.get("v.defaultExpiration"),10);
         var defaultAutoRefreshInterval = parseInt(cmp.get("v.defaultAutoRefreshInterval"),10);

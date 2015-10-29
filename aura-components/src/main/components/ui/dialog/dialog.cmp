@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="A dialog window used for overlays or modals.">
+<aura:component extensible="true" support="DEPRECATED" description="A dialog window used for overlays or modals.">
 
     <!-- main attributes -->
     <aura:attribute name="ariaRole" type="String" default="dialog" description="The value of the dialog's ARIA role attribute. Valid values are 'dialog' and 'alertdialog'. The default is 'dialog'."/>

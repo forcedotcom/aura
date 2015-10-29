@@ -17,8 +17,8 @@
 -->
 <aura:documentation>
 	<aura:description>
-		<p>
-			To use <code>ui:dialog</code>, include one instance of <code>ui:dialogManager</code> component at the end of your component.
+		<p>Deprecated. Use <code>ui:panel</code> instead.</p>
+			<p>To use <code>ui:dialog</code>, include one instance of <code>ui:dialogManager</code> component at the end of your component.
 			Only one instance of <code>ui:dialogManager</code> is required to handle multiple dialogs.
 		</p>
 		<p>

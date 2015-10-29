@@ -19,7 +19,7 @@
     <aura:attribute name="requiredAttribute" type="String" required="true"/>
     <aura:attribute name="message" type="String"/>
     <aura:attribute name="error" type="String"/>
-    <aura:attribute name="eventHandled" type="String" default="false"/>
+    <aura:attribute name="eventHandled" type="Boolean" default="false"/>
 
     <!-- set false when testing default handler-->
     <aura:attribute name="handleSystemError" type="Boolean" default="false"/>

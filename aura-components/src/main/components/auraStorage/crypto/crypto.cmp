@@ -21,6 +21,7 @@
     description="Initializes CryptoAdapter for secure, persistent storage. Also sends GET request for encryption key.">
 
     <aura:attribute name="debugLoggingEnabled" type="Boolean" default="false" description="Set to true to enable debug logging with $A.log()."/>
+    <aura:attribute name="requireQueryParam"   type="Boolean" default="false" description="Set to true to require URL query paramter aura.crypto=true to use Crypto Adapter."/>
 
     <!--
         This component is used to config the Aura Storage Service crypto adapter. It

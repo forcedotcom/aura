@@ -134,302 +134,231 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         }
     }
 
-    public void testNormalizeCssUrl() throws Exception {
-        getAppWithNestedTemplates(true);
-        String url = Aura.getConfigAdapter().getResetCssURL();
-        assertTrue("Reset CSS should be normalize.css when normalizeCss attribute set",
-                url.contains("normalize.css"));
-        assertTrue("Should contain fake fwUid for long cache headers",
-                url.contains("#FAKEUID#"));
+    public void testGetResetCssUrlDefaultsToReset(){
+        String expected="resetCSS.css";
+
+        startAppContext("<aura:application></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS should default to resetCSS.css. Found: "+resetCssUrl, actual);
     }
 
-    public void testResetCssUrl() throws Exception {
-        getAppWithNestedTemplates();
-        assertTrue("Reset CSS should be default resetCSS.css",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+    public void testGetResetCssUrlShouldContainFwUid() throws Exception {
+        String expected="#FAKEUID#";
+
+        startAppContext("<aura:application></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should contain fake fwUid for long cache headers. Found: "+resetCssUrl, actual);
     }
 
-    public void testResetCssNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, false);
-        assertTrue("Reset CSS should be resetCSS.css for nested template with normalizeCss false",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    public void testNormalizeCssNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(false, true);
-        assertTrue("Reset CSS should be normalize.css for nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    public void testNormalizeCssNestedTemplateWithSuper() throws Exception {
-        getAppWithNestedTemplates(true, true);
-        assertTrue("Reset CSS should be normalize.css for nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    public void testResetCssThirdNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, true, false);
-        assertTrue("Reset CSS should be resetCSS.css for third nested template with normalizeCss false",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    public void testNormalizeCssThirdNestedTemplate() throws Exception {
-        getAppWithNestedTemplates(true, false, true);
-        assertTrue("Reset CSS should be normalize.css for third nested template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    /**
-     * Tests normalizeCss set to false by ancestor and not set afterwards.
-     */
-    public void testResetCssSetByAncestor() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "false");
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be resetCSS.css with normalizeCss false set by ancestor",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    /**
-     * Tests normalizeCss set to true by ancestor and not set by descendants.
-     */
-    public void testNormalizeCssSetByAncestor() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "true");
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be normalize.css with normalizeCss true set by ancestor",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    /**
-     * Tests normalizeCss set to true by super and not set by template.
-     */
-    public void testNormalizeCssSetBySuper() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateMarkup, templateA.getDescriptorName(), "true");
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be normalize.css with normalizeCss true set by super",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    /**
-     * Tests normalizeCss set to false by super and not set by template
-     */
-    public void testResetCssSetBySuper() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateMarkup, templateA.getDescriptorName(), "false");
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be resetCSS.css for template with normalizeCss false set by super",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    /**
-     * Tests normalizeCss not set on any template
-     */
-    public void testResetCssNotSetBySuper() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be resetCSS.css for template with normalizeCss not set by super",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    /**
-     * Tests normalizeCss set to true by ancestor from another base template and not set by descendants.
-     */
-    public void testNormalizeCssDifferentBaseTemplate() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true'>" +
-                "<aura:attribute name='normalizeCss' type='Boolean' default='false'/>" +
-                "</aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateMarkup, superTemplate.getDescriptorName(), "true");
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be normalize.css for different template with normalizeCss true",
-                Aura.getConfigAdapter().getResetCssURL().contains("normalize.css"));
-    }
-
-    /**
-     * Tests normalizeCss not set from another base template
-     */
-    public void testResetCssDifferentBaseTemplateNormalizeNotSet() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true'>" +
-                "<aura:attribute name='normalizeCss' type='Boolean' default='false'/>" +
-                "</aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
-        DefDescriptor<ComponentDef> templateA = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-
-        String templateSrcB = String.format(templateExtends, templateA.getDescriptorName());
-        DefDescriptor<ComponentDef> templateB = addSourceAutoCleanup(ComponentDef.class, templateSrcB);
-
-        String templateSrcC = String.format(templateExtends, templateB.getDescriptorName());
-        DefDescriptor<ComponentDef> templateC = addSourceAutoCleanup(ComponentDef.class, templateSrcC);
-
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, templateC.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
-
-        assertTrue("Reset CSS should be resetCSS.css for different template with normalizeCss not set",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
-    }
-
-    /**
-     * Test different base template with no normalizeCss attribute defined
-     */
-    public void testResetCssDifferentBaseTemplateNoAttribute() throws Exception {
-        String superMarkup = "<aura:component isTemplate='true' extensible='true'></aura:component>";
-        String templateExtends = "<aura:component isTemplate='true' extensible='true' extends='%s'></aura:component>";
-
-        DefDescriptor<ComponentDef> superTemplate = addSourceAutoCleanup(ComponentDef.class, superMarkup);
-        String templateSrc = String.format(templateExtends, superTemplate.getDescriptorName());
+    public void testGetResetCssUrlShouldDefaultToResetForExtendedTemplate() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
         DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
-        String markup = "<aura:application access='unauthenticated' template='%s'></aura:application>";
-        String appSrc = String.format(markup, template.getDescriptorName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
+        startAppContext("<aura:application template='"+template.getDescriptorName()+"'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
 
-        assertTrue("Reset CSS should use default resetCSS.css for different template with no normalizeCss attribute",
-                Aura.getConfigAdapter().getResetCssURL().contains("resetCSS.css"));
+        assertTrue("Reset CSS url should default to resetCSS.css for extended template. Found: "+resetCssUrl, actual);
     }
 
-    /**
-     * Last boolean value is actual used by active template of app
-     *
-     * @param normalizes normalizeCss boolean varargs
-     * @return
-     */
-    private DefDescriptor<ApplicationDef> getAppWithNestedTemplates(boolean... normalizes) {
-        String templateMarkup = "<aura:component isTemplate='true' extensible='true' extends='%s'><aura:set attribute='normalizeCss' value='%s'/></aura:component>";
-        String extendsTemplate = "aura:template";
-        if (normalizes.length == 0) {
-            normalizes = new boolean[]{ false };
-        }
-        DefDescriptor<ComponentDef> template = null;
-        for (boolean normalize : normalizes) {
-            String nString = normalize ? "true" : "false";
-            String templateSrc = String.format(templateMarkup, extendsTemplate, nString);
-            template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
-            extendsTemplate = template.getDescriptorName();
-        }
+    public void testGetResetCssUrlShouldBeOverriddenToNormalizeByExtendedTemplate() throws Exception {
+        String expected="normalize.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
 
-        String markup = "<aura:application access='unauthenticated' template='%s:%s'></aura:application>";
-        String appSrc = String.format(markup, template.getNamespace(), template.getName());
-        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, appSrc);
-        setupContext(app);
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should be overridden to resetCss.css for extended template. Found: "+resetCssUrl,actual);
+    }
+
+    public void testGetResetCssUrlShouldReturnNullForExtendedTemplate() throws Exception {
+        String expected=null;
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String actual=Aura.getConfigAdapter().getResetCssURL();
+
+        assertEquals("Reset CSS url should be null for extended template.", expected, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeOverriddenToResetByExtendedTemplate() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should be overridden to normalize.css for extended template. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeSetToResetByLastExtendedTemplate() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should be overridden to normalize.css for last extended template. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeSetToNormalizeByLastExtendedTemplate() throws Exception {
+        String expected="normalize.css";
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should be overridden to resetCSS.css for last extended template. Found: "+resetCssUrl,actual);
+    }
+
+    public void testGetResetCssUrlShouldReturnNullForLastExtendedTemplate() throws Exception {
+        String expected=null;
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String actual=Aura.getConfigAdapter().getResetCssURL();
+
+        assertEquals("Reset CSS url should be null for last extended template.", expected, actual);
+    }
+
+    public void testGetResetCssUrlShouldDefaultToResetFromAncestorsTemplateForExtendedApplication() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true' template='"+template.getDescriptorName()+"'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeSetToResetFromAncestorsTemplateForExtendedApplication() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true' template='"+template.getDescriptorName()+"'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeNullFromAncestorsTemplateForExtendedApplication() throws Exception {
+        String expected=null;
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true' template='"+template.getDescriptorName()+"'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"'></aura:application>");
+        String actual=Aura.getConfigAdapter().getResetCssURL();
+
+        assertEquals("Reset CSS url should default to normalize.css for extended application.", expected, actual);
+    }
+
+    public void testGetResetCssUrlShouldDefaultToResetForExtendedApplication() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should default to normalize.css for extended application. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeSetToResetForExtendedApplication() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should default to resetCSS.css for extended application. Found: " + resetCssUrl, actual);
+    }
+
+    public void testGetResetCssUrlShouldBeNullForExtendedApplication() throws Exception {
+        String expected=null;
+        String templateSrc = "<aura:component isTemplate='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        String parentAppSrc="<aura:application access='unauthenticated' extensible='true'></aura:application>";
+        DefDescriptor<ApplicationDef> parentApp = addSourceAutoCleanup(ApplicationDef.class, parentAppSrc);
+
+        startAppContext("<aura:application access='unauthenticated' extends='"+parentApp.getDescriptorName()+"' template='"+template.getDescriptorName()+"'></aura:application>");
+        String actual=Aura.getConfigAdapter().getResetCssURL();
+
+        assertEquals("Reset CSS url should default to normalize.css for extended application.", expected, actual);
+    }
+
+    private DefDescriptor<ApplicationDef> startAppContext(String markup){
+        DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
+        if (Aura.getContextService().isEstablished()) {
+            Aura.getContextService().endContext();
+        }
+        AuraContext ctx = Aura.getContextService().startContext(
+                AuraContext.Mode.UTEST,
+                AuraContext.Format.JSON,
+                AuraContext.Authentication.UNAUTHENTICATED,
+                app
+        );
+        ctx.setFrameworkUID("#FAKEUID#");
         return app;
     }
 
     public void testJSLibsEqualivalentTimezone() throws Exception {
         try {
             AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
-
             LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
             when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-
             ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
             when(locator.get(LocalizationAdapter.class)).thenReturn(mockAdapter);
 
-            String markup = "<aura:application></aura:application>";
-            DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
-            setupContext(app);
+            startAppContext("<aura:application></aura:application>");
+
             assertTrue("JS libs file should be libs_America-Los-Angeles.js",
                     Aura.getConfigAdapter().getJSLibsURL().contains("libs_America-Los_Angeles.js"));
         } finally {
@@ -440,16 +369,13 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     public void testJSLibsInvalidTimezone() throws Exception {
         try {
             AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
-
             LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
             when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-
             ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
             when(locator.get(LocalizationAdapter.class)).thenReturn(mockAdapter);
 
-            String markup = "<aura:application></aura:application>";
-            DefDescriptor<ApplicationDef> app = addSourceAutoCleanup(ApplicationDef.class, markup);
-            setupContext(app);
+            startAppContext("<aura:application></aura:application>");
+
             assertTrue("JS libs file should be the default libs_GMT.js for invalid timezones",
                     Aura.getConfigAdapter().getJSLibsURL().contains("libs_GMT.js"));
         } finally {

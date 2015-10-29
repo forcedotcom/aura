@@ -46,6 +46,7 @@ import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.expression.PropertyReference;
+import org.auraframework.impl.expression.PropertyReferenceImpl;
 import org.auraframework.impl.javascript.AuraJavascriptGroup;
 import org.auraframework.impl.source.AuraResourcesHashingGroup;
 import org.auraframework.impl.source.file.AuraFileMonitor;
@@ -267,7 +268,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     /**
-     * Determines whether to use normalize.css or resetCSS.css by looking at template attribute "normalizeCss"
+     * Determines whether to use normalize.css or resetCSS.css or nothing.
      *
      * @return URL to reset css file
      */
@@ -277,66 +278,55 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         String contextPath = context.getContextPath();
         String uid = context.getFrameworkUID();
         String resetCss = "resetCSS";
-
         try {
             DefDescriptor<?> appDesc = context.getApplicationDescriptor();
             if (appDesc != null) {
                 BaseComponentDef templateDef = ((BaseComponentDef) appDesc.getDef()).getTemplateDef();
                 if (templateDef.isTemplate()) {
                     BaseComponent<?, ?> template = (BaseComponent<?, ?>) Aura.getInstanceService().getInstance(templateDef);
-                    if (useNormalizeCss(template)) {
-                        resetCss = "normalize";
+                    String auraResetStyle=getTemplateValue(template,"auraResetStyle");
+                    switch(auraResetStyle){
+                        case "reset":
+                            resetCss="resetCSS";
+                            break;
+                        case "normalize":
+                            resetCss="normalize";
+                            break;
+                        default:
+                            return null;
                     }
                 }
             }
         } catch (QuickFixException qfe) {
-            // ignore and use default resetCSS.css
+            // ignore and use default normalize.css
         }
-
         return String.format("%s/auraFW/resources/%s/aura/%s.css", contextPath, uid, resetCss);
     }
 
     /**
-     * Whether the current template normalizeCss attribute value is true. The attribute value provider is its
-     * super is it extends another template.
+     * FIXME: HACK: DELETEME: W-2540157
      *
-     * @param template template component
-     * @return whether normalizeCss attribute is set to true
-     * @throws QuickFixException
+     * The evaluated value for attribute returns the default value (false) if current
+     * template does not <aura:set attribute="myAttribute" />. This is incorrect if
+     * the current template extends a template that has [attribute] set to true.
+     *
+     * This workaround recurses through PropertyReference values until a value provider template
+     * provides a set value or it reaches the base component which we will use the default value.
      */
-    private boolean useNormalizeCss(BaseComponent<?, ?> template) throws QuickFixException {
-        BaseComponent<?, ?> valueProviderTemplate = template;
-        boolean baseTemplate = true;
-        if (template.getSuper() != null && ((BaseComponentDef) template.getSuper().getDescriptor().getDef()).isTemplate()) {
-            // super template is the value provider for the attribute
-            // template only has the default value
-            valueProviderTemplate = template.getSuper();
-            baseTemplate = false;
+    private String getTemplateValue(BaseComponent<?, ?> template, String attribute) throws QuickFixException {
+        Object attributeValue;
+        if (template.getSuper() != null && template.getSuper().getDescriptor().getDef().isTemplate()) {
+            template = template.getSuper();
         }
-        /**
-         * TODO: W-2540157
-         *
-         * The evaluated value for attribute "normalizeCss" returns the default value (false) if current
-         * template does not <aura:set attribute="normalizeCss" /> itself. This is incorrect if
-         * the current template extends a template that has normalizeCss set to true.
-         *
-         * This workaround recurses through PropertyReference values until a value provider template
-         * provides a set value or it reaches the base component which we will use the default value.
-         */
-        Object normalizeCssValue;
-        if (baseTemplate) {
-            normalizeCssValue = valueProviderTemplate.getAttributes().getValue("normalizeCss");
-        } else {
-            normalizeCssValue = valueProviderTemplate.getAttributes().getRawValue("normalizeCss");
-        }
-        if (normalizeCssValue != null) {
-            if (normalizeCssValue instanceof PropertyReference) {
-                return useNormalizeCss(valueProviderTemplate);
+        attributeValue=template.getAttributes().getValue(attribute);
+        if (attributeValue != null) {
+            if (attributeValue instanceof PropertyReference) {
+                return getTemplateValue(template,attribute);
             } else {
-                return (Boolean) normalizeCssValue;
+                return (String) attributeValue;
             }
         }
-        return false;
+        return "";
     }
 
     /**

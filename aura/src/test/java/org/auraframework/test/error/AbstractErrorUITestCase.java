@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 
 public class AbstractErrorUITestCase extends WebDriverTestCase {
 
@@ -32,21 +33,25 @@ public class AbstractErrorUITestCase extends WebDriverTestCase {
         super(name);
     }
 
-    protected void assertErrorMaskIsNotVisible() {
-        waitForElement("Error mask should not be visible.", findDomElement(ERROR_MASK_LOCATOR), false);
+    protected boolean isErrorMaskVisible() {
+        WebElement errorMask = findDomElement(ERROR_MASK_LOCATOR);
+        if(errorMask != null) {
+            return errorMask.isDisplayed();
+        }
+        return false;
     }
 
     protected String findErrorMessage() {
-        return this.findErrorMessage(ERROR_MASK_LOCATOR, ERROR_MSG_LOCATOR);
-    }
-
-    protected String findErrorMessage(By errorMaskLocator, By errorMessageLocator) {
-        waitForElement("Error mask should be visible when error is handled by default handler.", findDomElement(errorMaskLocator), true);
-        return getText(errorMessageLocator);
+        waitForElement("Error mask should be visible when error is handled by default handler.", findDomElement(ERROR_MASK_LOCATOR), true);
+        return getText(ERROR_MSG_LOCATOR);
     }
 
     protected void assertDisplayedErrorMessage(String message) {
         String actualMessage = findErrorMessage();
         assertThat("Did not find expected error in error message element.", actualMessage, containsString(message));
+    }
+
+    protected void assertErrorMaskIsNotVisible() {
+        assertFalse("Error mask should not be visible.", isErrorMaskVisible());
     }
 }

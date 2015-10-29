@@ -109,15 +109,27 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify new error message can be retrieved in Aura Friendly Error data
      */
     public void testAuraFriendlyErrorMessageFromData() throws Exception {
+        String expectedContainedMessage = "Friendly Error Message from data";
         open("/auratest/errorHandlingApp.app?useFriendlyErrorMessageFromData=true&handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .auraFriendlyErrorFromClientControllerButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Friendly Error Message from data");
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertErrorMaskIsNotVisible();
     }
 
     public void testCustomHandleFailedAuraAssertFromClientController() throws Exception{
+        String expectedContainedMessage = "Assert failed in app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Assert failed in app client controller");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -126,9 +138,12 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * an App's client side controller.
      */
     public void testDefaultHandleErrorThrownFromClientController() throws Exception {
+        String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
-        assertDisplayedErrorMessage("Error from app client controller");
+
+        assertDisplayedErrorMessage(expectedContainedMessage);
     }
 
     /*
@@ -136,9 +151,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * an App's client side controller.
      */
     public void testCustomHandleErrorThrownFromClientController() throws Exception {
+        String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from app client controller");
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -158,10 +178,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * a component's client side controller.
      */
     public void testCustomHandleErrorThrownFromContainedCmpClientController() throws Exception {
-        String expected = "Error from component client controller";
-        open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+        String expectedContainedMessage = "Error from component client controller";
+        open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput(expected);
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -170,10 +195,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * a component's client side controller.
      */
     public void testComponetCustomHandleErrorThrownFromClientController() throws Exception {
-        String expected = "Error from component client controller";
+        String expectedContainedMessage = "Error from component client controller";
         open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromCmpTable .errorFromClientControllerButton")).click();
-        assertDisplayedErrorMessageInComponentErrorOutput(expected);
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -182,10 +212,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * its containing app's client side controller.
      */
     public void testComponentCustomHandleErrorThrownFromContainingAppClientController() throws Exception {
-        String expected = "Error from app client controller";
+        String expectedContainedMessage = "Error from app client controller";
         open("/auratest/errorHandlingApp.app?handleSystemErrorInContainedCmp=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
-        assertDisplayedErrorMessageInComponentErrorOutput(expected);
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnCmp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='cmpErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -204,9 +239,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * a server action's callback.
      */
     public void testCustomHandleErrorThrownFromServerActionCallback() throws Exception {
+        String expectedContainedMessage = "Error from server action callback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromServerActionCallbackButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from server action callback in app");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -225,9 +266,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * creatComponent's callback.
      */
     public void testCustomtHandleErrorThrownFromCreateComponentCallback() throws Exception {
+        String expectedContainedMessage = "Error from createComponent callback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromCreateComponentCallbackButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from createComponent callback in app");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -246,9 +293,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * a function which is wrapped in $A.getCallback().
      */
     public void testCustomHandleErrorThrownFromFunctionWrappedInGetCallback() throws Exception {
+        String expectedContainedMessage = "Error from function wrapped in getCallback in app";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromFunctionWrappedInGetCallbackButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from function wrapped in getCallback in app");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -267,9 +320,15 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * a function that is imported from library.
      */
     public void testCustomHandleErrorFromLibraryCode() throws Exception {
+        String expectedContainedMessage = "Error from library Code";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromCmpTable .errorFromLibraryCodeButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from library Code");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
         assertErrorMaskIsNotVisible();
     }
 
@@ -326,9 +385,16 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * TODO(W-2790091)
      */
     public void _testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
+        String expectedContainedMessage = "Error from app rerender";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from app rerender");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertErrorMaskIsNotVisible();
     }
 
     /*
@@ -344,9 +410,16 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      * Verify custom error handler can handle systemError event when an error is thrown from render().
      */
     public void testCustomHandleErrorThrownFromUnrender() throws Exception {
+        String expectedContainedMessage = "Error from component unrender";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
+
         findDomElement(By.cssSelector(".errorFromCmpTable .errorFromUnrenderButton")).click();
-        assertDisplayedErrorMessageInAppErrorOutput("Error from component unrender");
+        // wait for custom handler on App handled the event.
+        waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
+
+        String actualMessage = getText(By.cssSelector("div[id='appErrorOutput']"));
+        assertThat("Did not find expected error in error message element.", actualMessage, containsString(expectedContainedMessage));
+        assertErrorMaskIsNotVisible();
     }
 
     /*
@@ -403,18 +476,5 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         String actualMessage = findErrorMessage();
         assertTrue("Stacktrace should not be present on displayed error.", actualMessage.length() < 150);
     }
-
-    private void assertDisplayedErrorMessageInAppErrorOutput(String message) {
-        By appErrorOutputLocator = By.cssSelector("div[id='appErrorOutput']");
-        String actualMessage = findErrorMessage(appErrorOutputLocator, appErrorOutputLocator);
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(message));
-    }
-
-    private void assertDisplayedErrorMessageInComponentErrorOutput(String message) {
-        By cmpErrorOutputLocator = By.cssSelector("div[id='cmpErrorOutput']");
-        String actualMessage = findErrorMessage(cmpErrorOutputLocator, cmpErrorOutputLocator);
-        assertThat("Did not find expected error in error message element.", actualMessage, containsString(message));
-    }
-
 
 }

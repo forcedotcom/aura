@@ -15,16 +15,11 @@
  */
 ({
     render : function(cmp, helper){
-    	var enabled = helper.isEnabled(cmp);
-		cmp.set("v.enabled", enabled);
-
-		if (enabled) {
-    		var storage = helper.getStorage(cmp);
-			cmp.set("v.implementation", storage.getName());
-
-	    	helper.update(cmp);
-		}
-
-    	return this.superRender();
+        var enabled = helper.isEnabled(cmp);
+        cmp.set("v.enabled", enabled);
+        if (enabled) {
+            helper.update(cmp);
+        }
+        return this.superRender();
     }
 })// eslint-disable-line semi

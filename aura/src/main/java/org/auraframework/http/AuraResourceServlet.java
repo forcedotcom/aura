@@ -19,21 +19,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.auraframework.Aura;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.http.resource.AppCss;
-import org.auraframework.http.resource.AppJs;
-import org.auraframework.http.resource.ClientLibraryCss;
-import org.auraframework.http.resource.ClientLibraryJs;
-import org.auraframework.http.resource.EncryptionKey;
-import org.auraframework.http.resource.Manifest;
-import org.auraframework.http.resource.ResourceSvg;
+import org.auraframework.http.resource.*;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraResource;
 
@@ -113,7 +105,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         AuraResource resource = findResource((String)request.getAttribute(ORIG_REQUEST_URI), context);
         ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         if (resource == null) {
-            servletUtil.send404(request, response);
+            servletUtil.send404(getServletConfig(), request, response);
             return;
         }
         if (servletUtil.resourceServletGetPre(request, response, resource)) {

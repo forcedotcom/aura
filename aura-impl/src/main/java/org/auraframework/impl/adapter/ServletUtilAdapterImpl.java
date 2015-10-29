@@ -17,38 +17,29 @@ package org.auraframework.impl.adapter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import aQute.bnd.annotation.component.Component;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.auraframework.Aura;
-import org.auraframework.adapter.ConfigAdapter;
-import org.auraframework.adapter.ContentSecurityPolicy;
-import org.auraframework.adapter.ExceptionAdapter;
-import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.adapter.*;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.CSP;
 import org.auraframework.instance.InstanceStack;
 import org.auraframework.service.DefinitionService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.AuraResource;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.ClientOutOfSyncException;
-import org.auraframework.throwable.NoAccessException;
+import org.auraframework.throwable.*;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -56,8 +47,6 @@ import org.auraframework.util.json.JsonEncoder;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
@@ -155,7 +144,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 // Is this correct?!?!?!
                 //
                 if (format != Format.JSON) {
-                    send404(request, response);
                     if (!isProductionMode(context.getMode())) {
                         // Preserve new lines and tabs in the stacktrace since this is directly being written on to the
                         // page
@@ -176,7 +164,6 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
 
                         if (dnfe.getDescriptor() != null
                                 && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
-                            send404(request, response);
                             return;
                         }
                     }
@@ -267,7 +254,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public void send404(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void send404(ServletConfig config, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         response.getWriter().println("404 Not Found"
                 + "<!-- Extra text so IE will display our custom 404 page -->"
@@ -485,12 +472,12 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public boolean actionServletGetPre(HttpServletRequest request, HttpServletResponse response) {
+    public boolean actionServletGetPre(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return false;
     }
 
     @Override
-    public boolean actionServletPostPre(HttpServletRequest request, HttpServletResponse response) {
+    public boolean actionServletPostPre(HttpServletRequest request, HttpServletResponse response) throws IOException {
         return false;
     }
 

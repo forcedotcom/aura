@@ -169,7 +169,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     @Deprecated
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Aura.getServletUtilAdapter().send404(request, response);
+        Aura.getServletUtilAdapter().send404(getServletConfig(), request, response);
     }
 
     @Deprecated

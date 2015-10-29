@@ -15,13 +15,9 @@
  */
 package org.auraframework.http;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringReader;
+import java.io.*;
 import java.net.URI;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,29 +26,19 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpHeaders;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ServletUtilAdapter;
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.BaseComponentDef;
-import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.EnumParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.instance.Action;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.LoggingService;
-import org.auraframework.service.SerializationService;
-import org.auraframework.service.ServerService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.service.*;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.Message;
-import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.throwable.ClientOutOfSyncException;
-import org.auraframework.throwable.NoAccessException;
-import org.auraframework.throwable.SystemErrorException;
+import org.auraframework.throwable.*;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonStreamReader.JsonParseException;
+
 import com.google.common.collect.Maps;
 
 /**
@@ -207,7 +193,7 @@ public class AuraServlet extends AuraBaseServlet {
             // at this point we simply broke.
             //
             Aura.getExceptionAdapter().handleException(re);
-            servletUtil.send404(request, response);
+            servletUtil.send404(getServletConfig() ,request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -234,7 +220,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             Mode mode = context.getMode();
             if (!isValidDefType(defType, mode)) {
-                servletUtil.send404(request, response);
+                servletUtil.send404(getServletConfig(), request, response);
                 return;
             }
 
@@ -479,10 +465,6 @@ public class AuraServlet extends AuraBaseServlet {
         } catch (Exception e) {
             servletUtil.handleServletException(e, false, context, request, response, written);
         }
-    }
-
-    protected void sendPost404(HttpServletRequest request, HttpServletResponse response) {
-        throw new NoAccessException("Missing required perms, or tried to access inaccessible namespace.");
     }
 
     /**

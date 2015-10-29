@@ -45,33 +45,11 @@ public class InitRenderer implements Renderer {
         }
 
         appendable.append("<script>\n");
-
         String script = String.format(
                 "$A.storageService.initStorage('%s', %s, %s, %d, %d, %d, %s, %s, '%s');\n",
                 name, persistent, secure, maxSize.longValue() * 1024, defaultExpiration.longValue(), defaultAutoRefreshInterval.longValue(),
                 debugLoggingEnabled, clearStorageOnInit, version);
-
-        Boolean onlyUseStorageIfRequested = (Boolean) attributes.getValue("requireUseStorageQueryParam");
-        if (onlyUseStorageIfRequested != null && onlyUseStorageIfRequested) {
-            script = wrapInTestForRequireUseStorageQueryParam(script);
-        }
-
         appendable.append(script);
-
         appendable.append("</script>\n");
     }
-
-    private static String wrapInTestForRequireUseStorageQueryParam(String script) {
-        // Temporary query param support to allow one extra level of switch so I
-        // can turn on storage w/out enabling it for the world right now
-        StringBuilder out = new StringBuilder();
-
-        out.append("var useStorage = window.location.href.toLowerCase().indexOf(\"aura.usestorage=true\") > 0;\n");
-        out.append("if (useStorage) {\n");
-        out.append(script);
-        out.append("}\n");
-
-        return out.toString();
-    }
-
 }

@@ -25,7 +25,6 @@
     <aura:attribute name="maxSize"                      type="Integer" default="1000"  access="GLOBAL" description="Maximum size (KB) of the storage instance. Existing items will be evicted to make room for new items; algorithm is adapter-specific."/>
     <aura:attribute name="debugLoggingEnabled"          type="Boolean" default="false" access="GLOBAL" description="Set to true to enable debug logging with $A.log()."/>
     <aura:attribute name="version"                      type="String"  default=""      access="GLOBAL" description="Version to associate with all stored items."/>
-    <aura:attribute name="requireUseStorageQueryParam"  type="Boolean" default="false"                 description="Set to true to require URL query paramter aura.useStorage=true to use the storage service."/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler event="aura:connectionLost" action="{!c.connectionLost}"/>

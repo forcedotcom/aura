@@ -13,4 +13,4 @@ script:
 #- mvn clean install -DproxySet=true -DproxyHost=public-proxy1-0-crd.data.sfdc.net -DproxyPort=8080 --settings ./.travis/settings.xml
 
 # 2a - Runs Aura integration tests on master branch.
-- mvn post-integration-test -Pubuntu12 -Pdesktop -DskipJsDoc -DskipUnitTests -DrunIntTests -DtestThreadCount=2 -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.reusebrowser=true -Dwebdriver.timeout.getdriver=90 -Dwebdriver.timeout.getdriver=30
+- mvn post-integration-test -Pubuntu12 -Pdesktop -DskipJsDoc -DskipUnitTests -DrunIntTests -DtestThreadCount=2 -Dwebdriver.browser.type=GOOGLECHROME -Dwebdriver.reusebrowser=true -Dwebdriver.timeout.getdriver=90 -Dwebdriver.timeout.getdriver=30 -Dhttp.proxyHost=public-proxy1-0-crd.data.sfdc.net -Dhttp.proxyPort=8080 -Dhttp.nonProxyHosts="*.salesforce.com|10.*" -Dmaven.wagon.http.ssl.insecure=true --settings ./.travis/settings.xml

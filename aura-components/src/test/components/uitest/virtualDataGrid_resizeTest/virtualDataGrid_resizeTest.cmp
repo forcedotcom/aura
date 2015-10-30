@@ -45,8 +45,36 @@
 	</div>
 	
 	<div>
-		<ui:outputText value="{!'Column: ' + v.prevResize.src.label}"/> <br/>
-		<ui:outputText value="{!'Index: ' + v.prevResize.src.index}"/> <br />
-		<ui:outputText value="{!'Width: ' + v.prevResize.width}"/> 
+		Column: <ui:outputText aura:id="srcColumn" value="{!v.prevResize.src.label}"/> <br/>
+		Index: <ui:outputText aura:id="srcIndex" value="{!v.prevResize.src.index}"/> <br />
+		Width: <ui:outputText aura:id="srcWidth" value="{!v.prevResize.width}"/> 
+	</div>
+	
+	<ui:button aura:id="showGrid2Btn" label="Show Grid #2" press="{!c.showGrid2}"/>
+	<ui:button aura:id="addColBtn" label="Add Column" press="{!c.addCol}"/>
+	<ui:button aura:id="removeColBtn" label="Remove Column" press="{!c.removeCol}"/>
+	<ui:button aura:id="switchColBtn" label="Switch Column" press="{!c.switchCol}"/>
+	
+	<div aura:id="container2" class="container2">
+		<ui:virtualDataGrid aura:id="grid2" class="testGrid"
+			enableResizableColumns="true"
+			onColumnResize="{!c.onResize}">
+			
+			<aura:set attribute="headerColumns">
+				<ui:dataGridColumn name="id"		label="Id" sortable="true"/>
+				<ui:dataGridColumn name="name"	label="Name"/>
+				<ui:dataGridColumn name="grade" label="Grade"/>
+			</aura:set>
+			
+			<aura:set attribute="columns">
+				<ui:outputText value="{!item.id}"/>
+				<ui:outputText value="{!item.name}"/>
+				<ui:outputText value="{!item.grade}"/>
+			</aura:set>
+			
+			<aura:set attribute="dataModel">
+				<uitest:virtualDataGrid_dataProvider />
+			</aura:set>
+		</ui:virtualDataGrid>
 	</div>
 </aura:component>

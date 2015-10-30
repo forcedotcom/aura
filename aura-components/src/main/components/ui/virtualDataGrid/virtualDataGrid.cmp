@@ -29,7 +29,7 @@
     <aura:method name="resizeColumns" description="Resizes columns if the plugin is enabled.">
     	<aura:attribute name="widths" type="Integer[]"/>
     </aura:method>
-    
+
     <aura:registerEvent name="gridAction" type="ui:gridAction" description="Notifies listeners when actions were triggered by grid cells"/>
     
     <aura:method name="sort">

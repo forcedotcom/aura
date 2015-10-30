@@ -26,7 +26,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
     		maxWidth : 1000,
     		step : 10,
     		
-    		indicatorClassses : '',
+    		indicatorClasses : '',
     		contentSpanClasses : 'content',
     		headerSpanClasses : 'header-wrapper',
     		
@@ -154,6 +154,9 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    		this._attachHandle(column, handle);
 	    		
 	    		var initialWidth = initialWidths[i] || column.clientWidth;
+	    		if (initialWidth < this.config.minWidth) {
+	    			initialWidth = this.config.minWidth;
+	    		}
 	    		
 	    		this._resize(column, initialWidth);
 	    		this._updateRange(this._findRangeElement(column), column.clientWidth);
@@ -267,7 +270,21 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_slideIndicator : function(x) {
-	    	this.indicator.style[this.transformStyle] = 'translate3d(' + x + 'px, 0, 0)';
+			var pos = this._getTranslatedPosition(this.indicator);
+	    	this.indicator.style[this.transformStyle] = 'translate3d(' + x + 'px,' + pos.y + 'px,' + pos.z + 'px)';
+	    	this._setTranslatedPosition(this.indicator, 'x', x);
+		},
+		
+		_getTranslatedPosition: function (element) {
+			return {
+				x : element._x || 0,
+				y : element._y || 0,
+				z : element._z || 0
+			};
+		},
+		
+		_setTranslatedPosition: function(element, coord, value) {
+			element['_' + coord] = value;
 		},
 		
 		/**
@@ -280,6 +297,10 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @param rangeElement {HTMLElement} OPTIONAL input element of type range that holds the width value
 		 */
 		resizeColumn : function(column, targetWidth, rangeElement) {
+			if (targetWidth < this.config.minWidth) {
+				targetWidth = this.config.minWidth;
+			}
+			
 	    	var diff = targetWidth - column.clientWidth;
 	    	
 	    	// Resize the column
@@ -392,7 +413,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @param e {event} Event fired by the browser
 		 */
 		_onStart : function(e) {
-			var th = this._findParentTH(e.srcElement);
+			var th = this._findParentTH(e.target);
 			
 			// Save what's being resized so we can reference it later
 	    	this.current = {
@@ -450,7 +471,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @param e {event} Event fired by the browser
 		 */
 		_onKeydown : function(e) {
-			var range = e.srcElement;
+			var range = e.target;
 			var column;
 			switch(e.keyCode) {
 			// Left Arrow key
@@ -567,8 +588,10 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * Manually resizes the specified column
 		 */
 		resize : function(index, width) {
-			var column = this.columns[index];
-			this.resizeColumn(column, width, this._findRangeElement(column));
+			if (width > 0) {
+				var column = this.columns[index];
+				this.resizeColumn(column, width, this._findRangeElement(column));
+			}
 		},
 		
 		/**

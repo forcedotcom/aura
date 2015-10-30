@@ -22,14 +22,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import aQute.bnd.annotation.component.Component;
-
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.builder.CacheBuilder;
 import org.auraframework.cache.Cache;
 import org.auraframework.def.*;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.cache.CacheImpl;
 import org.auraframework.service.CachingService;
 import org.auraframework.service.DefinitionService;
@@ -38,7 +36,7 @@ import org.auraframework.system.SourceListener;
 
 import com.google.common.base.Optional;
 
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class CachingServiceImpl implements CachingService {
 
     private static final long serialVersionUID = -3311707270226573084L;

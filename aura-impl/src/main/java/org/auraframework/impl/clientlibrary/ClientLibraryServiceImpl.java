@@ -18,15 +18,12 @@ package org.auraframework.impl.clientlibrary;
 import java.io.IOException;
 import java.util.*;
 
-import aQute.bnd.annotation.component.Component;
-
 import org.apache.commons.lang3.StringUtils;
 import org.auraframework.Aura;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.cache.Cache;
 import org.auraframework.clientlibrary.*;
 import org.auraframework.def.*;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -39,7 +36,6 @@ import com.google.common.collect.Sets;
 /**
  * Service for including external client libraries (CSS or JS)
  */
-@Component (provide=AuraServiceProvider.class)
 @ServiceComponent
 public class ClientLibraryServiceImpl implements ClientLibraryService {
 

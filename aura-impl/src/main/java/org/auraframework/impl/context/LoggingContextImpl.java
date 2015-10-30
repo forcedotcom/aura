@@ -18,6 +18,7 @@ package org.auraframework.impl.context;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.service.LoggingService;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.util.json.Json;
@@ -28,7 +29,7 @@ import com.google.common.collect.Maps;
 /**
  * LoggingContext impl.
  */
-
+@ServiceComponent
 public class LoggingContextImpl implements LoggingContext {
 
     protected static final Logger logger = Logger.getLogger("LoggingContextImpl");

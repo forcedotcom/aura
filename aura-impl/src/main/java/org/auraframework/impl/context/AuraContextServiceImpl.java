@@ -15,43 +15,32 @@
  */
 package org.auraframework.impl.context;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.GlobalValueProviderAdapter;
-import org.auraframework.adapter.PrefixDefaultsAdapter;
-import org.auraframework.adapter.RegistryAdapter;
+import org.auraframework.adapter.*;
+import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.impl.util.json.AuraJsonContext;
 import org.auraframework.instance.GlobalValueProvider;
 import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext;
+import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.DefRegistry;
-import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.NoContextException;
 import org.auraframework.util.ServiceLocator;
 
-import aQute.bnd.annotation.component.Component;
 import com.google.common.collect.ImmutableMap;
 
 
 /**
  */
-@Component (provide=AuraServiceProvider.class)
+@ServiceComponent
 public class AuraContextServiceImpl implements ContextService {
 
     private static final long serialVersionUID = 2204785781318401371L;

@@ -61,14 +61,28 @@ public class Stub<T> {
 	 * subsequent call.
 	 * 
 	 * @return the Answer for the current method invocation
+	 * @throws Throwable 
 	 */
-    public Answer<T> getNextAnswer() {
+    public Answer<T> getNextAnswer() throws Throwable {
         if (answerIndex <= answers.size() - 1) {
         	Answer<T> ret = answers.get(answerIndex);
             answerIndex++;
             return ret;
         } else {
-        	throw new AuraRuntimeException("You have "+answers.size()+" answers for mocking, but they are all exhausted");
+        	Answer<T> lastAnswer = answers.get(answers.size() - 1);
+        	Object value = lastAnswer.answer();
+        	String extraMessage = "";
+        	if(value instanceof MockModel) {
+        		value = (MockModel)value;
+        		extraMessage = ((MockModel) value).getDescriptor().getQualifiedName();
+        	} else if (value instanceof MockAction){
+        		value = (MockAction)value;
+        		extraMessage = ((MockAction) value).getDescriptor().getQualifiedName();
+        	} else {
+        		extraMessage = "**New mock type other than Action or Model, please update the type here**";
+        	}
+        	throw new AuraRuntimeException("You have "+answers.size()+" answers for mocking "+extraMessage
+        			+", but they are all exhausted");
         }
     }
 }

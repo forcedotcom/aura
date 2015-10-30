@@ -76,6 +76,27 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private static final Logger logger = Logger.getLogger(MasterDefRegistryImpl.class);
 
     private static final ImmutableSortedSet<String> cacheDependencyExceptions = ImmutableSortedSet.of(
+            //
+            // FIXME: these following 16 lines (applauncher) should be removed ASAP. They are here because
+            // we do not detect file backed apex, and we probably don't really want to.
+            //
+            "apex://applauncher.accountsettingscontroller",
+            "apex://applauncher.applauncherapexcontroller",
+            "apex://applauncher.applauncherdesktopcontroller",
+            "apex://applauncher.applauncherheadercontroller",
+            "apex://applauncher.applaunchersetupdesktopcontroller",
+            "apex://applauncher.applaunchersetupreorderercontroller",
+            "apex://applauncher.applaunchersetuptilecontroller",
+            "apex://applauncher.appmenu",
+            "apex://applauncher.changepasswordcontroller",
+            "apex://applauncher.communitylogocontroller",
+            "apex://applauncher.employeeloginlinkcontroller",
+            "apex://applauncher.forgotpasswordcontroller",
+            "apex://applauncher.identityheadercontroller",
+            "apex://applauncher.loginformcontroller",
+            "apex://applauncher.selfregistercontroller",
+            "apex://applauncher.sociallogincontroller",
+
             "apex://array",
             "apex://aura.component",
             "apex://blob",
@@ -96,6 +117,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             "apex://sobject",
             "apex://time"
             );
+
     private final static int ACCESS_CHECK_CACHE_SIZE = 4096;
 
     private final Lock rLock;

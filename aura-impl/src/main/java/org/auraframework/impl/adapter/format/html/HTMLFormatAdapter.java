@@ -38,10 +38,16 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
         return name;
     }
 
-    protected void writeHtmlStyles(List<String> styles, Appendable out) throws IOException {
-        if (styles != null) {
-            for (String style : styles) {
-                out.append(String.format(HTML_STYLE, style));
+    protected void writeHtmlStyle(String url, Appendable out) throws IOException {
+        if (url != null) {
+            out.append(String.format(HTML_STYLE, url));
+        }
+    }
+
+    protected void writeHtmlStyles(List<String> urls, Appendable out) throws IOException {
+        if (urls != null) {
+            for (String url : urls) {
+                writeHtmlStyle(url,out);
             }
         }
     }

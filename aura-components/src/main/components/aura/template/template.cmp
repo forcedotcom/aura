@@ -28,7 +28,8 @@
     <aura:attribute name="auraScriptTags"           type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other framework script"/>
     <aura:attribute name="auraBaseScriptTags"       type="String" />
     <aura:attribute name="auraNamespacesScriptTags" type="String" />
-    <aura:attribute name="auraResetCss"             type="String" />
+    <aura:attribute name="auraResetStyle"           type="String" default="reset" description="Which style of css reset file to use to smooth out default browser chrome inconsistencies. Possible values are 'normalize', 'reset', or '' (none). Default is 'normalize'."/>
+    <aura:attribute name="auraResetTags"            type="String" access="PRIVATE" description="Will contain the style import tag for the type of reset style chosen, or nothing."/>
     <aura:attribute name="auraInlineStyle"          type="String"           description="Loads Aura inline style from template.css."/>
     <aura:attribute name="auraInit"                 type="String"           description="Initializes Aura ayncronously."/>
     <aura:attribute name="auraInitSync"             type="String"           description="Denotes synchronous initialization of Aura. Returns the same value as auraInit."/>
@@ -48,7 +49,6 @@
     <aura:attribute name="extraScriptTags"          type="Aura.Component[]"                                               description="Additional &lt;script&gt; elements."/>
     <aura:attribute name="extraMetaTags"            type="Aura.Component[]"                                               description="Additional &lt;meta&gt; tags"/>
 
-    <aura:attribute name="normalizeCss"             type="Boolean" default="false" description="Use normalize or resetCSS"/>
     <aura:attribute name="forceError"               type="Boolean" default="false" description="Set this to true to force the display of an error that would be hidden because of nesting."/>
     <aura:attribute name="manifest"                 type="String"                  description="Specifies the location of the document's cache manifest. Works with HTML5 only."/>
     <aura:attribute name="lastMod"                  type="String"                  description="The last modified date."/>
@@ -72,7 +72,7 @@
             {!v.extraMetaTags}
 
             <!-- ====== Styles ====== -->
-            {!v.auraResetCss}
+            {!v.auraResetTags}
             <style>
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}

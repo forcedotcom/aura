@@ -664,6 +664,21 @@
     	}]
     },
     
+    testPanelWithWrongDirection: {
+    	attributes : {"testPanelType" : "panel", 
+    		"testReferenceElementSelector" : ".appInput",
+    		"testDirection" : "brokenDirection"},
+    	test: function(cmp) {
+    		try {
+    			this.createPanel(cmp);
+    			$A.test.fail("Expected Invalid direction error");
+    		} catch (e) {
+    			var expectedErrorMsg = "Invalid direction";
+            	$A.test.assertTrue($A.test.contains(e.message, expectedErrorMsg), "Expected Invalid direction error");
+            }
+    	}
+    },
+    
     testPanelEastPositionWithoutPointer: {
     	attributes : {"testPanelType" : "panel", 
     		"testReferenceElementSelector" : ".createPanelBtnClass",

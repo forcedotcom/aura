@@ -547,7 +547,7 @@ TestInstance.prototype.print = function(value) {
 
 /**
  * Internally used error function to log an error for a given test.
- * 
+ *
  * @param level
  *            ERROR
  * @param msg
@@ -579,7 +579,7 @@ TestInstance.prototype.expectAuraError = function(e) {
 
 /**
  * Internally used warning function to log a warning for a given test.
- * 
+ *
  * @param level
  *            WARNING
  * @param msg
@@ -921,9 +921,6 @@ TestInstance.prototype.assertAuraType = function(type, condition, assertMessage)
         case "ComponentDef": return condition instanceof ComponentDef;
 
         case "ControllerDef": return condition instanceof ControllerDef;
-        case "HelperDef": return condition instanceof HelperDef;
-        case "RendererDef": return condition instanceof RendererDef;
-        case "ProviderDef": return condition instanceof ProviderDef;
 
         case "ModelDef": return condition instanceof ModelDef;
 
@@ -1715,11 +1712,11 @@ TestInstance.prototype.sendOverride = function(config, auraXHR, actions, method,
 };
 
 /**
- * Override decode. 
+ * Override decode.
  * The callback before Decode take response in, you can make a copy of it, made some modification, then return your response.
- * The callback after Decode take the result of decode (see AuraClientService.decode for what's inside), at this point, we 
+ * The callback after Decode take the result of decode (see AuraClientService.decode for what's inside), at this point, we
  * don't modify response.
- * 
+ *
  * @private
  * @function Test#decodeOverride
  */
@@ -1755,7 +1752,7 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     for (i = 0; i < post_callbacks.length; i++) {
     	post_callbacks[i].postDecodeCallback(res);
     }
-    
+
     return res;
 };
 
@@ -2017,7 +2014,7 @@ TestInstance.prototype.run = function(name, code, timeoutOverride, quickFixExcep
 TestInstance.prototype.waitForRoot = function(callback) {
     var that = this;
     if ($A.getRoot()) {
-        setTimeout(callback, 1); // give browser a moment to settle down 
+        setTimeout(callback, 1); // give browser a moment to settle down
         return;
     }
     setTimeout(that.waitForRoot.bind(that, callback), 50);
@@ -2247,7 +2244,7 @@ $A.logger.subscribe("ERROR", $A["test"].auraError.bind($A["test"]));
 
 /**
  * Register a global error handler to catch uncaught javascript errors.
- * 
+ *
  * @ignore
  */
 window.onerror = (function() {

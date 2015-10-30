@@ -65,7 +65,7 @@
 	cmpStats : function(cmp, event, helper) {
 		var output = "";
 		var views = ["component", "componentDef", "controllerDef",
-					 "modelDef", "providerDef", "rendererDef", "helperDef"];
+					 "modelDef"];
 		var statsViews = ["actionReferenceValue", "arrayValue",
 					 "functionCallValue", "mapValue", "passthroughValue",
 					 "propertyReferenceValue", "value"];

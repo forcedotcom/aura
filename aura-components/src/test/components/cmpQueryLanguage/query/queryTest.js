@@ -89,7 +89,7 @@
     /**
      * Verify query on different view by specifying $A.getQueryStatement().from('<view name>')
      * The supported views are "component"(default view), "controllerDef",
-     * "modelDef", "providerDef", "rendererDef", "helperDef"
+     * "modelDef"
      */
     testQueryOnCustomViews:{
         test:function(cmp){
@@ -102,10 +102,7 @@
 
             // Verify all supported views
             var views = {"controllerDef" : "ControllerDef",
-                         "modelDef" : "ModelDef",
-                         "providerDef" : "ProviderDef",
-                         "rendererDef" : "RendererDef",
-                         "helperDef" : "HelperDef"
+                         "modelDef" : "ModelDef"
                          };
             for(var view in views){
                 result = $A.getQueryStatement().from(view).query();

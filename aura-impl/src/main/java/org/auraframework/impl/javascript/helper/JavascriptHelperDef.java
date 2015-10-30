@@ -62,10 +62,7 @@ public class JavascriptHelperDef extends DefinitionImpl<HelperDef> implements He
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
-        json.writeMapEntry("functions", functions);
-        json.writeMapEnd();
+    	json.writeMap(functions);
     }
 
     public static class Builder extends DefinitionImpl.BuilderImpl<HelperDef> {

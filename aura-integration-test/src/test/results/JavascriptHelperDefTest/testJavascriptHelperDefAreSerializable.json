@@ -1,16 +1,11 @@
 {
   "s":1,
   "v":{
-    "descriptor":"js://test.test_SimpleHelper",
-    "functions":{
-      "methodAOfSimpleHelper":
-function(arg1) {
+    "methodAOfSimpleHelper":function(arg1) {
         return "method A of simple helper";
     },
-      "methodBOfSimpleHelper":
-function(arg1, arg2) {
+    "methodBOfSimpleHelper":function(arg1, arg2) {
         return "method B of simple helper";
-    }
     }
   }
 }

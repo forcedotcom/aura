@@ -16,7 +16,7 @@
 ({
     /**
      * Verify the basic structure of Javascript Renderers.
-     * The render, rerender and unrender functions are objects on the RendererDef at the client side.
+     * The render, rerender and unrender functions are objects on the component class at the client side.
      * @hierarchy Aura.Components.Renderer
      * @priority medium
      * @userStory a07B0000000Ekdr
@@ -24,13 +24,13 @@
     testRendererDefProperties:{
         test:function(cmp){
             //Access the Renderer Def of test:testJSRenderer
-            var rendererDef = cmp.getDef().getRendererDef();
-            //Make sure what you actually accessed was a RendererDef
-            aura.test.assertAuraType("RendererDef", rendererDef, "Was expecting to find a rendererDef object.");
-            //Verify that the render object is initialized on the RendererDef
-            aura.test.assertNotNull(rendererDef.renderMethod, "Render object not found on the renderer def of this componentDef.");
-            //Verify that the rerender object is initialized on the RendererDef
-            aura.test.assertNotNull(rendererDef.rerenderMethod, "ReRender object not found on the renderer def of this componentDef.");
+            var renderer = cmp.getRenderer();
+            // Make sure what you actually accessed was an Object
+            aura.test.assertNotNull(renderer, "Was expecting to find an object.");
+            // Verify that the render object is initialized on the RendererDef
+            aura.test.assertNotNull(renderer.render, "Render method not found on the renderer of this component.");
+            // Verify that the rerender object is initialized on the RendererDef
+            aura.test.assertNotNull(renderer.rerender, "ReRender method not found on the renderer of this component.");
         }
     }
 })

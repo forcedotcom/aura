@@ -2042,12 +2042,12 @@ Aura.Utils.Util.prototype.isExpression = function (obj) {
  * Checks if the object is an Aura value object.
  *
  * @param {Object} obj The object to check for.
- * @returns {Boolean} True if the object type is an Aura value (PropertyReferenceValue, FunctionCallValue, PassthroughValue, or ActionReferenceValue).
+ * @returns {Boolean} True if the object type is an Aura value (PropertyReferenceValue, FunctionCallValue, PassthroughValue).
  * @export
  */
 Aura.Utils.Util.prototype.isValue = function(obj) {
     return obj instanceof PropertyReferenceValue || obj instanceof FunctionCallValue ||
-        obj instanceof PassthroughValue || obj instanceof ActionReferenceValue ;
+        obj instanceof PassthroughValue;
 };
 
 /**

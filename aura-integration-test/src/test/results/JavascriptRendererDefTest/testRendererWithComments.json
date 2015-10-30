@@ -1,17 +1,14 @@
 {
   "s":1,
   "v":{
-    "descriptor":"js://test.test_JSRenderer_WithComments",
-    "render":
-function(cmp) {
+    "render":function(cmp) {
         
 
         
 
         var str = 'do Nothing';
     },
-    "rerender":
-function(cmp) {
+    "rerender":function(cmp) {
         var str = 'Still do Nothing';
     }
   }

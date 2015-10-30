@@ -19,12 +19,8 @@
  */
 var valueFactory = {
     create: function create(valueConfig, def, component) {
-        if (aura.util.isObject(valueConfig)) {
-            if (!aura.util.isPlainObject(valueConfig)) {
-                if (valueConfig instanceof ActionDef) {
-                    return new ActionReferenceValue(valueConfig, def, component);
-                }
-            } else if (valueConfig["exprType"] === "PROPERTY") {
+        if (aura.util.isPlainObject(valueConfig)) {
+            if (valueConfig["exprType"] === "PROPERTY") {
                 return new PropertyReferenceValue(valueConfig["path"], component);
             } else if (valueConfig["exprType"] === "FUNCTION") {
                 return new FunctionCallValue(valueConfig, component);

@@ -120,8 +120,6 @@ public class JsFunction implements JsonSerializable, Serializable {
      */
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeBreak();
-
         json.writeLiteral(toString());
     }
 

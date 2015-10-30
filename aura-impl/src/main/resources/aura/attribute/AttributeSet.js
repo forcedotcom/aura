@@ -125,10 +125,6 @@ AttributeSet.prototype.get = function(key, component) {
 		value = value.evaluate();
 	}
 
-    if(value instanceof ActionReferenceValue) {
-        value = value.getAction();
-    }
-
     if(this.shadowValues.hasOwnProperty(key)) {
         value += this.getShadowValue(key);
     }
@@ -223,7 +219,7 @@ AttributeSet.prototype.set = function(key, value, component) {
 
     // We don't want to update the GVP from a component.
     // We do that from inside the GVP using $A.set()
-    // So clear the reference and change 
+    // So clear the reference and change
     if (target[key] instanceof PropertyReferenceValue && !target[key].isGlobal ) {
         target[key].set(value);
     } else if (!(target[key] instanceof FunctionCallValue)) {

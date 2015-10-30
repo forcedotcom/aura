@@ -16,9 +16,13 @@
 package org.auraframework.impl.compound.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.system.DefinitionImpl;
@@ -31,29 +35,61 @@ import org.auraframework.util.json.Json;
  */
 public class CompoundControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
     private static final long serialVersionUID = -902182692824281624L;
-    private final Map<String, ActionDef> actionDefs;
+    private final Map<String, ActionDef> actionMap;
 
     private CompoundControllerDef(Builder builder) {
         super(builder);
-        this.actionDefs = builder.actionDefs;
+        this.actionMap = builder.actionDefs;
     }
 
     @Override
     public ActionDef getSubDefinition(String name) {
-        return actionDefs.get(name);
+        return actionMap.get(name);
     }
 
     @Override
     public Map<String, ActionDef> getActionDefs() {
-        return actionDefs;
+        return actionMap;
     }
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", getDescriptor());
-        json.writeMapEntry("actionDefs", actionDefs.values());
-        json.writeMapEnd();
+
+    	// We check refSupport to find if we need to serialise
+        // either the server/Java/local actions or the
+    	// client/JavaScript/remote actions.
+
+    	if (json.getSerializationContext().refSupport()) {
+
+    		List<ActionDef> filteredList = new ArrayList<>();
+			for (ActionDef actionDef : actionMap.values()) {
+            	if (actionDef.getActionType() == ActionType.SERVER) {
+            		filteredList.add(actionDef);
+            	}
+            }
+            if (filteredList.isEmpty()) {
+                json.writeValue(null);
+            } else {
+	    		json.writeMapBegin();
+		        json.writeMapEntry("descriptor", getDescriptor());
+		        json.writeMapEntry("actionDefs", filteredList);
+		        json.writeMapEnd();
+            }
+
+    	} else {
+
+            Map<String, ActionDef> filteredMap = new HashMap<>();
+            for (ActionDef actionDef : actionMap.values()) {
+            	if (actionDef.getActionType() == ActionType.CLIENT) {
+            		filteredMap.put(actionDef.getName(), actionDef);
+            	}
+            }
+            if (filteredMap.isEmpty()) {
+                json.writeValue(null);
+            } else {
+        		json.writeMap(filteredMap);
+            }
+    	}
     }
 
     @Override

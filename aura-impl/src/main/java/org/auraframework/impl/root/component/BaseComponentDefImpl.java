@@ -31,6 +31,8 @@ import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
+import org.auraframework.def.ActionDef;
+import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
@@ -71,17 +73,11 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
-import org.auraframework.throwable.quickfix.InvalidExpressionException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.throwable.quickfix.*;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -621,7 +617,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
             dependencies.add(svgDefDescriptor);
         }
 
-        if (imports != null) {
+        if (imports != null && !imports.isEmpty()) {
             for (ImportDef imported : imports) {
                 dependencies.add(imported.getDescriptor());
             }
@@ -708,7 +704,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
      * @throws QuickFixException
      */
     @Override
-    public Collection<ImportDef> getImportDefs() throws QuickFixException {
+    public List<ImportDef> getImportDefs() throws QuickFixException {
         return imports;
     }
 
@@ -963,7 +959,17 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return this.clientComponentClass;
     }
 
-    /**	
+    public boolean hasServerAction(ControllerDef controllerDef) {
+    	Map<String, ? extends ActionDef> actionDefs = controllerDef.getActionDefs();
+        for (ActionDef actionDef : actionDefs.values()) {
+            if (actionDef.getActionType() == ActionType.SERVER) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
      */
@@ -1002,7 +1008,11 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("flavoredStyleDef", getFlavoredStyleDef());
                 }
 
-                json.writeMapEntry("controllerDef", getControllerDef());
+                ControllerDef controllerDef = getControllerDef();
+                if (controllerDef != null && hasServerAction(controllerDef)) {
+                    json.writeMapEntry("controllerDef", controllerDef);
+                }
+
                 json.writeMapEntry("modelDef", getModelDef());
                 json.writeMapEntry("superDef", getSuperDef());
                 if (preloading) {
@@ -1038,10 +1048,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 if (!handlers.isEmpty()) {
                     json.writeMapEntry("handlerDefs", handlers);
                 }
-                Collection<ImportDef> imports = getImportDefs();
-                if (!imports.isEmpty()) {
-                    json.writeMapEntry("imports", imports);
-                }
 
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
@@ -1055,11 +1061,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
                 if (isAbstract) {
                     json.writeMapEntry("isAbstract", isAbstract);
-                }
-
-                ProviderDef providerDef = getProviderDef();
-                if (providerDef != null && !providerDef.isLocal()) {
-                    json.writeMapEntry("providerDef", providerDef);
                 }
 
                 if (subDefs != null) {

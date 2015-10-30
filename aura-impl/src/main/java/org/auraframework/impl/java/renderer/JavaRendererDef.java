@@ -37,7 +37,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
     /**
      * Consumers of this class should use a builder to build the instance. If this were to be extended, the builder
      * should also be extended, and the build() method would need to be overridden.
-     * 
+     *
      * @param builder the builder that is building this class.
      */
     protected JavaRendererDef(Builder builder) {
@@ -47,7 +47,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
 
     /**
      * Validate our definition.
-     * 
+     *
      * Most of the validation actually occurs in the builder, but we do ensure that the renderer is not null. It would
      * be cleaner to throw all errors here, but we would need to store the error message in the constructor which is a
      * bit funky.
@@ -87,7 +87,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
 
     /**
      * A builder for JavaRendererDef.
-     * 
+     *
      * This builder extends the basic Definition builder by adding the class of the renderer.
      */
     public static class Builder extends DefinitionImpl.BuilderImpl<RendererDef> {
@@ -96,7 +96,7 @@ public class JavaRendererDef extends DefinitionImpl<RendererDef> implements Rend
 
         /**
          * A function to actually build the renderer class.
-         * 
+         *
          * This class is currently a bit over complicated, as it handles the old static case for render methods.
          */
         protected void buildRenderer() {

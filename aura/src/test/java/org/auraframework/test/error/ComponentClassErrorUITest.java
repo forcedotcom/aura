@@ -33,7 +33,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Test with dynamic created component */
     // create componentClassParent.cmp in controller dynamically, expect it to error out from render
     public void testDynamicCreatedCmpErrorOutFromRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.render";
+        String expectLocation = "auratest$componentClassParent.renderer.render";
         String expectContainedMessage = "blahFromParentRerender is not defined";
 
         String url = "/auratest/componentClassLifecycleTest.cmp?" +
@@ -50,7 +50,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Tests with parent component */
     // load componentClassParent.cmp, error out from its re-render
     public void testParentErrorOutFromReRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.rerender";
+        String expectLocation = "auratest$componentClassParent.renderer.rerender";
         String expectContainedMessage = "blahFromParentReRerender is not defined";
 
         String url = "/auratest/componentClassParent.cmp?errorOutFromReRender_Parent=true";
@@ -64,7 +64,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassParent.cmp, error out from its after-render
     public void testParentErrorOutFromAfterRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.afterRender";
+        String expectLocation = "auratest$componentClassParent.renderer.afterRender";
         String expectContainedMessage = "blahFromParentAfterRerender is not defined";
 
         String url = "/auratest/componentClassParent.cmp?errorOutFromAfterRender_Parent=true";
@@ -79,7 +79,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     /* Tests with grandChild component */
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's render
     public void testGrandChildClientErrorOutFromParentRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.render";
+        String expectLocation = "auratest$componentClassParent.renderer.render";
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Parent=true";
 
@@ -93,7 +93,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassChild.cmp's render
     public void testGrandChildClientErrorOutFromChildRender() throws Exception {
-        String expectLocation = "auratest$componentClassGrandChildClientProvider.render";
+        String expectLocation = "auratest$componentClassGrandChildClientProvider.renderer.render";
         String expectContainedMessage = "blahFromChildRerender is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromRender_Child=true";
 
@@ -107,7 +107,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     public void testGrandChildClientErrorOutFromParentHelper() throws Exception {
-        String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassParent.helper.getDelimiter";
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Parent=true";
 
@@ -121,7 +121,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
 
     // load componentClassGrandChildClientProvider.cmp, error out from componentClassParent.cmp's helper
     public void testGrandChildClientErrorOutFromChildHelper() throws Exception {
-        String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassChild.helper.getDelimiter";
         String expectContainedMessage = "blahFromChildHelper is not defined";
         String url = "/auratest/componentClassGrandChildClientProvider.cmp?errorOutFromHelper_Child=true";
 
@@ -137,7 +137,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     public void testClientProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
-        String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassChild.helper.getDelimiter";
         String expectContainedMessage = "blahFromChildHelper is not defined";
 
         String url = "/auratest/componentClassClientProvider.cmp?" +
@@ -155,7 +155,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     public void testClientProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
-        String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassParent.helper.getDelimiter";
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassClientProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
@@ -172,7 +172,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     public void testClientProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
-        String expectLocation = "auratest$componentClassChild.render";
+        String expectLocation = "auratest$componentClassChild.renderer.render";
         String expectContainedMessage = "blahFromChildRerender is not defined";
 
         String url = "/auratest/componentClassClientProvider.cmp?" +
@@ -190,7 +190,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's render
     public void testClientProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.render";
+        String expectLocation = "auratest$componentClassParent.renderer.render";
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassClientProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
@@ -208,7 +208,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's helper
     public void testServerProvidedGrandChildClientErrorOutFromChildHelper() throws Exception {
-        String expectLocation = "auratest$componentClassChild.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassChild.helper.getDelimiter";
         String expectContainedMessage = "blahFromChildHelper is not defined";
         String url ="/auratest/componentClassServerProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
@@ -225,7 +225,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassParent's helper
     public void testServerProvidedGrandChildClientErrorOutFromParentHelper() throws Exception {
-        String expectLocation = "auratest$componentClassParent.Helper.getDelimiter";
+        String expectLocation = "auratest$componentClassParent.helper.getDelimiter";
         String expectContainedMessage = "blahFromParentHelper is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
@@ -242,7 +242,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassClientProvider.cmp, error out from
     // componentClassChild's render
     public void testServerProvidedGrandChildClientErrorOutFromChildRender() throws Exception {
-        String expectLocation = "auratest$componentClassChild.render";
+        String expectLocation = "auratest$componentClassChild.renderer.render";
         String expectContainedMessage = "blahFromChildRerender is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +
@@ -259,7 +259,7 @@ public class ComponentClassErrorUITest extends AbstractErrorUITestCase {
     // load componentClassGrandChildServerProvider through componentClassServerProvider.cmp, error out from
     // componentClassParent's render
     public void testServerProvidedGrandChildClientErrorOutFromParentRender() throws Exception {
-        String expectLocation = "auratest$componentClassParent.render";
+        String expectLocation = "auratest$componentClassParent.renderer.render";
         String expectContainedMessage = "blahFromParentRerender is not defined";
         String url = "/auratest/componentClassServerProvider.cmp?" +
                 "requestDescriptor=auratest:componentClassGrandChildServerProvider&" +

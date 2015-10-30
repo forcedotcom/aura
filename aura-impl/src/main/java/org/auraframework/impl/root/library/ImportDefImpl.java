@@ -46,6 +46,11 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
     }
 
     @Override
+    public String getProperty() {
+        return property;
+    }
+
+    @Override
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         if (descriptor != null) {
             dependencies.add(descriptor);
@@ -71,10 +76,7 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("name", descriptor.getDescriptorName());
-        json.writeMapEntry("property", property);
-        json.writeMapEnd();
+        json.writeMapEntry(property, descriptor.getDescriptorName());
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {

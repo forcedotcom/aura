@@ -655,43 +655,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     }
 
     /**
-     * If a component extends the root component and doesn't implement it's own unrender function it should get a
-     * special default unrender function in it's component class.
-     */
-    public void testComponentClassUnrenderWhenExtendsRootComponent()
-            throws Exception {
-        String defaultUnrender = "if(elements){while(elements.length){$A.util.removeElement(elements.pop());}}this.disassociateElements();";
-
-        String js = getDefinitionsOutput(
-                "<aura:application></aura:application>", AuraContext.Mode.DEV);
-        int index = js.indexOf("aura$text.prototype.unrender");
-        String unrenderFunction = js.substring(index, index + 500).replaceAll(
-                "\\s+", "");
-
-        assertTrue(
-                "Default unrender function should be used when component extends the root component but was <"
-                        + unrenderFunction + ">",
-                        unrenderFunction.contains(defaultUnrender));
-    }
-
-    /**
-     * Verify when a component implements its own unrender function, that function overrides the default.
-     */
-    public void testComponentClassUnrenderDefaultOverriden() throws Exception {
-        String defaultUnrender = "if(elements){while(elements.length){$A.util.removeElement(elements.pop());}}this.disassociateElements();";
-
-        String js = getDefinitionsOutput(
-                "<aura:application></aura:application>", AuraContext.Mode.DEV);
-        int index = js.indexOf("aura$html.prototype.unrender");
-        String unrenderFunction = js.substring(index, index + 500).replaceAll(
-                "\\s+", "");
-
-        assertFalse(
-                "Default unrender function should be overriden if component defines its own unrender",
-                unrenderFunction.contains(defaultUnrender));
-    }
-
-    /**
      * When we write out the application javascript we should only include component classes once per component.
      */
     public void testNoComponentClassDuplicate() throws Exception {

@@ -62,10 +62,11 @@ AuraRenderingService.prototype.render = function(components, parent) {
             cmp = $A.componentService.createComponentPriv(cmp);
             // And put the constructed component back into the array.
             components[i] = cmp;
+
+            $A.assert($A.util.isComponent(cmp), "AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
         }
         // JBUCH: HALO: TODO: END REMOVE ME
 
-        $A.assert($A.util.isComponent(cmp), "AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
         if (cmp.isValid()) {
             $A.getContext().setCurrentAccess(cmp);
             var renderedElements = cmp["render"]();
@@ -563,7 +564,7 @@ AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
 AuraRenderingService.prototype.rerenderDirty = function(stackName) {
     if (this.needsCleaning) {
         var maxiterations = 1000;
-                  
+
         // #if {"modes" : ["PTEST","STATS"]}
         var allRerendered = [],
             startTime,

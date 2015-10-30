@@ -33,9 +33,7 @@ Aura.Flavors    = {};
 Aura.Value      = {};
 Aura.Model      = {};
 Aura.Component  = {};
-Aura.Renderer   = {};
 Aura.Provider   = {};
-Aura.Helper     = {};
 Aura.Library    = {};
 Aura.Event      = {};
 Aura.Layouts    = {};
@@ -91,7 +89,6 @@ window['$A'] = {};
 // -- Value -------------------------------------------------------------
 // #include aura.value.PropertyReferenceValue
 // #include aura.value.FunctionCallValue
-// #include aura.value.ActionReferenceValue
 // #include aura.value.PassthroughValue
 // #include aura.value.ValueFactory
 // #include aura.value.ExpressionFunctions
@@ -108,10 +105,8 @@ window['$A'] = {};
 // #include aura.component.ComponentDef
 
 // -- Renderer ----------------------------------------------------------
-// #include aura.renderer.RendererDef
 
 // -- Provider ----------------------------------------------------------
-// #include aura.provider.ProviderDef
 // #include aura.provider.GlobalValueProviders
 // #include aura.provider.LabelQueue
 // #include aura.provider.LabelValueProvider
@@ -119,7 +114,6 @@ window['$A'] = {};
 // #include aura.provider.ContextValueProvider
 
 // -- Helper -------------------------------------------------------------
-// #include aura.helper.HelperDef
 
 // -- Library ------------------------------------------------------------
 // #include aura.library.LibraryDefRegistry

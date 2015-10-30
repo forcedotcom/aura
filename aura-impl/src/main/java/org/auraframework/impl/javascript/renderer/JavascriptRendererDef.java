@@ -21,6 +21,7 @@ package org.auraframework.impl.javascript.renderer;
 import static org.auraframework.instance.AuraValueProviderType.LABEL;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -37,12 +38,12 @@ import com.google.common.collect.Sets;
 
 public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implements RendererDef {
     private static final long serialVersionUID = -6937625695562864219L;
+
     private final JsFunction render;
     private final JsFunction afterRender;
     private final JsFunction rerender;
     private final JsFunction unrender;
-    // Code is only used by aura-j. Would be nice if we could get rid of it.
-    private final String code;
+
     private final Set<PropertyReference> expressionRefs;
 
     protected JavascriptRendererDef(Builder builder) {
@@ -51,7 +52,6 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         this.afterRender = builder.afterRender;
         this.rerender = builder.rerender;
         this.unrender = builder.unrender;
-        this.code = builder.code;
         this.expressionRefs = builder.expressionRefs;
     }
 
@@ -60,18 +60,66 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         retrieveLabels();
     }
 
+	private boolean hasFunctions() {
+		return render != null || afterRender != null || rerender != null || unrender != null;
+	}
+
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapBegin();
-        json.writeMapEntry("descriptor", descriptor);
-        json.writeMapEntry("render", render);
-        json.writeMapEntry("afterRender", afterRender);
-        json.writeMapEntry("rerender", rerender);
-        json.writeMapEntry("unrender", unrender);
-        json.writeMapEntry("code", code);
-        json.writeMapEnd();
+        if (hasFunctions()) {
+            json.writeMapBegin();
+
+            serializeMethod(json, "render", render);
+            serializeMethod(json, "afterRender", afterRender);
+            serializeMethod(json, "rerender", rerender);
+            serializeMethod(json, "unrender", unrender);
+
+            json.writeMapEnd();
+        }
     }
 
+    /**
+     * Serialize a method, if it's defined, and alter it to
+     * re-scope local invocations of super methods. Those have
+     * moved to the component class itself and are not part of
+     * the renderer anymore.
+     * @return 
+     */
+    void serializeMethod(Json json, String methodName, JsFunction function)
+            throws IOException {
+        if (function != null) {
+            json.writeMapKey(methodName);
+            json.writeLiteral(changeSuper(methodName, function));
+        }
+    }
+
+    /**
+     * This method edits the call to the superMethod. Calling super methods on the 
+     * renderer was a questionable pattern because it forces us to create an instance  
+     * of the renderer at each level of the component inheritance just to hold a 
+     * reference on the component.
+     */
+    private JsFunction changeSuper(String methodName, JsFunction function) {
+
+    	// Get the name of the first argument, if not supplied, add a default one.
+    	List<String> arguments = function.getArguments();
+    	String cmp;
+    	if (arguments.size() > 0) {
+            cmp = arguments.get(0);
+        } else {
+        	cmp = "cmp";
+        	arguments.add(cmp);
+        }
+
+        // Re-scope the call to the super method .
+        String body = function.getBody();
+        String superMethodName = "super" + Character.toString(methodName.charAt(0)).toUpperCase() + methodName.substring(1);
+		body = body.replace("this." + superMethodName,  cmp + "." + superMethodName);
+		
+        // Now make sure we escape the right sequences.
+        return new JsFunction(arguments, body);
+    }
+    
     @Override
     public boolean isLocal() {
         return false;

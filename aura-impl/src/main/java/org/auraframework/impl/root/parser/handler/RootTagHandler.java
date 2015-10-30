@@ -99,8 +99,12 @@ public abstract class RootTagHandler<T extends RootDefinition> extends Container
     }
 
     protected Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> readRequiredVersionDefs(DefDescriptor<?> desc) {
-        Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
         Map<String, String> requiredVersions = Aura.getDefinitionParserAdapter().getRequiredVersions(desc);
+        return createRequiredVersionDefs(requiredVersions);
+    }
+    
+    public static Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> createRequiredVersionDefs(Map<String, String> requiredVersions) {
+    	Map<DefDescriptor<RequiredVersionDef>, RequiredVersionDef> requiredVersionDefs = null;
         if (requiredVersions != null) {
             requiredVersionDefs = Maps.newHashMap();
             for (Map.Entry<String, String> entry : requiredVersions.entrySet()) {

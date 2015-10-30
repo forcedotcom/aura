@@ -31,3 +31,11 @@ Aura.Errors.AuraFriendlyError = function AuraFriendlyError() {
 
 Aura.Errors.AuraFriendlyError.prototype = new Aura.Errors.AuraError();
 Aura.Errors.AuraFriendlyError.prototype.constructor = Aura.Errors.AuraFriendlyError;
+Aura.Errors.AuraFriendlyError.prototype.toString = function() {
+    var ret = Error.prototype.toString.apply(this);
+    if (this["data"]) {
+        ret = ret + "\n\t[custom data: " + JSON.stringify(this["data"]) + ']';
+    }
+
+    return ret;
+};

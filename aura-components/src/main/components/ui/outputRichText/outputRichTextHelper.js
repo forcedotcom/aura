@@ -96,7 +96,7 @@
     	var supportedTags = component.get("v.supportedTags");
     	
     	return supportedTags ? supportedTags.replace(/ /g,'').toLowerCase().split(",")
-    						 : this.SUPPORTED_HTML_TAGS;
+                : this.getDefaultSupportedTags(component);
     },
     
     /**
@@ -106,6 +106,14 @@
     	var supportedAttrs = component.get("v.supportedAttrs");
     	
     	return supportedAttrs ? supportedAttrs.replace(/ /g,'').toLowerCase().split(",")
-    						  : this.SUPPORTED_ATTRS;
+    						  : this.getDefaultSupportedAttributes(component);
+    },
+
+    getDefaultSupportedTags: function() {
+        return this.SUPPORTED_HTML_TAGS;
+    },
+
+    getDefaultSupportedAttributes: function() {
+        return this.SUPPORTED_ATTRS;
     }
 })// eslint-disable-line semi

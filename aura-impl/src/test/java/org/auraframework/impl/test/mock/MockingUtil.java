@@ -37,7 +37,6 @@ import org.auraframework.test.mock.MockModel;
 import org.auraframework.test.mock.MockModelDef;
 import org.auraframework.test.mock.MockProviderDef;
 import org.auraframework.test.source.StringSource;
-import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.mockito.Mockito;
 

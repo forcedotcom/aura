@@ -16,8 +16,6 @@
 package org.auraframework.impl.adapter.format.html;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.annotation.concurrent.ThreadSafe;

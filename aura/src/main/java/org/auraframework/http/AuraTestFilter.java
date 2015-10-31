@@ -23,10 +23,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,18 +56,14 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.SourceListener;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.SourceListener.SourceMonitorEvent;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
-import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -79,7 +72,6 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
@@ -87,7 +79,6 @@ import com.google.common.collect.Sets;
 public class AuraTestFilter implements Filter {
     private static final Log LOG = LogFactory.getLog(AuraTestFilter.class);
 
-    private static final long CACHE_CLEARING_TIMEOUT_SECS = 60;
     private static final String GET_URI = "/aura?aura.tag=%s:%s&aura.format=HTML&aura.deftype=%s&aura.mode=%s&aura.access=%s";
 
     private static final StringParam contextConfig = new StringParam(AuraServlet.AURA_PREFIX + "context", 0, false);

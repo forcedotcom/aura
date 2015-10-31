@@ -73,10 +73,8 @@ public class Stub<T> {
         	Object value = lastAnswer.answer();
         	String extraMessage = "";
         	if(value instanceof MockModel) {
-        		value = (MockModel)value;
         		extraMessage = ((MockModel) value).getDescriptor().getQualifiedName();
         	} else if (value instanceof MockAction){
-        		value = (MockAction)value;
         		extraMessage = ((MockAction) value).getDescriptor().getQualifiedName();
         	} else {
         		extraMessage = "**New mock type other than Action or Model, please update the type here**";

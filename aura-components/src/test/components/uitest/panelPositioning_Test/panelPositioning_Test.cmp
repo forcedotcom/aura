@@ -35,20 +35,21 @@
                     <ui:inputSelectOption text="southwest"/>
                     <ui:inputSelectOption text="brokendirection"/>
                 </ui:inputSelect>
-                <ui:inputCheckbox label="Use Advanced" value="false" aura:id="isAdvanced" />
+                <ui:inputCheckbox label="Use Advanced" value="true" aura:id="isAdvanced" />
                 <ui:inputCheckbox label="inside" value="false" aura:id="isInside" />
+                <ui:inputCheckbox label="Show Pointer" value="true" aura:id="showPointer" />
                 <ui:inputText aura:id="align" label="Align" value="left bottom" />
                 <ui:inputText aura:id="targetAlign" label="Target Align" value="left top"  />
-                <ui:inputNumber aura:id="pad" label="pad" value="15"  />
-                <ui:inputNumber aura:id="padTop" label="padTop" value=""  />
+                <ui:inputNumber aura:id="pad" label="pad" value="0"  />
+                <ui:inputNumber aura:id="padTop" label="vertPad" value=""  />
                 <ui:button label="GO!" press="{!c.handlePress}"/>
             </form>
         </div>
-        <div class="big-target" aura:id="bigTarget">
-            <div aura:id="handle" class="handle" onmousedown="{!c.handleMouseDown}"/>
+        <div class="big-target" aura:id="bigTarget" onmousedown="{!c.handleMouseDown}">
+            <!-- <div aura:id="handle" class="handle" onmousedown="{!c.handleMouseDown}"/> -->
         </div>
-        <div class="little-target" aura:id="littleTarget">
-            <a onclick="{!c.handleClick}" href="#">Little Target</a>
+        <div onmousedown="{!c.handleMouseDown}" class="little-target" aura:id="littleTarget">
+            little target
         </div>
     </div>
     <div class="manager">

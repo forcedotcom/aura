@@ -17,8 +17,10 @@
 package org.auraframework.impl;
 
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
 
+@ThreadHostileTest("Tests modify what namespaces are privileged or not")
 public class GetDefinitionAccessCheckUITest extends WebDriverTestCase {
     
     public GetDefinitionAccessCheckUITest(String name) {

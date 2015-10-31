@@ -66,7 +66,6 @@
 
             if (availableConsole) {
                 $A.test.assertTrue(debugOutput.indexOf("Error from test") !== -1, "Unexpected warning message logged");
-                $A.test.assertTrue(debugOutput.length > 105, "Stacktrace not present");
             }
         }
     },

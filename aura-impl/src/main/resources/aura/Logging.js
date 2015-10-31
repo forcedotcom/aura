@@ -24,18 +24,21 @@
      */
     function devDebugConsoleLog(level, message, error) {
         var stringVersion = null;
+        var showTrace = true;
+        var trace;
+        var logMsg = level + ": " + (!$A.util.isUndefinedOrNull(message) ? message : "");
+
         if (!$A.util.isUndefinedOrNull(message)) {
             stringVersion = level + ": " + message;
         }
+
         if (!$A.util.isUndefinedOrNull(error) && !$A.util.isUndefinedOrNull(error.message)) {
             stringVersion += " : " + error.message;
         }
 
-        var trace;
         if (error || level === "ERROR") {
             trace = $A.logger.getStackTrace(error);
         }
-        var logMsg = level + ": " + (!$A.util.isUndefinedOrNull(message) ? message : "");
 
         if (window["console"]) {
             var console = window["console"];
@@ -44,8 +47,9 @@
                 console[filter](message);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console[filter](error);
+                    showTrace = !(error.stack || error.stackTrace);
                 }
-                if (trace) {
+                if (showTrace && trace) {
                     for ( var j = 0; j < trace.length; j++) {
                         console[filter](trace[j]);
                     }
@@ -55,8 +59,9 @@
                 console["debug"](message);
                 if (!$A.util.isUndefinedOrNull(error)) {
                     console["debug"](error);
+                    showTrace = !(error.stack || error.stackTrace);
                 }
-                if (trace) {
+                if (showTrace && trace) {
                     console["group"]("stack");
                     for ( var i = 0; i < trace.length; i++) {
                         console["debug"](trace[i]);
@@ -136,6 +141,9 @@
     //#end
 
     function handleError(message, e) {
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        devDebugConsoleLog("ERROR", message, e);
+        //#end
         var dispMsg = message;
         var evtArgs = {"message":dispMsg,"error":null,"auraError":null};
 

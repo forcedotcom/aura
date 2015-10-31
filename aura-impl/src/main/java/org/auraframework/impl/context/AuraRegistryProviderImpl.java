@@ -282,8 +282,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                         DefType.RESOURCE));
                 regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
                         DefType.INCLUDE));
-                regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.STYLE));
                 regBuild.add(createStyleRegistry(markupSourceFactory));
                 regBuild.add(createDefRegistry(new CacheableDefFactoryImpl<FlavoredStyleDef>(markupSourceFactory),
                         EnumSet.of(DefType.FLAVORED_STYLE),

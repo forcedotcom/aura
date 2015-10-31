@@ -67,7 +67,6 @@ public class MockingUtil {
             Set<Definition> mocks = testContext.getLocalDefs();
             if (mocks != null) {
                 mocks.addAll(Arrays.asList(mockDefs));
-                AuraTestingUtil.clearCachedDefs(mocks);
             }
         }
     }

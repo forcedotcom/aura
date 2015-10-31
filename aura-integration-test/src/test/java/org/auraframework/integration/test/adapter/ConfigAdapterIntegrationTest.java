@@ -382,16 +382,4 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
             ServiceLocatorMocker.unmockServiceLocator();
         }
     }
-
-    private AuraContext setupContext(DefDescriptor<ApplicationDef> app) {
-        if (Aura.getContextService().isEstablished()) {
-            Aura.getContextService().endContext();
-        }
-
-        AuraContext ctx;
-        ctx = Aura.getContextService().startContext(AuraContext.Mode.UTEST, AuraContext.Format.JSON,
-                AuraContext.Authentication.UNAUTHENTICATED, app);
-        ctx.setFrameworkUID("#FAKEUID#");
-        return ctx;
-    }
 }

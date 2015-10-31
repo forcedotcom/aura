@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-.THIS .tabs__nav {
-    padding: 0;
-    margin: 0;
+
+.THIS {
+    display: table-cell;
+}
+
+
+.THIS .tabHeader .title {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.THIS.hidden {
+    display: none;
 }

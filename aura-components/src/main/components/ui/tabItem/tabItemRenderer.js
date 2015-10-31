@@ -13,28 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS .popupTargetContainer{
-	width:200px;
-}
-
-.THIS.block{
-	margin:10px;
-	padding:20px;
-	border:1px solid black;
-}
-
-.THIS h1{
-	font-size:25px;
-	color:blue;
-	margin-bottom:20px;
-	border-bottom:2px solid #aaa;
-	text-align:center;
-}
-
-
-.THIS h2{
-	font-size:20px;
-	color:tomato;
-	margin-bottom:20px;
-	border-bottom:2px solid #eee;
-}
+({
+    afterRender: function(cmp, helper){
+        this.superAfterRender();
+        helper.initWidth(cmp);
+    }
+}) // eslint-disable-line semi

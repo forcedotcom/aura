@@ -16,9 +16,9 @@
 
 -->
 <aura:component extensible="true" description="A tab that is rendered by the ui:tabBar component">
-	<aura:attribute name="class" type="String" description="The class to apply to the tab item"/>
+    <aura:attribute name="class" type="String" description="The class to apply to the tab item"/>
     <aura:attribute name="title" type="String" description="The text to display on the tab."/>
-    <aura:attribute name="name" type="String" description="The internal name of the tab that can be referenced to."/>
+    <aura:attribute name="name"  type="String" description="The internal name of the tab that can be referenced to."/>
     <aura:attribute name="icon" type="Aura.Component[]" description="The graphical image displayed on the tab."/>
     <aura:attribute name="active" type="Boolean" description="Specifies whether a tab is active (true) or not (false)."/>
     <aura:attribute name="hidden" type="Boolean" description="Specifies whether a tab is hidden (true) or not (false)."/>
@@ -26,29 +26,31 @@
     <aura:attribute name="closable" type="Boolean" default="false" description="Specifies whether to display an 'x' that will close the tab when clicked. Default value is 'false'." />
     <aura:attribute name="ariaControlId" type="String" description="Internal use for aria-controls attribute."/>
 
-    <aura:registerEvent name="activateTab" type="ui:tabsetEvent" description="The event is fired to activate the tab."/>
-
     <aura:registerevent name="onActivate" type="ui:tabsetEvent" description="The event is fired when the tab is clicked to activate." />
     <aura:registerevent name="onClose" type="ui:tabsetEvent" description="The event is fired when the close icon is clicked to close the tab." />
 
     <aura:registerevent name="onTabHover" type="ui:onTabHover" description="The event is fired when the mouse moves over a tab or when a tab is put into focus." />
-    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." /> 
-     
-    <aura:handler name="activateTab" action="{!c.activateTab}" />
-    
-    <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}" role="presentation">
-	    <a class="tabHeader" onclick="{!c.onTabActivated}" href="javascript:void(0);" aura:id="tabItem"
+    <aura:registerevent name="onTabUnhover" type="ui:onTabHover" description="The event is fired when the mouse moves off of a tab or when focus is moved away from a tab." />
+
+    <aura:method name="setActive" action="{!c.setActive}" access="PUBLIC" description="Set the tab item to active or inactive">
+        <aura:attribute name="active" type="Boolean" description="Indicates the tab is active or not."/>
+        <aura:attribute name="focus" type="Boolean" description="Indicates the tab item should be focused or not."/>
+        <aura:attribute name="callback" type="Object" description="Callback function"/>
+    </aura:method>
+
+    <li aura:id="li" class="{!v.class + ' tabs__item' + (v.active ? ' active' : '') + (v.hidden ? ' hidden' : '')}"  role="presentation">
+        <a class="tabHeader" onclick="{!c.onTabActivated}" href="javascript:void(0);" aura:id="tabItem"
            onmouseover="{!c.onTabHover}" onmouseout="{!c.onTabUnhover}" onfocus="{!c.onTabHover}" onblur="{!c.onTabUnhover}"
            aria-controls="{!v.ariaControlId}" aria-selected="{!v.active ? 'true' : 'false'}" title="{!v.title}" tabindex="{!v.active ? 0: -1}" role="tab">
 
             <span class="{!v.iconClass}">{!v.icon}</span>
-            <span>{!v.title}</span>
-	        <aura:renderIf isTrue="{!v.closable}">
-	          <a aura:id="close" class="close" href="javascript:void(0);" onclick="{!c.close}" tabindex="{!v.active ? 0: -1}">&times;
-	           <span class="assistiveText">Close</span>
-	          </a>
-	        </aura:renderIf>
-	    </a>
+            <span class="title">{!v.title}</span>
+            <aura:if isTrue="{!v.closable}">
+                <a aura:id="close" class="close" href="javascript:void(0);" onclick="{!c.close}" tabindex="{!v.active ? 0: -1}">&times;
+                    <span class="assistiveText">Close</span>
+                </a>
+            </aura:if>
+        </a>
     </li>
-     
+
 </aura:component>

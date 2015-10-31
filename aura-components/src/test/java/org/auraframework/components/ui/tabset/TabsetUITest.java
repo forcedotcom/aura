@@ -23,7 +23,11 @@ import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
@@ -50,6 +54,8 @@ public class TabsetUITest extends WebDriverTestCase {
     private void iterateThroughTabs(CharSequence rightOrDownArrow, CharSequence leftOrUpArrow) {
         WebElement element = findDomElement(By.linkText("Accounts"));
         element.click();
+        waitForTabSelected("Did not switch over to Accounts tab", element);
+        
         WebElement activeSection = findDomElement(ACTIVE_SECTION);
 
         // Loop through all of the tabs to make sure we get to the correct values
@@ -88,6 +94,18 @@ public class TabsetUITest extends WebDriverTestCase {
             assertTrue("The body of the section is not what it should be",
                     activeSection.getText().contains(BODY_ARRAY[i]));
         }
+    }
+    
+    private void waitForTabSelected(String msg, final WebElement element) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), auraUITestingUtil.getTimeout());
+        wait.withMessage(msg);
+        wait.until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+            	WebElement parent = element.findElement(By.xpath(".."));
+                return parent.getAttribute("class").contains("active");
+            }
+        });
     }
 
     /**
@@ -201,10 +219,9 @@ public class TabsetUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    //W-2721500 : in iterateThroughTabs(), we need to wait after click()
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
             BrowserType.IE8, BrowserType.IE7 })
-    public void _testLeftRightUpDownArrows() throws MalformedURLException, URISyntaxException {
+    public void testLeftRightUpDownArrows() throws MalformedURLException, URISyntaxException {
         open(createURL("basic", "false"));
 
         // Left/Up and Right/Down Arrows do the samething. Making sure that the result is also the same

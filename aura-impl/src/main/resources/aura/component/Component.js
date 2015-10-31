@@ -44,6 +44,7 @@ function Component(config, localCreation) {
     this.handlers = {};
     this.localIndex = {};
     this.destroyed=false;
+    this.version = config["version"];
 
     var context = $A.getContext();
 
@@ -1695,7 +1696,7 @@ Component.prototype.setupValueProviders = function(customValueProviders) {
     vp["style"]=this.createStyleValueProvider();
     vp["super"]=this.superComponent;
     vp["null"]=null;
-    vp["version"] = this.getVersionInternal();
+    vp["version"] = this.version ? this.version : this.getVersionInternal();
 
     for (var key in customValueProviders) {
         this.addValueProvider(key,customValueProviders[key]);

@@ -341,6 +341,12 @@ BaseComponent<D, I> {
                 json.writeMapEntry("attributes", attributeSet);
             }
 
+            if (def.getAPIVersion() != null  && 
+            		Aura.getConfigAdapter().isPrivilegedNamespace(def.getDescriptor().getNamespace()) &&
+            		context.getCurrentCallingDescriptor() == null) {
+            	json.writeMapEntry("version", def.getAPIVersion());
+            }
+
             if (def.getRendererDescriptor() != null) {
                 RendererDef rendererDef = def.getRendererDescriptor().getDef();
                 if (rendererDef.isLocal()) {

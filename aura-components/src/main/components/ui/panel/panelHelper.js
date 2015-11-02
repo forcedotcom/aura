@@ -54,6 +54,22 @@
         }
         return cmp._mouseHandler;
     },
+     
+    _getKeyHandler: function(cmp) {
+        if (!cmp._keyHandler && cmp.isValid()) {
+        	var closeAction = cmp.get("v.closeAction");
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
+        }
+        return cmp._keyHandler;
+    },
+    
+    _getMouseHandler: function(cmp) {
+        if (!cmp._mouseHandler && cmp.isValid()) {
+        	var closeAction = cmp.get("v.closeAction");
+            cmp._mouseHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
+        }
+        return cmp._mouseHandler;
+    },
 
     _getReferenceElement: function(cmp) {
 

@@ -1,4 +1,5 @@
-opyright (C) 2013 salesforce.com, inc.
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +14,7 @@ opyright (C) 2013 salesforce.com, inc.
  * limitations under the License.
  */
 ({
-    init: function(cmp) {
-    	var closeAction = cmp.get("v.closeAction");
-        var direction = cmp.get("v.direction");
-        //handler for closeOnEsc and closeOnTabOut
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
-        //handler for closeOnClickOut
-        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
+    init: function(cmp) {   
         //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('ui:button', {
@@ -56,38 +51,6 @@ opyright (C) 2013 salesforce.com, inc.
         return cmp._mouseHandler;
     },
      
-    _getKeyHandler: function(cmp) {
-        if (!cmp._keyHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
-        }
-        return cmp._keyHandler;
-    },
-    
-    _getMouseHandler: function(cmp) {
-        if (!cmp._mouseHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
-            cmp._mouseHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
-        }
-        return cmp._mouseHandler;
-    },
-     
-    _getKeyHandler: function(cmp) {
-        if (!cmp._keyHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
-        }
-        return cmp._keyHandler;
-    },
-    
-    _getMouseHandler: function(cmp) {
-        if (!cmp._mouseHandler && cmp.isValid()) {
-        	var closeAction = cmp.get("v.closeAction");
-            cmp._mouseHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
-        }
-        return cmp._mouseHandler;
-    },
-
     _getReferenceElement: function(cmp) {
 
         var referenceElementSelector = cmp.get("v.referenceElementSelector");

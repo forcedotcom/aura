@@ -14,55 +14,18 @@
  * limitations under the License.
  */
 
-.THIS .top-center {	
-	position:fixed;
-	top:0;
-	left:47%;
+.THIS--pop .tooltip {
+	transform: scale3d(1,1,1);
+	display: inline;
 }
 
-.THIS .top-right {	
-	position:fixed;
-	top:0;
-	right:0;	
-}
+.THIS--pop.transition-start .tooltip.fade-in.fade-out {
+	transform: scale3d(.97,.97,.97);
 
-.THIS .left-center{
-	position:fixed;
-	top:45%;
-}
-
-.THIS .center-center{
-	position:fixed;
-	top:45%;
-	left:47%;
 
 }
-.THIS .right-center{
-	position:fixed;
-	top:45%;
-	right:0;
-}
-.THIS .bottom-right{
-	position: fixed;
-    bottom: 0;
-    right: 0;
-}
-.THIS .bottom-center{
-	position: fixed;
-    bottom: 0;
-	text-align:center;
-	left:47%;
-}
-.THIS .bottom-left{
-	position: fixed;
-    bottom: 0;
-	left:0;
-}
-.THIS.container {
-	text-align: center;
-	background: #ccc;
-}
 
-.THIS.uiContainerManager {
-	pointer-events: none;
+.THIS--pop.visible.transition-start .tooltip.fade-in.fade-out {
+	transform: scale3d(1,1,1);
+	transition: all 200ms  cubic-bezier(.64,.36,.54,1.55)
 }

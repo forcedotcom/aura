@@ -34,22 +34,22 @@
 				
 				function topRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
-					var tt = component.find(ttLabel);
-					$A.test.fireDomEvent(trigger, "mouseover");						
+					var ttCmp = component.find(ttLabel);
+					var tt = $A.test.getElementByClass(ttLabel)[0];
+					$A.test.fireDomEvent(trigger, "mouseover");			console.log(ttLabel);			
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
-						if($A.util.hasClass(tt._tooltip,"visible") == true) {
+						if($A.util.hasClass(tt,"visible") == true) {
 							/* verticalEpsilon is different from epsilon since for north and south,
 							   the boundaries of the pointer and tooltip body are not perfectly aligned */
 							var verticalEpsilon = 4;
-							var epsilon = 0.001;
-							var direction = tt.get('v.direction');
-							var wrapper = tt._tooltip.querySelector('div.tooltip');
-							var body = tt._tooltip.querySelector('div.tooltip-body');
+							var epsilon = 1;
+							var direction = ttCmp.get('v.direction');
+							var wrapper = tt.querySelector('div.tooltip');
+							var body = tt.querySelector('div.tooltip-body');
 							var bodyBoundingRect = body.getBoundingClientRect();
-							var pointer = tt._tooltip.querySelector('div.pointer');
+							var pointer = tt.querySelector('div.pointer');
 							var pointerBoundingRect = pointer.getBoundingClientRect();
-							
 							// Check if correct styling has been applied 
 							// and make sure pointer is not disjoint from the tooltip body
 							
@@ -97,27 +97,30 @@
 				
 				function centerRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
-					var tt = component.find(ttLabel);
+					var ttCmp = component.find(ttLabel);
+					var tt = $A.test.getElementByClass(ttLabel)[0];
 					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 						
-						if($A.util.hasClass(tt._tooltip,"visible") == true) {
+						if($A.util.hasClass(tt,"visible") == true) {
 							
 							/* verticalEpsilon is different from epsilon since for north and south,
 							   the boundaries of the pointer and tooltip body are not perfectly aligned */
-							var epsilon = 0.001;
+							var epsilon = 1;
 							var verticalEpsilon = 4;
-							var direction = tt.get('v.direction');
-							var wrapper = tt._tooltip.querySelector('div.tooltip');
-							var body = tt._tooltip.querySelector('div.tooltip-body');
+							var direction = ttCmp.get('v.direction');
+							var wrapper = tt.querySelector('div.tooltip');
+							var body = tt.querySelector('div.tooltip-body');
 							var bodyBoundingRect = body.getBoundingClientRect();
-							var pointer = tt._tooltip.querySelector('div.pointer');
+							var pointer = tt.querySelector('div.pointer');
 							var pointerBoundingRect = pointer.getBoundingClientRect();
 							
 							// Check if correct styling has been applied 
 							// and make sure pointer is not disjoint from the tooltip body
 							if(direction == "west") {
-								$A.test.assertTrue($A.util.hasClass(wrapper,"west"), 'the class west is not attached to tooltip: ' + ttLabel);		
+								$A.test.assertTrue($A.util.hasClass(wrapper,"west"), 'the class west is not attached to tooltip: ' + ttLabel);	
+								console.log(pointerBoundingRect.left+"<="+bodyBoundingRect.right);
+								
 								$A.test.assertTrue(pointerBoundingRect.left <= (bodyBoundingRect.right + epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 								$A.test.assertTrue(pointerBoundingRect.left >= (bodyBoundingRect.right - epsilon), 'Pointer is disjoint from tooltip body for tooltip: ' + ttLabel);
 							}
@@ -173,21 +176,22 @@
 				
 				function bottomRow(ttLabel, triggerLabel) {
 					var trigger = component.find(triggerLabel).getElement();
-					var tt = component.find(ttLabel);
+					var ttCmp = component.find(ttLabel);
+					var tt = $A.test.getElementByClass(ttLabel)[0];
 					$A.test.fireDomEvent(trigger, "mouseover");						
 					$A.test.addWaitForWithFailureMessage(true, function(){	
 											
-						if($A.util.hasClass(tt._tooltip,"visible") == true) {
+						if($A.util.hasClass(tt,"visible") == true) {
 							
 							/* verticalEpsilon is different from epsilon since for north and south,
 							   the boundaries of the pointer and tooltip body are not perfectly aligned */
-							var epsilon = 0.001;
+							var epsilon = 1;
 							var verticalEpsilon = 4;
-							var direction = tt.get('v.direction');
-							var wrapper = tt._tooltip.querySelector('div.tooltip');
-							var body = tt._tooltip.querySelector('div.tooltip-body');
+							var direction = ttCmp.get('v.direction');
+							var wrapper = tt.querySelector('div.tooltip');
+							var body = tt.querySelector('div.tooltip-body');
 							var bodyBoundingRect = body.getBoundingClientRect();
-							var pointer = tt._tooltip.querySelector('div.pointer');
+							var pointer = tt.querySelector('div.pointer');
 							var pointerBoundingRect = pointer.getBoundingClientRect();
 							
 							// Check if correct styling has been applied 

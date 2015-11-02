@@ -13,12 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.THIS.tooltip-trigger {
-	display: inline;
-	position: relative;
-}
-
 .THIS .tooltip-body {
 	z-index: 100;
 	display: block;
@@ -33,16 +27,8 @@
 }
 
 
-.THIS .body-basic {
-	bottom:100%;
-	left:50%;
-	transform-origin: bottom left;
-	transform: translateX(-50%) translateY(-10px);
-}
-
 .THIS.advanced-wrapper {
 	position: inherit;
-	z-index: 10;
 }
 
 .THIS .tooltip-advanced {
@@ -52,13 +38,14 @@
 	left: 0;
 }
 
-.THIS.advanced-wrapper .tooltip,
+.THIS.advanced-wrapper.tooltip,
 .THIS.advanced-wrapper .tooltip-body {
 	opacity: 0;
+	z-index: 2;
 }
 
 
-.THIS.advanced-wrapper.visible .tooltip {
+.THIS.advanced-wrapper.visible.tooltip {
 	opacity: 0.999;
 }
 
@@ -98,7 +85,6 @@
 	border-left: 13px solid transparent;
 	border-right: 13px solid transparent;
 	border-top: 13px solid #16325c;
-	z-index: 100;
 }
 
 .THIS .east .pointer {
@@ -107,6 +93,7 @@
 	border-bottom: 13px solid transparent;
 	border-top: 13px solid transparent;
 }
+
 .THIS .west .pointer {
 	border-left: 13px solid #16325c;
 	border-right: none;
@@ -143,32 +130,6 @@
 	transition: 500ms opacity;
 }
 
-
-.THIS.tooltip-basic:hover .tooltip,
-.THIS.tooltip-basic:focus .tooltip {
-	opacity: 0.999;
-}
-
-.THIS.tooltip-basic:hover .tooltip.disabled,
-.THIS.tooltip-basic:focus .tooltip.disabled {
-	display: none;
-}
-
-.THIS.tooltip-trigger:hover .fade-out.tooltip,
-.THIS.tooltip-trigger:focus .fade-out.tooltip {
-	transition: none;
-}
-
-
-.THIS.tooltip-trigger:hover .fade-in.tooltip,
-.THIS.tooltip-trigger:focus .fade-out.tooltip {
-	transition: 500ms opacity;
-}
-
-.THIS.tooltip-trigger:hover .fade-in.fade-out.tooltip,
-.THIS.tooltip-trigger:focus .fade-out.tooltip {
-	transition: 500ms opacity;
-}
 
 
 .THIS .tooltip-body {

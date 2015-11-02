@@ -22,21 +22,43 @@
     },
 
     rerender: function(component, helper) {
-        helper.initStyle(component);
+        var isDirty = false;
 
+        // any of these attributes being dirty
+        // requires re-calculating classes and styles
+        var attrToCheck = [
+            'v.fadeInDuration',
+            'v.fadeOutDuration',
+            'v.triggerClass',
+            'v.class',
+            'v.delay',
+            'v.target',
+            'v.tooltipBody',
+            'v.direction',
+            'v.disabled'
+        ];
+
+
+        for (var i = 0; i < attrToCheck.length; i++) {
+           if(component.isDirty(attrToCheck[i])){
+                isDirty = true;
+           }
+        }
+
+        if(isDirty) {
+            helper.initStyle(component);
+        }
         return this.superRerender();
     },
 
-    afterRender: function(component, helper) {
+    afterRender: function(component) {
         var ret = this.superAfterRender();
-        if(component.get('v.advanced')) {
-            helper.makeTrigger(component);
+        if(component.get('v.isVisible')){
+        	component.getElement().classList.add('visible');
         }
         
+        
         return ret;
-    },
-
-    unrender: function(component, helper) {
-        helper.cleanup(component);
     }
+
 })// eslint-disable-line semi

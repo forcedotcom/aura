@@ -13,50 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.THIS .title{
-	font-size:30px;
-	margin-top:30px;
-	margin-bottom:30px;
-	text-align: center;
-}
-
-
-
-.THIS .blocks{
-	border: 1px solid #8AC007;
-	overflow: auto;
-}
-.THIS .attribute{
-	text-align:right;
-	margin-top:20px;
-	margin-bottom:20px;
-}
-
-.THIS .case{
-	float:left;
-	margin-top:20px;
-	margin-bottom:20px;
-	margin-left:30px;
-}
-
-.THIS .case:hover{
-
-}
-.THIS .tooltip-trigger2 {
-	text-decoration: underline;
-	font-color:red;
-}
-.THIS .logo {
-	margin-left: 10px;
-	height:40px;
-	width:60px;
-}
-.THIS.container {
-	text-align: center;
-	background: #ccc;
-}
-
-.THIS.uiContainerManager {
-	pointer-events: none;
-}
+({
+	handleVis: function (cmp, evt, helper) {
+		
+		var isVis = evt.getParam("value");
+		
+		if(isVis) {
+			helper.show(cmp);
+		} else {
+			helper.hide(cmp);
+		}
+	}
+})// eslint-disable-line semi

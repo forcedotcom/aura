@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component description="This is the tooltip advanced subcomponent, used by tooltip.cmp. DO NOT USE ALONE">
+    <aura:import library="ui:panelPositioningLib" property="lib" />
+    <aura:import library="ui:tooltipLib"     property="ttLib" />
+    <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
+    <aura:attribute name="tooltipBody" type="String" default="false" description="The message to display in the tooltip"/>
+    <aura:attribute name="target" type="Aura.Component" access="INTERNAL" />
+    <aura:attribute name="classList" type="String" access="INTERNAL" />
+    <aura:attribute name="direction" type="String" access="INTERNAL" />
+    <aura:attribute name="advanced" type="Boolean" access="INTERNAL" default="true" />
+    <aura:attribute name="disabled" type="Boolean" access="INTERNAL" default="false" description="Specifies whether the tooltip is disabled. The default is &quot;false&quot;."/>
+    <aura:attribute name="fadeOut" access="INTERNAL" default="0" type="Boolean" description="Fade out"/>
+    <aura:attribute name="fadeIn" access="INTERNAL" default="0" type="Boolean" description="Fade in"/>
+    <aura:attribute name="fadeOutDuration" access="INTERNAL" default="0" type="Integer" description="Fade out duration in ms"/>
+    <aura:attribute name="fadeInDuration" access="INTERNAL" default="0" type="Integer" description="Fade in duration in ms"/>
+    <aura:attribute name="delay" default="0" access="INTERNAL" type="Integer" description="Appearance delay in ms" />
+    <aura:attribute name="class" type="String" access="INTERNAL" default="" description="A CSS style to be attached to the tooltip. This style is added in addition to base styles output by the component."/>
+    <aura:attribute name="tooltipStyle" type="String" access="INTERNAL" default="false" description="The style of the tooltip"/>
+    <aura:attribute name="domClass" type="String" access="INTERNAL" description="The classes to include in the dom" default="advanced-wrapper "/>
+    <aura:attribute name="allowFlips" default="true" type="Boolean" access="INTERNAL" description="If true the tooltip will change direction automatically when needed to stay in the viewport"/>
+    <aura:attribute name="domId" type="String" access="INTERNAL" description="DOM id of the input element. By default, this attribute resolved to the globalId of the component to avoid id collision." />
+ 
+
+    <aura:handler name="change" value="{!v.isVisible}" action="{!c.handleVis}"/>
+
+    <div class="{!v.classList}" aura:flavorable="true" aura:id="tooltip" style="{!v.tooltipStyle}" aria-hidden="{!!v.isVisible}">
+        <div aura:id="tooltipwrapper">
+            <div class="pointer pointer-advanced"></div>
+            <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body">{!v.class}{!v.tooltipBody}</div>
+        </div>
+    </div>
+</aura:component>

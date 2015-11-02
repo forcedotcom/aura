@@ -173,6 +173,22 @@ Aura.Services.MetricsService.prototype.applicationReady = function () {
     }
     // #end
 };
+
+/**
+ * Create a transaction based on a given configuration
+ * @param {string} ns Namespace of the transaction
+ * @param {string} name Name of the transaction
+ * @param {Object} transaction Transaction
+ * @public
+ * @export
+**/
+Aura.Services.MetricsService.prototype.syntheticTransactionStart = function (ns, name, config) {
+    var trx = this.createTransaction(ns, name, config);
+    $A.util.apply(this.transactions[trx], config, true, true);
+    return trx;
+};
+
+
 /**
  * Add a callback everytime a transaction ends.
  * @param {function} callback Function to execute for every transaction

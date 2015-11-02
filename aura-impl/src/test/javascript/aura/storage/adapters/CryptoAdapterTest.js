@@ -15,9 +15,8 @@
  */
 Function.RegisterNamespace("Test.Aura.Storage.Adapters");
 
-[Fixture, Skip("Rewrite")]
+[Fixture]
 Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
-    /*
     var Aura = {
             Storage: {
                 IndexedDBAdapter: function(){}
@@ -57,29 +56,18 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
 
     Mocks.GetMocks(Object.Global(), {
         "window": {},
-        "Aura": Aura
+        "Aura": Aura,
+        "CryptoAdapter": {},
+        "AuraStorageService": function(){}
     })(function(){
         mockPromise(function(){
             Import("aura-impl/src/main/resources/aura/storage/adapters/CryptoAdapter.js");
         });
     });
 
-    // Mocks necessary to create a new CryptoAdapter Object
-    var mockOnLoadUtil = Mocks.GetMocks(Object.Global(), {
-        "window": {
-            "TextEncoder": function() {},
-            "TextDecoder": function() {}
-        },
-        "Aura": Aura
+    var mockCrypto = Mocks.GetMocks(Object.Global(), { 
+        CryptoAdapter: Aura.Storage.CryptoAdapter
     });
-
-    var targetService;
-    mockOnLoadUtil(function() {
-        mockPromise(function() {
-            targetService = new CryptoAdapter({});
-        });
-    });
-
 
     [Fixture]
     function register(){
@@ -99,8 +87,10 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                 warning: function(){}
             });
 
-            mockA(function() {
-                CryptoAdapter.register();
+            mockCrypto(function() {
+                mockA(function() {
+                    Aura.Storage.CryptoAdapter.register();
+                });
             });
 
             Assert.False(actual);
@@ -109,48 +99,10 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         [Fact]
         function DoesNotRegisterIfIndexedDbNotRegistered(){
             var actual = false;
-            var indexedDbName = "indexeddb";
             var mockA = Mocks.GetMock(Object.Global(), "$A", {
                 storageService: {
                     "isRegisteredAdapter": function(param) {
-                        if (param === CryptoAdapter.NAME || param === indexedDbName) {
-                            return false;
-                        }
-                        return true;
-                    },
-                    "registerAdapter": function() {
-                        actual = true;
-                    }
-                },
-                warning: function(){}
-            });
-            var mockIndexedDb = Mocks.GetMock(Object.Global(), "Aura", {
-                Storage: {
-                    IndexedDBAdapter: {
-                        NAME: indexedDbName
-                    }
-                }
-            });
-
-            mockA(function() {
-                mockIndexedDb(function() {
-                    CryptoAdapter.register();
-                });
-            });
-
-            Assert.False(actual);
-        }
-
-        [Fact]
-        function DoesNotRegisterIfHttp(){
-            var actual = false;
-            var mockA = Mocks.GetMock(Object.Global(), "$A", {
-                storageService: {
-                    "isRegisteredAdapter": function(param) {
-                        if (param === CryptoAdapter.NAME) {
-                            return false;
-                        }
-                        return true;
+                        return false;
                     },
                     "registerAdapter": function() {
                         actual = true;
@@ -165,17 +117,55 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
                     }
                 }
             });
-            var mockWindow = Mocks.GetMock(Object.Global(), "window", {
-                location: {
-                    href: "http://fakeMachine:9090"
+
+            mockCrypto(function() {
+                mockA(function() {
+                    mockIndexedDb(function() {
+                        System.Environment.Write(Aura.Storage.IndexedDBAdapter.NAME);
+                        Aura.Storage.CryptoAdapter.register();
+                    });
+                });
+            });
+
+            Assert.False(actual);
+        }
+
+        [Fact]
+        function DoesNotRegisterIfHttp() {
+            var actual = false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    storageService: {
+                        "isRegisteredAdapter": function(param) {
+                            if (param === Aura.Storage.CryptoAdapter.NAME) {
+                                return false;
+                            }
+                            return true;
+                        },
+                        "registerAdapter": function() {
+                            actual = true;
+                        }
+                    },
+                    warning: function(){}
+                },
+                Aura: {
+                    Storage: {
+                        IndexedDBAdapter: {
+                            NAME: "indexeddb"
+                        }
+                    }
+                },
+                // href mock is the crux of the test
+                window: {
+                    location: {
+                        href: "http://fakeMachine:9090"
+                    }
                 }
             });
 
-            mockA(function() {
-                mockIndexedDb(function() {
-                    mockWindow(function() {
-                        CryptoAdapter.register();
-                    });
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.register();
                 });
             });
 
@@ -185,39 +175,40 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         [Fact]
         function RegistersIfHttps(){
             var actual = false;
-            var mockA = Mocks.GetMock(Object.Global(), "$A", {
-                storageService: {
-                    "isRegisteredAdapter": function(param) {
-                        if (param === CryptoAdapter.NAME) {
-                            return false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    storageService: {
+                        "isRegisteredAdapter": function(param) {
+                            if (param === Aura.Storage.CryptoAdapter.NAME) {
+                                return false;
+                            }
+                            return true;
+                        },
+                        "registerAdapter": function() {
+                            actual = true;
                         }
-                        return true;
                     },
-                    "registerAdapter": function() {
-                        actual = true;
+                    warning: function(){}
+                },
+                Aura: {
+                    Storage: {
+                        IndexedDBAdapter: {
+                            NAME: "indexeddb"
+                        }
                     }
                 },
-                warning: function(){}
-            });
-            var mockIndexedDb = Mocks.GetMock(Object.Global(), "Aura", {
-                Storage: {
-                    IndexedDBAdapter: {
-                        NAME: "indexeddb"
+                // href mock is the crux of the test
+                window: {
+                    location: {
+                        href: "https://fakeMachine:9090"
                     }
                 }
             });
-            var mockWindow = Mocks.GetMock(Object.Global(), "window", {
-                location: {
-                    href: "https://fakeMachine:9090"
-                }
-            });
-            CryptoAdapter.engine = true;
+            Aura.Storage.CryptoAdapter.engine = true;
 
-            mockA(function() {
-                mockIndexedDb(function() {
-                    mockWindow(function() {
-                        CryptoAdapter.register();
-                    });
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.register();
                 });
             });
 
@@ -227,40 +218,41 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         [Fact]
         function RegistersIfLocalhost(){
             var actual = false;
-            var mockA = Mocks.GetMock(Object.Global(), "$A", {
-                storageService: {
-                    "isRegisteredAdapter": function(param) {
-                        if (param === CryptoAdapter.NAME) {
-                            return false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    storageService: {
+                        "isRegisteredAdapter": function(param) {
+                            if (param === Aura.Storage.CryptoAdapter.NAME) {
+                                return false;
+                            }
+                            return true;
+                        },
+                        "registerAdapter": function() {
+                            actual = true;
                         }
-                        return true;
                     },
-                    "registerAdapter": function() {
-                        actual = true;
+                    warning: function(){}
+                },
+                Aura: {
+                    Storage: {
+                        IndexedDBAdapter: {
+                            NAME: "indexeddb"
+                        }
                     }
                 },
-                warning: function(){}
-            });
-            var mockIndexedDb = Mocks.GetMock(Object.Global(), "Aura", {
-                Storage: {
-                    IndexedDBAdapter: {
-                        NAME: "indexeddb"
+                // href mock is the crux of the test
+                window: {
+                    location: {
+                        href: "http://localhost:9090",
+                        hostname: "localhost"
                     }
                 }
             });
-            var mockWindow = Mocks.GetMock(Object.Global(), "window", {
-                location: {
-                    href: "http://localhost:9090",
-                    hostname: "localhost"
-                }
-            });
-            CryptoAdapter.engine = true;
+            Aura.Storage.CryptoAdapter.engine = true;
 
-            mockA(function() {
-                mockIndexedDb(function() {
-                    mockWindow(function() {
-                        CryptoAdapter.register();
-                    });
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.register();
                 });
             });
 
@@ -270,45 +262,45 @@ Test.Aura.Storage.Adapters.CryptoAdapterTest = function(){
         [Fact]
         function DoesNotRegisterIfNoEngine(){
             var actual = false;
-            var mockA = Mocks.GetMock(Object.Global(), "$A", {
-                storageService: {
-                    "isRegisteredAdapter": function(param) {
-                        if (param === CryptoAdapter.NAME) {
-                            return false;
+            var mocks = Mocks.GetMocks(Object.Global(), {
+                $A: {
+                    storageService: {
+                        "isRegisteredAdapter": function(param) {
+                            if (param === Aura.Storage.CryptoAdapter.NAME) {
+                                return false;
+                            }
+                            return true;
+                        },
+                        "registerAdapter": function() {
+                            actual = true;
                         }
-                        return true;
                     },
-                    "registerAdapter": function() {
-                        actual = true;
+                    warning: function(){}
+                },
+                Aura: {
+                    Storage: {
+                        IndexedDBAdapter: {
+                            NAME: "indexeddb"
+                        }
                     }
                 },
-                warning: function(){}
-            });
-            var mockIndexedDb = Mocks.GetMock(Object.Global(), "Aura", {
-                Storage: {
-                    IndexedDBAdapter: {
-                        NAME: "indexeddb"
+                window: {
+                    location: {
+                        href: "http://localhost:9090",
+                        hostname: "localhost"
                     }
                 }
             });
-            var mockWindow = Mocks.GetMock(Object.Global(), "window", {
-                location: {
-                    href: "http://localhost:9090",
-                    hostname: "localhost"
-                }
-            });
-            CryptoAdapter.engine = false;
+            // Setting the engine to false is the crux of the test
+            Aura.Storage.CryptoAdapter.engine = false;
 
-            mockA(function() {
-                mockIndexedDb(function() {
-                    mockWindow(function() {
-                        CryptoAdapter.register();
-                    });
+            mockCrypto(function() {
+                mocks(function() {
+                    Aura.Storage.CryptoAdapter.register();
                 });
             });
 
             Assert.False(actual);
         }
     }
-    */
 }

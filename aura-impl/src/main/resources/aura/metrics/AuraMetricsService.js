@@ -665,7 +665,8 @@ Aura.Services.MetricsService.prototype.microsecondsResolution = function () {
  * @private
 **/
 Aura.Services.MetricsService.prototype.bootstrapMark = function (mark, value) {
-    this.bootstrap[mark] = value || this.time();
+    this.bootstrap[mark] = value || 
+    (Aura.Services.MetricsService.PERFTIME ? this.time() : Date.now() - this.getPageStartTime());
 };
 
 /**

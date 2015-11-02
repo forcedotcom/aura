@@ -22,6 +22,7 @@ import org.auraframework.impl.LoggingAdapterImpl;
 import org.auraframework.system.LoggingContext;
 import org.auraframework.test.adapter.TestLoggingAdapter;
 
+import com.google.common.cache.CacheStats;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -98,6 +99,14 @@ public class TestLoggingAdapterImpl extends LoggingAdapterImpl implements TestLo
         protected void logRequestValuesMap(Map<String, Object> valueMap) {
             captureLog(valueMap);
             super.logRequestValuesMap(valueMap);//keep logging-adapter informed
+        }
+        
+        @Override
+    	public void logCacheInfo(String name, String message, long size, CacheStats stats) {
+        	Map<String, Object> m = Maps.newHashMap();
+        	m.put("Cache: "+name, String.format("%s (size=%s, %s)", message, size, stats.toString()));
+        	captureLog(m);
+        	super.logCacheInfo(name, message, size, stats);
         }
 
     }

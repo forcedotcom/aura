@@ -290,12 +290,11 @@ public class ServerServiceImpl implements ServerService {
         Aura.getSerializationService().write(svgDef, null, SVGDef.class, sb, Format.SVG.name());
         return sb.toString();
     }
-
+    
     @Override
     public void writeDefinitions(final Set<DefDescriptor<?>> dependencies, Writer out)
             throws IOException, QuickFixException {
         AuraContext context = Aura.getContextService().getCurrentContext();
-
         Mode mode = context.getMode();
         final boolean minify = !mode.prettyPrint();
         final String mKey = minify ? "MIN:" : "DEV:";
@@ -305,14 +304,16 @@ public class ServerServiceImpl implements ServerService {
         final String uid = context.getUid(appDesc);
         final String key = "JS:" + mKey + uid;
 
-        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key,
-        	new Callable<String>() {
-        		@Override
-				public String call() throws Exception {
-        			return getDefinitionsString(dependencies, key, minify);
-        		}
-        	}
-		);
+        String cached = context.getDefRegistry().getCachedString(uid, appDesc, key, 
+        		new Callable<String>() {
+		    		@Override
+					public String call() throws Exception {
+		    			String res = getDefinitionsString(dependencies, key, minify);
+		    			//log the cache miss here
+		    			Aura.getCachingService().logStringsCacheStats("cache miss for key: "+key+";");
+		    			return res;
+		    		}
+		    	});
 
         if (out != null) {
             out.append(cached);
@@ -323,7 +324,7 @@ public class ServerServiceImpl implements ServerService {
     		throws QuickFixException, IOException {
 
     	Collection<BaseComponentDef> defs = filterAndLoad(BaseComponentDef.class, dependencies, null);
-
+    	
         //
         // create a temp buffer in case anything bad happens while we're processing this.
         // don't want to end up with a half a JS init function
@@ -409,7 +410,6 @@ public class ServerServiceImpl implements ServerService {
                 }
             }
         }
-
         return output;
     }
 
@@ -451,14 +451,17 @@ public class ServerServiceImpl implements ServerService {
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
 
         try {
-            for (DefDescriptor<?> descriptor : dependencies) {
-                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
-                        && (extraFilter == null || extraFilter.apply(descriptor))) {
-                    @SuppressWarnings("unchecked")
-                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
-                    out.add(mdr.getDef(dd));
-                }
+            if(dependencies != null) {
+            	for (DefDescriptor<?> descriptor : dependencies) {
+	                if (defType.isAssignableFrom(descriptor.getDefType().getPrimaryInterface())
+	                        && (extraFilter == null || extraFilter.apply(descriptor))) {
+	                    @SuppressWarnings("unchecked")
+	                    DefDescriptor<D> dd = (DefDescriptor<D>) descriptor;
+	                    out.add(mdr.getDef(dd));
+	                }
+            	}
             }
+            	
         } catch (QuickFixException qfe) {
             // This should never happen here, by the time we are filtering our set, all dependencies
             // MUST be loaded. If not, we have a serious bug that must be addressed.

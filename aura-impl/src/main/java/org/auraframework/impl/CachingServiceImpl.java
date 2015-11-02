@@ -158,6 +158,11 @@ public class CachingServiceImpl implements CachingService {
     public final Cache<String, String> getStringsCache() {
         return stringsCache;
     }
+    
+    @Override
+    public void logStringsCacheStats(String extraMessage) {
+    	stringsCache.logCacheStatus("StringsCache", extraMessage);
+    }
 
     @Override
     public final Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache() {

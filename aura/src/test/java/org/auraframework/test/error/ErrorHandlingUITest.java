@@ -19,8 +19,15 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.util.WebDriverTestCase.ExcludeBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.openqa.selenium.By;
 
+// The tests with click are failing on autobuild Firefox. Manually verified error can be handled correctly.
+// The failures can be reproduced in Saucelab. Seems the buttons were not actually clicked when executing click().
+// In Saucelab, during executing the tests, if manually click the button, the tests pass.
+// Disable for now (W-2796537)
+@ExcludeBrowsers({ BrowserType.FIREFOX })
 public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     public ErrorHandlingUITest(String name) {

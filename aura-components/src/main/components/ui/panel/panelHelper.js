@@ -34,6 +34,8 @@
                 cmp.set('v.closeButton', button);
             });
         }
+
+        var direction = cmp.get("v.direction");
         if(direction && direction.match(/(north|south)(east|west)/)) {
             cmp.set('v.showPointer', false);
         }
@@ -274,8 +276,6 @@
         if(!boundingElement) {
             boundingElement = window;
         }
-
-        
 
         if(!advancedConfig) {
 

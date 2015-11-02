@@ -40,6 +40,7 @@
     <aura:attribute name="inside" type="Boolean" default="false" description="Position the element inside the target"/>
     <aura:attribute name="advancedConfig" type="Object" description="Advanced positioning options, overrides direction. align and targetAlign are required, vertPad is optional."/>
     <aura:attribute name="pad" type="Integer" default="15" description="How much padding." />
+     
     <aura:handler name="init" value="{!this}" action="{!c.init}" />
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" description="Enables panel manager and panels to communicate"/>
 

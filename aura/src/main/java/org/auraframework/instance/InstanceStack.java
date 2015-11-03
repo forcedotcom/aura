@@ -16,13 +16,13 @@
 package org.auraframework.instance;
 
 import java.io.IOException;
-
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.json.Json;
@@ -45,6 +45,8 @@ import com.google.common.collect.Maps;
  * our 'parentage', but that is much easier said than done.
  */
 public class InstanceStack {
+    private ConfigAdapter configAdapter = Aura.getConfigAdapter();
+
     public InstanceStack() {
         this.path = new StringBuilder();
         this.stack = Lists.newArrayList();
@@ -61,7 +63,7 @@ public class InstanceStack {
      */
     public void pushInstance(Instance<?> instance, DefDescriptor<?> desc) {
         if (topUnprivileged == null) {
-            if (!Aura.getConfigAdapter().isPrivilegedNamespace(desc.getNamespace())) {
+            if (!configAdapter.isPrivilegedNamespace(desc.getNamespace())) {
                 topUnprivileged = instance;
             }
         }
@@ -441,4 +443,13 @@ public class InstanceStack {
     private Entry current;
     private final String base;
     private Instance<?> topUnprivileged;
+
+    /**
+     * Injection override.
+     *
+     * @param definitionService the definitionService to set
+     */
+    public void setConfigAdapter(ConfigAdapter adapter) {
+        this.configAdapter = adapter;
+    }
 }

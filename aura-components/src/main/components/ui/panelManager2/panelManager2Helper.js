@@ -17,17 +17,13 @@
 	PANELS_OWNER    : {},  // Owner relationship who creates the panel (key) owned by -> value
     PANELS_STACK    : [],  // The Panel Stack ordering
     PANELS_INSTANCE : {},  // Registered instances
-    containerManager: [],  // a reference to containerManager
+    containerManager: null,  // a reference to containerManager
 
 	initialize: function(cmp) {
-		if (this.containerManager && this.containerManager.length > 0) { // to skip the redundant init from extended components 
-			return;
-		}
         var containerManager = this.cmLib.containerManager;
         var sharedContainer  = cmp.get('v.useSharedContainer');
 
-        var cm = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
-        this.containerManager.push(cm);
+        this.containerManager = sharedContainer ? containerManager.getSharedInstance() : containerManager.createInstance(cmp.find('container'));
         this.initializeRegisteredPanels(cmp);
     },
 
@@ -36,7 +32,7 @@
     * @private
     */
     initializeRegisteredPanels: function (cmp, newPanels) {
-        this.containerManager[0].registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
+        this.containerManager.registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
     },
 
     /*
@@ -132,7 +128,7 @@
     * @private
     */
     createPanelInstance: function (cmp, config) {
-        var panel = this.containerManager[0].createContainer({
+        var panel = this.containerManager.createContainer({
                 containerType          : config.panelType,
                 containerConfig        : config.panelConfig,
                 containerValueProvider : cmp
@@ -199,7 +195,7 @@
 
         stack.splice(index, 1);
 
-        this.containerManager[0].destroyContainer(panel);
+        this.containerManager.destroyContainer(panel);
 
         delete this.PANELS_OWNER[panelId];
         delete this.PANELS_INSTANCE[panelId];
@@ -255,7 +251,7 @@
     * @private
     */
     renderPanelInstance: function (cmp, panel, config) {
-        this.containerManager[0].renderContainer(panel, config);
+        this.containerManager.renderContainer(panel, config);
     },
     notifyPanelContent: function (content, config) {
         var validInterface = config.typeOf ? content.isInstanceOf(config.typeOf) : true,

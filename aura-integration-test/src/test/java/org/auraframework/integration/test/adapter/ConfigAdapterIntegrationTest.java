@@ -40,7 +40,6 @@ import org.auraframework.util.AuraLocale;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -398,37 +397,29 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
     }
 
     public void testJSLibsEqualivalentTimezone() throws Exception {
-        try {
-            AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
-            LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
-            when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
+        AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
+        LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
+        when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
 
-            ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
-            configAdapter.setLocalizationAdapter(mockAdapter);
-            startAppContext("<aura:application></aura:application>");
+        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
+        configAdapter.setLocalizationAdapter(mockAdapter);
+        startAppContext("<aura:application></aura:application>");
 
-            assertTrue("JS libs file should be libs_America-Los-Angeles.js",
-                    configAdapter.getJSLibsURL().contains("libs_America-Los_Angeles.js"));
-        } finally {
-            ServiceLocatorMocker.unmockServiceLocator();
-        }
+        assertTrue("JS libs file should be libs_America-Los-Angeles.js",
+                configAdapter.getJSLibsURL().contains("libs_America-Los_Angeles.js"));
     }
 
     public void testJSLibsInvalidTimezone() throws Exception {
-        try {
-            AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
-            LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
-            when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
+        AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
+        LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
+        when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
 
-            ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
-            configAdapter.setLocalizationAdapter(mockAdapter);
+        ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
+        configAdapter.setLocalizationAdapter(mockAdapter);
 
-            startAppContext("<aura:application></aura:application>");
+        startAppContext("<aura:application></aura:application>");
 
-            assertTrue("JS libs file should be the default libs_GMT.js for invalid timezones",
-                    configAdapter.getJSLibsURL().contains("libs_GMT.js"));
-        } finally {
-            ServiceLocatorMocker.unmockServiceLocator();
-        }
+        assertTrue("JS libs file should be the default libs_GMT.js for invalid timezones",
+                configAdapter.getJSLibsURL().contains("libs_GMT.js"));
     }
 }

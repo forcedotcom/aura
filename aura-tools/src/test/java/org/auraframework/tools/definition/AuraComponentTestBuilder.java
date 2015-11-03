@@ -28,8 +28,6 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
-import org.auraframework.util.ServiceLoader;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
@@ -47,7 +45,6 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
     private Path componentsPath;
     private final ComponentLocationAdapter cla;
     private Set<ComponentLocationAdapter> modified;
-    private ServiceLoader mockedServiceLoader = null;
 
     /**
      * Create a new test builder.
@@ -67,10 +64,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
                 // DOH!
             }
         }
-        if (mockedServiceLoader != null) {
-            ServiceLocatorMocker.unmockServiceLocator();
-            mockedServiceLoader = null;
-        }
+
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
     }
 

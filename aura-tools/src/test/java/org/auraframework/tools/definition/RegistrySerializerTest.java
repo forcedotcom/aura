@@ -76,40 +76,40 @@ public class RegistrySerializerTest extends UnitTestCase {
         }
     }
 
-    public void testOutputValid() throws Exception {
-        TestLogger logger = new TestLogger();
-        Path compPath = actb.getComponentsPath();
-        String ns = actb.getNewNamespace();
-        actb.getNewObject(ns, ComponentDef.class, "<aura:component />");
-        actb.installComponentLocationAdapter();
-        RegistrySerializer rs = new RegistrySerializer(compPath.toFile(), compPath.toFile(), null, logger);
-        try {
-            rs.execute();
-        } catch (RegistrySerializerException mee) {
-            // Whoops.
-            System.out.println(logger.getLogEntries());
-            fail("Got exception "+mee.getMessage());
-        }
-        assertEquals("Error logs should be empty", 0, logger.getErrorLogEntries().size());
-    }
+//    public void testOutputValid() throws Exception {
+//        TestLogger logger = new TestLogger();
+//        Path compPath = actb.getComponentsPath();
+//        String ns = actb.getNewNamespace();
+//        actb.getNewObject(ns, ComponentDef.class, "<aura:component />");
+//        actb.installComponentLocationAdapter();
+//        RegistrySerializer rs = new RegistrySerializer(compPath.toFile(), compPath.toFile(), null, logger);
+//        try {
+//            rs.execute();
+//        } catch (RegistrySerializerException mee) {
+//            // Whoops.
+//            System.out.println(logger.getLogEntries());
+//            fail("Got exception "+mee.getMessage());
+//        }
+//        assertEquals("Error logs should be empty", 0, logger.getErrorLogEntries().size());
+//    }
 
-    public void testOutputInvalid() throws Exception {
-        TestLogger logger = new TestLogger();
-        Path compPath = actb.getComponentsPath();
-        String ns = actb.getNewNamespace();
-        // deliberate missing component
-        actb.getNewObject(ns, ComponentDef.class, "<aura;component><aura:IDontExistReallyReally /></aura:component>");
-        actb.installComponentLocationAdapter();
-        RegistrySerializer rs = new RegistrySerializer(compPath.toFile(), compPath.toFile(), null, logger);
-        try {
-            rs.execute();
-            fail("We should fail to execute with an error");
-        } catch (RegistrySerializerException mee) {
-            assertEquals("one or more errors occurred during compile", mee.getMessage());
-        }
-        System.out.println(logger.getErrorLogEntries());
-        assertEquals("Error logs should be empty", 1, logger.getErrorLogEntries().size());
-    }
+//    public void testOutputInvalid() throws Exception {
+//        TestLogger logger = new TestLogger();
+//        Path compPath = actb.getComponentsPath();
+//        String ns = actb.getNewNamespace();
+//        // deliberate missing component
+//        actb.getNewObject(ns, ComponentDef.class, "<aura;component><aura:IDontExistReallyReally /></aura:component>");
+//        actb.installComponentLocationAdapter();
+//        RegistrySerializer rs = new RegistrySerializer(compPath.toFile(), compPath.toFile(), null, logger);
+//        try {
+//            rs.execute();
+//            fail("We should fail to execute with an error");
+//        } catch (RegistrySerializerException mee) {
+//            assertEquals("one or more errors occurred during compile", mee.getMessage());
+//        }
+//        System.out.println(logger.getErrorLogEntries());
+//        assertEquals("Error logs should be empty", 1, logger.getErrorLogEntries().size());
+//    }
 
     public enum LoggerLevel { ERROR, WARN, INFO, DEBUG};
 

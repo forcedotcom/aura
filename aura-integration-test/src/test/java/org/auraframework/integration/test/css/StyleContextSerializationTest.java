@@ -37,7 +37,6 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.test.client.UserAgent;
 import org.auraframework.util.AuraTextUtil;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Sets;
@@ -48,12 +47,6 @@ import com.google.common.collect.Sets;
 public class StyleContextSerializationTest extends AuraImplTestCase {
     public StyleContextSerializationTest(String name) {
         super(name);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        ServiceLocatorMocker.unmockServiceLocator();
     }
 
     /** test that the css url includes the client/browser, no extra true conditions */

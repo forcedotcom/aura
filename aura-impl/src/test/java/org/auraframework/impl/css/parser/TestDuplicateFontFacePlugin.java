@@ -23,7 +23,6 @@ import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 
@@ -46,12 +45,6 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
         fontFamilyPlugin = plugin;
         TestStyleAdapter adapter = TestStyleAdapter.contextual(fontFamilyPlugin);
         return adapter;
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        super.tearDown();
-        ServiceLocatorMocker.unmockServiceLocator();
     }
 
     public void testNoErrorOnDifferentFonts() throws Exception {

@@ -22,6 +22,7 @@ import java.util.List;
 import javax.annotation.concurrent.ThreadSafe;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.css.FlavorOverrideLocator;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.BaseStyleDef;
@@ -44,6 +45,8 @@ import aQute.bnd.annotation.component.Component;
 @Component(provide = AuraServiceProvider.class)
 public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
 
+    private StyleAdapter styleAdapter = Aura.getStyleAdapter();
+
     @Override
     public Class<BaseStyleDef> getType() {
         return BaseStyleDef.class;
@@ -54,7 +57,7 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
         // get the list of plugins that should be run contextually, e.g., where the plugins have access to the full
         // set of StyleDefs to be combined together. This is important for plugins that need to make decisions based on
         // the aggregate, e.g., a validator that allows at most one occurrence of a particular thing.
-        List<Plugin> contextualPlugins = Aura.getStyleAdapter().getContextualRuntimePlugins();
+        List<Plugin> contextualPlugins = styleAdapter.getContextualRuntimePlugins();
 
         // the flavor mapping contains information on flavor CSS app overrides
         FlavorOverrideLocator overrides = getFlavorOverrides();
@@ -91,5 +94,12 @@ public class StyleDefCSSFormatAdapter extends CSSFormatAdapter<BaseStyleDef> {
             }
         }
         return null;
+    }
+
+    /**
+     * Injection override.
+     */
+    public void setStyleAdapter(StyleAdapter adapter) {
+        this.styleAdapter = adapter;
     }
 }

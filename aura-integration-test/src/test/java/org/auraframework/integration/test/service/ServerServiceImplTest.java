@@ -45,6 +45,7 @@ import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
 import org.auraframework.impl.AuraImplTestCase;
+import org.auraframework.impl.adapter.ServletUtilAdapterImpl;
 import org.auraframework.instance.AbstractActionImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.ActionDelegate;
@@ -62,7 +63,6 @@ import org.auraframework.system.Message;
 import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.json.Json;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.util.ServiceLocatorMocker;
@@ -747,11 +747,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             List<String> stack = Lists.newArrayList();
             SerializationService mockSerializationService = mock(SerializationService.class);
 
-            ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
-            Mockito.when(locator.get(ContextService.class)).thenReturn(mockContextService);
-            Mockito.when(locator.get(ConfigAdapter.class)).thenReturn(mockConfigAdapter);
-            Mockito.when(locator.get(SerializationService.class)).thenReturn(mockSerializationService);
-
             Mockito.when(mockResponse.getWriter()).thenReturn(writer);
             // for JS, SC_INTERNAL_SERVER_ERROR
             Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.JS);
@@ -763,7 +758,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
             Throwable exception = new InterruptedException("opps");
 
-            Aura.getServletUtilAdapter().handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
+            ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
+            adapter.setContextService(mockContextService);
+            adapter.setConfigAdapter(mockConfigAdapter);
+            adapter.setSerializationService(mockSerializationService);
+            adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
 
             Mockito.verify(mockResponse).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
             Mockito.verify(mockContextService, atLeastOnce()).endContext();
@@ -789,11 +788,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
             Throwable firstException = new EmptyStackException();
 
-            ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
-            Mockito.when(locator.get(ContextService.class)).thenReturn(mockContextService);
-            Mockito.when(locator.get(ConfigAdapter.class)).thenReturn(mockConfigAdapter);
-            Mockito.when(locator.get(ExceptionAdapter.class)).thenReturn(mockExceptionAdapter);
-
             Mockito.when(mockResponse.getWriter()).thenReturn(writer);
             Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.JSON);
             Mockito.when(mockContext.getMode()).thenReturn(Mode.PROD);
@@ -803,7 +797,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
             Throwable exception = new InterruptedException("opps");
 
-            Aura.getServletUtilAdapter().handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
+            ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
+            adapter.setContextService(mockContextService);
+            adapter.setConfigAdapter(mockConfigAdapter);
+            adapter.setExceptionAdapter(mockExceptionAdapter);
+            adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
 
             ArgumentCaptor<Throwable> handledException = ArgumentCaptor.forClass(Throwable.class);
             Mockito.verify(mockExceptionAdapter, Mockito.times(1)).handleException(handledException.capture());
@@ -837,11 +835,6 @@ public class ServerServiceImplTest extends AuraImplTestCase {
             String ccmeMsg = "double dead";
             Throwable secondException = new ConcurrentModificationException("double dead");
 
-            ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
-            Mockito.when(locator.get(ContextService.class)).thenReturn(mockContextService);
-            Mockito.when(locator.get(ConfigAdapter.class)).thenReturn(mockConfigAdapter);
-            Mockito.when(locator.get(ExceptionAdapter.class)).thenReturn(mockExceptionAdapter);
-
             Mockito.when(mockResponse.getWriter()).thenReturn(writer);
             Mockito.when(mockContext.getFormat()).thenReturn(AuraContext.Format.HTML);
             Mockito.when(mockContext.getMode()).thenReturn(Mode.DEV);
@@ -852,7 +845,11 @@ public class ServerServiceImplTest extends AuraImplTestCase {
 
             Throwable exception = new InterruptedException("opps");
 
-            Aura.getServletUtilAdapter().handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
+            ServletUtilAdapterImpl adapter = new ServletUtilAdapterImpl();
+            adapter.setContextService(mockContextService);
+            adapter.setConfigAdapter(mockConfigAdapter);
+            adapter.setExceptionAdapter(mockExceptionAdapter);
+            adapter.handleServletException(exception, true, mockContext, mockRequest, mockResponse, true);
 
             ArgumentCaptor<String> exceptionMessage = ArgumentCaptor.forClass(String.class);
             Mockito.verify(writer, Mockito.times(1)).println(exceptionMessage.capture());

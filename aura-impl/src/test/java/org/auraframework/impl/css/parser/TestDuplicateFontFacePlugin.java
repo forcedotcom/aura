@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl.css.parser;
 
-import static org.mockito.Mockito.when;
-
 import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.StyleDef;
@@ -25,13 +23,11 @@ import org.auraframework.impl.adapter.format.css.StyleDefCSSFormatAdapter;
 import org.auraframework.impl.css.StyleTestCase;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.throwable.AuraRuntimeException;
-import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 import com.google.common.collect.Lists;
 
 public class TestDuplicateFontFacePlugin extends StyleTestCase {
-    private ServiceLoader locator;
     private DuplicateFontFacePlugin fontFamilyPlugin;
     private StringBuilder out;
 
@@ -46,11 +42,10 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
 
     }
 
-    private void prepare(DuplicateFontFacePlugin plugin) {
-        locator = ServiceLocatorMocker.spyOnServiceLocator();
+    private StyleAdapter prepare(DuplicateFontFacePlugin plugin) {
         fontFamilyPlugin = plugin;
         TestStyleAdapter adapter = TestStyleAdapter.contextual(fontFamilyPlugin);
-        when(locator.get(StyleAdapter.class)).thenReturn(adapter);
+        return adapter;
     }
 
     @Override
@@ -60,22 +55,23 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testNoErrorOnDifferentFonts() throws Exception {
-        prepare(new DuplicateFontFacePlugin());
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom2; src: url(Custom2.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
+        cssFormatAdapter.setStyleAdapter(adapter);
         cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
         // no error
     }
 
     public void testErrorsOnDupeFontsSameFile() throws Exception {
-        prepare(new DuplicateFontFacePlugin());
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         String s = "@font-face {font-family: Custom1; src: url(Custom1.woff)}";
         DefDescriptor<StyleDef> desc = addStyleDef(s + "\n" + s);
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc.getDef()), out);
             fail("expected to get exception");
@@ -85,13 +81,13 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testErrorsOnDupeFontsDifferentFiles() throws Exception {
-        prepare(new DuplicateFontFacePlugin());
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom2; src: url(Custom2.woff)}");
         DefDescriptor<StyleDef> desc3 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef(), desc3.getDef()), out);
             fail("expected to get exception");
@@ -101,12 +97,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testErrorsOnDupeQuotedAndUnquoted() throws Exception {
-        prepare(new DuplicateFontFacePlugin());
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: \"Custom1\"; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -116,12 +112,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testErrorsOnDupeDifferentQuotes() throws Exception {
-        prepare(new DuplicateFontFacePlugin());
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin());
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: 'Custom1'; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: \"Custom1\"; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -131,12 +127,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testSamePropsCheckAllOn() throws Exception {
-        prepare(new DuplicateFontFacePlugin(false, true));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, true));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -146,12 +142,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testSamePropsCheckAllOff() throws Exception {
-        prepare(new DuplicateFontFacePlugin(false, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -161,23 +157,23 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testDifferentPropsCheckAllOn() throws Exception {
-        prepare(new DuplicateFontFacePlugin(false, true));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, true));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-style:italic; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
         // no error
     }
 
     public void testDifferentPropsCheckAllOff() throws Exception {
-        prepare(new DuplicateFontFacePlugin(false, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-style:italic; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -187,23 +183,23 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testSamePropsBothHaveAnnotation() throws Exception {
-        prepare(new DuplicateFontFacePlugin(true, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
         // no error
     }
 
     public void testSamePropsOnlyFirstHasAnnotation() throws Exception {
-        prepare(new DuplicateFontFacePlugin(true, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -213,12 +209,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testSamePropsOnlySecondHasAnnotation() throws Exception {
-        prepare(new DuplicateFontFacePlugin(true, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(true, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");
@@ -228,12 +224,12 @@ public class TestDuplicateFontFacePlugin extends StyleTestCase {
     }
 
     public void testSamePropsBothHaveAnnotationButNotAllowed() throws Exception {
-        prepare(new DuplicateFontFacePlugin(false, false));
+        StyleAdapter adapter = prepare(new DuplicateFontFacePlugin(false, false));
         DefDescriptor<StyleDef> desc1 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
         DefDescriptor<StyleDef> desc2 = addStyleDef("@font-face {/* @allowDuplicate */ font-family: Custom1; font-weight:bold; src: url(Custom1.woff)}");
 
         StyleDefCSSFormatAdapter cssFormatAdapter = new StyleDefCSSFormatAdapter();
-
+        cssFormatAdapter.setStyleAdapter(adapter);
         try {
             cssFormatAdapter.writeCollection(Lists.newArrayList(desc1.getDef(), desc2.getDef()), out);
             fail("expected to get exception");

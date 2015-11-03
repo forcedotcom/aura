@@ -81,6 +81,8 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private final boolean validateCss;
     private final Map<String, String> effectiveTimezones;
 
+    private LocalizationAdapter localizationAdapter = Aura.getLocalizationAdapter();
+
     public ConfigAdapterImpl() {
         this(getDefaultCacheDir());
     }
@@ -313,7 +315,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
      */
     @Override
     public String getJSLibsURL() {
-        AuraLocale al = Aura.getLocalizationAdapter().getAuraLocale();
+        AuraLocale al = localizationAdapter.getAuraLocale();
         String tz = al.getTimeZone().getID();
         tz = getAvailableTimezone(tz);
         tz = tz.replace("/", "-");
@@ -614,5 +616,12 @@ public class ConfigAdapterImpl implements ConfigAdapter {
             }
         }
         return new DefaultContentSecurityPolicy(inlineStyle);
+    }
+
+    /**
+     * Injection override.
+     */
+    public void setLocalizationAdapter(LocalizationAdapter adapter) {
+        this.localizationAdapter = adapter;
     }
 }

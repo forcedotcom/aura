@@ -124,8 +124,6 @@ public class TimeZoneInfoController {
 
     /**
      * Injection override.
-     *
-     * @param definitionService the definitionService to set
      */
     public static void setConfigAdapter(ConfigAdapter adapter) {
         configAdapter = adapter;

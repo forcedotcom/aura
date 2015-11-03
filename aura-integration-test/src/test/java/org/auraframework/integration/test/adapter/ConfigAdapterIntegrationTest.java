@@ -37,7 +37,6 @@ import org.auraframework.impl.util.AuraImplFiles;
 import org.auraframework.impl.util.AuraLocaleImpl;
 import org.auraframework.system.AuraContext;
 import org.auraframework.util.AuraLocale;
-import org.auraframework.util.ServiceLoader;
 import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
@@ -403,13 +402,13 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
             AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("US/Pacific"));
             LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
             when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-            ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
-            when(locator.get(LocalizationAdapter.class)).thenReturn(mockAdapter);
 
+            ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
+            configAdapter.setLocalizationAdapter(mockAdapter);
             startAppContext("<aura:application></aura:application>");
 
             assertTrue("JS libs file should be libs_America-Los-Angeles.js",
-                    Aura.getConfigAdapter().getJSLibsURL().contains("libs_America-Los_Angeles.js"));
+                    configAdapter.getJSLibsURL().contains("libs_America-Los_Angeles.js"));
         } finally {
             ServiceLocatorMocker.unmockServiceLocator();
         }
@@ -420,13 +419,14 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
             AuraLocale auraLocale = new AuraLocaleImpl(Locale.US, TimeZone.getTimeZone("HammerTime"));
             LocalizationAdapter mockAdapter = mock(LocalizationAdapter.class);
             when(mockAdapter.getAuraLocale()).thenReturn(auraLocale);
-            ServiceLoader locator = ServiceLocatorMocker.spyOnServiceLocator();
-            when(locator.get(LocalizationAdapter.class)).thenReturn(mockAdapter);
+
+            ConfigAdapterImpl configAdapter = new ConfigAdapterImpl();
+            configAdapter.setLocalizationAdapter(mockAdapter);
 
             startAppContext("<aura:application></aura:application>");
 
             assertTrue("JS libs file should be the default libs_GMT.js for invalid timezones",
-                    Aura.getConfigAdapter().getJSLibsURL().contains("libs_GMT.js"));
+                    configAdapter.getJSLibsURL().contains("libs_GMT.js"));
         } finally {
             ServiceLocatorMocker.unmockServiceLocator();
         }

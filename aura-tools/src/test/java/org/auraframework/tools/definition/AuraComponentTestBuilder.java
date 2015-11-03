@@ -98,14 +98,15 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
      * This function puts the component location adapter in the set that is returned by the Service loader. It uses the
      * mock, so one must be careful with it.
      */
-    public void installComponentLocationAdapter() {
-        mockedServiceLoader = ServiceLocatorMocker.spyOnServiceLocator();
-        modified = Sets.newHashSet();
-        modified.addAll(mockedServiceLoader.getAll(ComponentLocationAdapter.class));
-        modified.add(cla);
-        Mockito.when(mockedServiceLoader.getAll(ComponentLocationAdapter.class)).thenReturn(modified);
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
-    }
+// disable because serviceLoader.getAll cannot be mocked out
+//    public void installComponentLocationAdapter() {
+//        mockedServiceLoader = ServiceLocatorMocker.spyOnServiceLocator();
+//        modified = Sets.newHashSet();
+//        modified.addAll(mockedServiceLoader.getAll(ComponentLocationAdapter.class));
+//        modified.add(cla);
+//        Mockito.when(mockedServiceLoader.getAll(ComponentLocationAdapter.class)).thenReturn(modified);
+//        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+//    }
 
     /**
      * Build a directory for a namespace, and return the new namespace.

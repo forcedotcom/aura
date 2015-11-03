@@ -446,8 +446,6 @@ public class InstanceStack {
 
     /**
      * Injection override.
-     *
-     * @param definitionService the definitionService to set
      */
     public void setConfigAdapter(ConfigAdapter adapter) {
         this.configAdapter = adapter;

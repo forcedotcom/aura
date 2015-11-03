@@ -35,17 +35,28 @@ public class AccessChecksUITest extends WebDriverTestCase {
 
     /**
      * Cannot create a component with PUBLIC access from an unprivileged namespace.
+     * 
+     * Note that since auratest:accessPublicComponent IS included as a dependency on accessUnprivilegedNamespace, this
+     * will try to the component on the client and fail.
      */
-    //TODO: @tbliss Reenable this with better error messaging
-    // public void testPublicComponentInaccessibleFromUnprivilegedNamespace() throws Exception {
-    //     getMockConfigAdapter().setUnprivilegedNamespace("componentTest");
-    //     open("/componentTest/accessUnprivilegedNamespace.cmp?cmpToCreate=auratest:accessPublicComponent");
-    //     clickCreateComponentButton();
-    //     verifyComponentNotCreated();
-    // }
+    public void testPublicComponentInaccessibleFromUnprivilegedNamespace() throws Exception {
+        getMockConfigAdapter().setUnprivilegedNamespace("componentTest");
+        open("/componentTest/accessUnprivilegedNamespace.cmp?cmpToCreate=auratest:accessPublicComponent");
+        clickCreateComponentButton();
+
+        // Component create will fail on the client due to access checks so wait for error dialog to be displayed
+        // and then assert no new component on page.
+        waitForElementTextContains(
+                getDriver().findElement(By.id("auraErrorMessage")), "componentDef is required");
+        assertEquals("No new component should be present", "", getDriver().findElement(By.className("output"))
+                .getText());
+    }
 
     /**
      * Cannot create a component with INTERNAL access from an unprivileged namespace.
+     * 
+     * Note that since we did not include auratest:accessInternalComponent as a dependency on
+     * accessUnprivilegedNamespace, this will attempt to get the component from the server.
      */
     public void testInternalComponentInaccessibleFromUnprivilegedNamespace() throws Exception {
         getMockConfigAdapter().setUnprivilegedNamespace("componentTest");
@@ -203,6 +214,7 @@ public class AccessChecksUITest extends WebDriverTestCase {
     }
 
     private void verifyComponentNotCreated() {
-        waitForElementTextPresent(getDriver().findElement(By.className("output")), "null");
+        auraUITestingUtil.waitForElementText(By.className("output"), "null", true, "Expected 'null' to be outputted "
+                + "to indicate component could not be created due to access check violations");
     }
 }

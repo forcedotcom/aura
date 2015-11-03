@@ -59,11 +59,11 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
         super(name);
     }
     
-    @SuppressWarnings("unused")
     class Request implements Callable<Integer> {
     	private CloseableHttpClient httpClient;
     	private String url;
-    	private String name;
+    	@SuppressWarnings("unused")
+		private String name;
     	public Request(CloseableHttpClient httpClient, String url, String name) { 
     		this.httpClient = httpClient;
     		this.url = url;
@@ -72,18 +72,12 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
 
 		@Override
 		public Integer call() throws Exception {
-			
 			HttpGet get = obtainGetMethod(url);
-			//HttpResponse response = getHttpClient().execute(method, context);
 			HttpResponse httpResponse = httpClient.execute(get);
-			
-			//HttpGet get = obtainGetMethod(url);
-	        //HttpResponse httpResponse = perform(get);
 	        int statusCode = getStatusCode(httpResponse);
+	        //for debug only
 	        //String response = getResponseBody(httpResponse);
 	        //System.out.println("Request(#"+this.name+") status:"+statusCode/*+", get response:"+response*/);
-	        //EntityUtils.consume(httpResponse.getEntity());
-	        //EntityUtils.consumeQuietly(httpResponse.getEntity());
 	        //get.releaseConnection();
 	        return statusCode;
 		}

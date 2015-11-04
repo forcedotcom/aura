@@ -28,7 +28,7 @@
     <aura:attribute name="auraScriptTags"           type="String" description="Loads the js framework, preloads the definitions of all preload namespaces, and any other framework script"/>
     <aura:attribute name="auraBaseScriptTags"       type="String" />
     <aura:attribute name="auraNamespacesScriptTags" type="String" />
-    <aura:attribute name="auraResetStyle"           type="String" default="reset" description="Which style of css reset file to use to smooth out default browser chrome inconsistencies. Possible values are 'normalize', 'reset', or '' (none). Default is 'normalize'."/>
+    <aura:attribute name="auraResetStyle"           type="String" default="reset" description="Which style of css reset file to use to smooth out default browser chrome inconsistencies. Possible values are 'normalize', 'reset', or '' (none). Default is 'reset'."/>
     <aura:attribute name="auraResetTags"            type="String" access="PRIVATE" description="Will contain the style import tag for the type of reset style chosen, or nothing."/>
     <aura:attribute name="auraInlineStyle"          type="String"           description="Loads Aura inline style from template.css."/>
     <aura:attribute name="auraInit"                 type="String"           description="Initializes Aura ayncronously."/>

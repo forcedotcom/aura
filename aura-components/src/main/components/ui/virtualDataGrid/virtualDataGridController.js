@@ -35,9 +35,6 @@
     	helper.createVirtualRows(cmp);
         helper.markDirty(cmp); // So we go into the rerender
     },
-    handleHeadersChange: function (cmp) {
-    	cmp._updateResizer = true;
-    },
     handleColumnsChange: function (cmp, event, helper) {
         var concreteCmp = cmp.getConcreteComponent(),
             isExtended  = concreteCmp !== cmp;

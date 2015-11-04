@@ -150,16 +150,18 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	for (var i = 0; i < columns.length; i++) {
 	    		var column = columns[i];
 
-	    		var handle = this._createHandle();
-	    		this._attachHandle(column, handle);
-	    		
-	    		var initialWidth = initialWidths[i] || column.clientWidth;
-	    		if (initialWidth < this.config.minWidth) {
-	    			initialWidth = this.config.minWidth;
+	    		if (!this.hasHandle(column)) {
+	    			var handle = this._createHandle();
+		    		this._attachHandle(column, handle);
+		    		
+		    		var initialWidth = initialWidths[i] || column.clientWidth;
+		    		if (initialWidth < this.config.minWidth) {
+		    			initialWidth = this.config.minWidth;
+		    		}
+		    		
+		    		this._resize(column, initialWidth);
+		    		this._updateRange(this._findRangeElement(column), column.clientWidth);
 	    		}
-	    		
-	    		this._resize(column, initialWidth);
-	    		this._updateRange(this._findRangeElement(column), column.clientWidth);
 	    		totalWidth += column.clientWidth;
 	    	}
 	    	
@@ -566,6 +568,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		},
 		
 		/**
+		 * Checks to see if the specified column has a handle attached
+		 */
+		hasHandle : function(column) {
+			return column.querySelector('.handle') !== null;
+		},
+		
+		/**
 		 * Re-initialize column data
 		 */
 		updateColumns : function() {
@@ -583,7 +592,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 				return th.clientWidth;
 			});
 		},
-		
+
 		/**
 		 * Manually resizes the specified column
 		 */

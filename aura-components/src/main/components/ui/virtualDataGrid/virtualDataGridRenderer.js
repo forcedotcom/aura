@@ -62,7 +62,7 @@
     		helper.updateSizesForFixedHeader(cmp);
     	}
         
-        if (cmp.get("v.enableResizableColumns") && cmp._updateResizer) {
+        if (cmp.get("v.enableResizableColumns") && !helper.hasResizerHandles(cmp)) {
         	helper.updateColumnResizer(cmp);
         	cmp._updateResizer = null;
         }

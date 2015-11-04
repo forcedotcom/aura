@@ -51,6 +51,28 @@
     	        $A.test.assertEquals(expected, actual, "List element in autocompleteList is not clickable!");
     	    }]
         },
+        
+        /*
+         * Test case to avoid infinite loop when there are 0 items and no header/footer
+         * Bug: W-2800886
+         */
+        testFocusOnEmptyListDoesNotTriggerInfinteloop: {
+    		test : [function(cmp){
+    			autoComplete = cmp.find("autoCompleteNoData");
+    			autoList = autoComplete.find("list");
+    			$A.test.assertFalse(autoList.get("v.visible"), "Autocomplete list should not be visible");
+    			autoList.set("v.visible",true);
+            }, function(cmp){
+            	$A.test.assertTrue($A.util.hasClass(autoList.getElement(), "loading"), 
+    				"Loading indicator should be present");
+            	var input = this._getInput(cmp,"autoCompleteNoData");
+                try{
+                	this._fireKeydownEvent(input, this.DOWNARROW_KEY);
+                } catch (e) {
+                	$A.test.fail(e.message);
+                }
+    		}]
+    	},
 
 	testDownArrowSelectsNextItem: {
 		test : [function(cmp){

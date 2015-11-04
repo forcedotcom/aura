@@ -1246,6 +1246,15 @@ AuraClientService.prototype.popStack = function(name) {
 
     if (this.auraStack.length === 0) {
         this.auraStack.push("AuraClientService$popStack");
+        this.postProcess();
+    }
+};
+
+/*
+ * @private 
+ */
+AuraClientService.prototype.postProcess = function() {
+    if (this.auraStack.length === 1 && this.auraStack[0] === "AuraClientService$popStack") {
         try {
             this.process();
         } catch (e) {

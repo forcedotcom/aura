@@ -252,6 +252,55 @@ public class ConfigAdapterIntegrationTest extends AuraImplTestCase {
         assertEquals("Reset CSS url should be null for last extended template.", expected, actual);
     }
 
+    public void testGetResetCssUrlShouldRemainResetForLastExtendedTemplate() throws Exception {
+        String expected="resetCSS.css";
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'><aura:set attribute='auraResetStyle' value='reset'/></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should remain resetCSS.css for last extended template. Found: " + resetCssUrl, actual);
+    }
+
+
+    public void testGetResetCssUrlShouldRemainNormalizeForLastExtendedTemplate() throws Exception {
+        String expected="normalize.css";
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value='normalize'/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String resetCssUrl=Aura.getConfigAdapter().getResetCssURL();
+        boolean actual=resetCssUrl.contains(expected);
+
+        assertTrue("Reset CSS url should remain normalize.css for last extended template. Found: " + resetCssUrl, actual);
+    }
+
+
+    public void testGetResetCssUrlShouldRemainNullForLastExtendedTemplate() throws Exception {
+        String expected=null;
+        String templateSrc = "<aura:component isTemplate='true' extensible='true' extends='aura:template'><aura:set attribute='auraResetStyle' value=''/></aura:component>";
+        DefDescriptor<ComponentDef> template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+        templateSrc = "<aura:component isTemplate='true' extensible='true' extends='"+template.getDescriptorName()+"'></aura:component>";
+        template = addSourceAutoCleanup(ComponentDef.class, templateSrc);
+
+        startAppContext("<aura:application access='unauthenticated' template='" + template.getDescriptorName() + "'></aura:application>");
+        String actual=Aura.getConfigAdapter().getResetCssURL();
+
+        assertEquals("Reset CSS url should remain null for last extended template.", expected, actual);
+    }
+
     public void testGetResetCssUrlShouldDefaultToResetFromAncestorsTemplateForExtendedApplication() throws Exception {
         String expected="resetCSS.css";
         String templateSrc = "<aura:component isTemplate='true' extends='aura:template'></aura:component>";

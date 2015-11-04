@@ -252,7 +252,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         AuraContext context = Aura.getContextService().getCurrentContext();
         String contextPath = context.getContextPath();
         String uid = context.getFrameworkUID();
-        String resetCss = "resetCSS";
+        String resetCss = "resetCSS.css";
         try {
             DefDescriptor<?> appDesc = context.getApplicationDescriptor();
             if (appDesc != null) {
@@ -262,10 +262,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                     String auraResetStyle=getTemplateValue(template,"auraResetStyle");
                     switch(auraResetStyle){
                         case "reset":
-                            resetCss="resetCSS";
+                            resetCss="resetCSS.css";
                             break;
                         case "normalize":
-                            resetCss="normalize";
+                            resetCss="normalize.css";
                             break;
                         default:
                             return null;
@@ -273,9 +273,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
                 }
             }
         } catch (QuickFixException qfe) {
-            // ignore and use default normalize.css
+            resetCss+="?error";
+            // ignore and use default resetCSS.css
         }
-        return String.format("%s/auraFW/resources/%s/aura/%s.css", contextPath, uid, resetCss);
+        return String.format("%s/auraFW/resources/%s/aura/%s", contextPath, uid, resetCss);
     }
 
     /**
@@ -292,8 +293,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         Object attributeValue;
         if (template.getSuper() != null && template.getSuper().getDescriptor().getDef().isTemplate()) {
             template = template.getSuper();
+            attributeValue=template.getAttributes().getRawValue(attribute);
+        }else{
+            attributeValue=template.getAttributes().getValue(attribute);
         }
-        attributeValue=template.getAttributes().getValue(attribute);
         if (attributeValue != null) {
             if (attributeValue instanceof PropertyReference) {
                 return getTemplateValue(template,attribute);

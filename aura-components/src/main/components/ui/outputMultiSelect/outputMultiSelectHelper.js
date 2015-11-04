@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 ({
-    doInit: function(component) {
-        // trimming whitespaces
-        var value = component.get('v.value');
-        component.set('v.value', $A.util.trim((value)));
-        
-        var label = component.get('v.label');
-        component.set('v.label', $A.util.trim((label)));
+    updateValue: function (cmp) {
+        var element = cmp.find("span").getElement();
+        var delimiter = cmp.get("v.delimiter");
+
+        var value = cmp.get("v.value");
+        if ($A.util.isArray(value)) {
+            value = value.join(delimiter);
+        }
+
+        if (element.textContent !== undefined) {
+            element.textContent = value;
+        } else {
+            element.innerText = value;
+        }
     }
 })// eslint-disable-line semi

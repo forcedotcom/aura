@@ -22,8 +22,6 @@
 
     <aura:attribute name="value" type="String" required="true" access="GLOBAL" description="The output value of the email"/>
 
-    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
-
     <span aura:id="body" class="{!v.class}"></span>
 
 </aura:component>

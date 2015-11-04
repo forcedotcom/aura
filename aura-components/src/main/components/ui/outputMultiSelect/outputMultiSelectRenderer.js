@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 ({
-    render : function(cmp){
+    render: function (cmp, helper) {
         var ret = this.superRender();
-        var element = cmp.find("span").getElement();
-        var delimiter = cmp.get("v.delimiter");
 
-        var value = cmp.get("v.value");
-        if($A.util.isArray(value)){
-            value = value.join(delimiter);
-        }
+        helper.updateValue(cmp);
 
-        if(element.textContent !== undefined){
-        	element.textContent = value;
-        }
-        else{
-        	element.innerText = value;
-        }
         return ret;
+    },
+
+    rerender: function (cmp, helper) {
+        this.superRerender();
+
+        helper.updateValue(cmp);
     }
+
 })// eslint-disable-line semi

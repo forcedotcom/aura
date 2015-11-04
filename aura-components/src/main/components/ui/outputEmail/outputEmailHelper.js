@@ -22,10 +22,10 @@
             $A.util.clearNode(bodyElement);
 
             var actionable = $A.util.getBooleanValue(cmp.get("v.actionable"));
-            var value = cmp.get("v.value") || '';
+            var value = $A.util.trim(cmp.get("v.value") || '');
 
             if (!$A.util.isEmpty(value)) {
-                var label = cmp.get("v.label") || '';
+                var label = $A.util.trim(cmp.get("v.label") || '');
 
                 var node;
                 if (actionable) {

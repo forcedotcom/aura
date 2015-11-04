@@ -57,8 +57,6 @@ public interface CachingService extends AuraService {
 
     Cache<String, String> getStringsCache();
     
-    void logStringsCacheStats(String extraMessage);
-
     Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache();
 
     Cache<String, DependencyEntry> getDepsCache();

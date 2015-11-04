@@ -310,7 +310,7 @@ public class ServerServiceImpl implements ServerService {
 					public String call() throws Exception {
 		    			String res = getDefinitionsString(dependencies, key, minify);
 		    			//log the cache miss here
-		    			Aura.getCachingService().logStringsCacheStats("cache miss for key: "+key+";");
+		    			Aura.getCachingService().getStringsCache().logCacheStatus("StringsCache", "cache miss for key: "+key+";");
 		    			return res;
 		    		}
 		    	});

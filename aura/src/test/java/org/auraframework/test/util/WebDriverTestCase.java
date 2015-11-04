@@ -903,7 +903,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
             try {
                 currentDriver.quit();
             } catch (Exception e) {
-                Log.warn(currentDriver.toString(), e);
+                Log.getLogger(getClass()).warn(currentDriver.toString(), e);
             }
             setCurrentDriver(null);
         }

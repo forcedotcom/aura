@@ -19,6 +19,7 @@ import java.io.*;
 import java.util.*;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Annotations.Key;
@@ -34,6 +35,7 @@ import org.auraframework.util.resource.ResourceLoader;
 @Controller
 public class TimeZoneInfoController {
     private static Map<String, String> cache = Collections.synchronizedMap(new HashMap<String, String>(1));
+    private static ConfigAdapter configAdapter = Aura.getConfigAdapter();
 
     @AuraEnabled
     public static TimeZoneInfo getTimeZoneInfo(@Key("timezoneId") String timezoneId) throws Exception {
@@ -46,7 +48,7 @@ public class TimeZoneInfoController {
         }
         String info = cache.get(timezoneId);
         if (info == null) {
-            String availableTimezoneId = Aura.getConfigAdapter().getAvailableTimezone(timezoneId);
+            String availableTimezoneId = configAdapter.getAvailableTimezone(timezoneId);
             if (availableTimezoneId == null || "GMT".equalsIgnoreCase(availableTimezoneId)) {
             	return null;
             }
@@ -118,5 +120,12 @@ public class TimeZoneInfoController {
                 json.writeLiteral(this.info);
             }
         }
+    }
+
+    /**
+     * Injection override.
+     */
+    public static void setConfigAdapter(ConfigAdapter adapter) {
+        configAdapter = adapter;
     }
 }

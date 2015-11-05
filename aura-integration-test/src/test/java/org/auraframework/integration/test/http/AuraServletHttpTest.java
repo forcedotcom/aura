@@ -49,7 +49,6 @@ import org.auraframework.util.json.JsonEncoder;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 
 /**
  * Automation to verify the handling of AuraServlet requests.
@@ -624,7 +623,6 @@ public class AuraServletHttpTest extends AuraHttpTestCase {
             return headers;
         } finally {
             mci.setContentSecurityPolicy(null);
-            ServiceLocatorMocker.unmockServiceLocator();
         }
 
     }

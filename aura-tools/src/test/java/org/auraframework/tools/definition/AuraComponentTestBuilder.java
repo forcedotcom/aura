@@ -28,8 +28,6 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
-import org.auraframework.util.ServiceLoader;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Sets;
@@ -47,7 +45,6 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
     private Path componentsPath;
     private final ComponentLocationAdapter cla;
     private Set<ComponentLocationAdapter> modified;
-    private ServiceLoader mockedServiceLoader = null;
 
     /**
      * Create a new test builder.
@@ -67,10 +64,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
                 // DOH!
             }
         }
-        if (mockedServiceLoader != null) {
-            ServiceLocatorMocker.unmockServiceLocator();
-            mockedServiceLoader = null;
-        }
+
         Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
     }
 
@@ -98,14 +92,15 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
      * This function puts the component location adapter in the set that is returned by the Service loader. It uses the
      * mock, so one must be careful with it.
      */
-    public void installComponentLocationAdapter() {
-        mockedServiceLoader = ServiceLocatorMocker.spyOnServiceLocator();
-        modified = Sets.newHashSet();
-        modified.addAll(mockedServiceLoader.getAll(ComponentLocationAdapter.class));
-        modified.add(cla);
-        Mockito.when(mockedServiceLoader.getAll(ComponentLocationAdapter.class)).thenReturn(modified);
-        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
-    }
+// disable because serviceLoader.getAll cannot be mocked out
+//    public void installComponentLocationAdapter() {
+//        mockedServiceLoader = ServiceLocatorMocker.spyOnServiceLocator();
+//        modified = Sets.newHashSet();
+//        modified.addAll(mockedServiceLoader.getAll(ComponentLocationAdapter.class));
+//        modified.add(cla);
+//        Mockito.when(mockedServiceLoader.getAll(ComponentLocationAdapter.class)).thenReturn(modified);
+//        Aura.getDefinitionService().onSourceChanged(null, SourceListener.SourceMonitorEvent.CHANGED, null);
+//    }
 
     /**
      * Build a directory for a namespace, and return the new namespace.

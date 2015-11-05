@@ -20,8 +20,6 @@ import static org.mockito.Mockito.when;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.impl.controller.TimeZoneInfoController;
 import org.auraframework.impl.controller.TimeZoneInfoController.TimeZoneInfo;
-import org.auraframework.util.ServiceLoader;
-import org.auraframework.util.test.util.ServiceLocatorMocker;
 import org.auraframework.util.test.util.UnitTestCase;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -36,6 +34,7 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
 	TimeZoneInfoController.Helpers helpers;
 	
 	private ConfigAdapter mci;
+
 	
 	/**
      * setUp mocks Aura.getConfigAdapter().getAvailableTimezone(timezone).
@@ -44,17 +43,7 @@ public class TimeZoneInfoControllerUnitTest extends UnitTestCase {
     public void setUp() throws Exception {
     	 super.setUp();
     	 mci = Mockito.mock(ConfigAdapter.class);
-    	 ServiceLoader msl = ServiceLocatorMocker.mockServiceLocator();
-    	 Mockito.when(msl.get(ConfigAdapter.class)).thenReturn(mci);    	 
-    }
-
-    /**
-     * tearDown un-mocks Aura.getConfigAdapter().getAvailableTimezone(timezone).
-     */
-    @Override
-    public void tearDown() throws Exception {
-        ServiceLocatorMocker.unmockServiceLocator();
-        super.tearDown();
+    	 TimeZoneInfoController.setConfigAdapter(mci);
     }
 	
 	/** 

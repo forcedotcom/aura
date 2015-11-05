@@ -22,11 +22,6 @@
         if ($A.util.isArray(value)) {
             value = value.join(delimiter);
         }
-
-        if (element.textContent !== undefined) {
-            element.textContent = value;
-        } else {
-            element.innerText = value;
-        }
+        $A.util.setText(element, value);
     }
 })// eslint-disable-line semi

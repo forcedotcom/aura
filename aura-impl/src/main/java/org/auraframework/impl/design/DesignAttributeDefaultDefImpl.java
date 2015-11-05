@@ -19,6 +19,7 @@ package org.auraframework.impl.design;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.auraframework.def.ComponentDefRef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -26,6 +27,7 @@ import org.auraframework.util.json.Json;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementation for attribute default.
@@ -39,6 +41,14 @@ public class DesignAttributeDefaultDefImpl extends DefinitionImpl<DesignAttribut
     protected DesignAttributeDefaultDefImpl(Builder builder) {
         super(builder);
         this.defaultFacet = builder.defaultFacet;
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        for (ComponentDefRef ref : defaultFacet) {
+            dependencies.add(ref.getDescriptor());
+        }
     }
 
     @Override

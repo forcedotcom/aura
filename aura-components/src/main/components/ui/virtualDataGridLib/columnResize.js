@@ -553,7 +553,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @return {HTMLElement} The input of type range we use to store the column width values
 		 */
 		_findRangeElement: function(headerEl) {
-			return headerEl.querySelector('input');
+			return headerEl ? headerEl.querySelector('input') : null;
 		},
 		
 		/**
@@ -571,7 +571,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * Checks to see if the specified column has a handle attached
 		 */
 		hasHandle : function(column) {
-			return column.querySelector('.handle') !== null;
+			return column ? (column.querySelector('.handle') !== null) : false;
 		},
 		
 		/**
@@ -597,8 +597,8 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * Manually resizes the specified column
 		 */
 		resize : function(index, width) {
-			if (width > 0) {
-				var column = this.columns[index];
+			var column = this.columns[index];
+			if (column && width > 0) {
 				this.resizeColumn(column, width, this._findRangeElement(column));
 			}
 		},

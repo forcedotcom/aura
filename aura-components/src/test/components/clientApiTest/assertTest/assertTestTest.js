@@ -36,7 +36,6 @@
             } catch (e) {
                 $A.test.assertEquals(returned, e.message);
             }
-            $A.test.assertEquals(returned, aura.util.getElement("auraErrorMessage").innerHTML);
         }
     }
 })

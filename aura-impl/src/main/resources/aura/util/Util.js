@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint evil:true, sub: true */
+/*jslint sub: true */
 /*global Aura, Json, Component, PropertyReferenceValue, FunctionCallValue, PropertyReferenceValue, FunctionCallValue, PassthroughValue, Action*/
 
 /**
@@ -69,7 +69,9 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  */
 Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function(src) {
     // use assignment to variable so that the newlines in src are not actually treated as the end of the line
+    /*jshint evil:true*/
     return new Function("var a = " + src + "; return a;")();
+    /*jshint evil:false*/
 } : function(src) {
     // normal indirect eval call
     return window.eval("false||" + src);

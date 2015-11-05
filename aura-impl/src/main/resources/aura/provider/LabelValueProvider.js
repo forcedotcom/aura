@@ -18,8 +18,8 @@
  * @description Label Provider. Performs server action to retrieve label values
  * @constructor
  */
-function LabelValueProvider() {
-    this.values = {};
+function LabelValueProvider(values) {
+    this.values = values || {};
     this.queue = {};
 }
 

@@ -480,6 +480,18 @@
     	}
     },
     
+    /**
+     * Checks if all column headers have resize handles.
+     * 
+     * We hopefully won't need to do this anymore once dataGridColumn is refactored and we can let Aura
+     * rerender the resizer handles natively. 
+     */
+    hasResizerHandles : function(cmp) {
+    	var handles = cmp.find("thead").getElement().querySelectorAll(".handle").length;
+    	var headers = cmp.get("v.headerColumns").length;
+    	return handles === headers;
+    },
+    
     destroyTemplates: function (cmp) {
         var tmpls = cmp._templates;
         for (var i = 0; i < tmpls.length; ++i) {

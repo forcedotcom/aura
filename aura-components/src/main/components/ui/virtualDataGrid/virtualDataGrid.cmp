@@ -58,8 +58,7 @@
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <aura:handler name="change" value="{!v.items}"   action="{!c.handleItemsChange}"/>
-    <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/> 
-	<aura:handler name="change" value="{!v.headerColumns}" action="{!c.handleHeadersChange}"/>
+    <aura:handler name="change" value="{!v.columns}" action="{!c.handleColumnsChange}"/>
 
 	<aura:registerEvent name="onsort" type="ui:sort" description="The event fired when a column is sorted."/>
 	<aura:registerEvent name="onColumnResize" type="ui:resize" description="The event fired when a column is resized."/>

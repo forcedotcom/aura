@@ -1,0 +1,2 @@
+<aura:component helper="js://componentTest.helper">
+</aura:component>

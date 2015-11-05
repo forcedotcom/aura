@@ -1,0 +1,14 @@
+<aura:component extends="componentTest:helperSuper">
+    <aura:attribute type="String" name="message"/>
+
+    <aura:attribute type="Boolean" name="callsHelperMethodInRender" default="false"/>
+    <aura:attribute type="Boolean" name="callsHelperMethodInAfterRender" default="false"/>
+    <aura:attribute type="Boolean" name="callsHelperMethodInRerender" default="false"/>
+    <aura:attribute type="Boolean" name="callsHelperMethodInUnrender" default="false"/>
+
+    <aura:method name="updateWithMessageFromHelper" action="c.updateWithMessageFromHelper">
+        <aura:attribute name="newMessage" type="String"/>
+    </aura:method>
+
+    <componentTest:helperContainedCmp aura:id="containedCmp"/>
+</aura:component>

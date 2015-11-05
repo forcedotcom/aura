@@ -18,6 +18,7 @@
 <aura:component extensible="true" support="PROTO" description="A column of actionable buttons or links in ui:dataGrid">
 	<aura:attribute name="name" type="String"/>
 	<aura:attribute name="label" type="String"/>
+	<aura:attribute name="assistiveLabel" type="String" default="Actions" description="Hidden assistive text for the header."/>
 	<aura:attribute name="class" type="String"/>
 	<aura:attribute name="scope" type="String" default="col" description="{ col, row, colgroup, rowgroup }"/>
 	<aura:attribute name="header" type="Aura.Component[]"/>
@@ -26,5 +27,8 @@
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
-	<th scope="{!v.scope}" class="{!v.class}">{!v.label} {!v.header}</th>
+	<th scope="{!v.scope}" class="{!v.class}">
+		<span class="assistiveText">{!v.assistiveLabel}</span>
+		{!v.label} {!v.header}
+	</th>
 </aura:component>

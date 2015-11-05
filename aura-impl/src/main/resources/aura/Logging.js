@@ -161,11 +161,11 @@
     window.onerror = (function() {
         var existing = window.onerror;
         var newHandler = function(message, url, line, col, err) {
+            handleError(message, err);
             if ($A.initialized) {
                 $A.logger.reportError(err);
+                $A.services.client.postProcess();
             }
-
-            handleError(message, err);
             return true;
         };
 

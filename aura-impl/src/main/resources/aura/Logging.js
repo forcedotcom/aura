@@ -93,41 +93,14 @@
         }
     }
 
-    /**
-     * Throws error and show error dialog for failed assertion unless in production
-     */
-    function devAssertError(level, message) {
-        $A.trace();
-        
-        if ($A.showErrors()) {
-            var elt = $A.util.getElement("auraErrorMessage");
-            if (elt) {
-                elt.innerHTML = message;
-                $A.util.removeClass(document.body, "loading");
-                $A.util.addClass(document.body, "auraError");
-            } else {
-                alert(message);
-            }
-        }
-        throw new $A.auraError(message);
-    }
-
     $A.logger.subscribe("INFO", devDebugConsoleLog);
     $A.logger.subscribe("WARNING", devDebugConsoleLog);
     $A.logger.subscribe("ERROR", devDebugConsoleLog);
-    $A.logger.subscribe("ASSERT", devAssertError);
-
     //#end
-    
-    //#if {"modes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-    
-    /**
-     * $A.assert() will throw error in production
-     */
+
     $A.logger.subscribe("ASSERT", function(level, message) {
         throw new $A.auraError(message);
     });
-    //#end
 
     //#if {"modes" : ["PRODUCTIONDEBUG"]}
     /**

@@ -55,7 +55,9 @@
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                     </aura:If>
                     {!v.header}
-                    {!v.closeButton}
+                    <aura:if isTrue="{!v.showCloseButton}">
+                        {!v.closeButton}
+                    </aura:if>
                 </div>
 
                 <div aura:id="body" class="modal-body scrollable">

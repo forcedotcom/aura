@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 /*jslint evil:true, sub: true */
+/*global Aura, Json, Component, PropertyReferenceValue, FunctionCallValue, PropertyReferenceValue, FunctionCallValue, PassthroughValue, Action*/
 
 /**
  * @description

@@ -173,13 +173,17 @@
     focusOnInputBox: function(cmp) {
         var focused = false;
         var pillInput = cmp.get("v.pillInput");
-        var itemsLength = cmp.get("v.items").length;
+        var pillItemData = cmp.get("v.items");
+        var itemsLength = pillItemData.length;
         var maxAllowed = cmp.get("v.maxAllowed");
         if ($A.util.isEmpty(pillInput)) {
             $A.util.addClass(cmp.getElement(), 'noinput');
         } else if (itemsLength<maxAllowed) {
             pillInput[0].focus();
             focused = true;
+        }
+        if (!focused && itemsLength > 0) { // If there is any pill data present
+            this.focusItem(cmp, pillItemData, 0); // Focus on the last pill
         }
         return focused;
     },

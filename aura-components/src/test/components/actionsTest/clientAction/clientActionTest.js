@@ -65,7 +65,7 @@
      */
     testGetNonExistentAction : {
         test : function(cmp) {
-            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'.";
+            var errorMsg = "Unable to find 'notHereCaptain' on 'java://actionsTest.clientAction'.";
             try {
                 var action = cmp.get("c.notHereCaptain");
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");

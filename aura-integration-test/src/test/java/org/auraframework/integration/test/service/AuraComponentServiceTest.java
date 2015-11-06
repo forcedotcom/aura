@@ -43,7 +43,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
     /**
      * Testing the getComponent method. Get a component and call each getting
      * for the component.
-     * 
+     *
      * @throws Exception
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
@@ -67,7 +67,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
     /**
      * Testing the getComponentDef method. Get a componentDef and call each
      * getting for the componentDef.
-     * 
+     *
      * @hierarchy Aura.Runtime.Service
      * @userStory AuraServlet: POST
      */
@@ -87,9 +87,8 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         assertEquals(1, mdd.size());
         assertEquals("TestJavaModel", mdd.get(0).getName());
 
-        List<DefDescriptor<ControllerDef>> cds = component.getControllerDefDescriptors();
-        assertEquals(1, cds.size());
-        assertEquals("JavaTestController", cds.get(0).getName());
+        ControllerDef cd = component.getLocalControllerDef();
+        assertEquals("JavaTestController", cd.getName());
 
         DefDescriptor<ModelDef> lmdd = component.getLocalModelDefDescriptor();
         assertEquals("TestJavaModel", lmdd.getName());
@@ -97,8 +96,8 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         ModelDef model = component.getModelDef();
         assertEquals("TestJavaModel", model.getName());
 
-        ControllerDef controller = component.getControllerDef();
-        assertEquals("testComponent1", controller.getName());
+        ControllerDef controller = component.getRemoteControllerDef();
+        assertNull(controller);
 
         DefDescriptor<RendererDef> rd = component.getRendererDescriptor();
         assertEquals("testComponent1", rd.getName());
@@ -109,9 +108,9 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
 
     /**
      * Get an application and call each getting for the component.
-     * 
+     *
      * @throws QuickFixException
-     * 
+     *
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
@@ -132,7 +131,7 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
 
     /**
      * Get an applicationDef and call each getting for the componentDef.
-     * 
+     *
      * @hierarchy Aura.Runtime.Service
      * @userStory a07B0000000EYU4
      */
@@ -151,9 +150,9 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         assertEquals(1, mdd.size());
         assertEquals("TestJavaModel", mdd.get(0).getName());
 
-        List<DefDescriptor<ControllerDef>> cds = application.getControllerDefDescriptors();
+        List<ControllerDef> cds = application.getLocalControllerDefs();
         assertEquals(1, cds.size());
-        assertEquals("JavaTestController", cds.get(0).getName());
+        assertEquals("JavaTestController", cds.get(0).getDescriptor().getName());
 
         DefDescriptor<ModelDef> lmdd = application.getLocalModelDefDescriptor();
         assertEquals("TestJavaModel", lmdd.getName());
@@ -161,8 +160,8 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         ModelDef model = application.getModelDef();
         assertEquals("TestJavaModel", model.getName());
 
-        ControllerDef controller = application.getControllerDef();
-        assertEquals("testApplication1", controller.getName());
+        ControllerDef controller = application.getRemoteControllerDef();
+        assertNull(controller);
 
         DefDescriptor<RendererDef> rd = application.getRendererDescriptor();
         assertEquals("testApplication1", rd.getName());

@@ -504,7 +504,7 @@ AuraComponentService.prototype.buildComponentClass = function(componentPropertie
 
 
 /**
- * Augment the component class properties with thier respective inheritance. The
+ * Augment the component class properties with their respective inheritance. The
  * inner classes are "static" classes, and currenltly, only the helper is inherited.
  * @param {Object} componentProperties The pre-built component properties.
  */
@@ -513,23 +513,27 @@ AuraComponentService.prototype.addComponentClassInheritance = function(component
     var superDescriptor = componentProperties["meta"]["extends"];
     var superConstuctor = this.getComponentClass(superDescriptor);
 
-    // Component has a helper object even there is no helper in the bundle
-    componentProperties["helper"] = componentProperties["helper"] || {};
+    // Apply inheritance
+    for (var name in {"controller":true, "helper":true}) {
 
-    // Currently, only the helper is inherited.
-    var superHelper = superConstuctor && superConstuctor.prototype["helper"];
-    if (superHelper) {
-        // TODO: Update to the following line once all browsers have support for writeable __proto__
-        // (requires IE11+, supported elsewhere).
-        // componentProperties["helper"]['__proto__'] = superHelper;
-        var helper = Object.create(superHelper);
-        var helperProperties = componentProperties["helper"];
-        if (helperProperties) {
-            for (var property in helperProperties) {
-                helper[property] = helperProperties[property];
+        componentProperties[name] = componentProperties[name] || {};
+
+        // Currently, only the helper is inherited.
+        var superInnerClass = superConstuctor && superConstuctor.prototype[name];
+        if (superInnerClass) {
+            // TODO: Update to the following line once all browsers have support for writeable __proto__
+            // (requires IE11+, supported elsewhere).
+            // componentProperties["controller"]['__proto__'] = superController;
+            // componentProperties["helper"]['__proto__'] = superHelper;
+            var innerClass = Object.create(superInnerClass);
+            var instanceProperties = componentProperties[name];
+            if (instanceProperties) {
+                for (var property in instanceProperties) {
+                    innerClass[property] = instanceProperties[property];
+                }
             }
+            componentProperties[name] = innerClass;
         }
-        componentProperties["helper"] = helper;
     }
 };
 

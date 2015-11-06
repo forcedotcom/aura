@@ -289,13 +289,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
         // update a component's js controller file
         String replacement = getName() + System.currentTimeMillis();
-        DefDescriptor<?> desc = null;
-        for (DefDescriptor<?> cd : getTargetComponent().getControllerDefDescriptors()) {
-            if ("js".equals(cd.getPrefix())) {
-                desc = cd;
-                break;
-            }
-        }
+        DefDescriptor<?> desc = getTargetComponent().getRemoteControllerDef().getDescriptor();
         replaceToken(desc, replacement);
         logs = loadMonitorAndValidateApp(TOKEN, replacement, "", TOKEN);
         assertRequests(getExpectedChangeRequests(), logs);

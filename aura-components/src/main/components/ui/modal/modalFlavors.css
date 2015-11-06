@@ -26,5 +26,6 @@
 
 .THIS--large .modal-container {
     width: 90%;
+    max-width: none;
     min-width: 640px;
 }

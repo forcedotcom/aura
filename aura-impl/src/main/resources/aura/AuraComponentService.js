@@ -492,7 +492,6 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
  * and those are all combined into one single scope by the compiler.
  * @param {Object} componentProperties The pre-built component properties.
  * @returns {Function} The component class.
- * @export
  */
 AuraComponentService.prototype.buildComponentClass = function(componentProperties) {
 

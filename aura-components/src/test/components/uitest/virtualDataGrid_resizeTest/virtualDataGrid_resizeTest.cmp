@@ -30,12 +30,14 @@
 				<ui:dataGridColumn name="id"		label="Id" sortable="true"/>
 				<ui:dataGridColumn name="name"	label="Name"/>
 				<ui:dataGridColumn name="grade" label="Grade"/>
+				<ui:dataGridColumn name=""      label="Actions" hideLabel="true"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">
 				<ui:outputText value="{!item.id}"/>
 				<ui:outputText value="{!item.name}"/>
 				<ui:outputText value="{!item.grade}"/>
+				{!item.id}
 			</aura:set>
 			
 			<aura:set attribute="dataModel">

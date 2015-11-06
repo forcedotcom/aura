@@ -22,7 +22,7 @@
   EXPECTED_2_1  : ['Item Id', 'Item Subject', "Name"],
   EXPECTED_ADD  : ['Due Date'],
   
-  ASSISTIVE_SORT_TEXT : "Sort",
+  ASSISTIVE_SORT_TEXT : "Sort ",
   
   /**************************************************HELPER FUNCTIONS**************************************************/
   
@@ -252,10 +252,10 @@
          else if($A.util.isUndefinedOrNull(header)){
            return false;
          }
-         
+
          var text = $A.util.getText(header);
          if (text.indexOf(assistiveSortText) == 0) {
-        	 text = text.slice(4);
+        	 text = text.slice(assistiveSortText.length);
          }
          return text === firstElm;
         });  

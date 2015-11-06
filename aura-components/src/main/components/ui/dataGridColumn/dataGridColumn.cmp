@@ -18,6 +18,7 @@
 <aura:component implements="ui:visible" support="PROTO" description="A column of data in ui:dataGrid">
 	<aura:attribute name="name" type="String" description="Api name or field name on item. Can use dot notation."/>
 	<aura:attribute name="label" type="String" description="The text label displayed in column header."/>
+	<aura:attribute name="hideLabel" type="Boolean" description="Whether to hide the label. A hidden label will be moved into an assistiveText span"/>
 	<aura:attribute name="title" type="String" description="The title attribute on the TH element"/>
 	<aura:attribute name="type" type="String" description="Data type."/>
 	<aura:attribute name="sortable" type="Boolean"/>
@@ -53,15 +54,17 @@
 		<!-- Conditionally insert link for column sorting. -->
 		<aura:if isTrue="{!v.sortable}">
 			<a class="{! 'toggle ' + (v.disabled ? 'disabled' : '')}" onclick="{!c.handleClick}">
-				<span class="assistiveText">{! v.disabled ? '' : v.assistiveSortText}</span>
-				{!v.label}
+				<span class="assistiveText">{! (v.disabled ? '' : v.assistiveSortText) + ' '
+												+ (v.hideLabel ? v.label : '') } </span>
+				{!(!v.hideLabel) ? v.label : ''}
 				<span class="assistiveText">{! v.disabled ? ''
 												: ((v.direction == 'ascending') ? v.ascLabel 
 													: ((v.direction == 'descending') ? v.descLabel : v.direction))}</span>
 			</a>
 			
 			<aura:set attribute="else">
-				{!v.label}
+				{!(!v.hideLabel) ? v.label : ''}
+				<span class="assistiveText">{! (v.hideLabel ? v.label : '') }</span>
 			</aura:set>
 		</aura:if>
 	</th>

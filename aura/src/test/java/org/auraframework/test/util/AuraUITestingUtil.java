@@ -798,10 +798,12 @@ public class AuraUITestingUtil {
      * {@link #waitForDocumentReady()}.
      */
     public void waitForAuraFrameworkReady(final Set<String> expectedErrors) {
+        String doNotAssign = "\nThis message means, you aren't even on Aura application at this point. " +
+                "Please do not assign this test failure to Aura team/s unless, Aura team/s is the owner of this test. ";
         WebDriverWait waitAuraPresent = new WebDriverWait(driver, timeoutInSecs);
-        waitAuraPresent.withMessage("Initialization error: Perhaps the initial GET failed")
-        .until(
-                new Function<WebDriver, Boolean>() {
+        waitAuraPresent.withMessage("Initialization error: Perhaps the initial GET failed." + doNotAssign)
+                .until(
+                        new Function<WebDriver, Boolean>() {
                     @Override
                     public Boolean apply(WebDriver input) {
                         return (Boolean) getRawEval("return !!window.$A");

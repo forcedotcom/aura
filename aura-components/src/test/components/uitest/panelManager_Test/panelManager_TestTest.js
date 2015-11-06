@@ -133,6 +133,20 @@
     	}]
     },
     
+    testPanelOwner : {
+    	test : [
+    	        function(cmp) {
+    	        	// create panel 1
+    	    		this.createPanel(cmp);
+    	    		this.waitForPanelVisilbe(cmp, 0, true);
+    	        },
+    	        function(cmp) {
+    	        	// owner of the first panel is itself
+    	        	var expectedOwner = this.getPanel(cmp, 0).getGlobalId();
+    	        	this.verifyPanelOwner(cmp, 0, expectedOwner);
+    	        }
+    	        ]
+    },
     createPanel : function(cmp) {
     	cmp.find("createPanelBtn").get("e.press").fire();
     },
@@ -264,4 +278,11 @@
     		$A.test.assertTrue(panel == null, "Panel instance(0) should not have been present");
     	}
     },
+    
+    verifyPanelOwner : function(cmp, instanceId, expectedOwner) {
+    	var panelManager = cmp.find('pm');
+    	var globalId = this.getPanel(cmp, instanceId).getGlobalId();
+    	var owner = panelManager.getDef().getHelper().PANELS_OWNER[globalId];
+    	$A.test.assertEquals(expectedOwner, owner, "The owner and expected owner do not match");
+    }
 })

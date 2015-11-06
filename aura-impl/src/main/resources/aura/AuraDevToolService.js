@@ -599,8 +599,20 @@ var AuraDevToolService = function() {
                     }
                     else{
                         lblIsPres = ((inputTag.id in lblDict) || (accessAideFuncs.checkParentMatchesTag(inputTag, "LABEL")));
+
                         if(!lblIsPres){
-                            errorArray.push(inputTag);
+                        	
+                        	// W-2812697: Allowing aria-label for an <input> if it exists inside a <th>
+                        	if(inputTag.tagName === "INPUT" && type === "range") {
+                        		var ariaLbl = $A.util.getElementAttributeValue(inputTag, "aria-label");
+                        		var parent = accessAideFuncs.checkParentMatchesTag(inputTag, "TH");
+                        		if($A.util.isEmpty(ariaLbl) || parent === false) {
+                        			errorArray.push(inputTag);
+                        		}     		
+                        	}
+                        	else {
+                        		errorArray.push(inputTag);
+                        	}
                         }
                     }
                  }

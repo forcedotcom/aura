@@ -560,7 +560,7 @@ AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializ
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"]);
         $A.setLanguage();
-        this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices);
+        this.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
         $A.context.setCurrentAction(null);
     } else {

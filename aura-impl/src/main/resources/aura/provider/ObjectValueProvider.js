@@ -18,8 +18,8 @@
  * @description Simple Value Provider. Holds generic map of Key/Value Pairs
  * @constructor
  */
-function ObjectValueProvider() {
-    this.values = {};
+function ObjectValueProvider(values) {
+    this.values = values || {};
 }
 
 /**

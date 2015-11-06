@@ -34,12 +34,17 @@
  */
  function GlobalValueProviders (gvp, initCallback) {
     this.valueProviders = {
-        "$Browser" : new Aura.Provider.ObjectValueProvider(),
-        "$Label": new Aura.Provider.LabelValueProvider(),
-        "$Locale": new Aura.Provider.ObjectValueProvider(),
-        "$Global": new Aura.Provider.ContextValueProvider()
+        "$Browser" : new Aura.Provider.ObjectValueProvider(gvp["$Browser"]),
+        "$Label": new Aura.Provider.LabelValueProvider(gvp["$Label"]),
+        "$Locale": new Aura.Provider.ObjectValueProvider(gvp["$Locale"]),
+        "$Global": new Aura.Provider.ContextValueProvider(gvp["$Global"])
     };
+
     for(var type in gvp){
+        if (["$Browser", "$Label", "$Locale", "$Global"].indexOf(type) >= 0) {
+            continue;
+        }
+
         $A.assert(this.valueProviders[type]==null,"$A.globalValueProviders.ctor(): '"+type+"' has already been registered.");
         // work around the obfuscation logic to allow external GVPs
         var valueProvider = gvp[type];

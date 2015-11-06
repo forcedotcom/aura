@@ -360,8 +360,7 @@
             },
 
             select: function () {
-                if (this.highlightedIndex === -1) {
-                    $A.warning("Can't select item without index");
+                if (this.highlightedIndex === -1) { //nothing selected
                     return;
                 }
                 var highlightedCmp = this.iters[this.highlightedIndex];

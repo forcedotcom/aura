@@ -540,7 +540,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
         // order should be exactly that above.
         // child1, grandparent, parent, child2
         //
-        assertTrue("parent CSS should be written before child CSS in: " + css,
+        assertTrue("child CSS should be written before grandparent CSS in: " + css,
                 css.indexOf(".setAttributesTestChild") < css.indexOf(".setAttributesTestGrandparent"));
         assertTrue("grandparent CSS should be written before parent CSS in: " + css,
                 css.indexOf(".setAttributesTestGrandparent") < css.indexOf(".setAttributesTestParent"));

@@ -267,38 +267,12 @@ public class CachingServiceImpl implements CachingService {
             existsCache.invalidate(adesc);
 
             switch (descriptor.getDefType()) {
-            case NAMESPACE:
-                // invalidate all DDs with the same namespace if its a namespace DD
-                invalidateScope(descriptor, true, false);
-                break;
             case INCLUDE:
                 invalidateSourceRelatedCaches(descriptor.getBundle());
                 break;
             default:
             }
         }
-    }
-
-    private void invalidateScope(DefDescriptor<?> descriptor, boolean clearNamespace, boolean clearName) {
-
-        final Set<DefDescriptor<?>> defsKeySet = defsCache.getKeySet();
-        final String namespace = descriptor.getNamespace();
-        final String name = descriptor.getName();
-
-        for (DefDescriptor<?> dd : defsKeySet) {
-            boolean sameNamespace = namespace.equals(dd.getNamespace());
-            boolean sameName = name.equals(dd.getName());
-            boolean shouldClear = (clearNamespace && clearName) ? (clearNamespace && sameNamespace)
-                    && (clearName && sameName)
-                    : (clearNamespace && sameNamespace)
-                            || (clearName && sameName);
-
-            if (shouldClear) {
-                defsCache.invalidate(dd);
-                existsCache.invalidate(dd);
-            }
-        }
-
     }
 
     /**

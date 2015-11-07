@@ -190,7 +190,6 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
         case LIBRARY:
         case DOCUMENTATION:
         case EXAMPLE:
-        case NAMESPACE:
         case TOKENS:
         case DESIGN:
         case SVG:

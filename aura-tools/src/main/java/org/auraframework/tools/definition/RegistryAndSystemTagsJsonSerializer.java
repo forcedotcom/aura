@@ -35,7 +35,6 @@ import org.auraframework.impl.root.parser.handler.IncludeDefRefHandler;
 import org.auraframework.impl.root.parser.handler.InterfaceDefHandler;
 import org.auraframework.impl.root.parser.handler.LibraryDefHandler;
 import org.auraframework.impl.root.parser.handler.MethodDefHandler;
-import org.auraframework.impl.root.parser.handler.NamespaceDefHandler;
 import org.auraframework.impl.root.parser.handler.RegisterEventHandler;
 import org.auraframework.impl.root.parser.handler.TokensDefHandler;
 import org.auraframework.impl.root.parser.handler.XMLHandler;
@@ -110,8 +109,6 @@ public class RegistryAndSystemTagsJsonSerializer {
             return new AttributeDefRefHandler();
         } else if (tag.equals(DependencyDefHandler.TAG)) {
             return new DependencyDefHandler();
-        } else if (tag.equals(NamespaceDefHandler.TAG)) {
-            return new NamespaceDefHandler();
         } else if (tag.equals(TokensDefHandler.TAG)) {
             return new TokensDefHandler();
         } else if (tag.equals(DesignDefHandler.TAG)) {

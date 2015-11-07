@@ -38,7 +38,6 @@ public class DescriptorFileMapper {
     public enum NameFormat {
         BUNDLE, // ! A 'bundle' file like controller, component, app, helper.
         BUNDLED_EXTRA, // ! An 'extra' file e.g. library include js file
-        NAMESPACE, // ! A namespace .xml file (deprecated)
     };
 
     protected static final class ExtensionInfo {
@@ -118,7 +117,6 @@ public class DescriptorFileMapper {
         addExtension(".evt", NameFormat.BUNDLE, "markup", DefType.EVENT, Format.XML);
         addExtension(".lib", NameFormat.BUNDLE, "markup", DefType.LIBRARY, Format.XML);
         addExtension(".intf", NameFormat.BUNDLE, "markup", DefType.INTERFACE, Format.XML);
-        addExtension(".xml", NameFormat.NAMESPACE, "markup", DefType.NAMESPACE, Format.XML);
         addExtension(".tokens", NameFormat.BUNDLE, "markup", DefType.TOKENS, Format.XML);
         addExtension(".auradoc", NameFormat.BUNDLE, "markup", DefType.DOCUMENTATION, Format.XML);
         addExtension(".design", NameFormat.BUNDLE, "markup", DefType.DESIGN, Format.XML);
@@ -243,8 +241,6 @@ public class DescriptorFileMapper {
             // Alongside knowing the extension, we also know that namespace+name is a directory,
             // and name+ext is the file inside that directory:
             return String.format("%s%s%s%s%s%s", namespace, separator, name, separator, name, ei.extension);
-        case NAMESPACE:
-            return String.format("%s%s%s%s", namespace, separator, namespace, ei.extension);
         }
         throw new AuraRuntimeException("Could not get path for " + descriptor + "@" + descriptor.getDefType()
                 + " with ei=" + ei);

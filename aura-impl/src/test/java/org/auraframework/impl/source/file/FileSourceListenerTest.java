@@ -146,11 +146,6 @@ public class FileSourceListenerTest extends UnitTestCase {
                 "/some/awesome/ui/uiNamespace/uiNamespace.tokens");
     }
 
-    public void testSourceChangedNamespace() throws Exception {
-        assertSourceChangedCalled("markup", "namespaceDefTest", "namespaceDefTest", DefDescriptor.DefType.NAMESPACE,
-                "/some/awesome/namespaceDefTest/namespaceDefTest.xml");
-    }
-
     public void testSourceChangedTestSuite() throws Exception {
         assertSourceChangedCalled("js", "ui", "inputSelect", DefDescriptor.DefType.TESTSUITE,
                 "/some/awesome/ui/inputSelect/inputSelectTest.js");

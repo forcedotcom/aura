@@ -355,26 +355,46 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         ret["status"] = "ERROR";
         return ret;
     } else {
+        var cmpDefCollector = [];
+        var i;
         // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
         if (responseMessage["context"] && responseMessage["context"]["globalValueProviders"]) {
             var saved = [];
             var gvpList = responseMessage["context"]["globalValueProviders"];
 
             // Filter out providers without refs
-            for (var i = gvpList.length - 1; i >= 0; i--) {
+            for (i = gvpList.length - 1; i >= 0; i--) {
                 if (gvpList[i]["hasRefs"] !== true) {
                     saved.push(gvpList.splice(i, 1)[0]);
                 }
             }
 
-            $A.util.json.resolveRefs(responseMessage);
+            $A.util.json.resolveRefsFromActions(responseMessage, cmpDefCollector);
 
             // Restore original provider (order doesn't matter)
             responseMessage["context"]["globalValueProviders"] = gvpList.concat(saved);
         } else {
-            $A.util.json.resolveRefs(responseMessage);
+            $A.util.json.resolveRefsFromActions(responseMessage, cmpDefCollector);
+        }
+
+        // Merge our separated defs with the original set and prune the duplicates
+        if (cmpDefCollector.length > 0) {
+            $A.util.apply(responseMessage, { "context" : { "componentDefs" : [] } }, false, true);
+            var componentDefs = responseMessage["context"]["componentDefs"];
+            var lookup = {};
+            for (i = 0; i < cmpDefCollector.length; i++) {
+                lookup[cmpDefCollector[i]["descriptor"]] = true;
+            }
+
+            for (i = 0; i < componentDefs.length; i++) {
+                if (!lookup[componentDefs[i]["descriptor"]]) {
+                    cmpDefCollector.push(componentDefs[i]);
+                }
+            }
+            responseMessage["context"]["componentDefs"] = cmpDefCollector;
         }
     }
+
     ret["status"] = "SUCCESS";
     ret["message"] = responseMessage;
     return ret;
@@ -1263,7 +1283,7 @@ AuraClientService.prototype.popStack = function(name) {
 };
 
 /*
- * @private 
+ * @private
  */
 AuraClientService.prototype.postProcess = function() {
     if (this.auraStack.length === 1 && this.auraStack[0] === "AuraClientService$popStack") {
@@ -1535,12 +1555,12 @@ AuraClientService.prototype.finishCollection = function() {
  * @private
  */
 AuraClientService.prototype.shouldSendOutForegroundActions = function( foregroundActions, cabooseCount ) {
-	if(foregroundActions.length > cabooseCount ||
-		(cabooseCount > 0 && Date.now() - this.lastSendTime > 60000) ) {
-		return true;
-	} else {
-		return false;
-	}
+    if(foregroundActions.length > cabooseCount ||
+        (cabooseCount > 0 && Date.now() - this.lastSendTime > 60000) ) {
+        return true;
+    } else {
+        return false;
+    }
 };
 
 /**

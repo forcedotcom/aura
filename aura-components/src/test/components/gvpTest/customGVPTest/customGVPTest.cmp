@@ -17,4 +17,11 @@
 
 <aura:component template="gvpTest:customGVPTemplate" render="client">
     <aura:attribute default="Default" type="String" name="stringValue"></aura:attribute>
+
+    <aura:attribute name="handleSystemError" type="Boolean" default="false"/>
+    <aura:handler event="aura:systemError" action="{!c.handleSystemError}"/>
+
+    <!-- for debugging use, if the issue (W-2798816) is fixed, remove it -->
+    <aura:attribute name="debuggingMessage" type="String"/>
+    {!debuggingMessage}
 </aura:component>

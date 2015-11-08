@@ -119,7 +119,6 @@ window['$A'] = {};
 // #include aura.library.LibraryDefRegistry
 
 // -- Event --------------------------------------------------------------
-// #include aura.event.EventDefRegistry
 // #include aura.event.EventDef
 // #include aura.event.Event
 

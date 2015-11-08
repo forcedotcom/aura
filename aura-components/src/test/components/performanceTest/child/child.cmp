@@ -1,0 +1,6 @@
+<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">
+    <aura:attribute name="name" type="String" default="childDefaultName"/>
+    <section>
+        I'm a child with name {!v.name}
+    </section>
+</aura:component>

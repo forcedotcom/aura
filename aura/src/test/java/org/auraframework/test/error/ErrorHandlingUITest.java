@@ -389,13 +389,14 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
     }
 
     /*
-     * TODO(W-2790091)
+     * Verify custom handle on App can hanle systemError event when an error is thrown from rerender() of its contained component.
      */
-    public void _testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
-        String expectedContainedMessage = "Error from app rerender";
+    public void testHandleErrorThrownFromRerenderWhenMarkEventHandled() throws Exception {
+        String expectedContainedMessage = "Error from component rerender";
         open("/auratest/errorHandlingApp.app?handleSystemError=true", Mode.PROD);
 
-        findDomElement(By.cssSelector(".errorFromAppTable .errorFromRerenderButton")).click();
+        // click throw Error in rerender() on Component and handle it in app.
+        findDomElement(By.cssSelector(".errorFromCmpTable .errorFromRerenderButton")).click();
         // wait for custom handler on App handled the event.
         waitForElementTextContains(findDomElement(By.cssSelector("div[id='eventHandledOnApp']")), "true");
 

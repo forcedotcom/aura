@@ -1032,6 +1032,9 @@ Test.Aura.AuraClientServiceTest = function() {
                         resolveRefs : function(input) {
                             // copy input in case inner objects are changed
                             requestedToResolve.push(JSON.stringify(input));
+                        },
+                        resolveRefsFromActions : function (input) {
+                            requestedToResolve.push(JSON.stringify(input));  
                         }
                     },
                     stringEndsWith : function() {
@@ -1058,12 +1061,9 @@ Test.Aura.AuraClientServiceTest = function() {
                 }
             };
             
-            var response = {
-                status : 200,
-                responseText : "'useDecodedResponseInstead'"
-            };
-            
+            var response = { status : 200, responseText : "'useDecodedResponseInstead'" };
             var target;
+
             mocksForDecode(function() {
                 target = new Aura.Services.AuraClientService();
                 

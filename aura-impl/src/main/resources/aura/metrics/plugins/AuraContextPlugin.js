@@ -68,7 +68,7 @@ AuraContextPlugin.prototype.bind = function (metricsService) {
             cmpDefs = config['componentDefs'],
             evtDefs = config['eventDefs'],
             payload =  {},
-            hasDefs = cmpDefs || evtDefs;
+            hasDefs = (cmpDefs && cmpDefs.length) || (evtDefs && evtDefs.length);
 
         if (cmpDefs) {
             payload['componentDefs'] = defIter(cmpDefs);

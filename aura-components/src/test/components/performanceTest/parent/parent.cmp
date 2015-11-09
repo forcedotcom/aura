@@ -1,0 +1,7 @@
+<aura:component >
+    <aura:attribute name="name" type="String" default="parentDefaultName"/>
+    <section>
+        I'm a parent with name {!v.name}
+        <performanceTest:child aura:id="c"/>
+    </section>
+</aura:component>

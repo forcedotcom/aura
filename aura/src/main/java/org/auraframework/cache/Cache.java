@@ -49,4 +49,5 @@ public interface Cache<K,T> {
 	 */
 	Object getPrivateUnderlyingCache();
 
+	void logCacheStatus(String name, String extraMessage);
 }

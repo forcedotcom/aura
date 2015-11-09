@@ -158,7 +158,7 @@ public class CachingServiceImpl implements CachingService {
     public final Cache<String, String> getStringsCache() {
         return stringsCache;
     }
-
+    
     @Override
     public final Cache<String, Set<DefDescriptor<?>>> getDescriptorFilterCache() {
         return descriptorFilterCache;

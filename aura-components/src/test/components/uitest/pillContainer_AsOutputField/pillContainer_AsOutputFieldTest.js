@@ -263,6 +263,19 @@
         }
     },
 
+    testFocus: {
+        test: function (cmp) {
+
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems( [this.PILLS[0]] );
+            pillContainer.focus();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                var pill = pillContainer.find("pill");
+                return document.activeElement===pill.getElement();
+            }, "pill should be focused");
+        }
+    },
+
     _validatePillIsFocused: function(cmp) {
         $A.test.assertTrue($A.util.hasClass(cmp.getElement(), "focused"), "The pill is not focused");
 

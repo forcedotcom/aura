@@ -123,9 +123,10 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
                 // TODO: @dval @kvenkiteswaran find a better way to whitelist componentDefs
                 if ( defFound &&
                         cache[serRefId]["descriptor"] &&
-                        !cache[serRefId]["members"] &&
-                        !cache[serRefId]["actionDefs"] &&
-                        !cache[serRefId]["actionType"] )
+                        !cache[serRefId]["members"] && // models
+                        !cache[serRefId]["actionDefs"] && // actions
+                        !cache[serRefId]["type"] && // cmpEvent
+                        !cache[serRefId]["actionType"] ) // actions?
                 {
                     // replace the comp def with a descriptor
                     parent[property] = { "descriptor" : cache[serRefId]["descriptor"] };

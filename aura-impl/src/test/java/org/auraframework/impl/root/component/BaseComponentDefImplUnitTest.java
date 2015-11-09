@@ -15,6 +15,7 @@
  */
 package org.auraframework.impl.root.component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +88,8 @@ extends RootDefinitionImplUnitTest<I, D, B> {
     protected String render;
     protected WhitespaceBehavior whitespaceBehavior;
     protected List<DependencyDef> dependencies;
+    @Mock
+    protected DefDescriptor<ControllerDef> mockControllerDef;
 
     protected static DefinitionAccess GLOBAL_ACCESS;
     protected static DefinitionAccess PRIVATE_ACCESS;
@@ -123,7 +126,26 @@ extends RootDefinitionImplUnitTest<I, D, B> {
         setupTemplate(true);
         buildDefinition().validateReferences();
     }
-
+    
+    //test for W-2798390
+    @SuppressWarnings("unchecked")
+	@Override
+    public void testValidateDefinition() throws Exception {
+        //set up controllerDescriptors here to make sure we don't check it when validating definition
+        this.controllerDescriptors = new ArrayList<DefDescriptor<ControllerDef>>();
+        this.mockControllerDef = Mockito.mock(DefDescriptor.class);
+        this.controllerDescriptors.add(mockControllerDef);
+        this.modelDefDescriptor = Mockito.mock(DefDescriptor.class);
+        testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        
+        setupTemplate(true);
+        buildDefinition().validateDefinition();
+        
+        //verify we didn't touch controllerDef/modelDef, that's validateReference's job, not validateDefinition
+        Mockito.verify(this.mockControllerDef, Mockito.times(0)).getDef();
+        Mockito.verify(this.modelDefDescriptor, Mockito.times(0)).getDef();
+    }
+    
     public void testValidateReferencesExpressionToOwnPrivateAttribute() throws Exception {
         setupValidateReferences();
 
@@ -236,7 +258,6 @@ extends RootDefinitionImplUnitTest<I, D, B> {
 
     @Override
     protected void setupValidateReferences() throws Exception {
-        super.setupValidateReferences();
         this.interfaces = Sets.newHashSet();
         this.interfaces.add(BaseComponentDefImpl.ROOT_MARKER);
         testAuraContext = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);

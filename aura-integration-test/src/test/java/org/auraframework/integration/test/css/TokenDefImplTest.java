@@ -46,8 +46,6 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
 
     @Override
     protected void setupValidateReferences() throws Exception {
-        super.setupValidateReferences();
-
         ContextService contextService = Aura.getContextService();
         if (testAuraContext != null) {
             contextService.endContext();

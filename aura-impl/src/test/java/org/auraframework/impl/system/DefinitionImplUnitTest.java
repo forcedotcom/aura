@@ -228,4 +228,8 @@ extends UnitTestCase {
         builder.setAccess(this.access);
         return builder.build();
     }
+
+	protected void setupValidateDefinitions() throws Exception {
+		
+	}
 }

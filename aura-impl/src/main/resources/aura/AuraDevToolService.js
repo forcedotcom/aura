@@ -1229,6 +1229,33 @@ var AuraDevToolService = function() {
                      var errorArray = accessAideFuncs.inputDefaultErrorAide(domElem.getElementsByTagName("ul"), domElem.getElementsByTagName("input"), domElem.getElementsByTagName("select"), domElem.getElementsByTagName("textarea"));
                      return accessAideFuncs.formatOutput(inputErrorMsg, errorArray);
                 }
+            },
+            
+            /**
+             * Check that there are no anchors or buttons inside the tooltip component
+             * @returns String - Returns a string representation of the errors
+             */
+            checkNoAnchorsButtonsInTooltip : {
+                "tag"  : "A11Y_DOM_15",
+                "func" : function(domElem) {
+                     var inputLabelMsg   = "[A11Y_DOM_15] ui:tooltip must not contain anchors or buttons. More Info: http://sfdc.co/a11y_dom_15";
+                     var accessAideFuncs = aura.devToolService.accessbilityAide;
+                     var tooltipSelector = "div.uiTooltip";
+                     var tooltips = domElem.querySelectorAll(tooltipSelector);
+                     var errorArray = [];
+                     
+                    for(var index = 0; index < tooltips.length; index++) {
+                    	var tooltip = tooltips[index];
+                    	var children = tooltip.children;
+                    	
+                    	for(var c = 0; c < children.length; c++) {
+                    		if(children[c].tagName === "A" || children[c].tagName === "BUTTON"  ) {
+                    			errorArray.push(tooltip);
+                    		}
+                    	}
+                    }
+                    return accessAideFuncs.formatOutput(inputLabelMsg, errorArray);
+                 }
             }
         },
 
@@ -1251,7 +1278,8 @@ var AuraDevToolService = function() {
             if($A.util.isEmpty(checksToRun)){
             	checksToRun = ["A11Y_DOM_01", "A11Y_DOM_02", "A11Y_DOM_03", "A11Y_DOM_04",
             	               "A11Y_DOM_06", "A11Y_DOM_07", "A11Y_DOM_08", "A11Y_DOM_09",
-            	               "A11Y_DOM_10", "A11Y_DOM_11", "A11Y_DOM_12", "A11Y_DOM_13"];
+            	               "A11Y_DOM_10", "A11Y_DOM_11", "A11Y_DOM_12", "A11Y_DOM_13", 
+            	               "A11Y_DOM_15"];
             }
             //Run all tests that are applicable
             for(var funcLabel in functions){

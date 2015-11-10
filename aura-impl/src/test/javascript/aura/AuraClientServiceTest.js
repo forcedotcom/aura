@@ -86,7 +86,7 @@ Test.Aura.AuraClientServiceTest = function() {
             // Assert : we send out caboose action if it has been longer then 60s since last send
             Assert.Equal(true, actual);
     	}
-    	
+
     	[Fact]
     	function returnsTrueMoreForegroundThanCaboose() {
     		// Arrange
@@ -106,8 +106,8 @@ Test.Aura.AuraClientServiceTest = function() {
             Assert.Equal(true, actual);
     	}
     }
-    
-    
+
+
     [Fixture]
     function testDupes() {
     	[Fact]
@@ -509,7 +509,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 var get = {};
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
-                service.isActionInStorage(undefined, params, function(result) { actual = result; }); 
+                service.isActionInStorage(undefined, params, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -542,7 +542,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage(true, params, function(result) { actual = result; }); 
+                service.isActionInStorage(true, params, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -559,7 +559,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage([], params, function(result) { actual = result; }); 
+                service.isActionInStorage([], params, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -576,7 +576,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage(descriptor, undefined, function(result) { actual = result; }); 
+                service.isActionInStorage(descriptor, undefined, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -593,7 +593,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage(descriptor, null, function(result) { actual = result; }); 
+                service.isActionInStorage(descriptor, null, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -610,7 +610,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage(descriptor, true, function(result) { actual = result; }); 
+                service.isActionInStorage(descriptor, true, function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -627,7 +627,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 get[Action.getStorageKey(descriptor, params)] = "STORED";
                 storage.setup({get: get});
 
-                service.isActionInStorage(descriptor, [], function(result) { actual = result; }); 
+                service.isActionInStorage(descriptor, [], function(result) { actual = result; });
 
                 Assert.False(actual);
             });
@@ -756,7 +756,7 @@ Test.Aura.AuraClientServiceTest = function() {
                 Assert.Equal(expected, actual);
 
             });
-        }        
+        }
 
         [Fact]
         [Data({key: undefined, params: {params: "PARAMS"}})]
@@ -901,6 +901,24 @@ Test.Aura.AuraClientServiceTest = function() {
                 "sessionStorage": mockStorage
             },
             Aura: Aura,
+            Action : {
+                getStorage: function () {
+                    return {
+                        isPersistent: function () {
+                            return true;
+                        },
+
+                        clear: function () {
+                            return {
+                                then: function resolve() {
+                                    componentDefsClearCalled = true;
+                                    return { then: resolve };
+                                }
+                            }
+                        }
+                    };
+                }
+            },
             location: mockLocation
         });
 
@@ -1032,9 +1050,14 @@ Test.Aura.AuraClientServiceTest = function() {
                         resolveRefsArray : function(input) {
                             // copy input in case inner objects are changed
                             requestedToResolve.push(JSON.stringify(input));
+                            input["context"] = input["context"] || {}
+                            input["context"]["componentDefs"] = input["context"]["componentDefs"] || [];
                         },
                         resolveRefsObject: function (input) {
+                            // copy input in case inner objects are changed
                             requestedToResolve.push(JSON.stringify(input));
+                            input["context"] = input["context"] || {}
+                            input["context"]["componentDefs"] = input["context"]["componentDefs"] || [];
                         }
                     },
                     stringEndsWith : function() {
@@ -1060,16 +1083,16 @@ Test.Aura.AuraClientServiceTest = function() {
                     } ]
                 }
             };
-            
+
             var response = { status : 200, responseText : "'useDecodedResponseInstead'" };
             var target;
 
             mocksForDecode(function() {
                 target = new Aura.Services.AuraClientService();
-                
+
                 target.decode(response);
             });
-            
+
             Assert.Equal('{"context":{"globalValueProviders":[{"hasRefs":true,"type":"$TEST"}]}}',
                 requestedToResolve);
         }
@@ -1085,20 +1108,20 @@ Test.Aura.AuraClientServiceTest = function() {
                     } ]
                 }
             };
-            
+
             var response = {
                 status : 200,
                 responseText : "'useDecodedResponseInstead'"
             };
-            
+
             mocksForDecode(function() {
                 var target = new Aura.Services.AuraClientService();
                 target.decode(response);
             });
-            
+
             Assert.Equal('{"context":{"globalValueProviders":[]}}', requestedToResolve);
         }
-        
+
         [Fact]
         function GvpsWithRefSupportInMixedSetAreResolved() {
             requestedToResolve.length = 0;
@@ -1119,17 +1142,17 @@ Test.Aura.AuraClientServiceTest = function() {
                     } ]
                 }
             };
-            
+
             var response = {
                 status : 200,
                 responseText : "'useDecodedResponseInstead'"
             };
-            
+
             mocksForDecode(function() {
                 var target = new Aura.Services.AuraClientService();
                 target.decode(response);
             });
-            
+
             Assert.Equal(
                 '{"context":{"globalValueProviders":[{"hasRefs":true,"type":"$TEST_A"},{"hasRefs":true,"type":"$TEST_B"}]}}',
                 requestedToResolve);
@@ -1158,20 +1181,20 @@ Test.Aura.AuraClientServiceTest = function() {
                     } ]
                 }
             };
-            
+
             var response = {
                 status : 200,
                 responseText : "'useDecodedResponseInstead'"
             };
-            
+
             var actual;
             mocksForDecode(function() {
                 var target = new Aura.Services.AuraClientService();
                 actual = target.decode(response);
             });
-            
+
             Assert.Equal(
-                '{' + 
+                '{' +
                     '"status":"SUCCESS",' +
                     '"message":{' +
                         '"context":{' +
@@ -1182,6 +1205,7 @@ Test.Aura.AuraClientServiceTest = function() {
                                 '{"hasRefs":false,"type":"$NOREF_2"},' +
                                 '{"hasRefs":false,"type":"$NOREF_1"}' +
                             ']' +
+                            ',"componentDefs":[]' +
                         '}' +
                     '}' +
                 '}',

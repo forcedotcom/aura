@@ -375,6 +375,10 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         } else {
             $A.util.json.resolveRefsObject(responseMessage);
         }
+
+        if (responseMessage["context"]["componentDefs"].length) {
+            $A.componentService.saveDefsToStorage(responseMessage["context"]["componentDefs"]);
+        }
     }
 
     ret["status"] = "SUCCESS";
@@ -702,6 +706,38 @@ AuraClientService.prototype.handleAppCache = function() {
 
     var acs = this;
 
+
+    /**
+     * Clears actions and ComponentDefStorage stores then reloads the page.
+     */
+    function dumpCachesAndReload() {
+        // reload even if storage clear fails
+        var actionStorage = Action.getStorage();
+        var actionClear = actionStorage && actionStorage.isPersistent() ? actionStorage.clear() : Promise["resolve"]([]);
+
+        actionClear.then(
+            undefined, // noop on success
+            function() {
+                $A.log("Failed to clear persistent actions cache");
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                return $A.componentService.clearDefsFromStorage();
+            }
+        ).then(
+            undefined, // noop on success
+            function() {
+                $A.log("Failed to clear persistent component def storage");
+                // do not rethrow to return to resolve state
+            }
+        ).then(
+            function() {
+                window.location.reload(true);
+            }
+        );
+    }
+
     function showProgress(progress) {
         var progressContEl = document.getElementById("auraAppcacheProgress");
         if (progressContEl) {
@@ -725,12 +761,7 @@ AuraClientService.prototype.handleAppCache = function() {
         if (window.applicationCache.swapCache && window.applicationCache.status === window.applicationCache.UPDATEREADY) {
             window.applicationCache.swapCache();
         }
-
-        // reload even if storage clear fails
-        $A.componentService.clearDefsFromStorage().then(
-            function() { window.location.reload(true); },
-            function() { window.location.reload(true); }
-        );
+        dumpCachesAndReload();
     }
 
     function handleAppcacheError(e) {
@@ -762,7 +793,7 @@ AuraClientService.prototype.handleAppCache = function() {
         if (acs.appcacheDownloadingEventFired && acs.isOutdated) {
             // Hard reload if we error out trying to download new appcache
             $A.log("Outdated.");
-            window.location.reload(true);
+            dumpCachesAndReload();
         }
     }
 

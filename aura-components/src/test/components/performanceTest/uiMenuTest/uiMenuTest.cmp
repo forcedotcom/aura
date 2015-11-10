@@ -1,12 +1,17 @@
 <aura:component extends="performance:perfTest">
+	<!-- perf test params -->
+    <aura:attribute name="testManyItems" type="Boolean" default="false"/>
+    <aura:attribute name="testVisible" type="Boolean" default="false"/>
+    
 	<ui:menu>
 	    <ui:menuTriggerLink aura:id="trigger" label="Opportunity Status"/>
 	    
-        <ui:menuList class="actionMenu" aura:id="actionMenu">
-              
-              <!-- Needs to be toggled by the perf. framework-->
-        	  <aura:set attribute="visible" value="false"/>
-        
+	     <!--Need the `manualPosition` attribute to test menu with more items than fit the browser window-->
+        <ui:menuList class="actionMenu" aura:id="actionMenu" manualPosition="{!v.testManyItems}">
+                      
+              <!-- Needs to be toggled by the perf. framework if testing `visible` attribute-->
+        	  <aura:set attribute="visible" value="{!v.testVisible}"/>
+        	
               <ui:actionMenuItem aura:id="item1" label="A1"/>
               <ui:actionMenuItem aura:id="item2" label="A2" disabled="true"/>
               <ui:actionMenuItem aura:id="item3" label="A3" />

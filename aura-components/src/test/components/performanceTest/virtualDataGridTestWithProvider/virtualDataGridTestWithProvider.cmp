@@ -1,0 +1,29 @@
+<aura:component implements="performance:test">
+  <aura:attribute name="tableFlavor" type="String" default="default"/>
+   
+    <ui:virtualDataGrid aura:id="grid" fixedHeader="true" useRowHeaders="true">
+      <aura:set attribute="headerColumns">
+        <ui:dataGridColumn name="id" label="Id"/>
+        <ui:dataGridColumn name="subject" label="Subject"/>
+        <ui:dataGridColumn name="who.name" label="Name"/>
+        <ui:dataGridColumn name="what.name" label="Related To"/>
+        <ui:dataGridColumn name="activityDate" label="Due Date"/>
+      </aura:set>
+      
+      <aura:set attribute="columns">
+        <ui:outputText value="{!item.id}"/>
+        <ui:outputText value="{!item.subject}"/>
+        <ui:outputText value="{!item.who.name}"/>
+        <ui:outputText value="{!item.what.name}"/>
+        <ui:outputText value="{!item.activityDate}"/>
+      </aura:set>
+      
+      <aura:set attribute="dataModel">
+        <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
+                              sortBy="{!v.sortBy}"
+                              totalItems="400"
+                              pageSize="400"
+                              throwError="{!v.provideNoData}"/>
+      </aura:set>
+    </ui:virtualDataGrid>
+</aura:component>

@@ -1,0 +1,26 @@
+<aura:component extends="performance:perfTest" model="js://performanceTest.virtualDataGridTestAppendRows">
+    <aura:attribute name="data" type="List"/>
+    <ui:virtualDataGrid aura:id="myGrid" items="{!m.data}" >
+    
+        <aura:set attribute="headerColumns">       
+        	<ui:dataGridColumn label="First Name" name="firstName" />
+        	<ui:dataGridColumn label="Last Name" name="lastName" />
+        	<ui:dataGridColumn label="ID" name="_id" />       	
+        	<ui:dataGridColumn label="Active" name="isActive" />
+        	<ui:dataGridColumn label="Balance" name="balance" />
+        	<ui:dataGridColumn label="Age" name="age" />
+        	<ui:dataGridColumn label="Address" name="address" />           	
+        </aura:set>
+       
+        <aura:set attribute="columns">	
+        	{!item.firstName}
+        	{!item.lastName}
+        	{!item._id}
+        	{!item.isActive}
+        	{!item.balance}
+        	{!item.age}
+        	{!item.address}       	 
+        </aura:set>  
+        
+    </ui:virtualDataGrid>
+</aura:component>

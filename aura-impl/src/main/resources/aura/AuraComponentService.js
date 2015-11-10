@@ -923,7 +923,7 @@ AuraComponentService.prototype.getComponentDef = function(config) {
     var definition = this.componentDefRegistry[descriptor];
 
     if (!definition && this.savedComponentConfigs[descriptor]) {
-        definition = this.createComponentDef(config);
+        definition = this.createFromSavedComponentConfigs(config);
     }
 
     return definition;

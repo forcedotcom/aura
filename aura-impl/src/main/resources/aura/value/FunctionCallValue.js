@@ -21,14 +21,10 @@
  * @export
  */
 function FunctionCallValue(config, valueProvider){
-    if (!$A.util.isFunction(config["code"])) {
-        throw new Error("Invalid function");
-    }
-
     this.valueProvider = valueProvider;
     this.byValue = config["byValue"];
-    this.code = config["code"];
-    this.context=$A.getContext().getCurrentAccess();
+    this.code = $A.util.json.decodeString(config["code"]);
+    this.context = $A.getContext().getCurrentAccess();
 
     this.args = [];
     for (var i = 0; i < config["args"].length; i++) {

@@ -147,6 +147,9 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
                         // Pull up the values into the config itself
                         if (value["descriptor"] && (value["componentClass"] || value["attributeDefs"])) {
                             if (defFound) {
+                                var newValueDef = { "descriptor" : value["descriptor"] };
+                                cache[serId] = newValueDef;
+
                                 for (key in value) {
                                     v = value[key];
                                     if (typeof v === "object" && v !== null) {
@@ -155,8 +158,9 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
                                         collector.push.apply(collector, superCollector);
                                     }
                                 }
+
                                 collector.push(value);
-                                value = { "descriptor" : value["descriptor"] };
+                                value = newValueDef;
                             } else {
                                 defFound = true;
                             }

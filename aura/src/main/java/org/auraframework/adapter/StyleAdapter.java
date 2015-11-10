@@ -67,6 +67,14 @@ public interface StyleAdapter extends AuraAdapter {
             TokenCache overrides);
 
     /**
+     * Gets the def descriptor for the namespace-default {@link TokensDef}, from the same namespace as the given def
+     * descriptor.
+     *
+     * @param descriptor Find the namespace-default tokens from the same namespace as this descriptor.
+     */
+    DefDescriptor<TokensDef> getNamespaceDefaultDescriptor(DefDescriptor<?> descriptor);
+
+    /**
      * Should return whether validation of token with property name (as defined in the token def) should be enabled for
      * the given {@link StyleDef}.
      *

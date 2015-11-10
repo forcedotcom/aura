@@ -28,7 +28,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.Definition;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
@@ -258,9 +257,6 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @ThreadHostileTest("NamespaceDef modification affects namespace")
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
-        createDef(NamespaceDef.class, String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, namespace),
-                "<aura:namespace></aura:namespace>");
-
         createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
                 ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
 

@@ -23,7 +23,6 @@ import org.auraframework.controller.java.ServletConfigController;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.impl.adapter.format.html.BaseComponentDefHTMLFormatAdapterTest;
 import org.auraframework.system.AuraContext;
@@ -157,9 +156,6 @@ public class ApplicationDefHTMLFormatAdapterTest extends BaseComponentDefHTMLFor
         DefDescriptor<StyleDef> styleDef = Aura.getDefinitionService().getDefDescriptor(
                 "templateCss://string.thing" + System.currentTimeMillis() + "template", StyleDef.class);
         addSourceAutoCleanup(styleDef, css);
-        DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDef.getNamespace()), NamespaceDef.class);
-        addSourceAutoCleanup(namespaceDesc, "<aura:namespace></aura:namespace>");
         String templateCss = String.format("%s://%s.%s", DefDescriptor.TEMPLATE_CSS_PREFIX, styleDef.getNamespace(),
                 styleDef.getName());
         String templateMarkup = String.format(baseComponentTag, "style='" + templateCss

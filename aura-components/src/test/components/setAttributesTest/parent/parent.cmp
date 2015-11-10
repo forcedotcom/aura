@@ -16,6 +16,6 @@
 
 -->
 <!-- THIS COMPONENT IS USED BY TESTS.  BE PREPARED TO FIX TEST FAILURES IF YOU CHANGE IT. -->
-<aura:component extends="setAttributesTest:grandParent" extensible="true" render="client">
+<aura:component extends="setAttributesTest:grandparent" extensible="true" render="client">
     <aura:set attribute="SimpleAttribute" value="parentX"/>
 </aura:component>

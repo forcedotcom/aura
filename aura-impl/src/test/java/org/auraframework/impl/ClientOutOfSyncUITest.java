@@ -125,10 +125,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                 StyleDef.class);
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
-        addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
-                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
@@ -298,10 +294,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                 StyleDef.class);
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
-        addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
-                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));
@@ -329,10 +321,6 @@ public class ClientOutOfSyncUITest extends WebDriverTestCase {
         DefDescriptor<?> styleDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
                 StyleDef.class);
         addSourceAutoCleanup(styleDesc, String.format(".%s {font-style:italic;}", className));
-        addSourceAutoCleanup(
-                Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()),
-                        NamespaceDef.class), "<aura:namespace/>");
         open(cmpDesc);
         assertEquals("italic",
                 auraUITestingUtil.findDomElement(By.cssSelector("." + className)).getCssValue("font-style"));

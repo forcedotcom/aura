@@ -15,39 +15,60 @@
  */
 package org.auraframework.impl.context;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import aQute.bnd.annotation.component.Component;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ComponentLocationAdapter;
 import org.auraframework.adapter.RegistryAdapter;
-import org.auraframework.def.*;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.RendererDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
-import org.auraframework.impl.java.provider.*;
+import org.auraframework.impl.java.provider.JavaProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaTokenDescriptorProviderDefFactory;
+import org.auraframework.impl.java.provider.JavaTokenMapProviderDefFactory;
 import org.auraframework.impl.java.renderer.JavaRendererDefFactory;
 import org.auraframework.impl.java.type.JavaTypeDefFactory;
-import org.auraframework.impl.root.RootDefFactory;
 import org.auraframework.impl.source.SourceFactory;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
-import org.auraframework.impl.system.*;
+import org.auraframework.impl.system.CacheableDefFactoryImpl;
+import org.auraframework.impl.system.CachingDefRegistryImpl;
+import org.auraframework.impl.system.NonCachingDefRegistryImpl;
+import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Mode;
-import org.auraframework.system.*;
+import org.auraframework.system.CacheableDefFactory;
+import org.auraframework.system.DefFactory;
+import org.auraframework.system.DefRegistry;
+import org.auraframework.system.SourceListener;
+import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.ServiceLocator;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import aQute.bnd.annotation.component.Component;
 
 @Component (provide=AuraServiceProvider.class)
 public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
@@ -58,10 +79,36 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
      */
     private volatile DefRegistry<?>[] registries;
 
-    private static final Set<String> rootPrefixes = ImmutableSet.of(DefDescriptor.MARKUP_PREFIX);
-    private static final Set<DefType> rootDefTypes = EnumSet.of(DefType.APPLICATION, DefType.COMPONENT,
-            DefType.INTERFACE, DefType.EVENT, DefType.LIBRARY, DefType.NAMESPACE, DefType.TOKENS,
-            DefType.DOCUMENTATION, DefType.INCLUDE, DefType.DESIGN, DefType.SVG, DefType.FLAVOR_BUNDLE, DefType.FLAVORS);
+    private static final Set<String> markupPrefixes = ImmutableSet.of(
+            DefDescriptor.MARKUP_PREFIX,
+            DefDescriptor.CSS_PREFIX,
+            DefDescriptor.TEMPLATE_CSS_PREFIX,
+            DefDescriptor.CUSTOM_FLAVOR_PREFIX,
+            DefDescriptor.JAVASCRIPT_PREFIX);
+
+    private static final Set<DefType> markupDefTypes = EnumSet.of(
+            DefType.APPLICATION,
+            DefType.COMPONENT,
+            DefType.CONTROLLER,
+            DefType.DESIGN,
+            DefType.DOCUMENTATION,
+            DefType.EVENT,
+            DefType.FLAVOR_BUNDLE,
+            DefType.FLAVORED_STYLE,
+            DefType.FLAVORS,
+            DefType.HELPER,
+            DefType.INCLUDE,
+            DefType.INTERFACE,
+            DefType.LIBRARY,
+            DefType.MODEL,
+            DefType.PROVIDER,
+            DefType.RENDERER,
+            DefType.RESOURCE,
+            DefType.STYLE,
+            DefType.SVG,
+            DefType.TESTSUITE,
+            DefType.TOKENS
+            );
 
     private static class SourceLocationInfo {
         public final List<DefRegistry<?>> staticLocationRegistries;
@@ -264,28 +311,8 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
             if (markupLoaders.size() > 0) {
                 SourceFactory markupSourceFactory = new SourceFactory(markupLoaders);
-
-                regBuild.add(createDefRegistry(new RootDefFactory(markupSourceFactory), rootDefTypes, rootPrefixes));
-                regBuild.add(AuraRegistryProviderImpl.<ControllerDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.CONTROLLER));
-                regBuild.add(AuraRegistryProviderImpl.<TestSuiteDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.TESTSUITE));
-                regBuild.add(AuraRegistryProviderImpl.<RendererDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.RENDERER));
-                regBuild.add(AuraRegistryProviderImpl.<HelperDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.HELPER));
-                regBuild.add(AuraRegistryProviderImpl.<ProviderDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.PROVIDER));
-                regBuild.add(AuraRegistryProviderImpl.<ModelDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.MODEL));
-                regBuild.add(AuraRegistryProviderImpl.<ResourceDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.RESOURCE));
-                regBuild.add(AuraRegistryProviderImpl.<IncludeDef> createJavascriptRegistry(markupSourceFactory,
-                        DefType.INCLUDE));
-                regBuild.add(createStyleRegistry(markupSourceFactory));
-                regBuild.add(createDefRegistry(new CacheableDefFactoryImpl<FlavoredStyleDef>(markupSourceFactory),
-                        EnumSet.of(DefType.FLAVORED_STYLE),
-                        Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.CUSTOM_FLAVOR_PREFIX)));
+                CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory);
+                regBuild.add(new CachingDefRegistryImpl<>(factory, markupDefTypes, markupPrefixes));
             }
 
             regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(),
@@ -327,18 +354,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         } else {
             return ret;
         }
-    }
-
-    private static <T extends Definition> DefRegistry<T> createStyleRegistry(SourceFactory sourceFactory) {
-        CacheableDefFactoryImpl<T> factory = new CacheableDefFactoryImpl<>(sourceFactory);
-        return createDefRegistry(factory, EnumSet.of(DefType.STYLE, DefType.RESOURCE),
-                        Sets.newHashSet(DefDescriptor.CSS_PREFIX, DefDescriptor.TEMPLATE_CSS_PREFIX));
-    }
-
-    private static <T extends Definition> DefRegistry<T> createJavascriptRegistry(SourceFactory sourceFactory,
-            DefType dt) {
-        CacheableDefFactoryImpl<T> factory = new CacheableDefFactoryImpl<>(sourceFactory);
-        return createDefRegistry(factory, dt, DefDescriptor.JAVASCRIPT_PREFIX);
     }
 
     protected static <T extends Definition> DefRegistry<T> createDefRegistry(DefFactory<T> factory, DefType defType,

@@ -32,7 +32,6 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.system.AuraContext.Authentication;
@@ -242,16 +241,13 @@ public class RegistrySerializer {
         Set<DefDescriptor<?>> descriptors;
         List<Definition> defs = Lists.newArrayList();
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
-        DescriptorFilter root_nsf = new DescriptorFilter(namespace,
-                "COMPONENT,APPLICATION,EVENT,INTERFACE,LIBRARY,TOKENS,DOCUMENTATION,TESTSUITE,NAMESPACE");
+        DescriptorFilter root_nsf = new DescriptorFilter(namespace, "*");
         Map<DefDescriptor<?>, Definition> filtered;
         Set<String> namespaces = Sets.newHashSet(namespace);
         //
         // Fetch all matching descriptors for our 'root' definitions.
         //
         descriptors = mdr.find(root_nsf);
-        // HACK! this should go away with: W-2368045
-        descriptors.add(Aura.getDefinitionService().getDefDescriptor("markup://"+namespace, NamespaceDef.class));
         for (DefDescriptor<?> desc : descriptors) {
             Definition def = null;
             try {

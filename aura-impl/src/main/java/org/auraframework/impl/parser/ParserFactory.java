@@ -39,7 +39,6 @@ import org.auraframework.impl.root.parser.EventXMLParser;
 import org.auraframework.impl.root.parser.FlavorsXMLParser;
 import org.auraframework.impl.root.parser.InterfaceXMLParser;
 import org.auraframework.impl.root.parser.LibraryXMLParser;
-import org.auraframework.impl.root.parser.NamespaceXMLParser;
 import org.auraframework.impl.root.parser.TokensXMLParser;
 import org.auraframework.impl.svg.parser.SVGParser;
 import org.auraframework.system.Parser;
@@ -89,7 +88,6 @@ public class ParserFactory {
         parsers.put(new ParserKey(Format.XML, DefType.FLAVORS), new FlavorsXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.INTERFACE), new InterfaceXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.LIBRARY), new LibraryXMLParser());
-        parsers.put(new ParserKey(Format.XML, DefType.NAMESPACE), new NamespaceXMLParser());
         parsers.put(new ParserKey(Format.XML, DefType.TOKENS), new TokensXMLParser());
 
         parsers.put(new ParserKey(Format.CSS, DefType.RESOURCE), new ResourceCSSParser());

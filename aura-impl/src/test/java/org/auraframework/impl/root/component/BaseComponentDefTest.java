@@ -41,7 +41,6 @@ import org.auraframework.def.EventHandlerDef;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ModelDef;
-import org.auraframework.def.NamespaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.def.RendererDef;
@@ -385,9 +384,6 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
                 + StringUtils.capitalize(cmpDesc.getName());
         addSourceAutoCleanup(styleDesc,
                 String.format(".%s {font-style:italic;}", className));
-        DefDescriptor<NamespaceDef> namespaceDesc = Aura.getDefinitionService().getDefDescriptor(
-                String.format("%s://%s", DefDescriptor.MARKUP_PREFIX, styleDesc.getNamespace()), NamespaceDef.class);
-        addSourceAutoCleanup(namespaceDesc, "<aura:namespace/>");
 
         Set<DefDescriptor<?>> dependencies = new HashSet<>();
         cmpDesc.getDef().appendDependencies(dependencies);

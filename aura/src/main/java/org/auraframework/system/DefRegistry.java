@@ -108,6 +108,14 @@ public interface DefRegistry<T extends Definition> extends Serializable {
     boolean isCacheable();
 
     /**
+     * reset the registry.
+     *
+     * This can either do something or nothing depending on the registry. It will be called if there is a change
+     * to a file that is contained in the directory associated with the registry.
+     */
+    void reset();
+
+    /**
      * Return true if registry cannot change after creation.
      *
      * There is an implicit assumption that static registries are fast, and thus need not be cached

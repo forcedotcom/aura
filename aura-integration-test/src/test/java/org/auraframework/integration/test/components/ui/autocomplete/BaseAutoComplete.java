@@ -15,14 +15,21 @@
  */
 package org.auraframework.integration.test.components.ui.autocomplete;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**

@@ -51,7 +51,9 @@ import org.auraframework.impl.source.file.FileSourceLoader;
 import org.auraframework.impl.source.resource.ResourceSourceLoader;
 import org.auraframework.impl.system.CacheableDefFactoryImpl;
 import org.auraframework.impl.system.CachingDefRegistryImpl;
+import org.auraframework.impl.system.CompilingDefRegistry;
 import org.auraframework.impl.system.NonCachingDefRegistryImpl;
+import org.auraframework.impl.system.PassThroughDefRegistry;
 import org.auraframework.impl.system.StaticDefRegistryImpl;
 import org.auraframework.impl.type.AuraStaticTypeDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
@@ -73,11 +75,6 @@ import aQute.bnd.annotation.component.Component;
 @Component (provide=AuraServiceProvider.class)
 public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener {
     private static final Logger _log = Logger.getLogger(RegistryAdapter.class);
-
-    /**
-     * FIXME: (goliver) I am not convinced that this caching is correct in any way shape or form.
-     */
-    private volatile DefRegistry<?>[] registries;
 
     private static final Set<String> markupPrefixes = ImmutableSet.of(
             DefDescriptor.MARKUP_PREFIX,
@@ -112,20 +109,20 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
     private static class SourceLocationInfo {
         public final List<DefRegistry<?>> staticLocationRegistries;
-        public final List<SourceLoader> markupSourceLoaders;
         public final List<SourceLoader> javaSourceLoaders;
+        public final List<DefRegistry<?>> markupRegistries;
         public final String baseDir;
         private boolean changed;
 
         public SourceLocationInfo(DefRegistry<?>[] staticLocationRegistries, String baseDir,
-                List<SourceLoader> markupSourceLoaders,
+                List<DefRegistry<?>> markupRegistries,
                 List<SourceLoader> javaSourceLoaders) {
             List<DefRegistry<?>> slr_list = null;
             if (staticLocationRegistries != null) {
                 slr_list = Arrays.asList(staticLocationRegistries);
             }
             this.staticLocationRegistries = slr_list;
-            this.markupSourceLoaders = markupSourceLoaders;
+            this.markupRegistries = markupRegistries;
             this.javaSourceLoaders = javaSourceLoaders;
             this.baseDir = baseDir;
             this.changed = false;
@@ -218,24 +215,29 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
         String canonical = null;
         List<SourceLoader> markupLoaders = Lists.newArrayList();
         List<SourceLoader> javaLoaders = Lists.newArrayList();
+        List<DefRegistry<?>> markupRegistries = Lists.newArrayList();
         if (pkg != null) {
             ResourceSourceLoader rsl = new ResourceSourceLoader(pkg);
             markupLoaders.add(rsl);
             javaLoaders.add(rsl);
+            markupRegistries.add(new CompilingDefRegistry(rsl, markupPrefixes, markupDefTypes));
         } else if (location.getComponentSourceDir() != null) {
             File components = location.getComponentSourceDir();
             if (!components.canRead() || !components.canExecute() || !components.isDirectory()) {
                 _log.error("Unable to find " + components + ", ignored.");
             } else {
-                markupLoaders.add(new FileSourceLoader(components));
+                FileSourceLoader fsl = new FileSourceLoader(components);
+                markupLoaders.add(fsl);
+                markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes));
                 File javaBase = new File(components.getParent(), "java");
                 if (javaBase.exists()) {
                     javaLoaders.add(new FileSourceLoader(javaBase));
                 }
                 File generatedJavaBase = location.getJavaGeneratedSourceDir();
                 if (generatedJavaBase != null && generatedJavaBase.exists()) {
-                    FileSourceLoader fsl = new FileSourceLoader(generatedJavaBase);
+                    fsl = new FileSourceLoader(generatedJavaBase);
                     markupLoaders.add(fsl);
+                    markupRegistries.add(new CompilingDefRegistry(fsl, markupPrefixes, markupDefTypes));
                     javaLoaders.add(fsl);
                 }
                 try {
@@ -249,23 +251,26 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
             Set<SourceLoader> loaders = location.getSourceLoaders();
             if (!loaders.isEmpty()) {
                 markupLoaders.addAll(loaders);
+                for (SourceLoader loader : loaders) {
+                    markupRegistries.add(new PassThroughDefRegistry(loader, markupDefTypes, markupPrefixes, true));
+                }
             }
         }
+        //
+        // Ooh, now _this_ is ugly. Because internal namespaces are tracked by the
+        // SourceFactory constructor, we'd best build a source factory for every loader.
+        // This ensures that we do in the case of static registries. Note that it also
+        // allows us to see source on static registries.
+        //
+        SourceFactory sf = new SourceFactory(markupLoaders);
         if (staticRegs != null) {
-            //
-            // Ooh, now _this_ is ugly. Because internal namespaces are tracked by the
-            // SourceFactory constructor, we'd best build a source factory for every loader.
-            // This ensures that we do in the case of static registries. Note that it also
-            // allows us to see source on static registries.
-            //
-            SourceFactory sf = new SourceFactory(markupLoaders);
             for (DefRegistry<?> reg : staticRegs) {
                 if (reg instanceof StaticDefRegistryImpl) {
                     ((StaticDefRegistryImpl<?>)reg).setSourceFactory(sf);
                 }
             }
         }
-        return new SourceLocationInfo(staticRegs, canonical, markupLoaders, javaLoaders);
+        return new SourceLocationInfo(staticRegs, canonical, markupRegistries, javaLoaders);
     }
 
     private ConcurrentHashMap<ComponentLocationAdapter, SourceLocationInfo> locationMap = new ConcurrentHashMap<>();
@@ -282,9 +287,8 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
 
     @Override
     public DefRegistry<?>[] getRegistries(Mode mode, Authentication access, Set<SourceLoader> extraLoaders) {
-        DefRegistry<?>[] ret = registries;
+        DefRegistry<?>[] ret;
 
-        if (mode.isTestMode() || ret == null || (extraLoaders != null && !extraLoaders.isEmpty())) {
             Collection<ComponentLocationAdapter> markupLocations = getAllComponentLocationAdapters();
             List<SourceLoader> markupLoaders = Lists.newArrayList();
             List<SourceLoader> javaLoaders = Lists.newArrayList();
@@ -298,7 +302,7 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                     if (!sli.isChanged() && sli.staticLocationRegistries != null) {
                         regBuild.addAll(sli.staticLocationRegistries);
                     } else {
-                        markupLoaders.addAll(sli.markupSourceLoaders);
+                    regBuild.addAll(sli.markupRegistries);
                         javaLoaders.addAll(sli.javaSourceLoaders);
                     }
                 }
@@ -336,11 +340,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
             }
 
             ret = regBuild.toArray(new DefRegistry<?>[regBuild.size()]);
-            if (registries == null && !mode.isTestMode()) {
-                registries = ret;
-            }
-        }
-
         return ret;
     }
 
@@ -380,12 +379,14 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                     for (SourceLocationInfo sli : locationMap.values()) {
                         if (sli.baseDir != null && canonical.startsWith(sli.baseDir)) {
                             sli.setChanged(true);
+                            for (DefRegistry<?> registry : sli.markupRegistries) {
+                                registry.reset();
+                            }
                         }
                     }
                 } catch (IOException ioe) {
                 }
             }
-            registries = null;
         }
     }
 }

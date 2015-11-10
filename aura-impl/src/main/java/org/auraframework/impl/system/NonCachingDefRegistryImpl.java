@@ -74,4 +74,8 @@ public class NonCachingDefRegistryImpl<T extends Definition> extends DefRegistry
     public boolean isCacheable() {
         return false;
     }
+
+    @Override
+    public void reset() {
+    }
 }

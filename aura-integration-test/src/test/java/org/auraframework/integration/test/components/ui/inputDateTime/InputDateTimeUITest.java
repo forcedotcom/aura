@@ -18,10 +18,11 @@ package org.auraframework.integration.test.components.ui.inputDateTime;
 
 import org.auraframework.integration.test.util.WebDriverTestCase;
 import org.auraframework.integration.test.util.WebDriverTestCase.ExcludeBrowsers;
-import org.auraframework.test.util.*;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 /*
  * Mobile devices are still using the old time picker.

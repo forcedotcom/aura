@@ -20,14 +20,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.DefDescriptor.DefType;
-import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.EventType;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.system.AuraContext.Authentication;
@@ -35,9 +30,6 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestCase;
 import org.junit.Test;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 /**
  * Common tests for ui:output components

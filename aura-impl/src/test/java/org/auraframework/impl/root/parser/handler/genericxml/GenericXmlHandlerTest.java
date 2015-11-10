@@ -175,7 +175,6 @@ public class GenericXmlHandlerTest extends AuraImplTestCase {
             this(tag, allowText, allowedAttributes, children, false);
         }
 
-        @SuppressWarnings("unchecked")
         public MockValidator(String tag, boolean allowText, Function<Boolean, List<String>> allowedAttributes, Set<GenericXmlValidator> children, boolean requiresInternalNamespace) {
             super(tag, children);
             this.allowText = allowText;

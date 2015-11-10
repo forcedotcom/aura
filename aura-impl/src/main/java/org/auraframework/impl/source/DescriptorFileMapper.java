@@ -25,6 +25,7 @@ import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.util.AuraTextUtil;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -64,9 +65,9 @@ public class DescriptorFileMapper {
         }
     }
 
-    protected final static Map<String, ExtensionInfo> byExtension = Maps.newHashMapWithExpectedSize(32);
+    protected final static Map<String, List<ExtensionInfo>> byExtension = Maps.newHashMapWithExpectedSize(32);
     private final static Map<String, Map<DefType, ExtensionInfo>> byCompound = Maps.newHashMapWithExpectedSize(8);
-    private final static Map<NameFormat, Map<String, ExtensionInfo>> byNameFormatCompound = Maps.newHashMapWithExpectedSize(4);
+    private final static Map<NameFormat, Map<String, List<ExtensionInfo>>> byNameFormatCompound = Maps.newHashMapWithExpectedSize(4);
     private final static Set<DefType> defTypes = Sets.newHashSet();
     private final static Set<String> prefixes = Sets.newHashSet();
 
@@ -78,7 +79,13 @@ public class DescriptorFileMapper {
     protected synchronized static void addExtension(String extension, NameFormat nameFormat,
             String prefix, DefType defType, Format format, DefType bundleDefType) {
         ExtensionInfo ei = new ExtensionInfo(extension, nameFormat, prefix, defType, format, bundleDefType);
-        byExtension.put(ei.extension.toLowerCase(), ei);
+
+        List<ExtensionInfo> eiList = byExtension.get(ei.extension.toLowerCase());
+        if (eiList == null) {
+            eiList = Lists.newArrayList();
+            byExtension.put(ei.extension.toLowerCase(), eiList);
+        }
+        eiList.add(ei);
 
         Map<DefType, ExtensionInfo> defTypeMap = byCompound.get(ei.prefix.toLowerCase());
         if (defTypeMap == null) {
@@ -88,12 +95,17 @@ public class DescriptorFileMapper {
         defTypeMap.put(defType, ei);
 
         // index by nameFormat => { extension => ei } for cases where the extensions are the same
-        Map<String, ExtensionInfo> extMap = byNameFormatCompound.get(nameFormat);
+        Map<String, List<ExtensionInfo>> extMap = byNameFormatCompound.get(nameFormat);
         if (extMap == null) {
             extMap = Maps.newHashMap();
             byNameFormatCompound.put(nameFormat, extMap);
         }
-        extMap.put(extension, ei);
+        eiList = extMap.get(ei.extension.toLowerCase());
+        if (eiList == null) {
+            eiList = Lists.newArrayList();
+            extMap.put(ei.extension.toLowerCase(), eiList);
+        }
+        eiList.add(ei);
 
         defTypes.add(defType);
         prefixes.add(ei.prefix);
@@ -135,16 +147,15 @@ public class DescriptorFileMapper {
         addExtension(".css", NameFormat.BUNDLED_EXTRA, DefDescriptor.CUSTOM_FLAVOR_PREFIX, DefType.FLAVORED_STYLE, Format.CSS, DefType.FLAVOR_BUNDLE);
         addExtension("Flavors.css", NameFormat.BUNDLE, DefDescriptor.CSS_PREFIX, DefType.FLAVORED_STYLE, Format.CSS);
         addExtension(".css", NameFormat.BUNDLE, "templateCss", DefType.STYLE, Format.TEMPLATE_CSS);
-        addExtension("Resource.css", NameFormat.BUNDLE, "templateCss", DefType.RESOURCE, Format.TEMPLATE_CSS);
         addExtension(".css", NameFormat.BUNDLE, "css", DefType.STYLE, Format.CSS);
         addExtension("Resource.css", NameFormat.BUNDLE, "css", DefType.RESOURCE, Format.CSS);
     }
 
-    protected static DefDescriptor<? extends Definition> getDescriptor(String filename) {
+    public static DefDescriptor<? extends Definition> getDescriptor(String filename) {
     	return getDescriptor(filename, FILE_SEPARATOR);
     }
 
-    protected static DefDescriptor<? extends Definition> getDescriptor(String filename, String separator) {
+    public static List<DefDescriptor<? extends Definition>> getAllDescriptors(String filename, String separator) {
         List<String> names = AuraTextUtil.splitSimple(separator, filename);
         if (names.size() < 3) {
             return null;
@@ -152,38 +163,66 @@ public class DescriptorFileMapper {
         String last = names.get(names.size() - 1);
         String name = names.get(names.size() - 2);
         String ns = names.get(names.size() - 3);
+        List<ExtensionInfo> eiList;
+        List<DefDescriptor<?>> descList;
         //
         // First try the bundled type.
         //
-        ExtensionInfo ei;
         if (last.startsWith(name)) {
             String ext;
             ext = last.substring(name.length());
-            ei = byExtension.get(ext.toLowerCase());
-            if (ei != null) {
-                String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
-                return Aura.getDefinitionService().getDefDescriptor(
-                        String.format(format, ei.prefix, ns, name), ei.defType.getPrimaryInterface());
+            eiList = byExtension.get(ext.toLowerCase());
+            if (eiList != null) {
+                descList = Lists.newArrayList();
+                for (ExtensionInfo ei : eiList) {
+                    if (ei.bundleDefType == null) {
+                        String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
+                        descList.add(Aura.getDefinitionService().getDefDescriptor(
+                                String.format(format, ei.prefix, ns, name), ei.defType.getPrimaryInterface()));
+                    }
+                }
+                if (descList.size() > 0) {
+                    return descList;
+                }
             }
         }
 
-        // bundle extrasss
+        // bundle extras
         List<String> ext = AuraTextUtil.splitSimple(".", last);
-        if (ext != null && ext.size() == 2 && !last.startsWith(name)) {
-            Map<String, ExtensionInfo> bundledExtras = byNameFormatCompound.get(NameFormat.BUNDLED_EXTRA);
-            ei = bundledExtras.get("." + ext.get(1));
+        if (ext != null && ext.size() == 2) {
+            Map<String, List<ExtensionInfo>> bundledExtras = byNameFormatCompound.get(NameFormat.BUNDLED_EXTRA);
+            eiList = bundledExtras.get("." + ext.get(1));
 
-            if (ei != null && ei.bundleDefType != null) {
-                DefDescriptor<? extends Definition> bundle = Aura.getDefinitionService().getDefDescriptor(
-                        String.format("%s://%s:%s", DefDescriptor.MARKUP_PREFIX, ns, name), ei.bundleDefType.getPrimaryInterface());
-
-                String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
-                return Aura.getDefinitionService().getDefDescriptor(
-                        String.format(format, ei.prefix, ns, ext.get(0)), ei.defType.getPrimaryInterface(), bundle);
+            if (eiList != null) {
+                descList = Lists.newArrayList();
+                for (ExtensionInfo ei : eiList) {
+                    if (ei.bundleDefType != null) {
+                        DefDescriptor<? extends Definition> bundle = Aura.getDefinitionService().getDefDescriptor(
+                                String.format("%s://%s:%s", DefDescriptor.MARKUP_PREFIX, ns, name), ei.bundleDefType.getPrimaryInterface());
+                        String format = DefDescriptor.MARKUP_PREFIX.equals(ei.prefix) ? "%s://%s:%s" : "%s://%s.%s";
+                        descList.add(Aura.getDefinitionService().getDefDescriptor(
+                            String.format(format, ei.prefix, ns, ext.get(0)), ei.defType.getPrimaryInterface(), bundle));
+                    }
+                }
+                if (descList.size() > 0) {
+                    return descList;
+                }
             }
         }
 
         return null;
+    }
+
+    public static List<DefDescriptor<? extends Definition>> getAllDescriptors(String filename) {
+    	return getAllDescriptors(filename, FILE_SEPARATOR);
+    }
+
+    public static DefDescriptor<? extends Definition> getDescriptor(String filename, String separator) {
+        List<DefDescriptor<? extends Definition>> descList = getAllDescriptors(filename, separator);
+        if (descList == null || descList.size() == 0) {
+            return null;
+        }
+        return descList.get(descList.size()-1);
     }
 
     protected Format getFormat(DefDescriptor<?> descriptor) {

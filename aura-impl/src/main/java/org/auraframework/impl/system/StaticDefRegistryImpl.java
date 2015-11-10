@@ -101,4 +101,8 @@ public class StaticDefRegistryImpl<T extends Definition> extends DefRegistryImpl
     public boolean isStatic() {
         return true;
     }
+
+    @Override
+    public void reset() {
+    }
 }

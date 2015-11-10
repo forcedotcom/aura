@@ -537,37 +537,35 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         // If we can cache, look it up in the cache. If we find it, we have a built definition.
         // Currently, static registries are neither cached, nor do they affect dependency caching
         //
-        if (!registry.isStatic()) {
-            if (registry.isCacheable() && shouldCache(compiling.descriptor)) {
-                compiling.cacheable = true;
+        if (registry.isCacheable() && shouldCache(compiling.descriptor)) {
+            compiling.cacheable = true;
 
-                @SuppressWarnings("unchecked")
-                Optional<D> opt = (Optional<D>) defsCache.getIfPresent(compiling.descriptor);
-                if (opt != null) {
-                    D cachedDef = opt.orNull();
+            @SuppressWarnings("unchecked")
+            Optional<D> opt = (Optional<D>) defsCache.getIfPresent(compiling.descriptor);
+            if (opt != null) {
+                D cachedDef = opt.orNull();
 
-                    if (cachedDef != null) {
-                        @SuppressWarnings("unchecked")
-                        DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
+                if (cachedDef != null) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<D> canonical = (DefDescriptor<D>) cachedDef.getDescriptor();
 
-                        compiling.def = cachedDef;
-                        compiling.descriptor = canonical;
-                        compiling.built = false;
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    compiling.def = cachedDef;
+                    compiling.descriptor = canonical;
+                    compiling.built = false;
+                    return true;
+                } else {
+                    return false;
                 }
-            } else {
-                // if not a cacheable registry or not shouldCache, test other exceptions that might still
-                // allow dependency caching (if it's from static registry, it can't affect our decision on
-                // depsCaching) test for special cases: compounds and static apex types
-                boolean qualified = isOkForDependencyCaching(compiling.descriptor);
+            }
+        } else if (!registry.isStatic()) {
+            // if not a cacheable registry or not shouldCache, test other exceptions that might still
+            // allow dependency caching (if it's from static registry, it can't affect our decision on
+            // depsCaching) test for special cases: compounds and static apex types
+            boolean qualified = isOkForDependencyCaching(compiling.descriptor);
 
-                currentCC.shouldCacheDependencies = qualified;
-                if (!qualified) {
-                    defNotCacheable.add(compiling.descriptor);
-                }
+            currentCC.shouldCacheDependencies = qualified;
+            if (!qualified) {
+                defNotCacheable.add(compiling.descriptor);
             }
         }
 
@@ -580,17 +578,14 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         if (compiling.def == null) {
             return false;
         }
-        @SuppressWarnings("unchecked")
-        DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
-        compiling.descriptor = canonical;
-        currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
-        context.pushCallingDescriptor(canonical);
-        try {
-            compiling.def.validateDefinition();
-        } finally {
-            context.popCallingDescriptor();
-        }
         compiling.built = true;
+        if (!registry.isStatic()) {
+            @SuppressWarnings("unchecked")
+            DefDescriptor<D> canonical = (DefDescriptor<D>) compiling.def.getDescriptor();
+            compiling.descriptor = canonical;
+            currentCC.loggingService.incrementNum(LoggingService.DEF_COUNT);
+            compiling.def.validateDefinition();
+        }
         return true;
     }
 
@@ -1002,6 +997,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private <D extends Definition> void validateHelper(@Nonnull DefDescriptor<D> descriptor) throws QuickFixException {
         CompilingDef<D> compiling = new CompilingDef<>(descriptor);
         currentCC.compiled.put(descriptor, compiling);
+        if (compiling.def == null && !fillCompilingDef(compiling, currentCC.context)) {
+            throw new DefinitionNotFoundException(compiling.descriptor);
+        }
     }
 
     /**
@@ -1018,11 +1016,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             validateHelper(descriptor);
             for (DefDescriptor<?> dd : de.dependencies) {
                 validateHelper(dd);
-            }
-            for (CompilingDef<?> compiling : currentCC.compiled.values()) {
-                if (compiling.def == null && !fillCompilingDef(compiling, currentCC.context)) {
-                    throw new DefinitionNotFoundException(compiling.descriptor);
-                }
             }
             finishValidation();
         } finally {

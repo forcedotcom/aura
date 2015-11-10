@@ -21,6 +21,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
@@ -154,7 +155,6 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
         DefType defType = DefType.getDefType(primaryInterface);
         OneTypeFilter<T> otf = new OneTypeFilter<>(ret, defType);
         findFiles(new File(base, namespace), null, otf);
-        //System.out.println("PI="+primaryInterface.getName()+", prefix="+prefix+", ns = "+namespace+", RET="+ret);
         return ret;
     }
 
@@ -230,11 +230,16 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
             if (file.isDirectory()) {
                 return true;
             }
-            DefDescriptor<?> dd = getDescriptor(file.getPath());
-            if (dd != null && dd.getDefType() == dt) {
-                @SuppressWarnings("unchecked")
-                DefDescriptor<T> ddt = (DefDescriptor<T>)dd;
-                dset.add(ddt);
+            List<DefDescriptor<?>> dds = getAllDescriptors(file.getPath());
+            if (dds == null) {
+                return false;
+            }
+            for (DefDescriptor<?> dd : dds) {
+                if (dd.getDefType() == dt) {
+                    @SuppressWarnings("unchecked")
+                    DefDescriptor<T> ddt = (DefDescriptor<T>)dd;
+                    dset.add(ddt);
+                }
             }
             // We don't need to accept this, as we've already either included or
             // excluded the
@@ -283,12 +288,14 @@ public class FileSourceLoader extends BaseSourceLoader implements InternalNamesp
             if (file.isDirectory()) {
                 return true;
             }
-            DefDescriptor<?> dd = getDescriptor(file.getPath());
-            if (dd == null) {
+            List<DefDescriptor<?>> dds = getAllDescriptors(file.getPath());
+            if (dds == null) {
                 return false;
             }
-            if (dm.matchDescriptor(dd)) {
-                this.dset.add(dd);
+            for (DefDescriptor<?> dd : dds) {
+                if (dm.matchDescriptor(dd)) {
+                    this.dset.add(dd);
+                }
             }
             // We don't need to accept this, as we've already either included or
             // excluded the

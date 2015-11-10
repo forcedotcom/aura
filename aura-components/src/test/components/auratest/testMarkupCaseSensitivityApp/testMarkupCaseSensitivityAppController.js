@@ -76,6 +76,7 @@
     			}
     		};
     		cmp.set("v.output", str);
+    		cmp.set("v.outputClass", "libs");
     	} else {
     		cmp.set("v.output", "helper.importED should exsit, what happened?")
     	}

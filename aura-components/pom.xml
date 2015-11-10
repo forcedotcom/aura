@@ -224,15 +224,18 @@
                             <target>
                                 <path id="definitions">
                                     <fileset dir="src/main/components">
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.evt" />
-                                        <include name="**/*.lib" />
                                         <include name="**/*.app" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.tokens" />
-                                        <include name="**/*Test.js" />
                                         <include name="**/*.auradoc" />
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.design" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.flavors" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.js" />
+                                        <include name="**/*.lib" />
+                                        <include name="**/*.svg" />
+                                        <include name="**/*.tokens" />
                                     </fileset>
                                 </path>
                                 <pathconvert property="definitionList" refid="definitions" pathsep=",">
@@ -253,14 +256,18 @@
                             <target>
                                 <path id="definitions">
                                     <fileset dir="src/test/components">
-                                        <include name="**/*.cmp" />
-                                        <include name="**/*.intf" />
-                                        <include name="**/*.evt" />
                                         <include name="**/*.app" />
-                                        <include name="**/*.css" />
-                                        <include name="**/*.tokens" />
-                                        <include name="**/*Test.js" />
                                         <include name="**/*.auradoc" />
+                                        <include name="**/*.cmp" />
+                                        <include name="**/*.css" />
+                                        <include name="**/*.design" />
+                                        <include name="**/*.evt" />
+                                        <include name="**/*.flavors" />
+                                        <include name="**/*.intf" />
+                                        <include name="**/*.js" />
+                                        <include name="**/*.lib" />
+                                        <include name="**/*.svg" />
+                                        <include name="**/*.tokens" />
                                     </fileset>
                                 </path>
                                 <pathconvert property="definitionList" refid="definitions" pathsep=",">

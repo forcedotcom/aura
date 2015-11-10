@@ -15,14 +15,21 @@
  */
 package org.auraframework.impl.source.resource;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.def.*;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.Definition;
+import org.auraframework.def.DescriptorFilter;
 import org.auraframework.impl.source.BaseSourceLoader;
-import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.system.InternalNamespaceSourceLoader;
 import org.auraframework.system.Source;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -38,6 +45,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 /**
+ * A source loader to load from jars.
  */
 public class ResourceSourceLoader extends BaseSourceLoader implements InternalNamespaceSourceLoader {
 
@@ -45,22 +53,22 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
 
     protected final String packagePrefix;
     protected final String resourcePrefix;
-    protected final Map<IndexKey, Set<DefDescriptor<?>>> index = Maps.newHashMap();
+    protected final Map<DefDescriptor<?>,String> index = Maps.newHashMap();
     protected final Set<String> namespaces = Sets.newHashSet();
     private final ResourceLoader resourceLoader = Aura.getConfigAdapter().getResourceLoader();
 
     public ResourceSourceLoader(String basePackage) {
+        InputStreamReader reader = null;
+        InputStream is = null;
+        List<String> files;
+
         this.packagePrefix = "";
         resourcePrefix = basePackage;
-        List<String> files = null;
 
         // Ugh. this is used by tests.
         if (basePackage == null) {
             return;
         }
-        InputStreamReader reader = null;
-        InputStream is = null;
-        try {
             try {
                 is = resourceLoader.getResourceAsStream(resourcePrefix + "/.index");
                 if (is != null) {
@@ -78,6 +86,8 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
                         files.add(r.getURL().toString());
                     }
                 }
+        } catch (IOException x) {
+            throw new AuraRuntimeException(x);
             } finally {
                 //
                 // Make sure we close everything out.
@@ -97,43 +107,36 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
                     // ignore exceptions on close.
                 }
             }
-        } catch (IOException x) {
-            throw new AuraRuntimeException(x);
-        }
         if (files == null) {
             _log.warn("Unused base: "+basePackage);
             return;
         }
         for (String file : files) {
-            DefDescriptor<?> desc = getDescriptor(file, "/");
-            if (desc == null) {
+            List<DefDescriptor<?>> descs = getAllDescriptors(file, "/");
+            if (descs == null) {
                 // This should be a fatal error, and we should always compile our sources (FAIL FAST).
                 // throw new AuraRuntimeException("Unrecognized entry, source skew "+file);
                 _log.error("Bad filename in index: "+file);
                 continue;
             }
-            IndexKey key = new IndexKey(desc.getDefType(), desc.getNamespace());
+            for (DefDescriptor<?> desc : descs) {
+                _log.info("Adding: "+desc);
             namespaces.add(desc.getNamespace());
-
-            Set<DefDescriptor<?>> set = index.get(key);
-            if (set == null) {
-                set = Sets.newHashSet();
-                index.put(key, set);
+                index.put(desc, file);
             }
-            set.add(desc);
         }
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Definition> Set<DefDescriptor<T>> find(Class<T> primaryInterface, String prefix, String namespace) {
-
-        IndexKey key = new IndexKey(DefType.getDefType(primaryInterface), namespace);
         Set<DefDescriptor<T>> ret = Sets.newHashSet();
-        Set<DefDescriptor<?>> values = index.get(key);
-        if (values != null) {
-            for (DefDescriptor<?> desc : values) {
-                ret.add((DefDescriptor<T>) desc);
+        DefType dt = DefType.getDefType(primaryInterface);
+
+        for (DefDescriptor<?> descriptor : index.keySet()) {
+            if (descriptor.getNamespace().equals(namespace) && descriptor.getPrefix().equals(prefix)
+                    && descriptor.getDefType() == dt) {
+                ret.add((DefDescriptor<T>) descriptor);
             }
         }
         return ret;
@@ -143,15 +146,11 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
     public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
         Set<DefDescriptor<?>> ret = Sets.newHashSet();
 
-        for (Map.Entry<IndexKey, Set<DefDescriptor<?>>> entry : index.entrySet()) {
-            if (matcher.matchNamespace(entry.getKey().namespace)) {
-                for (DefDescriptor<?> desc : entry.getValue()) {
-                    if (matcher.matchDescriptorNoNS(desc)) {
-                        ret.add(desc);
-                    }
+        for (DefDescriptor<?> descriptor : index.keySet()) {
+            if (matcher.matchDescriptor(descriptor)) {
+                ret.add(descriptor);
                 }
             }
-        }
         return ret;
     }
 
@@ -162,49 +161,11 @@ public class ResourceSourceLoader extends BaseSourceLoader implements InternalNa
 
     @Override
     public <D extends Definition> Source<D> getSource(DefDescriptor<D> descriptor) {
-        Source<D> ret = new ResourceSource<>(descriptor, resourcePrefix + "/" + getPath(descriptor, "/"), getFormat(descriptor));
-        if (!ret.exists()) {
-            @SuppressWarnings("unchecked")
-            Set<DefDescriptor<D>> all = find((Class<D>) descriptor.getDefType().getPrimaryInterface(),
-                    descriptor.getPrefix(), descriptor.getNamespace());
-            for (DefDescriptor<D> candidate : all) {
-                if (candidate.equals(descriptor)) {
-                    ret = new ResourceSource<>(candidate, resourcePrefix + "/" + getPath(candidate, "/"), getFormat(descriptor));
+        String path = index.get(descriptor);
+        if (path == null) {
+            return null;
                 }
-            }
-        }
-        return ret;
-    }
-
-    private static class IndexKey {
-        private final DefType defType;
-        private final String namespace;
-        private final int hashCode;
-
-        private IndexKey(DefType defType, String namespace) {
-            this.defType = defType;
-            this.namespace = namespace;
-            this.hashCode = AuraUtil.hashCode(defType, namespace.toLowerCase());
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof IndexKey) {
-                IndexKey k = (IndexKey) obj;
-                return k.defType.equals(defType) && namespace.equalsIgnoreCase(k.namespace);
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s://[%s]", namespace, defType.toString());
-        }
+        return new ResourceSource<>(descriptor, resourcePrefix+"/"+path, getFormat(descriptor));
     }
 
     @Override

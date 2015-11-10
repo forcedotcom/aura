@@ -704,32 +704,32 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getControllerDefDescriptors()}.
+     * Test method for {@link BaseComponentDef#getLocalControllerDefs()}.
      */
     public void testGetControllerDefDescriptorsWithoutControllers() throws QuickFixException {
-        List<DefDescriptor<ControllerDef>> dds = define(baseTag, "", "").getControllerDefDescriptors();
-        assertNotNull(dds);
-        assertTrue(dds.isEmpty());
+        List<ControllerDef> cds = define(baseTag, "", "").getLocalControllerDefs();
+        assertNotNull(cds);
+        assertTrue(cds.isEmpty());
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getControllerDefDescriptors()}.
+     * Test method for {@link BaseComponentDef#getLocalControllerDefs()}.
      */
     public void testGetControllerDefDescriptors() throws QuickFixException {
         @SuppressWarnings("unchecked")
         DefDescriptor<T> ddParent = (DefDescriptor<T>) define(baseTag,
                 "extensible='true' controller='java://org.auraframework.impl.java.controller.TestController2'", "")
                 .getDescriptor();
-        List<DefDescriptor<ControllerDef>> dds = define(
+        List<ControllerDef> cds = define(
                 baseTag,
                 "controller='java://org.auraframework.components.test.java.controller.TestController' extends='"
-                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDefDescriptors();
-        assertNotNull(dds);
-        assertEquals(2, dds.size());
-        List<String> names = Lists.transform(dds, new Function<DefDescriptor<?>, String>() {
+                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getLocalControllerDefs();
+        assertNotNull(cds);
+        assertEquals(2, cds.size());
+        List<String> names = Lists.transform(cds, new Function<ControllerDef, String>() {
             @Override
-            public String apply(DefDescriptor<?> input) {
-                return input.getQualifiedName();
+            public String apply(ControllerDef input) {
+                return input.getDescriptor().getQualifiedName();
             }
         });
         assertTrue(names.containsAll(ImmutableSet.of(
@@ -738,15 +738,15 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getControllerDef()}.
+     * Test method for {@link BaseComponentDef#getRemoteControllerDef()}.
      */
     public void testGetControllerDefWithoutControllers() throws QuickFixException {
-        ControllerDef d = define(baseTag, "", "").getControllerDef();
+        ControllerDef d = define(baseTag, "", "").getRemoteControllerDef();
         assertNull(d);
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getControllerDef()}.
+     * Test method for {@link BaseComponentDef#getLocalControllerDef()}.
      */
     public void testGetControllerDef() throws QuickFixException {
         DefDescriptor<? extends BaseComponentDef> ddParent = define(baseTag,
@@ -755,10 +755,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
         ControllerDef d = define(
                 baseTag,
                 "controller='java://org.auraframework.components.test.java.controller.TestController' extends='"
-                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getControllerDef();
+                        + ddParent.getNamespace() + ":" + ddParent.getName() + "'", "").getLocalControllerDef();
         assertNotNull(d);
         String name = d.getDescriptor().getQualifiedName();
-        assertTrue("Unexpected name: " + name, name.matches("compound://string\\..*"));
+        assertTrue("Unexpected name: " + name, name.matches("java://org.auraframework.components.test.java.controller.TestController"));
     }
 
     /**

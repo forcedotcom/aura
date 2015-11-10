@@ -58,4 +58,6 @@ public interface ControllerDef extends ValueProvider, Definition {
      * @return the action def, or null if none.
      */
     ActionDef getSubDefinition(String name);
+    
+	boolean isLocal();
 }

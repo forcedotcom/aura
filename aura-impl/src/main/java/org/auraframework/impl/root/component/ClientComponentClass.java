@@ -18,10 +18,8 @@ package org.auraframework.impl.root.component;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.ActionDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
@@ -30,7 +28,6 @@ import org.auraframework.def.HelperDef;
 import org.auraframework.def.ImportDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
-import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -124,16 +121,6 @@ public class ClientComponentClass {
         	return descriptor.getQualifiedName();
         }
 
-        public boolean hasClientAction(ControllerDef controllerDef) {
-        	Map<String, ? extends ActionDef> actionDefs = controllerDef.getActionDefs();
-            for (ActionDef actionDef : actionDefs.values()) {
-                if (actionDef.getActionType() == ActionType.CLIENT) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
         final private void writeClassObjects(Appendable out) throws IOException, QuickFixException {
 
         	JsonEncoder json = new JsonEncoder(out, true, false);
@@ -167,8 +154,8 @@ public class ClientComponentClass {
 
             // Inner classes
 
-            ControllerDef controlerDef = def.getControllerDef();
-            if (controlerDef != null && hasClientAction(controlerDef)) {
+            ControllerDef controlerDef = def.getRemoteControllerDef();
+            if (controlerDef != null) {
                 json.writeMapEntry("controller", controlerDef);
             }
 

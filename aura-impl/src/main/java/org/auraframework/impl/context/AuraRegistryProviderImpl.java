@@ -37,7 +37,6 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.RendererDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
-import org.auraframework.impl.compound.controller.CompoundControllerDefFactory;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.impl.java.controller.JavaControllerDefFactory;
 import org.auraframework.impl.java.model.JavaModelDefFactory;
@@ -314,9 +313,6 @@ public class AuraRegistryProviderImpl implements RegistryAdapter, SourceListener
                 CacheableDefFactoryImpl<Definition> factory = new CacheableDefFactoryImpl<>(markupSourceFactory);
                 regBuild.add(new CachingDefRegistryImpl<>(factory, markupDefTypes, markupPrefixes));
             }
-
-            regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(new CompoundControllerDefFactory(),
-                    DefType.CONTROLLER, DefDescriptor.COMPOUND_PREFIX));
 
             if (javaLoaders.size() > 0) {
                 regBuild.add(AuraRegistryProviderImpl.<ControllerDef>createDefRegistry(

@@ -144,7 +144,7 @@ public class ApplicationDefImpl extends BaseComponentDefImpl<ApplicationDef> imp
             PropertyReference ref = (PropertyReference) expression;
             ref = ref.getStem();
 
-            ControllerDef controllerDef = getControllerDef();
+            ControllerDef controllerDef = getLocalControllerDef();
             ActionDef actionDef = controllerDef.getSubDefinition(ref.toString());
             Action action = Aura.getInstanceService().getInstance(actionDef);
 

@@ -206,11 +206,6 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     }
 
     private boolean isOkForDependencyCaching(DefDescriptor<?> descriptor) {
-        // if compound, OK as these tests are also conducted on the compound's target
-        if (descriptor.getPrefix().equals("compound")) {
-            return true;
-        }
-
         // test cacheDependencyExceptions (like static types in Apex)
         String descriptorName = descriptor.getQualifiedName().toLowerCase();
 
@@ -550,7 +545,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             } else {
                 // if not a cacheable registry or not shouldCache, test other exceptions that might still
                 // allow dependency caching (if it's from static registry, it can't affect our decision on
-                // depsCaching) test for special cases: compounds and static apex types
+                // depsCaching) test for special cases: static apex types
                 boolean qualified = isOkForDependencyCaching(compiling.descriptor);
 
                 currentCC.shouldCacheDependencies = qualified;
@@ -1398,7 +1393,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     public String getCachedString(String uid, DefDescriptor<?> descriptor, String key, Callable<String> loader) throws QuickFixException, IOException {
     	if (shouldCache(descriptor)) {
 	        DependencyEntry de = localDependencies.get(uid);
-	
+
 	        if (de != null) {
 	        	try {
 	        		return stringsCache.get(getKey(de, descriptor, key), loader);
@@ -1410,8 +1405,8 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 	    		    Throwables.propagate(e);
 	    		}
 	        }
-        } 
-    	
+        }
+
     	// When caching is bypassed, execute the loader directly.
     	try {
 			return loader.call();
@@ -1422,7 +1417,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 		    // Propagates as-is if RuntimeException, or wraps with a RuntimeException.
 		    Throwables.propagate(e);
 		}
-    	
+
     	return null;
     }
 

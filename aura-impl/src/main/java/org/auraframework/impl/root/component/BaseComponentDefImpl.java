@@ -27,12 +27,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.ActionDef;
-import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
@@ -98,7 +98,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
-    private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
     private final DefDescriptor<DesignDef> designDefDescriptor;
     private final DefDescriptor<SVGDef> svgDefDescriptor;
 
@@ -173,12 +172,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-        if (getDescriptor() != null) {
-            this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
-                    ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
-        } else {
-            this.compoundControllerDescriptor = null;
-        }
+
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, methodDefs, rendererDescriptors, helperDescriptors, resourceDescriptors,
                 imports);
@@ -780,31 +774,50 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     public List<DefDescriptor<ControllerDef>> getControllerDefDescriptors() throws QuickFixException {
         List<DefDescriptor<ControllerDef>> ret;
         if (extendsDescriptor != null) {
-            ret = new ArrayList<>();
-            ret.addAll(this.controllerDescriptors);
-            ret.addAll(getSuperDef().getControllerDefDescriptors());
-        } else {
-            ret = this.controllerDescriptors;
+	        ret = new ArrayList<>();
+	        ret.addAll(this.controllerDescriptors);
+	        ret.addAll(getSuperDef().getControllerDefDescriptors());
+	    } else {
+	        ret = this.controllerDescriptors;
+        }
+        return ret;
+	}
+    
+    @Override
+    public List<ControllerDef> getLocalControllerDefs() throws QuickFixException {
+        List<ControllerDef> ret = new ArrayList<>();
+        for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
+        	ControllerDef def = desc.getDef();
+            if (def.isLocal()) {
+            	ret.add(def);
+            }
+        }
+        if (extendsDescriptor != null) {
+            ret.addAll(getSuperDef().getLocalControllerDefs());
         }
         return ret;
     }
-
+            
     @Override
-    public ControllerDef getControllerDef() throws QuickFixException {
-        if (this.controllerDescriptors.isEmpty()) {
-            if (this.extendsDescriptor != null) {
-                return getSuperDef().getControllerDef();
-            } else {
-                return null;
+    public ControllerDef getLocalControllerDef() throws QuickFixException {
+        for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
+        	ControllerDef def = desc.getDef();
+            if (def.isLocal()) {
+                return def;
             }
-        } else {
-            return compoundControllerDescriptor.getDef();
         }
+        return null;
     }
 
     @Override
-    public ControllerDef getDeclaredControllerDef() throws QuickFixException {
-        return !this.controllerDescriptors.isEmpty() && compoundControllerDescriptor != null ? compoundControllerDescriptor.getDef() : null;
+    public ControllerDef getRemoteControllerDef() throws QuickFixException {
+        for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
+        	ControllerDef def = desc.getDef();
+            if (!def.isLocal()) {
+                return def;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -959,16 +972,6 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return this.clientComponentClass;
     }
 
-    public boolean hasServerAction(ControllerDef controllerDef) {
-    	Map<String, ? extends ActionDef> actionDefs = controllerDef.getActionDefs();
-        for (ActionDef actionDef : actionDefs.values()) {
-            if (actionDef.getActionType() == ActionType.SERVER) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
@@ -987,30 +990,33 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                 json.writeMapBegin();
                 json.writeValue(getAccess());
                 json.writeMapEntry("descriptor", descriptor);
-                /*
-                context.pushCallingDescriptor(descriptor);
-                try {
-                    RendererDef rendererDef = getRendererDef();
-                    if (rendererDef != null && !rendererDef.isLocal()) {
-                        json.writeMapEntry("rendererDef", rendererDef);
-                    }
-                } finally {
-                    context.popCallingDescriptor();
-                }
-                HelperDef helperDef = getHelperDef();
-                if (helperDef != null && !helperDef.isLocal()) {
-                    json.writeMapEntry("helperDef", helperDef);
-                }
-                 */
 
                 json.writeMapEntry("styleDef", getStyleDef());
                 if (flavoredStyleDescriptor != null) {
                     json.writeMapEntry("flavoredStyleDef", getFlavoredStyleDef());
                 }
 
-                ControllerDef controllerDef = getControllerDef();
-                if (controllerDef != null && hasServerAction(controllerDef)) {
-                    json.writeMapEntry("controllerDef", controllerDef);
+                List<ControllerDef> controllerDefList = getLocalControllerDefs();
+                if (controllerDefList != null && !controllerDefList.isEmpty()) {
+                    json.writeMapKey("controllerDef");
+                    json.writeMapBegin();
+
+                    // Create a java controller signature
+                    DefDescriptor<ComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ComponentDef.class,
+                    		DefDescriptor.JAVA_PREFIX);
+                    json.writeMapEntry("descriptor", compDesc);
+
+                    json.writeMapKey("actionDefs");
+                    json.writeArrayBegin();
+
+                    for (ControllerDef controllerDef : controllerDefList) {
+                        for (Entry<String, ? extends ActionDef> actionDefEntry: controllerDef.getActionDefs().entrySet()) {
+                        	json.writeArrayEntry(actionDefEntry.getValue());
+                        }
+                    }
+ 
+                    json.writeArrayEnd();
+                    json.writeMapEnd();
                 }
 
                 json.writeMapEntry("modelDef", getModelDef());
@@ -1660,7 +1666,10 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
 
         // If we've gotten this far, let's check for controllers.
         if (ret) {
-            ret = ret && getControllerDefDescriptors().isEmpty();
+            ret = ret && getLocalControllerDef() == null;
+        }
+        if (ret) {
+            ret = ret && getRemoteControllerDef() == null;
         }
 
         // If we've gotten this far, let's check for Styles (server rendering

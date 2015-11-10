@@ -156,4 +156,9 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
             this.actionMap = actionMap;
         }
     }
+
+    @Override
+    public boolean isLocal() {
+    	return true;
+    }
 }

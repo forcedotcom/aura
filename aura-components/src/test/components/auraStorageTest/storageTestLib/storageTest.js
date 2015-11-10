@@ -25,7 +25,7 @@ function storageTest () {
         append(cmp, string);
         $A.test.fail(string);
     }
-    
+
     function append(cmp, text) {
         $A.run(function() {
             var content = cmp.find("content");
@@ -137,23 +137,23 @@ function storageTest () {
         testUndefinedKey: function(cmp, storage) {
             runUnsureKey(cmp, storage, undefined);
         },
-        
+
         testEmptyStringKey: function(cmp, storage) {
             runUnsureKey(cmp, storage, "");
         },
-        
+
         testGetNullValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_Null", null);
         },
-        
+
         testGetUndefinedValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_Undefined", undefined);
         },
-        
+
         testGetBooleanTrueValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_True", true);
         },
-        
+
         testGetZeroValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_Zero", 0);
         },
@@ -161,27 +161,27 @@ function storageTest () {
         testGetSimpleStringValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_A", "a");
         },
-        
+
         testGetEmptyObjectValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_EmptyObject", {});
         },
-        
+
         testGetBasicObjectValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_BasicObject", {"a": "b"});
         },
-        
+
         testGetEmptyArrayValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_EmptyArray", []);
         },
-        
+
         testGetBasicArrayValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_BasicArray", ["a", "b"]);
         },
-        
+
         testGetBigArrayValue: function(cmp, storage) {
             runFullCycle(cmp, storage, "testValues_BigArray", new Array(1024).join("x"));
         },
-        
+
         testGetMultiByteStringValue: function(cmp, storage) {
             // 1-byte, 2-byte, 3-byte, and 4-byte characters, separated by spaces
             runFullCycle(cmp, storage, "testValues_MutlibyteString", "I ½ ♥ 💩");
@@ -202,6 +202,24 @@ function storageTest () {
             $A.test.addWaitFor(true, function(){ return completed; });
         },
 
+        testSetItemUnderMaxSize: function(cmp, storage) {
+            var completed = false;
+            var result = "";
+            var sizeTooBig = (storage.getMaxSize() - 1) * 1024;
+
+            storage.put("overSize", { "value" : { "LittleMac" : new Array(sizeTooBig).join("x") } })
+                .then(
+                    function() { completed = true; },
+                    function(error) {
+                        dieDie(cmp, "Promise to put item under max size shouldnot reject");
+                    }
+                );
+
+            $A.test.addWaitFor(true,
+                function() { return completed; }
+            );
+        },
+
         testSetItemOverMaxSize_stage1: function(cmp, storage) {
             var completed = false;
             var result = "";
@@ -211,7 +229,7 @@ function storageTest () {
             storage.put("overSize", { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
                 .then(
                     function() { dieDie(cmp, "Promise to put item too large should not be resolved"); },
-                    function(error) { 
+                    function(error) {
                         completed = true;
                         result = error.toString();
                     }
@@ -219,7 +237,7 @@ function storageTest () {
 
             $A.test.addWaitFor(true,
                 function() { return completed; },
-                function() { 
+                function() {
                     $A.test.assertTrue(result.indexOf(expected) > -1, "Did not receive expected error. Expected error "
                             + "to contain <" + expected +">, but got <" + result + ">");
                 });
@@ -326,7 +344,7 @@ function storageTest () {
             var completed = false;
             var stuff = { "changeling": 2 };
             storage.put("testModifyObject", stuff)
-                .then(function() { 
+                .then(function() {
                     stuff["changeling"] = 3;
                     return storage.get("testModifyObject"); })
                 .then(function(item) {
@@ -368,7 +386,7 @@ function storageTest () {
             // When SizeEstimator calculates the size it gives a value of 2 per string character so to get the total
             // size that will be added to storage we multiple 2 by the length of the chunk and key, times the number
             // of rows (5) , divided by 1024 to convert to KB.
-            var totalSizeAdded = (chunk.length + keyLength) * 2 * 5 / 1024; 
+            var totalSizeAdded = (chunk.length + keyLength) * 2 * 5 / 1024;
             var storageMax = storage.getMaxSize();
             $A.test.assertTrue(storage.getMaxSize() < totalSizeAdded, "Test setup failure: storage being tested is too"
                     + " large to properly test overflow");
@@ -443,7 +461,7 @@ function storageTest () {
 
         /**
          * Asserts that sizes are within an acceptable range of one another.
-         * 
+         *
          * @param {Number}
          *            expected - the expected size (in bytes)
          * @param {Number}

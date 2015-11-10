@@ -572,6 +572,14 @@ CryptoAdapter.prototype.clear = function() {
 
 
 /**
+ * Clears storage on initialization, before any other operation is performed.
+ */
+CryptoAdapter.prototype.clearOnInit = function() {
+    return this.adapter.clearOnInit();
+};
+
+
+/**
  * Gets the set of expired items.
  *
  * @returns {Promise} a promise that will resolve when the operation finishes.

@@ -158,6 +158,7 @@
 
     //test how datepicker behaves when setFocus=false
     testSetFocusOnDatepickerGridFalse: {
+        labels: ["flapper"],
         attributes : {"renderItem" : "testDatepickerSetFocus"},
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
         test: [function(cmp) {

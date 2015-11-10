@@ -12,29 +12,15 @@
         labels: ["flapper"],
         test: [
             function loadIframe(cmp) {
-                cmp._frameLoaded = false;
-                var frame = document.createElement("iframe");
-                frame.src = "/auraStorageTest/noGetApplicationCache.app";
-                frame.scrolling = "auto";
-                frame.id = "myFrame";
-                $A.util.on(frame, "load", function () {
-                    cmp._frameLoaded = true;
-                });
-                var content = cmp.find("iframeContainer");
-                $A.util.insertFirst(frame, content.getElement());
-
-                this.waitForIframeLoad(cmp);
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer");
             },
             function reloadIframeOffline(cmp) {
-                cmp._frameLoaded = false;
                 document.getElementById("myFrame").contentWindow.location.hash = "launchOffline";
-                document.getElementById("myFrame").contentWindow.location.reload();
-                this.waitForIframeLoad(cmp);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp);
             },
             function verifyApplicationLoaded(cmp) {
-                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
                 $A.test.addWaitFor("Loaded", function() {
-                    return iframeCmp.get('v.status');
+                    return cmp.helper.lib.iframeTest.getIframeRootCmp().get('v.status');
                 });
             },
             function verifyStorageGets(cmp) {
@@ -44,33 +30,19 @@
             }
         ]
     },
-    
+
     testOnlineLaunch: {
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);
-                cmp._frameLoaded = false;
-                var frame = document.createElement("iframe");
-                frame.src = "/auraStorageTest/noGetApplicationCache.app";
-                frame.scrolling = "auto";
-                frame.id = "myFrame";
-                $A.util.on(frame, "load", function () {
-                    cmp._frameLoaded = true;
-                });
-                var content = cmp.find("iframeContainer");
-                $A.util.insertFirst(frame, content.getElement());
-            
-                this.waitForIframeLoad(cmp);
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/noGetApplicationCache.app", "iframeContainer");
             },
-            function reloadIframeOffline(cmp) {
-                cmp._frameLoaded = false;
-                document.getElementById("myFrame").contentWindow.location.reload();
-                this.waitForIframeLoad(cmp);
+            function reloadIframeOnline(cmp) {
+                cmp.helper.lib.iframeTest.reloadIframe(cmp);
             },
             function verifyApplicationLoaded(cmp) {
-                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
                 $A.test.addWaitFor("Loaded", function() {
-                    return iframeCmp.get('v.status');
+                    return cmp.helper.lib.iframeTest.getIframeRootCmp().get('v.status');
                 });
             },
             function verifyStorageGets(cmp) {
@@ -79,15 +51,5 @@
                 $A.test.assertEquals(1, gets.length, "More than one storage.get() on reload! " + JSON.stringify(gets));
             }
         ]
-    },
-
-    waitForIframeLoad: function(cmp) {
-        var iframeWindow = document.getElementById("myFrame").contentWindow;
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                && iframeWindow.$A
-                && iframeWindow.$A.getRoot() !== undefined
-                && !$A.test.isActionPending()
-        });
     }
 })

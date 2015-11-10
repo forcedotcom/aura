@@ -1,12 +1,14 @@
 ({
-    // IndexedDb not supported in IE < 10
-    // Disable IndexedDB for Safari because it doesn't work reliably in iframe.
+    // IndexedDB has problems in Safari and is not supported in older IE
     browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
 
     // Test modifies/deletes the persistent database
     labels : [ "threadHostile" ],
 
     setUp : function(cmp) {
+        cmp._storageLib = cmp.helper.storageLib.storageTest;
+        cmp._iframeLib = cmp.helper.iframeLib.iframeTest;
+
         $A.test.overrideFunction($A.storageService, "selectAdapter", function(){ return "indexeddb"; });
         this.storage = $A.storageService.initStorage(
                 "browserdb",    // name
@@ -23,13 +25,13 @@
 
     testSizeInitial: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testSizeInitial(this.storage);
+            cmp._storageLib.testSizeInitial(this.storage);
         }
     },
 
     testGetName : {
         test : function(cmp) {
-            cmp.helper.lib.storageTest.testGetName(cmp, this.storage, "indexeddb");
+            cmp._storageLib.testGetName(cmp, this.storage, "indexeddb");
         }
     },
 
@@ -38,8 +40,8 @@
             cmp._storage = $A.storageService.initStorage("browserdb-testOverflow",
                     true, false, 32768, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
-            cmp._die = function(error) { cmp.helper.lib.storageTest.dieDieDie(cmp, error); }.bind(this);
-            cmp._append = function(string) { cmp.helper.lib.storageTest.appendLine(cmp, string); }.bind(this);
+            cmp._die = function(error) { cmp._storageLib.dieDieDie(cmp, error); }.bind(this);
+            cmp._append = function(string) { cmp._storageLib.appendLine(cmp, string); }.bind(this);
         }, function(cmp){
             var completed = false;
 
@@ -94,137 +96,137 @@
 
     testGetMaxSize:{
         test:function(cmp){
-            cmp.helper.lib.storageTest.testGetMaxSize(this.storage, 32);
+            cmp._storageLib.testGetMaxSize(this.storage, 32);
         }
     },
 
     testNullKey: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testNullKey(cmp, this.storage);
+            cmp._storageLib.testNullKey(cmp, this.storage);
         }
     },
 
     testUndefinedKey: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testUndefinedKey(cmp, this.storage);
+            cmp._storageLib.testUndefinedKey(cmp, this.storage);
         }
     },
 
     testEmptyStringKey: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testEmptyStringKey(cmp, this.storage);
+            cmp._storageLib.testEmptyStringKey(cmp, this.storage);
         }
     },
 
     testGetNullValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
+            cmp._storageLib.testGetNullValue(cmp, this.storage);
         }
     },
 
     testGetUndefinedValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
+            cmp._storageLib.testGetUndefinedValue(cmp, this.storage);
         }
     },
 
     testGetBooleanTrueValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
+            cmp._storageLib.testGetBooleanTrueValue(cmp, this.storage);
         }
     },
 
     testGetZeroValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
+            cmp._storageLib.testGetZeroValue(cmp, this.storage);
         }
     },
 
     testGetSimpleStringValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
+            cmp._storageLib.testGetSimpleStringValue(cmp, this.storage);
         }
     },
 
     testGetEmptyObjectValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
+            cmp._storageLib.testGetEmptyObjectValue(cmp, this.storage);
         }
     },
 
     testGetBasicObjectValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
+            cmp._storageLib.testGetBasicObjectValue(cmp, this.storage);
         }
     },
 
     testGetEmptyArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
+            cmp._storageLib.testGetEmptyArrayValue(cmp, this.storage);
         }
     },
 
     testGetBasicArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
+            cmp._storageLib.testGetBasicArrayValue(cmp, this.storage);
         }
     },
 
     testGetBigArrayValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
+            cmp._storageLib.testGetBigArrayValue(cmp, this.storage);
         }
     },
 
     testGetMultiByteStringValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
+            cmp._storageLib.testGetMultiByteStringValue(cmp, this.storage);
         }
     },
 
     // TODO(W-2701448): There are inconsistencies between Adapters on what can be stored. Formal evaluation needed.
     _testGetFunctionValue: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetFunctionValue(cmp, this.storage);
+            cmp._storageLib.testGetFunctionValue(cmp, this.storage);
         }
     },
 
     testCacheMiss: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
+            cmp._storageLib.testCacheMiss(cmp, this.storage);
         }
     },
 
     testSetItemUnderMaxSize : {
         test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+            cmp._storageLib.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
         }]
     },
 
     testSetItemOverMaxSize : {
         test : [function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
+            cmp._storageLib.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");
         },
         function(cmp) {
-            cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage2(cmp, this.storage);
+            cmp._storageLib.testSetItemOverMaxSize_stage2(cmp, this.storage);
         }]
     },
 
     testTwistedObject:{
         test:function(cmp){
-            cmp.helper.lib.storageTest.testTwistedObject(cmp, this.storage);
+            cmp._storageLib.testTwistedObject(cmp, this.storage);
         }
     },
 
     testModifyObject:{
         test:function(cmp){
-            cmp.helper.lib.storageTest.testModifyObject(cmp, this.storage);
+            cmp._storageLib.testModifyObject(cmp, this.storage);
         }
     },
 
     testUpdate: {
         test:function(cmp){
-            cmp.helper.lib.storageTest.testUpdate(cmp, this.storage);
+            cmp._storageLib.testUpdate(cmp, this.storage);
         }
     },
 
@@ -236,28 +238,28 @@
                     true, false, 5000, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testOverflow"); });
 
-            cmp.helper.lib.storageTest.testOverflow(cmp, cmp._storage);
+            cmp._storageLib.testOverflow(cmp, cmp._storage);
         }
     },
 
     testGetAll: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testGetAll(cmp, this.storage);
+            cmp._storageLib.testGetAll(cmp, this.storage);
         }
     },
 
     testClear:{
         test:[function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage1(cmp, this.storage);
+            cmp._storageLib.testClear_stage1(cmp, this.storage);
         },
         function(cmp){
-            cmp.helper.lib.storageTest.testClear_stage2(cmp, this.storage);
+            cmp._storageLib.testClear_stage2(cmp, this.storage);
         }]
     },
 
     testStorageInfo: {
         test: function(cmp) {
-            cmp.helper.lib.storageTest.testStorageInfo(this.storage, true, false);
+            cmp._storageLib.testStorageInfo(this.storage, true, false);
         }
     },
 
@@ -294,45 +296,23 @@
     testReloadPage: {
         test: [
         function loadComponentInIframe(cmp) {
-            cmp._frameLoaded = false;
             cmp._expected = "expected value";
-            var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected;
-            frame.scrolling = "auto";
-            frame.id = "myFrame";
-            $A.util.on(frame, "load", function(){
-                cmp._frameLoaded = true;
-            });
-            var content = cmp.find("iframeContainer");
-            $A.util.insertFirst(frame, content.getElement());
-
-            this.waitForIframeLoad(cmp);
+            cmp._iframeLib.loadIframe(cmp, "/auraStorageTest/persistentStorage.app?secure=false&value="+cmp._expected,
+                    "iframeContainer");
         },
         function resetDatabase(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
-            iframeCmp.resetStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Resetting";
-            }, function() {
-                $A.test.assertEquals("Done Resetting", $A.util.getText(iframeCmp.find("status").getElement()));
-            });
+            cmp._iframeLib.getIframeRootCmp().resetStorage();
+            cmp._iframeLib.waitForStatus("Resetting", "Done Resetting");
         },
         function addItemToDatabase(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
-            iframeCmp.addToStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
-            }, function() {
-                $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
-            });
+            cmp._iframeLib.getIframeRootCmp().addToStorage();
+            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function reloadIframe(cmp) {
-            cmp._frameLoaded = false;
-            document.getElementById("myFrame").contentWindow.location.reload();
-            this.waitForIframeLoad(cmp);
+            cmp._iframeLib.reloadIframe(cmp);
         },
         function getItemFromDatabase(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
             iframeCmp.getFromStorage();
             $A.test.addWaitFor(true, function() {
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
@@ -342,8 +322,7 @@
             });
         },
         function cleanupDatabase(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
-            iframeCmp.deleteStorage();
+            cmp._iframeLib.getIframeRootCmp().deleteStorage();
         }]
     },
 
@@ -455,18 +434,10 @@
                     true, false, maxSize, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });
 
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
+            cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage1(cmp, cmp._storage);
         },
         function getItem(cmp) {
-            cmp.helper.lib.storageTest.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
+            cmp._storageLib.testReplaceExistingWithEntryTooLarge_stage2(cmp, cmp._storage);
         }]
-    },
-
-    waitForIframeLoad: function(cmp) {
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                   && document.getElementById("myFrame").contentWindow.$A
-                   && document.getElementById("myFrame").contentWindow.$A.getRoot() !== undefined;
-        });
     }
 })

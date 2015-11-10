@@ -2,6 +2,8 @@
     <aura:attribute name="status" type="String" default="Waiting" />
     <aura:attribute name="fromStorage" type="String" default="Waiting" />
 
+    <aura:import library="auraStorageTest:iframeTestLib" property="lib" />
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
 
     <div aura:id="iframeContainer" />

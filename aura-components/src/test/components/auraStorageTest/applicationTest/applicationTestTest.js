@@ -27,56 +27,25 @@
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);
-                cmp._frameLoaded = false;
-                cmp._expected = "expected value";
-                var frame = document.createElement("iframe");
-                // Load in test mode so the controller can use test APIs
-                frame.src = "/auraStorageTest/applicationTest.app?aura.mode=SELENIUMDEBUG";
-                frame.scrolling = "auto";
-                frame.id = "myFrame";
-                $A.util.on(frame, "load", function () {
-                    cmp._frameLoaded = true;
-                });
-                var content = cmp.find("iframeContainer");
-                $A.util.insertFirst(frame, content.getElement());
-
-                this.waitForIframeLoad(cmp);
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/applicationTest.app", "iframeContainer");
                 // To account for refresh actions, even though it'd be ideal if there weren't any, wait for the flag
                 // to be set that tells us the bootstrap action has returned from the server.
                 $A.test.addWaitFor("true", function() {
                     return $A.util.getText(frame.contentWindow.$A.getRoot().find("actionComplete").getElement());
                 });
             },
-            function insertStaleApplicationAction() {
-                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
-                iframeCmp.addToStorage();
-                $A.test.addWaitFor(true, function() {
-                    return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
-                }, function() {
-                    $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
-                });
+            function insertStaleApplicationAction(cmp) {
+                cmp.helper.lib.iframeTest.getIframeRootCmp().addToStorage();
+                cmp.helper.lib.iframeTest.waitForStatus("Adding", "Done Adding");
             },
             function reloadIframe(cmp) {
-                cmp._frameLoaded = false;
-                document.getElementById("myFrame").contentWindow.location.reload();
-                this.waitForIframeLoad(cmp);
+                cmp.helper.lib.iframeTest.reloadIframe(cmp);
             },
             function verifyApplicationRefreshed(cmp) {
-                var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
                 $A.test.addWaitFor("YES", function() {
-                    return iframeCmp.get('v.refreshed');
+                    return cmp.helper.lib.iframeTest.getIframeRootCmp().get('v.refreshed');
                 });
             }
         ]
-    },
-
-    waitForIframeLoad: function(cmp) {
-        var iframeWindow = document.getElementById("myFrame").contentWindow;
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                && iframeWindow.$A
-                && iframeWindow.$A.getRoot() !== undefined
-                && !$A.test.isActionPending()
-        });
     }
 })

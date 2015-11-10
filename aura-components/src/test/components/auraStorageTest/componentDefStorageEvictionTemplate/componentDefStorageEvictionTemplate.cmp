@@ -1,0 +1,48 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <auraStorage:init name="actions"
+                          maxSize="4096"
+                          defaultExpiration="3600"
+                          secure="false"
+                          persistent="true"
+                          clearStorageOnInit="false"/>
+
+        <script>
+            // This test must be run in a non-obfuscated mode we will fail to override the def cache
+            var original = $A.$storageService$.$initStorage$;
+            $A.$storageService$.$initStorage$ = function() {
+                if (arguments[0] === "ComponentDefStorage") {
+	                return original.call(this,
+                        arguments[0],   // name
+	                    arguments[1],   // persistent
+	                    arguments[2],   // secure
+	                    30720,           // *** Override to 30KB for testing purposes ***
+	                    arguments[4],   // defaultExpiration (2 weeks)
+	                    arguments[5],   // defaultAutoRefreshInterval
+	                    arguments[6],   // debugLoggingEnabled
+	                    arguments[7]    // clearStorageOnInit
+	                );
+                } else {
+                    return original.apply(this, arguments);
+                }
+            }
+        </script>
+    </aura:set>
+</aura:component>

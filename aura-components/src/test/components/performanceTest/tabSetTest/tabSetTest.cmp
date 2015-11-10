@@ -2,7 +2,6 @@
 
     <!--only one of these 3 attributes should be set to true during a given test -->
 	<aura:attribute name="testDynamicTabLoading" type="Boolean" default="false"/>
-	<aura:attribute name="testRemoveTabs" type="Boolean" default="true"/>
 	<aura:attribute name="_lazyRenderTabs" type="Boolean" default="false"/>
 	<aura:attribute name="_useOverflowMenu" type="Boolean" default="false"/>
 

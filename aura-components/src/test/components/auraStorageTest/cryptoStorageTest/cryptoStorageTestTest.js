@@ -130,6 +130,12 @@
         }
     },
 
+    testSetItemUnderMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+        }]
+    },
+
     testSetItemOverMaxSize : {
         test : [function(cmp) {
             cmp.helper.lib.storageTest.testSetItemOverMaxSize_stage1(cmp, this.storage, "Item larger than size limit");

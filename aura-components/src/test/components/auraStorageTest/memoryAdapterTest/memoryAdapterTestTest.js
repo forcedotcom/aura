@@ -118,7 +118,7 @@
                 .then(function(size) { $A.test.assertEquals(originalSize, size); })
                 .then(function() { completed = true; })
                 ["catch"](function(error) { $A.test.fail(error.toString()); });
-            
+
 
             $A.test.addWaitFor(true, function() { return completed; });
         }
@@ -417,6 +417,12 @@
         test: function(cmp) {
             cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
         }
+    },
+
+    testSetItemUnderMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+        }]
     },
 
     testSetItemOverMaxSize : {

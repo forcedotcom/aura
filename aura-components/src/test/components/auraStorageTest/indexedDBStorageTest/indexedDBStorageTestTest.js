@@ -8,7 +8,16 @@
 
     setUp : function(cmp) {
         $A.test.overrideFunction($A.storageService, "selectAdapter", function(){ return "indexeddb"; });
-        this.storage = $A.storageService.initStorage("browserdb", true, false, 32768, 2000, 3000, true, true);
+        this.storage = $A.storageService.initStorage(
+                "browserdb",    // name
+                true,           // persistent
+                false,          // secure
+                32768,          // size
+                2000,           // expiration
+                3000,           // auto-refresh
+                true,           // debug logging
+                true);          // clear on init
+
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb"); });
     },
 
@@ -112,61 +121,61 @@
             cmp.helper.lib.storageTest.testGetNullValue(cmp, this.storage);
         }
     },
-    
+
     testGetUndefinedValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetUndefinedValue(cmp, this.storage);
         }
     },
-    
+
     testGetBooleanTrueValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBooleanTrueValue(cmp, this.storage);
         }
     },
-    
+
     testGetZeroValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetZeroValue(cmp, this.storage);
         }
     },
-    
+
     testGetSimpleStringValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetSimpleStringValue(cmp, this.storage);
         }
     },
-    
+
     testGetEmptyObjectValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetEmptyObjectValue(cmp, this.storage);
         }
     },
-    
+
     testGetBasicObjectValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBasicObjectValue(cmp, this.storage);
         }
     },
-    
+
     testGetEmptyArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetEmptyArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetBasicArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBasicArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetBigArrayValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetBigArrayValue(cmp, this.storage);
         }
     },
-    
+
     testGetMultiByteStringValue: {
         test: function(cmp) {
             cmp.helper.lib.storageTest.testGetMultiByteStringValue(cmp, this.storage);
@@ -184,6 +193,12 @@
         test: function(cmp) {
             cmp.helper.lib.storageTest.testCacheMiss(cmp, this.storage);
         }
+    },
+
+    testSetItemUnderMaxSize : {
+        test : [function(cmp) {
+            cmp.helper.lib.storageTest.testSetItemUnderMaxSize(cmp, this.storage, "Item smaller than size limit");
+        }]
     },
 
     testSetItemOverMaxSize : {

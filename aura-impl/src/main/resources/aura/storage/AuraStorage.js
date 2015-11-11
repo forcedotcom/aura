@@ -53,6 +53,7 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.deleteStorage = this.adapter.deleteStorage || this.adapter["deleteStorage"];
     this.adapter.isSecure = this.adapter.isSecure || this.adapter["isSecure"];
     this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
+    this.adapter.clearOnInit = this.adapter.clearOnInit || this.adapter["clearOnInit"];
 
     var adapterConfig = $A.storageService.getAdapterConfig(this.adapter.getName());
     this.persistent = !$A.util.isUndefinedOrNull(adapterConfig["persistent"]) && adapterConfig["persistent"];
@@ -65,10 +66,17 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter["getMRU"] = this.adapter.getMRU;
     //#end
 
+
+    // clear on init is special: it should complete before any subsequent operation
+    // is executed.
     if (clearStorageOnInit === true) {
         this.log("clearing " + this.getName() + " storage on init");
-        this.adapter.clear();
-    }
+        if (this.adapter.clearOnInit) {
+            this.adapter.clearOnInit();
+        } else {
+            this.adapter.clear();
+        }
+     }
 };
 
 /**

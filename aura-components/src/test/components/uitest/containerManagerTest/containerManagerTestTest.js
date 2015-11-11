@@ -61,6 +61,28 @@
         }]
     },
 
+    /**
+     * Verify that sendToBack/bringToFront accept component/element/id as arg
+     */
+    testAcceptableArgType: {
+        attributes: {"useContainer": true},
+        test: [function(cmp) {
+            this.createPanels(3, cmp);
+        }, function(cmp) {
+            var stackManager = this.getStackManager(cmp);
+            var panelRefs = this.getPanelRefs(cmp);
+
+            stackManager.bringToFront(panelRefs[0]);
+            this.verifyZIndices(this.getPanelRefs(cmp), ['4', '2', '3']);
+
+            stackManager.bringToFront(panelRefs[1].getElement());
+            this.verifyZIndices(this.getPanelRefs(cmp), ['4', '5', '3']);
+
+            stackManager.bringToFront(panelRefs[2].getGlobalId());
+            this.verifyZIndices(this.getPanelRefs(cmp), ['4', '5', '6']);
+        }]
+    },
+
     testStackManager: {
         attributes: {"useContainer": "true"},
         test: [function(cmp) {
@@ -172,173 +194,6 @@
             this.createPanels(1, cmp);
         }, function(cmp) {
             this.verifyZIndices(this.getPanelRefs(cmp), ['1000', '2', '1001']);
-        }]
-    },
-
-
-    /**
-     * Verify sendToBack increments the zIndeces of all the other elements
-     * when the lowest layer is already occupied
-     */
-    testBumpZIndexWhenSendToBack: {
-        attributes: {"useContainer": true},
-        test: [function(cmp) {
-            // zIndeces: 1,2,3,4,5
-            this.createPanels(5, cmp);
-        }, function(cmp) {
-            var panelRefs = this.getPanelRefs(cmp);
-            var stackManager = this.getStackManager(cmp);
-
-            // 0 is still available to use
-            stackManager.sendToBack(panelRefs[1].getElement());
-            this.verifyZIndices(panelRefs, ['1', '0', '3', '4', '5']);
-
-            // 0 is mininum, bump up all the zIndeces to make space
-            stackManager.sendToBack(panelRefs[2].getElement());
-            this.verifyZIndices(panelRefs, ['2', '1', '0', '5', '6']);
-        }]
-    },
-
-    /**
-     * Verify StackManager ignores non-integer zIndex
-     */
-    testIgnoreNaNZindex: {
-        attributes: {"useContainer": true},
-        test: [function(cmp) {
-            this.createPanels(5, cmp);
-        }, function(cmp) {
-            var panelRefs = this.getPanelRefs(cmp);
-            var stackManager = this.getStackManager(cmp);
-            var panel_2 = panelRefs[1].getElement();
-            var panel_3 = panelRefs[2].getElement();
-
-            panel_2.style.zIndex = 'auto';
-
-            stackManager.sendToBack(panel_3);
-            this.verifyZIndices(panelRefs, ['1', 'auto', '0', '4', '5']);
-
-            stackManager.bringToFront(panel_3);
-            this.verifyZIndices(panelRefs, ['1', 'auto', '6', '4', '5']);
-        }]
-    },
-
-    /**
-     * Verify bringToFront doesn't keep incrementing zIndex even
-     * when the element is already in the front
-     */
-    testBringToFrontSameElementTwice: {
-        attributes: {"useContainer": true},
-        test: [function(cmp) {
-            this.createPanels(3, cmp);
-        }, function(cmp) {
-            var panelRefs = this.getPanelRefs(cmp);
-            var stackManager = this.getStackManager(cmp);
-            var panel_2 = panelRefs[1].getElement();
-
-            stackManager.bringToFront(panel_2);
-            this.verifyZIndices(panelRefs, ['1', '4', '3']);
-
-            stackManager.bringToFront(panel_2);
-            this.verifyZIndices(panelRefs, ['1', '4', '3']);
-        }]
-    },
-
-    /**
-     * Verify sendToBack doesn't bump up other elements' zIndex
-     * when the element is already in the back
-     */
-    testSendToBackSameElementTwice: {
-        attributes: {"useContainer": true},
-        test: [function(cmp) {
-            this.createPanels(3, cmp);
-        }, function(cmp) {
-            var panelRefs = this.getPanelRefs(cmp);
-            var stackManager = this.getStackManager(cmp);
-            var panel_2 = panelRefs[1].getElement();
-
-            stackManager.sendToBack(panel_2);
-            this.verifyZIndices(panelRefs, ['1', '0', '3']);
-
-            stackManager.sendToBack(panel_2);
-            this.verifyZIndices(panelRefs, ['1', '0', '3']);
-        }]
-    },
-
-    /**
-     * Verify can pass custom function to create stacking context
-     * when panel's parent is not a stack context root
-     */
-    // Disable due to a typo in stackManager's function
-    _testForceCreateStackingCtxWithFunction: {
-        attributes: {"userContainer": true},
-        test: [function(cmp) {
-            this.createPanels(1, cmp);
-        }, function(cmp) {
-            var stackManager = this.getStackManager(cmp);
-            var panelRefs = this.getPanelRefs(cmp);
-            var panelEl = panelRefs[0].getElement();
-            var panelParent = panelEl.parentNode;
-
-            // manually make panel's parent a non-stackCtxRoot
-            panelParent._stackContextRoot = false;
-            panelParent.style.zIndex = 'auto';
-
-            // force createStackingCtx using the 2nd argument
-            stackManager.sendToBack(panelEl, function(parentNode) {
-                parentNode.callbackIsCalled = true;
-            });
-
-            $A.test.assertTrue(panelParent.callbackIsCalled,
-                    "Users should be able to pass in callback to customize stacking context!");
-        }]
-    },
-
-    /**
-     * Verify the default behavior of forcing to create stacking context
-     * when panel's parent is not a stack context root
-     */
-    // Disable due to a typo in stackManager's function
-    _testForceCreateStackingCtx: {
-        attributes: {"userContainer": true},
-        test: [function(cmp) {
-            this.createPanels(1, cmp);
-        }, function(cmp) {
-            var stackManager = this.getStackManager(cmp);
-            var panelRefs = this.getPanelRefs(cmp);
-            var panelEl = panelRefs[0].getElement();
-            var panelParent = panelEl.parentNode;
-
-            // manually make panel's parent a non-stackCtxRoot
-            panelParent._stackContextRoot = false;
-            panelParent.style.zIndex = 'auto';
-
-            // force createStackingCtx using the 2nd argument
-            stackManager.sendToBack(panelEl, true);
-            $A.test.assertEquals("0", panelParent.style.zIndex,
-                    "panel parent node should have a zindex 0!");
-        }]
-    },
-
-    /**
-     * Verify user can set element as stacking context root
-     */
-    testSetStackingCtxRoot: {
-        attributes: {"useContainer": true},
-        test: [function(cmp) {
-            this.createPanels(1, cmp);
-        }, function(cmp) {
-            var stackManager = this.getStackManager(cmp);
-            var panelRefs = this.getPanelRefs(cmp);
-            var panelEl = panelRefs[0].getElement();
-
-            // _stackContextRoot can be undefined/false
-            $A.test.assertNotEquals(true, panelEl._stackContextRoot,
-                "Initially panel should not be stacking context root!");
-
-            stackManager.setStackingContextRoot(panelEl);
-
-            $A.test.assertTrue(panelEl._stackContextRoot,
-                "Panel should now be stacking context root!");
         }]
     },
 

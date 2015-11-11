@@ -517,7 +517,7 @@
         var helper = cmp.getConcreteComponent().getDef().getHelper();
         helper.afterSetActiveInstance(panel);
 
-        if (panel) {
+        if (panel && panel.isValid()) {
             var panelDom=panel.getElement();
             if(panelDom) {
                 $A.util.addClass(panelDom, 'active');

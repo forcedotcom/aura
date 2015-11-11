@@ -171,8 +171,10 @@
                         // only add if it hasn't been added above
                         tdClassName += " is-selected";
                     }
-                    tdClassName += " is-selected-multi";
-                    trClassName = "has-multi-row-selection";
+                    if (!this.dateEquals(rangeStart, rangeEnd)) {
+                        tdClassName += " is-selected-multi";
+                        trClassName = "has-multi-row-selection";
+                    }
                 }
                 if (this.dateEquals(d, rangeStart)) {
                     className += " start-date";

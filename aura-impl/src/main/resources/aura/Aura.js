@@ -552,7 +552,7 @@ AuraInstance.prototype.setLanguage = function() {
  * 	 it should. Defaults to true for Aura Integration Service.
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
-    config = $A.util.json.resolveRefs(config);
+    config = $A.util.json.resolveRefsObject(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"], config["sid"]);

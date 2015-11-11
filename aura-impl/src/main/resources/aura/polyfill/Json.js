@@ -49,7 +49,7 @@ Json.prototype.decode = function(json, refSupport) {
         aura.error("Unable to parse JSON response", e);
         return null;
     }
-    return refSupport ? this.resolveRefs(obj) : obj;
+    return refSupport ? this.resolveRefsObject(obj) : obj;
 };
 
 /**
@@ -74,31 +74,51 @@ Json.prototype.decodeString = function(value) {
  * Convert a serialized state blob, which is returned from a server action, which
  * contains internal serId and serRefId markers, into a new data structure that
  * has internal JavaScript pointers to the same object. Component definitions are
- * extracted; original in-place definition is replaced with a descriptor.
+ * extracted and placed into <code>context.componentDefs</code>.
  *
  * @param {Object} obj The object to resolve. It is modified in-place.
- * @param {Array} cmpDefCollector Populated with component definitions.
  */
-Json.prototype.resolveRefsFromActions = function(obj, cmpDefCollector) {
-    var config = aura.util.isArray(obj) ? obj : [obj];
-    this._resolveRefs(config, {}, null, null, true, cmpDefCollector);
+Json.prototype.resolveRefsObject = function(obj) {
+    var cmpDefCollector = [];
+    $A.util.apply(obj, { "context" : { "componentDefs" : [] } }, false, true);
+    this._resolveRefs(obj, {}, null, null, cmpDefCollector);
+
+    if (cmpDefCollector.length > 0) {
+        var componentDefs = obj["context"]["componentDefs"];
+        var lookup = {};
+        var i;
+        for (i = 0; i < cmpDefCollector.length; i++) {
+            lookup[cmpDefCollector[i]["descriptor"]] = true;
+        }
+
+        for (i = 0; i < componentDefs.length; i++) {
+            if (!lookup[componentDefs[i]["descriptor"]]) {
+                cmpDefCollector.push(componentDefs[i]);
+            }
+        }
+        obj["context"]["componentDefs"] = cmpDefCollector;
+    }
+
+    return obj;
 };
 
 /**
  * Convert a serialized state blob, with its internal serId and serRefId
  * markers, into a new data structure that has internal JavaScript pointers
- * to the same object. Component definitions are extracted to the top-most
- * serId node within the subtree.
+ * to the same object. Component definitions are extracted and placed at
+ * the front of the array.
  *
- * @param {Object} obj The object to resolve. It is modified in-place.
+ * @param {Array} arr The array to resolve. It is modified in-place.
  */
-Json.prototype.resolveRefs = function(obj) {
-    var config = aura.util.isArray(obj) ? obj : [obj];
-    this._resolveRefs(config, {}, null, null, false, []);
-    return obj;
+Json.prototype.resolveRefsArray = function(arr) {
+    $A.assert($A.util.isArray(arr), "arr needs to be an array");
+    var cmpDefCollector = [];
+    this._resolveRefs(arr, {}, null, null, cmpDefCollector);
+    arr.unshift.apply(arr, cmpDefCollector);
+    return arr;
 };
 
-Json.prototype._resolveRefs = function(config, cache, parent, property, defFound, collector) {
+Json.prototype._resolveRefs = function(config, cache, parent, property, collector) {
     if (typeof config === "object" && config !== null) {
         var value;
         var key;
@@ -109,24 +129,19 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
             for ( var i = 0; i < config.length; i++) {
                 value = config[i];
                 if (typeof value === "object" && value !== null) {
-                    this._resolveRefs(value, cache, config, i, defFound, collector);
+                    this._resolveRefs(value, cache, config, i, collector);
                 }
-            }
-            if (!defFound) {
-                config.unshift.apply(config, collector);
-                collector.splice(0, collector.length);
             }
 
         } else {
             var serRefId = config[Json.ApplicationKey.SERIAL_REFID];
             if (serRefId !== undefined) {
                 // TODO: @dval @kvenkiteswaran find a better way to whitelist componentDefs
-                if ( defFound &&
-                        cache[serRefId]["descriptor"] &&
-                        !cache[serRefId]["members"] && // models
-                        !cache[serRefId]["actionDefs"] && // actions
-                        !cache[serRefId]["type"] && // cmpEvent
-                        !cache[serRefId]["actionType"] ) // actions?
+                if (cache[serRefId]["descriptor"] &&
+                    !cache[serRefId]["members"] && // models
+                    !cache[serRefId]["actionDefs"] && // actions
+                    !cache[serRefId]["type"] && // cmpEvent
+                    !cache[serRefId]["actionType"] ) // apex actions and others?
                 {
                     // replace the comp def with a descriptor
                     parent[property] = { "descriptor" : cache[serRefId]["descriptor"] };
@@ -141,29 +156,24 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
                     value = config[Json.ApplicationKey.VALUE];
 
                     if (typeof value === "object" && value !== null && (value[Json.ApplicationKey.SERIAL_ID] || value[Json.ApplicationKey.SERIAL_REFID])) {
-                        this._resolveRefs(value, cache, parent, property, defFound, collector);
+                        this._resolveRefs(value, cache, parent, property, collector);
                         value = parent[property];
                     } else {
                         // Pull up the values into the config itself
                         if (value["descriptor"] && (value["componentClass"] || value["attributeDefs"])) {
-                            if (defFound) {
-                                var newValueDef = { "descriptor" : value["descriptor"] };
-                                cache[serId] = newValueDef;
+                            var newValueDef = { "descriptor" : value["descriptor"] };
+                            cache[serId] = newValueDef;
 
-                                for (key in value) {
-                                    v = value[key];
-                                    if (typeof v === "object" && v !== null) {
-                                        superCollector = [];
-                                        this._resolveRefs(v, cache, value, key, defFound, superCollector);
-                                        collector.push.apply(collector, superCollector);
-                                    }
+                            for (key in value) {
+                                v = value[key];
+                                if (typeof v === "object" && v !== null) {
+                                    superCollector = [];
+                                    this._resolveRefs(v, cache, value, key, superCollector);
+                                    collector.push.apply(collector, superCollector);
                                 }
-
-                                collector.push(value);
-                                value = newValueDef;
-                            } else {
-                                defFound = true;
                             }
+                            collector.push(value);
+                            value = newValueDef;
                         }
 
                         parent[property] = value;
@@ -179,7 +189,7 @@ Json.prototype._resolveRefs = function(config, cache, parent, property, defFound
                 for (key in value) {
                     v = value[key];
                     if (typeof v === "object" && v !== null) {
-                        this._resolveRefs(v, cache, value, key, defFound, collector);
+                        this._resolveRefs(v, cache, value, key, collector);
                     }
                 }
             }
@@ -317,5 +327,4 @@ Json.prototype.orderedEncode = (function() {
 })();
 
 Json.prototype["encode"] = Json.prototype.encode;
-Json.prototype["resolveRefs"] = Json.prototype.resolveRefs;
 

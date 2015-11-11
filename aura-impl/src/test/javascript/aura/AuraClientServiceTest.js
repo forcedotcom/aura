@@ -1029,12 +1029,12 @@ Test.Aura.AuraClientServiceTest = function() {
                         decode : function() {
                             return mockData.decodedResponse;
                         },
-                        resolveRefs : function(input) {
+                        resolveRefsArray : function(input) {
                             // copy input in case inner objects are changed
                             requestedToResolve.push(JSON.stringify(input));
                         },
-                        resolveRefsFromActions : function (input) {
-                            requestedToResolve.push(JSON.stringify(input));  
+                        resolveRefsObject: function (input) {
+                            requestedToResolve.push(JSON.stringify(input));
                         }
                     },
                     stringEndsWith : function() {

@@ -355,7 +355,6 @@ AuraClientService.prototype.decode = function(response, noStrip) {
         ret["status"] = "ERROR";
         return ret;
     } else {
-        var cmpDefCollector = [];
         var i;
         // Prevent collision between $Label value provider and serRefId properties (typically "s" and "r").
         if (responseMessage["context"] && responseMessage["context"]["globalValueProviders"]) {
@@ -369,29 +368,12 @@ AuraClientService.prototype.decode = function(response, noStrip) {
                 }
             }
 
-            $A.util.json.resolveRefsFromActions(responseMessage, cmpDefCollector);
+            $A.util.json.resolveRefsObject(responseMessage);
 
             // Restore original provider (order doesn't matter)
             responseMessage["context"]["globalValueProviders"] = gvpList.concat(saved);
         } else {
-            $A.util.json.resolveRefsFromActions(responseMessage, cmpDefCollector);
-        }
-
-        // Merge our separated defs with the original set and prune the duplicates
-        if (cmpDefCollector.length > 0) {
-            $A.util.apply(responseMessage, { "context" : { "componentDefs" : [] } }, false, true);
-            var componentDefs = responseMessage["context"]["componentDefs"];
-            var lookup = {};
-            for (i = 0; i < cmpDefCollector.length; i++) {
-                lookup[cmpDefCollector[i]["descriptor"]] = true;
-            }
-
-            for (i = 0; i < componentDefs.length; i++) {
-                if (!lookup[componentDefs[i]["descriptor"]]) {
-                    cmpDefCollector.push(componentDefs[i]);
-                }
-            }
-            responseMessage["context"]["componentDefs"] = cmpDefCollector;
+            $A.util.json.resolveRefsObject(responseMessage);
         }
     }
 
@@ -1002,22 +984,22 @@ AuraClientService.prototype.idle = function() {
 AuraClientService.prototype.initDefs = function(config) {
     var i;
 
-    var evtConfigs = $A.util.json.resolveRefs(config["eventDefs"]);
+    var evtConfigs = $A.util.json.resolveRefsArray(config["eventDefs"]);
     for (i = 0; i < evtConfigs.length; i++) {
         $A.eventService.saveEventConfig(evtConfigs[i]);
     }
 
-    var libraryConfigs = $A.util.json.resolveRefs(config["libraryDefs"]);
+    var libraryConfigs = $A.util.json.resolveRefsArray(config["libraryDefs"]);
     for (i = 0; i < libraryConfigs.length; i++) {
         $A.componentService.createLibraryDef(libraryConfigs[i]);
     }
 
-    var controllerConfigs = $A.util.json.resolveRefs(config["controllerDefs"]);
+    var controllerConfigs = $A.util.json.resolveRefsArray(config["controllerDefs"]);
     for (i = 0; i < controllerConfigs.length; i++) {
         $A.componentService.createControllerDef(controllerConfigs[i]);
     }
 
-    var comConfigs = $A.util.json.resolveRefs(config["componentDefs"]);
+    var comConfigs = $A.util.json.resolveRefsArray(config["componentDefs"]);
     for (i = 0; i < comConfigs.length; i++) {
         $A.componentService.saveComponentConfig(comConfigs[i]);
     }
@@ -2188,7 +2170,7 @@ AuraClientService.prototype.runActions = function(actions, scope, callback) {
  * @export
  */
 AuraClientService.prototype.injectComponent = function(rawConfig, locatorDomId, localId) {
-    var config = $A.util.json.resolveRefs(rawConfig);
+    var config = $A.util.json.resolveRefsObject(rawConfig);
 
     // Save off any context global stuff like new labels
     $A.getContext()['merge'](config["context"]);

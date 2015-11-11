@@ -60,7 +60,7 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
     private static final Set<DefType> DEFTYPES = ImmutableSet.of(
             DefType.APPLICATION, DefType.COMPONENT, DefType.EVENT, DefType.LIBRARY,
             DefType.INCLUDE, DefType.INTERFACE, DefType.CONTROLLER,
-            DefType.HELPER, DefType.NAMESPACE, DefType.RENDERER, DefType.STYLE,
+            DefType.HELPER, DefType.RENDERER, DefType.STYLE,
             DefType.TESTSUITE, DefType.RESOURCE, DefType.DESIGN, DefType.FLAVORED_STYLE);
 
     /**
@@ -383,11 +383,6 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
                 // return a copy of the StringSource to emulate other Sources (hash is reset)
                 return new StringSource<>(ret);
             }
-            if (descriptor.getDefType().equals(DefType.NAMESPACE)) {
-                Format format = DescriptorInfo.get(descriptor.getDefType().getPrimaryInterface()).getFormat();
-                return new StringSource<>(descriptor, "", descriptor.getQualifiedName(),
-                        format);
-            }
         }
         return null;
     }
@@ -398,7 +393,6 @@ public class StringSourceLoader implements SourceLoader, PrivilegedNamespaceSour
         EVENT(EventDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         LIBRARY(LibraryDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
         INTERFACE(InterfaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ":"),
-        NAMESPACE(NamespaceDef.class, Format.XML, DefDescriptor.MARKUP_PREFIX, ""),
         CONTROLLER(ControllerDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         HELPER(HelperDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),
         MODEL(ModelDef.class, Format.JS, DefDescriptor.JAVASCRIPT_PREFIX, "."),

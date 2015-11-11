@@ -1,0 +1,2 @@
+<aura:component extensible="true" extends="componentTest:helperSuperSuper">
+</aura:component>

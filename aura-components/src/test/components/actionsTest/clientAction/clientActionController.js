@@ -1,20 +1,20 @@
 ({
     clientExecuteInBackground : function(component) {
-	},
+    },
 
-	clientExecuteInForeground : function(component) {
-	    component.set("v.value", "clientExecuteInForeground");
-	},
+    clientExecuteInForeground : function(component) {
+        component.set("v.value", "clientExecuteInForeground");
+    },
 
-	clientExecuteInFOREGROUND : function(component) {
+    clientExecuteInFOREGROUND : function(component) {
         component.set("v.value", "clientExecuteInFOREGROUND");
     },
 
-	clientSideAction : function(component) {
-		// foo
-	},
+    clientSideAction : function(component) {
+        // foo
+    },
 
-	error : function(cmp) {
-		throw new Error("intentional error");
-	}
+    throwsAnError : function(cmp) {
+        throw new Error("intentional error");
+    }
 })

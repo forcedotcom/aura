@@ -376,7 +376,7 @@
 
         //This is backwards because the selected cache pushes stack like (FILO)
         for(var i = endElm; i >= beginElm; i--){
-            $A.test.clickOrTouch(rows[i].children[0].children[0].children[1]);
+            $A.test.clickOrTouch(rows[i].children[0].querySelector('input'));
         }
     },
 

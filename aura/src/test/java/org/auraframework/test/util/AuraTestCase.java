@@ -297,12 +297,7 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     protected DefDescriptor<ControllerDef> getClientController(BaseComponentDef def) throws Exception {
-        for (DefDescriptor<ControllerDef> cd : def.getControllerDefDescriptors()) {
-            if ("js".equals(cd.getPrefix())) {
-                return cd;
-            }
-        }
-        return null;
+        return def.getRemoteControllerDef().getDescriptor();
     }
 
     /**

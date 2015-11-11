@@ -18,17 +18,29 @@ package org.auraframework.integration.test.http;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.test.controller.TestLoggingAdapterController;
 import org.auraframework.test.util.AuraHttpTestCase;
 import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.test.annotation.AuraTestLabels;
@@ -45,6 +57,89 @@ import org.auraframework.util.test.annotation.UnAdaptableTest;
 public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     public AuraResourceServletHttpTest(String name) {
         super(name);
+    }
+    
+    class Request implements Callable<Integer> {
+    	private CloseableHttpClient httpClient;
+    	private String url;
+    	@SuppressWarnings("unused")
+		private String name;
+    	public Request(CloseableHttpClient httpClient, String url, String name) { 
+    		this.httpClient = httpClient;
+    		this.url = url;
+    		this.name = name; 
+    	}
+
+		@Override
+		public Integer call() throws Exception {
+			HttpGet get = obtainGetMethod(url);
+			HttpResponse httpResponse = httpClient.execute(get);
+	        int statusCode = getStatusCode(httpResponse);
+	        //for debug only
+	        //String response = getResponseBody(httpResponse);
+	        //System.out.println("Request(#"+this.name+") status:"+statusCode/*+", get response:"+response*/);
+	        //get.releaseConnection();
+	        return statusCode;
+		}
+    	
+    }
+    
+    /**
+     * test add for W-2792895
+       also since I ask cache to log something when hit miss, this kind of verify W-2105858 as well
+     * @throws Exception
+     */
+    public void testConcurrentGetRequests() throws Exception {
+    	// I tried to use obtainGetMethod(url) then perform(HttpGet) , but 
+    	// our default httpClient use BasicClientConnectionManager, which doesn't work well with MultiThread
+    	// let's use PoolingHttpClientConnectionManager instead.
+	    PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+		// Increase max total connection to 200 -- just some big number
+		cm.setMaxTotal(200);
+		// Increase default max connection per route to 20 -- again, just some big numer
+		cm.setDefaultMaxPerRoute(20);
+		CloseableHttpClient httpClient = HttpClients.custom()
+			        .setConnectionManager(cm)
+			        .build();
+    	
+    	 TestLoggingAdapterController.beginCapture();
+    	
+    	 String modeAndContext = getSimpleContext(Format.JS, false);
+         String url = "/l/" + AuraTextUtil.urlencode(modeAndContext) + "/app.js";
+         
+         Request request1 = new Request(httpClient, url, "1");
+         Request request2 = new Request(httpClient, url, "2");
+         Request request3 = new Request(httpClient, url, "3");
+         Request request4 = new Request(httpClient, url, "4");
+         Request request5 = new Request(httpClient, url, "5");
+         ExecutorService excutor = Executors.newFixedThreadPool(5);
+         
+         Future<Integer> response1 = excutor.submit(request1);
+         Future<Integer> response2 = excutor.submit(request2);
+         Future<Integer> response3 = excutor.submit(request3);
+         Future<Integer> response4 = excutor.submit(request4);
+         Future<Integer> response5 = excutor.submit(request5);
+         
+         response1.get();
+         response2.get();
+         response3.get();
+         response4.get();
+         response5.get();
+         
+         int counter = 0;
+         List<Map<String, Object>> logList = TestLoggingAdapterController.endCapture();
+         for(Map<String, Object> log : logList) {
+        	 for(Entry<String, Object> entry : log.entrySet()) {
+        		 if(entry.getValue() != null) {
+        			 if(entry.getKey().toString().contains("StringsCache")) {
+        				 counter++;
+        				 assertTrue("get unexpected logging message for cache miss:"+entry.getValue().toString(), entry.getValue().toString().contains("cache miss for key: JS:DEV:"));
+        			 }
+        		 }
+        	 }
+         }
+         //run this test right after server is up, we get one miss. second time, what we looking for is cached already, no miss.
+         assertTrue("we should only have no more than one cache miss, instead we have "+counter, counter <= 1);
     }
 
     /**

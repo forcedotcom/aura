@@ -26,9 +26,11 @@ import org.auraframework.css.TokenCache;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.TokensDef;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.impl.css.parser.plugin.DuplicateFontFacePlugin;
 import org.auraframework.impl.css.token.TokenValueProviderImpl;
+import org.auraframework.impl.system.DefDescriptorImpl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -67,6 +69,12 @@ public class StyleAdapterImpl implements StyleAdapter {
     public boolean tokenPropertyValidation(DefDescriptor<? extends BaseStyleDef> style) {
         // validate all non-privileged namespaces. later can change this to include privileged as well.
         return !Aura.getConfigAdapter().isPrivilegedNamespace(style.getNamespace());
+    }
+
+    @Override
+    public DefDescriptor<TokensDef> getNamespaceDefaultDescriptor(DefDescriptor<?> descriptor) {
+        String fmt = String.format("%s:%sNamespace", descriptor.getNamespace(), descriptor.getNamespace());
+        return DefDescriptorImpl.getInstance(fmt, TokensDef.class);
     }
 
     @Override

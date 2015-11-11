@@ -15,11 +15,11 @@
  */
 package org.auraframework.impl.css.util;
 
+import org.auraframework.Aura;
 import org.auraframework.css.TokenCache;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokensDef;
 import org.auraframework.http.AuraBaseServlet;
-import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.AuraContext;
 
 import com.google.common.base.Optional;
@@ -35,8 +35,7 @@ public final class Tokens {
      * @param descriptor Find the namespace-default tokens from the same namespace as this descriptor.
      */
     public static DefDescriptor<TokensDef> namespaceDefaultDescriptor(DefDescriptor<?> descriptor) {
-        String fmt = String.format("%s:%sNamespace", descriptor.getNamespace(), descriptor.getNamespace());
-        return DefDescriptorImpl.getInstance(fmt, TokensDef.class);
+        return Aura.getStyleAdapter().getNamespaceDefaultDescriptor(descriptor);
     }
 
     /**

@@ -2085,8 +2085,8 @@ Aura.Utils.Util.prototype.supportsTouchEvents = function() {
 
             // IE  will also give false positives, so we make sure that only enable pointer events when is a windowsPhone
             || ($A.get('$Browser.isWindowsPhone') && (window["navigator"]["pointerEnabled"] ||  window["navigator"]["msPointerEnabled"]))
-            || window["navigator"]["msMaxTouchPoints"] > 0
-            || window["navigator"]["maxTouchPoints"] > 0)
+            // According to the browser support matrix (http://sfdc.co/cnHk6M), Touch-enabled laptops, such as Surface Pro 3 are ONLY supported via keyboard+mouse
+            || ($A.get('$Browser.formFactor') !== 'DESKTOP' && (window["navigator"]["msMaxTouchPoints"] > 0 || window["navigator"]["maxTouchPoints"] > 0)))
 
             // Aura internal testing
             && ($A.getContext().getMode() !== 'PTEST')

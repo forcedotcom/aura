@@ -15,22 +15,26 @@
  */
 package org.auraframework.integration.test.css;
 
-import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
+import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.token.TokenDefImpl;
 import org.auraframework.impl.css.token.TokenDefImpl.Builder;
 import org.auraframework.impl.system.DefinitionImplUnitTest;
-import org.auraframework.service.ContextService;
-import org.auraframework.system.AuraContext.Authentication;
-import org.auraframework.system.AuraContext.Format;
-import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
 /**
  * Unit tests for {@link TokenDefImpl}.
  */
 public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, TokenDef, TokenDef, TokenDefImpl.Builder> {
+    private ConfigAdapter configAdapter;
     private Builder builder;
+
+    @Mock
+    protected DefDescriptor<TokensDef> parentDescriptor;
 
     public TokenDefImplTest(String name) {
         super(name);
@@ -39,26 +43,27 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
     @Override
     public void setUp() throws Exception {
         super.setUp();
+
         this.qualifiedDescriptorName = "valid";
+
         this.builder = new Builder();
         this.builder.setValue("valid");
-    }
 
-    @Override
-    protected void setupValidateReferences() throws Exception {
-        super.setupValidateReferences();
+        //Mockito.when(parentDescriptor.getNamespace()).thenReturn("tokenDefImplTest");
 
-        ContextService contextService = Aura.getContextService();
-        if (testAuraContext != null) {
-            contextService.endContext();
-        }
-
-        testAuraContext = contextService.startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        configAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
     }
 
     @Override
     protected Builder getBuilder() {
         return builder;
+    }
+
+    @Override
+    protected TokenDef buildDefinition(Builder builder) throws Exception {
+        builder.setParentDescriptor(this.parentDescriptor);
+        return super.buildDefinition(builder);
     }
 
     public void testEqualsWhenSame() throws Exception {
@@ -102,12 +107,34 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         assertEquals("test", buildDefinition().getValue());
     }
 
+    public void testInvalidTokenValueChar() throws Exception {
+        builder.setValue("blue;} body { color: red !important }");
+
+        try {
+            buildDefinition().validateDefinition();
+            fail("Expected an exception");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class, "Illegal character in token value");
+        }
+    }
+
+    public void testInvalidTokenValueChar2() throws Exception {
+        builder.setValue("expression(alert('BOO'))");
+
+        try {
+            buildDefinition().validateDefinition();
+            fail("Expected an exception");
+        } catch (Exception e) {
+            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class, "Illegal character in token value");
+        }
+    }
+
     public void testGetAllowedProperties() throws Exception {
         builder.setAllowedProperties("border-color");
         assertTrue(buildDefinition().getAllowedProperties().contains("border-color"));
     }
 
-    public void _testUnknownProperty() throws Exception {
+    public void testUnknownProperty() throws Exception {
         builder.setAllowedProperties("wall-maria");
 
         try {
@@ -118,7 +145,7 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         }
     }
 
-    public void _testMultipleUnknownProperties() throws Exception {
+    public void testMultipleUnknownProperties() throws Exception {
         builder.setAllowedProperties("color, wall-maria");
 
         try {

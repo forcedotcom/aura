@@ -65,7 +65,7 @@
      */
     testGetNonExistentAction : {
         test : function(cmp) {
-            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'.";
+            var errorMsg = "Unable to find 'notHereCaptain' on 'java://actionsTest.clientAction'.";
             try {
                 var action = cmp.get("c.notHereCaptain");
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");
@@ -84,15 +84,15 @@
             $A.test.addFunctionHandler($A, "warning", function(msg, err) {
                 message = msg;
             });
+
             try {
-                // Ideally, we would run this action with $A.enqueueAction, but due to the way our js test framework
-                // is set up we can't catch the error without failing the test.
-                cmp.get("c.error").runDeprecated();
+                cmp.throwsAnError();
                 $A.test.fail("Expected error when running client-side action");
             } catch (e) {
                 $A.test.assertEquals("intentional error", e.message);
             }
-            $A.test.assertEquals("Action failed: actionsTest$clientAction$controller$error", message);
+
+            $A.test.assertEquals("Action failed: actionsTest$clientAction$controller$throwsAnError", message);
         }
     },
 

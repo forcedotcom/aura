@@ -35,10 +35,8 @@ Json.ApplicationKey={
  * function to consumers in the future, it should use the new window.JSON
  * support provided by newer browsers.
  *
- * @param {String}
- *            json
- * @param {Object}
- *            refSupport
+ * @param {String} json
+ * @param {Object} refSupport
  */
 Json.prototype.decode = function(json, refSupport) {
     var obj;
@@ -51,7 +49,7 @@ Json.prototype.decode = function(json, refSupport) {
         aura.error("Unable to parse JSON response", e);
         return null;
     }
-    return refSupport ? this.resolveRefs(obj) : obj;
+    return refSupport ? this.resolveRefsObject(obj) : obj;
 };
 
 /**
@@ -59,8 +57,7 @@ Json.prototype.decode = function(json, refSupport) {
  * object (or sub-object) property's value could be a function/array/object/ and
  * so on in string format. We need to convert them to the desired type.
  *
- * @param {String}
- *            value The string to be decoded
+ * @param {String} value The string to be decoded
  * @returns {Function|Array|Object} The converted value
  */
 Json.prototype.decodeString = function(value) {
@@ -74,48 +71,111 @@ Json.prototype.decodeString = function(value) {
 };
 
 /**
- * Convert a serialized state blob, with its internal serId and serRefId
- * markers, into a new data structure that can have internal JavaScript pointers
- * to the same identical location.
+ * Convert a serialized state blob, which is returned from a server action, which
+ * contains internal serId and serRefId markers, into a new data structure that
+ * has internal JavaScript pointers to the same object. Component definitions are
+ * extracted and placed into <code>context.componentDefs</code>.
  *
- * @param {Object}
- *            obj The object to resolve
+ * @param {Object} obj The object to resolve. It is modified in-place.
  */
-Json.prototype.resolveRefs = function(obj) {
-     
-    var config = aura.util.isArray(obj) ? obj : [obj];
-    this._resolveRefs(config, {}, null, null);
+Json.prototype.resolveRefsObject = function(obj) {
+    var cmpDefCollector = [];
+    $A.util.apply(obj, { "context" : { "componentDefs" : [] } }, false, true);
+    this._resolveRefs(obj, {}, null, null, cmpDefCollector);
 
-     
+    if (cmpDefCollector.length > 0) {
+        var componentDefs = obj["context"]["componentDefs"];
+        var lookup = {};
+        var i;
+        for (i = 0; i < cmpDefCollector.length; i++) {
+            lookup[cmpDefCollector[i]["descriptor"]] = true;
+        }
+
+        for (i = 0; i < componentDefs.length; i++) {
+            if (!lookup[componentDefs[i]["descriptor"]]) {
+                cmpDefCollector.push(componentDefs[i]);
+            }
+        }
+        obj["context"]["componentDefs"] = cmpDefCollector;
+    }
+
     return obj;
 };
 
-Json.prototype._resolveRefs = function(config, cache, parent, property) {
+/**
+ * Convert a serialized state blob, with its internal serId and serRefId
+ * markers, into a new data structure that has internal JavaScript pointers
+ * to the same object. Component definitions are extracted and placed at
+ * the front of the array.
+ *
+ * @param {Array} arr The array to resolve. It is modified in-place.
+ */
+Json.prototype.resolveRefsArray = function(arr) {
+    $A.assert($A.util.isArray(arr), "arr needs to be an array");
+    var cmpDefCollector = [];
+    this._resolveRefs(arr, {}, null, null, cmpDefCollector);
+    arr.unshift.apply(arr, cmpDefCollector);
+    return arr;
+};
+
+Json.prototype._resolveRefs = function(config, cache, parent, property, collector) {
     if (typeof config === "object" && config !== null) {
         var value;
+        var key;
+        var v;
+        var superCollector;
+
         if (aura.util.isArray(config)) {
             for ( var i = 0; i < config.length; i++) {
                 value = config[i];
                 if (typeof value === "object" && value !== null) {
-                    this._resolveRefs(value, cache, config, i);
+                    this._resolveRefs(value, cache, config, i, collector);
                 }
             }
+
         } else {
             var serRefId = config[Json.ApplicationKey.SERIAL_REFID];
             if (serRefId !== undefined) {
-                // Replace with the referenced object
-                parent[property] = cache[serRefId];
+                // TODO: @dval @kvenkiteswaran find a better way to whitelist componentDefs
+                if (cache[serRefId]["descriptor"] &&
+                    !cache[serRefId]["members"] && // models
+                    !cache[serRefId]["actionDefs"] && // actions
+                    !cache[serRefId]["type"] && // cmpEvent
+                    !cache[serRefId]["actionType"] ) // apex actions and others?
+                {
+                    // replace the comp def with a descriptor
+                    parent[property] = { "descriptor" : cache[serRefId]["descriptor"] };
+                } else {
+                    // replace the ref (r) with its definition (s)
+                    parent[property] = cache[serRefId];
+                }
+
             } else {
                 var serId = config[Json.ApplicationKey.SERIAL_ID];
                 if (serId !== undefined) {
                     value = config[Json.ApplicationKey.VALUE];
 
-                    if (typeof value === "object" && value !== null
-                            && (value[Json.ApplicationKey.SERIAL_ID] || value[Json.ApplicationKey.SERIAL_REFID])) {
-                        this._resolveRefs(value, cache, parent, property);
+                    if (typeof value === "object" && value !== null && (value[Json.ApplicationKey.SERIAL_ID] || value[Json.ApplicationKey.SERIAL_REFID])) {
+                        this._resolveRefs(value, cache, parent, property, collector);
                         value = parent[property];
                     } else {
                         // Pull up the values into the config itself
+                        if (value["descriptor"] && (value["componentClass"] || value["attributeDefs"])) {
+                            var newValueDef = { "descriptor" : value["descriptor"] };
+                            cache[serId] = newValueDef;
+
+                            for (key in value) {
+                                v = value[key];
+                                if (typeof v === "object" && v !== null) {
+                                    superCollector = [];
+                                    this._resolveRefs(v, cache, value, key, superCollector);
+                                    collector.push.apply(collector, superCollector);
+                                }
+                            }
+                            collector.push(value);
+                            value = newValueDef;
+                        }
+
                         parent[property] = value;
                     }
 
@@ -126,10 +186,10 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
                 }
 
                 // Recurse into the value's properties
-                for ( var key in value) {
-                    var v = value[key];
+                for (key in value) {
+                    v = value[key];
                     if (typeof v === "object" && v !== null) {
-                        this._resolveRefs(v, cache, value, key);
+                        this._resolveRefs(v, cache, value, key, collector);
                     }
                 }
             }
@@ -140,13 +200,10 @@ Json.prototype._resolveRefs = function(config, cache, parent, property) {
 /**
  * Encodes an object into a JSON representation.
  *
- * @param {Object}
- *            obj The object to pass in the encoder.
- * @param {Object}
- *            replacer Optional function which passes key and value bound to the
+ * @param {Object} obj The object to pass in the encoder.
+ * @param {Object} replacer Optional function which passes key and value bound to the
  *            object, and returns a stringified value.
- * @param {String}
- *            whiteSpace Adds spaces or tabs to the resulting string. E.g. '\t'
+ * @param {String} whiteSpace Adds spaces or tabs to the resulting string. E.g. '\t'
  *            for tab
  */
 Json.prototype.encode = function(obj, replacer, whiteSpace) {
@@ -158,10 +215,10 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
 
             if ($A.util.isUndefinedOrNull(replacer)) {
                 return JSON.stringify(obj, function(key, value) {
-                    // We have to do this as JSON.stringify removes the property from
-                    // the resulted JSON string if its value is a function
-                    return aura.util.json.encodeFunction(value);
-                }, whiteSpace);
+                        // We have to do this as JSON.stringify removes the property from
+                        // the resulted JSON string if its value is a function
+                        return aura.util.json.encodeFunction(value);
+                    }, whiteSpace);
             } else {
                 return JSON.stringify(obj, replacer, whiteSpace);
             }
@@ -187,38 +244,36 @@ Json.prototype.encode = function(obj, replacer, whiteSpace) {
     }
 
     switch (obj.constructor) {
-    case String:
-        return '"' + obj.replace(/\"/g, '\\"').replace(/\r|\n|\f/g, "\\n")
-                + '"';
+        case String:
+            return '"' + obj.replace(/\"/g, '\\"').replace(/\r|\n|\f/g, "\\n") + '"';
 
-    case Array:
-        var buf = [];
-        for ( var i = 0; i < obj.length; i++) {
-            buf.push(arguments.callee(obj[i]));
-        }
-        return '[' + buf.join(',') + ']';
-
-    case Object:
-        var buf2 = [];
-        for ( var k in obj) {
-            if (obj.hasOwnProperty(k)) {
-                // Recursively invoke encode() on both the property name and the
-                // value
-                buf2.push(arguments.callee(k) + ':' + arguments.callee(obj[k]));
+        case Array:
+            var buf = [];
+            for ( var i = 0; i < obj.length; i++) {
+                buf.push(arguments.callee(obj[i]));
             }
-        }
-        return '{' + buf2.join(',') + '}';
+            return '[' + buf.join(',') + ']';
 
-    default:
-        return obj.toString();
+        case Object:
+            var buf2 = [];
+            for ( var k in obj) {
+                if (obj.hasOwnProperty(k)) {
+                    // Recursively invoke encode() on both the property name and the
+                    // value
+                    buf2.push(arguments.callee(k) + ':' + arguments.callee(obj[k]));
+                }
+            }
+            return '{' + buf2.join(',') + '}';
+
+        default:
+            return obj.toString();
     }
 };
 
 /**
  * Encode function to String.
  *
- * @param {Function}
- *            value The function to be encoded.
+ * @param {Function} value The function to be encoded.
  */
 Json.prototype.encodeFunction = function(value) {
     if (typeof value === 'function') {
@@ -228,11 +283,11 @@ Json.prototype.encodeFunction = function(value) {
 };
 
 /**
- * Serializes object in alphabetical asc order. Sorts object keys during serialization.
+ * Serializes object in alphabetical ascending order. Sorts object keys during serialization.
  * @param {Object} object to sort
  * @returns {String} serialized object
  */
-Json.prototype.orderedEncode = (function () {
+Json.prototype.orderedEncode = (function() {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON
     var toString = Object.prototype.toString;
     var isArray = Array.isArray || function (a) { return toString.call(a) === '[object Array]'; };
@@ -256,11 +311,9 @@ Json.prototype.orderedEncode = (function () {
                 }
                 return res + ']';
             } else if (toString.call(value) === '[object Object]') {
-                var tmp = [],
-                    sortedKeys = Object.keys(value).sort(),
-                    len = sortedKeys.length;
+                var tmp = [], sortedKeys = Object.keys(value).sort(), len = sortedKeys.length;
                 // customized to sort keys during serialization
-                for(var j = 0; j < len; j++) {
+                for (var j = 0; j < len; j++) {
                     var key = sortedKeys[j];
                     if (value[key] !== undefined) {
                         tmp.push(stringify(key) + ':' + stringify(value[key]));
@@ -274,5 +327,4 @@ Json.prototype.orderedEncode = (function () {
 })();
 
 Json.prototype["encode"] = Json.prototype.encode;
-Json.prototype["resolveRefs"] = Json.prototype.resolveRefs;
 

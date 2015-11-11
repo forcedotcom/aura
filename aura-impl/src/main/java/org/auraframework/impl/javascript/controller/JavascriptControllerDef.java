@@ -109,4 +109,9 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
             return new JavascriptControllerDef(this);
         }
     }
+    
+    @Override
+    public boolean isLocal() {
+    	return false;
+    }
 }

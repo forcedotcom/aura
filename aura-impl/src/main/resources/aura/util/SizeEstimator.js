@@ -33,6 +33,11 @@ SizeEstimator.POINTER_SIZE   = 8;
 
 SizeEstimator.prototype.hasOwnProperty = Object.prototype.hasOwnProperty;
 
+/**
+ * Estimates the size of a value.
+ * @param {*} value the item to estimate
+ * @return {Number} the estimated size of the item in bytes.
+ */
 SizeEstimator.prototype.estimateSize = function(value) {
     if (value === null || value === undefined) {
         return 0;

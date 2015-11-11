@@ -61,17 +61,17 @@
 		}
 	},
 
-	//check component from $A.createComponent is instanceof what we get from componentClass
-	testCreateComponentReturnCorrectType : {
-		test: function(testCmp) {
-			var type="markup://aura:text";
-			var attributes = null;
+    //check component from $A.createComponent is instanceof what we get from componentClass
+    testCreateComponentReturnCorrectType : {
+        test: function(testCmp) {
+            var type="markup://aura:text";
+            var attributes = null;
             $A.createComponent(type, attributes, function(targetComponent){
-            	var cmpFromComponentClass = $A.componentService.getComponentClass(type);
-            	$A.test.assertTrue(targetComponent instanceof cmpFromComponentClass);
+                var cmpFromComponentClass = $A.componentService.getComponentClass(type);
+                $A.test.assertTrue(targetComponent instanceof cmpFromComponentClass);
             })
-		}
-	},
+        }
+    },
 
 	//get a component with server dependency via $A.createComponent
 	testCreateComponentServerDependencyReturnCorrectType : {

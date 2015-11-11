@@ -1,0 +1,7 @@
+<aura:component >
+    <aura:attribute name="name" type="String" default="grandparentDefaultName"/>
+    <section>
+        I'm grandparent with name {!v.name}
+        <performanceTest:parent/>
+    </section>
+</aura:component>

@@ -119,7 +119,6 @@ window['$A'] = {};
 // #include aura.library.LibraryDefRegistry
 
 // -- Event --------------------------------------------------------------
-// #include aura.event.EventDefRegistry
 // #include aura.event.EventDef
 // #include aura.event.Event
 
@@ -553,14 +552,14 @@ AuraInstance.prototype.setLanguage = function() {
  * 	 it should. Defaults to true for Aura Integration Service.
  */
 AuraInstance.prototype.initConfig = function(config, useExisting, doNotInitializeServices) {
-    config = $A.util.json.resolveRefs(config);
+    config = $A.util.json.resolveRefsObject(config);
 
     if (!useExisting || $A.util.isUndefined($A.getContext())) {
         $A.clientService.initHost(config["host"], config["sid"]);
         // creating context.
         $A.context = new Aura.Context.AuraContext(config["context"]);
         $A.setLanguage();
-        this.initPriv($A.util.json.resolveRefs(config["instance"]), config["token"], null, doNotInitializeServices);
+        this.initPriv(config["instance"], config["token"], null, doNotInitializeServices);
         $A.context.finishComponentConfigs($A.context.getCurrentAction().getId());
         $A.context.setCurrentAction(null);
     } else {

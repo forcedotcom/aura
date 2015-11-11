@@ -171,7 +171,7 @@
         var _helper = concreteCmp.getDef().getHelper();
         var value = component.get("v.value");
         if (!value) { // Setting an empty value probably means clear out existing value
-            _helper.displayDateTime(component, "");
+            _helper.displayDateTime(component, "", "");
             return;
         }
 

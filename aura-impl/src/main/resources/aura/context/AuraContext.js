@@ -47,12 +47,7 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     this.accessStack=[];
 
     var that = this;
-    if(!config["globalValueProviders"]){
-        config["globalValueProviders"]={};
-    }
-    $A.util.apply(config["globalValueProviders"],$A.globalValueProviders);
-
-    this.globalValueProviders = new Aura.Provider.GlobalValueProviders(config["globalValueProviders"], function(gvps) {
+    this.initGlobalValueProviders(config["globalValueProviders"], function(gvps) {
         var i, defs;
 
         // Don't ask.... You just kinda have to love this....
@@ -90,6 +85,33 @@ Aura.Context.AuraContext = function AuraContext(config, initCallback) {
     });
 };
 
+/**
+ * Temporary shim, until W-2812858 is addressed to serialize GVPs as a map and fix $A GVPs.
+ * Convert config GVPs from array to map, and merge $A GVPs, and create the context GVPs.
+ * @export
+ */
+Aura.Context.AuraContext.prototype.initGlobalValueProviders = function(gvps, callback) {
+    if ($A.util.isArray(gvps)) {
+        var map = {};
+
+        for (var i = 0; i < gvps.length; i++) {
+            var gvp = gvps[i];
+            var type = gvp["type"];
+            var values = gvp["values"];
+            map[type] = values;
+        }
+
+        gvps = map;
+    }
+
+    if(!gvps){
+        gvps = {};
+    }
+
+    $A.util.apply(gvps,$A.globalValueProviders);
+
+    this.globalValueProviders = new Aura.Provider.GlobalValueProviders(gvps, callback);
+};
 /**
  * Returns the mode for the current request. Defaults to "PROD" for production mode and "DEV" for development mode.
  * The HTTP request format is <code>http://<your server>/namespace/component?aura.mode=PROD</code>.

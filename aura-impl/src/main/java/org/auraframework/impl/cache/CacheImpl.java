@@ -112,6 +112,16 @@ public class CacheImpl<K, T> implements Cache<K, T> {
     CacheImpl(com.google.common.cache.Cache<K, T> cache) {
         this.cache = cache;
     }
+    
+    @Override
+    public void logCacheStatus(String name, String extraMessage) {
+    	LoggingAdapter adapter = AuraImpl.getLoggingAdapter();
+    	LoggingContext loggingCtx = adapter.getLoggingContext();
+        CacheStats stats = cache.stats();
+        loggingCtx.logCacheInfo(name,
+                String.format(extraMessage+"hit rate=%.3f", stats.hitRate()),
+                cache.size(), stats);
+    }
 
     public CacheImpl(Builder<K, T> builder) {
         // if builder.useSecondaryStorage is true, we should try to use a
@@ -149,7 +159,6 @@ public class CacheImpl<K, T> implements Cache<K, T> {
     @Override
     public void put(K key, T data) {
         cache.put(key, data);
-
     }
 
     @Override

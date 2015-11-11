@@ -48,7 +48,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
     public static final String TEMPLATE_CSS_PREFIX = "templateCss";
     public static final String CUSTOM_FLAVOR_PREFIX = "customFlavorCss";
     public static final String JAVASCRIPT_PREFIX = "js";
-    public static final String COMPOUND_PREFIX = "compound";
     public static final String JAVA_PREFIX = "java";
 
     public static final class DescriptorKey {
@@ -135,7 +134,6 @@ public interface DefDescriptor<T extends Definition> extends JsonSerializable,
         TESTCASE(TestCaseDef.class), //
         PROVIDER(ProviderDef.class), //
         REQUIRED_VERSION(RequiredVersionDef.class), //
-        NAMESPACE(NamespaceDef.class),
         RESOURCE(ResourceDef.class),
         DESIGN(DesignDef.class),
         ATTRIBUTE_DESIGN(DesignAttributeDef.class),

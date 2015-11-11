@@ -32,6 +32,7 @@ import org.auraframework.impl.css.parser.plugin.FlavorPlugin;
 import org.auraframework.impl.css.parser.plugin.SelectorScopingPlugin;
 import org.auraframework.impl.css.parser.plugin.TokenFunctionPlugin;
 import org.auraframework.impl.css.parser.plugin.TokenPropertyValidationPlugin;
+import org.auraframework.impl.css.parser.plugin.TokenSecurityPlugin;
 import org.auraframework.impl.css.parser.plugin.UrlCacheBustingPlugin;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
@@ -145,6 +146,8 @@ public final class CssPreprocessor {
                 if (Aura.getStyleAdapter().tokenPropertyValidation(style)) {
                     plugins.add(new TokenPropertyValidationPlugin(tvp));
                 }
+
+                plugins.add(new TokenSecurityPlugin());
             }
             return this;
         }

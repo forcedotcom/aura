@@ -21,9 +21,9 @@
      * @priority medium
      * @userStory a07B0000000Ekdr
      */
-    testRendererDefProperties:{
+    testRendererProperties:{
         test:function(cmp){
-            //Access the Renderer Def of test:testJSRenderer
+            //Access the Renderer of test:testJSRendererApp
             var renderer = cmp.getRenderer();
             // Make sure what you actually accessed was an Object
             aura.test.assertNotNull(renderer, "Was expecting to find an object.");

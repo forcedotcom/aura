@@ -164,7 +164,6 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             case LIBRARY:
             case DOCUMENTATION:
             case EXAMPLE:
-            case NAMESPACE:
             case TOKENS:
             case DESIGN:
             case SVG:
@@ -193,13 +192,8 @@ public class DefDescriptorImpl<T extends Definition> implements DefDescriptor<T>
             this.qualifiedName = qualifiedName;
             this.descriptorName = buildDescriptorName(prefix, namespace, name);
             this.prefix = prefix;
-            if (defType == DefType.NAMESPACE) {
-                this.namespace = name;
-                this.name = name;
-            } else {
-                this.namespace = namespace;
-                this.name = name;
-            }
+            this.namespace = namespace;
+            this.name = name;
             this.hashCode = createHashCode();
             this.nameParameters = nameParameters;
         } finally {

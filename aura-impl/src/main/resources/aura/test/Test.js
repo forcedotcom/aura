@@ -1537,28 +1537,6 @@ TestInstance.prototype.isInstanceOf = function(element, elementType, tag) {
 };
 
 /**
- * Returns set of keys on passed in Object.
- *
- * @param {Object}
- *            obj Object to retrieve set of keys from.
- * @export
- * @function Test#objectKeys
- */
-TestInstance.prototype.objectKeys = function(obj) {
-    if (Object.keys) {
-        return Object.keys(obj);
-    } else {
-        var result = [];
-        for ( var name in obj) {
-            if (obj.hasOwnProperty(name)) {
-                result.push(name);
-            }
-        }
-        return result;
-    }
-};
-
-/**
  * Return attributeValue of an element
  *
  * @param {HTMLElement}

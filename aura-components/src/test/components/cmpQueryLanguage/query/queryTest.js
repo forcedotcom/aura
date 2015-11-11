@@ -147,14 +147,14 @@
             var row = result.rows[0];
             $A.test.assertTruthy(row.globalId);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
-            $A.test.assertEquals(1, $A.test.objectKeys(row).length, "Query with 1 field specification returned extra fields in result set.");
+            $A.test.assertEquals(1, Object.keys(row).length, "Query with 1 field specification returned extra fields in result set.");
 
         // 3. Multiple fields (one for get function and one for is function)
         // with repetition
             result = $A.getQueryStatement().field('globalId').field('Concrete').field('globalId').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(2, $A.test.objectKeys(row).length, "Query with 2 field specification returned extra fields in result set.");
+            $A.test.assertEquals(2, Object.keys(row).length, "Query with 2 field specification returned extra fields in result set.");
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertEquals(cmp.isConcrete(), row.Concrete);
         },
@@ -166,7 +166,7 @@
             var result = $A.getQueryStatement().field('foo').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(1, $A.test.objectKeys(row).length, "Query with invalid field returned extra fields in result set.");
+            $A.test.assertEquals(1, Object.keys(row).length, "Query with invalid field returned extra fields in result set.");
             // Verify that the result set has undefined as the value for a
             // invalid query field
             $A.test.assertTrue(row.foo === undefined, "Invalid fields should result in 'undefined' values in result set.");
@@ -185,7 +185,7 @@
             row = result.rows[0];
             $A.test.assertTruthy(row.globalId);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
-            $A.test.assertEquals(3, $A.test.objectKeys(row).length, "Query returned extra fields in result set.");
+            $A.test.assertEquals(3, Object.keys(row).length, "Query returned extra fields in result set.");
             $A.test.assertTrue(row["null"] === undefined);
             $A.test.assertTrue(row.undefined === undefined);
 
@@ -207,7 +207,7 @@
             var result = $A.getQueryStatement().field('descriptor', 'getDef().getDescriptor().toString()').query();
             this.verifyQueryResultCount(result, 2);
             var row = result.rows[0];
-            $A.test.assertEquals(1, $A.test.objectKeys(row).length, "Query returned extra fields in result set.");
+            $A.test.assertEquals(1, Object.keys(row).length, "Query returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString() , row.descriptor,
                     "Query failed to return correct result for derived field");
 
@@ -215,7 +215,7 @@
             result = $A.getQueryStatement().field('descriptor', 'getDef().getDescriptor().toString()').field('concrete', 'isConcrete()').field('globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, $A.test.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString(), row.descriptor);
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
@@ -265,7 +265,7 @@
             var result = $A.getQueryStatement().fields('concrete, globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(2, $A.test.objectKeys(row).length, "Query with multiple fields is CSV format returned extra fields in result set.");
+            $A.test.assertEquals(2, Object.keys(row).length, "Query with multiple fields is CSV format returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
 
@@ -276,7 +276,7 @@
             /**
              * result = $A.getQueryStatement().fields(['concrete', 'globalId']).query();
              * this.verifyQueryResultCount(result, 2); row = result.rows[0];
-             * $A.test.assertEquals(2, $A.test.objectKeys(row).length, "Query with
+             * $A.test.assertEquals(2, Object.keys(row).length, "Query with
              * multiple fields in array format returned extra fields in result
              * set."); $A.test.assertEquals(cmp.isConcrete(), row.concrete);
              * $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
@@ -289,7 +289,7 @@
             var result = $A.getQueryStatement().fields('concrete, foo, globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, $A.test.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertTrue( row.foo == undefined);
@@ -298,7 +298,7 @@
             var result = $A.getQueryStatement().fields('concrete, getDef().getDescriptor().toString(), globalId').query();
             this.verifyQueryResultCount(result, 2);
             row = result.rows[0];
-            $A.test.assertEquals(3, $A.test.objectKeys(row).length, "Query with multiple derived fields returned extra fields in result set.");
+            $A.test.assertEquals(3, Object.keys(row).length, "Query with multiple derived fields returned extra fields in result set.");
             $A.test.assertEquals(cmp.isConcrete(), row.concrete);
             $A.test.assertEquals(cmp.getGlobalId(), row.globalId);
             $A.test.assertTrue(row["getDef().getDescriptor().toString()"] == undefined);
@@ -344,7 +344,7 @@
                         .field("desc","getDef().getDescriptor().toString()")
                         .query();
             this.verifyQueryResultCount(result, 1);
-            $A.test.assertEquals(1, $A.test.objectKeys(result.rows[0]).length, "Query returned extra fields in result set.");
+            $A.test.assertEquals(1, Object.keys(result.rows[0]).length, "Query returned extra fields in result set.");
             $A.test.assertEquals(cmp.getDef().getDescriptor().toString() , result.rows[0].desc);
             // Where clause on unselected fields
             try{

@@ -26,13 +26,16 @@ function lib() { //eslint-disable-line no-unused-vars
 
         // Private methods
         function createInstanceFromDef(containerDef, containerConfig, containerVP) {
+
+            // clone the config in case upstream callers re-use config
+            var clonedConfig = $A.util.apply({}, containerConfig, true, true); 
             var clonedDef = $A.util.apply({}, containerDef, true, true); // clone the cmp def
 
             // Remove flavor from attrubutes before merge
-            clonedDef.flavor = containerConfig.flavor;
-            delete containerConfig.flavor; 
+            clonedDef.flavor = clonedConfig.flavor;
+            delete clonedConfig.flavor; 
 
-            $A.util.apply(clonedDef.attributes.values, containerConfig); // merge panel config with DefRef
+            $A.util.apply(clonedDef.attributes.values, clonedConfig); // merge panel config with DefRef
             return $A.newCmp(clonedDef, containerVP);
         }
 

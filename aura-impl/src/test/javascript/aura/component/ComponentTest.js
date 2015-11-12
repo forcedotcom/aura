@@ -367,9 +367,9 @@ Test.Aura.Component.ComponentTest=function(){
         }
     }//end of [Fixture] Index()
 
-    [ Fixture ]
+    [Fixture]
     function superRender() {
-        [ Fact ]
+        [Fact]
         function ReturnsValueFromSuperComponentRender() {
             // Arrange
             var expected = "SuperRender";
@@ -407,14 +407,14 @@ Test.Aura.Component.ComponentTest=function(){
         }
     }
 
-    [ Fixture ]
+    [Fixture]
     function render() {
         var mockSuperComponent = {
             render: function() {
                 return "SuperRender";
             }
         };
-        [ Fact ]
+        [Fact]
         function CallsOwnRenderWhenHasOwnRender() {
             // Arrange
             var expected = "Render";
@@ -436,13 +436,10 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.Equal(expected, actual);
         }
 
-        [ Fact ]
+        [Fact]
         function CallsSuperComponentRenderWhenNoOwnRender() {
             // Arrange
             var expected = "SuperRender";
-            var mockRenderer = {
-                    render: function() {return expected}
-                };
             var actual = null;
             mockFramework(function() {
                 var target = new Aura.Component.Component({},true);
@@ -457,9 +454,9 @@ Test.Aura.Component.ComponentTest=function(){
         }
     }
 
-    [ Fixture ]
+    [Fixture]
     function GetDef() {
-        [ Fact ]
+        [Fact]
         function ReturnsNullForInvalidComponent() {
             // Arrange
             var target = null;
@@ -475,7 +472,7 @@ Test.Aura.Component.ComponentTest=function(){
             Assert.Null(actual);
         }
 
-        [ Fact ]
+        [Fact]
         function ReturnsComponentDef() {
             // Arrange
             var expected = "Expected ComponentDef";

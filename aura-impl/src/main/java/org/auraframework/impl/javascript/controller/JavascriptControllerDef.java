@@ -38,8 +38,6 @@ import com.google.common.collect.Sets;
  */
 public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> implements ControllerDef {
 
-    /**
-     */
     private static final long serialVersionUID = 133829572661899255L;
     private final Map<String, JavascriptActionDef> actionMap;
     private final Set<PropertyReference> expressionRefs;
@@ -109,9 +107,9 @@ public class JavascriptControllerDef extends DefinitionImpl<ControllerDef> imple
             return new JavascriptControllerDef(this);
         }
     }
-    
+
     @Override
     public boolean isLocal() {
-    	return false;
+        return false;
     }
 }

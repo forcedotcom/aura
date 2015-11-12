@@ -43,7 +43,6 @@
     },
 
     testAddDuplicateValueProvider: {
-        attributes:{ handleSystemError: true },
         test: function(component) {
             var cgvp = new CustomGlobalValueProvider();
             $A.addValueProvider('$Custom', cgvp);
@@ -56,7 +55,6 @@
     },
 
     testAddValueProvider_InvalidType: {
-        attributes:{ handleSystemError: true },
         test: function(component){
             var cgvp = new CustomGlobalValueProvider();
             try {
@@ -68,7 +66,6 @@
     },
 
     testAddValueProvider_InvalidName: {
-        attributes:{ handleSystemError: true },
         test: function(component){
             var cgvp = new CustomGlobalValueProvider();
             try {
@@ -80,7 +77,6 @@
     },
 
     testAddValueProvider_AuraReserved: {
-        attributes:{ handleSystemError: true },
         test: function(component){
             var cgvp = new CustomGlobalValueProvider();
             try {
@@ -92,7 +88,6 @@
     },
 
     testAddValueProvider_ValueProviderMissing: {
-        attributes:{ handleSystemError: true },
         test: function(component){
             try {
                 $A.addValueProvider('$Custom', null);

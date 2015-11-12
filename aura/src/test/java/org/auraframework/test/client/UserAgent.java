@@ -38,6 +38,8 @@ public enum UserAgent {
     IE11_WINDOWS_PHONE_8_1_SDK(
             "Mozilla/5.0 (Windows Phone 8.1; ARM; Trident/7.0; Touch; rv:11; IEMobile/11.0) like Android 4.1.2; compatible) like iPhone OS 7_0_3 Mac OS X WebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.99 Mobile Safari /537.36"),
     IE11_WINDOWS_RT_8_1("Mozilla/5.0 (compatible; MSIE 11.0; Windows NT 6.3; ARM; Trident/7.0)"),
+    // Microsoft Edge, it's not official supported yet. Conservatively, we use IE12 for now, since edge starts from 12.
+    IE12("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10240"),
     FIREFOX("Mozilla/6.0 (Windows NT 6.2; WOW64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"),
     SAFARI6(
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.73.11 (KHTML, like Gecko) Version/6.1.1 Safari/537.73.11"),

@@ -61,11 +61,12 @@ public class JavascriptMockActionHandler extends JavascriptMockHandler<Controlle
 
     @Override
     protected ControllerDef getDefaultBaseDefinition() throws QuickFixException {
-    	ControllerDef def = getTargetDescriptor().getDef().getLocalControllerDef();
-    	if (def == null) {
-    		throw new InvalidDefinitionException("Unable to locate the server controller", getLocation());
-    	}
-    	return def;
+        for (DefDescriptor<ControllerDef> desc : getTargetDescriptor().getDef().getControllerDefDescriptors()) {
+            if ("java".equals(desc.getPrefix())) {
+                return desc.getDef();
+            }
+        }
+        throw new InvalidDefinitionException("Unable to locate the server controller", getLocation());
     }
 
     @Override

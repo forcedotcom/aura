@@ -27,12 +27,12 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.auraframework.Aura;
 import org.auraframework.builder.BaseComponentDefBuilder;
 import org.auraframework.def.ActionDef;
+import org.auraframework.def.ActionDef.ActionType;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.AttributeDefRef;
 import org.auraframework.def.BaseComponentDef;
@@ -73,11 +73,17 @@ import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraUnhandledException;
-import org.auraframework.throwable.quickfix.*;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.FlavorNameNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
+import org.auraframework.throwable.quickfix.InvalidExpressionException;
+import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public abstract class BaseComponentDefImpl<T extends BaseComponentDef> extends
 RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
@@ -98,6 +104,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
     private final List<DefDescriptor<RendererDef>> rendererDescriptors;
     private final List<DefDescriptor<HelperDef>> helperDescriptors;
     private final List<DefDescriptor<ResourceDef>> resourceDescriptors;
+    private final DefDescriptor<ControllerDef> compoundControllerDescriptor;
     private final DefDescriptor<DesignDef> designDefDescriptor;
     private final DefDescriptor<SVGDef> svgDefDescriptor;
 
@@ -172,7 +179,12 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         this.dynamicallyFlavorable = builder.dynamicallyFlavorable;
 
         this.expressionRefs = AuraUtil.immutableSet(builder.expressionRefs);
-
+        if (getDescriptor() != null) {
+            this.compoundControllerDescriptor = DefDescriptorImpl.getAssociateDescriptor(getDescriptor(),
+                    ControllerDef.class, DefDescriptor.COMPOUND_PREFIX);
+        } else {
+            this.compoundControllerDescriptor = null;
+        }
         this.hashCode = AuraUtil.hashCode(super.hashCode(), events, controllerDescriptors, modelDefDescriptor,
                 extendsDescriptor, interfaces, methodDefs, rendererDescriptors, helperDescriptors, resourceDescriptors,
                 imports);
@@ -782,22 +794,21 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
         return ret;
 	}
-    
+
     @Override
-    public List<ControllerDef> getLocalControllerDefs() throws QuickFixException {
-        List<ControllerDef> ret = new ArrayList<>();
-        for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
-        	ControllerDef def = desc.getDef();
-            if (def.isLocal()) {
-            	ret.add(def);
+    public ControllerDef getControllerDef() throws QuickFixException {
+        if (controllerDescriptors.isEmpty()) {
+            if (extendsDescriptor != null) {
+                return getSuperDef().getControllerDef();
+            } else {
+                return null;
             }
+        } else {
+            return compoundControllerDescriptor.getDef();
         }
-        if (extendsDescriptor != null) {
-            ret.addAll(getSuperDef().getLocalControllerDefs());
-        }
-        return ret;
     }
-            
+
+
     @Override
     public ControllerDef getLocalControllerDef() throws QuickFixException {
         for (DefDescriptor<ControllerDef> desc : controllerDescriptors) {
@@ -972,6 +983,16 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         return this.clientComponentClass;
     }
 
+    public boolean hasServerAction(ControllerDef controllerDef) {
+    	Map<String, ? extends ActionDef> actionDefs = controllerDef.getActionDefs();
+        for (ActionDef actionDef : actionDefs.values()) {
+            if (actionDef.getActionType() == ActionType.SERVER) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Serialize this component to json. The output will include all of the attributes, events, and handlers inherited.
      * It doesn't yet include inherited ComponentDefRefs, but maybe it should.
@@ -996,27 +1017,9 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("flavoredStyleDef", getFlavoredStyleDef());
                 }
 
-                List<ControllerDef> controllerDefList = getLocalControllerDefs();
-                if (controllerDefList != null && !controllerDefList.isEmpty()) {
-                    json.writeMapKey("controllerDef");
-                    json.writeMapBegin();
-
-                    // Create a java controller signature
-                    DefDescriptor<ComponentDef> compDesc = DefDescriptorImpl.getAssociateDescriptor(descriptor, ComponentDef.class,
-                    		DefDescriptor.JAVA_PREFIX);
-                    json.writeMapEntry("descriptor", compDesc);
-
-                    json.writeMapKey("actionDefs");
-                    json.writeArrayBegin();
-
-                    for (ControllerDef controllerDef : controllerDefList) {
-                        for (Entry<String, ? extends ActionDef> actionDefEntry: controllerDef.getActionDefs().entrySet()) {
-                        	json.writeArrayEntry(actionDefEntry.getValue());
-                        }
-                    }
- 
-                    json.writeArrayEnd();
-                    json.writeMapEnd();
+                ControllerDef controllerDef = getControllerDef();
+                if (controllerDef != null && hasServerAction(controllerDef)) {
+                    json.writeMapEntry("controllerDef", controllerDef);
                 }
 
                 json.writeMapEntry("modelDef", getModelDef());
@@ -1117,7 +1120,7 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
         }
     }
 
-    protected abstract void serializeFields(Json json) throws IOException,
+	protected abstract void serializeFields(Json json) throws IOException,
     QuickFixException;
 
     /**

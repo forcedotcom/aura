@@ -16,7 +16,7 @@
 ({
   browsers: ["-IE7","-IE8"],
   
-  ASSISTIVE_SORT_TEXT : "Sort",
+  ASSISTIVE_SORT_TEXT : "Sort ",
   
   /**************************************************HELPER FUNCTIONS**************************************************/
   

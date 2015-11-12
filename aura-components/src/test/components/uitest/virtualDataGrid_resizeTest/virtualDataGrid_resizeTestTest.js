@@ -17,12 +17,12 @@
 	browsers: ["-IE7","-IE8"],
 	
 	WIDTHS : {
-		initialWidths  : [200, 400, 100],
-		smallerWidths  : [100, 300, 75],
-		smallestWidths : [50, 50, 50]
+		initialWidths  : [200, 400, 100, 50],
+		smallerWidths  : [100, 300, 75, 50],
+		smallestWidths : [50, 50, 50, 50]
 	},
 	
-	COLUMNS : ["Id", "Name", "Grade"],
+	COLUMNS : ["Id", "Name", "Grade", "Actions"],
 	
 	testHandlesExist : {
 		test : function(cmp) {

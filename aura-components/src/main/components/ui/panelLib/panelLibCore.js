@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function lib(scrollUtil) { //eslint-disable-line no-unused-vars
+function lib(scrollUtil, focusUtil, trap) { //eslint-disable-line no-unused-vars
     'use strict';
 
     var lib = { //eslint-disable-line no-shadow, no-unused-vars
@@ -81,7 +81,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
         /**
          * returns the key event handler function that do things based on the config
          * @param cmp
-         * @param config {closeOnEsc, trapFocus, closeOnTabOut}
+         * @param config {closeOnEsc, closeOnTabOut}
          * @param closeAction the caller defined close action
          * @returns {Function}
          */
@@ -115,15 +115,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                         focusables = me.getFocusables(cmp.getElement());
                     }
                         
-                    if (focusables && config.trapFocus) {
-                        if (current === focusables.last && !shiftPressed) {
-                            $A.util.squash(event, true);
-                            focusables.first.focus();
-                        } else if (current === focusables.first && shiftPressed) {
-                            $A.util.squash(event, true);
-                            focusables.last.focus();
-                        }
-                    } else if (focusables && config.closeOnTabOut) {
+                    if (focusables && config.closeOnTabOut) {
                         if (current === focusables.last && !shiftPressed) {
                             $A.util.squash(event, true);
                             if ($A.util.isFunction(closeAction)) {
@@ -199,10 +191,18 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
+                var el;
 
                 if(!cmp.isValid()) {
                     return;
                 }
+
+                el = cmp.getElement();
+                if(el && config.trapFocus) {
+                    trap.activate(cmp.getElement());
+                    cmp._trappedFocus = true;
+                }
+
                 
                 if (animEl) {
                     $A.util.removeClass(animEl, 'transitioning ' + animName);
@@ -261,6 +261,9 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
             }
 
             cmp.set('v.visible', false);
+            if(cmp._trappedFocus) {
+                trap.deactivate();
+            }
 
             //endAnimationHandler: cleanup all classes and events
             var finishHandler = function () {
@@ -438,7 +441,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          * @private
          */
         focusAllowed: function(el) {
-            return el && !el.disabled && !/hidden/i.test(el.type) && this.isVisible(el);
+            return el && focusUtil.isTabbable(el);
         },
 
         /**

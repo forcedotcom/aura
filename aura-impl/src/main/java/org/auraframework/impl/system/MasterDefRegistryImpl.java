@@ -150,6 +150,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private final RegistryTrie delegateRegistries;
 
     private final Map<DefDescriptor<? extends Definition>, Definition> defs;
+    private final Set<DefDescriptor<? extends Definition>> defNotCacheable = Sets.newHashSet();
 
     private Set<DefDescriptor<? extends Definition>> localDescs;
 
@@ -459,6 +460,10 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private boolean hasLocalDef(DefDescriptor<?> descriptor) {
         return (original != null && original.defs.containsKey(descriptor)) || defs.containsKey(descriptor);
     }
+    
+    private boolean localDefNotCacheable(DefDescriptor<?> descriptor) {
+        return (defNotCacheable.contains(descriptor) || (original != null && original.defNotCacheable.contains(descriptor)));
+    }
 
     private <D extends Definition> D getLocalDef(DefDescriptor<D> descriptor) {
         if (original != null && original.defs.containsKey(descriptor)) {
@@ -499,6 +504,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 compiling.built = !localDef.isValid();
                 if (compiling.built) {
                     localDef.validateDefinition();
+                }
+                if (localDefNotCacheable(compiling.descriptor)) {
+                    currentCC.shouldCacheDependencies = false;
                 }
                 return true;
             } else {
@@ -549,6 +557,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
                 boolean qualified = isOkForDependencyCaching(compiling.descriptor);
 
                 currentCC.shouldCacheDependencies = qualified;
+                if (!qualified) {
+                    defNotCacheable.add(compiling.descriptor);
+                }
             }
         }
 
@@ -1221,6 +1232,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
             throw new AuraRuntimeException("Invalid def has no descriptor");
         }
         defs.put(desc, def);
+        defNotCacheable.add(desc);
         if (localDescs == null) {
             localDescs = Sets.newHashSet();
         }

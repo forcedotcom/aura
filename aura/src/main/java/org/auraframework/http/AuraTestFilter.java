@@ -57,6 +57,7 @@ import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
+import org.auraframework.system.Client;
 import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -72,6 +73,7 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.net.HttpHeaders;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
@@ -127,6 +129,41 @@ public class AuraTestFilter implements Filter {
         if ("GET".equals(request.getMethod())) {
             String contextPath = request.getContextPath();
             String uri = request.getRequestURI();
+            String browserType = request.getParameter("aura.browserType");
+            if(browserType == null) { 
+            	//read it from request header
+            	String ua = request.getHeader(HttpHeaders.USER_AGENT);
+            	if(ua != null) {
+            		ua = ua.toLowerCase();
+            		if(ua.contains("chrome")) {
+            			browserType = "GOOGLECHROME";
+            		} else if (ua.contains("safari")) {
+            			browserType = "SAFARI";
+            		} else if (ua.contains("firefox")) {
+            			browserType = "FIREFOX";
+            		} else if (ua.contains("ipad")) {
+            			browserType = "IPAD";
+            		} else if (ua.contains("iphone")) {
+            			browserType = "IPHONE";
+            		} else if (ua.contains("msie 10")) {
+            			browserType = "IE10";
+            		} else if (ua.contains("msie 9")) {
+            			browserType = "IE9";
+            		} else if (ua.contains("msie 8")) {
+            			browserType = "IE8";
+            		} else if (ua.contains("msie 7")) {
+            			browserType = "IE7";
+            		} else if (ua.contains("msie 6")) {
+            			browserType = "IE6";
+            		} else if (ua.contains("trident/7.0")) {
+            			browserType = "IE11";
+            		} else if (ua.contains("edge/12")) {
+            			browserType = "IE12";
+            		} else {
+            			browserType = "OTHER";
+            		}
+            	}
+            }
             String path;
             if (uri.startsWith(contextPath)) {
                 path = uri.substring(contextPath.length());
@@ -156,9 +193,10 @@ public class AuraTestFilter implements Filter {
                             TestSuiteDef suiteDef = getTestSuite(targetDescriptor);
                             testDef = getTestCase(suiteDef, testToRun);
                             testDef.validateDefinition();
-                            testContextAdapter.getTestContext(testDef.getDescriptor().getQualifiedName());
+                            testDef.setCurrentBrowser(browserType);
+                            testContextAdapter.getTestContext(testDef.getQualifiedName());
                             testContextAdapter.release();
-                            testContext = testContextAdapter.getTestContext(testDef.getDescriptor().getQualifiedName());
+                            testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
                             targetUri = buildJsTestTargetUri(targetDescriptor, testDef);
                         } catch (QuickFixException e) {
                             ((HttpServletResponse) res).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -412,7 +450,7 @@ public class AuraTestFilter implements Filter {
                         }
                     });
             TestContext testContext = Aura.get(TestContextAdapter.class).getTestContext(
-                    testDef.getDescriptor().getQualifiedName());
+                    testDef.getQualifiedName());
             testContext.getLocalDefs().add(targetDef);
             return createURI(newDescriptor.getNamespace(), newDescriptor.getName(),
                     newDescriptor.getDefType(), null, Authentication.AUTHENTICATED.name(), null);

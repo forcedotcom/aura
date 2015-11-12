@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 /*jslint sub: true */
+
 /**
  * @class ComponentDef
  *
@@ -39,13 +40,6 @@ function ComponentDef(config) {
     this.modelDef = config["modelDef"] ? $A.componentService.createModelDef(config["modelDef"]) : undefined;
     this.methodDefs = config["methodDefs"] ? config["methodDefs"]: undefined;
 
-    // Initialize the concrete component class if provided
-    var componentClassDef = config["componentClass"];
-    if(componentClassDef && !$A.componentService.hasComponentClass(config["descriptor"])) {
-    	componentClassDef = $A.util.json.decode(componentClassDef);
-    	componentClassDef();
-    }
-
     this.interfaces = {};
     var intfConfig = config["interfaces"];
     if (intfConfig) {
@@ -54,6 +48,13 @@ function ComponentDef(config) {
             var intfName = intf.getNamespace() + ":" + intf.getName();
             this.interfaces[intfName] = true;
         }
+    }
+    
+    // Initialize the concrete component class if provided
+    var componentClassDef = config["componentClass"];
+    if (componentClassDef && !$A.componentService.hasComponentClass(config["descriptor"])) {
+		componentClassDef = $A.util.json.decode(componentClassDef);
+    	componentClassDef();
     }
 
     var appHandlerDefs;

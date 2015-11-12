@@ -588,7 +588,7 @@ Action.prototype.runDeprecated = function(evt) {
     this.state = "RUNNING";
     $A.getContext().setCurrentAccess(this.cmp);
     try {
-        this.returnValue = this.meth.call(this, this.cmp, evt, this.cmp['helper']);
+        this.returnValue = this.meth.call(this, LockerService.wrapComponent(this.cmp), evt, this.cmp['helper']);
         this.state = "SUCCESS";
     } catch (e) {
         this.markException(e);
@@ -1053,7 +1053,7 @@ Action.prototype.isStorable = function() {
 /**
  * Sets this action as a 'caboose'.
  *
- * This is only relevant for server side actions. 
+ * This is only relevant for server side actions.
  * This action will not be sent to the server until there is some other action
  * that would cause a server round-trip or after 60s since last send.
  *
@@ -1167,7 +1167,7 @@ Action.prototype.markException = function(e) {
 
 /**
  * Mark the current action as having an error and finish the Action.
- * 
+ *
  * @param context The current context.
  * @param e The error with which we want to mark the action.
  * @private

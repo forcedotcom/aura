@@ -476,6 +476,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
         var exporter = this.classConstructorExporter[descriptor];
         if (exporter) {
             var componentProperties = exporter();
+            
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;
             // No need to keep all these extra functions.

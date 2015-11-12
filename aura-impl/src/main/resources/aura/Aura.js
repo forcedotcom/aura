@@ -158,6 +158,9 @@ window['$A'] = {};
 // -- Mode injection ------------------------------------------------------
 // #include {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"], "path" : "aura.AuraDevToolService"}
 
+//-- LockerService -----------------------------------------------------------
+//#include aura.locker.LockerService
+
 /**
  * @class Aura
  * @classdesc The Aura framework. Default global instance name is $A.

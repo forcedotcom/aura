@@ -2597,6 +2597,10 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
     );
 };
 
+AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
+	return this.namespaces.hasOwnProperty(namespace);
+};
+
 AuraClientService.prototype.allowAccess = function(definition, component) {
     if(definition&&definition.getDescriptor){
         var context;

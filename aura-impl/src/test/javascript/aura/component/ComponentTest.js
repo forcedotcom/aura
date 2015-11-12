@@ -121,6 +121,22 @@ Test.Aura.Component.ComponentTest=function(){
                     isUndefinedOrNull:function(){
                     }
                 }
+            },
+            "LockerService": {
+              unwrap: function(elements) {
+                return elements;
+              },
+              wrapComponent: function(component) {
+                return component;
+              }
+            },
+            "LockerKeyUtil": {
+              _getKey: function() {
+                return undefined;
+              }
+            },
+            "masterKey": {
+              name: "master"
             }
         };
         return Mocks.GetMocks(Object.Global(),mock)(during);

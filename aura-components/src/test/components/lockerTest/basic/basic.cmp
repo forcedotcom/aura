@@ -1,0 +1,7 @@
+<aura:component implements="aura:requireLocker">
+    <!-- DCHASMAN TODO using <script> instead of <ltng:require scripts="/resource/requireTest"/> -->
+	Hello from the LockerService!
+    <div aura:id="clickTest" class="clickTest">Click Me</div>
+    <ui:button aura:id="button" label="Press Me, I am secure!" press="{!c.onpress}"/>
+    <div aura:id="content"/>
+</aura:component>

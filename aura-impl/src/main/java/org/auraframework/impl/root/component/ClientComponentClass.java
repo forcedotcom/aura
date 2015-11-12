@@ -20,12 +20,14 @@ import java.io.IOException;
 import java.util.List;
 
 import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.ImportDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
@@ -88,8 +90,9 @@ public class ClientComponentClass {
     }
 
     private class ClientComponentClassWriter {
+		private static final String REQUIRE_LOCKER = "aura:requireLocker";
 
-        final BaseComponentDef def;
+		final BaseComponentDef def;
 
         final DefDescriptor<? extends BaseComponentDef> descriptor;
         final DefDescriptor<? extends BaseComponentDef> superDescriptor;
@@ -181,14 +184,41 @@ public class ClientComponentClass {
         }
 
         final private void writeClassExporter(Appendable out) throws IOException, QuickFixException {
+        	ConfigAdapter configAdapter = Aura.getConfigAdapter();
+			boolean requireLocker = false;
+			
+			if (configAdapter.isLockerServiceEnabled()) {
+				requireLocker = !configAdapter.isPrivilegedNamespace(this.descriptor.getNamespace());     	
+	        	if (!requireLocker) {
+		            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor(REQUIRE_LOCKER, InterfaceDef.class);
+		        	requireLocker = def.isInstanceOf(requireLockerDescr);
+	        	}
+			}
+        	
+    		out.append("function () {\n");
 
-        	out.append("function () {\n");
+        	if (requireLocker) {
+    	    	// Key the def so we can transfer the key to component instances
+        		out.append(String.format("var def = $A.componentService.getDef(\"%s\");", descriptor.getQualifiedName()));
+        		out.append("var locker = window[\"LockerService\"].createForDef(\n\"");
+        	}
 
-        	out.append(String.format("var %s = ", className));
-        	writeClassObjects(out);
-        	out.append(";\n");
+        	StringBuilder classObjects = new StringBuilder();
+        	
+        	classObjects.append(String.format("var %s = ", className));
+        	writeClassObjects(classObjects);
+        	classObjects.append(";\n");
 
-        	out.append(String.format("return %s;\n", className));
+        	classObjects.append(String.format("return %s;\n", className));
+
+        	// Escape the class objects for JavaScript strings if we are lockerizing
+        	out.append(requireLocker ? AuraTextUtil.escapeForJavascriptString(classObjects.toString()) : classObjects);
+        	
+        	if (requireLocker) {
+        		out.append("\", def);\n");
+        		out.append("return locker.$result;\n");
+        	}
+        	
         	out.append("}");
         }
 
@@ -203,5 +233,4 @@ public class ClientComponentClass {
         	out.append(");\n");
         }
     }
-
 }

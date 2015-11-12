@@ -52,5 +52,14 @@
         if (!$A.util.isUndefinedOrNull(labelComponent)) {
             helper.resetLabelPosition(cmp);
         }
+    },
+
+    focus: function(cmp, event, helper) {
+        var inputElement = helper.getInputElement(cmp);
+        if (inputElement) {
+            inputElement.focus();
+        }
     }
+
+
 })// eslint-disable-line semi

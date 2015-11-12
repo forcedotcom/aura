@@ -49,11 +49,14 @@
 }</pre>
         The component event <code>evt</code> is fired by the <code>activateTab</code> handler in <code>ui:tabset</code>.</p>
         
-        <p>This example retrieves a tabset and identifies the active tab by firing the <code>getActiveTab</code> event.
+        <p>This example retrieves a tabset and identifies the active tab by firing the <code>getActiveTab</code> event. The index corresponds to the tab position in the tab bar, the first being 0.
         
         <pre>var tabset = cmp.find("myTabset");
 var e = tabset.get("e.getActiveTab");
-//Set tab parameters using e.setParams()</pre>
+//Set tab parameters using e.setParams()
+ e.setParams({callback: function(result) {
+    var index = result.index;
+}}).fire();</pre>
         </p>
          <h4>Rendering a Tab Selectively</h4>
          <p>To determine if a tab and its content should be rendered, use <code>aura:if</code> to wrap the tab. This example doesn't render the second tab 
@@ -74,35 +77,49 @@ var e = tabset.get("e.getActiveTab");
         </pre>
         
         <h4>Adding Tabs and Content Dynamically</h4>
-        <p>A tab's content can be created dynamically using the <code>onActivated</code> attribute on <code>ui:tab</code>.
-        <pre>
-var tab = evt.getParam("tab");
-$A.componentService.newComponentAsync(this, function(newCmp){
-    tab.set("v.body", [newCmp]);
- }, {"componentDef": "markup://aura:text", 
-     "attributes":{"values": {"value":"New tab content"}}});        
-        </pre>
-        </p>
         <p>To add a tab dynamically, set the tab's parameters and fire the <code>addTab</code> event. The new tab will be added after the last tab. To change its position,
         set <code>index: 0</code> in <code>e.setParams()</code>, which adds a tab at the head of the tabset in this case.
         <pre>
 var e = cmp.find("myTabSet").get("e.addTab");
 e.setParams({tab: {
-                    "title": title,
-                    "name": name,
-                    "body": [{
-                               "componentDef": { descriptor:"markup://aura:text" },
-                                 "attributes": {
-                                     "values": { "value": content }
-                                 }
-                              }]
-                    }, index: 0
-             });
+    "title": title,
+    "name": name,
+    "body": [{
+               "componentDef": { descriptor:"markup://aura:text" },
+                 "attributes": {
+                     "values": { "value": content }
+                 }
+              }]
+    }, index: 0
+});
 e.fire();
         </pre>
         </p>
+        <h4>Removing a Tab</h4>
+        <p>To remove a tab, retrieve its index and fire the <code>removeTab</code> event.</p>
+<pre>var index = cmp.get("v.index");
+var container = cmp.get("v.targetContainer");
+// Get the removeTab event from the ui:tabset component
+var removeEvt = container.get("v.body")[0].get("e.removeTab");
+removeEvt.setParams({"index": index});
+removeEvt.fire();</pre>
+        <h4>Using an Overflow Menu</h4>
+        <p>When you have more tabs than can fit the container width, use an overflow menu to contain the additional tabs. Selecting an item from the overflow menu swaps it with the last tab in the tab bar.</p>
+<pre>&lt;ui:tabset aura:id="myTabs" class="overflowTabset" useOverflowMenu="true">
+    &lt;ui:tab title="My Tab">
+        &lt;!--Tab content here-->
+    &lt;/ui:tab>
+    &lt;!--More tabs here-->
+&lt;/ui:tabset></pre>
+	<p>For example, the container of the tabset is set to 600px. Any tabs beyond the width limit are contained in the overflow menu.</p>
+<pre>.THIS .overflowTabset {
+    width: 600px;
+}</pre>
     </aura:description>
     <aura:example name="tabset" ref="uiExamples:tabsetExample" label="Using ui:tabset">
         <p>This example shows different ways to implement a tabset.</p>
+    </aura:example>
+    <aura:example name="tabsetOverflow" ref="uitest:tabset_DynamicOverflowTest" label="Implementing Overflow Menus">
+        <p>Use an overflow menu if you expect to render a large number of tabs that won't fit the screen width.</p>
     </aura:example>
 </aura:documentation>

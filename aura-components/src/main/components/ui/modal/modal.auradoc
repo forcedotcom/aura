@@ -18,7 +18,29 @@
 
 <aura:documentation>
     <aura:description>
-        <p><code>ui:modal</code> represents a modal panel that has a header, footer, and close button. It allows only interaction within the modal panel when it's opened.
-        You can customize all parts of the modal panel, including sizing and positioning. See <code>ui:panel</code> for more information.</p>
+        <p><code>ui:modal</code> represents a modal panel that has a header, footer, and close button. It allows interaction only within the modal panel when it's opened.
+        You can customize all parts of the modal panel, including sizing and positioning. </p>
+        <p>To create a modal, set the <code>panelType</code> attribute to <code>modal</code> and fire the <code>ui:createPanel</code> event.</p>
+        <pre>$A.get('e.ui:createPanel').setParams({
+    panelType: 'modal',
+    visible: true,
+    panelConfig: {
+        title: 'Modal Header',
+        body: body,
+        flavor: 'myFlavor',
+        footer: footer
+        },
+        onCreate: function(panel){
+            //do something
+        }
+    }).fire();</pre>
+    <p>In your component, register the modal with the <code>ui:panelManager2</code> component.</p>
+    <pre>&lt;ui:panelManager2 aura:id="pm" useSharedContainer="true">
+    &lt;aura:set attribute="registeredPanels">
+        &lt;ui:panel alias="panel"/>
+        &lt;ui:modal alias="modal"/>
+    &lt;/aura:set>
+&lt;/ui:panelManager2></pre>
+        <p>See <code>ui:panel</code> for more information.</p>
     </aura:description>
 </aura:documentation>

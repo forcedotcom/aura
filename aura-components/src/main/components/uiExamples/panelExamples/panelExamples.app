@@ -45,7 +45,7 @@
     </section>
 
     <section class="managerContainers">
-        <ui:panelManager2 aura:id="pm" useSharedContainer="true">
+        <ui:panelManager2 aura:id="pm" >
             <aura:set attribute="registeredPanels">
                 <ui:panel alias="panel"/>
                 <ui:modal alias="modal"/>

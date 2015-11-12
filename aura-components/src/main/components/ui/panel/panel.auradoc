@@ -65,7 +65,20 @@
        
     }</pre>  
         <h4>Customizing the Panel Close Action</h4>
-        <p>By default, a close button is provided on the modal but you can provide your own close button. You can also create your own <code>closeAction</code> override. 
+        <p>By default, a close button is provided on the modal but you can provide your own close button.</p>
+<pre>&lt;aura:component>    
+    &lt;ui:panelManager2 aura:id="pm">
+        &lt;aura:set attribute="registeredPanels">
+            &lt;ui:panel alias="panel"/>
+            &lt;ui:modal alias="modal">
+                &lt;aura:set attribute="closeButton">
+                    &lt;!-- your custom close button here -->
+                &lt;/aura:set>
+            &lt;/ui:modal>
+        &lt;/aura:set>
+    &lt;/ui:panelManager2>
+&lt;/aura:component></pre>
+        <p>You can also create your own <code>closeAction</code> override. 
         To remove the close button and provide a custom action, set <code>showCloseButton</code> to false and <code>closeOnClickOut</code> to true. 
         Override the close action by passing in the <code>closeAction</code> function in your <code>panelConfig</code> attribute.
         The customized <code>closeAction</code> is called when the close button is clicked or when user press ESC key, click out, or tab out of the panel. The default <code>closeAction</code> hides and destroys the panel.

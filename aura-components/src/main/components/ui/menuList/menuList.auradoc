@@ -1,0 +1,43 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:documentation>
+	<aura:description>
+		<p>
+			This component is nested in a <code>ui:menu</code> component and can be used together with a <code>ui:menuTriggerLink</code> component.
+			Clicking the menu trigger displays the container with menu items.
+		</p>
+		<pre>&lt;ui:menu>
+    &lt;ui:menuTriggerLink aura:id="trigger" label="Click me to display menu items"/>
+    &lt;ui:menuList class="actionMenu" aura:id="actionMenu">
+        &lt;ui:actionMenuItem aura:id="item1" label="Item 1" click="{!c.doSomething}"/>
+        &lt;ui:actionMenuItem aura:id="item2" label="Item 2" click="{!c.doSomething}"/>
+        &lt;ui:actionMenuItem aura:id="item3" label="Item 3" click="{!c.doSomething}"/>
+        &lt;ui:actionMenuItem aura:id="item4" label="Item 4" click="{!c.doSomething}"/>
+   &lt;/ui:menuList>
+&lt;/ui:menu></pre>
+		<p><code>ui:menuList</code> can contain these components, which runs a client-side controller when clicked:
+			<ul>
+                <li><code>ui:actionMenuItem</code></li>
+                <li><code>ui:checkboxMenuItem</code></li>
+				<li><code>ui:radioMenuItem</code></li>
+				<li><code>ui:menuItemSeparator</code></li>
+			</ul>
+		</p>
+		<p>See <code>ui:menu</code> for more information.</p>
+	</aura:description>
+</aura:documentation>

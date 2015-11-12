@@ -16,10 +16,7 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extensible="true" implements="ui:visible" extends="ui:popupTarget"
-                dynamicallyFlavorable="true" description="A menu component that can contain menu items:
-                ui:actionMenuItem, ui:checkboxMenuItem, and ui:radioMenuItem, and a separator component
-                ui:menuItemSeparator. This component can be nested in a ui:menu component and can be used
-                together with a ui:menuTriggerLink component, which triggers the menu items.">
+                dynamicallyFlavorable="true" description="A menu component that contains menu items.">
     <aura:attribute access="GLOBAL" name="menuItems" type="List" description="A list of menu items set explicitly using instances of the Java class: aura.​components.​ui.MenuItem."/>
     <aura:attribute access="GLOBAL" name="visible" type="Boolean" default="{!false}" description="Controls the visibility of the menu. The default is false, which hides the menu."/>
     <aura:attribute name="focusItemIndex" type="Integer" default="0"

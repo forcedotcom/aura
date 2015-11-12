@@ -46,9 +46,14 @@
     <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs."/>
     <aura:handler name="matchText" action="{!c.matchText}"/>
     
+    <aura:registerEvent name="listExpand" type="ui:autocompleteListExpand" description="The event fired when the autocompleteList expands."/>
+    <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
+    
+    <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the autocompleteList collapses."/>
+    <aura:handler name="listCollapse" event="ui:autocompleteListCollapse" action="{!c.handleListCollapse}"/>
+    
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:set attribute="labelPosition" value="hidden"/>
-    <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
 
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
         <ui:inputTextAreaForAutocomplete aura:id="input" 

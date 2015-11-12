@@ -156,7 +156,7 @@ public class MockingUtilUITest extends WebDriverTestCase {
         DefDescriptor<ComponentDef> cmpDefDescriptor = addSourceAutoCleanup(ComponentDef.class, String
                 .format(baseComponentTag, String.format("provider='%s'", providerDefDescriptor.getQualifiedName()),
                         "<aura:attribute name='echo' type='String'/>{!v.echo}"));
-        String url = String.format("/%s/%s.cmp", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName());
+        String url = String.format("/%s/%s.cmp", cmpDefDescriptor.getNamespace(), cmpDefDescriptor.getName());//  /string/thing1.cmp
 
         // no mocking - provider output isn't valid for this component (or any
         // probably), but the def is valid

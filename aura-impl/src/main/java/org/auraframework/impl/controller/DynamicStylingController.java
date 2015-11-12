@@ -26,8 +26,10 @@ import java.util.Set;
 import org.auraframework.Aura;
 import org.auraframework.css.StyleContext;
 import org.auraframework.css.TokenValueProvider;
+import org.auraframework.def.BaseStyleDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
+import org.auraframework.def.FlavoredStyleDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TokensDef;
 import org.auraframework.impl.css.parser.CssPreprocessor;
@@ -90,13 +92,13 @@ public final class DynamicStylingController {
         }
 
         // add style def descriptors based on app dependencies
-        Set<DefDescriptor<StyleDef>> styles = new LinkedHashSet<>(512);
+        Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>(512);
         String uid = context.getUid(context.getLoadingApplicationDescriptor());
 
         for (DefDescriptor<?> dependency : context.getDefRegistry().getDependencies(uid)) {
-            if (dependency.getDefType() == DefType.STYLE) {
+            if (dependency.getDefType() == DefType.STYLE || dependency.getDefType() == DefType.FLAVORED_STYLE) {
                 @SuppressWarnings("unchecked")
-                DefDescriptor<StyleDef> desc = ((DefDescriptor<StyleDef>) dependency);
+                DefDescriptor<? extends BaseStyleDef> desc = ((DefDescriptor<? extends BaseStyleDef>) dependency);
                 styles.add(desc);
             }
         }
@@ -112,10 +114,22 @@ public final class DynamicStylingController {
                 if (style.exists()) {
                     styles.add(style);
                 }
+                DefDescriptor<FlavoredStyleDef> flavor = defService.getDefDescriptor(desc, DefDescriptor.CSS_PREFIX,
+                        FlavoredStyleDef.class);
+                if (flavor.exists()) {
+                    styles.add(flavor);
+                }
             }
         } else {
             for (String name : clientLoaded) {
-                styles.add(defService.getDefDescriptor(name, StyleDef.class));
+                DefDescriptor<StyleDef> styleDef = defService.getDefDescriptor(name, StyleDef.class);
+                if (styleDef.exists()) {
+                    styles.add(styleDef);
+                }
+                DefDescriptor<FlavoredStyleDef> flavorDef = defService.getDefDescriptor(name, FlavoredStyleDef.class);
+                if (flavorDef.exists()) {
+                    styles.add(flavorDef);
+                }
             }
         }
 
@@ -135,9 +149,9 @@ public final class DynamicStylingController {
      * @param defDescriptor Find style dependencies of this def.
      * @return The list of style dependencies.
      */
-    protected static Set<DefDescriptor<StyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
+    protected static Set<DefDescriptor<? extends BaseStyleDef>> getAllStyleDependencies(DefDescriptor<?> defDescriptor)
             throws QuickFixException {
-        Set<DefDescriptor<StyleDef>> styles = new LinkedHashSet<>();
+        Set<DefDescriptor<? extends BaseStyleDef>> styles = new LinkedHashSet<>();
 
         DefinitionService defService = Aura.getDefinitionService();
         AuraContext context = Aura.getContextService().getCurrentContext();
@@ -150,6 +164,11 @@ public final class DynamicStylingController {
                 if (style.exists()) {
                     styles.add(style);
                 }
+
+                DefDescriptor<FlavoredStyleDef> flavor = defService.getDefDescriptor(dep, DefDescriptor.CSS_PREFIX, FlavoredStyleDef.class);
+                if (flavor.exists()) {
+                    styles.add(flavor);
+                }
             }
         }
 
@@ -157,7 +176,7 @@ public final class DynamicStylingController {
     }
 
     /** utility that actual does the css processing */
-    private static String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<StyleDef>> styles)
+    private static String extractStyles(Iterable<DefDescriptor<TokensDef>> tokens, Iterable<DefDescriptor<? extends BaseStyleDef>> styles)
             throws QuickFixException {
 
         // custom style context to include our one-off token descriptors
@@ -171,9 +190,9 @@ public final class DynamicStylingController {
         // pre-filter style defs
         // 1: skip over any styles without expressions
         // 2: skip any styles not using a relevant var (removed... todo?)
-        List<StyleDef> filtered = new ArrayList<>();
-        for (DefDescriptor<StyleDef> style : styles) {
-            StyleDef def = style.getDef();
+        List<BaseStyleDef> filtered = new ArrayList<>();
+        for (DefDescriptor<? extends BaseStyleDef> style : styles) {
+            BaseStyleDef def = style.getDef();
             if (!def.getExpressions().isEmpty()) {
                 filtered.add(def);
             }
@@ -183,7 +202,7 @@ public final class DynamicStylingController {
         StringBuilder out = new StringBuilder(512);
         ConditionalsValidator conditionalsValidator = new ConditionalsValidator();
 
-        for (StyleDef style : filtered) {
+        for (BaseStyleDef style : filtered) {
             // in dev mode, output a comment indicating which style def this css came from
             if (context.isDevMode()) {
                 out.append(String.format("/* %s */\n", style.getDescriptor()));
@@ -231,7 +250,7 @@ public final class DynamicStylingController {
         private final TokenValueProvider tvp;
 
         /** creates a new instance scoped to the specified set of token names */
-        public MagicEraser(Set<String> tokens, DefDescriptor<StyleDef> style) {
+        public MagicEraser(Set<String> tokens, DefDescriptor<? extends BaseStyleDef> style) {
             this.tokens = tokens;
             this.tvp = Aura.getStyleAdapter().getTokenValueProvider(style);
         }

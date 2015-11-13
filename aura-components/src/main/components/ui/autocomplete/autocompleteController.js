@@ -135,11 +135,5 @@
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
         concreteHelper.handleListExpand(component, event);
-
-        component.get("e.listExpand").fire();
-    },
-
-    handleListCollapse: function(component, event) {
-        component.get("e.listCollapse").fire();
     }
 })// eslint-disable-line semi

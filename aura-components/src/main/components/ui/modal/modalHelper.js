@@ -17,7 +17,7 @@
     init: function(cmp) {
     	var closeAction = cmp.get("v.closeAction");
         //handler for tab key to trap the focus within the modal
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true}, closeAction);
+        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
         this.initCloseBtn(cmp);
     },
     
@@ -74,7 +74,6 @@
             animationName: 'movefrom' + cmp.get('v.animation'),
             animationEl: panel,
             autoFocus: autoFocus,
-            trapFocus: true,
             onFinish: function() {
             	var handler = self._getKeyHandler(cmp);
             	if ($A.util.isFunction(handler)) {

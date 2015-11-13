@@ -68,6 +68,11 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     }
 
     @Override
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
+    }
+
+    @Override
     public Object getValue() {
         return value;
     }

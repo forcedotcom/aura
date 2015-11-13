@@ -15,27 +15,12 @@
  */
 package org.auraframework.def;
 
-import org.auraframework.throwable.quickfix.QuickFixException;
-
 /**
+ * A definition that is a child of a {@link RootDefinition}.
  */
-public interface AttributeDef extends Definition, ParentedDef {
-    @Override
-    DefDescriptor<AttributeDef> getDescriptor();
-
-    public static enum SerializeToType {
-        SERVER, BOTH, NONE, INVALID
-    };
-
+public interface ParentedDef {
     /**
-     * @return The default value to be used for instances of this AttributeDef
-     *         that do not have a Value explicitly set
+     * Gets the parent descriptor.
      */
-    AttributeDefRef getDefaultValue();
-
-    TypeDef getTypeDef() throws QuickFixException;
-
-    boolean isRequired();
-
-    SerializeToType getSerializeTo();
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

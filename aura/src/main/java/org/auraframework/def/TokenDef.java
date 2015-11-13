@@ -22,7 +22,7 @@ import java.util.Set;
  * <p>
  * <aura:token name="xxx" value="xxx"/>
  */
-public interface TokenDef extends Definition {
+public interface TokenDef extends Definition, ParentedDef {
     @Override
     DefDescriptor<TokenDef> getDescriptor();
 
@@ -33,6 +33,7 @@ public interface TokenDef extends Definition {
 
     /**
      * Gets the set of allowed properties, or an empty set if any property is allowed.
+     *
      * @return an ImmutableSet of property names.
      */
     Set<String> getAllowedProperties();

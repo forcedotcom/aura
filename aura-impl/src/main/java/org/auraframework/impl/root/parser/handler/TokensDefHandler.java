@@ -31,7 +31,6 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.token.TokensDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
@@ -47,9 +46,16 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
     private static final String ATTRIBUTE_PROVIDER = "provider";
     private static final String ATTRIBUTE_MAP_PROVIDER = "mapProvider";
 
-    protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_EXTENDS, ATTRIBUTE_PROVIDER, ATTRIBUTE_MAP_PROVIDER, ATTRIBUTE_SUPPORT,
-            ATTRIBUTE_DESCRIPTION, ATTRIBUTE_ACCESS, RootTagHandler.ATTRIBUTE_API_VERSION);
+    private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_ACCESS, ATTRIBUTE_EXTENDS, RootTagHandler.ATTRIBUTE_API_VERSION)
+            .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
+            .build();
+
+    private final static Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_PROVIDER, ATTRIBUTE_MAP_PROVIDER)
+            .addAll(ALLOWED_ATTRIBUTES)
+            .addAll(RootTagHandler.PRIVILEGED_ALLOWED_ATTRIBUTES)
+            .build();
 
     private final TokensDefImpl.Builder builder = new TokensDefImpl.Builder();
 
@@ -71,7 +77,7 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -121,9 +127,9 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             }
             builder.addTokenDef(def);
 
-        } else if (TokensImportDefHandler.TAG.equalsIgnoreCase(tag)) {
-            // imports must come before tokens. This is mainly for simplifying the token lookup implementation, while still
-            // matching the most common expected usages of imports vs. declared tokens.
+        } else if (isInPrivilegedNamespace && TokensImportDefHandler.TAG.equalsIgnoreCase(tag)) {
+            // imports must come before tokens. This is mainly for simplifying the token lookup implementation,
+            // while still matching the most common expected usages of imports vs. declared tokens.
             if (!builder.tokens().isEmpty()) {
                 error("tag %s must come before all declared tokens", TokensImportDefHandler.TAG);
             }

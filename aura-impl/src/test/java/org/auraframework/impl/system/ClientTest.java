@@ -44,6 +44,9 @@ public class ClientTest extends AuraImplTestCase {
         pairs.put(UserAgent.IE11_WINDOWS_PHONE_8_1.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11_WINDOWS_RT_8_1.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11_WINDOWS_PHONE_8_1_SDK.getUserAgentString(), Type.IE11);
+        // Microsoft Edge (W-2750408). 
+        // Update this if we change the type name when officially support Edge.
+        pairs.put(UserAgent.IE12.getUserAgentString(), Type.IE12);
         pairs.put(UserAgent.LUMIA_928.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11.getUserAgentString(), Type.IE11);
         pairs.put(UserAgent.IE11_NET_FRAMEWORK.getUserAgentString(), Type.IE11);

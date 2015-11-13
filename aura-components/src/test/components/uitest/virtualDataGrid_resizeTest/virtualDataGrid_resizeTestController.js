@@ -39,7 +39,7 @@
 	
 	addCol : function(cmp) {
 		var grid = cmp.find("grid");
-		var colIndex = 3;
+		var colIndex = 4;
 		var headers = grid.get("v.headerColumns");
 		var columns = grid.get("v.columns");
 		var config = {

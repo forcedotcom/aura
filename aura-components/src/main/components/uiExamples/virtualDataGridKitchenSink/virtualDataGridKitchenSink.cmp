@@ -51,7 +51,7 @@
 				<ui:dataGridColumn name="who.name" 		label="Name"/>
 				<ui:dataGridColumn name="what.name" 	label="Related To"/>
 				<ui:dataGridColumn name="activityDate" 	label="Due Date"/>
-				<ui:dataGridColumn name=""				label="Selection"/>
+				<ui:dataGridColumn name=""				label="Selection" hideLabel="true"/>
 			</aura:set>
 			
 			<aura:set attribute="columns">

@@ -142,7 +142,7 @@ public class JavascriptTestCaseDef extends DefinitionImpl<TestCaseDef> implement
         if (this.getDescriptor() != null) {
             String cb = getCurrentBrowser();
             if ((cb != null) && (cb.length() > 0)) {
-                return this.getDescriptor().getQualifiedName() + ":BROWSERTYPE" + cb;
+                return this.getDescriptor().getQualifiedName() + ":BROWSER" + cb;
             } else {
                 return this.getDescriptor().getQualifiedName();
             }

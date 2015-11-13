@@ -19,21 +19,6 @@
         if (current === false) {
         	component.set("v.selected", !current);
         }        
-	},
+	}
 
-    setSelected : function(component) {
-        var concreteCmp = component.getConcreteComponent();
-        var selected = concreteCmp.get("v.selected");
-        var linkCmp = component.find("link");
-        if (linkCmp) {
-            var elem = linkCmp.getElement();
-            if (selected === true) {
-                $A.util.addClass(elem, "selected");
-                elem.setAttribute("aria-checked", "true");
-            } else {
-                $A.util.removeClass(elem, "selected");
-                elem.setAttribute("aria-checked", "false");
-            }
-        }
-    }
 })// eslint-disable-line semi

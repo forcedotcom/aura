@@ -179,11 +179,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * TODO: refactor ui:dataGridColumn 
 		 */
 		_attachHandle : function(column, handle) {
-			var content = column.firstChild;
 			var contentSpan = document.createElement('span');
 			
+			// Move all childNodes into the contentSpan
 			contentSpan.setAttribute('class', this.config.contentSpanClasses);
-			contentSpan.appendChild(content);
+			while (column.firstChild) {
+				contentSpan.appendChild(column.firstChild);
+			}
 			
 			var outerSpan = document.createElement('span');
 			outerSpan.setAttribute('class', this.config.headerSpanClasses);

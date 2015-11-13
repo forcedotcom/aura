@@ -16,5 +16,5 @@
 
 -->
 <aura:library description="Panel helper functions">
-    <aura:include name="panelLibCore" imports="ui:scopedScroll:scroll" />
+    <aura:include name="panelLibCore" imports="ui:scopedScroll:scroll, ui:focusManagerLib:focusUtil, ui:focusManagerLib:trap" />
 </aura:library>

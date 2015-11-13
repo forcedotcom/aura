@@ -29,12 +29,12 @@
         } else if (params.keyCode === 46) { // delete key so we 'delete'
             action = 'delete';
         } else if (params.keyCode === 8) { // backspace key so we 'delete' and prevent default browser behavior
-            if (domEvent) {
-                domEvent.preventDefault();
-            }
             action = 'delete';
         }
         if (action) {
+            if (domEvent) {
+                domEvent.preventDefault();
+            }
             this.fireHandleEvent(component, action);
         }
     },

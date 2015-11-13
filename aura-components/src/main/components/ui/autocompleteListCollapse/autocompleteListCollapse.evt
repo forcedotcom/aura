@@ -15,5 +15,5 @@
     limitations under the License.
 
 -->
-<aura:event type="COMPONENT" support="PILOT" description="Indicates that the autocompleteList collapses.">
+<aura:event type="COMPONENT" support="GA" description="Indicates that the autocompleteList collapses.">
 </aura:event>

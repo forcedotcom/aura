@@ -929,6 +929,10 @@ AuraComponentService.prototype.getComponentDef = function(config) {
     return definition;
 };
 
+AuraComponentService.prototype.hasDefinition = function(descriptor) {
+    return !!this.getDef(descriptor);
+};
+
 /**
  * Gets the component definition from the registry.
  *
@@ -965,11 +969,6 @@ AuraComponentService.prototype.createFromSavedComponentConfigs = function(config
     var def = new ComponentDef(this.savedComponentConfigs[descriptor]);
     this.componentDefRegistry[descriptor] = def;
     delete this.savedComponentConfigs[descriptor];
-
-    if (this.componentDefStorage.shouldStore(descriptor)) {
-        this.componentDefStorage.storeDef(descriptor, config);
-    }
-
     return def;
 };
 
@@ -989,9 +988,6 @@ AuraComponentService.prototype.createComponentDef = function(config) {
         } else {
             definition = new ComponentDef(config);
             this.componentDefRegistry[descriptor] = definition;
-            if (this.componentDefStorage.shouldStore(descriptor)) {
-                this.componentDefStorage.storeDef(descriptor, config);
-            }
         }
     }
 
@@ -1253,10 +1249,18 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
 };
 
 /**
- * Asynchronously retrieves all definitions in storage and adds to localStorage
+ * Asynchronously retrieves all definitions in storage and adds to saved component configs.
  */
 AuraComponentService.prototype.restoreDefsFromStorage = function () {
-    this.componentDefStorage.restoreAllFromStorage();
+    this.componentDefStorage.restoreAll();
+};
+
+/**
+ * Asynchronously retrieves all definitions in storage
+ * @return {Promise}
+ */
+AuraComponentService.prototype.getDefsFromStorage = function () {
+    return this.componentDefStorage.getAll();
 };
 
 /**
@@ -1264,7 +1268,39 @@ AuraComponentService.prototype.restoreDefsFromStorage = function () {
  * @return {Promise} Promise when storage is cleared
  */
 AuraComponentService.prototype.clearDefsFromStorage = function () {
-    return this.componentDefStorage.clearAllFromStorage();
+    return this.componentDefStorage.clear();
+};
+
+/**
+ * Saves a list of component defs to persistent storage.
+ * @param {Array} configs component defs to persist.
+ * @return {Promise} promise which resolves when storing is complete.
+ */
+AuraComponentService.prototype.saveDefsToStorage = function (configs) {
+    var defStorage = this.componentDefStorage.getStorage();
+    var actionStorage = Action.getStorage();
+    if (actionStorage && actionStorage.isPersistent()) {
+        $A.assert(defStorage && defStorage.isPersistent(), "ComponentDefStorage must exist and be persistent because actions storage exists and is persistent");
+    }
+
+        // nothing to store or nowhere to store it
+    if (configs.length === 0 || !defStorage) {
+        return Promise["resolve"]();
+    }
+
+
+    return this.componentDefStorage.storeDefs(configs);
+
+    // TODO - enable eviction of component defs
+//    console.time('saveDefsToStorage');
+//    var self = this;
+//    var defSizeKb = $A.util.estimateSize(configs) / 1024;
+//    return self.pruneDefsFromStorage(defSizeKb)
+//        .then(function() {
+//            return self.componentDefStorage.storeDefs(configs);
+//        }).then(function() {
+//            console.timeEnd('saveDefsToStorage');
+//        });
 };
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
@@ -1296,6 +1332,368 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
 
     var classConstructor = this.getComponentClass(descriptor);
     return new classConstructor(config);
+};
+
+
+
+
+/*
+ * ====================================================================
+ * PERSISTENT CACHE EVICTION LOGIC
+ * ====================================================================
+ */
+
+/**
+ * Find dependencies of a component def or action.
+ * @param {String} key the component def or action id.
+ * @param {Object} defConfig
+ * @param {Array} storedDeps
+ * @return {Array} the list of dependencies
+ */
+AuraComponentService.prototype.findDependencies = function (key, defConfig, storedDeps) {
+    var dependencies = [];
+    var i;
+
+    if ($A.util.isArray(defConfig)) {
+        for (i = 0; i < defConfig.length; i++) {
+            dependencies.push.apply(dependencies, this.findDependencies(key, defConfig[i], storedDeps));
+        }
+    } else if ($A.util.isObject(defConfig)) {
+        for (var attr in defConfig) {
+            var value = defConfig[attr];
+
+            if (attr === 'descriptor') {
+                if (value !== key && storedDeps.indexOf(value) !== -1) {
+                    dependencies.push(value);
+                }
+            } else {
+                dependencies.push.apply(dependencies, this.findDependencies(key, value, storedDeps));
+            }
+        }
+    }
+
+    return dependencies;
+};
+
+/**
+ * Builds the dependency graph for for all persisted component definitions and stored actions (persistent or not).
+ *
+ * A component definition depends on components in its superDef chain and its facets.
+ * A stored action depends on components specified in its return value.
+ * This definition is recursive.
+ *
+ * For example:
+ * - Three components: plant, tree, leaf.
+ * - Tree's superDef is plant.
+ * - Tree has leaf in its facet.
+ * - An action was used to retrieve an instance of tree.
+ *
+ * Tree's graph node looks like this:
+ * { action: false, id: "markup://ns:tree", dependencies: ["markup://ns:plant", "markup://ns:leaf"] }
+ *
+ * The action's graph node looks like this:
+ * { action: true, id: "java://.../ACTION$getTree:{}", dependencies: ["markup://ns:tree", "markup://ns:plant", "markup://ns:leaf"] }
+ *
+ * @return {Promise} promise that resolves to an object (keyed on descriptor) of dependency objects. A dependency object has these keys:
+ * - action: true if this is an action, false if a component definition.
+ * - id: the action or def descriptor.
+ * - dependencies: array of action/def descriptors this item depends on.
+ */
+AuraComponentService.prototype.buildDependencyGraph = function() {
+    // list of actions to never evict
+    var actionsBlackList = ['globalValueProviders']; // TODO - make GVP key more specific, add getApplication and loadLabels
+
+    var promises = [];
+    var actionStorage = Action.getStorage();
+    var actionsGetAll = actionStorage ? actionStorage.getAll() : Promise["resolve"]([]);
+    promises.push(actionsGetAll);
+    promises.push(this.componentDefStorage.getAll());
+
+    // promise will reject if actions.getAll rejects
+    return Promise.all(promises).then(function (results) {
+        var actionEntries = results[0];
+        var defEntries    = results[1];
+        var storedKeys    = defEntries.map(function (entry) { return entry.key; });
+        var nodes         = {};
+
+        function createNode(isAction, entry) {
+            var key = entry.key;
+            var dependencies = this.findDependencies(key, entry.value, storedKeys);
+            nodes[key] = { "id": key, "dependencies": dependencies, "action": isAction };
+        }
+
+        actionEntries = actionEntries.filter(function (a) { return actionsBlackList.indexOf(a.key) === -1; });
+        actionEntries.forEach(createNode.bind(this, true));
+        defEntries.forEach(createNode.bind(this, false));
+        return nodes;
+    }.bind(this));
+};
+
+/**
+ * Sorts the dependency graph by topological order.
+ * @param {Object} graph a graph of nodes. See #buildDependencyGraph().
+ * @return {Array} a topologically sorted array of node ids.
+ */
+AuraComponentService.prototype.sortDependencyGraph = function(graph) {
+    var sorted  = [];
+    var visited = {};
+
+    Object.keys(graph).forEach(function visit(idstr, ancestors) {
+        var node = graph[idstr];
+        var id   = node["id"];
+
+        if (visited[idstr]) { return; }
+        if (!Array.isArray(ancestors)) {
+            ancestors = [];
+        }
+
+        ancestors.push(id);
+        visited[idstr] = true;
+        node["dependencies"].forEach(function(afterId) {
+            if (ancestors.indexOf(afterId) >= 0) { // if already in ancestors, a closed chain exists.
+                throw new Error("AuraComponentService.sortDependencyGraph: Found a cycle in the graph: " + afterId + " is in " + id);
+            }
+            visit(afterId.toString(), ancestors.map(function(v) { return v; }));
+        });
+
+        sorted.unshift(id);
+    });
+    return sorted;
+};
+
+
+/**
+ * Gets the "upstream" dependencies for a node in the graph. In other words, gets the nodes from the
+ * graph that are dependent, directly or indirectly, on a given node.
+ *
+ * This provides the list of component definitions and actions which must be removed if a given
+ * component definition is removed.
+ *
+ * For example:
+ * - Three components: plant, tree, leaf.
+ * - Tree's superDef is plant.
+ * - Tree has leaf in its facet.
+ * - An action was used to retrieve an instance of tree.
+ *
+ * If node is leaf then the upstream dependencies are:
+ * - tree because it has leaf in a facet
+ * - action because it depends on tree
+ *
+ * Notably plant is not an upstream dependency. It does not depend on leaf, tree or action.
+ *
+ * @param {String} rootKey key of the graph node whose upstream dependencies are desired.
+ * @param {Object} graph a graph of nodes. See #buildDependencyGraph().
+ * @param {Object} upstream map to populate with upstream dependencies. Key is the graph key; value is always true.
+ */
+AuraComponentService.prototype.getUpstreamDependencies = function(rootKey, graph, upstream) {
+    upstream = upstream || {};
+    for (var key in graph) {
+        if (key !== rootKey) {
+            var nodeDependencies = graph[key]["dependencies"];
+            if (nodeDependencies.indexOf(rootKey) !== -1) {
+                upstream[key] = true;
+                this.getUpstreamDependencies(key, graph, upstream);
+            }
+        }
+    }
+    upstream[rootKey] = true;
+    return upstream;
+};
+
+/**
+ * Separates the keys into actions and defs, pruning those that appear in exclude.
+ * @param {Object} graph a graph of nodes. See #buildDependencyGraph().
+ * @param {Object} keys a map whose keys are graph keys.
+ * @param {Array} exclude the list of keys to exclude.
+ * @param {Array} actions the array to populate with action keys.
+ * @param {Array} defs the array to populate with component def keys.
+ */
+AuraComponentService.prototype.splitComponentsAndActions = function(graph, keys, exclude, actions, defs) {
+    for (var key in keys) {
+        if (exclude.indexOf(key) === -1) {
+            if (graph[key]["action"]) {
+                actions.push(key);
+            } else {
+                defs.push(key);
+            }
+        }
+    }
+};
+
+/**
+ * Evicts component definitions and dependent actions from storage until the
+ * component def storage is under a size threshold.
+ *
+ * @param {Array} sortedKeys the ordered list of graph keys to remove under the size threshold is met.
+ * @param {Object} graph a graph of nodes. See #buildDependencyGraph().
+ * @param {Number} requiredSpaceKb space required to store incoming defs.
+ * @return {Promise} a promise that resolves with the list of evicted actions and component defs.
+ */
+AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph, requiredSpaceKb) {
+    var defStorage    = this.componentDefStorage.getStorage();
+    var actionStorage = Action.getStorage();
+    var self          = this;
+
+    return defStorage.getSize().then(function(startingSize) {
+        var maxSize = defStorage.getMaxSize();
+        // target is the lesser of
+        // a) a percent of max size, and
+        // b) size required to leave some headroom after the subsequent puts
+        var targetSize = Math.min(
+                maxSize * Aura.Component.ComponentDefStorage.EVICTION_TARGET_LOAD,
+                maxSize - maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM - requiredSpaceKb
+        );
+        var evicted = [];
+
+        // short circuit
+        if (startingSize <= targetSize) {
+            $A.log("AuraComponentService.evictDefsFromStorage: short-circuiting because current size (" + startingSize.toFixed(0) + ") < target size (" + targetSize.toFixed(0) + ")");
+            return Promise["resolve"]([]);
+        }
+
+        return new Promise(function (resolve, reject) {
+            /**
+             * Removes actions from the actions store
+             * @param {Array} actions the actions to remove
+             * @return {Promise} a promise that resolves when the actions are removed.
+             */
+            function removeActions(actions) {
+                if (!actionStorage || !actions.length) {
+                    $A.assert(actions.length === 0 || actionStorage, "Actions store doesn't exist but requested removal of " + actions.length + " actions");
+                    return Promise["resolve"]();
+                }
+
+                var promises = [];
+                for (var i = 0; i < actions.length; i++) {
+                    promises.push(actionStorage.remove(actions[i], true));
+                }
+
+                return Promise["all"](promises).then(
+                    function () {
+                        $A.log("AuraComponentService.evictDefsFromStorage.removeActions(): removed " + promises.length + " actions");
+                    }
+                );
+            }
+
+            /**
+             * Recursively evicts until component def storage is reduced to the target size
+             * or all component defs are evicted.
+             */
+            function evictRecursively(keysToEvict, currentSize) {
+                var key = keysToEvict.pop();
+
+                // exit if all defs evicted or under target size
+                if (!key || currentSize <= targetSize) {
+                    resolve(evicted);
+                    return;
+                }
+                var upstreamKeys = self.getUpstreamDependencies(key, graph);
+                var actions = [];
+                var defs = [];
+                self.splitComponentsAndActions(graph, upstreamKeys, evicted, actions, defs);
+
+                // short-circuit if nothing to evict in this round
+                if (actions.length === 0 && defs.length === 0) {
+                    evictRecursively(keysToEvict, currentSize);
+                    return;
+                }
+
+                removeActions(actions)
+                    .then(function() {
+                        // track removed actions for future filtering
+                        evicted.push.apply(evicted, actions);
+                    })
+                    .then(function() {
+                        return self.componentDefStorage.removeDefs(defs);
+                    })
+                    .then(function() {
+                        // track removed defs for future filtering
+                        evicted.push.apply(evicted, defs);
+
+                        // get the new size
+                        return defStorage.getSize();
+                    }).then(
+                        function(newSize) {
+                            // and recurse!
+                            evictRecursively(keysToEvict, newSize);
+                        },
+                        function(e) {
+                            $A.log("AuraComponentService.evictDefsFromStorage(): error during component def or action removal", e);
+                            // exit recursion
+                            reject(e);
+                        }
+                    );
+            }
+
+            $A.log("AuraComponentService.evictDefsFromStorage: evicting because current size (" + startingSize.toFixed(0) + ") > target size (" + targetSize.toFixed(0) + ")");
+            evictRecursively(sortedKeys, startingSize);
+        });
+    });
+};
+
+/**
+ * Prunes component definitions and dependent actions from persistent storage.
+ *
+ * This is the entry point for dependency graph generation, analysis, and
+ * eviction. Eviction proceedsuntil the component def storage is under a threshold
+ * size or all component defs are evicted from storage.
+ *
+ * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.
+ * @return {Promise} a promise that resolves when pruning is complete.
+ */
+AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) {
+    var self          = this;
+    var defStorage    = this.componentDefStorage.getStorage();
+    var actionStorage = Action.getStorage();
+
+    // no storage means no pruning required
+    if (!defStorage) {
+        return Promise["resolve"]();
+    }
+
+    // check space to determine if eviction is required. this is an approximate check meant to
+    // avoid storage.getAll() and graph analysis, which are expensive operations.
+    return defStorage.getSize().then(
+        function(size) {
+            var maxSize = defStorage.getMaxSize();
+            var newSize = size + requiredSpaceKb + maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM;
+            if (newSize < maxSize) {
+                return undefined;
+            }
+
+            // some eviction is required.
+            //
+            // note: buildDependencyGraph() loads all actions and defs from storage. this forces
+            // scanning all rows in the respectives stores. this results in the stores returning an
+            // accurate value to getSize().
+            //
+            // as items are evicted from the store it's important that getSize() continues returning
+            // a value that is close to accurate.
+            return self.buildDependencyGraph().then(function(graph) {
+                var keysToEvict = self.sortDependencyGraph(graph);
+                return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
+            })
+            .then(
+                function(evicted) {
+                    $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
+                }
+            );
+        })
+        .then(
+            undefined, // noop
+            function(e) {
+                $A.warning("AuraComponentService.pruneDefsFromStorage: failure during analysis or pruning; clearing actions and component def storages", e);
+                if (actionStorage) {
+                    actionStorage.clear().then(undefined, function(clearError) {
+                        $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing actions store", clearError);
+                    });
+                }
+
+                defStorage.clear().then(undefined, function(clearError) {
+                    $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing def store", clearError);
+                });
+            }
+        );
 };
 
 Aura.Services.AuraComponentService = AuraComponentService;

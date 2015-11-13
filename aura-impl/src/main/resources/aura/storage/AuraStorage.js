@@ -55,6 +55,9 @@ var AuraStorage = function AuraStorage(config) {
     this.adapter.isPersistent = this.adapter.isPersistent || this.adapter["isPersistent"];
     this.adapter.clearOnInit = this.adapter.clearOnInit || this.adapter["clearOnInit"];
 
+    this.adapter.suspendSweeping = this.adapter.suspendSweeping || this.adapter["suspendSweeping"];
+    this.adapter.resumeSweeping = this.adapter.resumeSweeping || this.adapter["resumeSweeping"];
+
     var adapterConfig = $A.storageService.getAdapterConfig(this.adapter.getName());
     this.persistent = !$A.util.isUndefinedOrNull(adapterConfig["persistent"]) && adapterConfig["persistent"];
     this.secure = !$A.util.isUndefinedOrNull(adapterConfig["secure"]) && adapterConfig["secure"];
@@ -297,6 +300,10 @@ AuraStorage.prototype.suspendSweeping = function() {
     this.log("suspendSweeping()");
 
     this._sweepingSuspended = true;
+
+    if (this.adapter.suspendSweeping) {
+        this.adapter.suspendSweeping();
+    }
 };
 
 /**
@@ -307,6 +314,11 @@ AuraStorage.prototype.resumeSweeping = function() {
     this.log("resumeSweeping()");
 
     this._sweepingSuspended = false;
+
+    if (this.adapter.resumeSweeping) {
+        this.adapter.resumeSweeping();
+    }
+
     this.sweep();
 };
 

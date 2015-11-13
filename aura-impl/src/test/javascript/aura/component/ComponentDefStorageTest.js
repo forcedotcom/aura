@@ -55,23 +55,6 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
     });
 
 
-
-    [Fixture]
-    function ShouldStore() {
-
-        [Fact]
-        function ShouldNotStoreNonLayoutDef() {
-            var target = new Aura.Component.ComponentDefStorage();
-            Assert.False(target.shouldStore("markup://foo:bar"));
-        }
-
-        [Fact]
-        function ShouldStoreLayoutDef() {
-            var target = new Aura.Component.ComponentDefStorage();
-            Assert.True(target.shouldStore("layout://foo:bar"));
-        }
-    }
-
     [Fixture]
     function SetupDefinitionStorage() {
 
@@ -85,7 +68,8 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                             },
                             isSecure: function() {
                                 return secure
-                            }
+                            },
+                            suspendSweeping: function() {}
                         }
                     },
                     deleteStorage: function() {}

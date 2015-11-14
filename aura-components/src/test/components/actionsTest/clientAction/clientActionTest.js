@@ -3,6 +3,7 @@
         component._gotResponse = null;
         delete component._gotResponse;
     },
+
     /**
      * Test the client side action is a background action
      */
@@ -65,7 +66,7 @@
      */
     testGetNonExistentAction : {
         test : function(cmp) {
-            var errorMsg = "Unable to find 'notHereCaptain' on 'java://actionsTest.clientAction'.";
+            var errorMsg = "Unable to find 'notHereCaptain' on 'compound://actionsTest.clientAction'.";
             try {
                 var action = cmp.get("c.notHereCaptain");
                 $A.test.fail("Attemping to get a non-existent controller action should have thrown error.");

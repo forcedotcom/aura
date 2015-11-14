@@ -87,8 +87,9 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         assertEquals(1, mdd.size());
         assertEquals("TestJavaModel", mdd.get(0).getName());
 
-        ControllerDef cd = component.getLocalControllerDef();
-        assertEquals("JavaTestController", cd.getName());
+        List<DefDescriptor<ControllerDef>> cds = component.getControllerDefDescriptors();
+        assertEquals(1, cds.size());
+        assertEquals("JavaTestController", cds.get(0).getName());
 
         DefDescriptor<ModelDef> lmdd = component.getLocalModelDefDescriptor();
         assertEquals("TestJavaModel", lmdd.getName());
@@ -96,8 +97,8 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         ModelDef model = component.getModelDef();
         assertEquals("TestJavaModel", model.getName());
 
-        ControllerDef controller = component.getRemoteControllerDef();
-        assertNull(controller);
+        ControllerDef controller = component.getControllerDef();
+        assertEquals("testComponent1", controller.getName());
 
         DefDescriptor<RendererDef> rd = component.getRendererDescriptor();
         assertEquals("testComponent1", rd.getName());
@@ -150,9 +151,9 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         assertEquals(1, mdd.size());
         assertEquals("TestJavaModel", mdd.get(0).getName());
 
-        List<ControllerDef> cds = application.getLocalControllerDefs();
+        List<DefDescriptor<ControllerDef>> cds = application.getControllerDefDescriptors();
         assertEquals(1, cds.size());
-        assertEquals("JavaTestController", cds.get(0).getDescriptor().getName());
+        assertEquals("JavaTestController", cds.get(0).getName());
 
         DefDescriptor<ModelDef> lmdd = application.getLocalModelDefDescriptor();
         assertEquals("TestJavaModel", lmdd.getName());
@@ -160,8 +161,8 @@ public class AuraComponentServiceTest extends AuraImplTestCase {
         ModelDef model = application.getModelDef();
         assertEquals("TestJavaModel", model.getName());
 
-        ControllerDef controller = application.getRemoteControllerDef();
-        assertNull(controller);
+        ControllerDef controller = application.getControllerDef();
+        assertEquals("testApplication1", controller.getName());
 
         DefDescriptor<RendererDef> rd = application.getRendererDescriptor();
         assertEquals("testApplication1", rd.getName());

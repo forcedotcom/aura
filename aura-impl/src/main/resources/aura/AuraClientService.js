@@ -376,8 +376,8 @@ AuraClientService.prototype.decode = function(response, noStrip) {
             $A.util.json.resolveRefsObject(responseMessage);
         }
 
-        if (responseMessage["context"]["componentDefs"].length) {
-            $A.componentService.saveDefsToStorage(responseMessage["context"]["componentDefs"]);
+        if (responseMessage["context"]) {
+            $A.componentService.saveDefsToStorage(responseMessage["context"]);
         }
     }
 

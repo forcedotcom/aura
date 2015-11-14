@@ -88,25 +88,34 @@ ComponentDefStorage.prototype.getStorage = function () {
 };
 
 /**
- * Stores component definition into storage.
- * @param {Object[]} configs the definitions to store
+ * Stores component and library definitions into storage.
+ * @param {Array} cmpConfigs the component definitions to store
+ * @param {Array} libConfigs the lib definitions to store
  * @return {Promise} promise that resolves when storing is complete.
  */
-ComponentDefStorage.prototype.storeDefs = function(configs) {
-    if (this.useDefinitionStorage() && configs.length) {
+ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs) {
+    if (this.useDefinitionStorage() && (cmpConfigs.length || libConfigs.length)) {
         var promises = [];
-        var descriptor, encodedConfig;
-        for (var i = 0; i < configs.length; i++) {
-            descriptor = configs[i]["descriptor"];
-            encodedConfig = $A.util.json.encode(configs[i]);
+        var descriptor, encodedConfig, i;
+
+        for (i = 0; i < cmpConfigs.length; i++) {
+            descriptor = cmpConfigs[i]["descriptor"];
+            encodedConfig = $A.util.json.encode(cmpConfigs[i]);
             promises.push(this.definitionStorage.put(descriptor, encodedConfig));
         }
+
+        for (i = 0; i < libConfigs.length; i++) {
+            descriptor = libConfigs[i]["descriptor"];
+            encodedConfig = $A.util.json.encode(libConfigs[i]);
+            promises.push(this.definitionStorage.put(descriptor, encodedConfig));
+        }
+
         return Promise["all"](promises).then(
             function () {
-                $A.log("ComponentDefStorage: Successfully stored " + promises.length + " descriptors");
+                $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
             },
             function (e) {
-                $A.log("ComponentDefStorage: Error storing  " + promises.length + " descriptors", e);
+                $A.log("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
                 throw e;
             }
         );
@@ -185,8 +194,18 @@ ComponentDefStorage.prototype.restoreAll = function() {
                 var item = items[i];
                 var value = item["value"];
                 var descriptor = value["descriptor"];
-                if (!$A.componentService.hasDefinition(descriptor)) {
-                    $A.componentService.saveComponentConfig(value);
+
+                if (value["includes"]) {
+                    var includesEncoded = {};
+                    for (var key in value["includes"]) {
+                       includesEncoded[key] = $A.util.json.decode(value["includes"][key]);
+                    }
+                    value["includes"] = includesEncoded;
+                    $A.componentService.createLibraryDef(value);
+                } else {
+                    if (!$A.componentService.hasDefinition(descriptor)) {
+                        $A.componentService.saveComponentConfig(value);
+                    }
                 }
             }
             $A.log("ComponentDefStorage: restored " + len + " definitions from storage into registry");

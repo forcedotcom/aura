@@ -80,9 +80,9 @@ Json.prototype.decodeString = function(value) {
  */
 Json.prototype.resolveRefsObject = function(obj) {
     var cmpDefCollector = [];
-    $A.util.apply(obj, { "context" : { "componentDefs" : [] } }, false, true);
-    this._resolveRefs(obj, {}, null, null, cmpDefCollector);
+    $A.util.apply(obj, { "context" : { "componentDefs" : [], "libraryDefs" : [] } }, false, true);
 
+    this._resolveRefs(obj, {}, null, null, cmpDefCollector);
     if (cmpDefCollector.length > 0) {
         var componentDefs = obj["context"]["componentDefs"];
         var lookup = {};

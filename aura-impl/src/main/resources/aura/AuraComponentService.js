@@ -1272,32 +1272,37 @@ AuraComponentService.prototype.clearDefsFromStorage = function () {
 };
 
 /**
- * Saves a list of component defs to persistent storage.
- * @param {Array} configs component defs to persist.
+ * Saves component and library defs to persistent storage.
+ * @param {Object} context the new context from which defs are to be stored.
  * @return {Promise} promise which resolves when storing is complete.
  */
-AuraComponentService.prototype.saveDefsToStorage = function (configs) {
+AuraComponentService.prototype.saveDefsToStorage = function (context) {
+    var cmpConfigs = context["componentDefs"];
+    var libConfigs = context["libraryDefs"];
+    if (cmpConfigs.length === 0 && libConfigs.length === 0) {
+        return Promise["resolve"]();
+    }
+
     var defStorage = this.componentDefStorage.getStorage();
     var actionStorage = Action.getStorage();
     if (actionStorage && actionStorage.isPersistent()) {
         $A.assert(defStorage && defStorage.isPersistent(), "ComponentDefStorage must exist and be persistent because actions storage exists and is persistent");
     }
 
-        // nothing to store or nowhere to store it
-    if (configs.length === 0 || !defStorage) {
+    if (!defStorage) {
         return Promise["resolve"]();
     }
 
-
-    return this.componentDefStorage.storeDefs(configs);
+    return this.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
 
     // TODO - enable eviction of component defs
 //    console.time('saveDefsToStorage');
 //    var self = this;
-//    var defSizeKb = $A.util.estimateSize(configs) / 1024;
-//    return self.pruneDefsFromStorage(defSizeKb)
+//    var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
+//    var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
+//    return self.pruneDefsFromStorage(defSizeKb + libSizeKb)
 //        .then(function() {
-//            return self.componentDefStorage.storeDefs(configs);
+//            return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
 //        }).then(function() {
 //            console.timeEnd('saveDefsToStorage');
 //        });

@@ -170,7 +170,10 @@
 			width = cmp.get('v.width'),
 			height = cmp.get('v.height'),
 			toolbarLocation = cmp.get('v.toolbarLocation'),
+			placeholder = cmp.get("v.placeholder"),
+            extraAllowedContent = this.getExtraAllowedContent(),
 			label = cmp.get('v.label');
+
 
 		var config = {
 				language : locale,
@@ -193,14 +196,23 @@
 	    	     * - Link dialog: advanced and target tabs
 	    	     */
 	    		removeDialogTabs : 'link:advanced;image:advanced;table:advanced;tableProperties:advanced',
-
 	    		enterMode : CKEDITOR.ENTER_BR, //to use <br/> instead of <p> each enter
 				shiftEnterMode : CKEDITOR.ENTER_P,
 
 				forcePasteAsPlainText : false,
 	    		forceSimpleAmpersand : true,
-	    		title : label
+	    		title : label,
+                customConfig: false, //don't load the config.js by default
+				stylesSet : false, //don't load the styleSet.js by default
+                extraAllowedContent : extraAllowedContent
 			};
+
+		//don't need to load the extra plugin if not needed
+		if (placeholder) {
+			config.placeholder = placeholder;
+			config.extraPlugins = 'confighelper';
+		}
+
 		return config;
 	},
 
@@ -307,6 +319,25 @@
 		}
 		return toolbarConfig;
 	},
+
+    getExtraAllowedContent: function() {
+        // CK4 filters some html tags and attributes by default, which disappear on save or during toggle from html to source and back
+        // see http://docs.ckeditor.com#!/guide/dev_allowed_content_rules
+        // these are safe, supported tags we always want to allow in client validation regardless of which plugins or toolbars are loaded
+        // some of these would only be needed if pasting in styled content from an outside app (which is supported)
+        var tags = [];
+        tags.push('div{*}(*); span{*}(*); p{*}(*); br{*}(*); hr{*}(*);');
+        tags.push('h1{*}(*); h2{*}(*); h3{*}(*); h4{*}(*); h5{*}(*); h6{*}(*);');
+        tags.push('a[!href]{*}(*);');
+        tags.push('img[!src,alt,width,height,border]{*}(*);');
+        tags.push('font[face,size,color];');
+        tags.push('strike; s; b; em; strong; i; big; small; sub; sup; blockquote; ins; kbd; pre; tt;');
+        tags.push('abbr; acronym; address; bdo; caption; cite; code; col; colgroup;');
+        tags.push('dd; del; dfn; dl; dt; q; samp; var;');
+        tags.push('table{*}(*)[align,border,cellpadding,cellspacing,summary];');
+        tags.push('caption{*}(*); tbody{*}(*); thead{*}(*); tfoot{*}(*); th{*}(*)[scope]; tr{*}(*); td{*}(*)[scope];');
+        return tags.join(' ');
+    },
 
 	unrender : function(cmp) {
 		var editorInstance = this.getEditorInstance(cmp);

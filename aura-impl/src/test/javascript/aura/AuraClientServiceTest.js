@@ -1027,6 +1027,9 @@ Test.Aura.AuraClientServiceTest = function() {
                         throw message;
                     }
                 },
+                componentService : {
+                    saveDefsToStorage: function() {}
+                },
                 util : {
                     on : function() {
                     },

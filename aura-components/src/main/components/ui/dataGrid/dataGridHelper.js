@@ -804,6 +804,24 @@
 	},
 	
 	/**
+	 * Properly destroy all components when we unrender
+	 */
+	destroyTemplates: function(concrete) {
+		var rowData = concrete._rowData;
+		var destroyCmp = function(cmp) {
+			cmp.destroy();
+		};
+		
+		for (var i = 0; i < rowData.length; i++) {
+			var columnData = rowData[i].columnData;
+			for (var j = 0; j < columnData.length; j++) {
+				columnData[j].components.forEach(destroyCmp);			
+				columnData[j] = null;
+			}
+		}
+	},
+	
+	/**
 	 * Maps the given operation onto all the components in the grid
 	 * 
 	 * @param {Component} concrete

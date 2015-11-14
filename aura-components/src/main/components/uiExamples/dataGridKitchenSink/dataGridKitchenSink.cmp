@@ -38,6 +38,8 @@
     <ui:inputText placeholder="index" value="{!v.index}"/>
     <ui:inputText placeholder="count" value="{!v.count}"/>
     <ui:button class="kitchenButton" label="Change Columns" press="{!c.switchColumn}"/>
+    <ui:button class="kitchenButton" label="Render Grid" press="{!c.renderGrid}"/>
+    <ui:button class="kitchenButton" label="Unrender Grid" press="{!c.unrenderGrid}"/>
     
     <br/>
     
@@ -49,37 +51,39 @@
     <ui:button class="kitchenButton" label="Remove Class" press="{!c.removeClass}"/>
     <ui:button class="kitchenButton" label="Toggle Class" press="{!c.toggleClass}"/>
 
-    <ui:dataGrid aura:id="grid" aura:flavor="{!v.tableFlavor}" mode="{!v.mode}" sortBy="{!v.sortBy}" summary="Assorted Data for testing">
-        <aura:set attribute="columns">
-            <ui:dataGridSelectionColumn/>
-
-            <ui:dataGridColumn label="Id" name="id" sortable="true" ascLabel="ASC" descLabel="DSC"/>             
-            <ui:dataGridColumn label="Subject" name="subject"/>
-            <ui:dataGridColumn label="Name" name="who.name"/>
-            <ui:dataGridColumn label="Related To" name="what.name"/>
-            <ui:dataGridColumn label="Due Date" name="activityDate"/>
-
-            <ui:dataGridActionColumn label="Actions">
-                <ui:actionButton name="disable" label="Disable" index="{!index}" disabled="{!disabled}"/>
-                <ui:actionButton name="enable" label="Enable" index="{!index}" disabled="{!!disabled}"/>
-                <ui:actionButton name="toggleClass" label="Toggle Class" index="{!index}" disabled="{!disabled}"/>
-            </ui:dataGridActionColumn>
-
-        </aura:set>
-        
-        <aura:set attribute="dataProvider">
-            <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
-            									   sortBy="{!v.sortBy}"
-                                                   pageSize="{!v.pageSize}"
-                                                   currentPage="{!v.currentPage}"
-                                                   totalItems="{!v.totalItems}"/>
-        </aura:set>
-
-        <aura:set attribute="actionDelegate">
-            <ui:actionDelegate onaction="{!c.handleAction}"/>
-        </aura:set>
-
-    </ui:dataGrid>
+	<div aura:id="container">
+	    <ui:dataGrid aura:id="grid" aura:flavor="{!v.tableFlavor}" mode="{!v.mode}" sortBy="{!v.sortBy}" summary="Assorted Data for testing">
+	        <aura:set attribute="columns">
+	            <ui:dataGridSelectionColumn/>
+	
+	            <ui:dataGridColumn label="Id" name="id" sortable="true" ascLabel="ASC" descLabel="DSC"/>             
+	            <ui:dataGridColumn label="Subject" name="subject"/>
+	            <ui:dataGridColumn label="Name" name="who.name"/>
+	            <ui:dataGridColumn label="Related To" name="what.name"/>
+	            <ui:dataGridColumn label="Due Date" name="activityDate"/>
+	
+	            <ui:dataGridActionColumn label="Actions">
+	                <ui:actionButton name="disable" label="Disable" index="{!index}" disabled="{!disabled}"/>
+	                <ui:actionButton name="enable" label="Enable" index="{!index}" disabled="{!!disabled}"/>
+	                <ui:actionButton name="toggleClass" label="Toggle Class" index="{!index}" disabled="{!disabled}"/>
+	            </ui:dataGridActionColumn>
+	
+	        </aura:set>
+	        
+	        <aura:set attribute="dataProvider">
+	            <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
+	            									   sortBy="{!v.sortBy}"
+	                                                   pageSize="{!v.pageSize}"
+	                                                   currentPage="{!v.currentPage}"
+	                                                   totalItems="{!v.totalItems}"/>
+	        </aura:set>
+	
+	        <aura:set attribute="actionDelegate">
+	            <ui:actionDelegate onaction="{!c.handleAction}"/>
+	        </aura:set>
+	
+	    </ui:dataGrid>
+	</div>
 
     <ui:pagerNextPrevious pageSize="{!v.pageSize}"
                                   currentPage="{!v.currentPage}"

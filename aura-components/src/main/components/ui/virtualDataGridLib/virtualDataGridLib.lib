@@ -17,4 +17,5 @@
 -->
 <aura:library description="Plugin for virtualDataGrid">
     <aura:include name="columnResize"/>
+    <aura:include name="keyNav"/>
 </aura:library>

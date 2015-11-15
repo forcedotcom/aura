@@ -1293,19 +1293,15 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
         return Promise["resolve"]();
     }
 
-    return this.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
+    var self = this;
+    var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
+    var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
 
-    // TODO - enable eviction of component defs
-//    console.time('saveDefsToStorage');
-//    var self = this;
-//    var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
-//    var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
-//    return self.pruneDefsFromStorage(defSizeKb + libSizeKb)
-//        .then(function() {
-//            return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
-//        }).then(function() {
-//            console.timeEnd('saveDefsToStorage');
-//        });
+    return self.pruneDefsFromStorage(defSizeKb + libSizeKb)
+        .then(function() {
+            return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
+        }
+    );
 };
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
@@ -1681,6 +1677,12 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
             .then(
                 function(evicted) {
                     $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
+                    $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                        "defsRequiredSize" : requiredSpaceKb,
+                        "storageCurrentSize" : size,
+                        "storageRequiredSize" : newSize,
+                        "evicted" : evicted
+                    });
                 }
             );
         })

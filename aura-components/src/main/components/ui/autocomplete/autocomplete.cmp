@@ -59,7 +59,8 @@
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
-                                         autocompleteButton="{!v.autocompleteButton}"/>
+                                         autocompleteButton="{!v.autocompleteButton}"
+                                         disabled="{!v.disabled}"/>
         <aura:set attribute="else">
             <ui:inputTextForAutocomplete aura:id="input" 
                                          class="{!v.inputClass+' '+v.theme}"
@@ -69,7 +70,8 @@
                                          placeholder="{!v.placeholder}"
                                          updateOn="{!v.updateOn}"
                                          ariaDescribedBy="{!v.ariaDescribedBy}"
-                                         autocompleteButton="{!v.autocompleteButton}"/>
+                                         autocompleteButton="{!v.autocompleteButton}"
+                                         disabled="{!v.disabled}"/>
         </aura:set>
     </aura:if>
     <aura:if isTrue="{!v.usePanel}">

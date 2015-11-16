@@ -122,7 +122,7 @@ ComponentDefStorage.prototype.storeDefs = function(cmpConfigs, libConfigs) {
                 $A.log("ComponentDefStorage: Successfully stored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries");
             },
             function (e) {
-                $A.log("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
+                $A.warning("ComponentDefStorage: Error storing  " + cmpConfigs.length + " components, " + libConfigs.length + " libraries", e);
                 throw e;
             }
         );

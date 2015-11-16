@@ -221,12 +221,13 @@ function storageTest () {
         },
 
         testSetItemOverMaxSize_stage1: function(cmp, storage) {
-            var completed = false;
+            var key = "overSize";
             var result = "";
             var sizeTooBig = (storage.getMaxSize() + 1) * 1024;
-            var expected = "AuraStorage.put() cannot store an item over the max size of " + (storage.getMaxSize() * 1024);
+            var expected = "AuraStorage.put() cannot store " + key;
 
-            storage.put("overSize", { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
+            var completed = false;
+            storage.put(key, { "value" : { "BigMac" : new Array(sizeTooBig).join("x") } })
                 .then(
                     function() { dieDie(cmp, "Promise to put item too large should not be resolved"); },
                     function(error) {
@@ -287,22 +288,25 @@ function storageTest () {
         },
 
         testReplaceExistingWithEntryTooLarge_stage1: function(cmp, storage) {
+            var key = "testReplaceExistingWithEntryTooLarge";
             var sizeTooBig = (storage.getMaxSize() + 1) * 1000;
             var itemTooLarge = new Array(sizeTooBig).join("x");
-            var completed = false;
-            var expectedError = "AuraStorage.put() cannot store an item over the max size of " + (storage.getMaxSize() * 1024);
 
-            storage.put("testReplaceExistingWithEntryTooLarge", "ORIGINAL")
+            var completed = false;
+            var expected = "AuraStorage.put() cannot store " + key;
+
+            storage.put(key, "ORIGINAL")
                 .then(function() { return storage.get("testReplaceExistingWithEntryTooLarge"); })
                 .then(function(item) { $A.test.assertEquals("ORIGINAL", item.value); })
                 .then(function() { return storage.put("testReplaceExistingWithEntryTooLarge", itemTooLarge); })
                 .then(function(){
                         $A.test.fail("Should not be able to save an item above the maxSize");
                      },
-                     function(error){
-                         $A.test.assertEquals(expectedError, error.message, "Unexpected error message trying to save item too large");
+                     function(result){
+                         $A.test.assertTrue(result.toString().indexOf(expected) > -1, "Did not receive expected error. Expected error "
+                                 + "to contain <" + expected +">, but got <" + result + ">");
                      })
-                 .then(function() { completed = true; }, function(err) { dieDie(cmp, err)});
+                 .then(function() { completed = true; }, function(err) { dieDie(cmp, err); });
 
             $A.test.addWaitFor(true, function() { return completed; });
         },
@@ -312,7 +316,7 @@ function storageTest () {
 
             storage.get("testReplaceExistingWithEntryTooLarge")
                 .then(function(item) { $A.test.assertUndefined(item, "Entry should be empty after attemping to put item too large"); })
-                .then(function(){ completed = true;}, function(err) { dieDieDie(cmp, err)});
+                .then(function(){ completed = true;}, function(err) { dieDie(cmp, err)});
 
             $A.test.addWaitFor(true, function() { return completed; });
         },

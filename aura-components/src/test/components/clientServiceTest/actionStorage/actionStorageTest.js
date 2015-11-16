@@ -124,8 +124,11 @@
                 "error handler didn't get called",
                 function() {
                     $A.test.assertTrue(
-                        errorHandled.message.indexOf("AuraStorage.put() cannot store an item over the max size") == 0,
-                        "Should have returned error indicating size too big");
+                        errorHandled.message.indexOf("AuraStorage.put() cannot store") === 0,
+                        "Should have returned error indicating cannot store");
+                    $A.test.assertTrue(
+                            errorHandled.message.indexOf("over the max size") > -1,
+                            "Should have returned error referencing over max size");
                 }
             );
          },

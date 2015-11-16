@@ -25,6 +25,7 @@
     },
 
     doInit: function(component, event, helper) {
+        var datePicker = component.find("datePicker");
     	// only add the placeholder when there is no date picker opener.
         if (helper.isDesktopMode(component)) {
             helper.updateTimeFormat(component);
@@ -41,6 +42,11 @@
                     component.set("v.timePlaceholder", timeFormat);
                 }
             }
+            datePicker.set("v.hasTime", false);
+            datePicker.set("v.showToday", false);
+        } else {
+            datePicker.set("v.hasTime", true);
+            datePicker.set("v.showToday", true);
         }
     },
 

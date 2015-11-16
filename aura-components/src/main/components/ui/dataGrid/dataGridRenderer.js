@@ -26,7 +26,8 @@
 		return table;
 	},
 	
-	unrender: function () {
+	unrender: function (cmp, helper) {
+		helper.destroyTemplates(cmp);
 		this.superUnrender();
 	}
 })// eslint-disable-line semi

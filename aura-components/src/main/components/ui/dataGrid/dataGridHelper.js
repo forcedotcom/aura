@@ -554,7 +554,7 @@
 	
 	/**
 	 * Destroys the column data and components at the specified row and column index
-	 * and removes the <td> element from the specified parent <tr>.
+	 * and removes the <td> or <th> element from the specified parent <tr>.
 	 * 
 	 * @param {Object} rowData
 	 * @param {Integer} colIndex
@@ -665,10 +665,11 @@
         
         var self = this,
 			cellTemplates = concrete._cellTemplates,
-			td, cdrs, largerLength, resizeRowData;
+			colElement, cdrs, largerLength, resizeRowData;
 		
 		largerLength = (cellTemplates.length > rowData.columnData.length) ? cellTemplates.length : rowData.columnData.length;
 		
+		var useRowHeaders = concrete.get("v.useRowHeaders");
 		for (var colIndex = 0; colIndex < largerLength; colIndex++) {
 			var colData = rowData.columnData[colIndex];
 			cdrs = cellTemplates[colIndex];
@@ -684,19 +685,24 @@
 				}
 				
 				if (!colData.elementRef) {
-					td = document.createElement('td');
-					tr.appendChild(td);
+					if (useRowHeaders && colIndex === 0) {
+						colElement = document.createElement('th');
+						colElement.setAttribute("scope", "row");
+					} else {
+						colElement = document.createElement('td');
+					}
+					tr.appendChild(colElement);
 				} else {
-					td = colData.elementRef;
+					colElement = colData.elementRef;
 				}
 				
-				colData.elementRef = td;
+				colData.elementRef = colElement;
 				
 				if (cleanOldComponents) {
 					$A.util.forEach(colData.components, destroyComponent);
 					colData.components = [];
 				}
-				self.createAndRenderCell(concrete, cdrs, rowData.vp, td, colData.components);
+				self.createAndRenderCell(concrete, cdrs, rowData.vp, colElement, colData.components);
 			}
 		}
 		
@@ -800,6 +806,24 @@
 		
 		for (var i=0;i<columns.length;++i) {
 			columns[i].set('v.' + attribute, value);
+		}
+	},
+	
+	/**
+	 * Properly destroy all components when we unrender
+	 */
+	destroyTemplates: function(concrete) {
+		var rowData = concrete._rowData;
+		var destroyCmp = function(cmp) {
+			cmp.destroy();
+		};
+		
+		for (var i = 0; i < rowData.length; i++) {
+			var columnData = rowData[i].columnData;
+			for (var j = 0; j < columnData.length; j++) {
+				columnData[j].components.forEach(destroyCmp);			
+				columnData[j] = null;
+			}
 		}
 	},
 	

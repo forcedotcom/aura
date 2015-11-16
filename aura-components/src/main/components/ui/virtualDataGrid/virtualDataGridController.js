@@ -128,6 +128,10 @@
     		return;
     	}
     	
+    	if (!helper.hasResizerHandles(cmp)) {
+    		helper.updateColumnResizer(cmp);
+    	}
+    	
     	helper.resizeColumns(cmp, widths);
     },
     

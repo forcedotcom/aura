@@ -112,7 +112,7 @@ public final class ComponentImpl extends BaseComponentImpl<ComponentDef, Compone
                             }
                             
                             // new component may have its own controllerdef so add that one
-                            ControllerDef cd = c.getLocalControllerDef();
+                            ControllerDef cd = c.getControllerDef();
                             if (cd != null) {
                                 this.valueProviders.put(AuraValueProviderType.CONTROLLER.getPrefix(), cd);
                             }

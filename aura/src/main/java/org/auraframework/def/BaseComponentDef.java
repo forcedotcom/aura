@@ -73,10 +73,10 @@ public interface BaseComponentDef extends RootDefinition {
 
     List<DefDescriptor<ControllerDef>> getControllerDefDescriptors()
             throws QuickFixException;
-    List<ControllerDef> getLocalControllerDefs() throws QuickFixException;
 
     ModelDef getModelDef() throws QuickFixException;
 
+    ControllerDef getControllerDef() throws QuickFixException;
     ControllerDef getLocalControllerDef() throws QuickFixException;
     ControllerDef getRemoteControllerDef() throws QuickFixException;
 

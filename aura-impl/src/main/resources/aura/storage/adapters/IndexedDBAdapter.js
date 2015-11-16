@@ -73,6 +73,8 @@ var IndexedDBAdapter = function IndexedDBAdapter(config) {
     var context = $A.getContext();
     this.tableName = (context && (context.app || context.cmp)) || "store";
 
+    this.sweepingSuspended = false;
+
     this.initialize();
 };
 
@@ -168,6 +170,20 @@ IndexedDBAdapter.prototype.getAll = function() {
         that.walkInternal(success, error, true);
     };
     return this.enqueue(execute);
+};
+
+/**
+ * Suspends eviction.
+ */
+IndexedDBAdapter.prototype.suspendSweeping = function() {
+    this.sweepingSuspended = true;
+};
+
+/**
+ * Resumes eviction.
+ */
+IndexedDBAdapter.prototype.resumeSweeping = function() {
+    this.sweepingSuspended = false;
 };
 
 /**
@@ -555,7 +571,7 @@ IndexedDBAdapter.prototype.clearInternal = function(success, error) {
  */
 IndexedDBAdapter.prototype.expireCache = function(requestedSize, success, error) {
     var now = new Date().getTime();
-    if (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh) {
+    if (this.sweepingSuspended || (this.lastSweep + this.sweepInterval > now && this.sizeGuess < this.limitSweepHigh)) {
         if (success) {
             success();
         }

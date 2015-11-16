@@ -167,15 +167,14 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * Test multiple overlay one above another on non-modal overlay should close all the overlay's when we press ESC on
      * the newest overlay
      */
-    // TODO(W-2789664): Opening modal on top of first one then pressing escape causes error.
-    // "Invalid component tried calling function [get] with arguments [v.isModal], markup://ui:panelDialog [22:c]"
-    public void _testClickEscButtonClosesAllNonModalOverlays() throws Exception {
+    public void testClickEscButtonClosesAllNonModalOverlays() throws Exception {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_NONMODAL_BUTTON);
         verifyOverlayActive();
         openNewOverlayOnTopOfExistingModalOverlay(2, true);
         verifyOverlayActive();
+        waitForActiveElementText("button 1", "Button1 should be active element");
         pressEscapeOnActiveElement();
         waitNumberOfPanelsInDom(0);
         verifyOverlayNotActive();
@@ -254,8 +253,11 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
                         new ExpectedCondition<Boolean>() {
                             @Override
                             public Boolean apply(WebDriver d) {
-                                List<WebElement> elements = findDomElements(By
-                                        .cssSelector(PANELDIALOG_MODAL_CMP));
+                            	By locator = By.cssSelector(PANELDIALOG_MODAL_CMP);
+                            	if(expectedPanels == 0){
+                            		return !isElementPresent(locator);
+                            	}
+                                List<WebElement> elements = findDomElements(locator);
                                 return elements.size() == expectedPanels;
                             }
                         },
@@ -307,7 +309,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
         waitForElementAppear(By.cssSelector(PANELDIALOG_MODAL_CMP));
     }
 
-    private void pressEscapeOnActiveElement() {
+    private void pressEscapeOnActiveElement() throws InterruptedException {
         WebElement activeElement = (WebElement) auraUITestingUtil.getEval(ACTIVE_ELEMENT);
         activeElement.sendKeys(Keys.ESCAPE);
     }

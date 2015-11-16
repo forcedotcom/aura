@@ -61,10 +61,6 @@ public final class TokensDefHandler extends RootTagHandler<TokensDef> {
             throws QuickFixException {
         super(defDescriptor, source, xmlReader);
 
-        if (!isInPrivilegedNamespace()) {
-            throw new DefinitionNotFoundException(defDescriptor);
-        }
-
         builder.setOwnHash(source.getHash());
     }
 

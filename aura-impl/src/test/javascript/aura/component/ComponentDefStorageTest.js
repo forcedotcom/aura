@@ -59,25 +59,36 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
     function SetupDefinitionStorage() {
 
         var mockStorageService = function (persistent, secure) {
-            return Mocks.GetMock(Object.Global(), "$A", {
-                storageService: {
-                    initStorage: function() {
+            return Mocks.GetMocks(Object.Global(), {
+                "$A": {
+                    storageService: {
+                        initStorage: function() {
+                            return {
+                                isPersistent: function() {
+                                    return persistent;
+                                },
+                                isSecure: function() {
+                                    return secure
+                                },
+                                suspendSweeping: function() {}
+                            }
+                        },
+                        deleteStorage: function() {}
+                    },
+                    getContext: function() {
+                        return {
+                            getApp: function() {
+                                return "foo";
+                            }
+                        }
+                    }
+                },
+                "Action": {
+                    getStorage: function() {
                         return {
                             isPersistent: function() {
-                                return persistent;
-                            },
-                            isSecure: function() {
-                                return secure
-                            },
-                            suspendSweeping: function() {}
-                        }
-                    },
-                    deleteStorage: function() {}
-                },
-                getContext: function() {
-                    return {
-                        getApp: function() {
-                            return "foo";
+                                return true;
+                            }
                         }
                     }
                 }

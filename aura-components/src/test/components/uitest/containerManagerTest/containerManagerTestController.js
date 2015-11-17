@@ -19,31 +19,26 @@
     },
 
     createPanel: function(cmp, event, helper) {
-        $A.createComponents([
-            ["uiExamples:panelHeader", {}],
-            ["ui:outputText", {value: (cmp.bodyCounter+=1)}]
-            ],
-            function(components, status, statusMessageList) {
-                $A.get('e.ui:createPanel').setParams({
-                    panelType   :'panel',
-                    visible: true,
-                    panelConfig : {
-                        'class': 'shift',
-                        showPointer: true,
-                        useTransition: false,
-                        showCloseButton: true,
-                        header: components[0],
-                        body  : components[1]
-                    },
-                    onCreate: function (panel) {
-                        $A.log('panel created ' + panel);
-                        var panelEl = panel.getElement();
-                        panelEl.id = 'panel_'+cmp.bodyCounter;
-                        panelEl.style.marginLeft = (30 * cmp.bodyCounter) + 'px';
-                        helper.globalPanelRefs.push(panel);
-                    }
-                }).fire();
-        });
+        cmp.bodyCounter += 1;
+
+        $A.get('e.ui:createPanel').setParams({
+            panelType   :'panel',
+            visible: true,
+            panelConfig : {
+                title: cmp.bodyCounter,
+                'class': 'shift',
+                showPointer: true,
+                useTransition: false,
+                showCloseButton: true
+            },
+            onCreate: function (panel) {
+                $A.log('panel created ' + panel);
+                var panelEl = panel.getElement();
+                panelEl.id = 'panel_'+cmp.bodyCounter;
+                panelEl.style.marginLeft = (30 * cmp.bodyCounter) + 'px';
+                helper.globalPanelRefs.push(panel);
+            }
+        }).fire();
     },
 
 })

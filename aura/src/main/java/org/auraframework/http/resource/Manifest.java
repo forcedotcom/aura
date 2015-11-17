@@ -142,8 +142,11 @@ public class Manifest extends AuraResourceImpl {
             attribs.put(UID, appUid);
             StringWriter sw = new StringWriter();
 
-            sw.write(configAdapter.getResetCssURL());
-            sw.write('\n');
+            String resetCssUrl = configAdapter.getResetCssURL();
+            if (resetCssUrl != null) {
+                sw.write(resetCssUrl);
+                sw.write('\n');
+            }
 
             for (String s : servletUtilAdapter.getStyles(context)) {
                 sw.write(s);

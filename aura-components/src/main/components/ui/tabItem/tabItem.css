@@ -17,7 +17,7 @@
 .THIS {
 	list-style: none;
 	white-space: nowrap;
-	display: table-cell;
+	display: inline-block;
 }
 
 .THIS a {

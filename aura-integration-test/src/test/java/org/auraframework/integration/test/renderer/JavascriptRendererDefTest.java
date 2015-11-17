@@ -25,11 +25,7 @@ import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Component;
 
 /**
- * Test class to verify implementation of Javascript renderers for component.
- * 
- * @hierarchy Aura.Components.Renderer
- * @priority high
- * @userStory a07B0000000Doob
+ * Test class to verify implementation of JavascriptRendererDef.
  */
 public class JavascriptRendererDefTest extends AuraImplTestCase {
     public JavascriptRendererDefTest(String name) {
@@ -37,14 +33,11 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Verify that Javascript renderers are defined as non-local.
-     * 
-     * @throws Exception
+     * Verify JavascriptRendererDef is non-local.
      */
-    public void testIsLocal() throws Exception {
-        JavascriptRendererDef.Builder builder = new JavascriptRendererDef.Builder();
-        JavascriptRendererDef def = builder.build();
-        assertFalse("Javascript renderers should not be defined as Local, they are run in clients", def.isLocal());
+    public void testIsLocalReturnsFalse() throws Exception {
+        JavascriptRendererDef def =  (new JavascriptRendererDef.Builder()).build();
+        assertFalse(def.isLocal());
     }
 
     /**

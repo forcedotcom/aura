@@ -1,6 +1,0 @@
-{
-  "s":1,
-  "v":function(args1, args2) {
-        var str = 'do Nothing';
-    }
-}

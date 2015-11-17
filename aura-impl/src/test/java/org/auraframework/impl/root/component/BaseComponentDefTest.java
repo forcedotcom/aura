@@ -1163,8 +1163,13 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#isLocallyRenderable()}.
      */
     public void testIsLocallyRenderableWithClientsideController() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "", "Body: Includes a component with a client controller. "
-                + " <test:testJSController/>");
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class, String.format(baseComponentTag, "", ""));
+        DefDescriptor<ControllerDef> controllerDesc = Aura.getDefinitionService().getDefDescriptor(cmpDesc,
+                DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
+        addSourceAutoCleanup(controllerDesc, "({ function1: function(cmp) {} })");
+
+        T baseComponentDef = define(baseTag, "", String.format("<%s/>", cmpDesc.getDescriptorName()));
+
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
         assertFalse("When a component has dependency on a controller, the rendering should be done clientside.",
                 baseComponentDef.isLocallyRenderable());

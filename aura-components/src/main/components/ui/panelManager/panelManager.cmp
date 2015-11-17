@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" description="A panel manager that instantiates and handles panels.">
+<aura:component extensible="true" support="DEPRECATED" description="A panel manager that instantiates and handles panels.">
 	<aura:attribute name="class" type="String" default="one" description="The class that's added to the div tag of the panel container."/>
     <aura:attribute name="cancelButtonLabel" type="String" default="Cancel" description="The label on the Cancel button on an overlay panel. The default label is Cancel." />
 

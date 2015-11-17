@@ -18,7 +18,7 @@
 <aura:component extends="ui:abstractList"
 				implements="ui:scrollerEmbeddable"
 				support="GA"
-    			description="A list component that iterates over and displays the items in the ui:dataProvider component.">
+    			description="A list component that iterates over and displays the items from the data provider.">
 
     <aura:attribute name="enableRowSwipe" type="Boolean" default="false" description="Toggles touch event handlers to open and close rows."/>
 

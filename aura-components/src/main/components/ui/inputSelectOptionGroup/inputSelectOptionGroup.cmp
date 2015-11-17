@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="GA" description="An HTML optgroup element that groups related options in a &lt;ui:inputSelect&gt; element.">
+<aura:component extensible="true" support="GA" description="An HTML optgroup element that groups related options in a ui:inputSelect component.">
     <aura:attribute name="class" type="String" description="The CSS style used to display the option group."/>
     <aura:attribute name="label" type="String" description="The text displayed on the option group."/>
     <optgroup aura:id="inputSelectOptgroup" class="{!v.class}" label="{!v.label}">{!v.body}</optgroup>

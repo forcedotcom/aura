@@ -18,7 +18,9 @@
 
 <aura:documentation>
     <aura:description>
-        <p><code>ui:​panelManager</code>​ handles dialogs created by the <code>ui:panelDialog</code> component. 
+        <p>Deprecated. Use <code>ui:panelManager2</code> with <code>ui:panel</code> instead.</p>
+        <p> 
+        <code>ui:​panelManager</code>​ handles dialogs created by the <code>ui:panelDialog</code> component. 
           You only need one instance of <code>ui:​panelManager</code> in an app. 
         </p>
 <pre>&lt;aura:component>    

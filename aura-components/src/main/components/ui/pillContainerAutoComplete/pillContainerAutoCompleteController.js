@@ -47,13 +47,6 @@
 
     },
 
-    focus: function(component, event, helper) {
-        var inputElement = helper.getInputElement(component);
-        if (inputElement) {
-            inputElement.focus();
-        }
-    },
-
     updateParameters: function (component, event, helper) {
         var parameters = event.getParam('arguments').parameters;
         if (parameters) {

@@ -105,7 +105,7 @@
                 self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
                 self.setDebugCmpAttribute(cmp, 'v.dpGrid_v_setFocus', setFocusBool_dpGrid);
 
-                //assertion 
+                //assertion
                 $A.test.assertTrue(
                     setFocusBool,
                     'datePicker.setFocus should be true'
@@ -210,7 +210,7 @@
             if(self.isViewDesktop()){
                 $A.test.assertEquals(
                     1,
-                    $A.test.select('#singleInputField input').length,
+                    $A.test.select('#singleInputField > input').length,
                     'There should be only one input (#singleInputField input)'
                 );
 
@@ -313,7 +313,7 @@
         }]
     },
 
-    
+
     //test to see if initial rendering of datepicker is covering the input date textbox.
     testInputDateTimePositionOnInitalRenderring : {
         attributes : {"renderItem" : "simpleInputDateTime"},
@@ -359,7 +359,7 @@
                                 //get bounding rect of the datepicker
                             	var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
                                 var rectTextbox = $A.test.select('.dateTime-inputTime input')[0].getBoundingClientRect();
-                                //using parseInt as IE browser's add decimal pt's 
+                                //using parseInt as IE browser's add decimal pt's
                                 var actualTopDelta = parseInt(rectTimePicker.top - rectTextbox.top);
                                 var actualLeftDelta = parseInt(rectTimePicker.left - rectTextbox.left);
 
@@ -369,13 +369,13 @@
                                     actualLeftDelta >= 0 && actualLeftDelta <= ACCEPTABLE_DELTA;
                             },
                             'Timepicker position is not aligned to the input textbox'//failureMessage
-                        );	
+                        );
                     }
                 );
             }
         }]
     },
-    
+
 
     verifyDatepickerVisibility: function(elSelector, visible){
         var els = $A.test.select(elSelector, '.uiDatePicker');
@@ -407,7 +407,7 @@
         cmp.set(
             attrName,
             attrVal
-        )  
+        )
     },
     showDatepicker: function(){
         // clicking on the datepicker open icon
@@ -418,11 +418,11 @@
         $A.test.clickOrTouch( $A.test.select('.timePicker-openIcon')[0] );
     },
     /**
-     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because 
-     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText 
+     * Method allowing us to extract whether or not we are looking at a mobile device. Extracted from two functions because
+     * depending on which mode we are in (Desktop or other), we either have a header with the Month Year combo or an outputText
      * and a select value
-     * 
-     */ 
+     *
+     */
     isViewDesktop : function(){
         return $A.get('$Browser.formFactor').toLowerCase() === "desktop";
     },

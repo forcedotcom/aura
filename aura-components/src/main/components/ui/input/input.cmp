@@ -62,5 +62,8 @@
     <aura:handler name="change"      value="{!v.label}"         action="{!c.handleLabelChange}"/>
     <aura:handler name="change"      value="{!v.labelPosition}" action="{!c.handleLabelPositionChange}"/>
 
+
+    <aura:method name="focus" description="Sets the focus to this component"/>
+
     {!v.body}{!v.errorComponent}
 </aura:component>

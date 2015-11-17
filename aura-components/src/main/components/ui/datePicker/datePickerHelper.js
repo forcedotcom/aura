@@ -369,12 +369,20 @@
                 }
 
                 if(!component.positionConstraint) {
+                    var referenceElementAlign = 'left bottom';
+                    var elementAlign = 'left top';
+
+                    if (this.shouldFlip(elem, referenceElem)) {
+                        referenceElementAlign = 'left top';
+                        elementAlign = 'left bottom';
+                    }
+
                     component.positionConstraint = this.lib.panelPositioning.createRelationship({
                         element:elem,
                         target:referenceElem,
                         appendToBody: true,
-                        align: 'left top',
-                        targetAlign: 'left bottom'
+                        align: elementAlign,
+                        targetAlign: referenceElementAlign
                     });
                 }
                 this.lib.panelPositioning.reposition(function() {
@@ -424,7 +432,20 @@
                 }
             }
         }
-        },
+    },
+
+    shouldFlip: function(element, targetElement) {
+        var viewPort = $A.util.getWindowSize();
+        var elemRect = element.getBoundingClientRect();
+        var referenceElemRect = targetElement.getBoundingClientRect();
+        var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+
+        if (referenceElemRect.top >= height         // enough space above
+            && (viewPort.height - referenceElemRect.bottom) < height) { // not enough space below
+            return true;
+        }
+        return false;
+    },
 
     refreshYearSelection: function(component) {
         var minY = component.get("v.minYear");

@@ -15,6 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component>
-
+<aura:component extends="componentTest:helperSuper">
 </aura:component>

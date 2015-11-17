@@ -52,10 +52,9 @@
         var self = this, items = cmp.get("v.tabHeaders");
         if ($A.util.isNumber(index) && index >= 0 && index <= items.length) {
             var tabValues = [tab];
-            var itemsContainer = cmp.find("tabItemsContainer");
             this.createComponents(cmp, tabValues, function (newItems) {
                 items.splice.apply(items, [index, 0].concat(newItems));
-                itemsContainer.set("v.body", items);
+                cmp.set("v.tabHeaders", items);
                 if (newItems[0].get("v.active")) {
                     self.activateTab(cmp, index);
                 }
@@ -213,10 +212,10 @@
         if (barWidth > 0) {
             var tabItem, width, totalTabs = tabItems.length;
             for (var i = 0; i < totalTabs; i++) {
-                if (mustShowTabIndices.indexOf(i) >= 0) {
+                tabItem = tabItems[i];
+                if (!tabItem.isRendered() || mustShowTabIndices.indexOf(i) >= 0) {
                     continue;
                 }
-                tabItem = tabItems[i];
                 width = this.getOuterWidth(tabItem.getElement());
                 if (width > 0) {
                     if (barWidth > width) {

@@ -244,13 +244,6 @@
             datePicker.set("v.visible", true);
             datePicker.set("v.hideOnSelect", true);
             datePicker.set("v.closeOnClickOut", true);
-            if (this.isDesktopMode(component)) {
-                datePicker.set("v.hasTime", false);
-                datePicker.set("v.showToday", false);
-            } else {
-                datePicker.set("v.hasTime", true);
-                datePicker.set("v.showToday", true);
-            }
         }
     },
 

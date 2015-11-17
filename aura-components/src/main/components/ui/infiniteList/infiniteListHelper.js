@@ -93,6 +93,7 @@
             }
         }
 
+        debugger;
         concrete.set("v.items", actualItems);
 
         if (callback) {

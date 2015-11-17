@@ -2,7 +2,7 @@
   "browsers":[ "chrome" ],
   "numberOfRuns" : 1,
   "variability": [{
-            "Aura.coql.afterRender.added": 100
+            "Aura.coql.afterRender.added": 10
         },
         {
             "Aura.coql.afterRender.removed": 10
@@ -14,7 +14,7 @@
             "Aura.coql.component.removed": 10
         },
         {
-            "Aura.coql.event.added": 305
+            "Aura.coql.event.added": 10
         },
         {
             "Aura.coql.event.removed": 10
@@ -26,7 +26,7 @@
             "Aura.coql.render.removed": 10
         },
         {
-            "Aura.coql.rerender.added": 800
+            "Aura.coql.rerender.added": 10
         },
         {
             "Aura.coql.rerender.removed": 10
@@ -38,7 +38,7 @@
             "Aura.coql.unrender.removed": 10
         },
         {
-            "Network.encodedDataLength": 404668
+            "Network.encodedDataLength": 10
         },
         {
             "Network.numRequests": 10
@@ -47,10 +47,10 @@
             "Tracing.Painting.Paint": 10
         },
         {
-            "Tracing.Memory.jsHeapSizeUsed": 10
+            "Tracing.Memory.jsHeapSizeUsed": 20
         },
         {
-            "Tracing.Memory.jsEventListeners": 25
+            "Tracing.Memory.jsEventListeners": 20
         },
         {
             "Tracing.Memory.documents": 10

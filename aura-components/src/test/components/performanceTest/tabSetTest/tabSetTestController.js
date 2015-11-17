@@ -10,7 +10,6 @@
 	    	 
 	    	 // test lazyRenderTabs functionality
 	    	 if(cmp.get("v._lazyRenderTabs") === true){
-	    		 debugger;
 		    	
 		    	 for(var i = 0; i< NUM_TABS; i++){
 		    		 var tabs = cmp.find("myTabset").get("e.activateTab").setParams({"index": i}).fire();

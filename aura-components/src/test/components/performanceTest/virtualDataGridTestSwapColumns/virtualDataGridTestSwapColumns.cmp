@@ -1,3 +1,5 @@
+<!--randomly swaps all of ui:virtualDataGrid's columns, uses virtualDataGridTestAppendRows's model-->
+
 <aura:component extends="performance:perfTest" model="js://performanceTest.virtualDataGridTestAppendRows">
     <aura:attribute name="data" type="List"/>
     <ui:virtualDataGrid aura:id="myGrid" items="{!m.data}" >

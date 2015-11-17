@@ -34,7 +34,6 @@
                     newColumns[i] = config.column;
                     // set the grid's attributes when we're done building the arrays 
                     if (shuffledColumnsIndices.length === 0) {
-                    	debugger;
                         grid.set("v.headerColumns", newHeaders);
                         grid.set("v.columns", newColumns);
                         event.getParam('arguments').done.immediate();

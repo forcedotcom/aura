@@ -5,7 +5,7 @@
     	var NUM_ROWS = 50,
     	    NUM_COLUMNS = 50;
     	
-    	// use helper to pass the gridData to the run callback
+    	// use helper to pass the gridData to the run() callback
     	// there might be a better way of doing this
     	helper.gridData = [];
     	

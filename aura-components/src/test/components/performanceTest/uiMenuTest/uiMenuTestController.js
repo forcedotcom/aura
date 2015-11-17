@@ -3,6 +3,7 @@
     setup: function(cmp, event, helper) {
        var NUM_ITEMS = 100;
        helper.newActionMenuItemComponents = [];
+       
        for(var i = 0; i<NUM_ITEMS; i++){
     	   $A.createComponent("ui:actionMenuItem",{'aura:id':'item' + 12 + i, 'label':'D' + (i+1) }, function(actionMenuItem, status, statusMessagesList){
     		   helper.newActionMenuItemComponents.push(actionMenuItem);

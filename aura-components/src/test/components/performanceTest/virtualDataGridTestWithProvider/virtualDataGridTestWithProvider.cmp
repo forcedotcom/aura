@@ -1,7 +1,8 @@
+<!-- tests ui:virtualDataGrid using a data provider -->
+
 <aura:component implements="performance:test">
-  <aura:attribute name="tableFlavor" type="String" default="default"/>
    
-    <ui:virtualDataGrid aura:id="grid" fixedHeader="true" useRowHeaders="true">
+   <ui:virtualDataGrid aura:id="grid" fixedHeader="true" useRowHeaders="true">
       <aura:set attribute="headerColumns">
         <ui:dataGridColumn name="id" label="Id"/>
         <ui:dataGridColumn name="subject" label="Subject"/>
@@ -20,10 +21,8 @@
       
       <aura:set attribute="dataModel">
         <uiExamples:dataGridKitchenSinkDataProvider aura:id="data"
-                              sortBy="{!v.sortBy}"
-                              totalItems="400"
-                              pageSize="400"
-                              throwError="{!v.provideNoData}"/>
+                              totalItems="400" pageSize="400"/>
       </aura:set>
     </ui:virtualDataGrid>
+    
 </aura:component>

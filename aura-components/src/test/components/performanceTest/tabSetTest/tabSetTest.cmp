@@ -8,8 +8,7 @@
 	<ui:tabset aura:id="myTabset" lazyRenderTabs="true">
 	
 	  <aura:set attribute="lazyRenderTabs" value="{!v._lazyRenderTabs}"/>
-	  <aura:set attribute="useOverflowMenu" value="{!v._useOverflowMenu}"/>
-	  
+	  <aura:set attribute="useOverflowMenu" value="{!v._useOverflowMenu}"/>  
 	  <aura:set attribute="overFlowLabel" value="Overflow" />
 	
 		<ui:tab title="Tab 0">

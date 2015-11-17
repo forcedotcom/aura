@@ -1,16 +1,14 @@
 ({  
-	
-	
+		
     setup: function (cmp, event, helper) {
-  		 	
+    	helper.mData = cmp.get('m.data');
+    	helper.datagrid = cmp.find("myGrid"); 
     },  
 
     run: function (cmp, event, helper) {    	
-    	var mData = cmp.get('m.data');
-    	var datagrid = cmp.find("myGrid"); 
     	
-    	for(var i = 0; i < mData.length;i++){
-    		datagrid.appendItems([mData[i]]);
+    	for(var i = 0; i < helper.mData.length; i++){
+    		helper.datagrid.appendItems([helper.mData[i]]);
     	}
     	
     	event.getParam('arguments').done.immediate();

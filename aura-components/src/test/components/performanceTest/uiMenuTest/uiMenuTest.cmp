@@ -1,4 +1,6 @@
 <aura:component extends="performance:perfTest">
+    <!-- tests ui:menu by using a combination of 1. adding many menu items and 2.toggling the menu's initial visibility -->
+    
 	<!-- perf test params -->
     <aura:attribute name="testManyItems" type="Boolean" default="false"/>
     <aura:attribute name="testVisible" type="Boolean" default="false"/>
@@ -33,6 +35,5 @@
 
           </ui:menuList>
 	</ui:menu>
-	
 	
 </aura:component>

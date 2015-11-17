@@ -1,0 +1,13 @@
+<aura:component>
+
+    <aura:attribute name="items" type="Object"></aura:attribute>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"></aura:handler>
+    
+	<aura:iteration items="{!v.items}" var="item">
+	
+	<ui:outputText value="{!item}"/>
+		
+	</aura:iteration>
+
+</aura:component>

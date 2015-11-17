@@ -45,7 +45,7 @@
     <aura:handler name="keydown" action="{!c.handleInteraction}"/>
     <aura:handler name="blur" action="{!c.onBlur}"/>
 
-    <a aura:id="link" aura:flavorable="true" class="pill" tabindex="{!v.active ? 0: -1}">
+    <a aura:id="link" aura:flavorable="true" class="{!v.active ? 'pill focused': 'pill'}" tabindex="{!v.active ? 0: -1}">
         <aura:if isTrue="{!!empty(v.iconUrl)}">
             <span class="pillIcon" style="{!'background-color: ' + ( empty(v.iconBackgroundColor) ? 'transparent': '#' + v.iconBackgroundColor ) }">
                 <ui:image aura:id="icon" src="{!v.iconUrl}" imageType="{!empty(v.iconAlt) ? 'decorative' : 'informational'}" alt="{!v.iconAlt}" onerror="{!c.onIconError}"/>

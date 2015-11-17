@@ -360,8 +360,7 @@
             },
 
             select: function () {
-                if (this.highlightedIndex === -1) {
-                    $A.warning("Can't select item without index");
+                if (this.highlightedIndex === -1) { //nothing selected
                     return;
                 }
                 var highlightedCmp = this.iters[this.highlightedIndex];
@@ -588,7 +587,7 @@
     setDefaultHighlight: function(component) {
     	var setDefaultHighlight = component.get("v.setDefaultHighlight");
     	var visible = component.get("v.visible");
-    	if (setDefaultHighlight !== true || visible !== true) {
+    	if (visible !== true) {
     		return; 
     	}
     	var iterCmp = component.find("iter");
@@ -597,7 +596,7 @@
     		var found = false;
     	    for (var i = 0; i < iters.length; i++) {
                 var optionCmp = iters[i];
-                if (found === false && optionCmp.get("v.visible") === true) {
+                if (setDefaultHighlight && found === false && optionCmp.get("v.visible") === true) {
                     optionCmp.set("v.highlighted", true);
                     this.updateAriaAttributes(component, optionCmp);
                     found = true;

@@ -56,7 +56,6 @@
         }
     },
     updateBody: function (component) {
-
         if (component.get("v.loaded") === false) {
         	component._queueUpdate = true;
             return component._queueUpdate;

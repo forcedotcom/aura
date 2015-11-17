@@ -51,24 +51,22 @@ function lib(focusUtil) { //eslint-disable-line no-unused-vars
 
     function checkKey(e) {
         if (e.key === 'Tab' || e.keyCode === 9) {
-            e.preventDefault();
             updateTabbableNodes();
-            var currentFocusIndex = tabbableNodes.indexOf(e.target);
             var lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
             var firstTabbableNode = tabbableNodes[0];
             if (e.shiftKey) {
                 if (e.target === firstTabbableNode) {
+                    e.preventDefault();
                     lastTabbableNode.focus();
                     return;
                 }
-                tabbableNodes[currentFocusIndex - 1].focus(0);
                 return;
             }
             if (e.target === lastTabbableNode) {
+                e.preventDefault();
                 firstTabbableNode.focus();
                 return;
             }
-            tabbableNodes[currentFocusIndex + 1].focus();
         }
 
         if (e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27) {

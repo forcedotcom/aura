@@ -15,8 +15,6 @@
  */
 package org.auraframework.test.util;
 
-
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,100 +59,110 @@ public class AuraUITestingUtil {
         this.driver = driver;
         setTimeoutInSecs(timeoutInSecs);
     }
-    
+
     public enum ActionDuringTransit {
         DROPACTION,
         NAVIGATEBACK
-        //TODO: navigate to other place
-        //TODO: delay the action
+        // TODO: navigate to other place
+        // TODO: delay the action
     }
-    
+
     public enum ActionTiming {
         PRESEND,
         POSTSEND,
         PREDECODE,
-        //TODO: AFTERDECODE 
+        // TODO: AFTERDECODE
     }
-    
+
     public static class StressAction {
-    	private String auraActionWeCare;
-    	private ActionTiming actionTiming;
-    	private ActionDuringTransit[] actionDuringTransit;
-    	public StressAction(String auraActionWeCare, ActionTiming actionTiming, ActionDuringTransit... actionDuringTransit) {
-    		this.auraActionWeCare = auraActionWeCare;
-    		this.actionTiming = actionTiming;
-    		this.actionDuringTransit = actionDuringTransit;
-    	}
-		public String getAuraActionWeCare() {
-			return auraActionWeCare;
-		}
-		public ActionTiming getActionTiming() {
-			return actionTiming;
-		}
-		public ActionDuringTransit[] getActionDuringTransit() {
-			return actionDuringTransit;
-		}
+        private final String auraActionWeCare;
+        private final ActionTiming actionTiming;
+        private final ActionDuringTransit[] actionDuringTransit;
+
+        public StressAction(String auraActionWeCare, ActionTiming actionTiming,
+                ActionDuringTransit... actionDuringTransit) {
+            this.auraActionWeCare = auraActionWeCare;
+            this.actionTiming = actionTiming;
+            this.actionDuringTransit = actionDuringTransit;
+        }
+
+        public String getAuraActionWeCare() {
+            return auraActionWeCare;
+        }
+
+        public ActionTiming getActionTiming() {
+            return actionTiming;
+        }
+
+        public ActionDuringTransit[] getActionDuringTransit() {
+            return actionDuringTransit;
+        }
     };
-    
-    public static StressAction createStressAction(String auraActionWeCare, ActionTiming stressActionTiming, ActionDuringTransit... stressActionDuringTransitList) {
-    	return new StressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
+
+    public static StressAction createStressAction(String auraActionWeCare, ActionTiming stressActionTiming,
+            ActionDuringTransit... stressActionDuringTransitList) {
+        return new StressAction(auraActionWeCare, stressActionTiming, stressActionDuringTransitList);
     }
-    
+
     public Object performStressActionsDuringTransit(StressAction stressAction) {
-    	return performStressActionsDuringTransit(stressAction.getAuraActionWeCare(), stressAction.getActionTiming(), stressAction.getActionDuringTransit());
+        return performStressActionsDuringTransit(stressAction.getAuraActionWeCare(), stressAction.getActionTiming(),
+                stressAction.getActionDuringTransit());
     }
-    
-    public Object performStressActionsDuringTransit(String auraActionWeCare, ActionTiming stressActionTiming, ActionDuringTransit... stressActionDuringTransitList) {
+
+    public Object performStressActionsDuringTransit(String auraActionWeCare, ActionTiming stressActionTiming,
+            ActionDuringTransit... stressActionDuringTransitList) {
         String jsScript;
-        jsScript ="var customCallback = function(actions) { "+
-        		"var i;"+
-        		"var action = undefined;"+
-        		"for (i = 0; i < actions.length; i++) {"+
-        		"if (actions[i].getDef().name === '"+ auraActionWeCare +"') {"+
-        			"action = actions[i];"+
-        			"break;"+
-        		"}"+
-        "}"+
-        "if (action) {";
-        
-		for(ActionDuringTransit actionDuringTransit : stressActionDuringTransitList) {
-			switch(actionDuringTransit) {
-            case DROPACTION : 
-                jsScript+= "actions.splice(i, 1);";
+        jsScript = "var customCallback = function(actions) { " +
+                "var i;" +
+                "var action = undefined;" +
+                "for (i = 0; i < actions.length; i++) {" +
+                "if (actions[i].getDef().name === '" + auraActionWeCare + "') {" +
+                "action = actions[i];" +
+                "break;" +
+                "}" +
+                "}" +
+                "if (action) {";
+
+        for (ActionDuringTransit actionDuringTransit : stressActionDuringTransitList) {
+            switch (actionDuringTransit) {
+            case DROPACTION:
+                jsScript += "actions.splice(i, 1);";
                 break;
-            case NAVIGATEBACK :
+            case NAVIGATEBACK:
                 jsScript += "$A.historyService.back();";
                 break;
-            default: //do nothing
+            default: // do nothing
                 break;
-			}
+            }
         }
-        
-        //remove the callback once we are done, only do it once
+
+        // remove the callback once we are done, only do it once
         jsScript += "$A.test.removePrePostSendCallback(cb_handle);";
-        jsScript += "}"+ //end of if(action)
-        "};"; //end of function customCallback
-        
-        //register the custom callback
-        switch(stressActionTiming) {
-            case PRESEND: 
-                jsScript += "var cb_handle = $A.test.addPreSendCallback(undefined, customCallback);";
-                break;
-            case POSTSEND:
-                jsScript += "var cb_handle = $A.test.addPostSendCallback(undefined, customCallback);";
-                break;
-            //we need different customCallback for this case PREDECODE:
-            //jsScript += "var cb_handle = $A.test.addPreDecodeCallback(customCallback);";
-            default:
-                break;
+        jsScript += "}" + // end of if(action)
+                "};"; // end of function customCallback
+
+        // register the custom callback
+        switch (stressActionTiming) {
+        case PRESEND:
+            jsScript += "var cb_handle = $A.test.addPreSendCallback(undefined, customCallback);";
+            break;
+        case POSTSEND:
+            jsScript += "var cb_handle = $A.test.addPostSendCallback(undefined, customCallback);";
+            break;
+        // we need different customCallback for this case PREDECODE:
+        // jsScript += "var cb_handle = $A.test.addPreDecodeCallback(customCallback);";
+        default:
+            break;
         }
-        
-        //TODO & Note:
-        //getEval will wrap jsScript in a try...catch(e), return an array of  [result, jsTestErrors, scriptExecException]
-        //result is the result of executing jsScript
-        //jsTestErrors = window.$A.test.getErrors() if there is any
-        //scriptExecException = e.message() , e is what we catched if any
-        //if jsTestErrors exist, we fail the test right away -- this is not what we want, if we are expecting some error in test
+
+        // TODO & Note:
+        // getEval will wrap jsScript in a try...catch(e), return an array of [result, jsTestErrors,
+        // scriptExecException]
+        // result is the result of executing jsScript
+        // jsTestErrors = window.$A.test.getErrors() if there is any
+        // scriptExecException = e.message() , e is what we catched if any
+        // if jsTestErrors exist, we fail the test right away -- this is not what we want, if we are expecting some
+        // error in test
         return getEval(jsScript);
     }
 
@@ -204,11 +212,11 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element with matching locator to appear in dom.
-     *
+     * 
      * This will wait for at least one element with the locator to appear in the dom, and it will return the first
      * element found. If there are more than one element that match the locator, this will succeed when the first one
      * appears.
-     *
+     * 
      * @param msg Error message on timeout.
      * @param locator By of element waiting for.
      */
@@ -223,9 +231,9 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element with matching locator to appear in dom.
-     *
+     * 
      * Convenience routine to supply a message.
-     *
+     * 
      * @param locator By of element waiting for.
      */
     public WebElement waitForElement(By locator) {
@@ -235,7 +243,7 @@ public class AuraUITestingUtil {
 
     /**
      * Waits for element to be not present
-     *
+     * 
      * @param locator By of element waiting to disapear
      * @return
      */
@@ -302,7 +310,7 @@ public class AuraUITestingUtil {
 
     /**
      * Very useful to get handle on the component passing globalId
-     *
+     * 
      * @param cmp: globalId of the component
      * @return
      */
@@ -313,7 +321,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return the javascript using which component's attribute value could be found out
-     *
+     * 
      * @param cmp : cmpName whose attribute you are looking for
      * @param val : attribute name
      * @return
@@ -324,7 +332,7 @@ public class AuraUITestingUtil {
 
     /**
      * Very useful when we know the globalId of the component, inorder to get the attribute value of cmp
-     *
+     * 
      * @param cmp: globalId of the component
      * @param val: attribute name of the component
      * @return
@@ -372,7 +380,7 @@ public class AuraUITestingUtil {
      * As an implementation detail, we accomplish this by wrapping the given javascript so that we can perform the error
      * check on each evaluation without doing a round-trip to the browser (which might be long in cases of remote test
      * runs).
-     *
+     * 
      * @return the result of calling {@link JavascriptExecutor#executeScript(String, Object...) with the given
      *         javascript and args.
      */
@@ -432,7 +440,7 @@ public class AuraUITestingUtil {
 
     /**
      * Returns value of executing javascript in current window.
-     *
+     * 
      * @see org.openqa.selenium.JavscriptExecutor#executeSript(String, Object...)
      */
     public Object getRawEval(String javascript, Object... args) {
@@ -452,7 +460,7 @@ public class AuraUITestingUtil {
 
     /**
      * Process the results from $A.test.getErrors(). If there were any errors, then fail the test accordingly.
-     *
+     * 
      * @param errors the raw results from invoking $A.test.getErrors()
      */
     public void assertJsTestErrors(String errors) {
@@ -491,7 +499,7 @@ public class AuraUITestingUtil {
 
     /**
      * use to do mouse over the element
-     *
+     * 
      * @param elem
      */
     public void setHoverOverElement(String elem) {
@@ -504,7 +512,7 @@ public class AuraUITestingUtil {
     /**
      * Get the text content of a DOM node. Tries "innerText" followed by "textContext" to take browser differences into
      * account.
-     *
+     * 
      */
     public String getActiveElementText() {
         return (String) getEval("return $A.test.getActiveElementText()");
@@ -512,7 +520,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return Bounding Rectangle Property for given Element
-     *
+     * 
      * @param elementLocalId
      * @param position = "top, left, right, and bottom"
      * @return
@@ -525,7 +533,7 @@ public class AuraUITestingUtil {
     /**
      * Given Element className, method would return component globalId which could be used with $A.getCmp(globalId) to
      * have handle in the component in UI test
-     *
+     * 
      * @param className
      * @return
      */
@@ -538,7 +546,7 @@ public class AuraUITestingUtil {
 
     /**
      * Check for uncaught Aura or Javascript errors after executing a particular WebDriver function.
-     *
+     * 
      * @param function a Function accepting a WebDriver instance
      * @return
      */
@@ -577,7 +585,7 @@ public class AuraUITestingUtil {
 
     /**
      * Find first matching element in the DOM.
-     *
+     * 
      * @param locator
      * @return
      */
@@ -591,7 +599,7 @@ public class AuraUITestingUtil {
 
     /**
      * Find matching elements in the DOM.
-     *
+     * 
      * @param locator
      * @return
      */
@@ -614,10 +622,10 @@ public class AuraUITestingUtil {
 
     /**
      * Get the current aura error message.
-     *
+     * 
      * This will fail the test if the div is not found (which means that the page did not load at all). If the box is
      * not displayed, it returns an empty string.
-     *
+     * 
      * @return any error message that is displayed.
      */
     public String getAuraErrorMessage() {
@@ -782,13 +790,21 @@ public class AuraUITestingUtil {
      * Wait for the document to enter the complete readyState.
      */
     public void waitForDocumentReady() {
-        waitUntil(
+        waitUntilWithCallback(
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
                         return getBooleanEval("return document.readyState === 'complete'");
                     }
                 },
+                new ExpectedCondition<String>() {
+                    @Override
+                    public String apply(WebDriver d) {
+                        String ret = (String) getRawEval("return document.readyState");
+                        return "Current document.readyState is <" + ret + ">";
+                    }
+                },
+                timeoutInSecs,
                 "Document is not Ready!");
     }
 
@@ -804,29 +820,29 @@ public class AuraUITestingUtil {
         waitAuraPresent.withMessage("Initialization error: Perhaps the initial GET failed." + doNotAssign)
                 .until(
                         new Function<WebDriver, Boolean>() {
-                    @Override
-                    public Boolean apply(WebDriver input) {
-                        return (Boolean) getRawEval("return !!window.$A");
-                    }
-                });
+                            @Override
+                            public Boolean apply(WebDriver input) {
+                                return (Boolean) getRawEval("return !!window.$A");
+                            }
+                        });
 
         WebDriverWait waitFinishedInit = new WebDriverWait(driver, timeoutInSecs);
         waitFinishedInit.ignoring(StaleElementReferenceException.class)
-        .withMessage("Initialization error: $A present but failed to initialize")
-        .until(
-                new Function<WebDriver, Boolean>() {
-                    @Override
-                    public Boolean apply(WebDriver input) {
-                        assertNoAuraErrorMessage(expectedErrors);
-                        return isAuraFrameworkReady();
-                    }
-                });
+                .withMessage("Initialization error: $A present but failed to initialize")
+                .until(
+                        new Function<WebDriver, Boolean>() {
+                            @Override
+                            public Boolean apply(WebDriver input) {
+                                assertNoAuraErrorMessage(expectedErrors);
+                                return isAuraFrameworkReady();
+                            }
+                        });
     }
 
     /**
      * Finds the WebElement identified by locator and applies the provided Function to it, ignoring
      * StaleElementReferenceException.
-     *
+     * 
      * @param locator By locator to find WebElement in the DOM.
      * @param function Function to run on web
      * @param message Message to display to user on timeout.
@@ -858,7 +874,7 @@ public class AuraUITestingUtil {
 
     /**
      * Wait for text of an element to be either present or not present.
-     *
+     * 
      * @param locator By locator to find WebElement in the DOM.
      * @param text Text on the found WebElement.
      * @param toBePresent True if we want text passed in as parameter to equal text on found WebElement.
@@ -893,7 +909,7 @@ public class AuraUITestingUtil {
 
     /**
      * Method of exposing accessibility tool to be exposed for testing purposes
-     *
+     * 
      * @return ArrayList - either 0,1, or 2. Position 0: Indicates there were no errors Position 1: Indicates that there
      *         were errors Position 2: Indicates that something unexpected happened.
      */
@@ -970,7 +986,7 @@ public class AuraUITestingUtil {
 
     /**
      * Return true if div has scrollBar
-     *
+     * 
      * @param elementClassName
      * @return
      */

@@ -31,7 +31,6 @@ function lib(w) { //eslint-disable-line no-unused-vars
         }
      }
 
-
     /**
      * Get the position of an element relative
      * to the viewport
@@ -56,7 +55,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
 
     /**
      * A facade for a DOM element
-     * to simplift reading/writing values
+     * to simplify reading/writing values
      * as well as prevent unnecessary DOM reads
      * @class  ElementProxy
      * @private
@@ -75,11 +74,25 @@ function lib(w) { //eslint-disable-line no-unused-vars
         this._node = null;
         this._releaseCb = null;
 
+        // Use mutation observers to invalidate cache. It's magic!
+        this._observer = new w.MutationObserver(this.refresh.bind(this));
 
         if(!el) {
             throw new Error('Element missing');
         }
+
         this._node = el;
+        //do not observe the window
+        if(this._node !== w) {
+            this._observer.observe(this._node, {
+            attributes: true, 
+            childList: true, 
+            characterData: true,
+            subtree: true
+        });
+        }
+        
+
         this.refresh();
     }
 
@@ -147,6 +160,7 @@ function lib(w) { //eslint-disable-line no-unused-vars
                 this.right = w.document.documentElement.clientWidth + scrollLeft;
                 this.bottom = w.document.documentElement.clientHeight;
             }
+            
             this._dirty = false;
         }
     };

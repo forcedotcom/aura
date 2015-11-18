@@ -30,6 +30,10 @@ Test.Components.Ui.PanelPositioning.elementProxyTest = function() {
 			return e.computedStyle;
 		};
 
+		windowMock.MutationObserver = function() {
+			this.observe = function() {};
+		}
+
 	windowMock(function(){
 		ImportJson("aura-components/src/main/components/ui/panelPositioningLib/elementProxy.js", function(path, result) {
 			var obj = result(windowMock);

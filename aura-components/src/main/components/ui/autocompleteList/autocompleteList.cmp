@@ -40,6 +40,7 @@
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is selected."/>
     <aura:registerEvent name="updateAriaAttributes" type="ui:updateAriaAttributes" description="The event fired when a new option is highlighted."/>
     <aura:registerEvent name="listExpand" type="ui:autocompleteListExpand" description="The event fired when the list is made visible"/>
+    <aura:registerEvent name="listCollapse" type="ui:autocompleteListCollapse" description="The event fired when the list is made invisible"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.visible}" action="{!c.visibleChange}"/>

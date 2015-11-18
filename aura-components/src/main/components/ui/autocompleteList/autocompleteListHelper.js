@@ -607,7 +607,7 @@
     	}
     },
     
-    setUpEvents: function (component) {
+    setUpEvents: function (component, onVisibleChange) {
         if (component.isRendered()) {
             var obj = {};
             var visible = component.get("v.visible");
@@ -624,17 +624,29 @@
                 // De-register list expand/collapse events
                 $A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
                 $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+                
+                if (onVisibleChange) {
+	                //push this even to the end of the queue to ensure that the interation in the component body is complete
+	                window.setTimeout($A.getCallback(function () {
+	                    if (component.isValid()) {
+	                        component.get("e.listCollapse").fire();
+	                    }
+	                }, 0));
+                }
+                
             } else { // Register list expand/collapse events
                 obj["aria-expanded"] = true;
                 $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
                 $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
 
-                //push this even to the end of the queue to ensure that the interation in the component body is complete
-                window.setTimeout($A.getCallback(function () {
-                    if (component.isValid()) {
-                        component.get("e.listExpand").fire();
-                    }
-                }, 0));
+                if (onVisibleChange) {
+	                //push this even to the end of the queue to ensure that the interation in the component body is complete
+	                window.setTimeout($A.getCallback(function () {
+	                    if (component.isValid()) {
+	                        component.get("e.listExpand").fire();
+	                    }
+	                }, 0));
+                }
 
             }
 

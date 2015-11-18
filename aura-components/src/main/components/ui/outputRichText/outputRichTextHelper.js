@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    SUPPORTED_HTML_TAGS: 	["a", "b", "big", "blockquote", "caption", "cite", "code", 
+    SUPPORTED_HTML_TAGS: 	["a", "b", "br", "big", "blockquote", "caption", "cite", "code",
                          	 "del", "div", "em", "h1", "h2", "h3", "hr", "i", "img", "ins",
                          	 "kbd", "li", "ol", "p", "param", "pre", "q", "s", "samp", "small",
                          	 "span", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th",

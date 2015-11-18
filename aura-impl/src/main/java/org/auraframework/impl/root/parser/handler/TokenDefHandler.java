@@ -28,6 +28,7 @@ import org.auraframework.impl.css.token.TokenDefImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.util.TextTokenizer;
 import org.auraframework.system.Source;
+import org.auraframework.throwable.quickfix.InvalidAccessValueException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
@@ -39,8 +40,14 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
     private static final String ATTRIBUTE_VALUE = "value";
     private static final String ATTRIBUTE_PROPERTY = "property";
 
-    private final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(
-            ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PROPERTY, ATTRIBUTE_DESCRIPTION);
+    private static final Set<String> ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .add(ATTRIBUTE_ACCESS, ATTRIBUTE_NAME, ATTRIBUTE_VALUE, ATTRIBUTE_PROPERTY)
+            .addAll(RootTagHandler.ALLOWED_ATTRIBUTES)
+            .build();
+
+    private final static Set<String> PRIVILEGED_ALLOWED_ATTRIBUTES = new ImmutableSet.Builder<String>()
+            .addAll(ALLOWED_ATTRIBUTES)
+            .build();
 
     private final TokenDefImpl.Builder builder = new TokenDefImpl.Builder();
     private String value;
@@ -61,7 +68,7 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
 
     @Override
     public Set<String> getAllowedAttributes() {
-        return ALLOWED_ATTRIBUTES;
+        return isInPrivilegedNamespace() ? PRIVILEGED_ALLOWED_ATTRIBUTES : ALLOWED_ATTRIBUTES;
     }
 
     @Override
@@ -79,6 +86,12 @@ public final class TokenDefHandler<P extends RootDefinition> extends ParentedTag
         String allowedProperties = getAttributeValue(ATTRIBUTE_PROPERTY); // comma-separated list of property names
         if (!AuraTextUtil.isNullEmptyOrWhitespace(allowedProperties)) {
             builder.setAllowedProperties(allowedProperties);
+        }
+
+        try {
+            builder.setAccess(readAccessAttribute());
+        } catch (InvalidAccessValueException e) {
+            builder.setParseError(e);
         }
 
         builder.setDescription(getAttributeValue(ATTRIBUTE_DESCRIPTION));

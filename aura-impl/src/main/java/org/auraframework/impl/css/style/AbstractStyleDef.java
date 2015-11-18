@@ -26,12 +26,14 @@ import org.auraframework.builder.BaseStyleDefBuilder;
 import org.auraframework.css.ResolveStrategy;
 import org.auraframework.css.TokenValueProvider;
 import org.auraframework.def.BaseStyleDef;
+import org.auraframework.def.TokenDef;
 import org.auraframework.expression.Expression;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.css.parser.CssPreprocessor;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.AuraValidationException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -108,12 +110,23 @@ public abstract class AbstractStyleDef<D extends BaseStyleDef> extends Definitio
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
-        // validate that expressions reference valid vars
+        // validate tokens
         if (!expressions.isEmpty()) {
             StyleAdapter adapter = Aura.getStyleAdapter();
             TokenValueProvider vp = adapter.getTokenValueProvider(descriptor, ResolveStrategy.RESOLVE_DEFAULTS);
+            MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
+
             for (String reference : expressions) {
-                vp.getValue(reference, getLocation()); // getValue will validate it's a valid expression/variable
+                // getValue will validate it's a valid expression/variable
+                vp.getValue(reference, getLocation());
+
+                // access checks FIXME this probably isn't the right location for this, and this check
+                // can be bypassed via cross references, among other issues.
+                for (List<TokenDef> tokenDefs : vp.extractTokenDefs(reference)) {
+                    for (TokenDef tokenDef : tokenDefs) {
+                        mdr.assertAccess(descriptor, tokenDef);
+                    }
+                }
             }
         }
     }

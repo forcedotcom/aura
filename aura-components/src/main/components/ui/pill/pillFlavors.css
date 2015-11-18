@@ -36,6 +36,7 @@
 .THIS .pillIcon, .THIS .pillIcon .uiImage {
     height: 20px;
     width: 20px;
+    line-height: 1;
 }
 
 .THIS .pillText {

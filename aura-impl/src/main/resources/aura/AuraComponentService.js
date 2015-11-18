@@ -1284,11 +1284,6 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
     }
 
     var defStorage = this.componentDefStorage.getStorage();
-    var actionStorage = Action.getStorage();
-    if (actionStorage && actionStorage.isPersistent()) {
-        $A.assert(defStorage && defStorage.isPersistent(), "ComponentDefStorage must exist and be persistent because actions storage exists and is persistent");
-    }
-
     if (!defStorage) {
         return Promise["resolve"]();
     }

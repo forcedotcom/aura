@@ -52,7 +52,14 @@ ComponentDefStorage.prototype.useDefinitionStorage = function() {
 ComponentDefStorage.prototype.setupDefinitionStorage = function() {
     if (this.useDefStore === undefined) {
         this.useDefStore = false;
-        if ($A.getContext().getApp()) {
+
+        // only persistently cache defs if actions is persistently cached. this is because
+        // labels are stored in the GVP mechanism which is stored in actions. if labels
+        // aren't persisted and defs are then components get rendered without labels (or with
+        // the label placeholder in non-prod mode).
+
+        var actions = Action.getStorage();
+        if (actions && actions.isPersistent() && $A.getContext().getApp()) {
             var storage = $A.storageService.initStorage(
                 "ComponentDefStorage",  // name
                 true,           // persistent

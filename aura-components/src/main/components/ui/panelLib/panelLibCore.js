@@ -271,7 +271,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 if(cmp.isValid()) {
 
                     if (config.useTransition) {
-                        panel.removeEventListener(animEl, finishHandler);
+                        animEl.removeEventListener(animEnd, finishHandler);
                     }                
 
                     config.onFinish && config.onFinish();

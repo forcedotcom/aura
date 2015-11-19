@@ -1058,6 +1058,11 @@ RootDefinitionImpl<T> implements BaseComponentDef, Serializable {
                     json.writeMapEntry("handlerDefs", handlers);
                 }
 
+                Collection<ImportDef> imports = getImportDefs();
+                if (!imports.isEmpty()) {
+                    json.writeMapEntry("imports", imports);
+                }
+
                 if (!facets.isEmpty()) {
                     json.writeMapEntry("facets", facets);
                 }

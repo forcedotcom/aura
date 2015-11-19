@@ -1,16 +1,7 @@
 ({
     setup: function (cmp, event, helper) {
-        var storage = $A.storageService.initStorage(
-                "actions",    // name
-                true,         // persistent
-                false,        // secure
-                1024*1024,    // maxSize in bytes
-                60*60*24,     // expiration in seconds for half a year.
-                60*60*12,     // defaultAutoRefreshInterval in seconds
-                true,         // debugLoggingEnabled
-                false         // clearStorageOnInit
-        );
     },
+
     // --- Performance framework lifecycle
     run: function (cmp, event, helper) {
         $A.metricsService.onTransactionEnd(function (t) {

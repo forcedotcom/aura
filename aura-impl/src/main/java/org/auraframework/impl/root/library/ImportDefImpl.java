@@ -76,7 +76,14 @@ public class ImportDefImpl extends DefinitionImpl<LibraryDef> implements ImportD
 
     @Override
     public void serialize(Json json) throws IOException {
-        json.writeMapEntry(property, descriptor.getDescriptorName());
+        if (json.getSerializationContext().refSupport()) {
+            json.writeMapBegin();
+            json.writeMapEntry("descriptor", descriptor.getQualifiedName());
+            json.writeMapEntry("property", property);
+            json.writeMapEnd();
+        } else {
+            json.writeMapEntry(property, descriptor.getDescriptorName());
+        }
     }
 
     public static class Builder extends DefinitionImpl.RefBuilderImpl<LibraryDef, ImportDefImpl> {

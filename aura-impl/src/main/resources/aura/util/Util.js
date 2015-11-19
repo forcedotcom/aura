@@ -843,10 +843,25 @@ Aura.Utils.Util.prototype.removeElement = function(element) {
  */
 Aura.Utils.Util.prototype.generateUrl = function(url, params, encoded) {
     if (this.isString(url) && this.isObject(params)) {
+        var hashPairs;
+        var map = {};
         var pieces = url.split("?");
         var query = pieces[1] || "";
 
-        var map = {};
+        if (query.length > 1) {
+            hashPairs = query.split("#");
+            if (hashPairs.length > 1) {
+                // Reset the query not to include hashtags
+                query = hashPairs[0];
+            }
+        } else {
+            // Check the url since it can still contain hashtags
+            hashPairs = pieces[0].split("#");
+            if (hashPairs.length > 1) {
+                // Reset the baseUrl not to include hashtags
+                pieces[0] = hashPairs[0];
+            }
+        }
 
         var pairs = query.split('&');
         for (var i = 0; i < pairs.length; i++) {
@@ -876,7 +891,16 @@ Aura.Utils.Util.prototype.generateUrl = function(url, params, encoded) {
 
         query = pairs.join("&");
         pieces[1] = query;
-        url = pieces.join("?");
+
+        if(hashPairs.length > 1) {
+            // Pop the base URL or Query string off the stack
+            hashPairs.shift();
+
+            return pieces.join("?") + "#" + hashPairs.join("#");
+        } else {
+            return pieces.join("?");
+        }
+
     }
     return url;
  };

@@ -885,5 +885,29 @@ Test.Aura.Util.UtilTest = function() {
 
             Assert.Equal(expected, actual);
         }
+
+        [Fact]
+        function persistsHashTokens() {
+            var url = "/path/page.apexp?key=value#Id=SOMEID";
+            var params = { "key": "NEWVALUE" };
+            var expected = "/path/page.apexp?key=NEWVALUE#Id=SOMEID";
+
+            var actual = targetUtil.generateUrl(url, params);
+
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        function persistsHashTokensOnAddKeys() {
+            var url = "/path/page.apexp#Id=SOMEID";
+            var params = { "key": "NEWVALUE" };
+            var expected = "/path/page.apexp?key=NEWVALUE#Id=SOMEID";
+
+            var actual = targetUtil.generateUrl(url, params);
+
+            Assert.Equal(expected, actual);
+        }
+
+
     }
 };

@@ -45,6 +45,14 @@
 		</test:testEventBubblingHandlerContainer>
 	</aura:iteration>
 
+	<aura:iteration items="{!v.iterationIds}" var="i1">
+		<aura:iteration items="{!v.iterationIds}" var="i2">
+		    <div style="margin: 5px; padding: 5px; border: 1px solid #666;">
+		    	<test:testEventBubblingEmitter aura:id="emitterInIteration" logId="Passthrough"/>
+		    </div>
+		</aura:iteration>
+	</aura:iteration>
+
 	<test:testEventBubblingHandler aura:id="provided" logId="Provided" provideByHandler="test:testEventBubblingHandlerChild"/>
 	
 	<test:testEventBubblingHandler aura:id="noSuperHandlers" logId="NoSuperHandlers" provideByHandler="test:testEventBubblingHandlerGrandchildWithoutHandlers"/>

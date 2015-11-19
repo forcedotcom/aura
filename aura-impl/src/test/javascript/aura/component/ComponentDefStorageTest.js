@@ -73,7 +73,8 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                                 suspendSweeping: function() {}
                             }
                         },
-                        deleteStorage: function() {}
+                        deleteStorage: function() {},
+                        getStorage: function() {}
                     },
                     getContext: function() {
                         return {

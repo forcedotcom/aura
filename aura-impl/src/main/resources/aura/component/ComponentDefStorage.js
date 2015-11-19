@@ -25,12 +25,12 @@ function ComponentDefStorage(){}
 /**
  * Target size, as a percent of max size, for component def storage during eviction.
  */
-ComponentDefStorage.EVICTION_TARGET_LOAD = 0.75;
+ComponentDefStorage.prototype.EVICTION_TARGET_LOAD = 0.75;
 
 /**
  * Minimum head room, as a percent of max size, to allocate after eviction and adding new definitions.
  */
-ComponentDefStorage.EVICTION_HEADROOM = 0.1;
+ComponentDefStorage.prototype.EVICTION_HEADROOM = 0.1;
 
 
 /**
@@ -60,16 +60,22 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
 
         var actions = Action.getStorage();
         if (actions && actions.isPersistent() && $A.getContext().getApp()) {
-            var storage = $A.storageService.initStorage(
-                "ComponentDefStorage",  // name
-                true,           // persistent
-                false,          // secure
-                4096000,        // maxSize 4MB
-                10886400,       // defaultExpiration (1/2 year because we handle eviction ourselves)
-                0,              // defaultAutoRefreshInterval
-                true,           // debugLoggingEnabled
-                false           // clearStorageOnInit
-            );
+
+            var storage = $A.storageService.getStorage("ComponentDefStorage");
+            if (!storage) {
+                // only create if the app hasn't defined one
+                storage = $A.storageService.initStorage(
+                    "ComponentDefStorage",  // name
+                    true,           // persistent
+                    false,          // secure
+                    4096000,        // maxSize 4MB
+                    10886400,       // defaultExpiration (1/2 year because we handle eviction ourselves)
+                    0,              // defaultAutoRefreshInterval
+                    true,           // debugLoggingEnabled
+                    false           // clearStorageOnInit
+                );
+            }
+
             if (storage.isPersistent()) {
                 // we only want a persistent storage
                 this.definitionStorage = storage;

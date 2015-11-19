@@ -1543,8 +1543,8 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
         // a) a percent of max size, and
         // b) size required to leave some headroom after the subsequent puts
         var targetSize = Math.min(
-                maxSize * Aura.Component.ComponentDefStorage.EVICTION_TARGET_LOAD,
-                maxSize - maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM - requiredSpaceKb
+                maxSize * self.componentDefStorage.EVICTION_TARGET_LOAD,
+                maxSize - maxSize * self.componentDefStorage.EVICTION_HEADROOM - requiredSpaceKb
         );
         var evicted = [];
 
@@ -1664,7 +1664,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
         function(size) {
             currentSize = size;
             var maxSize = defStorage.getMaxSize();
-            newSize = currentSize + requiredSpaceKb + maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM;
+            newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
             if (newSize < maxSize) {
                 return undefined;
             }

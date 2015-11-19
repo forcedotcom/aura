@@ -15,14 +15,8 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.builder.RootDefinitionBuilder;
-import org.auraframework.def.AttributeDef;
-import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignDef;
@@ -33,48 +27,32 @@ import org.auraframework.impl.design.DesignDefImpl;
 import org.auraframework.impl.root.parser.handler.RootTagHandler;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.system.Source;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class DesignDefHandler extends RootTagHandler<DesignDef> {
     public static final String TAG = "design:component";
     private static final String ATTRIBUTE_LABEL = "label";
 
-    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
-    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET = Sets.newHashSet("object[]", "aura.component[]");
-    private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
-
     protected final static Set<String> ALLOWED_ATTRIBUTES = ImmutableSet.of(ATTRIBUTE_LABEL);
 
-    private final DesignDefImpl.Builder builder = new DesignDefImpl.Builder();
-
-    private final ComponentDef cmp;
+    private final DesignDefImpl.Builder builder;
 
     // counter used to index child defs without an explicit id
     private int idCounter = 0;
 
     public DesignDefHandler() {
         super();
-        cmp = null;
+        builder = new DesignDefImpl.Builder();
     }
 
     public DesignDefHandler(DefDescriptor<DesignDef> defDescriptor, Source<DesignDef> source, XMLStreamReader xmlReader) {
         super(defDescriptor, source, xmlReader);
-        DefDescriptor<ComponentDef> cmpDesc = DefDescriptorImpl.getInstance(defDescriptor.getQualifiedName(),
-                ComponentDef.class);
-        ComponentDef tempCmp = null;
-        try {
-            tempCmp = cmpDesc.getDef();
-        } catch (Exception e) {
-            setParseError(e);
-        }
-        cmp = tempCmp;
-
+        builder = new DesignDefImpl.Builder();
         builder.setDescriptor(getDefDescriptor());
         builder.setLocation(getLocation());
         if (source != null) {
@@ -110,7 +88,6 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String tag = getTagName();
         if (DesignAttributeDefHandler.TAG.equalsIgnoreCase(tag)) {
             DesignAttributeDef attributeDesign = new DesignAttributeDefHandler(this, xmlReader, source).getElement();
-            validateDesignAttribute(attributeDesign);
             builder.addAttributeDesign(
                     DefDescriptorImpl.getInstance(attributeDesign.getName(), DesignAttributeDef.class), attributeDesign);
         } else if (DesignTemplateDefHandler.TAG.equalsIgnoreCase(tag)) {
@@ -150,29 +127,6 @@ public class DesignDefHandler extends RootTagHandler<DesignDef> {
         String ret = Integer.toString(idCounter);
         idCounter++;
         return ret;
-    }
-
-    private void validateDesignAttribute(DesignAttributeDef designAttr) throws QuickFixException {
-        AttributeDef attr = cmp.getAttributeDef(designAttr.getName());
-        if (attr == null) {
-            throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(designAttr.getName(),
-                    AttributeDef.class));
-        }
-        if(!isInPrivilegedNamespace() && designAttr.getDataSource() != null){
-            if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(
-                    attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
-                throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
-            }
-
-        } else if(!isInPrivilegedNamespace() && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
-                attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
-            throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
-        }
-
-        if (designAttr.getAttributeDefault() != null &&
-                !VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())) {
-            throw new InvalidDefinitionException("Only attributes of type Object[] or Aura.Component[] may have default blocks", getLocation());
-        }
     }
 
 }

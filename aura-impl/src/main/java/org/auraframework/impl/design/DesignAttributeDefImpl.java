@@ -15,18 +15,33 @@
  */
 package org.auraframework.impl.design;
 
+import com.google.common.collect.Sets;
 import org.auraframework.builder.design.DesignAttributeDefBuilder;
+import org.auraframework.def.AttributeDef;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
+import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 import java.io.IOException;
+import java.util.Set;
 
 public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> implements DesignAttributeDef {
+    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES = Sets.newHashSet("string", "integer", "boolean");
+    private static final Set<String> VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET = Sets.newHashSet("object[]", "aura.component[]");
+    private static final Set<String> VALID_DATASOURCE_ATTRIBUTE_TYPES = Sets.newHashSet("string");
     private static final long serialVersionUID = 3290806856269872853L;
+
+    private final boolean isInPriviledgedNamespace;
+    private final DefDescriptor<? extends RootDefinition> parentDescriptor;
+
     private final Boolean required;
     private final Boolean readonly;
     private final String name;
@@ -64,6 +79,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         this.maxApi = builder.maxApi;
         this.translatable = builder.translatable;
         this.defaultFacet = builder.defaultFacet;
+        this.isInPriviledgedNamespace = builder.isInPriviledgedNamespace;
+        this.parentDescriptor = builder.parentDescriptor;
     }
 
     @Override
@@ -147,14 +164,51 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
     }
 
     @Override
+    public DefDescriptor<? extends RootDefinition> getParentDescriptor() {
+        return parentDescriptor;
+    }
+
+    @Override
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
+
+        ComponentDef cmp = DefDescriptorImpl.getInstance(getParentDescriptor().getQualifiedName(),
+                ComponentDef.class).getDef();
+        AttributeDef attr = cmp.getAttributeDef(getName());
+        if (attr == null || !attr.getName().equals(getName())) {
+            throw new DefinitionNotFoundException(DefDescriptorImpl.getInstance(getName(),
+                    AttributeDef.class));
+        }
+        if(!isInPriviledgedNamespace && getDataSource() != null){
+            if(!VALID_DATASOURCE_ATTRIBUTE_TYPES.contains(
+                    attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
+                throw new InvalidDefinitionException("Only String attributes may have a datasource in the design file.", getLocation());
+            }
+
+        } else if(!isInPriviledgedNamespace && !VALID_DESIGN_ATTRIBUTE_TYPES.contains(
+                attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())){
+            throw new InvalidDefinitionException("Only Boolean, Integer or String attributes may be exposed in design files.", getLocation());
+        }
+
+        if (getAttributeDefault() != null &&
+                !VALID_DESIGN_ATTRIBUTE_TYPES_FOR_FACET.contains(attr.getTypeDef().getDescriptor().getDescriptorName().toLowerCase())) {
+            throw new InvalidDefinitionException("Only attributes of type Object[] or Aura.Component[] may have default blocks", getLocation());
+        }
+
         if (defaultFacet != null && defaultValue != null) {
             throw new InvalidDefinitionException("Design attribute can not contain a default attribute and a default tag.",
                     getLocation());
         }
         if (defaultFacet != null) {
             defaultFacet.validateReferences();
+        }
+    }
+
+    @Override
+    public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+        super.appendDependencies(dependencies);
+        if (defaultFacet != null) {
+            defaultFacet.appendDependencies(dependencies);
         }
     }
 
@@ -179,6 +233,8 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
         private String maxApi;
         private boolean translatable;
         private DesignAttributeDefaultDef defaultFacet;
+        private boolean isInPriviledgedNamespace;
+        private DefDescriptor<? extends RootDefinition> parentDescriptor;
 
         /**
          * @see org.auraframework.impl.system.DefinitionImpl.BuilderImpl#build()
@@ -282,5 +338,16 @@ public class DesignAttributeDefImpl extends DefinitionImpl<DesignAttributeDef> i
             return this;
         }
 
+        @Override
+        public DesignAttributeDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parent) {
+            this.parentDescriptor = parent;
+            return this;
+        }
+
+        @Override
+        public DesignAttributeDefBuilder setIsPriviledgedNamespace(boolean priviledgedNamespace) {
+            this.isInPriviledgedNamespace = priviledgedNamespace;
+            return this;
+        }
     }
 }

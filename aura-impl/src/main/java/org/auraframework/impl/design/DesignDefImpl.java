@@ -154,6 +154,9 @@ public class DesignDefImpl extends RootDefinitionImpl<DesignDef> implements Desi
         if (template != null) {
             template.appendDependencies(dependencies);
         }
+        for (DesignAttributeDef attributeDef : attributeDesignDefs.values()) {
+            attributeDef.appendDependencies(dependencies);
+        }
     }
 
     @Override

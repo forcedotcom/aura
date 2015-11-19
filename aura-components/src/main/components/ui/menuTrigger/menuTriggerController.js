@@ -15,12 +15,12 @@
  */
 ({
     onClick: function(component, event, helper) {
-        if (event && $A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
-            $A.util.squash(event);
+        if (component._recentlyClicked) {
+            return false;
         }
 
-        if (component._recentlyClicked) {
-            return;
+        if (event && $A.util.getBooleanValue(component.get("v.stopClickPropagation"))) {
+            $A.util.squash(event);
         }
 
         var concreteCmp = component.getConcreteComponent();

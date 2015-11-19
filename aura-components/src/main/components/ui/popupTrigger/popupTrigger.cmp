@@ -35,7 +35,9 @@
 	    	</div>
 
 	    	<aura:set attribute="else">
-	    		<a aura:id="popupTriggerElement" aria-haspopup="true" title="{!v.title}" class="{!v.class}" onclick="{!c.onClick}">
+	    		<a aura:id="popupTriggerElement" aria-haspopup="true" aria-disabled="{!v.disabled}" title="{!v.title}" class="{!v.class}"
+                   tabindex="{!v.disabled ? -1: 0}" onclick="{!c.onClick}">
+
 			    	<aura:if isTrue="{!v.label != null}">
 			    		{!v.label}
 			    		<aura:set attribute="else">

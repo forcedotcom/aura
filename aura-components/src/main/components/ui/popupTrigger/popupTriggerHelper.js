@@ -79,6 +79,10 @@
     },
     
     firePopupEvent: function(component, eventName, params) {
+        if (component.get("v.disabled")) {
+            return;
+        }
+
         var event = component.getConcreteComponent().get(eventName);
         if (params) {
             event.setParams(params);

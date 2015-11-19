@@ -49,13 +49,13 @@
 
 .THIS.indicator {
 	position: absolute;
-	opacity: 0;
+	display: none;
 	cursor: col-resize;
 	user-select:none;
 }
 
 .THIS.indicator.active {
-	opacity: 1;
+	display: block;
 }
 
 .THIS.resizable-cols .handle [type="range"] {
@@ -70,7 +70,7 @@
 }
 
 .THIS.resizable-cols .handle [type="range"]:focus ~ .resize-button {
-	opacity: 1;
+	display: block;
 }
 
 .THIS.resizable-cols .handle [type="range"]:focus ~ .resize-button .column-divider,

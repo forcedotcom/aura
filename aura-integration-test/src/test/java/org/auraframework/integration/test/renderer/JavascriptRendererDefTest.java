@@ -15,14 +15,16 @@
  */
 package org.auraframework.integration.test.renderer;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import java.io.StringWriter;
 
+import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RendererDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
-import org.auraframework.impl.system.DefDescriptorImpl;
-import org.auraframework.instance.Component;
 
 /**
  * Test class to verify implementation of JavascriptRendererDef.
@@ -35,43 +37,44 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
     /**
      * Verify JavascriptRendererDef is non-local.
      */
-    public void testIsLocalReturnsFalse() throws Exception {
-        JavascriptRendererDef def =  (new JavascriptRendererDef.Builder()).build();
-        assertFalse(def.isLocal());
+    public void testIsLocalReturnsFalse() {
+        RendererDef rendererDef =  (new JavascriptRendererDef.Builder()).build();
+        assertFalse(rendererDef.isLocal());
+    }
+
+    public void testGetDescriptor() throws Exception {
+        DefDescriptor<RendererDef> expectedRendererDesc = addSourceAutoCleanup(RendererDef.class, "({})");
+        RendererDef rendererDef = Aura.getDefinitionService().getDefinition(expectedRendererDesc);
+
+        DefDescriptor<RendererDef> actualRendererDesc = rendererDef.getDescriptor();
+        assertSame(expectedRendererDesc, actualRendererDesc);
     }
 
     /**
-     * Verify that rendering components locally using client side renderers is
-     * Unsupported.
-     * 
-     * @throws Exception
+     * Verify UnsupportedOperationException is thrown when rendering component locally using client renderer
      */
-    public void testUseOfJSRendererLocally() throws Exception {
-        Component dummyCmp = null;
-        StringWriter sw = new StringWriter();
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.testJSRenderer",
-                RendererDef.class);
-        RendererDef def = descriptor.getDef();
+    public void testThrownExceptionWhenUsingJSRendererLocally() throws Exception {
+        RendererDef rendererDef = (new JavascriptRendererDef.Builder()).build();
         try {
-            def.render(dummyCmp, sw);
-            fail("Should not able to use a ClientSide renderer to render a component locally.");
-        } catch (UnsupportedOperationException expected) {
+            rendererDef.render(null, new StringWriter());
+            fail("UnsupportedOperationException should be thrown when calling client render() in local.");
+        } catch (Exception e) {
+            checkExceptionFull(e, UnsupportedOperationException.class, null);
         }
     }
 
-    /**
-     * Verify that Javascript renderer with comments is acceptable.
-     * 
-     * @hierarchy Aura.Unit Tests.Json StreamReader
-     * @userStorySyncIdOrName a07B0000000DUGnIAO
-     * @priority medium
-     */
-    public void testRendererWithComments() throws Exception {
-        DefDescriptor<RendererDef> descriptor = DefDescriptorImpl.getInstance("js://test.test_JSRenderer_WithComments",
-                RendererDef.class);
-        RendererDef def = descriptor.getDef();
-        assertNotNull("Failed to fetch the definition of the Javascript Renderer.", def);
-        assertTrue(def instanceof JavascriptRendererDef);
-        serializeAndGoldFile(def);
+    public void testSerializeJavascriptRendererDef() throws Exception {
+        String rendererJs =
+                "({\n" +
+                "    render: function(cmp) {},\n" +
+                "    afterRender: function() {},\n" +
+                "    rerender: function() {},\n"+
+                "    unrender: function() {}\n" +
+                "})";
+        DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
+        RendererDef rendererDef = rendererDesc.getDef();
+
+        assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
+        serializeAndGoldFile(rendererDef, "_JSRendererDef");
     }
 }

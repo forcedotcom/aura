@@ -26,6 +26,7 @@ import org.auraframework.impl.javascript.parser.JavascriptRendererParser;
 import org.auraframework.impl.javascript.renderer.JavascriptRendererDef;
 import org.auraframework.system.Source;
 import org.auraframework.test.source.StringSourceLoader;
+import org.auraframework.util.json.JsonEncoder;
 
 public class JavascriptRendererParserTest extends AuraImplTestCase {
     public JavascriptRendererParserTest(String name) {
@@ -48,8 +49,8 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 
-        rendererDef.validateDefinition();
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
+        rendererDef.validateDefinition();
     }
 
     public void testParseJSRendererWithComments() throws Exception {
@@ -68,7 +69,44 @@ public class JavascriptRendererParserTest extends AuraImplTestCase {
 
         RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
 
-        rendererDef.validateDefinition();
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
+        rendererDef.validateDefinition();
+    }
+
+    /**
+     * Verify when there are duplicate render functions, only keep the one.
+     */
+    public void testParseJSRendererWithDuplicateFunction() throws Exception {
+        String rendererJs =
+                "({\n" +
+                "    render: function(cmp) {var v = 1;},\n" +
+                "    render: function(cmp) {var v = 2;}\n" +
+                "})";
+        DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
+        Source<RendererDef> source = StringSourceLoader.getInstance().getSource(rendererDesc);
+
+        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+
+        assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
+        rendererDef.validateDefinition();
+
+        String jsonStr = JsonEncoder.serialize(rendererDef);
+        assertEquals("The latest function should survive.", "{\"render\":function(cmp) {var v = 2;}}", jsonStr);
+    }
+
+    public void testParseJSRendererWithNonRendererFunctionElements() throws Exception {
+        String rendererJs =
+                "({\n" +
+                "    render: function(cmp) {var v = 1;},\n" +
+                "    foo: 'do NOthing',\n"+
+                "    bar: function(cmp) {var v = 2;}\n"+
+                "})";
+        DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
+        Source<RendererDef> source = StringSourceLoader.getInstance().getSource(rendererDesc);
+
+        RendererDef rendererDef = new JavascriptRendererParser().parse(rendererDesc, source);
+        String jsonStr = JsonEncoder.serialize(rendererDef);
+        assertEquals("Renderer parser should ignore non renderer function elements.",
+                "{\"render\":function(cmp) {var v = 1;}}", jsonStr);
     }
 }

@@ -62,8 +62,10 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
         if (actions && actions.isPersistent() && $A.getContext().getApp()) {
 
             var storage = $A.storageService.getStorage("ComponentDefStorage");
+            var removeStorage = false;
             if (!storage) {
-                // only create if the app hasn't defined one
+                // only create (and then remove) if the app hasn't defined one
+                removeStorage = true;
                 storage = $A.storageService.initStorage(
                     "ComponentDefStorage",  // name
                     true,           // persistent
@@ -76,14 +78,13 @@ ComponentDefStorage.prototype.setupDefinitionStorage = function() {
                 );
             }
 
+            // def storage only enabled with persistent storage
             if (storage.isPersistent()) {
-                // we only want a persistent storage
                 this.definitionStorage = storage;
-                // explicitly disable sweeping b/c we handle eviction ourselves
+                // explicitly disable sweeping b/c AuraComponentService handles eviction
                 this.definitionStorage.suspendSweeping();
-
                 this.useDefStore = true;
-            } else {
+            } else if (removeStorage) {
                 $A.storageService.deleteStorage("ComponentDefStorage");
             }
         }

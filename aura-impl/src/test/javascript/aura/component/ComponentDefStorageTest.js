@@ -118,6 +118,61 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
             Assert.True(target.useDefStore);
         }
 
+        [Fact]
+        function DoNotCreateComponentDefStorageIfAlreadyPresent() {
+            var initStorageCalled = false;
+
+            var mock = function () {
+                return Mocks.GetMocks(Object.Global(), {
+                    "$A": {
+                        storageService: {
+                            initStorage: function(name, persistent) {
+                                initStorageCalled = true;
+                                return {
+                                    isPersistent: function() {
+                                        return persistent;
+                                    }
+                                }
+                            },
+                            deleteStorage: function() {},
+                            getStorage: function(name) {
+                                if (name === "ComponentDefStorage") {
+                                    return {
+                                        isPersistent: function() { return true; },
+                                        suspendSweeping: function() {}
+                                    }
+                                }
+                            }
+                        },
+                        getContext: function() {
+                            return {
+                                getApp: function() {
+                                    return "foo";
+                                }
+                            }
+                        }
+                    },
+                    "Action": {
+                        getStorage: function() {
+                            return {
+                                isPersistent: function() {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            var target = new Aura.Component.ComponentDefStorage();
+            target.useDefStore = undefined;
+            mock()(function () {
+                target.setupDefinitionStorage();
+            });
+
+            Assert.False(initStorageCalled);
+        }
+
     }
 
 };

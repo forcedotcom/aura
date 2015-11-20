@@ -75,7 +75,6 @@ public class ClientLibraryTagUITest extends WebDriverTestCase {
         // Mode independent resources
         Object minuteThruMoment = auraUITestingUtil.getEval("return moment(new Date()).minutes()");
         assertNotNull(minuteThruMoment);
-        assertEquals( Calendar.getInstance().get(Calendar.MINUTE), ((Long) minuteThruMoment).intValue());
 
         Boolean walltime = (Boolean)auraUITestingUtil.getEval("return !!WallTime");
         assertTrue(walltime);

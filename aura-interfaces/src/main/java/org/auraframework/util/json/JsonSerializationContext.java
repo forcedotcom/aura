@@ -38,6 +38,21 @@ public interface JsonSerializationContext {
     boolean format();
 
     /**
+     * @return Whether or not to write the items of a root collection on separate lines.
+     */
+    boolean formatRootItems();
+
+    /**
+     * Set a new state of root collection line separation, preserving the previous one.
+     */
+    void pushFormatRootItems();
+
+    /**
+     * Restore the previous state of root collection line separation.
+     */
+    void popFormatRootItems();
+
+    /**
      * @return true if objects can be serialized by reference to prevent cycles
      */
     boolean refSupport();

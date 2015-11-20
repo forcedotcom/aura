@@ -10,7 +10,7 @@
             // Test out self and Function tricks
             var source = 
                 "var global = " + symbol + ";" + 
-                "helper.log(component, \"Global window via " + symbol + ": \" + global)";
+                "helper.log(component, \"Global window via " + symbol.replace(/"/g, "\\\"") + ": \" + global);";
             
             try {
                 eval(source);
@@ -26,7 +26,8 @@
         
         helper.log(component, "Cloister controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
         
-        ["self", "top", "parent", "(function () { return this }())", "Function('return this')()", "constructor.constructor('alert(this)')()"].forEach(testSymbol);
+        ["self", "top", "parent", "(function () { return this }())", "Function('return this')()", "toString.constructor.prototype", "constructor.constructor('alert(this)')()",
+         "''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__proto__, \"constructor\").value, null, \"return this;\")()"].forEach(testSymbol);
         
         try {
             // Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty

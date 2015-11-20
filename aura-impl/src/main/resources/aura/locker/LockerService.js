@@ -27,10 +27,9 @@ var LockerService = window["LockerService"] = (function() {
 	var validSymbolNameRegEx = /^[a-z$_][a-z0-9$]*$/i;
 
 	function getShadows(imports) {
-		var globalKeys = Object.getOwnPropertyNames(window);
-		
-		globalKeys.push("constructor");
-
+		var globalKeys = Object.getOwnPropertyNames(window).concat(
+			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
+			
 		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error" ].concat(globalKeys);
 
 		function getInitialWhitelist(symbols) {

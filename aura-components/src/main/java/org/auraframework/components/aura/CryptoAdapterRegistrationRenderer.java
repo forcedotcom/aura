@@ -52,7 +52,7 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
             .append("  request.addEventListener('load', function(event) {\n")
             .append("    var key;\n")
             .append("    try { key = JSON.parse(this.responseText); } catch (e) { };\n")
-            .append("    var validKey = Array.isArray(key) && (key.length === 16 || key.length === 32);\n")
+            .append("    var validKey = Array.isArray(key) && (key.length === 32 || key.length === 16);\n")
             .append(     debug ? "    $A.log('CryptoAdapter received ' + (validKey ? 'valid' : 'invalid') + ' key; calling CryptoAdapter.setKey()');\n" : "")
             .append("    if (!validKey) {\n")
             .append("      CryptoAdapter.setKey('');\n") // set an invalid key to unblock crypto adapter asap

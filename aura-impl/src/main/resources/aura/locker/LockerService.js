@@ -28,21 +28,30 @@ var LockerService = window["LockerService"] = (function() {
 
 	function getShadows(imports) {
 		var globalKeys = Object.getOwnPropertyNames(window);
+		
+		globalKeys.push("constructor");
 
 		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error" ].concat(globalKeys);
 
-		// eval and arguments keywords are protected by strict mode
-		var used = {
-			"eval" : true,
-			"arguments" : true,
+		function getInitialWhitelist(symbols) {
+			var skip = {};
 
-			"Date" : true
-		};
+			for (var i = 0; i < symbols.length; i++) {
+				var symbol = symbols[i];
+				skip["#" + symbol] = true;
+			}
+
+			return skip;
+		}
+
+		// eval and arguments keywords are protected by strict mode
+		var used = getInitialWhitelist([ "eval", "arguments", "undefined", "NaN", "Date", "Number", "Boolean" ]);
 
 		var shadows = [];
 		for (var n = 0; n < candidates.length; n++) {
 			var candidate = candidates[n];
-			if (!used[candidate]) {
+			var usedKey = "#" + candidate;
+			if (!used[usedKey]) {
 				if (!imports || !imports[candidate]) {
 					// Skip over non-viable names
 					if (validSymbolNameRegEx.test(candidate)) {
@@ -50,7 +59,7 @@ var LockerService = window["LockerService"] = (function() {
 					}
 				}
 
-				used[candidate] = true;
+				used[usedKey] = true;
 			}
 		}
 

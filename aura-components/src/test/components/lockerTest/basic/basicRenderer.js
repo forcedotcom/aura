@@ -26,7 +26,7 @@
         
         helper.log(component, "Cloister controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
         
-        ["self", "top", "parent", "(function () { return this }())", "Function('return this')()"].forEach(testSymbol);
+        ["self", "top", "parent", "(function () { return this }())", "Function('return this')()", "constructor.constructor('alert(this)')()"].forEach(testSymbol);
         
         try {
             // Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty

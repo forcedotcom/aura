@@ -1299,7 +1299,10 @@ Component.prototype.setAttributeValueProvider = function (avp) {
  */
 Component.prototype.getComponentValueProvider = function() {
     var valueProvider = this.attributeValueProvider||this.facetValueProvider;
-    return !(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent) ? valueProvider.getComponent() : valueProvider;
+    while (!(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent)) {
+        valueProvider = valueProvider.getComponent();
+    }
+    return valueProvider;
 };
 
 /**

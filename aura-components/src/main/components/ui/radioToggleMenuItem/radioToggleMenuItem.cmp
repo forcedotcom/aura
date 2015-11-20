@@ -23,7 +23,8 @@
     <aura:handler name="change" value="{!v.isAscending}" action="{!c.updateDirection}"/>
     
     <li aura:id="listItem" class="{!v.class}" role="presentation">
-        <a aura:id="link" class="{!'menuItemAnchor' + (v.selected == true ? ' selected' : '')}" role="menuitemradio" aria-checked="{!v.selected}">
+        <a aura:id="link" class="{!'menuItemAnchor' + (v.selected == true ? ' selected' : '')}" role="menuitemradio"
+           title="{!v.label}" aria-disabled="{!v.disabled}" aria-checked="{!v.selected}" tabindex="{!v.disabled ? -1: 0}">
         	<span class="labelSpan">{!v.label}</span>
         	<span class="stateIndicator">
         		<span class="indicatorBox">

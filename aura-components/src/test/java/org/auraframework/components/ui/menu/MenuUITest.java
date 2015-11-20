@@ -273,7 +273,13 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Item4 should be selected", (Boolean) auraUITestingUtil.getEval(selectedValueM4Exp));
 
         // click on item4
-        item4Element.click();
+        boolean disabledItemNotClickable = false;
+        try {
+            item4Element.click();
+        } catch (Exception e) {
+            disabledItemNotClickable = true;
+        }
+        assertTrue("Item4 should not be clickable", disabledItemNotClickable);
         assertTrue("Item4 aria attribute should be Selected even when clicked",
                 Boolean.valueOf(item4Element.getAttribute("aria-checked")));
         assertTrue("Item4 should be Selected even when clicked",

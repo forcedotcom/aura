@@ -62,7 +62,7 @@
     inputDateFocus: function(component, event, helper) {
         var inputText = helper.getDateString(component);
 
-        if ($A.util.isEmpty(inputText) && !component.get("v.disabled")) {
+        if ($A.util.isEmpty(inputText) && !component.get("v.disabled") && component.get("v.displayDatePicker")) {
             helper.displayDatePicker(component);
         }
     },

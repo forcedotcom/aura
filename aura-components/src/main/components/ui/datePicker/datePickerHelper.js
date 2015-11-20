@@ -103,7 +103,8 @@
                 // ignore gestures/swipes; only run the click handler if it's a click or tap
                 var clickEndEvent;
 
-                if (helper.getOnClickEventProp("isTouchDevice")) {
+                if (helper.getOnClickEventProp("isTouchDevice") && event.changedTouches) {
+
                     var touchIdFound = false;
                     for (var i = 0; i < event.changedTouches.length; i++) {
                         clickEndEvent = event.changedTouches[i];
@@ -190,7 +191,7 @@
         if ($A.util.isUndefined(component._onClickStartFunc)) {
             var helper = this;
             var f = function(event) {
-                if (helper.getOnClickEventProp("isTouchDevice")) {
+                if (helper.getOnClickEventProp("isTouchDevice") && event.changedTouches) {
                     var touch = event.changedTouches[0];
                     // record the ID to ensure it's the same finger on a multi-touch device
                     component._onStartId = touch.identifier;

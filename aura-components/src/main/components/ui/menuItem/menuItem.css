@@ -17,3 +17,8 @@
     display:block;
     overflow: hidden;
 }
+
+.THIS a[aria-disabled="true"] {
+    pointer-events: none;
+    cursor: default;
+}

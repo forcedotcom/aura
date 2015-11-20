@@ -44,10 +44,9 @@ public final class TokenDefImpl extends DefinitionImpl<TokenDef> implements Toke
     private static final String MISSING_VALUE = "Missing required attribute 'value'";
     private static final String UNKNOWN_PROPERTY = "Unknown CSS property '%s'";
     private static final String ILLEGAL_EXPR = "Illegal expression in token value";
-    private static final String ILLEGAL_CHARS = "Illegal character in token value (must "
-            + "only include alphanumeric, hyphen or underscore characters)";
+    private static final String ILLEGAL_CHARS = "Illegal character in token value";
 
-    private static final Pattern RESTRICTED_CHARS = Pattern.compile("[a-zA-Z0-9_-]*");
+    private static final Pattern RESTRICTED_CHARS = Pattern.compile("[a-zA-Z0-9_\\-%#.]*");
 
     private static final Set<String> EXTRA_PROPERTIES = ImmutableSet.of("box-flex");
     private static final long serialVersionUID = 344237166606014917L;

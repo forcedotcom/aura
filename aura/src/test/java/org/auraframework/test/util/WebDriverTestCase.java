@@ -160,11 +160,10 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     }
 
     public String getBrowserTypeString() {
-        String browserType = "";
         if (this.currentBrowserType != null) {
-            browserType = ":BROWSER" + this.currentBrowserType.name();
+            return "?browser=" + this.currentBrowserType.name();
         }
-        return browserType;
+        return "";
     }
 
     /**
@@ -1022,7 +1021,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     protected void open(String url, Mode mode, boolean waitForInit) throws MalformedURLException, URISyntaxException {
         Map<String, String> params = new HashMap<>();
         params.put("aura.mode", mode.name());
-        params.put("aura.browserType", getBrowserType().name());
         params.put("aura.test", getQualifiedName());
         url = addUrlParams(url, params);
         auraUITestingUtil.getRawEval("document._waitingForReload = true;");

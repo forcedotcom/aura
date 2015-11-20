@@ -422,7 +422,6 @@ public class MenuUITest extends WebDriverTestCase {
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
-    @Flapper
     public void testMenuPositionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
         open(MENUTEST_ATTACHTOBODY_APP);
 

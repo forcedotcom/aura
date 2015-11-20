@@ -4,9 +4,7 @@
 
         var NUM_ROWS = 50, NUM_COLUMNS = 50;
 
-        // use helper to pass the gridData to the run() callback
-        // there might be a better way of doing this
-        helper.gridData = [];
+        cmp.gridData = [];
 
         var dataGridColumns = [];
         // the body of virtualDataGrid's 'columns' attribute 
@@ -40,13 +38,13 @@
         // empty since the data is being provided in columnTemplate.attributes.values.value
         for (var i = 0; i < NUM_ROWS; i++) {
             var gridRow = {};
-            helper.gridData.push(gridRow);
+            cmp.gridData.push(gridRow);
         }
 
     },
 
     run : function(cmp, event, helper) {
-        cmp.set("v.data", helper.gridData);
+        cmp.set("v.data", cmp.gridData);
         event.getParam('arguments').done.immediate();
     },
 

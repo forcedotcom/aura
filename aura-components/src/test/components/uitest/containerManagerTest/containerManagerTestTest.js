@@ -24,7 +24,7 @@
         }
     },
 
-    _testUseSharedContainer: {
+    testUseSharedContainer: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(5, cmp);
@@ -42,7 +42,7 @@
         }]
     },
 
-    _testDoesNotUseSharedContainer: {
+    testDoesNotUseSharedContainer: {
         attributes: {"useContainer": false},
         test: [function(cmp) {
             this.createPanels(5, cmp);
@@ -60,7 +60,7 @@
         }]
     },
 
-    _testDefaultZIndex: {
+    testDefaultZIndex: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(3, cmp);
@@ -72,7 +72,7 @@
     /**
      * Verify that sendToBack/bringToFront accept component/element/id as arg
      */
-    _testAcceptableArgType: {
+    testAcceptableArgType: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(3, cmp);
@@ -91,7 +91,7 @@
         }]
     },
 
-    _testStackManager: {
+    testStackManager: {
         attributes: {"useContainer": "true"},
         test: [function(cmp) {
             //initial   panel_id => zIndex
@@ -161,7 +161,7 @@
         }]
     },
 
-    _testGarbageCollection: {
+    testGarbageCollection: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(5, cmp);
@@ -191,7 +191,7 @@
     /**
      * Verify new panel zIndex is based on existing panel's largest zIndex
      */
-    _testNewPanelZIndexBasedOnPrevPanels: {
+    testNewPanelZIndexBasedOnPrevPanels: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(2, cmp);
@@ -208,7 +208,7 @@
     /**
      * Verify destroyPanel event removes panel from global panel refs
      */
-    _testDestroyPanel: {
+    testDestroyPanel: {
         attributes: {"useContainer": true},
         test: [function(cmp) {
             this.createPanels(5, cmp);

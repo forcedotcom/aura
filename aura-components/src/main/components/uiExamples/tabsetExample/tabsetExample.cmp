@@ -61,6 +61,12 @@
                 <iframe id="myIframe" src="http://salesforce.com" height="200" width="500">
                 </iframe>
             </ui:tab>
+            <ui:tab title="More Tab 1">
+                <ui:inputText value="" label="Name" placeholder="input text" />
+            </ui:tab>
+            <ui:tab title="More Tab 2">
+                <ui:inputText value="" label="Name" placeholder="input text" />
+            </ui:tab>
         </ui:tabset>
         
         <h1>Tabs on the side</h1>

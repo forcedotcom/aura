@@ -360,8 +360,7 @@
             },
 
             select: function () {
-                if (this.highlightedIndex === -1) {
-                    $A.warning("Can't select item without index");
+                if (this.highlightedIndex === -1) { //nothing selected
                     return;
                 }
                 var highlightedCmp = this.iters[this.highlightedIndex];
@@ -588,7 +587,7 @@
     setDefaultHighlight: function(component) {
     	var setDefaultHighlight = component.get("v.setDefaultHighlight");
     	var visible = component.get("v.visible");
-    	if (setDefaultHighlight !== true || visible !== true) {
+    	if (visible !== true) {
     		return; 
     	}
     	var iterCmp = component.find("iter");
@@ -597,7 +596,7 @@
     		var found = false;
     	    for (var i = 0; i < iters.length; i++) {
                 var optionCmp = iters[i];
-                if (found === false && optionCmp.get("v.visible") === true) {
+                if (setDefaultHighlight && found === false && optionCmp.get("v.visible") === true) {
                     optionCmp.set("v.highlighted", true);
                     this.updateAriaAttributes(component, optionCmp);
                     found = true;
@@ -608,7 +607,7 @@
     	}
     },
     
-    setUpEvents: function (component) {
+    setUpEvents: function (component, onVisibleChange) {
         if (component.isRendered()) {
             var obj = {};
             var visible = component.get("v.visible");
@@ -625,17 +624,29 @@
                 // De-register list expand/collapse events
                 $A.util.removeOn(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
                 $A.util.removeOn(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
+                
+                if (onVisibleChange) {
+	                //push this even to the end of the queue to ensure that the interation in the component body is complete
+	                window.setTimeout($A.getCallback(function () {
+	                    if (component.isValid()) {
+	                        component.get("e.listCollapse").fire();
+	                    }
+	                }, 0));
+                }
+                
             } else { // Register list expand/collapse events
                 obj["aria-expanded"] = true;
                 $A.util.on(document.body, this.getOnClickEventProp("onClickStartEvent"), this.getOnClickStartFunction(component));
                 $A.util.on(document.body, this.getOnClickEventProp("onClickEndEvent"), this.getOnClickEndFunction(component));
 
-                //push this even to the end of the queue to ensure that the interation in the component body is complete
-                window.setTimeout($A.getCallback(function () {
-                    if (component.isValid()) {
-                        component.get("e.listExpand").fire();
-                    }
-                }, 0));
+                if (onVisibleChange) {
+	                //push this even to the end of the queue to ensure that the interation in the component body is complete
+	                window.setTimeout($A.getCallback(function () {
+	                    if (component.isValid()) {
+	                        component.get("e.listExpand").fire();
+	                    }
+	                }, 0));
+                }
 
             }
 

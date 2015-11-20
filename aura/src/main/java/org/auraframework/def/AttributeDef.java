@@ -19,7 +19,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
  */
-public interface AttributeDef extends Definition {
+public interface AttributeDef extends Definition, ParentedDef {
     @Override
     DefDescriptor<AttributeDef> getDescriptor();
 
@@ -38,6 +38,4 @@ public interface AttributeDef extends Definition {
     boolean isRequired();
 
     SerializeToType getSerializeTo();
-
-    DefDescriptor<? extends RootDefinition> getParentDescriptor();
 }

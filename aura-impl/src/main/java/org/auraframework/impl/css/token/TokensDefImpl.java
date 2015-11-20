@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.auraframework.Aura;
 import org.auraframework.builder.TokensDefBuilder;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.DefDescriptor;
@@ -36,6 +37,7 @@ import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.css.util.Tokens;
 import org.auraframework.impl.root.RootDefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
@@ -236,12 +238,20 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
     public void validateReferences() throws QuickFixException {
         super.validateReferences();
 
+        MasterDefRegistry mdr = Aura.getDefinitionService().getDefRegistry();
+
         // extends
         if (extendsDescriptor != null) {
+            TokensDef parentDef = extendsDescriptor.getDef();
+
             // check if it exists
-            if (extendsDescriptor.getDef() == null) {
+            if (parentDef == null) {
                 throw new DefinitionNotFoundException(extendsDescriptor, getLocation());
             }
+
+            // check access
+            mdr.assertAccess(descriptor, parentDef);
+
 
             // can't extend itself
             if (extendsDescriptor.equals(descriptor)) {
@@ -267,6 +277,7 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
         }
 
         for (DefDescriptor<TokensDef> imp : imports) {
+            // TODO: mdr access checks
             TokensDef def = imp.getDef();
 
             // can't import a def with a parent. This is an arbitrary restriction to enforce a level of token lookup
@@ -295,6 +306,8 @@ public final class TokensDefImpl extends RootDefinitionImpl<TokensDef> implement
                 throw new TokenValueNotFoundException(ref.toString(), descriptor, getLocation());
             }
         }
+
+        // TODO mdr access checks for providers
     }
 
     @Override

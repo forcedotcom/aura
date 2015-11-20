@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" description="Panel manager">
-    <aura:attribute name="registeredPanels"   type="Aura.ComponentDefRef[]" />
-    <aura:attribute name="useSharedContainer" type="Boolean" default="false"/>
+<aura:component extensible="true" description="Panel manager for the ui:panel and ui:modal components.">
+    <aura:attribute name="registeredPanels"   type="Aura.ComponentDefRef[]" description="The panel and modal components handled by the panel manager." />
+    <aura:attribute name="useSharedContainer" type="Boolean" default="false" description=""/>
 
     <aura:import library="ui:containerManagerLib" property="cmLib" />
     <aura:import library="ui:stackManagerLib"     property="smLib" />

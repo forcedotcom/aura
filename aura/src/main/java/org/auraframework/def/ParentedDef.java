@@ -13,6 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- .THIS {
-     position: relative;
- }
+package org.auraframework.def;
+
+/**
+ * A definition that is a child of a {@link RootDefinition}.
+ */
+public interface ParentedDef {
+    /**
+     * Gets the parent descriptor.
+     */
+    DefDescriptor<? extends RootDefinition> getParentDescriptor();
+}

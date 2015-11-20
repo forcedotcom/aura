@@ -1284,11 +1284,6 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
     }
 
     var defStorage = this.componentDefStorage.getStorage();
-    var actionStorage = Action.getStorage();
-    if (actionStorage && actionStorage.isPersistent()) {
-        $A.assert(defStorage && defStorage.isPersistent(), "ComponentDefStorage must exist and be persistent because actions storage exists and is persistent");
-    }
-
     if (!defStorage) {
         return Promise["resolve"]();
     }
@@ -1362,8 +1357,7 @@ AuraComponentService.prototype.findDependencies = function (key, defConfig, stor
     } else if ($A.util.isObject(defConfig)) {
         for (var attr in defConfig) {
             var value = defConfig[attr];
-
-            if (attr === 'descriptor') {
+            if (attr === "descriptor") {
                 if (value !== key && storedDeps.indexOf(value) !== -1) {
                     dependencies.push(value);
                 }
@@ -1402,7 +1396,8 @@ AuraComponentService.prototype.findDependencies = function (key, defConfig, stor
  */
 AuraComponentService.prototype.buildDependencyGraph = function() {
     // list of actions to never evict
-    var actionsBlackList = ['globalValueProviders']; // TODO - make GVP key more specific, add getApplication and loadLabels
+    var actionsBlackList = ["globalValueProviders",
+                            "aura://ComponentController/ACTION$getApplication"];
 
     var promises = [];
     var actionStorage = Action.getStorage();
@@ -1423,7 +1418,14 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
             nodes[key] = { "id": key, "dependencies": dependencies, "action": isAction };
         }
 
-        actionEntries = actionEntries.filter(function (a) { return actionsBlackList.indexOf(a.key) === -1; });
+        actionEntries = actionEntries.filter(function (a) {
+            for (var i = 0; i < actionsBlackList.length; i++) {
+                if (a.key.indexOf(actionsBlackList[i]) === 0) {
+                    return false;
+                }
+            }
+            return true;
+        });
         actionEntries.forEach(createNode.bind(this, true));
         defEntries.forEach(createNode.bind(this, false));
         return nodes;
@@ -1541,14 +1543,14 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
         // a) a percent of max size, and
         // b) size required to leave some headroom after the subsequent puts
         var targetSize = Math.min(
-                maxSize * Aura.Component.ComponentDefStorage.EVICTION_TARGET_LOAD,
-                maxSize - maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM - requiredSpaceKb
+                maxSize * self.componentDefStorage.EVICTION_TARGET_LOAD,
+                maxSize - maxSize * self.componentDefStorage.EVICTION_HEADROOM - requiredSpaceKb
         );
         var evicted = [];
 
         // short circuit
         if (startingSize <= targetSize) {
-            $A.log("AuraComponentService.evictDefsFromStorage: short-circuiting because current size (" + startingSize.toFixed(0) + ") < target size (" + targetSize.toFixed(0) + ")");
+            $A.log("AuraComponentService.evictDefsFromStorage: short-circuiting because current size (" + startingSize.toFixed(0) + "KB) < target size (" + targetSize.toFixed(0) + "KB)");
             return Promise["resolve"]([]);
         }
 
@@ -1626,7 +1628,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
                     );
             }
 
-            $A.log("AuraComponentService.evictDefsFromStorage: evicting because current size (" + startingSize.toFixed(0) + ") > target size (" + targetSize.toFixed(0) + ")");
+            $A.log("AuraComponentService.evictDefsFromStorage: evicting because current size (" + startingSize.toFixed(0) + "KB) > target size (" + targetSize.toFixed(0) + "KB)");
             evictRecursively(sortedKeys, startingSize);
         });
     });
@@ -1640,7 +1642,8 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.
- * @return {Promise} a promise that resolves when pruning is complete.
+ * @return {Promise} a promise that resolves when pruning is complete. If an error occurs
+ *  during pruning then all defs are purged and the promise resolves.
  */
 AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) {
     var self          = this;
@@ -1652,12 +1655,16 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
         return Promise["resolve"]();
     }
 
+    var currentSize = 0;
+    var newSize = 0;
+
     // check space to determine if eviction is required. this is an approximate check meant to
     // avoid storage.getAll() and graph analysis, which are expensive operations.
     return defStorage.getSize().then(
         function(size) {
+            currentSize = size;
             var maxSize = defStorage.getMaxSize();
-            var newSize = size + requiredSpaceKb + maxSize * Aura.Component.ComponentDefStorage.EVICTION_HEADROOM;
+            newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
             if (newSize < maxSize) {
                 return undefined;
             }
@@ -1679,7 +1686,7 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
                     $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
                     $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
                         "defsRequiredSize" : requiredSpaceKb,
-                        "storageCurrentSize" : size,
+                        "storageCurrentSize" : currentSize,
                         "storageRequiredSize" : newSize,
                         "evicted" : evicted
                     });
@@ -1690,13 +1697,21 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
             undefined, // noop
             function(e) {
                 $A.warning("AuraComponentService.pruneDefsFromStorage: failure during analysis or pruning; clearing actions and component def storages", e);
+                $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                    "defsRequiredSize" : requiredSpaceKb,
+                    "storageCurrentSize" : currentSize,
+                    "storageRequiredSize" : newSize,
+                    "error" : e
+                });
+
                 if (actionStorage) {
                     actionStorage.clear().then(undefined, function(clearError) {
                         $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing actions store", clearError);
                     });
                 }
 
-                defStorage.clear().then(undefined, function(clearError) {
+                // resolve after defs are cleared
+                return defStorage.clear().then(undefined, function(clearError) {
                     $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing def store", clearError);
                 });
             }

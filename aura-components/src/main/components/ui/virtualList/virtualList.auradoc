@@ -17,9 +17,16 @@
 -->
 <aura:documentation>
 	<aura:description>
-		 <p><code>ui:infiniteList</code></p>
+		 <p>To render your items in an unordered list, include a <code>&lt;ul></code> tag in your <code>ui:virtualList</code> component.
+		 In your template component, you can use the <code>&lt;li></code> tag to render the items. Note that this functionality is built-in for the
+		 <code>ui:infiniteList</code> component.</p>
+<pre>&lt;ui:virtualList aura:id="list" itemVar="item" items="{!v.items}">
+    &lt;aura:set attribute="itemTemplate">
+        &lt;!-- Your template here -->
+    &lt;/aura:set>
+    &lt;ul class="my list items"/>
+&lt;/ui:virtualList>
+</pre>		 
 	</aura:description>	
-		<aura:example name="infinitelist" ref="auradocs:demoList" label="Using ui:infiniteList">
-    	<p>Foo</p>
-	   </aura:example>
+		
 </aura:documentation>

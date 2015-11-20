@@ -21,7 +21,7 @@
     <aura:attribute name="class" type="String" description="A CSS style to be attached to the component. This style is added in addition to base styles output by the component." />
     <aura:attribute name="lazyRenderTabs" type="Boolean" default="false" description="If true, contained ui:tab components are rendered only when they are activated. The default is false." />
 
-    <aura:attribute name="useOverflowMenu" type="Boolean" default="false" description="Provides an overflow menu if set to true. Set barWidth and tabItemWidth to determine the number of overflow items. For example, if barWidth is 600 and tabItemWidth is 200, then the number of visible tabs is 3 and the third contains overflow items. The default is false."/>
+    <aura:attribute name="useOverflowMenu" type="Boolean" default="false" description="Set to true to use an overflow menu. The default is false. The overflow menu contains any tabs that fall outside the width of the tabset."/>
     <aura:attribute name="overflowLabel" type="String" default="More" description="The text label that appears on the label. The default is &quot;More&quot;."/>
 
     <!--

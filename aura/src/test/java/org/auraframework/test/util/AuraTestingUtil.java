@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nullable;
@@ -34,6 +35,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Source;
+import org.auraframework.system.SourceListener;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
@@ -94,12 +96,31 @@ public class AuraTestingUtil {
 
     /**
      * update source for a resource
+     * 
      * @param desc definition descriptor of the resource
      * @param content new content for the descriptor
      */
-    public void updateSource(DefDescriptor<?> desc, String content) {
+    public void updateSource(final DefDescriptor<?> desc, String content) {
         Source<?> src = getSource(desc);
-        src.addOrUpdate(content);
+
+        final Semaphore updated = new Semaphore(0);
+        SourceListener changeListener = new SourceListener() {
+            @Override
+            public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
+                if (desc.equals(source)) {
+                    updated.release();
+                }
+            }
+        };
+        Aura.getDefinitionService().subscribeToChangeNotification(changeListener);
+        try {
+            src.addOrUpdate(content);
+            updated.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while waiting for updated source event", e);
+        } finally {
+            Aura.getDefinitionService().unsubscribeToChangeNotification(changeListener);
+        }
     }
 
     /**
@@ -153,7 +174,8 @@ public class AuraTestingUtil {
     public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
             String namePrefix, boolean isPrivilegedNamespace) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
-        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isPrivilegedNamespace).getDescriptor();
+        DefDescriptor<T> descriptor = loader.addSource(defClass, contents, namePrefix, isPrivilegedNamespace)
+                .getDescriptor();
         markForCleanup(descriptor);
         return descriptor;
     }
@@ -176,7 +198,8 @@ public class AuraTestingUtil {
      * @param contents source contents
      * @return the {@link DefDescriptor} for the created definition
      */
-    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents, boolean isPrivilegedNamespace) {
+    public <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(DefDescriptor<T> descriptor, String contents,
+            boolean isPrivilegedNamespace) {
         StringSourceLoader loader = StringSourceLoader.getInstance();
         loader.putSource(descriptor, contents, false, isPrivilegedNamespace);
         markForCleanup(descriptor);
@@ -273,7 +296,7 @@ public class AuraTestingUtil {
     }
 
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app,
-            Map<DefDescriptor<?>,String> extraLoaded, List<String> dn) throws QuickFixException {
+            Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
         return buildContextForPost(mode, app, null, null, extraLoaded, dn);
     }
 
@@ -295,10 +318,10 @@ public class AuraTestingUtil {
      * </code>
      */
     public String buildContextForPost(Mode mode, DefDescriptor<? extends BaseComponentDef> app, String appUid,
-            String fwuid, Map<DefDescriptor<?>,String> extraLoaded, List<String> dn) throws QuickFixException {
+            String fwuid, Map<DefDescriptor<?>, String> extraLoaded, List<String> dn) throws QuickFixException {
         StringBuffer sb = new StringBuffer();
         JsonEncoder json = new JsonEncoder(sb, false, false);
-        Map<String,String> loaded = Maps.newHashMap();
+        Map<String, String> loaded = Maps.newHashMap();
 
         if (appUid == null) {
             AuraContext ctx = null;
@@ -317,7 +340,7 @@ public class AuraTestingUtil {
             dn = Lists.newArrayList();
         }
         if (extraLoaded != null) {
-            for (Map.Entry<DefDescriptor<?>,String> entry : extraLoaded.entrySet()) {
+            for (Map.Entry<DefDescriptor<?>, String> entry : extraLoaded.entrySet()) {
                 loaded.put(String.format("%s@%s", entry.getKey().getDefType().toString(),
                         entry.getKey().getQualifiedName()), entry.getValue());
             }

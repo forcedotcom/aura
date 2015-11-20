@@ -68,6 +68,6 @@
     },
 
     visibleChange: function(component, event, helper) {
-        helper.setUpEvents(component);
+        helper.setUpEvents(component, true);
     }
 })// eslint-disable-line semi

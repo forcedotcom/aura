@@ -224,6 +224,8 @@ public class CachingServiceImpl implements CachingService {
             }
 
             // successfully acquired the lock, start clearing caches
+            invalidateSourceRelatedCaches(source);
+
             // notify provided listeners, presumably to clear caches
             for (WeakReference<SourceListener> i : listeners) {
                 SourceListener sl = i.get();
@@ -232,9 +234,6 @@ public class CachingServiceImpl implements CachingService {
                     sl.onSourceChanged(source, event, filePath);
                 }
             }
-            // lastly, clear MDR's static caches
-            invalidateSourceRelatedCaches(source);
-
         } catch (InterruptedException e) {
         } finally {
             if (haveLock) {

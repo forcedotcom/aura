@@ -17,7 +17,7 @@
     afterRender : function(component, helper){
         this.superAfterRender();
         helper.updateEmptyListContent(component);
-        helper.setUpEvents(component);
+        helper.setUpEvents(component, false);
         helper.addHeaderAndFooterClassesAndAttributes(component);
         helper.setDefaultHighlight(component);
     },

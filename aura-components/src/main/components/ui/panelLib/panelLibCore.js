@@ -271,7 +271,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 if(cmp.isValid()) {
 
                     if (config.useTransition) {
-                        panel.removeEventListener(animEl, finishHandler);
+                        animEl.removeEventListener(animEnd, finishHandler);
                     }                
 
                     config.onFinish && config.onFinish();
@@ -305,7 +305,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
          */
         updatePanel: function(panel, facets, callback) {
             if ($A.util.isObject(facets)) {
-                var facet, body = facets['body'] || panel.get('v.body');
+                var facet, body = facets.body || panel.get('v.body');
                 for (var key in facets) {
                     facet = facets[key];
                     if (facets.hasOwnProperty(key) && $A.util.isComponent(facet)) {
@@ -316,36 +316,29 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                     //set body as value provider to route the events to the body
                     //presume only one root body component
                     var avp = $A.util.isComponent(body) ? body : body[0],
-                        header = facets['header'] || panel.get('v.header'), 
-                        footer = facets['footer'] || panel.get('v.footer');
+                        header = facets.header || panel.get('v.header'),
+                        footer = facets.footer || panel.get('v.footer');
                     
                     if ($A.util.isComponent(avp)) {
-                       avp.setAttributeValueProvider(panel);
-                    }
-                    
-                    var i, length;
-                    if (!$A.util.isEmpty(header)) {
-                        if ($A.util.isComponent(header)) {
-                            header.setAttributeValueProvider(avp);
-                        } else {
-                            for (i = 0, length = header.length; i < length; i++) {
-                                header[i].setAttributeValueProvider(avp);
-                            }
-                        }
-                    }
-                    if (!$A.util.isEmpty(footer)) {
-                        if ($A.util.isComponent(header)) {
-                            header.setAttributeValueProvider(avp);
-                        } else {
-                            for (i = 0, length = footer.length; i < length; i++) {
-                                footer[0].setAttributeValueProvider(avp);
-                            }
-                        }
+                        avp.setAttributeValueProvider(panel);
+                        this._updateAVP(header, avp);
+                        this._updateAVP(footer, avp);
                     }
                 }
             }
             callback && callback();
         },
+
+        _updateAVP: function(cmps, avp) {
+            if ($A.util.isComponent(cmps)) {
+                cmps.setAttributeValueProvider(avp);
+            } else if ($A.util.isArray(cmps)) {
+                for (var i = 0; i < cmps.length; i++) {
+                    cmps[i].setAttributeValueProvider(avp);
+                }
+            }
+        },
+
         handleNotify: function(cmp, event, helper) {
         	var params = event.getParams();
 	        if (!params) {

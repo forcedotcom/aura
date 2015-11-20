@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component access="GLOBAL" support="GA" extensible="true" abstract="true" extends="ui:interactive" provider="js://ui.menuItem" description="A UI menu item in a ui:menuList component.">
+<aura:component access="GLOBAL" support="GA" extensible="true" abstract="true" extends="ui:interactive" provider="js://ui.menuItem" description="An abstract component for menu items like ui:actionMenuItem, ui:checkboxMenuItem, and ui:radioMenuItem. Nest a menu item in a ui:menuList component.">
     <aura:registerevent name="menuSelect" type="ui:menuSelect" description="The event that is fired when the menu item is selected."/>
     <aura:attribute access="GLOBAL" name="selected" type="Boolean" default="false" description="The status of the menu item. True means this menu item is selected; False is not selected."/>
     <aura:attribute access="GLOBAL" name="type" type="String" description="The concrete type of the menu item. Accepted values are 'action', 'checkbox', 'radio', 'separator' or any namespaced component descriptor, e.g. ns:xxxxmenuItem."/>

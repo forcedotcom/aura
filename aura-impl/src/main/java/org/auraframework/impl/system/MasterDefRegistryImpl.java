@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.auraframework.Aura;
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.cache.Cache;
-import org.auraframework.def.AttributeDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.DefDescriptor;
@@ -40,6 +39,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DefinitionAccess;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.ParentedDef;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.impl.controller.AuraStaticControllerDefRegistry;
 import org.auraframework.service.CachingService;
@@ -465,7 +465,7 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
     private boolean hasLocalDef(DefDescriptor<?> descriptor) {
         return (original != null && original.defs.containsKey(descriptor)) || defs.containsKey(descriptor);
     }
-    
+
     private boolean localDefNotCacheable(DefDescriptor<?> descriptor) {
         return (defNotCacheable.contains(descriptor) || (original != null && original.defNotCacheable.contains(descriptor)));
     }
@@ -1313,9 +1313,9 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
 
         String namespace;
         String target;
-        if (def instanceof AttributeDef) {
-            AttributeDef attributeDef = (AttributeDef) def;
-            DefDescriptor<? extends RootDefinition> parentDescriptor = attributeDef.getParentDescriptor();
+        if (def instanceof ParentedDef) {
+            ParentedDef parentedDef = (ParentedDef) def;
+            DefDescriptor<? extends RootDefinition> parentDescriptor = parentedDef.getParentDescriptor();
             namespace = parentDescriptor.getNamespace();
             target = String.format("%s:%s.%s", namespace, parentDescriptor.getName(), desc.getName());
         } else {

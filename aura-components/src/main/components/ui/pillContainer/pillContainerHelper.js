@@ -87,7 +87,7 @@
         } else {
             $A.util.removeClass(cmp.getElement(), 'maxAllowed');
         }
-        this._setActiveItem(cmp, true);
+        this._setActiveItem(cmp,0);
     },
 
     handlePillEvent: function(cmp, event) {
@@ -162,11 +162,14 @@
         if (index >= itemsArray.length) {
             if (!this.focusOnInputBox(cmp)) {
                 itemsArray[0].focus();
+                this._setActiveItem(cmp,0);
             }
         } else if (index < 0) {
             itemsArray[itemsArray.length - 1].focus();
+            this._setActiveItem(cmp,itemsArray.length - 1);
         } else {
             itemsArray[index].focus();
+            this._setActiveItem(cmp,index);
         }
     },
 
@@ -235,6 +238,11 @@
         $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
         cmp.set("v.expanded", true);
 
+        var pillItemData = cmp.get("v.items");
+        if (pillItemData.length > 0) { // If there is any pill data present
+            this.focusItem(cmp, pillItemData, 0); // Focus on the last pill
+        }
+
     },
 
     _getActualHeight: function(element) {
@@ -299,20 +307,21 @@
 
                     pillItems[idxToFocus].focus();
                 }
-                this._setActiveItem(cmp, true);
+                this._setActiveItem(cmp,0);
                 break;
             }
         }
     },
 
-    _setActiveItem: function(cmp, firstActive) {
+    _setActiveItem: function(cmp, index) {
         var pillItems = cmp.find('pill');
         if (pillItems) {
             if (!$A.util.isArray(pillItems)) {
-                pillItems.set("v.active", true);
+                pillItems.set("v.active", index === 0);
             } else {
-                pillItems[0].set("v.active", firstActive);
-                pillItems[pillItems.length - 1].set("v.active", !firstActive);
+                for (var i=0;i<pillItems.length; i++) {
+                    pillItems[i].set("v.active", i === index);
+                }
             }
         }
     }

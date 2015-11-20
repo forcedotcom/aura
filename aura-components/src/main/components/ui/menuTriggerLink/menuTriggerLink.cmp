@@ -26,7 +26,9 @@
 
     <aura:set attribute="trigger">
         <div aura:id="menuTrigger">
-            <a aura:id="link" onblur="{!c.onblur}" onfocus="{!c.onfocus}" aria-haspopup="true" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
+            <a aura:id="link" onblur="{!c.onblur}" onfocus="{!c.onfocus}" aria-haspopup="true" aria-disabled="{!v.disabled}"
+               tabindex="{!v.disabled ? -1: 0}" class="{!v.class}" title="{!v.title}" onclick="{!c.onClick}">
+
                 <aura:if isTrue="{!v.body.length == 0}">
                     {!v.label}
                     <aura:set attribute="else">

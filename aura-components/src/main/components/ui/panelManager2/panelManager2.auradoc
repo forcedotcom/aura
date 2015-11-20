@@ -30,6 +30,7 @@
         &lt;/ui:panelManager2>
 &lt;/aura:component></pre>     
     <p>You must register your panels using the <code>registeredPanels</code> attribute before you can create them. The <code>alias</code> attribute must be unique. 
-    Pass in the alias for the <code>panelType</code> parameter when firing the <code>ui:createPanel</code> event. See <code>ui:panel</code> for more information.</p>   
+    Pass in the alias for the <code>panelType</code> parameter when firing the <code>ui:createPanel</code> event.</p>
+    <p>See <code>ui:panel</code> for more information.</p>   
   </aura:description>
 </aura:documentation>

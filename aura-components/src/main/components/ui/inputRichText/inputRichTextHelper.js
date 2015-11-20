@@ -94,6 +94,11 @@
 				var helper = cmp.getConcreteComponent().getDef().getHelper() || this;
 				editorInstance = CKEDITOR.replace(helper.getEditorId(cmp),  helper.getEditorConfig(cmp));
 			}
+			editorInstance.on("instanceReady", $A.getCallback(function() {
+				if (cmp.isValid()) {
+					cmp.getEvent("editorInstanceReady").fire();
+				}
+			}));
 		}
     },
 

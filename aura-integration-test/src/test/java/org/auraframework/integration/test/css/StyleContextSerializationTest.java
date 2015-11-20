@@ -15,14 +15,11 @@
  */
 package org.auraframework.integration.test.css;
 
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.StyleAdapter;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;

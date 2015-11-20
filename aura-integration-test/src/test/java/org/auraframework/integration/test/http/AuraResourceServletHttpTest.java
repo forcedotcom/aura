@@ -35,7 +35,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.system.AuraContext.Format;
@@ -62,12 +61,9 @@ public class AuraResourceServletHttpTest extends AuraHttpTestCase {
     class Request implements Callable<Integer> {
     	private CloseableHttpClient httpClient;
     	private String url;
-    	@SuppressWarnings("unused")
-		private String name;
     	public Request(CloseableHttpClient httpClient, String url, String name) { 
     		this.httpClient = httpClient;
     		this.url = url;
-    		this.name = name; 
     	}
 
 		@Override

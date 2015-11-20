@@ -132,7 +132,7 @@ extends RootDefinitionImplUnitTest<I, D, B> {
 	@Override
     public void testValidateDefinition() throws Exception {
         //set up controllerDescriptors here to make sure we don't check it when validating definition
-        this.controllerDescriptors = new ArrayList<DefDescriptor<ControllerDef>>();
+        this.controllerDescriptors = new ArrayList<>();
         this.mockControllerDef = Mockito.mock(DefDescriptor.class);
         this.controllerDescriptors.add(mockControllerDef);
         this.modelDefDescriptor = Mockito.mock(DefDescriptor.class);

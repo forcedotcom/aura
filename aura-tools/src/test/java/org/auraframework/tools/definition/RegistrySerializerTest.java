@@ -17,14 +17,10 @@ package org.auraframework.tools.definition;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
-import org.auraframework.def.ComponentDef;
 import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerException;
-import org.auraframework.tools.definition.RegistrySerializer.RegistrySerializerLogger;
 import org.auraframework.util.test.util.UnitTestCase;
 
-import com.google.common.collect.Lists;
 
 public class RegistrySerializerTest extends UnitTestCase {
     AuraComponentTestBuilder actb;
@@ -113,99 +109,99 @@ public class RegistrySerializerTest extends UnitTestCase {
 
     public enum LoggerLevel { ERROR, WARN, INFO, DEBUG};
 
-    private static class TestLoggerEntry {
-        public final LoggerLevel level;
-        public final String message;
-        public final Throwable cause;
-
-        public TestLoggerEntry(LoggerLevel level, String message, Throwable cause) {
-            this.level = level;
-            this.message = message;
-            this.cause = cause;
-        }
-
-        @Override
-        public String toString() {
-            return level+":"+message+", Caused by "+cause;
-        }
-    }
-
-    private static class TestLogger implements RegistrySerializerLogger {
-        private List<TestLoggerEntry> entries = Lists.newArrayList();
-
-        @Override
-        public void error(CharSequence loggable) {
-            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, loggable.toString(), null));
-        }
-
-        @Override
-        public void error(CharSequence loggable, Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, loggable.toString(), cause));
-        }
-
-        @Override
-        public void error(Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, null, cause));
-        }
-
-        @Override
-        public void warning(CharSequence loggable) {
-            entries.add(new TestLoggerEntry(LoggerLevel.WARN, loggable.toString(), null));
-        }
-
-        @Override
-        public void warning(CharSequence loggable, Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.WARN, loggable.toString(), cause));
-        }
-
-        @Override
-        public void warning(Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.WARN, null, cause));
-        }
-
-        @Override
-        public void info(CharSequence loggable) {
-            entries.add(new TestLoggerEntry(LoggerLevel.INFO, loggable.toString(), null));
-        }
-
-        @Override
-        public void info(CharSequence loggable, Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.INFO, loggable.toString(), cause));
-        }
-
-        @Override
-        public void info(Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.INFO, null, cause));
-        }
-
-        @Override
-        public void debug(CharSequence loggable) {
-            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, loggable.toString(), null));
-        }
-
-        @Override
-        public void debug(CharSequence loggable, Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, loggable.toString(), cause));
-        }
-
-        @Override
-        public void debug(Throwable cause) {
-            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, null, cause));
-        }
-
-        public List<TestLoggerEntry> getErrorLogEntries() {
-            List<TestLoggerEntry> errors = Lists.newArrayList();
-
-            for (TestLoggerEntry tle : entries) {
-                if (tle.level == LoggerLevel.ERROR) {
-                    errors.add(tle);
-                }
-            }
-            return errors;
-        }
-
-        public List<TestLoggerEntry> getLogEntries() {
-            return entries;
-        }
-    }
+//    private static class TestLoggerEntry {
+//        public final LoggerLevel level;
+//        public final String message;
+//        public final Throwable cause;
+//
+//        public TestLoggerEntry(LoggerLevel level, String message, Throwable cause) {
+//            this.level = level;
+//            this.message = message;
+//            this.cause = cause;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return level+":"+message+", Caused by "+cause;
+//        }
+//    }
+//
+//    private static class TestLogger implements RegistrySerializerLogger {
+//        private List<TestLoggerEntry> entries = Lists.newArrayList();
+//
+//        @Override
+//        public void error(CharSequence loggable) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, loggable.toString(), null));
+//        }
+//
+//        @Override
+//        public void error(CharSequence loggable, Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, loggable.toString(), cause));
+//        }
+//
+//        @Override
+//        public void error(Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.ERROR, null, cause));
+//        }
+//
+//        @Override
+//        public void warning(CharSequence loggable) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.WARN, loggable.toString(), null));
+//        }
+//
+//        @Override
+//        public void warning(CharSequence loggable, Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.WARN, loggable.toString(), cause));
+//        }
+//
+//        @Override
+//        public void warning(Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.WARN, null, cause));
+//        }
+//
+//        @Override
+//        public void info(CharSequence loggable) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.INFO, loggable.toString(), null));
+//        }
+//
+//        @Override
+//        public void info(CharSequence loggable, Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.INFO, loggable.toString(), cause));
+//        }
+//
+//        @Override
+//        public void info(Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.INFO, null, cause));
+//        }
+//
+//        @Override
+//        public void debug(CharSequence loggable) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, loggable.toString(), null));
+//        }
+//
+//        @Override
+//        public void debug(CharSequence loggable, Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, loggable.toString(), cause));
+//        }
+//
+//        @Override
+//        public void debug(Throwable cause) {
+//            entries.add(new TestLoggerEntry(LoggerLevel.DEBUG, null, cause));
+//        }
+//
+//        public List<TestLoggerEntry> getErrorLogEntries() {
+//            List<TestLoggerEntry> errors = Lists.newArrayList();
+//
+//            for (TestLoggerEntry tle : entries) {
+//                if (tle.level == LoggerLevel.ERROR) {
+//                    errors.add(tle);
+//                }
+//            }
+//            return errors;
+//        }
+//
+//        public List<TestLoggerEntry> getLogEntries() {
+//            return entries;
+//        }
+//    }
 }

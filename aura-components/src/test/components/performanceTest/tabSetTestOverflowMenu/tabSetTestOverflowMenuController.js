@@ -4,6 +4,6 @@
     },
 
     run : function(cmp, event, helper) {
-
+        event.getParam('arguments').done.immediate();  
     }
 })

@@ -5,6 +5,10 @@
     },
 
     run : function(cmp, event, helper) {
+        
+        var done = event.getParam('arguments').done;
+        var finishRun = done.async(); 
+        
         var NUM_TABS = 10;
 
         for (var i = 0; i < NUM_TABS; i++) {
@@ -24,11 +28,15 @@
                         }
                     } ]
                 },
-                index : 0
+                index : 0,
+                callback: function(tabObj){
+                    if(tabObj.tab.$attributeSet$.values.title === "Tab " + (NUM_TABS-1)){
+                        finishRun();
+                    }
+                }
             });
             e.fire();
         }
-        event.getParam('arguments').done.immediate();
     },
 
     postProcessing : function(cmp, event, helper) {

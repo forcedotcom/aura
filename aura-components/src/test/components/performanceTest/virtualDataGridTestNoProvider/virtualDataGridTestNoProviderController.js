@@ -31,7 +31,7 @@
             }
             columnTemplates.push(columnTemplate);
         }
-        ;
+        
 
         cmp.find('myData').set("v.headerColumns", dataGridColumns);
         cmp.find('myData').set("v.columns", columnTemplates);

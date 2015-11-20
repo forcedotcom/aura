@@ -25,7 +25,7 @@
             // get the configuration of the random column
             var config = cmp._columnConfigs[headers[randColumn].get("v.name")];
 
-            $A.newCmpAsync(this, function(newCmp) {
+            $A.createComponent("ui:dataGridColumn", config.header.attributes.values, function(newCmp, status, statusMessagesList) {
                 // create arrays holding virtualDataGrid's `columns` and `headerColumns` attributes
                 newHeaders[i] = newCmp;
                 newColumns[i] = config.column;
@@ -35,7 +35,8 @@
                     grid.set("v.columns", newColumns);
                     event.getParam('arguments').done.immediate();
                 }
-            }, config.header);
+            });
+
         }
     },
 

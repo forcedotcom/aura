@@ -1,6 +1,10 @@
 ({
 
     setup : function(cmp, event, helper) {
+        
+        var done = event.getParam('arguments').done;
+        var finishSetup = done.async();
+        
         var NUM_ITEMS = 100;
         helper.newActionMenuItemComponents = [];
 
@@ -10,6 +14,9 @@
                 'label' : 'D' + (i + 1)
             }, function(actionMenuItem, status, statusMessagesList) {
                 helper.newActionMenuItemComponents.push(actionMenuItem);
+                if(i == NUM_ITEMS - 1){
+                    finishSetup();
+                }
             });
         }
 

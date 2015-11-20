@@ -4,7 +4,7 @@
     },
 
     run : function(cmp, event, helper) {
-
+        event.getParam('arguments').done.immediate();
     },
 
     postProcessing : function(cmp, event, helper) {

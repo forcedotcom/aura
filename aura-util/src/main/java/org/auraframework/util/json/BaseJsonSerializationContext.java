@@ -23,6 +23,7 @@ import java.util.Deque;
  */
 public abstract class BaseJsonSerializationContext implements JsonSerializationContext {
     private final boolean format;
+    private int formatRootItems = 0;
     private boolean refSupport;
     private final int dataSizeLimit;
     private final int collectionSizeLimit;
@@ -41,6 +42,23 @@ public abstract class BaseJsonSerializationContext implements JsonSerializationC
     @Override
     public boolean format() {
         return format;
+    }
+
+    @Override
+    public boolean formatRootItems() {
+        return formatRootItems > 0;
+    }
+
+    @Override
+    public void pushFormatRootItems() {
+        formatRootItems++;
+    }
+
+    @Override
+    public void popFormatRootItems() {
+        if (formatRootItems > 0) {
+            formatRootItems--;
+        }
     }
 
     @Override

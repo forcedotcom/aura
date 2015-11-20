@@ -54,6 +54,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.javascript.JavascriptProcessingError;
 import org.auraframework.util.javascript.JavascriptWriter;
 import org.auraframework.util.json.JsonEncoder;
+import org.auraframework.util.json.JsonSerializationContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -360,7 +361,10 @@ public class ServerServiceImpl implements ServerService {
 
         // append component definitions
         sb.append("componentDefs:");
+        JsonSerializationContext serializationContext = context.getJsonSerializationContext();
+        serializationContext.pushFormatRootItems();
         Aura.getSerializationService().writeCollection(defs, BaseComponentDef.class, sb, "JSON");
+        serializationContext.popFormatRootItems();
         sb.append(",");
 
         // append namespaces. for now. *sigh*

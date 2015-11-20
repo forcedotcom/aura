@@ -1,0 +1,62 @@
+{
+  "browsers":[ "chrome" ],
+  "numberOfRuns" : 1,
+  "variability": [{
+            "Aura.coql.afterRender.added": 100
+        },
+        {
+            "Aura.coql.afterRender.removed": 10
+        },
+        {
+            "Aura.coql.component.added": 10
+        },
+        {
+            "Aura.coql.component.removed": 10
+        },
+        {
+            "Aura.coql.event.added": 305
+        },
+        {
+            "Aura.coql.event.removed": 10
+        },
+        {
+            "Aura.coql.render.added": 10
+        },
+        {
+            "Aura.coql.render.removed": 10
+        },
+        {
+            "Aura.coql.rerender.added": 800
+        },
+        {
+            "Aura.coql.rerender.removed": 10
+        },
+        {
+            "Aura.coql.unrender.added": 10
+        },
+        {
+            "Aura.coql.unrender.removed": 10
+        },
+        {
+            "Network.encodedDataLength": 404668
+        },
+        {
+            "Network.numRequests": 10
+        },
+        {
+            "Tracing.Painting.Paint": 10
+        },
+        {
+            "Tracing.Memory.jsHeapSizeUsed": 10
+        },
+        {
+            "Tracing.Memory.jsEventListeners": 25
+        },
+        {
+            "Tracing.Memory.documents": 10
+        },
+        {
+            "Tracing.Memory.nodes": 10
+        }],
+  "options" : {}
+}

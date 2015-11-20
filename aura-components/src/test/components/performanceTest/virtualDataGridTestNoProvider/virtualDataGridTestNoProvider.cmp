@@ -1,0 +1,12 @@
+<!-- tests setting ui:virtualDataGrid's `data` attribute with a large amount of data without using a provider -->
+
+<aura:component extends="performance:perfTest">
+    <aura:attribute name="data" type="List"/>
+    <ui:virtualDataGrid aura:id="myData" items="{!v.data}">
+    
+        <aura:set attribute="headerColumns">
+        	<ui:dataGridColumn label="placeholder column" name="placeholder" />
+        </aura:set>
+        
+    </ui:virtualDataGrid>
+</aura:component>

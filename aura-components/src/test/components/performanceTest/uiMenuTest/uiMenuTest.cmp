@@ -1,0 +1,39 @@
+<aura:component extends="performance:perfTest">
+    <!-- tests ui:menu by using a combination of 1. adding many menu items and 2.toggling the menu's initial visibility -->
+    
+	<!-- perf test params -->
+    <aura:attribute name="testManyItems" type="Boolean" default="false"/>
+    <aura:attribute name="testVisible" type="Boolean" default="false"/>
+    
+	<ui:menu>
+	    <ui:menuTriggerLink aura:id="trigger" label="Opportunity Status"/>
+	    
+	     <!--Need the `manualPosition` attribute to test menu with more items than fit the browser window-->
+        <ui:menuList class="actionMenu" aura:id="actionMenu" manualPosition="{!v.testManyItems}">
+                      
+              <!-- Needs to be toggled by the perf. framework if testing `visible` attribute-->
+        	  <aura:set attribute="visible" value="{!v.testVisible}"/>
+        	
+              <ui:actionMenuItem aura:id="item1" label="A1"/>
+              <ui:actionMenuItem aura:id="item2" label="A2" disabled="true"/>
+              <ui:actionMenuItem aura:id="item3" label="A3" />
+              <ui:actionMenuItem aura:id="item4" label="A4" />
+
+              <ui:menuItemSeparator/>
+
+              <ui:checkboxMenuItem aura:id="item5" label="C1"/>
+              <ui:checkboxMenuItem aura:id="item6" label="C2"/>
+              <ui:checkboxMenuItem aura:id="item7" label="C3"/>
+              <ui:checkboxMenuItem aura:id="item8" label="C4"/>
+
+              <ui:menuItemSeparator/>
+
+              <ui:radioMenuItem aura:id="item9" label="R1"/>
+              <ui:radioMenuItem aura:id="item10" label="R2"/>
+              <ui:radioMenuItem aura:id="item11" label="R3"/>
+              <ui:radioMenuItem aura:id="item12" label="R4"/>
+
+          </ui:menuList>
+	</ui:menu>
+	
+</aura:component>

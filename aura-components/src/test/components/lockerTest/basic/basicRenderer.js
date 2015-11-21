@@ -7,13 +7,10 @@
         div.className = "smoothAsButter";
         
         function testSymbol(symbol) {
-            // Test out self and Function tricks
-            var source = 
-                "var global = " + symbol + ";" + 
-                "helper.log(component, \"Global window via " + symbol.replace(/"/g, "\\\"") + ": \" + global);";
-            
+            // Test out eval, self, and Function tricks
             try {
-                eval(source);
+                var result = eval(symbol);
+                helper.log(component, "Global window via " + symbol + ": " + result);
             } catch (x) {
                 var error = x.toString();
                 if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__ is not permitted!") < 0) {
@@ -26,8 +23,15 @@
         
         helper.log(component, "Cloister controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
         
-        ["self", "top", "parent", "(function () { return this }())", "Function('return this')()", "toString.constructor.prototype", "constructor.constructor('alert(this)')()",
-         "''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__pro" + "to__, \"constructor\").value, null, \"return this;\")()"].forEach(testSymbol);
+        ["self", "top", "parent", 
+         "(function () { return this }())", 
+         "Function('return this')()", 
+         "toString.constructor.prototype", 
+         "constructor.constructor('return this')()",
+         "''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__pro" + "to__, \"constructor\").value, null, \"return this;\")()",
+         "var evil = ev" + "al; (\"indirect\", evil)(\"this\")",
+         "(\"indirect\", ev" + "al )(\"(new Function('return this'))()\")",
+         ].forEach(testSymbol);
         
         try {
             // Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty

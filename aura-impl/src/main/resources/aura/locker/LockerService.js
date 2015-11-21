@@ -82,8 +82,9 @@ var LockerService = window["LockerService"] = (function() {
 			throw Error("Security violation: use of __proto__ is not permitted!");
 		}
 		
-		// Rewrite calls to eval() NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
-		return code.replace(/eval\(/g, "_lsSafeEval(component, helper, ");
+		// Rewrite references to eval to avoid implicit calls leaking global state 
+		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
+		return code.replace(/\beval\b/g, "_lsSafeEval");
 	}
 
 	var service = {
@@ -104,7 +105,7 @@ var LockerService = window["LockerService"] = (function() {
 				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
 				
 				// DCHASMAN TODO Figure out the scoping issues here
-				shadowingIIFESource += "function _lsSafeEval(component, helper, code) { code = _lsPreprocessSource(code); return eval(code); }\n";
+				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(that.secureSource(code)); }\n";
 
 				shadowingIIFESource += preprocessSource(code) + "\n}";
 
@@ -153,6 +154,18 @@ var LockerService = window["LockerService"] = (function() {
 								}
 							}
 						}),
+						
+						sUtils : Object.create(Object.prototype, {
+							"secureSource" : {
+								value : preprocessSource
+							},
+
+							toString : {
+								value : function() {
+									return "SecureUtils: { key: " + JSON.stringify(key) + " }";
+								}
+							}
+						}),
 
 						sDocument : new SecureDocument(document, key)
 					};
@@ -164,7 +177,7 @@ var LockerService = window["LockerService"] = (function() {
 				}
 
 				var sWindow = env.sWindow;
-				var result = locker.call(sWindow, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, preprocessSource);
+				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, preprocessSource);
 
 				Object.defineProperty(locker, "$result", {
 					value : result

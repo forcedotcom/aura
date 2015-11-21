@@ -30,7 +30,7 @@ var LockerService = window["LockerService"] = (function() {
 		var globalKeys = Object.getOwnPropertyNames(window).concat(
 			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
 			
-		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error" ].concat(globalKeys);
+		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error", "_lsPreprocessSource" ].concat(globalKeys);
 
 		function getInitialWhitelist(symbols) {
 			var skip = {};
@@ -76,6 +76,16 @@ var LockerService = window["LockerService"] = (function() {
 		return true;
 	}
 
+	function preprocessSource(code) {
+		// Block use of __proto__
+		if (code.indexOf("__proto__") >= 0) {
+			throw Error("Security violation: use of __proto__ is not permitted!");
+		}
+		
+		// Rewrite calls to eval() NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
+		return code.replace(/eval\(/g, "_lsSafeEval(component, helper, ");
+	}
+
 	var service = {
 		createForDef : function(code, def) {
 			var namespace = def.getDescriptor().getNamespace();
@@ -91,7 +101,12 @@ var LockerService = window["LockerService"] = (function() {
 			return (function() {
 				var shadows = getShadows(imports);
 
-				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n" + code + "\n}";
+				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
+				
+				// DCHASMAN TODO Figure out the scoping issues here
+				shadowingIIFESource += "function _lsSafeEval(component, helper, code) { code = _lsPreprocessSource(code); return eval(code); }\n";
+
+				shadowingIIFESource += preprocessSource(code) + "\n}";
 
 				var locker;
 				try {
@@ -149,7 +164,7 @@ var LockerService = window["LockerService"] = (function() {
 				}
 
 				var sWindow = env.sWindow;
-				var result = locker.call(sWindow, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error);
+				var result = locker.call(sWindow, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, preprocessSource);
 
 				Object.defineProperty(locker, "$result", {
 					value : result

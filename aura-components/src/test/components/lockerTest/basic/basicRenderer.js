@@ -16,7 +16,7 @@
                 eval(source);
             } catch (x) {
                 var error = x.toString();
-                if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0) {
+                if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__ is not permitted!") < 0) {
                     throw Error("Unexpected exception: " + x.toString());
                 }
         
@@ -27,7 +27,7 @@
         helper.log(component, "Cloister controller scope: { document: " + document + ", window: " + window + ", $A: " + $A + " }");
         
         ["self", "top", "parent", "(function () { return this }())", "Function('return this')()", "toString.constructor.prototype", "constructor.constructor('alert(this)')()",
-         "''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__proto__, \"constructor\").value, null, \"return this;\")()"].forEach(testSymbol);
+         "''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__pro" + "to__, \"constructor\").value, null, \"return this;\")()"].forEach(testSymbol);
         
         try {
             // Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty

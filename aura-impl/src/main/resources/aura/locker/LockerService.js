@@ -18,6 +18,7 @@
 
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureComponent
+
 var LockerService = window["LockerService"] = (function() {
 	"use strict";
 
@@ -87,6 +88,10 @@ var LockerService = window["LockerService"] = (function() {
 		return code.replace(/\beval\b/g, "_lsSafeEval");
 	}
 
+	function isSafeModeEnabled() {
+		return $A.util.json.decode("(function() { 'use strict'; return this === undefined; })()");
+	}
+
 	var service = {
 		createForDef : function(code, def) {
 			var namespace = def.getDescriptor().getNamespace();
@@ -99,6 +104,10 @@ var LockerService = window["LockerService"] = (function() {
 		},
 
 		create : function(code, key, imports) {
+			if (!isSafeModeEnabled()) {
+				throw new Error("LockerService.create() is only supported in strict mode capable browsers!");
+			}
+			
 			return (function() {
 				var shadows = getShadows(imports);
 
@@ -113,7 +122,7 @@ var LockerService = window["LockerService"] = (function() {
 				try {
 					locker = $A.util.json.decode(shadowingIIFESource);
 				} catch (x) {
-					throw Error("Unable to create locker IIFE", x);
+					throw new Error("Unable to create locker IIFE", x);
 				}
 
 				locker.verifyShadows = function() {
@@ -143,8 +152,12 @@ var LockerService = window["LockerService"] = (function() {
 						sAura : Object.create($A, {
 							getComponent : {
 								value : function(globalId) {
-									// DCHASMAN TODO Wire up SecureComponent for scope awareness
-									throw Error("No Access");
+									
+									//#debugger
+									
+									var c = $A.getComponent(globalId);
+									LockerKeyUtil.verifyAccess(key, c);
+									return service.wrapComponent(c);
 								}
 							},
 
@@ -177,6 +190,8 @@ var LockerService = window["LockerService"] = (function() {
 				}
 
 				var sWindow = env.sWindow;
+				
+				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
 				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, preprocessSource);
 
 				Object.defineProperty(locker, "$result", {

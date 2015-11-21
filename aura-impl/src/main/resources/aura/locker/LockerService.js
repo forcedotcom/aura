@@ -79,8 +79,8 @@ var LockerService = window["LockerService"] = (function() {
 
 	function preprocessSource(code) {
 		// Block use of __proto__
-		if (code.indexOf("__proto__") >= 0) {
-			throw Error("Security violation: use of __proto__ is not permitted!");
+		if (code.indexOf("__proto__") >= 0 || code.indexOf("__defineGetter__") >= 0 || code.indexOf("__defineSetter__") >= 0) {
+			throw Error("Security violation: use of __proto__, __defineGetter__, and __defineSetter__ is not permitted!");
 		}
 				
 		// Rewrite references to eval to avoid implicit calls leaking global state 

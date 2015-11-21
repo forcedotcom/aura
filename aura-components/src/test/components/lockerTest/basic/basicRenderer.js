@@ -13,7 +13,7 @@
                 helper.log(component, "Global window via " + symbol + ": " + result);
             } catch (x) {
                 var error = x.toString();
-                if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__ is not permitted!") < 0) {
+                if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__") < 0) {
                     throw new Error("Unexpected exception: " + x.toString());
                 }
         

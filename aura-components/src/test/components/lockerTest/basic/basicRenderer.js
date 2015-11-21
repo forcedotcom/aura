@@ -14,7 +14,7 @@
             } catch (x) {
                 var error = x.toString();
                 if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__ is not permitted!") < 0) {
-                    throw Error("Unexpected exception: " + x.toString());
+                    throw new Error("Unexpected exception: " + x.toString());
                 }
         
                 helper.log(component, "Blocked: " + symbol);
@@ -33,13 +33,19 @@
          "(\"indirect\", ev" + "al )(\"(new Function('return this'))()\")",
          ].forEach(testSymbol);
         
+        // Use a SecureFunction
+        var f = new Function("x", "y", "return x + y");
+        if (f(1, 2) !== 3) {
+            throw new Error("Unable to use new Function()");
+        } 
+        
         try {
             // Should not be allowed because SecureElement is Object.freeze()'ed - we can support this if we want to though using Object.defineProperty
             div.onclick = function(event) {  
             };
         } catch (x) {
             if (x.toString().indexOf("TypeError") < 0) {
-                throw Error("Unexpected exception: " + x.toString());
+                throw new Error("Unexpected exception: " + x.toString());
             }
         }
         
@@ -73,7 +79,7 @@
         function testNoAccess(scenario, successMessage) {
             try {
                 scenario();
-                throw Error("Senario should not have successed: " + successMessage);
+                throw new Error("Senario should not have successed: " + successMessage);
             } catch (x) {
                 if (x.toString().indexOf("Access denied") < 0) {
                     throw x;

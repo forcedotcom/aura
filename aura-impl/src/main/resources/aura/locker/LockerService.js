@@ -31,7 +31,7 @@ var LockerService = window["LockerService"] = (function() {
 		var globalKeys = Object.getOwnPropertyNames(window).concat(
 			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
 			
-		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error", "_lsPreprocessSource" ].concat(globalKeys);
+		var candidates = [ "$A", "document", "window", "self", "top", "console", "Error", "Function" ].concat(globalKeys);
 
 		function getInitialWhitelist(symbols) {
 			var skip = {};
@@ -82,7 +82,7 @@ var LockerService = window["LockerService"] = (function() {
 		if (code.indexOf("__proto__") >= 0) {
 			throw Error("Security violation: use of __proto__ is not permitted!");
 		}
-		
+				
 		// Rewrite references to eval to avoid implicit calls leaking global state 
 		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
 		return code.replace(/\beval\b/g, "_lsSafeEval");
@@ -113,8 +113,8 @@ var LockerService = window["LockerService"] = (function() {
 
 				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
 				
-				// DCHASMAN TODO Figure out the scoping issues here
-				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(that.secureSource(code)); }\n";
+				// DCHASMAN TODO Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
+				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(\"'use strict';\" + that.secureSource(code)); }\n";
 
 				shadowingIIFESource += preprocessSource(code) + "\n}";
 
@@ -189,10 +189,17 @@ var LockerService = window["LockerService"] = (function() {
 					Object.freeze(env.sAura);
 				}
 
-				var sWindow = env.sWindow;
+				function sFunction() {
+					/*jslint evil: true */
+					var args = Array.prototype.slice.call(arguments);
+					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
+					
+					return Function.apply(undefined, args);
+				}
 				
 				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
-				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, preprocessSource);
+				var sWindow = env.sWindow;
+				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, sFunction);
 
 				Object.defineProperty(locker, "$result", {
 					value : result

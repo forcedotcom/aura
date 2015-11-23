@@ -788,7 +788,7 @@
     		//just verify the panel displays without errors.
     		this.waitForPanelDialogOpen();
     	}, function(cmp) {
-    		this.verifyPointerPresent(true);
+            this.verifyPointerPresent(false);//ns,sw,ne,se, directions never have pointers
     	}]
     },
     
@@ -803,7 +803,7 @@
     		//just verify the panel displays without errors.
     		this.waitForPanelDialogOpen();
     	}, function(cmp) {
-    		this.verifyPointerPresent(true);
+    		this.verifyPointerPresent(false); 
     	}]
     },
     
@@ -818,7 +818,7 @@
     		//just verify the panel displays without errors.
     		this.waitForPanelDialogOpen();
     	}, function(cmp) {
-    		this.verifyPointerPresent(true);
+    		this.verifyPointerPresent(false);
     	}]
     },
     
@@ -833,7 +833,7 @@
     		//just verify the panel displays without errors.
     		this.waitForPanelDialogOpen();
     	}, function(cmp) {
-    		this.verifyPointerPresent(true);
+    		this.verifyPointerPresent(false);
     	}]
     },
     

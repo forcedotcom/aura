@@ -16,6 +16,7 @@
 ({
     init: function(cmp) {
     	var closeAction = cmp.get("v.closeAction");
+        var direction = cmp.get("v.direction");
         //handler for closeOnEsc and closeOnTabOut
         cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
         //handler for closeOnClickOut
@@ -32,6 +33,9 @@
             }, function(button){
                 cmp.set('v.closeButton', button);
             });
+        }
+        if(direction && direction.match(/(north|south)(east|west)/)) {
+            cmp.set('v.showPointer', false);
         }
     },
 
@@ -209,6 +213,8 @@
         if(!boundingElement) {
             boundingElement = window;
         }
+
+        
 
         if(!advancedConfig) {
 

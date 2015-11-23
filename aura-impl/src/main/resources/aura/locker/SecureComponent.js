@@ -22,7 +22,7 @@ var SecureComponent = (function() {
 			return value;
 		}
 
-		// DCHASMAN TODO Figure out if we want to filter out sometimes, all of the time does not make sense e.g. for component.find()
+		// DCHASMAN TODO W-2837797 Figure out if we want to filter out sometimes, all of the time does not make sense e.g. for component.find()
 		// return LockerKeyUtil.hasAccess(sc, value) ? LockerService.wrapComponent(value, referencingKey) : undefined;
 
 		return LockerService.wrapComponent(value, LockerKeyUtil._getKey(sc, masterKey));
@@ -105,7 +105,7 @@ var SecureComponent = (function() {
 
 		"set" : {
 			value : function(expression, value) {
-				// DCHASMAN TODO Figure out the correct access control model for set()
+				// DCHASMAN TODO W-2837798 Figure out the correct access control model for set()
 				getComponent(this).set(expression, value);
 			}
 		},

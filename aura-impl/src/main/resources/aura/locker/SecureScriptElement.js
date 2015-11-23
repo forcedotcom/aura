@@ -33,7 +33,7 @@ var SecureScriptElement = (function() {
 						LockerService.create(xhr.responseText, key);
 					}
 					
-					// DCHASMAN TODO Add in error handling for 404's etc
+					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
 				};
 
 				xhr.open("GET", this._get("src", masterKey), true);
@@ -59,7 +59,7 @@ var SecureScriptElement = (function() {
 
 		addEventListener : {
 			value : function(event, callback) {
-				// DCHASMAN TOOD Add support for onload events
+				// DCHASMAN TOOD W-2837803 Add support for onload event
 			}
 		}
 	});

@@ -77,7 +77,7 @@ var SecureElement = (function() {
 					// Filter out any events not associated with our key
 					if (LockerKeyUtil.hasAccess(that, event.target)) {
 
-						// DCHASMAN TODO create SecureEvent class to allow delivery of bubbled events w/out exposing currentTarget etc
+						// DCHASMAN TODO W-2837770 create SecureEvent class to allow delivery of bubbled events w/out exposing currentTarget etc
 						// for (name in event) { if (event[name] instanceof Node) { console.log("Found something to wrap: " + name) } }
 
 						// Wrap the source event in "this" in a secure element

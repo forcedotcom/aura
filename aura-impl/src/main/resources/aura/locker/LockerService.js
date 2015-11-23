@@ -25,8 +25,8 @@ var LockerService = window["LockerService"] = (function() {
 	var lockers = [];
 	var keyToEnvironmentMap = {};
 
-	var validSymbolNameRegEx = /^[a-z$_][a-z0-9$]*$/i;
-
+	var validSymbolNameRegEx = /^[a-z$_][a-z0-9$_]*$/i;
+	
 	function getShadows(imports) {
 		var globalKeys = Object.getOwnPropertyNames(window).concat(
 			Object.getOwnPropertyNames(Object)).concat(Object.getOwnPropertyNames(Object.prototype));
@@ -72,9 +72,9 @@ var LockerService = window["LockerService"] = (function() {
 			return false;
 		}
 
-		// DCHASMAN TODO Scan shadows and expected shadows for equality
+		// DCHASMAN TODO W-2837786 Scan shadows and expected shadows for equality
 
-		return true;
+		return undefined;
 	}
 
 	function preprocessSource(code) {
@@ -89,7 +89,7 @@ var LockerService = window["LockerService"] = (function() {
 	}
 
 	function isSafeModeEnabled() {
-		return $A.util.json.decode("(function() { 'use strict'; return this === undefined; })()");
+		return $A.util.globalEval("(function() { 'use strict'; return this === undefined; })()");
 	}
 
 	var service = {
@@ -113,16 +113,16 @@ var LockerService = window["LockerService"] = (function() {
 
 				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
 				
-				// DCHASMAN TODO Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
+				// DCHASMAN TODO W-2837788 Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
 				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(\"'use strict';\" + that.secureSource(code)); }\n";
-
+				
 				shadowingIIFESource += preprocessSource(code) + "\n}";
 
 				var locker;
 				try {
-					locker = $A.util.json.decode(shadowingIIFESource);
+					locker = $A.util.globalEval(shadowingIIFESource);
 				} catch (x) {
-					throw new Error("Unable to create locker IIFE", x);
+					throw new Error("Unable to create locker IIFE: " + x);
 				}
 
 				locker.verifyShadows = function() {
@@ -136,7 +136,7 @@ var LockerService = window["LockerService"] = (function() {
 					}
 				});
 
-				// DCHASMAN TODO Fix this - does not work correctly because objects are auto coerced to strings in javascript maps until ES6
+				// DCHASMAN TODO W-2837795 reuse of environments uses JSON.stringify(key) as the index into the key to environment map - is this OK or do we need something stronger
 				var psuedoKeySymbol = JSON.stringify(key);
 				var env = keyToEnvironmentMap[psuedoKeySymbol];
 				if (!env) {
@@ -194,8 +194,12 @@ var LockerService = window["LockerService"] = (function() {
 					var args = Array.prototype.slice.call(arguments);
 					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
 					
+					//#debugger
+					
 					return Function.apply(undefined, args);
 				}
+				
+				// function getCtor(o) { if (o.constructor === Function.constructor) { throw new Error("You cannot get Function.ctor!") } return o.constructor; }
 				
 				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
 				var sWindow = env.sWindow;

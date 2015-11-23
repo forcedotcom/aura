@@ -1,0 +1,9 @@
+{
+  "s":1,
+  "v":{
+    "render":function(cmp) {},
+    "afterRender":function(cmp) {},
+    "rerender":function(cmp) {},
+    "unrender":function(cmp) {}
+  }
+}

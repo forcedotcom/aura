@@ -15,15 +15,17 @@
  */
 package org.auraframework.integration.test.helper;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.junit.Assert.assertThat;
+
 import org.auraframework.Aura;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.javascript.helper.JavascriptHelperDef;
 
 /**
- * @hierarchy Aura.Unit Tests.Components.HelperDef.JavascriptHelperDef
- * @priority medium
- * @userStorySyncIdOrName a07B0000000EuDd
+ * Test class to verify implementation of JavascriptHelperDef.
  */
 public class JavascriptHelperDefTest extends AuraImplTestCase {
     public JavascriptHelperDefTest(String name) {
@@ -31,27 +33,32 @@ public class JavascriptHelperDefTest extends AuraImplTestCase {
     }
 
     /**
-     * JavascriptHelperDef can be used only on the client side.
-     * 
-     * @throws Exception
+     * Verify JavascriptHelperDef is non-local.
      */
-    public void testIsNotLocal() throws Exception {
-        HelperDef hlprDef = Aura.getDefinitionService().getDefinition("js://test.test_SimpleHelper", HelperDef.class);
-        assertNotNull("Failed to extract helper def on component.", hlprDef);
-        assertTrue("Should have obtained a javascript helper def.", hlprDef instanceof JavascriptHelperDef);
-        assertEquals("Failed to create correct helper def for test component.", "js://test.test_SimpleHelper", hlprDef
-                .getDescriptor().getQualifiedName());
-        assertFalse("Javascript helper defs are not local.", hlprDef.isLocal());
+    public void testIsLocalReturnsFalse() {
+        HelperDef helperDef =  (new JavascriptHelperDef.Builder()).build();
+        assertFalse(helperDef.isLocal());
     }
 
-    /**
-     * Verify that javascript helper defs are serializable.
-     * 
-     * @throws Exception
-     */
-    public void testJavascriptHelperDefAreSerializable() throws Exception {
-        HelperDef hlprDef = Aura.getDefinitionService().getDefinition("js://test.test_SimpleHelper", HelperDef.class);
-        assertNotNull("Failed to extract helper def on component.", hlprDef);
-        this.serializeAndGoldFile(hlprDef);
+    public void testGetDescriptor() throws Exception {
+        DefDescriptor<HelperDef> expectedHelperDesc = addSourceAutoCleanup(HelperDef.class, "({})");
+        HelperDef helperDef = Aura.getDefinitionService().getDefinition(expectedHelperDesc);
+
+        DefDescriptor<HelperDef> actualHelperDesc = helperDef.getDescriptor();
+        assertSame(expectedHelperDesc, actualHelperDesc);
+    }
+
+    public void testSerializeJavascriptHelperDef() throws Exception {
+        String helperJS =
+                "({\n" +
+                "    getHelp:function() {\n" +
+                "        return 'simply';\n" +
+                "    }\n" +
+                "})\n";
+        DefDescriptor<HelperDef> helperDesc = addSourceAutoCleanup(HelperDef.class, helperJS);
+        HelperDef helperDef = helperDesc.getDef();
+
+        assertThat(helperDef, instanceOf(JavascriptHelperDef.class));
+        this.serializeAndGoldFile(helperDef, "_JSHelperDef");
     }
 }

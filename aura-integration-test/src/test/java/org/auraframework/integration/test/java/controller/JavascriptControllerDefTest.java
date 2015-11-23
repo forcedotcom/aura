@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.auraframework.Aura;
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -32,7 +33,7 @@ import org.auraframework.instance.Action;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 
 /**
- * Test class to verify implementation of JavaScript Controllers for component.
+ * Test class to verify implementation of JavascriptControllerDef.
  */
 public class JavascriptControllerDefTest extends AuraImplTestCase {
     public JavascriptControllerDefTest(String name) {
@@ -45,6 +46,14 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
     public void testIsLocalReturnsFalse() {
         ControllerDef controllerDef = (new JavascriptControllerDef.Builder()).build();
         assertFalse(controllerDef.isLocal());
+    }
+
+    public void testGetDescriptor() throws Exception {
+        DefDescriptor<ControllerDef> expectedControllerDesc = addSourceAutoCleanup(ControllerDef.class, "({})");
+        ControllerDef controllerDef = Aura.getDefinitionService().getDefinition(expectedControllerDesc);
+
+        DefDescriptor<ControllerDef> actualControllerDesc = controllerDef.getDescriptor();
+        assertSame(expectedControllerDesc, actualControllerDesc);
     }
 
     public void testGetActionDefs() throws Exception {
@@ -82,7 +91,7 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         assertEquals(expected, actionDef.getName());
     }
 
-    public void testSerializeJavascriptActionDef() throws Exception {
+    public void testSerializeJavascriptControllerDef() throws Exception {
         String controllerJs =
                 "({\n" +
                 "    function1: function(args) {\n" +
@@ -95,10 +104,11 @@ public class JavascriptControllerDefTest extends AuraImplTestCase {
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         ControllerDef controllerDef = controllerDesc.getDef();
 
+        assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
         serializeAndGoldFile(controllerDef, "_JSControllerDef");
     }
 
-    /*
+    /**
      * Verify JavascriptControllerDef creates an JavascriptPseudoAction object on server side.
      */
     public void testCreateAction() throws Exception {

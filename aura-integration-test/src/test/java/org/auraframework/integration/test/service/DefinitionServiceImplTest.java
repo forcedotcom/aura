@@ -27,6 +27,7 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.DescriptorFilter;
+import org.auraframework.def.HelperDef;
 import org.auraframework.def.StyleDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImplTestCase;
@@ -45,6 +46,7 @@ import org.auraframework.system.SourceLoader;
 import org.auraframework.throwable.ClientOutOfSyncException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
+import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
@@ -111,6 +113,73 @@ public class DefinitionServiceImplTest extends AuraImplTestCase {
                         "", ""));
         Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED, desc);
         assertEquals(desc, Aura.getDefinitionService().getDefinition(desc).getDescriptor());
+    }
+
+    public void testGetDefinitionThrowsExceptionWhenComponentHasInvalidHelper() {
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        DefDescriptor<HelperDef> helperDescriptor =
+                DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor, HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
+        String invalidHelperJs = "({help:function(){ ";
+        addSourceAutoCleanup(helperDescriptor, invalidHelperJs);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
+            fail("InvalidDefinitionException should be thrown when getting a definition of component with invalid helper.");
+        } catch (Exception e) {
+            this.checkExceptionContains(e, InvalidDefinitionException.class, "JsonStreamReader");
+        }
+    }
+
+    public void testGetDefinitionThrowsExceptionWhenComponentUsesNonExistingHelper() {
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        String cmpMarkup = String.format(baseComponentTag, "helper='js://test.notExistingHelper'", "");
+        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
+            fail("DefinitionNotFoundException should be thrown when getting a definition of component using non existing helper.");
+        } catch (Exception e) {
+            this.checkExceptionContains(e, DefinitionNotFoundException.class, "No HELPER named js://test.notExistingHelper");
+        }
+    }
+
+    public void testGetDefinitionThrowsExceptionWhenComponentUsesInvalidHelperDescriptor() {
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        DefDescriptor<HelperDef> helperDescriptor = addSourceAutoCleanup(HelperDef.class, "({})");
+        // using colon (:) as separator
+        String helperAttributeWithInvalidHelperDescriptor = String.format("helper='js://%s:%s'", helperDescriptor.getNamespace(), helperDescriptor.getName());
+        String cmpMarkup = String.format(baseComponentTag, helperAttributeWithInvalidHelperDescriptor, "");
+        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
+            fail("InvalidDefinitionException should be thrown when getting a definition of component using invalid helper descriptor.");
+        } catch (Exception e) {
+            this.checkExceptionContains(e, InvalidDefinitionException.class, "Invalid Descriptor Format");
+        }
+    }
+
+    public void testGetDefinitionThrowsExceptionWhenUsingDescriptorOfComponentWithoutHelper() throws Exception {
+        Aura.getContextService().startContext(Mode.PROD, Format.HTML, Authentication.AUTHENTICATED);
+        DefDescriptor<ComponentDef> cmpWithoutHelperDescriptor =
+                addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        // make sure it doesn't has helper
+        assertNull(cmpWithoutHelperDescriptor.getDef().getHelperDef());
+
+        String helperAttribute = String.format("helper='js://%s.%s'",
+                cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName());
+        String cmpMarkup = String.format(baseComponentTag, helperAttribute, "");
+        DefDescriptor<ComponentDef> cmpDescriptor = addSourceAutoCleanup(ComponentDef.class, cmpMarkup);
+
+        try {
+            Aura.getDefinitionService().getDefinition(cmpDescriptor.getQualifiedName(), ComponentDef.class);
+            fail("DefinitionNotFoundException should be thrown when getting a definition of component using descriptor of a component without helper.");
+        } catch (Exception e) {
+            String errorMessage = String.format("No HELPER named js://%s.%s found : [%s]",
+                    cmpWithoutHelperDescriptor.getNamespace(), cmpWithoutHelperDescriptor.getName(), cmpDescriptor.getQualifiedName());
+            this.checkExceptionContains(e, DefinitionNotFoundException.class, errorMessage);
+        }
     }
 
     /**

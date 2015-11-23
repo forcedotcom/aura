@@ -110,7 +110,7 @@ Aura.OverrideMap = function OverrideMap() {
             }
         ),
 
-    "ComponentService.createComponentPriv" : new Aura.Utils.Override($A.componentService, $A.componentService.createComponentPriv, false,
+        "ComponentService.createComponentPriv" : new Aura.Utils.Override($A.componentService, $A.componentService.createComponentPriv, false,
             function(bound) {
                 $A.componentService.createComponentPriv = bound;
             },
@@ -186,6 +186,29 @@ Aura.OverrideMap = function OverrideMap() {
                 Aura.Event.Event.prototype["fire"] = orig;
             }
         ),
+
+        "outputComponent" : new Aura.Utils.Override(null, Aura.Component.Component.prototype.toJSON, true,
+            function(bound) {
+                Aura.Component.Component.prototype.toJSON = bound;
+                Aura.Component.Component.prototype["toJSON"] = bound;
+
+                Aura.Component.Component.prototype["_$getSelfGlobalId$"] = function() {
+                    return this.globalId;
+                };
+
+                Aura.Component.Component.prototype["_$getRawValue$"] = function(key) {
+                    return this.attributeSet.values[key];
+                };
+            },
+
+            function(orig) {
+                Aura.Component.Component.prototype.toJSON = orig;
+                Aura.Component.Component.prototype["toJSON"] = orig;
+
+                delete Aura.Component.Component.prototype["_$getSelfGlobalId$"];
+                delete Aura.Component.Component.prototype["_$getRawValue$"];
+            }
+		),
 
         "StorageService.selectAdapter" : new Aura.Utils.Override($A.storageService, $A.storageService.selectAdapter,
             false,

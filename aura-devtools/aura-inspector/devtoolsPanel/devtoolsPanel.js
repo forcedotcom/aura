@@ -56,6 +56,8 @@
         var _onReadyQueue = [];
         var _isReady = false;
         var _subscribers = new Map();
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
         this.connect = function(){
             if(runtime) { return; }
@@ -270,81 +272,74 @@
             this.publish("AuraInspector:ConsoleLog", msg);
         };
 
-        this.updateComponentTree = function(json) {
-            this.addLogMessage("Updating Component Tree");
-            this.showLoading();
-            // $A will be present on aura error pages
-            // but we won't have a root
-            var command = `
-                var json = "{}";
-                if(window.$A) {
-                    var root = $A.getRoot();
-                    if(root) {
-                        json = root.toJSON();
-                    }
-                }
-                (json);
-            `;
-            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-                if(exceptionInfo) {
-                    this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo);
-                }
-                if(!response) { return; }
-                var tree = JSON.parse(response);
-
-                // RESOLVE REFERENCES
-                tree = ResolveJSONReferences(tree);
-
-                panels.get("component-tree").setData(tree);
-                this.addLogMessage("Component Tree Updated");
-                this.hideLoading();
-            }.bind(this));
-        };
-
         this.updateComponentView = function(globalId) {
-            var cmd = `
-                var component = $A.getComponent("${globalId}");
-                if(component) { 
-                    var result = component.toJSON();
-                    var tmpResult = JSON.parse(result);
-                    var elements = component.getElements() || [];
-                    var elementCount = 0;
-                    elements.forEach(function(current){
-                        // Sub elements
-                        elementCount += current.getElementsByTagName("*").length;
-                        // For the current element. 
-                        elementCount++;
-                    });
-                    tmpResult.elementCount = elementCount;
-
-                    JSON.stringify(tmpResult);
-                }
-            `;
-
-            chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
-                if(exceptionInfo) {
-                    this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo);
-                }
-                if(!response) { return; }
-                var tree = JSON.parse(response);
-
-                // RESOLVE REFERENCES
-                tree = ResolveJSONReferences(tree);
-
-                panels.get("component-view").setData(tree);
-            }.bind(this));
+            this.getComponent(globalId, function(component){
+                panels.get("component-view").setData(component);
+            }, {
+                elementCount: true
+            });
         };
 
-        this.updateCacheViewer = function(panelId, key, command) {
-            this.showLoading();
+        this.getComponent = function(globalId, callback, configuration) {
+            if(typeof callback !== "function") { throw new Error("callback is required for - getComponent(globalId, callback)"); }
+            if(globalId.startsWith(COMPONENT_CONTROL_CHAR)) { globalId = globalId.substr(1);}
+            var command;
+
+            if(configuration && typeof configuration === "object") {
+                var configParameter = JSON.stringify(configuration);
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', ${configParameter});`; 
+            } else {
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}');`; 
+            }
+
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
                 if(exceptionInfo) { console.error(exceptionInfo); }
                 if(!response) { return; }
-                panels.get(panelId).setData(key, response);
-                this.hideLoading();
-            }.bind(this));
+                var component = JSON.parse(response);
+
+                // RESOLVE REFERENCES
+                component = ResolveJSONReferences(component);
+
+                callback(component);
+            });
+        };
+
+        this.getComponents = function(globalIds, callback) {
+            if(!Array.isArray(globalIds)) { throw new Error("globalIds was not an array - getComponents(globalIds, callback)");}
+            var count = globalIds.length;
+            var processed = 0;
+            var returnValue = [];
+            for(var c=0;c<count;c++) {
+                this.getComponent(globalIds[c], function(index, component){
+                    returnValue[index] = component;
+                    if(++processed == count) {
+                        callback(returnValue);
+                    }
+                }.bind(this, c));
+            }
+        };
+
+        this.getRootComponent = function(callback) {
+            if(typeof callback !== "function") { throw new Error("callback is required for - getRootComponent(callback)"); }
+            var command = "window.$A && $A.getRoot() && window[Symbol.for('AuraDevTools')].Inspector.getComponent($A.getRoot().getGlobalId());"; 
+            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { return; }
+                var component = JSON.parse(response);
+
+                // RESOLVE REFERENCES
+                component = ResolveJSONReferences(component);
+
+                callback(component);
+            });
+        };
+
+        this.isComponentId = function(id) {
+            return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR);
+        };
+
+        this.cleanComponentId = function(id) {
+            return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR) ? id.substr(1) : id;
         };
 
         /**

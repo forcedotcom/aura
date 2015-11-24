@@ -19,16 +19,16 @@
    
     
         <div class="block">
-            <ui:tooltip aura:id="topLeftWest" advanced="true" direction="west" trigger="hover">
+            <ui:tooltip aura:id="topLeftWest" class="topLeftWest" advanced="true" direction="west" trigger="hover">
                <ui:label aura:id="topLeftWestlabel" for="topLeftWest" label="Wst"/>
             </ui:tooltip>
-            <ui:tooltip aura:id="topLeftNorth" advanced="true" direction="north" trigger="hover">
+            <ui:tooltip aura:id="topLeftNorth" class="topLeftNorth" advanced="true" direction="north" trigger="hover">
                <ui:label aura:id="topLeftNorthlabel" for="topLeftNorth" label=" Nrt"/>
             </ui:tooltip>
-             <ui:tooltip aura:id="topLeftSouth" advanced="true" direction="south" trigger="hover">
+             <ui:tooltip aura:id="topLeftSouth" class="topLeftSouth" advanced="true" direction="south" trigger="hover">
                <ui:label aura:id="topLeftSouthlabel" for="topLeftSouth" label=" Sth"/>
             </ui:tooltip>
-             <ui:tooltip aura:id="topLeftEast" advanced="true" direction="east" trigger="hover">
+             <ui:tooltip aura:id="topLeftEast" class="topLeftEast" advanced="true" direction="east" trigger="hover">
                <ui:label aura:id="topLeftEastlabel" for="topLeftEast" label=" Est"/>
             </ui:tooltip>
             <p aura:id="trigger1-trigger">Top-Left</p>
@@ -36,31 +36,31 @@
          
         <div>
             <div class="top-center">
-            <ui:tooltip aura:id="topCenterWest" advanced="true" direction="west" trigger="hover">
+            <ui:tooltip aura:id="topCenterWest" class="topCenterWest" advanced="true" direction="west" trigger="hover">
                <ui:label aura:id="topCenterWestlabel" for="topCenterWest" label=" Wst"/>
             </ui:tooltip>
-            <ui:tooltip aura:id="topCenterNorth" advanced="true" direction="west" trigger="hover">
+            <ui:tooltip aura:id="topCenterNorth" class="topCenterNorth" advanced="true" direction="west" trigger="hover">
                <ui:label aura:id="topCenterNorthlabel" for="topCenterNorth" label=" Nrt"/>
             </ui:tooltip>
-            <ui:tooltip aura:id="topCenterSouth" advanced="true" direction="south" trigger="hover">
+            <ui:tooltip aura:id="topCenterSouth" class="topCenterSouth" advanced="true" direction="south" trigger="hover">
                <ui:label aura:id="topCenterSouthlabel" for="topCenterSouth" label=" Sth"/>
             </ui:tooltip>
-            <ui:tooltip aura:id="topCenterEast" advanced="true" direction="west" trigger="hover">
+            <ui:tooltip aura:id="topCenterEast" class="topCenterEast" advanced="true" direction="west" trigger="hover">
                <ui:label aura:id="topCenterEastlabel" for="topCenterEast" label=" Est"/>
             </ui:tooltip>
             <p aura:id="trigger1-trigger">Top-Center</p>
            
             <div class="top-right">    
-            	<ui:tooltip aura:id="topRightWest" advanced="true" direction="west" trigger="hover">
+            	<ui:tooltip aura:id="topRightWest" class="topRightWest" advanced="true" direction="west" trigger="hover">
                 	<ui:label aura:id="topRightWestlabel" for="topRightWest" label="Wst"/>
                 </ui:tooltip>          
-                <ui:tooltip aura:id="topRightNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="topRightNorth" class="topRightNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="topRightNorthlabel" for="topRightNorth" label=" Nrt"/>
                 </ui:tooltip>
-                  <ui:tooltip aura:id="topRightSouth" advanced="true" direction="south" trigger="hover">
+                  <ui:tooltip aura:id="topRightSouth" class="topRightSouth" advanced="true" direction="south" trigger="hover">
                 	<ui:label aura:id="topRightSouthlabel" for="topRightSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="topRightEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="topRightEast" class="topRightEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="topRightEastlabel" for="topRightEast" label=" Est"/>
                 </ui:tooltip>
            		<p aura:id="trigger1-trigger">Top-Right</p>
@@ -69,93 +69,95 @@
         	
            <div class="left-center">
                 <h1>left-center</h1>
-                <ui:tooltip aura:id="leftCenterWest" advanced="true" direction="west" trigger="hover" >
+                <ui:tooltip aura:id="leftCenterWest" class="leftCenterWest" advanced="true" direction="west" trigger="hover" >
                 	<ui:label aura:id="leftCenterWestlabel" for="leftCenterWest" label=" Wst"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="leftCenterNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="leftCenterNorth" class="leftCenterNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="leftCenterNorthlabel" for="leftCenterNorth" label=" Nrt"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="leftCenterSouth" advanced="true" direction="south" trigger="hover" >
+                <ui:tooltip aura:id="leftCenterSouth" class="leftCenterSouth" advanced="true" direction="south" trigger="hover" >
                 	<ui:label aura:id="leftCenterSouthlabel" for="leftCenterSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="leftCenterEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="leftCenterEast" class="leftCenterEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="leftCenterEastlabel" for="leftCenterEast" label=" Est"/>
                 </ui:tooltip>
             </div>
             <div class="center-center">
                 <h1>center-center</h1>
-                <ui:tooltip aura:id="centerCenterWest" advanced="true" direction="west" trigger="hover" >
+                <ui:tooltip aura:id="centerCenterWest" class="centerCenterWest" advanced="true" direction="west" trigger="hover" >
                 	<ui:label aura:id="centerCenterWestlabel" for="centerCenterWest" label="Wst"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="centerCenterNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="centerCenterNorth" class="centerCenterNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="centerCenterNorthlabel" for="centerCenterNorth" label=" Nrt"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="centerCenterSouth" advanced="true" direction="south" trigger="hover">
+                <ui:tooltip aura:id="centerCenterSouth" class="centerCenterSouth" advanced="true" direction="south" trigger="hover">
                 	<ui:label aura:id="centerCenterSouthlabel" for="centerCenterSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="centerCenterEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="centerCenterEast" class="centerCenterEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="centerCenterEastlabel" for="centerCenterEast" label=" Est"/>
                 </ui:tooltip>
             </div>
             <div class="right-center">
                 <h1>right-center</h1>
-                <ui:tooltip aura:id="rightCenterWest" advanced="true" direction="west" trigger="hover" >
+                <ui:tooltip aura:id="rightCenterWest" class="rightCenterWest" advanced="true" direction="west" trigger="hover" >
                 	<ui:label aura:id="rightCenterWestlabel" for="rightCenterWest" label="Wst"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="rightCenterNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="rightCenterNorth" class="rightCenterNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="rightCenterNorthlabel" for="rightCenterNorth" label=" Nrt"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="rightCenterSouth" advanced="true" direction="south" trigger="hover" >
+                <ui:tooltip aura:id="rightCenterSouth" class="rightCenterSouth" advanced="true" direction="south" trigger="hover" >
                 	<ui:label aura:id="rightCenterSouthlabel" for="rightCenterSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="rightCenterEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="rightCenterEast" class="rightCenterEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="rightCenterEastlabel" for="rightCenterEast" label=" Est"/>
                 </ui:tooltip>
             </div>
+            
             <div class="bottom-right">
                 <h1>bottom-right</h1>
-                <ui:tooltip aura:id="bottomRightWest" advanced="true" direction="west" trigger="hover">
+                <ui:tooltip aura:id="bottomRightWest" class="bottomRightWest" advanced="true" direction="west" trigger="hover">
                 	<ui:label aura:id="bottomRightWestlabel" for="bottomRightWest" label="Wst"/>
                 </ui:tooltip>
-                 <ui:tooltip aura:id="bottomRightNorth" advanced="true" direction="north" trigger="hover">
+                 <ui:tooltip aura:id="bottomRightNorth" class="bottomRightNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="bottomRightNorthlabel" for="bottomRightNorth" label=" Nrt"/>
                 </ui:tooltip>
-                 <ui:tooltip aura:id="bottomRightSouth" advanced="true" direction="south" trigger="hover">
+                 <ui:tooltip aura:id="bottomRightSouth" class="bottomRightSouth" advanced="true" direction="south" trigger="hover">
                 	<ui:label aura:id="bottomRightSouthlabel" for="bottomRightSouth" label=" Sth"/>
                 </ui:tooltip>
-                 <ui:tooltip aura:id="bottomRightEast" advanced="true" direction="east" trigger="hover">
+                 <ui:tooltip aura:id="bottomRightEast" class="bottomRightEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="bottomRightEastlabel" for="bottomRightEast" label=" Est"/>
                 </ui:tooltip>
             </div>
             <div class="bottom-center">
                 <h1>bottom-center</h1>
-                <ui:tooltip aura:id="bottomCenterWest" advanced="true" direction="west" trigger="hover">
+                <ui:tooltip aura:id="bottomCenterWest" class="bottomCenterWest" advanced="true" direction="west" trigger="hover">
                 	<ui:label aura:id="bottomCenterWestlabel" for="bottomCenterWest" label="Wst"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomCenterNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="bottomCenterNorth" class="bottomCenterNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="bottomCenterNorthlabel" for="bottomCenterNorth" label=" Nrt"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomCenterSouth" advanced="true" direction="south" trigger="hover">
+                <ui:tooltip aura:id="bottomCenterSouth" class="bottomCenterSouth" advanced="true" direction="south" trigger="hover">
                 	<ui:label aura:id="bottomCenterSouthlabel" for="bottomCenterSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomCenterEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="bottomCenterEast" class="bottomCenterEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="bottomCenterEastlabel" for="bottomCenterEast" label=" Est"/>
                 </ui:tooltip>
             </div>
              <div class="bottom-left">
                 <h1>bottom-left</h1>
-                <ui:tooltip aura:id="bottomLeftWest" advanced="true" direction="west" trigger="hover">
+                <ui:tooltip aura:id="bottomLeftWest" class="bottomLeftWest" advanced="true" direction="west" trigger="hover">
                 	<ui:label aura:id="bottomLeftWestlabel" for="bottomLeftWest" label="Wst"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomLeftNorth" advanced="true" direction="north" trigger="hover">
+                <ui:tooltip aura:id="bottomLeftNorth" class="bottomLeftNorth" advanced="true" direction="north" trigger="hover">
                 	<ui:label aura:id="bottomLeftNorthlabel" for="bottomLeftNorth" label=" Nrt"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomLeftSouth" advanced="true" direction="south" trigger="hover">
+                <ui:tooltip aura:id="bottomLeftSouth" class="bottomLeftSouth" advanced="true" direction="south" trigger="hover">
                 	<ui:label aura:id="bottomLeftSouthlabel" for="bottomLeftSouth" label=" Sth"/>
                 </ui:tooltip>
-                <ui:tooltip aura:id="bottomLeftEast" advanced="true" direction="east" trigger="hover">
+                <ui:tooltip aura:id="bottomLeftEast" class="bottomLeftEast" advanced="true" direction="east" trigger="hover">
                 	<ui:label aura:id="bottomLeftEastlabel" for="bottomLeftEast" label=" Est"/>
                 </ui:tooltip>
             </div>
         </div>
+        <ui:containerManager />
 </aura:component>

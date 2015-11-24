@@ -25,7 +25,7 @@
         	<div class="blocks"> 	
 	            <div class="case">
 	                <h1>Default</h1>
-	                <ui:tooltip aura:id="default">
+	                <ui:tooltip aura:id="default" class="default">
 	                	<ui:label aura:id="defaultlabel" for="default" label="?"/>
 	                </ui:tooltip>
 	              
@@ -39,14 +39,14 @@
 	            <div class="case">
 	                <h1>Body Alphanumerics:</h1>
 	                <div id="asdf">
-	                <ui:tooltip aura:id="bodyalphanum" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="bodyalphanum" class="bodyalphanum" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
 	                	<ui:label aura:id="bodyalphanumlabel" for="input" label="ab54@#$Ω®"/>
 	                </ui:tooltip>
 	                </div>
 	            </div>
 	            <div class="case">
 	                <h1>Body HTML Tag: image</h1>
-	                <ui:tooltip aura:id="bodyhtmlimg" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="bodyhtmlimg" class="bodyhtmlimg" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
 	                	<br></br>
 	                	<div id="logo">
 	                	<ui:image aura:id="bodyhtmlimgtag" src = "http://ccoenraets.github.io/salesforce-mobile-sdk-presentation/images/salesforce-logo.png" class="logo" alt="sfdc logo" ></ui:image>
@@ -55,7 +55,7 @@
 	            </div>
 	            <div class="case">
 	                <h1>Body HTML Tag: table</h1>
-	                <ui:tooltip aura:id="bodyhtmltbl" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="bodyhtmltbl" class="bodyhtmltbl" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
 	                <br></br>
 	                	<table id="table" border="2px" style="width:50%">
 						  <tr>
@@ -78,7 +78,7 @@
 	            </div>
 	            <div class="case">
 	                <h1>Body Empty:</h1>
-	                <ui:tooltip aura:id="tooltip7" advanced="false" trigger="hover" tooltipBody="Tooltip Message"> </ui:tooltip>
+	                <ui:tooltip aura:id="tooltip7" class="tooltip7" advanced="false" trigger="hover" tooltipBody="Tooltip Message"> </ui:tooltip>
 	            </div>
 	            <div class="attribute">
 	            	Body
@@ -92,19 +92,19 @@
             <div class="blocks">
             	<div class="case">
             		<h1>TT Disabled=false:</h1>
-	                 <ui:tooltip aura:id="disabledfalse" advanced="false" disabled="false" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="disabledfalse" class="disabledfalse" advanced="false" disabled="false" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="disabledfalselabel" for="input" label="?"/>
 	                 </ui:tooltip> 
             	</div>      
             	<div class="case">
             		<h1>TT Disabled=true:</h1>
-	                 <ui:tooltip aura:id="disabledtrue" advanced="false" disabled="true" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="disabledtrue" class="disabledtrue" advanced="false" disabled="true" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="disabledtruelabel" for="input" label="?"/>
 	                 </ui:tooltip> 
             	</div>      
             	<div class="case">
             		<h1>TT Disabled="":</h1>	                 
-	                 <ui:tooltip aura:id="disabledempty" advanced="false" disabled="" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="disabledempty" class="disabledempty" advanced="false" disabled="" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="disabledemptylabel" for="input" label="?"/>
 	                 </ui:tooltip> 
             	</div>     	
@@ -120,17 +120,17 @@
             <div class="blocks">
            
             	<div class="case">
-	            	<ui:tooltip aura:id="advTrueTooltip" advanced="true" trigger="none" tooltipBody="Tooltip Message">?
+	            	<ui:tooltip aura:id="advTrueTooltip" class="advTrueTooltip" advanced="true" trigger="none" tooltipBody="Tooltip Message">?
 	                </ui:tooltip>Adv=true
 	                 <ui:button aura:id="advTrueButton" label="click me" press="{!c.handleClickTrue}"></ui:button>
                  </div>
                 <div class="case">
-	            	<ui:tooltip aura:id="advFalseTooltip" advanced="false" trigger="none" tooltipBody="Tooltip Message">?
+	            	<ui:tooltip aura:id="advFalseTooltip" class="advFalseTooltip" advanced="false" trigger="none" tooltipBody="Tooltip Message">?
 	                </ui:tooltip>Adv=false
 	                 <ui:button aura:id="advFalseButton" label="click me" press="{!c.handleClickFalse}"></ui:button>
                  </div>
                  <div class="case">
-	            	<ui:tooltip aura:id="advEmptyTooltip" advanced="false" trigger="none" tooltipBody="Tooltip Message">?
+	            	<ui:tooltip aura:id="advEmptyTooltip" class="advEmptyTooltip" advanced="false" trigger="none" tooltipBody="Tooltip Message">?
 	                </ui:tooltip>Adv=false
 	                 <ui:button aura:id="advEmptyButton" label="click me" press="{!c.handleClickEmpty}"></ui:button>
                  </div>
@@ -146,31 +146,31 @@
             <div class="blocks">Advanced = true
             	<div class="case">
             		<h1>trigger=hover:</h1>
-	                 <ui:tooltip aura:id="triggerhover" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerhover" class="triggerhover" advanced="true" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggerhoverlabel" for="triggerhover" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger=click:</h1>
-	                 <ui:tooltip aura:id="triggerclick" advanced="true" trigger="click" tooltipBody="Tooltip Message" triggerClass="triggerClick">
+	                 <ui:tooltip aura:id="triggerclick" class="triggerclick" advanced="true" trigger="click" tooltipBody="Tooltip Message" triggerClass="triggerClick">
 	                 	<ui:label aura:id="triggerclicklabel" for="triggerclick" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger=focus:</h1>
-	                  <ui:tooltip aura:id="triggerfocus" advanced="true" trigger="focus" tooltipBody="Tooltip Message">
+	                  <ui:tooltip aura:id="triggerfocus" class="triggerfocus" advanced="true" trigger="focus" tooltipBody="Tooltip Message">
 	                 	<ui:inputText aura:id="inputadvtrue" placeholder="Focus here"/>
 	                 </ui:tooltip>
             	</div> 
             	<div class="case">
             		<h1>trigger=none:</h1>
-	                 <ui:tooltip aura:id="triggernone" advanced="true" trigger="none" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggernone" class="triggernone" advanced="true" trigger="none" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggernonelabel" for="triggernone" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger="":</h1>
-	                 <ui:tooltip aura:id="triggerempty" advanced="true" trigger="" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerempty" class="triggerempty" advanced="true" trigger="" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggeremptylabel" for="triggerempty" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -186,32 +186,32 @@
              <div class="blocks">Advanced = false
              	<div class="case">
             		<h1>trigger=hover:</h1>
-	                 <ui:tooltip aura:id="triggerhoveradvfalse" advanced="false" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerhoveradvfalse" class="triggerhoveradvfalse" advanced="false" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggerhoveradvfalselabel" for="triggerhoveradvfalse" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>trigger=click:</h1>
-	                 <ui:tooltip aura:id="triggerclickadvfalse" advanced="false" trigger="click" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerclickadvfalse" class="triggerclickadvfalse" advanced="false" trigger="click" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggerclickadvfalselabel" for="triggerclickadvfalse" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger=focus:</h1>
-	                 <ui:tooltip aura:id="triggerfocusadvfalse" advanced="false" trigger="focus" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggerfocusadvfalse" class="triggerfocusadvfalse" advanced="false" trigger="focus" tooltipBody="Tooltip Message">
 	                 	<ui:inputText aura:id="triggerfocusadvfalseinput" placeholder="Focus here"/>
 	                 	
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger=none:</h1>
-	                 <ui:tooltip aura:id="triggernoneadvfalse" advanced="false" trigger="none" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggernoneadvfalse" class="triggernoneadvfalse" advanced="false" trigger="none" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggernoneadvfalselabel" for="triggernoneadvfalse" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>trigger="":</h1>
-	                 <ui:tooltip aura:id="triggeremptyadvfalse" advanced="false" trigger="" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="triggeremptyadvfalse" class="triggeremptyadvfalse" advanced="false" trigger="" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="triggeremptyadvfalselabel" for="triggeremptyadvfalse" label="?"/>
 	                 </ui:tooltip> 
             	</div>
@@ -229,19 +229,19 @@
             class attribute
             	<div class="case">
             		<h1>triggerClass=<br/>myTriggerClass</h1>
-	                 <ui:tooltip aura:id="trigClassAlpha" advanced="false" triggerClass="myTriggerClass" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="trigClassAlpha" class="trigClassAlpha" advanced="false" triggerClass="myTriggerClass" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="trigClassAlphalabel" for="trigClassAlpha" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>triggerClass=<br/>1234</h1>
-	                 <ui:tooltip aura:id="trigClassNum" advanced="false" triggerClass="1234" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="trigClassNum" class="trigClassNum" advanced="false" triggerClass="1234" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="trigClassNumlabel" for="trigClassNum" label="?"/>
 	                 </ui:tooltip> 
             	</div>  
             	<div class="case">
             		<h1>triggerClass=<br/>ab:12;$%∆∑π¬</h1>
-	                 <ui:tooltip aura:id="trigClassSpl" advanced="false" triggerClass="ab:12;$%∆∑π¬" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="trigClassSpl" class="trigClassSpl" advanced="false" triggerClass="ab:12;$%∆∑π¬" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="trigClassSpllabel" for="trigClassSpl" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -258,31 +258,31 @@
             <div class="blocks">
             	<div class="case">
             		<h1>fadeInDuration=0</h1>
-	                 <ui:tooltip aura:id="fadeInDuration0" advanced="false"  fadeIn="true" fadeInDuration="0" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInDuration0" class="fadeInDuration0" advanced="false"  fadeIn="true" fadeInDuration="0" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInDuration0label" for="fadeInDuration0" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeInDuration=200</h1>
-	                 <ui:tooltip aura:id="fadeInDuration200" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="200"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInDuration200" class="fadeInDuration200" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="200"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInDuration200label" for="fadeInDuration200" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>fadeInDuration=5000</h1>
-	                 <ui:tooltip aura:id="fadeInDuration5000" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="5000" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInDuration5000" class="fadeInDuration5000" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="5000" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInDuration5000label" for="fadeInDuration5000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeInDuration="-1000"</h1>
-	                 <ui:tooltip aura:id="fadeInDuration-1000" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="-1000"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInDuration-1000" class="fadeInDuration-1000" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="-1000"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInDuration-1000label" for="fadeInDuration-1000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeInDuration=""</h1>
-	                 <ui:tooltip aura:id="fadeInDurationempty" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInDurationempty" class="fadeInDurationempty" advanced="false" trigger="hover" fadeIn="true" fadeInDuration="" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInDurationemptylabel" for="fadeInDurationempty" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -300,31 +300,31 @@
             <div class="blocks">
             	<div class="case">
             		<h1>fadeOutDuration=0</h1>
-	                 <ui:tooltip aura:id="fadeOutDuration0" advanced="false"  fadeOut="true" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeOutDuration0" class="fadeOutDuration0" advanced="false"  fadeOut="true" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeOutDuration0label" for="fadeOutDuration0" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeOutDuration=200</h1>
-	                 <ui:tooltip aura:id="fadeOutDuration200" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="200"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeOutDuration200" class="fadeOutDuration200" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="200"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeOutDuration200label" for="fadeOutDuration200" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeOutDuration=5000</h1>
-	                 <ui:tooltip aura:id="fadeOutDuration5000" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="5000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeOutDuration5000" class="fadeOutDuration5000" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="5000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeOutDuration5000label" for="fadeOutDuration5000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeOutDuration=-1000</h1>
-	                 <ui:tooltip aura:id="fadeOutDuration-1000" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="-1000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeOutDuration-1000" class="fadeOutDuration-1000" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="-1000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeOutDuration-1000label" for="fadeOutDuration-1000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeOutDuration=""</h1>
-	                 <ui:tooltip aura:id="fadeOutDurationempty" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeOutDurationempty" class="fadeOutDurationempty" advanced="false" trigger="hover" fadeOut="true" fadeOutDuration="" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeOutDurationemptylabel" for="fadeOutDurationempty" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -341,43 +341,43 @@
             <div class="blocks">
             	<div class="case">
             		<h1>In=1000;Out=0</h1>
-	                 <ui:tooltip aura:id="fadeIn1000fadeOut0" fadeInDuration="1000" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn1000fadeOut0" class="fadeIn1000fadeOut0" fadeInDuration="1000" fadeOutDuration="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn1000fadeOut0label" for="fadeIn1000fadeOut0" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>In=100;Out=3000</h1>
-	                 <ui:tooltip aura:id="fadeIn100fadeOut3000" fadeInDuration="100" fadeOutDuration="3000"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn100fadeOut3000" class="fadeIn100fadeOut3000" fadeInDuration="100" fadeOutDuration="3000"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn100fadeOut3000label" for="fadeIn100fadeOut3000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>In=3000;Out=100</h1>
-	                 <ui:tooltip aura:id="fadeIn3000fadeOut100" fadeInDuration="3000" fadeOutDuration="100" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn3000fadeOut100" class="fadeIn3000fadeOut100" fadeInDuration="3000" fadeOutDuration="100" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn3000fadeOut100label" for="fadeIn3000fadeOut100" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>In=0;Out=1000</h1>
-	                 <ui:tooltip aura:id="fadeIn0fadeOut1000" fadeInDuration="0" fadeOutDuration="1000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn0fadeOut1000" class="fadeIn0fadeOut1000" fadeInDuration="0" fadeOutDuration="1000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn0fadeOut1000label" for="fadeIn0fadeOut1000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeIn-1000fadeOut3000</h1>
-	                 <ui:tooltip aura:id="fadeIn-1000fadeOut3000" fadeInDuration="-1000" fadeOutDuration="3000" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn-1000fadeOut3000" class="fadeIn-1000fadeOut3000" fadeInDuration="-1000" fadeOutDuration="3000" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn-1000fadeOut3000label" for="fadeIn-1000fadeOut3000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeIn3000fadeOut-1000</h1>
-	                 <ui:tooltip aura:id="fadeIn3000fadeOut-1000" fadeInDuration="3000" fadeOutDuration="-1000" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeIn3000fadeOut-1000" class="fadeIn3000fadeOut-1000" fadeInDuration="3000" fadeOutDuration="-1000" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeIn3000fadeOut-1000label" for="fadeIn3000fadeOut-1000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>fadeInAndfadeOut=""</h1>
-	                 <ui:tooltip aura:id="fadeInfadeOutEmpty" fadeInDuration="" fadeOutDuration="" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="fadeInfadeOutEmpty" class="fadeInfadeOutEmpty" fadeInDuration="" fadeOutDuration="" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="fadeInfadeOutEmptylabel" for="fadeInfadeOutEmpty" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -394,37 +394,37 @@
             	delay
             	<div class="case">
             		<h1>delay=0</h1>
-	                 <ui:tooltip aura:id="delay0" advanced="false"   delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay0" class="delay0" advanced="false"   delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay0label" for="delay0" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=300</h1>
-	                 <ui:tooltip aura:id="delay300" advanced="false" trigger="hover" delay="300"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay300" class="delay300" advanced="false" trigger="hover" delay="300"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay300label" for="delay300" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=3000</h1>
-	                 <ui:tooltip aura:id="delay3000" advanced="false" trigger="hover" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay3000" class="delay3000" advanced="false" trigger="hover" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay3000label" for="delay3000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=-150</h1>
-	                 <ui:tooltip aura:id="delay-150" advanced="false" trigger="hover" delay="-150" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-150" class="delay-150" advanced="false" trigger="hover" delay="-150" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-150label" for="delay-150" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>delay=-1000</h1>
-	                 <ui:tooltip aura:id="delay-1000" advanced="false" trigger="hover" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-1000" class="delay-1000" advanced="false" trigger="hover" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-1000label" for="delay-1000" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=""</h1>
-	                 <ui:tooltip aura:id="delayempty" advanced="false" trigger="hover" delay="" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delayempty" class="delayempty" advanced="false" trigger="hover" delay="" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delayemptylabel" for="delayempty" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -441,37 +441,37 @@
             	delay for fadeIn
             	<div class="case">
             		<h1>delay=0</h1>
-	                 <ui:tooltip aura:id="delay0FadeIn" advanced="false"  fadeInDuration="500" delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay0FadeIn" class="delay0FadeIn" advanced="false"  fadeInDuration="500" delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay0FadeInlabel" for="delay0FadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=300</h1>
-	                 <ui:tooltip aura:id="delay300FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="300"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay300FadeIn" class="delay300FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="300"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay300FadeInlabel" for="delay300FadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=3000</h1>
-	                 <ui:tooltip aura:id="delay3000FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay3000FadeIn" class="delay3000FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay3000FadeInlabel" for="delay3000FadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=-200</h1>
-	                 <ui:tooltip aura:id="delay-200FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="-200" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-200FadeIn" class="delay-200FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="-200" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-200FadeInlabel" for="delay-200FadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>delay=-1000</h1>
-	                 <ui:tooltip aura:id="delay-1000FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-1000FadeIn" class="delay-1000FadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-1000FadeInlabel" for="delay-1000FadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=""</h1>
-	                 <ui:tooltip aura:id="delayEmptyFadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delayEmptyFadeIn" class="delayEmptyFadeIn" advanced="false" trigger="hover" fadeInDuration="500" delay="" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delayEmptyFadeInlabel" for="delayEmptyFadeIn" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -488,37 +488,37 @@
             	delay for fadeOut
             	<div class="case">
             		<h1>delay=0</h1>
-	                 <ui:tooltip aura:id="delay0FadeOut" advanced="false"  fadeOutDuration="500" delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay0FadeOut" class="delay0FadeOut" advanced="false"  fadeOutDuration="500" delay="0" trigger="hover" isVisible="false" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay0FadeOutlabel" for="delay0FadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=300</h1>
-	                 <ui:tooltip aura:id="delay300FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="300"  tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay300FadeOut" class="delay300FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="300"  tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay300FadeOutlabel" for="delay300FadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=3000</h1>
-	                 <ui:tooltip aura:id="delay3000FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay3000FadeOut" class="delay3000FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="3000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay3000FadeOutlabel" for="delay3000FadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=-200</h1>
-	                 <ui:tooltip aura:id="delay-200FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="-200" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-200FadeOut" class="delay-200FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="-200" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-200FadeOutlabel" for="delay-200FadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>delay=-1000</h1>
-	                 <ui:tooltip aura:id="delay-1000FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delay-1000FadeOut" class="delay-1000FadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="-1000" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delay-1000FadeOutlabel" for="delay-1000FadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>delay=""</h1>
-	                 <ui:tooltip aura:id="delayEmptyFadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="" isVisible="true" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="delayEmptyFadeOut" class="delayEmptyFadeOut" advanced="false" trigger="hover" fadeOutDuration="500" delay="" isVisible="true" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="delayEmptyFadeOutlabel" for="delayEmptyFadeOut" label="?"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -535,25 +535,25 @@
             class attribute
             	<div class="case">
             		<h1>class=myOwnClassHERE</h1>
-	                 <ui:tooltip aura:id="classAlpha" advanced="false" class="myOwnClassHERE" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="classAlpha" advanced="false" class="classAlpha myOwnClassHERE" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="classAlphalabel" for="classAlpha" label="Class"/>
 	                 </ui:tooltip> 
             	</div>
             	<div class="case">
             		<h1>class=1234</h1>
-	                 <ui:tooltip aura:id="classNum" advanced="false" class="1234" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="classNum" advanced="false" class="classNum 1234" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="classNumLabel" for="classNum" label="Class"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>class=a:12;å¬∑πßå</h1>
-	                 <ui:tooltip aura:id="classSpl" advanced="false" class="a:12;å¬∑πßå" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="classSpl" advanced="false" class="classSpl a:12;å¬∑πßå" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="classSplLabel" for="classSpl" label="Class"/>
 	                 </ui:tooltip> 
             	</div> 
             	<div class="case">
             		<h1>class=--a</h1>
-	                 <ui:tooltip aura:id="classDash" advanced="false" class="--a" trigger="hover" tooltipBody="Tooltip Message">
+	                 <ui:tooltip aura:id="classDash" advanced="false" class="classDash --a" trigger="hover" tooltipBody="Tooltip Message">
 	                 	<ui:label aura:id="classDashLabel" for="classDash" label="Class"/>
 	                 </ui:tooltip> 
             	</div> 
@@ -569,25 +569,25 @@
             <div class="blocks">
 	            <div class="case">
 	                <h1>TT Body:</h1>
-	                <ui:tooltip aura:id="bodyNormal" advanced="false" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;)">
+	                <ui:tooltip aura:id="bodyNormal" class="bodyNormal" advanced="false" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;)">
 	                	<ui:label aura:id="bodyNormallabel" for="bodyNormal" label="?"/>
 	                </ui:tooltip>
 	            </div>
 	             <div class="case">
 	                <h1>TT Body Many Chars:</h1>
-	                <ui:tooltip aura:id="bodyMany" advanced="false" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;) This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!">
+	                <ui:tooltip aura:id="bodyMany" class="bodyMany" advanced="false" trigger="hover" tooltipBody="This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (&quot;!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ &amp; &quot;) This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!">
 	                	<ui:label aura:id="bodyManylabel" for="bodyMany" label="?"/>
 	                </ui:tooltip>
 	            </div>
 	            <div class="case">
 	                <h1>TT Body:</h1>
-	                <ui:tooltip aura:id="bodyHTML" advanced="false" trigger="hover" tooltipBody="&lt;h1&gt;Hello&lt;/h1&gt;">
+	                <ui:tooltip aura:id="bodyHTML" class="bodyHTML" advanced="false" trigger="hover" tooltipBody="&lt;h1&gt;Hello&lt;/h1&gt;">
 	                	<ui:label aura:id="bodyHTMLlabel" for="bodyHTML" label="?"/>
 	                </ui:tooltip>               
 	            </div>
 	            <div class="case">
 	                <h1>TT Body:</h1>
-	                <ui:tooltip aura:id="bodyEmpty" advanced="false" trigger="hover" tooltipBody="">
+	                <ui:tooltip aura:id="bodyEmpty" class="bodyEmpty" advanced="false" trigger="hover" tooltipBody="">
 	                	<ui:label aura:id="bodyEmptylabel" for="bodyHTML" label="?"/>
 	                </ui:tooltip>               
 	            </div>
@@ -602,25 +602,25 @@
          	<div class="blocks">
 	            <div class="case">
 	                <h1>domId=testDomId</h1>
-	                <ui:tooltip aura:id="domIdAlpha" advanced="false" domId="testDomId" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="domIdAlpha" class="domIdAlpha" advanced="false" domId="testDomId" trigger="hover" tooltipBody="Tooltip Message">
 	                	<ui:label aura:id="domIdAlphaLabel" for="domIdAlpha" label="?"/>
 	                </ui:tooltip>
 	            </div>
 	            <div class="case">
 	                <h1>domId=1234</h1>
-	                <ui:tooltip aura:id="domIdNum" advanced="false" domId="1234" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="domIdNum" class="domIdNum" advanced="false" domId="1234" trigger="hover" tooltipBody="Tooltip Message">
 	                	<ui:label aura:id="domIdNumLabel" for="domIdNum" label="?"/>
 	                </ui:tooltip>
 	            </div>
 	            <div class="case">
 	                <h1>domId=a:1;%$</h1>
-	                <ui:tooltip aura:id="domIdSpl" advanced="false" domId="a:1;%$∆ß∫åœ∑" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="domIdSpl" class="domIdSpl" advanced="false" domId="a:1;%$∆ß∫åœ∑" trigger="hover" tooltipBody="Tooltip Message">
 	                	<ui:label aura:id="domIdSplLabel" for="domIdSpl" label="?"/>
 	                </ui:tooltip>
 	            </div>
 	            <div class="case">
 	                <h1>domId=""</h1>
-	                <ui:tooltip aura:id="domIdEmpty" advanced="false" domId="" trigger="hover" tooltipBody="Tooltip Message">
+	                <ui:tooltip aura:id="domIdEmpty" class="domIdEmpty" advanced="false" domId="" trigger="hover" tooltipBody="Tooltip Message">
 	                	<ui:label aura:id="domIdEmptyLabel" for="domIdEmpty" label="?"/>
 	                </ui:tooltip>
 	            </div>
@@ -629,4 +629,5 @@
 	            </div>
             </div>           
         </div>
+        <ui:containerManager />
 </aura:component>

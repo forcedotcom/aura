@@ -52,10 +52,10 @@ public class TooltipUiTest extends WebDriverTestCase {
 	}
 	
 	private void waitForToolTipPresent() {
-		waitForElementAppear("Tooltip should been present but is not", By.cssSelector(".uiTooltip.visible"));
+		waitForElementAppear("Tooltip should been present but is not", By.cssSelector(".uiTooltipAdvanced.visible"));
 	}
 	
 	private void waitForToolTipAbsent() {
-		waitForElementDisappear("Tooltip should not be present but is", By.cssSelector(".uiTooltip.visible"));
+		waitForElementDisappear("Tooltip should not be present but is", By.cssSelector(".uiTooltipAdvanced.visible"));
 	}
 }

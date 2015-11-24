@@ -15,11 +15,50 @@
  */
 ({
     show: function(component, event, helper) {
-    	helper.show(component);
+        if($A.util.getBooleanValue(component.get('v.advanced'))) {
+            helper.show(component);
+        }
     },
 
     hide: function(component, event, helper) {
-    	helper.hide(component);
+    	if($A.util.getBooleanValue(component.get('v.advanced'))) {
+            helper.show(component);
+        }
+    },
+
+    handleMouseOver: function(component, event, helper) {
+        if(component.get('v.trigger') === 'hover') {
+            helper.show(component);
+        }
+        
+    },
+
+    handleFocus: function(component, event, helper) {
+        
+        //focus always works unless trigger is none
+        //because of accessibility
+        var trigger = component.get('v.trigger');
+        if(trigger && trigger !== 'none') {
+            event.preventDefault();
+            helper.show(component);
+        } 
+    },
+
+    handleBlur: function(component, event, helper) {
+        helper.hide(component);
+    },
+
+    handleClick: function(component, event, helper) {
+        event.preventDefault();
+        if(component.get('v.trigger') === 'click') {
+            helper.toggle(component);
+        }
+    },
+
+    handleMouseOut: function(component, event, helper) {
+        if(component.get('v.trigger') === 'hover') {
+            helper.hide(component);
+        }
     },
 
     handleKeyPress: function(component, event, helper) {

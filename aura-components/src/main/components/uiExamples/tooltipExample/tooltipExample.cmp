@@ -39,7 +39,7 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
         <div class="section form">
             <div class="formwrap">
                 <h2>Give us information:</h2>
-                <p><ui:tooltip tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
+                <p><ui:tooltip class="magic" tooltipBody="Click here for more info"><a href="http://www.google.com">Click me!</a></ui:tooltip></p>
                 <form>
                     <p>
                         <ui:tooltip fadeOutDuration="500" triggerClass="my-trigger-class" tooltipBody="Please?">
@@ -52,14 +52,14 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
                         </ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip delay="3000" fadeInDuration="500" advanced="false" fadeOutDuration="500" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
+                        <ui:tooltip delay="1000" fadeInDuration="500" advanced="false" fadeOutDuration="500" tooltipBody="TPS reports now require a cover sheet"><span class="help-icon">HELP</span></ui:tooltip>
                         <span>Fade in/out with delay</span>
                     </p>
                     <p>
                         <ui:tooltip advanced="true" trigger="focus" tooltipBody="Focus will toggle this"><ui:inputText placeholder="Show tooltip on focus" type="text" aura:id="mrfocus"/></ui:tooltip>
                     </p>
                     <p>
-                        <ui:tooltip advanced="true" direction="east" disabled="true" trigger="click" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
+                        <ui:tooltip class="banana" advanced="true" direction="east" disabled="true" trigger="click" tooltipBody="Focus will toggle this too"><span tabindex="1">It works on any focusable element</span></ui:tooltip>
                     </p>
                 </form>
             </div>
@@ -73,4 +73,5 @@ semper vere quiescunt quæ vulgo tanquam quiescentia spectantur.</p>
             </p>
         </div>
     </div>
+    <ui:containerManager />
 </aura:component>

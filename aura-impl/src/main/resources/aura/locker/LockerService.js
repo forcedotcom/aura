@@ -152,9 +152,6 @@ var LockerService = window["LockerService"] = (function() {
 						sAura : Object.create($A, {
 							getComponent : {
 								value : function(globalId) {
-									
-									//#debugger
-									
 									var c = $A.getComponent(globalId);
 									LockerKeyUtil.verifyAccess(key, c);
 									return service.wrapComponent(c);
@@ -193,9 +190,6 @@ var LockerService = window["LockerService"] = (function() {
 					/*jslint evil: true */
 					var args = Array.prototype.slice.call(arguments);
 					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
-					
-					//#debugger
-					
 					return Function.apply(undefined, args);
 				}
 				

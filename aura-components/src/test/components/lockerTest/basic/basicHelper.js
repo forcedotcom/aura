@@ -25,6 +25,13 @@
 		}
 	},
 
+	verifyElementCount: function(className, expected) {
+		var els = document.getElementsByClassName(className);
+		if (els.length !== expected) {
+			throw new Error("Wrong number of <" + tagName + "> returned from SecureDocument.getElementsByClassName('" + className + "'): " + els.length);
+		}
+	},
+	
 	// DCHASMAN TODO Move this POC/spike code to LockerService once things are ready to go
 
 	indexOfLeftMatchingBracket : function(text) {

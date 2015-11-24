@@ -18,7 +18,6 @@
 //#include aura.locker.SecureThing
 //#include aura.locker.SecureElement
 //#include aura.locker.SecureScriptElement
-
 var SecureDocument = (function() {
 	"use strict";
 
@@ -38,7 +37,7 @@ var SecureDocument = (function() {
 		SecureThing.call(this, key);
 
 		this._set("document", document, masterKey);
-		
+
 		Object.freeze(this);
 	}
 
@@ -48,6 +47,58 @@ var SecureDocument = (function() {
 
 	function getKey(sd) {
 		return LockerKeyUtil._getKey(sd, masterKey);
+	}
+
+	function filterNodes(sd, raw) {
+		if (!raw) {
+			return undefined;
+		}
+
+		if (raw.length !== undefined) {
+			var key = getKey(sd);
+			var filtered = [];
+			for (var n = 0; n < raw.length; n++) {
+				var e = raw[n];
+				if (LockerKeyUtil.hasAccess(sd, e)) {
+					filtered.push(new SecureElement(e, key));
+				}
+			}
+
+			return filtered;
+		} else {
+			return LockerKeyUtil.hasAccess(sd, raw) ? new SecureElement(raw, getKey(sd)) : undefined;
+		}
+	}
+
+	function createFilteredMethod(methodName) {
+		return {
+			value : function() {
+				var doc = getDocument(this);
+				return filterNodes(this, doc[methodName].apply(doc, arguments));
+			}
+		};
+	}
+
+	function createFilteredProperty(propertyName) {
+		return {
+			get : function() {
+				var doc = getDocument(this);
+				var raw = doc[propertyName];
+				LockerKeyUtil.verifyAccess(this, raw);
+				return new SecureElement(raw, getKey(sd));
+			}
+		};
+	}
+	
+	function createPassThroughProperty(name) {
+		return {
+			get : function() {
+				return getDocument(this)[name];
+			},
+			set : function(value) {
+				getDocument(this)[name] = value;
+			}
+		};
 	}
 
 	SecureDocument.prototype.constructor = SecureDocument;
@@ -61,11 +112,15 @@ var SecureDocument = (function() {
 		createElement : {
 			value : function(tag) {
 				var key = getKey(this);
-				if (tag.toLowerCase() === "script") {
+				switch (tag.toLowerCase()) {
+				case "script":
 					return new SecureScriptElement(key);
-				} else {
-					var el = getDocument(this).createElement(tag);
 
+				case "iframe":
+					throw new Error("SecureDocument: iframe element is not currently supported");
+
+				default:
+					var el = getDocument(this).createElement(tag);
 					return new SecureElement(el, key);
 				}
 			}
@@ -76,35 +131,20 @@ var SecureDocument = (function() {
 				return new SecureElement(getDocument(this).createTextNode(text), getKey(this));
 			}
 		},
+	
+		body : createFilteredProperty("body"),
+		head : createFilteredProperty("head"),
+		
+		getElementById : createFilteredMethod("getElementById"),
+		getElementsByClassName : createFilteredMethod("getElementsByClassName"),
+		getElementsByName : createFilteredMethod("getElementsByName"),
+		getElementsByTagName : createFilteredMethod("getElementsByTagName"),
 
-		getElementsByTagName : {
-			value : function(tagName) {
-				var raw = getDocument(this).getElementsByTagName(tagName);
-
-				var key = getKey(this);
-				var filtered = [];
-				for (var n = 0; n < raw.length; n++) {
-					var e = raw[n];
-					if (LockerKeyUtil.hasAccess(this, e)) {
-						filtered.push(new SecureElement(e, key));
-					}
-				}
-
-				return filtered;
-			}
-		},
-
-		body : {
-			get : function() {
-				var body = this._get("body", masterKey);
-				if (!body) {
-					body = new SecureElement(document.body, getKey(this));
-					this._set("body", body, masterKey);
-				}
-
-				return body;
-			}
-		}
+		querySelector : createFilteredMethod("querySelector"),
+		querySelectorAll : createFilteredMethod("querySelectorAll"),
+		
+		// DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
+		cookie: createPassThroughProperty("cookie")
 	});
 
 	SecureDocument.wrap = function(el) {

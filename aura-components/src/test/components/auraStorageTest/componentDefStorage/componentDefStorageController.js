@@ -58,20 +58,16 @@
     },
 
     /**
-     * Listen to Aura logs for things being added to the component def storage and save to attribute for test to
-     * monitor and wait on.
+     * Update attribute on component with contents of the component def storage whenever it's modified.
      */
-    setupLogListener: function(cmp) {
-        var logListener = function(level, message, error) {
-            var putLogLine = "'ComponentDefStorage' [indexeddb] : put() - key: ";
-            var index = message.indexOf(putLogLine)
-            if (index !== -1) {
-                var storedCmp = message.substring(index + putLogLine.length, message.length -1);
-                var putLogAttr = cmp.get("v.putLog");
-                putLogAttr.push(storedCmp);
-                cmp.set("v.putLog", putLogAttr);
+    storageModified: function(cmp) {
+        $A.storageService.getStorage("ComponentDefStorage").getAll()
+        .then(function(items) {
+            var storageContents  = [];
+            for (var i = 0; i < items.length; i++) {
+                storageContents.push(items[i]["key"]);
             }
-        }
-        $A.logger.subscribe("INFO", logListener);
+            cmp.set("v.defStorageContents", storageContents);
+        });
     }
 })

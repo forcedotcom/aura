@@ -27,11 +27,12 @@
         test: [
             function loadIframe(cmp) {
                 $A.test.setTestTimeout(100000);
-                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/applicationTest.app", "iframeContainer");
+                cmp.helper.lib.iframeTest.loadIframe(cmp, "/auraStorageTest/applicationTest.app?aura.mode=SELENIUMDEBUG",
+                        "iframeContainer");
                 // To account for refresh actions, even though it'd be ideal if there weren't any, wait for the flag
                 // to be set that tells us the bootstrap action has returned from the server.
                 $A.test.addWaitFor("true", function() {
-                    return $A.util.getText(frame.contentWindow.$A.getRoot().find("actionComplete").getElement());
+                    return $A.util.getText(cmp.helper.lib.iframeTest.getIframeRootCmp().find("actionComplete").getElement());
                 });
             },
             function insertStaleApplicationAction(cmp) {

@@ -15,8 +15,6 @@
                 cmp.helper.lib.iframeTest.reloadIframe(cmp);
             },
             function fetchComponentFromServer(cmp) {
-                // Start monitoring logs for what's added to storage to verify later that everything is stored we expect
-                cmp.helper.lib.iframeTest.getIframeRootCmp().setupLogListener();
                 cmp.helper.lib.iframeTest.getIframeRootCmp().fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
@@ -26,11 +24,11 @@
             },
             function waitForAllDefsStored(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                $A.test.addWaitFor(true, function(){
+                $A.test.addWaitFor(true, function() {
                     // ui:scroller has 4 items that go into the ComponentDefStorage: scroller, resizeObserver, and
                     // 2 libraries
-                    var log = iframeCmp.get("v.putLog");
-                    return log.length >= 4;
+                    var defStorageContents = iframeCmp.get("v.defStorageContents");
+                    return defStorageContents.length >= 4 && defStorageContents.indexOf("markup://ui:scroller") > -1;
                 });
             },
             function reloadIframe(cmp) {

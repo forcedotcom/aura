@@ -18,14 +18,15 @@
 <aura:application template="auraStorageTest:componentDefStorageTemplate">
     <aura:attribute name="load" type="String" default="ui:scroller"/>
     <aura:attribute name="status" type="String" default="Waiting" />
-    <aura:attribute name="putLog" type="String[]" default=""/>
+    <aura:attribute name="defStorageContents" type="String[]" default=""/>
     <aura:attribute name="output" type="Aura.Component" />
 
     <aura:method name="fetchCmp" action="c.fetchCmp" />
     <aura:method name="createComponentDeprecated" action="c.createComponentDeprecated" />
     <aura:method name="clearActionAndDefStorage" action="c.clearActionAndDefStorage" />
     <aura:method name="verifyDefsRestored" action="c.verifyDefsRestored" />
-    <aura:method name="setupLogListener" action="c.setupLogListener" />
+
+    <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
 
     <br/><br/>
     <div aura:id="status">{!v.status}</div><br/>

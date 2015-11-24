@@ -24,25 +24,14 @@
                           persistent="true"
                           clearStorageOnInit="false"/>
 
-        <script>
-            // This test must be run in a non-obfuscated mode we will fail to override the def cache
-            var original = $A.$storageService$.$initStorage$;
-            $A.$storageService$.$initStorage$ = function() {
-                if (arguments[0] === "ComponentDefStorage") {
-	                return original.call(this,
-                        arguments[0],   // name
-	                    arguments[1],   // persistent
-	                    arguments[2],   // secure
-	                    30720,           // *** Override to 30KB for testing purposes ***
-	                    arguments[4],   // defaultExpiration (2 weeks)
-	                    arguments[5],   // defaultAutoRefreshInterval
-	                    arguments[6],   // debugLoggingEnabled
-	                    arguments[7]    // clearStorageOnInit
-	                );
-                } else {
-                    return original.apply(this, arguments);
-                }
-            }
-        </script>
+        <!-- Make this 370KB so first cmp is saved to cache but then evicted after subsequent components added -->
+        <auraStorage:init name="ComponentDefStorage"
+                          persistent="true"
+                          secure="false"
+                          defaultExpiration="10886400"
+                          defaultAutoRefreshInterval="0"
+                          maxSize="370"
+                          debugLoggingEnabled="true"
+                          clearStorageOnInit="false"/>
     </aura:set>
 </aura:component>

@@ -18,20 +18,6 @@
         $A.enqueueAction(action);
     },
 
-    setupLogListener: function(cmp) {
-        var logListener = function(level, message, error) {
-            var evictLog = "'ComponentDefStorage' [indexeddb] : remove() - key: ";
-            var index = message.indexOf(evictLog)
-            if (index !== -1) {
-                var evictedCmp = message.substring(index + evictLog.length, message.length);
-                var evictLogAttr = cmp.get("v.evictLog");
-                evictLogAttr.push(evictedCmp);
-                cmp.set("v.evictLog", evictLogAttr);
-            }
-        }
-        $A.logger.subscribe("INFO", logListener);
-    },
-
     createComponentDeprecated: function(cmp) {
         cmp.set("v.status", "Creating Component");
         var load = cmp.get("v.load");
@@ -60,5 +46,19 @@
             cmp.set("v.status", "Done Clearing Action and Def Storage");
         })
         ['catch'](function(error) { cmp.set("v.status", "Error: " + error); });
+    },
+
+    /**
+     * Update attribute on component with contents of the component def storage whenever it's modified.
+     */
+    storageModified: function(cmp) {
+        $A.storageService.getStorage("ComponentDefStorage").getAll()
+        .then(function(items) {
+            var storageContents  = [];
+            for (var i = 0; i < items.length; i++) {
+                storageContents.push(items[i]["key"]);
+            }
+            cmp.set("v.defStorageContents", storageContents);
+        });
     }
 })

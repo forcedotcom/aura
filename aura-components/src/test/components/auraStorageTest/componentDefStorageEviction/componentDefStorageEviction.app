@@ -19,12 +19,13 @@
     <aura:attribute name="load" type="String" default="ui:tab"/>
     <aura:attribute name="status" type="String" default="Waiting"/>
     <aura:attribute name="output" type="Aura.Component"/>
-    <aura:attribute name="evictLog" type="String[]" default=""/>
+    <aura:attribute name="defStorageContents" type="String[]" default=""/>
 
     <aura:method name="fetchCmp" action="c.fetchCmp" />
     <aura:method name="createComponentDeprecated" action="c.createComponentDeprecated" />
     <aura:method name="clearActionAndDefStorage" action="c.clearActionAndDefStorage" />
-    <aura:method name="setupLogListener" action="c.setupLogListener" />
+
+    <aura:handler event="auraStorage:modified" action="{!c.storageModified}"/>
 
     <br/>
     <div aura:id="status">{!v.status}</div><br/>

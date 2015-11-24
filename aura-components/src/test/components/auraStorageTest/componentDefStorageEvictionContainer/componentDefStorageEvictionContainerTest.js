@@ -17,7 +17,7 @@
             },
             function fetchComponentFromServer(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.set("v.load", "ui:tab");
+                iframeCmp.set("v.load", "ui:scroller");
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
@@ -32,23 +32,25 @@
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
+            function verifyFirstCmpStored(cmp) {
+                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    var defStorageContents = iframeCmp.get("v.defStorageContents");
+                    return defStorageContents.indexOf("markup://ui:scroller") > -1;
+                }, "First component fetched from server (ui:scroller) was not saved to component def storage");
+            },
             function fetchCmpFromServerToEvictFirstCmp(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                // Setup listener on the logs to see what's evicted from the storage
-                iframeCmp.setupLogListener();
                 iframeCmp.set("v.load", "ui:menu");
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
             function verifyOriginalFetchedCmpEvicted(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                $A.test.addWaitFor(true, function() {
-                    var evictLog = iframeCmp.get("v.evictLog");
-                    if (evictLog.indexOf("markup://ui:tab") > -1) {
-                        return true;
-                    }
-                    return false;
-                });
+                $A.test.addWaitForWithFailureMessage(true, function(){
+                    var defStorageContents = iframeCmp.get("v.defStorageContents");
+                    return defStorageContents.indexOf("markup://ui:scroller") === -1;
+                }, "First component fetched from server (ui:scroller) never evicted from component def storage");
             },
             function reloadPage(cmp) {
                 // Reload page to clear anything saved in javascript memory
@@ -56,7 +58,7 @@
             },
             function fetchOriginalComponentAgain(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.set("v.load", "ui:tab");
+                iframeCmp.set("v.load", "ui:scroller");
                 iframeCmp.fetchCmp();
                 cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },

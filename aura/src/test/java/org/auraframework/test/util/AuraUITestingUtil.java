@@ -742,13 +742,13 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        return getBooleanEval("return window.aura.test.isComplete();");
+                        return getBooleanEval("return window.$A && window.$A.test && window.$A.test.isComplete();");
                     }
                 },
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
-                        String dump = (String) getRawEval("return (window.$A && $A.test && $A.test.getDump())||'';");
+                        String dump = (String) getRawEval("return (window.$A && window.$A.test && window.$A.test.getDump())||'';");
                         if (dump.isEmpty()) {
                             dump = "no test dump available.";
                         }

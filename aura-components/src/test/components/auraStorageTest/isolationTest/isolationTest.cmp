@@ -4,6 +4,8 @@
     <aura:attribute name="isolationKey" type="String" default="" />
     <aura:attribute name="storageItemValue" type="String" default="value" />
 
+    <aura:import library="auraStorageTest:iframeTestLib" property="iframeLib" />
+
     <aura:method name="addItemToStorage" action="{!c.addItemToStorage}"/>
     <aura:method name="getAllFromStorage" action="{!c.getAllFromStorage}"/>
 

@@ -1,7 +1,9 @@
 ({
-    setUp : function(component) {
+    setUp : function(cmp) {
+        cmp._iframeLib = cmp.helper.iframeLib.iframeTest;
+
         // must match AuraStorage.KEY_DELIMITER
-        component.DELIMITER = ":";
+        cmp.DELIMITER = ":";
     },
 
     testPreIsolationKey: {
@@ -56,48 +58,25 @@
     testGetAllOnlyReturnsCurrentIsolation: {
         test: [
         function loadCmpInIframe(cmp) {
-            $A.test.setTestTimeout(60000);
-            cmp._frameLoaded = false;
-            cmp._expected = "expected value";
-            var frame = document.createElement("iframe");
-            frame.src = "/auraStorageTest/isolationTest.cmp?isolationKey=isolationA&storageItemValue=valueA";
-            frame.scrolling = "auto";
-            frame.id = "myFrame";
-            $A.util.on(frame, "load", function () {
-                cmp._frameLoaded = true;
-            });
-            var content = cmp.find("iframeContainer");
-            $A.util.insertFirst(frame, content.getElement());
-
-            this.waitForIframeLoad(cmp);
+            var frameSrc = "/auraStorageTest/isolationTest.cmp?isolationKey=isolationA&storageItemValue=valueA";
+            cmp._iframeLib.loadIframe(cmp, frameSrc, "iframeContainer");
         },
         function addItemToStorageWithIsolation(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
-            iframeCmp.addItemToStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
-            }, function() {
-                $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
-            });
+            cmp._iframeLib.getIframeRootCmp().addItemToStorage();
+            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function reloadIframe(cmp) {
-            cmp._frameLoaded = false;
-            document.getElementById("myFrame").contentWindow.location.reload();
-            this.waitForIframeLoad(cmp);
+            cmp._iframeLib.reloadIframe(cmp);
         },
         function addItemToStorageWithNewIsolation(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
             iframeCmp.set("v.isolationKey", "isolationB");
             iframeCmp.set("v.storageItemValue", "valueB");
             iframeCmp.addItemToStorage();
-            $A.test.addWaitFor(true, function() {
-                return $A.util.getText(iframeCmp.find("status").getElement()) !== "Adding";
-            }, function() {
-                $A.test.assertEquals("Done Adding", $A.util.getText(iframeCmp.find("status").getElement()));
-            });
+            cmp._iframeLib.waitForStatus("Adding", "Done Adding");
         },
         function getAllFromStorage(cmp) {
-            var iframeCmp = document.getElementById("myFrame").contentWindow.$A.getRoot();
+            var iframeCmp = cmp._iframeLib.getIframeRootCmp();
             iframeCmp.getAllFromStorage();
             $A.test.addWaitFor(true, function() {
                 return $A.util.getText(iframeCmp.find("status").getElement()) !== "Getting";
@@ -107,15 +86,5 @@
                 $A.test.assertEquals("valueB", items[0].value, "Unexpected value returned from storage");
             });
         }]
-    },
-
-    waitForIframeLoad: function(cmp) {
-        var iframeWindow = document.getElementById("myFrame").contentWindow;
-        $A.test.addWaitFor(true, function() {
-            return cmp._frameLoaded
-                && iframeWindow.$A
-                && iframeWindow.$A.getRoot() !== undefined
-                && !$A.test.isActionPending()
-        });
     }
 })

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -84,14 +84,13 @@ public interface ServletUtilAdapter extends AuraAdapter {
      * @param response the http response
      * @param written have we already written to the response.
      */
-    void handleServletException(Throwable t, boolean quickfix, AuraContext context,
-            HttpServletRequest request, HttpServletResponse response,
+    void handleServletException(Throwable t, boolean quickfix, AuraContext context, HttpServletRequest request, HttpServletResponse response,
             boolean written) throws IOException;
 
     /**
      * Send a 404 page to the client.
      */
-    void send404(ServletConfig config, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+    void send404(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
     /**
      * Get the full set of scripts for the current context.

@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
-import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,9 +35,7 @@ import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.ds.serviceloader.AuraServiceProvider;
 import org.auraframework.http.CSP;
 import org.auraframework.instance.InstanceStack;
-import org.auraframework.service.ContextService;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.service.SerializationService;
+import org.auraframework.service.*;
 import org.auraframework.system.*;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
@@ -50,6 +48,12 @@ import org.auraframework.util.json.JsonEncoder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+/**
+ * Work to make this class final.
+ *
+ * @author kgray
+ * @since 202
+ */
 @Component (provide=AuraServiceProvider.class)
 public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     private ContextService contextSerivce = Aura.getContextService();
@@ -168,8 +172,10 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                     if (mappedEx instanceof DefinitionNotFoundException) {
                         DefinitionNotFoundException dnfe = (DefinitionNotFoundException) mappedEx;
 
-                        if (dnfe.getDescriptor() != null
-                                && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
+                        if (dnfe.getDescriptor() != null && dnfe.getDescriptor().equals(context.getApplicationDescriptor())) {
+                            // We're in production and tried to hit an aura app that doesn't exist.
+                            // just show the standard 404 page.
+                            this.send404(request.getServletContext(), request, response);
                             return;
                         }
                     }
@@ -260,7 +266,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
     }
 
     @Override
-    public void send404(ServletConfig config, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void send404(ServletContext servletContext, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         response.getWriter().println("404 Not Found"
                 + "<!-- Extra text so IE will display our custom 404 page -->"

@@ -18,7 +18,7 @@ var SecureScriptElement = (function() {
 	"use strict";
 
 	function SecureScriptElement(key) {
-		SecureThing.call(this, key);
+		SecureThing.call(this, key, "src");
 	}
 
 	SecureScriptElement.prototype.constructor = SecureScriptElement;

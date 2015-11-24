@@ -24,21 +24,10 @@ var SecureElement = (function() {
 	function getKey(se) {
 		return LockerKeyUtil._getKey(se, masterKey);
 	}
-	
-	function definePassThroughProperty(name) {
-		return {
-			get : function() {
-				return getElement(this)[name];
-			},
-			set : function(value) {
-				getElement(this)[name] = value;
-			}
-		};
-	}
-	
+
 	function SecureElement(el, key) {
-		SecureThing.call(this, key);
-		
+		SecureThing.call(this, key, "el");
+
 		LockerKeyUtil.applyKey(el, key);
 
 		this._set("el", el, masterKey);
@@ -53,9 +42,9 @@ var SecureElement = (function() {
 				return "SecureElement: " + getElement(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
 			}
 		},
-		
-		id : definePassThroughProperty("id"),
-		className : definePassThroughProperty("className"),
+
+		id : SecureThing.createPassThroughProperty("id"),
+		className : SecureThing.createPassThroughProperty("className"),
 
 		appendChild : {
 			value : function(child) {
@@ -91,6 +80,17 @@ var SecureElement = (function() {
 			}
 		},
 
+		childNodes : SecureThing.createFilteredProperty("childNodes"),
+		children : SecureThing.createFilteredProperty("children"),
+		
+		getAttribute: SecureThing.createPassThroughMethod("getAttribute"),
+		setAttribute: SecureThing.createPassThroughMethod("setAttribute"),
+
+		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
+		parentNode : SecureThing.createFilteredProperty("parentNode"),
+
+		// Internal master key protected API
+
 		unwrap : {
 			value : function(mk) {
 				if (mk !== masterKey) {
@@ -99,24 +99,8 @@ var SecureElement = (function() {
 
 				return getElement(this);
 			}
-		},
-
-		parentNode : {
-			get : function() {
-				var parentNode = getElement(this).parentNode;
-				if (!parentNode) {
-					return undefined;
-				}
-
-				LockerKeyUtil.verifyAccess(this, parentNode);
-
-				return SecureDocument.wrap(parentNode);
-			}
 		}
 	});
-
-	// definePassThroughProperty(sel, el, "id");
-	// definePassThroughProperty(sel, el, "className");
 
 	return SecureElement;
 })();

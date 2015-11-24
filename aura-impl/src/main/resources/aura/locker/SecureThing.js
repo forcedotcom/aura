@@ -19,20 +19,31 @@ var SecureThing = (function() {
 	"use strict";
 	/**
 	 * Construct a new SecureThing.
-	 *
+	 * 
 	 * @public
 	 * @class
 	 * @constructor
-	 *
+	 * 
 	 * @param {String}
 	 *            name - name of the secure getter for the wrapped thing
 	 * @param {Object}
 	 *            thing - the thing to be securely wrapped
 	 */
-	function SecureThing(key) {
-		var things = {};
+	function SecureThing(key, primaryName) {
+		var _things = {};
+		var _primaryName = primaryName;
 
 		LockerKeyUtil.applyKey(this, key);
+
+		Object.defineProperty(this, "_getPrimaryName", {
+			value : function(mk) {
+				if (mk !== masterKey) {
+					throw Error("Access denied");
+				}
+
+				return _primaryName;
+			}
+		});
 
 		Object.defineProperty(this, "_get", {
 			value : function(name, mk) {
@@ -40,7 +51,7 @@ var SecureThing = (function() {
 					throw Error("Access denied");
 				}
 
-				return things[name];
+				return _things[name];
 			}
 		});
 
@@ -50,13 +61,85 @@ var SecureThing = (function() {
 					throw Error("Access denied");
 				}
 
-				things[name] = value;
+				_things[name] = value;
 			}
 		});
 
+		this._getPrimaryName = this["_getPrimaryName"];
 		this._get = this["_get"];
 		this._set = this["_set"];
 	}
 
 	return SecureThing;
+})();
+
+(function() {
+	"use strict";
+
+	SecureThing.prototype.filterNodes = function(raw) {
+		if (!raw) {
+			return undefined;
+		}
+
+		var key = LockerKeyUtil._getKey(this, masterKey);
+		if (raw.length !== undefined) {
+			var filtered = [];
+			for (var n = 0; n < raw.length; n++) {
+				var e = raw[n];
+				if (LockerKeyUtil.hasAccess(this, e)) {
+					filtered.push(new SecureElement(e, key));
+				}
+			}
+
+			return filtered;
+		} else {
+			return LockerKeyUtil.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
+		}
+	};
+
+	function primaryThing(that) {
+		return that._get(that._getPrimaryName(masterKey), masterKey);
+	}
+
+	SecureThing.createFilteredMethod = function(methodName) {
+		return {
+			value : function() {
+				var thing = primaryThing(this);
+				return this.filterNodes(thing[methodName].apply(thing, arguments));
+			}
+		};
+	};
+
+	SecureThing.createFilteredProperty = function(propertyName) {
+		return {
+			get : function() {
+				var thing = primaryThing(this);
+				var raw = thing[propertyName];
+				LockerKeyUtil.verifyAccess(this, raw);
+
+				var key = LockerKeyUtil._getKey(this, masterKey);
+				return new SecureElement(raw, key);
+			}
+		};
+	};
+
+	SecureThing.createPassThroughMethod = function(methodName) {
+		return {
+			value : function() {
+				var thing = primaryThing(this);
+				return thing[methodName].apply(thing, arguments);
+			}
+		};
+	};
+	
+	SecureThing.createPassThroughProperty = function(name) {
+		return {
+			get : function() {
+				return primaryThing(this)[name];
+			},
+			set : function(value) {
+				primaryThing(this)[name] = value;
+			}
+		};
+	};
 })();

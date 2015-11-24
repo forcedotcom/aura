@@ -29,7 +29,7 @@ var SecureComponent = (function() {
 	}
 	
 	function SecureComponent(component, referencingKey) {
-		SecureThing.call(this, referencingKey);
+		SecureThing.call(this, referencingKey, "component");
 		
 		this._set("component", component, masterKey);
 	}

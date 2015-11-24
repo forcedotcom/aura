@@ -21,9 +21,7 @@ import java.util.List;
 import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 
 import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
@@ -169,7 +167,7 @@ public abstract class AuraBaseServlet extends HttpServlet {
 
     @Deprecated
     protected void send404(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Aura.getServletUtilAdapter().send404(getServletConfig(), request, response);
+        Aura.getServletUtilAdapter().send404(getServletConfig().getServletContext(), request, response);
     }
 
     @Deprecated

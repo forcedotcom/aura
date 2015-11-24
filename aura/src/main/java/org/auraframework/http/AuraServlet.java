@@ -193,7 +193,7 @@ public class AuraServlet extends AuraBaseServlet {
             // at this point we simply broke.
             //
             Aura.getExceptionAdapter().handleException(re);
-            servletUtil.send404(getServletConfig() ,request, response);
+            servletUtil.send404(getServletConfig().getServletContext() ,request, response);
             return;
         }
         String nocache = nocacheParam.get(request);
@@ -220,7 +220,7 @@ public class AuraServlet extends AuraBaseServlet {
 
             Mode mode = context.getMode();
             if (!isValidDefType(defType, mode)) {
-                servletUtil.send404(getServletConfig(), request, response);
+                servletUtil.send404(getServletConfig().getServletContext(), request, response);
                 return;
             }
 

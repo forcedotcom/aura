@@ -105,7 +105,7 @@ public class AuraResourceServlet extends AuraBaseServlet {
         AuraResource resource = findResource((String)request.getAttribute(ORIG_REQUEST_URI), context);
         ServletUtilAdapter servletUtil = Aura.getServletUtilAdapter();
         if (resource == null) {
-            servletUtil.send404(getServletConfig(), request, response);
+            servletUtil.send404(getServletConfig().getServletContext(), request, response);
             return;
         }
         if (servletUtil.resourceServletGetPre(request, response, resource)) {

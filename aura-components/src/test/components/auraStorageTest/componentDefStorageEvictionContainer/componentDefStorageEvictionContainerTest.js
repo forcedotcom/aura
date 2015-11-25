@@ -26,18 +26,19 @@
                 iframeCmp.createComponentDeprecated();
                 cmp.helper.lib.iframeTest.waitForStatus("Creating Component", "Done Creating Component - Success!");
             },
-            function fetchDifferentComponentFromServer(cmp) {
-                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
-                iframeCmp.set("v.load", "ui:block");
-                iframeCmp.fetchCmp();
-                cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
-            },
             function verifyFirstCmpStored(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
                 $A.test.addWaitForWithFailureMessage(true, function(){
                     var defStorageContents = iframeCmp.get("v.defStorageContents");
                     return defStorageContents.indexOf("markup://ui:scroller") > -1;
                 }, "First component fetched from server (ui:scroller) was not saved to component def storage");
+            },
+            function fetchDifferentComponentFromServer(cmp) {
+                // Fetch a couple more components to evict the first component
+                var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();
+                iframeCmp.set("v.load", "ui:block");
+                iframeCmp.fetchCmp();
+                cmp.helper.lib.iframeTest.waitForStatus("Fetching", "Done Fetching");
             },
             function fetchCmpFromServerToEvictFirstCmp(cmp) {
                 var iframeCmp = cmp.helper.lib.iframeTest.getIframeRootCmp();

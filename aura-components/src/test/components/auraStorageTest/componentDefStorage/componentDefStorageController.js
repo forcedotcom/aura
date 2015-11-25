@@ -24,7 +24,11 @@
         try {
             var newCmp = $A.newCmpDeprecated(load);
             if (newCmp) {
-                cmp.set("v.status", "Done Creating Component");
+                var type = " - Success!";
+                if (newCmp.getDef().getDescriptor().getQualifiedName().indexOf("placeholder") !== -1) {
+                    type = " - Placeholder";
+                }
+                cmp.set("v.status", "Done Creating Component" + type);
                 cmp.set("v.output", newCmp);
             }
         } catch (e) {

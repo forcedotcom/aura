@@ -34,6 +34,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
     };
     
     var VENDORS  = ['webkit', 'Moz', 'ms'];
+    var COLUMN_DIVIDER_CLASS = 'column-divider';
     
     var ColumnResizer = function(table, config) {
     	this._initializeConfig(config);
@@ -42,6 +43,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
     };
     
     ColumnResizer.prototype = {
+
+    	_setDividerHeight: function(indicator) {
+    		var viewportHeight = window.innerHeight;
+    		var divider = indicator.querySelector('.' + COLUMN_DIVIDER_CLASS);
+    		var indicatorLoc = indicator.parentNode.getBoundingClientRect().top;
+    		divider.style.height = (viewportHeight - indicatorLoc)  + 'px';
+    	},
     		
     	/**
     	 * Use the default configuration wherever the user hasn't specified a value
@@ -86,6 +94,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	// Create and attach the visual elements for resizing
 	    	this.indicator = this._createIndicator();
 	        this.container.insertBefore(this.indicator, table);
+	        this._setDividerHeight(this.indicator);
 	        
 	    	// Determine what vendor prefixes to use for the animation
 	    	this._initializeBrowserSupport();
@@ -99,6 +108,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_initializeColumns : function(table) {
+
 			// Avoid having to go to the DOM each time we need a reference to the columns.
 	    	// Use a real array so we get the array methods
 	    	this.columns = [];
@@ -110,6 +120,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	if (this.columns.length > 0) {
 	    		this._initializeHandles(table);
 	    		this.indicator.style.height = this.columns[0].clientHeight + 'px';
+	    		
 	    	}
 		},
 		
@@ -158,13 +169,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		    		if (initialWidth < this.config.minWidth) {
 		    			initialWidth = this.config.minWidth;
 		    		}
-		    		
+		    		this._setDividerHeight(handle);
 		    		this._resize(column, initialWidth);
 		    		this._updateRange(this._findRangeElement(column), column.clientWidth);
 	    		}
 	    		totalWidth += column.clientWidth;
 	    	}
-	    	
+	    	this._setDividerHeight(this.indicator);
 	    	// Fix the table's width so that the browser doesn't try to resize columns by itself
 	    	table.style.width = totalWidth + 'px';
 		},
@@ -196,6 +207,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 			colDiv.appendChild(outerSpan);
 			
 			column.appendChild(colDiv);
+
 		},
 		
 		/**
@@ -205,14 +217,18 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_createIndicator : function() {
+			
+
 			var indicator = document.createElement('div');
 	    	indicator.classList.add(this.config.indicatorClasses);
 	    	indicator.classList.add("indicator");
 	    	
 	    	var columnDivider = document.createElement('span');
-	    	columnDivider.classList.add("column-divider");
+	    	columnDivider.classList.add(COLUMN_DIVIDER_CLASS);
 	    	
 	    	indicator.appendChild(columnDivider);
+	    	
+	    	
 	    	
 	    	return indicator;
 		},
@@ -237,12 +253,16 @@ function lib(w){ //eslint-disable-line no-unused-vars
 			// Divider line to show what's being resized
 			var columnDivider = document.createElement('span');
 			columnDivider.classList.add("column-divider");
+
+			
 			
 			// Compose all the elements and attach event handlers
 			resizeHandle.appendChild(columnDivider);
+
 			
 			handleContainer.appendChild(range);
 			handleContainer.appendChild(resizeHandle);
+
 			
 			handleContainer.addEventListener('keydown', this);
 			handleContainer.addEventListener('mousedown', this);
@@ -256,12 +276,21 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @return {HTMLElement} input element of type range
 		 */
 		_createRangeElement : function(value) {
+			
 			var range = document.createElement('input');
+
 			
 			range.setAttribute('type', 'range');
 			range.setAttribute('min', this.config.minWidth);
 			range.setAttribute('max', this.config.maxWidth);
 			range.value = value;
+			range.addEventListener('focus', function(e) {
+				var handle = e.target.parentNode.querySelector('.resize-button');
+				if(handle) {
+					this._setDividerHeight(handle);
+				}
+				
+			}.bind(this));
 			
 			return range;
 		},
@@ -301,6 +330,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @param rangeElement {HTMLElement} OPTIONAL input element of type range that holds the width value
 		 */
 		resizeColumn : function(column, targetWidth, rangeElement) {
+
 			if (targetWidth < this.config.minWidth) {
 				targetWidth = this.config.minWidth;
 			}
@@ -390,6 +420,8 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		handleEvent : function(e) {
+			
+
 			switch (e.type) {
 			case 'mousedown':
 				this._onStart(e);
@@ -429,8 +461,10 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	};
 	    	
 			this.attachHandlers();
+
 			this.indicator.classList.add("active");
 	    	this.table.classList.add("resizing");
+	    	this._setDividerHeight(this.indicator);
 			
 			this._slideIndicator(e.clientX - this.current.tableOffset);
 		},
@@ -475,6 +509,8 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @param e {event} Event fired by the browser
 		 */
 		_onKeydown : function(e) {
+			
+
 			var range = e.target;
 			var column;
 			switch(e.keyCode) {
@@ -520,6 +556,8 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_fire: function(eventType) {
+			
+
 			var eventQueue = this._events[eventType],
 				eventFncs = eventQueue && eventQueue.length,
 				params = Array.prototype.slice.call(arguments, 1),
@@ -580,6 +618,9 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * Re-initialize column data
 		 */
 		updateColumns : function() {
+			if(this.indicator) {
+				this._setDividerHeight(this.indicator);
+			}
 			this._initializeColumns(this.table);
 		},
 		

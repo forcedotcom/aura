@@ -74,23 +74,32 @@ function lib(w) { //eslint-disable-line no-unused-vars
         this._node = null;
         this._releaseCb = null;
 
-        // Use mutation observers to invalidate cache. It's magic!
-        this._observer = new w.MutationObserver(this.refresh.bind(this));
-
         if(!el) {
             throw new Error('Element missing');
         }
 
         this._node = el;
-        //do not observe the window
-        if(this._node !== w) {
-            this._observer.observe(this._node, {
-            attributes: true, 
-            childList: true, 
-            characterData: true,
-            subtree: true
-        });
+
+        // this check is because phantomjs does not support
+        // mutation observers. The consqeuence here
+        // is that any browser without mutation observers will
+        // fail to update dimensions if they change after the proxy 
+        // is created and the proxy is not not refreshed
+        if("MutationObserver" in w) {
+                // Use mutation observers to invalidate cache. It's magic!
+            this._observer = new w.MutationObserver(this.refresh.bind(this));
+
+            //do not observe the window
+            if(this._node !== w) {
+                this._observer.observe(this._node, {
+                    attributes: true, 
+                    childList: true, 
+                    characterData: true,
+                    subtree: true
+                });
+            }
         }
+        
         
 
         this.refresh();

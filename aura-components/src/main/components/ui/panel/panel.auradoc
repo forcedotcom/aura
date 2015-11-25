@@ -110,7 +110,7 @@ closeAction: function(panel) {
         <h4>Positioning Panels</h4>
         <p>Position a panel in relation to a target element by using the direction attribute.To position a panel at the north of the target element, set <code>direction : north</code>. 
         To set a padding between the two, set <code>pad : 30</code>, where 30 is the padding in pixels. The target (referenceElement) can also be the viewport.
-        A padding can be added using <code>pad</code> and <code>padTop</code>.</p>
+        A padding can be added using <code>pad</code>.</p>
 		<pre>$A.get('e.ui:createPanel').setParams({
     panelType: 'panel',
     visible: true,
@@ -122,25 +122,26 @@ closeAction: function(panel) {
     }
 }).fire();</pre>
 		<h4>Aligning your Target Using Advanced Positioning</h4>
-        <p>With advanced positioning, instead of using <code>direction</code>, specify the alignments using <code>align</code> and <code>targetAlign</code>.
-        For example, you can position the panel on top of the target. Set <code>advanced: true</code>, and specify the alignments.
-        The <code>direction</code> attribute is ignored when advanced positioning is used.
-		</p>
+		<p>Advanced positioning gives you greater control on panel positioning, and overrides the <code>direction</code> attribute. 
+		Specify the alignments using <code>align</code>, <code>targetAlign</code>, and <code>vertPad</code> using the <code>panelConfig</code> attribute. The <code>vertPad</code> attribute adds vertical padding to the panel and is optional.
+        </p>
 		<pre>$A.get('e.ui:createPanel').setParams({
     panelType: 'panel',
     visible: true,
-    panelConfig : {
-        referenceElement: target,
-        advanced: true,
-        targetAlign : 'left top',
-        align : 'left top',
-        body  : body,
-        pad : 0
+    referenceElement: target,
+    body  : body,
+    advancedConfig: {
+        targetAlign: 'left top',
+        align: 'left top',
+        vertPad: 5 //optional
+    },
+    pad: 0,
+    showPointer: false,
+    boundingElement: window
     }
 }).fire();</pre>
-	<p>Let's see how advanced positioning further differs from using the direction attribute. When you set <code>direction</code> to north, the panel is center aligned at the north of the target. 
-	Using advanced positioning, you can vertically align the panel and target by setting <code>targetAlign : 'left top'</code> and <code>align : 'left bottom'</code>.
-	</p>
+	<p><code>align</code> specifies the alignment of the panel. <code>targetAlign</code> specifies the horizontal and vertical alignments for the panel on the target. Valid values for horizontal alignment are <code>right</code>,
+	<code>left</code>, and <code>center</code>. Valid values for vertical alignment are <code>top</code> and <code>bottom</code>.</p>
 	<h4>Using a Bounding Element</h4>
 	<p>A bounding element keeps the panel within the element. The default bounding element is the window. The child component must be bound within the parent component.
 	 If a bounding element is used, the panel is positioned in relation to the bounding element. For example, setting <code>direction</code> to <code>east</code> positions the panel at the east of the bounding element and within it.
@@ -156,7 +157,7 @@ closeAction: function(panel) {
     pad : 30
     }
 }).fire();</pre>
-	<p>For examples, see the <a href="/uiExamples/panelPositioningExample.cmp?aura.mode=DEV">Panel Positioning Demo</a>.</p>
+	<p>For examples, see the <a href="/uitest/panelPositioning_Test.cmp?aura.mode=DEV">Panel Positioning Demo</a>.</p>
      </aura:description>
    
  

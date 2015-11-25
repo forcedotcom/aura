@@ -2273,7 +2273,9 @@ Component.prototype.doIndex = function(cmp) {
             valueProvider=valueProvider.getComponent();
         }
 
-        $A.assert(valueProvider, "No attribute value provider defined for component " + cmp);
+        if(!valueProvider) {
+            throw new Error("No attribute value provider defined for component " + cmp);
+        }
         valueProvider.index(localId, this.globalId);
     }
 };

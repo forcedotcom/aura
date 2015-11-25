@@ -114,6 +114,12 @@ InvalidComponent.prototype.addValueHandler = function(){
     this.raiseInvalidComponentError("addValueHandler", arguments);
 };
 
+InvalidComponent.prototype.removeValueHandler = function() {
+    // We do nothing as this can be called in the destroy stage
+    // and in that case we don't really want to gack, just not worry
+    // about trying to cleanup a destroyed component.
+};
+
 /**
  * Forces the final destroy of a component (after async).
  */

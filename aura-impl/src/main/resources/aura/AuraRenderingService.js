@@ -63,7 +63,9 @@ AuraRenderingService.prototype.render = function(components, parent) {
             // And put the constructed component back into the array.
             components[i] = cmp;
 
-            $A.assert($A.util.isComponent(cmp), "AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
+            if(!$A.util.isComponent(cmp)) {
+                throw new Error("AuraRenderingService.render: 'cmp' must be a valid Component, found '" + cmp + "'.");
+            }
         }
         // JBUCH: HALO: TODO: END REMOVE ME
 
@@ -124,7 +126,9 @@ AuraRenderingService.prototype.rerender = function(components) {
             var renderedElements=[];
             var addExistingElements=visited[id];
             if(!visited[id]) {
-                $A.assert(cmp.isRendered(), "Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.");
+                if(!cmp.isRendered()) {
+                    throw new Error("Aura.RenderingService.rerender: attempt to rerender component that has not been rendered.");
+                }
                 var rerenderedElements = undefined;
                 try {
                     context.setCurrentAccess(cmp);
@@ -183,7 +187,9 @@ AuraRenderingService.prototype.afterRender = function(components) {
     var context=$A.getContext();
     for(var i=0;i<components.length;i++){
         var cmp = components[i];
-        $A.assert($A.util.isComponent(cmp), "AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
+        if(!$A.util.isComponent(cmp)) {
+            throw new Error("AuraRenderingService.afterRender: 'cmp' must be a valid Component, found '"+cmp+"'.");
+        }
         if(cmp.isValid()) {
             try {
                 context.setCurrentAccess(cmp);
@@ -278,11 +284,15 @@ AuraRenderingService.prototype.unrender = function(components) {
  * @param {Object} facet the component or array of components to store.
  */
 AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
-    $A.assert($A.util.isComponent(component), "Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
+    if(!$A.util.isComponent(component)) {
+        throw new Error("Aura.RenderingService.storeFacet: 'component' must be a valid Component. Found '" + component + "'.");
+    }
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
-    $A.assert($A.util.isArray(facet), "Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.");
+    if(!$A.util.isArray(facet)) {
+        throw new Error("Aura.RenderingService.storeFacet: 'facet' must be a valid Array. Found '" + facet + "'.");
+    }
     component._facetInfo=facet.slice(0);
 };
 
@@ -291,13 +301,17 @@ AuraRenderingService.prototype.storeFacetInfo = function(component, facet) {
  * @memberOf AuraRenderingService
  */
 AuraRenderingService.prototype.getUpdatedFacetInfo = function(component, facet) {
-    $A.assert($A.util.isComponent(component), "Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
+    if(!$A.util.isComponent(component)) {
+        throw new Error("Aura.RenderingService.getUpdatedFacetInfo: 'component' must be a valid Component. Found '" + component + "'.");
+    }
     if($A.util.isComponent(facet)){
         facet=[facet];
     }
     if(!$A.util.isArray(facet)){
+        //#if {"excludeModes" : ["PRODUCTION"}
         $A.warning("Aura.RenderingService.getUpdatedFacetInfo: 'facet' should be a valid Array. Found '" +
             facet + "' in '" + component + "'.");
+        //#end
         facet = [];
     }
     var updatedFacet={

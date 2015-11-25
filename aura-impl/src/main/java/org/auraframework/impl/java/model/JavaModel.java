@@ -22,15 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.auraframework.Aura;
-import org.auraframework.def.DefDescriptor;
-import org.auraframework.def.ModelDef;
-import org.auraframework.def.TypeDef;
+import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
 import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
-import org.auraframework.instance.InstanceStack;
-import org.auraframework.instance.Model;
-import org.auraframework.instance.ValueProvider;
+import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
+import org.auraframework.instance.*;
 import org.auraframework.service.LoggingService;
 import org.auraframework.throwable.AuraExecutionException;
 import org.auraframework.throwable.AuraRuntimeException;
@@ -142,6 +139,18 @@ public class JavaModel implements Model {
         try {
             String part = key.getRoot();
             PropertyReference stem = key.getStem();
+            if(root instanceof JavascriptMockHandler.Returns) {
+                JavascriptMockHandler.Returns returnsValue = (JavascriptMockHandler.Returns)root;
+                
+                try {
+                    Object answer = returnsValue.answer();
+                    return getValue(answer, key, def);
+                } catch (Throwable e) {
+                    // The answer was an exception
+                    return e;
+                }
+                
+            }
             if (root == null) {
                 return null;
             } else if (root instanceof Map) {

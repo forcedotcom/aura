@@ -16,7 +16,9 @@
 package org.auraframework.integration.test.clientlibrary;
 
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,8 +26,11 @@ import org.auraframework.Aura;
 import org.auraframework.AuraConfiguration;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.clientlibrary.ClientLibraryService;
-import org.auraframework.def.*;
+import org.auraframework.def.ApplicationDef;
+import org.auraframework.def.BaseComponentDef;
+import org.auraframework.def.ClientLibraryDef;
 import org.auraframework.def.ClientLibraryDef.Type;
+import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.clientlibrary.ClientLibraryResolverRegistryImpl;
 import org.auraframework.impl.clientlibrary.ClientLibraryServiceImpl;
@@ -36,6 +41,7 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.NoContextException;
+import org.auraframework.throwable.quickfix.ClientLibraryException;
 import org.auraframework.util.json.JsonReader;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
 
@@ -111,9 +117,9 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
             checkExceptionFull(e, AuraRuntimeException.class, "Output cannot be null");
         }
     }
-    
+
     public void testContextPath() throws Exception {
-    	AuraContext context = Aura.getContextService().getCurrentContext();
+        AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
                 .getDefDescriptor("clientLibraryTest:clientLibraryTest", ApplicationDef.class);
         context.setApplicationDescriptor(appDesc);
@@ -123,10 +129,10 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
         Set<String> urlSet = clientLibraryService.getUrls(context, Type.JS);
         Pattern pattern = Pattern.compile("/auraFW|/l/");
-        for(String url : urlSet) {
+        for (String url : urlSet) {
             Matcher matcher = pattern.matcher(url);
-            while(matcher.find()) {
-                int start =  matcher.start();
+            while (matcher.find()) {
+                int start = matcher.start();
                 String cool = url.substring(start - 5, start);
                 if (!cool.equals(coolContext)) {
                     fail("Context path was not prepended to Aura urls");
@@ -176,9 +182,11 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertEquals("js://clientLibraryTest.clientLibraryTest", clientLibraryService.getResolvedUrl(urlClientLibrary));
     }
 
-    public void testCanCombine() throws Exception {
+    public void testCanCombineIfNull() throws Exception {
         assertFalse(clientLibraryService.canCombine(null));
+    }
 
+    public void testCanCombineIfEmptyUrlAndResolverAllows() throws Exception {
         ClientLibraryDef combinableURL = vendor.makeClientLibraryDef("combinableUrl_test", "", Type.JS,
                 null, true, null, null);
         ClientLibraryResolver combinableResolver = new ClientLibraryResolver() {
@@ -209,7 +217,11 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         };
         ClientLibraryResolverRegistryImpl.INSTANCE.register(combinableResolver);
         assertTrue(clientLibraryService.canCombine(combinableURL));
+    }
 
+    public void testCanCombineIfEmptyUrlAndResolverDoesNotAllow() throws Exception {
+        ClientLibraryDef combinableURL = vendor.makeClientLibraryDef("combinableUrl_test", "", Type.JS,
+                null, true, null, null);
         ClientLibraryResolver unCombinableResolver = new ClientLibraryResolver() {
             @Override
             public String getName() {
@@ -240,26 +252,33 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertFalse(clientLibraryService.canCombine(combinableURL));
     }
 
-//    public void testLibraryDefWithUrlCanBeCombinedWithoutUsingResolver() throws Exception {
-//        ClientLibraryDef combinableURL = vendor.makeClientLibraryDef("fooBar",
-//                "js://clientLibraryTest.clientLibraryTest", Type.JS,
-//                null, true, null, null);
-//        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(combinableURL));
-//        ClientLibraryDef unCombinableURL = vendor.makeClientLibraryDef("fooBar",
-//                "js://clientLibraryTest.clientLibraryTest", Type.JS,
-//                null, false, null, null);
-//        assertTrue("ResourceDef should always to combined", clientLibraryService.canCombine(unCombinableURL));
-//        // TODO: If a library cannot be resolved, can it still be combined?
-//
-//        ClientLibraryDef blankURL = vendor.makeClientLibraryDef("fooBar", "", Type.JS,
-//                null, true, null, null);
-//        try {
-//            clientLibraryService.canCombine(blankURL);
-//            fail("Client library will blank url and no resolver should throw exception");
-//        } catch (QuickFixException qfe) {
-//            assertTrue(qfe instanceof ClientLibraryException);
-//        }
-//    }
+    public void testCanCombineIfEmptyUrlAndNoResolverAndDefDoesNotAllow() throws Exception {
+        ClientLibraryDef url = vendor.makeClientLibraryDef("fooBar", "", Type.JS, null, false, null, null);
+        assertEquals(false, clientLibraryService.canCombine(url));
+    }
+
+    public void testCanCombineIfEmptyUrlAndNoResolverAndDefAllows() throws Exception {
+        ClientLibraryDef url = vendor.makeClientLibraryDef("fooBar", "", Type.JS, null, true, null, null);
+        assertEquals(true, clientLibraryService.canCombine(url));
+    }
+
+    public void testCanCombineIfUrlIsAuraJs() throws Exception {
+        ClientLibraryDef url = vendor.makeClientLibraryDef("fooBar", "js://clientLibraryTest.clientLibraryTest",
+                Type.JS, null, false, null, null);
+        assertEquals(true, clientLibraryService.canCombine(url));
+    }
+
+    public void testCanCombineIfUrlIsAuraCss() throws Exception {
+        ClientLibraryDef url = vendor.makeClientLibraryDef("fooBar", "css://clientLibraryTest.clientLibraryTest",
+                Type.CSS, null, false, null, null);
+        assertEquals(true, clientLibraryService.canCombine(url));
+    }
+
+    public void testCanCombineIfUrlIsOther() throws Exception {
+        ClientLibraryDef url = vendor.makeClientLibraryDef("fooBar", "http://clientLibraryTest.clientLibraryTest",
+                Type.JS, null, true, null, null);
+        assertEquals(false, clientLibraryService.canCombine(url));
+    }
 
     public void testGetUrlsWithoutEstablishingContext() throws Exception {
         Aura.getContextService().endContext();
@@ -311,18 +330,15 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertRootComponentResourceUrl(appDesc, resourceUrl, Type.JS);
     }
 
-//    public void testCaseSensitiveName() throws Exception {
-//        Aura.getContextService().endContext();
-//        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
-//        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
-//                "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
-//        try {
-//            getClientLibraryUrls(appDesc, Type.CSS);
-//            fail("Should have thrown exception for no resolver");
-//        } catch (Exception e) {
-//            checkExceptionFull(e, ClientLibraryException.class, "Client library must have resolver if url is blank: UIPerfCsS");
-//        }
-//    }
+    public void testCaseSensitiveName() throws Exception {
+        Aura.getContextService().endContext();
+        Aura.getContextService().startContext(Mode.STATS, Format.JSON, Authentication.AUTHENTICATED);
+        DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
+                "clientLibraryTest:clientLibraryTest", ApplicationDef.class);
+
+        Set<String> res = getClientLibraryUrls(appDesc, Type.CSS);
+        assertFalse(res.isEmpty());
+    }
 
     public void testDifferentModes() throws Exception {
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService().getDefDescriptor(
@@ -334,7 +350,8 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue("Missing library for PTEST mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
         Aura.getContextService().endContext();
-        Aura.getContextService().startContext(Mode.CADENCE, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
+        Aura.getContextService()
+                .startContext(Mode.CADENCE, Format.JSON, Authentication.UNAUTHENTICATED, laxSecurityApp);
         jsUrls = getClientLibraryUrls(appDesc, Type.JS);
         assertTrue("Missing library for CADENCE mode", jsUrls.contains("http://likeaboss.com/mode.js"));
 
@@ -376,11 +393,11 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         String url;
 
         url = "http://likeaboss.com/facet.js";
-        assertTrue("did not find "+url, jsUrls.contains(url));
+        assertTrue("did not find " + url, jsUrls.contains(url));
         url = "http://likeaboss.com/child.js";
-        assertTrue("did not find "+url, jsUrls.contains(url));
+        assertTrue("did not find " + url, jsUrls.contains(url));
         url = "http://likeaboss.com/parent.js";
-        assertTrue("did not find "+url, jsUrls.contains(url));
+        assertTrue("did not find " + url, jsUrls.contains(url));
 
     }
 

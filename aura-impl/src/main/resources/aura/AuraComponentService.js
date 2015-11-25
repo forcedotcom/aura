@@ -1274,7 +1274,8 @@ AuraComponentService.prototype.clearDefsFromStorage = function () {
 /**
  * Saves component and library defs to persistent storage.
  * @param {Object} context the new context from which defs are to be stored.
- * @return {Promise} promise which resolves when storing is complete.
+ * @return {Promise} promise which resolves when storing is complete. If errors occur during
+ *  the process they are handled (and logged) so the returned promise always resolves.
  */
 AuraComponentService.prototype.saveDefsToStorage = function (context) {
     var cmpConfigs = context["componentDefs"];
@@ -1292,11 +1293,55 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
     var defSizeKb = $A.util.estimateSize(cmpConfigs) / 1024;
     var libSizeKb = $A.util.estimateSize(libConfigs) / 1024;
 
-    return self.pruneDefsFromStorage(defSizeKb + libSizeKb)
-        .then(function() {
-            return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
-        }
-    );
+    return this.pruneDefsFromStorage(defSizeKb + libSizeKb)
+        .then(
+            function() {
+                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
+            }
+        )
+        .then(
+            undefined, // noop
+            function(e) {
+                // there was an error during analysis, pruning, or saving defs. the persistent components and actions
+                // may now be in an inconsistent state: dependencies may not be available. therefore clear the actions
+                // and cmp def storages.
+
+                $A.warning("AuraComponentService.saveDefsToStorage: failure during analysis, pruning, or saving; clearing actions and component def storages", e);
+                $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                    "defsRequiredSize" : defSizeKb + libSizeKb,
+                    "error" : e
+                });
+
+                // collect promises that clear actions + cmp def storage. note that the promises do not reject in order
+                // for the returned promise.all() to not resolve until all operations are complete.
+                var promises = [];
+                var promise;
+
+                var actionStorage = Action.getStorage();
+                if (actionStorage) {
+                    promise = actionStorage.clear()
+                        .then(
+                            undefined, // noop
+                            function(clearError) {
+                                $A.warning("AuraComponentService.saveDefsToStorage: failure clearing actions store", clearError);
+                            }
+                        );
+                    promises.push(promise);
+                }
+
+                // resolve after defs are cleared
+                promise = defStorage.clear()
+                    .then(
+                        undefined, // noop
+                        function(clearError) {
+                            $A.warning("AuraComponentService.saveDefsTostorage: failure clearing cmp def store", clearError);
+                        }
+                    );
+                promises.push(promise);
+
+                return Promise["all"](promises);
+            }
+        );
 };
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
@@ -1642,13 +1687,11 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.
- * @return {Promise} a promise that resolves when pruning is complete. If an error occurs
- *  during pruning then all defs are purged and the promise resolves.
+ * @return {Promise} a promise that resolves when pruning is complete.
  */
 AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) {
     var self          = this;
     var defStorage    = this.componentDefStorage.getStorage();
-    var actionStorage = Action.getStorage();
 
     // no storage means no pruning required
     if (!defStorage) {
@@ -1659,61 +1702,43 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
     var newSize = 0;
 
     // check space to determine if eviction is required. this is an approximate check meant to
-    // avoid storage.getAll() and graph analysis, which are expensive operations.
-    return defStorage.getSize().then(
-        function(size) {
-            currentSize = size;
-            var maxSize = defStorage.getMaxSize();
-            newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
-            if (newSize < maxSize) {
-                return undefined;
-            }
-
-            // some eviction is required.
-            //
-            // note: buildDependencyGraph() loads all actions and defs from storage. this forces
-            // scanning all rows in the respectives stores. this results in the stores returning an
-            // accurate value to getSize().
-            //
-            // as items are evicted from the store it's important that getSize() continues returning
-            // a value that is close to accurate.
-            return self.buildDependencyGraph().then(function(graph) {
-                var keysToEvict = self.sortDependencyGraph(graph);
-                return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
-            })
-            .then(
-                function(evicted) {
-                    $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
-                    $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
-                        "defsRequiredSize" : requiredSpaceKb,
-                        "storageCurrentSize" : currentSize,
-                        "storageRequiredSize" : newSize,
-                        "evicted" : evicted
-                    });
-                }
-            );
-        })
+    // avoid storage.getAll() and graph analysis which are expensive operations.
+    return defStorage.getSize()
         .then(
-            undefined, // noop
-            function(e) {
-                $A.warning("AuraComponentService.pruneDefsFromStorage: failure during analysis or pruning; clearing actions and component def storages", e);
-                $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
-                    "defsRequiredSize" : requiredSpaceKb,
-                    "storageCurrentSize" : currentSize,
-                    "storageRequiredSize" : newSize,
-                    "error" : e
-                });
-
-                if (actionStorage) {
-                    actionStorage.clear().then(undefined, function(clearError) {
-                        $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing actions store", clearError);
-                    });
+            function(size) {
+                currentSize = size;
+                var maxSize = defStorage.getMaxSize();
+                newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
+                if (newSize < maxSize) {
+                    return undefined;
                 }
 
-                // resolve after defs are cleared
-                return defStorage.clear().then(undefined, function(clearError) {
-                    $A.warning("AuraComponentService.pruneDefsFromStorage: failure clearing def store", clearError);
-                });
+                // some eviction is required.
+                //
+                // note: buildDependencyGraph() loads all actions and defs from storage. this forces
+                // scanning all rows in the respectives stores. this results in the stores returning an
+                // accurate value to getSize().
+                //
+                // as items are evicted from the store it's important that getSize() continues returning
+                // a value that is close to accurate.
+                return self.buildDependencyGraph()
+                    .then(
+                        function(graph) {
+                            var keysToEvict = self.sortDependencyGraph(graph);
+                            return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
+                        }
+                    )
+                    .then(
+                        function(evicted) {
+                            $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
+                            $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                                "defsRequiredSize" : requiredSpaceKb,
+                                "storageCurrentSize" : currentSize,
+                                "storageRequiredSize" : newSize,
+                                "evicted" : evicted
+                            });
+                        }
+                    );
             }
         );
 };

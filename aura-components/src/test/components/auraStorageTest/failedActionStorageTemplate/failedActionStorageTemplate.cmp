@@ -43,11 +43,12 @@
                 "persistent": true
             });
 
+            // force test to select our mock adapter
+            $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME }, this); 
+
             // create the magic "actions" store. the requested attributes (notably persistence) will
             // cause our mock adapter to be selected
             $A.storageService.initStorage("actions", true, true, 4096, 200, 300, true, true);
         </script>
     </aura:set>
-
-    {!v.containerScripts}
 </aura:component>

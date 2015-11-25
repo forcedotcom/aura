@@ -57,7 +57,7 @@
                 return new Promise(function(success, error) { success([]); });
             };
 
-            // register the mock adapter
+            // register the mock adapter. must be persistent for GVP storage to be used.
             $A.storageService.registerAdapter({
                 "name": MockStorageAdapter.NAME,
                 "adapterClass": MockStorageAdapter,
@@ -65,11 +65,11 @@
                 "persistent": true
             });
 
-            // create the magic "actions" store. the requested attributes (notably persistence) will
-            // cause our mock adapter to be selected
+            // force test to select our mock adapter
+            $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME; }, this); 
+
+            // create the magic "actions" store
             $A.storageService.initStorage("actions", true, true, 1024, 200, 300, true, true);
         </script>
     </aura:set>
-
-    {!v.containerScripts}
 </aura:component>

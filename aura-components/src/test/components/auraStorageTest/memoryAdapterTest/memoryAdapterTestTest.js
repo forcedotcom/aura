@@ -26,7 +26,7 @@
         // must match AuraStorage.KEY_DELIMITER
         cmp.DELIMITER = ":";
 
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "memory"; });
+        $A.installOverride("StorageService.selectAdapter", function(){ return "memory" }, this); 
 
         this.storage = $A.storageService.initStorage(
                     "memory-store",

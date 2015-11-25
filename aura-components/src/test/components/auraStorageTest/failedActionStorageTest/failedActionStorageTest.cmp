@@ -1,4 +1,4 @@
 <aura:component
-    template="auraStorageTest:failedStorageTemplate"
+    template="auraStorageTest:failedActionStorageTemplate"
     controller="java://org.auraframework.impl.java.controller.AuraStorageTestController">
 </aura:component>

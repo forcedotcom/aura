@@ -185,6 +185,16 @@ Aura.OverrideMap = function OverrideMap() {
                 Aura.Event.Event.prototype.fire = orig;
                 Aura.Event.Event.prototype["fire"] = orig;
             }
+        ),
+
+        "StorageService.selectAdapter" : new Aura.Utils.Override($A.storageService, $A.storageService.selectAdapter,
+            false,
+            function(bound) {
+                $A.storageService.selectAdapter = bound;
+            },
+            function(orig) {
+                $A.storageService.selectAdapter = orig;
+            }
         )
     };
 };

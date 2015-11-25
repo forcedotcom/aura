@@ -9,7 +9,7 @@
         cmp._storageLib = cmp.helper.storageLib.storageTest;
         cmp._iframeLib = cmp.helper.iframeLib.iframeTest;
 
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function(){ return "indexeddb"; });
+        $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this); 
         this.storage = $A.storageService.initStorage(
                 "browserdb",    // name
                 true,           // persistent
@@ -429,7 +429,7 @@
         test: [
         function putItemThenReplaceWithEntryTooLarge(cmp) {
             var maxSize = 5120;
-            $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb"; });
+            $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this); 
             cmp._storage = $A.storageService.initStorage("browserdb-testReplaceTooLarge",
                     true, false, maxSize, 2000, 3000, true, true);
             $A.test.addCleanup(function(){ $A.storageService.deleteStorage("browserdb-testReplaceTooLarge"); });

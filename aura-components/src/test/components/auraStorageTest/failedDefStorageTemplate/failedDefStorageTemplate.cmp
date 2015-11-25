@@ -1,0 +1,59 @@
+<aura:component isTemplate="true" extensible="true" extends="aura:template">
+
+    <aura:set attribute="auraPreInitBlock">
+        <script>
+            // Track how many times clear was called for tests to verify
+            window.mockComponentDefStorage = { clearCallCount : 0 };
+            
+            // Some of the component def caching logic is bypassed without an actions cache
+            $A.storageService.initStorage("actions", true, false, 4096, 200, 300, true, true);
+
+            // a storage adapter that fails on all operations
+            var MockStorageAdapter = function MockStorageAdapter(config) {  this.name = config['name']; };
+            MockStorageAdapter.NAME = "mockComponentDefStorage";
+            MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
+
+            MockStorageAdapter.prototype.getSize = function() {
+                return Promise.reject(new Error("getSize(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.getItem = function(key) {
+                return Promise.reject(new Error("getItem(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.getAll = function(key) {
+                return Promise.reject(new Error("getAll(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.setItem = function(key, item) {
+                return Promise.reject(new Error("setItem(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.removeItem = function(key) {
+                return Promise.reject(new Error("removeItem(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.clear = function(key) {
+                window.mockComponentDefStorage.clearCallCount++;
+                return Promise.reject(new Error("clear(): mock always fails"));
+            };
+
+            MockStorageAdapter.prototype.getExpired = function() {
+                return Promise.reject(new Error("getExpired(): mock always fails"));
+            };
+
+            // register the mock adapter
+            $A.storageService.registerAdapter({
+                "name": MockStorageAdapter.NAME,
+                "adapterClass": MockStorageAdapter,
+                "secure": true,
+                "persistent": true
+            });
+
+            // force test to select our mock adapter
+            $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME; }, this);
+
+            $A.storageService.initStorage("ComponentDefStorage", true, true, 4096, 200, 300, true, false);
+        </script>
+    </aura:set>
+</aura:component>

@@ -30,7 +30,7 @@
                           secure="false"
                           defaultExpiration="10886400"
                           defaultAutoRefreshInterval="0"
-                          maxSize="370"
+                          maxSize="432"
                           debugLoggingEnabled="true"
                           clearStorageOnInit="false"/>
     </aura:set>

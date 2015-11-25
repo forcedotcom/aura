@@ -2471,6 +2471,9 @@ Component.prototype.outputArrayValue = function(array, avp, serialized, depth) {
 Component.prototype.outputComponent = function(cmp, serialized, depth) {
     /*jslint reserved: true */
     if (cmp) {
+        if(!cmp.isValid()) {
+            return { "globalId": cmp.globalId, "valid": false };
+        }
         var ret = {
             __proto__ : null//eslint-disable-line no-proto
         };

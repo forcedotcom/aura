@@ -57,12 +57,13 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
     [Fixture]
     function SetupDefinitionStorage() {
-
-        var mockStorageService = function (persistent, secure) {
+    	var initStorageCalled = false; //we set this to true in storageService.initStorage() below
+        var mockStorageService = function (persistent, secure, withComponentDefStorage, actionStorageIsPersistent) {
             return Mocks.GetMocks(Object.Global(), {
                 "$A": {
                     storageService: {
                         initStorage: function() {
+                        	initStorageCalled = true;
                             return {
                                 isPersistent: function() {
                                     return persistent;
@@ -74,7 +75,18 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                             }
                         },
                         deleteStorage: function() {},
-                        getStorage: function() {}
+                        getStorage: function(name) {
+                        	if(withComponentDefStorage == true) {
+                        		if (name === "ComponentDefStorage") {
+                                    return {
+                                        isPersistent: function() { return true; },
+                                        suspendSweeping: function() {}
+                                    }
+                                }
+                        	} else {
+                        		return;
+                        	}
+                        }
                     },
                     getContext: function() {
                         return {
@@ -88,7 +100,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
                     getStorage: function() {
                         return {
                             isPersistent: function() {
-                                return true;
+                                return actionStorageIsPersistent;
                             }
                         }
                     }
@@ -100,7 +112,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
         function ShouldNotUseNotPersistentStorage() {
             var target = new Aura.Component.ComponentDefStorage();
             target.useDefStore = undefined;
-            mockStorageService(false, false)(function () {
+            mockStorageService(false, false, false, true)(function () {
                 target.setupDefinitionStorage();
             });
 
@@ -111,7 +123,7 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
         function OnlyUsePersistent() {
             var target = new Aura.Component.ComponentDefStorage();
             target.useDefStore = undefined;
-            mockStorageService(true, false)(function () {
+            mockStorageService(true, false, false, true)(function () {
                 target.setupDefinitionStorage();
             });
 
@@ -120,57 +132,25 @@ Test.Aura.Component.ComponentDefStorageTest = function () {
 
         [Fact]
         function DoNotCreateComponentDefStorageIfAlreadyPresent() {
-            var initStorageCalled = false;
-
-            var mock = function () {
-                return Mocks.GetMocks(Object.Global(), {
-                    "$A": {
-                        storageService: {
-                            initStorage: function(name, persistent) {
-                                initStorageCalled = true;
-                                return {
-                                    isPersistent: function() {
-                                        return persistent;
-                                    }
-                                }
-                            },
-                            deleteStorage: function() {},
-                            getStorage: function(name) {
-                                if (name === "ComponentDefStorage") {
-                                    return {
-                                        isPersistent: function() { return true; },
-                                        suspendSweeping: function() {}
-                                    }
-                                }
-                            }
-                        },
-                        getContext: function() {
-                            return {
-                                getApp: function() {
-                                    return "foo";
-                                }
-                            }
-                        }
-                    },
-                    "Action": {
-                        getStorage: function() {
-                            return {
-                                isPersistent: function() {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                });
-            };
-
+        	initStorageCalled = false;
             var target = new Aura.Component.ComponentDefStorage();
             target.useDefStore = undefined;
-            mock()(function () {
+            mockStorageService(true, false, true, true)(function () {
                 target.setupDefinitionStorage();
             });
 
             Assert.False(initStorageCalled);
+        }
+        
+        [Fact]
+        function DoNotCreateComponentDefStorageIfActionStorageIsNotPersistent() {
+            var target = new Aura.Component.ComponentDefStorage();
+            target.useDefStore = undefined;
+            mockStorageService(true, false, false, false)(function () {
+                target.setupDefinitionStorage();
+            });
+
+            Assert.False(target.useDefStore);
         }
 
     }

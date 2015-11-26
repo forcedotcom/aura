@@ -35,6 +35,7 @@
 
         concreteHelper.addInputDomEvents(component);
         concreteHelper.updateErrorElement(component);
+        concreteHelper.updateAriaRequired(component);
     },
 
     rerender: function(component) {
@@ -45,6 +46,7 @@
 
         concreteHelper.addInputDomEvents(component);
         concreteHelper.updateErrorElement(component);
+        concreteHelper.updateAriaRequired(component);
 
         this.superRerender();
     }

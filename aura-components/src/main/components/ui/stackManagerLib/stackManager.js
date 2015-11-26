@@ -115,10 +115,8 @@ function lib() { //eslint-disable-line no-unused-vars
     function moveUpOrDown(el, forceCreateStackingCtx, increment) {
         var stackingCtxEl = getStackingCtx(el);
         if (forceCreateStackingCtx && stackingCtxEl !== el.parentNode) {
-            /*eslint-disable no-undef*/
-            if ($A.util.isFunction(createStackingCtx)) {
-                createStackingCtx(el.parentNode);
-            /*eslint-enable no-undef*/
+            if ($A.util.isFunction(forceCreateStackingCtx)) {
+                forceCreateStackingCtx(el.parentNode);
             } else {
                 el.parentNode.style.position = 'relative';
                 el.parentNode.style.zIndex = 0;

@@ -1369,7 +1369,7 @@ AuraComponentService.prototype.createComponentPrivAsync = function (config, call
 AuraComponentService.prototype.createComponentPriv = function (config) {
     var descriptor = this.getDescriptorFromConfig(config["componentDef"]);
     var def = this.getComponentDef({ "descriptor" : descriptor });
-    $A.assert(def, 'Definition does not exist on the client');
+    $A.assert(def, 'Definition does not exist on the client for descriptor:'+descriptor);
 
     var classConstructor = this.getComponentClass(descriptor);
     return new classConstructor(config);

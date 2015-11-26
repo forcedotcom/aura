@@ -122,9 +122,9 @@
 	
 	/**
 	 * Test to check Trigger Attribute with Advanced set to true
-	 *
+	 * please fix then enable : W-2846651
 	 */
-	testTrigger: {
+	_testTrigger: {
 		
 		test: function(component) {
 			var triggers = ['triggerhoverlabel', 'triggerclicklabel', 'inputadvtrue', 'triggernonelabel', 'triggeremptylabel', 'triggeremptylabel'];

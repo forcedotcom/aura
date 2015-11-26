@@ -25,8 +25,8 @@
         this.superRerender();
         if (component.isDirty('v.visible')) {
             helper.updateEmptyListContent(component);
+            helper.setDefaultHighlight(component);
         }
-        helper.setDefaultHighlight(component);
     },
     unrender: function(component, helper) {
         if (helper.getOnClickEventProp.cache && 

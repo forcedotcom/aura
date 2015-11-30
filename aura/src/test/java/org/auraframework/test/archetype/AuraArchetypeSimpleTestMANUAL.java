@@ -81,8 +81,7 @@ public class AuraArchetypeSimpleTestMANUAL extends AuraHttpTestCase {
 
     public void testProjectCreation() throws Throwable {
         Process jettyProcess = null;
-        workspace = new File(System.getProperty("java.io.tmpdir") + File.separator + getName()
-                + System.currentTimeMillis());
+        workspace = new File(IOUtil.newTempDir("archetype"));
         try {
             // create a workspace to place the project files in
             workspace.mkdirs();

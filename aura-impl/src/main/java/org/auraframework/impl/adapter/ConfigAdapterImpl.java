@@ -15,18 +15,34 @@
  */
 package org.auraframework.impl.adapter;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.auraframework.Aura;
-import org.auraframework.adapter.*;
+import org.auraframework.adapter.ConfigAdapter;
+import org.auraframework.adapter.ContentSecurityPolicy;
+import org.auraframework.adapter.DefaultContentSecurityPolicy;
+import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.annotations.Annotations.ServiceComponent;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.DefDescriptor;
@@ -42,12 +58,19 @@ import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.AuraError;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.*;
+import org.auraframework.util.AuraLocale;
+import org.auraframework.util.AuraTextUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.javascript.JavascriptGroup;
-import org.auraframework.util.resource.*;
+import org.auraframework.util.resource.CompiledGroup;
+import org.auraframework.util.resource.FileGroup;
+import org.auraframework.util.resource.ResourceLoader;
 import org.auraframework.util.text.Hash;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -88,8 +111,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     }
 
     private static String getDefaultCacheDir() {
-        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-        return new File(tmpDir, "auraResourceCache").getAbsolutePath();
+        return IOUtil.newTempDir("auracache");
     }
 
     protected ConfigAdapterImpl(String resourceCacheDir) {

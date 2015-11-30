@@ -18,6 +18,7 @@ package org.auraframework.integration.test.util;
 import java.io.File;
 
 import org.auraframework.Aura;
+import org.auraframework.util.IOUtil;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.nio.SelectChannelConnector;
@@ -49,12 +50,7 @@ public class AuraJettyServer extends Server {
     }
 
     private AuraJettyServer(String host, int port, String contextPath) {
-        String tmpPath = System.getProperty("java.io.tmpdir") + "/src/main/webapp";
-        File tmpDir = new File(tmpPath);
-        if (!tmpDir.exists()) {
-            tmpDir.mkdirs();
-            tmpDir.deleteOnExit();
-        }
+        File tmpDir = new File(IOUtil.newTempDir("webcache"));
 
         Connector connector = new SelectChannelConnector();
         if (host != null) {

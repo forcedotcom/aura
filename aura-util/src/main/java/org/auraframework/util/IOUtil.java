@@ -27,6 +27,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarOutputStream;
@@ -37,6 +38,46 @@ import java.util.zip.ZipEntry;
 import com.google.common.base.Preconditions;
 
 public class IOUtil {
+    private static String defaultTempDir = null;
+
+    public static String newTempDir(String prefix) {
+        File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+        int count = 0;
+        long time = System.currentTimeMillis();
+        StringBuilder sb = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+
+        if (!tmpDir.canWrite() && !tmpDir.mkdirs()) {
+            throw new RuntimeException("Unable to write to the temporary directory");
+        }
+        if (prefix == null) {
+            prefix = "aura";
+        }
+        sb.append(prefix);
+        sb.append("_");
+        sb.append(Long.toString(time, 36));
+        sb.append("_");
+        int len = sb.length();
+        while (count < 1000) {
+            sb.setLength(len);
+            sb.append(Long.toString(random.nextLong(), 36));
+            File attempt = new File(tmpDir, sb.toString());
+            if (attempt.mkdir()) {
+                attempt.deleteOnExit();
+                return attempt.getAbsolutePath();
+            }
+            System.out.println(attempt);
+            count += 1;
+        }
+        throw new RuntimeException("Unable to create a temporary directory");
+    }
+
+    public static synchronized String getDefaultTempDir() {
+        if (defaultTempDir == null) {
+            defaultTempDir = newTempDir("aura_default");
+        }
+        return defaultTempDir;
+    }
 
     public static long copyStream(InputStream in, OutputStream out) throws IOException {
         return copyStream(in, out, new byte[8192]);

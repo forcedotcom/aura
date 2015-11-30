@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.net.URL;
 
 import org.auraframework.util.AuraUtil;
+import org.auraframework.util.IOUtil;
 import org.auraframework.util.adapter.SourceControlAdapter;
 import org.auraframework.util.test.util.UnitTestCase;
 
@@ -69,7 +70,7 @@ public abstract class BaseDiffUtils<T> implements DiffUtils<T> {
 
         if (destUrl == null) {
             // if we're reading from jars and can't identify filesystem source locations, write to a temp file at least
-            destUrl = new URL("file://" + System.getProperty("java.io.tmpdir") + "/aura/test" + resourceName);
+            destUrl = new URL("file://" + IOUtil.getDefaultTempDir() + resourceName);
         }
         if (srcUrl == null) {
             // also if reading from jars and no gold included (shouldn't happen)

@@ -2,47 +2,81 @@
 
     <aura:set attribute="auraPreInitBlock">
         <script>
-            // Track how many times clear was called for tests to verify
-            window.mockComponentDefStorage = { clearCallCount : 0 };
-            
+            /*
+             * Settings for the test to set and flags for the test to verify. By default this template will fail all
+             * operations on the ComponentDefStorage. To fail specific adapter funcitons set failAll to false and
+             * fail[FunctionName] to true.
+             *
+             * clearCallCount - Track how many times clear was called for tests to verify
+             * failAll - Fail all storage operations with a rejected Promise. true by default.
+             */
+            window.mockComponentDefStorage = {
+                clearCallCount : 0,
+                failAll: true
+            };
+
             // Some of the component def caching logic is bypassed without an actions cache
             $A.storageService.initStorage("actions", true, false, 4096, 200, 300, true, true);
 
-            // a storage adapter that fails on all operations
+            // Create a functional storage to pass through to when we want operations to pass
+            var realStorage = $A.storageService.initStorage("ComponentDefStorageReal", true, false, 4096, 200, 300, true, false);
+
+            // A storage adapter that fails all operations by default and can be overriden to fail on specific methods
             var MockStorageAdapter = function MockStorageAdapter(config) {  this.name = config['name']; };
             MockStorageAdapter.NAME = "mockComponentDefStorage";
             MockStorageAdapter.prototype.getName = function() { return MockStorageAdapter.NAME; };
 
             MockStorageAdapter.prototype.getSize = function() {
-                return Promise.reject(new Error("getSize(): mock always fails"));
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetSize) {
+                    return Promise.reject(new Error("getSize(): mock always fails"));
+                }
+                return realStorage.adapter.getSize.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.getItem = function(key) {
-                return Promise.reject(new Error("getItem(): mock always fails"));
+            MockStorageAdapter.prototype.getItem = function() {
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetItem) {
+                    return Promise.reject(new Error("getItem(): mock always fails"));
+                }
+                return realStorage.adapter.getItem.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.getAll = function(key) {
-                return Promise.reject(new Error("getAll(): mock always fails"));
+            MockStorageAdapter.prototype.getAll = function() {
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failGetAll) {
+                    return Promise.reject(new Error("getAll(): mock always fails"));
+                }
+                return realStorage.adapter.getAll.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.setItem = function(key, item) {
-                return Promise.reject(new Error("setItem(): mock always fails"));
+            MockStorageAdapter.prototype.setItem = function() {
+                if (window.mockComponentDefStorage.failAll || window.mockComponentDefStorage.failSetItem) {
+                    return Promise.reject(new Error("setItem(): mock always fails"));
+                }
+                return realStorage.adapter.setItem.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.removeItem = function(key) {
-                return Promise.reject(new Error("removeItem(): mock always fails"));
+            MockStorageAdapter.prototype.removeItem = function() {
+                if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failRemoveItem) {
+                    return Promise.reject(new Error("removeItem(): mock always fails"));
+                }
+                return realStorage.adapter.removeItem.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.clear = function(key) {
+            MockStorageAdapter.prototype.clear = function() {
                 window.mockComponentDefStorage.clearCallCount++;
-                return Promise.reject(new Error("clear(): mock always fails"));
+                if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failClear) {
+                    return Promise.reject(new Error("clear(): mock always fails"));
+                }
+                return realStorage.adapter.clear.apply(realStorage.adapter, arguments);
             };
 
-            MockStorageAdapter.prototype.getExpired = function() {
-                return Promise.reject(new Error("getExpired(): mock always fails"));
+            MockStorageAdapter.prototype.sweep = function() {
+                if (window.mockComponentDefStorage.failAll  || window.mockComponentDefStorage.failSweep) {
+                    return Promise.reject(new Error("sweep(): mock always fails"));
+                }
+                return realStorage.adapter.sweep.apply(realStorage.adapter, arguments);
             };
 
-            // register the mock adapter
+            // Register the mock adapter
             $A.storageService.registerAdapter({
                 "name": MockStorageAdapter.NAME,
                 "adapterClass": MockStorageAdapter,
@@ -50,7 +84,7 @@
                 "persistent": true
             });
 
-            // force test to select our mock adapter
+            // Force test to select our mock adapter
             $A.installOverride("StorageService.selectAdapter", function(){ return MockStorageAdapter.NAME; }, this);
 
             $A.storageService.initStorage("ComponentDefStorage", true, true, 4096, 200, 300, true, false);

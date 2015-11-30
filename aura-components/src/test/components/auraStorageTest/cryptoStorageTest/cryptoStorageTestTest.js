@@ -14,7 +14,7 @@
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");
         }
 
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
         this.storage = this.createStorage("crypto-store", 32768, 2000, 3000);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("crypto-store"); });
     },

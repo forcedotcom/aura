@@ -62,6 +62,11 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertErrorMaskIsNotVisible();
     }
 
+   /*
+    * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
+    * or show anything in error object in the handler.
+    */
+   @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI })
     public void testErrorMessageFromErrorContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
         findDomElement(By.cssSelector(".errorFromAppTable .errorFromClientControllerButton")).click();
@@ -76,6 +81,11 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertNoStacktracePresent();
     }
 
+    /*
+     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
+     * or show anything in error object in the handler.
+     */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI })
     public void testErrorMessageFromAuraAssertContainsStacktraceInDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
         findDomElement(By.cssSelector(".errorFromAppTable .failAssertInClientControllerButton")).click();
@@ -90,6 +100,11 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
         assertNoStacktracePresent();
     }
 
+    /*
+     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
+     * or show anything in error object in the handler.
+     */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI })
     public void testErrorMessageFromAuraErrorContainsStacktraceDevMode() throws Exception {
         open("/auratest/errorHandlingApp.app", Mode.DEV);
         findDomElement(By.cssSelector(".errorFromAppTable .auraErrorFromClientControllerButton")).click();
@@ -113,7 +128,11 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
 
     /*
      * Verify new error message can be retrieved in Aura Friendly Error data
+     *
+     * Disabled for Safari, currently Safari does NOT pass error object to onerror handler, so we are not able to get
+     * or show anything in error object in the handler.
      */
+    @ExcludeBrowsers({ BrowserType.IPHONE, BrowserType.IPAD, BrowserType.SAFARI })
     public void testAuraFriendlyErrorMessageFromData() throws Exception {
         String expectedContainedMessage = "Friendly Error Message from data";
         open("/auratest/errorHandlingApp.app?useFriendlyErrorMessageFromData=true&handleSystemError=true", Mode.PROD);
@@ -448,14 +467,6 @@ public class ErrorHandlingUITest extends AbstractErrorUITestCase {
      */
     public void testDefaultHandleInvalidComponentErrorWhenMarkEventHandled() throws Exception {
         open("/auratest/errorHandlingApp.app?handleSystemError=true&addInvalidComponent=true", Mode.PROD, false);
-        assertDisplayedErrorMessage("Failed to initialize application");
-    }
-
-    /*
-     * Verify Aura default error handler can handle systemError when an exception is thrown from model.
-     */
-    public void testDefaultHandleErrorInModelWhenSerialize() throws Exception {
-        open("/auratest/errorHandlingErrorModelCmp.cmp", Mode.PROD, false);
         assertDisplayedErrorMessage("Failed to initialize application");
     }
 

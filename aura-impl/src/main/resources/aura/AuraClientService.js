@@ -512,9 +512,14 @@ AuraClientService.prototype.setCurrentTransactionId = function(abortableId) {
  * @private
  */
 AuraClientService.prototype.singleAction = function(action, actionResponse, key, store) {
-    var storage, toStore, needUpdate, errorHandler;
+    var storage, toStore, needUpdate, errorHandler, tid = this.currentTransactionId, newTid;
 
     try {
+        // Force the transaction id to 'this' action, so that we maintain chains.
+        if (action.getAbortableId() !== undefined) {
+            this.setCurrentTransactionId(action.getAbortableId());
+        }
+        newTid = this.currentTransactionId;
         needUpdate = action.updateFromResponse(actionResponse);
         if (action.getAbortableId() === this.lastTransactionId || !action.isAbortable()) {
             if (needUpdate) {
@@ -566,6 +571,10 @@ AuraClientService.prototype.singleAction = function(action, actionResponse, key,
     } catch (e) {
         $A.logger.auraErrorHelper(e, action);
         throw e;
+    } finally {
+        if (newTid === this.currentTransactionId || tid) {
+            this.currentTransactionId = tid;
+        }
     }
 };
 

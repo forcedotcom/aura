@@ -193,7 +193,7 @@ Test.Components.Ui.StackManager.StackManagerTest = function() {
      * Verify can create stacking context when panel's parent is not a stack
      * context root also verify that we can do it using a custom callback
      */
-    [Fixture, Skip('Waiting for W-2818517')]
+    [Fixture]
     function forceCreateStackingCtx() {
 
         [Fact, Data({

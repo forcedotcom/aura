@@ -155,17 +155,6 @@
         }
     },
 
-    /**
-     * Override ui:input.
-     *
-     */
-    doUpdate : function(component, value, hasTime) {
-        var langLocale = component.get("v.langLocale");
-        langLocale = !$A.util.isUndefinedOrNull(langLocale) ? langLocale : $A.get("$Locale.langLocale");
-
-        this.setDateTimeValue(component, value, hasTime, langLocale);
-    },
-
     formatDateTime: function(component) {
         var concreteCmp = component.getConcreteComponent();
         var _helper = concreteCmp.getDef().getHelper();
@@ -331,7 +320,7 @@
 
         var date = this.getDateTime(component, langLocale, dateString, timeString);
         if (!$A.util.isUndefinedOrNull(date)) {
-            if (!hasTime) {
+            if (!hasTime && !component.get("v.useSingleInput")) {
                 // using 12:00 as default value when no time has been entered yet
                 date = Date.UTC(date.getUTCFullYear(),
                     date.getUTCMonth(),

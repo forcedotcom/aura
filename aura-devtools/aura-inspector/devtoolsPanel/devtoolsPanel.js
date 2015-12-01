@@ -20,6 +20,7 @@
      * AuraInspector:OnEventEnd                     An Aura event fired. Process all the events and actions that have happened since the event fired. 
      * Transactions:OnTransactionEnd                Transaction has ended and should now be added to the UI.
      * AuraInspector:StorageData                    Aura Storage Service has async fetched data to show in the storage panel.
+     * AuraInspector:RemoveStorageData              Remove stored response for the action we would like to drop next time we see it
      * AuraInspector:OnClientActionStart
      * AuraInspector:OnClientActionEnd
      */

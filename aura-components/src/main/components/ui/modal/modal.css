@@ -71,6 +71,23 @@
     background-color: #FFFFFF;
 }
 
+
+.THIS .modal-header .title {
+    /*
+    The title is intended to wrap lines
+    but, per W-2816162, very long words
+    break this. This section is intended to fix
+    that by breaking words and using 
+    hyphens where supported (safari, ie, ff and opera)
+    */
+     -ms-word-break: break-all;
+     word-break: break-all;
+     word-break: break-word;
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+     hyphens: auto;
+}
+
 .THIS .modal-body {
     overflow: hidden;
     overflow-y: auto;
@@ -206,6 +223,8 @@
     visibility: visible;
     animation: movetopop-modal .2s ease-in-out;
 }
+
+
 
 /* ANIMATIONS */
 @keyframes movetobottom-modal {

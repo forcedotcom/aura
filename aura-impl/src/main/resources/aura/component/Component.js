@@ -1892,6 +1892,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
+                        defaultValue = $A.util.apply([], defaultValue, true, true);
                         for(var facet=0;facet<defaultValue.length;facet++){
                             if(defaultValue[facet]["attributes"]&&!defaultValue[facet]["attributes"]["valueProvider"]){
                                 defaultValue[facet]["attributes"]["valueProvider"]=this;

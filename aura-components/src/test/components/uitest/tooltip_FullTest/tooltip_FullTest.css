@@ -52,3 +52,11 @@
 	height:40px;
 	width:60px;
 }
+.THIS.container {
+	text-align: center;
+	background: #ccc;
+}
+
+.THIS.uiContainerManager {
+	pointer-events: none;
+}

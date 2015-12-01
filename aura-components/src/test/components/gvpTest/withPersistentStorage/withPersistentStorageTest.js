@@ -7,7 +7,7 @@
     labels : [ "threadHostile" ],
 
     setUp : function(cmp) {
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "indexeddb";});
+        $A.installOverride("StorageService.selectAdapter", function(){ return "indexeddb" }, this);
         var storage = $A.storageService.initStorage("actions", true, false, 32768, 2000, 3000, true, true);
         $A.test.addCleanup(function(){ $A.storageService.deleteStorage("actions")});
     },
@@ -52,7 +52,8 @@
                         }
                     }
                     completed = true;
-                }, failTest);
+                })
+                ["catch"](failTest);
 
             $A.test.addWaitFor(
                     true,
@@ -89,7 +90,9 @@
                         }
                     }
                     return storage.put("globalValueProviders", gvps.value);
-                }).then(function() { completed = true; }, failTest);
+                })
+                .then(function() { completed = true; })
+                ["catch"](failTest);
 
             $A.test.addWaitFor(true, function() { return completed; });
         },

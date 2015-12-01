@@ -15,7 +15,11 @@
  */
 ({
     assertLogs : function(cmp, expected) {
-        $A.test.assertEquals(expected.join(), cmp.find("logPanel").get("v.logs").join());
+        $A.test.assertEquals(expected.join(), this.getLoggedStatements(cmp).join());
+    },
+
+    getLoggedStatements: function(cmp) {
+        return cmp.find("logPanel").get("v.logs");
     },
 
     testFacetEventHandledByRoot : {
@@ -444,6 +448,24 @@
             cmp.find("logPanel").clear();
             cmp.getSuper().find("emitter").fireEvent();
             this.assertLogs(cmp, expected);
+        }
+    },
+
+    testBubbleThroughPassthroughValue: {
+        test: function(cmp) {
+            var expected = [
+                "fire Passthrough", 
+                "handle Passthrough in Root", 
+                "handleSuper Passthrough in Root"
+            ];
+            var emitter = cmp.find("emitterInIteration");
+
+            cmp.find("logPanel").clear();
+            emitter.fireEvent();
+
+            var actual = this.getLoggedStatements(cmp);
+
+            $A.test.assertEquals(expected.toString(), actual.toString());
         }
     }
 })

@@ -1299,7 +1299,10 @@ Component.prototype.setAttributeValueProvider = function (avp) {
  */
 Component.prototype.getComponentValueProvider = function() {
     var valueProvider = this.attributeValueProvider||this.facetValueProvider;
-    return !(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent) ? valueProvider.getComponent() : valueProvider;
+    while (!(valueProvider instanceof Component) && $A.util.isFunction(valueProvider.getComponent)) {
+        valueProvider = valueProvider.getComponent();
+    }
+    return valueProvider;
 };
 
 /**
@@ -1899,6 +1902,7 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
                 if (!configValues.hasOwnProperty(name)||defaultValue===configValues[name]) {
                     setByDefault[name]=true;
                     if (defaultDef.getTypeDefDescriptor() === "aura://Aura.Component[]" || defaultDef.getTypeDefDescriptor() === "aura://Aura.ComponentDefRef[]") {
+                        defaultValue = $A.util.apply([], defaultValue, true, true);
                         for(var facet=0;facet<defaultValue.length;facet++){
                             if(defaultValue[facet]["attributes"]&&!defaultValue[facet]["attributes"]["valueProvider"]){
                                 defaultValue[facet]["attributes"]["valueProvider"]=this;
@@ -2285,7 +2289,9 @@ Component.prototype.doIndex = function(cmp) {
             valueProvider=valueProvider.getComponent();
         }
 
-        $A.assert(valueProvider, "No attribute value provider defined for component " + cmp);
+        if(!valueProvider) {
+            throw new Error("No attribute value provider defined for component " + cmp);
+        }
         valueProvider.index(localId, this.globalId);
     }
 };
@@ -2483,6 +2489,9 @@ Component.prototype.outputArrayValue = function(array, avp, serialized, depth) {
 Component.prototype.outputComponent = function(cmp, serialized, depth) {
     /*jslint reserved: true */
     if (cmp) {
+        if(!cmp.isValid()) {
+            return { "globalId": cmp.globalId, "valid": false };
+        }
         var ret = {
             __proto__ : null//eslint-disable-line no-proto
         };

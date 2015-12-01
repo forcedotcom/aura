@@ -58,3 +58,11 @@
     bottom: 0;
 	left:0;
 }
+.THIS.container {
+	text-align: center;
+	background: #ccc;
+}
+
+.THIS.uiContainerManager {
+	pointer-events: none;
+}

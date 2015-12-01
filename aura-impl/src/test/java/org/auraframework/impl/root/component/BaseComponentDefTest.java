@@ -1117,7 +1117,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#isLocallyRenderable()}.
      */
     public void testIsLocallyRenderableWithClientsideRenderer() throws QuickFixException {
-        T baseComponentDef = define(baseTag, "renderer='js://test.testJSRenderer'", "");
+        DefDescriptor<?> rendererDesc = addSourceAutoCleanup(RendererDef.class, "({render:function(){}})");
+        String rendererAttributeStr = String.format("renderer='%s'", rendererDesc.getQualifiedName());
+        T baseComponentDef = define(baseTag, rendererAttributeStr, "");
+
         assertEquals("Rendering detection logic is not on.", RenderType.AUTO, baseComponentDef.getRender());
         assertFalse("When a component has client renderers, the component should not be serverside renderable.",
                 baseComponentDef.isLocallyRenderable());
@@ -1244,10 +1247,10 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesWithClientsideRenderer() throws Exception {
-        T baseComponentDef = define(
-                baseTag,
-                "renderer='js://test.testJSRenderer'",
-                "");
+        DefDescriptor<?> rendererDesc = addSourceAutoCleanup(RendererDef.class, "({render:function(){}})");
+        String rendererAttributeStr = String.format("renderer='%s'", rendererDesc.getQualifiedName());
+        T baseComponentDef = define(baseTag, rendererAttributeStr, "");
+
         assertFalse("When a component has a client renderer, the component does not have server dependencies.",
                 baseComponentDef.hasLocalDependencies());
         assertEquals(null, this.serializeAndReadAttributeFromDef(baseComponentDef, "hasServerDeps"));
@@ -1258,10 +1261,12 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
      * {@link BaseComponentDef#hasLocalDependencies()}.
      */
     public void testHasLocalDependenciesWithClientsideAndServersideRenderers() throws Exception {
-        T baseComponentDef = define(
-                baseTag,
-                "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer,js://test.testJSRenderer'",
-                "");
+        DefDescriptor<?> rendererDesc = addSourceAutoCleanup(RendererDef.class, "({render:function(){}})");
+        String rendererAttributeStr = String.format(
+                "renderer='java://org.auraframework.impl.renderer.sampleJavaRenderers.TestSimpleRenderer,%s'",
+                rendererDesc.getQualifiedName());
+        T baseComponentDef = define(baseTag, rendererAttributeStr, "");
+
         assertFalse("When a component has a client renderer, the component does not have server dependencies.",
                 baseComponentDef.hasLocalDependencies());
         assertEquals(null, this.serializeAndReadAttributeFromDef(baseComponentDef, "hasServerDeps"));
@@ -1813,51 +1818,57 @@ public abstract class BaseComponentDefTest<T extends BaseComponentDef> extends R
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getHelperDef()}.
+     * Verify getHelper returns null when no HelperDef
      */
-    public void testGetHelperDefDefault() throws QuickFixException {
-        HelperDef d = define(baseTag, "", "").getHelperDef();
-        assertNull(d);
+    public void testGetHelperDefDefault() throws Exception {
+        HelperDef helperDef = define(baseTag, "", "").getHelperDef();
+        assertNull(helperDef);
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getHelperDef()}.
+     * Verify getHelper returns HelperDef when component has auto-wired helper
      */
-    public void testGetHelperDefImplicit() throws QuickFixException {
-        DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
-        DefDescriptor<HelperDef> helperDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, HelperDef.class,
-                DefDescriptor.JAVASCRIPT_PREFIX);
-        addSourceAutoCleanup(helperDesc, "({help:function(){}})");
+    public void testGetHelperDefWithAutoWiredHelper() throws Exception {
+        DefDescriptor<T> cmpDescriptor = addSourceAutoCleanup(getDefClass(), String.format(baseTag, "", ""));
+        DefDescriptor<HelperDef> expectedHelperDescriptor =
+                DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor, HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(expectedHelperDescriptor, "({help:function(){}})");
+        HelperDef helperDef = cmpDescriptor.getDef().getHelperDef();
 
-        HelperDef d = compDesc.getDef().getHelperDef();
-        assertNotNull(d);
-        assertEquals(helperDesc, d.getDescriptor());
+        assertNotNull(helperDef);
+        DefDescriptor<HelperDef> actualHelperDescriptor = helperDef.getDescriptor();
+        assertEquals(expectedHelperDescriptor, actualHelperDescriptor);
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getHelperDef()}.
+     * Verify getHelper returns HelperDef when component has helper from other bundle
      */
-    public void testGetHelperDefExplicit() throws QuickFixException {
-        DefDescriptor<HelperDef> helperDesc = vendor.getHelperDescriptor();
-        HelperDef d = define(baseTag, String.format("helper='%s'", helperDesc), "").getHelperDef();
-        assertNotNull(d);
-        assertEquals(helperDesc, d.getDescriptor());
+    public void testGetHelperDefWithExplicitHelper() throws Exception {
+        String helperJS = "({})";
+        DefDescriptor<HelperDef> expectedHelperDescriptor = addSourceAutoCleanup(HelperDef.class, helperJS);
+        String helperAttribute = String.format("helper='%s'", expectedHelperDescriptor.getQualifiedName());
+        HelperDef helperDef = define(baseTag, helperAttribute, "").getHelperDef();
+
+        assertNotNull(helperDef);
+        DefDescriptor<HelperDef> actualHelperDescriptor = helperDef.getDescriptor();
+        assertEquals(expectedHelperDescriptor, actualHelperDescriptor);
     }
 
     /**
-     * Test method for {@link BaseComponentDef#getHelperDef()}.
+     * Verify getHelper returns explicit HelperDef when component has auto-wired helper and helper from other bundle
      */
-    public void testGetHelperDefImplicitAndExplicit() throws QuickFixException {
-        DefDescriptor<HelperDef> helperDesc = vendor.getHelperDescriptor();
-        DefDescriptor<T> compDesc = addSourceAutoCleanup(getDefClass(),
-                String.format(baseTag, String.format("helper='%s'", helperDesc), ""));
-        DefDescriptor<HelperDef> implicitDesc = DefDescriptorImpl.getAssociateDescriptor(compDesc, HelperDef.class,
-                DefDescriptor.JAVASCRIPT_PREFIX);
-        addSourceAutoCleanup(implicitDesc, "({help:function(){}})");
+    public void testGetHelperDefWithExplicitAndAutoWiredHelper() throws Exception {
+        String helperJS = "({})";
+        DefDescriptor<HelperDef> explicitHelperDescriptor = addSourceAutoCleanup(HelperDef.class, helperJS);
+        String helperAttribute = String.format("helper='%s'", explicitHelperDescriptor.getQualifiedName());
+        DefDescriptor<T> cmpDescriptor = addSourceAutoCleanup(getDefClass(), String.format(baseTag, helperAttribute, ""));
+        DefDescriptor<HelperDef> autoWiredHelperDescriptor =
+                DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor, HelperDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
+        addSourceAutoCleanup(autoWiredHelperDescriptor, "({help:function(){}})");
 
-        HelperDef d = compDesc.getDef().getHelperDef();
-        assertNotNull(d);
-        assertEquals(helperDesc, d.getDescriptor());
+        HelperDef helperDef = cmpDescriptor.getDef().getHelperDef();
+        assertNotNull(helperDef);
+        assertEquals(explicitHelperDescriptor, helperDef.getDescriptor());
     }
 
     private AttributeDefRef getBodyAttributeFromDef(T def) {

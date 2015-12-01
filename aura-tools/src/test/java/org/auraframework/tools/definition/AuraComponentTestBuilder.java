@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.auraframework.Aura;
@@ -28,9 +27,6 @@ import org.auraframework.def.*;
 import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.impl.source.DescriptorFileMapper;
 import org.auraframework.system.SourceListener;
-import org.mockito.Mockito;
-
-import com.google.common.collect.Sets;
 
 /**
  * A class to build a temporary components folder to allow for read/write tests.
@@ -44,7 +40,7 @@ public class AuraComponentTestBuilder extends DescriptorFileMapper implements Au
     private final static AtomicInteger nonce = new AtomicInteger(1);
     private Path componentsPath;
     private final ComponentLocationAdapter cla;
-    private Set<ComponentLocationAdapter> modified;
+//    private Set<ComponentLocationAdapter> modified;
 
     /**
      * Create a new test builder.

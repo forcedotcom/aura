@@ -1,9 +1,16 @@
 /* Listens for events and shows them in the event log */
 function AuraInspectorActionsView(devtoolsPanel) {
     var _list;
+    
     var _pending;
     var _running;
     var _completed;
+
+    var _listDrop;
+
+    var _toDrop;
+    var _dropped;
+
     var _listening;
     var _filtered = {
         all: false,
@@ -34,6 +41,14 @@ function AuraInspectorActionsView(devtoolsPanel) {
             <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions that errored"><span>Error</span></aurainspector-onOffButton></li>
             <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show aborted actions"><span>Aborted</span></aurainspector-onOffButton></li>
         </menu>
+        <div id="actionsToDrop-list" class="actionsToDrop-list">
+            <section id="actionsToDrop-pending">
+                <h1>To Drop</h1>
+            </section>
+            <section id="actionsToDrop-completed">
+                <h1>Dropped</h1>
+            </section>
+        </div>
         <div id="actions-list" class="actions-list">
             <section id="actions-pending">
                 <h1>Pending</h1>
@@ -55,30 +70,46 @@ function AuraInspectorActionsView(devtoolsPanel) {
         _running = tabBody.querySelector("#actions-running");
         _completed = tabBody.querySelector("#actions-completed");
 
+        _listDrop = tabBody.querySelector("#actionsToDrop-list");
+        _toDrop = tabBody.querySelector("#actionsToDrop-pending");
+        _dropped = tabBody.querySelector("#actionsToDrop-completed");
+
+        _listDrop.addEventListener("mouseover", displayTooltipMessage.bind(this, "Drag and Drop action from Action List below, next time we see the same action, we won't send it to server"));
+        _listDrop.addEventListener("mouseout", removeTooltipMessage.bind(this));
+        
         // Start listening for events to draw
         devtoolsPanel.subscribe("AuraInspector:OnActionEnqueue", AuraInspectorActionsView_OnActionEnqueue.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnActionStateChange", AuraInspectorActionsView_OnActionStateChange.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnBootstrap", AuraInspectorActionsView_OnBootstrap.bind(this));
 
-
         // Attach event handlers
+        var div_actionsToDrop = tabBody.querySelector("#actionsToDrop-list");
+        if(div_actionsToDrop) {
+            div_actionsToDrop.addEventListener("dragover", allowDrop.bind(this));
+            div_actionsToDrop.addEventListener("drop", drop.bind(this, devtoolsPanel));
+        } else {
+            var command = "console.error('div_actionsToDrop cannot be found');";
+            chrome.devtools.inspectedWindow.eval(command);
+        }
+
         var menu = tabBody.querySelector("menu");
         menu.addEventListener("click", Menu_OnClick.bind(this));
 
         var clearButton = tabBody.querySelector("#clear-button");
-        clearButton.addEventListener("click", ClearButton_OnClick.bind(this));
+        clearButton.addEventListener("click", ClearButton_OnClick.bind(this, devtoolsPanel));
 
         var filterText = tabBody.querySelector("#filter-text");
         filterText.addEventListener("change", FilterText_OnChange.bind(this));
         filterText.addEventListener("keyup", FilterText_OnChange.bind(this));
+
     };
 
     this.render = function() {
 
     };
 
-    this.refresh = function() {
-        removeAllCards();
+    this.refresh = function(devtoolsPanel) {
+        removeAllCards(devtoolsPanel);
 
         actions.forEach(function(action){
             upsertCard(action);
@@ -110,10 +141,10 @@ function AuraInspectorActionsView(devtoolsPanel) {
         upsertCard(action);
     }
 
-    function ClearButton_OnClick(event) {
+    function ClearButton_OnClick(devtoolsPanel, event) {
         actions = new Map();
 
-        this.refresh();
+        this.refresh(devtoolsPanel);
     }
 
     function FilterText_OnChange(event) {
@@ -183,9 +214,17 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("state", action.state);
             card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("fromStorage", action.fromStorage);
+            card.setAttribute("storageKey", action.storageKey);
             card.parentNode.removeChild(card);
         } else {
-            card = createActionCard(action.id);
+            card = createActionCard(action.id, false);
+        }
+        //remove from 'to drop' list
+        if(action.idToDrop) {
+            card = document.getElementById("action_card_" + action.idToDrop);
+            card.parentNode.removeChild(card);
+            //the action we just dropped is new action, we need to update the card with its id
+            card.setAttribute("actionId", action.id);
         }
 
         switch(action.state) {
@@ -195,22 +234,32 @@ function AuraInspectorActionsView(devtoolsPanel) {
             case "NEW": 
                 _pending.appendChild(card); 
                 break;
+            case "DROPPED":
+                _dropped.appendChild(card);
+                break;
             default: 
                 _completed.insertBefore(card, _completed.querySelector(".action-card"));
                 break;
         }
     }
 
-    function removeAllCards() {
+    function removeAllCards(devtoolsPanel) {
         if(_list) {
             var cards = _list.querySelectorAll("aurainspector-actionCard");
             for(var c=0,length=cards.length;c<length;c++) {
                 cards[c].parentNode.removeChild(cards[c]);
             }
         }
+        if(_listDrop) {
+            var cards = _listDrop.querySelectorAll("aurainspector-actionCard");
+            for(var c=0,length=cards.length;c<length;c++) {
+                cards[c].parentNode.removeChild(cards[c]);
+            }
+            devtoolsPanel.publish("AuraInspector:OnActionToDropClear", {});
+        }
     }
 
-    function createActionCard(actionId) {
+    function createActionCard(actionId, toDrop) {
         if(!actions.has(actionId)) {
             return;
         }
@@ -231,7 +280,98 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("isBackground", action.background);
             card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("isFromStorage", action.fromStorage);
-
+            card.setAttribute("storageKey", action.storageKey);
+            if(toDrop === false) { 
+                //set draggable
+                card.setAttribute("draggable","true");
+                card.addEventListener("dragstart", drag.bind(this) );
+                //set double click
+                card.addEventListener('dblclick', doubleClick.bind(this, devtoolsPanel));
+            }
+            //set drop
+            if(toDrop === true) {
+                card.setAttribute("toDrop", toDrop);
+            }
+            
         return card;
     }
+
+    //display a tooltip message as the last child node of element
+    function displayTooltipMessage (messageToDisplay, event) {
+        console.log(messageToDisplay);
+        var element = event.currentTarget;
+        var elementTop = element.style.top;
+        var elementLeft = element.style.left;
+        var toolTipElement = document.createElement("span");
+            toolTipElement.id = "toolTipElement";
+        var node = document.createTextNode(messageToDisplay);
+        toolTipElement.appendChild(node);
+        toolTipElement.style.fontSize = "10px"
+        element.appendChild(toolTipElement);  
+    }
+
+    //remove the tooltip message (it should be the last child node of element)
+    function removeTooltipMessage (event) {
+        var element = event.currentTarget;
+        if(element.childNodes[element.childNodes.length-1].id === "toolTipElement") {
+            element.removeChild(element.childNodes[element.childNodes.length-1]);
+        } 
+    }
+
+    function allowDrop (event) {
+        event.preventDefault();
+    }
+
+    function drag (event) {
+        event.target.style.opacity = "0.5";
+        event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());     
+    }
+
+    function doubleClick (devtoolsPanel, event) {
+        var actionCardElement = event.target;
+        if(actionCardElement && actionCardElement.getAttribute("actionId")) {
+            actionCardElement.style.opacity = "0.5";            
+            createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId"), devtoolsPanel).bind(this);
+        } else {
+            var command = "console.log('doubleClick.event.target or its actionId is missing');";
+            chrome.devtools.inspectedWindow.eval(command);
+        }
+
+    }
+
+    function createActionCardInToDropDivAndNotifyOthers(actionId, devtoolsPanel) {
+        var actionCard = createActionCard(actionId, true);
+        if(!_toDrop) {
+                var command = "console.log('_toDrop missing');";
+                chrome.devtools.inspectedWindow.eval(command);
+        }
+            
+        _toDrop.appendChild(actionCard);
+            //install override
+            
+        var actionName = actionCard.getAttribute("name");
+        var actionParameter = actionCard.getAttribute("parameters");
+        var actionStorageKey = actionCard.getAttribute("storageKey");
+
+        var dataToPublish = { 'actionName': actionName, 'actionParameter':actionParameter, 'actionId': actionId, 
+                            'actionStorageKey': actionStorageKey};
+        devtoolsPanel.publish("AuraInspector:OnActionToDropEnqueue", dataToPublish);
+    }
+
+    function drop (devtoolsPanel, event) {
+        event.preventDefault();        
+        
+        if(event && event.dataTransfer) {
+            var data = event.dataTransfer.getData("text");
+
+            if(!data) {
+                var command = "console.log('dataTransfer.getData.text is missing');";
+                chrome.devtools.inspectedWindow.eval(command);
+            } else {
+                createActionCardInToDropDivAndNotifyOthers(data, devtoolsPanel);
+            }
+    
+        }           
+    }
+
 }

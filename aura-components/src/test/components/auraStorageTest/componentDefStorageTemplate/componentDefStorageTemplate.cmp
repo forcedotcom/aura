@@ -1,0 +1,45 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:component isTemplate="true" extends="aura:template">
+    <aura:set attribute="auraPreInitBlock">
+        <auraStorage:init name="actions"
+                          maxSize="4096"
+                          defaultExpiration="3600"
+                          secure="false"
+                          persistent="true"
+                          clearStorageOnInit="false"/>
+                          
+        <script>
+            // Allow tests specify whether they want ComponentDefStorage overriden with a smaller maxSize or not
+            // The rest of the settings here should match the real ComponentDefStorage config
+            var overrideStorage = location.search.indexOf("overrideStorage") > -1;
+            if (overrideStorage) {
+                $A.storageService.initStorage(
+                        "ComponentDefStorage",
+                        true,      // persistent
+                        false,     // secure
+                        442368,    // maxSize
+                        10886400,  // defaultExpiration
+                        0,         // defaultAutoRefreshInterval
+                        true,      // debugLoggingEnabled
+                        false      // clearStorageOnInit
+                  );
+            }
+        </script>
+    </aura:set>
+</aura:component>

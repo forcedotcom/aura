@@ -20,6 +20,7 @@
 }
 
 .THIS .tooltip-body {
+	z-index: 100;
 	display: block;
 	position: absolute;
 	max-width: 300px;
@@ -41,6 +42,7 @@
 
 .THIS.advanced-wrapper {
 	position: inherit;
+	z-index: 10;
 }
 
 .THIS .tooltip-advanced {
@@ -96,6 +98,7 @@
 	border-left: 13px solid transparent;
 	border-right: 13px solid transparent;
 	border-top: 13px solid #16325c;
+	z-index: 100;
 }
 
 .THIS .east .pointer {

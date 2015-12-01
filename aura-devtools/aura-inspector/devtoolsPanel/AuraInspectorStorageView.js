@@ -32,6 +32,10 @@ function AuraInspectorStorageView(devtoolsPanel) {
         // listen for data
         devtoolsPanel.subscribe("AuraInspector:StorageData", AuraInspector_StorageData.bind(this));
 
+        // listen for removing storage item for action
+        devtoolsPanel.subscribe("AuraInspector:RemoveStorageData", AuraInspector_RemoveData.bind(this));
+
+
         // async fetch data about storages
         getStoresAndData.bind(this)();
     };
@@ -76,6 +80,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
         var output = document.createElement("aurainspector-json");
         output.setAttribute("expandTo", 2);
+        //Lin TODO: make each storage item a single element ?
         output.textContent = JSON.stringify(formatted);
 
         var node = document.getElementById("storage-viewer");
@@ -119,8 +124,27 @@ function AuraInspectorStorageView(devtoolsPanel) {
         this.render();
     };
 
+    this.removeData = function(key) {
+        dirty = true;
+        if(key && key.length > 0 ) {
+            //Lin TODO: highlight the storage item we gonna delete in StorageView, and ask for confirmation.
+            if(key in data) { 
+                console.log("in data[], find & remove storage item for action :", key); 
+                delete data[key];
+            } else {
+                console.log("in data[], no storage item for action :", key);
+            }
+            
+        }
+        this.render();
+    }
+
     function AuraInspector_StorageData(event) {
         this.setData(event.id, JSON.parse(event.data));
+    }
+
+    function AuraInspector_RemoveData(event) {
+        this.removeData(event.storageKey);
     }
 
     function getStoresAndData() {

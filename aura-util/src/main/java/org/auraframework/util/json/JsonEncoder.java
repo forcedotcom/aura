@@ -47,7 +47,7 @@ import com.google.common.io.CountingOutputStream;
 
 /**
  * java -> javascript encoder.
- * 
+ *
  * May or may not follow the official JSON (JavaScript Object Notation)
  * standard. It handles serializing all the basics, numbers, strings, booleans,
  * arrays, and maps as well as some common SFDC data structures like
@@ -59,14 +59,14 @@ import com.google.common.io.CountingOutputStream;
  * <li>Java List: JS Array
  * <li>Java Object: object.toArray()
  * </ol>
- * 
+ *
  * NOTE: the code for handling the stacks is rather more complicated to maintain
  * performance. The problem is that {@link #writeMapBegin()} and
  * {@link #writeArrayBegin()} are called hundreds of thousands of times a
  * second, meaning that creating and discarding objects for each one is too
  * expensive. This means that we use a separate stack in the case that we are
  * not formatting to avoid the allocation of the object.
- * 
+ *
  * @see <a
  *      href="https://sites.google.com/a/salesforce.com/user-interface/documentation/json">SFDC
  *      json documentation</a>
@@ -130,7 +130,7 @@ public class JsonEncoder implements Json {
      * Create a Json Serialization context object that maintains information
      * about one run. This Object is NOT thread-safe. It should only be used by
      * one thread at a time, and should not be reused.
-     * 
+     *
      * @param out The Appendable to write the serialized objects to.
      * @param format defaults to false. If true, the output will be multi-line
      *            and indented.
@@ -244,7 +244,7 @@ public class JsonEncoder implements Json {
      * Note that you will need to call {@link #close()} when you are done to
      * ensure that all characters have been written out to the given
      * OutputStream. Otherwise, some characters might be missing at the end.
-     * 
+     *
      * @param out The OutputStream to write the serialized objects to using
      *            UTF-8. This must not be null.
      * @param format Defaults to false. If true, the output will be multi-line
@@ -271,7 +271,7 @@ public class JsonEncoder implements Json {
      * Note that you will need to call {@link #close()} when you are done to
      * ensure that all characters have been written out to the given
      * OutputStream. Otherwise, some characters might be missing at the end.
-     * 
+     *
      * @param out The OutputStream to write the serialized objects to using
      *            UTF-8. This must not be null.
      * @param context The JSON serialization context to use for output
@@ -303,7 +303,7 @@ public class JsonEncoder implements Json {
     /**
      * This method is essentially here to provide type-checking for the
      * outermost map.
-     * 
+     *
      * @param jsonMap
      * @param out
      * @throws JsonSerializationException if there's an issue during
@@ -315,7 +315,7 @@ public class JsonEncoder implements Json {
 
     /**
      * If refSupport is on, track the object for later equality/identity checks
-     * 
+     *
      * @param rs the reference scope for the object.
      * @param value the value for which we are storing a reference.
      * @return
@@ -329,7 +329,7 @@ public class JsonEncoder implements Json {
 
     /**
      * If refSupport is on, clear a set of objects from the references.
-     * 
+     *
      */
     @Override
     public void clearReferences() {
@@ -357,13 +357,13 @@ public class JsonEncoder implements Json {
 
     /**
      * Push an indent, with a type.
-     * 
+     *
      * See the notes on performance on the class above.
-     * 
+     *
      * This either creates a new IndentEntry and pushes a value on the boolean
      * stack, or it just uses the boolean stack (in the case of not pretty
      * printing).
-     * 
+     *
      * @param type the type of indent to push.
      */
     @Override
@@ -377,9 +377,9 @@ public class JsonEncoder implements Json {
 
     /**
      * Check the indent type.
-     * 
+     *
      * See the notes on performance on the class above.
-     * 
+     *
      * @param type the type of indent that should be on the stack.
      * @param message the message for the throwable if it is wrong.
      */
@@ -392,7 +392,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Pop an indent off the stack.
-     * 
+     *
      * This both checks the type on the stack, and pulls it off. See the notes
      * on performance on the class above.
      */
@@ -408,7 +408,7 @@ public class JsonEncoder implements Json {
 
     /**
      * get the current indent.
-     * 
+     *
      * See the notes on performance on the class above.
      */
     @Override
@@ -422,7 +422,7 @@ public class JsonEncoder implements Json {
 
     /**
      * If formatting is enabled, indent, otherwise, no-op.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -434,7 +434,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write the beginning of a map. Make sure to call writeMapEnd later on.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -446,7 +446,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write the end of a map.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -459,7 +459,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Start a comment.
-     * 
+     *
      * This is probably not needed, but if we do want to write a multiline
      * comment in parts, you would call this function followed by multiple calls
      * to {@link #writeCommentBody(String)} followed by a call to
@@ -490,9 +490,9 @@ public class JsonEncoder implements Json {
 
     /**
      * Write out a part of a comment body.
-     * 
+     *
      * This call must be preceded by {@link #writeCommentBegin()}.
-     * 
+     *
      * @param body the comment to write.
      */
     @Override
@@ -507,15 +507,15 @@ public class JsonEncoder implements Json {
 
     /**
      * Write out a comment.
-     * 
+     *
      * Note that these are not legal structures in JSON, perhaps we should have
      * a flag to turn off the writing of these for 'valid' JSON. Unfortunately,
      * we'd also have to rework our error handling.
-     * 
+     *
      * This could take the body and re-work newlines with the indent, but that
      * seems a good bit of work for little gain (i.e. the result would be
      * prettier, but who cares).
-     * 
+     *
      * @param body the body of the comment.
      */
     @Override
@@ -528,7 +528,7 @@ public class JsonEncoder implements Json {
     /**
      * Write the beginning of an array. Make sure to call writeArrayEnd later
      * on.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -540,7 +540,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write the end of an array.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -555,7 +555,7 @@ public class JsonEncoder implements Json {
      * If any entries have already been written to the current map/array (as
      * marked by the write*Begin methods), write a comma. If no elements have
      * yet been written, no-op.
-     * 
+     *
      * @throws IOException
      */
     @Override
@@ -563,7 +563,11 @@ public class JsonEncoder implements Json {
         if (!this.indentStack.isEmpty()) {
             if (this.indentStack.peek().needSeparator()) {
                 out.append(",");
-                writeBreak();
+                // Special handling of pretty print for collections (arrays and objects)
+                // to separate the items on individual lines.
+                if (isFormatting() || isFormattingRootItems()) {
+                    out.append('\n');
+                }
             }
         } else {
             // ooh, why did this happen?
@@ -611,7 +615,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Just write the value.toString() out. Does not quote the value.
-     * 
+     *
      * @param value
      * @throws IOException
      */
@@ -622,7 +626,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Quotes value.toString() and writes it.
-     * 
+     *
      * @param value
      * @throws IOException
      */
@@ -636,7 +640,7 @@ public class JsonEncoder implements Json {
     /**
      * Write the date in the ISO-8601 format that's semi-standard in json2 (in
      * that it's in the comments)
-     * 
+     *
      * @param value
      * @throws IOException
      */
@@ -658,7 +662,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write a map in a predictable order
-     * 
+     *
      * @param map
      * @throws IOException
      */
@@ -675,7 +679,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write an array
-     * 
+     *
      * @param array
      * @throws IOException
      */
@@ -690,7 +694,7 @@ public class JsonEncoder implements Json {
 
     /**
      * Write an array
-     * 
+     *
      * @param array
      * @throws IOException
      */
@@ -706,7 +710,7 @@ public class JsonEncoder implements Json {
     /**
      * Write a value into the current array, and add leading commas and
      * formatting as appropriate.
-     * 
+     *
      * @param value
      * @throws IOException
      */
@@ -722,7 +726,7 @@ public class JsonEncoder implements Json {
     /**
      * Write a value into the current Map, and add leading commas and formatting
      * as appropriate.
-     * 
+     *
      * @param key
      * @param value
      * @throws IOException
@@ -736,7 +740,7 @@ public class JsonEncoder implements Json {
      * Write a value into the current Map, and add leading commas and formatting
      * as appropriate.  This version will consult its {@code type} parameter to
      * decide how to serialize null maps and arrays.
-     * 
+     *
      * @param key
      * @param value
      * @param type
@@ -765,7 +769,7 @@ public class JsonEncoder implements Json {
     /**
      * Write a partial Map Entry -- everything except the value. This is useful
      * when the value requires special serialization.
-     * 
+     *
      * @param key
      * @throws IOException
      * @throws JsonSerializerNotFoundException if a serializer is not found for the key
@@ -783,8 +787,8 @@ public class JsonEncoder implements Json {
     }
 
     /**
-     * If formatting is on, write out a line break.
-     * 
+     * If formatting is on, or if at top level, write out a line break.
+     *
      * @throws IOException
      */
     @Override
@@ -801,7 +805,7 @@ public class JsonEncoder implements Json {
      * After calling this, write exactly the number of bytes specified to the
      * OutputStream returned by this method. After you do that, call
      * {@link #writeBinaryStreamEnd()}.
-     * 
+     *
      * @param streamLength The number of bytes that will exist in the output before the ending backtick
      * @return The OutputStream that the caller can write its output to
      */
@@ -886,7 +890,7 @@ public class JsonEncoder implements Json {
     /**
      * Note: You should always try to use the write* methods instead, if at all
      * possible.
-     * 
+     *
      * @return the appendable for this run in case you want to write something
      *         special to it.
      */
@@ -899,6 +903,12 @@ public class JsonEncoder implements Json {
         return serializationContext.format();
     }
 
+    private boolean isFormattingRootItems() {
+        // Pretty print of collections has been requested and we are at level 1,
+        // which means the items of the root collection.
+        return serializationContext.formatRootItems() && indentStack.size() == 1;
+    }
+
     @Override
     public JsonSerializationContext getSerializationContext() {
         return this.serializationContext;
@@ -907,7 +917,7 @@ public class JsonEncoder implements Json {
     /**
      * Resolve references and remove refId/serRefIds from the passed in object.
      * Useful when parsing json serialized with reference support by this class.
-     * 
+     *
      * @param config Must be a Map or List that consists only of other
      *            Maps/Lists and primitives
      * @return A Map or List representing the data passed in with its references

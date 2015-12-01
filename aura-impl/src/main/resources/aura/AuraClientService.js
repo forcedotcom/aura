@@ -1090,7 +1090,7 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
     var acs = this;
     this.loadTokenFromStorage().then(
         function (value) {
-            if (value && value.value["token"]) {
+            if (value && value.value && value.value["token"]) {
                 acs._token = value.value["token"];
                 $A.log("AuraClientService.loadComponent(): token found in storage");
             } else {

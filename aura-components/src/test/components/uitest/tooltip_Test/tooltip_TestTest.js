@@ -15,7 +15,7 @@
  */
 ({
 
-	testClickTriggerShow: {
+	_testClickTriggerShow: {
 		attributes : {"renderItem" : "triggers"},
 		test: function(component) {
 			var trigger = component.find('trigger1-trigger');
@@ -29,7 +29,7 @@
 		}
 	},
 
-	testClickTriggerHide: {
+	_testClickTriggerHide: {
 		attributes : {"renderItem" : "triggers"},
 		test: function(component) {
 			var trigger = component.find('trigger1-trigger');
@@ -49,7 +49,7 @@
 	},
 
 
-	testAdvancedShow: {
+	_testAdvancedShow: {
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var trigger = component.find('tooltip1-trigger').getElement();
@@ -60,7 +60,7 @@
 		}
 	},
 
-	testAdvancedHide: {
+	_testAdvancedHide: {
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var trigger = component.find('tooltip1-trigger').getElement();
@@ -80,7 +80,7 @@
 	},
 
 	//the tooltip should adjust to fit on the screen
-	testLeftNearEdge: {
+	_testLeftNearEdge: {
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var tt = component.find('tooltip2');
@@ -120,7 +120,7 @@
 		}
 	},
 
-	testRightNearEdge: {
+	_testRightNearEdge: {
 		attributes : {"renderItem" : "advancedPositioning"},
 		test: function(component) {
 			var tt = component.find('tooltip4');

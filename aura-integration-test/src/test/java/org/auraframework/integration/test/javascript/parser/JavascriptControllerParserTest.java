@@ -56,8 +56,8 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
-        controllerDef.validateDefinition();
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
+        controllerDef.validateDefinition();
     }
 
     /**
@@ -81,13 +81,12 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
-        controllerDef.validateDefinition();
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
+        controllerDef.validateDefinition();
     }
 
     /**
-     * Verify when there are multiple controller functions have same name, only keep the
-     * later on in ActionDefs.
+     * Verify when there are multiple controller functions have same name, only keep the later one.
      */
     public void testParseJSControllerWithDuplicateFunction() throws Exception {
         String controllerJs =
@@ -100,15 +99,15 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
 
         ControllerDef controllerDef = new JavascriptControllerParser().parse(controllerDesc, source);
 
-        controllerDef.validateDefinition();
         assertThat(controllerDef, instanceOf(JavascriptControllerDef.class));
+        controllerDef.validateDefinition();
 
         Map<String, ? extends ActionDef> actionDefMap = controllerDef.getActionDefs();
         assertEquals("There should be one actionDef in ActionDefs", 1, actionDefMap.size());
         assertTrue(actionDefMap.containsKey("function1"));
         ActionDef actionDef = actionDefMap.get("function1");
-        String[] jsonStrs = (JsonEncoder.serialize(actionDef)).split("\"");
-        assertEquals("The latest function should survive.", "function(cmp) {var v = 2;}", jsonStrs[0]);
+        String jsonStr = JsonEncoder.serialize(actionDef);
+        assertEquals("The latest function should survive.", "function(cmp) {var v = 2;}", jsonStr);
     }
 
     /**
@@ -118,7 +117,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
     public void testParseInvalidJSController() throws Exception {
         String controllerJs =
                 "({\n" +
-                "    var global = 'Do everything'\n;"+
+                "    var global = 'Do everything';\n"+
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);
@@ -139,7 +138,7 @@ public class JavascriptControllerParserTest extends AuraImplTestCase {
     public void testParseControllerWithNonFunctionElement() throws Exception {
         String controllerJs =
                 "({\n" +
-                "    foo: 'do NOthing';\n;"+
+                "    foo: 'do NOthing'\n"+
                 "})";
         DefDescriptor<ControllerDef> controllerDesc = addSourceAutoCleanup(ControllerDef.class, controllerJs);
         Source<ControllerDef> source = StringSourceLoader.getInstance().getSource(controllerDesc);

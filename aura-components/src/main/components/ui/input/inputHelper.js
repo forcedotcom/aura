@@ -399,5 +399,14 @@
 
     domEventHandler : function (event) {
         this.lib.interactive.domEventHandler(event);
+    },
+
+    updateAriaRequired : function (component) {
+        if (component.get("v.required")) {
+            var inputElement = this.getInputElement(component);
+            if (!$A.util.isUndefinedOrNull(inputElement)) {
+                inputElement.setAttribute("aria-required", true);
+            }
+        }
     }
 })// eslint-disable-line semi

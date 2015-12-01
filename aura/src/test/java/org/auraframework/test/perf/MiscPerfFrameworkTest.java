@@ -58,8 +58,7 @@ public final class MiscPerfFrameworkTest extends AbstractPerfTestCase {
     //
     // Map data = perfWebDriverUtil.takeHeapSnapshot();
     // PerfWebDriverUtil.showHeapSnapshot(data);
-    // PerfWebDriverUtil.writeHeapSnapshot(data, new File(System.getProperty("java.io.tmpdir")
-    // + "/perf/heap/wd.heapsnapshot"));
+    // PerfWebDriverUtil.writeHeapSnapshot(data, new File(IOUtil.getDefaultTempDir()+"/wd.heapsnapshot"));
     //
     // JSONObject summary = PerfWebDriverUtil.analyzeHeapSnapshot(data);
     // int nodeCount = summary.getInt("node_count");

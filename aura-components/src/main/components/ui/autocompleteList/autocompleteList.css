@@ -26,6 +26,10 @@
     display: block;
 }
 
+.THIS.showEmptyContent ul {
+    display: none;
+}
+
 .THIS div.hidden {
     display: none;
 }

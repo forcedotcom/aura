@@ -2,7 +2,7 @@
     <aura:attribute name="name" type="String"/>
     <aura:attribute name="city" type="String"/>
     
-    <ui:Button label="Who are we?" press="{!c.revealMe}" aura:id="button"/>
+    <ui:button label="Who are we?" press="{!c.revealMe}" aura:id="button"/>
     <div aura:id="msg"/>
     <div aura:id="Division">{!m.teamDivision}</div>
 </aura:component>

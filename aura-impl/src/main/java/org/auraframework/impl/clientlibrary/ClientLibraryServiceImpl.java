@@ -82,7 +82,7 @@ public class ClientLibraryServiceImpl implements ClientLibraryService {
     @Override
     public boolean canCombine(ClientLibraryDef clientLibrary) throws QuickFixException {
 
-        if(clientLibrary == null) {
+        if (clientLibrary == null) {
             return false;
         }
 

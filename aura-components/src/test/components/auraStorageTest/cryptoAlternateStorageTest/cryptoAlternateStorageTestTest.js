@@ -5,7 +5,7 @@
     labels : [ "UnAdaptableTest" ],
 
     setUp : function(cmp) {
-        $A.test.overrideFunction($A.storageService, "selectAdapter", function() { return "crypto"; });
+        $A.installOverride("StorageService.selectAdapter", function(){ return "crypto" }, this); 
         $A.storageService.CryptoAdapter.register();
         if (!$A.storageService.isRegisteredAdapter($A.storageService.CryptoAdapter.NAME)) {
             $A.test.fail("CryptoAdapter failed to register. You must run these tests against localhost or with HTTPS (see http://sfdc.co/bO9Hok).");

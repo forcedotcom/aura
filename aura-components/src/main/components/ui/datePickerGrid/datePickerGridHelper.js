@@ -319,12 +319,26 @@
         var source = event.getSource();
         var hasTime = $A.util.getBooleanValue(component.get("v.hasTime"));
         if (hasTime === true) {
+
             var firstDate = new Date(component.get("v.year"), component.get("v.month"), 1);
             var firstDateId = parseInt(firstDate.getDay(),10);
 
+            // need to account for start of week differences when comparing indices
+            var firstDayOfWeek = $A.get("$Locale.firstDayOfWeek") - 1; // The week days in Java is 1 - 7
+            var offset = 0;
+            if (firstDayOfWeek !== 0) {
+                if (firstDateId >= firstDayOfWeek) {
+                    offset -=firstDayOfWeek;
+                } else {
+                    offset += (7-firstDayOfWeek);
+                }
+            }
+
+            firstDateId += offset;
             var lastDate = new Date(component.get("v.year"), component.get("v.month") + 1, 0);
             var lastDateCellCmp = this.findDateComponent(component, lastDate);
             var lastDateId = parseInt(lastDateCellCmp.getLocalId(),10);
+            lastDateId += offset;
 
             var currentId = parseInt(source.getLocalId(),10);
             var currentDate = source.get("v.label");

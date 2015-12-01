@@ -18,5 +18,6 @@
 <aura:component implements="test:testEventBubblingHasLogId">
 	<aura:registerEvent name="bubblingEvent" type="test:testEventBubblingEvent" />
     <aura:method name="fireEvent" action="{!c.fireEvent}"/>
+    
     <ui:button aura:id="button" press="{!c.fireEvent}" label="{!v.logId}"/>
 </aura:component>

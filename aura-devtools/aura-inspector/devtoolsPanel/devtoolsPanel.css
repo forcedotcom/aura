@@ -100,6 +100,10 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .actions-list .action-card { padding: 10px; display: block; }
 .actions-list .action-card:nth-child(odd) { background: #f0f8fc;}
 #tab-body-actions #filter-text { width: 150px; }
+.actionsToDrop-list { margin: 0; padding: 10px; }
+.actionsToDrop-list section h1 { font-size: 1.5em; background: #f4f6f9; margin: 5px 0 0 0; padding: 5px; border-bottom: 1px solid #d8dde6; }
+.actionsToDrop-list .action-card { padding: 10px; display: block; }
+.actionsToDrop-list .action-card:nth-child(odd) { background: #f0f8fc;}
 
 /* Storage Panel */
 #storage-viewer { padding: 10px; }

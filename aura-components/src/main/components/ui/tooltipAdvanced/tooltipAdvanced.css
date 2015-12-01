@@ -1,0 +1,141 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+.THIS .tooltip-body {
+	z-index: 100;
+	display: block;
+	position: absolute;
+	max-width: 300px;
+	min-width: 100px;
+	width: intrinsic;
+	width: -moz-max-content;
+	width: -webkit-max-content;
+	pointer-events: none;
+	display: inline-block;
+}
+
+
+.THIS.advanced-wrapper {
+	position: inherit;
+}
+
+.THIS .tooltip-advanced {
+	pointer-events: none;
+	position: absolute;
+	top:0;
+	left: 0;
+}
+
+.THIS.advanced-wrapper.tooltip,
+.THIS.advanced-wrapper .tooltip-body {
+	opacity: 0;
+	z-index: 2;
+}
+
+
+.THIS.advanced-wrapper.visible.tooltip {
+	opacity: 0.999;
+}
+
+.THIS.advanced-wrapper.visible .tooltip-body{
+	opacity: 0.999;
+}
+
+.THIS .pointer-advanced {
+	display: block;
+	position: absolute;
+	top:0;
+	left: 0;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.THIS.visible .pointer-advanced {
+	opacity: 1;
+}
+
+
+
+.THIS .pointer-basic {
+	display: block;
+	position: absolute;
+	width: 0; 
+	height: 0; 
+	bottom: 12px;
+	left: 50%;
+	pointer-events: none;
+	transform: translateX(-50%) translateY(-5px);
+}
+
+
+.THIS .pointer {
+	border-bottom: none;
+	border-left: 13px solid transparent;
+	border-right: 13px solid transparent;
+	border-top: 13px solid #16325c;
+}
+
+.THIS .east .pointer {
+	border-left: none;
+	border-right: 13px solid #16325c;
+	border-bottom: 13px solid transparent;
+	border-top: 13px solid transparent;
+}
+
+.THIS .west .pointer {
+	border-left: 13px solid #16325c;
+	border-right: none;
+	border-bottom: 13px solid transparent;
+	border-top: 13px solid transparent;
+}
+
+.THIS .south .pointer {
+	border-top: none;
+	border-right: 13px solid transparent;
+	border-left: 13px solid transparent;
+	border-bottom: 13px solid #16325c;
+}
+
+.THIS.tooltip-basic .tooltip {
+	pointer-events: none;
+	position: absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height: 100%;
+	opacity: 0;
+}
+
+.THIS .tooltip.fade-out {
+	transition: 500ms opacity;
+}
+
+.THIS .tooltip.fade-in {
+	transition: none;
+}
+
+.THIS .tooltip.fade-in.fade-out {
+	transition: 500ms opacity;
+}
+
+
+
+.THIS .tooltip-body {
+	padding: 12px;
+	border-radius: 5px;
+	background-color: #16325c;
+	color: white;
+	font-size: 12px;
+}

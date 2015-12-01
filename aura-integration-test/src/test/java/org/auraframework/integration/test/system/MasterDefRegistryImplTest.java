@@ -20,7 +20,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 
 import javax.annotation.Nonnull;
 
@@ -50,13 +48,10 @@ import org.auraframework.def.DescriptorFilter;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.def.StyleDef;
-import org.auraframework.def.TypeDef;
 import org.auraframework.impl.AuraImpl;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
-import org.auraframework.instance.BaseComponent;
-import org.auraframework.service.CachingService;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
@@ -64,18 +59,14 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.DefRegistry;
 import org.auraframework.system.DependencyEntry;
-import org.auraframework.system.Location;
 import org.auraframework.system.MasterDefRegistry;
-import org.auraframework.system.Source;
 import org.auraframework.system.SourceListener;
-import org.auraframework.system.SubDefDescriptor;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestingUtil;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
-import org.auraframework.util.json.Json;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.auraframework.util.test.util.AuraPrivateAccessor;
 import org.mockito.Mock;
@@ -1434,200 +1425,200 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return Aura.getContextService().getCurrentContext().getDefRegistry();
     }
 
-    /**
-     * A fake type def, this could probably be a mock, the tricky part being isValid().
-     */
-    @SuppressWarnings("serial")
-    private static class FakeTypeDef implements TypeDef {
-        private boolean valid;
-        DefDescriptor<TypeDef> desc;
-
-        public FakeTypeDef(DefDescriptor<TypeDef> desc) {
-            this.desc = desc;
-        }
-
-        @Override
-        public void validateDefinition() throws QuickFixException {
-        }
-
-        @Override
-        public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
-        }
-
-        @Override
-        public void validateReferences() throws QuickFixException {
-        }
-
-        @Override
-        public void markValid() {
-            valid = true;
-        }
-
-        @Override
-        public boolean isValid() {
-            return valid;
-        }
-
-        @Override
-        public String getName() {
-            return "name";
-        }
-
-        @Override
-        public Location getLocation() {
-            return null;
-        }
-
-        @Override
-        public DefinitionAccess getAccess() {
-            return null;
-        }
-
-        @Override
-        public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
-            return null;
-        }
-
-        @Override
-        public void retrieveLabels() throws QuickFixException {
-        }
-
-        @Override
-        public String getAPIVersion() {
-            return null;
-        }
-
-        @Override
-        public String getDescription() {
-            return "description";
-        }
-
-        @Override
-        public String getOwnHash() {
-            return "aaaa";
-        }
-
-        @Override
-        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
-        }
-
-        @Override
-        public void serialize(Json json) throws IOException {
-
-        }
-
-        @Override
-        public DefDescriptor<TypeDef> getDescriptor() {
-            return desc;
-        }
-
-        @Override
-        public Object valueOf(Object stringRep) {
-            return null;
-        }
-
-        @Override
-        public Object wrap(Object o) {
-            return null;
-        }
-
-        @Override
-        public Object getExternalType(String prefix) throws QuickFixException {
-            return null;
-        }
-
-        @Override
-        public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
-            return null;
-        }
-
-        @Override
-        public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
-        }
-    }
-
-    /**
-     * A fake registry to check locking as we call.
-     */
-    @SuppressWarnings("serial")
-    private static class FakeRegistry implements DefRegistry<TypeDef> {
-        public DefDescriptor<TypeDef> desc;
-        public TypeDef def;
-        private final Lock rLock;
-
-        public FakeRegistry(Lock rLock, Lock wLock) {
-            this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
-            this.def = new FakeTypeDef(desc);
-            this.rLock = rLock;
-        }
-
-        @Override
-        public TypeDef getDef(DefDescriptor<TypeDef> descriptor) throws QuickFixException {
-            Mockito.verify(rLock, Mockito.times(1)).lock();
-            Mockito.verify(rLock, Mockito.never()).unlock();
-            if (descriptor.equals(desc)) {
-                return def;
-            }
-            return null;
-        }
-
-        @Override
-        public boolean hasFind() {
-            return true;
-        }
-
-        @Override
-        public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
-            Mockito.verify(rLock, Mockito.times(1)).lock();
-            Mockito.verify(rLock, Mockito.never()).unlock();
-            Set<DefDescriptor<?>> found = Sets.newHashSet();
-            found.add(desc);
-            return found;
-        }
-
-        @Override
-        public boolean exists(DefDescriptor<TypeDef> descriptor) {
-            Mockito.verify(rLock, Mockito.times(1)).lock();
-            Mockito.verify(rLock, Mockito.never()).unlock();
-            return desc.equals(descriptor);
-        }
-
-        @Override
-        public Set<DefType> getDefTypes() {
-            Set<DefType> types = Sets.newHashSet();
-            types.add(DefType.TYPE);
-            return types;
-        }
-
-        @Override
-        public Set<String> getPrefixes() {
-            Set<String> prefixes = Sets.newHashSet();
-            prefixes.add("java");
-            return prefixes;
-        }
-
-        @Override
-        public Set<String> getNamespaces() {
-            Set<String> prefixes = Sets.newHashSet();
-            prefixes.add("fake");
-            return prefixes;
-        }
-
-        @Override
-        public Source<TypeDef> getSource(DefDescriptor<TypeDef> descriptor) {
-            return null;
-        }
-
-        @Override
-        public boolean isCacheable() {
-            return true;
-        }
-
-        @Override
-        public boolean isStatic() {
-            return false;
-        }
-    }
+//    /**
+//     * A fake type def, this could probably be a mock, the tricky part being isValid().
+//     */
+//    @SuppressWarnings("serial")
+//    private static class FakeTypeDef implements TypeDef {
+//        private boolean valid;
+//        DefDescriptor<TypeDef> desc;
+//
+//        public FakeTypeDef(DefDescriptor<TypeDef> desc) {
+//            this.desc = desc;
+//        }
+//
+//        @Override
+//        public void validateDefinition() throws QuickFixException {
+//        }
+//
+//        @Override
+//        public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
+//        }
+//
+//        @Override
+//        public void validateReferences() throws QuickFixException {
+//        }
+//
+//        @Override
+//        public void markValid() {
+//            valid = true;
+//        }
+//
+//        @Override
+//        public boolean isValid() {
+//            return valid;
+//        }
+//
+//        @Override
+//        public String getName() {
+//            return "name";
+//        }
+//
+//        @Override
+//        public Location getLocation() {
+//            return null;
+//        }
+//
+//        @Override
+//        public DefinitionAccess getAccess() {
+//            return null;
+//        }
+//
+//        @Override
+//        public <D extends Definition> D getSubDefinition(SubDefDescriptor<D, ?> descriptor) {
+//            return null;
+//        }
+//
+//        @Override
+//        public void retrieveLabels() throws QuickFixException {
+//        }
+//
+//        @Override
+//        public String getAPIVersion() {
+//            return null;
+//        }
+//
+//        @Override
+//        public String getDescription() {
+//            return "description";
+//        }
+//
+//        @Override
+//        public String getOwnHash() {
+//            return "aaaa";
+//        }
+//
+//        @Override
+//        public void appendSupers(Set<DefDescriptor<?>> supers) throws QuickFixException {
+//        }
+//
+//        @Override
+//        public void serialize(Json json) throws IOException {
+//
+//        }
+//
+//        @Override
+//        public DefDescriptor<TypeDef> getDescriptor() {
+//            return desc;
+//        }
+//
+//        @Override
+//        public Object valueOf(Object stringRep) {
+//            return null;
+//        }
+//
+//        @Override
+//        public Object wrap(Object o) {
+//            return null;
+//        }
+//
+//        @Override
+//        public Object getExternalType(String prefix) throws QuickFixException {
+//            return null;
+//        }
+//
+//        @Override
+//        public Object initialize(Object config, BaseComponent<?, ?> valueProvider) throws QuickFixException {
+//            return null;
+//        }
+//
+//        @Override
+//        public void appendDependencies(Object instance, Set<DefDescriptor<?>> deps) {
+//        }
+//    }
+//
+//    /**
+//     * A fake registry to check locking as we call.
+//     */
+//    @SuppressWarnings("serial")
+//    private static class FakeRegistry implements DefRegistry<TypeDef> {
+//        public DefDescriptor<TypeDef> desc;
+//        public TypeDef def;
+//        private final Lock rLock;
+//
+//        public FakeRegistry(Lock rLock, Lock wLock) {
+//            this.desc = Aura.getDefinitionService().getDefDescriptor("java://fake.type", TypeDef.class);
+//            this.def = new FakeTypeDef(desc);
+//            this.rLock = rLock;
+//        }
+//
+//        @Override
+//        public TypeDef getDef(DefDescriptor<TypeDef> descriptor) throws QuickFixException {
+//            Mockito.verify(rLock, Mockito.times(1)).lock();
+//            Mockito.verify(rLock, Mockito.never()).unlock();
+//            if (descriptor.equals(desc)) {
+//                return def;
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        public boolean hasFind() {
+//            return true;
+//        }
+//
+//        @Override
+//        public Set<DefDescriptor<?>> find(DescriptorFilter matcher) {
+//            Mockito.verify(rLock, Mockito.times(1)).lock();
+//            Mockito.verify(rLock, Mockito.never()).unlock();
+//            Set<DefDescriptor<?>> found = Sets.newHashSet();
+//            found.add(desc);
+//            return found;
+//        }
+//
+//        @Override
+//        public boolean exists(DefDescriptor<TypeDef> descriptor) {
+//            Mockito.verify(rLock, Mockito.times(1)).lock();
+//            Mockito.verify(rLock, Mockito.never()).unlock();
+//            return desc.equals(descriptor);
+//        }
+//
+//        @Override
+//        public Set<DefType> getDefTypes() {
+//            Set<DefType> types = Sets.newHashSet();
+//            types.add(DefType.TYPE);
+//            return types;
+//        }
+//
+//        @Override
+//        public Set<String> getPrefixes() {
+//            Set<String> prefixes = Sets.newHashSet();
+//            prefixes.add("java");
+//            return prefixes;
+//        }
+//
+//        @Override
+//        public Set<String> getNamespaces() {
+//            Set<String> prefixes = Sets.newHashSet();
+//            prefixes.add("fake");
+//            return prefixes;
+//        }
+//
+//        @Override
+//        public Source<TypeDef> getSource(DefDescriptor<TypeDef> descriptor) {
+//            return null;
+//        }
+//
+//        @Override
+//        public boolean isCacheable() {
+//            return true;
+//        }
+//
+//        @Override
+//        public boolean isStatic() {
+//            return false;
+//        }
+//    }
 
     /**
      * A private class to hold all the info for a lock test.

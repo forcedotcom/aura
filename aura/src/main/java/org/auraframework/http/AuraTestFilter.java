@@ -49,19 +49,18 @@ import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.def.Definition;
 import org.auraframework.def.TestCaseDef;
 import org.auraframework.def.TestSuiteDef;
-import org.auraframework.def.DefDescriptor.DefType;
 import org.auraframework.http.RequestParam.BooleanParam;
 import org.auraframework.http.RequestParam.StringParam;
 import org.auraframework.service.ContextService;
 import org.auraframework.system.AuraContext;
-import org.auraframework.system.Client;
-import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
+import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.test.Resettable;
 import org.auraframework.test.TestContext;
 import org.auraframework.test.TestContextAdapter;
@@ -73,7 +72,6 @@ import org.auraframework.util.json.JsonReader;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.net.HttpHeaders;
 
 /**
  * Supports test framework functionality, primarily for jstest mocks.
@@ -124,46 +122,17 @@ public class AuraTestFilter implements Filter {
             return;
         }
 
-        // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         HttpServletRequest request = (HttpServletRequest) req;
+        TestContext testContext = getTestContext(request);
+        boolean doResetTest = testReset.get(request, false);
+        if (testContext != null && doResetTest) {
+            testContext.getLocalDefs().clear();
+        }
+
+        // Check for requests to execute a JSTest, i.e. initial component GETs with particular parameters.
         if ("GET".equals(request.getMethod())) {
             String contextPath = request.getContextPath();
             String uri = request.getRequestURI();
-            String browserType = request.getParameter("aura.browserType");
-            if(browserType == null) { 
-            	//read it from request header
-            	String ua = request.getHeader(HttpHeaders.USER_AGENT);
-            	if(ua != null) {
-            		ua = ua.toLowerCase();
-            		if(ua.contains("chrome")) {
-            			browserType = "GOOGLECHROME";
-            		} else if (ua.contains("safari")) {
-            			browserType = "SAFARI";
-            		} else if (ua.contains("firefox")) {
-            			browserType = "FIREFOX";
-            		} else if (ua.contains("ipad")) {
-            			browserType = "IPAD";
-            		} else if (ua.contains("iphone")) {
-            			browserType = "IPHONE";
-            		} else if (ua.contains("msie 10")) {
-            			browserType = "IE10";
-            		} else if (ua.contains("msie 9")) {
-            			browserType = "IE9";
-            		} else if (ua.contains("msie 8")) {
-            			browserType = "IE8";
-            		} else if (ua.contains("msie 7")) {
-            			browserType = "IE7";
-            		} else if (ua.contains("msie 6")) {
-            			browserType = "IE6";
-            		} else if (ua.contains("trident/7.0")) {
-            			browserType = "IE11";
-            		} else if (ua.contains("edge/12")) {
-            			browserType = "IE12";
-            		} else {
-            			browserType = "OTHER";
-            		}
-            	}
-            }
             String path;
             if (uri.startsWith(contextPath)) {
                 path = uri.substring(contextPath.length());
@@ -187,16 +156,14 @@ public class AuraTestFilter implements Filter {
                     switch (format) {
                     case HTML:
                         TestCaseDef testDef;
-                        TestContext testContext;
                         String targetUri;
                         try {
                             TestSuiteDef suiteDef = getTestSuite(targetDescriptor);
                             testDef = getTestCase(suiteDef, testToRun);
                             testDef.validateDefinition();
-                            testDef.setCurrentBrowser(browserType);
-                            testContextAdapter.getTestContext(testDef.getQualifiedName());
-                            testContextAdapter.release();
-                            testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
+                            if (testContext == null) {
+                                testContext = testContextAdapter.getTestContext(testDef.getQualifiedName());
+                            }
                             targetUri = buildJsTestTargetUri(targetDescriptor, testDef);
                         } catch (QuickFixException e) {
                             ((HttpServletResponse) res).setStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR);
@@ -269,7 +236,6 @@ public class AuraTestFilter implements Filter {
         }
 
         // Handle mock definitions specified in the tests.
-        TestContext testContext = getTestContext(request);
         if (testContext == null) {
             // During manual testing, the test context adapter may not always get cleared.
             testContextAdapter.clear();
@@ -283,8 +249,7 @@ public class AuraTestFilter implements Filter {
             AuraContext context = contextService.getCurrentContext();
 
             // Reset mocks if requested, or for the initial GET.
-            boolean doResetMocks = testReset.get(request, Format.HTML.equals(context.getFormat()));
-            loadTestMocks(context, doResetMocks, testContext.getLocalDefs());
+            loadTestMocks(context, doResetTest, testContext.getLocalDefs());
         }
         chain.doFilter(req, res);
     }

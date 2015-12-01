@@ -16,14 +16,6 @@
 ({
     browsers: ["-IE7","-IE8"],
 
-    // TODO(W-2825313): These tests flap on Jenkins
-
-    testDummyTest: {
-        test: function(cmp) {
-            // TODO: remove when tests are re-enabled.
-        }
-    },
-
     testUseSharedContainer: {
         attributes: {"useContainer": true},
         test: [function(cmp) {

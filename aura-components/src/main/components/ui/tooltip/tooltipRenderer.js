@@ -22,30 +22,8 @@
     },
 
     rerender: function(component, helper) {
-        var isDirty = false;
+        helper.initStyle(component);
 
-        // any of these attributes being dirty
-        // requires re-calculating classes and styles
-        var attrToCheck = [
-            'v.fadeInDuration',
-            'v.fadeOutDuration',
-            'v.triggerClass',
-            'v.class',
-            'v.delay',
-            'v.direction',
-            'v.tabIndexOverride',
-            'v.trigger',
-            'v.disabled'
-        ];
-        for (var i = 0; i < attrToCheck.length; i++) {
-           if(component.isDirty(attrToCheck[i])){
-                isDirty = true;
-           }
-        }
-
-        if(isDirty) {
-            helper.initStyle(component);
-        }
         return this.superRerender();
     },
 

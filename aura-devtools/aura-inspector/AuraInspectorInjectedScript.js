@@ -2,12 +2,51 @@
 // This is injected in the DOM directly via <script> injection
 (function(){
     var $Aura = {};
+
+    var actionsToDrop = [];
     
     // Communicate directly with the aura inspector
     $Aura.Inspector = new AuraInspector();
     $Aura.Inspector.init();
 
     $Aura.actions = {
+        "AuraDevToolService.AddActionToDrop": function(data) {
+            //remove the stored response from action storage -- if there is any
+            var actionsStorage = $A.storageService.getStorage("actions");
+            var actionStorageKey = data.actionStorageKey;
+            if(actionsStorage && actionStorageKey && actionStorageKey.length > 0) {
+                actionsStorage.get(actionStorageKey)
+                .then(
+                    function() {
+                        console.log("find storage item for action:", data);
+                        actionsStorage.remove(actionStorageKey)
+                        .then(function () {
+                            console.log("successfully remove storage for action:", data);
+                            //notify Storage View
+                            $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
+                        });
+                    },
+                    function(e) {
+                        console.log("cannot find storage item for action:", data);
+                    }
+                );
+                
+            } else {
+                console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
+            }
+            
+            //override send
+            actionsToDrop.push(data);
+            $A.uninstallOverride("ClientService.send", OnSendAction);
+            $A.installOverride("ClientService.send", OnSendAction);
+        },
+
+        "AuraDevToolService.RemoveActionsToDrop": function() {
+            actionsToDrop = [];
+            $A.uninstallOverride("ClientService.send", OnSendAction);
+            $A.installOverride("ClientService.send", OnSendAction);
+        },
+
         "AuraDevToolService.HighlightElement": function(globalId) {
             // Ensure the classes are present that HighlightElement depends on.
             if(!$Aura.actions["AuraDevToolService.AddStyleRules"].addedStyleRules) {
@@ -100,11 +139,15 @@
                 try {
                     // Actions Tab
                     bootstrapActionsInstrumentation();
-                 } catch(e){}
+                 } catch(e){
+                    console.log('build action run into exception:', e);
+                 }
                  try {
                     // Perf Tab
                     bootstrapPerfDevTools();
-                 } catch(e){}
+                 } catch(e){
+
+                 }
                  try {
                     // Events Tab
                     bootstrapEventInstrumentation();
@@ -122,6 +165,10 @@
     $Aura.Inspector.subscribe("AuraInspector:OnBootstrap", $Aura.actions["AuraDevToolService.Bootstrap"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
+
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
+
 
     function AuraInspector() {
 
@@ -261,6 +308,45 @@
         }
     }
 
+    function OnSendAction(config, auraXHR, actions, method, options) {
+
+            if (actions) {
+
+                for(var c=0;c<actions.length;c++) {
+                    if(actionsToDrop.length > 0) {
+                        var action = actions[c];
+                        for(var i=0; i<actionsToDrop.length; i++) {
+                            var actionToDrop = actionsToDrop[i];
+                            if(actionToDrop.actionName.indexOf(action.getDef().name) >= 0) {
+                                $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                    "id": action.getId(),
+                                    "idToDrop": actionToDrop.actionId,
+                                    "state": "DROPPED",
+                                    "sentTime": performance.now()
+                                });
+                                //drop the action
+                                actions.splice(c, 1);
+                                actionsToDrop.splice(i, 1);
+                            }
+                        }
+                    }
+                    else {
+                        $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                        "id": actions[c].getId(),
+                        "state": "RUNNING",
+                        "sentTime": performance.now()
+                        });
+                    }
+                    
+                }
+            }
+
+            var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
+
+            
+            return ret;
+    }
+
     function bootstrapActionsInstrumentation() {
 
         $A.installOverride("enqueueAction", OnEnqueueAction);
@@ -282,7 +368,8 @@
                 "isRefresh"  : action.isRefreshAction(),
                 "defName"    : action.getDef()+"",
                 "fromStorage": action.isFromStorage(),
-                "enqueueTime": performance.now()
+                "enqueueTime": performance.now(),
+                "storageKey" : action.getStorageKey()
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionEnqueue", data);
@@ -324,20 +411,7 @@
             return ret;
         }
 
-        function OnSendAction(config, auraXHR, actions, method, options) {
-            var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
 
-            if (actions) {
-                for(var c=0;c<actions.length;c++) {
-                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                        "id": actions[c].getId(),
-                        "state": "RUNNING",
-                        "sentTime": performance.now()
-                    });
-                }
-            }
-            return ret;
-        }
 
         function OnActionRunDeprecated(config, event) {
             var action = config["self"];

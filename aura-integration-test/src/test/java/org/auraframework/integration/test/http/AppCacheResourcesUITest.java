@@ -56,7 +56,7 @@ import com.google.common.collect.Lists;
 /**
  * Tests for AppCache functionality by watching the requests received at the server and verifying that the updated
  * content is being used by the browser. AppCache only works for WebKit browsers.
- *
+ * 
  * @since 0.0.224
  */
 @FreshBrowserInstance
@@ -130,8 +130,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app will only query server for the manifest and the component load. BrowserType.SAFARI is disabled
-     * : W-2367702
+     * Opening cached app will only query server for the manifest and the component load.
+     * 
+     * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testNoChanges() throws Exception {
@@ -147,7 +148,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening cached app that had a prior cache error will reload the app. BrowserType.SAFARI is disabled : W-2367702
+     * Opening cached app that had a prior cache error will reload the app.
+     * 
+     * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
@@ -184,8 +187,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Opening uncached app that had a prior cache error will have limited caching. BrowserType.SAFARI is disabled :
-     * W-2367702
+     * Opening uncached app that had a prior cache error will have limited caching.
+     * 
+     * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     public void testCacheErrorWithEmptyCache() throws Exception {
@@ -215,8 +219,9 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     }
 
     /**
-     * Manifest request limit exceeded for the time period should result in reset. BrowserType.SAFARI is disabled :
-     * W-2367702
+     * Manifest request limit exceeded for the time period should result in reset.
+     * 
+     * BrowserType.SAFARI is disabled: W-2367702
      */
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.IPAD, BrowserType.IPHONE })
     // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
@@ -326,6 +331,116 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
         assertAppCacheStatus(Status.IDLE);
     }
 
+    /**
+     * After a source change, appcache will update. This test verifies the relevant storages are cleared when that
+     * happens to avoid stale data being persisted in storage.
+     * 
+     * Persistent storage (IndexedDB) is disabled in Safari so only run in Chrome.
+     */
+    @TargetBrowsers({ BrowserType.GOOGLECHROME })
+    public void testStoragesClearedOnAppcacheUpdate() throws Exception {
+        // Override app we load in the test with a custom one that uses a template to setup persistent storage and an
+        // inner component to interact with storages.
+        appName = "cacheapplicationStorage";
+        String storageCmpName = "cachecomponentStorage";
+        String templateName = "templatecomponentStorage";
+
+        DefDescriptor<ComponentDef> templateDesc = createDef(
+                ComponentDef.class,
+                String.format("%s:%s", namespace, templateName),
+                "<aura:component isTemplate='true' extends='aura:template'>"
+                        + "<aura:set attribute='auraPreInitBlock'>"
+                        + "<auraStorage:init name='actions' persistent='true' secure='false' clearStorageOnInit='false' debugLoggingEnabled='true' defaultExpiration='60' defaultAutoRefreshInterval='60'/>"
+                        + "</aura:set>"
+                        + "</aura:component>");
+
+        DefDescriptor<ComponentDef> storageCmpDesc = createDef(
+                ComponentDef.class,
+                String.format("%s:%s", namespace, storageCmpName),
+                "<aura:component>"
+                        + "<aura:attribute name='storageOutput' type='String' default='Waiting'/>"
+                        + "<ui:button label='Add to storage' class='addToStorage' press='{!c.addToStorage}'/>"
+                        + "<ui:button label='Check storage' class='checkStorage' press='{!c.checkStorage}'/>"
+                        + "<div class='storageOutput'>{!v.storageOutput}</div>"
+                        + "</aura:component>");
+
+        createDef(
+                ControllerDef.class,
+                String.format("%s://%s.%s", DefDescriptor.JAVASCRIPT_PREFIX,
+                        namespace, storageCmpName),
+                "{ addToStorage: function(cmp) { "
+                        + "$A.storageService.getStorage('actions').put('testkey','testvalue')"
+                        + ".then(function(){"
+                        + "return $A.storageService.getStorage('ComponentDefStorage').put('testkey','testvalue');"
+                        + "}).then(function() {"
+                        + "cmp.set('v.storageOutput','Storage Done')"
+                        + "})"
+                        + "['catch'](function(err){ cmp.set('v.storageOutput','Storage Failed ' + err.toString())});"
+                        + "},"
+                        + "checkStorage: function(cmp) {"
+                        + "var findKey = function(name) {"
+                        + "return $A.storageService.getStorage(name).getAll().then(function(items){"
+                        + "for (var i=0; i<items.length; i++) {"
+                        + "var item = items[i];"
+                        + "if (item.key.indexOf('testkey') > -1) {"
+                        + "return Promise.resolve();"
+                        + "}"
+                        + "}"
+                        + "return Promise.reject('Cache miss');"
+                        + "});"
+                        + "};"
+                        + "findKey('actions').then(function() {"
+                        + "return findKey('ComponentDefStorage');"
+                        + "}).then(function(){"
+                        + "cmp.set('v.storageOutput', 'Cache hit');"
+                        + "})"
+                        + "['catch'](function(err){ cmp.set('v.storageOutput', err); });"
+                        + "}}");
+
+        createDef(ApplicationDef.class, String.format("%s:%s", namespace, appName), String.format(
+                "<aura:application useAppcache='true' render='client' template='%s:%s'>"
+                        + "<%s:%s/> <%s:%s/>"
+                        + "</aura:application>", namespace, templateDesc.getName(), namespace, cmpName, namespace,
+                storageCmpDesc.getName()));
+
+        loadMonitorAndValidateApp(TOKEN, TOKEN, "", TOKEN);
+
+        // Add stuff to storage
+        findDomElement(By.cssSelector(".addToStorage")).click();
+        waitForStorage("Storage Done", "Failed to add items to storage");
+
+        // Verify items actually added to storage
+        findDomElement(By.cssSelector(".checkStorage")).click();
+        waitForStorage("Cache hit", "Item never added to actions storage");
+
+        // Update markup of component used by app and reload
+        String replacement = getName() + System.currentTimeMillis();
+        replaceToken(getTargetComponent().getDescriptor(), replacement);
+        loadMonitorAndValidateApp(replacement, TOKEN, "", TOKEN);
+
+        // Verify caches cleared
+        findDomElement(By.cssSelector(".checkStorage")).click();
+        waitForStorage("Cache miss", "Actions cache never cleared on appcache update");
+    }
+
+    private void waitForStorage(final String waitForText, String failMessage) {
+        auraUITestingUtil.waitUntil(new Function<WebDriver, String>() {
+            @Override
+            public String apply(WebDriver input) {
+                try {
+                    WebElement output = findDomElement(By.cssSelector("div.storageOutput"));
+                    String text = output.getText();
+                    if (text.equals(waitForText)) {
+                        return text;
+                    }
+                } catch (StaleElementReferenceException e) {
+                    // could happen before the click or if output is rerendering
+                }
+                return null;
+            }
+        }, failMessage);
+    }
+
     private <T extends Definition> DefDescriptor<T> createDef(Class<T> defClass, String qualifiedName, String content) {
         DefDescriptor<T> desc = Aura.getDefinitionService().getDefDescriptor(qualifiedName, defClass);
         addSourceAutoCleanup(desc, content);
@@ -364,7 +479,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * this function will check each request in actual list against expected list. fudge is the number this request
      * suppose to show up. we remove the request from expected list once it has been visited #fudge times. any missing
      * request will be added to missingRequests list.
-     *
+     * 
      * @param expected : list of expected request
      * @param actual : list of actual request captured by log
      * @throws Exception
@@ -432,7 +547,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
      * <li>updated styling applied (cssToken)</li>
      * <li>updated framework called (fwToken)</li>
      * </ul>
-     *
+     * 
      * @param markupToken The text to be found in the markup.
      * @param jsToken The text to be found from js
      * @param cssToken The text to be found from css.
@@ -573,7 +688,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Get the set of expected requests on change. These are the requests that we expect for filling the app cache.
-     *
+     * 
      * @return the list of request objects, not necessarily in order.
      */
     private List<Request> getExpectedChangeRequests() {
@@ -616,7 +731,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
     /**
      * Get the set of expected requests on change. These are the requests that we expect for filling the app cache.
-     *
+     * 
      * @return the list of request objects, not necessarily in order.
      */
     private List<Request> getExpectedInitialRequests() {
@@ -698,7 +813,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         /**
          * We passed the test for this request.
-         *
+         * 
          * @return true if we got the request. each request from expected list must show up at least once in the actual
          *         list.
          */
@@ -708,7 +823,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
 
         /**
          * Mark the request as found.
-         *
+         * 
          * @return true if it should be removed.count > fudge: browsers don't behave consistently. better have a loose
          *         bound here. we are comparing two requests list: actual list and expected list. count start at 0, we
          *         are expecting 1,2,..,fudge, or fudge+1 request. once we have some request X that show up fudge+1 in

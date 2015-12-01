@@ -1683,7 +1683,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * Prunes component definitions and dependent actions from persistent storage.
  *
  * This is the entry point for dependency graph generation, analysis, and
- * eviction. Eviction proceedsuntil the component def storage is under a threshold
+ * eviction. Eviction proceeds until the component def storage is under a threshold
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.

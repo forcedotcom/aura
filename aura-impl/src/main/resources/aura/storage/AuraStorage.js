@@ -67,6 +67,9 @@ var AuraStorage = function AuraStorage(config) {
     this["adapter"] = this.adapter;
     this.adapter["getItem"] = this.adapter.getItem;
     this.adapter["getMRU"] = this.adapter.getMRU;
+    this.adapter["getSize"] = this.adapter.getSize;
+    this.adapter["getAll"] = this.adapter.getAll;
+    this.adapter["sweep"] = this.adapter.sweep;
     //#end
 
 

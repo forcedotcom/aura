@@ -627,6 +627,6 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isLockerServiceEnabled() {
-		return false;
+		return true;
 	}
 }

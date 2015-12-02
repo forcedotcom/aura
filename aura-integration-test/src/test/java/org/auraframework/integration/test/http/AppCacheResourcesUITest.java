@@ -118,7 +118,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
                         + "return val;"
                         + "};"
                         + "var style = getStyle(c.getElement(),'background-image');"
-                        + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')'))"
+                        + "c.set('v.output','@@@TOKEN@@@' + style.substring(style.lastIndexOf('?')+1,style.lastIndexOf(')')-1)"
                         + "+ ($A.test ? $A.test.dummyFunction() : '@@@TOKEN@@@'));"
                         + "}}");
 
@@ -263,7 +263,7 @@ public class AppCacheResourcesUITest extends WebDriverTestCase {
     @TargetBrowsers({ BrowserType.GOOGLECHROME, BrowserType.SAFARI, BrowserType.IPAD, BrowserType.IPHONE })
     public void testComponentCssChange() throws Exception {
         createDef(StyleDef.class, String.format("%s://%s.%s", DefDescriptor.CSS_PREFIX, namespace, cmpName),
-                ".THIS {background-image: url(/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@);}");
+                ".THIS {background-image: url('/auraFW/resources/qa/images/s.gif?@@@TOKEN@@@');}");
 
         List<Request> logs = loadMonitorAndValidateApp(TOKEN, TOKEN, TOKEN, TOKEN);
         assertRequests(getExpectedInitialRequests(), logs);

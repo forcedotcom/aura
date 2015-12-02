@@ -22,7 +22,8 @@
 	 	}
 	 },
 
-	 testEast: {
+     // TODO(W-2853977): Tests flapping in Jenkins.
+	 _testEast: {
 	 	test: function(cmp){
 	 		var t = this.makeTest('east', function(cmp, panel) {
 	 			var p = panel.getElement();
@@ -93,7 +94,8 @@
 	 	}
 	 },
 
-	 testNorthInside: {
+	 // TODO(W-2853977): Tests flapping in Jenkins.
+	 _testNorthInside: {
 	 	test: function(cmp){
 	 		var t = this.makeTest('north', function(cmp, panel) {
 	 			var p = panel.getElement();
@@ -105,7 +107,8 @@
 	 	}
 	 },
 
-	 testSouthInside: {
+	 // TODO(W-2853977): Tests flapping in Jenkins.
+	 _testSouthInside: {
 	 	test: function(cmp){
 	 		var t = this.makeTest('south', function(cmp, panel) {
 	 			var p = panel.getElement();
@@ -186,7 +189,8 @@
 	    }
 	 },
 
-	 testTopPad: {
+	 // TODO(W-2853977): Tests flapping in Jenkins.
+	 _testTopPad: {
 	 	test: function(cmp) {
 	 	    var that = this;
 	 		var myPanel = null;

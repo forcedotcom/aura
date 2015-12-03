@@ -1,13 +1,18 @@
 //*** Used by Aura Inspector
 // This is injected in the DOM directly via <script> injection
-(function(){
+(function(global){
     var $Aura = {};
 
     var actionsToDrop = [];
-    
+    var $Symbol = Symbol.for("AuraDevTools");
+
     // Communicate directly with the aura inspector
     $Aura.Inspector = new AuraInspector();
     $Aura.Inspector.init();
+
+    // Attach to the global object so our integrations can access it, but 
+    // use a symbol so it doesn't create a global property.
+    global[$Symbol] = $Aura;
 
     $Aura.actions = {
         "AuraDevToolService.AddActionToDrop": function(data) {
@@ -136,6 +141,10 @@
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
                 // Try catches for branches that don't have the overrides
+                // 
+                try {
+                    $A.installOverride("outputComponent", function(){});
+                } catch(e){}
                 try {
                     // Actions Tab
                     bootstrapActionsInstrumentation();
@@ -177,6 +186,9 @@
         var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
         var postMessagesQueue = [];
         var batchPostId = null;
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
+        var increment = 0;
 
         this.init = function() {
             
@@ -205,6 +217,101 @@
             subscribers.get(key).push(callback);
         };
 
+        this.getComponent = function(componentId, options) {
+            var component = $A.getComponent(componentId);
+            // var configuration = {
+            //     "body" : true // Should we serialize the body?
+            // };
+            var configuration = Object.assign({
+                "body": true,
+                "elementCount": false
+            }, options);
+            if(component){
+                if(!component.isValid()) {
+                    return JSON.stringify({
+                        "valid": false,
+                        "__proto__": null // no inherited properties
+                    });
+                } else {
+                    var output = {
+                        "descriptor": component.getDef().getDescriptor().toString(),
+                        "globalId": component._$getSelfGlobalId$(),
+                        "localId": component.getLocalId(),
+                        "rendered": component.isRendered(),
+                        "valid": true,
+                        "expressions": {},
+                        "attributes": {},
+                        "attributeValueProvider": getValueProvider(component.getAttributeValueProvider()),
+                        "facetValueProvider": getValueProvider(component.getComponentValueProvider()),
+                        "__proto__": null, // no inherited properties
+                        "elementCount": 0
+
+                        // Added Later
+                        //,"super": ""
+                        //
+                        // Implement
+                        //,"model": null 
+                    };
+
+                    var attributes = component.getDef().getAttributeDefs();
+                    attributes.each(function(attributeDef) {
+                        var key = attributeDef.getDescriptor().getName();
+                        var value;
+                        var rawValue;
+                        // If we don't want the body serialized, skip it.
+                        // We would only want the body if we are going to show
+                        // the components children.
+                        if(key === "body" && !configuration.body) { return; }
+                        try {
+                            rawValue = component._$getRawValue$(key);
+                            value = component.get("v." + key);
+                        } catch(e) {
+                            value = undefined;
+                        }
+                        if($A.util.isExpression(rawValue)) {
+                            output.expressions[key] = rawValue+"";
+                            output.attributes[key] = value;
+                        } else {
+                            output.attributes[key] = rawValue;
+                        }
+                    }.bind(this));
+
+                    var supers = [];
+                    var superComponent = component;
+                    while(superComponent = superComponent.getSuper()) {
+                        supers.push(superComponent._$getSelfGlobalId$());
+                    }
+                    
+                    if(supers.length) {
+                        output["supers"] = supers;
+                    }
+
+                    if(configuration.elementCount) {
+                        var elements = component.getElements() || [];
+                        var elementCount = 0;
+                        for(var c=0,length=elements.length;c<length;c++) {
+                            if(elements[c] instanceof HTMLElement) {
+                                // Its child components, plus itself.
+                                elementCount += elements[c].getElementsByTagName("*").length + 1;
+                            }
+                        }
+                        output.elementCount = elementCount;
+                    }
+
+                    return this.safeStringify(output);
+                }
+            }
+            return "";
+        };
+
+        /** 
+         * Safe because it handles circular references in the data structure.
+         *
+         * Will add control characters and shorten components to just their global ids.
+         * Formats DOM elements in a pretty manner.
+         */
+        this.safeStringify = safeStringify; 
+
         // Start listening for messages
         window.addEventListener("message", Handle_OnPostMessage);
 
@@ -219,6 +326,91 @@
                     }        
                 }
             }
+        }
+
+        function safeStringify(value) {
+            // For circular dependency checks
+            var visited = new Set();
+
+            var result = JSON.stringify(value, function(key, value) {
+                if(Array.isArray(this) || key) { value = this[key]; }
+                if(!value) { return value; }
+
+                if(typeof value === "string" && value.startsWith(COMPONENT_CONTROL_CHAR)) {
+                    return ESCAPE_CHAR + escape(value);
+                }
+
+                if(value instanceof HTMLElement) {
+                    var attributes = value.attributes;
+                    var domOutput = [];
+                    for(var c=0,length=attributes.length,attribute;c<length;c++) {
+                        attribute = attributes.item(c);
+                        domOutput.push(attribute.name + "=" + attribute.value);
+                    }
+                    return `<${value.tagName} ${domOutput.join(' ')}>`; // Serialize it specially.
+                }
+
+                if(value instanceof Text) {
+                    return value.nodeValue;
+                }
+
+                if($A.util.isComponent(value)) {
+                    return COMPONENT_CONTROL_CHAR + value.getGlobalId();
+                }
+
+                if($A.util.isExpression(value)) {
+                    return value.toString();
+                }
+
+                if(Array.isArray(value)) {
+                    return value.slice();
+                }
+
+                if(typeof value === "object") {
+                    if("$serId$" in value && visited.has(value)) {
+                        return { 
+                            "$serRefId$": value["$serId$"], 
+                            "__proto__": null 
+                        };
+                    } else if(!$A.util.isEmpty(value)) {
+                        visited.add(value);
+                        value.$serId = increment++;
+                    }
+                }
+
+                return value;
+            });
+
+            visited.forEach(function(item){
+                if("$serId$" in item) {
+                    delete item["$serId"];
+                }
+            });
+
+            return result;
+        };
+
+        /** Serializing Passthrough Values as valueProviders is a bit complex, so we have this helper function to do it. */
+        function getValueProvider(valueProvider) {
+            if("_$getSelfGlobalId$" in valueProvider) {
+                return valueProvider._$getSelfGlobalId$();
+            }
+
+            // Probably a passthrough value
+            var output = {
+                // Can't do providers yet since we don't have a way to get access to them.
+                // We should though, it would be great to see in the inspector.
+                //"providers": safeStringify()
+                $type$: "passthrough"
+            };
+
+            while(!("_$getSelfGlobalId$" in valueProvider)) {
+                valueProvider = valueProvider.getComponent();
+            }
+
+            output["globalId"] = valueProvider._$getSelfGlobalId$();
+
+            return output;
         }
 
         function callSubscribers(key, data) {
@@ -685,5 +877,5 @@
 
     
 
-})();
+})(this);
     

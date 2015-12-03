@@ -40,8 +40,8 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
             var current = _items;
             var bodies = current.attributes && current.attributes.body || {};
-            var attributeValueProvider;
             var attributeNodesContainer;
+            var componentId;
 
             if(!current.attributes) {
                 current.attributes = {};
@@ -58,10 +58,26 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
                 // Should probably use a FacetFormatter, but how do I easily specify that info to TreeNode.create()
                 // that is compatible with every other TreeNode.create() call.
-                attributeValueProvider = TreeNode.create("Attribute Value Provider", "attributeValueProvider");
-                treeComponent.addChild(attributeValueProvider);
+                if(current.attributeValueProvider == current.facetValueProvider) {
+                    var attributeValueProvider = TreeNode.create("Attribute & Facet Value Provider", "attributeValueProvider");
+                    treeComponent.addChild(attributeValueProvider);
 
-                attributeValueProvider.addChild(TreeNode.parse(current.attributeValueProvider));
+                    componentId = devtoolsPanel.cleanComponentId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
+                    
+                    attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
+                } else {
+                    var attributeValueProvider = TreeNode.create("Attribute Value Provider", "attributeValueProvider");
+                    treeComponent.addChild(attributeValueProvider);
+
+                    componentId = devtoolsPanel.cleanComponentId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
+                    attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
+
+                    var facetValueProvider = TreeNode.create("Facet Value Provider", "facetValueProvider");
+                    treeComponent.addChild(facetValueProvider);
+
+                    componentId = devtoolsPanel.cleanComponentId(typeof current.facetValueProvider == "string" ? current.facetValueProvider : current.facetValueProvider.globalId);
+                    facetValueProvider.addChild(TreeNode.create(componentId, "facetValueProvider_" + current.globalId, "globalId"));
+                }
 
                 // Do attributes only at the concrete level
                 if(current === _items) {
@@ -106,25 +122,27 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
     function generateNodes(json, parentNode) {
         var node;
-
+        var value;
         for(var prop in json) {
             if(json.hasOwnProperty(prop)) {
-                if(typeof json[prop] === "object") {
+                value = json[prop];
+                if(typeof value === "object") {
                     if(prop === "body") {
-                        node = TreeNode.create({key: "body", value: json[prop]}, "", "keyvalue");
-                        var body = json[prop];
-                        for(var c=0;c<body.length;c++) {
-                            node.addChild(TreeNode.parse(body[c]));
+                        node = TreeNode.create({key: "body", value: value}, "", "keyvalue");
+                        for(var c=0;c<value.length;c++) {
+                            node.addChild(TreeNode.parse(value[c]));
                         }
                     
-                    } else if(json[prop] && ('descriptor' in json[prop] || 'componentDef' in json[prop])) {
-                        node = TreeNode.parse(json[prop]);
+                    } else if(json[prop] && ('descriptor' in value || 'componentDef' in value)) {
+                        node = TreeNode.parse(value);
                     } else {
-                        node = TreeNode.create({ key:prop, value: json[prop] }, parentNode.getId() + "_" + prop, "keyvalue");
-                        generateNodes(json[prop], node);
+                        node = TreeNode.create({ key:prop, value: value }, parentNode.getId() + "_" + prop, "keyvalue");
+                        generateNodes(value, node);
                     }
+                } else if(devtoolsPanel.isComponentId(value)) {
+                        node = TreeNode.create(devtoolsPanel.cleanComponentId(value), parentNode.getId() + "_" + prop, "globalId");
                 } else {
-                    node = TreeNode.create({key: prop, value: json[prop]}, parentNode.getId() + "_" + prop, "keyvalue");
+                    node = TreeNode.create({key: prop, value: value}, parentNode.getId() + "_" + prop, "keyvalue");
                 }
                 
                 parentNode.addChild(node);

@@ -1662,6 +1662,7 @@ WebInspector.CPUProfileView.prototype = {
     },
     _calculateTimes: function (profile) {
         function totalHitCount(node) {
+            if(!node) { return 0; }
             var result = node.hitCount;
             for (var i = 0; i < node.children.length; i++)
                 result += totalHitCount(node.children[i]);

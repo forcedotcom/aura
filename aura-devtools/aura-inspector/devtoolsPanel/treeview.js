@@ -121,7 +121,7 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            return value.attributes.value;
+            return value.attributes.expression;
         },
         KeyValueFormatter: function(config){
             var value = config.value;
@@ -157,6 +157,9 @@ function TreeNode(text, id) {
         },
         DescriptorFormatter: function(value) {
             return value.replace( /markup:\/\/(\w+):(\w+)/, '<span class="component-prefix">$1</span>:<span class="component-tagname">$2</span>');
+        },
+        GlobalIdFormatter: function(value) {
+            return `<aurainspector-auracomponent globalId='${value}'/>`;
         }
     };
 
@@ -188,6 +191,9 @@ function TreeNode(text, id) {
                 break;
             case "descriptor":
                 node.setFormatter(formatters.DescriptorFormatter);
+                break;
+            case "globalId":
+                node.setFormatter(formatters.GlobalIdFormatter);
                 break;
         }
 
@@ -280,6 +286,9 @@ function AuraInspectorTreeView() {
     };
 
     this.addChildren = function(children) {
+        if(!Array.isArray(children)) {
+            children = [children];
+        }
         _children = _children.concat(children);
     };
 

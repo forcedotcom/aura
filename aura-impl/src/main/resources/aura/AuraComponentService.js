@@ -1368,9 +1368,6 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
     return new classConstructor(config);
 };
 
-
-
-
 /*
  * ====================================================================
  * PERSISTENT CACHE EVICTION LOGIC

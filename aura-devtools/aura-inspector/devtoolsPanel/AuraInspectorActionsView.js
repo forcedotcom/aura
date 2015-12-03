@@ -80,13 +80,14 @@ function AuraInspectorActionsView(devtoolsPanel) {
         // Start listening for events to draw
         devtoolsPanel.subscribe("AuraInspector:OnActionEnqueue", AuraInspectorActionsView_OnActionEnqueue.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnActionStateChange", AuraInspectorActionsView_OnActionStateChange.bind(this));
-        devtoolsPanel.subscribe("AuraInspector:OnBootstrap", AuraInspectorActionsView_OnBootstrap.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:OnPanelConnect", AuraInspectorActionsView_OnBootstrap.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspectorActionsView_OnBootstrap.bind(this));
 
         // Attach event handlers
         var div_actionsToDrop = tabBody.querySelector("#actionsToDrop-list");
         if(div_actionsToDrop) {
             div_actionsToDrop.addEventListener("dragover", allowDrop.bind(this));
-            div_actionsToDrop.addEventListener("drop", drop.bind(this, devtoolsPanel));
+            div_actionsToDrop.addEventListener("drop", drop.bind(this));
         } else {
             var command = "console.error('div_actionsToDrop cannot be found');";
             chrome.devtools.inspectedWindow.eval(command);
@@ -96,7 +97,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         menu.addEventListener("click", Menu_OnClick.bind(this));
 
         var clearButton = tabBody.querySelector("#clear-button");
-        clearButton.addEventListener("click", ClearButton_OnClick.bind(this, devtoolsPanel));
+        clearButton.addEventListener("click", ClearButton_OnClick.bind(this));
 
         var filterText = tabBody.querySelector("#filter-text");
         filterText.addEventListener("change", FilterText_OnChange.bind(this));
@@ -108,8 +109,12 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     };
 
-    this.refresh = function(devtoolsPanel) {
-        removeAllCards(devtoolsPanel);
+    this.refresh = function() {
+        removeAllCards();
+        
+        if(_listDrop) {
+            devtoolsPanel.publish("AuraInspector:OnActionToDropClear", {});
+        }
 
         actions.forEach(function(action){
             upsertCard(action);
@@ -141,10 +146,10 @@ function AuraInspectorActionsView(devtoolsPanel) {
         upsertCard(action);
     }
 
-    function ClearButton_OnClick(devtoolsPanel, event) {
+    function ClearButton_OnClick(event) {
         actions = new Map();
 
-        this.refresh(devtoolsPanel);
+        this.refresh();
     }
 
     function FilterText_OnChange(event) {
@@ -243,7 +248,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
     }
 
-    function removeAllCards(devtoolsPanel) {
+    function removeAllCards() {
         if(_list) {
             var cards = _list.querySelectorAll("aurainspector-actionCard");
             for(var c=0,length=cards.length;c<length;c++) {
@@ -255,7 +260,6 @@ function AuraInspectorActionsView(devtoolsPanel) {
             for(var c=0,length=cards.length;c<length;c++) {
                 cards[c].parentNode.removeChild(cards[c]);
             }
-            devtoolsPanel.publish("AuraInspector:OnActionToDropClear", {});
         }
     }
 
@@ -286,7 +290,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 card.setAttribute("draggable","true");
                 card.addEventListener("dragstart", drag.bind(this) );
                 //set double click
-                card.addEventListener('dblclick', doubleClick.bind(this, devtoolsPanel));
+                card.addEventListener('dblclick', doubleClick.bind(this));
             }
             //set drop
             if(toDrop === true) {
@@ -327,11 +331,11 @@ function AuraInspectorActionsView(devtoolsPanel) {
         event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());     
     }
 
-    function doubleClick (devtoolsPanel, event) {
+    function doubleClick (event) {
         var actionCardElement = event.target;
         if(actionCardElement && actionCardElement.getAttribute("actionId")) {
             actionCardElement.style.opacity = "0.5";            
-            createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId"), devtoolsPanel).bind(this);
+            createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId")).bind(this);
         } else {
             var command = "console.log('doubleClick.event.target or its actionId is missing');";
             chrome.devtools.inspectedWindow.eval(command);
@@ -339,7 +343,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     }
 
-    function createActionCardInToDropDivAndNotifyOthers(actionId, devtoolsPanel) {
+    function createActionCardInToDropDivAndNotifyOthers(actionId) {
         var actionCard = createActionCard(actionId, true);
         if(!_toDrop) {
                 var command = "console.log('_toDrop missing');";
@@ -358,7 +362,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         devtoolsPanel.publish("AuraInspector:OnActionToDropEnqueue", dataToPublish);
     }
 
-    function drop (devtoolsPanel, event) {
+    function drop (event) {
         event.preventDefault();        
         
         if(event && event.dataTransfer) {

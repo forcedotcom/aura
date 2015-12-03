@@ -11,7 +11,10 @@
      *
      * The messages you can publish and subscribe to are
      *
-     * AuraInspector:OnBootstrap                    $A is available and we are just about to run $A.initAsync
+     * AuraInspector:OnAuraInitialized              $A is available and we are just about to run $A.initAsync
+     * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)      
+     * AuraInspector:OnPanelAlreadyConnected        The Aura Panel was already open, and we probably refreshed the page. The injected script will simply instrument the page at this point.
+     * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.              
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
@@ -30,17 +33,19 @@
 
     // Connects to content script
     // and draws the panels.
-    panel.init();
-
-    // Probably the default we want
-    AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
-        if(!panel.hasPanel(options["activePanel"])) {
-            // If the panel we are switching to doesn't exist, use the
-            // default which is the transaction panel.
-            options["activePanel"] = "transaction";
-        }
-        panel.showPanel(options["activePanel"]);
+    panel.init(function(){
+            // Probably the default we want
+        AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
+            if(!panel.hasPanel(options["activePanel"])) {
+                // If the panel we are switching to doesn't exist, use the
+                // default which is the transaction panel.
+                options["activePanel"] = "transaction";
+            }
+            panel.showPanel(options["activePanel"]);
+        });
     });
+
+    
 
     function AuraInspectorDevtoolsPanel() {
         //var EXTENSIONID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
@@ -55,6 +60,7 @@
         var _name = "AuraInspectorDevtoolsPanel" + Date.now();
         var _onReadyQueue = [];
         var _isReady = false;
+        var _initialized = false;
         var _subscribers = new Map();
         var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
@@ -76,33 +82,44 @@
             global.AuraInspector.ContentScript.disconnect();
         };
 
-        this.init = function() {
+        this.init = function(finishedCallback) {
             this.connect();
 
-            //-- Attach Event Listeners
-            var header = document.querySelector("header.tabs");
-            header.addEventListener("click", HeaderActions_OnClick.bind(this));
+            this.subscribe("AuraInspector:OnBootstrapEnd", function(){ 
+                if(_initialized) { return; }
+                //-- Attach Event Listeners
+                var header = document.querySelector("header.tabs");
+                header.addEventListener("click", HeaderActions_OnClick.bind(this));
 
-            // Initialize Panels
-            var eventLog = new AuraInspectorEventLog(this);
-            var tree = new AuraInspectorComponentTree(this);
-            var perf = new AuraInspectorPerformanceView(this);
-            var transaction = new AuraInspectorTransactionView(this);
-            var actions = new AuraInspectorActionsView(this);
-            var storage = new AuraInspectorStorageView(this);
+                // Initialize Panels
+                var eventLog = new AuraInspectorEventLog(this);
+                var tree = new AuraInspectorComponentTree(this);
+                var perf = new AuraInspectorPerformanceView(this);
+                var transaction = new AuraInspectorTransactionView(this);
+                var actions = new AuraInspectorActionsView(this);
+                var storage = new AuraInspectorStorageView(this);
 
-            this.addPanel("component-tree", tree, "Component Tree");
-            this.addPanel("performance", perf, "Performance");
-            this.addPanel("transaction", transaction, "Transactions");
-            this.addPanel("event-log", eventLog, "Event Log");
-            this.addPanel("actions", actions, "Actions");
-            this.addPanel(storage.panelId, storage, "Storage");
+                this.addPanel("component-tree", tree, "Component Tree");
+                this.addPanel("performance", perf, "Performance");
+                this.addPanel("transaction", transaction, "Transactions");
+                this.addPanel("event-log", eventLog, "Event Log");
+                this.addPanel("actions", actions, "Actions");
+                this.addPanel(storage.panelId, storage, "Storage");
 
-            // Sidebar Panel
-            // The AuraInspectorComponentView adds the sidebar class
-            this.addPanel("component-view", new AuraInspectorComponentView(this));
+                // Sidebar Panel
+                // The AuraInspectorComponentView adds the sidebar class
+                this.addPanel("component-view", new AuraInspectorComponentView(this));
 
-            this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
+                this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
+                this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
+                _initialized = true;
+                
+                if(typeof finishedCallback === "function") {
+                    finishedCallback();
+                }
+            }.bind(this));
+
+            this.publish("AuraInspector:OnPanelConnect", {});
         };
 
         /**
@@ -405,29 +422,29 @@
             }
         }
 
-        function AuraInspector_OnAddPanel(message) {
-            // Invalid message, or panel was already added, we return right away.
-            if(!message || !message.hasOwnProperty("panelId") || this.hasPanel(message.panelId)) { return; }
+        // function AuraInspector_OnAddPanel(message) {
+        //     // Invalid message, or panel was already added, we return right away.
+        //     if(!message || !message.hasOwnProperty("panelId") || this.hasPanel(message.panelId)) { return; }
 
-            if(!message.hasOwnProperty("classConstructor")) {
-                this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a classConstructor`);
-                return;
-            }
+        //     if(!message.hasOwnProperty("classConstructor")) {
+        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a classConstructor`);
+        //         return;
+        //     }
 
-            if(!message.scriptUrl) {
-                this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
-                return;
-            }
+        //     if(!message.scriptUrl) {
+        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
+        //         return;
+        //     }
 
-            // If we don't have this check, anyone one the web page who
-            // reverse enginers our plugin could add a panel to the aura inspector
-            // in which case they would have full access to the page.
-            // By limiting it to chrome-extension url's only, we are assuming
-            // the extension trying to add the panel is already trusted and has access to the page.
-            if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
-                this.addLogMessage(`Tried to create panel  ${message.panelId} with url ${message.scriptUrl} whos source was not from a chrome extension. Only panels from web_accessible_resources in chrome extensions are allowed.`);
-            }
-        }
+        //     // If we don't have this check, anyone one the web page who
+        //     // reverse enginers our plugin could add a panel to the aura inspector
+        //     // in which case they would have full access to the page.
+        //     // By limiting it to chrome-extension url's only, we are assuming
+        //     // the extension trying to add the panel is already trusted and has access to the page.
+        //     if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
+        //         this.addLogMessage(`Tried to create panel  ${message.panelId} with url ${message.scriptUrl} whos source was not from a chrome extension. Only panels from web_accessible_resources in chrome extensions are allowed.`);
+        //     }
+        // }
 
         function AuraInspector_OnAddPanel(message) {
 
@@ -451,6 +468,10 @@
 
                 document.head.appendChild(link);
             }
+        }
+
+        function AuraInspector_OnAuraInitialized() {
+            this.publish("AuraInspector:OnPanelAlreadyConnected", {});
         }
 
         /* PRIVATE */

@@ -195,7 +195,11 @@ Logger.prototype.reportError = function(e, action, id){
         "failedAction": action,
         "failedId": id,
         "clientError": e.toString(),
-        "clientStack": e.stackTrace || e.stack   // Note that stack is non-standard, and even if present, may be obfuscated
+        // Note that stack is non-standard, and even if present, may be obfuscated
+        // Also we only take the first 25k characters because stacks can get very large
+        // and our parser on the server will gack on more than a million characters 
+        // for the entire json package.
+        "clientStack": (e.stackTrace || e.stack || "").toString().substr(0, 25000)   
     });
     reportAction.setCallback(this, function() { /* do nothing */ });
     $A.clientService.enqueueAction(reportAction);

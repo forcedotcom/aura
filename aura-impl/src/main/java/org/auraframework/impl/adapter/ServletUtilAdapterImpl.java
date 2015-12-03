@@ -154,6 +154,7 @@ public class ServletUtilAdapterImpl implements ServletUtilAdapter {
                 // Is this correct?!?!?!
                 //
                 if (format != Format.JSON) {
+                    this.send404(request.getServletContext(), request, response);
                     if (!isProductionMode(context.getMode())) {
                         // Preserve new lines and tabs in the stacktrace since this is directly being written on to the
                         // page

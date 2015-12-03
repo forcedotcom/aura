@@ -211,6 +211,8 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_MODAL_BUTTON);
+        By locator = By.cssSelector(PANELDIALOG_MODAL_CMP + ".active");
+        waitForElementAppear("Overlay compoennt did not appear", locator);
         verifyOverlayActive();
         assertEquals("Button1 should be active element", "button 1", auraUITestingUtil.getEval(ACTIVE_ELEMENT_TEXT));
         pressTabOnActiveElementAndWait("button 2");

@@ -1249,18 +1249,11 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
 };
 
 /**
- * Asynchronously retrieves all definitions in storage and adds to saved component configs.
+ * Asynchronously retrieves all definitions from storage and adds to saved component config or library registry.
+ * @return {Promise} a promise that resolves when definitions are restored.
  */
 AuraComponentService.prototype.restoreDefsFromStorage = function () {
-    this.componentDefStorage.restoreAll();
-};
-
-/**
- * Asynchronously retrieves all definitions in storage
- * @return {Promise}
- */
-AuraComponentService.prototype.getDefsFromStorage = function () {
-    return this.componentDefStorage.getAll();
+    return this.componentDefStorage.restoreAll();
 };
 
 /**
@@ -1450,7 +1443,7 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
     promises.push(actionsGetAll);
     promises.push(this.componentDefStorage.getAll());
 
-    // promise will reject if actions.getAll rejects
+    // promise will reject if either getAll rejects
     return Promise.all(promises).then(function (results) {
         var actionEntries = results[0];
         var defEntries    = results[1];

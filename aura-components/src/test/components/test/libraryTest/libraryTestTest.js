@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 ({
+    testUsingLibraryFunctionInHelper: {
+        test: function(cmp) {
+            var expected = "Message from Library Function";
+
+            var actual = cmp.helper.getMessageFromLibFunction();
+            $A.test.assertEquals(expected, actual);
+        }
+    },
+
     /**
      * The imported Include is loaded correctly and hung off of the helper with property name given in the cmp.
      */

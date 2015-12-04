@@ -42,7 +42,7 @@
 
             $A.test.assertEquals('ltr', component.get('v.labelDir'), "Button label should be left to right by default");
 
-            $A.test.assertEquals("", component.get('v.accesskey'), "Button should have no shortcut key by default");
+            $A.test.assertUndefined(component.get('v.accesskey'), "Button should have no shortcut key by default");
             $A.test.assertEquals("", element.accessKey, "By default dom element for ui:button should have no shortcut key");
         }
     },

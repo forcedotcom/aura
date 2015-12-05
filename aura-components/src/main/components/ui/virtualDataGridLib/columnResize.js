@@ -315,11 +315,21 @@ function lib(w){ //eslint-disable-line no-unused-vars
 				z : element._z || 0
 			};
 		},
-		
+
 		_setTranslatedPosition: function(element, coord, value) {
 			element['_' + coord] = value;
 		},
-		
+
+
+		_addTableWidth: function(width) {
+			var currentTableWidth = this.tableWidth;
+			if (this.table.offsetParent !== null) {
+				currentTableWidth = this.table.clientWidth;
+			}
+			this.tableWidth = currentTableWidth + width;
+			this.table.style.width = this.tableWidth + 'px';
+		},
+
 		/**
 		 * Resizes the specified column to the target width and
 		 * updates the total table width
@@ -339,13 +349,13 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	
 	    	// Resize the column
 	    	this._resize(column, targetWidth);
-	    	this.table.style.width = (this.table.clientWidth + diff) + 'px';
+			this._addTableWidth(diff);
 	    	
 	    	// If the column width is invalid, we've failed to force the width of the column. To avoid inconsistencies
 	    	// between the style and the calculated width, we should reset the style to the calculated width.
 	    	if (!this.isValid(column)) {
 	    		this._resize(column, column.clientWidth);
-	    		this.table.style.width = (this.table.clientWidth + (column.clientWidth - targetWidth)) + 'px';
+				this._addTableWidth(column.clientWidth - targetWidth);
 	    	}
 	    	
 	    	// Update the value on the range input attached to this column
@@ -604,7 +614,11 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @return {Boolean} Whether the column's calculated width matches the specified width
 		 */
 		isValid : function(column) {
-			return ((column.clientWidth + 'px') === column.style.width);
+			//this detection only works if the column is visible so we check for that with offsetParent
+			if (column.offsetParent === null) {
+				return true;
+			}
+			return  ((column.clientWidth + 'px') === column.style.width);
 		},
 		
 		/**
@@ -650,8 +664,12 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * Manually resize all columns
 		 */
 		resizeAll : function(widths) {
+			this.tableWidth = 0;
 			for (var i = 0; i < widths.length; i++) {
 				this.resize(i, widths[i]);
+			}
+			for (var j = i; j < this.columns.length; j++) {
+				this.resize(j, this.config.minWidth);
 			}
 		},
 		

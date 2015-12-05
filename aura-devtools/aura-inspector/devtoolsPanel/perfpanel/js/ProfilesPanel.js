@@ -1674,6 +1674,7 @@ WebInspector.CPUProfileView.prototype = {
         this.samplingIntervalMs = samplingInterval;
 
         function calculateTimesForNode(node) {
+            if(!node) { return 0;}
             node.selfTime = node.hitCount * samplingInterval;
             var totalHitCount = node.hitCount;
             for (var i = 0; i < node.children.length; i++)

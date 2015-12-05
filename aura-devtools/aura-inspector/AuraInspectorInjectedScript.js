@@ -149,7 +149,6 @@
                     // Actions Tab
                     bootstrapActionsInstrumentation();
                  } catch(e){
-                    console.log('build action run into exception:', e);
                  }
                  try {
                     // Perf Tab
@@ -171,13 +170,34 @@
     };
 
     // Subscribes!
-    $Aura.Inspector.subscribe("AuraInspector:OnBootstrap", $Aura.actions["AuraDevToolService.Bootstrap"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function AuraInspector_OnPanelLoad() {
+        $Aura.actions["AuraDevToolService.Bootstrap"]();
+        // We only want to do the bootstrap the first time the page loads.
+        // If you close the dev tools and reopen then, we'll get a second onPanelLoad, but we should ignore that. 
+        // At least in regards to bootstrapping
+        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelConnect", AuraInspector_OnPanelLoad);
+        
+        $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function () {
+            $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+        });
+
+        $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+    });
+
+    $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
+        $Aura.actions["AuraDevToolService.Bootstrap"]();
+        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
+    });
+
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
 
+
+
+    
 
     function AuraInspector() {
 
@@ -215,6 +235,20 @@
             }
 
             subscribers.get(key).push(callback);
+        };
+
+        this.unsubscribe = function(key, callback) {
+            if(!key || !callback) { return false; }
+
+            if(!subscribers.has(key)) { 
+                return false;
+            }
+
+            var listeners = subscribers.get(key);
+            subscribers.set(key, listeners.filter(function(item){
+                return item !== callback;
+            }));
+
         };
 
         this.getComponent = function(componentId, options) {
@@ -697,27 +731,44 @@
             },
             _onTransactionEnd: function (t) {
                 setTimeout(function (){ 
-                // We do a timeout to give a chance to 
-                // other transactionEnd handlers to modify the transaction
-                    // window.postMessage({
-                    //     action  : "AuraDevToolService.OnTransactionEnd", 
-                    //     payload : t
-                    // }, '*');
-
+                    // We do a timeout to give a chance to 
+                    // other transactionEnd handlers to modify the transaction
                     $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
                 }, 0);
             },
 
             _initializeHooksComponentCreation: function () {
-                this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
+                this._hookOverride("ComponentService.createComponentPriv", CMP_CREATE_MARK);
+                
+                // newComponentDecprecated isn't the be all end all method anymore. Everything goes through createComponentPriv
+                //this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
             },
             getComponentCreationProfile: function () {
                 return this._generateCPUProfilerDataFromMarks(this.collector.componentCreation);
             },
+            _hookOverride: function(key, mark) {
+                $A.installOverride(key, function(){
+                    var config = Array.prototype.shift.apply(arguments);
+                    var cmpConfig = arguments[0];
+                    var descriptor = $A.util.isString(cmpConfig) ? cmpConfig : (cmpConfig["componentDef"]["descriptor"] || cmpConfig["componentDef"]) + '';
+
+                    var collector = this.collector[mark];
+                    collector.push(this._createNode(descriptor, mark + START_SUFIX));
+
+                    var ret = config["fn"].apply(config["scope"], arguments);
+
+                    var id = ret.getGlobalId && ret.getGlobalId() || "([ids])";
+                    collector.push(this._createNode(descriptor, mark + END_SUFIX, id));
+
+                    return ret;
+                }.bind(this), this);
+            },
             _hookMethod: function (host, methodName, mark) {
-                var self = this,
-                    hook = host[methodName];
-                self._hooks[methodName] = hook;
+                var self = this;
+                var hook = host[methodName];
+                var collector = this.collector[mark];
+
+                this._hooks[methodName] = hook;
                 host[methodName] = function (config) {
                     if (Array.isArray(config)) {
                         return hook.apply(this, arguments);
@@ -804,9 +855,11 @@
                 }
 
                 function generateSamples (root, size, idle) {
-                    var samples = Array.apply(0,Array(size)).map(function(){return idle.id;}),
-                        currentIndex = 0,
-                        idleHits = 0;
+                    var samples = new Array(size).join(","+idle.id).split(idle.id);
+                        samples[0] = idle.id;
+                    var currentIndex = 0;
+                    var idleHits = 0;
+
 
                     function calculateTimesForNode(node) {
                         if (node._idleHits) {

@@ -69,7 +69,7 @@
                     function callBootstrap() {
                         window.postMessage({
                             action  : "AuraInspector:publish",
-                            key: "AuraInspector:OnBootstrap"
+                            key: "AuraInspector:OnAuraInitialized"
                         }, '*');
                     }
                     var _$A;

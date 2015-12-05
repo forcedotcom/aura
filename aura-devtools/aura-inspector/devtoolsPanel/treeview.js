@@ -276,6 +276,7 @@ function AuraInspectorTreeView() {
     //var _childrenIndex = new Map();
     var events = new Map();
     var htmlToTreeNode = new WeakMap();
+    var container;
 
     // Constants
     var AUTO_EXPAND_LEVEL = 3;
@@ -298,12 +299,21 @@ function AuraInspectorTreeView() {
 
     this.clearChildren = function() {
         _children = [];
-        //_childrenIndex = new Map();
     };
 
     this.render = function(div, options) {
-        var container = document.createElement("ul");
+        if(!container) {
+            container = document.createElement("ul");
             container.className = "tree-view";
+
+            // Events
+            container.addEventListener("mouseout", Container_MouseOut.bind(this));
+            container.addEventListener("mouseover", Container_MouseOver.bind(this));
+            container.addEventListener("click", Container_Click.bind(this));
+            container.addEventListener("dblclick", Container_DblClick.bind(this));
+        } else {
+            container.innerHTML = "";
+        }
         div.innerHTML = "";
         // Configurable rendering options
         options = options || { 
@@ -321,11 +331,6 @@ function AuraInspectorTreeView() {
                div.appendChild(container);
             }
 
-            // Events
-            container.addEventListener("mouseout", Container_MouseOut.bind(this));
-            container.addEventListener("mouseover", Container_MouseOver.bind(this));
-            container.addEventListener("click", Container_Click.bind(this));
-            container.addEventListener("dblclick", Container_DblClick.bind(this));
         } catch(e) {
             alert([e.message, e.stack]);
         }
@@ -351,6 +356,15 @@ function AuraInspectorTreeView() {
                 item(eventInfo);
             });
          }
+    };
+
+    this.expandAll = function() {
+        var nodes = container.querySelectorAll("li.tree-view-parent");
+        for(var c=0,length=nodes.length;c<length;c++) {
+            if(!nodes[c].classList.contains("tree-view-expanded")) {
+                nodes[c].classList.add("tree-view-expanded");
+            }
+        }
     };
 
     /* Event Handlers */

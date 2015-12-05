@@ -11,6 +11,8 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var markup = `
         <menu type="toolbar">
             <li><button id="refresh-button"><span>Refresh</span></button></li>
+            <li><button id="expandall-button"><span>Expand All</span></button></li>
+            <li class="divider"></li>
             <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
         </menu>
         <div class="component-tree" id="tree"></div>
@@ -29,6 +31,9 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
         var refreshButton = tabBody.querySelector("#refresh-button");
             refreshButton.addEventListener("click", RefreshButton_OnClick.bind(this));
+
+        var expandAllButton = tabBody.querySelector("#expandall-button");
+            expandAllButton.addEventListener("click", ExpandAllButton_OnClick.bind(this));
 
         var showglobalidsCheckbox = tabBody.querySelector("#showglobalids-checkbox");
             showglobalidsCheckbox.addEventListener("change", ShowGlobalIdsCheckBox_Change.bind(this));
@@ -80,6 +85,10 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
     function RefreshButton_OnClick(event) {
         this.refresh();
+    }
+
+    function ExpandAllButton_OnClick(event) {
+        treeComponent.expandAll();
     }
 
     function ShowGlobalIdsCheckBox_Change(event) {

@@ -195,7 +195,7 @@
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
 
-
+    //$Aura.Inspector.subscribe("AuraInspector:OnContextMenu", $Aura.actions["AuraDevToolService.Inspect"]);
 
     
 
@@ -209,9 +209,17 @@
         var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var increment = 0;
+        var lastItemInspected;
 
         this.init = function() {
-            
+            // Add Rightclick handler. Just track what we rightclicked on.
+            addRightClickObserver();
+
+            this.subscribe("AuraInspector:ContextElementRequest", function(){
+                if(lastItemInspected) {
+                    this.publish("AuraInspector:OnInspectElement", lastItemInspected.getAttribute("data-aura-rendered-by"));
+                }
+            }.bind(this));
         };
 
         this.publish = function(key, data) {
@@ -471,6 +479,19 @@
                 postMessagesQueue = [];
                 batchPostId = null;
             }
+        }
+
+        function addRightClickObserver(){
+            document.addEventListener("mousedown", function(event){
+                // Right Click
+                if(event.button === 2) {
+                    var current = event.target;
+                    while(current && current != document && !current.hasAttribute("data-aura-rendered-by")) {
+                        current = current.parentNode;
+                    }
+                    lastItemInspected = current;
+                }
+            });
         }
     }
 

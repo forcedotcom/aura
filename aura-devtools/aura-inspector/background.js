@@ -18,6 +18,13 @@
             // onSuspend?
 
             chrome.runtime.onMessageExternal.addListener(BackgroundPage_OnMessageExternal.bind(this));
+
+            chrome.contextMenus.create({
+                title: "Inspect Aura Component", 
+                contexts:["all"], 
+                onclick: BackgroundPage_OnContextClick.bind(this),
+                documentUrlPatterns: ["*://*/*cmp*", "*://*/*app*"]
+            });
         };
 
         function BackgroundPage_OnConnect(port) {
@@ -60,6 +67,13 @@
                     stored.delete(tab.id); 
                 }
             }
+        }
+
+        function BackgroundPage_OnContextClick(event, tab) {
+            passMessageToDevTools({
+                action  : "AuraInspector:publish",
+                key: "AuraInspector:OnContextMenu"
+            }, tab.id);
         }
 
         function BackgroundPage_OnMessage(message, event) {

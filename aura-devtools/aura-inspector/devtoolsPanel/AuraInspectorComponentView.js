@@ -20,7 +20,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
         tabBody.classList.add("sidebar");
 
-        treeComponent = new AuraInspectorTreeView();
+        treeComponent = new AuraInspectorTreeView(container);
         treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
     };
 
@@ -99,7 +99,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
                 current = current.super;
             }
 
-            treeComponent.render(container);
+            treeComponent.render();
         } catch(e) {
             alert([e.message, e.stack]);
         }

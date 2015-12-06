@@ -59,6 +59,7 @@ menu aurainspector-onOffButton.on { background: rgba(0, 0, 0, .3); color: white;
 
 /* Component Tree */
 .component-tree { margin: 0 0 0 1em; padding: 0}
+.component-tree .tree-view li.tree-node-selected > span { background: rgb(225, 231, 253); }
 
 /* IFrame Tabs */
 section.tab-body.auraInspectorIFrameTab { overflow: hidden; }

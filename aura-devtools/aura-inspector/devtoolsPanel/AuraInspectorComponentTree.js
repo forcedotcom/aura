@@ -20,15 +20,14 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
     this.init = function(tabBody) {
         tabBody.innerHTML = markup;
+        treeElement = tabBody.querySelector("#tree");
 
-        treeComponent = new AuraInspectorTreeView();
+        treeComponent = new AuraInspectorTreeView(treeElement);
         treeComponent.attach("onhoverout", TreeComponent_OnHoverOut.bind(this));
         treeComponent.attach("onhover", TreeComponent_OnHover.bind(this));
         treeComponent.attach("onselect", TreeComponent_OnSelect.bind(this));
         treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
        
-        treeElement = tabBody.querySelector("#tree");
-
         var refreshButton = tabBody.querySelector("#refresh-button");
             refreshButton.addEventListener("click", RefreshButton_OnClick.bind(this));
 
@@ -40,6 +39,11 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
         AuraInspectorOptions.getAll({ "showGlobalIds": false }, function(options){
             tabBody.querySelector("#showglobalids-checkbox").checked = options.showGlobalIds;
+        });
+
+
+        devtoolsPanel.subscribe("AuraInspector:OnInspectElement", function(id) {
+            treeComponent.selectById(id);
         });
     };
 
@@ -64,8 +68,8 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         try {
             generateTree(_items, new TreeNode(), function(treeNode){
                 treeComponent.clearChildren();
-                treeComponent.addChildren(treeNode.getChildren());
-                treeComponent.render(treeElement, { "collapsable" : true });
+                treeComponent.addChild(treeNode);
+                treeComponent.render({ "collapsable" : true });
                 isDirty = false;
 
                 devtoolsPanel.hideLoading();

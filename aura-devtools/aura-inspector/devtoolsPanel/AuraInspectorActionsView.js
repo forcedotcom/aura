@@ -335,7 +335,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         var actionCardElement = event.target;
         if(actionCardElement && actionCardElement.getAttribute("actionId")) {
             actionCardElement.style.opacity = "0.5";            
-            createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId")).bind(this);
+            createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId"));
         } else {
             var command = "console.log('doubleClick.event.target or its actionId is missing');";
             chrome.devtools.inspectedWindow.eval(command);

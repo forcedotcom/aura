@@ -15,6 +15,8 @@
      * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)      
      * AuraInspector:OnPanelAlreadyConnected        The Aura Panel was already open, and we probably refreshed the page. The injected script will simply instrument the page at this point.
      * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.              
+     * AuraInspector:OnContextMenu                  User Selected the "Inspect Aura Component" option in the context menu. Handled in the inspected script. Does not contain the information on what they clicked on.
+     * AuraInspector:OnInspectElement               Contains the dom element that they right clicked and inspected. 
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
@@ -112,6 +114,11 @@
 
                 this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
                 this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
+
+                this.subscribe("AuraInspector:OnContextMenu", function() { 
+                    this.publish("AuraInspector:ContextElementRequest", {});
+                }.bind(this));
+
                 _initialized = true;
                 
                 if(typeof finishedCallback === "function") {

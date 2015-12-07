@@ -66,7 +66,7 @@
                             return returnValue;
                         }
                     }
-                    function callBootstrap() {
+                    function notifyDevTools() {
                         window.postMessage({
                             action  : "AuraInspector:publish",
                             key: "AuraInspector:OnAuraInitialized"
@@ -79,10 +79,10 @@
                         get: function() { return _$A; },
                         set: function(val) {
                             if(val && val.initAsync) {
-                                val.initAsync = wrap(val, val.initAsync, callBootstrap);
+                                val.initAsync = wrap(val, val.initAsync, notifyDevTools);
                             }
                             if(val && val.initConfig) {
-                                val.initConfig = wrap(val, val.initConfig, callBootstrap);
+                                val.initConfig = wrap(val, val.initConfig, notifyDevTools);
                             }
                             _$A = val;
                         }

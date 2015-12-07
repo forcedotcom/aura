@@ -38,7 +38,7 @@ function AuraInspectorDefinitionsList(devtoolsPanel) {
 
         //list.addEventListener("click", DefinitionsList_OnClick.bind(this));
 
-        tree = new AuraInspectorTreeView();
+        tree = new AuraInspectorTreeView(list);
         tree.attach("onselect", DefinitionsList_OnClick.bind(this));
         tree.attach("ondblselect", DefinitionsList_OnDblClick.bind(this));
     };
@@ -65,7 +65,7 @@ function AuraInspectorDefinitionsList(devtoolsPanel) {
                 var nodes = generateTreeNodesForDescriptorList(_componentDescriptors, _eventDescriptors);
                 tree.clearChildren();
                 tree.addChildren(nodes);
-                tree.render(list, { "collapsable" : true });
+                tree.render({ "collapsable" : true });
             }
         });
     };

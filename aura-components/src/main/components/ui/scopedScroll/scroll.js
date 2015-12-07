@@ -16,16 +16,6 @@
 function lib() { //eslint-disable-line no-unused-vars
     var raf;
 
-    var mouseWheelHandlerWrapper = function (e) {
-        // debounce event with calculation
-        if (!raf) {
-            raf = window.requestAnimationFrame(function () {
-                mouseWheelHandler(e);
-                raf = null;
-            });
-        }
-    };
-
     var getSrollerWrapper = function (element) {
         var parent = element;
         while (parent && !parent._scopedScroll) {
@@ -59,6 +49,16 @@ function lib() { //eslint-disable-line no-unused-vars
             e.preventDefault();
         } else {
             e.scopedScroll = true;
+        }
+    };
+
+    var mouseWheelHandlerWrapper = function (e) {
+        // debounce event with calculation
+        if (!raf) {
+            raf = window.requestAnimationFrame(function () {
+                mouseWheelHandler(e);
+                raf = null;
+            });
         }
     };
 

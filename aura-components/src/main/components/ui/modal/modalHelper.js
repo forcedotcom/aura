@@ -189,6 +189,13 @@
             mask.style.opacity = 1;
         }
     },
+    scopeScrollables: function (cmp) {
+        var dom = cmp.getElement();
+        var scrollables = dom.querySelectorAll('.scrollable');
+        for (var i = 0; i < scrollables.length; i++) {
+            this.lib.panelLibCore.scopeScroll(scrollables[i]);
+        }
+    },
     
     unmask: function(cmp, useTransition, panel) {
     	var mask = this._findContainedComponent(cmp, 'modal-glass').getElement();

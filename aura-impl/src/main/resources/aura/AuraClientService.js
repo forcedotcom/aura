@@ -20,6 +20,8 @@
  * @private
  * @constructor
  */
+Aura.Services.AuraClientServiceMarker = 0;
+
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.length = 0;
     this.marker = 0;
@@ -1822,6 +1824,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
+    auraXHR.marker = Aura.Services.AuraClientServiceMarker++;
     auraXHR.request["open"](method, url, true);
     if ("withCredentials" in auraXHR.request) {
         auraXHR.request["withCredentials"] = true;

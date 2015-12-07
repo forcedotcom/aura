@@ -87,9 +87,9 @@ Aura.Services.MetricsService.prototype.instrument = function (instance, method, 
         }
 
         if (override) {
-            Array.prototype.unshift.call(arguments, original);
-            ret = override.apply(this, arguments);
-            Array.prototype.shift.call(arguments);
+            var xargs = Array.prototype.slice.call(arguments);
+            xargs.unshift(original);
+            ret = override.apply(this, xargs);
         } else {
             ret = original.apply(this, arguments);
         }

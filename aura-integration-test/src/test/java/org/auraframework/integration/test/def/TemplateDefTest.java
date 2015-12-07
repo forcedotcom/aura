@@ -22,6 +22,7 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.instance.Component;
+import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 
 /**
@@ -188,18 +189,22 @@ public class TemplateDefTest extends AuraImplTestCase {
         }
     }
 
+    private static String SCRIPT_INCLUDE = "<script type='text/javascript' src='/aura/ckeditor/ckeditor.js'></script>";
+    private static String SCRIPT_EXCEPT_MESSAGE = "script tags only allowed in privileged templates";
+
     /**
      * Valid usage of script tags.
      * 
      * @throws Exception
      */
-    public void testValidScriptTags() throws Exception {
+    public void testValidScriptInTemplate() throws Exception {
         // Script tags inline in a template markup
-        String scriptInclude = "<script type='text/javascript' src='/aura/ckeditor/ckeditor.js'></script>";
         DefDescriptor<ComponentDef> scriptTagInBodyOfTemplate = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "isTemplate='true'", scriptInclude));
-        assertExceptionDueToScripts("Failed to use script tag in template", scriptTagInBodyOfTemplate, false);
+                String.format(baseComponentTag, "isTemplate='true'", SCRIPT_INCLUDE));
+        scriptTagInBodyOfTemplate.getDef();
+    }
 
+    public void testValidScriptInTemplateAsAttribute() throws Exception {
         // Script tags as attribute value of parent template
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "isTemplate='true' extensible='true'",
@@ -208,14 +213,62 @@ public class TemplateDefTest extends AuraImplTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("isTemplate='true' extends='%s:%s'", parent.getNamespace(), parent.getName()),
-                        String.format("<aura:set attribute='scriptTags'>%s</aura:set>", scriptInclude)));
-        assertExceptionDueToScripts("Failed to use script tag as attribute value of parent", scriptTagInAuraSet, false);
+                        String.format("<aura:set attribute='scriptTags'>%s</aura:set>", SCRIPT_INCLUDE)));
+        scriptTagInAuraSet.getDef();
+    }
 
+    public void testValidScriptInApplication() throws Exception {
         // Script tags inline in a application markup
         DefDescriptor<ApplicationDef> scriptTagInBodyOfApp = addSourceAutoCleanup(ApplicationDef.class,
-                String.format(baseApplicationTag, "", scriptInclude));
-        assertExceptionDueToScripts("Failed to use script tag in application", scriptTagInBodyOfApp, false);
+                String.format(baseApplicationTag, "", SCRIPT_INCLUDE));
+        scriptTagInBodyOfApp.getDef();
+    }
 
+    /**
+     * Invalid usage of script tag in a component (not a template).
+     * 
+     * @throws Exception
+     */
+    public void testInvalidScriptTagsInComponent() throws Exception {
+        DefDescriptor<ComponentDef> scriptTagInBodyOfComponent = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", SCRIPT_INCLUDE));
+        try {
+            scriptTagInBodyOfComponent.getDef();
+            fail("Script tags should not be allowed in components");
+        } catch (InvalidDefinitionException e) {
+            assertTrue(e.getMessage().contains(SCRIPT_EXCEPT_MESSAGE));
+        }
+    }
+
+    public void testInvalidScriptInUnprivilegedApplication() throws Exception {
+        // Script tags inline in a application markup
+        DefDescriptor<ApplicationDef> scriptTagInBodyOfApp = addSourceAutoCleanup(ApplicationDef.class,
+                String.format(baseApplicationTag, "", SCRIPT_INCLUDE),
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":thing", false);
+        try {
+            scriptTagInBodyOfApp.getDef();
+            fail("Script tags should not be allowed in unprivileged namespaces");
+        } catch (InvalidDefinitionException e) {
+            assertTrue(e.getMessage().contains(SCRIPT_EXCEPT_MESSAGE));
+        }
+    }
+
+    /**
+     * Invalid usage of script tag in an unprivileged template.
+     * 
+     * @throws Exception
+     */
+    public void testInvalidScriptTagsInUnprivilegedTemplate() throws Exception {
+        // Script tags inline in a component markup
+        DefDescriptor<ComponentDef> scriptTagInUnprivileged = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "isTemplate='true'", SCRIPT_INCLUDE),
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":thing", false);
+        try {
+            scriptTagInUnprivileged.getDef();
+            fail("Script tags should not be allowed in unprivileged namespaces");
+        } catch (InvalidDefinitionException e) {
+            assertTrue(e.getMessage().contains(SCRIPT_EXCEPT_MESSAGE));
+        }
     }
 
     /**
@@ -223,13 +276,31 @@ public class TemplateDefTest extends AuraImplTestCase {
      * 
      * @throws Exception
      */
-    public void testInvalidScriptTags() throws Exception {
-        // Script tags inline in a component markup
-        String scriptInclude = "<script type='text/javascript' src='/aura/ckeditor/ckeditor.js'></script>";
-        DefDescriptor<ComponentDef> scriptTagInBodyOfComponent = addSourceAutoCleanup(ComponentDef.class,
-                String.format(baseComponentTag, "", scriptInclude));
-        assertExceptionDueToScripts("Script tags should not be allowed in components", scriptTagInBodyOfComponent, true);
+    public void testInvalidScriptTagsInUnprivilegedAttribute() throws Exception {
+        // Script tags as attribute value of parent component
+        DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "extensible='true' isTemplate='true' ",
+                        "<aura:attribute name='scriptTags' type='String'/>"));
+        DefDescriptor<ComponentDef> scriptTagInAuraSet = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag,
+                        String.format("extends='%s:%s'", parent.getNamespace(), parent.getName()),
+                        String.format("<aura:set attribute='scriptTags'>%s</aura:set>", SCRIPT_INCLUDE)),
+                StringSourceLoader.DEFAULT_CUSTOM_NAMESPACE+":thing", false);
+        try {
+            scriptTagInAuraSet.getDef();
+            fail("Script tags should not be allowed as attribute value in unprivileged templates");;
+        } catch (InvalidDefinitionException e) {
+            assertTrue(e.getMessage().contains(SCRIPT_EXCEPT_MESSAGE));
+        }
+    }
 
+    /**
+     * Invalid usage of script tags.
+     * 
+     * @throws Exception
+     */
+    public void testInvalidScriptTagsInAttribute() throws Exception {
         // Script tags as attribute value of parent component
         DefDescriptor<ComponentDef> parent = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "extensible='true'",
@@ -238,9 +309,13 @@ public class TemplateDefTest extends AuraImplTestCase {
                 ComponentDef.class,
                 String.format(baseComponentTag,
                         String.format("extends='%s:%s'", parent.getNamespace(), parent.getName()),
-                        String.format("<aura:set attribute='scriptTags'>%s</aura:set>", scriptInclude)));
-        assertExceptionDueToScripts("Script tags should not be allowed as attribute value in components",
-                scriptTagInAuraSet, true);
+                        String.format("<aura:set attribute='scriptTags'>%s</aura:set>", SCRIPT_INCLUDE)));
+        try {
+            scriptTagInAuraSet.getDef();
+            fail("Script tags should not be allowed as attribute value in components");;
+        } catch (InvalidDefinitionException e) {
+            assertTrue(e.getMessage().contains(SCRIPT_EXCEPT_MESSAGE));
+        }
     }
 
     // Automation for W-1584537
@@ -267,23 +342,6 @@ public class TemplateDefTest extends AuraImplTestCase {
                 result.contains("<meta content=\"testtest\" name=\"firstThingDefault\""));
     }
 
-    private void assertExceptionDueToScripts(String msg, DefDescriptor<? extends BaseComponentDef> desc,
-            boolean expectException) {
-        try {
-            desc.getDef();
-            if (expectException) {
-                fail(msg);
-            }
-        } catch (Exception e) {
-            if (expectException && e instanceof InvalidDefinitionException) {
-                assertTrue(e.getMessage().contains("script tags only allowed in templates"));
-                return;
-            } else {
-                fail(msg);
-            }
-        }
-    }
-    
     /**
      * Verify the new errorTitle attribute, with default error message.
      */

@@ -222,8 +222,9 @@ implements ExpressionContainerHandler {
             RootTagHandler<P> parentHandler) throws DefinitionNotFoundException {
         String tag = getTagName();
         if (HtmlTag.allowed(tag)) {
-            if (!parentHandler.getAllowsScript() && SCRIPT_TAG.equals(tag.toLowerCase())) {
-                throw new AuraRuntimeException("script tags only allowed in templates", getLocation());
+            if ((!parentHandler.getAllowsScript() || !isInPrivilegedNamespace)
+                    && SCRIPT_TAG.equals(tag.toLowerCase())) {
+                throw new AuraRuntimeException("script tags only allowed in privileged templates", getLocation());
             }
             return new HTMLComponentDefRefHandler<>(parentHandler, tag, xmlReader, source);
         } else {

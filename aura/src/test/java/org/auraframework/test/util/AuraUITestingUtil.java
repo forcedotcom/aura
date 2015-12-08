@@ -742,7 +742,7 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<Boolean>() {
                     @Override
                     public Boolean apply(WebDriver d) {
-                        return getBooleanEval("return window.$A && window.$A.test && window.$A.test.isComplete();");
+                        return getBooleanEval("return (window.$A && window.$A.test && window.$A.test.isComplete()) || false;");
                     }
                 },
                 new ExpectedCondition<String>() {

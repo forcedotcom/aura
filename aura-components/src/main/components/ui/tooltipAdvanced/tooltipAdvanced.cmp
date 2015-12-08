@@ -20,7 +20,7 @@
     <aura:import library="ui:tooltipLib"     property="ttLib" />
     <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>
     <aura:attribute name="tooltipBody" type="String" default="false" description="The message to display in the tooltip"/>
-    <aura:attribute name="target" type="Aura.Component" access="INTERNAL" />
+    <aura:attribute name="target" type="Aura.Component" access="INTERNAL" description="The global id of the element to point at"/>
     <aura:attribute name="classList" type="String" access="INTERNAL" />
     <aura:attribute name="direction" type="String" access="INTERNAL" />
     <aura:attribute name="advanced" type="Boolean" access="INTERNAL" default="true" />
@@ -38,11 +38,12 @@
  
 
     <aura:handler name="change" value="{!v.isVisible}" action="{!c.handleVis}"/>
+    <aura:handler name="change" value="{!v.tooltipBody}" action="{!c.handleVis}"/>
 
     <div class="{!v.classList}" aura:flavorable="true" aura:id="tooltip" style="{!v.tooltipStyle}" aria-hidden="{!!v.isVisible}">
         <div aura:id="tooltipwrapper">
             <div class="pointer pointer-advanced"></div>
-            <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body">{!v.class}{!v.tooltipBody}</div>
+            <div aura:id="tooltipbody" class="tooltip-advanced tooltip-body">{!v.tooltipBody}</div>
         </div>
     </div>
 </aura:component>

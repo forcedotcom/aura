@@ -42,7 +42,9 @@
 	},
 
 	hide: function(cmp) {
-		cmp.set('v.classList', this.ttLib.tooltip.getClassList(cmp).join(' '));
+		if(cmp.isValid()) {
+			cmp.set('v.classList', this.ttLib.tooltip.getClassList(cmp).join(' '));
+		}
 		
 	},
 
@@ -55,7 +57,7 @@
 		var classList = component.get('v.classList');
 		
 		var pointer = node.querySelector('.pointer');
-		var target = component.get('v.target').getElement();
+		var target = $A.getComponent(component.get('v.target')).getElement();
 
 		var allowFlips = $A.util.getBooleanValue(component.get('v.allowFlips'));
 		var boundingRect = target.getBoundingClientRect();

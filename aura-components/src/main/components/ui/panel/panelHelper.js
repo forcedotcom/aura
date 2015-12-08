@@ -38,7 +38,7 @@
     _getKeyHandler: function(cmp) {
         if (!cmp._keyHandler && cmp.isValid()) {
         	var closeAction = cmp.get("v.closeAction");
-            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, trapFocus: true}, closeAction);
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
         }
         return cmp._keyHandler;
     },

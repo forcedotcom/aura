@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component description="This is the tooltip advanced subcomponent, used by tooltip.cmp. DO NOT USE ALONE">
+<aura:component description="A tooltip advanced subcomponent for use in tooltip.cmp. DO NOT USE.">
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:import library="ui:tooltipLib"     property="ttLib" />
     <aura:attribute name="isVisible" type="Boolean" description="Specifies whether the tooltip is visible. The default is &quot;false&quot;." default="false"/>

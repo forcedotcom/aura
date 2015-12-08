@@ -729,6 +729,8 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             if (!returnedConfig["attributes"]) {
                 returnedConfig["attributes"] = {};
             }
+            returnedConfig["attributes"]["valueProvider"] = avp;
+
             var merging = returnedConfig["attributes"];
             if (merging.hasOwnProperty("values")) {
                 merging = merging["values"];
@@ -739,8 +741,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             returnedConfig["localId"] = config["localId"];
             returnedConfig["flavor"] = config["flavor"];
 
+
             try {
-                newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
+                newComp = $A.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
@@ -749,10 +752,13 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";
             if(!returnNullOnError) {
-                newComp = $A.newCmpDeprecated("markup://aura:text");
-                newComp.set("v.value", statusMessage);
+                newComp = $A.createComponentPriv({
+                    "componentDef": { "descriptor": "markup://aura:text" },
+                    "attributes": { "values": { "value" : statusMessage } }
+                });
             }
         }
+
         if ( $A.util.isFunction(callback) ) {
             callback.call(callbackScope, newComp, status, statusMessage, index);
         }

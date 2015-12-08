@@ -177,8 +177,8 @@ public class ComponentJSTest extends TestSuite {
 
         public String getUrl() {
             DefType defType = caseDef.getDefType();
-            return String.format("%s?aura.jstestrun=%s&aura.testReset=true&aura.test=%s", suite.getUrl(defType),
-                    caseDef.getName(), getQualifiedName());
+            return String.format("%s?aura.jstestrun=%s&aura.testReset=true", suite.getUrl(defType),
+                    caseDef.getName());
         }
 
         /**

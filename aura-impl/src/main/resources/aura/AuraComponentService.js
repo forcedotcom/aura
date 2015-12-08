@@ -699,7 +699,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
+
     var atts = {};
+    var self = this;
 
     //
     // Note to self, these attributes are _not_ Aura Values. They are instead either
@@ -743,7 +745,7 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
 
 
             try {
-                newComp = $A.createComponentPriv(returnedConfig);
+                newComp = self.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
@@ -752,7 +754,7 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";
             if(!returnNullOnError) {
-                newComp = $A.createComponentPriv({
+                newComp = self.createComponentPriv({
                     "componentDef": { "descriptor": "markup://aura:text" },
                     "attributes": { "values": { "value" : statusMessage } }
                 });

@@ -16,8 +16,9 @@
 package org.auraframework.def.design;
 
 import org.auraframework.def.Definition;
+import org.auraframework.def.ParentedDef;
 
-public interface DesignAttributeDef extends Definition {
+public interface DesignAttributeDef extends Definition, ParentedDef{
     /**
      * Get the attribute design time requiredness
      * 

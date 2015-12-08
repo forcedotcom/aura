@@ -15,11 +15,7 @@
  */
 package org.auraframework.impl.root.parser.handler.design;
 
-import java.util.Set;
-
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
+import com.google.common.collect.ImmutableSet;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 import org.auraframework.def.design.DesignDef;
@@ -31,7 +27,9 @@ import org.auraframework.system.Source;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
-import com.google.common.collect.ImmutableSet;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.util.Set;
 
 public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttributeDef, DesignDef> {
     public static final String TAG = "design:attribute";
@@ -116,6 +114,8 @@ public class DesignAttributeDefHandler extends ParentedTagHandler<DesignAttribut
         builder.setMinApi(minApi);
         builder.setMaxApi(maxApi);
         builder.setTranslatable(translatable);
+        builder.setParentDescriptor(getParentDefDescriptor());
+        builder.setIsPriviledgedNamespace(isInPrivilegedNamespace());
 
     }
 

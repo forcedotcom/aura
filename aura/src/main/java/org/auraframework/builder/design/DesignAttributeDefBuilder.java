@@ -16,37 +16,43 @@
 package org.auraframework.builder.design;
 
 import org.auraframework.builder.DefBuilder;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.RootDefinition;
 import org.auraframework.def.design.DesignAttributeDef;
 import org.auraframework.def.design.DesignAttributeDefaultDef;
 
 public interface DesignAttributeDefBuilder extends DefBuilder<DesignAttributeDef, DesignAttributeDef> {
-    public DesignAttributeDefBuilder setName(String name);
+    DesignAttributeDefBuilder setName(String name);
 
-    public DesignAttributeDefBuilder setLabel(String label);
+    DesignAttributeDefBuilder setLabel(String label);
 
-    public DesignAttributeDefBuilder setType(String type);
+    DesignAttributeDefBuilder setType(String type);
 
-    public DesignAttributeDefBuilder setRequired(boolean required);
+    DesignAttributeDefBuilder setRequired(boolean required);
 
-    public DesignAttributeDefBuilder setReadOnly(boolean readonly);
+    DesignAttributeDefBuilder setReadOnly(boolean readonly);
 
-    public DesignAttributeDefBuilder setDependsOn(String dependency);
+    DesignAttributeDefBuilder setDependsOn(String dependency);
 
-    public DesignAttributeDefBuilder setDataSource(String datasource);
+    DesignAttributeDefBuilder setDataSource(String datasource);
 
-    public DesignAttributeDefBuilder setMin(String min);
+    DesignAttributeDefBuilder setMin(String min);
 
-    public DesignAttributeDefBuilder setMax(String max);
+    DesignAttributeDefBuilder setMax(String max);
 
-    public DesignAttributeDefBuilder setPlaceholderText(String placeholder);
+    DesignAttributeDefBuilder setPlaceholderText(String placeholder);
 
-    public DesignAttributeDefBuilder setDefault(String defaultValue);
+    DesignAttributeDefBuilder setDefault(String defaultValue);
 
-    public DesignAttributeDefBuilder setDefault(DesignAttributeDefaultDef defaultValue);
+    DesignAttributeDefBuilder setDefault(DesignAttributeDefaultDef defaultValue);
 
-    public DesignAttributeDefBuilder setMinApi(String minApi);
+    DesignAttributeDefBuilder setMinApi(String minApi);
 
-    public DesignAttributeDefBuilder setMaxApi(String maxApi);
+    DesignAttributeDefBuilder setMaxApi(String maxApi);
 
-    public DesignAttributeDefBuilder setTranslatable(boolean translatable);
+    DesignAttributeDefBuilder setTranslatable(boolean translatable);
+
+    DesignAttributeDefBuilder setParentDescriptor(DefDescriptor<? extends RootDefinition> parent);
+
+    DesignAttributeDefBuilder setIsPriviledgedNamespace(boolean priviledgedNamespace);
 }

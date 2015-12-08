@@ -767,8 +767,13 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheUpdateReady() {
-        if (window.applicationCache.swapCache && window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-            window.applicationCache.swapCache();
+        var appCache = window.applicationCache;
+        if (appCache.swapCache && appCache.status === appCache.UPDATEREADY) {
+            try {
+                appCache.swapCache();
+            } catch(ignore) {
+                // protect against InvalidStateError with swapCache even when UPDATEREADY (weird)
+            }
         }
         dumpCachesAndReload();
     }

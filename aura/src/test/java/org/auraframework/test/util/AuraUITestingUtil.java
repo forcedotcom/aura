@@ -748,9 +748,9 @@ public class AuraUITestingUtil {
                 new ExpectedCondition<String>() {
                     @Override
                     public String apply(WebDriver d) {
-                        String dump = (String) getRawEval("return (window.$A && window.$A.test && window.$A.test.getDump())||'';");
+                        String dump = (String) getRawEval("return (window.$A && window.$A.test) ? window.$A.test.getDump() : 'window.$A.test not present in browser';");
                         if (dump.isEmpty()) {
-                            dump = "no test dump available.";
+                            dump = "no extra test information to display.";
                         }
                         return "Test dump - " + dump;
                     }

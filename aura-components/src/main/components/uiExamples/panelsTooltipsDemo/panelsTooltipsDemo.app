@@ -64,7 +64,7 @@
             </article>
             <article>
                 <h4>Tooltips</h4>
-                <p>This is a paragraph with a <ui:tooltip advanced="false" triggerClass="my-tt" tabIndex="-1" tooltipBody="This is a CSS-only tooltip, perfect for long lists. (long tooltips are ok too)" fadeInDuration="400">word</ui:tooltip> that has a tooltip on it.</p>
+                <p>This is a paragraph with a <ui:tooltip isVisible="true" advanced="false" triggerClass="my-tt" tabIndex="-1" tooltipBody="This is a CSS-only tooltip, perfect for long lists. (long tooltips are ok too)" fadeInDuration="400">word</ui:tooltip> that has a tooltip on it.</p>
                 <p><ui:tooltip aura:flavor="pop" triggerClass="my-tt" advanced="true" tooltipBody="The position adjusts to fit the viewport.">Here</ui:tooltip> is a tooltip that barely fits</p>
                 <p><ui:tooltip fadeInDuration="500" fadeOutDuration="500" triggerClass="my-tt" advanced="true" direction="east" trigger="click" tooltipBody="Also it fades in!">This one</ui:tooltip> you trigger with a click</p>
                 <p>This one is <ui:tooltip aura:flavor="pop" fadeInDuration="500" fadeOutDuration="500" direction="east" triggerClass="my-tt" advanced="true" tooltipBody="This is tooltip goes to the east, also supported: south and west!">east</ui:tooltip></p>

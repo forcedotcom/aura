@@ -49,16 +49,6 @@
             helper.initStyle(component);
         }
         return this.superRerender();
-    },
-
-    afterRender: function(component) {
-        var ret = this.superAfterRender();
-        if(component.get('v.isVisible')){
-        	component.getElement().classList.add('visible');
-        }
-        
-        
-        return ret;
     }
 
 })// eslint-disable-line semi

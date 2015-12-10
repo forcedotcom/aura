@@ -54,6 +54,8 @@
     <aura:method name="show" access="INTERNAL"/>
     <aura:method name="hide" access="INTERNAL"/>
 
+    <aura:handler name="change" value="{!v.tooltipBody}" action="{!c.handleBodyChange}"/>
+
     <aura:dependency resource="markup://ui:tooltipAdvanced" type="COMPONENT"/>
     <aura:if isTrue="{!v.advanced}">
         <div aura:flavorable="true" 

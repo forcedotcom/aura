@@ -83,7 +83,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
-    private static final Set<String> CANONICAL_NAMESPACES = Sets.newHashSet();
+    private static final Set<String> CANONICAL_NAMESPACES = Sets.newTreeSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
 

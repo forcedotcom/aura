@@ -700,7 +700,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
+
     var atts = {};
+    var self = this;
 
     //
     // Note to self, these attributes are _not_ Aura Values. They are instead either
@@ -730,6 +732,8 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             if (!returnedConfig["attributes"]) {
                 returnedConfig["attributes"] = {};
             }
+            returnedConfig["attributes"]["valueProvider"] = avp;
+
             var merging = returnedConfig["attributes"];
             if (merging.hasOwnProperty("values")) {
                 merging = merging["values"];
@@ -740,8 +744,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             returnedConfig["localId"] = config["localId"];
             returnedConfig["flavor"] = config["flavor"];
 
+
             try {
-                newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
+                newComp = self.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
@@ -750,10 +755,13 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";
             if(!returnNullOnError) {
-                newComp = $A.newCmpDeprecated("markup://aura:text");
-                newComp.set("v.value", statusMessage);
+                newComp = self.createComponentPriv({
+                    "componentDef": { "descriptor": "markup://aura:text" },
+                    "attributes": { "values": { "value" : statusMessage } }
+                });
             }
         }
+
         if ( $A.util.isFunction(callback) ) {
             callback.call(callbackScope, newComp, status, statusMessage, index);
         }
@@ -1250,18 +1258,11 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
 };
 
 /**
- * Asynchronously retrieves all definitions in storage and adds to saved component configs.
+ * Asynchronously retrieves all definitions from storage and adds to saved component config or library registry.
+ * @return {Promise} a promise that resolves when definitions are restored.
  */
 AuraComponentService.prototype.restoreDefsFromStorage = function () {
-    this.componentDefStorage.restoreAll();
-};
-
-/**
- * Asynchronously retrieves all definitions in storage
- * @return {Promise}
- */
-AuraComponentService.prototype.getDefsFromStorage = function () {
-    return this.componentDefStorage.getAll();
+    return this.componentDefStorage.restoreAll();
 };
 
 /**
@@ -1376,9 +1377,6 @@ AuraComponentService.prototype.createComponentPriv = function (config) {
     return new classConstructor(config);
 };
 
-
-
-
 /*
  * ====================================================================
  * PERSISTENT CACHE EVICTION LOGIC
@@ -1451,7 +1449,7 @@ AuraComponentService.prototype.buildDependencyGraph = function() {
     promises.push(actionsGetAll);
     promises.push(this.componentDefStorage.getAll());
 
-    // promise will reject if actions.getAll rejects
+    // promise will reject if either getAll rejects
     return Promise.all(promises).then(function (results) {
         var actionEntries = results[0];
         var defEntries    = results[1];
@@ -1684,7 +1682,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * Prunes component definitions and dependent actions from persistent storage.
  *
  * This is the entry point for dependency graph generation, analysis, and
- * eviction. Eviction proceedsuntil the component def storage is under a threshold
+ * eviction. Eviction proceeds until the component def storage is under a threshold
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.

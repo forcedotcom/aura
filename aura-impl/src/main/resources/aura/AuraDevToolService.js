@@ -517,7 +517,7 @@ var AuraDevToolService = function() {
         	 var errorArray = [];
         	 var imgType = "";
         	 var alt = "";
-
+        	 
         	 for(var index = 0; index < allImgTags.length; index++){
         	     data_aura_rendered_by = $A.util.getElementAttributeValue(allImgTags[index], "data-aura-rendered-by");
         	     imgType = null;
@@ -526,10 +526,13 @@ var AuraDevToolService = function() {
         	   // Checking for the data_aura_rendered_by attribute
          	   if(!$A.util.isEmpty(data_aura_rendered_by)){
                    var component = $A.getCmp(data_aura_rendered_by);
-                   // This is to account for <img/> created both dynamically by image.cmp as well as the ones
-                   // that are within a .cmp and are therefore created by aura through the html.cmp template.
-                   imgType = component.getAttributeValueProvider().get('v.imageType') || component.get('v.imageType');
-                   alt     = component.getAttributeValueProvider().get('v.alt') || component.get('v.alt');
+                   if(!$A.util.isUndefinedOrNull(component)){
+                	   // This is to account for <img/> created both dynamically by image.cmp as well as the ones
+                       // that are within a .cmp and are therefore created by aura through the html.cmp template.
+                       imgType = component.getAttributeValueProvider().get('v.imageType') || component.get('v.imageType');
+                       alt     = component.getAttributeValueProvider().get('v.alt') || component.get('v.alt');
+                   }
+                
          	    }
 
          	     //Checking for injected image tag

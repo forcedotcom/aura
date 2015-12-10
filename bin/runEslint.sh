@@ -1,3 +1,3 @@
 #!/bin/sh
-rm ./aura-impl/target/eslint-output || true
-mvn pre-clean -Peslint || cat ./aura-impl/target/eslint-output
+rm ./aura-impl/src/test/eslint/eslint-output || true
+mvn pre-clean -Peslint || cat ./aura-impl/src/test/eslint/eslint-output

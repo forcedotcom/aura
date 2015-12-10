@@ -12,16 +12,11 @@
 	auracomponent.attachedCallback = function() {
 		var _data = this.getAttribute("componentData");
 		if(!_data) {
-            // This is currently way to expensive.
-            // We need to not return the body or the attribute value provider
-            // before we can realistically do this.
-            var shadowRoot = this.shadowRoot || this.createShadowRoot();
-            shadowRoot.appendChild(document.createTextNode(this.getAttribute("globalId")));
-			// getComponentData(this.getAttribute("globalId"), function(data) {
-			// 	_data = data;
-			// 	this.setAttribute("componentData", _data);
-			// 	render(this, _data);
-			// }.bind(this));
+			getComponentData(this.getAttribute("globalId"), function(data) {
+				_data = data;
+				this.setAttribute("componentData", _data);
+				render(this, _data);
+			}.bind(this));
 		} else {
             // If we do a setAttribute("componentData", "JSONSTRING"); 
             // It would be nice if it just worked.
@@ -77,24 +72,7 @@
 	}
 
 	function getComponentData(globalId, callback) {		
-		var cmd = `
-            var component = $A.getComponent("${globalId}");
-            if(component) { 
-                var result = component.toJSON();
-                var tmpResult = JSON.parse(result);
-                var elements = component.getElements() || [];
-                var elementCount = 0;
-                elements.forEach(function(current){
-                    // Sub elements
-                    elementCount += current.getElementsByTagName("*").length;
-                    // For the current element. 
-                    elementCount++;
-                });
-                tmpResult.elementCount = elementCount;
-
-                JSON.stringify(tmpResult);
-            }
-        `;
+		var cmd = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', {'body':false, 'elementCount': false});`;
 
         chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
             if(exceptionInfo) {

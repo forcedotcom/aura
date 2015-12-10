@@ -302,7 +302,10 @@ TestInstance.prototype.getDump = function() {
     var status = "";
     var errors = TestInstance.prototype.errors;
     if (errors.length > 0) {
-        status += "errors {" + $A.test.print($A.test.getErrors()) + "} ";
+        status += "errors {" + $A.test.print($A.test.getErrors()) + "}\n";
+    }
+    if (this.preErrors.length > 0) {
+        status += "errors during init {" + $A.test.print(this.preErrors) + "}\n";
     }
     if (this.waits.length > 0) {
         var actual;

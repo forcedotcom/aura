@@ -139,18 +139,6 @@ public class JavaModel implements Model {
         try {
             String part = key.getRoot();
             PropertyReference stem = key.getStem();
-            if(root instanceof JavascriptMockHandler.Returns) {
-                JavascriptMockHandler.Returns returnsValue = (JavascriptMockHandler.Returns)root;
-                
-                try {
-                    Object answer = returnsValue.answer();
-                    return getValue(answer, key, def);
-                } catch (Throwable e) {
-                    // The answer was an exception
-                    return e;
-                }
-                
-            }
             if (root == null) {
                 return null;
             } else if (root instanceof Map) {
@@ -170,7 +158,16 @@ public class JavaModel implements Model {
                     }
                     ret = ((List<?>) root).get(i);
                 }
-            } else {
+            } else if(root instanceof JavascriptMockHandler.Returns) {
+                try {
+                    Object answer = ((JavascriptMockHandler.Returns)root).answer();
+                    return getValue(answer, key, def);
+                } catch (Throwable e) {
+                    // The answer was an exception
+                    return e;
+                }
+            }
+            else {
                 Method meth = null;
                 try {
                     meth = root.getClass().getMethod("get" + AuraTextUtil.initCap(part));

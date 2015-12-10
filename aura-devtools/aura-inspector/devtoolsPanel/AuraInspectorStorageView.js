@@ -2,14 +2,13 @@
  * Inspector for Aura Storage Service.
  */
 function AuraInspectorStorageView(devtoolsPanel) {
-    /** Names of storages */
-    var stores = {};
-
     /** Data from Aura Storage Service to display */
     var data = {};
 
     /** Whether rerender is required */
     var dirty = true;
+
+    var firstLoad = true;
 
     /** Id for this view, must be unique among all views. */
     this.panelId = "storage";
@@ -34,16 +33,102 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
         // listen for removing storage item for action
         devtoolsPanel.subscribe("AuraInspector:RemoveStorageData", AuraInspector_RemoveData.bind(this));
-
-
-        // async fetch data about storages
-        getStoresAndData.bind(this)();
     };
 
     this.render = function() {
         if (!dirty) { return; }
         dirty = false;
 
+        if(firstLoad) {
+            firstLoad = false;
+            this.refresh();
+        } else {
+            drawStoragePanel();
+        }
+    };
+
+    this.refresh = function(){
+        this.clearData();
+        this.getStoresList(function(stores){
+            this.updateStores(stores, function() {
+                drawStoragePanel();
+                dirty = false;
+            });
+        }.bind(this));
+    };
+
+    this.updateStores = function(stores, allDoneCallback) {
+        var command;
+        var count = stores && stores.length || 0;
+        var processed = 0;
+
+        if(!count) {
+            allDoneCallback();
+            return;
+        }
+
+        for (var c=0;c<count;c++) {
+            var store = stores[c];
+            var command = `
+                var o_${store} = new Object();
+                var i_${store} = $A.storageService.getStorage('${store}');
+
+                // sync
+                o_${store}.name = i_${store}.getName();
+                o_${store}.maxSize = i_${store}.getMaxSize();
+                o_${store}.version = i_${store}.getVersion();
+
+                // async
+                i_${store}.getSize()
+                    .then(function(size) { o_${store}.size = size; }, function(err) { o_${store}.size = JSON.stringify(err); })
+                    .then(function() { return i_${store}.getAll(); })
+                    .then(function(all) { o_${store}.all = all; }, function(err) { o_${store}.all = JSON.stringify(err); })
+                    // last then() is to post the results to aura inspector
+                    .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, window.location.href); });
+
+                // sync return whatever properties we have
+                o_${store};
+            `;
+
+            chrome.devtools.inspectedWindow.eval(command, function(storeKey, response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { ++processed; return; }
+                this.setData(storeKey, response);
+
+                if(++processed === count) {
+                    allDoneCallback();
+                }
+            }.bind(this, store));
+        }
+    };
+
+    this.getStoresList = function(callback) {
+        var stores = [];
+
+        // must collect the store names before doing the cache update
+        var command = "Object.keys($A.storageService.getStorages());";
+        chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+            if(!response) { return; }
+            // Replace ' \' '  to '_' so that template strings doesn't break.
+            stores = response.map(function(name){ return name.replace('\'', '_'); });
+
+            if(callback) {
+                callback(stores);
+            }
+        });
+    };
+
+    this.setData = function(key, value) {
+        dirty = true;
+        data[key] = value;
+    };
+
+    this.clearData = function() {
+        dirty = true;
+        data = {};
+    }
+
+    function drawStoragePanel(){
         var formatted = {};
         var f, d;
         for (var i in data) {
@@ -86,43 +171,7 @@ function AuraInspectorStorageView(devtoolsPanel) {
         var node = document.getElementById("storage-viewer");
         node.removeChildren();
         node.appendChild(output);
-    };
-
-    this.updateCache = function() {
-        var command;
-        for (var key in stores) {
-            var store = stores[key];
-            var command = `
-                var o_${store} = new Object();
-                var i_${store} = $A.storageService.getStorage('${store}');
-
-                // sync
-                o_${store}.name = i_${store}.getName();
-                o_${store}.maxSize = i_${store}.getMaxSize();
-                o_${store}.version = i_${store}.getVersion();
-
-                // async
-                i_${store}.getSize()
-                    .then(function(size) { o_${store}.size = size; }, function(err) { o_${store}.size = JSON.stringify(err); })
-                    .then(function() { return i_${store}.getAll(); })
-                    .then(function(all) { o_${store}.all = all; }, function(err) { o_${store}.all = JSON.stringify(err); })
-                    // last then() is to post the results to aura inspector
-                    .then(function() { window.postMessage({action:'AuraInspector:publish', key: 'AuraInspector:StorageData', data:{ id:'${store}', data: JSON.stringify(o_${store})} }, window.location.href); });
-
-                // sync return whatever properties we have
-                o_${store};
-            `;
-
-            // Move this out of the devtools panel
-            devtoolsPanel.updateCacheViewer(this.panelId, store, command);
-        }
-    };
-
-    this.setData = function(key, value) {
-        dirty = true;
-        data[key] = value;
-        this.render();
-    };
+    }
 
     this.removeData = function(key) {
         dirty = true;
@@ -141,26 +190,15 @@ function AuraInspectorStorageView(devtoolsPanel) {
 
     function AuraInspector_StorageData(event) {
         this.setData(event.id, JSON.parse(event.data));
+        this.render();
     }
 
     function AuraInspector_RemoveData(event) {
         this.removeData(event.storageKey);
     }
 
-    function getStoresAndData() {
-        data = {}; // Refresh data before fetching new data
-        // must collect the store names before doing the cache update
-        var command = "Object.keys($A.storageService.getStorages());";
-        chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-            if(!response) { return; }
-            // Replace ' \' '  to '_' so that template strings doesn't break.
-            stores = response.map(function(x){ return x.replace('\'', '_'); });
-            this.updateCache();
-        }.bind(this));
-    }
-
     function RefreshButton_OnClick(event) {
-        getStoresAndData.bind(this)();
+        this.refresh();
     }
 
     /**

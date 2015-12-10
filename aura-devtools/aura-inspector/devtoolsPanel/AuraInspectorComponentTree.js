@@ -5,10 +5,14 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var _items = {};
     var isDirty = false;
     var initial = true;
+    var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+    var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
     var markup = `
         <menu type="toolbar">
             <li><button id="refresh-button"><span>Refresh</span></button></li>
+            <li><button id="expandall-button"><span>Expand All</span></button></li>
+            <li class="divider"></li>
             <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
         </menu>
         <div class="component-tree" id="tree"></div>
@@ -16,23 +20,30 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
     this.init = function(tabBody) {
         tabBody.innerHTML = markup;
+        treeElement = tabBody.querySelector("#tree");
 
-        treeComponent = new AuraInspectorTreeView();
+        treeComponent = new AuraInspectorTreeView(treeElement);
         treeComponent.attach("onhoverout", TreeComponent_OnHoverOut.bind(this));
         treeComponent.attach("onhover", TreeComponent_OnHover.bind(this));
         treeComponent.attach("onselect", TreeComponent_OnSelect.bind(this));
         treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
        
-        treeElement = tabBody.querySelector("#tree");
-
         var refreshButton = tabBody.querySelector("#refresh-button");
             refreshButton.addEventListener("click", RefreshButton_OnClick.bind(this));
+
+        var expandAllButton = tabBody.querySelector("#expandall-button");
+            expandAllButton.addEventListener("click", ExpandAllButton_OnClick.bind(this));
 
         var showglobalidsCheckbox = tabBody.querySelector("#showglobalids-checkbox");
             showglobalidsCheckbox.addEventListener("change", ShowGlobalIdsCheckBox_Change.bind(this));
 
         AuraInspectorOptions.getAll({ "showGlobalIds": false }, function(options){
             tabBody.querySelector("#showglobalids-checkbox").checked = options.showGlobalIds;
+        });
+
+
+        devtoolsPanel.subscribe("AuraInspector:OnInspectElement", function(id) {
+            treeComponent.selectById(id);
         });
     };
 
@@ -47,36 +58,48 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     this.render = function() {
         if(initial) {
             initial = false;
-            return devtoolsPanel.updateComponentTree();
+            return this.refresh();
         }
 
         if(!isDirty) {
             return;
         }
 
-        var treeNodes;
-
         try {
-            treeNodes = generateTreeNodes(_items);
+            generateTree(_items, new TreeNode(), function(treeNode){
+                treeComponent.clearChildren();
+                treeComponent.addChild(treeNode);
+                treeComponent.render({ "collapsable" : true });
+                isDirty = false;
+
+                devtoolsPanel.hideLoading();
+            });
         } catch(e) {
             alert([e.message, e.stack]);
         }
 
-        treeComponent.clearChildren();
-        treeComponent.addChildren(treeNodes);
-        treeComponent.render(treeElement, { "collapsable" : true });
-        isDirty = false;
+    };
+
+    this.refresh = function() {
+        devtoolsPanel.showLoading();
+        devtoolsPanel.getRootComponent(function(component){
+            this.setData(component);
+        }.bind(this));
     };
 
     function RefreshButton_OnClick(event) {
-        devtoolsPanel.updateComponentTree();
+        this.refresh();
+    }
+
+    function ExpandAllButton_OnClick(event) {
+        treeComponent.expandAll();
     }
 
     function ShowGlobalIdsCheckBox_Change(event) {
         var showGlobalIds = event.srcElement.checked;
         AuraInspectorOptions.set("showGlobalIds", showGlobalIds, function(options) {
-            devtoolsPanel.updateComponentTree(); 
-        });
+            this.refresh(); 
+        }.bind(this));
     }
 
     function TreeComponent_OnHoverOut(event) {
@@ -121,17 +144,122 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         }
     }
 
-    function generateTreeNodes(structure) {
+    function generateTree(rootComponent, currentTreeNode, callback) {
         var allnodes = new Set();
-        var root = new TreeNode();
 
         // Generates the whole tree
-        generateTreeNodeForConcreteComponent(structure, root);
+        generateTreeRecusively(rootComponent, currentTreeNode, callback);
         
-        return root.getChildren();
+        function generateTreeRecusively(component, treeNode, callback) {
+            var globalId = component.globalId;
+            if(allnodes.has(globalId)) { return callback(null); }
 
-        function generateTreeNodeForConcreteComponent(component, parent) {
-            if(!component || !component.descriptor) { return; }
+            var newTreeNode = createTreeNodeForComponent(component);
+            treeNode.addChild(newTreeNode);
+            allnodes.add(globalId);
+        
+            // Get Body ID's
+            getBodyFromComponent(component, function(bodyComponents){
+                var count = bodyComponents.length;
+                var processed = 0;
+
+                if(!count) {
+                    return callback(newTreeNode);
+                }
+
+                for(var c=0;c<bodyComponents.length;c++) {
+                    generateTreeRecusively(bodyComponents[c], newTreeNode, function(){
+                        if(++processed === count) {
+                            callback(newTreeNode);
+                        }
+                    });
+                }
+            });
+        }
+
+        function getBodyFromComponent(component, callback) {
+            var body = component.attributes.body;
+            var globalId = component.globalId;
+            var returnValue = [];
+            callback = callback || function(){}; // able to specify defaults in ES6?
+            if(body) {
+                var count;
+                var processed = 0;
+                var id;
+
+                // Start body building at the base component level and work your way up to the concrete.
+                var currentId = component.supers ? component.supers.reverse()[0] : component.globalId;
+                var currentBody = body[currentId];
+
+                getBodyFromIds(currentBody, function(bodyNodes){
+                    callback(flattenArray(bodyNodes))
+                });
+            } else if(isExpression(component) && isFacetArray(component.attributes.value)) {
+                
+                // Is an expression and a facet.    
+                getBodyFromIds(component.attributes.value, function(bodyNodes){
+                    callback(flattenArray(bodyNodes));
+                });
+            
+            } else  {
+                callback(returnValue);
+            }
+        }
+
+        function getBodyFromIds(ids, callback) {
+            var bodies = [];
+            var processed = 0;
+            var count = ids && ids.length;
+            
+            if(!count) {
+                return callback([]);
+            }
+
+            devtoolsPanel.getComponents(ids, function(components){
+                for(var c=0;c<components.length;c++) {
+                    bodies[c] = components[c];
+                    if(++processed === count) {
+                        callback(bodies);
+                    }
+                }
+            });
+
+        }
+
+        function isFacetArray(array) {
+            if(!Array.isArray(array)) { return false; }
+            for(var c=0;c<array.length;c++) {
+                if(!devtoolsPanel.isComponentId(array[c])) { return false; }
+            }
+            return true;
+        }
+
+        function flattenArray(array) {
+            var returnValue = [];
+            for(var c=0,length=array.length;c<length;c++) {
+                if(Array.isArray(array[c])) {
+                    returnValue = returnValue.concat(flattenArray(array[c]));
+                } else {
+                    returnValue.push(array[c]);
+                }
+            }
+            return returnValue;
+        }
+
+        function isComponentId(id) {
+            return id && id.startsWith(COMPONENT_CONTROL_CHAR);
+        }
+
+        function isExpression(cmp) {
+            return cmp && cmp.descriptor === "markup://aura:expression";
+        }
+
+        function cleanComponentId(id) {
+            return id && id.startsWith(COMPONENT_CONTROL_CHAR) ? id.substr(1) : id;
+        }
+
+        function createTreeNodeForComponent(component) {
+            if(!component) { return null; }
 
             var attributes = {
                 descriptor: component.descriptor,
@@ -148,9 +276,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 for(var property in component.attributes) {
                     if(!component.attributes.hasOwnProperty(property)) { continue; }
 
-                    if(property === "body") {
-                        body = getBody(component);
-                    }
+                    if(property === "body") {}
                     else if(component.expressions && component.expressions.hasOwnProperty(property)) {
                         //attributes.attributes[property] = component.expressions[property];
                         attributes.attributes[property] = component.expressions[property];
@@ -161,64 +287,12 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                 }
             }
 
-            var node = TreeNode.parse(attributes);
-
-            if(!allnodes.has(component.globalId)) {
-                allnodes.add(component.globalId);
-                
-                for(var c=0;c<body.length;c++) {
-                    generateTreeNodeForConcreteComponent(body[c], node);
-                }
-            }
-            
-            parent.addChild(node);
-        }
-
-        function getBody(component) {
-            if(!component) { return []; }
-
-            var ids = [];
-            var current = component;
-            do {
-                if(current.globalId) {
-                    ids.unshift(current.globalId);
-                }
-            } while(current = current.super);
-
-            return composeComponentBodies(ids, component);
-        }
-
-        function composeComponentBodies(hierarchy, cmp) {
-            if(!hierarchy.length) { return; }
-            var bodies;
-            var collection = [];
-            if(isExpression(cmp)) {
-                bodies = cmp.attributeValueProvider.attributes && cmp.attributeValueProvider.attributes.body || {};
-            } else {
-                bodies = cmp.attributes && cmp.attributes.body || {};
+            if(isExpression(component)) {
+                attributes.attributes.expression = component.expressions.value;
             }
 
-            var currentGlobalId = hierarchy.shift();
-            var currentBody = bodies[currentGlobalId] || [];
-            for(var c=0;c<currentBody.length;c++) {
-                if(isExpression(currentBody[c]) && currentBody[c].expressions.value === "{!v.body}") {
-                    // Get the body from the valueProvider
-                    if(cmp !== currentBody[c].attributeValueProvider) {
-                        var expressionBodies = composeComponentBodies([currentBody[c].attributeValueProvider.globalId], currentBody[c].attributeValueProvider);
-                        collection = collection.concat(expressionBodies);
-                    }
-                    // Must reference the Attribute Value provider for it's v.body
-                    collection = collection.concat(composeComponentBodies(hierarchy, currentBody[c]));
-                } else {
-                    collection.push(currentBody[c]);       
-                }
-            }
-            return collection;
+            return TreeNode.parse(attributes);
         }
-
-        function isExpression(cmp) {
-            return cmp && cmp.descriptor === "markup://aura:expression";
-        }
-
+    
     }
 }

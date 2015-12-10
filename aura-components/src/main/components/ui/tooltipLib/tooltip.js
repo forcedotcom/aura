@@ -25,12 +25,15 @@ function lib() { //eslint-disable-line no-unused-vars
                 direction          = component.get('v.direction'),
 
                 advanced           = component.get('v.advanced'),
+                isVisible          = component.get('v.isVisible'),
                 disabled           = component.get('v.disabled');
 
             var classList = ['tooltip'];
             
             if(advanced) {
                 classList.push('advanced-wrapper');
+            } else if(isVisible) {
+                classList.push('visible');
             }
 
             if(extraClass) {

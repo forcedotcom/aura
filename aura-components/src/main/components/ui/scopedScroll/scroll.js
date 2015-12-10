@@ -14,17 +14,31 @@
  * limitations under the License.
  */
 function lib() { //eslint-disable-line no-unused-vars
+    var raf;
+
+    var getSrollerWrapper = function (element) {
+        var parent = element;
+        while (parent && !parent._scopedScroll) {
+            parent = parent.parentElement;
+        }
+    };
+
     var mouseWheelHandler = function (e) {
-        var wrapper      = e.currentTarget;
+        if (e.scopedScroll) {
+            return;
+        }
+
+        var wrapper = e.currentTarget || getSrollerWrapper(e.target);
+
+        if (!wrapper) {
+            return;
+        }
+
         var scrollTop    = wrapper.scrollTop;
         var scrollHeight = wrapper.scrollHeight;
         var height       = wrapper.offsetHeight;
         var delta        = e.wheelDelta;
         var up           = delta > 0;
-
-        if (e.scopedScroll) {
-            return;
-        }
 
         if (!up && -delta > scrollHeight - height - scrollTop) {
             // Scrolling down, but this will take us past the bottom.
@@ -38,14 +52,28 @@ function lib() { //eslint-disable-line no-unused-vars
         }
     };
 
+    var mouseWheelHandlerWrapper = function (e) {
+        // debounce event with calculation
+        if (!raf) {
+            raf = window.requestAnimationFrame(function () {
+                mouseWheelHandler(e);
+                raf = null;
+            });
+        }
+    };
+
     return {
         scope: function (element) {
             var dom = typeof element === 'string' ? document.querySelector(element) : element;
-            dom.addEventListener('mousewheel', mouseWheelHandler, false);
+            if (dom && !dom._scopedScroll) {
+                dom.addEventListener('mousewheel', mouseWheelHandlerWrapper, false);
+                dom._scopedScroll = true;
+            }
         },
         unscope: function (element) {
             var dom = typeof element === 'string' ? document.querySelector(element) : element;
-            dom.removeEventListener('mousewheel', mouseWheelHandler, false);
+            dom.removeEventListener('mousewheel', mouseWheelHandlerWrapper, false);
+            dom._scopedScroll = false;
         }
     };
 }

@@ -17,6 +17,7 @@
 -->
 <aura:documentation>
 	<aura:description>
-        <p>Advanced tooltip used by tooltip.cmp. DO NOT USE ALONE</p>
+        <p>Do not use this component on its own. This component is dynamically created by <code>ui:tooltip</code> if <code>advanced="true"</code>. It wraps the tooltip in an actionable <code>div</code> container.
+        </p>
 	</aura:description>	
 </aura:documentation>

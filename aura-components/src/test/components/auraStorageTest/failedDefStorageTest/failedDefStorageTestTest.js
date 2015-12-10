@@ -86,21 +86,54 @@
      * After getting a new def from the server the framework will attempt to cache the def in persistent storage if
      * it's available. If the logic to save the def fails, we should clear the cache in an attempt to recover.
      */
-    testDefStorageClearedWhenOperationsFail: {
+    testDefStorageClearedWhenAllOperationsFail: {
         test: function(cmp) {
-            var completed = false;
+            var actual;
             $A.createComponent("test:text", {}, function(newCmp) {
-                completed = true;
+                actual = newCmp;
             });
-            
+
             $A.test.addWaitFor(
                     true,
                     function() {
-                        return completed;
+                        return actual !== undefined;
                     },
                     function() {
                         $A.test.assertTrue(window.mockComponentDefStorage.clearCallCount > 0,
                                 "Expected clear() to be called on ComponentDefStorage when storage operations fail");
+                        $A.test.assertEquals("markup://test:text", actual.getDef().getDescriptor().getQualifiedName(),
+                                "Unexpected component returned from createComponent() when storage operations fail");
+                    }
+            );
+        }
+    },
+
+    /**
+     * When we get a new def from the server we will attempt to prune the storages to see if items need to be evicted
+     * and then store the new defs to storage. If we error out during the store operation the app should continue
+     * functioning and storages should be cleared.
+     * 
+     * Failing specifically on setItem rather than all operations is important because it will fail further down the
+     * promise chain and may hit different error handlers (see W-2839691).
+     */
+    testDefStorageClearedWhenSetItemOperationFails: {
+        test: function(cmp) {
+            window.mockComponentDefStorage.failAll = false;
+            window.mockComponentDefStorage.failSetItem = true;
+            var actual;
+            $A.createComponent("test:text", {}, function(newCmp){
+                actual = newCmp;
+            });
+
+            $A.test.addWaitForWithFailureMessage(
+                    true,
+                    function() {
+                        return window.mockComponentDefStorage.clearCallCount > 0;
+                    },
+                    "Component def storage never called clear() when the adapter's setItem() fails",
+                    function() {
+                        $A.test.assertEquals("markup://test:text", actual.getDef().getDescriptor().getQualifiedName(),
+                                "Unexpected component returned from createComponent() when storage operations fail");
                     }
             );
         }

@@ -86,4 +86,35 @@ public class IOUtilTest extends UnitTestCase {
             assertTrue("test cleanup failed", testFolder.delete());
         }
     }
+
+    public void testCreateTempDirTwiceReturnsDifferentPaths() throws Exception {
+        String prefix = "testPrefix";
+        String path1 = IOUtil.newTempDir(prefix);
+        String path2 = IOUtil.newTempDir(prefix);
+        File file1 = new File(path1);
+        File file2 = new File(path2);
+        assertTrue("Failed to create directory on first call to IOUtil.newTempDir",
+                file1.exists() && file1.isDirectory());
+        assertTrue("Failed to create directory on second call to IOUtil.newTempDir",
+                file2.exists() && file2.isDirectory());
+        assertFalse("IOUtil.newTempDir should not return the same path on subsequent calls", path1.equals(path2));
+    }
+
+    public void testCreateTempDirWithNullParamSucceeds() throws Exception {
+        String path = IOUtil.newTempDir(null);
+        File file = new File(path);
+        assertTrue("Failed to create directory with null parameter", file.exists() && file.isDirectory());
+    }
+
+    public void testGetDefaultTempDirReturnsSamePathOnSubsequentCalls() throws Exception {
+        String path1 = IOUtil.getDefaultTempDir();
+        String path2 = IOUtil.getDefaultTempDir();
+        File file1 = new File(path1);
+        File file2 = new File(path2);
+        assertTrue("Failed to create directory on first call to IOUtil.getDefaultTempDir",
+                file1.exists() && file1.isDirectory());
+        assertTrue("Failed to create directory on second call to IOUtil.getDefaultTempDir",
+                file2.exists() && file2.isDirectory());
+        assertTrue("IOUtil.getDefaultTempDir should return the same path on subsequent calls", path1.equals(path2));
+    }
 }

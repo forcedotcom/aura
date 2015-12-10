@@ -157,10 +157,10 @@ public class ComponentJSTest extends TestSuite {
                     set = targetBrowsers;
                 }
                 try {
-                	if (token.equals("MOBILE")) {
+                    if (token.equals("MOBILE")) {
                         set.addAll(WebDriverUtil.MOBILE);
                     } else if (token.equals("DESKTOP")) {
-                        set.addAll(WebDriverUtil.DESKTOP);      
+                        set.addAll(WebDriverUtil.DESKTOP);
                     } else {
                         set.add(BrowserType.valueOf(token));
                     }
@@ -177,12 +177,12 @@ public class ComponentJSTest extends TestSuite {
 
         public String getUrl() {
             DefType defType = caseDef.getDefType();
-            return String.format("%s?aura.jstestrun=%s&aura.testReset=true&aura.test=%s", suite.getUrl(defType),
-                    caseDef.getName(), getQualifiedName());
+            return String.format("%s?aura.jstestrun=%s&aura.testReset=true", suite.getUrl(defType),
+                    caseDef.getName());
         }
 
         /**
-         * The URL for loading the test within the aurajstest:jstest app.  Used primarily by test:runner.
+         * The URL for loading the test within the aurajstest:jstest app. Used primarily by test:runner.
          */
         public String getAppUrl() {
             DefType defType = caseDef.getDefType();
@@ -200,11 +200,9 @@ public class ComponentJSTest extends TestSuite {
         protected void superRunTest() throws Throwable {
             open(getUrl(), Mode.AUTOJSTEST, false);
 
-            // Actions run on servers need special handling because their call
-            // back methods are called asynchronously.
-            // This check is to make sure all such calls were complete
-            waitForCondition("return window.$A && window.$A.test && window.$A.test.isComplete()",
-                    auraUITestingUtil.getTimeout());
+            // Actions run on servers need special handling because their call back methods are called asynchronously.
+            // This check is to make sure all such calls were complete.
+            auraUITestingUtil.waitForAuraTestComplete(auraUITestingUtil.getTimeout());
         }
 
         @Override

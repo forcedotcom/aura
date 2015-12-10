@@ -1,13 +1,18 @@
 //*** Used by Aura Inspector
 // This is injected in the DOM directly via <script> injection
-(function(){
+(function(global){
     var $Aura = {};
 
     var actionsToDrop = [];
-    
+    var $Symbol = Symbol.for("AuraDevTools");
+
     // Communicate directly with the aura inspector
     $Aura.Inspector = new AuraInspector();
     $Aura.Inspector.init();
+
+    // Attach to the global object so our integrations can access it, but 
+    // use a symbol so it doesn't create a global property.
+    global[$Symbol] = $Aura;
 
     $Aura.actions = {
         "AuraDevToolService.AddActionToDrop": function(data) {
@@ -136,11 +141,14 @@
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
                 // Try catches for branches that don't have the overrides
+                // 
+                try {
+                    $A.installOverride("outputComponent", function(){});
+                } catch(e){}
                 try {
                     // Actions Tab
                     bootstrapActionsInstrumentation();
                  } catch(e){
-                    console.log('build action run into exception:', e);
                  }
                  try {
                     // Perf Tab
@@ -162,13 +170,34 @@
     };
 
     // Subscribes!
-    $Aura.Inspector.subscribe("AuraInspector:OnBootstrap", $Aura.actions["AuraDevToolService.Bootstrap"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function AuraInspector_OnPanelLoad() {
+        $Aura.actions["AuraDevToolService.Bootstrap"]();
+        // We only want to do the bootstrap the first time the page loads.
+        // If you close the dev tools and reopen then, we'll get a second onPanelLoad, but we should ignore that. 
+        // At least in regards to bootstrapping
+        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelConnect", AuraInspector_OnPanelLoad);
+        
+        $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function () {
+            $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+        });
+
+        $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+    });
+
+    $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
+        $Aura.actions["AuraDevToolService.Bootstrap"]();
+        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
+    });
+
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
 
+    //$Aura.Inspector.subscribe("AuraInspector:OnContextMenu", $Aura.actions["AuraDevToolService.Inspect"]);
+
+    
 
     function AuraInspector() {
 
@@ -177,9 +206,20 @@
         var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
         var postMessagesQueue = [];
         var batchPostId = null;
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
+        var increment = 0;
+        var lastItemInspected;
 
         this.init = function() {
-            
+            // Add Rightclick handler. Just track what we rightclicked on.
+            addRightClickObserver();
+
+            this.subscribe("AuraInspector:ContextElementRequest", function(){
+                if(lastItemInspected) {
+                    this.publish("AuraInspector:OnInspectElement", lastItemInspected.getAttribute("data-aura-rendered-by"));
+                }
+            }.bind(this));
         };
 
         this.publish = function(key, data) {
@@ -205,6 +245,115 @@
             subscribers.get(key).push(callback);
         };
 
+        this.unsubscribe = function(key, callback) {
+            if(!key || !callback) { return false; }
+
+            if(!subscribers.has(key)) { 
+                return false;
+            }
+
+            var listeners = subscribers.get(key);
+            subscribers.set(key, listeners.filter(function(item){
+                return item !== callback;
+            }));
+
+        };
+
+        this.getComponent = function(componentId, options) {
+            var component = $A.getComponent(componentId);
+            // var configuration = {
+            //     "body" : true // Should we serialize the body?
+            // };
+            var configuration = Object.assign({
+                "body": true,
+                "elementCount": false
+            }, options);
+            if(component){
+                if(!component.isValid()) {
+                    return JSON.stringify({
+                        "valid": false,
+                        "__proto__": null // no inherited properties
+                    });
+                } else {
+                    var output = {
+                        "descriptor": component.getDef().getDescriptor().toString(),
+                        "globalId": component._$getSelfGlobalId$(),
+                        "localId": component.getLocalId(),
+                        "rendered": component.isRendered(),
+                        "valid": true,
+                        "expressions": {},
+                        "attributes": {},
+                        "attributeValueProvider": getValueProvider(component.getAttributeValueProvider()),
+                        "facetValueProvider": getValueProvider(component.getComponentValueProvider()),
+                        "__proto__": null, // no inherited properties
+                        "elementCount": 0
+
+                        // Added Later
+                        //,"super": ""
+                        //
+                        // Implement
+                        //,"model": null 
+                    };
+
+                    var attributes = component.getDef().getAttributeDefs();
+                    attributes.each(function(attributeDef) {
+                        var key = attributeDef.getDescriptor().getName();
+                        var value;
+                        var rawValue;
+                        // If we don't want the body serialized, skip it.
+                        // We would only want the body if we are going to show
+                        // the components children.
+                        if(key === "body" && !configuration.body) { return; }
+                        try {
+                            rawValue = component._$getRawValue$(key);
+                            value = component.get("v." + key);
+                        } catch(e) {
+                            value = undefined;
+                        }
+                        if($A.util.isExpression(rawValue)) {
+                            output.expressions[key] = rawValue+"";
+                            output.attributes[key] = value;
+                        } else {
+                            output.attributes[key] = rawValue;
+                        }
+                    }.bind(this));
+
+                    var supers = [];
+                    var superComponent = component;
+                    while(superComponent = superComponent.getSuper()) {
+                        supers.push(superComponent._$getSelfGlobalId$());
+                    }
+                    
+                    if(supers.length) {
+                        output["supers"] = supers;
+                    }
+
+                    if(configuration.elementCount) {
+                        var elements = component.getElements() || [];
+                        var elementCount = 0;
+                        for(var c=0,length=elements.length;c<length;c++) {
+                            if(elements[c] instanceof HTMLElement) {
+                                // Its child components, plus itself.
+                                elementCount += elements[c].getElementsByTagName("*").length + 1;
+                            }
+                        }
+                        output.elementCount = elementCount;
+                    }
+
+                    return this.safeStringify(output);
+                }
+            }
+            return "";
+        };
+
+        /** 
+         * Safe because it handles circular references in the data structure.
+         *
+         * Will add control characters and shorten components to just their global ids.
+         * Formats DOM elements in a pretty manner.
+         */
+        this.safeStringify = safeStringify; 
+
         // Start listening for messages
         window.addEventListener("message", Handle_OnPostMessage);
 
@@ -219,6 +368,91 @@
                     }        
                 }
             }
+        }
+
+        function safeStringify(value) {
+            // For circular dependency checks
+            var visited = new Set();
+
+            var result = JSON.stringify(value, function(key, value) {
+                if(Array.isArray(this) || key) { value = this[key]; }
+                if(!value) { return value; }
+
+                if(typeof value === "string" && value.startsWith(COMPONENT_CONTROL_CHAR)) {
+                    return ESCAPE_CHAR + escape(value);
+                }
+
+                if(value instanceof HTMLElement) {
+                    var attributes = value.attributes;
+                    var domOutput = [];
+                    for(var c=0,length=attributes.length,attribute;c<length;c++) {
+                        attribute = attributes.item(c);
+                        domOutput.push(attribute.name + "=" + attribute.value);
+                    }
+                    return `<${value.tagName} ${domOutput.join(' ')}>`; // Serialize it specially.
+                }
+
+                if(value instanceof Text) {
+                    return value.nodeValue;
+                }
+
+                if($A.util.isComponent(value)) {
+                    return COMPONENT_CONTROL_CHAR + value.getGlobalId();
+                }
+
+                if($A.util.isExpression(value)) {
+                    return value.toString();
+                }
+
+                if(Array.isArray(value)) {
+                    return value.slice();
+                }
+
+                if(typeof value === "object") {
+                    if("$serId$" in value && visited.has(value)) {
+                        return { 
+                            "$serRefId$": value["$serId$"], 
+                            "__proto__": null 
+                        };
+                    } else if(!$A.util.isEmpty(value)) {
+                        visited.add(value);
+                        value.$serId = increment++;
+                    }
+                }
+
+                return value;
+            });
+
+            visited.forEach(function(item){
+                if("$serId$" in item) {
+                    delete item["$serId"];
+                }
+            });
+
+            return result;
+        };
+
+        /** Serializing Passthrough Values as valueProviders is a bit complex, so we have this helper function to do it. */
+        function getValueProvider(valueProvider) {
+            if("_$getSelfGlobalId$" in valueProvider) {
+                return valueProvider._$getSelfGlobalId$();
+            }
+
+            // Probably a passthrough value
+            var output = {
+                // Can't do providers yet since we don't have a way to get access to them.
+                // We should though, it would be great to see in the inspector.
+                //"providers": safeStringify()
+                $type$: "passthrough"
+            };
+
+            while(!("_$getSelfGlobalId$" in valueProvider)) {
+                valueProvider = valueProvider.getComponent();
+            }
+
+            output["globalId"] = valueProvider._$getSelfGlobalId$();
+
+            return output;
         }
 
         function callSubscribers(key, data) {
@@ -245,6 +479,19 @@
                 postMessagesQueue = [];
                 batchPostId = null;
             }
+        }
+
+        function addRightClickObserver(){
+            document.addEventListener("mousedown", function(event){
+                // Right Click
+                if(event.button === 2) {
+                    var current = event.target;
+                    while(current && current != document && !current.hasAttribute("data-aura-rendered-by")) {
+                        current = current.parentNode;
+                    }
+                    lastItemInspected = current;
+                }
+            });
         }
     }
 
@@ -505,27 +752,44 @@
             },
             _onTransactionEnd: function (t) {
                 setTimeout(function (){ 
-                // We do a timeout to give a chance to 
-                // other transactionEnd handlers to modify the transaction
-                    // window.postMessage({
-                    //     action  : "AuraDevToolService.OnTransactionEnd", 
-                    //     payload : t
-                    // }, '*');
-
+                    // We do a timeout to give a chance to 
+                    // other transactionEnd handlers to modify the transaction
                     $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
                 }, 0);
             },
 
             _initializeHooksComponentCreation: function () {
-                this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
+                this._hookOverride("ComponentService.createComponentPriv", CMP_CREATE_MARK);
+                
+                // newComponentDecprecated isn't the be all end all method anymore. Everything goes through createComponentPriv
+                //this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
             },
             getComponentCreationProfile: function () {
                 return this._generateCPUProfilerDataFromMarks(this.collector.componentCreation);
             },
+            _hookOverride: function(key, mark) {
+                $A.installOverride(key, function(){
+                    var config = Array.prototype.shift.apply(arguments);
+                    var cmpConfig = arguments[0];
+                    var descriptor = $A.util.isString(cmpConfig) ? cmpConfig : (cmpConfig["componentDef"]["descriptor"] || cmpConfig["componentDef"]) + '';
+
+                    var collector = this.collector[mark];
+                    collector.push(this._createNode(descriptor, mark + START_SUFIX));
+
+                    var ret = config["fn"].apply(config["scope"], arguments);
+
+                    var id = ret.getGlobalId && ret.getGlobalId() || "([ids])";
+                    collector.push(this._createNode(descriptor, mark + END_SUFIX, id));
+
+                    return ret;
+                }.bind(this), this);
+            },
             _hookMethod: function (host, methodName, mark) {
-                var self = this,
-                    hook = host[methodName];
-                self._hooks[methodName] = hook;
+                var self = this;
+                var hook = host[methodName];
+                var collector = this.collector[mark];
+
+                this._hooks[methodName] = hook;
                 host[methodName] = function (config) {
                     if (Array.isArray(config)) {
                         return hook.apply(this, arguments);
@@ -612,9 +876,11 @@
                 }
 
                 function generateSamples (root, size, idle) {
-                    var samples = Array.apply(0,Array(size)).map(function(){return idle.id;}),
-                        currentIndex = 0,
-                        idleHits = 0;
+                    var samples = new Array(size).join(","+idle.id).split(idle.id);
+                        samples[0] = idle.id;
+                    var currentIndex = 0;
+                    var idleHits = 0;
+
 
                     function calculateTimesForNode(node) {
                         if (node._idleHits) {
@@ -685,5 +951,5 @@
 
     
 
-})();
+})(this);
     

@@ -145,7 +145,8 @@
 
 
 .THIS.tooltip-basic:hover .tooltip,
-.THIS.tooltip-basic:focus .tooltip {
+.THIS.tooltip-basic:focus .tooltip,
+.THIS.tooltip-basic .tooltip.visible {
 	opacity: 0.999;
 }
 

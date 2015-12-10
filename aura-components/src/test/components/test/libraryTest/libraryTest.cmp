@@ -3,4 +3,5 @@
     <aura:import library="test:test_Library" property="importedAgain" />
     <aura:import library="test:test_LibraryWithExternalImports" property="externallyImported" />
     <aura:import library="test:test_LibraryWithExternalImports" property="externallyImportedAgain" />
+    <aura:import library="test:libraryTestLib" property="libraryTestLib"/>
 </aura:component>

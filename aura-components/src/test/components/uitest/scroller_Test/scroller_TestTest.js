@@ -60,7 +60,7 @@
      */
     testVerticalScrollInHorizontalScroller: {
     	browsers: ["-IE7", "-IE8"],
-    	test: [function(component) {
+    	test: function(component) {
     		// record inital height of scroller
     		var scroller = component.find("horizontalScrollBottom").getElement()
     			.getElementsByClassName("scroller")[0];
@@ -70,15 +70,13 @@
     		component.find("hztlScrollButton").get("e.press").fire();
     		
     		// wait 3 seconds
-    		setTimeout(function () {/* do nothing */ }, 3000);
-    	}, function(component) {
-    		// verify didnt scroll
-    		var scroller = component.find("horizontalScrollBottom").getElement()
-				.getElementsByClassName("scroller")[0];
-    		var newOffset = scroller.getBoundingClientRect().top;
-    		$A.test.assertEquals(horizontalScrollerTopOffset, newOffset, 
-    				"Scroller should not have scrolled.")
-    	}]
+    		setTimeout(function () {
+    			// verify didnt scroll
+	    		var newOffset = scroller.getBoundingClientRect().top;
+	    		$A.test.assertEquals(horizontalScrollerTopOffset, newOffset, 
+	    				"Scroller should not have scrolled.") 
+	    	}, 3000);
+    	}
     },
     
     /**
@@ -87,7 +85,7 @@
      */
     testVerticalScrollInVerticalScroller: {
     	browsers: ["-IE7", "-IE8"],
-    	test: [function(component) {
+    	test: function(component) {
     		// record inital height of scroller
     		var scroller = component.find("verticalScrollBottom").getElement()
     			.getElementsByClassName("scroller")[0];
@@ -97,15 +95,13 @@
     		component.find("vrtScrollButton").get("e.press").fire();
     		
     		// wait 3 seconds
-    		setTimeout(function () {/* do nothing */ }, 3000);
-    	}, function(component) {
-    		// verify scroll happened. Current position should be less that initial.
-    		var scroller = component.find("verticalScrollBottom").getElement()
-				.getElementsByClassName("scroller")[0];
-    		var newOffset = scroller.getBoundingClientRect().top;
-    		$A.test.assertTrue(verticalScrollerTopOffset > newOffset, 
-    				"Scroller should not have scrolled. Moved from " 
-    				+ verticalScrollerTopOffset + " to " + newOffset);
-    	}]
+    		setTimeout(function () {
+    			// verify scroll happened. Current position should be less that initial.
+        		var newOffset = scroller.getBoundingClientRect().top;
+        		$A.test.assertTrue(verticalScrollerTopOffset > newOffset, 
+        				"Scroller should not have scrolled. Moved from " 
+        				+ verticalScrollerTopOffset + " to " + newOffset);
+    		}, 3000);
+    	}
     }
 })

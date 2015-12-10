@@ -121,7 +121,7 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            return value.attributes.value;
+            return value.attributes.expression;
         },
         KeyValueFormatter: function(config){
             var value = config.value;
@@ -157,6 +157,9 @@ function TreeNode(text, id) {
         },
         DescriptorFormatter: function(value) {
             return value.replace( /markup:\/\/(\w+):(\w+)/, '<span class="component-prefix">$1</span>:<span class="component-tagname">$2</span>');
+        },
+        GlobalIdFormatter: function(value) {
+            return `<aurainspector-auracomponent globalId='${value}'/>`;
         }
     };
 
@@ -188,6 +191,9 @@ function TreeNode(text, id) {
                 break;
             case "descriptor":
                 node.setFormatter(formatters.DescriptorFormatter);
+                break;
+            case "globalId":
+                node.setFormatter(formatters.GlobalIdFormatter);
                 break;
         }
 
@@ -265,11 +271,12 @@ function TreeNode(text, id) {
 
 })();
 
-function AuraInspectorTreeView() {
+function AuraInspectorTreeView(treeContainer) {
     var _children = [];
-    //var _childrenIndex = new Map();
+    var nodeIdToHtml;
     var events = new Map();
     var htmlToTreeNode = new WeakMap();
+    var container;
 
     // Constants
     var AUTO_EXPAND_LEVEL = 3;
@@ -280,6 +287,9 @@ function AuraInspectorTreeView() {
     };
 
     this.addChildren = function(children) {
+        if(!Array.isArray(children)) {
+            children = [children];
+        }
         _children = _children.concat(children);
     };
 
@@ -289,17 +299,28 @@ function AuraInspectorTreeView() {
 
     this.clearChildren = function() {
         _children = [];
-        //_childrenIndex = new Map();
     };
 
-    this.render = function(div, options) {
-        var container = document.createElement("ul");
+    this.render = function(options) {
+        if(!container) {
+            container = document.createElement("ul");
             container.className = "tree-view";
-        div.innerHTML = "";
+
+            // Events
+            container.addEventListener("mouseout", Container_MouseOut.bind(this));
+            container.addEventListener("mouseover", Container_MouseOver.bind(this));
+            container.addEventListener("click", Container_Click.bind(this));
+            container.addEventListener("dblclick", Container_DblClick.bind(this));
+        } else {
+            container.innerHTML = "";
+        }
+        treeContainer.innerHTML = "";
+        nodeIdToHtml = new Map();
+
         // Configurable rendering options
-        options = options || { 
+        options = Object.assign({ 
             "collapsable": false 
-        };
+        }, options);
         
         try {
             for(var c=0;c<_children.length;c++) {
@@ -308,15 +329,7 @@ function AuraInspectorTreeView() {
                 }
             }
 
-            if(div) {
-               div.appendChild(container);
-            }
-
-            // Events
-            container.addEventListener("mouseout", Container_MouseOut.bind(this));
-            container.addEventListener("mouseover", Container_MouseOver.bind(this));
-            container.addEventListener("click", Container_Click.bind(this));
-            container.addEventListener("dblclick", Container_DblClick.bind(this));
+            treeContainer.appendChild(container);
         } catch(e) {
             alert([e.message, e.stack]);
         }
@@ -324,8 +337,6 @@ function AuraInspectorTreeView() {
         if(options.collapsable === true) {
             container.classList.add("collapsable");
         }
-
-        return container;
     };
 
     this.attach = function(eventName, eventHandler) {
@@ -342,6 +353,31 @@ function AuraInspectorTreeView() {
                 item(eventInfo);
             });
          }
+    };
+
+    this.expandAll = function() {
+        var nodes = container.querySelectorAll("li.tree-view-parent");
+        for(var c=0,length=nodes.length;c<length;c++) {
+            expandNode(nodes[c]);
+        }
+    };
+
+    this.selectById = function(nodeId) {
+        if(nodeIdToHtml.has(nodeId)) {
+            var node = nodeIdToHtml.get(nodeId);
+            if(node) {
+                var current = node;
+                while(current && !current.matches("ul.tree-view")) {
+                    if(current.tagName === "LI") {
+                        expandNode(current);
+                    }
+                    current = current.parentNode;
+                }
+
+                selectNode(node);
+                this.notify("onselect", { domNode: node, treeNode: htmlToTreeNode.get(node) });
+            }
+        }
     };
 
     /* Event Handlers */
@@ -376,6 +412,7 @@ function AuraInspectorTreeView() {
             // Did we click on the span?
             if(target.classList.contains(spanClass)) {
                 var li = target.parentNode;
+                selectNode(li);
                 this.notify("onselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
                 return;
             }
@@ -392,6 +429,7 @@ function AuraInspectorTreeView() {
         // We hovered a list item
         if(target && target.parentNode && target.classList.contains(nodeClass)) {
             var li = target.parentNode;
+            selectNode(li);
             this.notify("ondblselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
         }
     }
@@ -414,7 +452,7 @@ function AuraInspectorTreeView() {
             autoExpandCounter--;
             isAutoExpanded = true;
         }
-        //_childrenIndex.set(node.getId(), node);
+        nodeIdToHtml.set(node.getId(), li);
 
         if(node.hasChildren()) {
             // Add Expand box
@@ -449,6 +487,22 @@ function AuraInspectorTreeView() {
             if(event.offsetX < 14 && event.offsetY < 14) {
                 event.target.classList.toggle(expanded);
             }
+        }
+    }
+
+    function expandNode(li) {
+        if(!li.classList.contains("tree-view-expanded")) {
+            li.classList.add("tree-view-expanded");
+        }
+    }
+
+    function selectNode(node) {
+        var previous = container.querySelector("li.tree-node-selected");
+        if(previous) {
+            previous.classList.remove("tree-node-selected");
+        }
+        if(node) {
+            node.classList.add("tree-node-selected");
         }
     }
 

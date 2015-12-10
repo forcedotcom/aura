@@ -166,8 +166,9 @@ ComponentDefStorage.prototype.removeDefs = function(descriptors) {
 
 /**
  * Gets all definitions from storage.
- * @return {Promise} a promise that resolves with an array of the configs from storage. If storage
- *  fails or is disabled the promise resolves to an empty array.
+ * @return {Promise} a promise that resolves with an array of the configs from storage. If decoding
+ *  the configs fails the promise rejects. If the underlying storage fails or is disabled the promise
+ *  resolves to an empty array.
  */
 ComponentDefStorage.prototype.getAll = function () {
     if (!this.useDefinitionStorage()) {
@@ -180,6 +181,9 @@ ComponentDefStorage.prototype.getAll = function () {
             for (i = 0, len = items.length; i < len; i++) {
                 var item = items[i];
                 var config = $A.util.json.decode(item["value"]);
+                if (config === null) {
+                    throw new Error("Error decoding definition from storage: " + item["key"]);
+                }
                 result.push({ "key": item["key"], "value" : config });
             }
 
@@ -193,6 +197,7 @@ ComponentDefStorage.prototype.getAll = function () {
 
 /**
  * Asynchronously retrieves all definitions from storage and adds to component service.
+ * @return {Promise} a promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function() {
     if (this.restoreInProgress) {
@@ -201,35 +206,53 @@ ComponentDefStorage.prototype.restoreAll = function() {
     this.restoreInProgress = true;
 
     var defRegistry = this;
-    this.getAll().then(
-        function(items) {
-            var i, len;
-            for (i = 0, len = items.length; i < len; i++) {
-                var item = items[i];
-                var value = item["value"];
-                var descriptor = value["descriptor"];
+    this.getAll()
+        .then(
+            function(items) {
+                // if any decode fails the dependency graph may be broken. therefore decode all items
+                // prior to inserting them.
+                var libConfigs = [];
+                var cmpConfigs = [];
+                var i;
 
-                if (value["includes"]) {
-                    var includesEncoded = {};
-                    for (var key in value["includes"]) {
-                       includesEncoded[key] = $A.util.json.decode(value["includes"][key]);
-                    }
-                    value["includes"] = includesEncoded;
-                    $A.componentService.createLibraryDef(value);
-                } else {
-                    if (!$A.componentService.hasDefinition(descriptor)) {
-                        $A.componentService.saveComponentConfig(value);
+                // decode all items
+                for (i = 0; i < items.length; i++) {
+                    var value = items[i]["value"];
+                    if (value["includes"]) {
+                        var includesEncoded = {};
+                        for (var key in value["includes"]) {
+                           includesEncoded[key] = $A.util.json.decode(value["includes"][key]);
+                           if (includesEncoded[key] === null) {
+                               throw new Error("Error decoding library definition from storage: " + value["descriptor"]);
+                           }
+                        }
+                        value["includes"] = includesEncoded;
+                        libConfigs.push(value);
+                    } else {
+                        cmpConfigs.push(value);
                     }
                 }
+
+                // decode successful for all items so insert definitions
+                for (i = 0; i < libConfigs.length; i++) {
+                    $A.componentService.createLibraryDef(libConfigs[i]);
+                }
+                for (i = 0; i < cmpConfigs.length; i++) {
+                    if (!$A.componentService.hasDefinition(cmpConfigs[i]["descriptor"])) {
+                        $A.componentService.saveComponentConfig(cmpConfigs[i]);
+                    }
+                }
+
+                $A.log("ComponentDefStorage: restored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries from storage into registry");
+                defRegistry.restoreInProgress = false;
             }
-            $A.log("ComponentDefStorage: restored " + len + " definitions from storage into registry");
-            defRegistry.restoreInProgress = false;
-        },
-        function(e) {
-            $A.log("ComponentDefStorage: error during restore from storage", e);
-            defRegistry.restoreInProgress = false;
-        }
-    );
+        ).then(
+            undefined, // noop
+            function(e) {
+                $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
+                defRegistry.restoreInProgress = false;
+            }
+        );
 };
 
 /**

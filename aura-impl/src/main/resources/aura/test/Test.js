@@ -1710,8 +1710,7 @@ TestInstance.prototype.decodeOverride = function(config, response, noStrip) {
     var oldResponse = response;
     var newResponse; var i;
     if(processing) {
-    	this.prePostDecodeConfigs = [];
-	    for (i = 0; i < processing.length; i++) {
+    	for (i = 0; i < processing.length; i++) {
 	        cb_config = processing[i];
 	        if (cb_config) {
 	        	if(cb_config.preDecodeCallback) {

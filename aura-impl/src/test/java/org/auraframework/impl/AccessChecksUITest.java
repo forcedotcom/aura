@@ -18,6 +18,8 @@ package org.auraframework.impl;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 
 @ThreadHostileTest("Tests modify what namespaces are privileged or not")
 public class AccessChecksUITest extends WebDriverTestCase {
@@ -206,7 +208,11 @@ public class AccessChecksUITest extends WebDriverTestCase {
 
     private void clickCreateComponentButton() {
         waitForElementAppear(By.className("testComponentAccess"));
-        getDriver().findElement(By.className("testComponentAccess")).click();
+        // Workaround for Webdriver tests run on Firefox. Calling WebElement.click() fails to click the button in some
+        // situations but executing a javascript click like so seems to work.
+        WebElement webElement = getDriver().findElement(By.className("testComponentAccess"));
+        JavascriptExecutor executor = (JavascriptExecutor) getDriver();
+        executor.executeScript("arguments[0].click();", webElement);
     }
 
     private void verifyComponentCreated(String expected) {

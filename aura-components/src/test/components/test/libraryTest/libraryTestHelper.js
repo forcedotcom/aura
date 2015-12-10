@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 ({
-	// need a helper, even if empty, to expose libraries
+    getMessageFromLibFunction: function() {
+        return this.libraryTestLib.Basic.getMessage();
+    }
 })

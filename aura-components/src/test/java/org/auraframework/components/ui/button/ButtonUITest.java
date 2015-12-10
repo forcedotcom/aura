@@ -32,7 +32,6 @@ public class ButtonUITest extends WebDriverTestCase {
     public void testButtonLabelRequired() throws Exception {
         final String errorMsg = "COMPONENT markup://uitest:button_LabelRequiredTest is missing required attribute 'label'";
         openNoAura("/uitest/button_LabelRequiredTest.cmp");
-        auraUITestingUtil.waitForDocumentReady();
 
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override

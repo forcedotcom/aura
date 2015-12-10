@@ -1,7 +1,7 @@
 {
     "manifest_version":2,
 	"name": "Aura Inspector",
-	"version": "0.8",
+	"version": "0.8.1",
 	"description": "For inspecting Aura apps",
 	"update_url": "http://download.auraframework.org/aura-inspector/aura-inspector-updates.xml",
 	"icons": {
@@ -29,7 +29,8 @@
 	}],
 	"permissions": [
 		"tabs", 
-		"background"
+		"background",
+		"contextMenus"
 	],
 
 	// For development only. Generates a specific extensionId for the Aura Inspector, so the Sfdc Inspector can reliably send messages do it.

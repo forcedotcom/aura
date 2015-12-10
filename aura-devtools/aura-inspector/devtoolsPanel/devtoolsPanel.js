@@ -11,7 +11,12 @@
      *
      * The messages you can publish and subscribe to are
      *
-     * AuraInspector:OnBootstrap                    $A is available and we are just about to run $A.initAsync
+     * AuraInspector:OnAuraInitialized              $A is available and we are just about to run $A.initAsync
+     * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)      
+     * AuraInspector:OnPanelAlreadyConnected        The Aura Panel was already open, and we probably refreshed the page. The injected script will simply instrument the page at this point.
+     * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.              
+     * AuraInspector:OnContextMenu                  User Selected the "Inspect Aura Component" option in the context menu. Handled in the inspected script. Does not contain the information on what they clicked on.
+     * AuraInspector:OnInspectElement               Contains the dom element that they right clicked and inspected. 
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
@@ -30,17 +35,19 @@
 
     // Connects to content script
     // and draws the panels.
-    panel.init();
-
-    // Probably the default we want
-    AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
-        if(!panel.hasPanel(options["activePanel"])) {
-            // If the panel we are switching to doesn't exist, use the
-            // default which is the transaction panel.
-            options["activePanel"] = "transaction";
-        }
-        panel.showPanel(options["activePanel"]);
+    panel.init(function(){
+            // Probably the default we want
+        AuraInspectorOptions.getAll({ "activePanel": "transaction" }, function(options) {
+            if(!panel.hasPanel(options["activePanel"])) {
+                // If the panel we are switching to doesn't exist, use the
+                // default which is the transaction panel.
+                options["activePanel"] = "transaction";
+            }
+            panel.showPanel(options["activePanel"]);
+        });
     });
+
+    
 
     function AuraInspectorDevtoolsPanel() {
         //var EXTENSIONID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
@@ -55,7 +62,10 @@
         var _name = "AuraInspectorDevtoolsPanel" + Date.now();
         var _onReadyQueue = [];
         var _isReady = false;
+        var _initialized = false;
         var _subscribers = new Map();
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
         this.connect = function(){
             if(runtime) { return; }
@@ -74,33 +84,49 @@
             global.AuraInspector.ContentScript.disconnect();
         };
 
-        this.init = function() {
+        this.init = function(finishedCallback) {
             this.connect();
 
-            //-- Attach Event Listeners
-            var header = document.querySelector("header.tabs");
-            header.addEventListener("click", HeaderActions_OnClick.bind(this));
+            this.subscribe("AuraInspector:OnBootstrapEnd", function(){ 
+                if(_initialized) { return; }
+                //-- Attach Event Listeners
+                var header = document.querySelector("header.tabs");
+                header.addEventListener("click", HeaderActions_OnClick.bind(this));
 
-            // Initialize Panels
-            var eventLog = new AuraInspectorEventLog(this);
-            var tree = new AuraInspectorComponentTree(this);
-            var perf = new AuraInspectorPerformanceView(this);
-            var transaction = new AuraInspectorTransactionView(this);
-            var actions = new AuraInspectorActionsView(this);
-            var storage = new AuraInspectorStorageView(this);
+                // Initialize Panels
+                var eventLog = new AuraInspectorEventLog(this);
+                var tree = new AuraInspectorComponentTree(this);
+                var perf = new AuraInspectorPerformanceView(this);
+                var transaction = new AuraInspectorTransactionView(this);
+                var actions = new AuraInspectorActionsView(this);
+                var storage = new AuraInspectorStorageView(this);
 
-            this.addPanel("component-tree", tree, "Component Tree");
-            this.addPanel("performance", perf, "Performance");
-            this.addPanel("transaction", transaction, "Transactions");
-            this.addPanel("event-log", eventLog, "Event Log");
-            this.addPanel("actions", actions, "Actions");
-            this.addPanel(storage.panelId, storage, "Storage");
+                this.addPanel("component-tree", tree, "Component Tree");
+                this.addPanel("performance", perf, "Performance");
+                this.addPanel("transaction", transaction, "Transactions");
+                this.addPanel("event-log", eventLog, "Event Log");
+                this.addPanel("actions", actions, "Actions");
+                this.addPanel(storage.panelId, storage, "Storage");
 
-            // Sidebar Panel
-            // The AuraInspectorComponentView adds the sidebar class
-            this.addPanel("component-view", new AuraInspectorComponentView(this));
+                // Sidebar Panel
+                // The AuraInspectorComponentView adds the sidebar class
+                this.addPanel("component-view", new AuraInspectorComponentView(this));
 
-            this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
+                this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
+                this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
+
+                this.subscribe("AuraInspector:OnContextMenu", function() { 
+                    this.publish("AuraInspector:ContextElementRequest", {});
+                }.bind(this));
+
+                _initialized = true;
+                
+                if(typeof finishedCallback === "function") {
+                    finishedCallback();
+                }
+            }.bind(this));
+
+            this.publish("AuraInspector:OnPanelConnect", {});
         };
 
         /**
@@ -270,81 +296,74 @@
             this.publish("AuraInspector:ConsoleLog", msg);
         };
 
-        this.updateComponentTree = function(json) {
-            this.addLogMessage("Updating Component Tree");
-            this.showLoading();
-            // $A will be present on aura error pages
-            // but we won't have a root
-            var command = `
-                var json = "{}";
-                if(window.$A) {
-                    var root = $A.getRoot();
-                    if(root) {
-                        json = root.toJSON();
-                    }
-                }
-                (json);
-            `;
-            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-                if(exceptionInfo) {
-                    this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo);
-                }
-                if(!response) { return; }
-                var tree = JSON.parse(response);
-
-                // RESOLVE REFERENCES
-                tree = ResolveJSONReferences(tree);
-
-                panels.get("component-tree").setData(tree);
-                this.addLogMessage("Component Tree Updated");
-                this.hideLoading();
-            }.bind(this));
-        };
-
         this.updateComponentView = function(globalId) {
-            var cmd = `
-                var component = $A.getComponent("${globalId}");
-                if(component) { 
-                    var result = component.toJSON();
-                    var tmpResult = JSON.parse(result);
-                    var elements = component.getElements() || [];
-                    var elementCount = 0;
-                    elements.forEach(function(current){
-                        // Sub elements
-                        elementCount += current.getElementsByTagName("*").length;
-                        // For the current element. 
-                        elementCount++;
-                    });
-                    tmpResult.elementCount = elementCount;
-
-                    JSON.stringify(tmpResult);
-                }
-            `;
-
-            chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {
-                if(exceptionInfo) {
-                    this.addLogMessage(exceptionInfo);
-                    console.error(exceptionInfo);
-                }
-                if(!response) { return; }
-                var tree = JSON.parse(response);
-
-                // RESOLVE REFERENCES
-                tree = ResolveJSONReferences(tree);
-
-                panels.get("component-view").setData(tree);
-            }.bind(this));
+            this.getComponent(globalId, function(component){
+                panels.get("component-view").setData(component);
+            }, {
+                elementCount: true
+            });
         };
 
-        this.updateCacheViewer = function(panelId, key, command) {
-            this.showLoading();
+        this.getComponent = function(globalId, callback, configuration) {
+            if(typeof callback !== "function") { throw new Error("callback is required for - getComponent(globalId, callback)"); }
+            if(globalId.startsWith(COMPONENT_CONTROL_CHAR)) { globalId = globalId.substr(1);}
+            var command;
+
+            if(configuration && typeof configuration === "object") {
+                var configParameter = JSON.stringify(configuration);
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', ${configParameter});`; 
+            } else {
+                command = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}');`; 
+            }
+
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
                 if(exceptionInfo) { console.error(exceptionInfo); }
                 if(!response) { return; }
-                panels.get(panelId).setData(key, response);
-                this.hideLoading();
-            }.bind(this));
+                var component = JSON.parse(response);
+
+                // RESOLVE REFERENCES
+                component = ResolveJSONReferences(component);
+
+                callback(component);
+            });
+        };
+
+        this.getComponents = function(globalIds, callback) {
+            if(!Array.isArray(globalIds)) { throw new Error("globalIds was not an array - getComponents(globalIds, callback)");}
+            var count = globalIds.length;
+            var processed = 0;
+            var returnValue = [];
+            for(var c=0;c<count;c++) {
+                this.getComponent(globalIds[c], function(index, component){
+                    returnValue[index] = component;
+                    if(++processed == count) {
+                        callback(returnValue);
+                    }
+                }.bind(this, c));
+            }
+        };
+
+        this.getRootComponent = function(callback) {
+            if(typeof callback !== "function") { throw new Error("callback is required for - getRootComponent(callback)"); }
+            var command = "window.$A && $A.getRoot() && window[Symbol.for('AuraDevTools')].Inspector.getComponent($A.getRoot().getGlobalId());"; 
+            chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
+                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(!response) { return; }
+                var component = JSON.parse(response);
+
+                // RESOLVE REFERENCES
+                component = ResolveJSONReferences(component);
+
+                callback(component);
+            });
+        };
+
+        this.isComponentId = function(id) {
+            return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR);
+        };
+
+        this.cleanComponentId = function(id) {
+            return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR) ? id.substr(1) : id;
         };
 
         /**
@@ -410,29 +429,29 @@
             }
         }
 
-        function AuraInspector_OnAddPanel(message) {
-            // Invalid message, or panel was already added, we return right away.
-            if(!message || !message.hasOwnProperty("panelId") || this.hasPanel(message.panelId)) { return; }
+        // function AuraInspector_OnAddPanel(message) {
+        //     // Invalid message, or panel was already added, we return right away.
+        //     if(!message || !message.hasOwnProperty("panelId") || this.hasPanel(message.panelId)) { return; }
 
-            if(!message.hasOwnProperty("classConstructor")) {
-                this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a classConstructor`);
-                return;
-            }
+        //     if(!message.hasOwnProperty("classConstructor")) {
+        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a classConstructor`);
+        //         return;
+        //     }
 
-            if(!message.scriptUrl) {
-                this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
-                return;
-            }
+        //     if(!message.scriptUrl) {
+        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
+        //         return;
+        //     }
 
-            // If we don't have this check, anyone one the web page who
-            // reverse enginers our plugin could add a panel to the aura inspector
-            // in which case they would have full access to the page.
-            // By limiting it to chrome-extension url's only, we are assuming
-            // the extension trying to add the panel is already trusted and has access to the page.
-            if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
-                this.addLogMessage(`Tried to create panel  ${message.panelId} with url ${message.scriptUrl} whos source was not from a chrome extension. Only panels from web_accessible_resources in chrome extensions are allowed.`);
-            }
-        }
+        //     // If we don't have this check, anyone one the web page who
+        //     // reverse enginers our plugin could add a panel to the aura inspector
+        //     // in which case they would have full access to the page.
+        //     // By limiting it to chrome-extension url's only, we are assuming
+        //     // the extension trying to add the panel is already trusted and has access to the page.
+        //     if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
+        //         this.addLogMessage(`Tried to create panel  ${message.panelId} with url ${message.scriptUrl} whos source was not from a chrome extension. Only panels from web_accessible_resources in chrome extensions are allowed.`);
+        //     }
+        // }
 
         function AuraInspector_OnAddPanel(message) {
 
@@ -456,6 +475,10 @@
 
                 document.head.appendChild(link);
             }
+        }
+
+        function AuraInspector_OnAuraInitialized() {
+            this.publish("AuraInspector:OnPanelAlreadyConnected", {});
         }
 
         /* PRIVATE */

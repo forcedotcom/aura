@@ -635,7 +635,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
      */
     public void testNoAppJSCompressionErrors() throws Exception {
         // check js compression on main aura namespaces
-        String[] namespaces = new String[] { "aura", "ui", "auraadmin",
+        String[] namespaces = new String[] { "aura", "ui",
                 "auradev", "auradocs", "auraStorage" };
 
         StringBuilder source = new StringBuilder();
@@ -809,7 +809,7 @@ public class ServerServiceImplTest extends AuraImplTestCase {
     /**
      * Verifies second exception within handleServletException is caught and processed
      * we throw 'EmptyStackException' when getting InstanceStack, when
-     * Aura.getExceptionAdapter().handleException(death) handle the exception, 
+     * Aura.getExceptionAdapter().handleException(death) handle the exception,
      * we throw second exception, then verify we printout the error message to response's writer
      */
     public void testHandleExceptionDoubleDeathCaught() throws Exception {

@@ -1589,28 +1589,4 @@ public class MasterDefRegistryImpl implements MasterDefRegistry {
         }
         return false;
     }
-
-
-    // TODO - W-2105858 - re-enable with either the private implementation of the Cache used, or
-    // a least-common-denominator implementation
-
-    // public static Collection<Optional<? extends Definition>> getCachedDefs() {
-    // return defsCache.asMap().values();
-    // }
-    //
-    // public static CacheStats getDefsCacheStats() {
-    // return defsCache.stats();
-    // }
-    //
-    // public static CacheStats getExistsCacheStats() {
-    // return existsCache.stats();
-    // }
-    //
-    // public static CacheStats getStringsCacheStats() {
-    // return stringsCache.stats();
-    // }
-    //
-    // public static CacheStats getDescriptorFilterCacheStats() {
-    // return descriptorFilterCache.stats();
-    // }
 }

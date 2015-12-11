@@ -1729,7 +1729,7 @@ Component.prototype.createActionValueProvider = function() {
                             "code": actionDef
                         });
                     } else {
-                        actionDef = controllerDef.getActionDef(key);
+                        actionDef = controllerDef && controllerDef.getActionDef(key);
                     }
                     $A.assert(actionDef, "Unknown controller action '"+key+"'");
                     this.actions[key] = actionDef;

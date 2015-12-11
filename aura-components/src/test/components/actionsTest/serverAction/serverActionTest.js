@@ -527,13 +527,8 @@
                    var postSendCallback = function(actions, actionToWatch) {
                        if(actionToWatch) {
                      	   //since a1 is already sent out, TransactionId has been increased by 1
-                    	   //enqueue abortable a3 in a2's callback, verify a3 doesn't get aborted.
+                    	   //enqueue abortable a3 in a2's callback, later we verify a3 doesn't get aborted.
                            a2.setCallback(cmp, function(action2) {
-                        	   console.log(action2);
-                        	   a3.setCallback(cmp, function(action3) {
-                        		   console.log(action3);
-                        		   $A.test.assertTrue(a3.getState() != "ABORTED", "a3 shouldn't get aborted");
-                        	   });
                                $A.enqueueAction(a3);
                            });
                     	   $A.enqueueAction(a2); 
@@ -546,8 +541,8 @@
                    $A.enqueueAction(a1);
                    //make sure the test did finish a3
                    $A.test.addWaitForWithFailureMessage(true,
-   	                    function() { return (a3.state==="SUCCESS"); },
-   	                    "fail waiting for action 3 to finish"
+   	                    function() { return $A.test.areActionsComplete([a3]) && (a3.getState() != "ABORTED"); },
+   	                    "fail waiting for action 3 to finish without being aborted"
    	               );
     	       }
     	]

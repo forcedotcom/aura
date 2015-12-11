@@ -245,10 +245,6 @@ AuraRenderingService.prototype.unrender = function(components) {
             try {
                 if(cmp.isValid()&&cmp.isRendered()) {
                     try {
-                        //renderer.def.unrender(renderer.renderable);
-						// KRIS:
-                        // The Stub generated for unrender seems to not work
-                        // when used for one of the base components. (aura:text in this case)
                         context.setCurrentAccess(cmp);
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);

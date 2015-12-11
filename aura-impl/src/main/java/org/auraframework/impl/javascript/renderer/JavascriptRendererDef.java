@@ -60,10 +60,6 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         retrieveLabels();
     }
 
-	private boolean hasFunctions() {
-		return render != null || afterRender != null || rerender != null || unrender != null;
-	}
-
     @Override
     public void serialize(Json json) throws IOException {
         json.writeMapBegin();

@@ -1628,11 +1628,14 @@ Component.prototype.rerender = function() {
  * @export
  */
 Component.prototype.unrender = function() {
-    var afterRender = this["renderer"] && this["renderer"]["unrender"];
-    if(afterRender){
+    // Clean any dirty values so we don't attempt to rerender.
+    $A.renderingService.cleanComponent(this.globalId);
+
+    var unrender = this["renderer"] && this["renderer"]["unrender"];
+    if(unrender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        afterRender(this, this["helper"]);
+        unrender(this, this["helper"]);
         context.releaseCurrentAccess();
      } else {
         // If a component extends the root component and doesn't implement it's own

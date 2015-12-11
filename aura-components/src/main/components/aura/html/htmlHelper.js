@@ -125,7 +125,7 @@
 
     // NOTE: Do not remove attributes from this method
     // Used by MetricsService plugin to collect information
-    dispatchAction: function (action, event, ownerComponent) {
+    dispatchAction: function (action, event) {
         $A.run(function() {
             action.runDeprecated(event);
         });

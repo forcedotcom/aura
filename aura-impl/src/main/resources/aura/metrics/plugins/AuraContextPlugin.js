@@ -15,6 +15,12 @@
  */
 /*jslint sub: true */
 /**
+ * AuraContextPlugin
+ * =================
+ * This plugin hooks into the Aura Context object.
+ * In particular the following methods:
+ * merge(): Tracks the component defs that are sent dynamically to the client.
+ *
  * @description AuraContextPlugin
  * @constructor
  * @export
@@ -79,7 +85,7 @@ AuraContextPlugin.prototype.bind = function (metricsService) {
         }
 
         if (hasDefs) {
-            metricsService['transaction']('AURAPERF', 'newDefs', {"context": payload});
+            metricsService['transaction']('aura', 'newDefs', { "context": payload });
         }
         
         return ret;

@@ -15,6 +15,12 @@
  */
 /*jslint sub: true */
 /**
+ * ComponentServiceMetricsPlugin
+ * =================
+ * This plugin hooks into the ComponentService.
+ * In particular the following methods:
+ * createComponentPriv(): Tracks the component creation time for all components
+ *
  * @description ComponentServiceMetricsPlugin
  * @constructor
  * @export

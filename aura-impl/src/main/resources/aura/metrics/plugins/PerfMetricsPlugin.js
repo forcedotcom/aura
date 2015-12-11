@@ -15,6 +15,13 @@
  */
 /*jslint sub: true */
 /**
+ * PerfMetricsPlugin
+ * =================
+ * This plugin hooks into the ClientService.
+ * In particular the following methods:
+ * processResponses(): Gets the performance metrics sent from the server
+ * and creates a mark so transactions can leverage all this information
+ *
  * @description Transport metrics plugin
  * @constructor
  */

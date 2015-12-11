@@ -118,11 +118,17 @@
         }
 
         if ($A.util.isExpression(valueExpression)) {
-            $A.run(function () {
-                var action = valueExpression.evaluate();
-                action.runDeprecated(event);
-            });
+            var action = valueExpression.evaluate();
+            this.dispatchAction(action, event, ownerComponent);
         }
+    },
+
+    // NOTE: Do not remove attributes from this method
+    // Used by MetricsService plugin to collect information
+    dispatchAction: function (action, event) {
+        $A.run(function() {
+            action.runDeprecated(event);
+        });
     },
 
     canHaveBody: function (component) {
@@ -141,9 +147,9 @@
         if (lowerName.indexOf("on") === 0) {
             var eventName = lowerName.substring(2);
             if (eventName === "click") {
-                this.addNamedClickHandler(element, this.domEventHandler, this.NAMES.domHandler);
+                this.addNamedClickHandler(element, this.domEventHandler.bind(this), this.NAMES.domHandler);
             } else {
-                $A.util.on(element, eventName, this.domEventHandler);
+                $A.util.on(element, eventName, this.domEventHandler.bind(this));
             }
         } else {
             var isSpecialBoolean = this.SPECIAL_BOOLEANS.hasOwnProperty(lowerName);

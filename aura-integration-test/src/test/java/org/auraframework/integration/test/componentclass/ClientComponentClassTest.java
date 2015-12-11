@@ -170,6 +170,25 @@ public class ClientComponentClassTest extends AuraImplTestCase {
         this.goldFileText(sb.toString());
     }
 
+    public void testWriteComponentClassForComponentWithClientEmptyRenderer() throws Exception {
+        DefDescriptor<ComponentDef> cmpDescriptor =
+                addSourceAutoCleanup(ComponentDef.class, "<aura:component></aura:component>");
+        DefDescriptor<RendererDef> rendererDescriptor =
+                DefDescriptorImpl.getAssociateDescriptor(cmpDescriptor, RendererDef.class, DefDescriptor.JAVASCRIPT_PREFIX);
+        String rendererJs = "({ })";
+        addSourceAutoCleanup(rendererDescriptor, rendererJs);
+
+        ComponentDef spyCmpDef = spy(cmpDescriptor.getDef());
+        when(spyCmpDef.getDescriptor()).thenReturn(mockCmpDescriptor);
+
+        StringBuilder sb = new StringBuilder();
+        ClientComponentClass componentClass = new ClientComponentClass(spyCmpDef);
+
+        componentClass.writeComponentClass(sb);
+
+        this.goldFileText(sb.toString());
+    }
+
     @SuppressWarnings("unchecked")
     public void testWriteComponentClassForComponentImportsLib() throws Exception {
         DefDescriptor<ComponentDef> cmpDescriptor =

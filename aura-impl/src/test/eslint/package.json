@@ -1,9 +1,0 @@
-{
-  "name":"frontend-tools",
-  "version":"0.0.1",
-  "dependencies": {
-    "grunt": "~0.4.5",
-    "grunt-cli": "~0.1.13",
-    "grunt-eslint":"^11.0.0"
-  }
-}

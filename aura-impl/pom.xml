@@ -231,28 +231,10 @@
             <build>
                 <plugins>
                     <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>xunit.js</id>
-                                <phase>test</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>eslint</id>
-            <build>
-                <plugins>
-                    
-                    <plugin>
                         <groupId>com.github.eirslett</groupId>
                         <artifactId>frontend-maven-plugin</artifactId>
                         <configuration>
-                            <workingDirectory>src/test/eslint</workingDirectory>
-                            <installDirectory>${project.build.directory}</installDirectory>
+                            <workingDirectory>${aura.home}</workingDirectory>
                         </configuration>
                         <executions>
                             <execution>
@@ -264,8 +246,47 @@
                                 <phase>pre-clean</phase>
                             </execution>
                             <execution>
-                                <id>grunt-build</id>
+                                <id>run-xunit</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run --color=false test -- /dependency:./aura-util/src/test/tools/xUnit/dependencies /output:text /strict:${xunit.js.isStrict} /verbose:false ${project.basedir}/src/test/javascript</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>eslint</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <configuration>
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install-node-npm</id>
                                 <phase>pre-clean</phase>
+                            </execution>
+                            <execution>
+                                <id>npm-install</id>
+                                <phase>pre-clean</phase>
+                            </execution>
+                            <execution>
+                                <id>grunt-build-auraImpl</id>
+                                <goals>
+                                    <goal>grunt</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>--no-color eslint:auraImpl</arguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

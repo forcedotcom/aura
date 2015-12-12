@@ -40,6 +40,7 @@
 			<ui:button class="kitchenButton" label="Re-fire datagrid's provide" press="{!c.replaceData}"/>
 		    <ui:button class="kitchenButton" label="Fire Data Provider With Empty Data" press="{!c.emptyData}"/>         
 			<br/>
+			<ui:button class="kitchenButton" label="Focus Next" press="{!c.focusNext}"/>
 			<ui:inputCheckbox label="Provide no data" value="{!v.provideNoData}"/> 
 			<ui:outputText label="Sorting By:" value="{!v.sortBy}"/>
 		</div>

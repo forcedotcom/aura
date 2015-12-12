@@ -16,5 +16,5 @@
 
 -->
 <aura:component implements="ui:hasGridEvents">
-	<input type="checkbox" onclick="{!c.handleClick}" />
+	<input type="checkbox" onclick="{!c.handleClick}" tabindex="-1"/>
 </aura:component>

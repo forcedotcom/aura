@@ -24,7 +24,7 @@
 			this.assertRichTextInitalized(component.find("rtCustom"));
 		}
 	},
-	
+
     /**
      * Test html content.
      */
@@ -46,12 +46,75 @@
     			"Rich text value expected is incorrect");
     	}]
     },
-	
+
+    /**
+     * Test RTE placeholder when value is not set
+     * RTE content should show placeholder
+     */
+    testRtePlaceholderWhenValueIsNotSet: {
+        owner: "smo",
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
+        attributes: {placeholder: "Test placeholder"},
+        test: [function(component) {
+            // placeholder should be shown when v.value is not set
+            this.waitForCkEditorContentUpdate(1, "Test placeholder",
+                "Rich text placeholder expected is incorrect");
+        }]
+    },
+
+    /**
+     * Test RTE placeholder when value is set
+     * RTE content should show value, when value is removed, placeholder should be shown
+     */
+    testRtePlaceholderWhenValueIsSet: {
+        owner: "smo",
+        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
+        attributes: {placeholder: "Test placeholder", testContent: "Test content"},
+        test: [function(component) {
+            // placeholder should be hidden after v.value is set
+            this.waitForCkEditorContentUpdate(1, "Test content",
+                "Rich text content expected is incorrect");
+        }, function(component) {
+            component.find("Text").set("v.value", "");
+        }, function(component) {
+            // when value is removed, placeholder should come back
+            this.waitForCkEditorContentUpdate(1, "Test placeholder",
+                "Rich text placeholder expected is incorrect");
+        }]
+    },
+
+    /**
+     * wait for a CKEDITOR's content to load and check if the content is correct
+     */
+    waitForCkEditorContentUpdate : function(rteIndex, expectedText, errMsg) {
+        var self = this;
+        $A.test.addWaitForWithFailureMessage(true, function() {
+            return self.getRteContent(rteIndex) === expectedText;
+        }, errMsg);
+    },
+
+    /**
+     * get the text content of a CKEditor
+     */
+    getRteContent : function(rteIndex) {
+        var iframe = document.querySelector(".cke_" + rteIndex + " iframe");
+        if (iframe) {
+            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            if (innerDoc) {
+                var body = innerDoc.querySelector("body");
+                if (body) {
+                    return $A.test.getText(body);
+                }
+            }
+        }
+        return "";
+    },
+
 	assertRichTextInitalized : function(rtCmp) {
 		var textArea = rtCmp.find("textAreaElem");
     	$A.test.assertNotNull(textArea, "Component did not initialize correctly");
     },
-    
+
     waitForBaseComponentInitialized : function(cmp) {
     	$A.test.addWaitForWithFailureMessage(false, function(){
  			return $A.util.isUndefinedOrNull(cmp.find("base"));

@@ -18,9 +18,10 @@
 <aura:component>
 	<aura:attribute name="testCmpName" type="String" default="Text"/>
 	<aura:attribute name="testContent" type="String"/>
+    <aura:attribute name="placeholder" type="String" default=""/>
 
 	<a id="linkbefore" domId="linkbefore" class="linkbefore" href="">RichText</a><br/>
-    <ui:inputRichText aura:id="Text" value="{!v.testContent}"/> <br/> 
+    <ui:inputRichText aura:id="Text" value="{!v.testContent}" placeholder="{!v.placeholder}"/> <br/>
     <a id="linkafter" domId="linkafter" class="linkafter" href="">Custom Rich Text</a><br/>
     <ui:inputRichText aura:id="rtCustom"/> <br/>
     				  		 

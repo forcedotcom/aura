@@ -33,11 +33,11 @@ var SecureThing = (function() {
 		var _things = {};
 		var _primaryName = primaryName;
 
-		LockerKeyUtil.applyKey(this, key);
+		$A.lockerService.util.applyKey(this, key);
 
 		Object.defineProperty(this, "_getPrimaryName", {
 			value : function(mk) {
-				if (mk !== masterKey) {
+				if (mk !== $A.lockerService.masterKey) {
 					throw Error("Access denied");
 				}
 
@@ -47,7 +47,7 @@ var SecureThing = (function() {
 
 		Object.defineProperty(this, "_get", {
 			value : function(name, mk) {
-				if (mk !== masterKey) {
+				if (mk !== $A.lockerService.masterKey) {
 					throw Error("Access denied");
 				}
 
@@ -57,7 +57,7 @@ var SecureThing = (function() {
 
 		Object.defineProperty(this, "_set", {
 			value : function(name, value, mk) {
-				if (mk !== masterKey) {
+				if (mk !== $A.lockerService.masterKey) {
 					throw Error("Access denied");
 				}
 
@@ -81,24 +81,24 @@ var SecureThing = (function() {
 			return undefined;
 		}
 
-		var key = LockerKeyUtil._getKey(this, masterKey);
+		var key = $A.lockerService.util._getKey(this, $A.lockerService.masterKey);
 		if (raw.length !== undefined) {
 			var filtered = [];
 			for (var n = 0; n < raw.length; n++) {
 				var e = raw[n];
-				if (LockerKeyUtil.hasAccess(this, e)) {
+				if ($A.lockerService.util.hasAccess(this, e)) {
 					filtered.push(new SecureElement(e, key));
 				}
 			}
 
 			return filtered;
 		} else {
-			return LockerKeyUtil.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
+			return $A.lockerService.util.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
 		}
 	};
 
 	function primaryThing(that) {
-		return that._get(that._getPrimaryName(masterKey), masterKey);
+		return that._get(that._getPrimaryName($A.lockerService.masterKey), $A.lockerService.masterKey);
 	}
 
 	SecureThing.createFilteredMethod = function(methodName) {
@@ -115,9 +115,9 @@ var SecureThing = (function() {
 			get : function() {
 				var thing = primaryThing(this);
 				var raw = thing[propertyName];
-				LockerKeyUtil.verifyAccess(this, raw);
+				$A.lockerService.util.verifyAccess(this, raw);
 
-				var key = LockerKeyUtil._getKey(this, masterKey);
+				var key = $A.lockerService.util._getKey(this, $A.lockerService.masterKey);
 				return new SecureElement(raw, key);
 			}
 		};

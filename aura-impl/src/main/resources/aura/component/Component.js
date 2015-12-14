@@ -1582,7 +1582,7 @@ Component.prototype.render = function() {
         var context = $A.getContext();
         context.setCurrentAccess(this);
 
-        var result = render(LockerService.wrapComponent(this), this["helper"]);
+        var result = render($A.lockerService.wrapComponent(this), this["helper"]);
 
         context.releaseCurrentAccess();
 
@@ -1602,7 +1602,7 @@ Component.prototype.afterRender = function() {
         var context=$A.getContext();
         context.setCurrentAccess(this);
 
-        afterRender(LockerService.wrapComponent(this), this["helper"]);
+        afterRender($A.lockerService.wrapComponent(this), this["helper"]);
 
         context.releaseCurrentAccess();
     } else {
@@ -1620,7 +1620,7 @@ Component.prototype.rerender = function() {
     if(rerender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        var result = rerender(LockerService.wrapComponent(this), this["helper"]);
+        var result = rerender($A.lockerService.wrapComponent(this), this["helper"]);
         context.releaseCurrentAccess();
         return result;
      } else {
@@ -1640,7 +1640,7 @@ Component.prototype.unrender = function() {
     if(unrender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        unrender(LockerService.wrapComponent(this), this["helper"]);
+        unrender($A.lockerService.wrapComponent(this), this["helper"]);
         context.releaseCurrentAccess();
      } else {
         // If a component extends the root component and doesn't implement it's own
@@ -1771,9 +1771,9 @@ Component.prototype.setupComponentDef = function(config) {
         this.replaceComponentClass(componentDef.getDescriptor().getQualifiedName());
     }
 
-    var key = LockerKeyUtil._getKey(this.componentDef, masterKey);
+    var key = $A.lockerService.util._getKey(this.componentDef, $A.lockerService.masterKey);
 	if (key) {
-    	LockerKeyUtil.applyKey(this, key);
+    	$A.lockerService.util.applyKey(this, key);
 	}
 };
 

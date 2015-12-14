@@ -86,6 +86,8 @@ var SecureElement = (function() {
 		getAttribute: SecureThing.createPassThroughMethod("getAttribute"),
 		setAttribute: SecureThing.createPassThroughMethod("setAttribute"),
 
+		innerText: SecureThing.createPassThroughProperty("innerText"),
+		
 		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
 		parentNode : SecureThing.createFilteredProperty("parentNode"),
 

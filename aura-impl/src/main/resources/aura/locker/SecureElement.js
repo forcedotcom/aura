@@ -18,19 +18,19 @@ var SecureElement = (function() {
 	"use strict";
 
 	function getElement(se) {
-		return se._get("el", masterKey);
+		return se._get("el", $A.lockerService.masterKey);
 	}
 
 	function getKey(se) {
-		return LockerKeyUtil._getKey(se, masterKey);
+		return $A.lockerService.util._getKey(se, $A.lockerService.masterKey);
 	}
 
 	function SecureElement(el, key) {
 		SecureThing.call(this, key, "el");
 
-		LockerKeyUtil.applyKey(el, key);
+		$A.lockerService.util.applyKey(el, key);
 
-		this._set("el", el, masterKey);
+		this._set("el", el, $A.lockerService.masterKey);
 
 		Object.freeze(this);
 	}
@@ -48,12 +48,12 @@ var SecureElement = (function() {
 
 		appendChild : {
 			value : function(child) {
-				LockerKeyUtil.verifyAccess(this, child);
+				$A.lockerService.util.verifyAccess(this, child);
 
 				if (child.$run) {
 					child.$run();
 				} else {
-					var childEl = child.unwrap(masterKey);
+					var childEl = child.unwrap($A.lockerService.masterKey);
 					getElement(this).appendChild(childEl);
 				}
 			}
@@ -62,9 +62,9 @@ var SecureElement = (function() {
 		addEventListener : {
 			value : function(event, callback, useCapture) {
 				var that = this;
-				var sCallback = function(event) {
+				var sCallback = function(e) {
 					// Filter out any events not associated with our key
-					if (LockerKeyUtil.hasAccess(that, event.target)) {
+					if ($A.lockerService.util.hasAccess(that, e.target)) {
 
 						// DCHASMAN TODO W-2837770 create SecureEvent class to allow delivery of bubbled events w/out exposing currentTarget etc
 						// for (name in event) { if (event[name] instanceof Node) { console.log("Found something to wrap: " + name) } }
@@ -72,7 +72,7 @@ var SecureElement = (function() {
 						// Wrap the source event in "this" in a secure element
 						var sourceEvent = SecureDocument.wrap(this);
 
-						callback.call(sourceEvent, event);
+						callback.call(sourceEvent, e);
 					}
 				};
 
@@ -93,7 +93,7 @@ var SecureElement = (function() {
 
 		unwrap : {
 			value : function(mk) {
-				if (mk !== masterKey) {
+				if (mk !== $A.lockerService.masterKey) {
 					throw new Error("Access denied");
 				}
 

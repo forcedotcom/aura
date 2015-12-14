@@ -219,6 +219,7 @@ function AuraInstance () {
     this.storageService       = new Aura.Services.AuraStorageService();
     this.styleService         = new Aura.Services.AuraStyleService();
     this.metricsService       = new Aura.Services.MetricsService();
+    this.lockerService        = new Aura.Services.LockerService();
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
@@ -325,6 +326,7 @@ function AuraInstance () {
          * @memberOf AuraInstance.prototype
          */
         style: this.styleService,
+        
         /**
          * Metrics Service
          *
@@ -334,6 +336,15 @@ function AuraInstance () {
          */
         metrics: this.metricsService,
 
+        /**
+         * Locker Service
+         *
+         * @public
+         * @type AuraLockerService
+         * @memberOf AuraInstance.prototype
+         */
+        locker: this.lockerService,
+        
         get : function(key) {
             var ret = $A.services[key];
             if (!ret && key === "root") {
@@ -435,6 +446,7 @@ function AuraInstance () {
     this["eventService"] = this.eventService;
     this["layoutService"] = this.layoutService;
     this["metricsService"] = this.metricsService;
+    this["lockerService"] = this.lockerService;
     this["storageService"] = this.storageService;
     this["styleService"] = this.styleService;
     this["services"] = this.services;

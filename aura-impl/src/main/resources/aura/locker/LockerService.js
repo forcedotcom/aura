@@ -19,7 +19,7 @@
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureComponent
 
-var LockerService = window["LockerService"] = (function() {
+function LockerService() {
 	"use strict";
 
 	var lockers = [];
@@ -95,17 +95,17 @@ var LockerService = window["LockerService"] = (function() {
 	var service = {
 		createForDef : function(code, def) {
 			var namespace = def.getDescriptor().getNamespace();
-			var key = LockerKeyUtil.getKeyForNamespace(namespace);
+			var key = $A.lockerService.util.getKeyForNamespace(namespace);
 
 			// Key this def so we can transfer the key to component instances
-			LockerKeyUtil.applyKey(def, key);
+			$A.lockerService.util.applyKey(def, key);
 
 			return this.create(code, key);
 		},
 
 		create : function(code, key, imports) {
 			if (!isSafeModeEnabled()) {
-				throw new Error("LockerService.create() is only supported in strict mode capable browsers!");
+				throw new Error("$A.lockerService.create() is only supported in strict mode capable browsers!");
 			}
 			
 			return (function() {
@@ -153,7 +153,7 @@ var LockerService = window["LockerService"] = (function() {
 							getComponent : {
 								value : function(globalId) {
 									var c = $A.getComponent(globalId);
-									LockerKeyUtil.verifyAccess(key, c);
+									$A.lockerService.util.verifyAccess(key, c);
 									return service.wrapComponent(c);
 								}
 							},
@@ -180,8 +180,8 @@ var LockerService = window["LockerService"] = (function() {
 						sDocument : new SecureDocument(document, key)
 					};
 
-					LockerKeyUtil.applyKey(env.sAura, key);
-					LockerKeyUtil.applyKey(env.sWindow, key);
+					$A.lockerService.util.applyKey(env.sAura, key);
+					$A.lockerService.util.applyKey(env.sWindow, key);
 
 					Object.freeze(env.sAura);
 				}
@@ -238,7 +238,7 @@ var LockerService = window["LockerService"] = (function() {
 				return component;
 			}
 
-			var key = !referencingKey ? LockerKeyUtil._getKey(component, masterKey) : referencingKey;
+			var key = !referencingKey ? $A.lockerService.util._getKey(component, $A.lockerService.masterKey) : referencingKey;
 			if (!key) {
 				return component;
 			}
@@ -263,7 +263,7 @@ var LockerService = window["LockerService"] = (function() {
 		},
 
 		unwrap : function(elements) {
-			if (!LockerKeyUtil.isKeyed(elements)) {
+			if (!$A.lockerService.util.isKeyed(elements)) {
 				return elements;
 			}
 
@@ -271,12 +271,12 @@ var LockerService = window["LockerService"] = (function() {
 				for (var n = 0; n < elements.length; n++) {
 					var value = elements[n];
 					if (value && value.unwrap) {
-						elements[n] = value.unwrap(masterKey);
+						elements[n] = value.unwrap($A.lockerService.masterKey);
 					}
 				}
 			} else {
 				if (elements && elements.unwrap) {
-					elements = elements.unwrap(masterKey);
+					elements = elements.unwrap($A.lockerService.masterKey);
 				}
 			}
 
@@ -284,16 +284,16 @@ var LockerService = window["LockerService"] = (function() {
 		},
 
 		trust : function(from) {
-			var key = LockerKeyUtil._getKey(from, masterKey);
+			var key = $A.lockerService.util._getKey(from, $A.lockerService.masterKey);
 			if (key) {
 				for (var n = 1; n < arguments.length; n++) {
-					LockerKeyUtil.applyKey(arguments[n], key);
+					$A.lockerService.util.applyKey(arguments[n], key);
 				}
 			}
 		},
 
 		showLockedNodes : function showLockedNodes(root) {
-			if (LockerKeyUtil.isKeyed(root)) {
+			if ($A.lockerService.util.isKeyed(root)) {
 				$A.util.addClass(root, "lockerizedNode");
 			}
 
@@ -301,8 +301,90 @@ var LockerService = window["LockerService"] = (function() {
 			for (var i = 0; i < children.length; i++) {
 				showLockedNodes(children[i]);
 			}
-		}
+		},
+		
+		// Master key will be hidden by both locker shadowing and scope
+		masterKey : Object.freeze({
+			name : "master"
+		})
 	};
+	
+	service.util = (function() {
+		var lockerNamespaceKeys = {};
+
+		function getKey(thing) {
+			var f = thing["$lsKey"];
+			return f ? f($A.lockerService.masterKey) : undefined;
+		}
+
+		var util = {
+			getKeyForNamespace : function(namespace) {
+		    	// Get the locker key for this namespace
+				var key = lockerNamespaceKeys[namespace];
+				if (!key) {
+		    		key = lockerNamespaceKeys[namespace] = Object.freeze({
+		    			namespace: namespace
+		    		});
+				}
+				
+				return key;
+			},
+			
+			_getKey : function(thing, mk) {
+				if (mk !== $A.lockerService.masterKey) {
+					throw Error("Access denied");
+				}
+				
+				return getKey(thing); 
+			},
+			
+			isKeyed : function(thing) {
+				return getKey(thing) !== undefined;
+			},
+			
+			hasAccess : function(from, to) {
+				var fromKey = getKey(from);
+				var toKey = getKey(to);
+
+				return (fromKey === $A.lockerService.masterKey) || (fromKey === toKey);
+			},
+
+			verifyAccess : function(from, to) {
+				if (!$A.lockerService.util.hasAccess(from, to)) {
+					var fromKey = getKey(from);
+					var toKey = getKey(to);
+
+					throw new Error("Access denied: " + JSON.stringify({
+						from : fromKey,
+						to : toKey
+					}));
+				}
+			},
+
+			applyKey : function(thing, key) {
+				var keyToCheck = getKey(thing);
+				if (!keyToCheck) {
+					Object.defineProperty(thing, "$lsKey", {
+						value : function(mk) {
+							if (mk !== $A.lockerService.masterKey) {
+								throw new Error("Access denied");
+							}
+
+							return key;
+						}
+					});
+				} else {
+					if (keyToCheck !== key) {
+						throw new Error("Re-keying of " + thing + " is prohibited");
+					}
+				}
+			}
+		};
+		
+		Object.freeze(util);
+		
+		return util;
+	})();
 
 	service["createForDef"] = service.createForDef;
 	service["trust"] = service.trust;
@@ -311,4 +393,7 @@ var LockerService = window["LockerService"] = (function() {
 	Object.freeze(service);
 
 	return service;
-})();
+}
+
+Aura.Services.LockerService = LockerService;
+

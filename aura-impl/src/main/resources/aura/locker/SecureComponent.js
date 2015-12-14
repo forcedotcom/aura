@@ -23,26 +23,26 @@ var SecureComponent = (function() {
 		}
 
 		// DCHASMAN TODO W-2837797 Figure out if we want to filter out sometimes, all of the time does not make sense e.g. for component.find()
-		// return LockerKeyUtil.hasAccess(sc, value) ? LockerService.wrapComponent(value, referencingKey) : undefined;
+		// return $A.lockerService.util.hasAccess(sc, value) ? $A.lockerService.wrapComponent(value, referencingKey) : undefined;
 
-		return LockerService.wrapComponent(value, LockerKeyUtil._getKey(sc, masterKey));
+		return $A.lockerService.wrapComponent(value, $A.lockerService.util._getKey(sc, $A.lockerService.masterKey));
 	}
 	
 	function SecureComponent(component, referencingKey) {
 		SecureThing.call(this, referencingKey, "component");
 		
-		this._set("component", component, masterKey);
+		this._set("component", component, $A.lockerService.masterKey);
 	}
 	
 	function getComponent(sc) {
-		return sc._get("component", masterKey);
+		return sc._get("component", $A.lockerService.masterKey);
 	}
 
 	SecureComponent.prototype.constructor = SecureComponent;
 	SecureComponent.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
-				return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + JSON.stringify(LockerKeyUtil._getKey(this, masterKey)) + " }";
+				return "SecureComponent: " + getComponent(this) + "{ referencingKey: " + JSON.stringify($A.lockerService.util._getKey(this, $A.lockerService.masterKey)) + " }";
 			}
 		},
 
@@ -113,7 +113,7 @@ var SecureComponent = (function() {
 		"getElement" : {
 			value : function() {
 				var element = getComponent(this).getElement();
-				LockerKeyUtil.verifyAccess(this, element);
+				$A.lockerService.util.verifyAccess(this, element);
 				return SecureDocument.wrap(element);
 			}
 		},

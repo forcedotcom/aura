@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-//#include aura.locker.LockerKeyUtil
 //#include aura.locker.SecureThing
 //#include aura.locker.SecureElement
 //#include aura.locker.SecureScriptElement
@@ -36,17 +35,17 @@ var SecureDocument = (function() {
 	function SecureDocument(document, key) {
 		SecureThing.call(this, key, "document");
 
-		this._set("document", document, masterKey);
+		this._set("document", document, $A.lockerService.masterKey);
 
 		Object.freeze(this);
 	}
 
 	function getDocument(sd) {
-		return sd._get("document", masterKey);
+		return sd._get("document", $A.lockerService.masterKey);
 	}
 
 	function getKey(sd) {
-		return LockerKeyUtil._getKey(sd, masterKey);
+		return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
 	}
 
 	SecureDocument.prototype.constructor = SecureDocument;
@@ -102,7 +101,7 @@ var SecureDocument = (function() {
 	});
 
 	SecureDocument.wrap = function(el) {
-		return new SecureElement(el, LockerKeyUtil._getKey(el, masterKey));
+		return new SecureElement(el, $A.lockerService.util._getKey(el, $A.lockerService.masterKey));
 	};
 
 	return SecureDocument;

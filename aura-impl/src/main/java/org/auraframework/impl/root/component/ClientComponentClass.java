@@ -133,7 +133,7 @@ public class ClientComponentClass {
     	if (requireLocker) {
 	    	// Key the def so we can transfer the key to component instances
     		out.append(String.format("var def = $A.componentService.getDef(\"%s\");", descriptor.getQualifiedName()));
-    		out.append("var locker = window[\"LockerService\"].createForDef(\n\"");
+    		out.append("var locker = $A.lockerService.createForDef(\n\"");
     	}
     	
     	StringBuilder classObjects = new StringBuilder();

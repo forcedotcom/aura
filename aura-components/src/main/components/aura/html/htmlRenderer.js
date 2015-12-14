@@ -41,7 +41,7 @@
     	// aura:html is syntactic sugar for document.createElement() and the resulting elements need to be directly visible to the container
     	// otherwise no code would be able to manipulate them
     	var parent = component.getComponentValueProvider();
-    	LockerService.trust(parent, component, element);
+    	$A.lockerService.trust(parent, component, element);
     	
     	return element;
 	},

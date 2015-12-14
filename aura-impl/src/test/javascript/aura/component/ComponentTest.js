@@ -135,7 +135,7 @@ Test.Aura.Component.ComponentTest=function(){
                 return undefined;
               }
             },
-            "masterKey": {
+            "$A.lockerService.masterKey": {
               name: "master"
             }
         };

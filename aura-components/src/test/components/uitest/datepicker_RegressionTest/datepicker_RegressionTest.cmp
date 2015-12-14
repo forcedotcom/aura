@@ -13,6 +13,7 @@
 <aura:component>
 	<aura:attribute name="value" type="String" default="2015-07-01"/>
 	<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
+	<aura:attribute name="setFocus" type="Boolean" default="true" />
 
 	<div class="block">
 		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
@@ -39,12 +40,10 @@
 		        <h1>Test Set Focus Attribute</h1>
 		    </div>
 		    <div class="subtitle">
-		    	<div>dp_v_setFocus = {!v.dp_v_setFocus}</div>
-		    	<div>focusedElm_TagName = {!v.activeElm_tagName}</div>
-		    	<div>focusedElm_ClassList = {!v.activeElm_classList}</div>
+		    	<div>setFocus = {!v.setFocus}</div>
 			</div>
 		    <div>
-		        <ui:inputDate aura:id="inputDate" displayDatePicker="true"/>
+		        <ui:datePicker aura:id="standAloneDatepicker" visible="true" setFocus="{!v.setFocus}"/>
 		    </div>
 		</aura:if>
 

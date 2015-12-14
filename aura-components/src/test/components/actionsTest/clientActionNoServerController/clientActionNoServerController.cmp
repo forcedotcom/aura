@@ -15,26 +15,5 @@
     limitations under the License.
 
 -->
-<aura:component>
-<aura:attribute name="beans" type="List"/>
-<table>
-<tr>
-<th>Name</th>
-<th>Most Recent Value</th>
-<th>Count</th>
-<th>Min Value</th>
-<th>Max Value</th>
-<th>Total Value</th>
-</tr>
-<aura:iteration var="bean" items="{!v.beans}">
-<tr>
-<td class="name">{!bean.name}</td>
-<td>{!bean.mostRecentValue}</td>
-<td>{!bean.count}</td>
-<td>{!bean.minValue}</td>
-<td>{!bean.maxValue}</td>
-<td>{!bean.totalValue}</td>
-</tr>
-</aura:iteration>
-</table>
+<aura:component >
 </aura:component>

@@ -1180,7 +1180,9 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
+
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
+// #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.DomHandlersPlugin"}
 
 // #include aura.Logging
 //#include {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}

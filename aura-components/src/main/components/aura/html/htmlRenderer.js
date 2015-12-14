@@ -53,7 +53,7 @@
 		if (!element) {
 			return;
 		}
-		
+
 		var skipMap = {
 			"height" : true,
 			"width" : true,
@@ -67,16 +67,16 @@
 				if (skipMap[lowerName] || lowerName.indexOf("on") === 0) {
 					continue;
 				}
-				
+
 				var value = HTMLAttributes[name];
 				if ($A.util.isExpression(value)) {
 					value = value.evaluate();
 				}
-				
+
 				if (helper.SPECIAL_BOOLEANS.hasOwnProperty(lowerName)) {
 					value = $A.util.getBooleanValue(value);
 				}
-	
+
 				var oldValue = element[helper.caseAttribute(lowerName)];
 				if (value !== oldValue) {
 					helper.createHtmlAttribute(component, element, lowerName, value);
@@ -85,7 +85,7 @@
                     }
                 }
 			}
-	
+
 			var className = HTMLAttributes["class"];
 			if ($A.util.isExpression(className)) {
                  className = className.evaluate();
@@ -94,16 +94,16 @@
             if($A.util.isUndefinedOrNull(className)){
  				className='';
             }
-			
+
 			if (!$A.util.isUndefinedOrNull(element.auraClass)) {
 				className += (" " + element.auraClass);
 			}
-			
+
 			if (element["className"] !== className) {
 				element["className"] = className;
 			}
 		}
-		
+
 		if (element.tagName ==="A" && !element.getAttribute("href")) {
 			/*eslint-disable no-script-url*/
 			element.setAttribute("href", "javascript:void(0);");
@@ -120,7 +120,11 @@
 		}
 	},
 
-	unrender : function(component) {
+	unrender : function(component, helper) {
+        var HTMLAttributes = component.get("v.HTMLAttributes");
+        for ( var attribute in HTMLAttributes) {
+            helper.destroyHtmlAttribute(component, attribute, HTMLAttributes[attribute]);
+        }
 		// Even if we don't have body we need to deattach the elements from the component itself
 		$A.renderingService.unrenderFacet(component, component.get("v.body"));
 	}

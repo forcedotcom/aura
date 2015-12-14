@@ -1,10 +1,19 @@
+<<<<<<< HEAD
 markup://ui:outputNumber : cHiNh9KfDHVJ-yL85UO7bA
+=======
+markup://ui:outputNumber : qAb0nrqdsozuvfhPWxJVtA
+>>>>>>> master
 aura://Aura.Component[] : null
 aura://Map : null
 aura://String : null
 java://org.auraframework.renderer.HtmlRenderer : null
+<<<<<<< HEAD
 js://aura.html : BBgF-c3Pg_8xC87z3kYIoQ
 js://aura.html : hzqaE8TdDeyM15C3L7lLZQ
+=======
+js://aura.html : 7HfD77hCg9rQB20IchVjIw
+js://aura.html : FL6ExK1_Iqld5FrWYKHFDA
+>>>>>>> master
 markup://aura:rootComponent : qVmSU1_tP0GyeKj3ouU24g
 aura://Boolean : null
 markup://aura:html : O7nGtFWJWPxYzv-A9Qo4yg
@@ -22,7 +31,7 @@ markup://ui:baseDOMEvent : 3Ed5j-HTYzJmWI45X-RPRQ
 aura://List : null
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
 java://org.auraframework.def.DefDescriptor : null
-js://aura.placeholder : HqeCJnPgIjQTq6si-wG7JQ
+js://aura.placeholder : MhZJ25U0-XFIIfcxViVmxQ
 markup://aura:applicationEvent : o2iboZiE9E-Up-cxMvDhwQ
 markup://aura:text : iMISc8xaxbWq72wXtgmLUg
 markup://aura:valueEvent : 2hfE4qX-pfEvpzF7HrxDPA

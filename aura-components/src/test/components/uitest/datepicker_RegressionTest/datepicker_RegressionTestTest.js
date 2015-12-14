@@ -84,124 +84,6 @@
         }]
     },
 
-    //test how datepicker behaves when setFocus=true
-    testSetFocusOnDatepickerGridTrue: {
-        attributes : {"renderItem" : "testDatepickerSetFocus"},
-        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
-        test: [function(cmp) {
-            //initial focus state (DEFAULT SETFOCUS state)
-            var self = this;
-            if(self.isViewDesktop()){
-                var cmpInputDate = cmp.find('inputDate');
-                var setFocusBool = $A.util.getBooleanValue(
-                    cmpInputDate.find('datePicker').get('v.setFocus')
-                );
-
-                var setFocusBool_dpGrid = $A.util.getBooleanValue(
-                    cmpInputDate.find('datePicker').find('grid').get('v._setFocus')
-                );
-
-                // //set this for view in the ui
-                self.setDebugCmpAttribute(cmp, 'v.dp_v_setFocus', setFocusBool);
-                self.setDebugCmpAttribute(cmp, 'v.dpGrid_v_setFocus', setFocusBool_dpGrid);
-
-                //assertion
-                $A.test.assertTrue(
-                    setFocusBool,
-                    'datePicker.setFocus should be true'
-                )
-
-                $A.test.assertTrue(
-                    setFocusBool_dpGrid,
-                    'datePickergrid._setFocus should be true'
-                )
-            }
-        }, function(cmp) {
-            var self = this;
-            if(self.isViewDesktop()){
-                var cmpInputDate = cmp.find('inputDate');
-
-                //show datepicker
-                self.showDatepicker();
-
-                //wait for datepicker to pop
-                $A.test.addWaitForWithFailureMessage(
-                    1,
-                    function(){// testFunction
-                        return $A.test.select('.uiDatePicker.visible').length;
-                    },
-                    'datepicker grid is not shown',
-                    function(){// callback
-                        //attribute showing active element class list
-                        var activeElm = $A.test.getActiveElement();
-                        var tagName = self.getTagName(activeElm);
-
-                        self.setDebugCmpAttribute(cmp, 'v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
-                        self.setDebugCmpAttribute(cmp, 'v.activeElm_tagName', tagName);
-
-                        //assert focus state
-                        $A.test.assertTrue(
-                            $A.util.hasClass(activeElm, 'uiDayInMonthCell'),
-                            'with SetFocus=true, focused elm should have a class named "uiDayInMonthCell"'
-                        );
-
-                        $A.test.assertEquals(
-                            'A',
-                            tagName,
-                            'with SetFocus=true, focused elm should be an "A" tag'
-                        );
-                    }
-                );
-            }
-        }]
-    },
-
-    //test how datepicker behaves when setFocus=false
-    // TODO(W-2853912): Excessive flapping on Jenkins.
-    _testSetFocusOnDatepickerGridFalse: {
-        labels: ["flapper"],
-        attributes : {"renderItem" : "testDatepickerSetFocus"},
-        browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET", "-IPHONE", "-IPAD"],
-        test: [function(cmp) {
-            var self = this;
-            if(self.isViewDesktop()){
-                var cmpInputDate = cmp.find('inputDate');
-
-                //set setFocus=false
-                cmpInputDate.find('datePicker').set('v.setFocus', false);
-                cmpInputDate.find('datePicker').find('grid').set('v.setFocus', false)
-
-                //show datepicker
-                self.showDatepicker();
-
-                //wait for datepicker to pop
-                $A.test.addWaitForWithFailureMessage(
-                    1,
-                    function(){// testFunction
-                        return $A.test.select('.uiDatePicker.visible').length;
-                    },
-                    'datepicker grid is not shown',
-                    function(){// callback
-                        //attribute showing active element class list
-                        var activeElm = $A.test.getActiveElement();
-                        var tagName = self.getTagName(activeElm);
-
-                        self.setDebugCmpAttribute(cmp, 'v.activeElm_classList', $A.util.getElementAttributeValue(activeElm, 'class'));
-                        self.setDebugCmpAttribute(cmp, 'v.activeElm_tagName', tagName);
-
-                        //assert focus state
-                        $A.test.assertEquals(
-                            'BODY',
-                            tagName,
-                            'with SetFocus=true, focused elm should be an "BODY" tag'
-                        );
-                    }
-                );
-            }
-        }]
-    },
-
-
     //test to see if we have useSingleInputFlagSet=true or false
     testUseSingleInputFlag: {
         attributes : {"renderItem" : "testSingleInputFlag"},
@@ -315,6 +197,27 @@
         }]
     },
 
+    // test date picker focus on initial render when setFocus = false
+    testDatePickerSetFocusFalse: {
+        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "false"},
+        test: [function(cmp) {
+            var tagName = $A.test.getActiveElement().tagName;
+            $A.test.assertEquals('BODY', tagName,
+                'with SetFocus=false, focused elm should be an "BODY" tag'
+            );
+        }]
+    },
+
+    // test date picker focus on initial render when setFocus = true
+    testDatePickerSetFocusTrue: {
+        attributes: {"renderItem": "testDatepickerSetFocus", "setFocus": "true"},
+        test: [function(cmp) {
+            var tagName = $A.test.getActiveElement().tagName;
+            $A.test.assertEquals('A', tagName,
+                'with SetFocus=true, focused elm should be an "A" tag'
+            );
+        }]
+    },
 
     //test to see if initial rendering of datepicker is covering the input date textbox.
     testInputDateTimePositionOnInitalRenderring : {

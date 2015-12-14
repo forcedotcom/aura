@@ -15,6 +15,12 @@
  */
 /*jslint sub: true */
 /**
+ * ClientServiceMetricsPlugin
+ * =================
+ * This plugin hooks into the ClientService.
+ * In particular the following methods:
+ * init(): Tracks the time it take to create and render the app
+ *
  * @description Client Service metrics plugin
  * @constructor
  * @export
@@ -51,8 +57,8 @@ ClientServiceMetricsPlugin.prototype.disable = function () {
 };
 
 ClientServiceMetricsPlugin.prototype.bind = function (metricsService) {
-    var method     = 'init',
-    startTime  = 0;
+    var method = 'init';
+    var startTime = 0;
 
 	function beforeHook (markStart) {
 	    startTime = markStart["ts"];

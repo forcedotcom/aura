@@ -162,7 +162,7 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 AuraComponentService.prototype.newComponentArray = function(config, attributeValueProvider, localCreation, doForce){
     var ret = [];
     for (var i = 0; i < config.length; i++) {
-        ret.push(this["newComponentDeprecated"](config[i], attributeValueProvider, localCreation, doForce));
+        ret.push(this.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce));
     }
     return ret;
 };
@@ -203,11 +203,55 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
 };
 
 
+/*
+ * Creates an internal object config for a component from a public config.
+ *
+ * This is only used by createComponentFromConfig to separate the internal
+ * representation from the external representation.
+ * If we change the component format, we could change this method 
+ * without breaking anyone's code.
+ *
+ * @function
+ */
+AuraComponentService.prototype.createInternalConfig = function (config) {
+    var descriptor = config["descriptor"];
+    $A.assert(descriptor.indexOf("markup://") === 0, "Descriptor needs to be of the format markup://ns:name");
+
+    return {
+        "componentDef" : this.createDescriptorConfig(config["descriptor"]),
+        "localId"      : config["localId"],
+        "attributes"   : {
+            "values"        : config["attributes"],
+            "valueProvider" : config["valueProvider"]
+        }
+    };
+};
+
 /**
- * Create a component from a DefRef config
- * It accepts the config Object to generate the tree
+ * Creates a component from a config.
+ *
+ * It accepts a config Object generated directly by the framework
+ * or a custom manually created config (see notes for details).
+ * 
+ * IMPORTANT NOTES:
+ *
+ * - It's key that we separate the internal representation of a component
+ * from the external one (publicly available), so we can always improve 
+ * and change the framework implementation without breaking anything.
+ *
+ * - Passing a user generated config is discouraged (instead createComponent
+ * should be used). This method will only work for clientCreatable components
+ * and for very simple use cases.
  *
  * @param {Object} config A map with the component tree configuration,
+ * the configuration can be external (publicly exposed) or internal.
+ *
+ * {
+        descriptor    : "markup://ns:cmpName",
+        localId       : "localId",
+        attributes    : { attr1: value1, ... },
+        valueProvider : myValueProviderComponent
+ * }
  *
  * @public
  * @function
@@ -215,6 +259,15 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  */
 AuraComponentService.prototype.createComponentFromConfig = function(config) {
     $A.assert(config, "Config is required to create a component");
+
+    // The assumption is, that if we have a first level "descriptor" property
+    // is a user created config, otherwise we assume it is a private one
+    // NOTE @dval: I know this is a weak assumption, but we can always enforce something more
+    // reliable in the future if we need to.
+    if (config["descriptor"]) {
+        config = this.createInternalConfig(config);
+    }
+
     return this.createComponentPriv(config);
 };
 
@@ -279,7 +332,7 @@ AuraComponentService.prototype.createComponents = function(components, callback)
  * @export
  */
 AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
-    return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
+    return this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
 };
 
 

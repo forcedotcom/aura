@@ -15,13 +15,15 @@
  */
 /*jslint sub: true */
 /**
+ * TransportMetricsPlugin
+ * =================
+ * This plugin tracks information about all XHRs done to the aura servlet
  * @description Transport metrics plugin
  * @constructor
  * @export
  */
 var TransportMetricsPlugin = function TransportMetricsPlugin(config) {
     this.config = config;
-    this.counter = -1;
     this["enabled"] = true;
 };
 
@@ -68,8 +70,6 @@ TransportMetricsPlugin.prototype.sendOverride = function (/* config, auraXHR, ac
             }
         }
 
-        auraXHR.marker = this.counter++;
-
         startMark["context"] = {
             "auraXHRId"     : auraXHR.marker,
             "requestLength" : auraXHR.length,
@@ -95,7 +95,8 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
     if (this.metricsService.microsecondsResolution()/*timing API is supported*/ && window.performance.getEntriesByName) {
         var resource = window.performance.getEntriesByName(TransportMetricsPlugin.AURA_URL)[auraXHR.marker];
         if (resource) {
-            endMark["context"]["latency"] = resource.responseEnd - resource.fetchStart;
+            endMark["context"]["xhrDuration"] = resource.duration;
+            endMark["context"]["xhrLatency"] = resource.responseStart - resource.fetchStart;
         }
     }
 

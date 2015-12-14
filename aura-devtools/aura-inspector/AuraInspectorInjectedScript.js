@@ -760,9 +760,6 @@
 
             _initializeHooksComponentCreation: function () {
                 this._hookOverride("ComponentService.createComponentPriv", CMP_CREATE_MARK);
-                
-                // newComponentDecprecated isn't the be all end all method anymore. Everything goes through createComponentPriv
-                //this._hookMethod($A.componentService, 'newComponentDeprecated', CMP_CREATE_MARK);
             },
             getComponentCreationProfile: function () {
                 return this._generateCPUProfilerDataFromMarks(this.collector.componentCreation);

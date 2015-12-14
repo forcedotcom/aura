@@ -40,11 +40,17 @@
     		helper.enableColumnResizer(cmp);
     	}
     	
+    	// TODO: provide generic hooks for keyNav plugin to listen to
+        if (cmp.get("v.keyboardNavigation")) {
+            helper.lib.keyNav.initialize(cmp.find("tbody").getElement(), cmp._virtualItems);
+        }
+
+
         this.superAfterRender();
     },
     rerender: function (cmp, helper) {
         this.superRerender();
-
+        
         var container = helper.getGridBody(cmp),
             items     = cmp._virtualItems,
             fragment  = document.createDocumentFragment();
@@ -65,6 +71,11 @@
         if (cmp.get("v.enableResizableColumns") && !helper.hasResizerHandles(cmp)) {
         	helper.updateColumnResizer(cmp);
         	cmp._updateResizer = null;
+        }
+        
+        // TODO: provide generic hook for plugin to listen to
+        if (cmp.get("v.keyboardNavigation")) {
+            helper.lib.keyNav.updateRowElements(cmp._virtualItems);
         }
     },
     unrender: function (cmp, helper) {

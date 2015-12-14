@@ -118,11 +118,17 @@
         }
 
         if ($A.util.isExpression(valueExpression)) {
-            $A.run(function () {
-                var action = valueExpression.evaluate();
-                action.runDeprecated(event);
-            });
+            var action = valueExpression.evaluate();
+            this.dispatchAction(action, event, ownerComponent);
         }
+    },
+
+    // NOTE: Do not remove attributes from this method
+    // Used by MetricsService plugin to collect information
+    dispatchAction: function (action, event) {
+        $A.run(function() {
+            action.runDeprecated(event);
+        });
     },
 
     canHaveBody: function (component) {
@@ -141,9 +147,9 @@
         if (lowerName.indexOf("on") === 0) {
             var eventName = lowerName.substring(2);
             if (eventName === "click") {
-                this.addNamedClickHandler(element, this.domEventHandler, this.NAMES.domHandler);
+                this.addNamedClickHandler(element, this.domEventHandler.bind(this), this.NAMES.domHandler);
             } else {
-                $A.util.on(element, eventName, this.domEventHandler);
+                $A.util.on(element, eventName, this.domEventHandler.bind(this));
             }
         } else {
             var isSpecialBoolean = this.SPECIAL_BOOLEANS.hasOwnProperty(lowerName);
@@ -179,7 +185,7 @@
                         });
                     } else {
                         // prevent default action for anchors on IE11.
-                        if ($A.get("$Browser").isDesktop && 
+                        if ($A.get("$Browser").isDesktop &&
                             window.location.href.indexOf("one.app") !== -1 &&
                             event.pointerType === "touch") {
                             return;
@@ -208,7 +214,7 @@
                 var casedName = this.caseAttribute(lowerName);
                 if (value === false) {
                     element.removeAttribute(casedName);
-                    
+
                     // Support for IE's weird handling of checked (unchecking case):
                     if (casedName === "checked") {
                         element.removeAttribute("defaultChecked");
@@ -221,7 +227,7 @@
                         element.setAttribute("defaultChecked", true);
                     }
                 }
-                
+
                 // We still need to make sure that the property is set on the HTMLElement, because it is used for
                 // change detection:
                 if($A.util.isUndefinedOrNull(value)){
@@ -230,16 +236,16 @@
                 element[casedName] = value;
             } else {
 
-                // KRIS: HALO: 
+                // KRIS: HALO:
                 // If in older IE's you set the type attribute to a value that the browser doesn't support
                 // you'll get an exception.
                 // Also, you can't change the type after the element has been added to the DOM.
                 // Honestly, I can't see how this wasn't blowing up Pre-halo
                 if ($A.util.isIE && element.tagName === "INPUT" && lowerName === "type") {
-                    try { 
-                        element.setAttribute("type", value); 
+                    try {
+                        element.setAttribute("type", value);
                     } catch (e) {
-                        return undefined;   
+                        return undefined;
                     }
                 }
                 // as long as we have a valid value at this point, set
@@ -262,6 +268,12 @@
                     }
                 }
             }
+        }
+    },
+
+    destroyHtmlAttribute: function (component, name, attribute) {
+        if ($A.util.isExpression(attribute)) {
+            attribute.removeChangeHandler(component, "HTMLAttributes." + name);
         }
     }
 });

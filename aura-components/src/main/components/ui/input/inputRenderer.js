@@ -49,5 +49,10 @@
         concreteHelper.updateAriaRequired(component);
 
         this.superRerender();
+    },
+
+    unrender: function(component, helper) {
+        helper.lib.interactive.removeDomEventsFromMap(component);
+        return this.superUnrender();
     }
 })// eslint-disable-line semi

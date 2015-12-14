@@ -18,7 +18,12 @@ Function.RegisterNamespace("Test.Aura.Controller");
 [Fixture]
 Test.Aura.Controller.ActionTest = function() {
     var Aura = {
-        "Controller": {}
+        "Controller": {},
+        "lockerService": {
+        	wrapComponent: function(component) {
+        		return component;
+        	}
+        }
     };
 
     Mocks.GetMocks(Object.Global(), {
@@ -26,12 +31,6 @@ Test.Aura.Controller.ActionTest = function() {
         "Action": function(){}
     })(function() {
         [Import("aura-impl/src/main/resources/aura/controller/Action.js")]
-    });
-
-    var mockLockerService = Mocks.GetMock(Object.Global(), "LockerService", {
-      wrapComponent: function(component) {
-        return component;
-      }
     });
 
     var targetNextActionId = 123;
@@ -605,6 +604,11 @@ Test.Aura.Controller.ActionTest = function() {
                 },
                 assert : function(param) {
                     actual = param;
+                },
+                lockerService : {
+                	wrapComponent: function(component) {
+                		return component;
+                	}
                 }
             });
 
@@ -633,9 +637,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAura(function() {
-              mockLockerService(function() {
-                target.runDeprecated();
-              })
+		        target.runDeprecated();
             })
 
             // Assert
@@ -733,6 +735,11 @@ Test.Aura.Controller.ActionTest = function() {
                     return Test.Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
+                },
+                lockerService : {
+                	wrapComponent: function(component) {
+                		return component;
+                	}
                 }
             });
             var def = {
@@ -758,9 +765,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAssert(function() {
-                mockLockerService(function() {
-                  target.runDeprecated();
-                })
+            	target.runDeprecated();
             })
 
             // Assert

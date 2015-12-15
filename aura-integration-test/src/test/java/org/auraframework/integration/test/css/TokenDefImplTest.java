@@ -15,6 +15,8 @@
  */
 package org.auraframework.integration.test.css;
 
+import java.util.List;
+
 import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.TokenDef;
@@ -26,11 +28,12 @@ import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * Unit tests for {@link TokenDefImpl}.
  */
 public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, TokenDef, TokenDef, TokenDefImpl.Builder> {
-    private ConfigAdapter configAdapter;
     private Builder builder;
 
     @Mock
@@ -48,11 +51,6 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
 
         this.builder = new Builder();
         this.builder.setValue("valid");
-
-        //Mockito.when(parentDescriptor.getNamespace()).thenReturn("tokenDefImplTest");
-
-        configAdapter = Mockito.mock(ConfigAdapter.class);
-        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
     }
 
     @Override
@@ -107,28 +105,6 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
         assertEquals("test", buildDefinition().getValue());
     }
 
-    public void testInvalidTokenValueChar() throws Exception {
-        builder.setValue("blue;} body { color: red !important }");
-
-        try {
-            buildDefinition().validateDefinition();
-            fail("Expected an exception");
-        } catch (Exception e) {
-            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class, "Illegal character in token value");
-        }
-    }
-
-    public void testInvalidTokenValueChar2() throws Exception {
-        builder.setValue("expression(alert('BOO'))");
-
-        try {
-            buildDefinition().validateDefinition();
-            fail("Expected an exception");
-        } catch (Exception e) {
-            assertExceptionMessageStartsWith(e, InvalidDefinitionException.class, "Illegal character in token value");
-        }
-    }
-
     public void testGetAllowedProperties() throws Exception {
         builder.setAllowedProperties("border-color");
         assertTrue(buildDefinition().getAllowedProperties().contains("border-color"));
@@ -153,6 +129,74 @@ public class TokenDefImplTest extends DefinitionImplUnitTest<TokenDefImpl, Token
             fail("Expected an exception");
         } catch (Exception e) {
             assertExceptionMessage(e, InvalidDefinitionException.class, "Unknown CSS property 'wall-maria'");
+        }
+    }
+
+    public void testUntrustedNamspaceAllowedTokenValues() throws Exception {
+        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
+
+        List<String> tests = ImmutableList.of(
+                "#111",
+                "#0070d2",
+                "0.1",
+                "24px",
+                "5%",
+                "1 1 1 1",
+                "100%/1.5 'Salesforce Sans', Arial, sans-serif",
+                "rgba(255, 255, 255, 0.15)",
+                "block",
+                "hypen-ated",
+                "under_scored"
+                );
+
+        for (String test : tests) {
+            builder.setValue(test);
+            try {
+                buildDefinition().validateDefinition();
+            } catch (Exception e) {
+                fail("did not expect to catch an exception");
+            }
+        }
+    }
+
+    public void testUntrustedNamespaceDisallowedTokenValues() throws Exception {
+        ConfigAdapter configAdapter = Mockito.mock(ConfigAdapter.class);
+        Mockito.when(configAdapter.isPrivilegedNamespace(parentDescriptor.getNamespace())).thenReturn(true);
+
+        List<String> tests = ImmutableList.of(
+                "blue;} body { color: red !important }",
+                "expression(alert('xss'))",
+                "exp/* */ression",
+                "&#x0065;xpression",
+                "\\000065xpression",
+                "\\65xpression",
+                "\\65 xpression",
+                "e\\x\\pr\\e\\ssion",
+                "expression ",
+                "exPressioN",
+                "url('javascript:alert()')",
+                "url(xss.htc)",
+                "URL(xss.htc)",
+                "ur\\00006c(xss.htc)",
+                "j\\ava\\scri\\pt"
+                );
+
+        for (String test : tests) {
+            builder.setValue(test);
+            try {
+                buildDefinition().validateDefinition();
+                fail("Expected an exception for test expression: " + test);
+            } catch (Exception e) {
+                assertExceptionType(e, InvalidDefinitionException.class);
+                String errorMsg = "Illegal character in token value";
+                String errorMsg2 = "is not allowed in token values";
+
+                if (!e.getMessage().contains(errorMsg) && !e.getMessage().contains(errorMsg2)) {
+                    fail(String.format("Expected message containing: [%s], but got message: [%s] %nFor test expression %s",
+                            errorMsg, e.getMessage(), test));
+                }
+            }
         }
     }
 }

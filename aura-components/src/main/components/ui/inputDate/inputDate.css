@@ -21,25 +21,6 @@ div.THIS {
 	position: relative;
 }
 
-.THIS + .datePicker-openIcon,
-.THIS .datePicker-openIcon {
-    position: relative;
-    vertical-align: middle;
-    left: -22px;
-    width: 12px;
-    height: 15px;
-    background: url('/auraFW/resources/aura/images/icon_openCalendar.png') no-repeat 0 0;
-}
-
-.THIS .clearIcon {
-    position: relative;
-    vertical-align: middle;
-    left: -22px;
-    width: 15px;
-    height: 15px;
-    background: url('/auraFW/resources/aura/images/clear.png') no-repeat 0 0;
-}
-
 .THIS + .display,
 .THIS .display {
 	display: inline-block;

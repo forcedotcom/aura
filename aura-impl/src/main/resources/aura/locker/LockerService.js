@@ -45,7 +45,7 @@ function LockerService() {
 		}
 
 		// eval and arguments keywords are protected by strict mode
-		var used = getInitialWhitelist([ "eval", "arguments", "undefined", "NaN", "Date", "Number", "Boolean" ]);
+		var used = getInitialWhitelist([ "eval", "arguments", "undefined", "NaN", "Date", "Number", "Boolean", "alert" ]);
 
 		var shadows = [];
 		for (var n = 0; n < candidates.length; n++) {

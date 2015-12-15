@@ -120,9 +120,26 @@ Test.Aura.Component.ComponentTest=function(){
                     },
                     isUndefinedOrNull:function(){
                     }
-                }
+                },
+	            lockerService: {
+	              unwrap: function(elements) {
+	                return elements;
+	              },
+	              wrapComponent: function(component) {
+	                return component;
+	              },
+	              util: {
+	                  _getKey: function() {
+	                      return undefined;
+	                  }
+	              },
+	              masterKey: {
+	                  name: "master"
+	              }
+	            }
             }
         };
+        
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }
     [Fixture]

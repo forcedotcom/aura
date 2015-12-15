@@ -18,7 +18,12 @@ Function.RegisterNamespace("Test.Aura.Controller");
 [Fixture]
 Test.Aura.Controller.ActionTest = function() {
     var Aura = {
-        "Controller": {}
+        "Controller": {},
+        "lockerService": {
+        	wrapComponent: function(component) {
+        		return component;
+        	}
+        }
     };
 
     Mocks.GetMocks(Object.Global(), {
@@ -47,7 +52,7 @@ Test.Aura.Controller.ActionTest = function() {
     }
 
     var mockActionDependencies = Mocks.GetMocks(Object.Global(), {
-            "$A": { 
+            "$A": {
                 getContext: function() { return null; },
                 util: {
                     isFunction: function(value) {
@@ -90,7 +95,7 @@ Test.Aura.Controller.ActionTest = function() {
                 mockActionId(function() {
                     var target = new Aura.Controller.Action();
                     actual = target.actionId;
-                }); 
+                });
             });
 
             // Assert
@@ -120,7 +125,7 @@ Test.Aura.Controller.ActionTest = function() {
     function GetId() {
 
         var targetContextNum = "expectedContextNum";
-        
+
         [Fact]
         function ReturnsIdIfSet() {
             // Arrange
@@ -303,9 +308,9 @@ Test.Aura.Controller.ActionTest = function() {
             mockActionDependencies(function(){
                 var target = new Aura.Controller.Action(null, null, null, paramDefs);
                 target.setParams(config);
-                actual = target.params;    
+                actual = target.params;
             });
-            
+
             Assert.Equal(expected, actual);
         }
     }
@@ -468,7 +473,7 @@ Test.Aura.Controller.ActionTest = function() {
                 target.setCallback(expectedScope, expectedCallback, "ALL");
                 actual = target.callbacks;
             });
-            
+
 
             // Assert
             Assert.Equal(expected, actual);
@@ -599,8 +604,14 @@ Test.Aura.Controller.ActionTest = function() {
                 },
                 assert : function(param) {
                     actual = param;
+                },
+                lockerService : {
+                	wrapComponent: function(component) {
+                		return component;
+                	}
                 }
             });
+
             var def = {
                 isClientAction : function() {
                     return expected;
@@ -626,7 +637,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAura(function() {
-                target.runDeprecated();
+		        target.runDeprecated();
             })
 
             // Assert
@@ -720,10 +731,15 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var expectedState = "SUCCESS";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() { 
+                getContext: function() {
                     return Test.Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
+                },
+                lockerService : {
+                	wrapComponent: function(component) {
+                		return component;
+                	}
                 }
             });
             var def = {
@@ -749,7 +765,7 @@ Test.Aura.Controller.ActionTest = function() {
 
             // Act
             mockAssert(function() {
-                target.runDeprecated();
+            	target.runDeprecated();
             })
 
             // Assert
@@ -761,7 +777,7 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var expectedState = "ERROR";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() { 
+                getContext: function() {
                     return Test.Stubs.Aura.GetContext();
                 },
                 assert : function(param) {},
@@ -815,7 +831,7 @@ Test.Aura.Controller.ActionTest = function() {
             var sentToServer = 0;
 
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() { 
+                getContext: function() {
                     return Test.Stubs.Aura.GetContext();
                 },
                 assert : function(param) {},
@@ -985,7 +1001,7 @@ Test.Aura.Controller.ActionTest = function() {
             // Arrange
             var expectedReturn = "expectedReturn";
             var mockAssert = Mocks.GetMock(Object.Global(), "$A", {
-                getContext: function() { 
+                getContext: function() {
                     return Test.Stubs.Aura.GetContext();
                 },
                 assert : function(param) {
@@ -1120,7 +1136,7 @@ Test.Aura.Controller.ActionTest = function() {
     [ Fixture ]
     function UpdateFromResponse() {
         var mockContext = Mocks.GetMock(Object.Global(), "$A", {
-            getContext: function() { 
+            getContext: function() {
                 return Test.Stubs.Aura.GetContext();
             },
             util : {

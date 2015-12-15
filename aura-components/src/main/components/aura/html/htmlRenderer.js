@@ -21,6 +21,7 @@
 		}
 
 		var HTMLAttributes = component.get("v.HTMLAttributes");
+				
 		var element = document.createElement(tag);
 
 		for ( var attribute in HTMLAttributes) {
@@ -35,10 +36,14 @@
 		if (helper.canHaveBody(component)) {
             var body=component.get("v.body");
             $A.renderingService.renderFacet(component,body,element);
-			//$A.render(component.get("v.body"), element);
 		}
-
-		return element;
+		
+    	// aura:html is syntactic sugar for document.createElement() and the resulting elements need to be directly visible to the container
+    	// otherwise no code would be able to manipulate them
+    	var parent = component.getComponentValueProvider();
+    	$A.lockerService.trust(parent, component, element);
+    	
+    	return element;
 	},
 
 	rerender : function(component, helper) {

@@ -552,7 +552,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public final String getAuraFrameworkNonce() {
         regenerateAuraJS();
         try {
-            // framework nonce now consists of Aura JS and resources files (CSS and JS)
+            // framework nonce now consists of Aura JS and resources files (CSS and JS) and if locker service is enabled
             String jsHash = jsGroup.getGroupHash().toString();
             String resourcesHash = getAuraResourcesNonce();
 
@@ -646,4 +646,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         this.localizationAdapter = adapter;
     }
+
+	@Override
+	public boolean isLockerServiceEnabled() {
+		return true;
+	}
 }

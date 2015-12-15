@@ -13,7 +13,7 @@
 ,{"name":"Network.encodedDataLength","value":406178,"units":"bytes"}
 ,{"name":"Network.numRequests","value":10}
 ,{"name":"Tracing.Painting.Paint","value":1}
-,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 11000000,"units":"bytes"}
-,{"name":"Tracing.Memory.jsEventListeners","value":23}
+,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 31019640,"units":"bytes"}
+,{"name":"Tracing.Memory.jsEventListeners","value":15}
 ,{"name":"Tracing.Memory.documents","value":1 }
-,{"name":"Tracing.Memory.nodes","value":60 }]
+,{"name":"Tracing.Memory.nodes","value":4563}]

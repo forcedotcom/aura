@@ -47,7 +47,7 @@
             "Tracing.Painting.Paint": 10
         },
         {
-            "Tracing.Memory.jsHeapSizeUsed": 10
+            "Tracing.Memory.jsHeapSizeUsed": 15
         },
         {
             "Tracing.Memory.jsEventListeners": 25

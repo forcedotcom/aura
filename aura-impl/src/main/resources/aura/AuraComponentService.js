@@ -1315,6 +1315,15 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
  * @return {Promise} a promise that resolves when definitions are restored.
  */
 AuraComponentService.prototype.restoreDefsFromStorage = function () {
+    var defStorage = this.componentDefStorage.getStorage();
+    if (!defStorage || !defStorage.isPersistent()) {
+        // If the def storage is not persistent, that means that actions are not secure.
+        // Which means that we might have partial pieces that we can use (layouts://), so
+        // restore but do not block waiting since we are not dependent on them for start the app.
+        this.componentDefStorage.restoreAll();
+        return Promise["resolve"]();
+    }
+
     return this.componentDefStorage.restoreAll();
 };
 

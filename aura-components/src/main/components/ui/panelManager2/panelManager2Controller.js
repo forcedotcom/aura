@@ -47,5 +47,9 @@
         if (callback) {
             helper.stackElement(callback);
         }
-    } 
+    },
+    
+    registerPanels: function (cmp, event, helper) {
+        helper.registerPanels(cmp, event.getParams());
+    }
 })// eslint-disable-line semi

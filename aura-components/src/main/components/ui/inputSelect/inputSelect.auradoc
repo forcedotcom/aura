@@ -70,7 +70,7 @@ HTML <code>value</code> attribute.</p>
     }
 })		
 		</pre>
-		<p><code>class</code> is a reserved keyword that might not work with older versions of Internet Explorer. We recommend using <code>"class"</code> with double quotes.</p>
+		<p><code>class</code> is a reserved keyword that might not work with older versions of Internet Explorer. We recommend using <code>"class"</code> with double quotes.
                 If you’re reusing the same set of options on multiple drop-down lists, use different attributes for each set of options. Otherwise, selecting a different option in one list also updates other list options bound to the same attribute.</p>
 <pre>&lt;aura:attribute name="options1" type="String" />
 &lt;aura:attribute name="options2" type="String" />

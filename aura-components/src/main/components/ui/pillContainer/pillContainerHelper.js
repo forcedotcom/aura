@@ -200,8 +200,12 @@
             var hideShowMore = true;
             var maxLines = cmp.get("v.maxLines");
             var list = cmp.find("list");
-            if (maxLines > 0) {
-                var listItems = list.getElement().querySelectorAll('li');
+            var listElement = null;
+            if (list) {
+                listElement = list.getElement();
+            }
+            if (maxLines > 0 && listElement) {
+                var listItems = listElement.querySelectorAll('li');
                 if (!$A.util.isEmpty(listItems)) {
 
                     //find the height of a pill

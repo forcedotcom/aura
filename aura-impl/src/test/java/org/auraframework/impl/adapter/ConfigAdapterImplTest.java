@@ -24,6 +24,9 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -230,5 +233,21 @@ public class ConfigAdapterImplTest extends UnitTestCase {
 
         impl.addPrivilegedNamespace("");
         assertFalse(impl.isPrivilegedNamespace(""));
+    }
+
+    public void testGetPrivilegedNamespacesReturnsSortedNamespaces() {
+        ConfigAdapterImpl impl = new ConfigAdapterImpl();
+        impl.getPrivilegedNamespaces().clear();
+        String[] namespaces = new String[] {"c", "a", "d", "b","e"};
+        for(String namespace : namespaces) {
+            impl.addPrivilegedNamespace(namespace);
+        }
+        // increasing order
+        Arrays.sort(namespaces);
+        List<String> expected = Arrays.asList(namespaces);
+
+        // keep the iterate order of the returned collection from getPrivilegedNamespaces()
+        List<String> actual = new ArrayList<>(impl.getPrivilegedNamespaces());
+        assertEquals(expected, actual);
     }
 }

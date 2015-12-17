@@ -83,7 +83,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     private static final String VALIDATE_CSS_CONFIG = "aura.css.validate";
 
     private static final Set<String> SYSTEM_NAMESPACES = Sets.newHashSet();
-    private static final Set<String> CANONICAL_NAMESPACES = Sets.newHashSet();
+    private static final Set<String> CANONICAL_NAMESPACES = Sets.newTreeSet();
 
     private static final Set<String> UNSECURED_PREFIXES = new ImmutableSortedSet.Builder<>(String.CASE_INSENSITIVE_ORDER).add("aura", "layout").build();
 
@@ -552,7 +552,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public final String getAuraFrameworkNonce() {
         regenerateAuraJS();
         try {
-            // framework nonce now consists of Aura JS and resources files (CSS and JS)
+            // framework nonce now consists of Aura JS and resources files (CSS and JS) and if locker service is enabled
             String jsHash = jsGroup.getGroupHash().toString();
             String resourcesHash = getAuraResourcesNonce();
 
@@ -646,4 +646,9 @@ public class ConfigAdapterImpl implements ConfigAdapter {
     public void setLocalizationAdapter(LocalizationAdapter adapter) {
         this.localizationAdapter = adapter;
     }
+
+	@Override
+	public boolean isLockerServiceEnabled() {
+		return true;
+	}
 }

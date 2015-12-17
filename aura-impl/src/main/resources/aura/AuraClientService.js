@@ -20,6 +20,8 @@
  * @private
  * @constructor
  */
+Aura.Services.AuraClientServiceMarker = 0;
+
 Aura.Services.AuraClientService$AuraXHR = function AuraXHR() {
     this.length = 0;
     this.marker = 0;
@@ -767,8 +769,13 @@ AuraClientService.prototype.handleAppCache = function() {
     }
 
     function handleAppcacheUpdateReady() {
-        if (window.applicationCache.swapCache && window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-            window.applicationCache.swapCache();
+        var appCache = window.applicationCache;
+        if (appCache.swapCache && appCache.status === appCache.UPDATEREADY) {
+            try {
+                appCache.swapCache();
+            } catch(ignore) {
+                // protect against InvalidStateError with swapCache even when UPDATEREADY (weird)
+            }
         }
         dumpCachesAndReload();
     }
@@ -1817,6 +1824,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
+    auraXHR.marker = Aura.Services.AuraClientServiceMarker++;
     auraXHR.request["open"](method, url, true);
     if ("withCredentials" in auraXHR.request) {
         auraXHR.request["withCredentials"] = true;
@@ -2604,6 +2612,10 @@ AuraClientService.prototype.invalidateAction = function(descriptor, params, succ
         function() { successCallback(true); },
         errorCallback
     );
+};
+
+AuraClientService.prototype.isPrivilegedNamespace = function(namespace) {
+	return this.namespaces.hasOwnProperty(namespace);
 };
 
 AuraClientService.prototype.allowAccess = function(definition, component) {

@@ -30,6 +30,6 @@
         "r":3
       }
     ],
-    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://fake:component\",function () {\nvar fake$component = {\n  \"meta\":{\n    \"name\":\"fake$component\",\n    \"extends\":\"markup://aura:component\"\n  }\n};\nreturn fake$component;\n});\n}"
+    "componentClass":"function(){$A.componentService.addComponentClass(\"markup://fake:component\",function () {\nvar def = $A.componentService.getDef(\"markup://fake:component\");var locker = $A.lockerService.createForDef(\n\"var fake$component = {\\n  \\\"meta\\\":{\\n    \\\"name\\\":\\\"fake$component\\\",\\n    \\\"extends\\\":\\\"markup://aura:component\\\"\\n  }\\n};\\nreturn fake$component;\\n\", def);\nreturn locker.$result;\n});\n}"
   }
 }

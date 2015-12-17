@@ -14,14 +14,8 @@
  * limitations under the License.
  */
 ({
-    init: function(cmp) {
-    	var closeAction = cmp.get("v.closeAction");
-        var direction = cmp.get("v.direction");
-        //handler for closeOnEsc and closeOnTabOut
-        cmp._windowKeyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
-        //handler for closeOnClickOut
-        cmp._mouseEventHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
-      //create default close button
+    init: function(cmp) {   
+        //create default close button
         if ($A.util.isEmpty(cmp.get('v.closeButton')) && cmp.get('v.showCloseButton')) {
             $A.componentService.createComponent('ui:button', {
                 'body': $A.newCmp({componentDef: 'aura:unescapedHtml', attributes: {values: {value: '&times;'}}}),
@@ -34,11 +28,29 @@
                 cmp.set('v.closeButton', button);
             });
         }
+
+        var direction = cmp.get("v.direction");
         if(direction && direction.match(/(north|south)(east|west)/)) {
             cmp.set('v.showPointer', false);
         }
     },
-
+     
+    _getKeyHandler: function(cmp) {
+        if (!cmp._keyHandler && cmp.isValid()) {
+        	var closeAction = cmp.get("v.closeAction");
+            cmp._keyHandler = this.lib.panelLibCore.getKeyEventListener(cmp, {closeOnEsc: true, closeOnTabOut:true}, closeAction);
+        }
+        return cmp._keyHandler;
+    },
+    
+    _getMouseHandler: function(cmp) {
+        if (!cmp._mouseHandler && cmp.isValid()) {
+        	var closeAction = cmp.get("v.closeAction");
+            cmp._mouseHandler = this.lib.panelLibCore.getMouseEventListener(cmp, {closeOnClickOut: cmp.get('v.closeOnClickOut')}, closeAction);
+        }
+        return cmp._mouseHandler;
+    },
+     
     _getReferenceElement: function(cmp) {
 
         var referenceElementSelector = cmp.get("v.referenceElementSelector");
@@ -72,14 +84,20 @@
             animationName: 'movefrom' + cmp.get('v.animation'),
             autoFocus: false,
             onFinish: function() {
-                $A.util.on(panelEl, 'keydown', cmp._windowKeyHandler);
+            	var keyHandler = self._getKeyHandler(cmp);
+            	if ($A.util.isFunction(keyHandler)) {
+                    $A.util.on(panelEl, 'keydown', keyHandler);
+            	}
                 if (cmp.get('v.closeOnClickOut')) {
                     //Need to attach event in setTimeout in case the same click event that fires the show panel event
                     //bubbles up to the document, and if the closeOnClickOut is true, it causes the panel to close right away
                     //if the click is outside of the panel
-                    window.setTimeout(function () {
-                        $A.util.on(document, 'click', cmp._mouseEventHandler);
-                    }, 0);
+                	var mouseHandler = self._getMouseHandler(cmp);
+                	if ($A.util.isFunction(mouseHandler)) {
+                		window.setTimeout(function () {
+                            $A.util.on(document, 'click', mouseHandler);
+                        }, 0);
+                	}
                 }
                 
                 if(referenceEl) {
@@ -136,6 +154,7 @@
     hide: function (cmp, callback) {
         var panelEl = cmp.getElement();
         panelEl.style.opacity = 0;
+        var self = this;
         this.lib.panelLibCore.hide(cmp, {
             useTransition: cmp.get('v.useTransition'),
             animationName: 'moveto' + cmp.get('v.animation'),
@@ -144,8 +163,14 @@
                     if(cmp.positioned) {
                         panelEl.style.display = 'none';
                     }
-                    $A.util.removeOn(panelEl, 'keydown', cmp._windowKeyHandler);
-                    $A.util.removeOn(document, 'click', cmp._mouseEventHandler);
+                    var keyHandler = self._getKeyHandler(cmp);
+                	if ($A.util.isFunction(keyHandler)) {
+                		$A.util.removeOn(panelEl, 'keydown', keyHandler);
+                	}
+                	var mouseHandler = self._getMouseHandler(cmp);
+                	if ($A.util.isFunction(mouseHandler)) {
+                        $A.util.removeOn(document, 'click', mouseHandler);
+                    }
                     cmp.set('v.visible', false);
                     callback && callback();
                 } else {
@@ -213,8 +238,6 @@
         if(!boundingElement) {
             boundingElement = window;
         }
-
-        
 
         if(!advancedConfig) {
 

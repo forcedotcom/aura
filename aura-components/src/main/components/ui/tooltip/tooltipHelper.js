@@ -16,6 +16,7 @@
 ({
 
 	initStyle: function(component) {
+
 		var tabIndex = component.get('v.tabIndexOverride');
 		var trigger            = component.get('v.trigger');
 
@@ -34,14 +35,20 @@
 
 	},
 
+	updateBodyText: function(component) {
+		if(component._tooltip && component._tooltip.isValid()) {
+			component._tooltip.set('v.tooltipBody', component.get('v.tooltipBody'));
+		}
+	},
+
 
 	buildTooltip: function(component, cb) {
 		var cmLib = this.cmLib;
 		var compDef ={};
 		if(component._tooltip) {
-			setTimeout(function () {
+			setTimeout($A.getCallback(function () {
 				cb(component._tooltip);
-			}, 0);
+			}, 0));
 		} else {
 
 			['tooltipBody', 
@@ -58,7 +65,8 @@
 					compDef[attr] = component.get('v.' + attr);
 				});
 			
-			compDef.target = component;
+			compDef.target = component.getGlobalId();
+
 			$A.createComponent('ui:tooltipAdvanced', compDef, function(tt){
                 cmLib.containerManager.getSharedInstance().renderContainer(tt);
                 component._tooltip = tt;
@@ -85,10 +93,10 @@
 		}, 100);
 		
 		component.set('v.isVisible', true);
-		this.buildTooltip(component, function(tt) {
+		this.buildTooltip(component, $A.getCallback(function(tt) {
 			tt.set('v.isVisible', true);
 			self.smLib.stackManager.bringToFront(tt);
-		});
+		}));
 	},
 
 
@@ -109,10 +117,15 @@
 
 	hide: function(component) {
 
-		this.buildTooltip(component, function(tt){
-			tt.set('v.isVisible', false);
-			component.set('v.isVisible', false);
-		});
+		this.buildTooltip(component, $A.getCallback(function(tt){
+			if(tt.isValid()) {
+				tt.set('v.isVisible', false);
+			}
+			if(component.isValid()) {
+				component.set('v.isVisible', false);
+			}
+			
+		}));
 
 	},
 
@@ -134,11 +147,9 @@
 	},
 
 	cleanup: function(component) {
-		if(component._tooltip) {
+		if(component._tooltip ) {
 			this.cmLib.containerManager.getSharedInstance().destroyContainer(component._tooltip);
-			
 		}
-
 	},
 
 	makeTrigger: function(component) {
@@ -179,8 +190,13 @@
 		}
 		component._trigger = node;
 
-		this.buildTooltip(component, function() {
-			self.initStyle(component);
-		});
+		this.buildTooltip(component, $A.getCallback(function() {
+			// it seems that there is a race condition 
+			// somewhere when components are destroyed 
+			// and created rapidly (clicking home over and over)
+			if(component && component.isValid()) {
+				self.initStyle(component);
+			}
+		}));
 	}
 })// eslint-disable-line semi

@@ -120,9 +120,26 @@ Test.Aura.Component.ComponentTest=function(){
                     },
                     isUndefinedOrNull:function(){
                     }
-                }
+                },
+	            lockerService: {
+	              unwrap: function(elements) {
+	                return elements;
+	              },
+	              wrapComponent: function(component) {
+	                return component;
+	              },
+	              util: {
+	                  _getKey: function() {
+	                      return undefined;
+	                  }
+	              },
+	              masterKey: {
+	                  name: "master"
+	              }
+	            }
             }
         };
+        
         return Mocks.GetMocks(Object.Global(),mock)(during);
     }
     [Fixture]
@@ -447,6 +464,30 @@ Test.Aura.Component.ComponentTest=function(){
 
                 // Act
                 actual = target.render();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
+    function unrender() {
+        [Fact]
+        function RemoveUnrenderedComponentFromDirtyComponents() {
+            // Arrange
+            var expected = "testGlobalId";
+            var actual = null;
+            mockFramework(function() {
+                // Assuming that cleanComponent() cleans the given component from dirtyComponents.
+                $A.renderingService.cleanComponent = function(globalId) {
+                    actual = globalId;
+                }
+                var target = new Aura.Component.Component({},true);
+                target.setupGlobalId(expected);
+
+                // Act
+                target.unrender();
             });
 
             // Assert

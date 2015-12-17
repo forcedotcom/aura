@@ -19,14 +19,18 @@ package org.auraframework.impl.root.component;
 import java.io.IOException;
 import java.util.List;
 
+import org.auraframework.Aura;
+import org.auraframework.adapter.ConfigAdapter;
 import org.auraframework.def.BaseComponentDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.HelperDef;
 import org.auraframework.def.ImportDef;
+import org.auraframework.def.InterfaceDef;
 import org.auraframework.def.ProviderDef;
 import org.auraframework.def.RendererDef;
 import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.AuraTextUtil;
 import org.auraframework.util.json.JsonEncoder;
 
 public class ClientComponentClass {
@@ -63,7 +67,7 @@ public class ClientComponentClass {
     	return descriptor.getQualifiedName();
     }
 
-    final private void writeClassObjects(Appendable out) throws IOException, QuickFixException {
+    final private void writeObjects(Appendable out) throws IOException, QuickFixException {
 
     	JsonEncoder json = new JsonEncoder(out, true, false);
         json.writeMapBegin();
@@ -122,27 +126,66 @@ public class ClientComponentClass {
         json.writeMapEnd();
     }
 
-    final private void writeClassExporter(Appendable out) throws IOException, QuickFixException {
+    final private void writeExporter(Appendable out) throws IOException, QuickFixException {
 
-    	out.append("function () {\n");
+        out.append("function () {\n");
 
-    	out.append(String.format("var %s = ", className));
-    	writeClassObjects(out);
-    	out.append(";\n");
+        out.append("var ").append(className).append(" = ");
+        writeObjects(out);
+        out.append(";\n");
+        out.append("return ").append(className).append(";\n");
 
-    	out.append(String.format("return %s;\n", className));
+        out.append("}");
+    }
+
+    final private void writeLockerExporter(Appendable out) throws IOException, QuickFixException {
+
+    	StringBuilder sb = new StringBuilder();
+        sb.append("var ").append(className).append(" = ");
+    	writeObjects(sb);
+    	sb.append(";\n");
+        sb.append("return ").append(className).append(";\n");
+
+        // Key the def so we can transfer the key to component instances
+        // and escape the class objects for JavaScript strings
+        out.append("function () {\n");
+        out.append(String.format("var def = $A.componentService.getDef(\"%s\");", descriptor.getQualifiedName()));
+        out.append("var locker = $A.lockerService.createForDef(\n\"");
+        out.append(AuraTextUtil.escapeForJavascriptString(sb.toString()));
+		out.append("\", def);\n");
+		out.append("return locker.$result;\n");
     	out.append("}");
     }
 
     final public void writeComponentClass(Appendable out) throws QuickFixException, IOException {
-
         String name = getFullyQualifiedName(descriptor);
 
         out.append("$A.componentService.addComponentClass(");
         out.append('"').append(name).append('"');
         out.append(',');
-        writeClassExporter(out);
+        if (isLockerRequired()) {
+            writeLockerExporter(out);
+        } else {
+            writeExporter(out);
+        }
     	out.append(");\n");
     }
+
+    private boolean isLockerRequired() throws QuickFixException {
+    	boolean requireLocker = false;
+
+    	ConfigAdapter configAdapter = Aura.getConfigAdapter();
+    	if (configAdapter.isLockerServiceEnabled()) {
+			requireLocker = !configAdapter.isPrivilegedNamespace(descriptor.getNamespace());
+        	if (!requireLocker) {
+	            DefDescriptor<InterfaceDef> requireLockerDescr = Aura.getDefinitionService().getDefDescriptor(REQUIRE_LOCKER, InterfaceDef.class);
+	        	requireLocker = componentDef.isInstanceOf(requireLockerDescr);
+        	}
+		}
+
+    	return requireLocker;
+    }
+
+	private static final String REQUIRE_LOCKER = "aura:requireLocker";
 }
 

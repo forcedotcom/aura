@@ -3,12 +3,12 @@ module.exports = function (grunt) {
     grunt.initConfig({
         eslint: {
             options: {
-                configFile: '${basedir}/src/test/eslint/eslint-overrides.json',
-                outputFile: '${project.build.directory}/eslint-output'
+                configFile: 'eslint-overrides.json',
+                outputFile: 'eslint-output'
             },
             target: [
-                '${basedir}/src/main/resources/aura/**/*.js',
-                '!${basedir}/src/main/resources/aura/**/*_export.js'
+                '../../main/resources/aura/**/*.js',
+                '!../../main/resources/aura/**/*_export.js'
             ]
         }
     });

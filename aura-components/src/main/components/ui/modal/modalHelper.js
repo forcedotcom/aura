@@ -77,7 +77,7 @@
             onFinish: function() {
             	var handler = self._getKeyHandler(cmp);
             	if ($A.util.isFunction(handler)) {
-            		$A.util.on(containerEl, 'keydown', self._getKeyHandler(cmp));
+            		$A.util.on(containerEl, 'keydown', handler);
             	}
                 callback && callback();
             }

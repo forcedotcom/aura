@@ -382,9 +382,22 @@ Test.Aura.LoggerTest = function() {
     function reportError() {
         var logger = new Aura.Utils.Logger();
         var called = false;
+        var clientStackLength = -1;
         var mockAction = {
+        		params : {},
                 setAbortable: function() {},
-                setParams: function() {},
+                setParams: function(config) { 
+                    if(config) {
+                    	for ( var key in config) {
+                    		this.params[key] = config[key];
+                    	}
+                    }
+                },
+                getParam: function(name) {
+                	if(name) { 
+                		return this.params[name];
+                	}
+                },
                 setCallback: function() {},
                 setCaboose: function() {}
             };
@@ -392,7 +405,13 @@ Test.Aura.LoggerTest = function() {
         var mockDeps = Mocks.GetMock(Object.Global(), "$A", {
                 get: function() { return mockAction; },
                 clientService: {
-                    enqueueAction: function() {called = true;}
+                    enqueueAction: function(reportAction) {
+                    	called = true;
+                    	var clientStack = reportAction.getParam('clientStack');
+                    	if(clientStack) {
+                    		clientStackLength = clientStack.length;
+                    	}
+                    }
                 }
             });
 
@@ -428,6 +447,22 @@ Test.Aura.LoggerTest = function() {
             });
 
             Assert.True(target["reported"]);
+        }
+        
+        [Fact]
+        function noLongerThan25000Charactors() {
+        	var mockError = {
+        		'stackTrace' : Array(25010).join('x'),
+        		'reported' : false,
+        		toString : function() { }
+        	}
+        	var target = new Error();
+
+            mockDeps(function() {
+                logger.reportError(mockError, "testAction", "testId");
+            });
+            
+            Assert.True(clientStackLength === 25000);
         }
     }
 };

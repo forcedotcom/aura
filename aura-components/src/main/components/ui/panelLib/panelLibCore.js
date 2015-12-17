@@ -308,7 +308,7 @@ function lib(scrollUtil) { //eslint-disable-line no-unused-vars
                 var facet, body = facets.body || panel.get('v.body');
                 for (var key in facets) {
                     facet = facets[key];
-                    if (facets.hasOwnProperty(key) && $A.util.isComponent(facet)) {
+                    if (facets.hasOwnProperty(key) && ($A.util.isComponent(facet) || $A.util.isArray(facet))) {
                         panel.set('v.' + key, facet);
                     }
                 }

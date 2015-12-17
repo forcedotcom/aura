@@ -91,7 +91,11 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
-
+	"SecureThing": true,
+	"SecureComponent": true,
+	"SecureDocument": true,
+	"SecureElement": true,
+	"SecureScriptElement": true
   },
 
   "rules": {

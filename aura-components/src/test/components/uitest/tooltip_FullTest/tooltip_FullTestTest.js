@@ -122,28 +122,39 @@
 	
 	/**
 	 * Test to check Trigger Attribute with Advanced set to true
-	 * please fix then enable : W-2846651
 	 */
-	_testTrigger: {
+	testTrigger: {
 		
-		test: function(component) {
-			var triggers = ['triggerhoverlabel', 'triggerclicklabel', 'inputadvtrue', 'triggernonelabel', 'triggeremptylabel', 'triggeremptylabel'];
-			var tooltips = ['triggerhover', 'triggerclick', 'triggerfocus', 'triggernone', 'triggerempty', 'triggerempty'];
-			var domEvents = ['mouseover', 'click', 'focus', 'mouseover', 'mouseover', 'click'];
-			var assertions = [true, true, true, false, false, false];
+		test: [
+		        function(cmp) {
+		        	this.checkTrigger(cmp, "triggerhover", "triggerhoverlabel", "mouseover", true);
+		        },
+		        function(cmp) {
+		        	this.checkTrigger(cmp, "triggerclick", "triggerclicklabel", "click", true);
+		        },
+		        function (cmp) {
+		        	this.checkTrigger(cmp, "triggerfocus", "inputadvtrue", "focus", true);
+		        },
+		        function (cmp) {
+		        	this.checkTrigger(cmp, "triggernone", "triggernonelabel", "mouseover", false);
+		        },
+		        function(cmp) {
+		        	this.checkTrigger(cmp, "triggerempty", "triggeremptylabel", "mouseover", false);
+		        },
+		        function(cmp) {
+		        	this.checkTrigger(cmp, "triggerempty", "triggeremptylabel", "click", false);
+		        }]
+			
+			
+	},
 	
-			for(var i = 0; i < triggers.length; i++) {
-				function checkTrigger(ttLabel, triggerLabel) {
-					var trigger = component.find(triggerLabel).getElement();
-					var tt = component.find(ttLabel);
-					var ttElem = $A.test.getElementByClass(ttLabel)[0];
-					$A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
-					$A.test.fireDomEvent(trigger, domEvents[i]);		
-					$A.test.addWaitForWithFailureMessage(assertions[i], function(){return ($A.util.hasClass(ttElem,"visible"));}, "Problem with tooltip having aura:id = " + ttLabel);
-				}
-				checkTrigger(tooltips[i], triggers[i]);
-			}
-		}
+	checkTrigger : function(component, ttLabel, triggerLabel, domEvent, assertion) {
+		var trigger = component.find(triggerLabel).getElement();
+		var tt = component.find(ttLabel);
+		var ttElem = $A.test.getElementByClass(ttLabel)[0];
+		$A.test.assertFalse($A.util.hasClass(ttElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ ttLabel);
+		$A.test.fireDomEvent(trigger, domEvent);		
+		$A.test.addWaitForWithFailureMessage(assertion, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Problem with tooltip having aura:id = " + ttLabel);
 	},
 	
 	/**

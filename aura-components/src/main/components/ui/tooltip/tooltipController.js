@@ -15,14 +15,20 @@
  */
 ({
     show: function(component, event, helper) {
-        if($A.util.getBooleanValue(component.get('v.advanced'))) {
+        if(component.isValid() && $A.util.getBooleanValue(component.get('v.advanced'))) {
             helper.show(component);
         }
     },
 
     hide: function(component, event, helper) {
-    	if($A.util.getBooleanValue(component.get('v.advanced'))) {
-            helper.show(component);
+    	if(component.isValid() && $A.util.getBooleanValue(component.get('v.advanced'))) {
+            helper.hide(component);
+        }
+    },
+
+    handleBodyChange: function(component, event, helper) {
+        if($A.util.getBooleanValue(component.get('v.advanced'))) {
+            helper.updateBodyText(component);
         }
     },
 

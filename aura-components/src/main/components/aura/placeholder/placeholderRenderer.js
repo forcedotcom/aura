@@ -57,10 +57,10 @@
                     config["attributes"]={"values":{}};
                 }
                 $A.util.apply(config["attributes"]["values"],attributes);
-                newBody = $A.newCmpDeprecated(config, avp, false, false);
+                newBody = $A.componentService.newComponentDeprecated(config, avp, false, false);
             } else {
                 var errors = a.getError();
-                newBody = $A.newCmpDeprecated("markup://aura:text", null, false, false);
+                newBody = $A.componentService.newComponentDeprecated("markup://aura:text", null, false, false);
                 if (errors) {
                     newBody.set("v.value", errors[0].message);
 //                    throw errors[0].message;

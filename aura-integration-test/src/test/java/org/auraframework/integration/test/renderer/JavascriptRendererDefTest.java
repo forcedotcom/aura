@@ -77,4 +77,13 @@ public class JavascriptRendererDefTest extends AuraImplTestCase {
         assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
         serializeAndGoldFile(rendererDef, "_JSRendererDef");
     }
+
+    public void testSerializeJavascriptRendererDefHasNoFunction() throws Exception {
+        String rendererJs = "({ })";
+        DefDescriptor<RendererDef> rendererDesc = addSourceAutoCleanup(RendererDef.class, rendererJs);
+        RendererDef rendererDef = rendererDesc.getDef();
+
+        assertThat(rendererDef, instanceOf(JavascriptRendererDef.class));
+        serializeAndGoldFile(rendererDef, "_JSRendererDef");
+    }
 }

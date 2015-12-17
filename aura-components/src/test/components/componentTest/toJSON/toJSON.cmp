@@ -16,5 +16,8 @@
 
 -->
 <aura:component render="client">
-        
+    <aura:attribute name="components" type="Aura.Component[]">
+        <aura:text value="ToJSON Test"/>
+    </aura:attribute>
+    <aura:attribute name="object" type="Object"/>
 </aura:component>

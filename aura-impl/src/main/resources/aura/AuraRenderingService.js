@@ -70,11 +70,13 @@ AuraRenderingService.prototype.render = function(components, parent) {
         // JBUCH: HALO: TODO: END REMOVE ME
 
         if (cmp.isValid()) {
-            $A.getContext().setCurrentAccess(cmp);
+            $A.getContext().setCurrentAccess(cmp);    
             var renderedElements = cmp["render"]();
             $A.getContext().releaseCurrentAccess();
+            
             renderedElements=this.finishRender(cmp, renderedElements);
-            elements=elements.concat(renderedElements);
+            
+            elements = elements.concat(renderedElements);
         }
     }
 
@@ -245,10 +247,6 @@ AuraRenderingService.prototype.unrender = function(components) {
             try {
                 if(cmp.isValid()&&cmp.isRendered()) {
                     try {
-                        //renderer.def.unrender(renderer.renderable);
-						// KRIS:
-                        // The Stub generated for unrender seems to not work
-                        // when used for one of the base components. (aura:text in this case)
                         context.setCurrentAccess(cmp);
                         cmp["unrender"]();
                         context.releaseCurrentAccess(cmp);
@@ -262,7 +260,9 @@ AuraRenderingService.prototype.unrender = function(components) {
                     }
                 }
             } finally {
-                cmp.setUnrendering(false);
+                if (cmp.isValid()) {
+                    cmp.setUnrendering(false);
+                }
             }
         }
     }

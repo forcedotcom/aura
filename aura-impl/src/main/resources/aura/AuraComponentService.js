@@ -162,7 +162,7 @@ AuraComponentService.prototype.getAttributeProviderForElement = function(element
 AuraComponentService.prototype.newComponentArray = function(config, attributeValueProvider, localCreation, doForce){
     var ret = [];
     for (var i = 0; i < config.length; i++) {
-        ret.push(this["newComponentDeprecated"](config[i], attributeValueProvider, localCreation, doForce));
+        ret.push(this.newComponentDeprecated(config[i], attributeValueProvider, localCreation, doForce));
     }
     return ret;
 };
@@ -203,11 +203,55 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
 };
 
 
+/*
+ * Creates an internal object config for a component from a public config.
+ *
+ * This is only used by createComponentFromConfig to separate the internal
+ * representation from the external representation.
+ * If we change the component format, we could change this method 
+ * without breaking anyone's code.
+ *
+ * @function
+ */
+AuraComponentService.prototype.createInternalConfig = function (config) {
+    var descriptor = config["descriptor"];
+    $A.assert(descriptor.indexOf("markup://") === 0, "Descriptor needs to be of the format markup://ns:name");
+
+    return {
+        "componentDef" : this.createDescriptorConfig(config["descriptor"]),
+        "localId"      : config["localId"],
+        "attributes"   : {
+            "values"        : config["attributes"],
+            "valueProvider" : config["valueProvider"]
+        }
+    };
+};
+
 /**
- * Create a component from a DefRef config
- * It accepts the config Object to generate the tree
+ * Creates a component from a config.
+ *
+ * It accepts a config Object generated directly by the framework
+ * or a custom manually created config (see notes for details).
+ * 
+ * IMPORTANT NOTES:
+ *
+ * - It's key that we separate the internal representation of a component
+ * from the external one (publicly available), so we can always improve 
+ * and change the framework implementation without breaking anything.
+ *
+ * - Passing a user generated config is discouraged (instead createComponent
+ * should be used). This method will only work for clientCreatable components
+ * and for very simple use cases.
  *
  * @param {Object} config A map with the component tree configuration,
+ * the configuration can be external (publicly exposed) or internal.
+ *
+ * {
+        descriptor    : "markup://ns:cmpName",
+        localId       : "localId",
+        attributes    : { attr1: value1, ... },
+        valueProvider : myValueProviderComponent
+ * }
  *
  * @public
  * @function
@@ -215,6 +259,15 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  */
 AuraComponentService.prototype.createComponentFromConfig = function(config) {
     $A.assert(config, "Config is required to create a component");
+
+    // The assumption is, that if we have a first level "descriptor" property
+    // is a user created config, otherwise we assume it is a private one
+    // NOTE @dval: I know this is a weak assumption, but we can always enforce something more
+    // reliable in the future if we need to.
+    if (config["descriptor"]) {
+        config = this.createInternalConfig(config);
+    }
+
     return this.createComponentPriv(config);
 };
 
@@ -279,7 +332,7 @@ AuraComponentService.prototype.createComponents = function(components, callback)
  * @export
  */
 AuraComponentService.prototype.newComponent = function(config, attributeValueProvider, localCreation, doForce){
-    return this["newComponentDeprecated"](config, attributeValueProvider, localCreation, doForce);
+    return this.newComponentDeprecated(config, attributeValueProvider, localCreation, doForce);
 };
 
 
@@ -476,6 +529,7 @@ AuraComponentService.prototype.getComponentClass = function(descriptor) {
         var exporter = this.classConstructorExporter[descriptor];
         if (exporter) {
             var componentProperties = exporter();
+            
             storedConstructor = this.buildComponentClass(componentProperties);
             this.classConstructors[descriptor] = storedConstructor;
             // No need to keep all these extra functions.
@@ -699,7 +753,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
     var attributes = config["attributes"] ?
             (config["attributes"]["values"] ? config["attributes"]["values"] : config["attributes"])
             : null;
+
     var atts = {};
+    var self = this;
 
     //
     // Note to self, these attributes are _not_ Aura Values. They are instead either
@@ -729,6 +785,8 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             if (!returnedConfig["attributes"]) {
                 returnedConfig["attributes"] = {};
             }
+            returnedConfig["attributes"]["valueProvider"] = avp;
+
             var merging = returnedConfig["attributes"];
             if (merging.hasOwnProperty("values")) {
                 merging = merging["values"];
@@ -739,8 +797,9 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             returnedConfig["localId"] = config["localId"];
             returnedConfig["flavor"] = config["flavor"];
 
+
             try {
-                newComp = $A.newCmpDeprecated(returnedConfig, avp, false);
+                newComp = self.createComponentPriv(returnedConfig);
             } catch(e) {
                 status = "ERROR";
                 statusMessage = e.message;
@@ -749,10 +808,13 @@ AuraComponentService.prototype.requestComponent = function(callbackScope, callba
             var errors = a.getError();
             statusMessage=errors?errors[0].message:"Unknown Error.";
             if(!returnNullOnError) {
-                newComp = $A.newCmpDeprecated("markup://aura:text");
-                newComp.set("v.value", statusMessage);
+                newComp = self.createComponentPriv({
+                    "componentDef": { "descriptor": "markup://aura:text" },
+                    "attributes": { "values": { "value" : statusMessage } }
+                });
             }
         }
+
         if ( $A.util.isFunction(callback) ) {
             callback.call(callbackScope, newComp, status, statusMessage, index);
         }
@@ -1253,6 +1315,15 @@ AuraComponentService.prototype.saveComponentConfig = function(config) {
  * @return {Promise} a promise that resolves when definitions are restored.
  */
 AuraComponentService.prototype.restoreDefsFromStorage = function () {
+    var defStorage = this.componentDefStorage.getStorage();
+    if (!defStorage || !defStorage.isPersistent()) {
+        // If the def storage is not persistent, that means that actions are not secure.
+        // Which means that we might have partial pieces that we can use (layouts://), so
+        // restore but do not block waiting since we are not dependent on them for start the app.
+        this.componentDefStorage.restoreAll();
+        return Promise["resolve"]();
+    }
+
     return this.componentDefStorage.restoreAll();
 };
 

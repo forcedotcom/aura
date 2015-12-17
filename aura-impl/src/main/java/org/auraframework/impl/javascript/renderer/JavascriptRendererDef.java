@@ -60,22 +60,16 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         retrieveLabels();
     }
 
-	private boolean hasFunctions() {
-		return render != null || afterRender != null || rerender != null || unrender != null;
-	}
-
     @Override
     public void serialize(Json json) throws IOException {
-        if (hasFunctions()) {
-            json.writeMapBegin();
+        json.writeMapBegin();
 
-            serializeMethod(json, "render", render);
-            serializeMethod(json, "afterRender", afterRender);
-            serializeMethod(json, "rerender", rerender);
-            serializeMethod(json, "unrender", unrender);
+        serializeMethod(json, "render", render);
+        serializeMethod(json, "afterRender", afterRender);
+        serializeMethod(json, "rerender", rerender);
+        serializeMethod(json, "unrender", unrender);
 
-            json.writeMapEnd();
-        }
+        json.writeMapEnd();
     }
 
     /**
@@ -83,7 +77,7 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
      * re-scope local invocations of super methods. Those have
      * moved to the component class itself and are not part of
      * the renderer anymore.
-     * @return 
+     * @return
      */
     void serializeMethod(Json json, String methodName, JsFunction function)
             throws IOException {
@@ -94,9 +88,9 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
     }
 
     /**
-     * This method edits the call to the superMethod. Calling super methods on the 
-     * renderer was a questionable pattern because it forces us to create an instance  
-     * of the renderer at each level of the component inheritance just to hold a 
+     * This method edits the call to the superMethod. Calling super methods on the
+     * renderer was a questionable pattern because it forces us to create an instance
+     * of the renderer at each level of the component inheritance just to hold a
      * reference on the component.
      */
     private JsFunction changeSuper(String methodName, JsFunction function) {
@@ -115,11 +109,11 @@ public class JavascriptRendererDef extends DefinitionImpl<RendererDef> implement
         String body = function.getBody();
         String superMethodName = "super" + Character.toString(methodName.charAt(0)).toUpperCase() + methodName.substring(1);
 		body = body.replace("this." + superMethodName,  cmp + "." + superMethodName);
-		
+
         // Now make sure we escape the right sequences.
         return new JsFunction(arguments, body);
     }
-    
+
     @Override
     public boolean isLocal() {
         return false;

@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 ({
+	focusNext : function(cmp, evt, helper) {
+		var current = cmp._currentIndex;
+		if (!current) {
+			current = 1;
+		}
+		cmp.getElement().querySelectorAll('input')[current].focus();
+		cmp._currentIndex = current + 1;
+	},
+	
 	handleGridEvents : function(cmp, evt, helper) {
 		if (evt.getParam("action") === 'select') {
 			var index = evt.getParam("index");

@@ -15,6 +15,9 @@
  */
 /*jslint sub: true */
 /**
+ * QueuedActionsMetricsPlugin
+ * =================
+ * This plugin tracks the state and result of all actions from the framework
  * @description Queued Action metrics plugin
  * @constructor
  * @export

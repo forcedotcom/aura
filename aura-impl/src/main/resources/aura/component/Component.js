@@ -1022,7 +1022,7 @@ Component.prototype.getElement = function() {
     if (elements) {
         for (var i = 0; i<elements.length; i++) {
             if (elements[i]){
-                return elements[i];
+            	return elements[i];
             }
         }
     }
@@ -1579,10 +1579,13 @@ Component.prototype.getFlavor = function() {
 Component.prototype.render = function() {
     var render = this["renderer"] && this["renderer"]["render"];
     if(render){
-        var context=$A.getContext();
+        var context = $A.getContext();
         context.setCurrentAccess(this);
-        var result = render(this, this["helper"]);
+
+        var result = render($A.lockerService.wrapComponent(this), this["helper"]);
+
         context.releaseCurrentAccess();
+
         return result;
     } else {
         return this.superRender();
@@ -1598,7 +1601,9 @@ Component.prototype.afterRender = function() {
     if(afterRender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        afterRender(this, this["helper"]);
+
+        afterRender($A.lockerService.wrapComponent(this), this["helper"]);
+
         context.releaseCurrentAccess();
     } else {
         this.superAfterRender();
@@ -1615,7 +1620,7 @@ Component.prototype.rerender = function() {
     if(rerender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        var result = rerender(this, this["helper"]);
+        var result = rerender($A.lockerService.wrapComponent(this), this["helper"]);
         context.releaseCurrentAccess();
         return result;
      } else {
@@ -1628,11 +1633,14 @@ Component.prototype.rerender = function() {
  * @export
  */
 Component.prototype.unrender = function() {
-    var afterRender = this["renderer"] && this["renderer"]["unrender"];
-    if(afterRender){
+    // Clean any dirty values so we don't attempt to rerender.
+    $A.renderingService.cleanComponent(this.globalId);
+
+    var unrender = this["renderer"] && this["renderer"]["unrender"];
+    if(unrender){
         var context=$A.getContext();
         context.setCurrentAccess(this);
-        afterRender(this, this["helper"]);
+        unrender($A.lockerService.wrapComponent(this), this["helper"]);
         context.releaseCurrentAccess();
      } else {
         // If a component extends the root component and doesn't implement it's own
@@ -1726,7 +1734,7 @@ Component.prototype.createActionValueProvider = function() {
                             "code": actionDef
                         });
                     } else {
-                        actionDef = controllerDef.getActionDef(key);
+                        actionDef = controllerDef && controllerDef.getActionDef(key);
                     }
                     $A.assert(actionDef, "Unknown controller action '"+key+"'");
                     this.actions[key] = actionDef;
@@ -1762,6 +1770,11 @@ Component.prototype.setupComponentDef = function(config) {
     if (config["original"]) { // We have to replace the abstractdef for the concrete one
         this.replaceComponentClass(componentDef.getDescriptor().getQualifiedName());
     }
+
+    var key = $A.lockerService.util._getKey(this.componentDef, $A.lockerService.masterKey);
+	if (key) {
+    	$A.lockerService.util.applyKey(this, key);
+	}
 };
 
 Component.prototype.createComponentStack = function(facets, valueProvider){
@@ -2108,11 +2121,14 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
     if(!valueProvider&&$A.util.isExpression(actionExpression)){
         valueProvider=actionExpression.valueProvider;
     }
+
     return function Component$getActionCaller(event) {
         if (valueProvider.isValid && !valueProvider.isValid() && event.getDef().getDescriptor().getName() !== "valueDestroy") {
             return;
         }
+
         var clientAction;
+
         // JBUCH: HALO: HACK: FIXME?
         actionExpression=valueFactory.create(actionExpression, null, valueProvider);
 
@@ -2121,11 +2137,13 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
         }else{
             clientAction=valueProvider.get(actionExpression);
         }
+
         if (clientAction) {
             // JBUCH: HALO: HACK: FIXME?
             if($A.util.isString(clientAction)){
                 clientAction=valueProvider.getConcreteComponent().get(clientAction);
             }
+
             clientAction.runDeprecated(event);
         } else {
             $A.assert(false, "no client action by name " + actionExpression);

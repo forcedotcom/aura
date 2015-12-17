@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.3362-SNAPSHOT</version>
+        <version>0.3401-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -142,7 +142,7 @@
     </properties>
     <build>
         <pluginManagement>
-            <plugins>              
+            <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -282,7 +282,7 @@
            					 </transformationSet>
           				</transformationSets>
         			</configuration>
-      			</plugin>                
+      			</plugin>
                 <plugin>
                     <groupId>com.savage7.maven.plugins</groupId>
                     <artifactId>maven-external-dependency-plugin</artifactId>
@@ -431,8 +431,8 @@
      				<plugin>
         				<groupId>org.codehaus.mojo</groupId>
         				<artifactId>xml-maven-plugin</artifactId>
-                    </plugin>        					            	 
-                </plugins>                
+                    </plugin>
+                </plugins>
             </build>
         </profile>
         <profile>
@@ -496,7 +496,7 @@
      				<plugin>
         				<groupId>org.codehaus.mojo</groupId>
         				<artifactId>xml-maven-plugin</artifactId>
-                    </plugin>                     
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -845,7 +845,6 @@
                             <testDirectory>${project.parent.basedir}/${module.name}/src/test</testDirectory>
                             <excludeArgs>
                                 <excludeArg>--exclude=src/main/java</excludeArg>
-                                <excludeArg>--exclude=src/main/components/auraadmin</excludeArg>
                                 <excludeArg>--exclude=src/main/components/auradev</excludeArg>
                                 <excludeArg>--exclude=src/main/components/auradocs</excludeArg>
                                 <excludeArg>--exclude=src/main/components/auraide</excludeArg>

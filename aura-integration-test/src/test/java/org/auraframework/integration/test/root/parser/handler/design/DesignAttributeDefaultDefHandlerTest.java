@@ -63,7 +63,7 @@ public class DesignAttributeDefaultDefHandlerTest extends AuraImplTestCase {
             createComponentAndDesignWithAttributeDefault("<aura:set/>");
             fail("Should only allow component tags in attributeDefault");
         } catch (Exception e) {
-            assertExceptionMessage(e, DefinitionNotFoundException.class,
+            assertExceptionMessageStartsWith(e, DefinitionNotFoundException.class,
                     "No COMPONENT named markup://aura:set found");
         }
     }

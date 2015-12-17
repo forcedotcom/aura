@@ -31,6 +31,7 @@
     <aura:attribute name="animation" type="String" default="center" description="Adds animation to the dialog"/>
     <aura:attribute name="closeAnimation" type="String" description="Adds animation to the dialog"/>
     <aura:attribute name="autoFocus" type="Boolean" default="true" description="Sets initial focus on the first item in the panel" />
+    <aura:attribute name="icon" type="Aura.Component[]" description="The icon for the modal"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
@@ -51,6 +52,7 @@
                 <span class="assistiveText">{!v.startOfDialogLabel}</span>
 
                 <div class="{!'modal-header' + (and(empty(v.header), empty(v.title)) ? ' empty' : '')}">
+                    {!v.icon}
                     <aura:If isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
                     </aura:If>

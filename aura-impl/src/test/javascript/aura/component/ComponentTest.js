@@ -472,6 +472,30 @@ Test.Aura.Component.ComponentTest=function(){
     }
 
     [Fixture]
+    function unrender() {
+        [Fact]
+        function RemoveUnrenderedComponentFromDirtyComponents() {
+            // Arrange
+            var expected = "testGlobalId";
+            var actual = null;
+            mockFramework(function() {
+                // Assuming that cleanComponent() cleans the given component from dirtyComponents.
+                $A.renderingService.cleanComponent = function(globalId) {
+                    actual = globalId;
+                }
+                var target = new Aura.Component.Component({},true);
+                target.setupGlobalId(expected);
+
+                // Act
+                target.unrender();
+            });
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+
+    [Fixture]
     function GetDef() {
         [Fact]
         function ReturnsNullForInvalidComponent() {

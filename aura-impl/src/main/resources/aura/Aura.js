@@ -603,45 +603,49 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         $A.setRoot(app);
 
         if (!$A.initialized) {
-            // restore component definitions from AuraStorage into memory
-            $A.componentService.restoreDefsFromStorage();
-
-            // add default handler to aura:systemError event
-            $A.eventService.addHandler({
-                'event': 'aura:systemError',
-                'globalId': app.getGlobalId(),
-                'handler': function(event) {
-                    if (event["handled"]) {
-                        return;
-                    }
-
-                    $A.message(event.getParam("message"));
-                    event["handled"] = true;
-                 }});
-
-            $A.initialized = true;
+            // Restore component definitions from AuraStorage into memory (if persistent)
+            $A.componentService.restoreDefsFromStorage().then(function () {
+                $A.initialized = true;
+                $A.addDefaultErrorHandler(app);
+                $A.finishInit(doNotInitializeServices);
+            });
         }
-
-        $A.finishInit();
-
-        // After App initialization is done
-        if (!doNotInitializeServices) {
-            $A.historyService.init();
-        }
+        
     }
+};
+
+/**
+ * Add default handler to aura:systemError event
+ * @private
+ */
+AuraInstance.prototype.addDefaultErrorHandler = function (app) {
+    $A.eventService.addHandler({
+        "event": "aura:systemError",
+        "globalId": app.getGlobalId(),
+        "handler": function(event) {
+            if (event["handled"]) { return; }
+            $A.message(event.getParam("message"));
+            event["handled"] = true;
+        }
+    });
 };
 
 /**
  * Signals that initialization has completed.
  * @private
  */
-AuraInstance.prototype.finishInit = function() {
+AuraInstance.prototype.finishInit = function(doNotInitializeServices) {
     if (!this["finishedInit"]) {
         $A.util.removeClass(document.body, "loading");
         delete $A.globalValueProviders;
         this["finishedInit"] = true;
         $A.get("e.aura:initialized").fire();
         $A.metricsService.applicationReady();
+    }
+
+    // Unless we are in IntegrationServices, dispatch location hash change.
+    if (!doNotInitializeServices) {
+        $A.historyService.init();
     }
 };
 

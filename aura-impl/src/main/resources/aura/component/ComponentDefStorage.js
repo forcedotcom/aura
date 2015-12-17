@@ -200,13 +200,13 @@ ComponentDefStorage.prototype.getAll = function () {
  * @return {Promise} a promise that resolves when definitions are restored.
  */
 ComponentDefStorage.prototype.restoreAll = function() {
-    if (this.restoreInProgress) {
-        return;
-    }
-    this.restoreInProgress = true;
-
     var defRegistry = this;
-    this.getAll()
+    if (this.restoreInProgress) {
+        return this.currentPromise;
+    }
+
+    this.restoreInProgress = true;
+    this.currentPromise = this.getAll()
         .then(
             function(items) {
                 // if any decode fails the dependency graph may be broken. therefore decode all items
@@ -245,14 +245,18 @@ ComponentDefStorage.prototype.restoreAll = function() {
 
                 $A.log("ComponentDefStorage: restored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries from storage into registry");
                 defRegistry.restoreInProgress = false;
+                this.currentPromise = null;
             }
         ).then(
             undefined, // noop
             function(e) {
                 $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
                 defRegistry.restoreInProgress = false;
+                this.currentPromise = null;
             }
         );
+
+    return this.currentPromise;
 };
 
 /**

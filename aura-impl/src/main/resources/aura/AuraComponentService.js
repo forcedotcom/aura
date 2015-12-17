@@ -621,10 +621,7 @@ AuraComponentService.prototype.buildComponentClassConstructor = function(compone
     // TODO: Update to the following line when all browsers have support for dynamic function names.
     // (only supported in IE11+).
     // var componentConstructor = function [className](){ Component.apply(this, arguments); };
-    var componentConstructor = new Function(
-        "Component",
-        "return function " + className + "() { Component.apply(this, arguments); };"
-    )(Component);
+    var componentConstructor = $A.util.globalEval("function " + className + "() { Component.apply(this, arguments); };");
 
     // Extends from Component (and restore constructor).
     componentConstructor.prototype = Object.create(Component.prototype);

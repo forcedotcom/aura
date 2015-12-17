@@ -66,12 +66,19 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function(src) {
-    // use assignment to variable so that the newlines in src are not actually treated as the end of the line
-    return new Function("var a = " + src + "; return a;")();
-} : function(src) {
-    // normal indirect eval call
-    return window.eval("false||" + src);
+Aura.Utils.Util.prototype.globalEval = function(src) {
+	var head = document.getElementsByTagName("head")[0];
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.appendChild(document.createTextNode("window.$globalEvalResult$ = " + src));
+        
+    head.appendChild(script);
+    head.removeChild(script);
+	
+    var result = window["$globalEvalResult$"];
+    delete window["$globalEvalResult$"];
+    
+    return result;
 };
 
 /**

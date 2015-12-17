@@ -83,7 +83,6 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         list.add(null);  // Same origin allowed
         list.add("chrome-extension:");
         if (inlineStyle) {
-            list.add(CSP.UNSAFE_EVAL);
             list.add(CSP.UNSAFE_INLINE);
         }
         return list;

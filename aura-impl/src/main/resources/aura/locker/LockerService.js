@@ -85,7 +85,7 @@ function LockerService() {
 				
 		// Rewrite references to eval to avoid implicit calls leaking global state 
 		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
-		return code.replace(/\beval\b/g, "_lsSafeEval");
+		return code;
 	}
 
 	function isSafeModeEnabled() {
@@ -114,7 +114,7 @@ function LockerService() {
 				var shadowingIIFESource = "function(" + shadows.toString() + ") {\n\"use strict\";\n";
 				
 				// DCHASMAN TODO W-2837788 Figure out the scoping issues here (e.g. component, helper, etc is not visible and maybe that is ok???)
-				shadowingIIFESource += "var that = this; function _lsSafeEval(code) { return eval(\"'use strict';\" + that.secureSource(code)); }\n";
+				shadowingIIFESource += "var that = this;\n";
 				
 				shadowingIIFESource += preprocessSource(code) + "\n}";
 
@@ -185,19 +185,10 @@ function LockerService() {
 
 					Object.freeze(env.sAura);
 				}
-
-				function sFunction() {
-					/*jslint evil: true */
-					var args = Array.prototype.slice.call(arguments);
-					args[args.length - 1] = "'use strict'; " + args[args.length - 1];
-					return Function.apply(undefined, args);
-				}
-				
-				// function getCtor(o) { if (o.constructor === Function.constructor) { throw new Error("You cannot get Function.ctor!") } return o.constructor; }
-				
+								
 				// We pass in SecureUtils as this to provide an object that cannot be replaced/spoofed
 				var sWindow = env.sWindow;
-				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, sFunction);
+				var result = locker.call(env.sUtils, env.sAura, env.sDocument, sWindow, sWindow, sWindow, console, Error, Function);
 
 				Object.defineProperty(locker, "$result", {
 					value : result

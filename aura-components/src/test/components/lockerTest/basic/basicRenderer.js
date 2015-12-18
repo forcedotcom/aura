@@ -94,15 +94,6 @@
 			var div = content.getElement();
 			var parentNode = div.parentNode;
 		}, "Blocked access to div.parentNode in afterRender()");
-		
-		// Try to create an inline script
-	    var script = document.createElement("script");
-	    script.type = "text/javascript";
-	    script.appendChild(document.createTextNode("alert('Hack alert!')"));
-	    
-	    var content = component.find("content");
-		var div = content.getElement();
-	    div.appendChild(script);
 
 		// DCHASMAN TODO Add hasAccess check in Component.getElement()
 		/*

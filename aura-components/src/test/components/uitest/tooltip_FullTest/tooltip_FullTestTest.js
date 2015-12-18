@@ -477,6 +477,22 @@
 				]
 	},
 	
+	/**
+	 * Test to check if a Modal containing tooltips functions properly when opened and closed
+	 */
+	testModal : {
+		test : [
+		        function(cmp) {
+		        	var modalBtn = cmp.find("modalBtn").getElement();
+		        	this.openOrCloseModal(cmp, modalBtn, "open");
+		        },
+		        function(cmp) {
+		        	var closeBtn = $A.test.select(".closeBtn")[0];
+		        	this.openOrCloseModal(cmp, closeBtn, "close");
+		        },
+		        ]
+	},
+	
 	openOrCloseTT : function(component, ttLabel, tooltip, action) {
 		var trigger = component.find(ttLabel).getElement();
 		var tt = component.find(tooltip);
@@ -489,6 +505,32 @@
 			$A.test.fireDomEvent(trigger, "mouseout");
 			$A.test.addWaitForWithFailureMessage(false, function(){return ($A.util.hasClass(ttElem,"visible"));}, "Tooltip not closing for tooltip with aura:id = " + tooltip);
 		}
+	},
+	
+	openOrCloseModal : function(cmp, btnElement, action) {
+
+    	$A.test.fireDomEvent(btnElement, "click");
+    	$A.test.addWaitForWithFailureMessage(true, function(){
+    		var modals =$A.test.select(".uiModal");
+ 
+    		if(action == "open") {
+    			if(modals.length > 0){
+        			return true;
+        		}
+        		else{
+        			return false;
+        		}
+    		}
+    		else {
+    			if(modals.length == 0){
+    				return true;
+    			}
+    			else {
+    				return false;
+    			}		
+    		}
+    			
+    	}, "Could not complete action: " + action);
 	}
 
 })

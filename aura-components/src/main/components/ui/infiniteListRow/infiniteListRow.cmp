@@ -15,19 +15,19 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true">
-	<aura:attribute name="class" type="String"/>
-	<aura:attribute name="swipeBody" type="Aura.Component[]"/>
+<aura:component extensible="true" description="A row in a list that supports swiping to expose more content. Each row touch event is resolved by ui:infiniteList via the uiInfiniteListRow CSS class">
+	<aura:attribute name="class" type="String" description="The CSS class added to the row."/>
+	<aura:attribute name="swipeBody" type="Aura.Component[]" description="The body that displays on swipe."/>
 
-	<aura:registerEvent name="open" type="ui:open"/>
-	<aura:registerEvent name="close" type="ui:close"/>
+	<aura:registerEvent name="open" type="ui:open" description="The event fired when the user swipes a row to expose additional content."/>
+	<aura:registerEvent name="close" type="ui:close" description="The event fired when the user swipes a row to hide additional content."/>
 
 	<aura:handler name="open" action="{!c.handleOpen}"/>
 	<aura:handler name="close" action="{!c.handleClose}"/>
 
 	<!-- 
 	 ~ Each row touch event is resolved by ui:infiniteList via the class "uiInfiniteListRow" (see infiniteListRowHelper). 
-	 ~ Hence, try not to mess around with the class name. Adding an additional class name is acceptable tough.
+	 ~ Hence, try not to mess around with the class name. Adding an additional class name is acceptable.
 	 -->
 	<li aura:id="containerLI" class="{!v.class}" style="{! $Browser.isWindowsPhone ? 'touch-action: pan-y' : ''}">
 		<div aura:id="body" class="body">{!v.body}</div>

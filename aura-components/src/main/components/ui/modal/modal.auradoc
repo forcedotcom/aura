@@ -35,12 +35,12 @@
         }
     }).fire();</pre>
     <p>In your component, register the modal with the <code>ui:panelManager2</code> component.</p>
-    <pre>&lt;ui:panelManager2 aura:id="pm" useSharedContainer="true">
+    <pre>&lt;ui:panelManager2 aura:id="pm">
     &lt;aura:set attribute="registeredPanels">
         &lt;ui:panel alias="panel"/>
         &lt;ui:modal alias="modal"/>
     &lt;/aura:set>
 &lt;/ui:panelManager2></pre>
-        <p>See <code>ui:panel</code> for more information.</p>
+        <p>See the <a href="/uiExamples/panelExamples.app" target="_blank">panel demo</a> for examples.</p>
     </aura:description>
 </aura:documentation>

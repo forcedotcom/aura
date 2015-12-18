@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" support="PROTO" description="">
+<aura:component extensible="true" support="PROTO" description="Displays a table of data">
 	<aura:import library="ui:virtualDataGridLib" property="lib"/>
     <aura:attribute name="sortBy" type="String" description="Comma-separated list of columns predicated by a '-' for descending."/>
     
-    <!-- This is deprecated, used in old grid, eventually this shoul be a <method> -->
+    <!-- This is deprecated, used in old grid, eventually this should be a <method> -->
     <aura:handler name="refresh" action="{!c.handleRefresh}"/>
     <aura:registerEvent name="refresh" type="ui:refresh" description="Provides fresh data from the dataProvider."/>
     <aura:method name="appendItems">
@@ -49,7 +49,8 @@
     <aura:attribute name="_sortBy" 		type="String" default="" description="Sort order of the data in the grid. Name of column, predicated by a '-' for descending."/>
     
     <aura:attribute name="useRowHeaders"	type="Boolean"				default="false" description="Makes the first column of each row a header cell. The default is false."/>
-    <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description="Specifies whether the grid should use CSS to fix the header's position. Content in the table body is set to overflow and scrolling is enabled. The default is false."/>
+    <aura:attribute name="fixedHeader"		type="Boolean"				default="false" description="Specifies whether the grid should use CSS to fix the header's position. If true, content in the table body is set to overflow and scrolling is enabled. 
+    																	To support overflow and scrolling, you must include a fixed or max-height CSS style for the table. The default is false."/>
 
     <aura:attribute name="keyboardNavigation" type="boolean"            default="false" description="Enables keyboard navigation with up/down arrows. Requires having an input element in every row."/>
 

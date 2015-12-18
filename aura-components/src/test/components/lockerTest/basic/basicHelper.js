@@ -21,7 +21,7 @@
 			var error = x.toString();
 			if (error.indexOf("TypeError") < 0 && error.indexOf("ReferenceError") < 0 && error.indexOf("Security violation: use of __pro" + "to__") < 0
 					&& error.indexOf("EvalError: Refused to evaluate a string as JavaScript because 'unsafe-ev" + "al' is not an allowed source of script") < 0
-					&& error.indexOf("Error: call to eval() blocked by CSP") < 0
+					&& error.indexOf("Error: call to eval() blocked by CSP") < 0 && error.indexOf("Error: call to Function() blocked by CSP") < 0
 					&& error.indexOf("SecurityError") < 0) {
 				throw new Error("Unexpected exception: " + x.toString());
 			}

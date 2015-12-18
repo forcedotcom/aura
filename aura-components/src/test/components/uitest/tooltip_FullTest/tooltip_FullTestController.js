@@ -56,7 +56,23 @@
 		catch(e){
 			console.log("Tooltip does not exist since Advanced=\"\" \nError Message:" + e.message);
 		}	   
-},
+  },
 	  
-  
+	openPanel: function(cmp){
+
+		var body = [];
+	    body.push ($A.createComponentFromConfig({
+		    componentDef : { descriptor: "markup://uitest:tooltipTestPosition"
+		    	}
+		}));
+	
+	    $A.get('e.ui:createPanel').setParams({
+	        panelType: 'modal',
+	        visible: true,
+	        panelConfig: {     
+	            body: body,
+	            }
+	        }).fire();
+	},
+
 })

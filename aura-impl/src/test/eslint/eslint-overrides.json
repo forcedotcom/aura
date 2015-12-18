@@ -91,12 +91,13 @@
     "valueFactory": true,
     "ValueDef": true,
     "WallTime": true,
-	"SecureThing": true,
-	"SecureComponent": true,
-	"SecureWindow": true,
-	"SecureDocument": true,
-	"SecureElement": true,
-	"SecureScriptElement": true
+    "SecureThing": true,
+    "SecureComponent": true,
+    "SecureWindow": true,
+    "SecureDocument": true,
+    "SecureElement": true,
+    "SecureScriptElement": true,
+    "SecureDOMEvent": true
   },
 
   "rules": {

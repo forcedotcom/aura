@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+//#include aura.locker.SecureDOMEvent
+
 var SecureElement = (function() {
 	"use strict";
 
@@ -35,7 +37,6 @@ var SecureElement = (function() {
 		Object.freeze(this);
 	}
 
-	SecureElement.prototype.constructor = SecureElement;
 	SecureElement.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
@@ -61,33 +62,30 @@ var SecureElement = (function() {
 
 		addEventListener : {
 			value : function(event, callback, useCapture) {
-				var that = this;
+				if (!callback) {
+					return; // by spec, missing callback argument does not throw, just ignores it.
+				}
+				var key = getKey(this);
 				var sCallback = function(e) {
-					// Filter out any events not associated with our key
-					if ($A.lockerService.util.hasAccess(that, e.target)) {
-
-						// DCHASMAN TODO W-2837770 create SecureEvent class to allow delivery of bubbled events w/out exposing currentTarget etc
-						// for (name in event) { if (event[name] instanceof Node) { console.log("Found something to wrap: " + name) } }
-
-						// Wrap the source event in "this" in a secure element
-						var sourceEvent = SecureDocument.wrap(this);
-
-						callback.call(sourceEvent, e);
-					}
+					var se = new SecureDOMEvent(e, key);
+					// Wrap the source event in "this" in a secure element
+					var secureEventContext = SecureDocument.wrap(this);
+					callback.call(secureEventContext, se);
 				};
-
 				getElement(this).addEventListener(event, sCallback, useCapture);
 			}
 		},
+		removeEventListener : SecureThing.createPassThroughMethod("removeEventListener"),
+		dispatchEvent : SecureThing.createPassThroughMethod("dispatchEvent"),
 
 		childNodes : SecureThing.createFilteredProperty("childNodes"),
 		children : SecureThing.createFilteredProperty("children"),
-		
+
 		getAttribute: SecureThing.createPassThroughMethod("getAttribute"),
 		setAttribute: SecureThing.createPassThroughMethod("setAttribute"),
 
 		innerText: SecureThing.createPassThroughProperty("innerText"),
-		
+
 		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
 		parentNode : SecureThing.createFilteredProperty("parentNode"),
 
@@ -103,6 +101,8 @@ var SecureElement = (function() {
 			}
 		}
 	});
+	
+	SecureElement.prototype.constructor = SecureElement;
 
 	return SecureElement;
 })();

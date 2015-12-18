@@ -16,7 +16,10 @@
 
 -->
 <aura:component>
+
     <aura:attribute name="renderItem" type="String" default="all"/>
+    <aura:dependency resource="markup://uitest:tooltipTestPosition" type="COMPONENT"/>
+
         <div>
         	<div class="title"> 	
         		Tooltip Component Test Cases
@@ -596,6 +599,21 @@
 	            </div>
             </div>
             
+            <!--
+        		Test tooltip inside panel/modal
+       	 	-->
+        
+        
+            <div class="blocks">
+	            <div class="case">
+	                <h1>Tooltips in Modal</h1>
+	                <ui:button aura:id="modalBtn" class="modalBtn" label="Modal" press="{!c.openPanel}"/>
+	            </div>
+	            <div class="attribute">
+	            	Modals
+	            </div>
+            </div>
+            
              <!--
             	domId Attribute test
             -->
@@ -629,5 +647,14 @@
 	            </div>
             </div>           
         </div>
+        
+
+        <ui:panelManager2 aura:id="pm">
+            <aura:set attribute="registeredPanels">
+                <ui:modal aura:id="modal" alias="modal"/>
+            </aura:set>
+        </ui:panelManager2>
+
+        
         <ui:containerManager />
 </aura:component>

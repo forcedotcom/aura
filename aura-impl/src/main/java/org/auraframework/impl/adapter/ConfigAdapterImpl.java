@@ -634,9 +634,13 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if ("HTML".equals(format)) {
             String defType = request.getParameter("aura.deftype");
             if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
-                inlineStyle = true;  // apps and components allow inlines.  Sigh.
+                inlineStyle = false;  // apps and components allow inlines.  Sigh.
             }
+        } else {
+        	// Look for /auraFW/resources/lockerservice/safeEval.html
+        	inlineStyle = request.getRequestURI().equals("/auraFW/resources/lockerservice/safeEval.html");
         }
+        
         return new DefaultContentSecurityPolicy(inlineStyle);
     }
 

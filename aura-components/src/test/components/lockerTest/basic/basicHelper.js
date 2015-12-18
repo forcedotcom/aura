@@ -10,10 +10,12 @@
 		content.getElement().appendChild(messageDiv);
 	},
 
-	testSymbol : function(symbol) {		
+	testSymbol : function(testCase) {
+		var symbol = testCase.toString();
+		
 		// Test out eval, self, and Function tricks
 		try {
-			var result = eval(symbol);
+			var result = testCase();
 			this.helper.log(this.component, "Global window via " + symbol + ": " + result);
 		} catch (x) {
 			var error = x.toString();

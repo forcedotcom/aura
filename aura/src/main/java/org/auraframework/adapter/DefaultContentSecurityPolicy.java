@@ -84,7 +84,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         list.add("chrome-extension:");
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
+        } else {
+            list.add("'nonce-dutchWasHere'");
         }
+
         return list;
     }
 
@@ -96,7 +99,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         list.add("chrome-extension:");
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
-        }
+	    } else {
+	        list.add("'nonce-dutchWasHere'");
+	    }
+
         return list;
     }
 

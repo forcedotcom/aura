@@ -68,18 +68,27 @@
     <html manifest="{!v.manifest}">
         <head>
             <title>{!v.title}</title>
-            <script>var pageStartTime = (new Date()).getTime();</script>
+            <script nonce="dutchWasHere">
+            var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
 
             <!-- ====== Styles ====== -->
             {!v.auraResetTags}
-            <style>
+            <style nonce="dutchWasHere">
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}
             </style>
             {!v.auraStyleTags}
             {!v.extraStyleTags}
-            <style>{!v.auraInlineStyle}</style>
+            <style nonce="dutchWasHere">{!v.auraInlineStyle}</style>
+            
+          	<style nonce="dutchWasHere">
+           	.safeEvalWorker {
+           		width: 10px;
+           		height: 10px;
+           		background-color: gray;
+           	}
+            </style>
         <!-- ==================== -->
         </head>
 
@@ -112,7 +121,7 @@
 
             {!v.auraPreInitBlock}
 
-            <script>
+            <script nonce="dutchWasHere">
                 if ({!v.autoInitialize}) {
                     $A.initAsync({!v.auraInit});
                 } else if ({!v.autoInitializeSync}){
@@ -147,7 +156,9 @@
             {!v.auraInitBlock}
 
             {!v.auraNamespacesScriptTags}
-
+            
+          	<iframe aura:id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" class="safeEvalWorker"></iframe>
+          
         </body>
     </html>
 </aura:component>

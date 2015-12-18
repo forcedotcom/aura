@@ -67,18 +67,7 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  * @private
  */
 Aura.Utils.Util.prototype.globalEval = function(src) {
-	var head = document.getElementsByTagName("head")[0];
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.appendChild(document.createTextNode("window.$globalEvalResult$ = " + src));
-        
-    head.appendChild(script);
-    head.removeChild(script);
-	
-    var result = window["$globalEvalResult$"];
-    delete window["$globalEvalResult$"];
-    
-    return result;
+    return window["$$safeEval$$"](src);
 };
 
 /**

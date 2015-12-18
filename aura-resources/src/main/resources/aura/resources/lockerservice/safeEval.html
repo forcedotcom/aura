@@ -1,0 +1,30 @@
+<html>
+<body>
+	<script>
+	window.parent.$$safeEval$$ = function(src) {
+		if (!window.$A) {
+			// Copy all of the globals from the parent to publish them to this window's scope
+			var parent = window.parent;
+			for (var key in parent) {
+				if (parent.hasOwnProperty(key) && !window[key]) {
+					window[key] = parent[key];
+				}
+			}
+		}
+	
+		var head = document.getElementsByTagName("head")[0];
+	    var script = document.createElement("script");
+	    script.type = "text/javascript";
+	    script.appendChild(document.createTextNode("window.$globalEvalResult$ = " + src));
+	        	    
+	    head.appendChild(script);
+	    head.removeChild(script);
+		
+	    var result = window["$globalEvalResult$"];
+	    delete window["$globalEvalResult$"];
+	    
+	    return result;
+	}
+	</script>
+</body>
+</html>

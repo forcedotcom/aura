@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component defaultFlavor="lookup" >
+<aura:component defaultFlavor="lookup" description="A list of results for the ui:autocomplete component that uses the panel positioning library." >
     <aura:import library="ui:panelPositioningLib" property="lib" />
     <aura:attribute name="referenceElement" type="Object"/>
     <aura:attribute name="visible" type="boolean" default="false" access="INTERNAL"/>

@@ -17,7 +17,7 @@
 -->
 <aura:component implements="ui:scrollerEmbeddable"
                 extensible="true"
-                description="">
+                description="Displays a list of items horizontally, which can be swiped through or clicked through using page indicators.">
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     

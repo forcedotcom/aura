@@ -15,9 +15,9 @@
     limitations under the License.
 
 -->
-<aura:component template="auradev:blankTemplate" extensible="true">
-<aura:attribute name="lastMod" type="String" default=""/>
-<aura:attribute name="resourceURLs" type="String" default=""/>CACHE MANIFEST
+<aura:component template="auradev:blankTemplate" extensible="true" description="A cache manifest file.">
+<aura:attribute name="lastMod" type="String" default="" description="The last modified timestamp."/>
+<aura:attribute name="resourceURLs" type="String" default="" description="The resources that are explicitly cached."/>CACHE MANIFEST
 
 
 # LAST MOD: {!v.lastMod}

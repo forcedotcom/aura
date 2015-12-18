@@ -206,8 +206,9 @@
                 }
                 href += ");";
                 element.setAttribute("href", href);
-            } else if (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0) {
+            } else if (!$A.util.isUndefinedOrNull(value) && (lowerName === "role" || lowerName.lastIndexOf("aria-", 0) === 0)) {
                 // use setAttribute to render accessibility attributes to markup
+                // do not set the property on the HTMLElement if value is null or undefined to avoid accessibility confusion.
                 element.setAttribute(name, value);
             } else if (isSpecialBoolean) {
                 // handle the boolean attributes for whom presence implies truth

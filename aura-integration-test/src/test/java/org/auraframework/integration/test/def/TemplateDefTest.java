@@ -15,6 +15,7 @@
  */
 package org.auraframework.integration.test.def;
 
+import java.util.regex.Pattern;
 import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.BaseComponentDef;
@@ -334,14 +335,17 @@ public class TemplateDefTest extends AuraImplTestCase {
         Component template = Aura.getInstanceService().getInstance(scriptTagInBodyOfTemplate);
         Aura.getRenderingService().render(template, sb);
         String result = sb.toString();
-        assertTrue("extraScriptTags attribute on aura:template could not retrieve value off model",
-                result.contains("<script type=\"text/javascript\" src=\"firstThingDefault\""));
-        assertTrue("extraStyleTags attribute on aura:template could not retrieve value off model",
-                result.contains("<script type=\"text/javascript\" src=\"readonly\""));
-        assertTrue("extraMetaTags attribute on aura:template could not retrieve value off model",
-                result.contains("<meta content=\"testtest\" name=\"firstThingDefault\""));
-    }
 
+        // Using pattens here because in java 1.7 we get attributes rendered one way, in 1.8 we get a different way.
+        Pattern scriptPattern = Pattern.compile("<script src=\"firstThingDefault\" type=\"text/javascript\"|<script type=\"text/javascript\" src=\"firstThingDefault\"");
+        Pattern stylePattern = Pattern.compile("<script src=\"readonly\" type=\"text/javascript\"|<script type=\"text/javascript\" src=\"readonly\"");
+        Pattern metaPattenr = Pattern.compile("<meta content=\"testtest\" name=\"firstThingDefault\"|<meta name=\"firstThingDefault\" content=\"testtest\"");
+        
+        assertTrue("extraScriptTags attribute on aura:template could not retrieve value off model", scriptPattern.matcher(result).find());
+        assertTrue("extraStyleTags attribute on aura:template could not retrieve value off model",stylePattern.matcher(result).find());
+        assertTrue("extraMetaTags attribute on aura:template could not retrieve value off model",metaPattenr.matcher(result).find());
+    }
+    
     /**
      * Verify the new errorTitle attribute, with default error message.
      */

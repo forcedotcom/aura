@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.component.auradev.ShowDependenciesModel">
+<aura:component model="java://org.auraframework.components.aura.ShowDependenciesModel">
     <aura:attribute type="String" name="component" default="aura:application" />
     <div>
         <div class="{!'header'+(m.error==true?' error':'')}">

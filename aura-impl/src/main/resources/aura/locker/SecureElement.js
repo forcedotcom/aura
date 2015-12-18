@@ -37,7 +37,6 @@ var SecureElement = (function() {
 		Object.freeze(this);
 	}
 
-	SecureElement.prototype.constructor = SecureElement;
 	SecureElement.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
@@ -102,6 +101,8 @@ var SecureElement = (function() {
 			}
 		}
 	});
+	
+	SecureElement.prototype.constructor = SecureElement;
 
 	return SecureElement;
 })();

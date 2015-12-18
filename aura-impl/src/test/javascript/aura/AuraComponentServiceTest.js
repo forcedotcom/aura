@@ -33,11 +33,13 @@ Test.Aura.AuraComponentServiceTest = function(){
     var Aura = {
         Services: {},
         Component: {
-            ComponentDefStorage: function () {}
-        }, 
+            ComponentDefStorage: function () {},
+            ComponentClassRegistry: function () {}
+        },
         Library: {
             LibraryDefRegistry: function () {},
-        }
+        },
+
     };
 
     Mocks.GetMocks(Object.Global(), {
@@ -81,7 +83,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                     return !!obj && Object.prototype.toString.apply(obj) === '[object Function]';
                 }
             }
-            
+
         });
 
         [Fact]
@@ -368,7 +370,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 targetService.componentDefRegistry["markup://" + descriptor] = definition;
                 actual = targetService.hasDefinition(descriptor);
             });
-            
+
             Assert.True(actual);
         }
 
@@ -382,7 +384,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 targetService.componentDefRegistry[descriptor] = definition;
                 actual = targetService.hasDefinition(descriptor);
             });
-            
+
             Assert.True(actual);
 
         }
@@ -396,7 +398,7 @@ Test.Aura.AuraComponentServiceTest = function(){
                 targetService.componentDefRegistry[descriptor] = null;
                 actual = targetService.hasDefinition(descriptor);
             });
-            
+
             Assert.False(actual);
         }
     }

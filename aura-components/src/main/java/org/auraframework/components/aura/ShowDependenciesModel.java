@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.auraframework.component.auradev;
+package org.auraframework.components.aura;
 
 import java.util.List;
 import java.util.Map;

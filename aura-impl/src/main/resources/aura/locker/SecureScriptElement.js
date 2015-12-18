@@ -21,7 +21,6 @@ var SecureScriptElement = (function() {
 		SecureThing.call(this, key, "src");
 	}
 
-	SecureScriptElement.prototype.constructor = SecureScriptElement;
 	SecureScriptElement.prototype = Object.create(SecureThing.prototype, {
 		$run : {
 			value : function() {
@@ -63,6 +62,8 @@ var SecureScriptElement = (function() {
 			}
 		}
 	});
+	
+	SecureScriptElement.prototype.constructor = SecureScriptElement;
 
 	return SecureScriptElement;
 })();

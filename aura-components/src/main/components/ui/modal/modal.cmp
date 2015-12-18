@@ -16,7 +16,8 @@
 
 -->
 
-<aura:component implements="ui:panelType" extensible="true">
+<aura:component implements="ui:panelType" extensible="true" description="A modal dialog displayed over the main UI, interrupting the process to prompt user for information or a response. It holds focus until the dialog is closed or submitted.
+																		Use one instance of ui:panelManager2 to manage your modals.">
     <aura:import library="ui:panelLib" property="lib"/>
 
     <aura:attribute name="title" type="String" description="The title of the dialog window" />

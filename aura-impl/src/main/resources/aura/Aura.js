@@ -99,6 +99,7 @@ window['$A'] = {};
 // #include aura.model.Model
 
 // -- Component ---------------------------------------------------------
+// #include aura.component.ComponentClassRegistry
 // #include aura.component.ComponentDefStorage
 // #include aura.component.Component
 // #include aura.component.InvalidComponent

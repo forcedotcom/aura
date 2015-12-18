@@ -2,14 +2,9 @@
 <body>
 	<script>
 	window.parent.$$safeEval$$ = function(src) {
-		if (!window.$A) {
-			// Copy all of the globals from the parent to publish them to this window's scope
+		if (!window.Component) {
 			var parent = window.parent;
-			for (var key in parent) {
-				if (parent.hasOwnProperty(key) && !window[key]) {
-					window[key] = parent[key];
-				}
-			}
+			window.Component = parent.Component;
 		}
 	
 		var head = document.getElementsByTagName("head")[0];

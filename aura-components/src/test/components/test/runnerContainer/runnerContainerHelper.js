@@ -512,7 +512,7 @@
                       return;
                }
         }
-        console.log(testCb);
+
         for (i = 0; i < testCb.length; i++) {
             row      = testCb[i];
             id       = $A.util.getDataAttribute(row, 'testid');
@@ -571,7 +571,6 @@
             update = testsMap[id];
             updateState = update.status.toLowerCase();
             $A.util.setDataAttribute(test, 'state', updateState);
-            console.log(update);
             if (updateState === this.STATE.FAILED) {
                 test.querySelector('.exception').innerHTML = update.exception
                                                                 .replace(/&/g, '&amp;')

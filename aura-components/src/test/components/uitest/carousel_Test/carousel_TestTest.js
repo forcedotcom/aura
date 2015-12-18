@@ -505,12 +505,9 @@
 	assertAriaControlDefined : function(element, isDefined, errMsg) {
 		var actualAria = $A.test.getElementAttributeValue(element,
 				"aria-controls");
-		if (isDefined) {
-			$A.test.assertNotEquals("undefined", actualAria, errMsg);
-		} else {
-			$A.test.assertTrue(("undefined" == actualAria || "" == actualAria),
+
+		$A.test[isDefined ? "assertFalse" : "assertTrue"](("undefined" === actualAria || null === actualAria || "" === actualAria),
 					errMsg);
-		}
 	},
 
 	assertAriaSelected : function(element, isSelected, errMsg) {

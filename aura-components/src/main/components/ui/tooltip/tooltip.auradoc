@@ -37,6 +37,7 @@
 		The fade animation can be customized using these attributes: <code>fadeIn</code>, <code>fadeInDuration</code>, <code>fadeOut</code>, and <code>fadeOutDuration</code>. 
 		You can also use the <code>delay</code> attribute to delay the appearance of the tooltip.
 		</p>
+		<p>See the <a href="/uiExamples/panelsTooltipsDemo.app" target="_blank">tooltip demo</a> for examples.</p>
 	</aura:description>	
 		<aura:example name="tooltipExample1" ref="auradocs:demoTooltip" label="Displaying the Tooltip using Fade Animation">
     	<p>This example fades the tooltip into view with a delayed appearance of 500ms when you hover over the icon.</p>

@@ -15,11 +15,11 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="pageModels"        type="Object[]" description="TODO" />
-    <aura:attribute name="pageComponents"    type="Object[]" description="TODO" />
-    <aura:attribute name="justifyContent" type="String" description="Which horizontal justification to use for the page indicators. Valid values are 'stretch', 'leftGrowRight'. Default is 'stretch'."/>
-    <aura:attribute name="isDotIndicator" type="Boolean" default="false" description="Set to true to use dot indicators rather than text." />
+<aura:component description="Page indicators for the ui:carousel component.">
+    <aura:attribute name="pageModels"        type="Object[]" description="An array of component definition for the carousel pages." />
+    <aura:attribute name="pageComponents"    type="Object[]" description="An array of components for the carousel pages." />
+    <aura:attribute name="justifyContent" type="String" description="Which horizontal justification to use for the page indicators. Valid values are 'stretch', 'leftGrowRight'. The default is 'stretch'."/>
+    <aura:attribute name="isDotIndicator" type="Boolean" default="false" description="Set to true to use dot indicators rather than text. The default is false." />
     <aura:attribute name="_calculatedStyles" type="String" description="" />
 
     <aura:registerevent name="pagerClicked"  type="ui:pagerClicked" description="The event fired when the pager is clicked" />

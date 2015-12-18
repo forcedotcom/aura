@@ -129,5 +129,22 @@
                 }
             }).fire();
         });
+    },
+    
+    createCustomPanel: function(cmp, event) {
+    	$A.componentService.createComponent(
+            'ui:outputText', 
+    		{value: 'This is a dynamically registered panel type'}, 
+            function(textCmp){
+    			$A.get('e.ui:createPanel').setParams({
+    	            panelType   :'customPanel',
+    	            visible: true,
+    	            panelConfig : {
+    	                title: 'Custom Panel',
+    	                body  : textCmp
+    	            }
+    	        }).fire();
+    	    }
+        );	
     }
 })

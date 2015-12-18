@@ -38,7 +38,6 @@ var SecureComponent = (function() {
 		return sc._get("component", $A.lockerService.masterKey);
 	}
 
-	SecureComponent.prototype.constructor = SecureComponent;
 	SecureComponent.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
@@ -130,6 +129,8 @@ var SecureComponent = (function() {
 			}
 		}
 	});
+	
+	SecureComponent.prototype.constructor = SecureComponent;
 
 	return SecureComponent;
 })();

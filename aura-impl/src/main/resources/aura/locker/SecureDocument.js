@@ -48,7 +48,6 @@ var SecureDocument = (function() {
 		return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
 	}
 
-	SecureDocument.prototype.constructor = SecureDocument;
 	SecureDocument.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
@@ -99,6 +98,8 @@ var SecureDocument = (function() {
 		// DCHASMAN TODO W-2839646 Figure out how much we want to filter cookie access???
 		cookie : SecureThing.createPassThroughProperty("cookie")
 	});
+
+	SecureDocument.prototype.constructor = SecureDocument;
 
 	SecureDocument.wrap = function(el) {
 		return new SecureElement(el, $A.lockerService.util._getKey(el, $A.lockerService.masterKey));

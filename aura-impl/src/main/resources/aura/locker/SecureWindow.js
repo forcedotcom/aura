@@ -46,7 +46,6 @@ var SecureWindow = (function() {
 		return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
 	}
 
-	SecureWindow.prototype.constructor = SecureWindow;
 	SecureWindow.prototype = Object.create(SecureThing.prototype, {
 		toString : {
 			value : function() {
@@ -54,6 +53,8 @@ var SecureWindow = (function() {
 			}
 		}
 	});
+
+	SecureWindow.prototype.constructor = SecureWindow;
 
 	return SecureWindow;
 })();

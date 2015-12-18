@@ -93,6 +93,7 @@
     "WallTime": true,
 	"SecureThing": true,
 	"SecureComponent": true,
+	"SecureWindow": true,
 	"SecureDocument": true,
 	"SecureElement": true,
 	"SecureScriptElement": true

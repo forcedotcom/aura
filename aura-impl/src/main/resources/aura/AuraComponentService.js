@@ -22,12 +22,13 @@
  */
 function AuraComponentService () {
     // Def registries
-    this.componentDefRegistry  = {};
-    this.controllerDefRegistry = {};
-    this.actionDefRegistry     = {};
-    this.modelDefRegistry      = {};
-    this.libraryDefRegistry    = new Aura.Library.LibraryDefRegistry(); // To abstract lib logic
-    this.componentDefStorage   = new Aura.Component.ComponentDefStorage();
+    this.componentDefRegistry   = {};
+    this.controllerDefRegistry  = {};
+    this.actionDefRegistry      = {};
+    this.modelDefRegistry       = {};
+    this.libraryDefRegistry     = new Aura.Library.LibraryDefRegistry(); // To abstract lib logic
+    this.componentClassRegistry = new Aura.Component.ComponentClassRegistry(); // To abstract class logic
+    this.componentDefStorage    = new Aura.Component.ComponentDefStorage();
 
     // holds ComponentDef configs to be created
     this.savedComponentConfigs = {};
@@ -47,14 +48,6 @@ function AuraComponentService () {
     this.flavorable    = "auraFlavorable";
     this.renderedBy    = "auraRenderedBy";
     this["renderedBy"] = this.renderedBy;   // originally exposed using exp()
-
-    // We delay the creation of the definition of a class till it's requested.
-    // The function that creates the component class is a classConstructorExporter
-    this.classConstructorExporter = {};
-
-    // Collection of all the component classes we generate for
-    // proper stack traces and proper use of prototypical inheritance
-    this.classConstructors = {};
 }
 
 /**
@@ -208,7 +201,7 @@ AuraComponentService.prototype.createComponent = function(type, attributes, call
  *
  * This is only used by createComponentFromConfig to separate the internal
  * representation from the external representation.
- * If we change the component format, we could change this method 
+ * If we change the component format, we could change this method
  * without breaking anyone's code.
  *
  * @function
@@ -232,11 +225,11 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
  *
  * It accepts a config Object generated directly by the framework
  * or a custom manually created config (see notes for details).
- * 
+ *
  * IMPORTANT NOTES:
  *
  * - It's key that we separate the internal representation of a component
- * from the external one (publicly available), so we can always improve 
+ * from the external one (publicly available), so we can always improve
  * and change the framework implementation without breaking anything.
  *
  * - Passing a user generated config is discouraged (instead createComponent
@@ -491,17 +484,6 @@ AuraComponentService.prototype.createComponentInstance = function(config, localC
 };
 
 /**
- * Load the initial map of class constructors.
- * @param {Object} classConstructorExporter A map of descriptor:exporter. See addComponentClass().
- * @export
- */
-AuraComponentService.prototype.initComponentClass = function(classConstructorExporter){
-    if (!this.classConstructorExporter) {
-        this.classConstructorExporter = classConstructorExporter;
-    }
-};
-
-/**
  * Use the specified constructor as the definition of the class descriptor.
  * We store them for execution later so we do not load definitions into memory unless they are utilized in getComponentClass.
  * @param {String} descriptor Uses the pattern of namespace:componentName.
@@ -509,11 +491,7 @@ AuraComponentService.prototype.initComponentClass = function(classConstructorExp
  * @export
  */
 AuraComponentService.prototype.addComponentClass = function(descriptor, exporter){
-    if (descriptor in this.classConstructorExporter || descriptor in this.classConstructors) {
-        return;
-    }
-
-    this.classConstructorExporter[descriptor] = exporter;
+    return this.componentClassRegistry.addComponentClass(descriptor, exporter);
 };
 
 /**
@@ -523,118 +501,7 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, exporter
  * @export
  */
 AuraComponentService.prototype.getComponentClass = function(descriptor) {
-    var storedConstructor = this.classConstructors[descriptor];
-
-    if (!storedConstructor) {
-        var exporter = this.classConstructorExporter[descriptor];
-        if (exporter) {
-            var componentProperties = exporter();
-            
-            storedConstructor = this.buildComponentClass(componentProperties);
-            this.classConstructors[descriptor] = storedConstructor;
-            // No need to keep all these extra functions.
-            delete this.classConstructorExporter[descriptor];
-        }
-    }
-
-    return storedConstructor;
-};
-
-/**
- * Build the class for the specified component.
- * This process is broken into subroutines for clarity and maintainabiity,
- * and those are all combined into one single scope by the compiler.
- * @param {Object} componentProperties The pre-built component properties.
- * @returns {Function} The component class.
- */
-AuraComponentService.prototype.buildComponentClass = function(componentProperties) {
-
-    this.addComponentClassInheritance(componentProperties);
-    this.addComponentClassLibraries(componentProperties);
-    var componentConstructor = this.buildComponentClassConstructor(componentProperties);
-
-    return componentConstructor;
-};
-
-
-/**
- * Augment the component class properties with their respective inheritance. The
- * inner classes are "static" classes, and currenltly, only the helper is inherited.
- * @param {Object} componentProperties The pre-built component properties.
- */
-AuraComponentService.prototype.addComponentClassInheritance = function(componentProperties) {
-
-    var superDescriptor = componentProperties["meta"]["extends"];
-    var superConstuctor = this.getComponentClass(superDescriptor);
-
-    // Apply inheritance
-    for (var name in {"controller":true, "helper":true}) {
-
-        componentProperties[name] = componentProperties[name] || {};
-
-        // Currently, only the helper is inherited.
-        var superInnerClass = superConstuctor && superConstuctor.prototype[name];
-        if (superInnerClass) {
-            // TODO: Update to the following line once all browsers have support for writeable __proto__
-            // (requires IE11+, supported elsewhere).
-            // componentProperties["controller"]['__proto__'] = superController;
-            // componentProperties["helper"]['__proto__'] = superHelper;
-            var innerClass = Object.create(superInnerClass);
-            var instanceProperties = componentProperties[name];
-            if (instanceProperties) {
-                for (var property in instanceProperties) {
-                    innerClass[property] = instanceProperties[property];
-                }
-            }
-            componentProperties[name] = innerClass;
-        }
-    }
-};
-
-/**
- * Augment the component class properties with the component libraries. This method
- * attached the component imports (a.k.a. "libraries") on the properties.
- * @param {Object} componentProperties The pre-built component properties.
- */
-AuraComponentService.prototype.addComponentClassLibraries = function(componentProperties) {
-
-    var componentImports = componentProperties["meta"]["imports"];
-    if (componentImports) {
-        var helper = componentProperties["helper"];
-        for (var property in componentImports) {
-            helper[property] = this.getLibraryDef(componentImports[property]);
-        }
-        componentProperties["helper"] = helper;
-    }
-};
-
-/**
- * Build the class constructor for the specified component.
- * @param {Object} componentProperties The pre-built component properties.
- * @returns {Function} The component class.
- */
-AuraComponentService.prototype.buildComponentClassConstructor = function(componentProperties) {
-
-    var className = componentProperties["meta"]["name"];
-
-    // Create a named function dynamically to use as a constructor.
-    // TODO: Update to the following line when all browsers have support for dynamic function names.
-    // (only supported in IE11+).
-    // var componentConstructor = function [className](){ Component.apply(this, arguments); };
-    var componentConstructor = $A.util.globalEval("function " + className + "() { Component.apply(this, arguments); };");
-
-    // Extends from Component (and restore constructor).
-    componentConstructor.prototype = Object.create(Component.prototype);
-    componentConstructor.prototype.constructor = componentConstructor;
-
-    // Mixin inner classes (controller, helper, renderer, provider) and meta properties.
-    for (var property in componentProperties) {
-        if (componentProperties.hasOwnProperty(property)) {
-            componentConstructor.prototype[property] = componentProperties[property];
-        }
-    }
-
-    return componentConstructor;
+    return this.componentClassRegistry.getComponentClass(descriptor);
 };
 
 /**
@@ -645,8 +512,7 @@ AuraComponentService.prototype.buildComponentClassConstructor = function(compone
  * @param {String} descriptor The qualified name of the component to check in the form prefix:componentname or protocol://prefix:componentname
  */
 AuraComponentService.prototype.hasComponentClass = function(descriptor) {
-    //descriptor = descriptor.replace(/^\w+:\/\//, "").replace(/\.|:/g, "$").replace(/-/g, "_");
-    return !!(descriptor in this.classConstructorExporter || descriptor in this.classConstructors);
+    return this.componentClassRegistry.hasComponentClass(descriptor);
 };
 
 /**
@@ -1357,8 +1223,8 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
     return this.pruneDefsFromStorage(defSizeKb + libSizeKb)
         .then(
             function() {
-                return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
-            }
+            return self.componentDefStorage.storeDefs(cmpConfigs, libConfigs);
+        }
         )
         .then(
             undefined, // noop
@@ -1402,7 +1268,7 @@ AuraComponentService.prototype.saveDefsToStorage = function (context) {
 
                 return Promise["all"](promises);
             }
-        );
+    );
 };
 
 AuraComponentService.prototype.createComponentPrivAsync = function (config, callback, forceClientCreation) {
@@ -1741,7 +1607,7 @@ AuraComponentService.prototype.evictDefsFromStorage = function(sortedKeys, graph
  * Prunes component definitions and dependent actions from persistent storage.
  *
  * This is the entry point for dependency graph generation, analysis, and
- * eviction. Eviction proceeds until the component def storage is under a threshold
+ * eviction. Eviction proceedsuntil the component def storage is under a threshold
  * size or all component defs are evicted from storage.
  *
  * @param {Number} requiredSpaceKb space (in KB) required by new configs to be stored.
@@ -1763,40 +1629,40 @@ AuraComponentService.prototype.pruneDefsFromStorage = function(requiredSpaceKb) 
     // avoid storage.getAll() and graph analysis which are expensive operations.
     return defStorage.getSize()
         .then(
-            function(size) {
-                currentSize = size;
-                var maxSize = defStorage.getMaxSize();
-                newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
-                if (newSize < maxSize) {
-                    return undefined;
-                }
+        function(size) {
+            currentSize = size;
+            var maxSize = defStorage.getMaxSize();
+            newSize = currentSize + requiredSpaceKb + maxSize * self.componentDefStorage.EVICTION_HEADROOM;
+            if (newSize < maxSize) {
+                return undefined;
+            }
 
-                // some eviction is required.
-                //
-                // note: buildDependencyGraph() loads all actions and defs from storage. this forces
-                // scanning all rows in the respectives stores. this results in the stores returning an
-                // accurate value to getSize().
-                //
-                // as items are evicted from the store it's important that getSize() continues returning
-                // a value that is close to accurate.
+            // some eviction is required.
+            //
+            // note: buildDependencyGraph() loads all actions and defs from storage. this forces
+            // scanning all rows in the respectives stores. this results in the stores returning an
+            // accurate value to getSize().
+            //
+            // as items are evicted from the store it's important that getSize() continues returning
+            // a value that is close to accurate.
                 return self.buildDependencyGraph()
                     .then(
                         function(graph) {
-                            var keysToEvict = self.sortDependencyGraph(graph);
-                            return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
+                var keysToEvict = self.sortDependencyGraph(graph);
+                return self.evictDefsFromStorage(keysToEvict, graph, requiredSpaceKb);
                         }
                     )
-                    .then(
-                        function(evicted) {
-                            $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
-                            $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
-                                "defsRequiredSize" : requiredSpaceKb,
-                                "storageCurrentSize" : currentSize,
-                                "storageRequiredSize" : newSize,
-                                "evicted" : evicted
-                            });
-                        }
-                    );
+            .then(
+                function(evicted) {
+                    $A.log("AuraComponentService.pruneDefsFromStorage: evicted " + evicted.length + " component defs and actions");
+                    $A.metricsService.transaction('AURAPERF', 'defsEvicted', {
+                        "defsRequiredSize" : requiredSpaceKb,
+                        "storageCurrentSize" : currentSize,
+                        "storageRequiredSize" : newSize,
+                        "evicted" : evicted
+                    });
+                }
+            );
             }
         );
 };

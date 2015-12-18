@@ -193,26 +193,30 @@
 
     adjustHeight: function(cmp) {
         if (!cmp.get("v.expanded")) {
+
+            //
+            // @todo refactor this to be less dom heavy W-2874667
+            // 
             var hideShowMore = true;
             var maxLines = cmp.get("v.maxLines");
+            var list = cmp.find("list");
             if (maxLines > 0) {
-                var listItems = cmp.find("listitem");
+                var listItems = list.getElement().querySelectorAll('li');
                 if (!$A.util.isEmpty(listItems)) {
 
                     //find the height of a pill
                     var firstItem;
                     var lastItem;
-                    if ($A.util.isArray(listItems)) {
-                        firstItem = listItems[0].getElement();
-                        lastItem = listItems[listItems.length - 1].getElement();
+                    if (listItems.length > 1) {
+                        firstItem = listItems[0];
+                        lastItem = listItems[listItems.length - 1];
                     } else {
-                        lastItem = firstItem = listItems.getElement();
+                        lastItem = firstItem = listItems[0];
                     }
                     if (firstItem) {
                     	var pillHeight = this._getActualHeight(firstItem);
 
                         //set the maximum height of the pill container based on maxLines attribute
-                        var list = cmp.find("list");
                         var limitedHeight = pillHeight * maxLines;
                         list.getElement().style.maxHeight = limitedHeight + "px";
 

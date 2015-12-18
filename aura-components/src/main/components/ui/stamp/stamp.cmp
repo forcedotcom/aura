@@ -15,7 +15,7 @@
     limitations under the License.
 
 -->
-<aura:component extensible="true" implements="ui:visible" support="beta" description="A decorated stamp containing text">
+<aura:component extensible="true" implements="ui:visible" support="beta" description="An actionable label colored by severity level.">
     <aura:attribute name="severity" type="String" description="The severity with which to decorate this stamp.  Accepted values: success, warning, important, info, inverse"/>
     <aura:attribute name="title" type="String" description="The title text for the stamp."/>
     <aura:attribute name="onclick" type="Aura.Action" description="The controller method that runs when the stamp is clicked."/>

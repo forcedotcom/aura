@@ -30,7 +30,7 @@ var SecureDocument = (function() {
 	 * @param {Object}
 	 *            document - the DOM document
 	 * @param {Object}
-	 *            key - the key to apply to the swecure document
+	 *            key - the key to apply to the secure document
 	 */
 	function SecureDocument(document, key) {
 		SecureThing.call(this, key, "document");

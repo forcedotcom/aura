@@ -15,12 +15,13 @@
     limitations under the License.
 
 -->
-<aura:component>
-    <aura:attribute name="content" type="Object" description=""/>
-    <aura:attribute name="pageIndex" type="Integer" description=""/>
-    <aura:attribute name="scrollerPlugins" type="String" description="Additional scroller plugins to be used (comma separated with no spaces betweeen them (scroller bug as of 8/6/2014))"/>
-    <aura:attribute name="isContentLoaded" type="Boolean" default="false" description=""/>
-    <aura:attribute name="isScrollable" type="Boolean" default="true" description="If false will prevent the page from scrolling."/>
+<aura:component description="A carousel page for the ui:carousel component, which can be swiped horizontally to display its content.">
+    <aura:attribute name="content" type="Object" description="The content on a carousel page."/>
+    <aura:attribute name="pageIndex" type="Integer" description="The carousel page index."/>
+    <!-- scroller bug as of 8/6/2014 -->
+    <aura:attribute name="scrollerPlugins" type="String" description="Additional scroller plugins to be used, comma separated with no spaces between them."/>
+    <aura:attribute name="isContentLoaded" type="Boolean" default="false" description="Indicates whether the page content is loaded. The default is false."/>
+    <aura:attribute name="isScrollable" type="Boolean" default="true" description="Indicates whether the page is scrollable. The default is true."/>
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
 
     <aura:attribute name="placeholder" type="Aura.ComponentDefRef[]">

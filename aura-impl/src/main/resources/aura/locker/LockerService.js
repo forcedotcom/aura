@@ -16,6 +16,7 @@
 
 /*jslint sub: true */
 
+//#include aura.locker.SecureWindow
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureComponent
 
@@ -141,13 +142,7 @@ function LockerService() {
 				var env = keyToEnvironmentMap[psuedoKeySymbol];
 				if (!env) {
 					env = keyToEnvironmentMap[psuedoKeySymbol] = {
-						sWindow : Object.create(Object.prototype, {
-							toString : {
-								value : function() {
-									return "SecureWindow: { key: " + JSON.stringify(key) + " }";
-								}
-							}
-						}),
+						sWindow : new SecureWindow(window, key),
 
 						sAura : Object.create($A, {
 							getComponent : {

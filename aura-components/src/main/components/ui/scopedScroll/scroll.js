@@ -52,16 +52,6 @@ function lib() { //eslint-disable-line no-unused-vars
         }
     };
 
-    var mouseWheelHandlerWrapper = function (e) {
-        // debounce event with calculation
-        if (!raf) {
-            raf = window.requestAnimationFrame(function () {
-                mouseWheelHandler(e);
-                raf = null;
-            });
-        }
-    };
-
     return {
         scope: function (element) {
             var dom = typeof element === 'string' ? document.querySelector(element) : element;

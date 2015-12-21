@@ -765,7 +765,7 @@
         </profile>
         <!-- profile for js code coverage for aura-impl xunit tests -->
         <profile>
-            <id>xunit.js.coverage.auraImpl</id>
+            <id>xunit.js.coverage.framework</id>
             <properties>
                 <module.name>aura-impl</module.name>
                 <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>

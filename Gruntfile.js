@@ -2,9 +2,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-eslint');
     grunt.initConfig({
         eslint: {
-            auraImpl: {
+            framework: {
                 options: {
-                    configFile: 'aura-impl/src/test/eslint/.eslintrc.json',
+                    configFile: 'aura-impl/src/main/resources/aura/.eslintrc',
                     outputFile: 'aura-impl/target/eslint-output'
                 },
                 src: [
@@ -12,9 +12,9 @@ module.exports = function (grunt) {
                     '!aura-impl/src/main/resources/aura/**/*_export.js'
                 ]
             },
-            auraComponents: {
+            components: {
                 options: {
-                    configFile: 'aura-components/src/test/eslint/.eslintrc.json',
+                    configFile: 'aura-components/src/main/components/.eslintrc',
                     outputFile: 'aura-components/target/eslint-output'
                 },
                 src: [

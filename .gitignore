@@ -16,6 +16,6 @@ pom.xml.releaseBackup
 version.properties
 *~
 tags
-aura-impl/node/
 aura-impl/src/test/eslint/
-aura-components/node/
+node
+node_modules

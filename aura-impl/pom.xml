@@ -285,7 +285,7 @@
                                     <goal>grunt</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>--no-color eslint:auraImpl</arguments>
+                                    <arguments>--no-color eslint:framework</arguments>
                                 </configuration>
                             </execution>
                         </executions>

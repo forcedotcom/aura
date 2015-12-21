@@ -388,7 +388,7 @@
                                     <goal>grunt</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>--no-color eslint:auraComponents</arguments>
+                                    <arguments>--no-color eslint:components</arguments>
                                 </configuration>
                             </execution>
                         </executions>

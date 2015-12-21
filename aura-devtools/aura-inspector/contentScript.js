@@ -13,7 +13,8 @@
         var runtime = null;
         var allowedPostMessageKeys = {
             "AuraInspector:publishbatch": true,
-            "AuraInspector:publish": true
+            "AuraInspector:publish": true,
+            "AuraInspector:bootstrap": true
         };
 
         /**
@@ -70,7 +71,7 @@
                         window.postMessage({
                             action  : "AuraInspector:publish",
                             key: "AuraInspector:OnAuraInitialized"
-                        }, '*');
+                        }, window.location.href);
                     }
                     var _$A;
                     Object.defineProperty(window, "$A", {

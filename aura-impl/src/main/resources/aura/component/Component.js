@@ -1332,16 +1332,6 @@ Component.prototype.removeValueProvider=function(key){
 };
 
 /**
- * Gets the event dispatcher.
- *
- * @public
- * @export
- */
-Component.prototype.getEventDispatcher = function() {
-    return this.getEventDispatcher();
-};
-
-/**
  * Returns the model for this instance, if one exists. Shorthand :
  * <code>get("m")</code>
  *
@@ -2151,6 +2141,12 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
     };
 };
 
+/**
+ * Gets the event dispatcher.
+ *
+ * @public
+ * @export
+ */
 Component.prototype.getEventDispatcher = function(cmp) {
     if (!this.eventDispatcher && cmp) {
         var dispatcher = {

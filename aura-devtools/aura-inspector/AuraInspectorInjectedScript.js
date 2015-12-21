@@ -163,6 +163,9 @@
 
                 // Need a way to conditionally do this based on a user setting. 
                 $A.PerfDevTools.init();
+
+                // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
+                this["AuraDevToolService.Bootstrap"] = function(){};
             } else {
                 console.log('Could not attach AuraDevTools Extension.');
             }
@@ -172,22 +175,18 @@
     // Subscribes!
     $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function AuraInspector_OnPanelLoad() {
         $Aura.actions["AuraDevToolService.Bootstrap"]();
-        // We only want to do the bootstrap the first time the page loads.
-        // If you close the dev tools and reopen then, we'll get a second onPanelLoad, but we should ignore that. 
-        // At least in regards to bootstrapping
-        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelConnect", AuraInspector_OnPanelLoad);
-        
-        $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function () {
-            $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
-        });
 
-        $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+        window.postMessage({
+            "action": "AuraInspector:bootstrap",
+            "data": {"key":"AuraInspector:bootstrap", "data":{}}
+        }, window.location.href);
+
     });
 
-    $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
-        $Aura.actions["AuraDevToolService.Bootstrap"]();
-        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
-    });
+    // $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
+    //     $Aura.actions["AuraDevToolService.Bootstrap"]();
+    //     $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
+    // });
 
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
@@ -195,15 +194,11 @@
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
 
-    //$Aura.Inspector.subscribe("AuraInspector:OnContextMenu", $Aura.actions["AuraDevToolService.Inspect"]);
-
-    
-
     function AuraInspector() {
-
         var subscribers = new Map();
         var PUBLISH_KEY = "AuraInspector:publish";
         var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
+        var BOOTSTRAP_KEY = "AuraInspector:bootstrap";
         var postMessagesQueue = [];
         var batchPostId = null;
         var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
@@ -217,7 +212,7 @@
 
             this.subscribe("AuraInspector:ContextElementRequest", function(){
                 if(lastItemInspected) {
-                    this.publish("AuraInspector:OnInspectElement", lastItemInspected.getAttribute("data-aura-rendered-by"));
+                    this.publish("AuraInspector:ShowComponentInTree", lastItemInspected.getAttribute("data-aura-rendered-by"));
                 }
             }.bind(this));
         };
@@ -339,7 +334,7 @@
                         }
                         output.elementCount = elementCount;
                     }
-
+                    
                     return this.safeStringify(output);
                 }
             }
@@ -373,6 +368,8 @@
         function safeStringify(value) {
             // For circular dependency checks
             var visited = new Set();
+            var toJSON = InvalidComponent.prototype.toJSON;
+            delete InvalidComponent.prototype.toJSON;
 
             var result = JSON.stringify(value, function(key, value) {
                 if(Array.isArray(this) || key) { value = this[key]; }
@@ -428,6 +425,8 @@
                     delete item["$serId"];
                 }
             });
+
+            InvalidComponent.prototype.toJSON = toJSON;
 
             return result;
         };
@@ -493,6 +492,7 @@
                 }
             });
         }
+
     }
 
     function bootstrapEventInstrumentation() {
@@ -527,7 +527,7 @@
                 "endTime": performance.now(),
                 "type": event.getDef().getEventType()
             };
-
+            
             $Aura.Inspector.publish("AuraInspector:OnEventEnd", data);
 
             return ret;

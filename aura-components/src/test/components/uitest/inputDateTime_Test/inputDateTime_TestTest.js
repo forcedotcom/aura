@@ -260,7 +260,19 @@
 			 }
 		 }
 	 },
-	 
+
+	 testSingleDateTimeInput: {
+		 browsers: ['DESKTOP'],
+		 attributes : {useSingleInput: 'true', value:'2015-10-23T16:30:00.000Z' , format: "MM-dd-yyyy hh:mm A", timezone: 'GMT'},
+		 test: function(cmp) {
+			 var inputDateTimeCmp = cmp.find("dateTimePickerTest");
+			 var inputDateTimeElement = inputDateTimeCmp.find("inputDate").getElement();
+			 inputDateTimeElement.value = "10-24-2015 04:35 PM";
+			 $A.test.fireDomEvent(inputDateTimeElement, "change");
+			 aura.test.assertEquals('2015-10-24T16:35:00.000Z', cmp.get("v.value"), "value should update when input is changed");
+		 }
+	 },
+
 	 /**
 	  * Clear date without clearing time
 	  */
@@ -277,7 +289,7 @@
 			 aura.test.assertEquals("2015-10-23T16:30:00.000Z", cmp.get("v.value"), "Date and time should not be reset");
 		 }
 	 },
-	 
+
 	 /**
 	  * Clear time without clearing date
 	  */
@@ -294,7 +306,7 @@
 			 aura.test.assertEquals("2015-10-23T12:00:00.000Z", cmp.get("v.value"), "Time should be reset");
 		 }
 	 },
-	 
+
 	 /**
 	  * Clear date and time
 	  */

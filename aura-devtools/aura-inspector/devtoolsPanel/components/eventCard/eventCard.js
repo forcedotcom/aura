@@ -115,29 +115,59 @@
 		var dt;
 		var auracomponent;
 		var dd;
+		var link;
+		var handlers;
 		for(var c=0;c<data.length;c++) {
-			if(data[c].scope) {
+			handlers = "handledBy" in data[c] ? data[c].handledBy : [data[c]];
+			for(var d=0;d<handlers.length;d++) {
 				auracomponent = document.createElement("aurainspector-auracomponent");
-				auracomponent.setAttribute("globalId", data[c].scope);
+				auracomponent.setAttribute("globalId", handlers[d].scope);
 				
 				dt = document.createElement("dt");
 				dt.appendChild(auracomponent);
 
-				dd = document.createElement("dd");
-				dd.textContent = "c." + data[c].name;
-
-				dl.appendChild(dt);
-				dl.appendChild(dd);
-			} else {				
-				dt = document.createElement("dt");
-				dt.appendChild(document.createTextNode("{Bubbled Event}"));
+				link = document.createElement("a");
+				link.textContent = "c." + handlers[d].name;
+				link.href="";
+				link.setAttribute("data-globalid", handlers[d].scope);
+				link.setAttribute("data-controller-name", handlers[d].name);
+				link.addEventListener("click", ControllerLink_OnClick);
 
 				dd = document.createElement("dd");
-				dd.textContent = data[c].name;
+				dd.appendChild(link);
 
 				dl.appendChild(dt);
 				dl.appendChild(dd);
 			}
+			// if(data[c].scope) {
+			// 	auracomponent = document.createElement("aurainspector-auracomponent");
+			// 	auracomponent.setAttribute("globalId", data[c].scope);
+				
+			// 	dt = document.createElement("dt");
+			// 	dt.appendChild(auracomponent);
+
+			// 	link = document.createElement("a");
+			// 	link.textContent = "c." + data[c].name;
+			// 	link.href="";
+			// 	link.setAttribute("data-globalid", data[c].scope);
+			// 	link.setAttribute("data-controller-name", data[c].name);
+			// 	link.addEventListener("click", ControllerLink_OnClick);
+
+			// 	dd = document.createElement("dd");
+			// 	dd.appendChild(link);
+
+			// 	dl.appendChild(dt);
+			// 	dl.appendChild(dd);
+			// } else {				
+			// 	dt = document.createElement("dt");
+			// 	dt.appendChild(document.createTextNode("{Bubbled Event}"));
+
+			// 	dd = document.createElement("dd");
+			// 	dd.textContent = data[c].name;
+
+			// 	dl.appendChild(dt);
+			// 	dl.appendChild(dd);
+			// }
 		}
 
 		// build the handled collection
@@ -225,5 +255,17 @@
 	function ToggleButton_OnClick(event) {
 		var showGrid = this.getAttribute("showGrid");
 		this.setAttribute("showGrid", (!showGrid || showGrid !== "true") ? "true" : "false");
+	}
+
+	function ControllerLink_OnClick(event) {
+		var globalId = this.getAttribute("data-globalid");
+		var name = this.getAttribute("data-controller-name");
+
+		var inspectMethod = `$A.getComponent('${globalId}') && inspect($A.getComponent('${globalId}').controller['${name}'])`;
+
+		chrome.devtools.inspectedWindow.eval(inspectMethod);
+
+		event.preventDefault();
+		event.stopPropagation();
 	}
 })();

@@ -13,10 +13,8 @@
      *
      * AuraInspector:OnAuraInitialized              $A is available and we are just about to run $A.initAsync
      * AuraInspector:OnPanelConnect                 The Aura Panel has been loaded and initialized. (Where we start the instrumentation of the app.)      
-     * AuraInspector:OnPanelAlreadyConnected        The Aura Panel was already open, and we probably refreshed the page. The injected script will simply instrument the page at this point.
      * AuraInspector:OnBootstrapEnd                 We've instrumented Aura, and now the Dev Tools can initialize and expect it to be there.              
      * AuraInspector:OnContextMenu                  User Selected the "Inspect Aura Component" option in the context menu. Handled in the inspected script. Does not contain the information on what they clicked on.
-     * AuraInspector:OnInspectElement               Contains the dom element that they right clicked and inspected. 
      * AuraInspector:OnHighlightComponent           We focused over a component in the ComponentTree or ComponentView and the accompanying HTML element in the DOM should be spotlighted.
      * AuraInspector:OnHighlightComponentEnd        We have stopped focusing on the component, and now remove the dom element spotlight.
      * AuraInspector:AddPanel                       Add the panel at the specified URL as an Iframe tab.
@@ -26,10 +24,10 @@
      * Transactions:OnTransactionEnd                Transaction has ended and should now be added to the UI.
      * AuraInspector:StorageData                    Aura Storage Service has async fetched data to show in the storage panel.
      * AuraInspector:RemoveStorageData              Remove stored response for the action we would like to drop next time we see it
+     * AuraInspector:ShowComponentInTree            Indicates you want to show the specified globalID in the component tree.
      * AuraInspector:OnClientActionStart
      * AuraInspector:OnClientActionEnd
      */
-
 
     var panel = new AuraInspectorDevtoolsPanel();
 
@@ -53,6 +51,7 @@
         //var EXTENSIONID = "mhfgenmncdnmcoonglmkepfdnjjjcpla";
         var PUBLISH_KEY = "AuraInspector:publish";
         var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
+        var BOOTSTRAP_KEY = "AuraInspector:bootstrap";
         var runtime = null;
         var actions = new Map();
         // For Drawing the Tree, eventually to be moved into it's own component
@@ -66,17 +65,16 @@
         var _subscribers = new Map();
         var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
+        var tabId;
 
         this.connect = function(){
             if(runtime) { return; }
-            var tabId = chrome.devtools.inspectedWindow.tabId;
+            tabId = chrome.devtools.inspectedWindow.tabId;
 
             runtime = chrome.runtime.connect({"name": _name });
             runtime.onMessage.addListener(DevToolsPanel_OnMessage.bind(this));
 
-            // AuraInspector:publish is the only thing we listen for anymore.
-            // We broadcast one publish message everywhere, and then we have subscribers.
-            runtime.postMessage({subscribe : [PUBLISH_KEY, PUBLISH_BATCH_KEY], port: runtime.name, tabId: tabId });
+            runtime.postMessage({subscribe: [BOOTSTRAP_KEY], port: runtime.name, tabId: tabId});
         };
 
         this.disconnect = function(port) {
@@ -87,6 +85,7 @@
         this.init = function(finishedCallback) {
             this.connect();
 
+            // Wait for the AuraInjectedScript to finish loading.
             this.subscribe("AuraInspector:OnBootstrapEnd", function(){ 
                 if(_initialized) { return; }
                 //-- Attach Event Listeners
@@ -112,12 +111,20 @@
                 // The AuraInspectorComponentView adds the sidebar class
                 this.addPanel("component-view", new AuraInspectorComponentView(this));
 
-                this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
                 this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
 
                 this.subscribe("AuraInspector:OnContextMenu", function() { 
                     this.publish("AuraInspector:ContextElementRequest", {});
                 }.bind(this));
+
+                this.subscribe("AuraInspector:AddPanel", AuraInspector_OnAddPanel.bind(this));
+                this.subscribe("AuraInspector:ShowComponentInTree", AuraInspector_OnShowComponentInTree.bind(this));
+
+                // AuraInspector:publish and AuraInspector:publishbash are essentially the only things we listen for anymore.
+                // We broadcast one publish message everywhere, and then we have subscribers.
+                // We do this here, after we've setup all the subscribers. So now we say send us everything that has been
+                // queued up, and start listening going forward.
+                runtime.postMessage({subscribe : [PUBLISH_KEY, PUBLISH_BATCH_KEY], port: runtime.name, tabId: tabId });
 
                 _initialized = true;
                 
@@ -163,7 +170,7 @@
         /*
          * Which panel to show to the user in the dev tools.
          */
-        this.showPanel = function(key) {
+        this.showPanel = function(key, options) {
             if(!key) { return; }
             var buttons = document.querySelectorAll("header.tabs button");
             var sections = document.querySelectorAll("section.tab-body:not(.sidebar)");
@@ -183,7 +190,7 @@
             // Render the output. Panel is responsible for not redrawing if necessary.
             var current = panels.get(panelKey);
             if(current) {
-                current.render();
+                current.render(options);
             }
 
             AuraInspectorOptions.set("activePanel", panelKey);
@@ -317,7 +324,9 @@
             }
 
             chrome.devtools.inspectedWindow.eval(command, function(response, exceptionInfo) {
-                if(exceptionInfo) { console.error(exceptionInfo); }
+                if(exceptionInfo) { 
+                    console.error(command, " resulted in ", exceptionInfo); 
+                }
                 if(!response) { return; }
                 var component = JSON.parse(response);
 
@@ -411,49 +420,55 @@
 
         function DevToolsPanel_OnMessage(message) {
             if(!message) { return; }
-            if(message.action === PUBLISH_KEY) {
+            if(message.action === BOOTSTRAP_KEY) {
+                this.publish("AuraInspector:OnBootstrapEnd", {});
+            } else if(message.action === PUBLISH_KEY) {
                 callSubscribers(message.key, message.data);
             } else if(message.action === PUBLISH_BATCH_KEY) {
                 var data = message.data || [];
                 for(var c=0,length=data.length;c<length;c++) {
                     callSubscribers(data[c].key, data[c].data);
                 }
-            }
+            } 
         }
 
         function callSubscribers(key, data) {
             if(_subscribers.has(key)) {
                 _subscribers.get(key).forEach(function(callback){
-                    callback(data);
+                    //console.log("SUCCESS:", key, " with data ", data, " had a subscribers");
+                    try {
+                        callback(data);
+                    } catch(e) {
+                        console.error(e);
+                    }
                 });
             }
+            //  else {
+            //     console.warn("FAIL:", key, " with data ", data, " had no subscribers.");
+            // }
         }
 
-        // function AuraInspector_OnAddPanel(message) {
-        //     // Invalid message, or panel was already added, we return right away.
-        //     if(!message || !message.hasOwnProperty("panelId") || this.hasPanel(message.panelId)) { return; }
-
-        //     if(!message.hasOwnProperty("classConstructor")) {
-        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a classConstructor`);
-        //         return;
-        //     }
-
-        //     if(!message.scriptUrl) {
-        //         this.addLogMessage(`Tried to create the panel ${message.panelId} without specifying a url for the panel script file.`);
-        //         return;
-        //     }
-
-        //     // If we don't have this check, anyone one the web page who
-        //     // reverse enginers our plugin could add a panel to the aura inspector
-        //     // in which case they would have full access to the page.
-        //     // By limiting it to chrome-extension url's only, we are assuming
-        //     // the extension trying to add the panel is already trusted and has access to the page.
-        //     if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
-        //         this.addLogMessage(`Tried to create panel  ${message.panelId} with url ${message.scriptUrl} whos source was not from a chrome extension. Only panels from web_accessible_resources in chrome extensions are allowed.`);
-        //     }
-        // }
+        function AuraInspector_OnShowComponentInTree() {
+            this.showPanel("component-tree");
+        }
 
         function AuraInspector_OnAddPanel(message) {
+            // If we don't have this check, anyone one the web page who
+            // reverse enginers our plugin could add a panel to the aura inspector
+            // in which case they would have full access to the page.
+            // By limiting it to chrome-extension url's only, we are assuming
+            // the extension trying to add the panel is already trusted and has access to the page.
+            if(message.scriptUrl.indexOf("chrome-extension://") !== 0) {
+                return;
+            }
+
+            // Security fix.
+            // We instantiate a panel using a global window[] reference,
+            // and we don't want people to call any function, just the panel 
+            // constructors.
+            if(!message.classConstructor.startsWith("InspectorPanel")) {
+                return;
+            }
 
             var script = document.createElement("script");
                 script.src = message.scriptUrl;
@@ -478,7 +493,8 @@
         }
 
         function AuraInspector_OnAuraInitialized() {
-            this.publish("AuraInspector:OnPanelAlreadyConnected", {});
+            // The initialize script ran.
+            this.publish("AuraInspector:OnPanelConnect", {});
         }
 
         /* PRIVATE */

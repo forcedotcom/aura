@@ -105,7 +105,6 @@ function AuraInspectorComponentView(devtoolsPanel) {
         }
     };
 
-
     function TreeComponent_OnDblSelect(event) {
         if(event && event.data) {
             var domNode = event.data.domNode;
@@ -117,8 +116,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
                 chrome.devtools.inspectedWindow.eval(command);
             }
         }
-    }
-    
+    }   
 
     function generateNodes(json, parentNode) {
         var node;

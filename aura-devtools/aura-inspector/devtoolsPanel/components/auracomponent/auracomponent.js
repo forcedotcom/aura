@@ -140,7 +140,11 @@
     function AuraComponent_OnDblClick(event) {
         var globalId = this.getAttribute("globalId");
         if(globalId) {
-            var command = "$auraTemp = $A.getCmp('" + globalId + "'); console.log('$auraTemp = ', $auraTemp);";
+            var command = `
+                $auraTemp = $A.getComponent('${globalId}'); 
+                console.log('$auraTemp = ', $auraTemp);
+                window[Symbol.for('AuraDevTools')].Inspector.publish("AuraInspector:ShowComponentInTree", $auraTemp.getGlobalId());
+            `;
             chrome.devtools.inspectedWindow.eval(command);
         }
     }

@@ -58,7 +58,10 @@ menu aurainspector-onOffButton.on { background: rgba(0, 0, 0, .3); color: white;
 .component-array-length { color: teal; font-size: .9em; font-style: normal; }
 
 /* Component Tree */
-.component-tree { margin: 0 0 0 1em; padding: 0}
+/*
+  The beginnings of a resize. Need to get the component tree and component view in sync, so when you change one, the other fills in the space.
+ #tab-body-component-tree { resize: horizontal; overflow: auto; } */
+.component-tree { margin: 0 0 0 1em; padding: 0;}
 .component-tree .tree-view li.tree-node-selected > span { background: rgb(225, 231, 253); }
 
 /* IFrame Tabs */

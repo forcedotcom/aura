@@ -5,6 +5,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     var _items = {};
     var isDirty = false;
     var initial = true;
+    var selectedNodeId = null;
     var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
     var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
 
@@ -41,9 +42,12 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             tabBody.querySelector("#showglobalids-checkbox").checked = options.showGlobalIds;
         });
 
-
-        devtoolsPanel.subscribe("AuraInspector:OnInspectElement", function(id) {
-            treeComponent.selectById(id);
+        devtoolsPanel.subscribe("AuraInspector:ShowComponentInTree", function(id) {
+            if(treeComponent.isRendered()) {
+                treeComponent.selectById(id);
+            } else {
+                selectedNodeId = id;
+            }
         });
     };
 
@@ -69,7 +73,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             generateTree(_items, new TreeNode(), function(treeNode){
                 treeComponent.clearChildren();
                 treeComponent.addChild(treeNode);
-                treeComponent.render({ "collapsable" : true });
+                treeComponent.render({ "collapsable" : true, "selectedNodeId": selectedNodeId });
                 isDirty = false;
 
                 devtoolsPanel.hideLoading();

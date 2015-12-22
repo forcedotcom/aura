@@ -5807,7 +5807,7 @@ var InspectorFrontendAPI = {
             InspectorFrontendAPI._pendingCommands[i]();
         InspectorFrontendAPI._pendingCommands = [];
         if (window.opener)
-            window.opener.postMessage(["loadCompleted"], "*");
+            window.opener.postMessage(["loadCompleted"], window.opener.location.href);
     },
     dispatchQueryParameters: function (dispatchParameter) {
         if (dispatchParameter)

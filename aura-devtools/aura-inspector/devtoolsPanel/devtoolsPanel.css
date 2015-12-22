@@ -314,10 +314,10 @@ button.toggle:focus {
   display: block;
   border: 1px solid #e0e5ee;
   border-radius: 4px;
-  cursor: move;
 }
 .actions-list .action-card:hover {
   background: #f4f6f9;
+  cursor: move;
 }
 #tab-body-actions #filter-text { width: 150px; }
 .actionsToDrop-list {
@@ -344,6 +344,13 @@ button.toggle:focus {
   display: block;
   border: 1px solid #e0e5ee;
   border-radius: 4px;
+}
+.actions-list .action-card.dropped, .action-card.dragging {
+  opacity: .6;
+}
+.actions-list .action-card.dropped:hover {
+  background-color: #fff;
+  cursor: default;
 }
 
 /* Storage Panel */

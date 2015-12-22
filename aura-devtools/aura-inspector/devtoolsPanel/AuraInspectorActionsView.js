@@ -343,13 +343,19 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     function endDrag (event) {
       console.log("end-drop",event);
+      event.target.classList.remove("dragging");
       if(event.dataTransfer.dropEffect == "none"){
-        event.target.style.opacity = "1";
+        // event.target.style.opacity = "1";
+      } else {
+        event.target.classList.add("dropped");
+        event.target.setAttribute("draggable","false");
+        // event.target.style.opacity = "1";
       }
     }
 
     function drag (event) {
-        event.target.style.opacity = "0.5";
+        // event.target.style.opacity = "0.5";
+        event.target.classList.add("dragging");
         event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());
     }
 

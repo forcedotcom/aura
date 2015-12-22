@@ -268,6 +268,10 @@
                         element[casedAttribute] = value;
                     }
                 }
+                // W-2872594, IE11 input text set('v.value', null) would not clear up the field.
+                else if ($A.util.isIE && element.tagName === "INPUT" && lowerName === "value" && value === null) {
+                    element.value = '';
+                }
             }
         }
     },

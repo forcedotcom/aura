@@ -18,7 +18,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
               </button>
             </li>
             <li>
-              <button id="expandall-button" class="text-button">
+              <button id="expandall-button" class="slds-button slds-button--neutral slds-button--x-small">
                 <span>Expand All</span>
               </button>
             </li>

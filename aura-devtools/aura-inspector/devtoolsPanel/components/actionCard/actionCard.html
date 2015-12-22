@@ -1,15 +1,63 @@
 
 <template>
 	<style>
-		header { font-weight: bold; font-size: 1.25em; padding: 0 0 3px 0; }
-		table { margin: 5px 0 0 0;}
-		th { font-weight: bold; font-size: .75em; padding: 0 10px 0 5px; text-align: left; }
-		td { font-size: .75em; padding: 0 10px 0 5px; }
+		header {
+			font-weight: 300;
+			font-size: 1.125rem;
+			line-height: 1.25;
+			margin: .5rem;
+			overflow-wrap: break-word;
+		}
+		table { margin: 0; width: 100%;}
+		th {
+			font-weight: normal;
+			font-size: .75em;
+			padding: .5rem .5rem 0 0.5rem;
+			text-align: left;
+			font-size: 0.75rem;
+			line-height: 1.25;
+			letter-spacing: 0.0625em;
+			color: #54698d;
+		}
+		td {
+			font-size: .75rem;
+			padding: 0 .5rem 0 .5rem;
+			color: #16325c;
+		}
 		code { margin: 5px; display: block; white-space: pre; }
-		.parameters:before { content: 'Parameters'; display:inline-block; width: 80px; font-weight: bold; vertical-align: top;}
-        .storageKey:before { content: 'StorageKey'; display:inline-block; width: 80px; font-weight: bold; vertical-align: top;}
-		.result:before { content: 'Result'; display:inline-block; width: 80px; font-weight: bold; vertical-align: top; }
-        aurainspector-json { margin: 5px; display: block; }
+		.parameters:before {
+			color: #54698d;
+			content: 'Parameters';
+			display: inline-block;
+			flex: 0 0 auto;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			width: 80px;
+			vertical-align: top;
+		}
+    .storageKey:before {
+			color: #54698d;
+			content: 'StorageKey';
+			display: inline-block;
+			flex: 0 0 auto;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			width: 80px;
+			vertical-align: top;
+		}
+		.result:before { content: 'Result'; display: inline-block;
+			color: #54698d;
+			display: inline-block;
+			flex: 0 0 auto;
+			font-size: 0.75rem;
+			line-height: 1.5;
+			width: 80px;
+			vertical-align: top;
+		}
+    aurainspector-json {
+			margin: .5rem .5rem 0 0.5rem;
+			display: flex;
+		}
 	</style>
 
     <header></header>

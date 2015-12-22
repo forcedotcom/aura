@@ -320,7 +320,9 @@ button.toggle:focus {
   background: #f4f6f9;
 }
 #tab-body-actions #filter-text { width: 150px; }
-.actionsToDrop-list { margin: 0 0 1.5rem 0;}
+.actionsToDrop-list {
+  margin: 0;
+}
 .actionsToDrop-list section h1 {
   margin: .5rem 0 0 0;
   font-weight: normal;

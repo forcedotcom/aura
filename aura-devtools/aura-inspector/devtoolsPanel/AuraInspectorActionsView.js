@@ -333,12 +333,12 @@ function AuraInspectorActionsView(devtoolsPanel) {
     function allowDrop (event) {
         event.preventDefault();
         console.log("allow-drop",_toDrop.className);
-        _toDrop.classList.add = "allow-drop";
+        _toDrop.className = "drop-zone allow-drop";
     }
 
     function noDrop (event) {
       console.log("no-drop",event);
-        _toDrop.classList.remove = "allow-drop";
+        _toDrop.className = "drop-zone";
     }
 
     function endDrag (event) {

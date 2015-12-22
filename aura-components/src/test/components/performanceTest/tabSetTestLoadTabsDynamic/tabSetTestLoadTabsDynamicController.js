@@ -30,7 +30,7 @@
                 },
                 index : 0,
                 callback: function(tabObj){
-                    if(tabObj.tab.$attributeSet$.values.title === "Tab " + (NUM_TABS-1)){
+                    if(tabObj.tab.get("v.title") === "Tab " + (NUM_TABS-1)){
                         finishRun();
                     }
                 }

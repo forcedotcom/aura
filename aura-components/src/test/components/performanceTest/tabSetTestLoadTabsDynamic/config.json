@@ -50,9 +50,6 @@
             "Tracing.Memory.jsHeapSizeUsed": 10
         },
         {
-            "Tracing.Memory.jsEventListeners": 25
-        },
-        {
             "Tracing.Memory.documents": 10
         },
         {

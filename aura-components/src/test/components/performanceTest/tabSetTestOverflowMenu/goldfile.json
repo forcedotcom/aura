@@ -1,8 +1,8 @@
 [{"name":"Aura.coql.afterRender.added","value":1}
 ,{"name":"Aura.coql.afterRender.removed","value":0}
-,{"name":"Aura.coql.component.added","value":0}
+,{"name":"Aura.coql.component.added","value":551}
 ,{"name":"Aura.coql.component.removed","value":0}
-,{"name":"Aura.coql.event.added","value":1}
+,{"name":"Aura.coql.event.added","value":18}
 ,{"name":"Aura.coql.event.removed","value":0}
 ,{"name":"Aura.coql.render.added","value":0}
 ,{"name":"Aura.coql.render.removed","value":0}
@@ -13,7 +13,6 @@
 ,{"name":"Network.encodedDataLength","value":404269,"units":"bytes"}
 ,{"name":"Network.numRequests","value":9}
 ,{"name":"Tracing.Painting.Paint","value":0}
-,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 18347552,"units":"bytes"}
-,{"name":"Tracing.Memory.jsEventListeners","value":16}
+,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 33681328,"units":"bytes"}
 ,{"name":"Tracing.Memory.documents","value":1 }
-,{"name":"Tracing.Memory.nodes","value":241 }]
+,{"name":"Tracing.Memory.nodes","value":1231 }]

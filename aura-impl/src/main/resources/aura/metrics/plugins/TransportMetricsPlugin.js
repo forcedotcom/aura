@@ -92,11 +92,27 @@ TransportMetricsPlugin.prototype.receiveOverride = function(/* config, auraXHR *
         "responseLength" : auraXHR.request.responseText.length
     };
 
-    if (this.metricsService.microsecondsResolution()/*timing API is supported*/ && window.performance.getEntriesByName) {
-        var resource = window.performance.getEntriesByName(TransportMetricsPlugin.AURA_URL)[auraXHR.marker];
-        if (resource) {
-            endMark["context"]["xhrDuration"] = Math.round(resource.duration * 100) / 100;
-            endMark["context"]["xhrLatency"] = Math.round((resource.responseStart - resource.fetchStart) * 100) / 100;
+    if (window.performance && window.performance.getEntriesByName) {
+        var allResources = window.performance.getEntriesByType("resource");
+        var r = allResources.filter(function (res) {
+            return res.name.indexOf(auraXHR.url) !== -1; 
+        })[0];
+        
+        if (r) {
+            $A.util.apply(endMark["context"], {
+                "xhrDuration"  : parseInt(r.responseEnd - r.startTime, 10),
+                "startTime"    : parseInt(r.startTime, 10),
+                "fetchStart"   : parseInt(r.fetchStart, 10),
+                "requestStart" : parseInt(r.requestStart, 10),
+                "dns"          : parseInt(r.domainLookupEnd - r.domainLookupStart, 10),
+                "tcp"          : parseInt(r.connectEnd - r.connectStart, 10),
+                "ttfb"         : parseInt(r.responseStart - r.startTime, 10),
+                "transfer"     : parseInt(r.responseEnd - r.responseStart, 10)
+            });
+
+            if (window.performance.clearResourceTimings) {
+                window.performance.clearResourceTimings();
+            }
         }
     }
 

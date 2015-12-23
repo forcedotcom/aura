@@ -2252,7 +2252,8 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
     var processed = false;
     var timedOut = false;
     var timerId = undefined;
-    var qs;
+    var marker = Aura.Services.AuraClientServiceMarker++;
+    var qs, url;
 
     try {
         var params = {
@@ -2273,16 +2274,18 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         }
     }
 
-    var url = this._host + "/aura";
-    if (qs && method === "GET") {
-        url = url + "?" + qs;
-    }
+    url = this._host + "/aura?r=" + marker;
+
+    //#if {"excludeModes" : ["PRODUCTION"]}
+    url = this._host + "/aura?" + this.buildActionNameList(actionsToSend);
+    //#end
 
     auraXHR.background = options && options.background;
     auraXHR.length = qs.length;
     auraXHR.request = this.createXHR();
-    auraXHR.marker = Aura.Services.AuraClientServiceMarker++;
     auraXHR.request["open"](method, url, this._appNotTearingDown);
+    auraXHR.marker = marker;
+    auraXHR.url = url;
 
     if (this._appNotTearingDown && "withCredentials" in auraXHR.request) {
         auraXHR.request["withCredentials"] = true;
@@ -2320,8 +2323,6 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
             }
         }
     }
-
-    // Delete all this jiffy nonsense start of 200 release
 
     if (qs && method === "POST") {
         auraXHR.request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=ISO-8859-13');
@@ -2457,6 +2458,25 @@ AuraClientService.prototype.buildParams = function(map) {
         }
     }
     return arr.join("");
+};
+
+/**
+ * Create an encoded query string with action names and their occurrence count
+ *
+ * @param {Action[]} actions  The list of actions.
+ * @returns {String}          The encoded query string.
+ * @private
+ */
+AuraClientService.prototype.buildActionNameList = function(actions) {
+    var map = {};
+
+    for (var i = 0; i < actions.length; i++) {
+        var actionDescriptor = actions[i]["descriptor"];
+        var actionName = actionDescriptor.split("/ACTION$")[1];
+        map[actionName] = map[actionName] ? map[actionName] + 1 : 1;
+    }
+
+    return this.buildParams(map);
 };
 
 /**

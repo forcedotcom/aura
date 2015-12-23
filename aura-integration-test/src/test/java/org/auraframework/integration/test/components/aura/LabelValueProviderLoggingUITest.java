@@ -61,6 +61,6 @@ public class LabelValueProviderLoggingUITest extends AbstractLoggingUITest {
             }
         }
         assertTrue("Fail: LabelController should be called", isLabelControllerCalled);
-        assertTrue("Fail: There should be two calls to LabelController "+callCount.toString(), callCount == 2L);
+        assertTrue("Fail: There should be two calls to LabelController "+callCount.toString(), callCount == 3L);
     }
 }

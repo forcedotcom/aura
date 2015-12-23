@@ -1393,6 +1393,10 @@ Test.Aura.AuraClientServiceTest = function() {
             target.buildParams = function() {
                 return "";
             };
+            target.buildActionNameList = function () {
+                return "";
+            };
+
             target.createXHR = function() {
                 return {
                     open: function(){},

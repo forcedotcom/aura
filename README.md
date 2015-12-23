@@ -32,7 +32,7 @@ with your favorite IDE too.
 
 You need:
 
-* JDK 1.7
+* JDK 1.8
 * Apache Maven 3
 
 ### Step 1: Generate a Template from the Aura Archetype

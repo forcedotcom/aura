@@ -287,7 +287,8 @@ public class TestJavaModel {
 
     @AuraEnabled
     public Calendar getCalendar() {
-        Calendar c = Calendar.getInstance();
+        // jdk8: set default timezone instead of jvm (local) timezone
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(2004, 9, 23, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c;
@@ -295,7 +296,8 @@ public class TestJavaModel {
 
     @AuraEnabled
     public Calendar getCalendarLater() {
-        Calendar c = Calendar.getInstance();
+        // jdk8: set default timezone instead of jvm (local) timezone
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         c.set(2005, 9, 23, 16, 30, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c;

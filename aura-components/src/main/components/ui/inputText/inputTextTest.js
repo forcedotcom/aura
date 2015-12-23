@@ -25,4 +25,6 @@
             $A.test.assertEquals('', component.getElement().value, "input text value is not cleared.");
         }]
     }
+/*eslint-disable semi*/
 })
+/*eslint-enable semi*/

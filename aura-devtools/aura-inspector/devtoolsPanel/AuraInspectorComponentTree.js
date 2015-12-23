@@ -129,6 +129,12 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var globalId = treeNode && treeNode.getRawLabel().globalId;
             
             if(globalId) {
+                // Need to include undefined at the end, or devtools can't handle it internally.
+                // You'll see this error.
+                // "Extension server error: Inspector protocol error: Object has too long reference chain(must not be longer than 1000)"
+                var command = "$auraTemp = $A.getCmp('" + globalId + "'); undefined;";
+                chrome.devtools.inspectedWindow.eval(command);
+
                 devtoolsPanel.updateComponentView(globalId);
                 devtoolsPanel.showSidebar();
             }
@@ -250,16 +256,8 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             return returnValue;
         }
 
-        function isComponentId(id) {
-            return id && id.startsWith(COMPONENT_CONTROL_CHAR);
-        }
-
         function isExpression(cmp) {
             return cmp && cmp.descriptor === "markup://aura:expression";
-        }
-
-        function cleanComponentId(id) {
-            return id && id.startsWith(COMPONENT_CONTROL_CHAR) ? id.substr(1) : id;
         }
 
         function createTreeNodeForComponent(component) {

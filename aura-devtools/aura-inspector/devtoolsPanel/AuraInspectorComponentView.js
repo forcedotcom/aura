@@ -9,7 +9,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
         "elementCount": "HTML Elements"
     }
     var treeComponent;
-    var _items = {};
+    var _componentId = null;
     var _isDirty = false;
 
     this.init = function(tabBody){
@@ -21,102 +21,154 @@ function AuraInspectorComponentView(devtoolsPanel) {
         tabBody.classList.add("sidebar");
 
         treeComponent = new AuraInspectorTreeView(container);
-        treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
     };
 
-    this.setData = function(items) {
-        if(items != _items || JSON.stringify(items) != JSON.stringify(_items)) {
-            _isDirty = true;
-            _items = items;
-            this.render();
-        }
+    this.setData = function(globalId) {
+        _isDirty = true;
+        _componentId = globalId;
+        this.render();
     };
 
     this.render = function(){
-        try {
-            var c = 0;
+        if(_isDirty && _componentId) {
             container.innerHTML = "";
             treeComponent.clearChildren();
 
-            var current = _items;
-            var bodies = current.attributes && current.attributes.body || {};
-            var attributeNodesContainer;
-            var componentId;
-
-            if(!current.attributes) {
-                current.attributes = {};
-            }
-
-
-            while(current) {
-                // Add Header for Super Levels
-                if(current != _items) {
-                    treeComponent.addChild(TreeNode.create("[[Super]]", "Super" + c++, "header"));
-                }
-
-                treeComponent.addChildren(generateGeneralNodes(current));
-
-                // Should probably use a FacetFormatter, but how do I easily specify that info to TreeNode.create()
-                // that is compatible with every other TreeNode.create() call.
-                if(current.attributeValueProvider == current.facetValueProvider) {
-                    var attributeValueProvider = TreeNode.create("Attribute & Facet Value Provider", "attributeValueProvider");
-                    treeComponent.addChild(attributeValueProvider);
-
-                    componentId = devtoolsPanel.cleanComponentId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
-                    
-                    attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
-                } else {
-                    var attributeValueProvider = TreeNode.create("Attribute Value Provider", "attributeValueProvider");
-                    treeComponent.addChild(attributeValueProvider);
-
-                    componentId = devtoolsPanel.cleanComponentId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
-                    attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
-
-                    var facetValueProvider = TreeNode.create("Facet Value Provider", "facetValueProvider");
-                    treeComponent.addChild(facetValueProvider);
-
-                    componentId = devtoolsPanel.cleanComponentId(typeof current.facetValueProvider == "string" ? current.facetValueProvider : current.facetValueProvider.globalId);
-                    facetValueProvider.addChild(TreeNode.create(componentId, "facetValueProvider_" + current.globalId, "globalId"));
-                }
-
-                // Do attributes only at the concrete level
-                if(current === _items) {
-                    treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
-
-                    current.attributes.body = bodies[current.globalId] || [];
-                    attributeNodesContainer = TreeNode.create();
-                    generateNodes(current.attributes, attributeNodesContainer);
-                    treeComponent.addChildren(attributeNodesContainer.getChildren());
-                } else {
-                    // We still want to inspect the body at the super levels,
-                    // since they get composted together and output.
-                    var body = bodies[current.globalId] || [];
-                    attributeNodesContainer = TreeNode.create({ key: "body", value: body }, "", "keyvalue");
-                    generateNodes(body, attributeNodesContainer);
-                    treeComponent.addChild(attributeNodesContainer);
-                }
-                
-                current = current.super;
-            }
-
-            treeComponent.render();
-        } catch(e) {
-            alert([e.message, e.stack]);
+            devtoolsPanel.getComponent(_componentId, function(component) {
+                renderForComponent(component, true);
+                renderForComponentSuper(component, function(){
+                    treeComponent.render();              
+                });
+            }, {
+                elementCount: true,
+                model: true
+            });
         }
     };
 
-    function TreeComponent_OnDblSelect(event) {
-        if(event && event.data) {
-            var domNode = event.data.domNode;
-            var treeNode = event.data.treeNode;
-            var globalId = treeNode && treeNode.getRawLabel().globalId;
+    function renderForComponent(current, showAttributes) {
+
+        var componentId;
+        var parentNode;
+
+        treeComponent.addChildren(generateGeneralNodes(current));
+
+        // Should probably use a FacetFormatter, but how do I easily specify that info to TreeNode.create()
+        // that is compatible with every other TreeNode.create() call.
+        if(current.attributeValueProvider == current.facetValueProvider) {
+            var attributeValueProvider = TreeNode.create("Attribute & Facet Value Provider", "attributeValueProvider");
+            treeComponent.addChild(attributeValueProvider);
+
+            componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
             
-            if(globalId) {
-                var command = "$auraTemp = $A.getCmp('" + globalId + "'); console.log('$auraTemp = ', $auraTemp);";
-                chrome.devtools.inspectedWindow.eval(command);
+            attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
+        } else {
+            var attributeValueProvider = TreeNode.create("Attribute Value Provider", "attributeValueProvider");
+            treeComponent.addChild(attributeValueProvider);
+
+            componentId = devtoolsPanel.cleanId(typeof current.attributeValueProvider == "string" ? current.attributeValueProvider : current.attributeValueProvider.globalId);
+            attributeValueProvider.addChild(TreeNode.create(componentId, "attributeValueProvider_" + current.globalId, "globalId"));
+
+            var facetValueProvider = TreeNode.create("Facet Value Provider", "facetValueProvider");
+            treeComponent.addChild(facetValueProvider);
+
+            componentId = devtoolsPanel.cleanId(typeof current.facetValueProvider == "string" ? current.facetValueProvider : current.facetValueProvider.globalId);
+            facetValueProvider.addChild(TreeNode.create(componentId, "facetValueProvider_" + current.globalId, "globalId"));
+        }
+
+        var bodies = current.attributes.body || {};
+        // Do attributes only at the concrete level
+        if(showAttributes) {
+            treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
+
+            current.attributes.body = bodies[current.globalId] || [];
+            parentNode = TreeNode.create();
+            generateAttributeNodes(current, parentNode);
+            treeComponent.addChildren(parentNode.getChildren());
+        } else {
+            treeComponent.addChild(TreeNode.create("Attributes", "Attributes", "header"));
+            // We still want to inspect the body at the super levels,
+            // since they get composted together and output.
+            var body = bodies[current.globalId] || [];
+            parentNode = TreeNode.create({ key: "body", value: body }, "", "keyvalue");
+            generateNodes(body, parentNode);
+            treeComponent.addChild(parentNode);
+        }
+
+        if(current.model) {
+            treeComponent.addChild(TreeNode.create("Model", "Model", "header"));
+            parentNode = TreeNode.create();
+            generateNodes(current.model, parentNode);
+            treeComponent.addChildren(parentNode.getChildren());
+        }
+    }
+
+    function renderForComponentSuper(component, callback) {
+        if(component.supers && component.supers.length) {
+            devtoolsPanel.getComponent(component.supers[0], function(superComponent) {
+                treeComponent.addChild(TreeNode.create("[[Super]]", "Super" + superComponent.globalId, "header"));
+                renderForComponent(superComponent, false);
+                renderForComponentSuper(superComponent, function() {
+                    if(callback) { 
+                        callback();
+                    }
+                });
+            }, {
+                attributes: false,
+                body: true,
+                elementCount: false,
+                model: true
+            });
+        } else if(callback) { 
+            callback();
+        }     
+    }
+
+    function generateAttributeNodes(component, parentNode) {
+        var node;
+        var value;
+        var attributes = component.attributes;
+        var expressions = component.expressions;
+        for(var prop in attributes) {
+            value = attributes[prop];
+            if(expressions.hasOwnProperty(prop)) {
+                node = TreeNode.create({key: prop, value: expressions[prop]}, "", "keyvalue");
+                if(typeof value === "object") {
+                    generateNodes(attributes[prop], node);
+                } else if(devtoolsPanel.isComponentId(value)) {
+                    node.addChild(TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "globalId"));
+                } else if(devtoolsPanel.isActionId(value)) {
+                    node.addChild(TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "controllerref"));                    
+                } else {
+                    node.addChild(TreeNode.create(value, parentNode.getId() + "_" + prop));
+                }
+                parentNode.addChild(node);
+                continue;
+            }
+            if(attributes.hasOwnProperty(prop)) {
+                if(typeof value === "object") {
+                    if(prop === "body") {
+                        node = TreeNode.create({key: "body", value: value}, "", "keyvalue");
+                        for(var c=0;c<value.length;c++) {
+                            node.addChild(TreeNode.parse(value[c]));
+                        }
+                    } else if(attributes[prop] && ('descriptor' in value || 'componentDef' in value)) {
+                        node = TreeNode.parse(value);
+                    } else {
+                        node = TreeNode.create({ key:prop, value: value }, parentNode.getId() + "_" + prop, "keyvalue");
+                        generateNodes(value, node);
+                    }
+                } else if(devtoolsPanel.isComponentId(value)) {
+                    node = TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "globalId");
+                } else {
+                    node = TreeNode.create({key: prop, value: value}, parentNode.getId() + "_" + prop, "keyvalue");
+                }
+                
+                parentNode.addChild(node);
             }
         }
-    }   
+        return parentNode;
+    }
 
     function generateNodes(json, parentNode) {
         var node;
@@ -129,8 +181,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
                         node = TreeNode.create({key: "body", value: value}, "", "keyvalue");
                         for(var c=0;c<value.length;c++) {
                             node.addChild(TreeNode.parse(value[c]));
-                        }
-                    
+                        }                    
                     } else if(json[prop] && ('descriptor' in value || 'componentDef' in value)) {
                         node = TreeNode.parse(value);
                     } else {
@@ -138,7 +189,7 @@ function AuraInspectorComponentView(devtoolsPanel) {
                         generateNodes(value, node);
                     }
                 } else if(devtoolsPanel.isComponentId(value)) {
-                        node = TreeNode.create(devtoolsPanel.cleanComponentId(value), parentNode.getId() + "_" + prop, "globalId");
+                        node = TreeNode.create(devtoolsPanel.cleanId(value), parentNode.getId() + "_" + prop, "globalId");
                 } else {
                     node = TreeNode.create({key: prop, value: value}, parentNode.getId() + "_" + prop, "keyvalue");
                 }
@@ -159,4 +210,5 @@ function AuraInspectorComponentView(devtoolsPanel) {
 
         return nodes;
     }
+
 }

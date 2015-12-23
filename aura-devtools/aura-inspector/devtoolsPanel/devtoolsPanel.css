@@ -79,7 +79,7 @@ section.tab-body.auraInspectorIFrameTab { overflow: hidden; }
 .event-log li button:focus { outline: 1px solid #ddd; }
 
 /* Component View */
-.component-view { position: absolute; width: 25%; top: 0; right: 0; bottom: 0; background: #fff; opacity: .8; border-left: 1px solid #efefef;}
+.component-view { position: absolute; width: 25%; top: 0; right: 0; bottom: 0; background: #fff; opacity: .8; border-left: 1px solid #efefef; overflow: auto;}
 .component-view ul { margin: 0; padding: 0;  }
 .component-view ul li { list-style: none; padding: .1em 0 0 0; text-indent: .5em }
 .component-view ul li li { list-style: square inside; padding: 0 0 0 1em;}

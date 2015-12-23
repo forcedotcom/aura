@@ -23,10 +23,10 @@
                 actionsStorage.get(actionStorageKey)
                 .then(
                     function() {
-                        console.log("find storage item for action:", data);
+                        //console.log("find storage item for action:", data);
                         actionsStorage.remove(actionStorageKey)
                         .then(function () {
-                            console.log("successfully remove storage for action:", data);
+                            //console.log("successfully remove storage for action:", data);
                             //notify Storage View
                             $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
                         });
@@ -201,7 +201,8 @@
         var BOOTSTRAP_KEY = "AuraInspector:bootstrap";
         var postMessagesQueue = [];
         var batchPostId = null;
-        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // ☺ - This value is a component Global Id
+        var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var increment = 0;
         var lastItemInspected;
@@ -225,7 +226,7 @@
             // stabalization issues.
             postMessagesQueue.push({"key":key, "data":data});
 
-            if(batchPostId === null) {
+            if(batchPostId === null || batchPostId === undefined) {
                 batchPostId = sendQueuedPostMessages();
             }
         };
@@ -260,8 +261,10 @@
             //     "body" : true // Should we serialize the body?
             // };
             var configuration = Object.assign({
-                "body": true,
-                "elementCount": false
+                "attributes": true, // True to serialize the attributes, if you just want the body you can set this to false and body to true. (Good for serializing supers)
+                "body": true, // Serialize the Body? This can be expensive so you can turn it off.
+                "elementCount": false, // Count all child elements of all the elements associated to a component. 
+                "model": false // Serialize the model data as well
             }, options);
             if(component){
                 if(!component.isValid()) {
@@ -285,33 +288,48 @@
 
                         // Added Later
                         //,"super": ""
-                        //
-                        // Implement
                         //,"model": null 
                     };
 
-                    var attributes = component.getDef().getAttributeDefs();
-                    attributes.each(function(attributeDef) {
-                        var key = attributeDef.getDescriptor().getName();
-                        var value;
+                    if(configuration.attributes) {
+                        var attributes = component.getDef().getAttributeDefs();
+                        attributes.each(function(attributeDef) {
+                            var key = attributeDef.getDescriptor().getName();
+                            var value;
+                            var rawValue;
+                            // If we don't want the body serialized, skip it.
+                            // We would only want the body if we are going to show
+                            // the components children.
+                            if(key === "body" && !configuration.body) { return; }
+                            try {
+                                rawValue = component._$getRawValue$(key);
+                                value = component.get("v." + key);
+                            } catch(e) {
+                                value = undefined;
+                            }
+                            if($A.util.isExpression(rawValue)) {
+                                output.expressions[key] = rawValue+"";
+                                output.attributes[key] = value;
+                            } else {
+                                output.attributes[key] = rawValue;
+                            }
+                        }.bind(this));
+                    } else if(!configuration.attributes && configuration.body) {
                         var rawValue;
-                        // If we don't want the body serialized, skip it.
-                        // We would only want the body if we are going to show
-                        // the components children.
-                        if(key === "body" && !configuration.body) { return; }
+                        var value;
                         try {
-                            rawValue = component._$getRawValue$(key);
-                            value = component.get("v." + key);
+                            rawValue = component._$getRawValue$("body");
+                            value = component.get("v.body");
                         } catch(e) {
                             value = undefined;
                         }
                         if($A.util.isExpression(rawValue)) {
-                            output.expressions[key] = rawValue+"";
-                            output.attributes[key] = value;
+                            output.expressions["body"] = rawValue+"";
+                            output.attributes["body"] = value;
                         } else {
-                            output.attributes[key] = rawValue;
+                            output.attributes["body"] = rawValue;
                         }
-                    }.bind(this));
+                    }
 
                     var supers = [];
                     var superComponent = component;
@@ -333,6 +351,13 @@
                             }
                         }
                         output.elementCount = elementCount;
+                    }
+
+                    if(configuration.model) {
+                        var model = component.getModel();
+                        if(model) {
+                            output["model"] = model.data;
+                        }
                     }
                     
                     return this.safeStringify(output);
@@ -365,17 +390,19 @@
             }
         }
 
-        function safeStringify(value) {
+        function safeStringify(originalValue) {
             // For circular dependency checks
             var visited = new Set();
             var toJSON = InvalidComponent.prototype.toJSON;
+            var toJSONCmp = Component.prototype.toJSON;
             delete InvalidComponent.prototype.toJSON;
+            delete Component.prototype.toJSON;
 
-            var result = JSON.stringify(value, function(key, value) {
+            var result = JSON.stringify(originalValue, function(key, value) {
                 if(Array.isArray(this) || key) { value = this[key]; }
                 if(!value) { return value; }
 
-                if(typeof value === "string" && value.startsWith(COMPONENT_CONTROL_CHAR)) {
+                if(typeof value === "string" && (value.startsWith(COMPONENT_CONTROL_CHAR) || value.startsWith(ACTION_CONTROL_CHAR))) {
                     return ESCAPE_CHAR + escape(value);
                 }
 
@@ -399,6 +426,10 @@
 
                 if($A.util.isExpression(value)) {
                     return value.toString();
+                }
+
+                if($A.util.isAction(value)) {
+                    return ACTION_CONTROL_CHAR + value.getDef().toString();
                 }
 
                 if(Array.isArray(value)) {
@@ -427,6 +458,7 @@
             });
 
             InvalidComponent.prototype.toJSON = toJSON;
+            Component.prototype.toJSON = toJSONCmp;
 
             return result;
         };

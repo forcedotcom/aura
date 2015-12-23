@@ -139,35 +139,6 @@
 				dl.appendChild(dt);
 				dl.appendChild(dd);
 			}
-			// if(data[c].scope) {
-			// 	auracomponent = document.createElement("aurainspector-auracomponent");
-			// 	auracomponent.setAttribute("globalId", data[c].scope);
-				
-			// 	dt = document.createElement("dt");
-			// 	dt.appendChild(auracomponent);
-
-			// 	link = document.createElement("a");
-			// 	link.textContent = "c." + data[c].name;
-			// 	link.href="";
-			// 	link.setAttribute("data-globalid", data[c].scope);
-			// 	link.setAttribute("data-controller-name", data[c].name);
-			// 	link.addEventListener("click", ControllerLink_OnClick);
-
-			// 	dd = document.createElement("dd");
-			// 	dd.appendChild(link);
-
-			// 	dl.appendChild(dt);
-			// 	dl.appendChild(dd);
-			// } else {				
-			// 	dt = document.createElement("dt");
-			// 	dt.appendChild(document.createTextNode("{Bubbled Event}"));
-
-			// 	dd = document.createElement("dd");
-			// 	dd.textContent = data[c].name;
-
-			// 	dl.appendChild(dt);
-			// 	dl.appendChild(dd);
-			// }
 		}
 
 		// build the handled collection

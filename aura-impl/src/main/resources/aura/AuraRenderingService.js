@@ -667,7 +667,7 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
  */
 AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
     if (cmp && cmp.isValid()) {
-        var id = cmp.getConcreteComponent().getGlobalId();
+        var id = cmp.getGlobalId();
         var dirtyAttributes = this.dirtyComponents[id];
         if (dirtyAttributes) {
             if (dirtyAttributes[value]) {

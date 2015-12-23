@@ -245,14 +245,14 @@ ComponentDefStorage.prototype.restoreAll = function() {
 
                 $A.log("ComponentDefStorage: restored " + cmpConfigs.length + " components, " + libConfigs.length + " libraries from storage into registry");
                 defRegistry.restoreInProgress = false;
-                defRegistry.currentPromise = null;
+                this.currentPromise = null;
             }
         ).then(
             undefined, // noop
             function(e) {
                 $A.log("ComponentDefStorage: error during restore from storage, no component or library defs restored", e);
                 defRegistry.restoreInProgress = false;
-                defRegistry.currentPromise = null;
+                this.currentPromise = null;
             }
         );
 

@@ -64,6 +64,7 @@
         var _initialized = false;
         var _subscribers = new Map();
         var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var tabId;
 
@@ -304,11 +305,7 @@
         };
 
         this.updateComponentView = function(globalId) {
-            this.getComponent(globalId, function(component){
-                panels.get("component-view").setData(component);
-            }, {
-                elementCount: true
-            });
+            panels.get("component-view").setData(globalId);
         };
 
         this.getComponent = function(globalId, callback, configuration) {
@@ -371,8 +368,12 @@
             return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR);
         };
 
-        this.cleanComponentId = function(id) {
-            return typeof id === "string" && id.startsWith(COMPONENT_CONTROL_CHAR) ? id.substr(1) : id;
+        this.isActionId = function(id) {
+            return typeof id === "string" && id.startsWith(ACTION_CONTROL_CHAR);
+        }
+
+        this.cleanId = function(id) {
+            return typeof id === "string" && (id.startsWith(COMPONENT_CONTROL_CHAR) || id.startsWith(ACTION_CONTROL_CHAR)) ? id.substr(1) : id;
         };
 
         /**

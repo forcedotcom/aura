@@ -18,7 +18,7 @@
 	render: function(component, helper) {
         var domId = component.get('v.domId');
 		if (!domId) {
-            var globalId = component.getConcreteComponent().getGlobalId();
+            var globalId = component.getGlobalId();
 			helper.setAttribute(component, {key: 'domId', value: globalId});
 		}
 

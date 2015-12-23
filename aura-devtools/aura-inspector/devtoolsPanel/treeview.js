@@ -41,6 +41,10 @@ function TreeNode(text, id) {
     this.setFormatter = function(formatter) {
         _formatter = formatter;
     };
+
+    this.toString = function() {
+        return this.getLabel()+"";
+    }
 }
 
 (function(){
@@ -160,6 +164,9 @@ function TreeNode(text, id) {
         },
         GlobalIdFormatter: function(value) {
             return `<aurainspector-auracomponent globalId='${value}'/>`;
+        },
+        ControllerReference: function(value) {
+            return `<aurainspector-controllerreference>${value}</aurainspector-controllerreference>`;
         }
     };
 
@@ -195,6 +202,9 @@ function TreeNode(text, id) {
             case "globalId":
                 node.setFormatter(formatters.GlobalIdFormatter);
                 break;
+            case "controllerref":
+                node.setFormatter(formatters.ControllerReference);
+                break;
         }
 
         return node;
@@ -204,8 +214,19 @@ function TreeNode(text, id) {
      * Very SFDC specific. Takes a config def, and returns simply the node with the proper formatting.
      */
     TreeNode.parse = function(config) {
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // ☺ - This value is a component Global Id
+        var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
+
         if(!config) {
             return new TreeNode();
+        }
+
+        if(typeof config === "string" && config.startsWith(COMPONENT_CONTROL_CHAR)) {
+            return TreeNode.create(config.substr(1), config, "globalId");
+        }
+
+        if(typeof config === "string" && config.startsWith(ACTION_CONTROL_CHAR)) {
+            return TreeNode.create(config.substr(1), config, "controllerref")
         }
 
         var id = config.globalId || "";

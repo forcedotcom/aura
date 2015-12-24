@@ -14,7 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*jslint evil:true, sub: true */
+/*jslint sub: true */
+/*global Aura, Json, Component, PropertyReferenceValue, FunctionCallValue, PropertyReferenceValue, FunctionCallValue, PassthroughValue, Action*/
 
 /**
  * @description
@@ -68,7 +69,9 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  */
 Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function(src) {
     // use assignment to variable so that the newlines in src are not actually treated as the end of the line
+    /*jshint evil:true*/
     return new Function("var a = " + src + "; return a;")();
+    /*jshint evil:false*/
 } : function(src) {
     // normal indirect eval call
     return window.eval("false||" + src);
@@ -546,6 +549,9 @@ Aura.Utils.Util.prototype.swapClass = function(element, oldClass, newClass){
     }
 };
 
+/**
+ * @private
+ */
 Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
     var constructedClass='';
     if(this.isComponent(element)){
@@ -583,6 +589,9 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
     }
 };
 
+/**
+ * @private
+ */
 Aura.Utils.Util.prototype.buildClass=function(oldClass, newClass, remove){
     if(this.isUndefinedOrNull(oldClass)) {
         oldClass='';
@@ -1536,6 +1545,9 @@ Aura.Utils.Util.prototype.attachToDocumentBody = function(element) {
 };
 /**
 * Check for substrings at the end
+* @param {String} fullstring The string to check against
+* @param {String} substring The substring to look for at the end
+* @returns {Boolean}
 * @export
 */
 Aura.Utils.Util.prototype.stringEndsWith = function(fullstr, substr) {
@@ -1953,7 +1965,7 @@ Aura.Utils.Util.prototype.emptyComponentTrash = function() {
  * @param {HTMLElement} container The element you think is the outermost container.
  * @param {HTMLElement} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
-* @export
+ * @export
  */
 Aura.Utils.Util.prototype.contains = function(container, element) {
     if ($A.util.isElement(container) && $A.util.isElement(element)) {
@@ -1975,7 +1987,7 @@ Aura.Utils.Util.prototype.contains = function(container, element) {
 
 /**
  * Simple event squasher.
-
+ *
  * @param {UIEvent} event the DOM event to squash
  * @param {Boolean} preventDefault if preventDefault() should also be called
  * @export
@@ -1997,7 +2009,7 @@ Aura.Utils.Util.prototype.squash = function(event, preventDefault) {
 
 /**
  * Strip off html tags from html codes.
-
+ *
  * @param {String} input the input html codes
  * @param {Array} tags the html tag names to be removed
  * @return {String} an output string without those specified tags
@@ -2252,7 +2264,12 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
         return t;
     };
 
-    /** @export */
+    /**
+     * Loads a JavaScript resource
+     * @param {Function} callback
+     * @param {String} url
+     * @export
+     */
     Aura.Utils.Util.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
             this.includeScript.cache = {};

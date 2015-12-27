@@ -2112,7 +2112,7 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
         valueProvider=actionExpression.valueProvider;
     }
 
-    return function Component$getActionCaller(event) {
+    var actionCaller = function Component$getActionCaller(event) {
         if (valueProvider.isValid && !valueProvider.isValid() && event.getDef().getDescriptor().getName() !== "valueDestroy") {
             return;
         }
@@ -2139,6 +2139,12 @@ Component.prototype.getActionCaller = function(valueProvider, actionExpression) 
             $A.assert(false, "no client action by name " + actionExpression);
         }
     };
+
+    // Expose the information for inspecting purposes.
+    actionCaller["valueProvider"] = valueProvider;
+    actionCaller["actionExpression"] = actionExpression;
+
+    return actionCaller;
 };
 
 /**

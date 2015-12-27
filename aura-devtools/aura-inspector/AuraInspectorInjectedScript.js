@@ -212,7 +212,7 @@
             addRightClickObserver();
 
             this.subscribe("AuraInspector:ContextElementRequest", function(){
-                if(lastItemInspected) {
+                if(lastItemInspected && lastItemInspected.nodeType === 1) {
                     this.publish("AuraInspector:ShowComponentInTree", lastItemInspected.getAttribute("data-aura-rendered-by"));
                 }
             }.bind(this));

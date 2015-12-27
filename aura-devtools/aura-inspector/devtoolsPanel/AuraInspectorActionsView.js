@@ -1,7 +1,7 @@
 /* Listens for events and shows them in the event log */
 function AuraInspectorActionsView(devtoolsPanel) {
     var _list;
-    
+
     var _pending;
     var _running;
     var _completed;
@@ -28,7 +28,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     var markup = `
         <menu type="toolbar">
-            <li><aurainspector-onOffButton class="circle on" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
+            <li class="record-button"><aurainspector-onOffButton class="circle on" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
             <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
             <li class="divider" style="margin-left: -3px;"></li>
             <li><input id="filter-text" type="search" placeholder="Filter"/></li>
@@ -41,24 +41,29 @@ function AuraInspectorActionsView(devtoolsPanel) {
             <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions that errored"><span>Error</span></aurainspector-onOffButton></li>
             <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show aborted actions"><span>Aborted</span></aurainspector-onOffButton></li>
         </menu>
-        <div id="actionsToDrop-list" class="actionsToDrop-list">
-            <section id="actionsToDrop-pending">
-                <h1>To Drop</h1>
-            </section>
-            <section id="actionsToDrop-completed">
-                <h1>Dropped</h1>
-            </section>
-        </div>
-        <div id="actions-list" class="actions-list">
-            <section id="actions-pending">
-                <h1>Pending</h1>
-            </section>
-            <section id="actions-running">
-                <h1>Running</h1>
-            </section>
-            <section id="actions-completed">
-                <h1>Completed</h1>
-            </section>
+        <div class="actions-tab">
+            <div id="actionsToDrop-list" class="actionsToDrop-list">
+                <section>
+                    <h1>To Drop</h1>
+                    <div id="actionsToDrop-pending" class="drop-zone">
+                        <span class="description">Drag actions here. Next time we see the action, we won't send it to server.</span>
+                    </div>
+                </section>
+                <section id="actionsToDrop-completed">
+                    <h1>Dropped</h1>
+                </section>
+            </div>
+            <div id="actions-list" class="actions-list">
+                <section id="actions-pending">
+                    <h1>Pending</h1>
+                </section>
+                <section id="actions-running">
+                    <h1>Running</h1>
+                </section>
+                <section id="actions-completed">
+                    <h1>Completed</h1>
+                </section>
+            </div>
         </div>
     `;
 
@@ -74,9 +79,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
         _toDrop = tabBody.querySelector("#actionsToDrop-pending");
         _dropped = tabBody.querySelector("#actionsToDrop-completed");
 
-        _listDrop.addEventListener("mouseover", displayTooltipMessage.bind(this, "Drag and Drop action from Action List below, next time we see the same action, we won't send it to server"));
-        _listDrop.addEventListener("mouseout", removeTooltipMessage.bind(this));
-        
+        // _listDrop.addEventListener("mouseover", displayTooltipMessage.bind(this, "Drag and Drop action from Action List below, next time we see the same action, we won't send it to server"));
+        // _listDrop.addEventListener("mouseout", removeTooltipMessage.bind(this));
+
         // Start listening for events to draw
         devtoolsPanel.subscribe("AuraInspector:OnActionEnqueue", AuraInspectorActionsView_OnActionEnqueue.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnActionStateChange", AuraInspectorActionsView_OnActionStateChange.bind(this));
@@ -87,6 +92,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
         var div_actionsToDrop = tabBody.querySelector("#actionsToDrop-list");
         if(div_actionsToDrop) {
             div_actionsToDrop.addEventListener("dragover", allowDrop.bind(this));
+            div_actionsToDrop.addEventListener("dragleave", noDrop.bind(this));
+            div_actionsToDrop.addEventListener("dragend", noDrop.bind(this));
             div_actionsToDrop.addEventListener("drop", drop.bind(this));
         } else {
             var command = "console.error('div_actionsToDrop cannot be found');";
@@ -111,7 +118,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     this.refresh = function() {
         removeAllCards();
-        
+
         if(_listDrop) {
             devtoolsPanel.publish("AuraInspector:OnActionToDropClear", {});
         }
@@ -135,7 +142,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         upsertCard(action);
     }
 
-    function AuraInspectorActionsView_OnActionStateChange(data) {        
+    function AuraInspectorActionsView_OnActionStateChange(data) {
         if(!actions.has(data.id)) {
             return;
         }
@@ -233,16 +240,16 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
 
         switch(action.state) {
-            case "RUNNING": 
-                _running.appendChild(card); 
+            case "RUNNING":
+                _running.appendChild(card);
                 break;
-            case "NEW": 
-                _pending.appendChild(card); 
+            case "NEW":
+                _pending.appendChild(card);
                 break;
             case "DROPPED":
                 _dropped.appendChild(card);
                 break;
-            default: 
+            default:
                 _completed.insertBefore(card, _completed.querySelector(".action-card"));
                 break;
         }
@@ -270,7 +277,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
         var action = actions.get(actionId);
         var params = JSON.stringify(action.params);
-        
+
         var card = document.createElement("aurainspector-actionCard");
             card.id = "action_card_" + action.id;
             card.className = "action-card action-card-state-" + action.state;
@@ -285,33 +292,34 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("isFromStorage", action.fromStorage);
             card.setAttribute("storageKey", action.storageKey);
-            if(toDrop === false) { 
+            if(toDrop === false) {
                 //set draggable
                 card.setAttribute("draggable","true");
                 card.addEventListener("dragstart", drag.bind(this) );
+                card.addEventListener("dragend", endDrag.bind(this) );
                 //set double click
-                card.addEventListener('dblclick', doubleClick.bind(this));
+                //card.addEventListener('dblclick', doubleClick.bind(this));
             }
             //set drop
             if(toDrop === true) {
                 card.setAttribute("toDrop", toDrop);
             }
-            
+
         return card;
     }
 
     //display a tooltip message as the last child node of element
     function displayTooltipMessage (messageToDisplay, event) {
-        console.log(messageToDisplay);
         var element = event.currentTarget;
         var elementTop = element.style.top;
         var elementLeft = element.style.left;
         var toolTipElement = document.createElement("span");
             toolTipElement.id = "toolTipElement";
+            toolTipElement.className = "toolTipElement";
         var node = document.createTextNode(messageToDisplay);
         toolTipElement.appendChild(node);
-        toolTipElement.style.fontSize = "10px"
-        element.appendChild(toolTipElement);  
+        //toolTipElement.style.fontSize = "10px";
+        element.appendChild(toolTipElement);
     }
 
     //remove the tooltip message (it should be the last child node of element)
@@ -319,22 +327,40 @@ function AuraInspectorActionsView(devtoolsPanel) {
         var element = event.currentTarget;
         if(element.childNodes[element.childNodes.length-1].id === "toolTipElement") {
             element.removeChild(element.childNodes[element.childNodes.length-1]);
-        } 
+        }
     }
 
     function allowDrop (event) {
         event.preventDefault();
+        _toDrop.className = "drop-zone allow-drop";
+    }
+
+    function noDrop (event) {
+        _toDrop.className = "drop-zone";
+    }
+
+    function endDrag (event) {
+      console.log("end-drop",event);
+      event.target.classList.remove("dragging");
+      if(event.dataTransfer.dropEffect == "none"){
+        // event.target.style.opacity = "1";
+      } else {
+        event.target.classList.add("dropped");
+        event.target.setAttribute("draggable","false");
+        // event.target.style.opacity = "1";
+      }
     }
 
     function drag (event) {
-        event.target.style.opacity = "0.5";
-        event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());     
+        // event.target.style.opacity = "0.5";
+        event.target.classList.add("dragging");
+        event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());
     }
 
     function doubleClick (event) {
         var actionCardElement = event.target;
         if(actionCardElement && actionCardElement.getAttribute("actionId")) {
-            actionCardElement.style.opacity = "0.5";            
+            actionCardElement.style.opacity = "0.5";
             createActionCardInToDropDivAndNotifyOthers(actionCardElement.getAttribute("actionId"));
         } else {
             var command = "console.log('doubleClick.event.target or its actionId is missing');";
@@ -349,22 +375,22 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 var command = "console.log('_toDrop missing');";
                 chrome.devtools.inspectedWindow.eval(command);
         }
-            
+
         _toDrop.appendChild(actionCard);
             //install override
-            
+
         var actionName = actionCard.getAttribute("name");
         var actionParameter = actionCard.getAttribute("parameters");
         var actionStorageKey = actionCard.getAttribute("storageKey");
 
-        var dataToPublish = { 'actionName': actionName, 'actionParameter':actionParameter, 'actionId': actionId, 
+        var dataToPublish = { 'actionName': actionName, 'actionParameter':actionParameter, 'actionId': actionId,
                             'actionStorageKey': actionStorageKey};
         devtoolsPanel.publish("AuraInspector:OnActionToDropEnqueue", dataToPublish);
     }
 
     function drop (event) {
-        event.preventDefault();        
-        
+        event.preventDefault();
+        noDrop(event);
         if(event && event.dataTransfer) {
             var data = event.dataTransfer.getData("text");
 
@@ -374,8 +400,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
             } else {
                 createActionCardInToDropDivAndNotifyOthers(data, devtoolsPanel);
             }
-    
-        }           
+
+        }
     }
 
 }

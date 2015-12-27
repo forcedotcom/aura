@@ -5,7 +5,7 @@
 	var auracomponent = Object.create(HTMLDivElement.prototype);
 
     auracomponent.createdCallback = function() {
-        
+
         this.addEventListener("dblclick", AuraComponent_OnDblClick.bind(this));
     }
 
@@ -18,7 +18,7 @@
 				render(this, _data);
 			}.bind(this));
 		} else {
-            // If we do a setAttribute("componentData", "JSONSTRING"); 
+            // If we do a setAttribute("componentData", "JSONSTRING");
             // It would be nice if it just worked.
             try {
                 if(typeof _data === "string") {
@@ -33,7 +33,7 @@
             }
 		}
 	};
-	
+
 	function render(element, data) {
 		var descriptor = data.descriptor;
 		descriptor = descriptor.split("://")[1] || descriptor;
@@ -57,7 +57,7 @@
 
                     pattern.push(' <span class="component-attribute">' + attr + '</span>="' + current + '"');
                 }
-            }   
+            }
         }
 
         pattern.push("&gt;");
@@ -71,7 +71,7 @@
         shadowRoot.appendChild(template.content);
 	}
 
-	function getComponentData(globalId, callback) {		
+	function getComponentData(globalId, callback) {
 		var cmd = `window[Symbol.for('AuraDevTools')].Inspector.getComponent('${globalId}', {'body':false, 'elementCount': false});`;
 
         chrome.devtools.inspectedWindow.eval(cmd, function(response, exceptionInfo) {

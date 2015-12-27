@@ -18,7 +18,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
 
     var markup = `
         <menu type="toolbar">
-            <li><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
+            <li class="record-button"><aurainspector-onOffButton class="circle" data-filter="all" title="Toggle recording"><span>Recording</span></aurainspector-onOffButton></li>
             <li><button id="clear-button" class="clear-status-bar-item status-bar-item" title="Clear"><div class="glyph"></div><div class="glyph shadow"></div></button></li>
             <li class="divider" style="margin-left: -3px;"></li>
             <li><input id="filter-text" type="search" placeholder="Filter"/></li>
@@ -98,7 +98,9 @@ function AuraInspectorEventLog(devtoolsPanel) {
         var li = document.createElement("li");
 
         var expand = document.createElement("button");
-        expand.textContent = "+";
+        expand.value = "OFF";
+        expand.className = "toggle";
+        // expand.textContent = "+";
         expand.addEventListener("click", ExpandButton_OnClick);
 
         var card = document.createElement("aurainspector-eventCard");
@@ -143,7 +145,7 @@ function AuraInspectorEventLog(devtoolsPanel) {
             var removed = _events.pop();
             _eventsMap.delete(getEventId(removed));
         }
-        _events.push(eventInfo);        
+        _events.push(eventInfo);
     }
 
     function getHandledDataTree(contextId, previousId) {
@@ -296,18 +298,17 @@ function AuraInspectorEventLog(devtoolsPanel) {
     }
 
     function ExpandButton_OnClick(event) {
-        var button = event.currentTarget;
-        var card = button.nextSibling;
+      var button = event.currentTarget;
+      var card = button.nextSibling;
 
-        if(button.textContent === "+") {
-            button.textContent = "-";
-            card.setAttribute("collapsed", "false");
-        } else {
-            button.textContent = "+";
-            card.setAttribute("collapsed", "true");
-        }
+      if (button.value == "OFF") {
+        button.value = "ON";
+        card.setAttribute("collapsed", "false");
+      } else {
+        button.value = "OFF";
+        card.setAttribute("collapsed", "true");
+      }
     }
-
 
     function FilterText_OnChange(event) {
         var text = event.currentTarget;

@@ -125,7 +125,8 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            return value.attributes.expression;
+            //return ByReference || ByValue;
+            return value.attributes.expression || value.attributes.value;
         },
         KeyValueFormatter: function(config){
             var value = config.value;

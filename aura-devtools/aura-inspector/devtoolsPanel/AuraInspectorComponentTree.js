@@ -11,12 +11,21 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
     var markup = `
         <menu type="toolbar">
-            <li><button id="refresh-button"><span>Refresh</span></button></li>
-            <li><button id="expandall-button"><span>Expand All</span></button></li>
+            <li>
+              <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+                <div class="glyph toolbar-button-theme"></div>
+                <div class="glyph shadow"></div>
+              </button>
+            </li>
+            <li>
+              <button id="expandall-button" class="text-button">
+                <span>Expand All</span>
+              </button>
+            </li>
             <li class="divider"></li>
             <li><input type="checkbox" id="showglobalids-checkbox"><label for="showglobalids-checkbox">Show Global IDs</label></li>
         </menu>
-        <div class="component-tree" id="tree"></div>
+        <div class="component-tree source-code" id="tree"></div>
     `;
 
     this.init = function(tabBody) {
@@ -28,7 +37,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         treeComponent.attach("onhover", TreeComponent_OnHover.bind(this));
         treeComponent.attach("onselect", TreeComponent_OnSelect.bind(this));
         treeComponent.attach("ondblselect", TreeComponent_OnDblSelect.bind(this));
-       
+
         var refreshButton = tabBody.querySelector("#refresh-button");
             refreshButton.addEventListener("click", RefreshButton_OnClick.bind(this));
 
@@ -102,7 +111,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
     function ShowGlobalIdsCheckBox_Change(event) {
         var showGlobalIds = event.srcElement.checked;
         AuraInspectorOptions.set("showGlobalIds", showGlobalIds, function(options) {
-            this.refresh(); 
+            this.refresh();
         }.bind(this));
     }
 
@@ -115,7 +124,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var domNode = event.data.domNode;
             var treeNode = event.data.treeNode;
             var globalId = treeNode && treeNode.getRawLabel().globalId;
-            
+
             if(globalId) {
                 devtoolsPanel.highlightElement(globalId);
             }
@@ -127,7 +136,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var domNode = event.data.domNode;
             var treeNode = event.data.treeNode;
             var globalId = treeNode && treeNode.getRawLabel().globalId;
-            
+
             if(globalId) {
                 // Need to include undefined at the end, or devtools can't handle it internally.
                 // You'll see this error.
@@ -146,7 +155,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var domNode = event.data.domNode;
             var treeNode = event.data.treeNode;
             var globalId = treeNode && treeNode.getRawLabel().globalId;
-            
+
             if(globalId) {
                 var command = "$auraTemp = $A.getCmp('" + globalId + "'); console.log('$auraTemp = ', $auraTemp);";
                 chrome.devtools.inspectedWindow.eval(command);
@@ -159,7 +168,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
         // Generates the whole tree
         generateTreeRecusively(rootComponent, currentTreeNode, callback);
-        
+
         function generateTreeRecusively(component, treeNode, callback) {
             var globalId = component.globalId;
             if(allnodes.has(globalId)) { return callback(null); }
@@ -167,7 +176,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var newTreeNode = createTreeNodeForComponent(component);
             treeNode.addChild(newTreeNode);
             allnodes.add(globalId);
-        
+
             // Get Body ID's
             getBodyFromComponent(component, function(bodyComponents){
                 var count = bodyComponents.length;
@@ -205,12 +214,12 @@ function AuraInspectorComponentTree(devtoolsPanel) {
                     callback(flattenArray(bodyNodes))
                 });
             } else if(isExpression(component) && isFacetArray(component.attributes.value)) {
-                
-                // Is an expression and a facet.    
+
+                // Is an expression and a facet.
                 getBodyFromIds(component.attributes.value, function(bodyNodes){
                     callback(flattenArray(bodyNodes));
                 });
-            
+
             } else  {
                 callback(returnValue);
             }
@@ -220,7 +229,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var bodies = [];
             var processed = 0;
             var count = ids && ids.length;
-            
+
             if(!count) {
                 return callback([]);
             }
@@ -272,7 +281,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             if(component.localId) {
                 attributes.attributes["aura:id"] = component.localId;
             }
-            
+
             var body = [];
             if(component.attributes) {
                 for(var property in component.attributes) {
@@ -295,6 +304,6 @@ function AuraInspectorComponentTree(devtoolsPanel) {
 
             return TreeNode.parse(attributes);
         }
-    
+
     }
 }

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+//#include aura.locker.SecureAuraEvent
+
 var SecureComponent = (function() {
 	"use strict";
 
@@ -25,15 +27,19 @@ var SecureComponent = (function() {
 		// DCHASMAN TODO W-2837797 Figure out if we want to filter out sometimes, all of the time does not make sense e.g. for component.find()
 		// return $A.lockerService.util.hasAccess(sc, value) ? $A.lockerService.wrapComponent(value, referencingKey) : undefined;
 
-		return $A.lockerService.wrapComponent(value, $A.lockerService.util._getKey(sc, $A.lockerService.masterKey));
+		return $A.lockerService.wrapComponent(value, getKey(sc));
 	}
-	
+
 	function SecureComponent(component, referencingKey) {
 		SecureThing.call(this, referencingKey, "component");
-		
+
 		this._set("component", component, $A.lockerService.masterKey);
 	}
-	
+
+	function getKey(sc) {
+		return $A.lockerService.util._getKey(sc, $A.lockerService.masterKey);
+	}
+
 	function getComponent(sc) {
 		return sc._get("component", $A.lockerService.masterKey);
 	}
@@ -112,14 +118,23 @@ var SecureComponent = (function() {
 		"getElement" : {
 			value : function() {
 				var element = getComponent(this).getElement();
+				if (!element) {
+					return element;
+				}
 				$A.lockerService.util.verifyAccess(this, element);
 				return SecureDocument.wrap(element);
 			}
 		},
 
 		"getEvent" : {
-			value : function(event) {
-				return getComponent(this).getEvent(event);
+			value : function(name) {
+				// system call to collect the low level aura event
+				var event = getComponent(this).getEvent(name);
+				if (!event) {
+					return event;
+				}
+				// shadowing the low level aura event with the component's key
+				return new SecureAuraEvent(event, getKey(this));
 			}
 		},
 
@@ -129,7 +144,7 @@ var SecureComponent = (function() {
 			}
 		}
 	});
-	
+
 	SecureComponent.prototype.constructor = SecureComponent;
 
 	return SecureComponent;

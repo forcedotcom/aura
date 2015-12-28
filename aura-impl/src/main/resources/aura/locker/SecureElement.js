@@ -15,9 +15,23 @@
  */
 
 //#include aura.locker.SecureDOMEvent
+//#include aura.locker.SecureIFrameElement
 
 var SecureElement = (function() {
 	"use strict";
+
+	// Standard Element interface represents an object of a Document.
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element#Properties
+	var ElementSecureProperties = ['attributes', 'childElementCount', 'classList', 'className', 'id', 'tagName'];
+	// Note: ignoring 'children', 'firstElementChild', 'innerHTML', 'lastElementChild', 'namespaceURI',
+	//      'nextElementSibling' and 'previousElementSibling' from the list above.
+
+	// Standard HTMLElement interface represents any HTML element
+	// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Properties
+	var HTMLElementSecureProperties = ['accessKey', 'accessKeyLabel', 'contentEditable', 'isContentEditable',
+			'contextMenu', 'dataset', 'dir', 'draggable', 'dropzone', 'hidden', 'lang', 'spellcheck',
+			'style', 'tabIndex', 'title'];
+	// Note: ignoring 'offsetParent' from the list above.
 
 	function getElement(se) {
 		return se._get("el", $A.lockerService.masterKey);
@@ -28,12 +42,18 @@ var SecureElement = (function() {
 	}
 
 	function SecureElement(el, key) {
+		// A secure element can have multiple forms, this block allows us to apply
+		// some polymorphic behavior to SecureElement depending on the tagName
+		var tagName = el.tagName && el.tagName.toUpperCase();
+		if (tagName === 'IFRAME') {
+			return new SecureIFrameElement(el, key);
+		}
+
+		// SecureElement is it then!
 		SecureThing.call(this, key, "el");
-
 		$A.lockerService.util.applyKey(el, key);
-
 		this._set("el", el, $A.lockerService.masterKey);
-
+		SecureElement.enableSecureProperties(this);
 		Object.freeze(this);
 	}
 
@@ -43,9 +63,6 @@ var SecureElement = (function() {
 				return "SecureElement: " + getElement(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
 			}
 		},
-
-		id : SecureThing.createPassThroughProperty("id"),
-		className : SecureThing.createPassThroughProperty("className"),
 
 		appendChild : {
 			value : function(child) {
@@ -89,6 +106,12 @@ var SecureElement = (function() {
 		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
 		parentNode : SecureThing.createFilteredProperty("parentNode"),
 
+		// Standard HTMLElement methods
+		// https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement#Methods
+		blur: SecureThing.createPassThroughMethod("blur"),
+		click: SecureThing.createPassThroughMethod("click"),
+		focus: SecureThing.createPassThroughMethod("focus"),
+
 		// Internal master key protected API
 
 		unwrap : {
@@ -101,8 +124,14 @@ var SecureElement = (function() {
 			}
 		}
 	});
-	
+
 	SecureElement.prototype.constructor = SecureElement;
+
+	SecureElement.enableSecureProperties = function (se) {
+		[].concat(ElementSecureProperties, HTMLElementSecureProperties).forEach(function (name) {
+			Object.defineProperty(se, name, SecureThing.createPassThroughProperty(name));
+		});
+	};
 
 	return SecureElement;
 })();

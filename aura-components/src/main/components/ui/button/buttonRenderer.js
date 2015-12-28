@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 ({
-	render: function(component, helper) {
-		component.set("v.classList", helper.getClassList(component));
-		return this.superRender();
-	},
+    render: function(component, helper) {
+        component.set("v.classList", helper.getClassList(component));
+        return this.superRender();
+    },
 
-	rerender: function(component, helper) {
-		if(component.isDirty("v.class") || component.isDirty("v.stateful") || component.isDirty("v.selected")) {
-			component.set("v.classList", helper.getClassList(component));
-		}
-		return this.superRerender();
-	}
+    rerender: function(component, helper) {
+        if (component.isDirty("v.class") || component.isDirty("v.stateful") || component.isDirty("v.selected")) {
+            component.set("v.classList", helper.getClassList(component));
+        }
+
+        return this.superRerender();
+    }
 })// eslint-disable-line semi

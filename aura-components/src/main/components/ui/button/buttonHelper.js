@@ -14,19 +14,36 @@
  * limitations under the License.
  */
 ({
-    catchAndFireEvent: function (cmp, event, eventName) {
+    EVENT_DISPATCH: { 
+        'keydown'   : 'onkeydown',
+        'mouseover' : 'onmouseover',
+        'mouseout'  : 'onmouseout',
+        'focus'     : 'onfocus',
+        'blur'      : 'onblur',
+        'press'     : 'onclick'
+    },
+    initializeHandlers: function (cmp) {
+        var htmlButton = cmp.find('button');
+        var htmlAttr   = htmlButton.get('v.HTMLAttributes');
+        var dispatcher = cmp.getEventDispatcher();
 
+        for (var e in this.EVENT_DISPATCH) {
+            if (dispatcher[e].length) {
+                htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
+            }
+        }
+
+    },
+    catchAndFireEvent: function (cmp, event, eventName) {
         if (eventName === 'press' && $A.util.getBooleanValue(cmp.get("v.stopPropagation"))) {
             $A.util.squash(event);
         }
 
         if ($A.util.getBooleanValue(cmp.get("v.disabled"))) {
-            event.preventDefault();
-            return false;
+            return event.preventDefault();
         }
 
         cmp.getEvent(eventName).fire({"domEvent": event});
-        return true;
     },
 
     getClassList: function (cmp) {

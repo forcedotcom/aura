@@ -17,6 +17,10 @@
     init: function (cmp, event, helper) {
         helper.initializeHandlers(cmp);
     },
+    addHandler: function (cmp, event, helper) {
+        var params = event.getParam('arguments');
+        helper.addHandler(cmp, params);
+    },
     changeSelected: function (cmp, event, helper) {
         helper.updateStatefulClasses(cmp, event);
     },

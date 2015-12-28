@@ -44,6 +44,12 @@
     <aura:registerevent name="focus"     type="ui:focus"     access="INTERNAL"/>
     <aura:registerevent name="blur"      type="ui:blur"      access="INTERNAL"/>
 
+    <aura:method name="addHandler" description="Adds a binding for DOM->Action handler">
+        <aura:attribute name="eventName"  type="String" />
+        <aura:attribute name="valueProvider"  type="Object" />
+        <aura:attribute name="actionExpression" type="Aura.Action"/>
+    </aura:method>
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.selected}" action="{!c.changeSelected}"/>
 

@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 ({
+
+    /*
+    * We do the event attachment programatically to avoid
+    * adding DOM handlers when no actions are provided.
+    */
     EVENT_DISPATCH: { 
         'keydown'   : 'onkeydown',
         'mouseover' : 'onmouseover',
@@ -22,6 +27,11 @@
         'blur'      : 'onblur',
         'press'     : 'onclick'
     },
+
+    /*
+     * In order to not attach all declared dom handlers automatically, we just
+     * attach the ones that have an action to be dispatched 
+    */
     initializeHandlers: function (cmp) {
         var htmlButton = cmp.find('button');
         var htmlAttr   = htmlButton.get('v.HTMLAttributes');
@@ -32,6 +42,31 @@
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
         }
+    },
+
+    /*
+    * See initializeHandlers comments, then:
+    * In order to add handlers dynamically, we need to override the original function.
+    * We need to programatically add the aura handler and the DOM event.
+    */
+    addHandler: function (cmp, handlerParams) {
+        var eventName = handlerParams.eventName;
+        var htmlEventName = this.EVENT_DISPATCH[eventName];
+        $A.assert(htmlEventName, 'Type of event not supported');
+
+        var valueProvider = handlerParams.valueProvider;
+        var actionExpression = handlerParams.actionExpression;
+        var htmlButton = cmp.find('button');
+        var originalAddHandler = htmlButton.addHandler;
+        var htmlAttr = htmlButton.get('v.HTMLAttributes');
+
+        // Set the attribute so the aura:html will add the dom handler
+        htmlAttr[htmlEventName] = cmp.getReference('c.' + eventName);
+        // Set the attribute back so if the button is render will attach the handlers correctly
+        htmlButton.set('v.HTMLAttributes', htmlAttr);
+
+        // Call the origin addHandler method  with the given attributes
+        originalAddHandler.call(cmp, eventName, valueProvider, actionExpression);
 
     },
     catchAndFireEvent: function (cmp, event, eventName) {

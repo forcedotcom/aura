@@ -1,4 +1,4 @@
-/* Listens for events and shows them in the event log */
+/* Listens for actions and shows them in the actions tab */
 function AuraInspectorActionsView(devtoolsPanel) {
     var _list;
 
@@ -340,7 +340,6 @@ function AuraInspectorActionsView(devtoolsPanel) {
     }
 
     function endDrag (event) {
-      console.log("end-drop",event);
       event.target.classList.remove("dragging");
       if(event.dataTransfer.dropEffect == "none"){
         // event.target.style.opacity = "1";

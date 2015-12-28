@@ -436,7 +436,6 @@
         function callSubscribers(key, data) {
             if(_subscribers.has(key)) {
                 _subscribers.get(key).forEach(function(callback){
-                    //console.log("SUCCESS:", key, " with data ", data, " had a subscribers");
                     try {
                         callback(data);
                     } catch(e) {

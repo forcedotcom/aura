@@ -58,8 +58,17 @@ DomHandlersPlugin.prototype.disable = function () {
     }
 };
 
-DomHandlersPlugin.prototype.dispatchActionHook = function (original) {
-    //TODO!
+DomHandlersPlugin.prototype.dispatchActionHook = function (original, action, event, cmp) {
+    var localCmpId = cmp.getLocalId();
+    var dispatchCmpId = action.getComponent().getLocalId();
+    var contextId = localCmpId && dispatchCmpId ? (localCmpId + ':' + dispatchCmpId) : dispatchCmpId || localCmpId;
+
+    $A.log({
+        "id": contextId,
+        "eventType": event.type,
+        "action" : action.getDef().getDescriptor().toString()
+    });
+
     var ret = original.apply(this, Array.prototype.slice.call(arguments, 1));
     return ret;
 };

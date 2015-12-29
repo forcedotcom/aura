@@ -10,7 +10,7 @@
     $Aura.Inspector = new AuraInspector();
     $Aura.Inspector.init();
 
-    // Attach to the global object so our integrations can access it, but 
+    // Attach to the global object so our integrations can access it, but
     // use a symbol so it doesn't create a global property.
     global[$Symbol] = $Aura;
 
@@ -23,10 +23,8 @@
                 actionsStorage.get(actionStorageKey)
                 .then(
                     function() {
-                        //console.log("find storage item for action:", data);
                         actionsStorage.remove(actionStorageKey)
                         .then(function () {
-                            //console.log("successfully remove storage for action:", data);
                             //notify Storage View
                             $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
                         });
@@ -35,11 +33,11 @@
                         console.log("cannot find storage item for action:", data);
                     }
                 );
-                
+
             } else {
                 console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
             }
-            
+
             //override send
             actionsToDrop.push(data);
             $A.uninstallOverride("ClientService.send", OnSendAction);
@@ -129,7 +127,6 @@
             document.body.addEventListener("transitionend", function removeClassHandler(event) {
                 var removeClassName = "auraDevToolServiceHighlight3";
                 var addClassName = "auraDevToolServiceHighlight4";
-                //console.log("Remove it", event.target);
                 var element = event.target;
                 element.classList.remove(removeClassName);
                 element.classList.remove(addClassName);
@@ -141,7 +138,7 @@
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
                 // Try catches for branches that don't have the overrides
-                // 
+                //
                 try {
                     $A.installOverride("outputComponent", function(){});
                 } catch(e){}
@@ -161,7 +158,7 @@
                     bootstrapEventInstrumentation();
                 } catch(e){}
 
-                // Need a way to conditionally do this based on a user setting. 
+                // Need a way to conditionally do this based on a user setting.
                 $A.PerfDevTools.init();
 
                 // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
@@ -222,7 +219,7 @@
             if(!key) { return; }
 
             // We batch the post messages
-            // to avoid excessive messages which was causing 
+            // to avoid excessive messages which was causing
             // stabalization issues.
             postMessagesQueue.push({"key":key, "data":data});
 
@@ -244,7 +241,7 @@
         this.unsubscribe = function(key, callback) {
             if(!key || !callback) { return false; }
 
-            if(!subscribers.has(key)) { 
+            if(!subscribers.has(key)) {
                 return false;
             }
 
@@ -263,7 +260,7 @@
             var configuration = Object.assign({
                 "attributes": true, // True to serialize the attributes, if you just want the body you can set this to false and body to true. (Good for serializing supers)
                 "body": true, // Serialize the Body? This can be expensive so you can turn it off.
-                "elementCount": false, // Count all child elements of all the elements associated to a component. 
+                "elementCount": false, // Count all child elements of all the elements associated to a component.
                 "model": false // Serialize the model data as well
             }, options);
             if(component){
@@ -288,7 +285,7 @@
 
                         // Added Later
                         //,"super": ""
-                        //,"model": null 
+                        //,"model": null
                     };
 
                     if(configuration.attributes) {
@@ -336,7 +333,7 @@
                     while(superComponent = superComponent.getSuper()) {
                         supers.push(superComponent._$getSelfGlobalId$());
                     }
-                    
+
                     if(supers.length) {
                         output["supers"] = supers;
                     }
@@ -359,20 +356,20 @@
                             output["model"] = model.data;
                         }
                     }
-                    
+
                     return this.safeStringify(output);
                 }
             }
             return "";
         };
 
-        /** 
+        /**
          * Safe because it handles circular references in the data structure.
          *
          * Will add control characters and shorten components to just their global ids.
          * Formats DOM elements in a pretty manner.
          */
-        this.safeStringify = safeStringify; 
+        this.safeStringify = safeStringify;
 
         // Start listening for messages
         window.addEventListener("message", Handle_OnPostMessage);
@@ -385,7 +382,7 @@
                     var data = event.data.data || [];
                     for(var c=0,length=data.length;c<length;c++) {
                         callSubscribers(data[c].key, data[c].data);
-                    }        
+                    }
                 }
             }
         }
@@ -438,9 +435,9 @@
 
                 if(typeof value === "object") {
                     if("$serId$" in value && visited.has(value)) {
-                        return { 
-                            "$serRefId$": value["$serId$"], 
-                            "__proto__": null 
+                        return {
+                            "$serRefId$": value["$serId$"],
+                            "__proto__": null
                         };
                     } else if(!$A.util.isEmpty(value)) {
                         visited.add(value);
@@ -506,7 +503,7 @@
                     "action": PUBLISH_BATCH_KEY,
                     "data": postMessagesQueue
                 }, window.location.href);
-                
+
                 postMessagesQueue = [];
                 batchPostId = null;
             }
@@ -559,7 +556,7 @@
                 "endTime": performance.now(),
                 "type": event.getDef().getEventType()
             };
-            
+
             $Aura.Inspector.publish("AuraInspector:OnEventEnd", data);
 
             return ret;
@@ -616,13 +613,13 @@
                         "sentTime": performance.now()
                         });
                     }
-                    
+
                 }
             }
 
             var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
 
-            
+
             return ret;
     }
 
@@ -743,7 +740,7 @@
                 this._initializeHooks();
             },
             clearMarks: function (marks) {
-                this._resetCollector(marks);  
+                this._resetCollector(marks);
             },
             _initializeOptions: function (cfg) {
                 this.opts = {
@@ -759,7 +756,7 @@
                 }
                 // It should work in all modes
                 this._initializeHooksTransactions();
-                
+
             },
             _createNode: function (name, mark, id) {
                 return {
@@ -783,8 +780,8 @@
                 $A.metricsService.onTransactionEnd(this._onTransactionEnd.bind(this));
             },
             _onTransactionEnd: function (t) {
-                setTimeout(function (){ 
-                    // We do a timeout to give a chance to 
+                setTimeout(function (){
+                    // We do a timeout to give a chance to
                     // other transactionEnd handlers to modify the transaction
                     $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
                 }, 0);
@@ -841,7 +838,7 @@
             },
             _generateCPUProfilerDataFromMarks: function (marks) {
                 if(!marks || !marks.length) { return {}; }
-                
+
                 //global stuff for the id
                 var id = 0;
                 function nextId () {return ++id;}
@@ -891,7 +888,7 @@
 
                 current._startTime = marks[0].timestamp;
 
-                function generateTimestamps(startTime, endTime) { 
+                function generateTimestamps(startTime, endTime) {
                     var diff  = endTime - startTime,
                         ticks = Math.round(diff / sampling), // every N miliseconds
                         time  = startTime,
@@ -978,7 +975,7 @@
     };
 
 
-    
+
 
 })(this);
-    
+

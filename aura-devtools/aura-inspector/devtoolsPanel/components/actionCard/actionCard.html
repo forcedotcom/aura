@@ -8,21 +8,30 @@
 			margin: .5rem;
 			overflow-wrap: break-word;
 		}
-		table { margin: 0; width: 100%;}
-		th {
+		table, dl { margin: 0; width: 100%;}
+		dl{
+			display: flex;
+			flex-wrap: wrap;
+		}
+		th, dt {
 			font-weight: normal;
 			font-size: .75em;
-			padding: .5rem .5rem 0 0.5rem;
+			padding: .5rem .5rem 0 .5rem;
 			text-align: left;
 			font-size: 0.75rem;
 			line-height: 1.25;
 			letter-spacing: 0.0625em;
 			color: #54698d;
 		}
-		td {
+		td, dd {
+			color: #16325c;
 			font-size: .75rem;
 			padding: 0 .5rem 0 .5rem;
-			color: #16325c;
+			margin: 0;
+		}
+		.col {
+			flex: 1 1 auto;
+			min-width: 80px;
 		}
 		code { margin: 5px; display: block; white-space: pre; }
 		.parameters:before {
@@ -55,7 +64,7 @@
 			vertical-align: top;
 		}
     aurainspector-json {
-			margin: .5rem .5rem 0 0.5rem;
+			margin: .5rem .5rem 0 .5rem;
 			display: flex;
 		}
 	</style>
@@ -64,28 +73,40 @@
     <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
     <aurainspector-json class="result" expandTo="0"></aurainspector-json>
     <aurainspector-json class="storageKey" expandTo="0"></aurainspector-json>
-    <table>
-        <thead>
-            <th>Id</th>
-            <th>State</th>
-            <th>Abortable</th>
-            <th>Background</th>
-            <th>Storable</th>
-            <th>Storable Size Est.</th>
-            <th>Storable Refresh</th>
-            <th>Storable Cache Hit</th>
-        </thead>
-        <tbody>
-            <td id="actionId"></td>
-            <td id="actionState"></td>
-            <td id="actionIsAbortable"></td>
-            <td id="actionIsBackground"></td>
-            <td id="actionIsStorable"></td>
-            <td id="actionStorableSize"></td>
-            <td id="actionIsRefresh"></td>
-            <td id="actionFromStorage"></td>
-        </tbody>
-    </table>
+    <dl>
+				<div class="col">
+						<dt>Id</dt>
+						<dd id="actionId"></dd>
+					</div>
+				<div class="col">
+            <dt>State</dt>
+						<dd id="actionState"></dd>
+				</div>
+				<div class="col">
+            <dt>Abortable</dt>
+						<dd id="actionIsAbortable"></dd>
+				</div>
+				<div class="col">
+            <dt>Background</dt>
+						<dd id="actionIsBackground"></dd>
+				</div>
+				<div class="col">
+            <dt>Storable</dt>
+						<dd id="actionIsStorable"></dd>
+				</div>
+				<div class="col">
+            <dt>Storable Size Est.</dt>
+						<dd id="actionStorableSize"></dd>
+				</div>
+				<div class="col">
+            <dt>Storable Refresh</dt>
+						<dd id="actionIsRefresh"></dd>
+						</div>
+				<div class="col">
+            <dt>Storable Cache Hit</dt>
+						<dd id="actionFromStorage"></dd>
+				</div>
+    </dl>
 
 </template>
 

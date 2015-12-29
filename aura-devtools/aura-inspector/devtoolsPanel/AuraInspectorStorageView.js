@@ -183,13 +183,8 @@ function AuraInspectorStorageView(devtoolsPanel) {
         if(key && key.length > 0 ) {
             //Lin TODO: highlight the storage item we gonna delete in StorageView, and ask for confirmation.
             if(key in data) {
-                //console.log("in data[], find & remove storage item for action :", key);
                 delete data[key];
             }
-            //  else {
-            //     console.log("in data[], no storage item for action :", key);
-            // }
-
         }
         this.render();
     }

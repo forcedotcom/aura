@@ -41,19 +41,19 @@ function AuraInspectorActionsView(devtoolsPanel) {
             <li><aurainspector-onOffButton class="on" data-filter="error" title="Show actions that errored"><span>Error</span></aurainspector-onOffButton></li>
             <li><aurainspector-onOffButton class="on" data-filter="aborted" title="Show aborted actions"><span>Aborted</span></aurainspector-onOffButton></li>
         </menu>
-        <div class="slds-grid actions-tab">
-            <div id="actionsToDrop-list" class="actionsToDrop-list slds-scrollable--y slds-col slds-size--1-of-2 slds-max-small-order--1 slds-max-small-size--1-of-1 ">
+        <div class="actions-tab">
+            <div id="actionsToDrop-list" class="actionsToDrop-list">
                 <section>
                     <h1>To Drop</h1>
                     <div id="actionsToDrop-pending" class="drop-zone">
-                        <span class="slds-text-body--small description">Drag actions here. Next time we see the action, we will not send it to server.</span>
+                        <span class="description">Drag actions here. Next time we see the action, we won't send it to server.</span>
                     </div>
                 </section>
                 <section id="actionsToDrop-completed">
                     <h1>Dropped</h1>
                 </section>
             </div>
-            <div id="actions-list" class="actions-list slds-scrollable--y slds-col slds-size--1-of-2 slds-max-small-order--2 slds-max-small-size--1-of-1 ">
+            <div id="actions-list" class="actions-list">
                 <section id="actions-pending">
                     <h1>Pending</h1>
                 </section>
@@ -332,17 +332,14 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     function allowDrop (event) {
         event.preventDefault();
-        console.log("allow-drop",_toDrop.className);
         _toDrop.className = "drop-zone allow-drop";
     }
 
     function noDrop (event) {
-      console.log("no-drop",event);
         _toDrop.className = "drop-zone";
     }
 
     function endDrag (event) {
-      console.log("end-drop",event);
       event.target.classList.remove("dragging");
       if(event.dataTransfer.dropEffect == "none"){
         // event.target.style.opacity = "1";

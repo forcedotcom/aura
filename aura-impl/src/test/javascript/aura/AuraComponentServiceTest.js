@@ -402,6 +402,4 @@ Test.Aura.AuraComponentServiceTest = function(){
             Assert.False(actual);
         }
     }
-
-
 }

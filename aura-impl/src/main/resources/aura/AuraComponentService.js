@@ -497,7 +497,7 @@ AuraComponentService.prototype.addComponentClass = function(descriptor, exporter
 /**
  * Get the class constructor for the specified component.
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
- * @returns Either the class that defines the component you are requesting, or null if not found.
+ * @returns Either the class that defines the component you are requesting, or undefined if not found.
  * @export
  */
 AuraComponentService.prototype.getComponentClass = function(descriptor) {

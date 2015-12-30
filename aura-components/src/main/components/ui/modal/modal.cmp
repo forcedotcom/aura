@@ -36,9 +36,9 @@
 
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="notify" event="ui:notify" action="{!c.onNotify}" />
-    
+
     <aura:dependency resource="markup://aura:unescapedHtml"  type="COMPONENT"/>
-    
+
     <div aura:flavorable="true" class="{!v.class}">
 
         <div aura:id='modal-glass' class="modal-glass hidden"  tabindex="-1"></div>
@@ -54,9 +54,9 @@
 
                 <div class="{!'modal-header' + (and(empty(v.header), empty(v.title)) ? ' empty' : '')}">
                     {!v.icon}
-                    <aura:If isTrue="{!!empty(v.title)}">
+                    <aura:if isTrue="{!!empty(v.title)}">
                         <h2 id="{!'title_' + globalId}" class="{!v.titleDisplay ? 'title' : 'assistiveText'}">{!v.title}</h2>
-                    </aura:If>
+                    </aura:if>
                     {!v.header}
                     <aura:if isTrue="{!v.showCloseButton}">
                         {!v.closeButton}
@@ -75,5 +75,5 @@
             </div>
         </div>
     </div>
-    
+
 </aura:component>

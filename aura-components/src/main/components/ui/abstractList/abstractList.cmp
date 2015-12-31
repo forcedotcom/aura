@@ -22,7 +22,7 @@
                 description="An abstract component that provides a basic layout for the ui:list component.">
 
     <aura:attribute name="itemTemplate" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated row in the list."/>
-    <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list. This can only be used to set the initial values, and must be passed by value."/>
+    <aura:attribute name="items" type="Object[]" description="An array of arbitrary map objects representing the rows of data in the list."/>
     <aura:attribute name="itemVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each row."/>
     <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components. Use a ui:dataProvider component to provide list data."/>
     <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty"/>

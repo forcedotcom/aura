@@ -51,16 +51,8 @@
     },
 
     init: function(component) {
-        this.initItems(component);
         this.initDataProvider(component);
         this.initPagers(component);
-    },
-
-    initItems: function(component) {
-        // The items attribute can't be a reference: abstract list doesn't
-        // support "publishing" the list of values it gets from the provider.
-        // Using clear reference converts the reference into a value.
-        component.clearReference("v.items");
     },
 
     initDataProvider: function(component) {

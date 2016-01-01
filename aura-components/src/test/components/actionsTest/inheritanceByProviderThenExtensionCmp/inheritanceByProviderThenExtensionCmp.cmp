@@ -1,0 +1,38 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    This component extends an abstract component. the abstract component has a provider. 
+    This verify that whatever that abstract component's provider provides is gone, this behave just like
+    normal extended component
+-->
+<aura:component extends="actionsTest:inheritanceByProviderAbstractCmp" 
+controller="java://org.auraframework.components.test.java.controller.JavaTestController"
+extensible="false">
+    <aura:attribute name="WhichControllerWasCalledSolid" type="string" default="no one"/>
+     
+    <aura:set attribute="attributeAuraActionAbstract" value="{!c.setAttributeAuraActionSolid}"/>
+    
+    <p class="title"> Solid Component </p>
+    <div class="solidlog">
+        WhichControllerWasCalled? {!v.WhichControllerWasCalledSolid}
+    </div>
+    <span class="buttons">
+            <ui:button aura:id="testAction" label="clientSideActionInSolidOnly" press="{!c.clientSideActionInSolidOnly}"/>
+            <ui:button aura:id="testAction" label="clientSideActionInBoth" press="{!c.clientSideActionInBoth}"/>
+            <ui:button aura:id="testAction" label="serverSideActionInBoth" press="{!c.serverSideActionInBoth}"/>
+            <ui:button aura:id="testAction" label="fire attributeAuraAction" press="{!c.fireAttributeAuraAction}"/>
+    </span>
+</aura:component>

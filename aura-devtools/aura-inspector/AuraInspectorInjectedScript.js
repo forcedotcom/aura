@@ -138,10 +138,19 @@
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
                 // Try catches for branches that don't have the overrides
-                //
+                // This instrument is where we add the methods _$getRawValue$() and _$getSelfGlobalId$() to the 
+                // component prototype. This allowed us to move to outputing the component from injected code, vs code in the framework.
+                // Would be nice to get rid of needing this.
                 try {
                     $A.installOverride("outputComponent", function(){});
                 } catch(e){}
+
+
+                try {
+                    // Counts how many times various things have happened.
+                    bootstrapCounters();
+                } catch(e){}
+
                 try {
                     // Actions Tab
                     bootstrapActionsInstrumentation();
@@ -158,7 +167,8 @@
                     bootstrapEventInstrumentation();
                 } catch(e){}
 
-                // Need a way to conditionally do this based on a user setting.
+
+                // Need a way to conditionally do this based on a user setting. 
                 $A.PerfDevTools.init();
 
                 // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
@@ -203,6 +213,7 @@
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var increment = 0;
         var lastItemInspected;
+        var countMap = new Map();
 
         this.init = function() {
             // Add Rightclick handler. Just track what we rightclicked on.
@@ -281,7 +292,8 @@
                         "attributeValueProvider": getValueProvider(component.getAttributeValueProvider()),
                         "facetValueProvider": getValueProvider(component.getComponentValueProvider()),
                         "__proto__": null, // no inherited properties
-                        "elementCount": 0
+                        "elementCount": 0,
+                        "rerender_count": this.getCount(component._$getSelfGlobalId$() + "_rerendered")
 
                         // Added Later
                         //,"super": ""
@@ -369,25 +381,7 @@
          * Will add control characters and shorten components to just their global ids.
          * Formats DOM elements in a pretty manner.
          */
-        this.safeStringify = safeStringify;
-
-        // Start listening for messages
-        window.addEventListener("message", Handle_OnPostMessage);
-
-        function Handle_OnPostMessage(event) {
-            if(event && event.data) {
-                if(event.data.action === PUBLISH_KEY) {
-                    callSubscribers(event.data.key, event.data.data);
-                } else if(event.data.action === PUBLISH_BATCH_KEY) {
-                    var data = event.data.data || [];
-                    for(var c=0,length=data.length;c<length;c++) {
-                        callSubscribers(data[c].key, data[c].data);
-                    }
-                }
-            }
-        }
-
-        function safeStringify(originalValue) {
+        this.safeStringify = function(originalValue) {
             // For circular dependency checks
             var visited = new Set();
             var toJSON = InvalidComponent.prototype.toJSON;
@@ -460,6 +454,54 @@
             return result;
         };
 
+        /**
+         * Increment a counter for the specified key. 
+         * @example
+         * $Aura.Inspector.count('rendered');
+         * $Aura.Inspector.count('rendered');
+         * $Aura.Inspector.getCount('rendered'); // 2
+         * @param  {String} key Any unique ID to count
+         */
+        this.count = function(key) {
+            countMap.set(key, countMap.has(key) ? countMap.get(key) + 1 : 1)
+        };
+
+        /**
+         * Get how many times a key has been counted without incrementing the counter.
+         * 
+         * @param  {String} key Unique id to count.
+         */
+        this.getCount = function(key) {
+            return countMap.has(key) ? countMap.get(key) : 0;
+        };
+
+        /**
+         * Reset a counted key to 0.
+         * 
+         * @param  {String} key Unique id that you passed to this.count(key) to increment the counter.
+         */
+        this.clearCount = function(key) {
+            if(countMap.has(key)) {
+                countMap.delete(key);
+            }
+        }
+
+        // Start listening for messages
+        window.addEventListener("message", Handle_OnPostMessage);
+
+        function Handle_OnPostMessage(event) {
+            if(event && event.data) {
+                if(event.data.action === PUBLISH_KEY) {
+                    callSubscribers(event.data.key, event.data.data);
+                } else if(event.data.action === PUBLISH_BATCH_KEY) {
+                    var data = event.data.data || [];
+                    for(var c=0,length=data.length;c<length;c++) {
+                        callSubscribers(data[c].key, data[c].data);
+                    }        
+                }
+            }
+        }
+
         /** Serializing Passthrough Values as valueProviders is a bit complex, so we have this helper function to do it. */
         function getValueProvider(valueProvider) {
             if("_$getSelfGlobalId$" in valueProvider) {
@@ -521,7 +563,47 @@
                 }
             });
         }
+    }
 
+    function wrapFunction(target, methodName, newFunction) {
+        if(typeof target[methodName] != "function") {
+            return;
+        }
+        var original = target[methodName];
+        target[methodName] = function() {
+            newFunction.apply(this, arguments);
+            return original.apply(this, arguments);
+        };
+    }
+
+    function bootstrapCounters() {
+        // Count how many components are being created.
+        $A.installOverride("ComponentService.createComponentPriv", function(){
+             var config = Array.prototype.shift.apply(arguments);
+
+             var ret = config["fn"].apply(config["scope"], arguments);
+
+             $Aura.Inspector.count("component_created");
+
+             return ret;
+        });
+
+        // No way of displaying this at the moment.
+        // wrapFunction(Component.prototype, "render", function(){
+        //     $Aura.Inspector.count("component_rendered");
+        //     $Aura.Inspector.count(this.getGlobalId() + "_rendered");
+        // });
+
+        wrapFunction(Component.prototype, "rerender", function(){
+            $Aura.Inspector.count("component_rerendered");
+            $Aura.Inspector.count(this.getGlobalId() + "_rerendered");
+        });
+
+        // No way of displaying this at the moment.
+        // wrapFunction(Component.prototype, "unrender", function(){
+        //     $Aura.Inspector.count("component_unrendered");
+        //     $Aura.Inspector.count(this.getGlobalId() + "_unrendered");
+        // });
     }
 
     function bootstrapEventInstrumentation() {
@@ -654,6 +736,13 @@
         }
 
         function OnFinishAction(config, context) {
+            var startCounts = {
+                "created": $Aura.Inspector.getCount("component_created")
+                // "rendered": $Aura.Inspector.getCount("component_rendered"),
+                // "rerendered": $Aura.Inspector.getCount("component_rerendered"),
+                // "unrendered": $Aura.Inspector.getCount("component_unrendered")
+            };
+
             var ret = config["fn"].call(config["scope"], context);
 
             var action = config["self"];
@@ -663,7 +752,13 @@
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
                 "returnValue": JSON.stringify(action.getReturnValue()),
-                "finishTime": performance.now()
+                "finishTime": performance.now(),
+                "stats": {
+                    "created": $Aura.Inspector.getCount("component_created") - startCounts.created
+                    // "rendered": $Aura.Inspector.getCount("component_rendered") - startCounts.rendered,
+                    // "rerendered": $Aura.Inspector.getCount("component_rerendered") - startCounts.rerendered,
+                    // "unrendered": $Aura.Inspector.getCount("component_unrendered") - startCounts.unrendered
+                }
             };
 
             $Aura.Inspector.publish("AuraInspector:OnActionStateChange", data);

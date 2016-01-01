@@ -6,7 +6,8 @@ function AuraInspectorComponentView(devtoolsPanel) {
         "valid": "IsValid",
         "localId": "aura:id",
         "descriptor": "Descriptor",
-        "elementCount": "HTML Elements"
+        "elementCount": "HTML Elements",
+        "rerender_count": "Rerendered"
     }
     var treeComponent;
     var _componentId = null;

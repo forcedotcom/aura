@@ -42,7 +42,12 @@
     	this.shadowRoot.querySelector("#actionStorableSize").textContent = model.storableSize;
     	this.shadowRoot.querySelector("#actionIsRefresh").textContent 	= model.isRefresh;
     	this.shadowRoot.querySelector("#actionFromStorage").textContent = model.fromStorage;
-    	
+    
+    	if(this.hasAttribute("stats")) {
+    		var statsInfo = JSON.parse(this.getAttribute("stats"));
+
+    		this.shadowRoot.querySelector("#statsCreated").textContent = statsInfo.created;
+    	}	
 	};
 
 	/*

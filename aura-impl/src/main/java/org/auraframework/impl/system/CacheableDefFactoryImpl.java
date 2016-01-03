@@ -38,10 +38,6 @@ public class CacheableDefFactoryImpl<D extends Definition> extends DefFactoryImp
     public D getDef(DefDescriptor<D> descriptor) throws QuickFixException {
         Source<D> source = sourceFactory.getSource(descriptor);
         if (source != null && source.exists()) {
-
-            // Update the descriptor to respect the case sensitivity of the source.
-            descriptor = source.getDescriptor();
-
             Parser<D> parser = ParserFactory.getParser(source.getFormat(), descriptor);
             D def = parser.parse(descriptor, source);
             return def;

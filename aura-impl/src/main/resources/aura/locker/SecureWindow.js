@@ -15,16 +15,18 @@
  */
 
 //#include aura.locker.SecureThing
+//#include aura.locker.SecureDocument
+//#include aura.locker.SecureAura
 var SecureWindow = (function() {
 	"use strict";
 
 	/**
 	 * Construct a new SecureWindow.
-	 * 
+	 *
 	 * @public
 	 * @class
 	 * @constructor
-	 * 
+	 *
 	 * @param {Object}
 	 *            window - the DOM window
 	 * @param {Object}
@@ -34,21 +36,34 @@ var SecureWindow = (function() {
 		SecureThing.call(this, key, "window");
 
 		this._set("window", window, $A.lockerService.masterKey);
-
+		Object.defineProperties(this, {
+			document: {
+				value: new SecureDocument(window.document, key)
+			},
+			"$A": {
+				value: new SecureAura($A, key)
+			},
+			window: {
+				get: function () {
+					// circular window references to match DOM API
+					return this;
+				}
+			}
+		});
 		Object.freeze(this);
 	}
 
-	function getWindow(sd) {
-		return sd._get("window", $A.lockerService.masterKey);
+	function getWindow(sw) {
+		return sw._get("window", $A.lockerService.masterKey);
 	}
 
-	function getKey(sd) {
-		return $A.lockerService.util._getKey(sd, $A.lockerService.masterKey);
+	function getKey(sw) {
+		return $A.lockerService.util._getKey(sw, $A.lockerService.masterKey);
 	}
 
 	SecureWindow.prototype = Object.create(SecureThing.prototype, {
-		toString : {
-			value : function() {
+		toString: {
+			value: function() {
 				return "SecureWindow: " + getWindow(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
 			}
 		}

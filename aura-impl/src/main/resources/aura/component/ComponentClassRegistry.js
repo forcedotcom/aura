@@ -172,11 +172,9 @@ ComponentClassRegistry.prototype.buildConstructor = function(componentProperties
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     var className = componentProperties["meta"]["name"];
 
-    /*jslint evil: true */
-    /*eslint-disable no-eval, no-redeclare*/
-    var componentConstructor = $A.util.globalEval("function " + className + "() { Component.apply(this, arguments); };");
-    /*eslint-enable no-eval, no-redeclare*/
-    /*jslint evil: false */
+    var componentConstructor = $A.util.globalEval("(function " + className + "() { Component.apply(this, arguments); });", {
+        "Component": Component
+    });
     //#end
 
     // Extends from Component (and restore constructor).

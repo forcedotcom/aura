@@ -25,17 +25,6 @@ function LockerService() {
 	var lockers = [];
 	var keyToEnvironmentMap = {};
 
-	function preprocessSource(code) {
-		// Block use of __proto__
-		if (code.indexOf("__proto__") >= 0 || code.indexOf("__defineGetter__") >= 0 || code.indexOf("__defineSetter__") >= 0) {
-			throw Error("Security violation: use of __proto__, __defineGetter__, and __defineSetter__ is not permitted!");
-		}
-
-		// Rewrite references to eval to avoid implicit calls leaking global state
-		// NOTE: strict mode does not allow the symbol eval to be redefined, passed as parameter, so a simple regex can rewrite this during lockering
-		return code;
-	}
-
 	var service = {
 		createForDef : function(code, def) {
 			var namespace = def.getDescriptor().getNamespace();
@@ -62,7 +51,7 @@ function LockerService() {
 			try {
 				locker = {
 					"$envRec": envRec,
-					"$result": window['$$safe-eval$$'](preprocessSource(code), envRec, imports)
+					"$result": window['$$safe-eval$$'](code, envRec, imports)
 				};
 			} catch (x) {
 				throw new Error("Unable to create locker IIFE: " + x);

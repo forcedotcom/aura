@@ -16,7 +16,12 @@ function AuraInspectorStorageView(devtoolsPanel) {
     /** Markup of panel */
     var markup = `
         <menu type="toolbar">
-            <li><button id="refresh-button"><span>Refresh</span></button></li>
+        <li>
+          <button id="refresh-button" class="refresh-status-bar-item status-bar-item" title="Refresh">
+            <div class="glyph toolbar-button-theme"></div>
+            <div class="glyph shadow"></div>
+          </button>
+        </li>
         </menu>
         <div class="storage-viewer" id="storage-viewer"/>
     `;
@@ -177,13 +182,14 @@ function AuraInspectorStorageView(devtoolsPanel) {
         dirty = true;
         if(key && key.length > 0 ) {
             //Lin TODO: highlight the storage item we gonna delete in StorageView, and ask for confirmation.
-            if(key in data) { 
-                console.log("in data[], find & remove storage item for action :", key); 
+            if(key in data) {
+                //console.log("in data[], find & remove storage item for action :", key);
                 delete data[key];
-            } else {
-                console.log("in data[], no storage item for action :", key);
             }
-            
+            //  else {
+            //     console.log("in data[], no storage item for action :", key);
+            // }
+
         }
         this.render();
     }

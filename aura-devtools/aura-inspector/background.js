@@ -50,7 +50,9 @@
                 
                 // Delete the stored port on the tab
                 if(tabs.has(port.tabId)) {
-                    tabs.get(port.tabId).port = null;
+                    var tabInfo = tabs.get(port.tabId);
+                    tabInfo.port = null;
+                    tabInfo.subscriptions.clear();
                 }
 
                 // Port is closed, delete it.
@@ -126,9 +128,6 @@
         }
 
         function BackgroundPage_OnMessageExternal(message, event) {
-            // Only allow messages from the Sfdc Inspector
-            //if(event.id !== "eihmlihnchelfaplbpcpgelolkommnib") { return; }
-            
             var tabId = message.tabId;
             delete message.tabId;
 

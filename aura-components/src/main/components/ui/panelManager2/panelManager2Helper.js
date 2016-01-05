@@ -34,6 +34,20 @@
     initializeRegisteredPanels: function (cmp, newPanels) {
         this.containerManager.registerContainers(newPanels || cmp.get('v.registeredPanels') || []);
     },
+    
+    /*
+     * Dynamically register panels. Used to register feature specific panels.
+     * @private
+     */
+    registerPanels: function(cmp, params) {
+    	var panels = params.panels;
+    	if (panels) {
+    		this.containerManager.registerContainers(panels);
+    		if ($A.util.isFunction(params.callback)) {
+    			params.callback();
+            }
+    	}
+    },
 
     /*
     * Create panel

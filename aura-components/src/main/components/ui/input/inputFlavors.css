@@ -108,3 +108,23 @@
     border-radius: 2px;
     background-color: #B5DAEE;
 }
+.THIS--datetime + .datePicker-openIcon,
+.THIS--datetime .datePicker-openIcon,
+.THIS--datetime + .timePicker-openIcon,
+.THIS--datetime .timePicker-openIcon {
+    position: relative;
+    vertical-align: middle;
+    left: -22px;
+    width: 12px;
+    height: 15px;
+    background: url('/auraFW/resources/aura/images/icon_openCalendar.png') no-repeat 0 0;
+}
+
+.THIS--datetime .clearIcon {
+    position: relative;
+    vertical-align: middle;
+    left: -22px;
+    width: 15px;
+    height: 15px;
+    background: url('/auraFW/resources/aura/images/clear.png') no-repeat 0 0;
+}

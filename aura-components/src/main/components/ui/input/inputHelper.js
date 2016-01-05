@@ -21,7 +21,7 @@
             //create label
             var domId = component.get("v.domId");
             if (!domId) {
-                domId = component.getConcreteComponent().getGlobalId();
+                domId = component.getGlobalId();
             }
             var labelPositionAttribute = this.checkValidPosition(component.get("v.labelPosition"));
             var labelClass = component.get("v.labelClass") + " uiLabel-" + labelPositionAttribute + " form-element__label";

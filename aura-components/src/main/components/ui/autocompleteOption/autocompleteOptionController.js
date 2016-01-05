@@ -15,7 +15,7 @@
  */
 ({
 	init: function(component) {
-		var concreteId = component.getConcreteComponent().getGlobalId();
+		var concreteId = component.getGlobalId();
 		
 		component.set("v.domId", concreteId);
 	},

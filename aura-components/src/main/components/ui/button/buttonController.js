@@ -14,34 +14,38 @@
  * limitations under the License.
  */
 ({
-    handleKeydown : function(cmp, event){
+    init: function (cmp, event, helper) {
+        helper.initializeHandlers(cmp);
+    },
+    addHandler: function (cmp, event, helper) {
+        var params = event.getParam('arguments');
+        helper.addHandler(cmp, params);
+    },
+    changeSelected: function (cmp, event, helper) {
+        helper.updateStatefulClasses(cmp, event);
+    },
+    keydown : function(cmp, event){
         var keydownEvent = cmp.getEvent("keydown");
         keydownEvent.setParams({"domEvent": event});
         keydownEvent.fire();
-        return true;
     },
-
-    changeSelected: function (cmp, event, helper) {
-        return helper.updateStatefulClasses(cmp, event);
-    },
-
     mouseover: function (cmp, event, helper) {
-        return helper.catchAndFireEvent(cmp, event, 'mouseover');
+        helper.catchAndFireEvent(cmp, event, 'mouseover');
     },
 
     mouseout: function (cmp, event, helper) {
-        return helper.catchAndFireEvent(cmp, event, 'mouseout');
+        helper.catchAndFireEvent(cmp, event, 'mouseout');
     },
 
     focus: function (cmp, event, helper) {
-        return helper.catchAndFireEvent(cmp, event, 'focus');
+        helper.catchAndFireEvent(cmp, event, 'focus');
     },
 
     blur: function (cmp, event, helper) {
-        return helper.catchAndFireEvent(cmp, event, 'blur');
+        helper.catchAndFireEvent(cmp, event, 'blur');
     },
 
     press : function(cmp, event, helper){
-        return helper.catchAndFireEvent(cmp, event, 'press');
+        helper.catchAndFireEvent(cmp, event, 'press');
     }
 })// eslint-disable-line semi

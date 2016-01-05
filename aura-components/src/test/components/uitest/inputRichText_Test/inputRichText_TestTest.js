@@ -52,7 +52,6 @@
      * RTE content should show placeholder
      */
     testRtePlaceholderWhenValueIsNotSet: {
-        owner: "smo",
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         attributes: {placeholder: "Test placeholder"},
         test: [function(component) {
@@ -67,7 +66,6 @@
      * RTE content should show value, when value is removed, placeholder should be shown
      */
     testRtePlaceholderWhenValueIsSet: {
-        owner: "smo",
         browsers: ["-ANDROID_PHONE", "-ANDROID_TABLET"],
         attributes: {placeholder: "Test placeholder", testContent: "Test content"},
         test: [function(component) {
@@ -76,7 +74,6 @@
                 "Rich text content expected is incorrect");
         }, function(component) {
             component.find("Text").set("v.value", "");
-        }, function(component) {
             // when value is removed, placeholder should come back
             this.waitForCkEditorContentUpdate(1, "Test placeholder",
                 "Rich text placeholder expected is incorrect");
@@ -97,9 +94,10 @@
      * get the text content of a CKEditor
      */
     getRteContent : function(rteIndex) {
-        var iframe = document.querySelector(".cke_" + rteIndex + " iframe");
+        var iframeIndex = rteIndex - 1;
+        var iframe = $A.test.getElementByClass("cke_wysiwyg_frame");
         if (iframe) {
-            var innerDoc = iframe.contentDocument || iframe.contentWindow.document;
+            var innerDoc = iframe[iframeIndex].contentDocument || iframe[iframeIndex].contentWindow.document;
             if (innerDoc) {
                 var body = innerDoc.querySelector("body");
                 if (body) {

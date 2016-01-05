@@ -12,8 +12,6 @@
 	 * @return {[type]} [description]
 	 */
 	actionCard.attachedCallback = function() {
-		//storageKey could be very long, I want people be able to see it when they want to, hide it like other JSON object when no one cares
-		var storageKeyJson = "{\"storageKey\":"+JSON.stringify(this.getAttribute("storageKey"))+"}";
 		var model = {
 			id: 			this.getAttribute("actionId"),
 			actionName: 	this.getAttribute("name"),
@@ -25,7 +23,9 @@
 			isAbortable:	this.getAttribute("isAbortable"),
 			returnValue:	this.getAttribute("returnValue"),
 			fromStorage:	this.getAttribute("isStorable") === "true" ? this.getAttribute("isFromStorage") : "-",
-			storageKey:     storageKeyJson
+                        //storageKey could be very long, I want people be able to see it when they want to, hide it like other JSON object when no one cares
+			storageKey:	this.getAttribute("isStorable") === "true" ? "{\"storageKey\":"+JSON.stringify(this.getAttribute("storageKey"))+"}" : "-",
+			storableSize:	this.getAttribute("isStorable") === "true" ? (JSON.stringify(this.getAttribute("returnValue")).length / 1024).toFixed(1) + " KB" : "-"
 		};
 
 		// I'm still working on what the best pattern is here
@@ -39,6 +39,7 @@
     	this.shadowRoot.querySelector("#actionIsAbortable").textContent = model.isAbortable;
     	this.shadowRoot.querySelector("#actionIsBackground").textContent = model.isBackground;
     	this.shadowRoot.querySelector("#actionIsStorable").textContent 	= model.isStorable;
+    	this.shadowRoot.querySelector("#actionStorableSize").textContent = model.storableSize;
     	this.shadowRoot.querySelector("#actionIsRefresh").textContent 	= model.isRefresh;
     	this.shadowRoot.querySelector("#actionFromStorage").textContent = model.fromStorage;
     	

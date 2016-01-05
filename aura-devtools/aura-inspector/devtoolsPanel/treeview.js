@@ -41,6 +41,10 @@ function TreeNode(text, id) {
     this.setFormatter = function(formatter) {
         _formatter = formatter;
     };
+
+    this.toString = function() {
+        return this.getLabel()+"";
+    }
 }
 
 (function(){
@@ -121,7 +125,8 @@ function TreeNode(text, id) {
             return text;
         },
         ExpressionComponentFormatter: function(value) {
-            return value.attributes.expression;
+            //return ByReference || ByValue;
+            return value.attributes.expression || value.attributes.value;
         },
         KeyValueFormatter: function(config){
             var value = config.value;
@@ -160,6 +165,9 @@ function TreeNode(text, id) {
         },
         GlobalIdFormatter: function(value) {
             return `<aurainspector-auracomponent globalId='${value}'/>`;
+        },
+        ControllerReference: function(value) {
+            return `<aurainspector-controllerreference>${value}</aurainspector-controllerreference>`;
         }
     };
 
@@ -195,6 +203,9 @@ function TreeNode(text, id) {
             case "globalId":
                 node.setFormatter(formatters.GlobalIdFormatter);
                 break;
+            case "controllerref":
+                node.setFormatter(formatters.ControllerReference);
+                break;
         }
 
         return node;
@@ -204,8 +215,19 @@ function TreeNode(text, id) {
      * Very SFDC specific. Takes a config def, and returns simply the node with the proper formatting.
      */
     TreeNode.parse = function(config) {
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // ☺ - This value is a component Global Id
+        var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
+
         if(!config) {
             return new TreeNode();
+        }
+
+        if(typeof config === "string" && config.startsWith(COMPONENT_CONTROL_CHAR)) {
+            return TreeNode.create(config.substr(1), config, "globalId");
+        }
+
+        if(typeof config === "string" && config.startsWith(ACTION_CONTROL_CHAR)) {
+            return TreeNode.create(config.substr(1), config, "controllerref")
         }
 
         var id = config.globalId || "";
@@ -277,6 +299,8 @@ function AuraInspectorTreeView(treeContainer) {
     var events = new Map();
     var htmlToTreeNode = new WeakMap();
     var container;
+    var isRendered = false;
+    var isCollapsable = false;
 
     // Constants
     var AUTO_EXPAND_LEVEL = 3;
@@ -319,7 +343,8 @@ function AuraInspectorTreeView(treeContainer) {
 
         // Configurable rendering options
         options = Object.assign({ 
-            "collapsable": false 
+            "collapsable": false,
+            selectedNodeId: undefined
         }, options);
         
         try {
@@ -336,7 +361,15 @@ function AuraInspectorTreeView(treeContainer) {
 
         if(options.collapsable === true) {
             container.classList.add("collapsable");
+            isCollapsable = true;
         }
+
+        isRendered = true;
+
+        if(options.selectedNodeId) {
+            this.selectById(options.selectedNodeId);
+        }
+
     };
 
     this.attach = function(eventName, eventHandler) {
@@ -363,6 +396,10 @@ function AuraInspectorTreeView(treeContainer) {
     };
 
     this.selectById = function(nodeId) {
+        if(!this.isRendered()) {
+            return;
+        }
+
         if(nodeIdToHtml.has(nodeId)) {
             var node = nodeIdToHtml.get(nodeId);
             if(node) {
@@ -378,6 +415,14 @@ function AuraInspectorTreeView(treeContainer) {
                 this.notify("onselect", { domNode: node, treeNode: htmlToTreeNode.get(node) });
             }
         }
+    };
+
+    this.isRendered = function() {
+        return isRendered;
+    };
+
+    this.isCollapsable = function() {
+        return isCollapsable;
     };
 
     /* Event Handlers */
@@ -422,6 +467,8 @@ function AuraInspectorTreeView(treeContainer) {
 
     function Container_DblClick(event) {
         var nodeClass = "tree-view-node";
+        var parentClass = "tree-view-parent";
+        var expanded = "tree-view-expanded";
         var target = event.target;
         while(target && target.parentNode && !target.classList.contains(nodeClass)) {
             target = target.parentNode;
@@ -430,6 +477,9 @@ function AuraInspectorTreeView(treeContainer) {
         if(target && target.parentNode && target.classList.contains(nodeClass)) {
             var li = target.parentNode;
             selectNode(li);
+            if(li.classList.contains(parentClass)) {
+                li.classList.toggle(expanded);
+            }
             this.notify("ondblselect", { domNode: li, treeNode: htmlToTreeNode.get(li) });
         }
     }

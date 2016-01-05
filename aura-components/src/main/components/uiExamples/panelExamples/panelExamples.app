@@ -38,6 +38,7 @@
             <ui:button label="Create panelType: modal" press="{!c.createModal}"/>
             <ui:button label="Create panelType: modal, flavor: large" press="{!c.createLargeModal}"/>
             <ui:button label="Update content after panel created" press="{!c.lazyLoadPanel}"/>
+            <ui:button label="Create panelType: customPanel" press="{!c.createCustomPanel}"/> 
         </div>
 
         <footer/>
@@ -54,5 +55,11 @@
 
         <ui:containerManager/>
     </section>
+    
+    <uiExamples:registerCustomPanel>
+        <aura:set attribute="customPanels">
+            <ui:panel alias="customPanel"/>
+        </aura:set>
+    </uiExamples:registerCustomPanel>
 
 </aura:application>

@@ -63,7 +63,7 @@ ComponentClassRegistry.prototype.addComponentClass = function(descriptor, export
 /**
  * Get the class constructor for the specified component.
  * @param {String} descriptor use either the fqn markup://prefix:name or just prefix:name of the component to get a constructor for.
- * @returns Either the class that defines the component you are requesting, or null if not found.
+ * @returns Either the class that defines the component you are requesting, or undefined if not found.
  * @export
  */
 ComponentClassRegistry.prototype.getComponentClass = function(descriptor) {
@@ -115,7 +115,7 @@ ComponentClassRegistry.prototype.buildInheritance = function(componentProperties
 
         componentProperties[name] = componentProperties[name] || {};
 
-        // Currently, only the helper is inherited.
+        // Currently, controller and helper are inherited.
         var superInnerClass = superConstructor && superConstructor.prototype[name];
         if (superInnerClass) {
             // TODO: Update to the following line once all browsers have support for writeable __proto__

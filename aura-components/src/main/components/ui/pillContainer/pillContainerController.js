@@ -58,7 +58,7 @@
     },
 
     onShowMore: function(cmp, event, helper) {
-        helper.showMore(cmp);
+        helper.expand(cmp);
     },
 
     onClickBackground: function(cmp, event, helper) {
@@ -90,7 +90,14 @@
 
     focus: function(cmp, event, helper) {
         helper.focusOnInputBox(cmp);
-    }
+    },
 
+    collapse: function(cmp, event, helper) {
+        helper.collapse(cmp);
+    },
+
+    expand: function(cmp, event, helper) {
+        helper.expand(cmp);
+    }
 
 })// eslint-disable-line semi

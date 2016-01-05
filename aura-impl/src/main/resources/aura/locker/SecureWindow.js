@@ -14,11 +14,21 @@
  * limitations under the License.
  */
 
+/*jslint sub: true */
+
 //#include aura.locker.SecureThing
 //#include aura.locker.SecureDocument
 //#include aura.locker.SecureAura
 var SecureWindow = (function() {
 	"use strict";
+
+	function getWindow(sw) {
+		return sw._get("window", $A.lockerService.masterKey);
+	}
+
+	function getKey(sw) {
+		return $A.lockerService.util._getKey(sw, $A.lockerService.masterKey);
+	}
 
 	/**
 	 * Construct a new SecureWindow.
@@ -28,20 +38,20 @@ var SecureWindow = (function() {
 	 * @constructor
 	 *
 	 * @param {Object}
-	 *            window - the DOM window
+	 *            win - the DOM window
 	 * @param {Object}
 	 *            key - the key to apply to the secure window
 	 */
-	function SecureWindow(window, key) {
+	function SecureWindow(win, key) {
 		SecureThing.call(this, key, "window");
 
-		this._set("window", window, $A.lockerService.masterKey);
+		this._set("window", win, $A.lockerService.masterKey);
 		Object.defineProperties(this, {
 			document: {
-				value: new SecureDocument(window.document, key)
+				value: new SecureDocument(win.document, key)
 			},
 			"$A": {
-				value: new SecureAura($A, key)
+				value: new SecureAura(win['$A'], key)
 			},
 			window: {
 				get: function () {
@@ -51,14 +61,6 @@ var SecureWindow = (function() {
 			}
 		});
 		Object.freeze(this);
-	}
-
-	function getWindow(sw) {
-		return sw._get("window", $A.lockerService.masterKey);
-	}
-
-	function getKey(sw) {
-		return $A.lockerService.util._getKey(sw, $A.lockerService.masterKey);
 	}
 
 	SecureWindow.prototype = Object.create(SecureThing.prototype, {

@@ -18,6 +18,14 @@
 var SecureAura = (function() {
   "use strict";
 
+  function getAuraInstance(sa) {
+		return sa._get("aura", $A.lockerService.masterKey);
+	}
+
+  function getKey(sa) {
+    return $A.lockerService.util._getKey(sa, $A.lockerService.masterKey);
+  }
+
   /**
    * Construct a new SecureAura.
    *
@@ -26,32 +34,37 @@ var SecureAura = (function() {
    * @constructor
    *
    * @param {Object}
-   *            window - the DOM window
+   *            AuraInstance - the Aura Instance to be secured
    * @param {Object}
-   *            key - the key to apply to the secure window
+   *            key - the key to apply to the secure aura
    */
-  function SecureAura(window, key) {
+  function SecureAura(AuraInstance, key) {
     SecureThing.call(this, key, "aura");
-
-    this._set("aura", $A, $A.lockerService.masterKey);
-
+    this._set("aura", AuraInstance, $A.lockerService.masterKey);
+    // Creating a proxy of the Aura Instance to preserve backward compatibility, but
+    // eventually we want to ignore any API that is not a public API in Aura. For now,
+    // we settle on only enumerable properties (whether they are own or inherited).
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Enumerability_and_ownership_of_properties
+    for (var name in AuraInstance) {
+      if (SecureAura.prototype.hasOwnProperty(name)) {
+        // ignoring anything that SecureAura already implements
+        return;
+      }
+      Object.defineProperty(this, name, SecureThing.createPassThroughProperty(name));
+    }
     Object.freeze(this);
-  }
-
-  function getKey(sa) {
-    return $A.lockerService.util._getKey(sa, $A.lockerService.masterKey);
   }
 
   SecureAura.prototype = Object.create(SecureThing.prototype, {
     toString: {
       value: function() {
-        return "SecureAura: { key: " + JSON.stringify(getKey(this)) + " }";
+        return "SecureAura: " + getAuraInstance(this) + "{ key: " + JSON.stringify(getKey(this)) + " }";
       }
     },
     getComponent: {
       value: function(globalId) {
         var key = getKey(this);
-        var c = $A.getComponent(globalId);
+        var c = getAuraInstance(this).getComponent(globalId);
         $A.lockerService.util.verifyAccess(key, c);
         return $A.lockerService.wrapComponent(c);
       }

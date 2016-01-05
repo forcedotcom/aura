@@ -28,17 +28,16 @@ import aQute.bnd.annotation.component.Component;
  */
 @Component (immediate=true)
 class SourceNotifier implements SourceListener {
-	private static SourceNotifier sourceNotifier = new SourceNotifier();
+    private static SourceNotifier sourceNotifier = new SourceNotifier();
 
-	static {
-	    Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
-	}
+    static {
+        Aura.getDefinitionService().subscribeToChangeNotification(sourceNotifier);
+    }
 
-	@Override
+    @Override
     public void onSourceChanged(DefDescriptor<?> source, SourceMonitorEvent event, String filePath) {
-    	
+
         Aura.getCachingService().getClientLibraryOutputCache().invalidateAll();
-        Aura.getCachingService().getClientLibraryUrlsCache().invalidateAll();
     }
 }
 

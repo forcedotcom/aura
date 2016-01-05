@@ -1,5 +1,5 @@
 <aura:application access="public" render="client">
-    <aura:clientLibrary name="endofBody" url="http://likeaboss.com/topOfBody.js" type="JS"/>
+    <aura:clientLibrary name="topOfBody" url="http://likeaboss.com/topOfBody.js" type="JS"/>
     <clientLibraryTest:testChild/>
     <clientLibraryTest:testInterface implNumber="1"/>
     <clientLibraryTest:testFacet/>

@@ -223,10 +223,14 @@ public class MenuUITest extends WebDriverTestCase {
     }
 
     @PerfTest
+    //Timing issue on firefox when trying to click on non clickable element
+    @ExcludeBrowsers({BrowserType.FIREFOX})
     public void testCheckboxMenu() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
-
+    
+    //Timing issue on firefox when trying to click on non clickable element
+    @ExcludeBrowsers({BrowserType.FIREFOX})
     public void testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
@@ -274,9 +278,10 @@ public class MenuUITest extends WebDriverTestCase {
         assertTrue("Item4 should be selected", (Boolean) auraUITestingUtil.getEval(selectedValueM4Exp));
 
         // click on item4
+        //flapper in firefox
         boolean disabledItemNotClickable = false;
         try {
-            item4Element.click();
+        	item4Element.click();
         } catch (Exception e) {
             disabledItemNotClickable = true;
         }

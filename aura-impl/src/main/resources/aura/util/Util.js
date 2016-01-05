@@ -66,8 +66,8 @@ Aura.Utils.Util.prototype.isIOSWebView = function() {
  *
  * @private
  */
-Aura.Utils.Util.prototype.globalEval = function(src) {
-    return window["$$safeEval$$"](src);
+Aura.Utils.Util.prototype.globalEval = function(src, globals) {
+    return window["$$safe-eval-compat$$"](src, window, globals);
 };
 
 /**

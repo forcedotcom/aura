@@ -62,6 +62,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 			config = config || {};
 	    	
 	    	this.config = {
+	    			container : config.container,
 	    			initialWidths : config.initialWidths,
 	    			
 	    			step : config.step || DEFAULT_CONFIG.step,
@@ -85,7 +86,8 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		_initializeResizer : function(table) {
-			this.container = table.parentNode;
+			this.container = this.config.container || table.parentNode;
+			this.tableParent = table.parentNode;
 	    	this.table = table;
 	    	this._events = {};
 	    	
@@ -93,7 +95,7 @@ function lib(w){ //eslint-disable-line no-unused-vars
 	    	
 	    	// Create and attach the visual elements for resizing
 	    	this.indicator = this._createIndicator();
-	        this.container.insertBefore(this.indicator, table);
+	        this.tableParent.insertBefore(this.indicator, table);
 	        this._setDividerHeight(this.indicator);
 	        
 	    	// Determine what vendor prefixes to use for the animation
@@ -430,11 +432,12 @@ function lib(w){ //eslint-disable-line no-unused-vars
 		 * @private
 		 */
 		handleEvent : function(e) {
-			
-
 			switch (e.type) {
 			case 'mousedown':
 				this._onStart(e);
+				
+				// Prevent the browser default (text selection) during resizing
+				$A.util.squash(e, true);
 				break;
 			case 'mousemove':
 				this._onMove(e);

@@ -250,6 +250,31 @@
         }
     },
 
+    testShowMoreVisibleAfterCallingCollapse: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            this._getInputElement(cmp).blur();
+            $A.test.select(".showMore")[0].click();
+            pillContainer.collapse();
+            $A.test.assertFalse(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should exist");
+        }
+    },
+
+    testShowMoreNotVisibleAfterCallingExpand: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            this._getInputElement(cmp).blur();
+            pillContainer.expand();
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
     testFocusOnPillAfterMaxReached: {
         attributes: {
             maxAllowed: 2

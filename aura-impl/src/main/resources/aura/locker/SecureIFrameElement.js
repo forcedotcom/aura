@@ -40,8 +40,8 @@ var SecureIFrameElement = (function() {
     SecureElement.enableSecureProperties(this);
     // applying iframe's specific attributes
     IFrameAttributes.forEach(function (name) {
-      Object.defineProperty(se, name, SecureThing.createPassThroughProperty(name));
-    });
+      Object.defineProperty(this, name, SecureThing.createPassThroughProperty(name));
+    }, this);
 
     Object.freeze(this);
   }

@@ -19,6 +19,14 @@
 var SecureComponent = (function() {
 	"use strict";
 
+	function getKey(sc) {
+		return $A.lockerService.util._getKey(sc, $A.lockerService.masterKey);
+	}
+
+	function getComponent(sc) {
+		return sc._get("component", $A.lockerService.masterKey);
+	}
+
 	function filterComponent(sc, value) {
 		if (!$A.util.isComponent(value)) {
 			return value;
@@ -34,14 +42,6 @@ var SecureComponent = (function() {
 		SecureThing.call(this, referencingKey, "component");
 
 		this._set("component", component, $A.lockerService.masterKey);
-	}
-
-	function getKey(sc) {
-		return $A.lockerService.util._getKey(sc, $A.lockerService.masterKey);
-	}
-
-	function getComponent(sc) {
-		return sc._get("component", $A.lockerService.masterKey);
 	}
 
 	SecureComponent.prototype = Object.create(SecureThing.prototype, {

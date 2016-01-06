@@ -43,6 +43,9 @@
         <aura:attribute name="items" type="List"/>
     </aura:method>
 
+    <aura:method name="collapse" description="Collapses the pill list to the number of lines specified in the maxLines attribute"/>
+    <aura:method name="expand" description="Expands the pill list after being collapsed from the collapse method"/>
+
     <aura:handler name="init" value="{!this}" action="{!c.init}"/>
     <aura:handler name="change" value="{!v.items}" action="{!c.onItemsChanged}"/>
     <aura:handler name="change" value="{!v.maxAllowed}" action="{!c.onItemsChanged}"/>

@@ -240,7 +240,7 @@
         }
     },
 
-    showMore: function(cmp) {
+    expand: function(cmp) {
         var list = cmp.find("list");
         list.getElement().style.maxHeight = "";
         $A.util.addClass(cmp.find("showMore").getElement(), 'invisible');
@@ -251,6 +251,11 @@
             this.focusItem(cmp, pillItemData, 0); // Focus on the last pill
         }
 
+    },
+
+    collapse: function(cmp) {
+        cmp.set("v.expanded", false);
+        this.adjustHeight(cmp);
     },
 
     _getActualHeight: function(element) {

@@ -32,6 +32,7 @@
     <aura:handler event="ui:destroyPanel"   action="{!c.destroyPanel}"/>
     <aura:handler event="ui:getActivePanel" action="{!c.getActivePanel}"/>
     <aura:handler event="ui:stackPanel"     action="{!c.stackPanel}"/>
+    <aura:handler event="ui:registerPanels" action="{!c.registerPanels}"/>
 
     <aura:if isTrue="{! not(v.useSharedContainer) }">
         <div aura:id="container" class="{!$Browser.formFactor}"/>

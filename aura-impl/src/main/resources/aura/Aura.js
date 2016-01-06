@@ -604,10 +604,10 @@ AuraInstance.prototype.initPriv = function(config, token, container, doNotInitia
         $A.setRoot(app);
 
         if (!$A.initialized) {
+            $A.initialized = true;
+            $A.addDefaultErrorHandler(app);
             // Restore component definitions from AuraStorage into memory (if persistent)
             $A.componentService.restoreDefsFromStorage().then(function () {
-                $A.initialized = true;
-                $A.addDefaultErrorHandler(app);
                 $A.finishInit(doNotInitializeServices);
             });
         }
@@ -1197,9 +1197,9 @@ window['aura'] = window['$A'];
 // #include aura.metrics.plugins.QueuedActionsMetricsPlugin
 // #include aura.metrics.plugins.ClientServiceMetricsPlugin
 // #include aura.metrics.plugins.AuraContextPlugin
+// #include aura.metrics.plugins.DomHandlersPlugin
 
 // #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.ComponentServiceMetricsPlugin"}
-// #include {"excludeModes" : ["PRODUCTION"], "path" : "aura.metrics.plugins.DomHandlersPlugin"}
 
 // #include aura.Logging
 //#include {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}

@@ -550,7 +550,7 @@ AuraRenderingService.prototype.addDirtyValue = function(expression, cmp) {
  * @param cmp the component to check.
  */
 AuraRenderingService.prototype.hasDirtyValue = function(cmp){
-   return this.dirtyComponents.hasOwnProperty(cmp.getConcreteComponent().getGlobalId());
+   return this.dirtyComponents.hasOwnProperty(cmp.getGlobalId());
 };
 
 /**
@@ -558,7 +558,7 @@ AuraRenderingService.prototype.hasDirtyValue = function(cmp){
  */
 AuraRenderingService.prototype.isDirtyValue = function(expression, cmp) {
     if (cmp && cmp.isValid()) {
-        var id = cmp.getConcreteComponent().getGlobalId();
+        var id = cmp.getGlobalId();
         var list = this.dirtyComponents[id];
         if (list && list[expression]){
             return true;
@@ -667,7 +667,7 @@ AuraRenderingService.prototype.rerenderDirty = function(stackName) {
  */
 AuraRenderingService.prototype.removeDirtyValue = function(value, cmp) {
     if (cmp && cmp.isValid()) {
-        var id = cmp.getConcreteComponent().getGlobalId();
+        var id = cmp.getGlobalId();
         var dirtyAttributes = this.dirtyComponents[id];
         if (dirtyAttributes) {
             if (dirtyAttributes[value]) {

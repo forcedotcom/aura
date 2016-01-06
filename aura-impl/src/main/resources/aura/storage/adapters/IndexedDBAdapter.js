@@ -739,17 +739,32 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
     };
 };
 
+/**
+ * Register the indexDB adapter
+ */
+IndexedDBAdapter.register = function() {
+    // Always disable support for Safari (including embedded Safari eg Outlook) because its implementation is not reliable in iframe.
+    if (navigator.userAgent.indexOf("AppleWebKit") !== -1 && navigator.userAgent.indexOf("Chrome") === -1) {
+        return;
+    }
 
+    // Always disable support for Firefox since it's not implemented in private mode.
+    if (navigator.userAgent.indexOf("Firefox") !== -1) {
+        return;
+    }
 
-// Only register this adapter if the IndexedDB API is present
-// disable support for Safari (including embedded Safari eg Outlook) because its implementation is not reliable in iframe.
-if (window.indexedDB &&
-    !(navigator.userAgent.indexOf("AppleWebKit") !== -1 && navigator.userAgent.indexOf("Chrome") === -1)) {
+    // Only register this adapter if the IndexedDB API is present
+    if (!window.indexedDB) {
+        return;
+    }
+
     $A.storageService.registerAdapter({
         "name": IndexedDBAdapter.NAME,
         "adapterClass": IndexedDBAdapter,
         "persistent": true
     });
-}
+};
+
+IndexedDBAdapter.register();
 
 Aura.Storage.IndexedDBAdapter = IndexedDBAdapter;

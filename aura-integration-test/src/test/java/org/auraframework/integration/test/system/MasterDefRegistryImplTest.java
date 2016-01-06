@@ -53,6 +53,7 @@ import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.MasterDefRegistryImpl;
 import org.auraframework.service.ContextService;
+import org.auraframework.service.DefinitionService;
 import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
@@ -63,6 +64,7 @@ import org.auraframework.system.MasterDefRegistry;
 import org.auraframework.system.SourceListener;
 import org.auraframework.test.source.StringSourceLoader;
 import org.auraframework.test.util.AuraTestingUtil;
+import org.auraframework.throwable.AuraException;
 import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
@@ -867,9 +869,14 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         return true;
     }
 
-    private boolean isInDepsCache(DefDescriptor<?> dd, MasterDefRegistryImpl mdr) throws Exception {
+    private boolean isInDepsCache(DefDescriptor<?> dd, String cacheKey, MasterDefRegistryImpl mdr) throws Exception {
         Cache<String, ?> cache = AuraPrivateAccessor.get(mdr, "depsCache");
-        String ddKey = dd.getDescriptorName().toLowerCase();
+        String ddKey;
+        if(dd != null) {
+        	ddKey = dd.getDescriptorName().toLowerCase();
+        } else {
+        	ddKey = cacheKey;
+        }
         for (String key : cache.getKeySet()) {
             if (key.endsWith(ddKey)) {
                 return cache.getIfPresent(key) != null;
@@ -1284,7 +1291,35 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         assertTrue("No caching for wildcard namespaces", notInDescriptorFilterCache(df, mdr));
     }
 
-    public void testDepsCache() throws Exception {
+    /**
+     * verify we cache dependency for descriptor start with compound
+     * notice that we actually cache dependency for it twice, once with Uid, once not.
+     * other special case includes apex, I won't test it here.
+     * @throws Exception 
+     */
+    public void testDepsCacheCompound() throws Exception {
+    	String auraIf = "<aura:if isTrue='{!true}'>It is true</aura:if>";
+    	DefDescriptor<ComponentDef> privilegedCmpWithCompound = getAuraTestingUtil().addSourceAutoCleanup(
+                ComponentDef.class, String.format(baseComponentTag, "access='global'", auraIf), null, true);
+    	
+    	 MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
+         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
+         
+         Aura.getInstanceService().getInstance(privilegedCmpWithCompound, null);
+         assertTrue(isInDepsCache(null, "compound://aura.if", mdri));
+    }
+    
+    /**
+     * we have a component in Unprivileged NameSpace , it depends on some component on a Privileged NameSpace
+     * test verify getting def of Unprivileged one won't add itself, or the privileged component into dependency cache
+     * also verify getting def of privileged one will add itself to dependency cache
+     * 
+     * we also have a component in Privileged NameSpace which depends on a component on a Unprivileged NameSpace
+     * test verify getting def of the Privileged one will throw error, and it won't add itself or Unprivileged component 
+     * into dependency cache.
+     * @throws Exception
+     */
+    public void testDepsCachePrivAndUnPrivNamespace() throws Exception {
         String unprivilegedNamespace = getAuraTestingUtil().getNonce("alien");
 
         // in privileged namespace
@@ -1324,15 +1359,15 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         }
 
         mdr.getDef(unprivilegedCmp);
-        assertFalse(isInDepsCache(privilegedCmp, mdri));
-        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
-        assertFalse(isInDepsCache(privilegedRoot, mdri));
+        assertFalse(isInDepsCache(privilegedCmp, "", mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, "", mdri));
+        assertFalse(isInDepsCache(privilegedRoot, "", mdri));
 
 
         mdr.getDef(privilegedCmp);
-        assertTrue(isInDepsCache(privilegedCmp, mdri));
-        assertFalse(isInDepsCache(unprivilegedCmp, mdri));
-        assertFalse(isInDepsCache(privilegedRoot, mdri));
+        assertTrue(isInDepsCache(privilegedCmp, "", mdri));
+        assertFalse(isInDepsCache(unprivilegedCmp, "", mdri));
+        assertFalse(isInDepsCache(privilegedRoot, "", mdri));
 
     }
 
@@ -1349,7 +1384,7 @@ public class MasterDefRegistryImplTest extends AuraImplTestCase {
         MasterDefRegistry mdr = Aura.getContextService().getCurrentContext().getDefRegistry();
         // mdr.getDef(controllerDef);
         MasterDefRegistryImpl mdri = (MasterDefRegistryImpl) mdr;
-        assertTrue(isInDepsCache(controllerDef, mdri));
+        assertTrue(isInDepsCache(controllerDef, "", mdri));
     }
 
     private MasterDefRegistry restartContextGetNewMDR() {

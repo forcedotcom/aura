@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 ({
-    render: function(component, helper) {
-        component.set("v.classList", helper.getClassList(component));
-        return this.superRender();
-    },
-
-    rerender: function(component, helper) {
-        if (component.isDirty("v.class") || component.isDirty("v.stateful") || component.isDirty("v.selected")) {
-            component.set("v.classList", helper.getClassList(component));
+    init: function(cmp, evt) {
+        var customPanels = cmp.get('v.customPanels');
+        if (customPanels) {
+    	    $A.get('e.ui:registerPanels').setParams({
+                panels: customPanels
+            }).fire();
         }
-
-        return this.superRerender();
     }
-})// eslint-disable-line semi
+})

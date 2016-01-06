@@ -23,9 +23,6 @@
 }
 
 .THIS.open {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
 }
 
@@ -58,12 +55,10 @@
 .THIS .modal-header {
     position: relative;
     text-align: center;
-    -webkit-flex-shrink: 0;
     flex-shrink: 0;
 }
 
 .THIS .modal-footer {
-    -webkit-flex-shrink: 0;
     flex-shrink: 0;
 }
 
@@ -94,9 +89,6 @@
 }
 
 .THIS .panel {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
     position: fixed;
     top: 0;
@@ -108,19 +100,8 @@
 }
 
 .THIS .modal-container{
-
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -webkit-flex-direction: column;
-    -ms-flex-direction: column;
     flex-direction: column;
-    -webkit-box-pack: center;
-    -webkit-justify-content: center;
-    -ms-flex-pack: center;
     justify-content: center;
     margin: 0 auto;
     border-radius: 0.25rem;

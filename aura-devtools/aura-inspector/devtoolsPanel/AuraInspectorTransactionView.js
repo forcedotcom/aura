@@ -14,8 +14,8 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 			<table>
 				<thead>
 					<th>Id</th>
-					<th>Start Time (seconds)<br /><span style="font-size:8px">(since page loaded)</span></th>
-					<th>Duration (milliseconds)</th>
+					<th>Start Time<br /><span class="th-description">(second since page loaded)</span></th>
+					<th>Duration<br /><span class="th-description">(milliseconds)</span></th>
 					<th>Context</th>
 					<th>Actions</th>
 					<th>XHRs</th>

@@ -1,21 +1,199 @@
 
 <template>
 	<style>
+		body {
+			font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
+		}
 		header { display: inline-block; }
-		h1 { display: inline-block; font-weight: bold; font-family: 'Lucida Grande', 'Consolas', 'sans-serif'; font-size: 1.25em; padding: 0 0 3px 0; margin: 0;}
+		h1 {
+			font-weight: 300;
+	    font-size: 1.125rem;
+	    line-height: 1.25;
+		  padding: 0 0 3px 0;
+			margin: 0;
+		}
 		h6 { color: #bbb; display: inline; font-size: .75em; margin: 0; padding: 0; }
 		dl, dt, dd { margin: 0; padding: 0; display: inline-block; }
 		dd { padding: 0 10px; display: block; }
 		.parameters { display: block; }
-		.parameters:before { content: 'Parameters'; display:inline-block; width: 80px; vertical-align: top; font-weight: bold; }
-		.caller { display: block; }
-		.caller:before { content: 'Caller'; display:inline-block; width: 80px; vertical-align: top; font-weight: bold; }
-		#eventSource::before { content: 'Source'; display:inline-block; width: 80px; vertical-align: top; font-weight: bold; }
-		#eventDuration::before { content: 'Duration'; display:inline-block; width: 80px; vertical-align: top; font-weight: bold; }
-		#eventHandledBy::before { content: 'Handled By'; display:inline-block; width: 80px; vertical-align: top; font-weight: bold; }
-		#eventHandledByGrid { width: 700px; height: 400px; background: #efefef; border-radius: 10px; margin-left: 80px; }
-		#gridToggle { border: 1px solid #ddd; border-radius: 5px; background: #eee; float: left; }
+		.parameters:before {
+			content: 'Parameters';
+			display: inline-block;
+			font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
+			flex: 0 0 auto;
+			width: 80px;
+			vertical-align: top;
+			display: inline-block;
+			color: #54698d;
+			font-size: 0.75rem;
+			line-height: 1.5;
+		}
+	.caller { display: block; }
+	.caller:before {
+		content: 'Caller';
+		display: inline-block;
+		font-family:  'Lucida Grande', 'Consolas', 'sans-serif';
+		flex: 0 0 auto;
+		width: 80px;
+		vertical-align: top;
+		display: inline-block;
+		color: #54698d;
+		font-size: 0.75rem;
+		line-height: 1.5;
+	}
+	.eventSource::before {
+		content: 'Source';
+		display:inline-block;
+		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
+		flex: 0 0 auto;
+		width: 80px;
+		vertical-align: top;
+		display: inline-block;
+		color: #54698d;
+		font-size: 0.75rem;
+		line-height: 1.5;
+		-webkit-font-smoothing: subpixel-antialiased;
+	}
+	.eventDuration::before {
+		content: 'Duration';
+		display: inline-block;
+		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
+		flex: 0 0 auto;
+		width: 80px;
+		vertical-align: top;
+		display: inline-block;
+		color: #54698d;
+		font-size: 0.75rem;
+		line-height: 1.5;
+	}
+	.eventHandledBy::before {
+		content: 'Handled By';
+		display: inline-block;
+		flex: 0 0 auto;
+		font-family: 'Lucida Grande', 'Consolas', 'sans-serif';
+		width: 80px;
+		vertical-align: top;
+		display: inline-block;
+		color: #54698d;
+		font-size: 0.75rem;
+		line-height: 1.5;
+	}
+	.eventHandledBy dl, .eventSource{
+	  font-family: Menlo, monospace;
+	  font-size: 11px;
+	  -webkit-font-smoothing: antialiased;
+	}
+	.eventHandledBy, .eventSource, .caller, .parameters, .eventDuration{
+		display: flex;
+		margin-top: .5rem;
+	}
+		#eventHandledByGrid {
+			width: 700px;
+			height: 400px;
+			background: #f4f6f9;
+			/*border-radius: 10px; */
+			/*margin-left: 80px; */
+			margin-top: .5rem;
+			}
+		/*#gridToggle { border: 1px solid #ddd; border-radius: 5px; background: #eee; float: left; }*/
 		.hidden { display: none; }
+		.slds-m-top--x-small {
+		  margin-top: 0.5rem; }
+			a:active {
+			  color: #00396b;
+			}
+
+			a:focus {
+			  outline: #0070D2;
+			  text-decoration: underline;
+			}
+			a:hover {
+			  color: #005fb2;
+			  text-decoration: underline;
+			}
+
+			a {
+			  color: #0070D2;
+			  text-decoration: none;
+			}
+			/* Lightning Design System 0.12.1 */
+			/*
+			Copyright (c) 2015, salesforce.com, inc. All rights reserved.
+
+			Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+			Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+			Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+			Neither the name of salesforce.com, inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+			THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+			*/
+		.slds-button {
+		  position: relative;
+		  display: inline-block;
+		  padding: 0;
+		  background: transparent;
+		    background-clip: padding-box;
+		  border: none;
+		    border-radius: 0.25rem;
+		  color: #0070d2;
+		  font-size: inherit;
+		  line-height: 2.125rem;
+		  text-decoration: none;
+		  -webkit-appearance: none;
+		  white-space: normal;
+		  -webkit-user-select: none;
+		     -moz-user-select: none;
+		      -ms-user-select: none;
+		          user-select: none;
+		  -webkit-transition: color 0.05s linear, background-color 0.05s linear;
+		          transition: color 0.05s linear, background-color 0.05s linear; }
+		  .slds-button:hover,
+		  .slds-button:focus,
+		  .slds-button:active,
+		  .slds-button:visited {
+		    text-decoration: none; }
+		  .slds-button:hover,
+		  .slds-button:focus {
+		    color: #005fb2; }
+		  .slds-button:focus {
+		    outline: 0;
+		    box-shadow: 0 0 3px #0070D2; }
+		  .slds-button:active {
+		    color: #00396b; }
+		  .slds-button[disabled] {
+		    color: #d8dde6; }
+		  .slds-button:hover .slds-button__icon,
+		  .slds-button:focus .slds-button__icon,
+		  .slds-button:active .slds-button__icon,
+		  .slds-button[disabled] .slds-button__icon {
+		    fill: currentColor; }
+		  .slds-button + .slds-button-group {
+		    margin-left: 0.25rem; }
+		  .slds-button + .slds-button {
+		    margin-left: 0.25rem; }
+
+		    .slds-button--neutral {
+		      padding-left: 1rem;
+		      padding-right: 1rem;
+		      text-align: center;
+		      vertical-align: middle;
+		      border: 1px solid #d8dde6;
+		      background-color: white; }
+		      .slds-button--neutral:hover,
+		      .slds-button--neutral:focus {
+		        background-color: #f4f6f9; }
+		      .slds-button--neutral:active {
+		        background-color: #eef1f6; }
+		      .slds-button--neutral[disabled] {
+		        background-color: white;
+		        cursor: default; }
+		.slds-button--small {
+		  line-height: 1.875rem;
+		  min-height: 2rem; }
+		.slds-button--x-small {
+		  line-height: 1.25rem;
+		  min-height: 1.25rem; }
+
 	</style>
 	<header>
     	<h1><!-- Event Name --></h1>
@@ -24,10 +202,10 @@
     <section>
 	    <aurainspector-json class="parameters" expandTo="0"><!-- Parameters --></aurainspector-json>
 	    <aurainspector-outputFunction class="caller"><!-- Caller --></aurainspector-outputFunction>
-	    <div id="eventSource"></div>
-	    <div id="eventDuration"></div>
-	    <div id="eventHandledBy"></div>
-	    <button id="gridToggle" class="hidden">Toggle Grid</button>
+	    <div id="eventSource" class="eventSource"></div>
+	    <div id="eventDuration" class="eventDuration"></div>
+	    <div id="eventHandledBy" class="eventHandledBy"></div>
+	    <button id="gridToggle" class="hidden slds-button slds-button--neutral slds-button--x-small slds-m-top--x-small">Toggle Grid</button>
 	    <div id="eventHandledByGrid" class="hidden">
 	    </div>
     </section>

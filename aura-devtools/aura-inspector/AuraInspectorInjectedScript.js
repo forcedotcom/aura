@@ -10,7 +10,7 @@
     $Aura.Inspector = new AuraInspector();
     $Aura.Inspector.init();
 
-    // Attach to the global object so our integrations can access it, but 
+    // Attach to the global object so our integrations can access it, but
     // use a symbol so it doesn't create a global property.
     global[$Symbol] = $Aura;
 
@@ -23,10 +23,8 @@
                 actionsStorage.get(actionStorageKey)
                 .then(
                     function() {
-                        console.log("find storage item for action:", data);
                         actionsStorage.remove(actionStorageKey)
                         .then(function () {
-                            console.log("successfully remove storage for action:", data);
                             //notify Storage View
                             $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
                         });
@@ -35,11 +33,11 @@
                         console.log("cannot find storage item for action:", data);
                     }
                 );
-                
+
             } else {
                 console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
             }
-            
+
             //override send
             actionsToDrop.push(data);
             $A.uninstallOverride("ClientService.send", OnSendAction);
@@ -129,7 +127,6 @@
             document.body.addEventListener("transitionend", function removeClassHandler(event) {
                 var removeClassName = "auraDevToolServiceHighlight3";
                 var addClassName = "auraDevToolServiceHighlight4";
-                //console.log("Remove it", event.target);
                 var element = event.target;
                 element.classList.remove(removeClassName);
                 element.classList.remove(addClassName);
@@ -141,7 +138,7 @@
         "AuraDevToolService.Bootstrap": function() {
             if (typeof $A !== "undefined" && $A.initAsync) {
                 // Try catches for branches that don't have the overrides
-                // 
+                //
                 try {
                     $A.installOverride("outputComponent", function(){});
                 } catch(e){}
@@ -161,8 +158,11 @@
                     bootstrapEventInstrumentation();
                 } catch(e){}
 
-                // Need a way to conditionally do this based on a user setting. 
+                // Need a way to conditionally do this based on a user setting.
                 $A.PerfDevTools.init();
+
+                // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
+                this["AuraDevToolService.Bootstrap"] = function(){};
             } else {
                 console.log('Could not attach AuraDevTools Extension.');
             }
@@ -172,22 +172,18 @@
     // Subscribes!
     $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function AuraInspector_OnPanelLoad() {
         $Aura.actions["AuraDevToolService.Bootstrap"]();
-        // We only want to do the bootstrap the first time the page loads.
-        // If you close the dev tools and reopen then, we'll get a second onPanelLoad, but we should ignore that. 
-        // At least in regards to bootstrapping
-        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelConnect", AuraInspector_OnPanelLoad);
-        
-        $Aura.Inspector.subscribe("AuraInspector:OnPanelConnect", function () {
-            $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
-        });
 
-        $Aura.Inspector.publish("AuraInspector:OnBootstrapEnd", {});
+        window.postMessage({
+            "action": "AuraInspector:bootstrap",
+            "data": {"key":"AuraInspector:bootstrap", "data":{}}
+        }, window.location.href);
+
     });
 
-    $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
-        $Aura.actions["AuraDevToolService.Bootstrap"]();
-        $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
-    });
+    // $Aura.Inspector.subscribe("AuraInspector:OnPanelAlreadyConnected", function AuraInspector_OnPanelLoad() {
+    //     $Aura.actions["AuraDevToolService.Bootstrap"]();
+    //     $Aura.Inspector.unsubscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspector_OnPanelLoad);
+    // });
 
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
@@ -195,18 +191,15 @@
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
     $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
 
-    //$Aura.Inspector.subscribe("AuraInspector:OnContextMenu", $Aura.actions["AuraDevToolService.Inspect"]);
-
-    
-
     function AuraInspector() {
-
         var subscribers = new Map();
         var PUBLISH_KEY = "AuraInspector:publish";
         var PUBLISH_BATCH_KEY = "AuraInspector:publishbatch";
+        var BOOTSTRAP_KEY = "AuraInspector:bootstrap";
         var postMessagesQueue = [];
         var batchPostId = null;
-        var COMPONENT_CONTROL_CHAR = "\u263A"; // This value is a component Global Id
+        var COMPONENT_CONTROL_CHAR = "\u263A"; // ☺ - This value is a component Global Id
+        var ACTION_CONTROL_CHAR = "\u2744"; // ❄ - This is an action
         var ESCAPE_CHAR = "\u2353"; // This value was escaped, unescape before using.
         var increment = 0;
         var lastItemInspected;
@@ -216,8 +209,8 @@
             addRightClickObserver();
 
             this.subscribe("AuraInspector:ContextElementRequest", function(){
-                if(lastItemInspected) {
-                    this.publish("AuraInspector:OnInspectElement", lastItemInspected.getAttribute("data-aura-rendered-by"));
+                if(lastItemInspected && lastItemInspected.nodeType === 1) {
+                    this.publish("AuraInspector:ShowComponentInTree", lastItemInspected.getAttribute("data-aura-rendered-by"));
                 }
             }.bind(this));
         };
@@ -226,11 +219,11 @@
             if(!key) { return; }
 
             // We batch the post messages
-            // to avoid excessive messages which was causing 
+            // to avoid excessive messages which was causing
             // stabalization issues.
             postMessagesQueue.push({"key":key, "data":data});
 
-            if(batchPostId === null) {
+            if(batchPostId === null || batchPostId === undefined) {
                 batchPostId = sendQueuedPostMessages();
             }
         };
@@ -248,7 +241,7 @@
         this.unsubscribe = function(key, callback) {
             if(!key || !callback) { return false; }
 
-            if(!subscribers.has(key)) { 
+            if(!subscribers.has(key)) {
                 return false;
             }
 
@@ -265,8 +258,10 @@
             //     "body" : true // Should we serialize the body?
             // };
             var configuration = Object.assign({
-                "body": true,
-                "elementCount": false
+                "attributes": true, // True to serialize the attributes, if you just want the body you can set this to false and body to true. (Good for serializing supers)
+                "body": true, // Serialize the Body? This can be expensive so you can turn it off.
+                "elementCount": false, // Count all child elements of all the elements associated to a component.
+                "model": false // Serialize the model data as well
             }, options);
             if(component){
                 if(!component.isValid()) {
@@ -290,40 +285,55 @@
 
                         // Added Later
                         //,"super": ""
-                        //
-                        // Implement
-                        //,"model": null 
+                        //,"model": null
                     };
 
-                    var attributes = component.getDef().getAttributeDefs();
-                    attributes.each(function(attributeDef) {
-                        var key = attributeDef.getDescriptor().getName();
-                        var value;
+                    if(configuration.attributes) {
+                        var attributes = component.getDef().getAttributeDefs();
+                        attributes.each(function(attributeDef) {
+                            var key = attributeDef.getDescriptor().getName();
+                            var value;
+                            var rawValue;
+                            // If we don't want the body serialized, skip it.
+                            // We would only want the body if we are going to show
+                            // the components children.
+                            if(key === "body" && !configuration.body) { return; }
+                            try {
+                                rawValue = component._$getRawValue$(key);
+                                value = component.get("v." + key);
+                            } catch(e) {
+                                value = undefined;
+                            }
+                            if($A.util.isExpression(rawValue)) {
+                                output.expressions[key] = rawValue+"";
+                                output.attributes[key] = value;
+                            } else {
+                                output.attributes[key] = rawValue;
+                            }
+                        }.bind(this));
+                    } else if(!configuration.attributes && configuration.body) {
                         var rawValue;
-                        // If we don't want the body serialized, skip it.
-                        // We would only want the body if we are going to show
-                        // the components children.
-                        if(key === "body" && !configuration.body) { return; }
+                        var value;
                         try {
-                            rawValue = component._$getRawValue$(key);
-                            value = component.get("v." + key);
+                            rawValue = component._$getRawValue$("body");
+                            value = component.get("v.body");
                         } catch(e) {
                             value = undefined;
                         }
                         if($A.util.isExpression(rawValue)) {
-                            output.expressions[key] = rawValue+"";
-                            output.attributes[key] = value;
+                            output.expressions["body"] = rawValue+"";
+                            output.attributes["body"] = value;
                         } else {
-                            output.attributes[key] = rawValue;
+                            output.attributes["body"] = rawValue;
                         }
-                    }.bind(this));
+                    }
 
                     var supers = [];
                     var superComponent = component;
                     while(superComponent = superComponent.getSuper()) {
                         supers.push(superComponent._$getSelfGlobalId$());
                     }
-                    
+
                     if(supers.length) {
                         output["supers"] = supers;
                     }
@@ -340,19 +350,26 @@
                         output.elementCount = elementCount;
                     }
 
+                    if(configuration.model) {
+                        var model = component.getModel();
+                        if(model) {
+                            output["model"] = model.data;
+                        }
+                    }
+
                     return this.safeStringify(output);
                 }
             }
             return "";
         };
 
-        /** 
+        /**
          * Safe because it handles circular references in the data structure.
          *
          * Will add control characters and shorten components to just their global ids.
          * Formats DOM elements in a pretty manner.
          */
-        this.safeStringify = safeStringify; 
+        this.safeStringify = safeStringify;
 
         // Start listening for messages
         window.addEventListener("message", Handle_OnPostMessage);
@@ -365,20 +382,24 @@
                     var data = event.data.data || [];
                     for(var c=0,length=data.length;c<length;c++) {
                         callSubscribers(data[c].key, data[c].data);
-                    }        
+                    }
                 }
             }
         }
 
-        function safeStringify(value) {
+        function safeStringify(originalValue) {
             // For circular dependency checks
             var visited = new Set();
+            var toJSON = InvalidComponent.prototype.toJSON;
+            var toJSONCmp = Component.prototype.toJSON;
+            delete InvalidComponent.prototype.toJSON;
+            delete Component.prototype.toJSON;
 
-            var result = JSON.stringify(value, function(key, value) {
+            var result = JSON.stringify(originalValue, function(key, value) {
                 if(Array.isArray(this) || key) { value = this[key]; }
                 if(!value) { return value; }
 
-                if(typeof value === "string" && value.startsWith(COMPONENT_CONTROL_CHAR)) {
+                if(typeof value === "string" && (value.startsWith(COMPONENT_CONTROL_CHAR) || value.startsWith(ACTION_CONTROL_CHAR))) {
                     return ESCAPE_CHAR + escape(value);
                 }
 
@@ -404,15 +425,19 @@
                     return value.toString();
                 }
 
+                if($A.util.isAction(value)) {
+                    return ACTION_CONTROL_CHAR + value.getDef().toString();
+                }
+
                 if(Array.isArray(value)) {
                     return value.slice();
                 }
 
                 if(typeof value === "object") {
                     if("$serId$" in value && visited.has(value)) {
-                        return { 
-                            "$serRefId$": value["$serId$"], 
-                            "__proto__": null 
+                        return {
+                            "$serRefId$": value["$serId$"],
+                            "__proto__": null
                         };
                     } else if(!$A.util.isEmpty(value)) {
                         visited.add(value);
@@ -428,6 +453,9 @@
                     delete item["$serId"];
                 }
             });
+
+            InvalidComponent.prototype.toJSON = toJSON;
+            Component.prototype.toJSON = toJSONCmp;
 
             return result;
         };
@@ -475,7 +503,7 @@
                     "action": PUBLISH_BATCH_KEY,
                     "data": postMessagesQueue
                 }, window.location.href);
-                
+
                 postMessagesQueue = [];
                 batchPostId = null;
             }
@@ -493,6 +521,7 @@
                 }
             });
         }
+
     }
 
     function bootstrapEventInstrumentation() {
@@ -584,13 +613,13 @@
                         "sentTime": performance.now()
                         });
                     }
-                    
+
                 }
             }
 
             var ret = config["fn"].call(config["scope"], auraXHR, actions, method, options);
 
-            
+
             return ret;
     }
 
@@ -711,7 +740,7 @@
                 this._initializeHooks();
             },
             clearMarks: function (marks) {
-                this._resetCollector(marks);  
+                this._resetCollector(marks);
             },
             _initializeOptions: function (cfg) {
                 this.opts = {
@@ -727,7 +756,7 @@
                 }
                 // It should work in all modes
                 this._initializeHooksTransactions();
-                
+
             },
             _createNode: function (name, mark, id) {
                 return {
@@ -751,8 +780,8 @@
                 $A.metricsService.onTransactionEnd(this._onTransactionEnd.bind(this));
             },
             _onTransactionEnd: function (t) {
-                setTimeout(function (){ 
-                    // We do a timeout to give a chance to 
+                setTimeout(function (){
+                    // We do a timeout to give a chance to
                     // other transactionEnd handlers to modify the transaction
                     $Aura.Inspector.publish("Transactions:OnTransactionEnd", t);
                 }, 0);
@@ -809,7 +838,7 @@
             },
             _generateCPUProfilerDataFromMarks: function (marks) {
                 if(!marks || !marks.length) { return {}; }
-                
+
                 //global stuff for the id
                 var id = 0;
                 function nextId () {return ++id;}
@@ -859,7 +888,7 @@
 
                 current._startTime = marks[0].timestamp;
 
-                function generateTimestamps(startTime, endTime) { 
+                function generateTimestamps(startTime, endTime) {
                     var diff  = endTime - startTime,
                         ticks = Math.round(diff / sampling), // every N miliseconds
                         time  = startTime,
@@ -946,7 +975,7 @@
     };
 
 
-    
+
 
 })(this);
-    
+

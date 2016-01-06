@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 ({
-    render: function(component, helper) {
-        component.set("v.classList", helper.getClassList(component));
-        return this.superRender();
-    },
-
-    rerender: function(component, helper) {
-        if (component.isDirty("v.class") || component.isDirty("v.stateful") || component.isDirty("v.selected")) {
-            component.set("v.classList", helper.getClassList(component));
-        }
-
-        return this.superRerender();
+    /**
+     * Verify setting value to null will clear out the field.
+     */
+    testSetValueNull: {
+        attributes : {value: "test"},
+        test: [ function(component) {
+            component.set("v.value", null);
+        } , function(component) {
+            $A.test.assertEquals('', component.getElement().value, "input text value is not cleared.");
+        }]
     }
-})// eslint-disable-line semi
+/*eslint-disable semi*/
+})
+/*eslint-enable semi*/

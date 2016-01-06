@@ -161,6 +161,14 @@
     window.onerror = (function() {
         var existing = window.onerror;
         var newHandler = function(message, url, line, col, err) {
+
+            // Firefox private browsing mode throws an uncatchable (except by window.onerror) InvalidStateError when
+            // indexedDB.open is called. suppress this type of error. IndexedDBAdapter.js handlers the error. see
+            // that file for more details.
+            if (message === "InvalidStateError" && navigator.userAgent.indexOf("Firefox") !== -1) {
+                return true;
+            }
+
             handleError(message, err);
             if ($A.initialized) {
                 $A.logger.reportError(err);

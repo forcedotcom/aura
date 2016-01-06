@@ -15,6 +15,7 @@
  */
 
 /*jslint sub: true */
+/*eslint-disable no-console */
 
 /**
  * Logger implementation providing log messages to subscribers
@@ -391,5 +392,82 @@ Logger.prototype.hasSubscriptions = function(level) {
         return this.subscriptions[level] > 0;
     }
 };
+
+//#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+/**
+ * Prints log to both the console (if available), and to the aura debug component
+ * @private
+ */
+Logger.prototype.devDebugConsoleLog = function(level, message, error) {
+    var stringVersion = null;
+    var showTrace = true;
+    var trace;
+    var logMsg = level + ": " + (message || "");
+
+    if (message) {
+        stringVersion = level + ": " + message;
+    }
+
+    if (error && error.message) {
+        stringVersion += " : " + error.message;
+    }
+
+    if (error || level === "ERROR") {
+        trace = $A.logger.getStackTrace(error);
+    }
+
+    if (window["console"]) {
+        var console = window["console"];
+        var filter = level === "WARNING" ? "warn" : level.toLowerCase();
+        if (console[filter]) {
+            console[filter](message);
+            if (error) {
+                console[filter](error);
+                showTrace = !(error.stack || error.stackTrace);
+            }
+            if (showTrace && trace) {
+                for ( var j = 0; j < trace.length; j++) {
+                    console[filter](trace[j]);
+                }
+            }
+        } else if (console["group"]) {
+            console["group"](logMsg);
+            console["debug"](message);
+            if (error) {
+                console["debug"](error);
+                showTrace = !(error.stack || error.stackTrace);
+            }
+            if (showTrace && trace) {
+                console["group"]("stack");
+                for ( var i = 0; i < trace.length; i++) {
+                    console["debug"](trace[i]);
+                }
+                console["groupEnd"]();
+            }
+            console["groupEnd"]();
+        } else {
+            stringVersion = $A.logger.stringVersion(logMsg, error, trace);
+            if (console["debug"]) {
+                console["debug"](stringVersion);
+            } else if (console["log"]) {
+                console["log"](stringVersion);
+            }
+        }
+    }
+
+    // sending logging info to debug tool if enabled
+    if($A.util.getDebugToolComponent()) {
+        if (!stringVersion) {
+            if (!trace) {
+                trace = $A.logger.getStackTrace(error);
+            }
+            stringVersion = $A.logger.stringVersion(logMsg, error, trace);
+        }
+        var debugLogEvent = $A.util.getDebugToolsAuraInstance().get("e.aura:debugLog");
+        debugLogEvent.setParams({"type" : level, "message" : stringVersion});
+        debugLogEvent.fire();
+    }
+};
+//#end
 
 Aura.Utils.Logger = Logger;

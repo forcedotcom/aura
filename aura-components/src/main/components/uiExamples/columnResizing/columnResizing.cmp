@@ -16,6 +16,8 @@
 
 -->
 <aura:component>
+	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
+
 	<div class="container">
 		<ui:virtualDataGrid aura:id="grid" class="testGrid"
 			enableResizableColumns="true"

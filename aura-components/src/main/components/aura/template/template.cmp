@@ -68,21 +68,21 @@
     <html manifest="{!v.manifest}">
         <head>
             <title>{!v.title}</title>
-            <script nonce="dutchWasHere">
+            <script nonce="LockerServiceTemporaryNonce">
             var pageStartTime = (new Date()).getTime();</script>
             {!v.extraMetaTags}
 
             <!-- ====== Styles ====== -->
             {!v.auraResetTags}
-            <style nonce="dutchWasHere">
+            <style nonce="LockerServiceTemporaryNonce">
                 {!v.inlineStyle}
                 {!v.appcacheProgressBarStyle}
             </style>
             {!v.auraStyleTags}
             {!v.extraStyleTags}
-            <style nonce="dutchWasHere">{!v.auraInlineStyle}</style>
+            <style nonce="LockerServiceTemporaryNonce">{!v.auraInlineStyle}</style>
             
-          	<style nonce="dutchWasHere">
+          	<style nonce="LockerServiceTemporaryNonce">
            	.safeEvalWorker {
            		width: 10px;
            		height: 10px;
@@ -121,7 +121,7 @@
 
             {!v.auraPreInitBlock}
 
-            <script nonce="dutchWasHere">
+            <script nonce="LockerServiceTemporaryNonce">
                 if ({!v.autoInitialize}) {
                     $A.initAsync({!v.auraInit});
                 } else if ({!v.autoInitializeSync}){

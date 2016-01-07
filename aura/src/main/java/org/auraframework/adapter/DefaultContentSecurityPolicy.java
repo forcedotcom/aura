@@ -85,7 +85,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
         } else {
-            list.add("'nonce-dutchWasHere'");
+            list.add("'nonce-LockerServiceTemporaryNonce'");
         }
 
         return list;
@@ -100,7 +100,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
 	    } else {
-	        list.add("'nonce-dutchWasHere'");
+	        list.add("'nonce-LockerServiceTemporaryNonce'");
 	    }
 
         return list;

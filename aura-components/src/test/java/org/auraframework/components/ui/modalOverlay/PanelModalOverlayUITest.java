@@ -66,7 +66,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] non-modal overlay dialog closing on Esc key. Test case for W-2396326
      */
-    public void testPressEscKeyOnNonModalDialog() throws Exception {
+    public void _testPressEscKeyOnNonModalDialog() throws Exception {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_NONMODAL_BUTTON);
@@ -80,7 +80,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
      * [Accessibility] non-modal overlay dialog with transient set to false should be closing on Esc key. Test case for
      * W-2396326
      */
-    public void testPressEscKeyOnNonModalNonTransientDialog() throws Exception {
+    public void _testPressEscKeyOnNonModalNonTransientDialog() throws Exception {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_NONTRANSIENT_NONMODAL_BUTTON);
@@ -225,7 +225,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on nonModal overlay dialog should close the overlay and not trap the focus within the overlay
      */
-    public void testNonModalOverlayDialogDoesNotDoFocusTrapping()
+    public void _testNonModalOverlayDialogDoesNotDoFocusTrapping()
             throws MalformedURLException, URISyntaxException,
             InterruptedException {
         open(APP);

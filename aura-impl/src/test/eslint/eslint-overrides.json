@@ -97,7 +97,9 @@
     "SecureDocument": true,
     "SecureElement": true,
     "SecureScriptElement": true,
-    "SecureDOMEvent": true
+    "SecureIFrameElement": true,
+    "SecureDOMEvent": true,
+    "SecureAuraEvent": true
   },
 
   "rules": {

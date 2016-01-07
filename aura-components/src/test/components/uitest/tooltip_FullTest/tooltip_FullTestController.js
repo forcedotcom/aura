@@ -74,5 +74,10 @@
 	            }
 	        }).fire();
 	},
+	
+	changeText : function(cmp) {
+		var input = cmp.find("input").get('v.value');
+		cmp.find("dynamicBody").set("v.tooltipBody", input);
+	}
 
 })

@@ -102,6 +102,12 @@ IndexedDBAdapter.prototype.initialize = function(version) {
     // Set version number when changing schema ie adding index, etc
     var dbRequest,
         that = this;
+
+    // Firefox private browsing mode throws an uncatchable (except by window.onerror) InvalidStateError when
+    // indexedDB.open is called. the onerror handler is also invoked which allows us to set the adapter to a
+    // permanent error state. FYI Logging.js suppresses InvalidStateError messages.
+    // see https://bugzilla.mozilla.org/show_bug.cgi?id=781982.
+
     if (version) {
         // version is dynamic because it needs to be incremented when we need to create an objectStore
         // for the current app or cmp. IndexedDB only allows modifications to db or objectStore during
@@ -111,6 +117,7 @@ IndexedDBAdapter.prototype.initialize = function(version) {
     } else {
         dbRequest = window.indexedDB.open(this.instanceName);
     }
+
     dbRequest.onupgradeneeded = function (e) {
         that.createTables(e);
     };
@@ -321,7 +328,7 @@ IndexedDBAdapter.prototype.executeQueue = function(ready) {
     var that = this;
     var promise;
 
-    if (this.clearBeforeReady) {
+    if (this.clearBeforeReady && ready) {
         promise = new Promise(function(resolve, reject) {
             that.clearInternal(resolve, reject);
         })
@@ -740,16 +747,11 @@ IndexedDBAdapter.prototype.deleteStorageInternal = function(success, error) {
 };
 
 /**
- * Register the indexDB adapter
+ * Registers the indexedDB adapter.
  */
 IndexedDBAdapter.register = function() {
     // Always disable support for Safari (including embedded Safari eg Outlook) because its implementation is not reliable in iframe.
     if (navigator.userAgent.indexOf("AppleWebKit") !== -1 && navigator.userAgent.indexOf("Chrome") === -1) {
-        return;
-    }
-
-    // Always disable support for Firefox since it's not implemented in private mode.
-    if (navigator.userAgent.indexOf("Firefox") !== -1) {
         return;
     }
 

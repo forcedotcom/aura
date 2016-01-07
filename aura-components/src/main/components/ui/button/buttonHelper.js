@@ -19,7 +19,7 @@
     * We do the event attachment programatically to avoid
     * adding DOM handlers when no actions are provided.
     */
-    EVENT_DISPATCH: { 
+    EVENT_DISPATCH: {
         'keydown'   : 'onkeydown',
         'mouseover' : 'onmouseover',
         'mouseout'  : 'onmouseout',
@@ -30,15 +30,15 @@
 
     /*
      * In order to not attach all declared dom handlers automatically, we just
-     * attach the ones that have an action to be dispatched 
+     * attach the ones that have an action to be dispatched
     */
     initializeHandlers: function (cmp) {
         var htmlButton = cmp.find('button');
         var htmlAttr   = htmlButton.get('v.HTMLAttributes');
-        var dispatcher = cmp.getEventDispatcher();
+        var dispatcher = cmp.getConcreteComponent().getEventDispatcher();
 
         for (var e in this.EVENT_DISPATCH) {
-            if (dispatcher[e].length) {
+            if (dispatcher[e]) {
                 htmlAttr[this.EVENT_DISPATCH[e]] = cmp.getReference('c.' + e);
             }
         }

@@ -1,13 +1,16 @@
 <aura:component implements="aura:requireLocker">
-	<aura:attribute name="xss" type="String"/>
-	
+    <aura:attribute name="xss" type="String"/>
+
     <!-- DCHASMAN TODO using <script> instead of <ltng:require scripts="/resource/requireTest"/> -->
-	Hello from the LockerService!
+    Hello from the LockerService!
+
+    <aura:registerevent name="foo" type="ui:selectDate" description="The event fired when foo."/>
+
     <div aura:id="clickTest" class="clickTest">Click Me</div>
-    
+
     <ui:button aura:id="button" label="Press Me, I am secure!" press="{!c.onpress}"/>
-    
+
     <aura:unescapedHtml value="{!v.xss}"/>
-    
-    <div aura:id="content"/>    
+
+    <div aura:id="content"/>
 </aura:component>

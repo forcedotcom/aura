@@ -18,7 +18,7 @@ var SecureDOMEvent = (function() {
   "use strict";
 
   function getEvent(se) {
-    return se._get("ev", $A.lockerService.masterKey);
+    return se._get("event", $A.lockerService.masterKey);
   }
 
   function getKey(se) {
@@ -120,7 +120,7 @@ var SecureDOMEvent = (function() {
     SecureThing.call(this, key, "event");
     $A.lockerService.util.applyKey(event, key);
     // keying the event in case it is passed around by the component logic
-    this._set("ev", event, $A.lockerService.masterKey);
+    this._set("event", event, $A.lockerService.masterKey);
 
     // re-exposing externals
     for (var name in event) {

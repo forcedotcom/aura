@@ -18,6 +18,8 @@
 <aura:component>
 
     <aura:attribute name="renderItem" type="String" default="all"/>
+    <aura:attribute name="pointerBoundingRect" type="Object"/>
+    
     <aura:dependency resource="markup://uitest:tooltipTestPosition" type="COMPONENT"/>
 
         <div>
@@ -596,6 +598,26 @@
 	            </div>
 	            <div class="attribute">
 	            	tooltipBody
+	            </div>
+            </div>
+            
+              <!--
+        		Test dynamically change tooltip body and verify positioning
+       	 	-->
+        
+        
+            <div class="blocks">
+	            <div class="case">
+	                <h1>Dynamic Text</h1>
+	                <ui:tooltip aura:id="dynamicBody" class="dynamicBody" advanced="true" trigger="hover">
+	                	<ui:button aura:id="changeTextBtn" class="changeTextBtn" label="Change Text" press="{!c.changeText}"/>
+	                </ui:tooltip>
+	            </div>
+	            <div class="case">
+	            	<ui:inputText aura:id="input" class="input" ></ui:inputText>
+	            </div>
+	            <div class="attribute">
+	            	Dynamic Tooltip Body Text
 	            </div>
             </div>
             

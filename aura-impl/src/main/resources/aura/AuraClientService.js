@@ -129,8 +129,9 @@ Aura.Services.AuraClientService$AuraActionCollector = function AuraActionCollect
  *  * actionsDeferred - actions that have been processed through storage, but need to go to the server.
  *
  * @constructor
+ * @export
  */
-AuraClientService = function AuraClientService () {
+function AuraClientService () {
     this._host = "";
     this._token = null;
     this._isDisconnected = false;
@@ -216,7 +217,7 @@ AuraClientService = function AuraClientService () {
 
     this.handleAppCache();
 
-};
+}
 
 AuraClientService.BOOTSTRAP_KEY = "appBootstrap";
 

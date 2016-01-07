@@ -639,7 +639,7 @@ AuraInstance.prototype.beforeInitHooks = function () {
 };
 
 /*
- * Execute all the functions that have been injected after the framework is initialized 
+ * Execute all the functions that have been injected after the framework is initialized
  * (the app component tree has been created and rendered)
 */
 AuraInstance.prototype.afterInitHooks = function () {
@@ -1152,6 +1152,7 @@ AuraInstance.prototype.uninstallOverride = function(name, fn) {
  * @public
  * @function
  * @platform
+ * @export
  */
 AuraInstance.prototype.getRoot = function() {
     return this.root;
@@ -1481,13 +1482,12 @@ window['aura'] = window['$A'];
 // #include aura.Logging
 // #include {"modes" : ["DOC","TESTING","AUTOTESTING", "TESTINGDEBUG", "AUTOTESTINGDEBUG"], "path" : "aura.test.Test"}
 
-/* 
+/*
  * Async Bootstrap dependency
- * The scripts are loaded with no order, which means 
+ * The scripts are loaded with no order, which means
  * we need to call iniAsync in case it was already evaluated
 */
 Aura["frameworkJsReady"] = true;
 if (Aura["initConfig"]) {
   $A.initAsync(Aura["initConfig"]);
 }
-

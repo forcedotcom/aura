@@ -576,7 +576,7 @@
     testAgeBasedEviction: {
         test: function(cmp) {
             // set min sweep interval to 1ms
-            AuraStorage.SWEEP_INTERVAL.MIN = 1;
+            // AuraStorage.SWEEP_INTERVAL.MIN = 1;
 
             var storage = $A.storageService.initStorage({
                 name: "ageBasedEviction",

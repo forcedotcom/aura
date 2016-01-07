@@ -573,8 +573,8 @@
         test: [
            function setup(cmp) {
                // force rapid sweeps so test runs quickly
-               AuraStorage.SWEEP_INTERVAL.MIN = 1;
-               AuraStorage.SWEEP_INTERVAL.MAX = 2;
+               // AuraStorage.SWEEP_INTERVAL.MIN = 1;
+               // AuraStorage.SWEEP_INTERVAL.MAX = 2;
 
                // store max size
                var maxSize = 400;

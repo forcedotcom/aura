@@ -83,7 +83,7 @@
 
     addChildren : function (cmp, children, base, levels) {
         cmp.set("v.children", children);
-        
+
         this.reindex(cmp, children[0]);
         this.reindex(cmp, children[1]);
 
@@ -93,7 +93,7 @@
 
     reindex: function(cmp, child) {
         var valueProvider = child.getAttributeValueProvider();
-        while(valueProvider instanceof PassthroughValue){
+        while(valueProvider && valueProvider.getComponent){
             valueProvider = valueProvider.getComponent();
         }
         if(valueProvider) {

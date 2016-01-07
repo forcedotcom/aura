@@ -17,6 +17,11 @@
 var goog = {};
 
 /**
+ * Reference to the global context.  In most cases this will be 'window'.
+ */
+goog.global = this;
+
+/**
  * Exports a property unobfuscated into the object's namespace.
  * ex. goog.exportProperty(Foo, 'staticFunction', Foo.staticFunction);
  * ex. goog.exportProperty(Foo.prototype, 'myMethod', Foo.prototype.myMethod);
@@ -51,7 +56,7 @@ goog.exportProperty = function(object, publicName, symbol) {
  */
 goog.exportSymbol = function(publicPath, opt_object, opt_objectToExportTo) {
     var parts = publicPath.split('.');
-    var cur = opt_objectToExportTo || window;
+    var cur = opt_objectToExportTo || goog.global;
 
   // Internet Explorer exhibits strange behavior when throwing errors from
   // methods externed in this manner.  See the testExportSymbolExceptions in

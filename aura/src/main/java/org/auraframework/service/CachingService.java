@@ -63,8 +63,6 @@ public interface CachingService extends AuraService {
 
     Cache<String, String> getClientLibraryOutputCache();
 
-    Cache<String, Set<String>>  getClientLibraryUrlsCache();
-
     Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getDefDescriptorByNameCache();
 
     Lock getReadLock();

@@ -17,13 +17,22 @@
 
 var SecureThing = (function() {
 	"use strict";
+
+	function primaryThing(st) {
+		return st._get(st._getPrimaryName($A.lockerService.masterKey), $A.lockerService.masterKey);
+	}
+
+	function getKey(st) {
+		return $A.lockerService.util._getKey(st, $A.lockerService.masterKey);
+	}
+
 	/**
 	 * Construct a new SecureThing.
-	 * 
+	 *
 	 * @public
 	 * @class
 	 * @constructor
-	 * 
+	 *
 	 * @param {String}
 	 *            name - name of the secure getter for the wrapped thing
 	 * @param {Object}
@@ -70,37 +79,6 @@ var SecureThing = (function() {
 		this._set = this["_set"];
 	}
 
-	return SecureThing;
-})();
-
-(function() {
-	"use strict";
-
-	SecureThing.prototype.filterNodes = function(raw) {
-		if (!raw) {
-			return undefined;
-		}
-
-		var key = $A.lockerService.util._getKey(this, $A.lockerService.masterKey);
-		if (raw.length !== undefined) {
-			var filtered = [];
-			for (var n = 0; n < raw.length; n++) {
-				var e = raw[n];
-				if ($A.lockerService.util.hasAccess(this, e)) {
-					filtered.push(new SecureElement(e, key));
-				}
-			}
-
-			return filtered;
-		} else {
-			return $A.lockerService.util.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
-		}
-	};
-
-	function primaryThing(that) {
-		return that._get(that._getPrimaryName($A.lockerService.masterKey), $A.lockerService.masterKey);
-	}
-
 	SecureThing.createFilteredMethod = function(methodName) {
 		return {
 			value : function() {
@@ -117,7 +95,7 @@ var SecureThing = (function() {
 				var raw = thing[propertyName];
 				$A.lockerService.util.verifyAccess(this, raw);
 
-				var key = $A.lockerService.util._getKey(this, $A.lockerService.masterKey);
+				var key = getKey(this);
 				return new SecureElement(raw, key);
 			}
 		};
@@ -131,7 +109,7 @@ var SecureThing = (function() {
 			}
 		};
 	};
-	
+
 	SecureThing.createPassThroughProperty = function(name) {
 		return {
 			get : function() {
@@ -142,4 +120,32 @@ var SecureThing = (function() {
 			}
 		};
 	};
+
+	SecureThing.prototype = {
+		filterNodes: function(raw) {
+			if (!raw) {
+				return undefined;
+			}
+
+			var key = getKey(this);
+			if (raw.length !== undefined) {
+				var filtered = [];
+				for (var n = 0; n < raw.length; n++) {
+					var e = raw[n];
+					if ($A.lockerService.util.hasAccess(this, e)) {
+						filtered.push(new SecureElement(e, key));
+					}
+				}
+
+				return filtered;
+			} else {
+				return $A.lockerService.util.hasAccess(this, raw) ? new SecureElement(raw, key) : undefined;
+			}
+		}
+	};
+
+	SecureThing.prototype.constructor = SecureThing;
+
+	return SecureThing;
+
 })();

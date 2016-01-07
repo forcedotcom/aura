@@ -31,7 +31,7 @@ var SecureScriptElement = (function() {
 					if (xhr.readyState === 4 && xhr.status === 200) {
 						$A.lockerService.create(xhr.responseText, $A.lockerService.util._getKey(this, $A.lockerService.masterKey));
 					}
-					
+
 					// DCHASMAN TODO W-2837800 Add in error handling for 404's etc
 				};
 
@@ -62,7 +62,7 @@ var SecureScriptElement = (function() {
 			}
 		}
 	});
-	
+
 	SecureScriptElement.prototype.constructor = SecureScriptElement;
 
 	return SecureScriptElement;

@@ -15,6 +15,10 @@
 		cmp.set("v.log", log);
 	},
 
+	getAlert: function(cmp) {
+	    cmp.set("v.log", alert.toString());
+	},
+
 	getSecureElementFromMarkup : function(cmp) {
 		var div = cmp.find("content").getElement();
 		cmp.set("v.log", div);

@@ -653,7 +653,7 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isLockerServiceEnabled() {
-		return false; // DCHASMAN TODO Flip this to true once we get all of Aura OS working with CSP unsafe-inline/unsafe-eval removed from the main document
+		return true;
 	}
 	
 	protected boolean isSafeEvalWorkerURI(String uri) {

@@ -634,11 +634,11 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         if ("HTML".equals(format)) {
             String defType = request.getParameter("aura.deftype");
             if ("APPLICATION".equals(defType) || "COMPONENT".equals(defType)) {
-                inlineStyle = false;  // apps and components allow inlines.  Sigh.
+                inlineStyle = !isLockerServiceEnabled();
             }
         } else {
         	// Look for /auraFW/resources/lockerservice/safeEval.html
-        	inlineStyle = request.getRequestURI().equals("/auraFW/resources/lockerservice/safeEval.html");
+        	inlineStyle = isSafeEvalWorkerURI(request.getRequestURI());
         }
         
         return new DefaultContentSecurityPolicy(inlineStyle);
@@ -653,6 +653,10 @@ public class ConfigAdapterImpl implements ConfigAdapter {
 
 	@Override
 	public boolean isLockerServiceEnabled() {
-		return true;
+		return false; // DCHASMAN TODO Flip this to true once we get all of Aura OS working with CSP unsafe-inline/unsafe-eval removed from the main document
+	}
+	
+	protected boolean isSafeEvalWorkerURI(String uri) {
+		return uri.equals("/auraFW/resources/lockerservice/safeEval.html");
 	}
 }

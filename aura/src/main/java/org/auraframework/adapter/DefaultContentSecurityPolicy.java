@@ -84,6 +84,7 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         list.add("chrome-extension:");
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
+            list.add(CSP.UNSAFE_EVAL);
         } else {
             list.add("'nonce-LockerServiceTemporaryNonce'");
         }

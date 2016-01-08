@@ -17,16 +17,16 @@
 -->
 <aura:component implements="ui:focusable" description="A container for ui:pill" extensible="true" support="PROTO">
 
-    <aura:attribute name="items" type="List"/>
+    <aura:attribute name="items" type="List" description="A list of pill items."/>
     <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
     <aura:attribute name="maxLines" type="Integer" default="0" description="Maximum lines to show. Hidden lines can be expanded. Use 0 to disable."/>
     <aura:attribute name="focusOnInput" type="Boolean" default="true" description="Focus on input box when the component is created."/>
     <aura:attribute name="allowRemove" type="Boolean" default="true" description="Allows deleting pills from container."/>
     <aura:attribute name="pillInput" type="Aura.Component[]" description="An input component that will be added to the end of the list of pills"/>
-    <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button"/>
-    <aura:attribute name="pillFlavor" type="String" default="default"/>
-    <aura:attribute name="assistiveTextLabel" type="String"  description="Assitive text for the pill container"/>
-    <aura:attribute name="expanded" type="Boolean" default="false" access="private"/>
+    <aura:attribute name="showMoreLabel" type="String" default="Show More &#9662;" description="The label for the show more button. The default is 'Show More&#9662;'."/>
+    <aura:attribute name="pillFlavor" type="String" default="default" description="The flavor for the pills."/>
+    <aura:attribute name="assistiveTextLabel" type="String"  description="Assistive text for the pill container."/>
+    <aura:attribute name="expanded" type="Boolean" default="false" access="private" description="Used internally by the pill container to specify whether the pill list is expanded or collapsed. The default is false."/>
 
     <!-- events -->
     <aura:handler name="blur" event="ui:blur" action="{!c.onInputFocus}"/>

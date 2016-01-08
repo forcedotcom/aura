@@ -75,6 +75,19 @@ datagrid.appendItems(rowData);</pre>
 		</p>
 		
 		<h4>Resizing Columns</h4>
+		<p>Column resizing is configured by the <code>ui:virtualDataGridLib</code> library in <code>columnResize.js</code>. You can configure the following attributes.</p>
+		<ul>
+		    <li>container: The container to use for column resizing, which determines where your cursor can be dragged to</li>
+			<li>initialWidths: An array of widths in pixels</li>
+			<li>step: The width to resize the column by when the keyboard is used</li>
+			<li>minWidth: The minimum width of the column in pixels</li>
+			<li>maxWidth: The minimum width of the column in pixels</li>
+			<li>indicatorClasses: The classes for the indicator element, which shows how the column is resized</li>
+			<li>contentSpanClasses: The classes to be added to the content span tag in the column header</li>
+			<li>headerSpanClasses: The classes to be added to the first span tag in the column header</li>
+			<li>assistiveLabel: The label specified for the <code>aria-label</code> tag, which is "Column Width" by default</li>		
+		</ul>
+		
 		<p>Enable column resizing so users can easily adjust their column widths. To set the initial widths of the columns, specify the widths in an <code>init</code> event.
 		Set the <code>enableResizableColumns</code> attribute to <code>true</code>.</p>
 		<pre>&lt;aura:attribute name="initialWidths" type="Integer[]" default="[200, 400, 100]" />
@@ -89,18 +102,16 @@ datagrid.appendItems(rowData);</pre>
         initialWidths : cmp.get("v.initialWidths")
     });
 }</pre>
-		<h5>Setting the Resize Configuration</h5>
-		<p>The column resizing configuration is set by the <code>ui:virtualDataGridLib</code> library in <code>columnResize.js</code>. You can overwrite the default attribute configuration.</p>
-		<ul>
-			<li>initialWidths: An array of widths in pixels.</li>
-			<li>step: The width to resize the column by when the keyboard is used</li>
-			<li>minWidth: The minimum width of the column in pixels</li>
-			<li>maxWidth: The minimum width of the column in pixels</li>
-			<li>indicatorClasses: The classes for the indicator element, which shows how the column is resized</li>
-			<li>contentSpanClasses: The classes to be added to the content span tag in the column header</li>
-			<li>headerSpanClasses: The classes to be added to the first span tag in the column header</li>
-			<li>assistiveLabel: The label specified for the <code>aria-label</code> tag, which is "Column Width" by default</li>		
-		</ul>
+		<p>When resizing columns, your cursor might extend outside the default container, which is the data grid's parent container. 
+		This condition causes resizing to stop at the position that the resizing event handling is lost. To prevent this, update the container configuration using the <code>container</code> attribute.
+		For example, setting the container to the document body enables you to drag the cursor outside the data grid.</p>
+<pre>init : function(cmp, evt, helper) {
+    var config = {
+        container : document.body	
+    };
+    cmp.find("grid").set("v.resizableColumnsConfig", config);
+}</pre>		
+		<p>For multiple resizable tables on a page, scope the events to the data grid or the data grid's parent container instead of the document body.</p>
 		
 		<h4>Handling Actions in a Grid</h4>
 		<p>

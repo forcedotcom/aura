@@ -119,7 +119,7 @@
 
         if ($A.util.isExpression(valueExpression)) {
             var action = valueExpression.evaluate();
-            this.dispatchAction(action, event, ownerComponent);
+            this.dispatchAction(action, event);
         }
     },
 
@@ -281,4 +281,4 @@
             attribute.removeChangeHandler(component, "HTMLAttributes." + name);
         }
     }
-});
+})// eslint-disable-line semi

@@ -70,7 +70,6 @@ public class CachingServiceImpl implements CachingService {
     private final Cache<String, Set<DefDescriptor<?>>> descriptorFilterCache;
     private final Cache<String, DependencyEntry> depsCache;
     private final Cache<String, String> clientLibraryOutputCache;
-    private final Cache<String, Set<String>> clientLibraryUrlsCache;
     private final Cache<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> defDescriptorByNameCache;
 
     private static final Logger logger = Logger.getLogger(CachingServiceImpl.class);
@@ -126,14 +125,6 @@ public class CachingServiceImpl implements CachingService {
                 .setName("clientLibraryOutputCache")
                 .setRecordStats(true).build();
 
-        size = getCacheSize("aura.cache.clientLibraryUrlsCacheSize", CLIENT_LIB_CACHE_SIZE);
-        clientLibraryUrlsCache = this.<String, Set<String>> getCacheBuilder()
-                .setInitialSize(size)
-                .setMaximumSize(size)
-                 .setSoftValues(true)
-                .setName("clientLibraryUrlsCache")
-                .setRecordStats(true).build();
-
         size = getCacheSize("aura.cache.defDescByNameCacheSize", 1024 * 20);
         defDescriptorByNameCache =
                 this.<DefDescriptor.DescriptorKey, DefDescriptor<? extends Definition>> getCacheBuilder()
@@ -172,11 +163,6 @@ public class CachingServiceImpl implements CachingService {
     @Override
     public final Cache<String, String> getClientLibraryOutputCache() {
         return clientLibraryOutputCache;
-    }
-
-    @Override
-    public final Cache<String, Set<String>> getClientLibraryUrlsCache() {
-        return clientLibraryUrlsCache;
     }
 
     @Override

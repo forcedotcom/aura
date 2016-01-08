@@ -344,26 +344,31 @@ CryptoAdapter.prototype.getItem = function(key) {
 CryptoAdapter.prototype.getItemInternal = function(key, resolve, reject) {
     var that = this;
     this.adapter.getItem(key)
-    .then(function(value) {
-        // key not found
-        if ($A.util.isUndefinedOrNull(value)) {
-            resolve();
-            return;
-        }
+    .then(
+        function(value) {
+            // key not found
+            if ($A.util.isUndefinedOrNull(value)) {
+                resolve();
+                return;
+            }
 
-        if (that.isCrypto()) {
-            that.decrypt(value).then(
-                function (decrypted) {
-                    resolve(decrypted);
-                },
-                function (err) {
-                    reject(err);
-                }
-            );
-        } else {
-            resolve(value);
+            if (that.isCrypto()) {
+                that.decrypt(value).then(
+                    function (decrypted) {
+                        resolve(decrypted);
+                    },
+                    function (err) {
+                        reject(err);
+                    }
+                );
+            } else {
+                resolve(value);
+            }
+        },
+        function(e) {
+            reject(e);
         }
-    });
+    );
 };
 
 /**
@@ -400,42 +405,45 @@ CryptoAdapter.prototype.decrypt = function(value) {
  */
 CryptoAdapter.prototype.getAll = function() {
     var that = this;
-    var execute = function(success, error) {
+    var execute = function(resolve, reject) {
         that.adapter.getAll()
-        .then(function(items) {
+        .then(
+            function(items) {
+                if (that.isCrypto()) {
+                    var results = [];
+                    var promises = [];
 
-            if (that.isCrypto()) {
-                var results = [];
-                var promises = [];
+                    var captureResults = function (key, decrypted) {
+                        decrypted["key"] = key;
+                        results.push(decrypted);
+                    };
 
-                var captureResults = function (key, decrypted) {
-                    decrypted["key"] = key;
-                    results.push(decrypted);
-                };
-
-                // use bind() to curry a function specific to each item, capturing its key.
-                // decrypt returns only the decrypted value, not the other properties.
-                for (var i in items) {
-                    promises.push(
-                        that.decrypt(items[i])
-                            .then(captureResults.bind(undefined, items[i]["key"]))
-                    );
-                }
-
-                // when all items are decrypted we can return the full result set
-                Promise["all"](promises).then(
-                    function () {
-                        success(results);
-                    },
-                    function (err) {
-                        error(new Error("getAll(): decryption failed: " + err));
+                    // use bind() to curry a function specific to each item, capturing its key.
+                    // decrypt returns only the decrypted value, not the other properties.
+                    for (var i in items) {
+                        promises.push(
+                            that.decrypt(items[i])
+                                .then(captureResults.bind(undefined, items[i]["key"]))
+                        );
                     }
-                );
-            } else {
-                success(items);
-            }
 
-        });
+                    // when all items are decrypted we can return the full result set
+                    Promise["all"](promises).then(
+                        function () {
+                            resolve(results);
+                        },
+                        function (err) {
+                            reject(new Error("getAll(): decryption failed: " + err));
+                        }
+                    );
+                } else {
+                    resolve(items);
+                }
+            },
+            function(e) {
+                reject(e);
+            }
+        );
 
     };
     return this.enqueue(execute);

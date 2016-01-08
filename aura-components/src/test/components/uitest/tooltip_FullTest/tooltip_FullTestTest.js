@@ -407,21 +407,24 @@
 		test: function(component) {
 			var triggers = ['bodyNormallabel', 'bodyManylabel', 'bodyHTMLlabel', 'bodyEmptylabel'];
 			var tooltips = ['bodyNormal', 'bodyMany', 'bodyHTML', 'bodyEmpty'];
-			var expectedBodies = ["This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
-			                      "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
-			                      "<h1>Hello</h1>",
-			                      ""]
+			var expectedBodies = {
+								  "bodyNormal" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
+			                      "bodyMany"   : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
+			                      "bodyHTML"   : "<h1>Hello</h1>",
+			                      "bodyEmpty"  : ""
+			                   	  };
 			var tooltipElem = "";
 			var wrapper = "";
 			var trigger = "";
 			var tt = "";
 			for(var i = 0; i < triggers.length; i++) {
+				var tooltip = tooltips[i];
 				trigger = component.find(triggers[i]).getElement();
-				tt = component.find(tooltips[i]);
+				tt = component.find(tooltip);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
-				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-				$A.test.assertEquals(expectedBodies[i], $A.test.getText(wrapper).trim(), "Content of the tooltip did not match expected for tooltip with aura:id = " + tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltip);
+				$A.test.assertEquals(expectedBodies[tooltip], $A.test.getText(wrapper).trim(), "Content of the tooltip did not match expected for tooltip with aura:id = " + tooltip);
 				
 			}
 		
@@ -587,20 +590,10 @@
     		var modals =$A.test.select(".uiModal");
  
     		if(action == "open") {
-    			if(modals.length > 0){
-        			return true;
-        		}
-        		else{
-        			return false;
-        		}
+    			return (modals.length > 0);		
     		}
     		else {
-    			if(modals.length == 0){
-    				return true;
-    			}
-    			else {
-    				return false;
-    			}		
+    			return (modals.length == 0);
     		}
     			
     	}, "Could not complete action: " + action);

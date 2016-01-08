@@ -15,6 +15,7 @@
     limitations under the License.
 
 -->
-<aura:application access="global" useAppcache="true" render="client">
-    <appCache:slate/>
-</aura:application>
+<aura:component>
+    <p> I'm outer cmp that contains a inner cmp in markup, the inner cmp's name has wrong case </p>
+    <auratest:TESTMarkupCaseSensitivityInnerCmp/>
+</aura:component>

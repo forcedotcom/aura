@@ -20,7 +20,8 @@
 				"(1.2).constructor.constructor('return this')()",
 				"(new Date()).constructor.constructor('return this')()",
 				"''.substring.call.call(({})[\"constructor\"].getOwnPropertyDescriptor(''.substring.__pro"
-						+ "to__, \"constructor\").value, null, \"return this;\")()", "var evil = ev" + "al; (\"indirect\", evil)(\"this\")",
+						+ "to__, \"constructor\").value, null, \"return this;\")()",
+				"var evil = ev" + "al; (\"indirect\", evil)(\"this\")",
 				"(\"indirect\", ev" + "al )(\"(new Function('return this'))()\")" ].forEach(helper.testSymbol.bind({
 			component : component,
 			helper : helper

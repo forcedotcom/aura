@@ -32,11 +32,29 @@
 <pre>blur: function(component) {
    component.getEvent("blur").fire();
 }</pre>		
-
+		<h4>Methods</h4>
+		<p><code>insertItems()</code></p>
+		<p>Adds an array of pill items in the format <code>[{name:'name', id:'id'}, ...]</code>.</p>
+<pre>initializePills: function (cmp) {
+    var pills = [{id:'pill01',label:"HTML",icon: {url:'path/to/url'}},
+            {id:'pill02',label:"CSS",icon: {url:'path/to/url'}}];
+  
+    var pillContainer = component.find("pillContainer");
+    pillContainer.insertItems(pills);
+}</pre>		
+		<p><code>collapse()</code></p>
+		<p>Collapses the pill list to the number of lines specified in the maxLines attribute.</p>
+		<p><code>expand()</code></p>
+		<p>Expands the pill list after being collapsed from the collapse method.</p> 
 		<p>See the Examples tab for more information.</p>
 	</aura:description>	
+	<aura:example name="pillAutocompleteExample" ref="uitest:pillContainer_WithAutocomplete" label="Creating Pills using Autocomplete">
+    	<p>This pill container handles the <code>pillInserted</code> and <code>pillRemoved</code> events and contains an input field.</p>
+	   Type "test" and select an autocomplete option to see how it works.
+	   </aura:example>
+	   
 		<aura:example name="pillExample1" ref="uitest:pillContainer_WithTextInput" label="Creating Pills in an Input Field">
-    	<p>This pill container handles the <code>pillInserted</code> and <code>pillRemoved</code> events and contains an input field that's wired up to the <code>ui:eventLib</code> library.</p>
+    	<p>This pill container handles the <code>pillInserted</code> and <code>pillRemoved</code> events and contains an input field.</p>
 	   Type a string of text and press enter to see how it works.
 	   </aura:example>	
 		

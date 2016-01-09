@@ -546,6 +546,9 @@ Aura.Utils.Util.prototype.swapClass = function(element, oldClass, newClass){
     }
 };
 
+/**
+ * @private
+ */
 Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
     var constructedClass='';
     if(this.isComponent(element)){
@@ -583,6 +586,9 @@ Aura.Utils.Util.prototype.setClass=function(element,newClass,remove){
     }
 };
 
+/**
+ * @private
+ */
 Aura.Utils.Util.prototype.buildClass=function(oldClass, newClass, remove){
     if(this.isUndefinedOrNull(oldClass)) {
         oldClass='';
@@ -1535,7 +1541,10 @@ Aura.Utils.Util.prototype.attachToDocumentBody = function(element) {
     }
 };
 /**
-* Check for substrings at the end
+* Check for substrings at the end.
+* @param {String} fullstr The string to check against.
+* @param {String} substr The substring to look for at the end.
+* @returns {Boolean} True if fullstr ends with substr.
 * @export
 */
 Aura.Utils.Util.prototype.stringEndsWith = function(fullstr, substr) {
@@ -1953,7 +1962,7 @@ Aura.Utils.Util.prototype.emptyComponentTrash = function() {
  * @param {HTMLElement} container The element you think is the outermost container.
  * @param {HTMLElement} element The element you think is buried inside the container.
  * @returns {Boolean} Returns true if 'element' is indeed inside 'container', false otherwise.
-* @export
+ * @export
  */
 Aura.Utils.Util.prototype.contains = function(container, element) {
     if ($A.util.isElement(container) && $A.util.isElement(element)) {
@@ -1975,7 +1984,7 @@ Aura.Utils.Util.prototype.contains = function(container, element) {
 
 /**
  * Simple event squasher.
-
+ *
  * @param {UIEvent} event the DOM event to squash
  * @param {Boolean} preventDefault if preventDefault() should also be called
  * @export
@@ -1997,7 +2006,7 @@ Aura.Utils.Util.prototype.squash = function(event, preventDefault) {
 
 /**
  * Strip off html tags from html codes.
-
+ *
  * @param {String} input the input html codes
  * @param {Array} tags the html tag names to be removed
  * @return {String} an output string without those specified tags
@@ -2252,7 +2261,12 @@ Aura.Utils.Util.prototype.setText = function(node, text) {
         return t;
     };
 
-    /** @export */
+    /**
+     * Loads a JavaScript resource.
+     * @param {String} url The URL of the JavaScript resource to load.
+     * @param {Function} callback Callback function that is invoked when the resource is loaded.
+     * @export
+     */
     Aura.Utils.Util.prototype.includeScript = function(url, callback) {
         if (this.isUndefined(this.includeScript.cache)) {
             this.includeScript.cache = {};

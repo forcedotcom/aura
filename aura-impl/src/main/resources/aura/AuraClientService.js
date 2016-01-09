@@ -1791,7 +1791,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         if (action.isChained()) {
             continue;
         }
-        actionsToSend.push(action);
+        actionsToSend.push(action.prepareToSend());
     }
     if (actionsToSend.length === 0) {
         return false;
@@ -1799,6 +1799,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     var processed = false;
     var qs;
+
     try {
         var params = {
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),

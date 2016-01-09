@@ -22,6 +22,8 @@
 
     <auraStorage:init name="actions" secure="true" debugLoggingEnabled="true" defaultExpiration="60" defaultAutoRefreshInterval="60"/>
 
+    <ui:button label="Run two server actions (enqueue)" press="{!c.twoActions}" aura:id="twoActions"/>
+
     <ui:button label="Run server action in foreground" press="{!c.cExecuteInForeground}" aura:id="executeInForeground"/>
     <p/>
     <ui:button label="Run server action in foreground with return" press="{!c.cExecuteInForegroundWithReturn}" aura:id="executeInForegroundWithReturn"/>

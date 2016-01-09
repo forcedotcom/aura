@@ -108,7 +108,6 @@ TransportMetricsPlugin.prototype.bind = function () {
     $A.installOverride("ClientService.receive", this.receiveOverride, this);
 };
 
-//#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
 TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
     var procesedMarks = [];
@@ -130,7 +129,6 @@ TransportMetricsPlugin.prototype.postProcess = function (transportMarks) {
 
     return procesedMarks;
 };
-//#end
 
 TransportMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("ClientService.send", this.sendOverride);

@@ -23,22 +23,22 @@ public interface DateConverter {
      * This will format dates based on the JDK's default timezone. For ISO8601
      * formatting, this is not a problem.
      */
-    public String format(Date date);
+    String format(Date date);
 
     /**
      * This will format dates based on the timeZone passed in.
      */
-    public String format(Date date, TimeZone timeZone);
+    String format(Date date, TimeZone timeZone);
 
     /**
      * This will parse dates based on the JDK's default timezone. For ISO8601
      * parsing, this works well as the timezone is built into the format.
      */
-    public Date parse(String date);
+    Date parse(String date);
 
     /**
      * This will parse dates based on the timeZone passed in. Use this, and
      * you'll predictable dates come out the parsing.
      */
-    public Date parse(String date, TimeZone timeZone);
+    Date parse(String date, TimeZone timeZone);
 }

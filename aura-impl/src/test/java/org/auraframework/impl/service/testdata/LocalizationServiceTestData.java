@@ -66,8 +66,8 @@ public final class LocalizationServiceTestData {
     /**
      * Test data for Date
      */
-    public static final String[] PASS_DATE_STRINGS = { "February 29, 2008", // leap
-                                                                            // year
+    public static final String[] PASS_DATE_STRINGS = {
+            "February 29, 2008", // leap year
             "January 1, 2000", // Y2K
             "December 31, 1999" // Day before Y2K
     };

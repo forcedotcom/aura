@@ -16,6 +16,7 @@
 package org.auraframework.util.date;
 
 import java.text.DateFormat;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -71,9 +72,17 @@ public class DateServiceTest extends UnitTestCase {
     };
     public static final int[] DATE_TIME_STYLES = { DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG,
         DateFormat.FULL, -1 };
-    public static final String[] SIMPLE_DATE_FORMAT_PATTERNS = { "yyyy.MM.dd G 'at' HH:mm:ss z", "EEE, MMM d, ''yy",
-        "h:mm a", "hh 'o''clock' a, zzzz", "K:mm a, z", "yyyyy.MMMMM.dd GGG hh:mm aaa",
-        "EEE, d MMM yyyy HH:mm:ss Z", "yyMMddHHmmssZ", "yyyy-MM-dd'T'HH:mm:ss.SSSZ" };
+    public static final String[] SIMPLE_DATE_FORMAT_PATTERNS = {
+            "yyyy.MM.dd G 'at' HH:mm:ss z",
+            "eee, MMM d, yyyy",
+            "h:mm a",
+            "hh 'o''clock' a, zzzz",
+            "K:mm a, z",
+            "yyyyy.MMMMM.dd GGG hh:mm a",
+            "eee, d MMM yyyy HH:mm:ss Z",
+            "yyMMddHHmmssZ",
+            "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    };
 
     public List<LocaleConfig> getConfigs() {
         List<LocaleConfig> configs = new ArrayList<>();
@@ -332,7 +341,7 @@ public class DateServiceTest extends UnitTestCase {
                         + "\t\tParsed date:" + parsedDate.getTime() + "\t\tLocale:" + l.getDisplayName()
                         + "\t\tTimeZone:" + tz.getID() + "\t\tSimpleDateFormat pattern:" + pattern + "\n";
                         sb.append(text);
-                    } catch (IllegalArgumentException e) {
+                    } catch (IllegalArgumentException | DateTimeParseException e) {
                         sb.append(e.getMessage() + "\n");
                     }
                 }
@@ -358,21 +367,21 @@ public class DateServiceTest extends UnitTestCase {
             DateServiceImpl.get().getDateTimeStyleConverter(Locale.US, -1, -1);
         } catch (IllegalArgumentException e) {
             assertEquals("# Incorrect exception message for api getDateTimeStyleConverter(Locale.US, -1, -1)",
-                    "Style '--' is invalid", e.getMessage());
+                    "Both date style and time style cannot be none", e.getMessage());
         }
 
         try {
             DateServiceImpl.get().getDateStyleConverter(Locale.US, -1);
         } catch (IllegalArgumentException e) {
             assertEquals("# Incorrect exception message for api getDateStyleConverter(Locale.US, -1)",
-                    "Style '--' is invalid", e.getMessage());
+                    "Both date style and time style cannot be none", e.getMessage());
         }
 
         try {
             DateServiceImpl.get().getTimeStyleConverter(Locale.US, -1);
         } catch (IllegalArgumentException e) {
             assertEquals("# Incorrect exception message for api getTimeStyleConverter(Locale.US, -1)",
-                    "Style '--' is invalid", e.getMessage());
+                    "Both date style and time style cannot be none", e.getMessage());
         }
     }
 
@@ -381,25 +390,13 @@ public class DateServiceTest extends UnitTestCase {
             DateServiceImpl.get().getDateTimeStyleConverter(null, -0, -0);
         } catch (IllegalArgumentException e) {
             assertEquals("# Incorrect exception message for api getDateTimeStyleConverter(null, -0, -0)",
-                    "Both dateStyle and timeStyle are invalid", e.getMessage());
+                    "Locale must be provided", e.getMessage());
         }
         try {
-            DateServiceImpl.get().getDateStyleConverter(null, -0);
-        } catch (IllegalArgumentException e) {
-            assertEquals("# Incorrect exception message for api getDateStyleConverter(null, -0)",
-                    "Style '--' is invalid", e.getMessage());
-        }
-        try {
-            DateServiceImpl.get().getTimeStyleConverter(null, -0);
-        } catch (IllegalArgumentException e) {
-            assertEquals("# Incorrect exception message for api getTimeStyleConverter(null, -0)",
-                    "Style '--' is invalid", e.getMessage());
-        }
-        try {
-            DateServiceImpl.get().getPatternConverter(null, null);
+            DateServiceImpl.get().getPatternConverter(Locale.US, null);
         } catch (IllegalArgumentException e) {
             assertEquals("# Incorrect exception message for api getPatternConverter(null, null)",
-                    "Invalid pattern specification", e.getMessage());
+                    "Pattern must be provided", e.getMessage());
         }
         try {
             DateServiceImpl.get().getStyle(null);

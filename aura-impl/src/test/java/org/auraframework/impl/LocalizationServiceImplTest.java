@@ -18,6 +18,7 @@ package org.auraframework.impl;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,20 +26,11 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.auraframework.Aura;
-import org.auraframework.adapter.LocalizationAdapter;
 import org.auraframework.impl.service.testdata.LocalizationServiceTestData;
 import org.auraframework.service.LocalizationService;
 import org.auraframework.test.util.AuraTestCase;
-import org.auraframework.util.AuraLocale;
-import org.auraframework.util.date.DateConverter;
-import org.auraframework.util.date.DateService;
-import org.auraframework.util.date.DateServiceImpl;
 import org.auraframework.util.number.AuraNumberFormat;
 import org.auraframework.util.test.annotation.UnAdaptableTest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import com.ibm.icu.text.NumberFormat;
 
@@ -70,27 +62,6 @@ public class LocalizationServiceImplTest extends AuraTestCase {
             String actualEN = localizationService.formatDate(dateEN, Locale.GERMAN, TimeZone.getTimeZone("CEST"),
                     DateFormat.FULL);
 
-            // ***** TODO remove debugging code  ****/
-            LocalizationAdapter adaptor = Aura.getLocalizationAdapter();
-            AuraLocale auraLocale = adaptor.getAuraLocale();
-            System.out.println(String.format("LocalizationAdaptor: %s, AuraLocale: %s, Locale: %s",
-                    adaptor.getClass().getName(), auraLocale.getClass().getName(), auraLocale.getLocale().getDisplayName()));
-
-            DateService dateService = DateServiceImpl.get();
-            DateConverter dateConverter = dateService.getDateStyleConverter(Locale.GERMAN, DateFormat.FULL);
-            String formattedDate = dateConverter.format(dateEN, TimeZone.getTimeZone("CEST"));
-
-            String pattern = DateTimeFormat.patternForStyle("F-", Locale.GERMAN);
-            DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern).withLocale(Locale.GERMAN);
-            DateTimeZone dtz = DateTimeZone.forTimeZone(TimeZone.getTimeZone("CEST"));
-            DateTime dt = new DateTime(dateEN);
-            String formattedDate2 = formatter.withZone(dtz).print(dt);
-
-            System.out.println(String.format("DateService: %s, DateConverter: %s, Formatted Date: %s, Manual Formatted Date: %s",
-                    dateService.getClass().getName(), dateConverter.getClass().getName(), formattedDate, formattedDate2));
-
-            // ***** debugging code  ****/
-
             assertEquals("Failed to convert date from English to German locale", expectedDE, actualEN);
         }
         // Locale: English -> Simplified Chinese
@@ -120,7 +91,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
     public void testDateTimeParserBorderCases() {
         for (String dt : LocalizationServiceTestData.PASS_DATE_STRINGS) {
             try {
-                localizationService.parseDate(dt, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.MEDIUM);
+                localizationService.parseDate(dt, Locale.ENGLISH, TimeZone.getTimeZone("PST"), DateFormat.LONG);
             } catch (Exception e) {
                 fail("Failed to parse valid date \'" + dt + "\', error: " + e);
             }
@@ -170,7 +141,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                         DateFormat.FULL);
                 fail("# Exception not thrown for date:" + EN_DATE_STRING);
             } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof IllegalArgumentException)));
+                assertTrue("# Incorrect exception type!", ((e instanceof DateTimeParseException)));
             }
         }
 
@@ -182,7 +153,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                         DateFormat.FULL);
                 fail("# Exception not thrown for date:" + US_TIME_STRING);
             } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof IllegalArgumentException)));
+                assertTrue("# Incorrect exception type!", ((e instanceof DateTimeParseException)));
             }
         }
 
@@ -194,7 +165,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                         TimeZone.getTimeZone("UTC"), DateFormat.MEDIUM, DateFormat.FULL);
                 fail("# Exception not thrown for date:" + US_DATE_TIME_STRING);
             } catch (Exception e) {
-                assertTrue("# Incorrect exception type!", ((e instanceof IllegalArgumentException)));
+                assertTrue("# Incorrect exception type!", ((e instanceof DateTimeParseException)));
             }
         }
     }
@@ -209,7 +180,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                     fail("No Exception thrown when trying to parse \'" + t + "\' into Time");
                 } catch (Exception e) {
                     // Expected
-                    assertTrue("# Incorrect exception type!", ((e instanceof IllegalArgumentException)));
+                    assertTrue("# Incorrect exception type!", ((e instanceof DateTimeParseException)));
                 }
             }
         }
@@ -278,7 +249,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 fail("parseDateTimeToCalendar(\"\", null, null, -1, -1) did not throw an exception");
             } catch (Exception e) {
                 // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Style '--' is invalid");
+                checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
             }
 
             try {
@@ -286,7 +257,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 fail("parseDateTime(\"\") did not throw an exception");
             } catch (Exception e) {
                 // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
+                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
             }
 
             try {
@@ -294,7 +265,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 fail("parseTimeToCalendar(\"\", null, null, -1) did not throw an exception");
             } catch (Exception e) {
                 // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Style '--' is invalid");
+                checkExceptionContains(e, IllegalArgumentException.class, "Both date style and time style cannot be none");
             }
 
             try {
@@ -302,7 +273,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 fail("parseTime(\"\") did not throw an exception");
             } catch (Exception e) {
                 // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
+                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
             }
 
             try {
@@ -310,7 +281,7 @@ public class LocalizationServiceImplTest extends AuraTestCase {
                 fail("parseDate(\"\") did not throw an exception");
             } catch (Exception e) {
                 // TODO(W-1482880): same as testDateTimeParserExceptions()
-                checkExceptionContains(e, IllegalArgumentException.class, "Invalid format: \"\"");
+                checkExceptionContains(e, DateTimeParseException.class, "Text '' could not be parsed at index 0");
             }
 
             try {

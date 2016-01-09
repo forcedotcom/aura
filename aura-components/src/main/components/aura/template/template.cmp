@@ -81,14 +81,6 @@
             {!v.auraStyleTags}
             {!v.extraStyleTags}
             <style nonce="LockerServiceTemporaryNonce">{!v.auraInlineStyle}</style>
-            
-          	<style nonce="LockerServiceTemporaryNonce">
-           	.safeEvalWorker {
-           		width: 10px;
-           		height: 10px;
-           		background-color: gray;
-           	}
-            </style>
         <!-- ==================== -->
         </head>
 
@@ -102,7 +94,7 @@
 	            <div class="logo"/>
 	            <div class="spinner"/>
 	            <h2>{!v.loadingText}</h2>
-	        </div>
+	          </div>
             <div aura:id="auraErrorMask" class="{! 'auraMsgMask' + ( v.forceError ? ' auraForcedErrorBox' : '' )}" >
                 <div class="auraMsgBox auraErrorBox" aura:id="auraError">
                     <h2>
@@ -112,6 +104,7 @@
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
                 </div>
             </div>
+            <iframe id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" width="0" height="0" tabindex="-1" class="invisible">&nbsp;</iframe>
 
             {!v.body}
 
@@ -156,9 +149,7 @@
             {!v.auraInitBlock}
 
             {!v.auraNamespacesScriptTags}
-            
-          	<iframe aura:id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" class="safeEvalWorker"></iframe>
-          
+
         </body>
     </html>
 </aura:component>

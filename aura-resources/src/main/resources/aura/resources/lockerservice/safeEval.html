@@ -8,8 +8,11 @@
 
       var isStrictModeAvailable = (function () { return !this; })();
       var validIdentifierEx = /^[a-z$_][a-z0-9$_]*$/i;
-      var returnableEx = /^[{(["']/; // TODO: improve returnable detection
-      var trimCommentsLeftEx = /^\/\/.*\n?/; // TODO: improve first comment removal
+      // TODO: improve returnable detection. `function (...` is a trick used today
+      //       to return arbitrary code from actions, it should be legacy in the future.
+      var returnableEx = /^\s*([{(["']|function\s*\()/;
+      // TODO: improve first comment removal
+      var trimCommentsLeftEx = /^\/\/.*\n?/;
       var hookFn = '$globalEvalIIFE$';
       var USE_STRICT = true;
 

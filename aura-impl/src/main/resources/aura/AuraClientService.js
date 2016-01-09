@@ -1166,7 +1166,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                 //
                 if (loaded === false || force) {
                     err = err || "";
-                    throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                    $A.reportError("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                    return;
                 }
 
                 if (!loaded) {

@@ -15,17 +15,22 @@
  */
 package org.auraframework.util.date;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -65,74 +70,16 @@ public class DateServiceImpl implements DateService {
     }
 
     /**
-     * Converts dateStyle and timeStyle to joda-equivalents, and calls
-     * getStyleConverter.
-     */
-    @Override
-    public DateConverter getDateTimeStyleConverter(Locale locale, int dateStyle, int timeStyle) {
-        StyleType date = intToStyleTypeMap.get(dateStyle);
-        StyleType time = intToStyleTypeMap.get(timeStyle);
-        String style;
-        if ((date != null) && (time != null)) {
-            style = date.getJodaNameStyle() + time.getJodaNameStyle();
-        } else if (date != null) {
-            style = date.getJodaNameStyle() + "-";
-        } else if (time != null) {
-            style = "-" + time.getJodaNameStyle();
-        } else {
-            throw new IllegalArgumentException("Both dateStyle and timeStyle are invalid");
-        }
-        return getStyleConverter(locale, style);
-    }
-
-    /**
-     * Calls getDateTimeStyleConverter, with DateService.NONE for timeStyle.
-     */
-    @Override
-    public DateConverter getDateStyleConverter(Locale locale, int dateStyle) {
-        return getDateTimeStyleConverter(locale, dateStyle, DateService.NONE);
-    }
-
-    /**
-     * Calls getDateTimeStyleConverter, with DateService.NONE for dateStyle.
-     */
-    @Override
-    public DateConverter getTimeStyleConverter(Locale locale, int timeStyle) {
-        return getDateTimeStyleConverter(locale, DateService.NONE, timeStyle);
-    }
-
-    /**
-     * SimpleDateFormat pattern - e.g. yyyy/MM/dd
-     */
-    @Override
-    public DateConverter getPatternConverter(Locale locale, String pattern) {
-        return new JodaDateConverter(DateTimeFormat.forPattern(pattern).withLocale(locale));
-    }
-
-    @Override
-    public int getStyle(String style) {
-        if (style == null) {
-            throw new IllegalArgumentException("Style is null");
-        }
-        style = style.trim().toLowerCase();
-        StyleType st = nameToStyleTypeMap.get(style);
-        if (st == null) {
-            throw new IllegalArgumentException("Unknown style name '" + style + "'");
-        } else {
-            return st.getIntStyle();
-        }
-    }
-
-    /**
-     * Expects a two character style string, based on joda-time's style syntax:
-     * 
-     * @see <a
-     *      href="http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html#patternForStyle(java.lang.String, java.util.Locale)">DateTimeFormat</a>
-     *      <p>
-     *      Style and results:
-     *      <p>
-     * 
-     *      <pre>
+     * Returns converter based on locale, date style, and time style
+     *
+     * <p/>
+     * * @see <a
+     * href="http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html#patternForStyle(java.lang.String, java.util.Locale)">DateTimeFormat</a>
+     * <p/>
+     * Style and results:
+     * <p/>
+     * <p/>
+     * <pre>
      * SS   6/1/12 10:37 PM
      * SM   6/1/12 10:37:14 PM
      * SL   6/1/12 10:37:14 PM UTC
@@ -159,75 +106,166 @@ public class DateServiceImpl implements DateService {
      * -F   10:37:14 PM UTC
      * </pre>
      */
-    private DateConverter getStyleConverter(Locale locale, String style) {
-        if (style.length() != 2) {
-            throw new IllegalArgumentException(
-                    "expecting two characters:  S, M, L, or F.  Use - to indicate that date or time should be repressed.");
+    @Override
+    public DateConverter getDateTimeStyleConverter(Locale locale, int dateStyle, int timeStyle) {
+
+        if (locale == null) {
+            throw new IllegalArgumentException("Locale must be provided");
         }
-        String pattern = DateTimeFormat.patternForStyle(style, locale);
-        return new JodaDateConverter(DateTimeFormat.forPattern(pattern).withLocale(locale));
+
+        StyleType date = intToStyleTypeMap.get(dateStyle);
+        StyleType time = intToStyleTypeMap.get(timeStyle);
+
+        if (date == null) {
+            throw new IllegalArgumentException("Date style is invalid");
+        }
+
+        if (time == null) {
+            throw new IllegalArgumentException("Time style is invalid");
+        }
+
+        FormatStyle dateFormat = date.getFormatStyle();
+        FormatStyle timeFormat = time.getFormatStyle();
+
+        DateTimeFormatter formatter;
+
+        if (dateFormat == null && timeFormat == null) {
+            throw new IllegalArgumentException("Both date style and time style cannot be none");
+        } else if (dateFormat == null) {
+            formatter = DateTimeFormatter.ofLocalizedTime(timeFormat);
+        } else if (timeFormat == null) {
+            formatter = DateTimeFormatter.ofLocalizedDate(dateFormat);
+        } else {
+            formatter = DateTimeFormatter.ofLocalizedDateTime(dateFormat, timeFormat);
+        }
+
+        return new JodaConverter(formatter.withLocale(locale));
     }
 
-    private static enum StyleType {
+    /**
+     * Calls getDateTimeStyleConverter, with DateService.NONE for timeStyle.
+     */
+    @Override
+    public DateConverter getDateStyleConverter(Locale locale, int dateStyle) {
+        return getDateTimeStyleConverter(locale, dateStyle, DateService.NONE);
+    }
 
-        SHORT(DateService.SHORT, "short", "S"), MEDIUM(DateService.MEDIUM, "medium", "M"), LONG(DateService.LONG,
-                "long", "L"), FULL(DateService.FULL, "full", "F"), NONE(DateService.NONE, "none", "-");
+    /**
+     * Calls getDateTimeStyleConverter, with DateService.NONE for dateStyle.
+     */
+    @Override
+    public DateConverter getTimeStyleConverter(Locale locale, int timeStyle) {
+        return getDateTimeStyleConverter(locale, DateService.NONE, timeStyle);
+    }
+
+    /**
+     * SimpleDateFormat pattern - e.g. yyyy/MM/dd
+     */
+    @Override
+    public DateConverter getPatternConverter(Locale locale, String pattern) {
+        if (locale == null) {
+            throw new IllegalArgumentException("Locale must be provided");
+        }
+        if (pattern == null) {
+            throw new IllegalArgumentException("Pattern must be provided");
+        }
+        return new JodaConverter(DateTimeFormatter.ofPattern(pattern, locale));
+    }
+
+    @Override
+    public int getStyle(String style) {
+        if (style == null) {
+            throw new IllegalArgumentException("Style is null");
+        }
+        style = style.trim().toLowerCase();
+        StyleType st = nameToStyleTypeMap.get(style);
+        if (st == null) {
+            throw new IllegalArgumentException("Unknown style name '" + style + "'");
+        } else {
+            return st.getIntStyle();
+        }
+    }
+
+    private enum StyleType {
+
+        SHORT(DateService.SHORT, FormatStyle.SHORT, "short", "S"),
+        MEDIUM(DateService.MEDIUM, FormatStyle.MEDIUM, "medium", "M"),
+        LONG(DateService.LONG, FormatStyle.LONG, "long", "L"),
+        FULL(DateService.FULL, FormatStyle.FULL, "full", "F"),
+        NONE(DateService.NONE, null, "none", "-");
 
         int dateFormat;
         String nameStyle;
         String jodaNameStyle;
+        FormatStyle formatStyle;
 
-        StyleType(int intStyle, String nameStyle, String jodaNameStyle) {
+        StyleType(int intStyle, FormatStyle formatStyle, String nameStyle, String jodaNameStyle) {
             this.dateFormat = intStyle;
             this.nameStyle = nameStyle;
             this.jodaNameStyle = jodaNameStyle;
+            this.formatStyle = formatStyle;
         }
 
         String getNameStyle() {
-            return nameStyle;
+            return this.nameStyle;
         }
 
         int getIntStyle() {
-            return dateFormat;
+            return this.dateFormat;
         }
 
         String getJodaNameStyle() {
-            return jodaNameStyle;
+            return this.jodaNameStyle;
+        }
+
+        FormatStyle getFormatStyle() {
+            return this.formatStyle;
         }
     }
 
     private static Map<Integer, StyleType> intToStyleTypeMap = new ImmutableMap.Builder<Integer, StyleType>()
-            .put(StyleType.SHORT.getIntStyle(), StyleType.SHORT).put(StyleType.MEDIUM.getIntStyle(), StyleType.MEDIUM)
-            .put(StyleType.LONG.getIntStyle(), StyleType.LONG).put(StyleType.FULL.getIntStyle(), StyleType.FULL)
-            .put(StyleType.NONE.getIntStyle(), StyleType.NONE).build();
+            .put(StyleType.SHORT.getIntStyle(), StyleType.SHORT)
+            .put(StyleType.MEDIUM.getIntStyle(), StyleType.MEDIUM)
+            .put(StyleType.LONG.getIntStyle(), StyleType.LONG)
+            .put(StyleType.FULL.getIntStyle(), StyleType.FULL)
+            .put(StyleType.NONE.getIntStyle(), StyleType.NONE)
+            .build();
 
     private static Map<String, StyleType> nameToStyleTypeMap = new ImmutableMap.Builder<String, StyleType>()
             .put(StyleType.SHORT.getNameStyle(), StyleType.SHORT)
-            .put(StyleType.MEDIUM.getNameStyle(), StyleType.MEDIUM).put(StyleType.LONG.getNameStyle(), StyleType.LONG)
-            .put(StyleType.FULL.getNameStyle(), StyleType.FULL).put(StyleType.NONE.getNameStyle(), StyleType.NONE)
+            .put(StyleType.MEDIUM.getNameStyle(), StyleType.MEDIUM)
+            .put(StyleType.LONG.getNameStyle(), StyleType.LONG)
+            .put(StyleType.FULL.getNameStyle(), StyleType.FULL)
+            .put(StyleType.NONE.getNameStyle(), StyleType.NONE)
             .build();
 
     /**
-     * Format: yyyy-MM-dd'T'HH:mm:ss.SSSZZ
+     * Format: yyyy-MM-dd'T'HH:mm:ss.SSSXXX
      */
-    private static DateConverter ISO_8601_DATETIME = new ISO8601JodaDateConverter(ISODateTimeFormat.dateTime());
+    private static DateConverter ISO_8601_DATETIME = new ISO8601DateTimeConverter(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    );
 
     /**
      * Format: yyyy-MM-dd
      */
-    private static DateConverter ISO_8601_DATE = new ISO8601JodaDateConverter(ISODateTimeFormat.date());
+    private static DateConverter ISO_8601_DATE = new ISO8601DateTimeConverter(
+            DateTimeFormatter.ISO_LOCAL_DATE
+    );
 
     /**
-     * Format: yyyy-MM-dd'T'HH:mmZ
+     * Format: yyyy-MM-dd'T'HH:mm'Z'
      */
-    private static DateConverter ISO_8601_DATETIME_NO_SECONDS = new ISO8601JodaDateConverter(
-            DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm'Z'"));
+    private static DateConverter ISO_8601_DATETIME_NO_SECONDS = new ISO8601DateTimeConverter(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'")
+    );
 
     /**
-     * Format: yyyy-MM-dd'T'HH:mm:ssZ
+     * Format: yyyy-MM-dd'T'HH:mm:ss'Z'
      */
-    private static DateConverter ISO_8601_DATETIME_SECONDS = new ISO8601JodaDateConverter(
-            DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+    private static DateConverter ISO_8601_DATETIME_SECONDS = new ISO8601DateTimeConverter(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+    );
 
     /**
      * Tries a number of ISO formats when converting a Date to a String. String
@@ -235,8 +273,11 @@ public class DateServiceImpl implements DateService {
      */
     private static DateConverter ISO_8601_ANY = new DateConverter() {
 
-        private final List<DateConverter> isoConversions = ImmutableList.of(ISO_8601_DATETIME,
-                ISO_8601_DATETIME_NO_SECONDS, ISO_8601_DATETIME_SECONDS, ISO_8601_DATE);
+        private final List<DateConverter> isoConversions = ImmutableList.of(
+                ISO_8601_DATETIME,
+                ISO_8601_DATETIME_NO_SECONDS,
+                ISO_8601_DATETIME_SECONDS,
+                ISO_8601_DATE);
 
         /**
          * Uses ISO_8601_DATETIME.
@@ -263,7 +304,7 @@ public class DateServiceImpl implements DateService {
             for (DateConverter format : isoConversions) {
                 try {
                     return format.parse(date, timeZone);
-                } catch (IllegalArgumentException e) {
+                } catch (DateTimeParseException | IllegalArgumentException e) {
                     // try the next one
                 }
             }
@@ -287,11 +328,11 @@ public class DateServiceImpl implements DateService {
         }
     };
 
-    private static class JodaDateConverter implements DateConverter {
+    private static class JodaConverter implements DateConverter {
 
-        private final DateTimeFormatter formatter;
+        protected final DateTimeFormatter formatter;
 
-        protected JodaDateConverter(DateTimeFormatter formatter) {
+        protected JodaConverter(DateTimeFormatter formatter) {
             this.formatter = formatter;
         }
 
@@ -308,9 +349,8 @@ public class DateServiceImpl implements DateService {
             if (timeZone == null) {
                 throw new IllegalArgumentException("TimeZone can not be null");
             }
-            DateTimeZone dtz = DateTimeZone.forTimeZone(timeZone);
-            DateTime dt = new DateTime(date);
-            return formatter.withZone(dtz).print(dt);
+
+            return formatter.withZone(timeZone.toZoneId()).format(date.toInstant());
         }
 
         @Override
@@ -326,8 +366,32 @@ public class DateServiceImpl implements DateService {
             if (timeZone == null) {
                 throw new IllegalArgumentException("TimeZone can not be null");
             }
-            DateTimeZone dtz = DateTimeZone.forTimeZone(timeZone);
-            return formatter.withZone(dtz).parseDateTime(date).toDate();
+
+            TemporalAccessor temporalAccessor = formatter.parse(date);
+
+            LocalDate qld = temporalAccessor.query(TemporalQueries.localDate());
+            LocalTime qlt = temporalAccessor.query(TemporalQueries.localTime());
+            ZoneOffset qzo = temporalAccessor.query(TemporalQueries.offset());
+
+            Instant instant;
+
+            if (qlt == null && qld == null) {
+                throw new IllegalArgumentException("Could not parse");
+            } else if (qlt == null) {
+                LocalDate ld = LocalDate.from(temporalAccessor);
+                instant = ld.atStartOfDay(timeZone.toZoneId()).toInstant();
+            } else if (qld == null) {
+                LocalTime lt = LocalTime.from(temporalAccessor);
+                instant = LocalDate.ofEpochDay(0).atTime(lt).atZone(timeZone.toZoneId()).toInstant();
+            } else {
+                if (qzo != null) {
+                    instant = ZonedDateTime.from(temporalAccessor).toInstant();
+                } else {
+                    instant = LocalDateTime.from(temporalAccessor).atZone(timeZone.toZoneId()).toInstant();
+                }
+            }
+
+            return Date.from(instant);
         }
 
     }
@@ -336,11 +400,11 @@ public class DateServiceImpl implements DateService {
      * Allows ISO8601 converters to default to GMT instead of the JDK's
      * timezone. Makes things more predictable - especially for testing.
      */
-    private static class ISO8601JodaDateConverter extends JodaDateConverter {
+    private static class ISO8601DateTimeConverter extends JodaConverter {
 
         private static TimeZone ISO8601_DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT");
 
-        protected ISO8601JodaDateConverter(DateTimeFormatter formatter) {
+        protected ISO8601DateTimeConverter(DateTimeFormatter formatter) {
             super(formatter);
         }
 
@@ -355,5 +419,4 @@ public class DateServiceImpl implements DateService {
         }
 
     }
-
 }

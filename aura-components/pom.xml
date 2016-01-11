@@ -387,6 +387,7 @@
                                 <goals>
                                     <goal>grunt</goal>
                                 </goals>
+                                <phase>pre-clean</phase>
                                 <configuration>
                                     <arguments>--no-color eslint:components</arguments>
                                 </configuration>

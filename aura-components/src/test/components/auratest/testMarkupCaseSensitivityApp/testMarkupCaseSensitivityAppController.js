@@ -66,19 +66,23 @@
     //in markup, lib
     tryOutLibs : function(cmp) {
     	var helper = cmp.getDef().getHelper();
-    	var basicFirst = helper.importED.basicFirst(); //"BASIC1"
-    	console.log(basicFirst);
-    	
-    	var basicSecond = helper.importED.expectsImport(); //"IMPORTS1:BASIC2"
-    	console.log(basicSecond);
-    	
-    	var basicFirstAgain = helper.importED.expectsImportAlso(); 
-    	//$A.test.assertEquals("IMPORTS2:BASIC1", helper.imported.EXPECTSImportAlso());
-    	console.log(basicFirstAgain);
-    	
-    	var firstVar = helper.importED.hasVars();
-    	//"I was exported. I imported: undefined"
-    	console.log(firstVar);
+    	var importED = helper.importED;
+    	if(importED) {
+    		var str = "";
+    		for(var item in importED) { 
+    			if(item) { 
+    				str=str+item+":";
+    				if(importED[item] instanceof Function) {
+    					str = str + importED[item]() + ";";
+    				} else {
+    					str = str + importED[item] + ";";
+    				}
+    			} 
+    		};
+    		cmp.set("v.output", str);
+    	} else {
+    		cmp.set("v.output", "helper.importED should exsit, what happened?")
+    	}
     },
     
     tryOutClientLibs: function(cmp) {

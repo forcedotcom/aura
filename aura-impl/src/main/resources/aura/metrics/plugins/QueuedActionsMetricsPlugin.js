@@ -27,11 +27,11 @@ var QueuedActionsMetricsPlugin = function QueuedActionsMetricsPlugin(config) {
     this["enabled"] = true;
 };
 
-QueuedActionsMetricsPlugin.NAME = "queuedActions";
+QueuedActionsMetricsPlugin.NAME = "actions";
 
 /** @export */
 QueuedActionsMetricsPlugin.prototype.initialize = function (metricsService) {
-    this.collector = metricsService;
+    this.metricsService = metricsService;
     if (this["enabled"]) {
         this.bind(metricsService);
     }
@@ -41,7 +41,7 @@ QueuedActionsMetricsPlugin.prototype.initialize = function (metricsService) {
 QueuedActionsMetricsPlugin.prototype.enable = function () {
     if (!this["enabled"]) {
         this["enabled"] = true;
-        this.bind(this.collector);
+        this.bind(this.metricsService);
     }
 };
 
@@ -49,49 +49,61 @@ QueuedActionsMetricsPlugin.prototype.enable = function () {
 QueuedActionsMetricsPlugin.prototype.disable = function () {
     if (this["enabled"]) {
         this["enabled"] = false;
-        this.unbind(this.collector);
+        this.unbind(this.metricsService);
     }
 };
 
 QueuedActionsMetricsPlugin.prototype.enqueueActionOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
     var action = arguments[0];
-    var ret = config["fn"].apply(config["scope"], arguments);
-    var stampMark = this.collector["markStart"](QueuedActionsMetricsPlugin.NAME, 'dispatch');
-    stampMark["phase"] = 'stamp'; //mark as a stamp metric
-    stampMark["context"] = {
+
+    this.metricsService["mark"](QueuedActionsMetricsPlugin.NAME, 'enqueue', {
         "id"         : action.getId(),
-        //"params"     : action.getParams(),
         "abortable"  : action.isAbortable(),
         "storable"   : action.isStorable(),
         "background" : action.isBackground(),
         "state"      : action.getState(),
         "isRefresh"  : action.isRefreshAction(),
         "defName"    : action.getDef().name
-    };
+    });
+
+    var ret = config["fn"].apply(config["scope"], arguments);
     return ret;
+};
+
+QueuedActionsMetricsPlugin.prototype.actionSendOverride = function() {
+    var config = Array.prototype.shift.apply(arguments);
+    var actions = arguments[1];
+
+    for (var i = 0; i < actions.length; i++) {
+        this.metricsService["markStart"](QueuedActionsMetricsPlugin.NAME, 'send', {
+            "id" : actions[i].getId()
+        });
+    }
+
+    return config["fn"].apply(config["scope"], arguments);
 };
 
 QueuedActionsMetricsPlugin.prototype.actionFinishOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
-    var action = config["self"];
-    this.markStart(action);
-    var ret = config["fn"].apply(config["scope"], arguments);
-    this.markEnd(action);
-    return ret;
+    this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
+        "id" : config["self"].getId()
+    });
+
+    return config["fn"].apply(config["scope"], arguments);
 };
 
 QueuedActionsMetricsPlugin.prototype.actionAbortOverride = function() {
     var config = Array.prototype.shift.apply(arguments);
-    var action = config["self"];
-    this.markStart(action);
-    var ret = config["fn"].apply(config["scope"], arguments);
-    this.markEnd(action);
-    return ret;
+    this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'send', {
+        "id" : config["self"].getId()
+    });
+
+    return config["fn"].apply(config["scope"], arguments);
 };
 
 QueuedActionsMetricsPlugin.prototype.markStart = function(action) {
-    var startMark = this.collector["markStart"](QueuedActionsMetricsPlugin.NAME, 'dispatch');
+    var startMark = this.metricsService["markStart"](QueuedActionsMetricsPlugin.NAME, 'finish');
     startMark["context"] = {
         "id"         : action.getId(),
         //"params"     : action.getParams(),
@@ -105,7 +117,7 @@ QueuedActionsMetricsPlugin.prototype.markStart = function(action) {
 };
 
 QueuedActionsMetricsPlugin.prototype.markEnd = function(action) {
-    var endMark = this.collector["markEnd"](QueuedActionsMetricsPlugin.NAME, 'dispatch');
+    var endMark = this.metricsService["markEnd"](QueuedActionsMetricsPlugin.NAME, 'finish');
     endMark["context"] = {
         "id"            : action.getId(),
         "isFromStorage" : action.isFromStorage(),
@@ -114,55 +126,54 @@ QueuedActionsMetricsPlugin.prototype.markEnd = function(action) {
 };
 
 QueuedActionsMetricsPlugin.prototype.bind = function () {
+    // Time of $A.enqueue
     $A.installOverride("enqueueAction", this.enqueueActionOverride, this);
-    $A.installOverride("Action.finishAction", this.actionFinishOverride, this);
+
+    // Time when the action is sent or aborted
+    $A.installOverride("ClientService.send", this.actionSendOverride, this);
     $A.installOverride("Action.abort", this.actionAbortOverride, this);
+
+    // Time when the action is done
+    $A.installOverride("Action.finishAction", this.actionFinishOverride, this);
 };
 
-//#if {"excludeModes" : ["PRODUCTION"]}
 /** @export */
 QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
     var processedMarks = [];
     var queue  = {};
 
-    // All this loops are to get all actions in the same bundle
+    // This loop is to assemble the action time
     for (var i = 0; i < actionMarks.length; i++) {
-        var action = actionMarks[i];
-        var id = action["context"]["id"];
-        var phase = action["phase"];
+        var actionMark = actionMarks[i];
+        var id = actionMark["context"]["id"];
+        var phase = actionMark["phase"];
         var mark = queue[id];
 
         if (phase === 'stamp') {
-            if (action["context"]["state"] === "NEW") {
-                queue[id] = $A.util.apply({}, action, true, true);
-            } else {
-                // finished at enqueue (aborted)
-                processedMarks.push(action);
-            }
-            action["enqueuets"] = action["ts"];
+            queue[id] = $A.util.apply({}, actionMark, true, true);
         } else if (phase === 'start') {
             if (mark) {
-                mark["context"] = $A.util.apply(mark["context"], action["context"]);
-                mark["wait"] = action["ts"] - mark["ts"];
-                mark["ts"] = action["ts"];
+                mark["enqueueWait"] = actionMark["ts"] - mark["ts"];
             } else {
-                queue[id] = $A.util.apply({}, action, true, true);
+                // @TODO: @dval: We hit this sometimes, figure out when and why in PROD
+                queue[id] = $A.util.apply({ "wait" : 0 }, actionMark, true, true);
             }
         } else if (phase === 'end' && mark) {
-            mark["context"]  = $A.util.apply(mark["context"], action["context"]);
-            mark["duration"] = action["ts"] - mark["ts"];
+            mark["context"]["state"] = actionMark["context"]["state"];
+            mark["duration"] = actionMark["ts"] - mark["ts"];
             processedMarks.push(mark);
             delete queue[id];
         }
     }
+
     return processedMarks;
 };
-//#end
 
 QueuedActionsMetricsPlugin.prototype.unbind = function () {
     $A.uninstallOverride("enqueueAction", this.enqueueActionOverride);
-    $A.uninstallOverride("Action.finishAction", this.actionFinishOverride);
+    $A.uninstallOverride("ClientService.send", this.actionSendOverride, this);
     $A.uninstallOverride("Action.abort", this.actionAbortOverride);
+    $A.uninstallOverride("Action.finishAction", this.actionFinishOverride);
 };
 
 $A.metricsService.registerPlugin({

@@ -4,6 +4,9 @@
   "dependencies": {
     "grunt": "~0.4.5",
     "grunt-cli": "~0.1.13",
-    "grunt-eslint":"^10.0.0"
+    "grunt-eslint":"^11.0.0"
+  },
+  "scripts": {
+    "test": "node ./aura-util/src/test/tools/xUnit/xUnit.js.Console.js"
   }
 }

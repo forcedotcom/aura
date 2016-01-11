@@ -17,8 +17,17 @@
     handleMouseover: function(component, event, helper) {
         helper.setFocus(component);
     },
-    
+
     setFocus: function(component, event, helper) {
         helper.setFocus(component);
+    },
+
+    select: function(component, event, helper) {
+        var hideMenu = $A.util.getBooleanValue(component.get("v.hideMenuAfterSelected"));
+        var focusTrigger = $A.util.getBooleanValue(component.get("v.focusTriggerAfterSelected"));
+        helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": focusTrigger});
+
+        return false;
     }
+
 })// eslint-disable-line semi

@@ -22,7 +22,7 @@
         <h2>Checkbox - Metadata driven menu</h2>
         <ui:menu>
             <ui:menuTriggerLink aura:id="metadatatrigger" label="Snow Resorts"/>
-            <ui:menuList menuItems="{!m.resorts}"/>
+            <ui:menuList menuItems="{!m.resorts}" hideMenuAfterSelected="false"/>
         </ui:menu>
     </div>
     <div style="display:inline-block;width:50%;">
@@ -43,7 +43,7 @@
         <h2>Actions - Metadata driven menu</h2>
         <ui:menu>
             <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
-            <ui:menuList class="actionMenu" menuItems="{!m.places}" menuSelect="{!c.pickPlace}"/>
+            <ui:menuList class="actionMenu" menuItems="{!m.places}" menuSelect="{!c.pickPlace}" hideMenuAfterSelected="false"/>
         </ui:menu> 
     </div>
     <div style="display:inline-block;width:50%;">
@@ -64,7 +64,7 @@
         <h2>Example: how to get menu selected values</h2>
         <ui:menu>
             <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
-            <ui:menuList class="checkboxMenu" aura:id="checkboxMenu" menuItems="{!m.data}"/>
+            <ui:menuList class="checkboxMenu" aura:id="checkboxMenu" menuItems="{!m.data}" hideMenuAfterSelected="false"/>
         </ui:menu>
         <p/>
         <ui:button class="checkboxButton" aura:id="checkboxButton" press="{!c.getMenuSelected}" label="Check the selected menu items"/>
@@ -93,7 +93,7 @@
         <h2>Example: custom Image Menu Item</h2>
         <ui:menu>
             <ui:menuTriggerLink aura:id="imageTrigger" class="imageLink" label="Tiger"/>
-            <ui:menuList aura:id="tigerMenu" class="inline" menuItems="{!m.images}" menuSelect="{!c.pickTiger}"/>
+            <ui:menuList aura:id="tigerMenu" class="inline" menuItems="{!m.images}" menuSelect="{!c.pickTiger}" hideMenuAfterSelected="false"/>
         </ui:menu>
    </div>
 </div>

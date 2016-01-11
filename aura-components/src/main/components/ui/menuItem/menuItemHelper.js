@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 ({
-    typeMap : {
+    typeMap: {
         "action": "ui:actionMenuItem",
         "checkbox": "ui:checkboxMenuItem",
         "radio": "ui:radioMenuItem",
         "separator": "ui:menuItemSeparator"
-        
+
     },
-    
-    addMenuItemDomEvents : function(component) {
+
+    addMenuItemDomEvents: function (component) {
         var events = ["click", "keydown", "mouseover"];
-        for (var i=0, len=events.length; i < len; i++) {
+        for (var i = 0, len = events.length; i < len; i++) {
             // We need to fire these events for status update anyway
             if (!component.hasEventHandler(events[i])) {
                 this.addDomHandler(component, events[i]);
@@ -35,52 +35,57 @@
      * Override
      *
      */
-     fireEvent : function (component, event, helper) {
-        if (component.get("v.disabled") === true && event.type !== "mouseover") {
+    fireEvent: function (component, event, helper) {
+        if (this.isDisabled(component) && event.type !== "mouseover") {
             return;
         }
         var e = component.getEvent(event.type);
         helper.setEventParams(e, event);
         e.fire();
-     },
-  
-   fireSelectEvent: function(component, event, options) {
-    	options = options || {};
+    },
+
+    isDisabled: function (component) {
+        return component.get("v.disabled") === true;
+    },
+
+    fireSelectEvent: function (component, event, options) {
+        if (this.isDisabled(component)) {
+            return;
+        }
+
+        options = options || {};
         var e = component.getEvent("menuSelect");
         if (e) {
             e.setParams({
-                selectedItem: event.getSource(),
+                selectedItem: component,
                 "hideMenu": options.hideMenu,
                 "deselectSiblings": options.deselectSiblings,
                 "focusTrigger": options.focusTrigger
             });
             e.fire();
         }
-    },
+    }/*eslint-disable no-unused-vars*/,
     /**
      * Select the menu item when Space bar is pressed
      *
      */
-    handleSpacekeydown: function(component, event) {
-    	if (component.get("v.disabled") === true) {
+    handleSpacekeydown: function (component, event) {
+        if (this.isDisabled(component)) {
             return;
         }
-        var e = component.getEvent("click");
-        this.setEventParams(e, event);
-        e.fire();
+        component.select();
     },
-    
-    preEventFiring: function(component, event) {
+
+    preEventFiring: function (component, event) {
         this.supportKeyboardInteraction(component, event);
     },
-    
-    setDisabled : function(component) {
-    	var concreteCmp = component.getConcreteComponent();
+
+    setDisabled: function (component) {
+        var concreteCmp = component.getConcreteComponent();
         var linkCmp = this.getAnchorElement(component);
         var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem) {
-            var disabled = concreteCmp.get("v.disabled");
-            if (disabled === true) {
+            if (this.isDisabled(concreteCmp)) {
                 $A.util.removeClass(elem, "selectable");
                 elem.setAttribute("aria-disabled", "true");
             } else {
@@ -89,40 +94,41 @@
             }
         }
     },
-    
-    setFocus: function(component) {
+
+    setFocus: function (component) {
         var linkCmp = this.getAnchorElement(component);
         var elem = linkCmp ? linkCmp.getElement() : null;
         if (elem && elem.focus) {
             elem.focus();
         }
     },
-    
-    getAnchorElement: function(component) {
-    	//Walk up the component ancestor to find the contained component by localId
-    	var localId = "link", c =  component.getConcreteComponent();
-    	var retCmp = null;    	
-    	while (c) {    		    		
-    		retCmp = c.find(localId);
-    		if (retCmp) {
-    			break;
-    		}
-    		c = c.getSuper();
-    	}
-    	return retCmp;
+
+    getAnchorElement: function (component) {
+        //Walk up the component ancestor to find the contained component by localId
+        var localId = "link", c = component.getConcreteComponent();
+        var retCmp = null;
+        while (c) {
+            retCmp = c.find(localId);
+            if (retCmp) {
+                break;
+            }
+            c = c.getSuper();
+        }
+        return retCmp;
     },
-    
+
     /**
      * Handle keyboard interactions
      *
      */
-    supportKeyboardInteraction: function(component, event) {
+    supportKeyboardInteraction: function (component, event) {
         var concreteCmp = component.getConcreteComponent();
         if (event.type === "keydown") {
-        	if (event.keyCode === 32) {  // space key: select the menu item
+            if (event.keyCode === 32) {  // space key: select the menu item
                 event.preventDefault();
                 this.handleSpacekeydown(concreteCmp, event);
             }
         }
     }
+
 })// eslint-disable-line semi

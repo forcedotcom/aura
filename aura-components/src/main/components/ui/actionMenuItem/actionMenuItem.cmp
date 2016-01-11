@@ -16,11 +16,13 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true" description="​A menu item that triggers an action. This component is nested in a ui:menu component.">
-    <aura:handler name="click" action="{!c.handleClick}"/>
+
+    <aura:method name="select" action="{!c.select}"/>
+
     <aura:attribute name="id" type="String" description="id of the menu item"/>
-    <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
+
     <li aura:id="listitem" class="{!v.class}" role="presentation">
-        <a aura:id="link" role="menuitem" aria-disabled="{!v.disabled}" title="{!v.label}" tabindex="{!v.disabled ? -1: 0}">
+        <a aura:id="link" onclick="{!c.select}" role="menuitem" aria-disabled="{!v.disabled}" title="{!v.label}" tabindex="{!v.disabled ? -1: 0}">
             <aura:renderIf isTrue="{!v.body.length == 0}">
                 {!v.label}
                 <aura:set attribute="else">

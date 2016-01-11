@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.auraframework.Aura;
 import org.auraframework.http.CSP;
 import org.auraframework.http.CSPReporterServlet;
 
@@ -84,7 +85,10 @@ public class DefaultContentSecurityPolicy implements ContentSecurityPolicy {
         list.add("chrome-extension:");
         if (inlineStyle) {
             list.add(CSP.UNSAFE_INLINE);
-            list.add(CSP.UNSAFE_EVAL);
+            
+            if (!Aura.getConfigAdapter().isLockerServiceEnabled()) {
+            	list.add(CSP.UNSAFE_EVAL);
+            }
         } else {
             list.add("'nonce-LockerServiceTemporaryNonce'");
         }

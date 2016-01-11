@@ -2177,7 +2177,6 @@ TestInstance.prototype.checkGlobalNamespacePollution = function(whitelistedPollu
 };
 
 /**
->>>>>>> clean up js code in framework
  * Json instance for test. Used to export Json methods for testing.
  *
  * @private

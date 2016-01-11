@@ -224,8 +224,8 @@ public class AuraServlet extends AuraBaseServlet {
                 return;
             }
 
-            defDescriptor = definitionService.getDefDescriptor(tagName,
-                    defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class);
+            Class<? extends BaseComponentDef> defClass = defType == DefType.APPLICATION ? ApplicationDef.class : ComponentDef.class;
+            defDescriptor = definitionService.getDefDescriptor(tagName, defClass);
         } catch (RequestParam.InvalidParamException ipe) {
             servletUtil.handleServletException(new SystemErrorException(ipe), false, context, request, response, false);
             return;

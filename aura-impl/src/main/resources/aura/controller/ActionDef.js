@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2013 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,14 +33,12 @@ function ActionDef(config) {
         this.caboose = false;
 
     if (this.actionType === "SERVER") {
-        this.returnType = new ValueDef(config["returnType"]);
+        this.returnType = config["returnType"]&&config["returnType"]["name"];
 
         var params = config["params"];
         if (!!params && $A.util.isArray(params)) {
             for ( var i = 0; i < params.length; i++) {
-                var paramConfig = params[i];
-                var param = new ValueDef(paramConfig);
-                this.paramDefs[param.getName()] = param;
+                this.paramDefs[params[i]["name"]] = params[i];
             }
         }
         if (config["background"]) {

@@ -14,6 +14,6 @@
 ,{"name":"Network.numRequests","value":10}
 ,{"name":"Tracing.Painting.Paint","value":1}
 ,{"name":"Tracing.Memory.jsHeapSizeUsed","value": 110000000,"units":"bytes"}
-,{"name":"Tracing.Memory.jsEventListeners","value":23}
+,{"name":"Tracing.Memory.jsEventListeners","value":15}
 ,{"name":"Tracing.Memory.documents","value":1 }
 ,{"name":"Tracing.Memory.nodes","value":3000 }]

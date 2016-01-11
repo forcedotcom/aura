@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 ({
+	init : function(cmp, evt, helper) {
+		var config = {
+			container : document.body	
+		};
+		
+		cmp.find("grid").set("v.resizableColumnsConfig", config);
+	},
+	
 	onResize : function(cmp, evt, helper) {
 		console.log(cmp);
 		console.log(evt);

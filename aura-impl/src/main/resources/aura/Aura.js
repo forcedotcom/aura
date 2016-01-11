@@ -224,6 +224,7 @@ function AuraInstance () {
 
     //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
     this.devToolService = new AuraDevToolService();
+    this.errors = [];
     //#end
 
 
@@ -436,7 +437,7 @@ function AuraInstance () {
     };
 
     //	Google Closure Compiler Symbol Exports
-	this["getCurrentTransactionId"] = this.getCurrentTransactionId;
+    this["getCurrentTransactionId"] = this.getCurrentTransactionId;
     this["setCurrentTransactionId"] = this.setCurrentTransactionId;
     this["clientService"] = this.clientService;
     this["componentService"] = this.componentService;
@@ -463,11 +464,13 @@ function AuraInstance () {
     this["pushCreationPath"] = this.pushCreationPath;
     this["popCreationPath"] = this.popCreationPath;
     this["setCreationPathIndex"] = this.setCreationPathIndex;
-        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
-        this["devToolService"] = this.devToolService;
-        this["getQueryStatement"] = this.devToolService.newStatement;
-        this["qhelp"] = function() { return this.devToolService.help();};
-        //#end
+
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    this["devToolService"] = this.devToolService;
+    this["getQueryStatement"] = this.devToolService.newStatement;
+    this["qhelp"] = function() { return this.devToolService.help();};
+    //#end
+
     this["createComponent"] = this.createComponent;
     this["createComponents"] = this.createComponents;
     this["createComponentFromConfig"] = this.createComponentFromConfig;
@@ -682,6 +685,72 @@ AuraInstance.prototype.showErrors = function(toggle){
     return this.displayErrors;
 };
 
+/**
+ * @private
+ */
+AuraInstance.prototype.handleError = function(message, e) {
+    //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+    $A.logger.devDebugConsoleLog("ERROR", message, e);
+    //#end
+    var dispMsg = message;
+    var evtArgs = {"message":dispMsg,"error":null,"auraError":null};
+    if (e) {
+        //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+        // only keep the most recent 1000 errors
+        var len = this.errors.length;
+        if (len === 1000) {
+            this.errors = this.errors.slice(1, len);
+        }
+
+        this.errors.push(e);
+        //#end
+        if (e["handled"]) {
+            return;
+        } else {
+            e["handled"] = true;
+        }
+
+        if (e["name"] === "AuraError") {
+            var format = "Something has gone wrong. {0}.\nPlease try again.\n{1}";
+            var displayMessage = e.message || e.name;
+            //#if {"excludeModes" : ["PRODUCTION", "PRODUCTIONDEBUG"]}
+            displayMessage += "\n" + e.stackTrace;
+            //#end
+            dispMsg = $A.util.format(format, displayMessage, e.errorCode+"");
+        }
+
+        if (e["name"] === "AuraFriendlyError") {
+            evtArgs = {"message":e["message"],"error":e["name"],"auraError":e};
+        }
+        else {
+            // use null error string to specify non auraFriendlyError type.
+            evtArgs = {"message":dispMsg,"error":null,"auraError":e};
+        }
+    }
+
+    if ($A.initialized) {
+        $A.getEvt("aura:systemError").fire(evtArgs);
+    } else {
+        if ($A.showErrors()) {
+            $A.message(dispMsg);
+        }
+    }
+};
+
+/**
+ * Report error to the server after handling it.
+ * Note that the method should only be used if try-catch mechanism 
+ * of error handling is not desired or not functional (ex: in nested promises)
+ * @public
+ * @platform
+ */
+AuraInstance.prototype.reportError = function(message, error) {
+    $A.handleError(message, error);
+    if ($A.initialized) {
+        $A.logger.reportError(error);
+        $A.services.client.postProcess();
+    }
+};
 
 /**
  * <code>$A.warning()</code> should be used in the case where poor programming practices have been used.

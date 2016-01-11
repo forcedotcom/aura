@@ -32,7 +32,8 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     @Override
     public void perBrowserSetUp() {
         super.perBrowserSetUp();
-        // This page, especially the reference tab, loads several components and needs extra time in slower environments
+        // This page, especially the reference tab, loads several components and
+        // needs extra time in slower environments
         auraUITestingUtil.setTimeoutInSecs(60);
     }
 
@@ -71,7 +72,8 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     private long doBase(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
         open("/auradocs", mode);
-        WebElement content = getAuraUITestingUtil().findDomElement(By.cssSelector(".content"));
+        WebElement content = getAuraUITestingUtil().findDomElement(
+                By.cssSelector(".content"));
         assertNotNull("Should have content showing", content);
         assertTrue("Should have content displayed", content.isDisplayed());
         return System.currentTimeMillis() - start;
@@ -80,17 +82,21 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     private long doReference(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
         open("/auradocs#reference", mode);
-        WebElement sidebar = getAuraUITestingUtil()
-                .findDomElement(By.xpath("//ol[contains(@class,'auradocsSidebar')]"));
-        assertEquals("We expect 8 sidebar menu items", 8, sidebar.findElements(By.xpath("li")).size());
+        WebElement sidebar = getAuraUITestingUtil().findDomElement(
+                By.xpath("//ol[contains(@class,'auradocsSidebar')]"));
+        assertEquals("We expect 8 sidebar menu items", 8,
+                sidebar.findElements(By.xpath("li")).size());
         return System.currentTimeMillis() - start;
     }
 
     private long doComponent(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
-        open("/auradocs#reference?descriptor=aura:component&defType=component", mode);
-        WebElement tabset = getAuraUITestingUtil().findDomElement(By.xpath("//ul[contains(@class,'tabs__nav')]"));
-        assertEquals("We expect 6 tabs in the component help", 6, tabset.findElements(By.xpath("li")).size());
+        open("/auradocs#reference?descriptor=aura:component&defType=component",
+                mode);
+        WebElement tabset = getAuraUITestingUtil().findDomElement(
+                By.xpath("//ul[contains(@class,'tabs__nav')]"));
+        assertEquals("We expect 6 tabs in the component help", 6, tabset
+                .findElements(By.xpath("li")).size());
         return System.currentTimeMillis() - start;
     }
 
@@ -98,7 +104,8 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
         long start = System.currentTimeMillis();
         open("/auradocs#reference?topic=api:Aura");
         // TODO: this should test more.
-        WebElement content = getAuraUITestingUtil().findDomElement(By.cssSelector(".content"));
+        WebElement content = getAuraUITestingUtil().findDomElement(
+                By.cssSelector(".content"));
         assertNotNull("Should have content showing", content);
         assertTrue("Should have content displayed", content.isDisplayed());
         return System.currentTimeMillis() - start;

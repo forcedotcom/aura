@@ -400,17 +400,21 @@ public class AuraUITestingUtil {
          * {@link JavascriptExecutor#executeScript(String, Object...)} cannot handle Objects as return values."
          */
         String escapedJavascript = StringEscapeUtils.escapeEcmaScript(javascript);
-        String wrapper = "var ret,scriptExecException;"
-                + String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript) + "try\n{"
-                + " ret = func.call(this, arguments);\n" + "}\n" + "catch(e){\n"
-                + " scriptExecException = e.message || e.toString();\n" + "}\n"
-                + //
-                "var jstesterrors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n"
+        String wrapper = "var ret,scriptExecException;\n"
+                + "try {\n"
+                + String.format("var func = new Function('arguments', \"%s\");\n", escapedJavascript)
+                + "  ret = func.call(this, arguments);\n"
+                + "} catch(e){\n"
+                + "  scriptExecException = e.message || e.toString();\n"
+                + "}\n"
+                + "var jstesterrors = (window.$A && window.$A.test) ? window.$A.test.getErrors() : '';\n"
                 + "return [ret, jstesterrors, scriptExecException];";
 
         try {
+            Object obj = getRawEval(wrapper, args);
+            Assert.assertTrue("Expecting an instance of list, but get " + obj + ", when running: " + escapedJavascript, obj instanceof List);
             @SuppressWarnings("unchecked")
-            List<Object> wrapResult = (List<Object>) getRawEval(wrapper, args);
+            List<Object> wrapResult = (List<Object>) obj;
             Assert.assertEquals("Wrapped javsascript execution expects an array of exactly 3 elements", 3,
                     wrapResult.size());
             Object exception = wrapResult.get(2);

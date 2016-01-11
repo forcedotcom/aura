@@ -11,4 +11,4 @@ if test -n "$name"; then
     NAME_ARG="-DtestNameContains=$name";
 fi
 
-mvn verify -DskipUnitTests -DskipJsDoc -DskipComponentCompile -DrunOnlyIntTests ${MVN_ARGS} ${NAME_ARG}
+mvn verify -DskipUnitTests -DskipJsDoc -DskipComponentCompile -DrunIntTests ${MVN_ARGS} ${NAME_ARG}

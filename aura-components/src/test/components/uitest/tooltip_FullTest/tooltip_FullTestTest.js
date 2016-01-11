@@ -407,21 +407,24 @@
 		test: function(component) {
 			var triggers = ['bodyNormallabel', 'bodyManylabel', 'bodyHTMLlabel', 'bodyEmptylabel'];
 			var tooltips = ['bodyNormal', 'bodyMany', 'bodyHTML', 'bodyEmpty'];
-			var expectedBodies = ["This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
-			                      "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
-			                      "<h1>Hello</h1>",
-			                      ""]
+			var expectedBodies = {
+								  "bodyNormal" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
+			                      "bodyMany"   : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
+			                      "bodyHTML"   : "<h1>Hello</h1>",
+			                      "bodyEmpty"  : ""
+			                   	  };
 			var tooltipElem = "";
 			var wrapper = "";
 			var trigger = "";
 			var tt = "";
 			for(var i = 0; i < triggers.length; i++) {
+				var tooltip = tooltips[i];
 				trigger = component.find(triggers[i]).getElement();
-				tt = component.find(tooltips[i]);
+				tt = component.find(tooltip);
 				tooltipElem = tt.getElement();
 				wrapper = tooltipElem.querySelector('span.tooltip');
-				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltips[i]);
-				$A.test.assertEquals(expectedBodies[i], $A.test.getText(wrapper).trim(), "Content of the tooltip did not match expected for tooltip with aura:id = " + tooltips[i]);
+				$A.test.assertFalse($A.util.hasClass(tooltipElem,"visible"), "Tooltip visible should not be visible at this point for tooltip with aura:id = "+ tooltip);
+				$A.test.assertEquals(expectedBodies[tooltip], $A.test.getText(wrapper).trim(), "Content of the tooltip did not match expected for tooltip with aura:id = " + tooltip);
 				
 			}
 		
@@ -493,6 +496,79 @@
 		        ]
 	},
 	
+	/**
+	 * Test tooltip positioning does not break when tooltipBody is changed dynamically
+	 */
+	testDynamicTooltipBody : {
+		test : [
+		        function(cmp) {
+		        	this.changeTTBodyAndVerify(cmp, "basic");
+		        },
+		        function(cmp) {
+		        	this.changeTTBodyAndVerify(cmp, "specialChars"); 	
+		        },
+		        function(cmp) {
+		        	this.changeTTBodyAndVerify(cmp, "specialCharsLong"); 	
+		        },
+		        function(cmp) {
+		        	this.changeTTBodyAndVerify(cmp, "htmlText"); 	
+		        }]
+	},
+	
+	changeTTBodyAndVerify : function(cmp, testCase) {
+	
+		var self = this;
+		var trigger = cmp.find("changeTextBtn").getElement();
+		var tt = "dynamicBody";
+		var tooltip = $A.test.getElementByClass(tt)[0];
+		var tooltipBodies = {	"basic" :            "hey",
+		                     	"specialChars" :     "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \")",
+		                     	"specialCharsLong" : "This is a fairly normal amount of text that you would put in the tooltip. Maybe a bit more is fine too. Don't forget to include spl. chars (\"!@#$%*^ ÅıÇΩœ∑®†¥ˆøπ¬˚∆˙©ƒ∂ßåΩ≈ç√∫˜µ≤≥ & \") This info here is just to add some more text to the tooltip. Just adding more and more! It's like theres no end to this right? Wrong! All you need is patience. Man! I have to move this test further down the screen just because this tooltip has so many characters! Its just growing and growing. I don't know if the text will overflow. It doesn't look like it will. This was pretty well written so its all been handled very well! Don't you worry, we've got your back!",
+		                     	"htmlText" :         "<h1>Hello</h1>"
+							 };
+	
+		cmp.find(tt).set("v.tooltipBody", tooltipBodies[testCase]);
+		$A.test.fireDomEvent(trigger, "mouseover");
+		$A.test.addWaitForWithFailureMessage(true, function(){
+			if($A.util.hasClass(tooltip,"visible")) {		
+				
+				// Setting the pointer bounding rectangle for verification purposes on the first run (if basic is the first run)
+				if(testCase == "basic") {
+					var pointerBoundingRect = tooltip.querySelector('div.pointer').getBoundingClientRect();
+					cmp.set('v.pointerBoundingRect', pointerBoundingRect);
+				}	
+				
+				self.verifyBoundingRectangles(cmp, tooltip);
+				var tooltipText = $A.test.getText(tooltip); 
+				return (tooltipText === tooltipBodies[testCase]);
+			}		
+			return false;
+			}, "Problem at tooltip with aura:id = " + tt + " for test case: " + testCase + "tooltip's text does not match");	
+	},
+	
+	verifyBoundingRectangles : function(cmp, tooltip) {
+		
+		var epsilon = 5;
+		var origPBR = cmp.get('v.pointerBoundingRect');
+		var currentPBR = tooltip.querySelector('div.pointer').getBoundingClientRect();
+		var currentBBR = tooltip.querySelector('div.tooltip-body').getBoundingClientRect();
+
+		$A.test.assertTrue((origPBR != null) && (currentPBR != null) && (currentBBR != null), 'One or more of the bounding rectangles are not present');
+		
+		// Verify that pointer is positioned correctly
+		$A.test.assertTrue((origPBR.top < currentPBR.top + epsilon) && (origPBR.top > currentPBR.top - epsilon), 'Top part of pointer not positioned properly');
+		$A.test.assertTrue((origPBR.bottom < currentPBR.bottom + epsilon) && (origPBR.bottom > currentPBR.bottom - epsilon), 'Bottom part of pointer not positioned properly');
+		$A.test.assertTrue((origPBR.left < currentPBR.left + epsilon) && (origPBR.left > currentPBR.left - epsilon), 'Left part of pointer not positioned properly');
+		$A.test.assertTrue((origPBR.right < currentPBR.right + epsilon) && (origPBR.right > currentPBR.right - epsilon), 'Right part of pointer not positioned properly');
+		
+		 
+		// Dimensions of tooltip body varies with size of text, so verifying that pointer is not disjoint from the body, instead
+		// of verifying that original BBR matches the new BBR	 
+		$A.test.assertTrue(currentPBR.top <= (currentBBR.bottom + epsilon), 'Pointer is disjoint from tooltip body');
+		$A.test.assertTrue(currentPBR.top >= (currentBBR.bottom - epsilon), 'Pointer is disjoint from tooltip body');
+		
+	},
+	
 	openOrCloseTT : function(component, ttLabel, tooltip, action) {
 		var trigger = component.find(ttLabel).getElement();
 		var tt = component.find(tooltip);
@@ -514,20 +590,10 @@
     		var modals =$A.test.select(".uiModal");
  
     		if(action == "open") {
-    			if(modals.length > 0){
-        			return true;
-        		}
-        		else{
-        			return false;
-        		}
+    			return (modals.length > 0);		
     		}
     		else {
-    			if(modals.length == 0){
-    				return true;
-    			}
-    			else {
-    				return false;
-    			}		
+    			return (modals.length == 0);
     		}
     			
     	}, "Could not complete action: " + action);

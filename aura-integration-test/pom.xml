@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.3438-SNAPSHOT</version>
+        <version>0.3474-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <dependencies>
@@ -146,11 +146,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <configuration>
-                        <source>1.7</source>
-                        <target>1.7</target>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -462,45 +457,6 @@
             </build>
         </profile>
         <profile>
-            <id>runOnlyIntTests</id>
-            <activation>
-                <property>
-                    <name>runOnlyIntTests</name>
-                </property>
-            </activation>
-            <properties>
-                <testPhase>integration-test</testPhase>
-                <testSetupPhase>pre-integration-test</testSetupPhase>
-                <testTeardownPhase>post-integration-test</testTeardownPhase>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>build-helper-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-	           			<groupId>org.apache.maven.plugins</groupId>
-	           			<artifactId>maven-resources-plugin</artifactId>
-	            		<executions>
-	                		<execution>
-	                    		<id>copy-jstest</id>
-	                        	<phase>generate-test-resources</phase>
-	                    	</execution>
-	                	</executions>
-	            	</plugin>
-     				<plugin>
-        				<groupId>org.codehaus.mojo</groupId>
-        				<artifactId>xml-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
             <id>dev</id>
             <activation>
                 <property>
@@ -765,7 +721,7 @@
         </profile>
         <!-- profile for js code coverage for aura-impl xunit tests -->
         <profile>
-            <id>xunit.js.coverage.auraImpl</id>
+            <id>xunit.js.coverage.framework</id>
             <properties>
                 <module.name>aura-impl</module.name>
                 <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>
@@ -792,80 +748,29 @@
                         </configuration>
                     </plugin>
                     <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>xunit.js</id>
-                                <phase>test</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.tntim96</groupId>
-                        <artifactId>jscover-report-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate-cobertura-xml</id>
-                                <phase>verify</phase>
-                            </execution>
-                        </executions>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
                         <configuration>
-                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
-                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
+                            <workingDirectory>${project.parent.basedir}</workingDirectory>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <!-- profile for js code coverage for aura-components xunit tests -->
-        <profile>
-            <id>xunit.js.coverage.auraComponents</id>
-            <properties>
-                <module.name>aura-components</module.name>
-                <xunit.js.testPath>${project.build.directory}/js-coverage/${module.name}/src/test/javascript</xunit.js.testPath>
-                <xunit.js.currentModule>${module.name}</xunit.js.currentModule>
-                <xunit.js.isStrict>false</xunit.js.isStrict>
-                <xunit.js.format>jscover</xunit.js.format>
-                <xunit.js.coverage>true</xunit.js.coverage>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.tntim96</groupId>
-                        <artifactId>jscover-file-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>instrument-javascript-resources</id>
-                                <phase>process-test-classes</phase>
+                                <id>install-node-npm</id>
+                                <phase>pre-clean</phase>
                             </execution>
-                        </executions>
-                        <configuration>
-                            <srcDir>${project.parent.basedir}/${module.name}</srcDir>
-                            <reportDir>${project.build.directory}/js-coverage/${module.name}</reportDir>
-                            <testDirectory>${project.parent.basedir}/${module.name}/src/test</testDirectory>
-                            <excludeArgs>
-                                <excludeArg>--exclude=src/main/java</excludeArg>
-                                <excludeArg>--exclude=src/main/components/auradev</excludeArg>
-                                <excludeArg>--exclude=src/main/components/auradocs</excludeArg>
-                                <excludeArg>--exclude=src/main/components/auraide</excludeArg>
-                                <excludeArg>--exclude=src/main/components/aurajstest</excludeArg>
-                                <excludeArg>--exclude=src/main/components/uiExamples</excludeArg>
-                                <excludeArg>--exclude=target</excludeArg>
-                            </excludeArgs>
-                            <instrumentPathArgs>
-                                <arg>--no-instrument=src/main/components/aura</arg>
-                                <arg>--no-instrument=src/main/components/auraStorage</arg>
-                                <arg>--no-instrument=src/main/components/ui</arg>
-                                <arg>--no-instrument=src/test</arg>
-                            </instrumentPathArgs>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
                             <execution>
-                                <id>xunit.js</id>
+                                <id>npm-install</id>
+                                <phase>pre-clean</phase>
+                            </execution>
+                            <execution>
+                                <id>run-xunit</id>
                                 <phase>test</phase>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run --color=false test -- /dependency:./aura-util/src/test/tools/xUnit/dependencies /strict:${xunit.js.isStrict} /output:${xunit.js.format} /verbose:false ${xunit.js.testPath} /coverage:${xunit.js.coverage} /logFile:${project.build.directory}/js-coverage/${xunit.js.currentModule}/jscoverage.json ${xunit.js.testPath}</arguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

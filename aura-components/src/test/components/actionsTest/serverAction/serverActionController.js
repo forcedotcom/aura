@@ -1,4 +1,16 @@
 ({
+    twoActions: function (component) {
+        var serverAction = component.get("c.executeInForeground");
+        serverAction.setCallback(this, function(action) { });
+        $A.enqueueAction(serverAction);
+
+        serverAction = component.get("c.executeInForegroundWithReturn");
+        serverAction.setParams({ i : 0 });
+        serverAction.setCallback(this, function(action) {});
+
+        $A.enqueueAction(serverAction);
+
+    },
     cExecuteInForeground : function(component) {
         var serverAction = component.get("c.executeInForeground");
 

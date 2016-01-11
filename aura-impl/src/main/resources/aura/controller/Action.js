@@ -797,6 +797,14 @@ Action.prototype.getStorageErrorHandler = function() {
 };
 
 /**
+ * Returns the json representation of the action
+ * @private
+ */
+Action.prototype.prepareToSend = function() {
+    return this.toJSON();
+};
+
+/**
  * Calls callbacks and fires events upon completion of the action.
  *
  * @param {AuraContext} context the context for pushing and popping the current action.

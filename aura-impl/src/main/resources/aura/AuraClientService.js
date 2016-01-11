@@ -1166,7 +1166,8 @@ AuraClientService.prototype.loadComponent = function(descriptor, attributes, cal
                 //
                 if (loaded === false || force) {
                     err = err || "";
-                    throw new $A.auraError("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                    $A.reportError("Aura.loadComponent(): Failed to initialize application.\n" + err);
+                    return;
                 }
 
                 if (!loaded) {
@@ -1790,7 +1791,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
         if (action.isChained()) {
             continue;
         }
-        actionsToSend.push(action);
+        actionsToSend.push(action.prepareToSend());
     }
     if (actionsToSend.length === 0) {
         return false;
@@ -1798,6 +1799,7 @@ AuraClientService.prototype.send = function(auraXHR, actions, method, options) {
 
     var processed = false;
     var qs;
+
     try {
         var params = {
             "message"      : $A.util.json.encode({ "actions" : actionsToSend }),

@@ -16,5 +16,5 @@
 
 -->
 <aura:application access="global" useAppcache="true" render="client">
-    <appcache:slate/>
+    <appCache:slate/>
 </aura:application>

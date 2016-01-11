@@ -383,7 +383,7 @@
                                 <phase>pre-clean</phase>
                             </execution>
                             <execution>
-                                <id>grunt-build-auraImpl</id>
+                                <id>grunt-build-components</id>
                                 <goals>
                                     <goal>grunt</goal>
                                 </goals>

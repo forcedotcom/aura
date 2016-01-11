@@ -280,7 +280,7 @@
                                 <phase>pre-clean</phase>
                             </execution>
                             <execution>
-                                <id>grunt-build-auraImpl</id>
+                                <id>grunt-build-framework</id>
                                 <goals>
                                     <goal>grunt</goal>
                                 </goals>

@@ -29,7 +29,6 @@
     "AuraInstance": true,
     "AuraDevToolService": true,
     "ActionDefRegistry": true,
-    "AuraDevToolService": true,
     "AuraHistoryService": true,
     "AttributeDef": true,
     "AttributeDefSet": true,

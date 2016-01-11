@@ -1,4 +1,6 @@
 <aura:application> 
+    <aura:attribute name="output" type="String" default="Ready, push any button please"/>
+
     <!-- markup is case non-sensitive, this will include hasBody -->
 	<componentTest:HASBody/>
 	
@@ -25,8 +27,12 @@
     <aura:clientLibrary name="uiPerf" type="JS" />
     
     
-	<ui:button press="{!c.tryOutMarkup}" label="press me to test markup"/> 
-	<ui:button press="{!c.tryOutDependency}" label="press me to test dependency"/> 
-	<ui:button press="{!c.tryOutLibs}" label="press me to test Libs"/>
-	<ui:button press="{!c.tryOutClientLibs}" label="press me to test ClientLibs"/> 
+	<ui:button press="{!c.tryOutMarkup}" label="press me to test markup" class="button_tryOutMarkup"/> 
+	<ui:button press="{!c.tryOutDependency}" label="press me to test dependency" class="button_tryOutDependency"/> 
+	<ui:button press="{!c.tryOutLibs}" label="press me to test Libs" class="button_tryOutLibs"/>
+	<ui:button press="{!c.tryOutClientLibs}" label="press me to test ClientLibs" class="button_tryOutClientLibs"/> 
+	
+	<div class="div_output">
+	   {!v.output}
+	</div>
 </aura:application>

@@ -18,7 +18,6 @@
 <aura:application model="java://org.auraframework.components.ui.MenuTestModel">
     <aura:attribute name="expandEventFired" type="boolean" default="false"/>
     <aura:attribute name="collapseEventFired" type="boolean" default="false"/>
-    <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="true"/>
     <aura:attribute name="menuSelectFireCount" type="Integer" default="0" />
     <aura:attribute name="menuCondition" type="Boolean" default="true"/>
     <aura:attribute name="focus_counter" type="Integer" default="0"/>
@@ -44,9 +43,9 @@
             <ui:menu aura:id="uiMenu" class="clubMenu">
                 <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
                 <ui:menuList class="actionMenu" aura:id="actionMenu">
-                    <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" />
                     <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                    <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" />
                     <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
                 </ui:menuList>
             </ui:menu>
@@ -79,7 +78,7 @@
             <h2>Your favorite football teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
-                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu">
+                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu" hideMenuAfterSelected="false">
                     <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers"/>
                     <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks"/>
                     <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams"/>
@@ -97,7 +96,7 @@
             <br/>
             <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="checkboxMenuLabel" label="NFC West Teams"/&#62;'/>
             <br/>
-            <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="checkboxMenu"&#62;'/>
+            <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="checkboxMenu" hideMenuAfterSelected="false"&#62;'/>
             <br/>
             <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem aura:id="checkboxItem1" label="San Francisco 49ers"/&#62;'/>
             <br/>
@@ -123,7 +122,7 @@
             <h2>Your favorite baseball teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
-                <ui:menuList class="radioMenu" aura:id="radioMenu">
+                <ui:menuList class="radioMenu" aura:id="radioMenu" hideMenuAfterSelected="false">
                     <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco"/>
                     <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers"/>
                     <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona"/>
@@ -170,7 +169,7 @@
             <h2>Example: Menu Item using Iteration</h2>
             <ui:menu>
               <ui:menuTriggerLink aura:id="iterationTrigger" label="iterationTrigger"/>
-              <ui:menuList aura:id="iterationRadioMenu">
+              <ui:menuList aura:id="iterationRadioMenu" hideMenuAfterSelected="false">
                 <aura:iteration items="{!m.iterationItems}" var="item">
                     <ui:radioMenuItem label="{!item.label}" value="{!item.value}"/>
                 </aura:iteration>
@@ -211,7 +210,7 @@
             <h2>Example: Menu Item using Condition</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionTrigger" label="conditionTrigger"/>
-                <ui:menuList aura:id="conditionRadioMenu">
+                <ui:menuList aura:id="conditionRadioMenu" hideMenuAfterSelected="false">
                     <aura:if isTrue="{!v.menuCondition}">
                         <ui:radioMenuItem label="trueCondition" value="trueCondition"/>
                         <aura:set attribute="else">
@@ -235,7 +234,7 @@
             <h2>Example: Menu Item using Condition and Iteration</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionIterationTrigger" label="conditionIterationTrigger"/>
-                <ui:menuList aura:id="conditionIterationMenu">
+                <ui:menuList aura:id="conditionIterationMenu" hideMenuAfterSelected="false">
                     <aura:if isTrue="{!v.menuCondition}">
                         <ui:actionMenuItem label="trueCondition" value="trueCondition"/>
                         <ui:menuItemSeparator/>
@@ -265,7 +264,7 @@
                 <ui:menuTriggerLink class="triggerNested" aura:id="triggerNested" label="Please pick your favorite soccer club"/>
                 <ui:menuList class="actionMenuNested" aura:id="actionMenuNested">
                     <aura:if isTrue="{!v.menuCondition}">
-                        <ui:actionMenuItem class="actionItem1Nested" aura:id="actionItem1Nested" label="Bayern München" click="{!c.updateTriggerLabelForNestedMenuItems}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                        <ui:actionMenuItem class="actionItem1Nested" aura:id="actionItem1Nested" label="Bayern München" click="{!c.updateTriggerLabelForNestedMenuItems}" />
                         <aura:if isTrue="{!v.menuCondition}">
                             <ui:actionMenuItem class="actionItem2Nested" aura:id="actionItem2Nested" label="FC Barcelona" click="{!c.updateTriggerLabelForNestedMenuItems}" disabled="true"/>
                         </aura:if>
@@ -273,7 +272,7 @@
                             <ui:actionMenuItem class="actionItem3Nested" aura:id="actionItem3Nested" label="{!team}" click="{!c.updateTriggerLabelForNestedMenuItems}"/>
                         </aura:iteration>
                     </aura:if>
-                    <ui:actionMenuItem class="actionItem4Nested" aura:id="actionItem4Nested" label="Manchester United" click="{!c.updateTriggerLabelForNestedMenuItems}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:actionMenuItem class="actionItem4Nested" aura:id="actionItem4Nested" label="Manchester United" click="{!c.updateTriggerLabelForNestedMenuItems}" />
                 </ui:menuList>
             </ui:menu>
         </div>
@@ -285,7 +284,7 @@
             <h2>All together</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="mytrigger" label="All teams"/>
-                <ui:menuList>
+                <ui:menuList hideMenuAfterSelected="false">
                     <ui:actionMenuItem label="Bayern München" click="{!c.updateLabel}"/>
                     <ui:actionMenuItem label="FC Barcelona" click="{!c.updateLabel}"/>
                     <ui:actionMenuItem label="Inter Milan" click="{!c.updateLabel}"/>
@@ -365,9 +364,9 @@
             	<ui:image aura:id="image" src="/auraFW/resources/aura/auralogo.png" imageType="decorative"/>
             </ui:menuTriggerLink>
             <ui:menuList class="actionMenuImage" aura:id="actionMenuImage">
-                <ui:actionMenuItem class="actionItem1Image" aura:id="actionItem1Image" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                <ui:actionMenuItem class="actionItem1Image" aura:id="actionItem1Image" label="Bayern München" click="{!c.updateTriggerLabel}" />
                 <ui:actionMenuItem class="actionItem2Image" aura:id="actionItem2Image" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem class="actionItem3Image" aura:id="actionItem3Image" label="Inter Milan" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                <ui:actionMenuItem class="actionItem3Image" aura:id="actionItem3Image" label="Inter Milan" click="{!c.updateTriggerLabel}" />
                 <ui:actionMenuItem class="actionItem4Image" aura:id="actionItem4Image" label="Manchester United" click="{!c.updateTriggerLabel}"/>
             </ui:menuList>
         </ui:menu>

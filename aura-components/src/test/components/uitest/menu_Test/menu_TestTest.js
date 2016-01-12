@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    clickTrigger: function (trigger) {
+    clickAnchor: function (trigger) {
         var anchor = trigger.getElement().getElementsByTagName("a")[0];
         anchor.click();
     },
@@ -37,7 +37,7 @@
             //check menu is default to hidden by using DOM API
             $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "uiMenuList"), "Class name should be just uiMenuList");
             $A.test.assertFalse($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should not contain visible");
-            this.clickTrigger(menuLabel);
+            this.clickAnchor(menuLabel);
 
             //Check if secondItem in the menu is disabled
             $A.test.addWaitForWithFailureMessage(true, function () {
@@ -62,7 +62,7 @@
             $A.test.assertTrue(disableAttrValue, "Menu item 1 should not be clickable");
 
             //click actionItem3 and check if label is updated
-            cmp.find("actionItem3").get("e.click").fire();
+            this.clickAnchor(cmp.find("actionItem3"));
             $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function () {
                 return menuLabel.get('v.label')
             }, "Label should be updated to " + cmp.find("actionItem3").get('v.label'));
@@ -87,7 +87,7 @@
                 return cmp.find(outputText).get('v.value')
             }, "Ouput Label should be updated to " + cmp.find("checkboxItem4").get('v.label'));
         }, function (cmp) {
-            this.clickTrigger(menuLabel);
+            this.clickAnchor(menuLabel);
             //Check if menu is visible
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(checkboxMenu.getElement(), "visible")
@@ -96,12 +96,12 @@
             //check item 1 is not selected
             $A.test.assertFalse(cmp.find("checkboxItem1").get('v.selected'), "Checkbox Menu item 1 should not be selected");
             //Select item1 from the list
-            cmp.find("checkboxItem1").get('e.click').fire();
+            this.clickAnchor(cmp.find("checkboxItem1"));
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return cmp.find("checkboxItem1").get('v.selected')
             }, "Checkbox Menu item 1 should be selected");
         }, function (cmp) {
-            this.clickTrigger(menuLabel);
+            this.clickAnchor(menuLabel);
             $A.test.addWaitForWithFailureMessage(false, function () {
                 return $A.util.hasClass(checkboxMenu.getElement(), "visible")
             }, "Checkbox Menu Should be not be visible");
@@ -115,7 +115,7 @@
             }, "Checkbox Menu Default value is not correct");
         }, function (cmp) {
             //uncheck item1 from the list
-            cmp.find("checkboxItem1").get('e.click').fire();
+            this.clickAnchor(cmp.find("checkboxItem1"));
 
             $A.test.addWaitForWithFailureMessage(false, function () {
                 return cmp.find("checkboxItem1").get('v.selected')
@@ -145,28 +145,28 @@
             item2 = cmp.find("radioItem2");
             outputText = "radioMenuResult";
 
-            this.clickTrigger(menuLabel);
+            this.clickAnchor(menuLabel);
             //check if menu is visible
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(radioMenu.getElement(), "visible")
             }, "Radio Menu should be visible");
         }, function (cmp) {
             //Select first item from the menu
-            item1.get('e.click').fire();
+            this.clickAnchor(item1);
             //check if first item is selected
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return item1.get('v.selected')
             }, "Radio Menu item 1 should be selected");
         }, function (cmp) {
             //select 2nd item from the menu
-            item2.get('e.click').fire();
+            this.clickAnchor(item2);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return item2.get('v.selected')
             }, "Radio Menu item 2 should be selected");
         }, function (cmp) {
             //menu item 1 should be unchecked after selecting item2
             $A.test.assertFalse(item1.get('v.selected'), "Radio Menu item 1 should be unchecked");
-            this.clickTrigger(menuLabel);
+            this.clickAnchor(menuLabel);
             $A.test.addWaitForWithFailureMessage(false, function () {
                 return $A.util.hasClass(radioMenu.getElement(), "visible")
             }, "Radio Menu should not be visible");
@@ -181,62 +181,8 @@
         ]
     },
 
-    /**
-     * Test to verify radioMenuItem when hideMenuSelected is set
-     * Test case for W-2678659
-     * using AURA API
-     */
-    testRadioMenuWithHideMenuSelectedSet: {
-        test: [function (cmp) {
-            menuLabel = cmp.find("radioMenuLabel");
-            radioMenu = cmp.find("radioMenu");
-            ouptutButton = cmp.find("radioButton");
-            item1 = cmp.find("radioItem1");
-            item2 = cmp.find("radioItem2");
-            outputText = "radioMenuResult";
 
-            this.clickTrigger(menuLabel);
-            //check if menu is visible
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                return $A.util.hasClass(radioMenu.getElement(), "visible")
-            }, "Radio Menu should be visible");
-        }, function (cmp) {
-        	item1.set("v.hideMenuAfterSelected",true);
-            //Select first item from the menu
-            item1.get('e.click').fire();
-            //check if first item is selected
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                return item1.get('v.selected')
-            }, "Radio Menu item 1 should be selected");
-        }, function (cmp) {
-            //Menu should be hidden
-        	$A.test.assertFalse($A.util.hasClass(radioMenu.getElement(), "visible"), "Radio Menu Class name should not contain visible");
-        	//MenuTrigger should be active element 
-        	$A.test.assertEquals($A.test.getText(menuLabel.getElement()), $A.test.getActiveElementText(), "Active Element should be Radio MenuList Trigger");
-            this.clickTrigger(menuLabel);
-            item2.get('e.click').fire();
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                return item2.get('v.selected')
-            }, "Radio Menu item 2 should be selected");
-        }, function (cmp) {
-            //menu item 1 should be unchecked after selecting item2
-            $A.test.assertFalse(item1.get('v.selected'), "Radio Menu item 1 should be unchecked");
-            this.clickTrigger(menuLabel);
-            $A.test.addWaitForWithFailureMessage(false, function () {
-                return $A.util.hasClass(radioMenu.getElement(), "visible")
-            }, "Radio Menu should not be visible");
-        }, function (cmp) {
-            ouptutButton.get('e.press').fire();
-            var expectedOutputText = item2.get('v.label');
-            $A.test.addWaitForWithFailureMessage(expectedOutputText, function () {
-                return cmp.find(outputText).get('v.value')
-            }, "Radio Menu output text did not get updated");
-        }
 
-        ]
-    },
-
-    
     /**
      * Test to verify radiobox menu created using iteration cmp works when interacting with the menu items
      * using AURA API
@@ -361,7 +307,7 @@
     testFocusOnMenuItem: {
         test: [function (cmp) {
             trigger = cmp.find("trigger");
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
         }, function (cmp) {
             var menuItem3 = cmp.find("actionItem3");
             menuItem3.get("e.mouseover").fire();
@@ -381,7 +327,7 @@
             menuList = cmp.find("checkPosition");
             menuListElement = menuList.getElement();
             item1 = cmp.find("checkPositionItem1").getElement();
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should be visible");
@@ -396,7 +342,7 @@
             viewPort = $A.util.getWindowSize();
             //change the height for item1 such that not enough space below
             item1.style.height = viewPort.height * 2 + "px";
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(false, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should not be visible");
@@ -406,7 +352,7 @@
             $A.test.assertFalse(cmp.get('v.expandEventFired'), "Expand event should not be fired");
 
             //open the menu
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should be visible after changing height of item1");
@@ -425,68 +371,13 @@
         test: function (cmp) {
             trigger = cmp.find("triggerLink");
             menuList = cmp.find("extendMenuList");
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should be visible when you extend from menuList");
         }
     },
 
-    /**
-     * Test to verify action menu list does not collapse if HideMenuAfterSelected is set to false
-     * Test case: W-2328775
-     */
-    testHideMenuAfterSelected: {
-        attributes: {hideMenuAfterSelected: "false"},
-        test: [function (cmp) {
-            actionMenu = cmp.find("actionMenu");
-            menuLabel = cmp.find("trigger");
-
-            //check menu is default to hidden by using AURA API
-            $A.test.assertFalse(actionMenu.get('v.visible'), "Action Menu should not be visible");
-
-            //check menu is default to hidden by using DOM API
-            $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "uiMenuList"), "Class name should be just uiMenuList");
-            $A.test.assertFalse($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should not contain visible");
-            this.clickTrigger(menuLabel);
-
-            //Check if secondItem in the menu is disabled
-            $A.test.addWaitForWithFailureMessage(true, function () {
-                return cmp.find("actionItem2").get("v.disabled");
-            }, "Check if Item2 in the menu is disabled");
-        }, function (cmp) {
-            //make sure menuItem is not attached to body directly and its attached to uiMenu instead
-            //Test case for W-2181713
-            var actionMenuParentClassName = actionMenu.getElement().parentNode.className;
-            $A.test.assertTrue($A.test.contains(actionMenuParentClassName, "uiMenu"), "Menu Item List not attached to correct uiMenu");
-
-            //click actionItem3 and check if label is updated
-            cmp.find("actionItem3").get("e.click").fire();
-            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function () {
-                return menuLabel.get('v.label')
-            }, "Label should be updated to " + cmp.find("actionItem3").get('v.label'));
-        }, function (cmp) {
-            //check menu is still visible after selecting actionItem3
-            $A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible after selecting actionItem3");
-            //click actionItem1 and check if label is updated
-            cmp.find("actionItem1").get("e.click").fire();
-            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem1").get('v.label'), function () {
-                return menuLabel.get('v.label')
-            }, "Label should be updated to " + cmp.find("actionItem1").get('v.label'));
-        }, function (cmp) {
-            //check menu is still visible after selecting actionItem1
-            $A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible after selecting actionItem1");
-            //click actionItem4 and check if label is updated
-            cmp.find("actionItem4").get("e.click").fire();
-            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem4").get('v.label'), function () {
-                return menuLabel.get('v.label')
-            }, "Label should be updated to " + cmp.find("actionItem4").get('v.label'));
-        }, function (cmp) {
-            //check menu is still visible after selecting actionItem1
-            $A.test.assertFalse(actionMenu.get('v.visible'), "Menu should not be visible after selecting actionItem4");
-        }
-        ]
-    },
     /**
      * Test to verify menuSelect event is fired only 1 time upon selecting a menu item and not multiple times
      * Test Case: W-2413902
@@ -499,14 +390,14 @@
             $A.test.assertEquals(0, cmp.get("v.menuSelectFireCount"), "menuSelect event should not be fired yet");
             item1 = cmp.find("checkPositionItem1");
 
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
 
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu list Should be visible");
         }, function (cmp) {
             //click item1
-            item1.get("e.click").fire();
+            this.clickAnchor(item1);
             $A.test.addWaitForWithFailureMessage(false, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu list Should not be visible");
@@ -522,7 +413,7 @@
      */
     testActionMenuWithImageTrigger: {
         test: function (cmp) {
-        	actionMenu = cmp.find("actionMenuImage");
+            actionMenu = cmp.find("actionMenuImage");
             menuLabel = cmp.find("triggerImage");
 
             //check menu is default to hidden by using AURA API
@@ -531,8 +422,8 @@
             //check menu is default to hidden by using DOM API
             $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "uiMenuList"), "Class name should be just uiMenuList");
             $A.test.assertFalse($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should not contain visible");
-            this.clickTrigger(menuLabel);
-            
+            this.clickAnchor(menuLabel);
+
             // check to see if menu opened
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return actionMenu.get('v.visible');
@@ -545,9 +436,9 @@
      */
     testFocusEvent: {
         owner: 'smo',
-        test: [function(cmp) {
+        test: [function (cmp) {
             this.fireEvents(cmp, "focus", 2);
-        }, function(cmp) {
+        }, function (cmp) {
             this.verifyCount(cmp, "focus", 2);
         }]
     },
@@ -555,11 +446,11 @@
     /**
      * Test to verify if blur event is triggered on blur
      */
-    testblurEvent: {
+    testBlurEvent: {
         owner: 'smo',
-        test: [function(cmp) {
+        test: [function (cmp) {
             this.fireEvents(cmp, "blur", 2);
-        }, function(cmp) {
+        }, function (cmp) {
             this.verifyCount(cmp, "blur", 2);
         }]
     },
@@ -571,7 +462,7 @@
         $A.test.assertDefined(menuItem.get('v.value'), "value of menuItem should be defined");
         $A.test.assertEquals(menuItem.get('v.value'), menuItem.get('v.label'), "Value of menuItem is not correct");
         //select item from the menu
-        menuItem.get('e.click').fire();
+        this.clickAnchor(menuItem);
         $A.test.assertTrue(menuItem.get('v.selected'), message);
     },
 
@@ -584,7 +475,7 @@
     },
 
     verifyMenuVisibilityOnClick: function (menuLabel, menu, visible, message) {
-        this.clickTrigger(menuLabel);
+        this.clickAnchor(menuLabel);
 
         //check if menu is visible
         $A.test.addWaitForWithFailureMessage(visible,
@@ -601,15 +492,15 @@
             }, message);
     },
 
-    fireEvents: function(cmp, evtName, count) {
+    fireEvents: function (cmp, evtName, count) {
         var menuLinkEl = cmp.find("menuLink").getElement();
         for (var i = 0; i < count; i++) {
             $A.test.fireDomEvent(menuLinkEl, evtName);
         }
     },
 
-    verifyCount: function(cmp, evtName, count) {
+    verifyCount: function (cmp, evtName, count) {
         $A.test.assertEquals(count, cmp.get("v." + evtName + "_counter"),
-                evtName + "event counter is not correct! Event might not be handled!");
+            evtName + "event counter is not correct! Event might not be handled!");
     }
 })

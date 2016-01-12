@@ -218,38 +218,32 @@
      * select sortBy column and Sort order and make sure its checked on the sort menu
      * pass in sortOrder ="asc" for A-Z and "desc" for Z-A
      */
-    selectSortByColumnAndAssert: function(listSorter, columnNumber, sortOrder){
-        var menuItem = this.getMenuItemByColumnNumber(listSorter,columnNumber);
-        menuItem.get('e.click').fire();
+    selectSortByColumnAndAssert: function(listSorter, columnNumber, sortOrder) {
+        var menuItem = this.getMenuItemByColumnNumber(listSorter, columnNumber);
+        var menuItemAnchor = menuItem.getElement().getElementsByTagName("a")[0];
+        menuItemAnchor.click();
 
-        var menuItems =  this.getDisplayedColumns(listSorter);
-        var selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
-
+        var expectedSortOrder = sortOrder.indexOf("desc") >= 0 ? "Z-A" : "A-Z";
         var expectedColumn = "Column " + columnNumber;
+
+        var self = this;
+
         $A.test.addWaitForWithFailureMessage(expectedColumn, function(){
+            var menuItems = self.getDisplayedColumns(listSorter);
+            var selectedColumnAndSortOrder = self.getSelectedColumnsAndSortOrder(menuItems);
             var selectedColumn = selectedColumnAndSortOrder.split(":")[0];
             return selectedColumn;
         }, "Wrong Selected field displayed on Dialog");
 
-        var expectedSortOrder;
-        var isAscending = $A.util.getBooleanValue(menuItem.get("v.isAscending"));
-        if(sortOrder.indexOf("desc") >= 0){
-            if(isAscending){
-                //fire event so that it would change it to descending
-                menuItem.get('e.click').fire();
-            }
-            expectedSortOrder = "Z-A";
-        }else{
-            if(!isAscending){
-                //fire event on the item so that it will change it to ascending
-                menuItem.get('e.click').fire();
-            }
-            expectedSortOrder = "A-Z";
-        }
-        menuItems =  this.getDisplayedColumns(listSorter);
-        selectedColumnAndSortOrder = this.getSelectedColumnsAndSortOrder(menuItems);
-        //verify sort order is selected properly
         $A.test.addWaitForWithFailureMessage(expectedSortOrder, function(){
+            var isAscending = $A.util.getBooleanValue(menuItem.get("v.isAscending"));
+            if ((isAscending && sortOrder.indexOf("desc") >= 0) || (!isAscending && sortOrder.indexOf("asc") >= 0)) {
+
+                menuItem.select();
+            }
+
+            var menuItems = self.getDisplayedColumns(listSorter);
+            selectedColumnAndSortOrder = self.getSelectedColumnsAndSortOrder(menuItems);
             var actualSortOrder = selectedColumnAndSortOrder.split(":")[1];
             return actualSortOrder;
         }, "Sort Order selected is not correct");

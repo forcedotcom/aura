@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 ({
-    handleClick : function(component, event, helper) {
-    	var concrete = component.getConcreteComponent();
-        var concreteHelper = concrete.getDef().getHelper();
-        
-        concreteHelper.handleClick(concrete);
+    select : function(component, event, helper) {
+        var current = component.get("v.selected");
+        if (current === false) {
+            component.set("v.selected", !current);
+        }
 
-        // Un-select the previously selected item
-        var hideMenu = $A.util.getBooleanValue(concrete.get("v.hideMenuAfterSelected"));
         helper.fireSelectEvent(component, event, {
-            "deselectSiblings": true,
-            "hideMenu": hideMenu,
-            "focusTrigger": hideMenu
+            "deselectSiblings": true
         });
     }
 })// eslint-disable-line semi

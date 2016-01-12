@@ -807,18 +807,33 @@
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-plugin-plugin</artifactId>
-										<goals>
-											<goal>descriptor</goal>
-										</goals>
-										<versionRange>[3.3,)</versionRange>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-  								</pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-plugin-plugin</artifactId>
+                                        <goals>
+                                            <goal>descriptor</goal>
+                                        </goals>
+                                        <versionRange>[3.3,)</versionRange>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <execute/>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>com.github.eirslett</groupId>
+                                        <artifactId>frontend-maven-plugin</artifactId>
+                                        <goals>
+                                            <goal>install-node-and-npm</goal>
+                                            <goal>npm</goal>
+                                            <goal>grunt</goal>
+                                        </goals>
+                                        <versionRange>[0.0,)</versionRange>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
                             </pluginExecutions>
                         </lifecycleMappingMetadata>
                     </configuration>
@@ -834,9 +849,9 @@
 	                <version>3.3</version>
 	            </plugin>
                 <plugin>
-                    <groupId>com.github.phasebash</groupId>
+                    <groupId>com.phasebash.jsdoc</groupId>
                     <artifactId>jsdoc3-maven-plugin</artifactId>
-                    <version>1.0.7</version>
+                    <version>1.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

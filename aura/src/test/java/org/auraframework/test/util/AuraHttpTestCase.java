@@ -121,8 +121,8 @@ public abstract class AuraHttpTestCase extends IntegrationTestCase {
                             csp.get("script-src"));
                     assertEquals("style-src is wrong", "'self' chrome-extension: 'unsafe-inline'", csp.get("style-src"));
                 } else {
-                    assertEquals("script-src is wrong", "'self' chrome-extension:", csp.get("script-src"));
-                    assertEquals("style-src is wrong", "'self' chrome-extension:", csp.get("style-src"));
+                    assertEquals("script-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'", csp.get("script-src"));
+                    assertEquals("style-src is wrong", "'self' chrome-extension: 'nonce-LockerServiceTemporaryNonce'", csp.get("style-src"));
                 }
                 // These maybe aren't strictly "anti-clickjacking", but since we're testing the rest of the default CSP:
                 assertEquals("font-src is wrong", "*", csp.get("font-src"));

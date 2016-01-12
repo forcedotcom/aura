@@ -34,7 +34,7 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
 
         String encryptionKeyUrl = Aura.getConfigAdapter().getEncryptionKeyURL();
         appendable
-            .append("<script>\n")
+            .append("<script nonce='LockerServiceTemporaryNonce'>\n")
             .append("(function(){\n")
             .append(   requireQueryParam ?  "  if (window.location.href.toLowerCase().indexOf('aura.crypto=true') === -1) {" : "")
             .append(   requireQueryParam ?  "    $A.log('CryptoAdapter not registering because aura.crypto=true is absent');" : "")

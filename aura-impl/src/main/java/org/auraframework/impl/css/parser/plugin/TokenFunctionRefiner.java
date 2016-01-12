@@ -25,6 +25,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.AuraTextUtil;
 
 import com.google.common.collect.Sets;
+import com.salesforce.omakase.ast.Syntax;
 import com.salesforce.omakase.ast.atrule.AtRule;
 import com.salesforce.omakase.ast.declaration.RawFunction;
 import com.salesforce.omakase.broadcast.Broadcaster;
@@ -42,7 +43,8 @@ import com.salesforce.omakase.util.Args;
  */
 final class TokenFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
     private static final String UNABLE_PARSE = "Unable to parse the remaining content '%s'";
-    private static final String INVALID_EMPTY = "The token function arguments '%s' must not evaluate to an " +
+    private static final String EMPTY_FUNCTION = "Empty token functions are not allowed";
+    private static final String EVALUATED_TO_EMPTY = "The token function arguments '%s' must not evaluate to an " +
             "empty string. Ensure that the variable(s) referenced have a valid media query expression value";
 
     private static final String NORMAL = "token";
@@ -75,7 +77,7 @@ final class TokenFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
         }
 
         try {
-            String expression = expression(raw.args());
+            String expression = expression(raw.args(), raw);
 
             if (provider.getResolveStrategy() == ResolveStrategy.PASSTHROUGH) {
                 broadcaster.broadcast(new TokenFunction(raw.line(), raw.column(), NORMAL, expression));
@@ -116,7 +118,7 @@ final class TokenFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
 
         try {
             // extract the inner expression
-            String expression = expression(Args.extract(raw));
+            String expression = expression(Args.extract(raw), atRule);
 
             if (provider.getResolveStrategy() == ResolveStrategy.PASSTHROUGH) {
                 TokenExpression tokenExpression = new TokenExpression(NORMAL_FUNCTION + expression + ")");
@@ -126,7 +128,7 @@ final class TokenFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
 
                 // cannot be empty
                 if (AuraTextUtil.isEmptyOrWhitespace(evaluated.toString())) {
-                    throw new ParserException(atRule, String.format(INVALID_EMPTY, expression));
+                    throw new ParserException(atRule, String.format(EVALUATED_TO_EMPTY, expression));
                 }
 
                 // parse the media query expression
@@ -146,8 +148,17 @@ final class TokenFunctionRefiner implements FunctionRefiner, AtRuleRefiner {
         return Refinement.PARTIAL;
     }
 
-    private String expression(String raw) throws QuickFixException {
+    private String expression(String raw, Syntax syntax) throws QuickFixException {
+        if (AuraTextUtil.isNullEmptyOrWhitespace(raw)) {
+            throw new ParserException(syntax, EMPTY_FUNCTION);
+        }
+
         String expression = Args.trimDoubleQuotes(raw); // remove encasing double quotes if they exist
+
+        if (AuraTextUtil.isEmptyOrWhitespace(expression)) {
+            throw new ParserException(syntax, EMPTY_FUNCTION);
+        }
+
         expressions.add(expression);
         return expression;
     }

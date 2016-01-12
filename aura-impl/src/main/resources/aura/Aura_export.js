@@ -218,6 +218,16 @@ Aura.OverrideMap = function OverrideMap() {
             function(orig) {
                 $A.storageService.selectAdapter = orig;
             }
+        ),
+
+        "RenderingService.addDirtyValue" : new Aura.Utils.Override($A.renderingService, $A.renderingService.addDirtyValue,
+            false,
+            function(bound) {
+                $A.renderingService.addDirtyValue = bound;
+            },
+            function(orig) {
+                $A.renderingService.addDirtyValue = orig;
+            }
         )
     };
 };

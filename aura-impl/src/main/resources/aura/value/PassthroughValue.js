@@ -25,7 +25,6 @@ function PassthroughValue(primaryProviders, component) {
     this.component = component;
     this.references={};
     this.handlers={};
-    this.errors = {};
 }
 
 /**
@@ -165,6 +164,20 @@ PassthroughValue.prototype.getComponent = function() {
     return this.component;
 };
 
+/**
+ * Gets all the keys for the additional providers specified in the passthrough value.
+ * @export
+ * @return Array of keys
+ */
+PassthroughValue.prototype.getPrimaryProviderKeys = function() {
+    return Object.keys(this.primaryProviders);
+};
+
+/**
+ * Get the definition of the valueProvider component. 
+ * If the immediate value provider for this passthrough value is another passthrough value
+ * it will resolve up the chain till it finds a valid component.
+ */
 PassthroughValue.prototype.getDef=function(){
     var valueProvider=this;
     while (valueProvider instanceof PassthroughValue) {

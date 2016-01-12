@@ -17,25 +17,31 @@
 	init: function(component) {
 		var hourError = component.find("hourError");
 		var minError = component.find("minuteError");
-		
+
 		component.find("hours").set("v.ariaDescribedBy", hourError.getGlobalId());
 		component.find("minutes").set("v.ariaDescribedBy", minError.getGlobalId());
 	},
-	
+
 	updateAmpm: function(component, event, helper) {
     	var amPmCmp = component.find("ampm");
         var isAndroid = $A.get("$Browser.isAndroid");
-        if (isAndroid === true) { // On Android, if hour field is changed and then ampm select is clicked, 
+        if (isAndroid === true) { // On Android, if hour field is changed and then ampm select is clicked,
         	                      // the focus is still in hour field. That is, the hour value doesn't get updated.
             var hoursCmp = component.find("hours");
             var currentHourValue = hoursCmp.getElement().value;
-            hoursCmp.set("v.value", currentHourValue); 
+            hoursCmp.set("v.value", currentHourValue);
             if (helper.validateHours(component)) {
                 if (amPmCmp) { // it must be in 12 hour format
+                    var hourValue = parseInt(currentHourValue);
+                    if (hourValue === 12) {
+                        // when 12am, v.hours should be 0. when 12pm, v.hours should be 12.
+                        // initializing it to 0 and will add 12 for the pm case a few lines below
+                        hourValue = 0;
+                    }
                     if (amPmCmp.get("v.value") === "am") {
-                        component.set("v.hours", parseInt(currentHourValue));
+                        component.set("v.hours", hourValue);
                     } else {
-                        component.set("v.hours", parseInt(currentHourValue) + 12);
+                        component.set("v.hours", hourValue + 12);
                     }
                 }
                 component.set("v.isValid", true);
@@ -44,7 +50,7 @@
             }
             return;
         }
-        
+
         if (component.get("v.isValid") === true) {
             var hours = component.get("v.hours");
             if (amPmCmp) {
@@ -56,7 +62,7 @@
             }
         }
     },
-    
+
     updateHours: function(component, event, helper) {
         if (helper.validateHours(component)) {
             var hoursCmp = event.getSource();
@@ -68,7 +74,7 @@
         }
         component.set("v.isValid", false);
     },
-    
+
     updateMinutes: function(component, event, helper) {
         if (helper.validateMinutes(component)) {
             var minutesCmp = event.getSource();

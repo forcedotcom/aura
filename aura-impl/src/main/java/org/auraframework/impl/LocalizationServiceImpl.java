@@ -17,6 +17,7 @@ package org.auraframework.impl;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -35,12 +36,9 @@ import com.ibm.icu.text.DecimalFormat;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.Currency;
 
-import aQute.bnd.annotation.component.Component;
-
 /**
  * Default implementation for the Localization Service
  */
-@Component (provide=AuraServiceProvider.class)
 public class LocalizationServiceImpl implements LocalizationService {
 
     // make pluggable in the future?
@@ -427,27 +425,27 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public Date parseDate(String date) throws ParseException {
+    public Date parseDate(String date) throws DateTimeParseException {
         return parseDate(date, null, null, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseDate(String date, int dateStyle) throws ParseException {
+    public Date parseDate(String date, int dateStyle) throws DateTimeParseException {
         return parseDate(date, null, null, dateStyle);
     }
 
     @Override
-    public Date parseDate(String date, Locale locale) throws ParseException {
+    public Date parseDate(String date, Locale locale) throws DateTimeParseException {
         return parseDate(date, locale, null, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseDate(String date, Locale locale, TimeZone timeZone) throws ParseException {
+    public Date parseDate(String date, Locale locale, TimeZone timeZone) throws DateTimeParseException {
         return parseDate(date, locale, timeZone, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseDate(String date, Locale locale, TimeZone timeZone, int dateStyle) throws ParseException {
+    public Date parseDate(String date, Locale locale, TimeZone timeZone, int dateStyle) throws DateTimeParseException {
         if (date == null) {
             return null;
         }
@@ -463,7 +461,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public Calendar parseDateToCalendar(String date, Locale locale, TimeZone timeZone, int dateStyle)
-            throws ParseException {
+            throws DateTimeParseException {
         if (date == null) {
             return null;
         }
@@ -480,27 +478,27 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public Date parseTime(String time) throws ParseException {
+    public Date parseTime(String time) throws DateTimeParseException {
         return parseTime(time, null, null, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseTime(String time, int timeStyle) throws ParseException {
+    public Date parseTime(String time, int timeStyle) throws DateTimeParseException {
         return parseTime(time, null, null, timeStyle);
     }
 
     @Override
-    public Date parseTime(String time, Locale locale) throws ParseException {
+    public Date parseTime(String time, Locale locale) throws DateTimeParseException {
         return parseTime(time, locale, null, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseTime(String time, Locale locale, TimeZone timeZone) throws ParseException {
+    public Date parseTime(String time, Locale locale, TimeZone timeZone) throws DateTimeParseException {
         return parseTime(time, locale, timeZone, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseTime(String time, Locale locale, TimeZone timeZone, int timeStyle) throws ParseException {
+    public Date parseTime(String time, Locale locale, TimeZone timeZone, int timeStyle) throws DateTimeParseException {
         if (time == null) {
             return null;
         }
@@ -516,7 +514,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public Calendar parseTimeToCalendar(String time, Locale locale, TimeZone timeZone, int timeStyle)
-            throws ParseException {
+            throws DateTimeParseException {
         if (time == null) {
             return null;
         }
@@ -533,28 +531,28 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public Date parseDateTime(String dateTime) throws ParseException {
+    public Date parseDateTime(String dateTime) throws DateTimeParseException {
         return parseDateTime(dateTime, null, null, DateFormat.DEFAULT, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseDateTime(String dateTime, int dateStyle, int timeStyle) throws ParseException {
+    public Date parseDateTime(String dateTime, int dateStyle, int timeStyle) throws DateTimeParseException {
         return parseDateTime(dateTime, null, null, dateStyle, timeStyle);
     }
 
     @Override
-    public Date parseDateTime(String dateTime, Locale locale) throws ParseException {
+    public Date parseDateTime(String dateTime, Locale locale) throws DateTimeParseException {
         return parseDateTime(dateTime, locale, null, DateFormat.DEFAULT, DateFormat.DEFAULT);
     }
 
     @Override
-    public Date parseDateTime(String dateTime, Locale locale, TimeZone timeZone) throws ParseException {
+    public Date parseDateTime(String dateTime, Locale locale, TimeZone timeZone) throws DateTimeParseException {
         return parseDateTime(dateTime, locale, timeZone, DateFormat.DEFAULT, DateFormat.DEFAULT);
     }
 
     @Override
     public Date parseDateTime(String dateTime, Locale locale, TimeZone timeZone, int dateStyle, int timeStyle)
-            throws ParseException {
+            throws DateTimeParseException {
         if (dateTime == null) {
             return null;
         }
@@ -569,7 +567,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     }
 
     @Override
-    public Date parseDateTime(String dateTime, Locale locale, TimeZone timeZone, String format) throws ParseException {
+    public Date parseDateTime(String dateTime, Locale locale, TimeZone timeZone, String format) throws DateTimeParseException {
         if (dateTime == null) {
             return null;
         }
@@ -585,7 +583,7 @@ public class LocalizationServiceImpl implements LocalizationService {
 
     @Override
     public Calendar parseDateTimeToCalendar(String dateTime, Locale locale, TimeZone timeZone, int dateStyle,
-            int timeStyle) throws ParseException {
+            int timeStyle) throws DateTimeParseException {
         if (dateTime == null) {
             return null;
         }
@@ -750,7 +748,7 @@ public class LocalizationServiceImpl implements LocalizationService {
     public BigDecimal parseBigDecimal(String number, Locale locale) throws ParseException {
         return parseBigDecimal(number, locale, true);
     }
-    
+
     @Override
     public BigDecimal parseBigDecimal(String number, Locale locale, boolean strict) throws ParseException {
     	if (number == null) {

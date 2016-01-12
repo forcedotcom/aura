@@ -43,7 +43,7 @@ import com.google.common.collect.Maps;
 
 /**
  * The servlet for initialization and actions in Aura.
- * 
+ *
  * The sequence of requests is:
  * <ol>
  * <li>GET(AuraServlet): initial fetch of an aura app/component + Resource Fetches:
@@ -68,11 +68,11 @@ import com.google.common.collect.Maps;
  * </ul>
  * </li>
  * </ol>
- * 
+ *
  * Run from aura-jetty project. Pass in these vmargs: <code>
  * -Dconfig=${AURA_HOME}/config -Daura.home=${AURA_HOME} -DPORT=9090
  * </code>
- * 
+ *
  * Exception handling is dealt with in {@link #handleServletException} which should almost always be called when
  * exceptions are caught. This routine will use {@link org.auraframework.adapter.ExceptionAdapter ExceptionAdapter} to
  * log and rewrite exceptions as necessary.
@@ -99,14 +99,14 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Check for the nocache parameter and redirect as necessary.
-     * 
+     *
      * This is part of the appcache refresh, forcing a reload while
-     * avoiding the appcache which is important for system such as 
+     * avoiding the appcache which is important for system such as
      * Android such doesn't adhere to window.location.reload(true)
      * and still uses appcache.
-     * 
+     *
      * It maybe should be done differently (e.g. a nonce).
-     * 
+     *
      * @param request The request to retrieve the parameter.
      * @param response the response (for setting the location header.
      * @returns true if we are finished with the request.
@@ -157,10 +157,10 @@ public class AuraServlet extends AuraBaseServlet {
 
     /**
      * Handle an HTTP GET operation.
-     * 
+     *
      * The HTTP GET operation is used to retrieve resources from the Aura servlet. It is only used for this purpose,
      * where POST is used for actions.
-     * 
+     *
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
@@ -236,7 +236,7 @@ public class AuraServlet extends AuraBaseServlet {
             servletUtil.handleServletException(new SystemErrorException(t), false, context, request, response, false);
             return;
         }
-        
+
         internalGet(request, response, defDescriptor, context, definitionService);
     }
 

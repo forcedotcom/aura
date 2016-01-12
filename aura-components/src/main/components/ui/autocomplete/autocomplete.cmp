@@ -35,7 +35,9 @@
     <aura:attribute name="showListFooter" type="Boolean" default="true" description="When true the listFooter will be visible"/>
     <aura:attribute name="usePanel" type="boolean" default="false"/>
     <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Indicate if the first option item should be highlighted by default."/>
-    
+    <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the list is displayed under"/>
+    <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
+
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="inputChange" type="ui:inputChange" description="The event fired when the input value changes."/>
     <aura:registerEvent name="selectListOption" type="ui:selectListOption" description="The event fired when a list option is displayed."/>
@@ -51,7 +53,7 @@
     <aura:handler name="listExpand" event="ui:autocompleteListExpand" action="{!c.handleListExpand}"/>
 
     <aura:if isTrue="{!v.inputType == 'inputTextArea'}">
-        <ui:inputTextAreaForAutocomplete aura:id="input" 
+        <ui:inputTextAreaForAutocomplete aura:id="input"
                                          class="{!v.inputClass+' '+v.theme}"
                                          label="{!v.label}"
                                          labelClass="{!v.labelClass}"
@@ -63,7 +65,7 @@
                                          disabled="{!v.disabled}"
                                          domId="{!v.domId}"/>
         <aura:set attribute="else">
-            <ui:inputTextForAutocomplete aura:id="input" 
+            <ui:inputTextForAutocomplete aura:id="input"
                                          class="{!v.inputClass+' '+v.theme}"
                                          label="{!v.label}"
                                          labelClass="{!v.labelClass}"
@@ -79,8 +81,8 @@
     <aura:if isTrue="{!v.usePanel}">
         <ui:autocompletePanel aura:id="panel">
             <ui:autocompleteList aura:id="list" class="{!v.class + ' lookup__menu'}"
-        dataProvider="{!v.dataProvider}" 
-        itemVar="{!v.optionVar}" 
+        dataProvider="{!v.dataProvider}"
+        itemVar="{!v.optionVar}"
         itemTemplate="{!v.listOption}"
         emptyListContent="{!v.emptyListContent}"
         loadingIndicator="{!v.loadingIndicator}"

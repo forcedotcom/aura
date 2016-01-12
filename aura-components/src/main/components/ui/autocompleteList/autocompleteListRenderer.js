@@ -20,12 +20,14 @@
         helper.setUpEvents(component, false);
         helper.addHeaderAndFooterClassesAndAttributes(component);
         helper.setDefaultHighlight(component);
+        helper.positionList(component);
     },
     rerender : function(component, helper){
         this.superRerender();
         if (component.isDirty('v.visible')) {
             helper.updateEmptyListContent(component);
             helper.setDefaultHighlight(component);
+            helper.positionList(component);
         }
     },
     unrender: function(component, helper) {

@@ -849,9 +849,9 @@
 	                <version>3.3</version>
 	            </plugin>
                 <plugin>
-                    <groupId>com.phasebash.jsdoc</groupId>
+                    <groupId>com.github.phasebash</groupId>
                     <artifactId>jsdoc3-maven-plugin</artifactId>
-                    <version>1.2.0</version>
+                    <version>1.0.7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

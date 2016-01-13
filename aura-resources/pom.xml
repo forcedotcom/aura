@@ -142,9 +142,9 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>com.phasebash.jsdoc</groupId>
+                                        <groupId>com.github.phasebash</groupId>
                                         <artifactId>jsdoc3-maven-plugin</artifactId>
-                                        <versionRange>[1.1,)</versionRange>
+                                        <versionRange>[1.0.7,)</versionRange>
                                         <goals>
                                             <goal>jsdoc3</goal>
                                         </goals>
@@ -174,7 +174,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.phasebash.jsdoc</groupId>
+                        <groupId>com.github.phasebash</groupId>
                         <artifactId>jsdoc3-maven-plugin</artifactId>
                         <executions>
                             <execution>
@@ -186,9 +186,6 @@
                                     </sourceFiles>
                                     <outputDirectory>${basedir}/target/src-gen/main/resources/jsdoc</outputDirectory>
                                     <configFile>${basedir}/config/jsdoc3/${jsDoc.mode}.json</configFile>
-                                    <directoryRoots>
-                                        <directoryRoot>${basedir}/config/jsdoc3</directoryRoot>
-                                    </directoryRoots>
                                 </configuration>
                                 <goals>
                                     <goal>jsdoc3</goal>

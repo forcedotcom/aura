@@ -20,7 +20,7 @@ import org.apache.commons.lang3.Validate;
 import org.auraframework.Aura;
 import org.auraframework.clientlibrary.ClientLibraryResolver;
 import org.auraframework.def.ClientLibraryDef;
-import org.auraframework.http.AuraFrameworkServlet;
+import org.auraframework.http.services.AuraFrameworkServletServiceImpl;
 import org.auraframework.system.AuraContext;
 
 /**
@@ -90,6 +90,6 @@ public abstract class AbstractResourceResolver implements ClientLibraryResolver 
 
         String nonce = Aura.getContextService().getCurrentContext().getFrameworkUID();
         String contextPath = Aura.getContextService().getCurrentContext().getContextPath();
-        return String.format(AuraFrameworkServlet.RESOURCES_FORMAT, contextPath, nonce, location);
+        return String.format(AuraFrameworkServletServiceImpl.RESOURCES_FORMAT, contextPath, nonce, location);
     }
 }

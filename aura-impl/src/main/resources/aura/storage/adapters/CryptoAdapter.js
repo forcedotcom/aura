@@ -56,7 +56,9 @@ function CryptoAdapter(config) {
     this.config = config;
 
     // default storage is indexeddb (alternative is memory adapter)
-    this.adapter = new Aura.Storage.IndexedDBAdapter(config);
+    var adapterClass = $A.storageService.getAdapterConfig("indexeddb")["adapterClass"];
+    this.adapter = new adapterClass(config);
+
     this.mode = CryptoAdapter.NAME;
 
     // async initialize. if it completes successfully, process the queue;

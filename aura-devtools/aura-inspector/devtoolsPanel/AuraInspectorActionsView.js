@@ -227,6 +227,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("fromStorage", action.fromStorage);
             card.setAttribute("storageKey", action.storageKey);
+            if(action.stats) {
+                card.setAttribute("stats", JSON.stringify(action.stats));
+            }
             card.parentNode.removeChild(card);
         } else {
             card = createActionCard(action.id, false);
@@ -292,6 +295,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("isFromStorage", action.fromStorage);
             card.setAttribute("storageKey", action.storageKey);
+            if(action.stats) {
+                card.setAttribute("stats", JSON.stringify(action.stats));
+            }
             if(toDrop === false) {
                 //set draggable
                 card.setAttribute("draggable","true");

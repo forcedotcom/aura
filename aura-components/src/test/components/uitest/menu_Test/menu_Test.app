@@ -22,6 +22,7 @@
     <aura:attribute name="menuCondition" type="Boolean" default="true"/>
     <aura:attribute name="focus_counter" type="Integer" default="0"/>
     <aura:attribute name="blur_counter" type="Integer" default="0"/>
+    <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="false"/>
 
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>Check Menu Position Test</h2>
@@ -42,7 +43,7 @@
             <h2>Your favorite soccer club</h2>
             <ui:menu aura:id="uiMenu" class="clubMenu">
                 <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
-                <ui:menuList class="actionMenu" aura:id="actionMenu">
+                <ui:menuList class="actionMenu" aura:id="actionMenu" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}">
                     <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" />
                     <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
                     <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" />
@@ -78,7 +79,7 @@
             <h2>Your favorite football teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
-                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu" hideMenuAfterSelected="false">
+                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu" hideMenuAfterSelected="{!v.hideMenuAfterSelected}">
                     <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers"/>
                     <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks"/>
                     <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams"/>
@@ -122,7 +123,7 @@
             <h2>Your favorite baseball teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
-                <ui:menuList class="radioMenu" aura:id="radioMenu" hideMenuAfterSelected="false">
+                <ui:menuList class="radioMenu" aura:id="radioMenu" hideMenuAfterSelected="{!v.hideMenuAfterSelected}">
                     <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco"/>
                     <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers"/>
                     <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona"/>

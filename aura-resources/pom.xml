@@ -142,9 +142,9 @@
                             <pluginExecutions>
                                 <pluginExecution>
                                     <pluginExecutionFilter>
-                                        <groupId>com.github.phasebash</groupId>
+                                        <groupId>com.phasebash.jsdoc</groupId>
                                         <artifactId>jsdoc3-maven-plugin</artifactId>
-                                        <versionRange>[1.0.7,)</versionRange>
+                                        <versionRange>[1.1,)</versionRange>
                                         <goals>
                                             <goal>jsdoc3</goal>
                                         </goals>
@@ -174,7 +174,7 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>com.github.phasebash</groupId>
+                        <groupId>com.phasebash.jsdoc</groupId>
                         <artifactId>jsdoc3-maven-plugin</artifactId>
                         <executions>
                             <execution>

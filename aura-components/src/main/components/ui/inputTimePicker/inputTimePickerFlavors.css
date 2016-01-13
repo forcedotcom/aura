@@ -15,11 +15,11 @@
  */
 /* top level .html styles */
 .THIS {
-    overflow: hidden;
+    display: none;
+    top: 0;
+    position: absolute;
     font: 100%/1.5 "Salesforce Sans",Arial,sans-serif;
-    background: #fff;
-    color: #16325c;
-    -webkit-tap-highlight-color: transparent;
+    z-index: 7000;
 }
 
 .THIS ol,
@@ -27,19 +27,6 @@
     margin: 0;
     padding: 0;
     list-style: none;
-}
-
-.THIS div.dropdown:not(.visible) {
-    display: block;
-    position: absolute;
-    visibility: hidden;
-}
-
-.THIS > div.dropdown.visible {
-    display: block;
-    position: absolute;
-    z-index: 7000;
-    visibility: visible;
 }
 
 .THIS .dropdown {
@@ -50,7 +37,6 @@
     padding: .5rem 0;
     z-index: 7000;
     float: left;
-    position: absolute;
     min-width: 130px;
     max-width: 400px;
     -webkit-transform: translateX(-50%);
@@ -66,7 +52,6 @@
 }
 
 .THIS .datepicker {
-    margin-top: .25rem;
     padding: .75rem .5rem;
     font-size: .75rem;
 }

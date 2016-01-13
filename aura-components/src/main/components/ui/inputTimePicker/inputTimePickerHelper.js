@@ -19,11 +19,42 @@
         var target = component.get("v.referenceElement");
         var self = this;
         if (target && element) {
+            var scrollableParent = this._getScrollableParent(element);
+            this._handleScroll = function() {
+                self.lib.panelPositioning.reposition();
+            };
+
+            this._handleWheel = function(e) {
+                var elScrollableParent = self._getScrollableParent(element);
+                if(elScrollableParent && elScrollableParent.scrollTop) {
+                    elScrollableParent.scrollTop += e.deltaY;
+                }
+
+            };
+
+            // if the target element is inside a
+            // scrollable element, we need to make sure
+            // scroll events move that element,
+            // not the parent, also we need to reposition on scroll
+            if(scrollableParent) {
+                scrollableParent.addEventListener('scroll', this._handleScroll);
+                element.addEventListener('wheel', this._handleWheel);
+            }
+
+            var referenceElementAlign = 'left bottom';
+            var elementAlign = 'left top';
+
+            if (this.shouldFlip(element, target)) {
+                referenceElementAlign = 'left top';
+                elementAlign = 'left bottom';
+            }
+
             component.positionConstraint = this.lib.panelPositioning.createRelationship({
                 element: element,
                 target: target,
-                align: 'left top',
-                targetAlign: 'left bottom'
+                appendToBody: true,
+                align: elementAlign,
+                targetAlign: referenceElementAlign
             });
             this.lib.panelPositioning.reposition($A.getCallback(function(){
                 self.scrollToSelectedTime(component);
@@ -31,7 +62,49 @@
         } else {
             this.scrollToSelectedTime(component);
         }
+    },
 
+    /**
+     * If any parent element is scrollable with the wheel
+     * (overflow-y), return that
+     * @param  {HTMLElement} elem The element to check
+     * @return {Mixed}      Returns an HTMLElement if one is found, otherwise null
+     */
+    _getScrollableParent: function(elem) {
+
+        if(this._scrollableParent) {
+            return this._scrollableParent;
+        }
+
+        // if overflow is auto overflow-y is also auto,
+        // however in firefox the opposite is not true
+        var overflow = getComputedStyle(elem)['overflow-y'];
+
+        if(overflow === 'auto') {
+            this._scrollableParent = elem;
+            return elem;
+        }
+
+        if(elem === document.body) {
+            this._scrollableParent = null;
+            return null;
+        }
+
+        return this._getScrollableParent(elem.parentNode);
+
+    },
+
+    shouldFlip: function(element, targetElement) {
+        var viewPort = $A.util.getWindowSize();
+        var elemRect = element.getBoundingClientRect();
+        var referenceElemRect = targetElement.getBoundingClientRect();
+        var height = typeof elemRect.height !== 'undefined' ? elemRect.height : elemRect.bottom - elemRect.top;
+
+        if (referenceElemRect.top >= height         // enough space above
+            && (viewPort.height - referenceElemRect.bottom) < height) { // not enough space below
+            return true;
+        }
+        return false;
     },
 
     selectTime: function(component, event) {
@@ -89,7 +162,7 @@
     updateGlobalEventListeners: function(component) {
         var visible = component.get("v.visible");
         if (!component._clickHandler) {
-            component._clickHandler = component.addDocumentLevelHandler("click", this.getOnClickFunction(component), visible);
+            component._clickHandler = component.addDocumentLevelHandler("mouseup", this.getOnClickFunction(component), visible);
         } else {
             component._clickHandler.setEnabled(visible);
         }
@@ -159,7 +232,7 @@
                 }
                 var time = ("0" + hours).slice(-2) + ("0" + closestMinute).slice(-2);
                 if (!$A.util.isUndefinedOrNull(time)) {
-                    var elem = document.getElementById(time);
+                    var elem = document.querySelector(".visible li[id = '" + time + "']");
                     if (!$A.util.isUndefinedOrNull(elem)) {
                         //elem.scrollIntoView();
                         elem.focus();
@@ -239,7 +312,7 @@
         }
         var time = ("0" + hours).slice(-2) + ("0" + newMinutes).slice(-2);
         if (!$A.util.isUndefinedOrNull(time)) {
-            var elem = document.getElementById(time);
+            var elem = document.querySelector(".visible li[id = '" + time + "']");
             if (!$A.util.isUndefinedOrNull(elem)) {
                 elem.focus();
             }
@@ -263,7 +336,7 @@
         }
         var time = ("0" + hours).slice(-2) + ("0" + newMinutes).slice(-2);
         if (!$A.util.isUndefinedOrNull(time)) {
-            var elem = document.getElementById(time);
+            var elem = document.querySelector(".visible li[id = '" + time + "']");
             if (!$A.util.isUndefinedOrNull(elem)) {
                 elem.focus();
             }

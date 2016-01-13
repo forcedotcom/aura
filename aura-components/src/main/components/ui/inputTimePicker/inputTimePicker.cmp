@@ -28,8 +28,8 @@
 
     <aura:registerevent name="selectDate" type="ui:selectDate" description="The event fired when a date is selected."/>
 
-    <div aura:flavorable="true" class="{!v.class}">
-        <div aura:id="timeDropdown" class="{!(v.visible == true ? 'visible ' : '')  + 'dropdown dropdown--left datepicker datepicker--time scrollable'}" aria-hidden="false" data-selection="time">
+    <div aura:id="timeDropdown" aura:flavorable="true" class="{!v.class + (v.visible == true ? ' visible' : '')}">
+        <div class="dropdown dropdown--left datepicker datepicker--time scrollable" aria-hidden="false" data-selection="time">
             <ul aura:id="timeList" role="menu" class="datepicker--time__list" onclick="{!c.selectTime}" onmouseover="{!c.handleMouseover}"/>
         </div>
     </div>

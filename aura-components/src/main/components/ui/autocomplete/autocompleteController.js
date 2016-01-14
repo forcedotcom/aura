@@ -71,7 +71,9 @@
 
         if (component._delay) {
             component._delay(function() {
-                helper.fireInputChangeEvent(component, event);
+            	if (component && component.isValid()) {
+                    helper.fireInputChangeEvent(component, event);
+            	}
             }, 300);
         } else {
             helper.fireInputChangeEvent(component, event);

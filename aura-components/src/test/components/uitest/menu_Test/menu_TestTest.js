@@ -69,6 +69,41 @@
         }
         ]
     },
+    
+    /**
+     * verify hideMenuAfterSelected when set on menu's
+     * Test case for W-2720943
+     */
+    testActionMenuHideAfterSelectedSet: {
+    	attributes : {"hideMenuAfterSelected" : "true"},
+        test: [function (cmp) {
+            actionMenu = cmp.find("actionMenu");
+            menuLabel = cmp.find("trigger");
+
+            //check menu is default to hidden by using AURA API
+            $A.test.assertFalse(actionMenu.get('v.visible'), "Action Menu should not be visible");
+            this.clickAnchor(menuLabel);
+
+            //Check if secondItem in the menu is disabled
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return cmp.find("actionItem2").get("v.disabled");
+            }, "Check if Item2 in the menu is disabled");
+        }, function (cmp) {
+            //check menu is visible by using AURA API
+            $A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible");
+            $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should be uiMenuList visible");
+
+            //click actionItem3 and check if label is updated
+            this.clickAnchor(cmp.find("actionItem3"));
+            $A.test.addWaitForWithFailureMessage(cmp.find("actionItem3").get('v.label'), function () {
+                return menuLabel.get('v.label')
+            }, "Label should be updated to " + cmp.find("actionItem3").get('v.label'));
+        }, function (cmp) {
+        	$A.test.assertTrue(actionMenu.get('v.visible'), "Menu should be visible");
+            $A.test.assertTrue($A.util.hasClass(actionMenu.getElement(), "visible"), "Class name should be uiMenuList visible");
+        }
+        ]
+    },
 
     /**
      * Test to verify checkbox menu works when interacting with the menu items
@@ -131,6 +166,41 @@
         }
         ]
     },
+    
+    /**
+     * verify hideMenuAfterSelected when set on menu's
+     * Test case for W-2720943
+     */
+    testCheckboxMenuListHidesAfterSelected: {
+    	attributes : {"hideMenuAfterSelected" : "true"},
+        test: [function (cmp) {
+            menuLabel = cmp.find("checkboxMenuLabel");
+            checkboxMenu = cmp.find("checkboxMenu");
+            ouptutButton = cmp.find("checkboxButton");
+            outputText = "checkboxMenuResult";
+
+            ouptutButton.get('e.press').fire();
+            //check if default value is checked
+            $A.test.addWaitForWithFailureMessage(cmp.find("checkboxItem4").get('v.label'), function () {
+                return cmp.find(outputText).get('v.value')
+            }, "Ouput Label should be updated to " + cmp.find("checkboxItem4").get('v.label'));
+        }, function (cmp) {
+            this.clickAnchor(menuLabel);
+            //Check if menu is visible
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return $A.util.hasClass(checkboxMenu.getElement(), "visible")
+            }, "Checkbox Menu Should be visible");
+        }, function (cmp) {
+            //Select item1 from the list
+            this.clickAnchor(cmp.find("checkboxItem1"));
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return cmp.find("checkboxItem1").get('v.selected')
+            }, "Checkbox Menu item 1 should be selected");
+        }, function (cmp) {
+            $A.test.assertFalse($A.util.hasClass(checkboxMenu.getElement(), "visible"), "Checkbox Menu Should not be visible as hideMenuAfterSelected is set to true");
+        }
+        ]
+    },
 
     /**
      * Test to verify radiobox menu works when interacting with the menu items
@@ -180,8 +250,34 @@
 
         ]
     },
+    
+    testRadioMenuListHidesAfterSelected: {
+    	attributes : {"hideMenuAfterSelected" : "true"},
+        test: [function (cmp) {
+            menuLabel = cmp.find("radioMenuLabel");
+            radioMenu = cmp.find("radioMenu");
+            ouptutButton = cmp.find("radioButton");
+            item1 = cmp.find("radioItem1");
+            item2 = cmp.find("radioItem2");
+            outputText = "radioMenuResult";
 
-
+            this.clickAnchor(menuLabel);
+            //check if menu is visible
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return $A.util.hasClass(radioMenu.getElement(), "visible")
+            }, "Radio Menu should be visible");
+        }, function (cmp) {
+            //Select first item from the menu
+            this.clickAnchor(item1);
+            //check if first item is selected
+            $A.test.addWaitForWithFailureMessage(true, function () {
+                return item1.get('v.selected')
+            }, "Radio Menu item 1 should be selected");
+        }, function (cmp) {
+            $A.test.assertFalse($A.util.hasClass(radioMenu.getElement(), "visible"), "Radio Menu should not be visible as hideMenuAfterSelected is set to true");
+        }
+        ]
+    },
 
     /**
      * Test to verify radiobox menu created using iteration cmp works when interacting with the menu items

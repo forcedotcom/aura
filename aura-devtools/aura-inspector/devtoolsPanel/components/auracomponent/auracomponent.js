@@ -6,6 +6,7 @@
 
     auracomponent.createdCallback = function() {
 
+        this.addEventListener("click", AuraComponent_OnClick.bind(this));
         this.addEventListener("dblclick", AuraComponent_OnDblClick.bind(this));
     }
 
@@ -137,12 +138,21 @@
         return object;
     }
 
+    function AuraComponent_OnClick(event) {
+        var globalId = this.getAttribute("globalId");
+        if(globalId) {
+            var command = `
+                $auraTemp = $A.getComponent('${globalId}'); undefined;
+            `;
+            chrome.devtools.inspectedWindow.eval(command);
+        }
+    }
+
     function AuraComponent_OnDblClick(event) {
         var globalId = this.getAttribute("globalId");
         if(globalId) {
             var command = `
                 $auraTemp = $A.getComponent('${globalId}'); 
-                console.log('$auraTemp = ', $auraTemp);
                 window[Symbol.for('AuraDevTools')].Inspector.publish("AuraInspector:ShowComponentInTree", $auraTemp.getGlobalId());
             `;
             chrome.devtools.inspectedWindow.eval(command);

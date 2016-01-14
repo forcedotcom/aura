@@ -95,7 +95,8 @@ button#clear-button {
 header.tabs {
   background: #F0F1F2;
   box-shadow: 0 1px 0 #e0e5ee;
-  padding: 0 0 0 1em;
+  padding: 0 3em 0 1em;
+  position: relative;
 }
 header.tabs button {
   background: #F5F6F7;
@@ -103,7 +104,6 @@ header.tabs button {
   border-bottom: 0 none;
   border-radius: 0;
   color: #000;
-  margin-right: .2em;
   margin: .6em .2em 0 .2em;
   padding: 2px 6px 3px 6px;
 }
@@ -112,6 +112,46 @@ header.tabs button:focus {
 }
 header.tabs button.selected {
   background: #fff;
+  border-bottom:1px solid #fff;
+  margin-bottom:-1px;
+}
+
+header.tabs div.dropdown#help {
+  margin: .6em .2em 0 .2em;
+  border: 1px solid #DADEE2;
+  border-bottom: 0 none;
+  position: absolute;
+  bottom: 0;
+  right: 1em;
+  background-color:#fff;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+header.tabs div.dropdown#help A.trigger {
+  padding: 2px 9px;
+  display:inline-block;
+  z-index:20;
+  position: relative;
+  background:#fff;
+}
+header.tabs div.dropdown menu {
+  display: none;
+  border: 1px solid #D8DDE6;
+  text-align:right;
+  position:absolute;
+  right:-1px;
+  margin-top:-1px;
+  background:#fff;
+  white-space: nowrap;
+  z-index:10;
+}
+header.tabs div.dropdown.visible menu { 
+  display:block;
+}
+header.tabs div.dropdown menuitem { 
+  display:block;
 }
 section.tab-body {
   display: none;

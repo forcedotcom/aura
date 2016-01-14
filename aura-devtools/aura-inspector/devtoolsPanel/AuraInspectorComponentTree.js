@@ -157,7 +157,7 @@ function AuraInspectorComponentTree(devtoolsPanel) {
             var globalId = treeNode && treeNode.getRawLabel().globalId;
 
             if(globalId) {
-                var command = "$auraTemp = $A.getCmp('" + globalId + "'); console.log('$auraTemp = ', $auraTemp);";
+                var command = "$auraTemp = $A.getCmp('" + globalId + "'); undefined;";
                 chrome.devtools.inspectedWindow.eval(command);
             }
         }

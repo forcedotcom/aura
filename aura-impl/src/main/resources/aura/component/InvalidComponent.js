@@ -312,13 +312,6 @@ InvalidComponent.prototype.toString = function(){
 };
 
 /**
- * @private
- */
-InvalidComponent.prototype.toJSON = function(){
-    this.raiseInvalidComponentError("toJSON", arguments);
-};
-
-/**
  * @export
  */
 InvalidComponent.prototype.getFacets = function() {

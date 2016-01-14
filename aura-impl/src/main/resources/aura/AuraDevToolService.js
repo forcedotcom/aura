@@ -303,7 +303,7 @@ var AuraDevToolService = function() {
         },
 
         output : function(cmp) {
-            return cmp.output();
+            return cmp.toJSON();
         },
         accessbilityAide:{
 

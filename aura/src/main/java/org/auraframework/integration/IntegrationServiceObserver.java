@@ -15,36 +15,6 @@
  */
 package org.auraframework.integration;
 
-import org.auraframework.def.ApplicationDef;
-import org.auraframework.def.TokensDef;
-import org.auraframework.system.AuraContext;
 
 public interface IntegrationServiceObserver {
-    /**
-     * A notification that the {@link AuraContext} for this integration has been established (or an existing one was
-     * properly set up).
-     * <p>
-     * Note that this notification occurs every time a context is started (e.g., every time
-     * {@link Integration#injectComponent} is called). If your implementation is performing an operation that only needs
-     * to run once, before the application is written, consider
-     * {@link #beforeApplicationWritten(Integration, AuraContext)} instead.
-     *
-     *
-     * @param integration The integration being observed.
-     * @param context The {@link AuraContext} for the current integration.
-     */
-    void contextEstablished(Integration integration, AuraContext context);
-
-    /**
-     * A notification sent just before the application is written out.
-     * <p>
-     * This is useful for operations that need to run once, before the application is serialized, e.g., setting
-     * {@link TokensDef} overrides (see {@link AuraContext#appendTokensDescriptor(org.auraframework.def.DefDescriptor)}).
-     *
-     *
-     * @param integration The integration being observed.
-     * @param context The {@link AuraContext} for the current integration.
-     * @param app The {@link ApplicationDef} that will be written.
-     */
-    void beforeApplicationWritten(Integration integration, AuraContext context, ApplicationDef app);
 }

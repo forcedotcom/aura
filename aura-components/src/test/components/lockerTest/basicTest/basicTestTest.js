@@ -17,6 +17,14 @@
         }
     },
 
+    testAlertExposed: {
+        test: function(cmp) {
+            cmp.getAlert();
+            var alert = cmp.get("v.log");
+            $A.test.assertStartsWith("function alert() {", alert, "alert() not exposed");
+        }
+    },
+
     testAuraLockerInController: {
         test: function(cmp) {
             cmp.getWrappersFromController();

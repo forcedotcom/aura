@@ -18,16 +18,7 @@
 <aura:component implements="aura:requireLocker">
     <aura:attribute name="log" type="Object" description="Store info from helper to verify in test"/>
 
-    <div>LockerService test</div>
-    <ui:button label="Test Wrappers" press="{!c.testWrappers}" aura:id="testWrappers"/>
-    <aura:method name="getWrappersFromController" action="{!c.getWrappersFromController}"/>
-    <aura:method name="getSecureElementFromMarkup" action="{!c.getSecureElementFromMarkup}"/>
-    <aura:method name="appendDiv" action="{!c.appendDiv}"/>
-    <aura:method name="createScriptTags" action="{!c.createScriptTags}"/>
-    <aura:method name="getAlert" action="{!c.getAlert}"/>
-    <aura:method name="testEvalBlocking" action="{!c.testEvalBlocking}">
-	    <aura:attribute name="testUtils" type="Object"/>
-    </aura:method>
-    
-    <div aura:id="content"/>
+	<aura:method name="getWindow" action="{!c.getWindow}"/>
+
+    <div>SecureWindow test</div>
 </aura:component>

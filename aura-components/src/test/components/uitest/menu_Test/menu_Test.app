@@ -24,17 +24,19 @@
     <aura:attribute name="blur_counter" type="Integer" default="0"/>
     <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="false"/>
 
-    <div style="display:inline-block;width:50%;vertical-align:top;">
-        <h2>Check Menu Position Test</h2>
-        <ui:menu aura:id="uiMenu" class="checkPositionMenu">
-            <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
-            <ui:menuList class="checkPosition" aura:id="checkPosition" menuCollapse="{!c.menuCollapse}" menuExpand="{!c.menuExpand}" menuSelect="{!c.incrementMenuSelectFireCount}">
-                <ui:actionMenuItem class="checkPositionItem1" aura:id="checkPositionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
-                <ui:actionMenuItem class="checkPositionItem2" aura:id="checkPositionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                <ui:actionMenuItem class="checkPositionItem3" aura:id="checkPositionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
-                <ui:actionMenuItem class="checkPositionItem4" aura:id="checkPositionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
-            </ui:menuList>
-        </ui:menu>
+    <div style="margin:20px;">
+        <div style="display:inline-block;width:50%;vertical-align:top;">
+            <h2>Check Menu Position Test</h2>
+            <ui:menu aura:id="uiMenu" class="checkPositionMenu">
+                <ui:menuTriggerLink class="triggercheckPosition" aura:id="triggercheckPosition" label="Please pick your favorite soccer club"/>
+                <ui:menuList class="checkPosition" aura:id="checkPosition" menuCollapse="{!c.menuCollapse}" menuExpand="{!c.menuExpand}" menuSelect="{!c.incrementMenuSelectFireCount}">
+                    <ui:actionMenuItem class="checkPositionItem1" aura:id="checkPositionItem1" label="Bayern München" click="{!c.updateTriggerLabel}"/>
+                    <ui:actionMenuItem class="checkPositionItem2" aura:id="checkPositionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
+                    <ui:actionMenuItem class="checkPositionItem3" aura:id="checkPositionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}"/>
+                    <ui:actionMenuItem class="checkPositionItem4" aura:id="checkPositionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+                </ui:menuList>
+            </ui:menu>
+        </div>
     </div>
     <hr/>
     <p/>

@@ -56,7 +56,11 @@
 
         var valueProvider = handlerParams.valueProvider;
         var actionExpression = handlerParams.actionExpression;
-        var htmlButton = cmp.find('button');
+        var uiButton = cmp;
+        while (!(uiButton.getDef().getDescriptor().getQualifiedName() === "markup://ui:button")) {
+            uiButton = uiButton.getSuper();
+        }
+        var htmlButton = uiButton.find('button');
         var originalAddHandler = htmlButton.addHandler;
         var htmlAttr = htmlButton.get('v.HTMLAttributes');
 

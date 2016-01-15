@@ -1471,7 +1471,10 @@ Component.prototype.toString = function() {
  * @private
  */
 Component.prototype.toJSON = function() {
-	return $A.util.json.encode(this.output(this));
+	return {
+        "globalId": this.globalId,
+        "isValid": this.isValid()
+    };
 };
 
 /**
@@ -2409,161 +2412,6 @@ Component.prototype.associateRenderedBy = function(cmp, element) {
     if (!$A.util.hasDataAttribute(element, $A.componentService.renderedBy)) {
         $A.util.setDataAttribute(element, $A.componentService.renderedBy, cmp.globalId);
     }
-};
-
-Component.prototype.output = function(value, avp, serialized, depth) {
-    if (serialized === undefined) {
-        serialized = [];
-        depth = 0;
-    } else {
-        depth++;
-    }
-
-    if (value){
-        var isArray = $A.util.isArray(value);
-        // Look for value in serialized
-        if(typeof value === "object" && !isArray) {
-            var length = serialized.length;
-            for(var c=0;c<length;c++) {
-                if(serialized[c] === value) {
-                    return { "$serRefId": c };
-                }
-            }
-
-            value["$serId"] = length;
-            serialized.push(value);
-        }
-
-        if(value instanceof Component) {
-            return this.outputComponent(value, serialized, depth);
-        } else if(value instanceof Action) {
-            return "Action";
-        }else{
-            if(isArray){
-                return this.outputArrayValue(value, avp, serialized, depth);
-            } else if($A.util.isElement(value)) {
-                var domOutput = {};
-                domOutput["tagName"]  = value.tagName;
-                domOutput["id"] = value.id||"";
-                domOutput["className"] = value.className||"";
-                domOutput["$serId"] = value["$serId"];
-                domOutput["__proto__"] = null;//eslint-disable-line no-proto
-                return domOutput;
-            } else if($A.util.isObject(value)){
-                return this.outputMapValue(value, avp, serialized, depth);
-            }
-        }
-    }
-
-    return value ? value.toString() : value;
-};
-
-Component.prototype.outputMapValue = function(map, avp, serialized, depth) {
-    var ret = {};
-    var that = this;
-    for(var key in map){
-        var value=map[key];
-        if(key === "$serId"){
-            ret[key] = value;
-            continue;
-        }
-        try {
-            if($A.util.isExpression(value)){
-                ret[key]=that.output(value.evaluate(), avp, serialized, depth);
-            }else{
-                ret[key] = that.output(value, avp, serialized, depth);
-            }
-        } catch (e) {
-            ret[key] = "Error";
-            $A.warning("Error in chrome plugin support", e);
-        }
-    }
-    ret["__proto__"] = null;//eslint-disable-line no-proto
-    return ret;
-};
-
-Component.prototype.outputArrayValue = function(array, avp, serialized, depth) {
-    var ret = [];
-    for (var i = 0; i < array.length; i++) {
-        ret.push(this.output(array[i], avp, serialized, depth));
-    }
-    ret["__proto__"] = null;//eslint-disable-line no-proto
-    return ret;
-};
-
-Component.prototype.outputComponent = function(cmp, serialized, depth) {
-    /*jslint reserved: true */
-    if (cmp) {
-        if(!cmp.isValid()) {
-            return { "globalId": cmp.globalId, "valid": false };
-        }
-        var ret = {
-            __proto__ : null//eslint-disable-line no-proto
-        };
-        ret["descriptor"] = cmp.getDef().getDescriptor().toString();
-        ret["globalId"] = cmp.globalId;
-        ret["localId"] = cmp.getLocalId();
-        ret["rendered"] = cmp.isRendered();
-        ret["valid"] = cmp.isValid();
-        ret["expressions"] = {};
-        var model = cmp.getModel();
-        if (model) {
-            ret["model"] = this.output(model, cmp.getAttributeValueProvider(), serialized, depth);
-        }
-
-        var attributeDefs = cmp.getDef().getAttributeDefs();
-        var that = this;
-        //var values = cmp.get("v").values;
-        //if(cmp.isConcrete()) {
-        ret.attributes = {};
-        var values = cmp.attributeSet.values;
-
-
-        attributeDefs.each(function ComponentPriv$outputComponent$forEachAttribute(attributeDef) {
-            var key = attributeDef.getDescriptor().name;
-            var val;
-            var rawValue;
-            try {
-                val = cmp.get("v."+key);
-                rawValue = values[key];
-            } catch (e) {
-                val = undefined;
-            }
-            if($A.util.isExpression(rawValue)) {
-                // KRIS: Also needs to output the value provider for the expression.
-
-                // KRIS: This rawValue only works in non prod mode, otherwise you get "PropertyReferenceValue"
-                ret["expressions"][key] = rawValue+"";
-            }
-            if(key !== "body") {
-                ret.attributes[key] = that.output(val, cmp.getAttributeValueProvider(), serialized, depth);
-            } else {
-                ret.attributes[key] = {};
-                for(var id in rawValue) {
-                    if(rawValue.hasOwnProperty(id)) {
-                        ret.attributes[key][id] = that.output(rawValue[id], cmp.getAttributeValueProvider(), serialized, depth);
-                    }
-                }
-            }
-        });
-        ret.attributes["__proto__"] = null;//eslint-disable-line no-proto
-        //}
-        var valueProvider = cmp.getAttributeValueProvider();
-        ret["attributeValueProvider"] = this.output(valueProvider,
-            cmp.getAttributeValueProvider(), serialized, depth);
-
-        var superComponent = cmp.getSuper();
-        if (superComponent) {
-            ret["super"] = this.output(superComponent, cmp, serialized, depth);
-        }
-
-        if("$serId" in cmp) {
-            ret["$serId"] = cmp["$serId"];
-        }
-
-        return ret;
-    }
-    return null;
 };
 
 Aura.Component.Component = Component;

@@ -95,38 +95,29 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' />" +
-                        "<aura:clientLibrary name='UIPerf' type='JS' modes=''/>" +
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
-        assertEquals(2, libraries.size());
+        assertEquals(1, libraries.size());
         ClientLibraryDef cld1 = libraries.get(0);
         assertTrue(cld1.getModes().isEmpty());
-
-        ClientLibraryDef cld2 = libraries.get(1);
-        assertEquals(0, cld2.getModes().size());
     }
 
     public void testModesSpecifiedInLibraryTag() throws Exception {
         StringSource<ComponentDef> source = new StringSource<>(descriptor,
                 "<aura:component>" +
                         "<aura:clientLibrary name='HTML5Shiv' type='JS' modes='DEV'/>" +
-                        "<aura:clientLibrary name='UIPerf' type='JS' modes='DEV,FTEST'/>" +
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
-        assertEquals(2, libraries.size());
+        assertEquals(1, libraries.size());
 
         ClientLibraryDef cld1 = libraries.get(0);
         assertEquals(1, cld1.getModes().size());
         assertTrue(cld1.getModes().contains(Mode.DEV));
         assertEquals(Sets.newHashSet(Mode.DEV), cld1.getModes());
-
-        ClientLibraryDef cld2 = libraries.get(1);
-        assertEquals(2, cld2.getModes().size());
-        assertEquals(Sets.newHashSet(Mode.DEV, Mode.FTEST), cld2.getModes());
     }
 
     public void testInvalidModeSpecificationInLibraryTag() throws Exception {
@@ -169,18 +160,17 @@ public class ClientLibraryDefHandlerTest extends AuraImplTestCase {
                         "<aura:clientLibrary url='//jslibrary/abc/sfdc/Alto.js' combine='true'/>" + //5
                         "<aura:clientLibrary url='https://www.likeaboss.com/jslibrary/xyz/sfdc/Zen.js' combine='true'/>" + //6
                         "<aura:clientLibrary url='http://www.likeaboss.com/jslibrary/xyz/sfdc/Zen.js' combine='true'/>" + //7
-                        "<aura:clientLibrary name='UIPerf' type='JS' combine='false'/>" + //8
                         "</aura:component>", "myID",
                 Format.XML);
         ComponentDef cmpDef = new ComponentXMLParser().parse(descriptor, source);
         List<ClientLibraryDef> libraries = cmpDef.getClientLibraries();
-        assertEquals(9, libraries.size());
+        assertEquals(8, libraries.size());
         ClientLibraryDef cld;
         for(int i= 0; i< 3; i++){
              cld = libraries.get(i);
             assertTrue(i + " should be combine", cld.shouldCombine());
         }
-        for(int i= 3; i< 9; i++){
+        for(int i= 3; i< 8; i++){
             cld = libraries.get(i);
            assertFalse(i + " should not combine", cld.shouldCombine());
        }

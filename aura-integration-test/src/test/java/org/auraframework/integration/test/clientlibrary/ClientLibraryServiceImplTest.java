@@ -89,15 +89,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertTrue(cls instanceof ClientLibraryServiceImpl);
     }
 
-    // SFDC uses UIPerf
-    @UnAdaptableTest
-    public void testUIPerfJS() throws Exception {
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf", null, ClientLibraryDef.Type.JS,
-                null, false, null, null);
-        String url = clientLibraryService.getResolvedUrl(clientLibrary);
-        assertTrue(url.contains("UIPerf.js"));
-    }
-
     public void testWriteResourcesCSS() throws Exception {
         AuraContext context = Aura.getContextService().getCurrentContext();
         DefDescriptor<ApplicationDef> appDesc = Aura.getDefinitionService()
@@ -164,11 +155,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
 
     public void testGetResolvedUrl() {
         assertNull(clientLibraryService.getResolvedUrl(null));
-
-        // Non existing
-        ClientLibraryDef badClientLibrary = vendor.makeClientLibraryDef("UIPerfCSS", null, Type.JS,
-                null, false, null, null);
-        assertNull(clientLibraryService.getResolvedUrl(badClientLibrary));
 
         // Null name and null type
         ClientLibraryDef nullsClientLibrary = vendor.makeClientLibraryDef(null, null, null,
@@ -315,7 +301,6 @@ public class ClientLibraryServiceImplTest extends AuraImplTestCase {
         assertRootComponentResourceUrl(appDesc, resourceUrl, Type.CSS);
     }
 
-    // SFDC uses UIPerf
     @UnAdaptableTest
     public void testGetUrlsChangesWithMode() throws Exception {
         Aura.getContextService().endContext();

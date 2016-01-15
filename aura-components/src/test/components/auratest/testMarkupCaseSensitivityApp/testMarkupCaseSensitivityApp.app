@@ -21,10 +21,8 @@
     
     <!-- aura clientLibrary, name is case sensitive, url is case sensitive -->
     <aura:clientLibrary name="clTestAppJS" url="js://clientLibraryTest.clientLibraryTest" type="JS" />
-    <aura:clientLibrary name="clTestAppCSS" url="css://clientLibraryTest.clientLibraryTest" type="CSS" combine="true" />
-    <aura:clientLibrary name="CkEditor" type="JS" />
-    <!-- this won't load as we register the lib as UIPerf -->
-    <aura:clientLibrary name="uiPerf" type="JS" />
+    <!-- this won't load as we register the lib with name: CkEditor -->
+    <aura:clientLibrary name="ckEDITOR" type="JS" />
     
     
 	<ui:button press="{!c.tryOutMarkup}" label="press me to test markup" class="button_tryOutMarkup"/> 

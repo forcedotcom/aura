@@ -15,8 +15,6 @@
  */
 package org.auraframework.impl;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.auraframework.Aura;
@@ -31,8 +29,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.error.AbstractErrorUITestCase;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -59,15 +56,13 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
      * we modify test_Library.lib, change all basicFirst to BASICFirst (wrong case, BASICFirst.js doesn't exist)
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
 	 */
+	@ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
 	public void testLibFileChangeAfterCached() throws Exception {
 		//load the test app, and verify the lib loads fine
 		String url = "/"+testAppNamespace+"/"+testAppName+".app";
         open(url, Mode.DEV);
         waitForElementAppear(By.className(testLibButtonClass));
         findDomElement(By.className(testLibButtonClass)).click();
-        //waitForElementTextContains(findDomElement(By.className(outputDivClass)), "basicFirst");
-        //close the current page
-        getDriver().close();
         //change lib source
         ContextService service = Aura.getContextService();
         AuraContext context = service.getCurrentContext();
@@ -85,7 +80,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
         	idd = id.getDescriptor();
         	source = context.getDefRegistry().getSource(idd);
             String originalContent = source.getContents();
-            System.out.println("originalContent of "+idd.getName()+" is: "+originalContent);
+            //System.out.println("originalContent of "+idd.getName()+" is: "+originalContent);
             //Notice two things:
             //1. the name of ImportDef has no namespace
             //2. we have both test_Library and TEST_Library because we include them both via the test app's markup

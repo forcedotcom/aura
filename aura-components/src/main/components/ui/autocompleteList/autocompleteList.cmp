@@ -32,6 +32,7 @@
     <aura:attribute name="showListHeader" type="Boolean" default="true" description="When true the listHeader will be visible"/>
     <aura:attribute name="showListFooter" type="Boolean" default="true" description="When true the listFooter will be visible"/>
     <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Indicate if the first option item should be highlighted by default."/>
+    <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the list is displayed under"/>
 
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>
     <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted."/>

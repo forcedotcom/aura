@@ -26,6 +26,27 @@
     RIGHT_ARROW_KEY:39,
     LEFT_ARROW_KEY: 37,
 
+    testListReferenceComponent: {
+        test: function (cmp) {
+            //set reference component to the button
+            var autocomplete = cmp.find("autocomplete");
+            autocomplete.set("v.listReferenceComponent",cmp.find("button"));
+
+            //add some text
+            var textInput = this._getInput(cmp);
+            var autocomplete = cmp.find("autocomplete");
+            var value = this.PILLS[0].label.substring(0, 4);
+            textInput.set("v.value", value);
+            this._fireInputchange(autocomplete, value);
+
+            //validate the list shares the left position of the button
+            $A.test.assertEquals(
+                cmp.find("button").getElement().getBoundingClientRect().left,
+                autocomplete.getSuper().find("list").getElement().getBoundingClientRect().left,
+                "left position of list should be the same as the button");
+        }
+    },
+
     testEnterCreatesPill: {
         test: function (cmp) {
             this._inputPill(this._getInput(cmp), this.PILLS[0].label);

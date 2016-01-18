@@ -26,11 +26,16 @@
     RIGHT_ARROW_KEY:39,
     LEFT_ARROW_KEY: 37,
 
-    testListReferenceComponent: {
+    /**
+     * Automation to support full-width MRU for input lookup
+     * Story: W-2886097
+     */
+    testListWithReferenceElementOnLeft: {
         test: function (cmp) {
             //set reference component to the button
+        	buttonId = "leftButton";
             var autocomplete = cmp.find("autocomplete");
-            autocomplete.set("v.listReferenceComponent",cmp.find("button"));
+            autocomplete.set("v.listReferenceComponent",cmp.find(buttonId));
 
             //add some text
             var textInput = this._getInput(cmp);
@@ -38,12 +43,13 @@
             var value = this.PILLS[0].label.substring(0, 4);
             textInput.set("v.value", value);
             this._fireInputchange(autocomplete, value);
-
+            
             //validate the list shares the left position of the button
-            $A.test.assertEquals(
-                cmp.find("button").getElement().getBoundingClientRect().left,
-                autocomplete.getSuper().find("list").getElement().getBoundingClientRect().left,
-                "left position of list should be the same as the button");
+			$A.test.addWaitForWithFailureMessage(true, function() {
+			    var refElementLoc = cmp.find(buttonId).getElement().getBoundingClientRect().left;
+			    var autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().left;
+			    return refElementLoc===autoCompleteListLoc;
+			}, "left position of list should be the same as the button");
         }
     },
 

@@ -26,6 +26,30 @@
     RIGHT_ARROW_KEY:39,
     LEFT_ARROW_KEY: 37,
 
+    /**
+     * Automation to support full-width MRU for input lookup
+     * Story: W-2886097
+     */
+    testListWithReferenceElementOnLeft: {
+        test: function (cmp) {
+        	//set reference component to the button
+        	var buttonId = "leftButton";
+            this._verifyListReferenceComponent(cmp, buttonId);
+        }
+    },
+    
+    /**
+     * Automation to support full-width MRU for input lookup
+     * Story: W-2886097
+     */
+    testListWithReferenceElementOnRight: {
+    	test: function (cmp) {
+    		//set reference component to the button
+        	var buttonId = "rightButton";
+            this._verifyListReferenceComponent(cmp, buttonId);
+        }
+    },
+
     testEnterCreatesPill: {
         test: function (cmp) {
             this._inputPill(this._getInput(cmp), this.PILLS[0].label);
@@ -150,15 +174,12 @@
         }
     },
 
-    /**
-     * uiAutocompletePanel does destroy the panel
-     * Bug: W-2707857
-     */
     testEnterOnAutoCompleteItemHidesList: {
         test: function (cmp) {
             this._createPillByAutoComplete(cmp);
             var list = cmp.find("autocomplete").getSuper().find("list");
             $A.test.assertFalse(list.get("v.visible"), "list should be hidden");
+            //Verification for W-2707857
             $A.test.assertUndefinedOrNull($A.test.select(".visible")[0], "Auto complete List Content should not be visible in dom");
         }
     },
@@ -192,7 +213,10 @@
     testShowMoreHidden: {
         test: function (cmp) {
             this._getInput(cmp).getElement().blur();
-            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+            var that = this;
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return that._isDisplayNone($A.test.select(".showMore")[0])
+            }, "\"show more\" button should not exist");
         }
     },
 
@@ -246,6 +270,31 @@
             //delete a pill after clicking show more
             var lastPill = pillContainer.find("pill")[3];
             this._fireKeydownEvent(lastPill, this.BACKSPACE_KEY);
+            $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
+        }
+    },
+
+    testShowMoreVisibleAfterCallingCollapse: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            this._getInputElement(cmp).blur();
+            $A.test.select(".showMore")[0].click();
+            pillContainer.collapse();
+            $A.test.assertFalse(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should exist");
+        }
+    },
+
+    testShowMoreNotVisibleAfterCallingExpand: {
+        attributes: {
+            maxLines: 1
+        },
+        test: function (cmp) {
+            var pillContainer = this._initializeWithFourPills(cmp);
+            this._getInputElement(cmp).blur();
+            pillContainer.expand();
             $A.test.assertTrue(this._isDisplayNone($A.test.select(".showMore")[0]), "\"show more\" button should not exist");
         }
     },
@@ -528,6 +577,30 @@
         var pillContainer = this._initializeWithThreePills(cmp);
         pillContainer.insertItems([this.PILLS[3]]);
         return pillContainer;
-    }
+    },
+    _verifyListReferenceComponent: function(cmp, referenceElemId){
+    	var autocomplete = cmp.find("autocomplete");
+        autocomplete.set("v.listReferenceComponent",cmp.find(referenceElemId));
 
+        //add some text
+        var textInput = this._getInput(cmp);
+        var autocomplete = cmp.find("autocomplete");
+        var value = this.PILLS[0].label.substring(0, 4);
+        textInput.set("v.value", value);
+        this._fireInputchange(autocomplete, value);
+        
+        //validate the list shares the left position of the button
+		$A.test.addWaitForWithFailureMessage(true, function() {
+			var refElementLoc,autoCompleteListLoc;
+			if(referenceElemId.indexOf("left") !=-1){
+				refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().right;
+			    autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().right;
+			}
+			else{
+				refElementLoc = cmp.find(referenceElemId).getElement().getBoundingClientRect().right;
+			    autoCompleteListLoc = autocomplete.getSuper().find("list").getElement().getBoundingClientRect().right;
+			}
+			return refElementLoc===autoCompleteListLoc;
+		}, "List should be position below "+referenceElemId);
+    }
 })

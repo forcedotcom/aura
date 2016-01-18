@@ -102,11 +102,6 @@ public abstract class AuraTestCase extends UnitTestCase {
     }
 
     protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
-            String namePrefix, boolean isPrivileged) {
-        return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents, namePrefix, isPrivileged);
-    }
-
-    protected <T extends Definition> DefDescriptor<T> addSourceAutoCleanup(Class<T> defClass, String contents,
             String namePrefix) {
         return getAuraTestingUtil().addSourceAutoCleanup(defClass, contents, namePrefix);
     }

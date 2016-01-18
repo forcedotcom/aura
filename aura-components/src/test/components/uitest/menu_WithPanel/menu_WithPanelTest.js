@@ -22,10 +22,10 @@
     testMenuWithPanelModal: {
         test: [function(cmp) {
             trigger = cmp.find("menuWithPanelTrigger");
-            this.clickTrigger(trigger);
+            this.clickAnchor(trigger);
         }, function(cmp) {
         	// click menuitem that opens panel
-            cmp.find("menuWithPanelItem1").get("e.click").fire();
+            this.clickAnchor(cmp.find("menuWithPanelItem1"));
         }, function(cmp) {
             this.waitForModalOpen();
         }, function(cmp) {
@@ -38,7 +38,7 @@
         }]
     },
     
-    clickTrigger: function (trigger) {
+    clickAnchor: function (trigger) {
 		var anchor = trigger.getElement().getElementsByTagName("a")[0];
 		anchor.click();
     },

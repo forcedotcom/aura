@@ -13,12 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-	handleClick : function(component) {
-		var current = component.get("v.selected");
-        if (current === false) {
-        	component.set("v.selected", !current);
-        }        
-	}
+package org.auraframework.http.services;
 
-})// eslint-disable-line semi
+import java.io.IOException;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public interface AuraResourceServletService {
+    
+    /**
+     * Serves up CSS or JS resources for an app.
+     *
+     * @param request the HTTP Request.
+     * @param response the HTTP response.
+     */
+    void doGet(HttpServletRequest request, HttpServletResponse response, ServletContext servletContext) throws ServletException, IOException;
+    
+}

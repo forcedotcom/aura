@@ -153,19 +153,21 @@ public class ConfigAdapterImpl implements ConfigAdapter {
         }
         resourcesGroup = tempResourcesGroup;
 
-        Properties props = (jsGroup == null) ? loadProperties() : null;
-        if (props == null) {
-            // If we don't get the framework version from properties, the default is a development build:
-            auraVersionString = "development";
-            buildTimestamp = System.currentTimeMillis();
-        } else {
-            // If we do get our version info from properties, then try to do that.
+        Properties props = null;
+        try {
+            props = loadProperties();
             auraVersionString = props.getProperty(VERSION_PROPERTY);
-            if (auraVersionString == null || auraVersionString.isEmpty()) {
-                throw new AuraError("Unable to read build version from version.prop file");
-            }
-
+        } catch (AuraError t) {
+            auraVersionString = "development";
+        }
+        if (props != null) {
             buildTimestamp = readBuildTimestamp(props);
+        } else {
+            buildTimestamp = System.currentTimeMillis();
+        }
+        
+        if (auraVersionString == null || auraVersionString.isEmpty()) {
+            throw new AuraError("Unable to read build version from version.prop file");
         }
 
         Properties config = loadConfig();

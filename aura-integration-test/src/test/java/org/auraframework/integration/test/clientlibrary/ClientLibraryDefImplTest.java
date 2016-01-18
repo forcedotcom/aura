@@ -134,7 +134,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
      */
     public void testCommaSeparatedStringInNameWillNotResolve() throws Exception {
         ClientLibraryService service = new ClientLibraryServiceImpl();
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf, UIPerfUi", null, ClientLibraryDef.Type.JS,
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib, MyLib2", null, ClientLibraryDef.Type.JS,
                 null, false, null, null);
         String url = service.getResolvedUrl(clientLibrary);
         assertNull("Expected null if a invalid library name was specified", url);
@@ -145,7 +145,7 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
      */
     public void testDefaultModeIfNoneSpecified() {
         Set<Mode> modes = Collections.emptySet();
-        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("UIPerf", null, ClientLibraryDef.Type.JS,
+        ClientLibraryDef clientLibrary = vendor.makeClientLibraryDef("MyLib", null, ClientLibraryDef.Type.JS,
                 modes, false, null, null);
         assertTrue(clientLibrary.shouldInclude(null));
         for (Mode mode : AuraContext.Mode.values()) {
@@ -188,40 +188,40 @@ public class ClientLibraryDefImplTest extends AuraImplTestCase {
         assertFalse("Same library tag marked for different modes should not be considered duplicates",
                 sameLibraryButDifferentModes1.equals(sameLibraryButDifferentModes2));
 
-        ClientLibraryDef sameNameButDifferentType1 = getElement("<aura:clientLibrary name='UIPerf' type='CSS'/>");
-        ClientLibraryDef sameNameButDifferentType2 = getElement("<aura:clientLibrary name='UIPerf' type='JS'/>");
+        ClientLibraryDef sameNameButDifferentType1 = getElement("<aura:clientLibrary name='MyLib' type='CSS'/>");
+        ClientLibraryDef sameNameButDifferentType2 = getElement("<aura:clientLibrary name='MyLib' type='JS'/>");
         assertFalse("Same library with diffrent types should not be considered duplicates", 
                 sameNameButDifferentType1.equals(sameNameButDifferentType2));
 
-        ClientLibraryDef sameNameButDifferentUrl1 = getElement("<aura:clientLibrary name='UIPerf' url='/auraFW/resources/UIPerf/UIPerf.js' type='CSS'/>");
-        ClientLibraryDef sameNameButDifferentUrl2 = getElement("<aura:clientLibrary name='UIPerf' url='/auraFW/resources/UIPerf/UIPerf1.js' type='JS'/>");
+        ClientLibraryDef sameNameButDifferentUrl1 = getElement("<aura:clientLibrary name='MyLib' url='/auraFW/resources/some/lib.css' type='CSS'/>");
+        ClientLibraryDef sameNameButDifferentUrl2 = getElement("<aura:clientLibrary name='MyLib' url='/auraFW/resources/some/lib2.js' type='JS'/>");
         assertFalse("Same library with diffrent types should not be considered duplicates",
                 sameNameButDifferentUrl1.equals(sameNameButDifferentUrl2));
 
-        ClientLibraryDef sameUrlButDifferentName1 = getElement("<aura:clientLibrary name='UIPerf' url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
-        ClientLibraryDef sameUrlButDifferentName2 = getElement("<aura:clientLibrary name='Kylie' url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
+        ClientLibraryDef sameUrlButDifferentName1 = getElement("<aura:clientLibrary name='MyLib1' url='/auraFW/resources/some/lib.js' type='JS'/>");
+        ClientLibraryDef sameUrlButDifferentName2 = getElement("<aura:clientLibrary name='MyLib2' url='/auraFW/resources/some/lib.js' type='JS'/>");
         assertTrue("Same library url with different names should not be considered duplicates",
                 sameUrlButDifferentName1.equals(sameUrlButDifferentName2));
 
-        ClientLibraryDef sameUrl1 = getElement("<aura:clientLibrary url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
-        ClientLibraryDef sameUrl2 = getElement("<aura:clientLibrary url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
+        ClientLibraryDef sameUrl1 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
+        ClientLibraryDef sameUrl2 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
         assertTrue("Library tags without a name but same URL should be considered equal", sameUrl1.equals(sameUrl2));
 
-        ClientLibraryDef sameUrlDifferentName1 = getElement("<aura:clientLibrary name='name' url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
-        ClientLibraryDef sameUrlDifferentName2 = getElement("<aura:clientLibrary name='name2' url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
+        ClientLibraryDef sameUrlDifferentName1 = getElement("<aura:clientLibrary name='name' url='/auraFW/resources/some/lib.js' type='JS'/>");
+        ClientLibraryDef sameUrlDifferentName2 = getElement("<aura:clientLibrary name='name2' url='/auraFW/resources/some/lib.js' type='JS'/>");
         assertTrue("Library tags without a name but same URL should be considered equal", sameUrlDifferentName1.equals(sameUrlDifferentName2));
 
-        ClientLibraryDef sameUrl3 = getElement("<aura:clientLibrary url='/auraFW/resources/UIPerf/UIPerf.js' type='JS'/>");
-        ClientLibraryDef sameUrl4 = getElement("<aura:clientLibrary url='/auraFW/resources/UIPerf/UIPerf1.js' type='JS'/>");
+        ClientLibraryDef sameUrl3 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib.js' type='JS'/>");
+        ClientLibraryDef sameUrl4 = getElement("<aura:clientLibrary url='/auraFW/resources/some/lib2.js' type='JS'/>");
         assertFalse("Library tags without a name and different URLs should not equal", sameUrl3.equals(sameUrl4));
 
-        ClientLibraryDef sameButAllMode = getElement("<aura:clientLibrary name='UIPerf' type='JS' />");
-        ClientLibraryDef sameButDifferentMode = getElement("<aura:clientLibrary name='UIPerf' type='JS' modes='PTEST' />");
+        ClientLibraryDef sameButAllMode = getElement("<aura:clientLibrary name='MyLib' type='JS' />");
+        ClientLibraryDef sameButDifferentMode = getElement("<aura:clientLibrary name='MyLib' type='JS' modes='PTEST' />");
         assertTrue("Library which includes all modes is equal to one which specifies one",
                 sameButAllMode.equals(sameButDifferentMode));
 
-        ClientLibraryDef sameButCombine = getElement("<aura:clientLibrary name='UIPerf' type='JS' combine='true' />");
-        ClientLibraryDef sameButNotCombine = getElement("<aura:clientLibrary name='UIPerf' type='JS' modes='PTEST' />");
+        ClientLibraryDef sameButCombine = getElement("<aura:clientLibrary name='MyLib' type='JS' combine='true' />");
+        ClientLibraryDef sameButNotCombine = getElement("<aura:clientLibrary name='MyLib' type='JS' modes='PTEST' />");
         assertTrue("Library with different combine attribute is still the same",
                 sameButCombine.equals(sameButNotCombine));
     }

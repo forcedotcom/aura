@@ -32,6 +32,8 @@
     <aura:registerEvent access="GLOBAL" name="menuFocusChange" type="ui:menuFocusChange" description="The event fired when the menu list focus changed from one menuItem to another menuItem."/>
     <aura:registerEvent name="refresh" type="ui:refresh" description="Fire this event to refresh the menuList."/>
 
+    <aura:attribute name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
+
     <aura:handler name="refresh" action="{!c.update}"/>
 
     <div class="{!v.class}" aura:id="menu" role="menu">

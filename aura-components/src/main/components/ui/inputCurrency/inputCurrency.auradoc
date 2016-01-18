@@ -22,7 +22,7 @@
 			The browser's locale is used by default. To render the output from a <code>ui:inputCurrency</code> component, use the <code>ui:outputCurrency</code> component.
 		</p>
 		<p>This is a basic set up of a <code>ui:inputCurrency</code> component, which renders an input field with the value <code>$50.00</code> when the browser's currency locale is <code>$</code>.</p>
-		<pre>&lt;ui:inputCurrency label="Amount" class="field" value="50"/></pre>
+		<pre>&lt;ui:inputCurrency aura:id="amount" label="Amount" class="field" value="50"/></pre>
 		<p>This example results in the following HTML.</p>
 <pre>&lt;div class="uiInput uiInput--default uiInput--input">
     &lt;label class="uiLabel-left form-element__label uiLabel">

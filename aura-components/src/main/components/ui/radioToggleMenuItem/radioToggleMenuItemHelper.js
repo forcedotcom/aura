@@ -14,15 +14,6 @@
  * limitations under the License.
  */
 ({
-	handleClick: function(cmp) {
-		var current = cmp.get("v.selected");
-        if (current === false) {
-        	cmp.set("v.selected", !current);
-        } else {
-        	this.toggleState(cmp);
-        }
-	},
-
     toggleState: function(cmp) {
     	var ascending = $A.util.getBooleanValue(cmp.get("v.isAscending"));
     	

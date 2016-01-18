@@ -53,7 +53,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     /**
      * [Accessibility] modal overlay dialog closing on Esc key. Test case for W-2396326
      */
-    public void testPressEscKeyOnModalOverlayDialog() throws Exception {
+    public void _testPressEscKeyOnModalOverlayDialog() throws Exception {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_MODAL_BUTTON);
@@ -207,7 +207,7 @@ public class PanelModalOverlayUITest extends WebDriverTestCase {
     /**
      * Tabs on Modal overlay should do focus trapping and not close the overlay
      */
-    public void testModalOverlayDialogDoesFocusTrapping() throws Exception {
+    public void _testModalOverlayDialogDoesFocusTrapping() throws Exception {
         open(APP);
         verifyOverlayNotActive();
         openOverlay(PANELDIALOG_MODAL_BUTTON);

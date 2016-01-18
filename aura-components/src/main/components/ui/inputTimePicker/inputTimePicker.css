@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-.THIS div.dropdown {
-	position: absolute;
-	top:0;
-	left:0;
+.THIS.visible {
+	opacity: 1;
+	display: block;
 }

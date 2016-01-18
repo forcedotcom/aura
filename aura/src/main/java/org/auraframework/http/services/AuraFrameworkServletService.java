@@ -13,10 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    handleClick : function(component, event, helper) {
-    	var hideMenu = component.getConcreteComponent().get("v.hideMenuAfterSelected");
-    	//set focus to menuTrigger is hideMenu is true
-    	helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": hideMenu});         
-    }
-})// eslint-disable-line semi
+package org.auraframework.http.services;
+
+import java.io.IOException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public interface AuraFrameworkServletService {
+
+    void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+    
+}

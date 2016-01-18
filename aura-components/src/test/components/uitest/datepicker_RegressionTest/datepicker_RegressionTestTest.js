@@ -262,7 +262,7 @@
                             true,//expected value
                             function(){//actual value
                                 //get bounding rect of the datepicker
-                            	var rectTimePicker = $A.test.select('.uiInputTimePicker .visible')[0].getBoundingClientRect();
+                            	var rectTimePicker = $A.test.select('.uiInputTimePicker.visible')[0].getBoundingClientRect();
                                 var rectTextbox = $A.test.select('.dateTime-inputTime input')[0].getBoundingClientRect();
                                 //using parseInt as IE browser's add decimal pt's
                                 var actualTopDelta = parseInt(rectTimePicker.top - rectTextbox.top);

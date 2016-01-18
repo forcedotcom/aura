@@ -34,7 +34,7 @@ public class InputDateTimeUITest extends WebDriverTestCase {
     private final String TIME_ICON_SEL = "a[class*='timePicker-openIcon']";
 
     private final String TIME_INPUT_BOX_SEL = ".uiInputDateTime .dateTime-inputTime input";
-    private final String TIME_PICKER_SEL = ".uiInputTimePicker .visible";
+    private final String TIME_PICKER_SEL = ".uiInputTimePicker.visible";
 
     private final String TIME_1200_XPATH = "//li[@data-hours='12' and @data-minutes='00']";
     private final String TIME_1230_XPATH = "//li[@data-hours='12' and @data-minutes='30']";

@@ -59,9 +59,9 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem2 = driver.findElement(By.className(menuItem2));
-        WebElement actionItem2Element = actionItem2.findElement(By.tagName("a"));
+        WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
-        WebElement actionItem3Element = actionItem3.findElement(By.tagName("a"));
+        WebElement actionItem3Element = getAnchor(actionItem3);
 
         // check menu list is not visible
         assertFalse("Menu list should not be visible", actionMenu.getAttribute("class").contains("visible"));
@@ -85,17 +85,18 @@ public class MenuUITest extends WebDriverTestCase {
                 auraUITestingUtil.getActiveElementText());
 
         // action item 2 not clickable as its disable item
-        actionItem2.click();
-        // check menu list is still visible after the click
-        assertTrue("Menu list should be visible after click on item2",
-                actionMenu.getAttribute("class").contains("visible"));
-        // set focus back to actionItem3
-        auraUITestingUtil.setHoverOverElement(menuItem3);
-        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        boolean disabledItemNotClickable = false;
+        try {
+            actionItem2Element.click();
+        } catch (Exception e) {
+            disabledItemNotClickable = true;
+        }
+
+        // check that the disabled item is not clickable
+        assertTrue("Disabled item should not be clickable", disabledItemNotClickable);
 
         // click on item 1 and verify click worked
-        actionItem3.click();
+        actionItem3Element.click();
         assertEquals("Item3 not selected", "Inter Milan", menuLabel.getText());
     }
 
@@ -112,11 +113,11 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem1 = driver.findElement(By.className(menuItem1));
-        WebElement actionItem1Element = actionItem1.findElement(By.tagName("a"));
+        WebElement actionItem1Element = getAnchor(actionItem1);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
-        WebElement actionItem3Element = actionItem3.findElement(By.tagName("a"));
+        WebElement actionItem3Element = getAnchor(actionItem3);
         WebElement actionItem4 = driver.findElement(By.className(menuItem4));
-        WebElement actionItem4Element = actionItem4.findElement(By.tagName("a"));
+        WebElement actionItem4Element = getAnchor(actionItem4);
 
         // click on menu list
         menuLabel.click();
@@ -135,7 +136,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
                 auraUITestingUtil.getActiveElementText());
 
-        actionItem3.click();
+        actionItem3Element.click();
         assertEquals("Item3 unchecked after pressing Enter key", "Inter Milan", menuLabel.getText());
 
         menuLabel.click();
@@ -250,9 +251,9 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement item3 = driver.findElement(By.className(menuItem3));
-        WebElement item3Element = item3.findElement(By.tagName("a"));
+        WebElement item3Element = getAnchor(item3);
         WebElement item4 = driver.findElement(By.className(menuItem4));
-        WebElement item4Element = item4.findElement(By.tagName("a"));
+        WebElement item4Element = getAnchor(item4);
         WebElement button = driver.findElement(By.className("checkboxButton"));
         WebElement result = driver.findElement(By.className("checkboxMenuResult"));
 
@@ -348,11 +349,11 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement item3 = driver.findElement(By.className(menuItem3));
-        WebElement item3Element = item3.findElement(By.tagName("a"));
+        WebElement item3Element = getAnchor(item3);
         WebElement item4 = driver.findElement(By.className(menuItem4));
-        WebElement item4Element = item4.findElement(By.tagName("a"));
+        WebElement item4Element = getAnchor(item4);
         WebElement item5 = driver.findElement(By.className(menuItem5));
-        WebElement item5Element = item5.findElement(By.tagName("a"));
+        WebElement item5Element = getAnchor(item5);
         WebElement button = driver.findElement(By.className("radioButton"));
         WebElement result = driver.findElement(By.className("radioMenuResult"));
 
@@ -437,6 +438,7 @@ public class MenuUITest extends WebDriverTestCase {
         String menuItem3 = "actionItemAttachToBody3";
         WebDriver driver = this.getDriver();
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
+        WebElement actionItem3Element = getAnchor(actionItem3);
         // Need to make the screen bigger so WebDriver doesn't need to scroll
         driver.manage().window().setSize(new Dimension(1366, 768));
         waitForWindowResize(1366, 768);
@@ -453,7 +455,7 @@ public class MenuUITest extends WebDriverTestCase {
 
         // Select menu item and verify still aligned
         String triggerLeftPosBeforeClick = auraUITestingUtil.getBoundingRectPropOfElement(triggerGlobalId, "left");
-        actionItem3.click();
+        actionItem3Element.click();
         String triggerLeftPosAfterClickOnItem2 = auraUITestingUtil
                 .getBoundingRectPropOfElement(triggerGlobalId, "left");
         assertEquals("Menu Item position changed after clicking on Item2", triggerLeftPosBeforeClick,
@@ -469,6 +471,10 @@ public class MenuUITest extends WebDriverTestCase {
                 "Menu List is not positioned correctly after the resize");
     }
 
+    private WebElement getAnchor(WebElement actionItem3) {
+        return actionItem3.findElement(By.tagName("a"));
+    }
+
     /**
      * Wait for the current window to have expected dimensions.
      * 
@@ -480,10 +486,7 @@ public class MenuUITest extends WebDriverTestCase {
             @Override
             public Boolean apply(WebDriver d) {
                 Dimension current = getDriver().manage().window().getSize();
-                if (current.width == width && current.height == height) {
-                    return true;
-                }
-                return false;
+                return current.width == width && current.height == height;
             }
         });
     }
@@ -572,11 +575,11 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement actionMenu = driver.findElement(By.className(menuName));
         WebElement actionItem1 = driver.findElement(By.className(menuItem1));
-        WebElement actionItem1Element = actionItem1.findElement(By.tagName("a"));
+        WebElement actionItem1Element = getAnchor(actionItem1);
         WebElement actionItem2 = driver.findElement(By.className(menuItem2));
-        WebElement actionItem2Element = actionItem2.findElement(By.tagName("a"));
+        WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
-        WebElement actionItem3Element = actionItem3.findElement(By.tagName("a"));
+        WebElement actionItem3Element = getAnchor(actionItem3);
         // click on menu list
         menuLabel.click();
         // check menu list is visible after the click

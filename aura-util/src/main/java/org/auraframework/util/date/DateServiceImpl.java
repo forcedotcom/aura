@@ -15,22 +15,11 @@
  */
 package org.auraframework.util.date;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.FormatStyle;
+import java.time.*;
+import java.time.format.*;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -71,7 +60,7 @@ public class DateServiceImpl implements DateService {
 
     /**
      * Returns converter based on locale, date style, and time style
-     *
+     * <p/>
      * <p/>
      * * @see <a
      * href="http://joda-time.sourceforge.net/apidocs/org/joda/time/format/DateTimeFormat.html#patternForStyle(java.lang.String, java.util.Locale)">DateTimeFormat</a>
@@ -139,7 +128,7 @@ public class DateServiceImpl implements DateService {
             formatter = DateTimeFormatter.ofLocalizedDateTime(dateFormat, timeFormat);
         }
 
-        return new JodaConverter(formatter.withLocale(locale));
+        return new DateServiceConverter(formatter.withLocale(locale));
     }
 
     /**
@@ -169,7 +158,7 @@ public class DateServiceImpl implements DateService {
         if (pattern == null) {
             throw new IllegalArgumentException("Pattern must be provided");
         }
-        return new JodaConverter(DateTimeFormatter.ofPattern(pattern, locale));
+        return new DateServiceConverter(DateTimeFormatter.ofPattern(pattern, locale));
     }
 
     @Override
@@ -188,21 +177,19 @@ public class DateServiceImpl implements DateService {
 
     private enum StyleType {
 
-        SHORT(DateService.SHORT, FormatStyle.SHORT, "short", "S"),
-        MEDIUM(DateService.MEDIUM, FormatStyle.MEDIUM, "medium", "M"),
-        LONG(DateService.LONG, FormatStyle.LONG, "long", "L"),
-        FULL(DateService.FULL, FormatStyle.FULL, "full", "F"),
-        NONE(DateService.NONE, null, "none", "-");
+        SHORT(DateService.SHORT, FormatStyle.SHORT, "short"),
+        MEDIUM(DateService.MEDIUM, FormatStyle.MEDIUM, "medium"),
+        LONG(DateService.LONG, FormatStyle.LONG, "long"),
+        FULL(DateService.FULL, FormatStyle.FULL, "full"),
+        NONE(DateService.NONE, null, "none");
 
         int dateFormat;
         String nameStyle;
-        String jodaNameStyle;
         FormatStyle formatStyle;
 
-        StyleType(int intStyle, FormatStyle formatStyle, String nameStyle, String jodaNameStyle) {
+        StyleType(int intStyle, FormatStyle formatStyle, String nameStyle) {
             this.dateFormat = intStyle;
             this.nameStyle = nameStyle;
-            this.jodaNameStyle = jodaNameStyle;
             this.formatStyle = formatStyle;
         }
 
@@ -212,10 +199,6 @@ public class DateServiceImpl implements DateService {
 
         int getIntStyle() {
             return this.dateFormat;
-        }
-
-        String getJodaNameStyle() {
-            return this.jodaNameStyle;
         }
 
         FormatStyle getFormatStyle() {
@@ -320,7 +303,7 @@ public class DateServiceImpl implements DateService {
             for (DateConverter format : isoConversions) {
                 try {
                     return format.parse(date);
-                } catch (IllegalArgumentException e) {
+                } catch (DateTimeParseException | IllegalArgumentException e) {
                     // try the next one
                 }
             }
@@ -328,11 +311,11 @@ public class DateServiceImpl implements DateService {
         }
     };
 
-    private static class JodaConverter implements DateConverter {
+    private static class DateServiceConverter implements DateConverter {
 
         protected final DateTimeFormatter formatter;
 
-        protected JodaConverter(DateTimeFormatter formatter) {
+        protected DateServiceConverter(DateTimeFormatter formatter) {
             this.formatter = formatter;
         }
 
@@ -354,12 +337,12 @@ public class DateServiceImpl implements DateService {
         }
 
         @Override
-        public Date parse(String date) {
+        public Date parse(String date) throws DateTimeParseException {
             return parse(date, TimeZone.getDefault());
         }
 
         @Override
-        public Date parse(String date, TimeZone timeZone) {
+        public Date parse(String date, TimeZone timeZone) throws DateTimeParseException {
             if (date == null) {
                 throw new IllegalArgumentException("Date can not be null");
             }
@@ -400,7 +383,7 @@ public class DateServiceImpl implements DateService {
      * Allows ISO8601 converters to default to GMT instead of the JDK's
      * timezone. Makes things more predictable - especially for testing.
      */
-    private static class ISO8601DateTimeConverter extends JodaConverter {
+    private static class ISO8601DateTimeConverter extends DateServiceConverter {
 
         private static TimeZone ISO8601_DEFAULT_TIMEZONE = TimeZone.getTimeZone("GMT");
 

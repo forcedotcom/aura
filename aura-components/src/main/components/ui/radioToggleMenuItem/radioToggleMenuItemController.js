@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 ({
+	select : function(component, event, helper) {
+		var current = component.get("v.selected");
+		if (current === false) {
+			component.set("v.selected", !current);
+		} else {
+			helper.toggleState(component);
+		}
+
+		helper.fireSelectEvent(component, event, { "deselectSiblings": true});
+	},
+
 	updateDirection: function(cmp, evt, helper) {
 		helper.updateDirection(cmp);
 	}

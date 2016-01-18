@@ -48,5 +48,6 @@
             component.positionConstraint.destroy();
         }
         helper.removeEventHandlers(component);
+        this.superUnrender();
     }
 })// eslint-disable-line semi

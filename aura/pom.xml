@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.auraframework</groupId>
         <artifactId>aura-framework</artifactId>
-        <version>0.3475-SNAPSHOT</version>
+        <version>0.3490-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -118,80 +118,16 @@
             </resource>
         </resources>
         <testResources>
-        	<testResource>
-        		<directory>src/test/resources/aura/resources</directory>
-        		<targetPath>aura/resources</targetPath>
-        	</testResource>
+            <testResource>
+                <directory>src/test/resources/aura/resources</directory>
+                <targetPath>aura/resources</targetPath>
+            </testResource>
         </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>target/generated-sources/enum/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.auraframework</groupId>
-                <artifactId>aura-util</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-enums</id>
-                        <phase>generate-sources</phase>
-						<goals>
-							<goal>enum</goal>
-						</goals>
-                        <configuration>
-                            <baseScanDirectory>.</baseScanDirectory>
-                            <scanDirectoryList>
-                                <param>../aura/src/main</param>
-                                <param>../aura-components/src/main</param>
-                            </scanDirectoryList>
-                            <outputPackageName>org.auraframework.id</outputPackageName>
-                            <outputClassName>AuraId</outputClassName>
-                            <outputFile>./target/generated-sources/enum/java/org/auraframework/id/AuraId.java</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-			<plugin>
-				<groupId>org.eclipse.m2e</groupId>
-				<artifactId>lifecycle-mapping</artifactId>
-				<configuration>
-					<lifecycleMappingMetadata>
-						<pluginExecutions>
-							<pluginExecution>
-								<pluginExecutionFilter>
-									<groupId>org.auraframework</groupId>
-									<artifactId>aura-util</artifactId>
-									<goals>
-										<goal>enum</goal>
-									</goals>
-								</pluginExecutionFilter>
-								<action>
-									<!-- M2E should ignore the plugin -->
-									<ignore />
-								</action>
-							</pluginExecution>
-						</pluginExecutions>
-					</lifecycleMappingMetadata>
-				</configuration>
-			</plugin>
         </plugins>
     </build>
 </project>

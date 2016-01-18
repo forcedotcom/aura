@@ -263,7 +263,9 @@
 
     onMenuItemSelected: function(component, event) {
     	var concrete = component.getConcreteComponent();
-    	var hideMenu = event.getParam("hideMenu");
+
+    	var hideMenu = event.getParam("hideMenu") || $A.util.getBooleanValue(component.get("v.hideMenuAfterSelected"));
+
     	var deselectSiblings = event.getParam("deselectSiblings");
     	var focusTrigger = event.getParam("focusTrigger");
 

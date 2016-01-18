@@ -97,7 +97,7 @@
         var pillListElement = this._getPillContainerListElement(component);
         if (pillListElement) {
             var autocompleteList = component.find("list");
-            if (autocompleteList && !usePanel) {
+            if (autocompleteList && !usePanel && $A.util.isEmpty(component.get("v.listReferenceComponent"))) {
                 autocompleteList.getElement().style.top = pillListElement.offsetHeight+"px";
             }
         }

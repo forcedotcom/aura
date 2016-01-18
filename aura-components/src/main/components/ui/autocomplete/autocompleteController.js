@@ -32,7 +32,7 @@
             };
         })();
     },
-    
+
     fetchData: function(component, event, helper) {
         helper.fetchData(component, event);
     },
@@ -127,7 +127,12 @@
         
         if(usePanel) {
             panel.set('v.visible', true);
-            panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
+            var listReferenceComponent = component.get("v.listReferenceComponent");
+            if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
+                panel.set('v.referenceElement', listReferenceComponent[0].getElement());
+            } else {
+                panel.set('v.referenceElement', component.find('input').getElement().querySelector('input'));
+            }
             $A.get('e.ui:stackPanel').setParams({
                 callback: function(zIndex) {
                     panel.set('v.zIndex', zIndex);
@@ -137,5 +142,14 @@
         var concrete = component.getConcreteComponent();
         var concreteHelper = concrete.getDef().getHelper();
         concreteHelper.handleListExpand(component, event);
+    },
+
+    referenceElementChange: function(component) {
+        var usePanel = component.get('v.usePanel');
+        if (!usePanel) {
+            var list = component.find("list");
+            var referenceComponent = component.get("v.listReferenceComponent");
+            list.set("v.listReferenceComponent", referenceComponent);
+        }
     }
 })// eslint-disable-line semi

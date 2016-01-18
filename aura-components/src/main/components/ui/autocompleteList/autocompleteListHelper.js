@@ -660,5 +660,24 @@
                 updateAriaEvt.fire();
             }
         }
+    },
+
+    positionList: function(component) {
+        var listReferenceComponent = component.get("v.listReferenceComponent");
+        if (!$A.util.isEmpty(listReferenceComponent) && !$A.util.isUndefinedOrNull(listReferenceComponent[0])) {
+
+            //get reference element rect
+            var referenceElement = listReferenceComponent[0].getElement();
+            var referenceElementRect = referenceElement.getBoundingClientRect();
+
+            //get parent component rect
+            var listElement = component.getElement();
+            listElement.style.left = "0"; // reset the position to obtain the correct relative difference
+            var listElementParentRect = listElement.getBoundingClientRect();
+
+            //set left position
+            var relativeLeft = referenceElementRect.left - listElementParentRect.left;
+            listElement.style.left = relativeLeft +"px";
+        }
     }
 })// eslint-disable-line semi

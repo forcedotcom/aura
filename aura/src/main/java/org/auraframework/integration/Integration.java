@@ -29,38 +29,27 @@ import org.auraframework.throwable.quickfix.QuickFixException;
  * @since 184
  */
 public interface Integration {
-    /**
-     * Generates a &lt;script&gt; tag that will correctly embed an instance of an
-     * Aura component bound to the DOM element identified by localDomId.
-     *
-     * @param tag
-     *            Fully qualified (namespace:name) name of the Aura component.
-     * @param attributes
-     *            A map of the component's attributes as key/value pairs.
-     * @param localId
-     *            The user-provided locally unique ID of this component
-     *            that can be used with $A.getRoot().find(localId).
-     * @param locatorDomId
-     *            The DOM identifier for the element that will be used as the
-     *            parent of the component's elements.
-     * @param out
-     *            Destination for injection script content.
-     * @param useAsync use asynchonous component call instead of HTML config
-     * @throws UnsupportedUserAgentException
-     * @throws AuraRuntimeException
-     * @throws IOException
-     * @throws QuickFixException
-     */
-    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-                         Appendable out, boolean useAsync)
-            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
-
-    /**
-     * Print config to HTML page
-     *
-     * @see #injectComponent(String, java.util.Map, String, String, Appendable)
-     */
-    void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
-                         Appendable out)
-            throws UnsupportedUserAgentException, AuraRuntimeException, IOException, QuickFixException;
+	/**
+	 * Generates a &lt;script&gt; tag that will correctly embed an instance of
+	 * an Aura component bound to the DOM element identified by localDomId.
+	 *
+	 * @param tag
+	 *            Fully qualified (namespace:name) name of the Aura component.
+	 * @param attributes
+	 *            A map of the component's attributes as key/value pairs.
+	 * @param localId
+	 *            The user-provided locally unique ID of this component that can
+	 *            be used with $A.getRoot().find(localId).
+	 * @param locatorDomId
+	 *            The DOM identifier for the element that will be used as the
+	 *            parent of the component's elements.
+	 * @param out
+	 *            Destination for injection script content.
+	 * @throws UnsupportedUserAgentException
+	 * @throws AuraRuntimeException
+	 * @throws IOException
+	 * @throws QuickFixException
+	 */
+	void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws UnsupportedUserAgentException,
+			AuraRuntimeException, IOException, QuickFixException;
 }

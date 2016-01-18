@@ -25,7 +25,6 @@ import org.auraframework.def.ComponentDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
 import org.auraframework.integration.Integration;
-import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.ContextService;
 import org.auraframework.service.DefinitionService;
@@ -49,7 +48,7 @@ public class IntegrationImpl implements Integration {
 
 	private static final String ASYNC_INJECTION_TEMPLATE = "$A.run(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });";
 
-	public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer)
+	public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application)
 			throws QuickFixException {
 		this.client = userAgent != null ? new Client(userAgent) : null;
 		this.contextPath = contextPath;

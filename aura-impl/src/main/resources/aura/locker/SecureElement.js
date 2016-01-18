@@ -69,6 +69,8 @@ var SecureElement = (function() {
 				$A.lockerService.util.verifyAccess(this, child);
 
 				if (child.$run) {
+					// special case for SecureScriptElement to execute without insertion.
+					// TODO: improve
 					child.$run();
 				} else {
 					var childEl = child.unwrap($A.lockerService.masterKey);
@@ -100,8 +102,6 @@ var SecureElement = (function() {
 
 		getAttribute: SecureThing.createPassThroughMethod("getAttribute"),
 		setAttribute: SecureThing.createPassThroughMethod("setAttribute"),
-
-		innerText: SecureThing.createPassThroughProperty("innerText"),
 
 		ownerDocument : SecureThing.createFilteredProperty("ownerDocument"),
 		parentNode : SecureThing.createFilteredProperty("parentNode"),

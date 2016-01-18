@@ -271,21 +271,15 @@ function LockerService() {
 		},
 
 		unwrap : function(elements) {
-			if (!$A.lockerService.util.isKeyed(elements)) {
-				return elements;
-			}
-
-			if ($A.util.isArray(elements)) {
+			if (Array.isArray(elements)) {
 				for (var n = 0; n < elements.length; n++) {
 					var value = elements[n];
 					if (value && value.unwrap) {
 						elements[n] = value.unwrap($A.lockerService.masterKey);
 					}
 				}
-			} else {
-				if (elements && elements.unwrap) {
-					elements = elements.unwrap($A.lockerService.masterKey);
-				}
+			} else if (elements && elements.unwrap && $A.lockerService.util.isKeyed(elements)) {
+				elements = elements.unwrap($A.lockerService.masterKey);
 			}
 
 			return elements;

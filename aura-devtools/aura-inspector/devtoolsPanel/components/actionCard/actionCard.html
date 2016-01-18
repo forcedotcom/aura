@@ -1,6 +1,77 @@
 
-<template>
+<template id="actionCardTemplate">
 	<style>
+	button {
+	  /*.slds-button {*/
+	  position: relative;
+	  display: inline-block;
+	  padding: 0;
+	  background-clip: padding-box;
+	  border-radius: 0.25rem;
+	  color: #0070d2;
+	  font-size: inherit;
+	  text-decoration: none;
+	  -webkit-appearance: none;
+	  white-space: normal;
+	  -webkit-user-select: none;
+	  -moz-user-select: none;
+	  -ms-user-select: none;
+	  user-select: none;
+	  -webkit-transition: color 0.05s linear, background-color 0.05s linear;
+	  transition: color 0.05s linear, background-color 0.05s linear;
+	  /*}*/
+	}
+	button.text-button{
+	  /*.slds-button--x-small {*/
+	  line-height: 1.25rem;
+	  min-height: 1.25rem;
+	  /*}*/
+	  /*.slds-button--neutral {*/
+	  padding-left: 1rem;
+	  padding-right: 1rem;
+	  text-align: center;
+	  vertical-align: middle;
+	  border: 1px solid #d8dde6;
+	  background-color: white;
+	  /*}*/
+	}
+	button.toggle{
+	  /*.slds-button--x-small {*/
+	  line-height: 1.25rem;
+	  min-height: 1.25rem;
+	  /*}*/
+	  /*.slds-button--neutral {*/
+		border: none;
+	  text-align: center;
+	  vertical-align: middle;
+	  background-color: white;
+	  /*}*/
+	}
+	button.text-button:hover,
+	button.text-button:focus {
+	  background-color: #f4f6f9;
+	  color: #005fb2;
+	}
+	button:focus {
+	  outline: 0;
+	  box-shadow: 0 0 3px #0070D2;
+	}
+	button.toggle:focus{
+		box-shadow: none;
+	}
+	button.toggle:focus label,
+	button.toggle:hover label{
+		color: #005fb2;
+		text-decoration: underline;
+	}
+	button.text-button:active {
+	  background-color: #eef1f6;
+	  color: #00396b;
+	}
+	button[disabled].text-button {
+	  background-color: white;
+	  cursor: default;
+	}
 		header {
 			font-weight: 300;
 			font-size: 1.125rem;
@@ -29,12 +100,17 @@
 			padding: 0 .5rem 0 .5rem;
 			margin: 0;
 		}
-		.col {
-			flex: 1 1 auto;
-			min-width: 80px;
+		dd {
+			word-wrap: break-word;
 		}
+    .div_actionParameter,
+    .div_actionResponse
+    {
+      flex: 1 100%;
+      min-width: 80px;
+    }
 		code { margin: 5px; display: block; white-space: pre; }
-		.parameters:before {
+		/*.parameters:before {
 			color: #54698d;
 			content: 'Parameters';
 			display: inline-block;
@@ -43,8 +119,8 @@
 			line-height: 1.5;
 			width: 80px;
 			vertical-align: top;
-		}
-		.storageKey:before {
+		}*/
+		/*.storageKey:before {
 			color: #54698d;
 			content: 'Storage Key';
 			display: inline-block;
@@ -53,32 +129,207 @@
 			line-height: 1.5;
 			width: 80px;
 			vertical-align: top;
-		}
-		.result:before { content: 'Result'; display: inline-block;
+		}*/
+		/*.result:before {
+			content: 'Result';
+			display: inline-block;
 			color: #54698d;
 			display: inline-block;
 			flex: 0 0 auto;
 			font-size: 0.75rem;
-			line-height: 1.5;
+			line-height: 1.25;
+			letter-spacing: .0625em;
 			width: 80px;
 			vertical-align: top;
+		}*/
+    .div_editActionResult {
+			display: none;
+			flex: auto;
+			padding: 0 .5rem;
+    }
+		.div_editActionParameter {
+			flex: auto;
+			padding: 0 .5rem;
+    }
+		.code{
+			font-family: Menlo, monospace;
 		}
-    	aurainspector-json {
-			margin: .5rem .5rem 0 0.5rem;
+    .textarea_ActionResult,
+		.textarea_ActionParameter {
+      border: 1px solid #e0e5ee;
+      width: 100%;
+      box-sizing: border-box; /* Chrome, IE8, Opera, Safari 5.1*/
+    }
+		textarea{
+			background-color: #fff;
+			color: #16325c;
+			border: 1px solid #d8dde6;
+			border-radius: .25rem;
+			width: 100%;
+			transition: border .1s linear,background-color .1s linear;
+			display: inline-block;
+			resize: vertical;
+    	padding: .5rem .75rem;
+		}
+		textarea:active,
+		textarea:focus {
+	    outline: 0;
+	    border-color: #1589ee;
+	    background-color: #fff;
+	    box-shadow: 0 0 3px #0070D2;
+		}
+    aurainspector-json {
+			/*margin: .5rem .5rem 0 0.5rem;*/
 			display: flex;
 		}
+		.watch .div_actionResponse,
+		.watch .div_actionParameter,
+		.watch aurainspector-json,
+		.watch dl.attributes{
+			display: none;
+		}
+		.select {
+	    background-color: #fff;
+	    color: #16325c;
+	    border: 1px solid #d8dde6;
+	    border-radius: 0.25rem;
+	    width: 100%;
+	    -webkit-transition: border 0.1s linear,background-color 0.1s linear;
+	    transition: border 0.1s linear,background-color 0.1s linear;
+	    height: 2rem;
+		}
+		select:active,
+		select:focus {
+	    outline: 0;
+	    border-color: #1589ee;
+	    background-color: #fff;
+	    box-shadow: 0 0 3px #0070D2;
+		}
+		.inline dd,
+		.inline dt{
+      display: inline-block;
+      vertical-align: middle;
+			padding: 0 .5rem 0 0;
+		}
+		.grid{
+			display: flex;
+		}
+		.col {
+			flex: 1 1 auto;
+			min-width: 80px;
+		}
+		.shrink {
+			flex: 0 1 auto;
+		}
+		.p-around--xsmall{
+			padding: .5rem;
+		}
+		.p-top--xxsmall{
+			padding-top: .25rem;
+		}
+		.m-top--xsmall{
+			margin-top: .5rem;
+		}
+		.p-left--xsmall{
+			padding-left: .5rem;
+		}
+		.p-right--xsmall{
+			padding-right: .5rem;
+		}
+		.p-bottom--none{
+			padding-bottom: 0;
+		}
+		.hidden {
+			display: none;
+		}
+		.label {
+			color: #54698d;
+	    flex: 0 0 auto;
+	    font-size: 0.75rem;
+	    line-height: 1.5;
+	    width: 80px;
+	    vertical-align: top;
+		}
+		.toggle::before {
+		  content: '';
+		  display: inline-block;
+		  width: 0;
+		  height: 0;
+		  border-top: 4px solid transparent;
+		  border-left: 7px solid #777;
+		  border-bottom: 4px solid transparent;
+		  margin: 3px 3px 0 0;
+		}
+		.toggle.expanded::before {
+		  content: '';
+		  display: inline-block;
+		  width: 0;
+		  height: 0;
+		  border-left: 4px solid transparent;
+		  border-top: 7px solid #777;
+		  border-right: 4px solid transparent;
+		  margin: 0 2px 0 0;
+		  position: relative;
+		  top: 4px;
+		}
 	</style>
-
+	<div class="card">
     <header></header>
-    <aurainspector-json class="parameters" expandTo="0"></aurainspector-json>
-    <aurainspector-json class="result" expandTo="0"></aurainspector-json>
-    <aurainspector-json class="storageKey" expandTo="0"></aurainspector-json>
-    <dl>
-				<div class="col">
-						<dt>Id</dt>
-						<dd id="actionId"></dd>
-					</div>
-				<div class="col">
+
+    <div>
+		<dl class="inline">
+		<div class="div_actionParameter p-around--xsmall p-bottom--none grid">
+			<dt class="shink">Parameters</dt>
+			<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
+        </div>
+        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
+						<dt class="shrink">Result</dt>
+            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
+            <button id="button_editActionResponse">Modify</button>
+        </div>
+			</dl>
+				<div class="p-around--xsmall p-bottom--none" id="actionParameter">
+					<button id="button_editActionParameter" class="button_editActionParameter toggle">
+						<label  for="actionParameter" class="label">Match Parameters</label>
+					</button>
+				</div>
+        <div class="div_editActionParameter p-left--xsmall p-right--xsmall p-top--xxsmall" id="textarea_actionParameter">
+			<textarea name="actionParameter" id="text_actionParameter" class="textarea_ActionParameter code" rows="5" wrap="off">
+            </textarea>
+        </div>
+		<div class="p-around--xsmall p-bottom--none dropOrModify">
+			<select id="select_dropOrModify" class="select_dropOrModify select">
+			   	<option value="dropAction">Drop the Action</option>
+			    <option value="modifyResponse">Override the Result</option>
+			 </select>
+		</div>
+        <div class="div_editActionResult p-around--xsmall p-bottom--none">
+            <label for="actionResult" class="label">New Result</label>
+            <div class="div_textarea_ActionResult">
+            	<label for="actionResult" class="label">Key</label>
+            	<textarea name="actionResultKey" id="textarea_actionResultKey" class="textarea_ActionResult m-top--xsmall code" rows="1" wrap="off">
+            	</textarea>
+            	<label for="actionResult" class="label">New Value</label>
+            	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult m-top--xsmall code" rows="5" wrap="off">
+            	</textarea>
+        	</div>
+			<div class="div_actionButtons p-around--xsmall p-bottom--none">
+	            <button id="button_saveActionResult" class="button_saveActionResult text-button">Save Action Result</button>
+	            <button id="button_cancelChangeActionResult" class="button_cancelChangeActionResult text-button">Cancel</button>
+			</div>
+        </div>
+		<div class="hidden">
+				<button id="button_saveActionParameter" class="text-button">Save</button>
+				<button id="button_cancelChangeActionParameter" class="button_cancelChangeActionParameter text-button">Cancel</button>
+		</div>
+    </div>
+    <!-- <aurainspector-json class="storageKey" expandTo="0"></aurainspector-json> -->
+    <dl class="attributes">
+			<div class="col">
+			     <dt>Id</dt>
+				<dd id="actionId"></dd>
+			</div>
+			<div class="col">
             <dt>State</dt>
 						<dd id="actionState"></dd>
 				</div>
@@ -110,8 +361,15 @@
             <dt>Created Components</dt>
 						<dd id="statsCreated"></dd>
 				</div>
-
+				<div class="col">
+            <dt>Storage Key</dt>
+						<dd id=""><aurainspector-json class="storageKey code" expandTo="0"></aurainspector-json></dd>
+				</div>
     </dl>
+</div>
+
+
+    
 
 </template>
 

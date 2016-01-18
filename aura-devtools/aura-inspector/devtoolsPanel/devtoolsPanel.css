@@ -115,7 +115,6 @@ header.tabs button.selected {
   border-bottom:1px solid #fff;
   margin-bottom:-1px;
 }
-
 header.tabs div.dropdown#help {
   margin: .6em .2em 0 .2em;
   border: 1px solid #DADEE2;
@@ -495,6 +494,15 @@ button.toggle:focus {
 .drop-zone.allow-drop{
   border: 1px solid #0070D2;
 }
+.drop-zone.allow-drop::after{
+  content:" ";
+  height:.25rem;
+  width:calc(100% - 1rem);
+  display:block;
+  background-color: #0070D2;
+  margin:.5rem;
+  border-radius:.125rem;
+}
 .actions-tab{
   height: calc(100% - 63px);
   /* .slds-grid  { */
@@ -504,14 +512,18 @@ button.toggle:focus {
   display: flex;
   position: relative;
   /* } */
+  overflow: hidden;
 }
 .actions-list {
-  order:-1;
   border-right:1px solid #d8dde6;
-  padding-right: .5rem;
-  margin-right: .5rem;
+  box-shadow: 0 -2px 4px rgba(0,0,0,.07);
+  order:-1;
+  z-index: 1;
+  /*padding-right: .5rem;
+  margin-right: .5rem;*/
+
 }
-.actions-list, .actionsToDrop-list {
+.actions-list, .actionsToWatch-list {
   /*.slds-scrollable--y {*/
   -webkit-overflow-scrolling: touch;
   max-height: 100%;
@@ -528,18 +540,25 @@ button.toggle:focus {
   width: 50%;
   /*}*/
 }
+.actionsToWatch-list {
+  background-color: #f4f6f9;
+}
+.action-card{
+  background-color: #fff;
+}
+
 @media (max-width: 800px) {
   .actions-tab{
     flex-wrap: wrap;
     align-content: flex-start;
   }
-  .actions-list, .actionsToDrop-list {
+  .actions-list, .actionsToWatch-list {
     flex: 0 1 auto;
     max-height: none;
     overflow: auto;
     width: 100%;
   }
-  .actionsToDrop-list {
+  .actionsToWatch-list {
     border-bottom: 1px solid #d8dde6;
     padding-bottom: .5rem;
     /*.slds-max-small-order--1 {*/
@@ -562,9 +581,16 @@ button.toggle:focus {
   }
 }
 
-.actions-list section h1,
-.actionsToDrop-list section h1{
+.actions-list section h1{
   background: #f4f6f9;
+  color: #54698d;
+  letter-spacing: 0.0625em;
+  margin: .5rem 0 0 0;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+}
+.actionsToWatch-list section h1{
+  background: #eef1f6;
   color: #54698d;
   letter-spacing: 0.0625em;
   margin: .5rem 0 0 0;
@@ -576,7 +602,7 @@ h1{
   font-size: 0.75rem;
   line-height: 1.25;
 }
-.actionsToDrop-list section .description{
+.actionsToWatch-list section .description{
   margin: .5rem;
   display: block;
   /*.slds-text-body--small {*/
@@ -585,7 +611,7 @@ h1{
   /*}*/
 }
 .actions-list .action-card,
-.actionsToDrop-list .action-card {
+.actionsToWatch-list .action-card {
   border: 1px solid #e0e5ee;
   border-radius: 4px;
   display: block;
@@ -597,7 +623,7 @@ h1{
   cursor: move;
 }
 #tab-body-actions #filter-text { width: 150px; }
-.actionsToDrop-list {
+.actionsToWatch-list {
   margin: 0;
 }
 .actions-list .action-card.dropped, .action-card.dragging {
@@ -607,6 +633,7 @@ h1{
   background-color: #fff;
   cursor: default;
 }
+
 
 /* Storage Panel */
 #storage-viewer { padding: 10px; }

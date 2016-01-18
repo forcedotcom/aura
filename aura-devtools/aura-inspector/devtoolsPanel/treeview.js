@@ -81,7 +81,7 @@ function TreeNode(text, id) {
                             current = Object.keys(current).length ? "{...}" : "{}"
                         }
 
-                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + current + '"');
+                        pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(current) + '"');
                     }
                 }   
             }
@@ -106,7 +106,7 @@ function TreeNode(text, id) {
             if(value.attributes["aura:id"]) {
                 pattern.push(' <span class="component-attribute">aura:id</span>="' + value.attributes["aura:id"] + '"');
                 for(var attr in value.attributes.HTMLAttributes) {
-                    pattern.push(' <span class="component-attribute">' + attr + '</span>="' + value.attributes.HTMLAttributes[attr] + '"');
+                    pattern.push(' <span class="component-attribute">' + attr + '</span>="' + String$escape(value.attributes.HTMLAttributes[attr]) + '"');
                 }   
             }
 
@@ -290,6 +290,11 @@ function TreeNode(text, id) {
             }
         );
     };
+
+    function String$escape(string) {
+        if(typeof string != "string") { return string; }
+        return string.replace("<", "&lt;").replace(">", "&gt;");
+    }
 
 })();
 

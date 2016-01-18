@@ -112,6 +112,15 @@
                 // The AuraInspectorComponentView adds the sidebar class
                 this.addPanel("component-view", new AuraInspectorComponentView(this));
 
+                // Draw the help option
+                fetch(chrome.extension.getURL("configuration.json"), {
+                    method: "get"
+                }).then(function(response){
+                   response.json().then(function(json){
+                        drawHelp(json.help); 
+                   }); 
+                });
+
                 this.subscribe("AuraInspector:OnAuraInitialized", AuraInspector_OnAuraInitialized.bind(this));
 
                 this.subscribe("AuraInspector:OnContextMenu", function() { 
@@ -287,23 +296,6 @@
             chrome.devtools.inspectedWindow.eval("$A.getContext().getMode();", callback);
         };
 
-
-        /*
-         =========== BEGIN REFACTOR! ===============
-         Can we move some of these to the individual panels themselves?
-         */
-        this.highlightElement = function(globalId) {
-            this.publish("AuraInspector:OnHighlightComponent", globalId);
-        };
-
-        this.removeHighlightElement = function() {
-            this.publish("AuraInspector:OnHighlightComponentEnd");
-        };
-
-        this.addLogMessage = function(msg) {
-            this.publish("AuraInspector:ConsoleLog", msg);
-        };
-
         this.updateComponentView = function(globalId) {
             panels.get("component-view").setData(globalId);
         };
@@ -401,6 +393,23 @@
         };
 
 
+
+        /*
+         =========== BEGIN REFACTOR! ===============
+         Can we move some of these to the individual panels themselves?
+         */
+        this.highlightElement = function(globalId) {
+            this.publish("AuraInspector:OnHighlightComponent", globalId);
+        };
+
+        this.removeHighlightElement = function() {
+            this.publish("AuraInspector:OnHighlightComponentEnd");
+        };
+
+        this.addLogMessage = function(msg) {
+            this.publish("AuraInspector:ConsoleLog", msg);
+        };
+
         /**
          * Should show a message of a different type obviously.
          */
@@ -415,8 +424,9 @@
         /* Event Handlers */
         function HeaderActions_OnClick(event){
             var target = event.target;
-            if(target.id.indexOf("tabs-") !== 0) { return; }
-            this.showPanel(target.id);
+            if(target.id.indexOf("tabs-") === 0) { 
+                this.showPanel(target.id);
+            }
         }
 
         function DevToolsPanel_OnMessage(message) {
@@ -442,10 +452,7 @@
                         console.error(e);
                     }
                 });
-            }
-            //  else {
-            //     console.warn("FAIL:", key, " with data ", data, " had no subscribers.");
-            // }
+            }``
         }
 
         function AuraInspector_OnShowComponentInTree() {
@@ -497,7 +504,81 @@
             this.publish("AuraInspector:OnPanelConnect", {});
         }
 
-        /* PRIVATE */
+        /**  BEGIN HELP BUTTON */
+        function Dropdown_OnClick(event) {
+            if(event.target.classList.contains("trigger")) {
+                if(this.classList.contains("visible")) {
+                    hideHelp(this);
+                } else { 
+                    showHelp(this);
+                }
+            }
+        }
+
+        function Body_OnClick(event) {
+            var target = event.target;
+            var current = target;
+            while(current != null && current != current.parentNode) {
+                if(current == this) {
+                    return;
+                }
+                current = current.parentNode;
+            }
+
+            hideHelp(this);
+        }
+
+        function Help_OnClick(event) {
+            if(event.target.tagName === "A") {
+                chrome.devtools.inspectedWindow.eval("window.open('" + event.target.href + "');");
+            }
+        }
+
+        function drawHelp(helpLinks) {
+            var header = document.querySelector("header.tabs");
+            var dropdown = document.createElement("div");
+            dropdown.id = "help";
+            dropdown.className = "dropdown";
+            dropdown.addEventListener("click", Dropdown_OnClick);
+
+            var trigger = document.createElement("a");
+            trigger.className = "trigger";
+            trigger.textContent="?";
+            dropdown.appendChild(trigger);
+
+            var menu = document.createElement("menu");
+                menu.addEventListener("click", Help_OnClick);
+
+            var menuitem;
+            var link;
+            for(var c=0;c<helpLinks.length;c++) {
+                menuitem = document.createElement("menuitem");
+                menuitem.label = helpLinks[c].text;
+
+                link = document.createElement("a");
+                link.href = helpLinks[c].href;
+                link.textContent = helpLinks[c].text;
+
+                menuitem.appendChild(link);
+                menu.appendChild(menuitem);
+            }
+
+            dropdown.appendChild(menu);
+            header.appendChild(dropdown);
+        }
+
+        function showHelp(dropdown) {
+            document.body.addEventListener("click", Body_OnClick.bind(dropdown));
+            dropdown.classList.add("visible");
+        }
+
+        function hideHelp(dropdown) {
+            document.body.removeEventListener("click", Body_OnClick.bind(dropdown));
+            dropdown.classList.remove("visible");
+        }
+
+        /** END HELP BUTTON */
+
         function stripDescriptorProtocol(descriptor) {
             if(typeof descriptor != 'string') { return descriptor; }
             if(descriptor.indexOf("://") === -1) {

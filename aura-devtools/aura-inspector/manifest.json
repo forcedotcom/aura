@@ -1,7 +1,7 @@
 {
     "manifest_version":2,
 	"name": "Aura Inspector",
-	"version": "0.8.2",
+	"version": "0.8.3",
 	"description": "For inspecting Aura apps",
 	"update_url": "http://download.auraframework.org/aura-inspector/aura-inspector-updates.xml",
 	"icons": {
@@ -18,11 +18,6 @@
 	"devtools_page": "devtools.html",
 	"content_scripts": [{
         "matches": ["*://*/*cmp*", "*://*/*app*"],
-		// "matches": [
-		// 	"http://localhost/*",
-		// 	"http://*.salesforce.com/*",
-		// 	"http://*.force.com/*"
-		// ],
 		"js": ["contentScript.js"],
 		"run_at": "document_start",
 		"all_frames": false

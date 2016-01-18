@@ -383,64 +383,83 @@
          */
         this.safeStringify = function(originalValue) {
             // For circular dependency checks
+            var doNotSerialize = {
+                "[object Window]": true,
+                "[object global]": true,
+                "__proto__": null
+            };
             var visited = new Set();
             var toJSON = InvalidComponent.prototype.toJSON;
             var toJSONCmp = Component.prototype.toJSON;
             delete InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
+            var result = "{}";
+            try {
+                result = JSON.stringify(originalValue, function(key, value) {
+                    if(value === document) { return {}; }
+                    if(Array.isArray(this) || key) { value = this[key]; }
+                    if(!value) { return value; }
 
-            var result = JSON.stringify(originalValue, function(key, value) {
-                if(Array.isArray(this) || key) { value = this[key]; }
-                if(!value) { return value; }
-
-                if(typeof value === "string" && (value.startsWith(COMPONENT_CONTROL_CHAR) || value.startsWith(ACTION_CONTROL_CHAR))) {
-                    return ESCAPE_CHAR + escape(value);
-                }
-
-                if(value instanceof HTMLElement) {
-                    var attributes = value.attributes;
-                    var domOutput = [];
-                    for(var c=0,length=attributes.length,attribute;c<length;c++) {
-                        attribute = attributes.item(c);
-                        domOutput.push(attribute.name + "=" + attribute.value);
+                    if(typeof value === "string" && (value.startsWith(COMPONENT_CONTROL_CHAR) || value.startsWith(ACTION_CONTROL_CHAR))) {
+                        return ESCAPE_CHAR + escape(value);
                     }
-                    return `<${value.tagName} ${domOutput.join(' ')}>`; // Serialize it specially.
-                }
 
-                if(value instanceof Text) {
-                    return value.nodeValue;
-                }
-
-                if($A.util.isComponent(value)) {
-                    return COMPONENT_CONTROL_CHAR + value.getGlobalId();
-                }
-
-                if($A.util.isExpression(value)) {
-                    return value.toString();
-                }
-
-                if($A.util.isAction(value)) {
-                    return ACTION_CONTROL_CHAR + value.getDef().toString();
-                }
-
-                if(Array.isArray(value)) {
-                    return value.slice();
-                }
-
-                if(typeof value === "object") {
-                    if("$serId$" in value && visited.has(value)) {
-                        return {
-                            "$serRefId$": value["$serId$"],
-                            "__proto__": null
-                        };
-                    } else if(!$A.util.isEmpty(value)) {
-                        visited.add(value);
-                        value.$serId = increment++;
+                    if(value instanceof HTMLElement) {
+                        var attributes = value.attributes;
+                        var domOutput = [];
+                        for(var c=0,length=attributes.length,attribute;c<length;c++) {
+                            attribute = attributes.item(c);
+                            domOutput.push(attribute.name + "=" + attribute.value);
+                        }
+                        return `<${value.tagName} ${domOutput.join(' ')}>`; // Serialize it specially.
                     }
-                }
 
-                return value;
-            });
+                    if(value instanceof Text) {
+                        return value.nodeValue;
+                    }
+
+                    if($A.util.isComponent(value)) {
+                        return COMPONENT_CONTROL_CHAR + value.getGlobalId();
+                    }
+
+                    if($A.util.isExpression(value)) {
+                        return value.toString();
+                    }
+
+                    if($A.util.isAction(value)) {
+                        return ACTION_CONTROL_CHAR + value.getDef().toString();
+                    }
+
+                    if(Array.isArray(value)) {
+                        return value.slice();
+                    }
+
+                    if(typeof value === "object") {
+                    //     try {
+                    //     var primitive = value+"";
+                    // } catch(ex) { debugger; }
+                        if("$serId$" in value && visited.has(value)) {
+                            return {
+                                "$serRefId$": value["$serId$"],
+                                "__proto__": null
+                            };
+                        } 
+                        else if(doNotSerialize[Object.prototype.toString.call(value)]) {
+                            value = {};
+                        }
+                        else if(!$A.util.isEmpty(value)) {
+                            visited.add(value);
+                            value.$serId = increment++;
+                        }
+                    }
+
+                    return value;
+                });
+
+            } catch(e) {
+                console.error("AuraInspector: Error serializing object to json.");
+            }
+            
 
             visited.forEach(function(item){
                 if("$serId$" in item) {
@@ -650,7 +669,7 @@
             delete Component.prototype.toJSON;
             delete InvalidComponent.prototype.toJSON;
 
-            var json = JSON.stringify(data, function(key, value){
+            var json = $Aura.Inspector.safeStringify(data, function(key, value){
                 if($A.util.isComponent(value)) {
                     return "[Component] {" + value.getGlobalId() + "}";
                 } else if(value instanceof Function) {
@@ -751,7 +770,7 @@
                 "id": action.getId(),
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
-                "returnValue": JSON.stringify(action.getReturnValue()),
+                "returnValue": $Aura.Inspector.safeStringify(action.getReturnValue()),
                 "finishTime": performance.now(),
                 "stats": {
                     "created": $Aura.Inspector.getCount("component_created") - startCounts.created

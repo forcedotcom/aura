@@ -241,15 +241,17 @@
 	            	console.log('ERROR from saveNextResponse, CMD:', command, exception);
 	            }
 	        });
+	        //make the textara readonly
+	        this.shadowRoot.querySelector("#textarea_actionResultKey").setAttribute('readonly','readonly');
+	        this.shadowRoot.querySelector("#textarea_actionResultValue").setAttribute('readonly','readonly');
+	        //hide save/cancel button
+	        this.shadowRoot.querySelector("#button_saveActionResult").style.display="none";
+	        this.shadowRoot.querySelector("#button_cancelChangeActionResult").style.display="none";
+	        
 		} else {
 			console.log("saveNextResponse, either actionId is bogus, or bad value of key/value in nextResponse", 
 				actionId, nextResponseKey, nextResponseValue);
 		}
-
-		//TODO: make the custom result and params read only. show edit button?
-		//var div_editActionResult = this.shadowRoot.querySelector(".div_editActionResult");
-        //div_editActionResult.style.display = "none";
-		
 	}
 
 	function parseJSON(jsonString, errorMsg) {

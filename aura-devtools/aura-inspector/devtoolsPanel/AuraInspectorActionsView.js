@@ -221,10 +221,6 @@ function AuraInspectorActionsView(devtoolsPanel) {
     }
 
     function upsertCard(action) {
-        if(!isAllowed(action)) {
-            return;
-        }
-
         var card;
         //card on the right side: move from Watch List
         if(action.idtoWatch) {
@@ -238,6 +234,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
             //also want to hide modify buttons
             card.setAttribute("toWatch", "false");
         } else { //card on the left side
+            if(!isAllowed(action)) {
+                return;
+            }
             card = document.getElementById("action_card_" + action.id);
             if(card) {
                 card.setAttribute("state", action.state);

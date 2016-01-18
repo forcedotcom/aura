@@ -69,7 +69,7 @@
         }
         ]
     },
-    
+
     /**
      * verify hideMenuAfterSelected when set on menu's
      * Test case for W-2720943
@@ -166,7 +166,7 @@
         }
         ]
     },
-    
+
     /**
      * verify hideMenuAfterSelected when set on menu's
      * Test case for W-2720943
@@ -250,7 +250,7 @@
 
         ]
     },
-    
+
     testRadioMenuListHidesAfterSelected: {
     	attributes : {"hideMenuAfterSelected" : "true"},
         test: [function (cmp) {
@@ -424,6 +424,7 @@
             menuListElement = menuList.getElement();
             item1 = cmp.find("checkPositionItem1").getElement();
             this.clickAnchor(trigger);
+            $A.test.setTestTimeout(30000);
             $A.test.addWaitForWithFailureMessage(true, function () {
                 return $A.util.hasClass(menuList.getElement(), "visible")
             }, "Menu Should be visible");

@@ -1287,7 +1287,13 @@ Component.prototype.getAttributeValueProvider = function() {
  * @export
  */
 Component.prototype.setAttributeValueProvider = function (avp) {
+	// Remove this component from the current AVP's index
+    this.doDeIndex(this);
+
     this.attributeValueProvider = avp;
+
+	// Add this component from the new AVP's index
+    this.doIndex(this);
 };
 
 /**

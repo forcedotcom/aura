@@ -53,4 +53,7 @@ public interface IntegrationService extends AuraService {
      * @throws QuickFixException 
      */
     Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application) throws QuickFixException;
+    
+    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, Object tempDummy) throws QuickFixException;
+
 }

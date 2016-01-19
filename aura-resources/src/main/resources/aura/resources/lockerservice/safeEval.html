@@ -13,7 +13,6 @@
       var returnableEx = /^\s*([{(["']|function\s*\()/;
       // TODO: improve first comment removal
       var trimCommentsLeftEx = /^\/\/.*\n?/;
-      var multilineComments = /\/\*([\s\S]*?)\*\//g;
       var hookFn = '$globalEvalIIFE$';
       var USE_STRICT = true;
 
@@ -50,7 +49,6 @@
           // removing first line CSFR protection and other comments to facilitate
           // the detection of returnable code
           src = src.replace(trimCommentsLeftEx, '');
-          src = src.replace(multilineComments, '');
           // only add return statement if source it starts with [, {, or (
           if (returnableEx.test(src)) src = 'return ' + src;
           if (useStrict) src = '"use strict";\n' + src;

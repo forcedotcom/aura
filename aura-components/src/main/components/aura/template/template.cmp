@@ -104,7 +104,7 @@
                     <div id="auraErrorMessage">{!v.errorMessage}</div>
                 </div>
             </div>
-            <iframe id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" width="0" height="0" tabindex="-1" class="invisible">&nbsp;</iframe>
+            <iframe id="safeEvalWorker" src="/auraFW/resources/lockerservice/safeEval.html" width="0" height="0" tabindex="-1" class="invisible" aria-hidden="true" title="scripts">&nbsp;</iframe>
 
             {!v.body}
 

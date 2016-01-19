@@ -76,13 +76,16 @@
      * Acessibility test, making sure that any functionality added is still accessible
      *
      */
-    testAccessibile : {
-    	attributes : {value: "2012-09-10 11:23", format: "MM-dd-yyyy hh:mm"},
-    	        test : [function(cmp) {
-    	  			this.openDatePicker(cmp);
-    	    	}, function(cmp) {
-    	    		$A.test.assertAccessible();
-    	}]
+    testAccessible : {
+        attributes : {
+            value: "2012-09-10 11:23",
+            format: "MM-dd-yyyy hh:mm"
+        },
+        test : [function(cmp) {
+            this.openDatePicker(cmp);
+        }, function(cmp) {
+            $A.test.assertAccessible();
+        }]
      },
 
     /**

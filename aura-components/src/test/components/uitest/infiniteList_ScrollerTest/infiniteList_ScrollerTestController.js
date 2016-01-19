@@ -14,40 +14,27 @@
  * limitations under the License.
  */
 ({
-        doInit : function(component, event, helper) {
-            var array = [];
-            $A.componentService.newComponentAsync(
-                    this,
-                    function (newcmp) {
-                        array.push(newcmp);
-                        component.set("v.extendedPullAtrib",array);
-                    },
-                    {
-                        "componentDef": {
-                            "descriptor": "markup://ui:outputText"
-                        },
-                        
-                        "attributes": {
-                            "values": {
-                            	"value"  : "12/12/2012 12:12"
-                            }
-                        }
-                    }
-            );
-        },
-	refresh: function(component, event, helper) {
-             helper.refresh(component, "list");
-	},
+    doInit : function(component, event, helper) {
+        var array = [];
+        $A.createComponent("ui:outputText", { "value": "12/12/2012 12:12" }, function(newCmp) {
+            array.push(newCmp);
+            component.set("v.extendedPullAtrib",array);
+        });
+    },
 
-	showMore: function(component, event, helper) {
-             helper.showMore(component, "list");
-	},
-	
-	refresh2: function(component, event, helper) {
-              helper.refresh(component, "list2");
-	},
+    refresh: function(component, event, helper) {
+        helper.refresh(component, "list");
+    },
 
-	showMore2: function(component, event, helper) {
-              helper.showMore(component, "list2");
-	}
+    showMore: function(component, event, helper) {
+        helper.showMore(component, "list");
+    },
+
+    refresh2: function(component, event, helper) {
+        helper.refresh(component, "list2");
+    },
+
+    showMore2: function(component, event, helper) {
+        helper.showMore(component, "list2");
+    }
 })

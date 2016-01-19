@@ -247,6 +247,7 @@ Aura.Utils.Util.prototype.isEmpty = function(obj){
     } else if (typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Object]') {
         return Object.keys(obj).length === 0;
     }
+    return false;
 };
 
 /**

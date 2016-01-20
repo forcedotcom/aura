@@ -40,8 +40,6 @@ import java.util.concurrent.Semaphore;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import junit.framework.AssertionFailedError;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpGet;
@@ -72,8 +70,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Action;
@@ -86,7 +87,6 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.ScreenshotException;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -95,6 +95,8 @@ import org.uiautomation.ios.client.uiamodels.impl.augmenter.IOSDriverAugmenter;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import junit.framework.AssertionFailedError;
 
 /**
  * Base class for Aura WebDriver tests.
@@ -549,7 +551,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Stop JavaScript CPU profiler and return profile info
-     * 
+     *
      * See https://src.chromium.org/viewvc/chrome?revision=271803&view=revision
      */
     public final Map<String, ?> endProfile() {
@@ -591,7 +593,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Load a string as a component in an app.
-     * 
+     *
      * @param namePrefix the name of the component
      * @param componentText The actual text of the component.
      * @param isClient Should we use client or server rendering.
@@ -614,7 +616,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * A convenience routine to load a application string.
-     * 
+     *
      * @param namePrefix the application name.
      * @param appText the actual text of the application
      */
@@ -638,7 +640,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * <li>running/waiting</li>
      * <li>a screenshot</li>
      * </ul>
-     * 
+     *
      * @param originalErr the test failure
      * @throws Throwable a new AssertionFailedError or UnexpectedError with the original and additional info
      */
@@ -681,15 +683,20 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
             String screenshotsDirectory = System.getProperty("screenshots.directory");
             if (screenshotsDirectory != null) {
-                String img = getBase64EncodedScreenshot(originalErr, true);
-                if (img == null) {
-                    description.append("\nScreenshot: {not available}");
-                } else {
+                String screenshot = null;
+                TakesScreenshot ts = (TakesScreenshot) getDriver();
+                try {
+                    screenshot = ts.getScreenshotAs(OutputType.BASE64);
+                } catch (WebDriverException e) {
+                    description.append(String.format("%nScreenshot: {capture error: %s}", e.getMessage()));
+                }
+
+                if (screenshot != null) {
                     String fileName = getClass().getName() + "." + getName() + "_" + currentBrowserType + ".png";
-                    File path = new File(screenshotsDirectory + "/" + fileName);
                     try {
+                        File path = new File(screenshotsDirectory + "/" + fileName);
                         path.getParentFile().mkdirs();
-                        byte[] bytes = Base64.decodeBase64(img.getBytes());
+                        byte[] bytes = Base64.decodeBase64(screenshot.getBytes());
                         FileOutputStream fos = new FileOutputStream(path);
                         fos.write(bytes);
                         fos.close();
@@ -731,35 +738,6 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
         return newFailure;
     }
 
-    /**
-     * Try to extract a screenshot from the given Throwable's stacktrace.
-     * 
-     * @param t the throwable to check for
-     * @param trigger if true, and t is null or doesn't have a screenshot, synthesize a WebDriverException and look in
-     *            there.
-     * @return base64 encoding of the screenshot, or null if one could not be obtained
-     */
-    private String getBase64EncodedScreenshot(Throwable t, boolean trigger) {
-        if (t == null) {
-            if (trigger) {
-                try {
-                    auraUITestingUtil.getRawEval("return $A.test.dummymethod();");
-                } catch (Throwable i) {
-                    return getBase64EncodedScreenshot(i, false);
-                }
-            }
-        } else {
-            if (t instanceof AssertionFailedError) {
-                return getBase64EncodedScreenshot(null, trigger);
-            } else if (t instanceof ScreenshotException) {
-                return ((ScreenshotException) t).getBase64EncodedScreenshot();
-            } else {
-                return getBase64EncodedScreenshot(t.getCause(), trigger);
-            }
-        }
-        return null;
-    }
-
     protected BrowserType getBrowserType() {
         return currentBrowserType;
     }
@@ -767,7 +745,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Find all the browsers the current test case should be executed in. Test cases can be annotated with multiple
      * target browsers. If the testcase does not have an annotation, the class level annotation is used.
-     * 
+     *
      * @return
      * @throws NoSuchMethodException
      */
@@ -792,7 +770,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Browser types to be excluded for this testcase or test class.
-     * 
+     *
      * @return
      * @throws NoSuchMethodException
      */
@@ -989,7 +967,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
     /**
      * Open a Aura URL with the default mode provided by {@link WebDriverTestCase#getAuraModeForCurrentBrowser()} and
      * wait for intialization as defined by {@link AuraUITestingUtil#waitForAuraInit()}.
-     * 
+     *
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
@@ -1010,7 +988,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Open a Aura URL in given aura.mode and wait for initialization.
-     * 
+     *
      * @throws MalformedURLException
      * @throws URISyntaxException
      */
@@ -1066,7 +1044,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Wait the specified number of seconds for the provided javascript to evaluate to true.
-     * 
+     *
      * @throws AssertionFailedError if the provided javascript does not return a boolean.
      */
     public void waitForCondition(final String javascript, int timeoutInSecs) {
@@ -1173,7 +1151,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * waitForElement to present or absent before executing the next command
-     * 
+     *
      * @param msg Error message
      * @param e WebElement to look for
      * @param isDisplayed if set to true, will wait till the element is displayed else will wait till element is not
@@ -1191,7 +1169,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Waits for element with matching locator to appear on screen.
-     * 
+     *
      * @param msg Error message on timeout.
      * @param locator By of element waiting for.
      */
@@ -1214,7 +1192,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Waits for element with matching locator to disappear from the screen.
-     * 
+     *
      * @param msg Error message on timeout.
      * @param locator By of element waiting for.
      */
@@ -1238,7 +1216,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      * Overriding wait to wait until the dialog box closes, Since we are using the class variable to check for the
      * Dialog box, it changes from dialog modal medium uiDialog slideUp -> dialog modal medium uiDialog-> dialog hidden
      * modal medium uiDialog (this is the state that we want to make sure to grab)
-     * 
+     *
      * @param selectorToFindCmp way to find componenet (ex: "div[class*='dialog']")
      * @param attr components attribute that we want to find
      * @param itemAttrShouldContain Keyword that we are looking for in the attribute
@@ -1252,8 +1230,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
                 if (useBangOperator) {
                     return !d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
                             .contains(itemAttrShouldContain);
-                }
-                else {
+                } else {
                     return d.findElement(By.cssSelector(selectorToFindCmp)).getAttribute(attr)
                             .contains(itemAttrShouldContain);
                 }
@@ -1263,7 +1240,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Wait for the carousel page to change. Asserts the expectedText appears in the innerHTML of page element
-     * 
+     *
      * @param page - the next page that should be loaded on carousel.
      * @param expectedText - the expected text on that page.
      */
@@ -1325,7 +1302,7 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
 
     /**
      * Flick starting at on_element, and moving by the xoffset and yoffset with normal speed
-     * 
+     *
      * @param locator
      * @param xOffset
      * @param yOffset

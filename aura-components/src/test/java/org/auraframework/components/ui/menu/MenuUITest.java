@@ -15,9 +15,6 @@
  */
 package org.auraframework.components.ui.menu;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
 import org.auraframework.test.util.WebDriverUtil.BrowserType;
@@ -27,13 +24,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * UI automation to verify Action, checkbox and radio Menu using mouse and keyboard interaction .
- * 
+ *
  * @userStory a07B0000000TG3R Excluding the test from IE due to know issue related to mouseOver Excluding it from touch
  *            browsers due to to W-1478819 and mouse over related issues
  */
@@ -49,7 +47,39 @@ public class MenuUITest extends WebDriverTestCase {
         super(name);
     }
 
-    private void testActionMenuForApp(String appName, String appendId) throws MalformedURLException, URISyntaxException {
+    /**
+     * Test that verify's interaction with Action Menu.
+     */
+    public void testActionMenu() throws Exception {
+        testActionMenuForApp(MENUTEST_APP, "");
+    }
+
+    /**
+     * Test that verify's interaction with Action Menu with image is trigger link.
+     */
+    public void testActionMenuWithImageTrigger() throws Exception {
+        testActionMenuForApp(MENUTEST_APP, "Image", false);
+    }
+
+    public void testActionMenuNestedMenuItems() throws Exception {
+        testActionMenuForApp(MENUTEST_APP, "Nested");
+    }
+
+    // Test case for W-2181713
+    @Flapper
+    public void testActionMenuAttachToBodySet() throws Exception {
+        testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP, "");
+    }
+
+    public void testActionMenuGeneratedFromMetaData() throws Exception {
+        testActionMenuForApp(MENUTEST_METADATA_APP, "");
+    }
+
+    private void testActionMenuForApp(String appName, String appendId) throws Exception {
+        testActionMenuForApp(appName, appendId, true);
+    }
+
+    private void testActionMenuForApp(String appName, String appendId, boolean verifyLabelUpdate) throws Exception {
         open(appName);
         WebDriver driver = this.getDriver();
         String label = "trigger" + appendId;
@@ -66,43 +96,56 @@ public class MenuUITest extends WebDriverTestCase {
         // check menu list is not visible
         assertFalse("Menu list should not be visible", actionMenu.getAttribute("class").contains("visible"));
 
-        menuLabel.click();
-        // check menu list is visible after the click
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, actionMenu);
 
-        // verify focus on action item3
         auraUITestingUtil.setHoverOverElement(menuItem3);
-        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem3Element);
 
         assertTrue("Item 2 in the menu List is should be visible on the page", actionItem2.isDisplayed());
 
-        // use send key("f") to move to actionItem2
+        // actionItem2 text starts with the letter F so pressing that key should switch focus to it
         actionItem3Element.sendKeys("f");
+        waitForFocusOnMenuActionItem(actionItem2Element);
 
-        // verify focus on actionItem2
-        assertEquals("Focus should be on actionItem 2", actionItem2Element.getText(),
-                auraUITestingUtil.getActiveElementText());
-
-        // action item 2 not clickable as its disable item
-        boolean disabledItemNotClickable = false;
+        // actionItem2 is not clickable as it's disabled via markup
         try {
             actionItem2Element.click();
+            fail("Expected exception trying to click an unclickable element");
         } catch (Exception e) {
-            disabledItemNotClickable = true;
+            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
         }
 
-        // check that the disabled item is not clickable
-        assertTrue("Disabled item should not be clickable", disabledItemNotClickable);
-
-        // click on item 1 and verify click worked
-        actionItem3Element.click();
-        assertEquals("Item3 not selected", "Inter Milan", menuLabel.getText());
+        if (verifyLabelUpdate) {
+            // click on an item and verify the menu text is updated
+            actionItem3Element.click();
+            waitForMenuText(menuLabel, "Inter Milan");
+        }
     }
 
-    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString)
-            throws MalformedURLException,
-            URISyntaxException {
+    public void testActionMenuWithImageTriggerViaKeyboardInteraction() throws Exception {
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image", false);
+    }
+
+    public void testActionMenuViaKeyboardInteraction() throws Exception {
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "");
+    }
+
+    // Test case for W-2234265
+    public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws Exception {
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP, "");
+    }
+
+    // TODO: W-2406307: remaining Halo test failure
+    public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws Exception {
+        testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
+    }
+
+    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString) throws Exception {
+        testActionMenuViaKeyboardInteractionForApp(appName, appendString, true);
+    }
+
+    private void testActionMenuViaKeyboardInteractionForApp(String appName, String appendString,
+            boolean verifyLabelUpdate) throws Exception {
         open(appName);
         WebDriver driver = this.getDriver();
         String label = "trigger" + appendString;
@@ -119,124 +162,58 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement actionItem4 = driver.findElement(By.className(menuItem4));
         WebElement actionItem4Element = getAnchor(actionItem4);
 
-        // click on menu list
-        menuLabel.click();
-        // check menu list is visible after the click
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, actionMenu);
 
         // default focus on action item1
-        assertEquals("Focus should be on actionItem1", actionItem1Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem1Element);
 
         // press down key twice
         actionItem1Element.sendKeys(Keys.DOWN, Keys.DOWN);
 
         // verify focus on action item3
         auraUITestingUtil.setHoverOverElement(menuItem3);
-        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem3Element);
 
         actionItem3Element.click();
-        assertEquals("Item3 unchecked after pressing Enter key", "Inter Milan", menuLabel.getText());
+        if (verifyLabelUpdate) {
+            waitForMenuText(menuLabel, "Inter Milan");
+        }
 
-        menuLabel.click();
-        // focus on action item4
+        openMenu(menuLabel, actionMenu);
         auraUITestingUtil.setHoverOverElement(menuItem4);
-        assertEquals("Focus should be on actionItem4", actionItem4Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem4Element);
 
         actionItem4Element.sendKeys(Keys.UP);
         // verify focus on action item3
-        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem3Element);
 
         // press space key and check if item3 got selected
         actionItem3Element.sendKeys(Keys.SPACE);
-        assertEquals("Item3 not selected after pressing space key", "Inter Milan", menuLabel.getText());
+        if (verifyLabelUpdate) {
+            waitForMenuText(menuLabel, "Inter Milan");
+        }
 
-        menuLabel.click();
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, actionMenu);
         auraUITestingUtil.setHoverOverElement(menuItem1);
+        waitForFocusOnMenuActionItem(actionItem1Element);
         actionItem1Element.sendKeys(Keys.ESCAPE);
-        assertFalse("Menu list should not be visible", actionMenu.getAttribute("class").contains("visible"));
-    }
-
-    /**
-     * Test that verify's interaction with Action Menu Excluding Ipad and iphone as hover wont work for touch devices
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    public void testActionMenu() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_APP, "");
-    }
-
-    /**
-     * Test that verify's interaction with Action Menu with image is trigger link Test case: W-2515040 Excluding Ipad
-     * and iphone as hover wont work for touch devices
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException Uncomment test once W-2515040 is fixed
-     */
-    public void _testActionMenuWithImageTrigger() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_APP, "Image");
-    }
-
-    public void testActionMenuNestedMenuItems() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_APP, "Nested");
-    }
-
-    /**
-     * Uncomment test once W-2515040 is fixed
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
-     */
-    public void _testActionMenuWithImageTriggerViaKeyboardInteraction() throws MalformedURLException,
-            URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "Image");
-    }
-
-    // Test case for W-2181713
-    @Flapper
-    public void testActionMenuAttachToBodySet() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_ATTACHTOBODY_APP, "");
-    }
-
-    public void testActionMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
-        testActionMenuForApp(MENUTEST_METADATA_APP, "");
-    }
-
-    public void testActionMenuViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_APP, "");
-    }
-
-    // Test case for W-2234265
-    // TODO: Uncomment test once W-2234265 is fixed
-    public void testActionMenuAttachToBodySetViaKeyboardInteraction() throws MalformedURLException, URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_ATTACHTOBODY_APP, "");
-    }
-
-    // TODO: W-2406307: remaining Halo test failure
-    public void _testActionMenuGeneratedFromMetaDataViaKeyboardInteraction() throws MalformedURLException,
-            URISyntaxException {
-        testActionMenuViaKeyboardInteractionForApp(MENUTEST_METADATA_APP, "");
+        waitForMenuClose(actionMenu);
     }
 
     @PerfTest
-    //Timing issue on firefox when trying to click on non clickable element
-    @ExcludeBrowsers({BrowserType.FIREFOX})
-    public void testCheckboxMenu() throws MalformedURLException, URISyntaxException {
+    // Timing issue on firefox when trying to click on non clickable element
+    @ExcludeBrowsers({ BrowserType.FIREFOX })
+    public void testCheckboxMenu() throws Exception {
         testMenuCheckboxForApp(MENUTEST_APP);
     }
-    
-    //Timing issue on firefox when trying to click on non clickable element
-    @ExcludeBrowsers({BrowserType.FIREFOX})
-    public void testCheckboxMenuGeneratedFromMetaData() throws MalformedURLException, URISyntaxException {
+
+    // Timing issue on firefox when trying to click on non clickable element
+    @ExcludeBrowsers({ BrowserType.FIREFOX })
+    public void testCheckboxMenuGeneratedFromMetaData() throws Exception {
         testMenuCheckboxForApp(MENUTEST_METADATA_APP);
     }
 
-    private void testMenuCheckboxForApp(String appName) throws MalformedURLException, URISyntaxException {
+    private void testMenuCheckboxForApp(String appName) throws Exception {
         open(appName);
         WebDriver driver = this.getDriver();
         String label = "checkboxMenuLabel";
@@ -261,11 +238,7 @@ public class MenuUITest extends WebDriverTestCase {
         assertEquals("label is wrong", "NFC West Teams", menuLabel.getText());
         assertFalse("Default: CheckboxMenu list should not be visible", menu.getAttribute("class").contains("visible"));
 
-        // click on label
-        menuLabel.click();
-
-        // verify menu list is visible
-        assertTrue("CheckboxMenu list should be visible", menu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, menu);
 
         // verify aria attribute item4 which is used for accessibility is disabled and selected
         assertTrue("Item4 aria attribute should be disabled",
@@ -274,19 +247,17 @@ public class MenuUITest extends WebDriverTestCase {
                 Boolean.valueOf(item4Element.getAttribute("aria-checked")));
 
         // verify item4 is disabled and selected
-
         assertTrue("Item4 should be disabled", (Boolean) auraUITestingUtil.getEval(disableValueM4Exp));
         assertTrue("Item4 should be selected", (Boolean) auraUITestingUtil.getEval(selectedValueM4Exp));
 
-        // click on item4
-        //flapper in firefox
-        boolean disabledItemNotClickable = false;
+        // item4Element is not clickable as it's disabled via markup
         try {
-        	item4Element.click();
+            item4Element.click();
+            fail("Expected exception trying to click an unclickable element");
         } catch (Exception e) {
-            disabledItemNotClickable = true;
+            checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
         }
-        assertTrue("Item4 should not be clickable", disabledItemNotClickable);
+
         assertTrue("Item4 aria attribute should be Selected even when clicked",
                 Boolean.valueOf(item4Element.getAttribute("aria-checked")));
         assertTrue("Item4 should be Selected even when clicked",
@@ -319,25 +290,22 @@ public class MenuUITest extends WebDriverTestCase {
 
         // check if focus changes when you use up and down arrow using keyboard
         item3Element.sendKeys(Keys.DOWN);
-        assertEquals("Focus should be on item 4", item4Element.getText(), auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(item4Element);
         item4Element.sendKeys(Keys.UP);
-        assertEquals("Focus should be back to item 3", item3Element.getText(), auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(item3Element);
 
         // press Tab to close to menu
         item3Element.sendKeys(Keys.TAB);
-
-        // verify menu not visible
-        assertFalse("CheckboxMenu list should not be visible after escape",
-                menu.getAttribute("class").contains("visible"));
+        waitForMenuClose(menu);
 
         // click on submit button and verify the results
         assertEquals("label value should not get updated", "NFC West Teams", menuLabel.getText());
         button.click();
-        assertEquals("Checkbox items selected are not correct", "St. Louis Rams,Arizona Cardinals", result.getText());
+        waitForElementTextPresent(result, "St. Louis Rams,Arizona Cardinals");
     }
 
     // W-2721266 : disable this test because it's a flapper.
-    public void _testMenuRadio() throws MalformedURLException, URISyntaxException {
+    public void _testMenuRadio() throws Exception {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();
         String label = "radioMenuLabel";
@@ -403,11 +371,8 @@ public class MenuUITest extends WebDriverTestCase {
 
     /**
      * Test case for W-1575100
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testMenuExpandCollapse() throws MalformedURLException, URISyntaxException {
+    public void testMenuExpandCollapse() throws Exception {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();
         String label = "trigger";
@@ -415,23 +380,20 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menuLabel = driver.findElement(By.className(label));
         WebElement menu = driver.findElement(By.className(menuName));
         WebElement button = driver.findElement(By.className("radioButton"));
+
         assertFalse("Action Menu list should not be visible", menu.getAttribute("class").contains("visible"));
-        menuLabel.click();
-        assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, menu);
         button.click();
-        assertFalse("Action Menu list should be collapsed", menu.getAttribute("class").contains("visible"));
+        waitForMenuClose(menu);
     }
 
     /**
      * Test case : W-2235117 menuItem should reposition itself relative to its trigger when attachToBody attribute is
      * set
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    //For env reason the test is failing on Luna Autobuild, will run the test on jenkins only for now.
+    // For env reason the test is failing on Luna Autobuild, will run the test on jenkins only for now.
     @UnAdaptableTest
-    public void testMenuPositionWhenMenuItemAttachToBody() throws MalformedURLException, URISyntaxException {
+    public void testMenuPositionWhenMenuItemAttachToBody() throws Exception {
         open(MENUTEST_ATTACHTOBODY_APP);
 
         // Verify menulist and trigger are properly aligned
@@ -448,8 +410,7 @@ public class MenuUITest extends WebDriverTestCase {
         String menuListGlobalId = auraUITestingUtil.getCmpGlobalIdGivenElementClassName(menuList);
         WebElement menuLabel = driver.findElement(By.className(trigger));
         WebElement menu = driver.findElement(By.className(menuList));
-        menuLabel.click();
-        assertTrue("Action Menu list should be expanded", menu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, menu);
         waitForMenuPositionedCorrectly(triggerGlobalId, menuListGlobalId,
                 "Menu List is not positioned correctly when the menuList rendered on the page");
 
@@ -462,7 +423,7 @@ public class MenuUITest extends WebDriverTestCase {
                 triggerLeftPosAfterClickOnItem2);
 
         // Resize window with menulist open and verify realigns properly
-        menuLabel.click();
+        openMenu(menuLabel, menu);
         int newWidth = driver.manage().window().getSize().width - 200;
         int newHeight = driver.manage().window().getSize().height - 100;
         driver.manage().window().setSize(new Dimension(newWidth, newHeight));
@@ -477,7 +438,7 @@ public class MenuUITest extends WebDriverTestCase {
 
     /**
      * Wait for the current window to have expected dimensions.
-     * 
+     *
      * @param width Expected width of the current window.
      * @param height Expected height of the current window.
      */
@@ -493,10 +454,6 @@ public class MenuUITest extends WebDriverTestCase {
 
     /**
      * Verify horizontal alignment of menuItem
-     * 
-     * @param trigger
-     * @param menuList
-     * @param failureMessage
      */
     private void waitForMenuPositionedCorrectly(final String trigger, final String menuList, String failureMessage) {
         auraUITestingUtil.waitUntilWithCallback(
@@ -523,7 +480,7 @@ public class MenuUITest extends WebDriverTestCase {
     /*
      * Test case for: W-1559070
      */
-    public void testRemovingMenuDoesNotThrowJsError() throws MalformedURLException, URISyntaxException {
+    public void testRemovingMenuDoesNotThrowJsError() throws Exception {
         open(MENUTEST_APP);
         WebDriver driver = this.getDriver();
         String uiMenuClassName = "clubMenu";
@@ -541,11 +498,8 @@ public class MenuUITest extends WebDriverTestCase {
     /**
      * Test case to check double clicking on Menu Trigger link component within 350ms with disableDoubleClicks attribute
      * set disregards the 2nd click. Test case for W-1855568
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testDoubleClickOnMenuTrigger() throws MalformedURLException, URISyntaxException {
+    public void testDoubleClickOnMenuTrigger() throws Exception {
         open(MENUTEST_APP);
         String label = "doubleClick";
         String menuName = "doubleClickDisabledMenuList";
@@ -554,17 +508,13 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement menu = driver.findElement(By.className(menuName));
         Actions a = new Actions(driver);
         a.doubleClick(menuLabel).build().perform();
-        assertTrue("Check Menu list should be expanded even after double click",
-                menu.getAttribute("class").contains("visible"));
+        waitForMenuOpen(menu);
     }
 
     /**
      * Test case for W-2315592 Components extends menuItem get's focus
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testFocusForExtendedMenuItem() throws MalformedURLException, URISyntaxException {
+    public void testFocusForExtendedMenuItem() throws Exception {
         open("/uitest/menu_extendMenuItem.app");
         WebDriver driver = this.getDriver();
         String label = "trigger";
@@ -580,10 +530,8 @@ public class MenuUITest extends WebDriverTestCase {
         WebElement actionItem2Element = getAnchor(actionItem2);
         WebElement actionItem3 = driver.findElement(By.className(menuItem3));
         WebElement actionItem3Element = getAnchor(actionItem3);
-        // click on menu list
-        menuLabel.click();
-        // check menu list is visible after the click
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+
+        openMenu(menuLabel, actionMenu);
 
         // default focus on action item1
         assertEquals("Focus should be on actionItem1", actionItem1Element.getText(),
@@ -591,23 +539,17 @@ public class MenuUITest extends WebDriverTestCase {
 
         // verify focus on action item3
         auraUITestingUtil.setHoverOverElement(menuItem3);
-        assertEquals("Focus should be on actionItem3", actionItem3Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem3Element);
+
         // use send key("f") to move to actionItem2
         actionItem3Element.sendKeys("f");
-
-        // verify focus on actionItem2
-        assertEquals("Focus should be on actionItem 2", actionItem2Element.getText(),
-                auraUITestingUtil.getActiveElementText());
+        waitForFocusOnMenuActionItem(actionItem2Element);
     }
 
     /**
      * Test case to allow bubbling of event with menu Bug: W-2368359
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testStopClickPropogoationByDefault() throws MalformedURLException, URISyntaxException {
+    public void testStopClickPropagationByDefault() throws Exception {
         open(MENUTEST_EVENTBUBBLING_APP);
         WebDriver driver = this.getDriver();
         String label = "trigger";
@@ -617,17 +559,14 @@ public class MenuUITest extends WebDriverTestCase {
         String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.eventBubbled");
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         assertNull("Event should not bubble up to parent div", auraUITestingUtil.getEval(valueExpression));
-        // click on menu list
-        menuLabel.click();
-        // check menu list is visible after the click
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, actionMenu);
         assertTrue("Event should get bubble up to parent div", auraUITestingUtil.getBooleanEval(valueExpression));
     }
 
-    /*
+    /**
      * Test case to Stop bubbling of event when StopClickPropogoation attribute is set Bug: W-2368359
      */
-    public void testStopClickPropogoationIsSet() throws MalformedURLException, URISyntaxException {
+    public void testStopClickPropagationIsSet() throws Exception {
         open(MENUTEST_EVENTBUBBLING_APP + "?stopClickPropagation=true");
         WebDriver driver = this.getDriver();
         String label = "trigger";
@@ -637,12 +576,80 @@ public class MenuUITest extends WebDriverTestCase {
         String valueExpression = auraUITestingUtil.getValueFromRootExpr("v.eventBubbled");
         valueExpression = auraUITestingUtil.prepareReturnStatement(valueExpression);
         assertNull("Event should not bubble up to parent div", auraUITestingUtil.getEval(valueExpression));
-
-        // click on menu list
-        menuLabel.click();
-        // check menu list is visible after the click
-        assertTrue("Menu list should be visible", actionMenu.getAttribute("class").contains("visible"));
+        openMenu(menuLabel, actionMenu);
         assertNull("Event should not bubble up to parent div when StopPropogoation is set on menu",
                 auraUITestingUtil.getEval(valueExpression));
     }
+
+    /**
+     * Open the menu and wait for it to have the visible class.
+     *
+     * @param menuLabel The WebElement to click on that opens the menu
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
+     */
+    private void openMenu(WebElement menuLabel, WebElement actionMenu) {
+        menuLabel.click();
+        waitForMenuOpen(actionMenu);
+    }
+
+    /**
+     * Wait for the visible class to be present on the menu list.
+     *
+     * @param actionMenu The WebElement on which to wait for the visible class to be present
+     */
+    private void waitForMenuOpen(WebElement actionMenu) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return actionMenu.getAttribute("class").contains("visible");
+            }
+        }, "Menu list should be visible after clicking to open");
+    }
+
+    /**
+     * Wait for the visible class to no longer be present on the menu list.
+     *
+     * @param actionMenu The WebElement on which to wait for the visible class to not be present on
+     */
+    private void waitForMenuClose(WebElement actionMenu) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return !actionMenu.getAttribute("class").contains("visible");
+            }
+        }, "Menu list never closed");
+    }
+
+    /**
+     * Wait for focus to be on a certain menu action item by checking the current active element.
+     *
+     * @param actionItemElement The WebElement on which to wait for focus
+     */
+    private void waitForFocusOnMenuActionItem(WebElement actionItemElement) {
+        String text = actionItemElement.toString();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                String actionItemText = actionItemElement.getText();
+                String activeElementText = auraUITestingUtil.getActiveElementText();
+                return actionItemText.equals(activeElementText);
+            }
+        }, "After hover, focus never switched to WebElement <" + text + ">");
+    }
+
+    /**
+     * Wait for the menu label to display a certain text.
+     *
+     * @param menuLabel The WebElement on which to verify the text on
+     * @param expectedText The expected text
+     */
+    private void waitForMenuText(WebElement menuLabel, String expectedText) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return menuLabel.getText().equals(expectedText);
+            }
+        }, "Menu text not updated after clicking menu item");
+    }
+
 }

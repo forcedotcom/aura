@@ -828,6 +828,7 @@
                                             <goal>npm</goal>
                                             <goal>grunt</goal>
                                         </goals>
+                
                                         <versionRange>[0.0,)</versionRange>
                                     </pluginExecutionFilter>
                                     <action>
@@ -888,6 +889,8 @@
                             <configuration>
                                 <nodeVersion>v4.2.1</nodeVersion>
                                 <npmVersion>2.14.7</npmVersion>
+                                <nodeDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/node/</nodeDownloadRoot>
+			                    <npmDownloadRoot>http://repo.auraframework.org/simple/plugins-release-local/npm/2.14.7/</npmDownloadRoot>
                             </configuration>
                         </execution>
                         <execution>

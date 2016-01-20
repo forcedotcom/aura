@@ -161,6 +161,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * trigger an intentional report after load and we will check that. Any report during load should have been received
      * before it.
      */
+    @UnAdaptableTest
     public void testAllowFontSrc() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));

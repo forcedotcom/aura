@@ -83,8 +83,8 @@ Aura.Utils.Util.prototype.globalEval = Aura.Utils.Util.prototype.isIE ? function
  * @platform
  * @export
  */
-Aura.Utils.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(obj) {
-    return obj instanceof Array;
+Aura.Utils.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.isArray : function(arg) {
+  return Object.prototype.toString.call(arg) === '[object Array]';
 };
 
 /**
@@ -99,19 +99,40 @@ Aura.Utils.Util.prototype.isArray = typeof Array.isArray === "function" ? Array.
  * @export
  */
 Aura.Utils.Util.prototype.isObject = function(obj){
-    return typeof obj === "object" && obj !== null && !this.isArray(obj);
+    return typeof obj === "object" && obj !== null && !Array.isArray(obj);
 };
 
 /**
  * Checks whether the specified object is a plain object or literal.
  * A plain object is created using "{}" or "new Object()".
  *
- * @param {Object} obj The object to check for.
+ * @param {Object} o The object to check for.
  * @returns {Boolean} True if the object is a plain object, or false otherwise.
  * @export
  */
-Aura.Utils.Util.prototype.isPlainObject = function(obj){
-    return obj instanceof Object && obj.constructor === Object.prototype.constructor;
+Aura.Utils.Util.prototype.isPlainObject = function(o){
+
+    function isObjectObject(x) {
+        return (typeof x === 'object' && x !== null)
+            && Object.prototype.toString.call(x) === '[object Object]';
+    }
+
+    if (isObjectObject(o) === false) { return false; }
+
+    // If has modified constructor
+    if (typeof o.constructor !== 'function') { return false; }
+
+    // If has modified prototype
+    var p = o.constructor.prototype;
+    if (isObjectObject(p) === false) { return false; }
+
+    // If constructor does not have an Object-specific method
+    if (p.hasOwnProperty('isPrototypeOf') === false) {
+        return false;
+    }
+
+    // Most likely a plain Object
+    return true;
 };
 
 /**
@@ -218,7 +239,15 @@ Aura.Utils.Util.prototype.isUndefinedOrNull = function(obj){
  * @export
  */
 Aura.Utils.Util.prototype.isEmpty = function(obj){
-    return obj === undefined || obj === null || obj === '' || (obj instanceof Array && obj.length === 0) || (obj instanceof Object && Object.keys(obj).length === 0);
+    if (obj === undefined || obj === null || obj === '') {
+        return true;
+    }
+    if (Array.isArray(obj)) {
+        return obj.length === 0;
+    } else if (typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Object]') {
+        return Object.keys(obj).length === 0;
+    }
+    return false;
 };
 
 /**

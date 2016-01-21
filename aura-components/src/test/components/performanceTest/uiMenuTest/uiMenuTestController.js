@@ -5,7 +5,7 @@
         var done = event.getParam('arguments').done;
         var finishSetup = done.async();
         
-        var NUM_ITEMS = 2300;
+        var NUM_ITEMS = 100;
         cmp.newActionMenuItemComponents = [];
 
         for (var i = 0; i < NUM_ITEMS; i++) {

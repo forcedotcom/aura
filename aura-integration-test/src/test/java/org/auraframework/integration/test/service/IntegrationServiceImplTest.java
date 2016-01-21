@@ -26,15 +26,19 @@ import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.InterfaceDef;
 import org.auraframework.impl.AuraImplTestCase;
 import org.auraframework.integration.Integration;
+import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
 import org.auraframework.service.IntegrationService;
+import org.auraframework.system.AuraContext;
 import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.AuraTestingMarkupUtil;
 import org.auraframework.throwable.AuraRuntimeException;
+import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.junit.Ignore;
+import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -77,13 +81,13 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Integration integration = null;
         assertNotNull("Failed to locate integration service implementation.", service);
         // All Nulls
-        integration = service.createIntegration(null, null, true, null, null);
+        integration = service.createIntegration(null, null, true, null, null, null);
         assertException(integration);
         // No Context Path
-        integration = service.createIntegration(null, Mode.UTEST, true, null, null);
+        integration = service.createIntegration(null, Mode.UTEST, true, null, null, null);
         assertException(integration);
         // No mode specified
-        integration = service.createIntegration("", null, true, null, null);
+        integration = service.createIntegration("", null, true, null, null, null);
         assertException(integration);
     }
 
@@ -120,7 +124,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
      */
     public void testThrowsOnUnsupportedBrowsers() throws Exception{
         String ie6UserAgent = "Mozilla/4.0 (compatible; MSIE 6.1; Windows XP; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null);
+        Integration integration = service.createIntegration("", Mode.DEV, true, ie6UserAgent, null, null);
         try{
             injectSimpleComponent(integration);
             fail("Integration service should throw exception when used with unsupported browsers.");
@@ -138,7 +142,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
 
         Mode[] testModes = new Mode[] { Mode.UTEST, Mode.PROD, Mode.FTEST, Mode.JSTEST, Mode.JSTESTDEBUG, Mode.PRODDEBUG, Mode.PTEST, Mode.SELENIUM, Mode.STATS };
         for (Mode m : testModes) {
-            Integration integration = service.createIntegration("", m, true, null, getNoDefaultPreloadsApp().getQualifiedName());
+            Integration integration = service.createIntegration("", m, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
             assertNotNull(String.format(
                     "Failed to create an integration object using IntegrationService in %s mode. Returned null.", m),
                     integration);
@@ -208,7 +212,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
         Appendable out = new StringBuffer();
         Integration integration = createIntegration();
         try {
-            integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out);
+            integration.injectComponent(cmp.getDescriptorName(), attributes, "", "", out, async);
         } catch (Exception unexpected) {
             fail("Exception occured when injecting component with attribute values. Exception:"
                     + unexpected.getMessage());
@@ -304,7 +308,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
     }
     
 	private Integration createIntegration() throws QuickFixException {
-		return service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName());
+		return service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), null);
 	}
 
     @Ignore("W-1505382")
@@ -322,6 +326,42 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             // Expected
         } catch (Exception unexpected) {
             fail("Failed to detect bad value provided for event handlers. Failed :" + unexpected.getMessage());
+        }
+    }
+
+    /**
+     * Verify that injecting non existing exceptions is flagged with an
+     * exception.
+     * 
+     * @throws Exception
+     */
+    public void testInjectingNonExistingComponent() throws Exception {
+        Map<String, Object> attributes = Maps.newHashMap();
+        Appendable out = new StringBuffer();
+        Integration integration = createIntegration();
+        try {
+            integration.injectComponent("foo:bared", attributes, "", "", out);
+            fail("Instantiating component through integration service should have failed because of missing component def.");
+        } catch (DefinitionNotFoundException expected) {
+            // Expected exception
+            assertTrue(expected.getMessage().contains("No COMPONENT named markup://foo:bared found"));
+        }
+    }
+
+    /**
+     * Verify that only component defs can be injected.
+     */
+    public void testInjectingApplications() throws Exception {
+        String validApp = "test:laxSecurity";
+        Map<String, Object> attributes = Maps.newHashMap();
+        Appendable out = new StringBuffer();
+        Integration integration = createIntegration();
+        try {
+            integration.injectComponent(validApp, attributes, "", "", out);
+            fail("Injecting an application through integration service should have failed.");
+        } catch (DefinitionNotFoundException expected) {
+            // TODO: Maybe a better error message?
+            assertTrue(expected.getMessage().contains("No COMPONENT named markup://test:laxSecurity found"));
         }
     }
 
@@ -360,6 +400,19 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
             fail("Failed to get definition of noDefaultPreloads interface. IntegrationService may suffer performance degredation.");
         }
     }
+    
+    /**
+     * Verify IntegrationServiceObserver invoked during integration service component injection.
+     * 
+     * @throws Exception
+     */
+    public void testObserverInvoked() throws Exception {
+        IntegrationServiceObserver mockObserver = Mockito.mock(IntegrationServiceObserver.class);
+        AuraContext cntx = Aura.getContextService().startContext(Mode.UTEST, Format.JSON, Authentication.AUTHENTICATED);
+        Integration integration = service.createIntegration("", Mode.UTEST, true, null, getNoDefaultPreloadsApp().getQualifiedName(), mockObserver);
+        injectSimpleComponent(integration);
+        Mockito.verify(mockObserver, Mockito.times(2)).contextEstablished(integration, cntx);
+    }
 
     /**
      * Test app used for integration should extend aura:integrationServiceApp
@@ -370,7 +423,7 @@ public class IntegrationServiceImplTest extends AuraImplTestCase {
                 ApplicationDef.class, appMarkup);
         Map<String, Object> attributes = Maps.newHashMap();
         Appendable out = new StringBuffer();
-        Integration integration = service.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName());
+        Integration integration = service.createIntegration("", Mode.UTEST, true, null, appDesc.getQualifiedName(), null);
         try {
             integration.injectComponent(simpleComponentTag, attributes, "", "", out);
             fail("App used for integration should extend aura:integrationServiceApp");

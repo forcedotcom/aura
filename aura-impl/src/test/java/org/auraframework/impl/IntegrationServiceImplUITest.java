@@ -542,6 +542,19 @@ public class IntegrationServiceImplUITest extends WebDriverTestCase {
     }
 
     /**
+     * Verify the behavior of injectComponent when the placeholder specified is missing.
+     */
+    public void testMissingPlaceholder() throws Exception {
+        DefDescriptor<ComponentDef> stub = addSourceAutoCleanup(
+                ComponentDef.class,
+                getIntegrationStubMarkup(
+                        "java://org.auraframework.impl.renderer.sampleJavaRenderers.RendererToInjectCmpInNonExistingPlaceholder",
+                        true, true, true)
+                );
+        verifyMissingPlaceholder(stub, "locatorDomId");
+    }
+
+    /**
      * Verify the behavior of injectComponent when the placeholder specified is missing. (ASYNC)
      */
     public void testMissingPlaceholderAsync() throws Exception {

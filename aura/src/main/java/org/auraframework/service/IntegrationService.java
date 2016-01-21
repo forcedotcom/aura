@@ -16,6 +16,7 @@
 package org.auraframework.service;
 
 import org.auraframework.integration.Integration;
+import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
@@ -52,8 +53,5 @@ public interface IntegrationService extends AuraService {
      *         A new integration.
      * @throws QuickFixException 
      */
-    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application) throws QuickFixException;
-    
-    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, Object tempDummy) throws QuickFixException;
-
+    Integration createIntegration(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer) throws QuickFixException;
 }

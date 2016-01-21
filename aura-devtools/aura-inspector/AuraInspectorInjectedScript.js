@@ -3,7 +3,12 @@
 (function(global){
     var $Aura = {};
 
-    var actionsToDrop = [];
+    //let's keep a map between actionID to action here, just like what AuraClientService is doing
+    //when user wants to watch a action, let's add an entry here
+    var actionsWatched = {};
+    //a map between acitonName to action, if action.nextResponse exist, we override next response, if no, just drop the action
+    var actionsToWatch = {}; 
+
     var $Symbol = Symbol.for("AuraDevTools");
 
     // Communicate directly with the aura inspector
@@ -15,39 +20,76 @@
     global[$Symbol] = $Aura;
 
     $Aura.actions = {
-        "AuraDevToolService.AddActionToDrop": function(data) {
-            //remove the stored response from action storage -- if there is any
-            var actionsStorage = $A.storageService.getStorage("actions");
-            var actionStorageKey = data.actionStorageKey;
-            if(actionsStorage && actionStorageKey && actionStorageKey.length > 0) {
-                actionsStorage.get(actionStorageKey)
-                .then(
-                    function() {
-                        actionsStorage.remove(actionStorageKey)
-                        .then(function () {
-                            //notify Storage View
-                            $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
-                        });
-                    },
-                    function(e) {
-                        console.log("cannot find storage item for action:", data);
-                    }
-                );
-
-            } else {
-                console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
+        /*the event handler for AuraInspector:OnActionToWatchEnqueue
+        called by AuraInspectorActionsView.drop and AuraInspectorActionsView_OnEnqueueNextResponseForAction
+        var dataToPublish = { 
+                            'actionName': actionName, //no need
+                            'actionParameter':actionParameter, //no need for here...yet
+                            'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
+                            'actionIsStorable': actionIsStorable,
+                            'actionStorageKey': actionStorageKey,
+                            'nextResponse': nextResponse};
+                            */
+        "AuraDevToolService.AddActionToWatch": function(data) {
+            if(!data) {
+                console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
             }
-
-            //override send
-            actionsToDrop.push(data);
-            $A.uninstallOverride("ClientService.send", OnSendAction);
-            $A.installOverride("ClientService.send", OnSendAction);
+            //check if we already has the action in actionsToWatch, if so replace it with the new one
+            var aleadyAdded = false;
+            if(data.actionName && actionsToWatch[data.actionName]) {
+                delete actionsToWatch[data.actionName];
+                aleadyAdded = true;
+            }
+            //we only remove the response from storage once
+            if( aleadyAdded === false ) {
+                //remove the stored response from action storage -- if there is any
+                if(data.actionIsStorable && data.actionIsStorable === true) {
+                    var actionsStorage = $A.storageService.getStorage("actions");
+                    var actionStorageKey = data.actionStorageKey;//data.actionName+JSON.stringify(data.actionParameter);//
+                    if(actionsStorage && actionStorageKey && actionStorageKey.length > 0) {
+                        actionsStorage.get(actionStorageKey)
+                        .then(
+                            function() {
+                                console.log("find storage item for action:", data);
+                                actionsStorage.remove(actionStorageKey)
+                                .then(function () {
+                                    console.log("successfully remove storage for action:", data);
+                                    //notify Storage View
+                                    $Aura.Inspector.publish("AuraInspector:RemoveStorageData", {'storageKey': actionStorageKey});
+                                });
+                            },
+                            function(e) {
+                                console.log("cannot find storage item for action:", data);
+                            }
+                        );
+                    } else {
+                        console.log("actionStorageKey missing, or there is no actionsStorage(what?)", data);
+                    }
+                }
+            }//end of aleadyAdded is false
+            
+            actionsToWatch[data.actionName] = data; 
+            if(data.nextResponse) {
+                //override decode
+                //console.log("AddActionToWatch, nextResponse:", data.nextResponse);
+                $A.uninstallOverride("ClientService.decode", onDecode);
+                $A.installOverride("ClientService.decode", onDecode);
+            } else {
+                //override send                
+                //actionsToDrop.push(data);
+                //we need to keep a map between actionID --> action , right before send
+                $A.uninstallOverride("ClientService.send", OnSendAction);
+                $A.installOverride("ClientService.send", OnSendAction);
+            }
         },
 
-        "AuraDevToolService.RemoveActionsToDrop": function() {
-            actionsToDrop = [];
+
+
+        "AuraDevToolService.RemoveActionsToWatch": function() {
+            actionsToWatch = {};
             $A.uninstallOverride("ClientService.send", OnSendAction);
             $A.installOverride("ClientService.send", OnSendAction);
+            $A.uninstallOverride("ClientService.decode", onDecode);
         },
 
         "AuraDevToolService.HighlightElement": function(globalId) {
@@ -145,7 +187,6 @@
                     $A.installOverride("outputComponent", function(){});
                 } catch(e){}
 
-
                 try {
                     // Counts how many times various things have happened.
                     bootstrapCounters();
@@ -168,7 +209,7 @@
                 } catch(e){}
 
 
-                // Need a way to conditionally do this based on a user setting. 
+                // Need a way to conditionally do this based on a user setting.
                 $A.PerfDevTools.init();
 
                 // Only do once, we wouldn't want to instrument twice, that would give us double listeners.
@@ -198,8 +239,8 @@
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponent", $Aura.actions["AuraDevToolService.HighlightElement"]);
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
-    $Aura.Inspector.subscribe("AuraInspector:OnActionToDropEnqueue", $Aura.actions["AuraDevToolService.AddActionToDrop"]);
-    $Aura.Inspector.subscribe("AuraInspector:OnActionToDropClear", $Aura.actions["AuraDevToolService.RemoveActionsToDrop"])
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchEnqueue", $Aura.actions["AuraDevToolService.AddActionToWatch"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsToWatch"])
 
     function AuraInspector() {
         var subscribers = new Map();
@@ -582,6 +623,7 @@
                 }
             });
         }
+
     }
 
     function wrapFunction(target, methodName, newFunction) {
@@ -685,25 +727,167 @@
         }
     }
 
-    function OnSendAction(config, auraXHR, actions, method, options) {
+    //how expensive is JSON.parse?  can we save the trouble by just doing string.indexof
+    function containsActionsWeAreWatching(oldResponseText) {
+        for(actionWatched in actionsWatched) {
+            if(oldResponseText.indexOf(actionWatched) > 0 ) {
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
 
-            if (actions) {
+    function isNonEmptyArray(obj) {
+        if(obj && typeof obj === "object" && obj instanceof Array && obj.length && obj.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-                for(var c=0;c<actions.length;c++) {
-                    if(actionsToDrop.length > 0) {
-                        var action = actions[c];
-                        for(var i=0; i<actionsToDrop.length; i++) {
-                            var actionToDrop = actionsToDrop[i];
-                            if(actionToDrop.actionName.indexOf(action.getDef().name) >= 0) {
+    function isTrueObject(obj) {
+        if(obj && typeof obj === "object" && !(obj instanceof Array)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //go through returnValue object, replace the value if nextResponse[key] exist
+    function replaceValueInObj (returnValue, nextResponse) {
+        if(isNonEmptyArray(returnValue)) {
+            for(var i = 0; i < returnValue.length; i ++) {
+                var returnValuei = returnValue[i];
+                var res = replaceValueInObj(returnValuei, nextResponse);
+                if(res) { return res; }
+            }
+        }  else if (isTrueObject(returnValue)) {
+            for(key in returnValue) {
+                if(key && nextResponse) {
+                    var returnValuek = returnValue[key];
+                    if(nextResponse[key]) {
+                        returnValue[key] = nextResponse[key];
+                        console.log("found a match, update response for "+key);
+                        //delete nextResponse[key];
+                        return true;   
+                    } else {
+                        var res = replaceValueInObj(returnValuek, nextResponse);
+                        if(res) { return res; }
+                    }
+                }
+            }
+        }
+    }
+
+    //oldResponse: XMLHttpRequest
+    //actionsFromAuraXHR: AuraXHR keep an object called actions, it has all actions client side are waiting for response, a map between actionId and action.
+    function onDecode(config, oldResponse, noStrip) {
+        //var response = oldResponse["response"];
+        if(oldResponse["response"] && oldResponse["response"].length > 0) {
+            //modify response if we find the action we are watching
+            var response = oldResponse["response"];
+            var oldResponseText = oldResponse["responseText"];
+            var newResponseText = oldResponseText;
+            var responseModified = false;//if we modify the response, set this to true
+
+            if( actionsWatched != {} ) {
+                for(actionWatchedId in actionsWatched) {
+                    if(oldResponseText.indexOf(actionWatchedId) > 0) {
+                        var actionWatched = actionsWatched[actionWatchedId];
+                        if(actionWatched.nextResponse && oldResponseText.startsWith("while(1);") ) {
+                            var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                            if(oldResponseObj && oldResponseObj.actions) {
+                                var actionsFromOldResponse = oldResponseObj.actions;
+                                for(var i = 0; i < actionsFromOldResponse.length; i++) {
+                                    var returnValue = actionsFromOldResponse[i].returnValue; 
+                                    responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
+
+                                    if(responseModified === true) {
+                                        //no need to continue, returnValue now contains new response
+                                        actionsFromOldResponse[i].returnValue = returnValue;
+                                        break; //get out of looping over actionsFromOldResponse
+                                    }
+                                }//end of looping over actionsFromOldResponse
+                            }//end of oldResponseObj is valid and it has actions
+                            if(responseModified === true) {
+                                oldResponseObj.actions = actionsFromOldResponse;
+                                newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                //move the action from Watching to Processed
                                 $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
-                                    "id": action.getId(),
-                                    "idToDrop": actionToDrop.actionId,
-                                    "state": "DROPPED",
-                                    "sentTime": performance.now()
+                                        "id": actionWatchedId,
+                                        "idtoWatch": actionWatched.idtoWatch,
+                                        "state": "RESPONSEMODIFIED",
+                                        "sentTime": performance.now()//do we need this?
                                 });
-                                //drop the action
-                                actions.splice(c, 1);
-                                actionsToDrop.splice(i, 1);
+                                delete actionsWatched[actionWatchedId];
+                                break;//get out of looping over actionsWatched
+                            }
+                        }//end of actionWatched has nextResponse and oldResponseText start with 'while(1);'
+                    }//end of oldResponseText contains the actionWatchedId we care
+                }//end of looping over actionsWatched
+            }//end of actionsWatched is not empty
+
+            if(responseModified === true) {
+                var newHttpRequest = {};
+                newHttpRequest = $A.util.apply(newHttpRequest, oldResponse);
+                newHttpRequest["response"] = newResponseText;
+                newHttpRequest["responseText"] = newResponseText;
+
+                var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
+                return ret;
+            } else {
+                var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
+                return oldResponse;
+            }
+        } else {
+            console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along");
+            var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
+            return oldResponse;
+        }
+    }
+
+    function OnSendAction(config, auraXHR, actions, method, options) {
+            if (actions) {
+                for(var c=0;c<actions.length;c++) {
+                    if(actionsToWatch !== {}) {
+                        var action = actions[c];
+                        //for(var i=0; i<actionsToWatch.length; i++) {
+                        for(key in actionsToWatch) {
+                            var actionToWatch = actionsToWatch[key];
+                            if(actionToWatch.actionName.indexOf(action.getDef().name) >= 0) {
+                                //udpate the record of what we are watching, this is mainly for action we want to modify response
+                                if(actionsWatched[''+action.getId()]) {
+                                    console.log("Error: we already watching this action:", action);
+                                } else {
+                                    //copy nextResponse to actionWatched
+                                    action['nextResponse'] = actionToWatch.nextResponse;
+                                    action['idtoWatch'] = actionToWatch.actionId;
+                                    actionsWatched[''+action.getId()] = action;
+                                }
+                                if(actionToWatch.nextResponse) { //we want to modify response, so let it stay in watch list
+                                    console.log("action we want to modify response are send to server:"+actionToWatch.actionName, action);
+                                    //still update the left side
+                                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                        "id": action.getId(),
+                                        "state": "RUNNING",
+                                        "sentTime": performance.now()
+                                        });
+                                    //we already copy everything to actionToWatch, no need to keep it here
+                                    delete actionsToWatch[key];
+                                } else { //we want to drop it, so do it
+                                    //move the action from Watching to Processed
+                                    $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                        "id": action.getId(),
+                                        "idtoWatch": actionToWatch.actionId,
+                                        "state": "DROPPED",
+                                        "sentTime": performance.now()
+                                    });
+                                    //drop the action from auraXHR
+                                    actions.splice(c, 1);
+                                    //remove it from actionsToWatch
+                                    delete actionsToWatch[key];
+                                }
                             }
                         }
                     }

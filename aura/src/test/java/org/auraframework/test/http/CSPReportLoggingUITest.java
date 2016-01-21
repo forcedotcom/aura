@@ -64,6 +64,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         }
     }
 
+    @UnAdaptableTest
     public void testReportClientRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -86,6 +87,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertViolatedDirective(cspReport, "style-src 'self'");
     }
 
+    @UnAdaptableTest
     public void testReportServerRenderedCSS() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
                 ComponentDef.class,
@@ -159,6 +161,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * trigger an intentional report after load and we will check that. Any report during load should have been received
      * before it.
      */
+    @UnAdaptableTest
     public void testAllowFontSrc() throws Exception {
         DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
                 String.format(baseComponentTag, "", ""));
@@ -186,6 +189,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
         assertViolatedDirective(cspReport, "script-src 'self'");
     }
 
+    @UnAdaptableTest
     public void testReportJavaScript() throws Exception {
         // This test loads script via its template, since <script> is not allowed in cmp markup.
         DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(
@@ -224,6 +228,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * Automation for the connect-src CSP policy. With connect-src set to 'self' and http://invalid.salesforce.com, 
      * a report should be generated when an XHR is sent to invalid origin. 
      */
+    @UnAdaptableTest
     public void testReportXHRConnect() throws Exception {
     	String externalUri = "http://www.example.com";
     	runTestReportXHRConnect("\"http://www.example.com\"",externalUri, 1);
@@ -233,6 +238,7 @@ public class CSPReportLoggingUITest extends WebDriverTestCase {
      * Automation for the connect-src CSP policy. 
      * http://invalid.salesforce.com is white-listed, getting it via XHR shouldn't give us CSP error
      */
+    @UnAdaptableTest
     public void testReportXHRConnectWhitelistedUrl() throws Exception {
     	runTestReportXHRConnect("\"http://invalid.salesforce.com\"","", 0);
     }

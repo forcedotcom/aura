@@ -213,6 +213,7 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
     return {
         "componentDef" : this.createDescriptorConfig(config["descriptor"]),
         "localId"      : config["localId"],
+        "flavor"       : config["flavor"],
         "attributes"   : {
             "values"        : config["attributes"],
             "valueProvider" : config["valueProvider"]
@@ -242,6 +243,7 @@ AuraComponentService.prototype.createInternalConfig = function (config) {
  * {
         descriptor    : "markup://ns:cmpName",
         localId       : "localId",
+        flavor        : "flavor",
         attributes    : { attr1: value1, ... },
         valueProvider : myValueProviderComponent
  * }

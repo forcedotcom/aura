@@ -363,7 +363,7 @@
     <div style="display:inline-block;width:50%;vertical-align:top;">
         <h2>ui:Image as menuTrigger</h2>
         <ui:menu aura:id="uiMenuImage" class="uiMenuImage">
-            <ui:menuTriggerLink class="triggerImage" aura:id="triggerImage" >
+            <ui:menuTriggerLink class="triggerImage" aura:id="triggerImage">
             	<ui:image aura:id="image" src="/auraFW/resources/aura/auralogo.png" imageType="decorative"/>
             </ui:menuTriggerLink>
             <ui:menuList class="actionMenuImage" aura:id="actionMenuImage">

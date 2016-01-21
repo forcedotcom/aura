@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.THIS.container {
-	position: relative;
-	z-index: 1;
-}
-.THIS.leftButton {
-	float: left;
-}
-.THIS.rightButton {
-	float: right;
-}
+({
+    toggle: function(cmp) {
+        var truth = cmp.get("v.truth");
+        truth = !truth;
+        cmp.set("v.truth", truth);
+
+        var index = cmp.get("v.index");
+        var choices = cmp.get("v.choices");
+        index = index < choices.length - 1 ? index + 1 : 0;
+        cmp.set("v.index", index);
+
+        if (index >= 0) {
+            $A.createComponent("aura:text", {value: choices[index]}, function(newCmp) {
+                cmp.find("message").set(truth ? "v.body" : "v.else", newCmp);
+            });
+        }
+    }
+})

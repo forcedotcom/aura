@@ -22,8 +22,10 @@ import org.auraframework.Aura;
 import org.auraframework.def.ApplicationDef;
 import org.auraframework.def.AttributeDef;
 import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.RegisterEventDef;
+import org.auraframework.instance.Action;
 import org.auraframework.integration.Integration;
 import org.auraframework.integration.IntegrationServiceObserver;
 import org.auraframework.integration.UnsupportedUserAgentException;
@@ -35,191 +37,263 @@ import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.system.Client;
 import org.auraframework.system.Client.Type;
+import org.auraframework.system.Message;
 import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.ClientOutOfSyncException;
-import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.JsonEncoder;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class IntegrationImpl implements Integration {
 
-	private static final String COMPONENT_DEF_TEMPLATE = "{'componentDef': 'markup://%s', 'attributes': { 'values' : %s }, 'localId': '%s'}";
+    private static final String COMPONENT_DEF_TEMPLATE =
+        "{'componentDef': 'markup://%s', 'attributes': { 'values' : %s }, 'localId': '%s'}";
 
-	private static final String ASYNC_INJECTION_TEMPLATE = "$A.run(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });";
+    private static final String ASYNC_INJECTION_TEMPLATE =
+        "$A.run(function() { $A.clientService.injectComponentAsync(%s, '%s', %s); });";
 
-	public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent, String application, IntegrationServiceObserver observer)
-			throws QuickFixException {
-		this.client = userAgent != null ? new Client(userAgent) : null;
-		this.contextPath = contextPath;
-		this.mode = mode;
-		this.initializeAura = initializeAura;
-		this.application = application != null ? application : DEFAULT_APPLICATION;
-	}
+    public IntegrationImpl(String contextPath, Mode mode, boolean initializeAura, String userAgent,
+                           String application, IntegrationServiceObserver observer) throws QuickFixException {
+        this.client = userAgent != null ? new Client(userAgent) : null;
+        this.contextPath = contextPath;
+        this.mode = mode;
+        this.initializeAura = initializeAura;
+        this.application = application != null ? application : DEFAULT_APPLICATION;
+        this.observer = observer;
+    }
 
-	@Override
-	public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId, Appendable out) throws UnsupportedUserAgentException, IOException,
-			QuickFixException {
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                                Appendable out) throws UnsupportedUserAgentException, IOException, QuickFixException {
+        this.injectComponent(tag, attributes, localId, locatorDomId, out, false);
+    }
 
-		if (!isSupportedClient(client)) {
-			throw new UnsupportedUserAgentException(client.getUserAgent());
-		}
+    @Override
+    public void injectComponent(String tag, Map<String, Object> attributes, String localId, String locatorDomId,
+                                Appendable out, boolean useAsync)
+            throws UnsupportedUserAgentException, IOException, QuickFixException {
 
-		if (initializeAura && !hasApplicationBeenWritten) {
-			// load aura resources
-			// specifies async so component configs are not printed to HTML
-			writeApplication(out);
-			hasApplicationBeenWritten = true;
-		}
+        if (!isSupportedClient(client)) {
+            throw new UnsupportedUserAgentException(client.getUserAgent());
+        }
 
-		getContext("is");
+        if (initializeAura && !hasApplicationBeenWritten) {
+            // load aura resources
+            // specifies async so component configs are not printed to HTML
+            writeApplication(out);
+            hasApplicationBeenWritten = true;
+        }
 
-		try {
-			DefinitionService definitionService = Aura.getDefinitionService();
-			DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor(tag, ComponentDef.class);
+        AuraContext context = getContext("is");
 
-			Map<String, Object> actionAttributes = Maps.newHashMap();
-			Map<String, String> actionEventHandlers = Maps.newHashMap();
+        try {
+            DefinitionService definitionService = Aura.getDefinitionService();
+            DefDescriptor<ComponentDef> descriptor = definitionService.getDefDescriptor(tag,
+                    ComponentDef.class);
 
-			if (attributes != null) {
-				try {
-					ComponentDef componentDef = descriptor.getDef();
+            Map<String, Object> actionAttributes = Maps.newHashMap();
+            Map<String, String> actionEventHandlers = Maps.newHashMap();
 
-					for (Map.Entry<String, Object> entry : attributes.entrySet()) {
-						String key = entry.getKey();
+            ComponentDef componentDef = descriptor.getDef();
+            if(attributes!=null) {
+                for (Map.Entry<String, Object> entry : attributes.entrySet()) {
+                    String key = entry.getKey();
 
-						AttributeDef attributeDef = componentDef.getAttributeDef(key);
-						if (attributeDef != null) {
-							String name = attributeDef.getName();
-							actionAttributes.put(name, entry.getValue());
-						} else {
-							RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
-							if (eventDef != null) {
-								// Emit component.addHandler() wired to special
-								// global scope value provider
-								String name = eventDef.getAttributeName();
-								actionEventHandlers.put(name, (String) entry.getValue());
-							} else {
-								throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
-							}
-						}
-					}
-				} catch (DefinitionNotFoundException x) {
-					// NOOP
-				}
-			}
+                    AttributeDef attributeDef = componentDef.getAttributeDef(key);
+                    if (attributeDef != null) {
+                        String name = attributeDef.getName();
+                        actionAttributes.put(name, entry.getValue());
+                    } else {
+                        RegisterEventDef eventDef = componentDef.getRegisterEventDefs().get(key);
+                        if (eventDef != null) {
+                            // Emit component.addHandler() wired to special global scope value provider
+                            String name = eventDef.getAttributeName();
+                            actionEventHandlers.put(name, (String) entry.getValue());
+                        } else {
+                            throw new AuraRuntimeException(String.format("Unknown attribute or event %s - %s", tag, key));
+                        }
+                    }
+                }
+            }
 
-			StringBuilder jsonEventHandlers = null;
-			if (!actionEventHandlers.isEmpty()) {
-				// serialize registered event handlers into js object
-				jsonEventHandlers = new StringBuilder();
-				JsonEncoder.serialize(actionEventHandlers, jsonEventHandlers);
-			}
+            try {
 
-			StringBuilder init = new StringBuilder();
+                StringBuilder jsonEventHandlers = null;
+                if (!actionEventHandlers.isEmpty()) {
+                    // serialize registered event handlers into js object
+                    jsonEventHandlers = new StringBuilder();
+                    JsonEncoder.serialize(actionEventHandlers, jsonEventHandlers);
+                }
 
-			// uses newComponentAsync to create component
-			StringBuilder jsonAttributes = new StringBuilder();
-			JsonEncoder.serialize(actionAttributes, jsonAttributes);
+                StringBuilder init = new StringBuilder();
 
-			// set event handlers to either js "undefined" or object of
-			// event and handler names
-			String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
-			String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
-			String newComponentScript = String.format(ASYNC_INJECTION_TEMPLATE, def, locatorDomId, eventHandlers);
+                if (useAsync) {
+                    // uses newComponentAsync to create component
+                    StringBuilder jsonAttributes = new StringBuilder();
+                    JsonEncoder.serialize(actionAttributes, jsonAttributes);
 
-			init.append(newComponentScript);
+                    // set event handlers to either js "undefined" or object of event and handler names
+                    String eventHandlers = jsonEventHandlers != null ? jsonEventHandlers.toString() : "undefined";
+                    String def = String.format(COMPONENT_DEF_TEMPLATE, tag, jsonAttributes.toString(), localId);
+                    String newComponentScript = String.format(ASYNC_INJECTION_TEMPLATE, def, locatorDomId, eventHandlers);
 
-			out.append("<script>").append(init).append("</script>");
-		} finally {
-			releaseContext();
-		}
-	}
+                    init.append(newComponentScript);
 
-	private void releaseContext() {
-		if (contextDepthCount == 0) {
-			Aura.getContextService().endContext();
-		} else {
-			contextDepthCount -= 1;
-		}
-	}
+                } else {
+                    // config printed onto HTML page
 
-	private AuraContext getContext(String num) throws ClientOutOfSyncException, QuickFixException {
-		ContextService contextService = Aura.getContextService();
+                    // mark injectee component as loaded
+                    // only when not using async because component defs will be printed onto HTML
+                    definitionService.updateLoaded(descriptor);
 
-		if (contextService.isEstablished()) {
-			contextDepthCount += 1;
-		}
+                    ControllerDef componentControllerDef = definitionService.getDefDescriptor("aura://ComponentController",
+                            ControllerDef.class).getDef();
 
-		DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor(application);
+                    Map<String, Object> paramValues = Maps.newHashMap();
+                    paramValues.put("name", descriptor.getQualifiedName());
+                    paramValues.put("attributes", actionAttributes);
 
-		AuraContext context;
-		if (contextDepthCount == 0) {
-			context = contextService.startContext(mode, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
-		} else {
-			context = contextService.getCurrentContext();
-		}
+                    Action action = componentControllerDef.createAction("getComponent", paramValues);
+                    action.setId("ais");
 
-		String cuid = context.getLoaded().get(applicationDescriptor);
-		String uid = context.getDefRegistry().getUid(cuid, applicationDescriptor);
-		context.addLoaded(applicationDescriptor, uid);
-		context.setPreloadedDefinitions(context.getDefRegistry().getDependencies(uid));
+                    //
+                    // Now build a second action.... to load all of the relevant labels.
+                    //
+                    Action labelAction = componentControllerDef.createAction("loadLabels", null);
+                    labelAction.setId("aisLabels");
 
-		if (!DEFAULT_APPLICATION.equals(application)) {
-			// Check to insure that the app extends aura:integrationServiceApp
-			ApplicationDef def = applicationDescriptor.getDef();
-			if (!def.isInstanceOf(getApplicationDescriptor(DEFAULT_APPLICATION))) {
-				throw new AuraRuntimeException("Application must extend aura:integrationServiceApp.");
-			}
-		}
-		context.setContextPath(contextPath);
-		context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+                    Action previous = context.setCurrentAction(action);
+                    try {
+                        action.run();
+                        context.setCurrentAction(labelAction);
+                        labelAction.run();
+                    } finally {
+                        context.setCurrentAction(previous);
+                    }
 
-		if (num != null) {
-			context.setNum(num);
-		}
+                    Message message = new Message(Lists.newArrayList(action));
 
-		if (client != null) {
-			context.setClient(client);
-		}
+                    init.append("var config = ");
+                    Aura.getSerializationService().write(message, null, Message.class, init);
+                    init.append(";\n");
 
-		return context;
-	}
+                    if (!actionEventHandlers.isEmpty()) {
+                        init.append("config.actionEventHandlers = ");
+                        init.append(jsonEventHandlers);
+                        init.append(";\n");
+                    }
 
-	private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
-		if (isSupportedClient(client)) {
-			// ensure that we have a context.
-			getContext(null);
-			try {
-				ApplicationDef appDef = getApplicationDescriptor(application).getDef();
+                    init.append(String.format("$A.run(function() { $A.clientService.injectComponent(config, \"%s\", \"%s\"); });", locatorDomId, localId));
+                }
 
-				Aura.getSerializationService().write(appDef, null, ApplicationDef.class, out, "EMBEDDED_HTML");
-			} catch (QuickFixException e) {
-				throw new AuraRuntimeException(e);
-			} finally {
-				releaseContext();
-			}
-		}
-	}
+                out.append("<script>").append(init).append("</script>");
 
-	private static boolean isSupportedClient(Client client) {
-		return client == null || (client.getType() != Type.IE6 && client.getType() != Type.OTHER);
-	}
+            } catch (Throwable t) {
+                // DCHASMAN TODO W-1498425 Refine this approach - we currently have 2 conflicting exception handling mechanisms kicking in that need to be
+                // reconciled
+                out.append("<script>").append("$A.log(\"failed to create component: " + t.toString() + "\")")
+                        .append("</script>");
+            }
+        } finally {
+            releaseContext();
+        }
+    }
 
-	private DefDescriptor<ApplicationDef> getApplicationDescriptor(String application) {
-		DefinitionService definitionService = Aura.getDefinitionService();
-		return definitionService.getDefDescriptor(application, ApplicationDef.class);
-	}
+    private void releaseContext() {
+        if (contextDepthCount == 0) {
+            Aura.getContextService().endContext();
+        } else {
+            contextDepthCount -= 1;
+        }
+    }
 
-	private static final String DEFAULT_APPLICATION = "aura:integrationServiceApp";
+    private AuraContext getContext(String num) throws ClientOutOfSyncException, QuickFixException {
+        ContextService contextService = Aura.getContextService();
 
-	private final String contextPath;
-	private final Mode mode;
-	private final boolean initializeAura;
-	private final Client client;
-	private final String application;
+        if (contextService.isEstablished()) {
+            contextDepthCount += 1;
+        }
 
-	private boolean hasApplicationBeenWritten = false;
-	private int contextDepthCount = 0;
+        DefDescriptor<ApplicationDef> applicationDescriptor = getApplicationDescriptor(application);
+
+        AuraContext context;
+        if (contextDepthCount == 0) {
+            context = contextService.startContext(mode, Format.JSON, Authentication.AUTHENTICATED, applicationDescriptor);
+        } else {
+            context = contextService.getCurrentContext();
+        }
+
+        String cuid = context.getLoaded().get(applicationDescriptor);
+        String uid = context.getDefRegistry().getUid(cuid, applicationDescriptor);
+        context.addLoaded(applicationDescriptor, uid);
+        context.setPreloadedDefinitions(context.getDefRegistry().getDependencies(uid));
+
+        if (!DEFAULT_APPLICATION.equals(application)) {
+            // Check to insure that the app extends aura:integrationServiceApp
+            ApplicationDef def = applicationDescriptor.getDef();
+            if (!def.isInstanceOf(getApplicationDescriptor(DEFAULT_APPLICATION))) {
+                throw new AuraRuntimeException("Application must extend aura:integrationServiceApp.");
+            }
+        }
+        context.setContextPath(contextPath);
+        context.setFrameworkUID(Aura.getConfigAdapter().getAuraFrameworkNonce());
+
+        if (num != null) {
+            context.setNum(num);
+        }
+
+        if (client != null) {
+            context.setClient(client);
+        }
+
+        if (observer != null) {
+            observer.contextEstablished(this, context);
+        }
+
+        return context;
+    }
+
+    private void writeApplication(Appendable out) throws IOException, AuraRuntimeException, QuickFixException {
+        if (isSupportedClient(client)) {
+            // ensure that we have a context.
+            AuraContext context = getContext(null);
+            try {
+                ApplicationDef appDef = getApplicationDescriptor(application).getDef();
+
+                if (observer != null) {
+                    observer.beforeApplicationWritten(this, context, appDef);
+                }
+
+                Aura.getSerializationService().write(appDef, null,
+                        ApplicationDef.class, out, "EMBEDDED_HTML");
+            } catch (QuickFixException e) {
+                throw new AuraRuntimeException(e);
+            } finally {
+                releaseContext();
+            }
+        }
+    }
+
+    private static boolean isSupportedClient(Client client) {
+        return client == null || (client.getType() != Type.IE6 && client.getType() != Type.OTHER);
+    }
+
+    private DefDescriptor<ApplicationDef> getApplicationDescriptor(String application) {
+        DefinitionService definitionService = Aura.getDefinitionService();
+        return definitionService.getDefDescriptor(application, ApplicationDef.class);
+    }
+
+    private static final String DEFAULT_APPLICATION = "aura:integrationServiceApp";
+
+    private final String contextPath;
+    private final Mode mode;
+    private final boolean initializeAura;
+    private final Client client;
+    private final String application;
+    private final IntegrationServiceObserver observer;
+
+    private boolean hasApplicationBeenWritten = false;
+    private int contextDepthCount = 0;
 }

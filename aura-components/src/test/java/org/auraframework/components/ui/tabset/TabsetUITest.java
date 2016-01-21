@@ -15,8 +15,6 @@
  */
 package org.auraframework.components.ui.tabset;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.List;
 
 import org.auraframework.test.util.WebDriverTestCase;
@@ -32,10 +30,10 @@ public class TabsetUITest extends WebDriverTestCase {
     private final String URL = "/uitest/tabset_Test.cmp";
     private final By ACTIVE_LI_LOCATOR = By.cssSelector("li[class*='tabs__item active uiTabItem'] > a");
     private final By ACTIVE_SECTION = By.cssSelector("section[class*='tabs__content active uiTab']");
-    private final String[] TITLE_ARRAY = { "Accounts", "Contacts", "Opportunities", "Leads", "Chatter", "Icon",
-            "Dashboards" };
-    private final String[] BODY_ARRAY = { "tab 1 contents", "tab 2 contents", "tab 3 contents", "tab 4 contents",
-            "tab 5 contents", "tab 6 contents", "tab 7 contents", };
+    private final String[] TITLE_ARRAY = {"Accounts", "Contacts", "Opportunities", "Leads", "Chatter", "Icon",
+            "Dashboards"};
+    private final String[] BODY_ARRAY = {"tab 1 contents", "tab 2 contents", "tab 3 contents", "tab 4 contents",
+            "tab 5 contents", "tab 6 contents", "tab 7 contents"};
     private int NUMBER_OF_TABS = 7;
 
     public TabsetUITest(String name) {
@@ -54,11 +52,11 @@ public class TabsetUITest extends WebDriverTestCase {
         WebElement element = findDomElement(By.linkText("Accounts"));
         element.click();
         waitForTabSelected("Did not switch over to Accounts tab", element);
-        
         WebElement activeSection = findDomElement(ACTIVE_SECTION);
 
         // Loop through all of the tabs to make sure we get to the correct values
         for (int i = 0; i < TITLE_ARRAY.length; i++) {
+
             // Verify on correct tab
             assertEquals("Did not get to the correct tab", TITLE_ARRAY[i], element.getText());
 
@@ -72,6 +70,11 @@ public class TabsetUITest extends WebDriverTestCase {
 
             // Go to the next element then grab the new active elements
             element.sendKeys(rightOrDownArrow);
+            int index = i + 1;
+            // Loop back to the first tab if we've reached the end of the list
+            index = index == TITLE_ARRAY.length ? 0 : index;
+            waitForTabSelected("Right or down arrow navigation did not navigate to expected tab",
+                    findDomElement(By.linkText(TITLE_ARRAY[index])));
             element = findDomElement(ACTIVE_LI_LOCATOR);
             activeSection = findDomElement(ACTIVE_SECTION);
         }
@@ -79,6 +82,8 @@ public class TabsetUITest extends WebDriverTestCase {
         // Loop through all of the tabs to make sure we get to the correct values
         for (int i = TITLE_ARRAY.length - 1; i >= 0; i--) {
             element.sendKeys(leftOrUpArrow);
+            waitForTabSelected("Left or up arrow navigation did not navigate to expected tab",
+                    findDomElement(By.linkText(TITLE_ARRAY[i])));
             element = findDomElement(ACTIVE_LI_LOCATOR);
             activeSection = findDomElement(ACTIVE_SECTION);
 
@@ -94,14 +99,14 @@ public class TabsetUITest extends WebDriverTestCase {
                     activeSection.getText().contains(BODY_ARRAY[i]));
         }
     }
-    
+
     private void waitForTabSelected(String msg, final WebElement element) {
         WebDriverWait wait = new WebDriverWait(getDriver(), auraUITestingUtil.getTimeout());
         wait.withMessage(msg);
         wait.until(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
-            	WebElement parent = element.findElement(By.xpath(".."));
+                WebElement parent = element.findElement(By.xpath(".."));
                 return parent.getAttribute("class").contains("active");
             }
         });
@@ -181,7 +186,6 @@ public class TabsetUITest extends WebDriverTestCase {
      * @param item - what item we want rendered
      * @return - the desired URL string
      */
-
     private String createURL(String item, String closable) {
         return URL + "?renderItem=" + item + "&closable=" + closable;
     }
@@ -191,7 +195,6 @@ public class TabsetUITest extends WebDriverTestCase {
      * 
      * @param loc - the locator for the element
      */
-
     private void verifyElementIsActive(By loc) {
         WebElement el = findDomElement(loc);
         assertTrue("The Active class name was not found in the non deleted element",
@@ -203,7 +206,6 @@ public class TabsetUITest extends WebDriverTestCase {
         String activeElementClass = (String) auraUITestingUtil
                 .getEval("return $A.test.getActiveElement().getAttribute('class')");
         assertTrue("Focus is not on ther correct element", activeElementClass.contains(itemToVerifyAgainst));
-
     }
 
     /********************************************************************************************************************/
@@ -211,31 +213,22 @@ public class TabsetUITest extends WebDriverTestCase {
     /**
      * Test that will verify that the arrows keys work. This is not something that will be run on mobile devices
      * 
-     * IE7/8 don't handle arrows well. Disabling tests until bug is fixed: W-2295362
-     * 
-     * 
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
+     * IE7/8 don't handle arrows well.
      */
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE, BrowserType.IPAD,
             BrowserType.IE8, BrowserType.IE7 })
-    public void testLeftRightUpDownArrows() throws MalformedURLException, URISyntaxException {
+    public void testLeftRightUpDownArrows() throws Exception {
         open(createURL("basic", "false"));
 
         // Left/Up and Right/Down Arrows do the samething. Making sure that the result is also the same
         iterateThroughTabs(Keys.ARROW_RIGHT, Keys.ARROW_LEFT);
         iterateThroughTabs(Keys.ARROW_DOWN, Keys.ARROW_UP);
-
     }
 
     /**
      * Test that will verify that when a tab closes, the active element is moved to either the correct element.
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testFocusOnClose_MovesToAnotherElement() throws MalformedURLException, URISyntaxException {
+    public void testFocusOnClose_MovesToAnotherElement() throws Exception {
         open(createURL("basic", "true"));
         NUMBER_OF_TABS = 7;
         // Check focus moves from the first element to the second element after it is closed
@@ -246,33 +239,24 @@ public class TabsetUITest extends WebDriverTestCase {
 
         // Check focus moves from the last element to the second to last element
         checkFocusMoves(createXPath(5), TITLE_ARRAY[6], TITLE_ARRAY[5]);
-
     }
 
     /**
      * Test verifying that if an element that is not active is closed, then focus is not lost
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testFocusOnClose_NonCurrentElementDoesntLoseFocus() throws MalformedURLException, URISyntaxException {
+    public void testFocusOnClose_NonCurrentElementDoesntLoseFocus() throws Exception {
         open(createURL("basic", "true"));
         NUMBER_OF_TABS = 7;
         closeTabAndVerify(createXPath(4) + "/a");
 
         WebElement element = findDomElement(ACTIVE_LI_LOCATOR);
         assertEquals("Correct element was not found", TITLE_ARRAY[4], element.getText());
-
     }
 
     /**
      * Dynamically create a component, verify it and make sure that it still acts as a normal component
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testFocusOnClose_DynamicTabGeneration() throws MalformedURLException, URISyntaxException {
-
+    public void testFocusOnClose_DynamicTabGeneration() throws Exception {
         String tabName = "Dynamic";
         String tabBody = "Dynamically generated";
         NUMBER_OF_TABS = 7;
@@ -281,16 +265,12 @@ public class TabsetUITest extends WebDriverTestCase {
         createNewTab(tabName, tabBody);
 
         checkFocusMoves(createXPath(8), tabName, TITLE_ARRAY[6]);
-
     }
 
     /**
      * Verifying that nestedTabs work the same as normal tabs
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-    public void testNestedTabsDelete() throws MalformedURLException, URISyntaxException {
+    public void testNestedTabsDelete() throws Exception {
         open(createURL("nestedTabs", "false"));
         WebElement el = findDomElement(By.partialLinkText("inner tab 1"));
         el.click();
@@ -315,14 +295,10 @@ public class TabsetUITest extends WebDriverTestCase {
      * Disabled against mobile since tabbing does not make sense on mobile Tabbing with Safari acts oddly. For some
      * strange reason, I have to grab the element I want and then send the tab key to put it into focus other wise
      * nothing happens
-     * 
-     * @throws MalformedURLException
-     * @throws URISyntaxException
      */
-
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPHONE,
             BrowserType.IPAD })
-    public void testTabbingInTabSet() throws MalformedURLException, URISyntaxException {
+    public void testTabbingInTabSet() throws Exception {
         open(createURL("tab", "true"));
 
         // Focus on tab and move to next focusable element

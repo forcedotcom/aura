@@ -41,6 +41,8 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     private final String SELECTED_DATE = "a[class*='selectedDate']";
     private final String OUTPUT_ST = "span[class*='outputStatus']";
 
+    private final String DATEPICKER_SEL = "div.uiDatePicker.visible";
+
     private final String CLASSNAME = "return $A.test.getActiveElement().className";
 
     public InputDateWithLabelUITest(String name) {
@@ -50,17 +52,17 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
     /**
      * Excluded Browser Reasons:
-     * 
+     *
      * IE7: pageUpDown test is flappy, works through webdriver after running a few times and manually. Issue here is
      * that it will sometimes stop one short
-     * 
+     *
      * IE8: homeEndButton test is flappy, works fine manually and on webdriver after running a few times
-     * 
+     *
      * IE9/10/11: Sending in Shift anything (tab, page up, page down), does not register when sent through WebDriver.
      * Manually works fine
-     * 
+     *
      * Android/IOS: This feature will not be used on mobile devices. Instead the their native versions will be used
-     * 
+     *
      * Safari: Sending in Shift tab does not register when sent through WebDriver. Manually works fine
      */
     /***********************************************************************************************
@@ -87,9 +89,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.clear();
         element.sendKeys(TEST_DATE_TO_USE);
 
-        // Grabbing the Date Icon and click on it to open the calendar
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
         element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
@@ -114,12 +114,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.sendKeys(initDate);
 
         // Opening the calendar icon to grab the date we are looking for
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         // Grabbing the correct focus cell date
         By selectedDate = By.cssSelector(SELECTED_DATE);
-        waitForElementAppear("After clicking on the date icon, calendar doesn't appear!", selectedDate);
         element = findDomElement(selectedDate);
 
         // Pressing the home or End button and grabbing the associated date
@@ -136,6 +134,14 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         return element.getAttribute("value");
     }
 
+    private void openDatePicker() {
+        // Grabbing the Date Icon and click on it to open the calendar
+        WebElement element = findDomElement(By.cssSelector(DATE_ICON_SEL));
+        element.click();
+        waitForElementAppear("DatePicker doesn't appear after clicking on the calendar icon!",
+            By.cssSelector(DATEPICKER_SEL));
+    }
+
     public void gotToNextElem(WebDriver driver, String shftTab) {
         String classOfActiveElem = "a[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']";
         findDomElement(By.cssSelector(classOfActiveElem)).sendKeys(shftTab);
@@ -145,8 +151,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     /***********************************************************************************************
      *********************************** Date Picker Tests*******************************************
      ***********************************************************************************************/
-    // W-2721497: test flapper, in homeEndButtonHelper() above
-    // we might need some wait between click() and findDomElement(...)
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
@@ -301,9 +305,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         // tab out does not fire value change event
         assertEquals("Value Change event should not be fired", "", element.getText());
 
-        // Setting focus to the Calendar Icon and clicking on it
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         // Todays date should be on focus, Grabbing that element. Pressing tab with WebDriver after clicking on the icon
         // will move to the move month to the left
@@ -387,12 +389,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         boolean escButtonClosedCal = false;
 
-        // Setting focus to the Calendar Icon and clicking on it
-        WebElement element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         // Looking for the current date, which should be focused on
-        element = findDomElement(By.cssSelector(SELECTED_DATE));
+        WebElement element = findDomElement(By.cssSelector(SELECTED_DATE));
 
         // Hitting escape to close the Calendar
         element.sendKeys(Keys.ESCAPE);
@@ -405,7 +405,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
 
         assertTrue("Escape button did not close the calendar", escButtonClosedCal);
     }
-    
+
     /**
      * Test Flow:
      * 1. Have focus on inputDate
@@ -417,38 +417,38 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Testing the focus after closing datePicker
     // Disabling for Safari since Safari does not handle tabs normally
     @ExcludeBrowsers({ BrowserType.SAFARI, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    
+
     public void testFocusOnClosingDP() throws Exception {
-    	
+
     	// the different keys we will use to close the datePicker
     	Keys[] keysToClose = {Keys.ESCAPE, Keys.ENTER, Keys.SPACE};
         String getActiveElem = "return $A.test.getActiveElement()";
-        
+
     	open(URL);
-    	
+
         for(int i = 0; i < keysToClose.length; i++) {
-        	
+
         	WebElement inputDate = findDomElement(By.cssSelector(DATE_INPUT_BOX_SEL));
             inputDate.sendKeys(Keys.TAB);
-            
+
             //active element should now be the calendar icon - hit enter to open datePicker
             WebElement activeElement = (WebElement)auraUITestingUtil.getEval(getActiveElem);
             activeElement.sendKeys(Keys.ENTER);
-            
+
             //datePicker should be open
             waitForElementAppear("datePicker should been present, but its not", By.cssSelector(".uiDatePicker.visible"));
-            
+
             //use key to close the datePicker
             WebElement selectedDate = findDomElement(By.cssSelector(SELECTED_DATE));
             selectedDate.sendKeys(keysToClose[i]);
-            
+
             //check if datePicker is closed
             waitForElementDisappear("datePicker should not be present, but it is", By.cssSelector(".uiDatePicker.visible"));
-            
+
             //check if active element is the inputDate
             activeElement = (WebElement)auraUITestingUtil.getEval(getActiveElem);
             assertEquals("Focus not on the right element", activeElement, inputDate);
-            
+
         }
     }
 
@@ -466,8 +466,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.sendKeys("2013-10-01");
         element.click();
 
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
 
@@ -483,7 +482,6 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     }
 
     // Testing functionality of arrows being used one after the other
-    // W-2721497: test flapper, we might need some wait between click() and findDomElement(...)
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
     public void testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
@@ -495,13 +493,10 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.click();
 
         // Test Begins
-        // Grab calendar Icon
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         // Find todays date, which should be focused
         By activeElmLoc = By.cssSelector("a[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']");
-        waitForElementAppear("After clicking on the date icon, calendar doesn't appear!", activeElmLoc);
         element = findDomElement(activeElmLoc);
 
         // Move from todays date, to the todays date +41
@@ -531,9 +526,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.click();
 
         // Test Begins
-        // Select the calendar Icon
-        element = findDomElement(By.cssSelector(DATE_ICON_SEL));
-        element.click();
+        openDatePicker();
 
         // Find todays date, which should be focused
         String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);

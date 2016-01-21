@@ -430,9 +430,7 @@
                 "__proto__": null
             };
             var visited = new Set();
-            var toJSON = InvalidComponent.prototype.toJSON;
             var toJSONCmp = Component.prototype.toJSON;
-            delete InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
             var result = "{}";
             try {
@@ -490,7 +488,7 @@
                         }
                         else if(!$A.util.isEmpty(value)) {
                             visited.add(value);
-                            value.$serId = increment++;
+                            value.$serId$ = increment++;
                         }
                     }
 
@@ -504,11 +502,10 @@
 
             visited.forEach(function(item){
                 if("$serId$" in item) {
-                    delete item["$serId"];
+                    delete item["$serId$"];
                 }
             });
 
-            InvalidComponent.prototype.toJSON = toJSON;
             Component.prototype.toJSON = toJSONCmp;
 
             return result;
@@ -707,9 +704,7 @@
 
         function output(data) {
             var componentToJSON = Component.prototype.toJSON;
-            var invalidComponentToJSON = InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
-            delete InvalidComponent.prototype.toJSON;
 
             var json = $Aura.Inspector.safeStringify(data, function(key, value){
                 if($A.util.isComponent(value)) {
@@ -721,7 +716,6 @@
             });
 
             Component.prototype.toJSON = componentToJSON;
-            InvalidComponent.prototype.toJSON = invalidComponentToJSON;
 
             return json;
         }

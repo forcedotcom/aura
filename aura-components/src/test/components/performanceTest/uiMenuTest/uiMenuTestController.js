@@ -5,7 +5,7 @@
         var done = event.getParam('arguments').done;
         var finishSetup = done.async();
         
-        var NUM_ITEMS = 100;
+        var NUM_ITEMS = 2300;
         cmp.newActionMenuItemComponents = [];
 
         for (var i = 0; i < NUM_ITEMS; i++) {
@@ -14,7 +14,7 @@
                 'label' : 'D' + (i + 1)
             }, function(actionMenuItem, status, statusMessagesList) {
                 cmp.newActionMenuItemComponents.push(actionMenuItem);
-                if(i == NUM_ITEMS - 1){
+                if(cmp.newActionMenuItemComponents.length == NUM_ITEMS - 1){
                     finishSetup();
                 }
             });

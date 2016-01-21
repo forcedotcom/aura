@@ -1,0 +1,12 @@
+<aura:component extends="performance:perfTest"> 
+  <ui:scroller aura:id="listScroller" snap="true" showScrollbars="true" onPullToRefresh="{!c.show}">
+  <ui:infinitelist aura:id="listData" itemVar="item" listComplete="{!c.listComplete}">
+    <aura:set attribute="dataProvider">
+      <auradocs:demoDataProvider />
+    </aura:set>
+    <aura:set attribute="itemTemplate">
+      <auradocs:demoListTemplate label="{!item.label}"/>
+    </aura:set>
+  </ui:infinitelist>
+  </ui:scroller>    
+</aura:component>

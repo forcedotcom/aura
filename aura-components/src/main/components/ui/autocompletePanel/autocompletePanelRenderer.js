@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 ({
-    unrender: function(component, helper) {
+    unrender: function(component) {
 
         //clean up constraint
         if(component.positionConstraint) {
@@ -22,7 +22,6 @@
             delete component.positionConstraint;
         }
 
-        helper.cleanEvents(component);
         this.superUnrender();
     }
 })// eslint-disable-line semi

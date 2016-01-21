@@ -20,5 +20,6 @@
     <aura:include name="elementProxy"/>
     <aura:include name="elementProxyFactory" imports="elementProxy"/>
     <aura:include name="constraint" imports="elementProxyFactory"/>
-	<aura:include name="panelPositioning" imports="constraint, elementProxyFactory"/>
+    <aura:include name="positioningUtils" />
+	<aura:include name="panelPositioning" imports="constraint, elementProxyFactory, positioningUtils"/>
 </aura:library>

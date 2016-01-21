@@ -256,7 +256,7 @@
     verifyZIndices: function(panelRefs, expectedZIndices) {
         for(var i = 0; i < panelRefs.length; i++) {
             var panelEl = panelRefs[i].getElement();
-            $A.test.assertEquals(expectedZIndices[i], panelEl.style.zIndex,
+            $A.test.assertEquals(parseInt(expectedZIndices[i]), parseInt(panelEl.style.zIndex),
                 "Incorrect zIndex for panel id:" + panelEl.id
             );
         }

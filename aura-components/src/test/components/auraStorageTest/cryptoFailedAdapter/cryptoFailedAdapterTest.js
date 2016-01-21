@@ -6,6 +6,13 @@
      * A real world scenario that this emulates is Firefox in private browsing mode.
      */
 
+    // IndexedDB has problems in Safari and is not supported in older IE
+    browsers:["-IE7", "-IE8", "-IE9", "-SAFARI", "-IPAD", "-IPHONE"],
+
+    // threadHostile - test modifies/deletes the persistent database.
+    // UnAdaptableTest - must be run on https or localhost otherwise CryptoAdapter will not register
+    labels : [ "threadHostile", "UnAdaptableTest" ],
+
     setUp: function(cmp) {
         cmp.__storageName = "crypto-failed-adapter";
 

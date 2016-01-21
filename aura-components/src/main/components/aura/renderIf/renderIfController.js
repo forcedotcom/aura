@@ -15,7 +15,7 @@
  */
 ({
     facetChange: function(component, event) {
-        var facets=[event.getParam("newValue"),event.getParam("oldValue")];
+        var facets=[event.getParam("value"),event.getParam("oldValue")];
         for(var i=0;i<facets.length;i++){
             for(var j=0;j<facets[i].length;j++){
                 facets[i][j].autoDestroy(i);

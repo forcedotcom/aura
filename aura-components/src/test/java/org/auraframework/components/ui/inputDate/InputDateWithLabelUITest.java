@@ -118,7 +118,9 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.click();
 
         // Grabbing the correct focus cell date
-        element = findDomElement(By.cssSelector(SELECTED_DATE));
+        By selectedDate = By.cssSelector(SELECTED_DATE);
+        waitForElementAppear("After clicking on the date icon, calendar doesn't appear!", selectedDate);
+        element = findDomElement(selectedDate);
 
         // Pressing the home or End button and grabbing the associated date
         element.sendKeys(buttonToPress);
@@ -148,7 +150,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Home and End Button Test using January (31 days) , February (28 or 29 days), September (30 days)
     @ExcludeBrowsers({ BrowserType.IE7, BrowserType.IE8, BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET,
             BrowserType.IPAD, BrowserType.IPHONE })
-    public void _testHomeEnd() throws Exception {
+    public void testHomeEnd() throws Exception {
         open(URL);
 
         // Checking January (31 days)
@@ -483,7 +485,7 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
     // Testing functionality of arrows being used one after the other
     // W-2721497: test flapper, we might need some wait between click() and findDomElement(...)
     @ExcludeBrowsers({ BrowserType.ANDROID_PHONE, BrowserType.ANDROID_TABLET, BrowserType.IPAD, BrowserType.IPHONE })
-    public void _testLeftAndRightArrows() throws Exception {
+    public void testLeftAndRightArrows() throws Exception {
         // Increase day in month by 1
         open(URL);
         WebDriver driver = getDriver();
@@ -498,8 +500,9 @@ public class InputDateWithLabelUITest extends WebDriverTestCase {
         element.click();
 
         // Find todays date, which should be focused
-        String classOfActiveElem = "" + auraUITestingUtil.getEval(CLASSNAME);
-        element = findDomElement(By.cssSelector("a[class*='" + classOfActiveElem + "']"));
+        By activeElmLoc = By.cssSelector("a[class*='" + auraUITestingUtil.getEval(CLASSNAME) + "']");
+        waitForElementAppear("After clicking on the date icon, calendar doesn't appear!", activeElmLoc);
+        element = findDomElement(activeElmLoc);
 
         // Move from todays date, to the todays date +41
         element = loopThroughKeys(element, driver, "" + Keys.ARROW_RIGHT, 41, ARIA_SELECTED_SEL, "Arrow-Right key ");

@@ -56,11 +56,22 @@
         options = options || {};
         var e = component.getEvent("menuSelect");
         if (e) {
+
+            var hideMenu = options.hideMenu;
+            if ($A.util.isUndefinedOrNull(hideMenu)) {
+                hideMenu = component.get("v.hideMenuAfterSelected");
+            }
+
+            var focusTrigger = options.focusTrigger;
+            if ($A.util.isUndefinedOrNull(focusTrigger)) {
+                focusTrigger = hideMenu;
+            }
+
             e.setParams({
                 selectedItem: component,
-                "hideMenu": options.hideMenu,
+                "hideMenu": hideMenu,
                 "deselectSiblings": options.deselectSiblings,
-                "focusTrigger": options.focusTrigger
+                "focusTrigger": focusTrigger
             });
             e.fire();
         }

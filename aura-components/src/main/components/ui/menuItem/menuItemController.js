@@ -23,9 +23,7 @@
     },
 
     select: function(component, event, helper) {
-        var hideMenu = $A.util.getBooleanValue(component.get("v.hideMenuAfterSelected"));
-        var focusTrigger = $A.util.getBooleanValue(component.get("v.focusTriggerAfterSelected"));
-        helper.fireSelectEvent(component, event, {"hideMenu": hideMenu, "focusTrigger": focusTrigger});
+        helper.fireSelectEvent(component, event);
 
         return false;
     }

@@ -17,6 +17,9 @@
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:menuItem" extensible="true" description="​A menu item with a radio button that indicates a mutually exclusive selection and can be used to invoke an action. This component is nested in a ui:menu component.">
 
+    <!-- Overrides the default value of 'true' -->
+    <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="false" description="Set to true to hide menu after the menu item is selected." />
+
     <aura:method name="select" action="{!c.select}"/>
 
     <li aura:id="listitem" class="{!v.class + ' has-icon--left'}" role="presentation">

@@ -264,22 +264,22 @@
     onMenuItemSelected: function(component, event) {
     	var concrete = component.getConcreteComponent();
 
-    	var hideMenu = event.getParam("hideMenu") || $A.util.getBooleanValue(component.get("v.hideMenuAfterSelected"));
+        var deselectSiblings = event.getParam("deselectSiblings");
+        if (deselectSiblings === true) {
+            this.deselectSiblings(component, event.getSource());
+        }
 
-    	var deselectSiblings = event.getParam("deselectSiblings");
-    	var focusTrigger = event.getParam("focusTrigger");
+        var hideMenu = event.getParam("hideMenu");
+        if (hideMenu === true) {
+            concrete.set("v.visible", false);
+        }
 
-    	if (deselectSiblings === true) {
-    		this.deselectSiblings(component, event.getSource());
-    	}
-    	if (hideMenu === true) {
-    		concrete.set("v.visible", false);
-    	}
-    	if (focusTrigger) {
-    		this.setFocusToTrigger(component);
-    	}
-    	var e = component.get("e.menuSelect");
-    	e.setParams(event.getParams()).fire();
+        var focusTrigger = event.getParam("focusTrigger");
+        if (focusTrigger === true) {
+            this.setFocusToTrigger(component);
+        }
+
+    	component.get("e.menuSelect").fire(event.getParams());
     },
 
     /**

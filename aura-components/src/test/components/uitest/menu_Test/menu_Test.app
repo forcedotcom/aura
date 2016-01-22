@@ -45,11 +45,11 @@
             <h2>Your favorite soccer club</h2>
             <ui:menu aura:id="uiMenu" class="clubMenu">
                 <ui:menuTriggerLink class="trigger" aura:id="trigger" label="Please pick your favorite soccer club"/>
-                <ui:menuList class="actionMenu" aura:id="actionMenu" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}">
-                    <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" />
-                    <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true"/>
-                    <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" />
-                    <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}"/>
+                <ui:menuList class="actionMenu" aura:id="actionMenu">
+                    <ui:actionMenuItem class="actionItem1" aura:id="actionItem1" label="Bayern München" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}"/>
+                    <ui:actionMenuItem class="actionItem2" aura:id="actionItem2" label="FC Barcelona" click="{!c.updateTriggerLabel}" disabled="true" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}"/>
+                    <ui:actionMenuItem class="actionItem3" aura:id="actionItem3" label="Inter Milan" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}" />
+                    <ui:actionMenuItem class="actionItem4" aura:id="actionItem4" label="Manchester United" click="{!c.updateTriggerLabel}" hideMenuAfterSelected="{!!v.hideMenuAfterSelected}"/>
                 </ui:menuList>
             </ui:menu>
         </div>
@@ -81,11 +81,11 @@
             <h2>Your favorite football teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="checkboxMenuLabel" aura:id="checkboxMenuLabel" label="NFC West Teams"/>
-                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu" hideMenuAfterSelected="{!v.hideMenuAfterSelected}">
-                    <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers"/>
-                    <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks"/>
-                    <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams"/>
-                    <ui:checkboxMenuItem class="checkboxItem4" aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true" selected="true"/>
+                <ui:menuList aura:id="checkboxMenu" class="checkboxMenu">
+                    <ui:checkboxMenuItem class="checkboxItem1" aura:id="checkboxItem1" label="San Francisco 49ers" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:checkboxMenuItem class="checkboxItem2" aura:id="checkboxItem2" label="Seattle Seahawks" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:checkboxMenuItem class="checkboxItem3" aura:id="checkboxItem3" label="St. Louis Rams" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:checkboxMenuItem class="checkboxItem4" aura:id="checkboxItem4" label="Arizona Cardinals" disabled="true" selected="true" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
                 </ui:menuList>
             </ui:menu>
             <p/>
@@ -99,7 +99,7 @@
             <br/>
             <ui:outputText value='&#160;&#160;&#60;ui:menuTriggerLink aura:id="checkboxMenuLabel" label="NFC West Teams"/&#62;'/>
             <br/>
-            <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="checkboxMenu" hideMenuAfterSelected="false"&#62;'/>
+            <ui:outputText value='&#160;&#160;&#60;ui:menuList aura:id="checkboxMenu"/&#62;'/>
             <br/>
             <ui:outputText value='&#160;&#160;&#160;&#160;&#60;ui:checkboxMenuItem aura:id="checkboxItem1" label="San Francisco 49ers"/&#62;'/>
             <br/>
@@ -125,12 +125,12 @@
             <h2>Your favorite baseball teams</h2>
             <ui:menu>
                 <ui:menuTriggerLink class="radioMenuLabel" aura:id="radioMenuLabel" label="National League West"/>
-                <ui:menuList class="radioMenu" aura:id="radioMenu" hideMenuAfterSelected="{!v.hideMenuAfterSelected}">
-                    <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco"/>
-                    <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers"/>
-                    <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona"/>
-                    <ui:radioMenuItem class="radioItem4" aura:id="radioItem4" label="Diego" disabled="true"/>
-                    <ui:radioMenuItem class="radioItem5" aura:id="radioItem5" label="Colorado"/>
+                <ui:menuList class="radioMenu" aura:id="radioMenu">
+                    <ui:radioMenuItem class="radioItem1" aura:id="radioItem1" label="San Francisco" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:radioMenuItem class="radioItem2" aura:id="radioItem2" label="LA Dodgers" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:radioMenuItem class="radioItem3" aura:id="radioItem3" label="Arizona" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:radioMenuItem class="radioItem4" aura:id="radioItem4" label="Diego" disabled="true" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
+                    <ui:radioMenuItem class="radioItem5" aura:id="radioItem5" label="Colorado" hideMenuAfterSelected="{!v.hideMenuAfterSelected}"/>
                 </ui:menuList>
             </ui:menu>
             <p/>
@@ -172,9 +172,9 @@
             <h2>Example: Menu Item using Iteration</h2>
             <ui:menu>
               <ui:menuTriggerLink aura:id="iterationTrigger" label="iterationTrigger"/>
-              <ui:menuList aura:id="iterationRadioMenu" hideMenuAfterSelected="false">
+              <ui:menuList aura:id="iterationRadioMenu">
                 <aura:iteration items="{!m.iterationItems}" var="item">
-                    <ui:radioMenuItem label="{!item.label}" value="{!item.value}"/>
+                    <ui:radioMenuItem label="{!item.label}" value="{!item.value}" hideMenuAfterSelected="false"/>
                 </aura:iteration>
               </ui:menuList>
             </ui:menu>
@@ -213,15 +213,15 @@
             <h2>Example: Menu Item using Condition</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionTrigger" label="conditionTrigger"/>
-                <ui:menuList aura:id="conditionRadioMenu" hideMenuAfterSelected="false">
+                <ui:menuList aura:id="conditionRadioMenu">
                     <aura:if isTrue="{!v.menuCondition}">
-                        <ui:radioMenuItem label="trueCondition" value="trueCondition"/>
+                        <ui:radioMenuItem label="trueCondition" value="trueCondition" hideMenuAfterSelected="false"/>
                         <aura:set attribute="else">
-                            <ui:radioMenuItem label="falseCondition1" value="falseCondition1"/>
-                            <ui:radioMenuItem label="falseCondition2" value="falseCondition2"/>
+                            <ui:radioMenuItem label="falseCondition1" value="falseCondition1" hideMenuAfterSelected="false"/>
+                            <ui:radioMenuItem label="falseCondition2" value="falseCondition2" hideMenuAfterSelected="false"/>
                         </aura:set>
                     </aura:if>
-                    <ui:radioMenuItem label="outsideCondition" value="outsideCondition"/>
+                    <ui:radioMenuItem label="outsideCondition" value="outsideCondition" hideMenuAfterSelected="false"/>
                 </ui:menuList>
             </ui:menu>
             <p/>
@@ -237,15 +237,15 @@
             <h2>Example: Menu Item using Condition and Iteration</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="conditionIterationTrigger" label="conditionIterationTrigger"/>
-                <ui:menuList aura:id="conditionIterationMenu" hideMenuAfterSelected="false">
+                <ui:menuList aura:id="conditionIterationMenu">
                     <aura:if isTrue="{!v.menuCondition}">
-                        <ui:actionMenuItem label="trueCondition" value="trueCondition"/>
+                        <ui:actionMenuItem label="trueCondition" value="trueCondition" hideMenuAfterSelected="false"/>
                         <ui:menuItemSeparator/>
                         <aura:iteration items="{!m.iterationItems}" var="item">
-                            <ui:radioMenuItem label="{!item.label}" value="{!item.value}"/>
+                            <ui:radioMenuItem label="{!item.label}" value="{!item.value}" hideMenuAfterSelected="false"/>
                         </aura:iteration>
                         <aura:set attribute="else">
-                            <ui:checkboxMenuItem label="falseCondition" value="falseCondition"/>
+                            <ui:checkboxMenuItem label="falseCondition" value="falseCondition" hideMenuAfterSelected="false"/>
                         </aura:set>
                     </aura:if>
                     <ui:menuItemSeparator/>
@@ -287,22 +287,22 @@
             <h2>All together</h2>
             <ui:menu>
                 <ui:menuTriggerLink aura:id="mytrigger" label="All teams"/>
-                <ui:menuList hideMenuAfterSelected="false">
+                <ui:menuList>
                     <ui:actionMenuItem label="Bayern München" click="{!c.updateLabel}"/>
                     <ui:actionMenuItem label="FC Barcelona" click="{!c.updateLabel}"/>
                     <ui:actionMenuItem label="Inter Milan" click="{!c.updateLabel}"/>
                     <ui:actionMenuItem label="Manchester United" click="{!c.updateLabel}"/>
                     <ui:menuItemSeparator/>
-                    <ui:checkboxMenuItem label="San Francisco 49ers"/>
-                    <ui:checkboxMenuItem label="Seattle Seahawks"/>
-                    <ui:checkboxMenuItem label="St. Louis Rams"/>
-                    <ui:checkboxMenuItem label="Arizona Cardinals"/>
+                    <ui:checkboxMenuItem label="San Francisco 49ers" hideMenuAfterSelected="false"/>
+                    <ui:checkboxMenuItem label="Seattle Seahawks" hideMenuAfterSelected="false"/>
+                    <ui:checkboxMenuItem label="St. Louis Rams" hideMenuAfterSelected="false"/>
+                    <ui:checkboxMenuItem label="Arizona Cardinals" hideMenuAfterSelected="false"/>
                     <ui:menuItemSeparator/>
-                    <ui:radioMenuItem label="San Francisco"/>
-                    <ui:radioMenuItem label="LA Dodgers"/>
-                    <ui:radioMenuItem label="Arizona"/>
-                    <ui:radioMenuItem label="San Diego"/>
-                    <ui:radioMenuItem label="Colorado"/>
+                    <ui:radioMenuItem label="San Francisco" hideMenuAfterSelected="false"/>
+                    <ui:radioMenuItem label="LA Dodgers" hideMenuAfterSelected="false"/>
+                    <ui:radioMenuItem label="Arizona" hideMenuAfterSelected="false"/>
+                    <ui:radioMenuItem label="San Diego" hideMenuAfterSelected="false"/>
+                    <ui:radioMenuItem label="Colorado" hideMenuAfterSelected="false"/>
                 </ui:menuList>
             </ui:menu>
         </div>

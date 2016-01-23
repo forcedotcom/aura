@@ -74,10 +74,11 @@
                 //console.log("AddActionToWatch, nextResponse:", data.nextResponse);
                 $A.uninstallOverride("ClientService.decode", onDecode);
                 $A.installOverride("ClientService.decode", onDecode);
+            } else if(data.nextError) {
+                $A.uninstallOverride("ClientService.decode", onDecode);
+                $A.installOverride("ClientService.decode", onDecode);
             } else {
                 //override send                
-                //actionsToDrop.push(data);
-                //we need to keep a map between actionID --> action , right before send
                 $A.uninstallOverride("ClientService.send", OnSendAction);
                 $A.installOverride("ClientService.send", OnSendAction);
             }
@@ -721,17 +722,7 @@
         }
     }
 
-    //how expensive is JSON.parse?  can we save the trouble by just doing string.indexof
-    function containsActionsWeAreWatching(oldResponseText) {
-        for(actionWatched in actionsWatched) {
-            if(oldResponseText.indexOf(actionWatched) > 0 ) {
-                return true;
-                break;
-            }
-        }
-        return false;
-    }
-
+    //This return true if the object is an array, and it's not empty
     function isNonEmptyArray(obj) {
         if(obj && typeof obj === "object" && obj instanceof Array && obj.length && obj.length > 0) {
             return true;
@@ -740,6 +731,7 @@
         }
     }
 
+    //This return true if the object is with type Object, but not an array or null/undefined
     function isTrueObject(obj) {
         if(obj && typeof obj === "object" && !(obj instanceof Array)) {
             return true;
@@ -762,8 +754,7 @@
                     var returnValuek = returnValue[key];
                     if(nextResponse[key]) {
                         returnValue[key] = nextResponse[key];
-                        console.log("found a match, update response for "+key);
-                        //delete nextResponse[key];
+                        //console.log("found a match, update response for "+key);
                         return true;   
                     } else {
                         var res = replaceValueInObj(returnValuek, nextResponse);
@@ -784,30 +775,57 @@
             var oldResponseText = oldResponse["responseText"];
             var newResponseText = oldResponseText;
             var responseModified = false;//if we modify the response, set this to true
+            var responseWithError = false;//if we send back error response, set this to true
 
-            if( actionsWatched != {} ) {
+            if( Object.getOwnPropertyNames(actionsWatched).length > 0 ) {
                 for(actionWatchedId in actionsWatched) {
                     if(oldResponseText.indexOf(actionWatchedId) > 0) {
                         var actionWatched = actionsWatched[actionWatchedId];
-                        if(actionWatched.nextResponse && oldResponseText.startsWith("while(1);") ) {
+                        if( ( actionWatched.nextResponse || actionWatched.nextError) && oldResponseText.startsWith("while(1);") ) {
                             var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
                             if(oldResponseObj && oldResponseObj.actions) {
                                 var actionsFromOldResponse = oldResponseObj.actions;
                                 for(var i = 0; i < actionsFromOldResponse.length; i++) {
-                                    var returnValue = actionsFromOldResponse[i].returnValue; 
-                                    responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
-
-                                    if(responseModified === true) {
-                                        //no need to continue, returnValue now contains new response
-                                        actionsFromOldResponse[i].returnValue = returnValue;
-                                        break; //get out of looping over actionsFromOldResponse
-                                    }
+                                    if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
+                                        if(actionWatched.nextError) {//we would like to return error response 
+                                            var errsArr = []; 
+                                            errsArr.push(actionWatched.nextError);
+                                            actionsFromOldResponse[i].state = "ERROR";
+                                            actionsFromOldResponse[i].returnValue = null;
+                                            actionsFromOldResponse[i].error = errsArr;
+                                            responseWithError = true;
+                                            break;//get out of looping over actionsFromOldResponse
+                                        } else {//we would like to return non-error response
+                                            var returnValue = actionsFromOldResponse[i].returnValue; 
+                                            responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
+                                            if(responseModified === true) {
+                                                //no need to continue, returnValue now contains new response
+                                                actionsFromOldResponse[i].returnValue = returnValue;
+                                                break; //get out of looping over actionsFromOldResponse
+                                            }
+                                        }
+                                    } 
                                 }//end of looping over actionsFromOldResponse
                             }//end of oldResponseObj is valid and it has actions
-                            if(responseModified === true) {
+                            if(responseWithError === true ) {
+                                //when action return with error, responseText should be null
+                                newResponseText = "null";
+                                //move the actionCard from watch list to Processed
+                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
+                                $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                        "id": actionWatchedId,
+                                        "idtoWatch": actionWatched.idtoWatch,
+                                        "state": "RESPONSEMODIFIED",
+                                        "error": actionWatched.nextError,
+                                        "sentTime": performance.now()//do we need this?
+                                });
+                                delete actionsWatched[actionWatchedId];
+                                break;//get out of looping over actionsWatched
+                            } else if(responseModified === true) {
                                 oldResponseObj.actions = actionsFromOldResponse;
                                 newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
-                                //move the action from Watching to Processed
+                                //move the actionCard from watch list to Processed
+                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
                                 $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                                         "id": actionWatchedId,
                                         "idtoWatch": actionWatched.idtoWatch,
@@ -822,7 +840,7 @@
                 }//end of looping over actionsWatched
             }//end of actionsWatched is not empty
 
-            if(responseModified === true) {
+            if(responseModified === true || responseWithError === true) {
                 var newHttpRequest = {};
                 newHttpRequest = $A.util.apply(newHttpRequest, oldResponse);
                 newHttpRequest["response"] = newResponseText;
@@ -830,23 +848,24 @@
 
                 var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
                 return ret;
-            } else {
+            } else {//nothing happended, just send back oldResponse
                 var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
-                return oldResponse;
+                return ret;
             }
         } else {
             console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along");
             var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
-            return oldResponse;
+            return ret;
         }
     }
 
+    //go through actionToWatch, if we run into an action we are watching, either drop it
+    //or register with actionsWatched, and modify response later in onDecode
     function OnSendAction(config, auraXHR, actions, method, options) {
             if (actions) {
                 for(var c=0;c<actions.length;c++) {
-                    if(actionsToWatch !== {}) {
+                    if( Object.getOwnPropertyNames(actionsToWatch).length > 0) {
                         var action = actions[c];
-                        //for(var i=0; i<actionsToWatch.length; i++) {
                         for(key in actionsToWatch) {
                             var actionToWatch = actionsToWatch[key];
                             if(actionToWatch.actionName.indexOf(action.getDef().name) >= 0) {
@@ -855,11 +874,12 @@
                                     console.log("Error: we already watching this action:", action);
                                 } else {
                                     //copy nextResponse to actionWatched
+                                    action['nextError'] = actionToWatch.nextError;
                                     action['nextResponse'] = actionToWatch.nextResponse;
                                     action['idtoWatch'] = actionToWatch.actionId;
                                     actionsWatched[''+action.getId()] = action;
                                 }
-                                if(actionToWatch.nextResponse) { //we want to modify response, so let it stay in watch list
+                                if(actionToWatch.nextResponse || actionToWatch.nextError) { //we want to modify response, so let it stay in watch list
                                     console.log("action we want to modify response are send to server:"+actionToWatch.actionName, action);
                                     //still update the left side
                                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
@@ -867,8 +887,6 @@
                                         "state": "RUNNING",
                                         "sentTime": performance.now()
                                         });
-                                    //we already copy everything to actionToWatch, no need to keep it here
-                                    delete actionsToWatch[key];
                                 } else { //we want to drop it, so do it
                                     //move the action from Watching to Processed
                                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
@@ -879,19 +897,22 @@
                                     });
                                     //drop the action from auraXHR
                                     actions.splice(c, 1);
-                                    //remove it from actionsToWatch
-                                    delete actionsToWatch[key];
                                 }
+                                //remove from actionsToWatch
+                                //if we wanted to drop the action it's done alreay,
+                                //if we want to override response, we did copy everything to actionsWatched
+                                //no need to keep this actoinToWatch around
+                                delete actionsToWatch[key];
                             }
                         }
-                    }
+                    }//end if actionsToWatch is not empty
                     else {
                         $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                         "id": actions[c].getId(),
                         "state": "RUNNING",
                         "sentTime": performance.now()
                         });
-                    }
+                    }//if actionsToWatch is empty
 
                 }
             }
@@ -949,6 +970,7 @@
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
                 "returnValue": $Aura.Inspector.safeStringify(action.getReturnValue()),
+                "error": $Aura.Inspector.safeStringify(action.getError()),
                 "finishTime": performance.now(),
                 "stats": {
                     "created": $Aura.Inspector.getCount("component_created") - startCounts.created

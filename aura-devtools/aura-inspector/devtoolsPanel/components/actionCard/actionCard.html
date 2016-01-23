@@ -278,36 +278,40 @@
 
     <div>
 		<dl class="inline">
-		<div class="div_actionParameter p-around--xsmall p-bottom--none grid">
-			<dt class="shink">Parameters</dt>
-			<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
-        </div>
-        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
-						<dt class="shrink">Result</dt>
-            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
-            <button id="button_editActionResponse">Modify</button>
-        </div>
-			</dl>
-				<div class="p-around--xsmall p-bottom--none" id="actionParameter">
-					<button id="button_editActionParameter" class="button_editActionParameter toggle">
-						<label  for="actionParameter" class="label hidden">Match Parameters</label>
-					</button>
-				</div>
-        <div class="div_editActionParameter p-left--xsmall p-right--xsmall p-top--xxsmall" id="textarea_actionParameter">
-			<textarea name="actionParameter" id="text_actionParameter" class="textarea_ActionParameter code" rows="5" wrap="off">
+			<div class="div_actionParameter p-around--xsmall p-bottom--none grid">
+				<dt class="shink">Parameters</dt>
+				<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
+	        </div>
+	        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
+				<dt class="shrink">Result</dt>
+	            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
+	            <dt class="shrink">Error</dt>
+	            <dd class="col"><aurainspector-json class="code" expandTo="0" id="actionError" ></aurainspector-json></dd>
+	        </div>
+		</dl>
+		<!--
+		<div class="p-around--xsmall p-bottom--none" id="matchActionParameter" class="matchActionParameter">
+			<button id="button_editActionParameter" class="button_editActionParameter toggle">
+				<label  for="actionParameter" class="label hidden">Match Parameters</label>
+			</button>
+		</div>
+        <div class="div_editActionParameter p-left--xsmall p-right--xsmall p-top--xxsmall" id="div_editActionParameter">
+			<textarea name="actionParameter" id="textarea_ActionParameter" class="textarea_ActionParameter code" rows="5" wrap="off">
             </textarea>
         </div>
+        -->
 		<div class="p-around--xsmall p-bottom--none dropOrModify">
 			<select id="select_dropOrModify" class="select_dropOrModify select">
 			   	<option value="dropAction">Drop the Action</option>
 			    <option value="modifyResponse">Override the Result</option>
-			 </select>
+			    <option value="errorResponseNextTime">Error Response Next Time</option>
+			</select>
 		</div>
         <div class="div_editActionResult p-around--xsmall p-bottom--none">
             <div class="div_textarea_ActionResult">
             	<label for="actionResult" class="label">Key</label>
-            	<textarea name="actionResultKey" id="textarea_actionResultKey" class="textarea_ActionResult m-top--xsmall code" rows="1" wrap="off">
-            	</textarea>
+            	<select id="select_actionResultKey" class="select">
+            	</select>
             	<label for="actionResult" class="label">New Value</label>
             	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
             	</textarea>
@@ -317,12 +321,23 @@
 	            <button id="button_cancelChangeActionResult" class="button_cancelChangeActionResult text-button">Cancel</button>
 			</div>
         </div>
+        <div class="div_errorResponse">
+        	<label for="actionResult" class="label">Error Message</label>
+        	<textarea name="actionErrorMessage" id="textarea_actionErrorMessage" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+            </textarea>
+            <label for="actionResult" class="label">Error Stack</label>
+            <textarea name="actionErrorStack" id="textarea_actionErrorStack" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+            </textarea>
+            <div class="div_actionButtons p-around--xsmall p-bottom--none">
+	            <button id="button_saveError" class="button_saveError text-button">Save Error</button>
+	            <button id="button_cancelError" class="button_cancelError text-button">Cancel</button>
+			</div>
+        </div>
 		<div class="hidden">
 				<button id="button_saveActionParameter" class="text-button">Save</button>
 				<button id="button_cancelChangeActionParameter" class="button_cancelChangeActionParameter text-button">Cancel</button>
 		</div>
     </div>
-    <!-- <aurainspector-json class="storageKey" expandTo="0"></aurainspector-json> -->
     <dl class="attributes">
 			<div class="col">
 			     <dt>Id</dt>

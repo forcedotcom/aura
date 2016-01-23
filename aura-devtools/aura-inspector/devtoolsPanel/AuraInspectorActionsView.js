@@ -86,6 +86,8 @@ function AuraInspectorActionsView(devtoolsPanel) {
         devtoolsPanel.subscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspectorActionsView_OnBootstrap.bind(this));
 
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextResponseForAction", AuraInspectorActionsView_OnEnqueueNextResponseForAction.bind(this));
+        devtoolsPanel.subscribe("AuraInspector:EnqueueNextErrorForAction", AuraInspectorActionsView_OnEnqueueNextErrorForAction.bind(this));
+
 
         // Attach event handlers
         var div_actionsToWatch = tabBody.querySelector("#actionsToWatch-list");
@@ -222,16 +224,16 @@ function AuraInspectorActionsView(devtoolsPanel) {
 
     function upsertCard(action) {
         var card;
-        //card on the right side: move from Watch List
-        if(action.idtoWatch) {
+        if(action.idtoWatch) { //card on the right side: move from Watch List
             card = document.getElementById("action_card_" + action.idtoWatch);
             card.parentNode.removeChild(card);
-            //the action we just dropped/modified is a new action, need to update the card with its id
-            //this only move the card from Watch List to Process
-            //at the point we don't have the result/parameter now as the action has come back from server yet.
-            //if we would like to update that, will need to delay this logic
+            //the action we just dropped/modified is a new action, let's update the card with new actionId
+            //this only move the card from Watch List to Processed
+            //at the point we don't have the result/parameter now as the action hasn'ts come back from server yet.
+            //if we would like to update that, would need to delay this logic
             card.setAttribute("actionId", action.id);
-            //also want to hide modify buttons
+            card.setAttribute("returnError", action.error);
+            //also want to hide choice to drop/modify action
             card.setAttribute("toWatch", "false");
         } else { //card on the left side
             if(!isAllowed(action)) {
@@ -243,8 +245,9 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 card.setAttribute("returnValue", action.returnValue);
                 card.setAttribute("fromStorage", action.fromStorage);
                 card.setAttribute("storageKey", action.storageKey);
+                card.setAttribute("returnError", action.error);
                 if(action.stats) {
-                card.setAttribute("stats", JSON.stringify(action.stats));
+                    card.setAttribute("stats", JSON.stringify(action.stats));
                 }
                 card.parentNode.removeChild(card);
             } else {
@@ -265,7 +268,10 @@ function AuraInspectorActionsView(devtoolsPanel) {
             case "RESPONSEMODIFIED":
                 _processed.appendChild(card);
                 break;
-            default:
+            case "ERROR":
+                _completed.insertBefore(card, _completed.querySelector(".action-card"));
+                break;
+            default://"SUCCESS"
                 _completed.insertBefore(card, _completed.querySelector(".action-card"));
                 break;
         }
@@ -286,7 +292,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         }
     }
 
-    function createActionCard(actionId, toWatch, nextActionResponse, newActionParameter) {
+    function createActionCard(actionId, toWatch) {
         if(!actions.has(actionId)) {
             return;
         }
@@ -299,20 +305,20 @@ function AuraInspectorActionsView(devtoolsPanel) {
             card.className = "action-card action-card-state-" + action.state;
             card.setAttribute("actionId", action.id);
             card.setAttribute("name", action.defName);
-            card.setAttribute("parameters", newActionParameter?JSON.stringify(newActionParameter):params);
+            card.setAttribute("parameters", params);
             card.setAttribute("state", action.state);
             card.setAttribute("isStorable", action.storable);
             card.setAttribute("isRefresh", action.isRefresh);
             card.setAttribute("isAbortable", action.abortable);
             card.setAttribute("isBackground", action.background);
-            card.setAttribute("returnValue", nextActionResponse?JSON.stringify(nextActionResponse):action.returnValue);
+            card.setAttribute("returnValue", action.returnValue);
             card.setAttribute("isFromStorage", action.fromStorage);
             card.setAttribute("storageKey", action.storageKey);
             card.setAttribute("dropOrModify", "dropAction");
             if(action.stats) {
                 card.setAttribute("stats", JSON.stringify(action.stats));
             }
-            //if it's on the right side, it's not draggable, also we need to remember that in the actionCard itself.
+            //if card is on the right side, it's not draggable, we need to remember that in the actionCard itself.
             if(toWatch === true) {
                 card.setAttribute("toWatch", true);
             } else {
@@ -346,16 +352,13 @@ function AuraInspectorActionsView(devtoolsPanel) {
     function endDrag (event) {
       event.target.classList.remove("dragging");
       if(event.dataTransfer.dropEffect == "none"){
-        // event.target.style.opacity = "1";
       } else {
         event.target.classList.add("dropped");
         event.target.setAttribute("draggable","false");
-        // event.target.style.opacity = "1";
       }
     }
 
     function drag (event) {
-        // event.target.style.opacity = "0.5";
         event.target.classList.add("dragging");
         event.dataTransfer.setData("text", event.target.getAttribute("actionId").toString());
     }
@@ -376,13 +379,14 @@ function AuraInspectorActionsView(devtoolsPanel) {
                             //'actionName': string, 
                             //'actionParameter': obj
                             //'actionId': string, like "713;a"
-                            //'nextResponse': { key: newValue } 
+                            //'nextResponse': { key: newValue }
+                            //'nextError' : { "message":bla, "stack":bla } 
                             //}};
     //then call AuraInspectorInjectedScript.AddActionToWatch
     function AuraInspectorActionsView_OnEnqueueNextResponseForAction(actionInfo) {
         console.log("AuraInspectorActionsView_OnEnqueueNextResponseForAction:", actionInfo);
         var actionInfoObj = JSON.parse(actionInfo);
-        if(actionInfoObj && actionInfoObj.actionId && actionInfoObj.nextResponse) {
+        if( actionInfoObj && actionInfoObj.actionId && actionInfoObj.nextResponse ) {
             var action = actions.get(actionInfoObj.actionId);
             //fill in action info from original action
             actionInfoObj.actionIsStorable = action.storable;
@@ -390,6 +394,16 @@ function AuraInspectorActionsView(devtoolsPanel) {
             //call AuraInspectorInjectedScript.AddActionToWatch
             devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", actionInfoObj);
         }        
+    }
+
+    function AuraInspectorActionsView_OnEnqueueNextErrorForAction(actionInfo) {
+        console.log("AuraInspectorActionsView_OnEnqueueNextErrorForAction:", actionInfo);
+        var actionInfoObj = JSON.parse(actionInfo);
+        if(actionInfoObj && actionInfoObj.actionId && actionInfoObj.nextError) {
+            var action = actions.get(actionInfoObj.actionId);
+            //call AuraInspectorInjectedScript.AddActionToWatch
+            devtoolsPanel.publish("AuraInspector:OnActionToWatchEnqueue", actionInfoObj);
+        }  
     }
 
     function drop (event) {

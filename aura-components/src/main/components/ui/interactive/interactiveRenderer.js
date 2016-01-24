@@ -21,5 +21,9 @@
     rerender: function(component, helper) {
         helper.addDomEvents(component);
         return this.superRerender();
+    },
+    unrender: function(component, helper) {
+    	helper.removeDomEventsFromMap(component);
+        return this.superUnrender();
     }
 })// eslint-disable-line semi

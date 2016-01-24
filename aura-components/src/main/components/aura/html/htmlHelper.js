@@ -147,9 +147,9 @@
         if (lowerName.indexOf("on") === 0) {
             var eventName = lowerName.substring(2);
             if (eventName === "click") {
-                this.addNamedClickHandler(element, this.domEventHandler.bind(this), this.NAMES.domHandler);
+                this.addNamedClickHandler(element, $A.getCallback(this.domEventHandler.bind(this)), this.NAMES.domHandler);
             } else {
-                $A.util.on(element, eventName, this.domEventHandler.bind(this));
+                $A.util.on(element, eventName, $A.getCallback(this.domEventHandler.bind(this)));
             }
         } else {
             var isSpecialBoolean = this.SPECIAL_BOOLEANS.hasOwnProperty(lowerName);

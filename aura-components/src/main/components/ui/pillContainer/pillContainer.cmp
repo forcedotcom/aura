@@ -64,7 +64,9 @@
                              id="{!item.id}"
                              showDelete="{!v.allowRemove}"
                              maxCharacters="{!v.maxCharactersInPill}"
-                             onHandledEvent="{!c.handlePillEvent}"/>
+                             onHandledEvent="{!c.handlePillEvent}"
+                             focus="{!c.relayPillEvent}"
+                             blur="{!c.relayPillEvent}"/>
                 </li>
             </aura:iteration>
             <li aura:id="inputListItem" role="presentation" class="pillContainerListItem">

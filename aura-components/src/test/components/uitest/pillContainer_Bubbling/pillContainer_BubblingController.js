@@ -16,20 +16,9 @@
 ({
 
 
-    processPillInserted: function (cmp) {
-        cmp.find("result").set("v.value","inserted");
+    showResult: function (cmp, event) {
+        cmp.find("component").set("v.value",event.getSource().getName());
+        cmp.find("event").set("v.value",event.getName());
     },
-
-    processPillRemoved: function (cmp) {
-        cmp.find("result").set("v.value","removed");
-    },
-
-    processBlur: function (cmp) {
-        cmp.find("result").set("v.value","blur");
-    },
-
-    processFocus: function (cmp) {
-        cmp.find("result").set("v.value","focus");
-    }
 
 })

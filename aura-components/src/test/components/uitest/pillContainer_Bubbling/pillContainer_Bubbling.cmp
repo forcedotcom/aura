@@ -1,9 +1,9 @@
 <aura:component>
     <aura:attribute name="maxAllowed" type="Integer" default="10" description="Max pills this container should have."/>
-    <aura:handler name="pillInserted" event="ui:response" action="{!c.processPillInserted}"/>
-    <aura:handler name="pillRemoved" event="ui:response" action="{!c.processPillRemoved}"/>
-    <aura:handler name="blur" event="ui:blur" action="{!c.processBlur}"/>
-    <aura:handler name="focus" event="ui:focus" action="{!c.processFocus}"/>
+    <aura:handler name="pillInserted" event="ui:response" action="{!c.showResult}"/>
+    <aura:handler name="pillRemoved" event="ui:response" action="{!c.showResult}"/>
+    <aura:handler name="blur" event="ui:blur" action="{!c.showResult}"/>
+    <aura:handler name="focus" event="ui:focus" action="{!c.showResult}"/>
     <ui:pillContainer aura:id="pillContainer" maxAllowed="{!v.maxAllowed}">
         <aura:set attribute="pillInput">
             <ui:pillContainerAutoComplete aura:id="autocomplete" optionVar="row">
@@ -16,5 +16,6 @@
             </ui:pillContainerAutoComplete>
         </aura:set>
     </ui:pillContainer>
-    <ui:inputText aura:id="result"/>
+    Component: <ui:outputText aura:id="component" value=""/><br/>
+    Event: <ui:inputText aura:id="event" value=""/>
 </aura:component>

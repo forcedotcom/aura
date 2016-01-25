@@ -782,7 +782,9 @@
                     if(oldResponseText.indexOf(actionWatchedId) > 0) {
                         var actionWatched = actionsWatched[actionWatchedId];
                         if( ( actionWatched.nextResponse || actionWatched.nextError) && oldResponseText.startsWith("while(1);") ) {
+                            //parse oldResponseObj out of oldResponseText
                             var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                            //replace returnValue in oldResponseObj's actions
                             if(oldResponseObj && oldResponseObj.actions) {
                                 var actionsFromOldResponse = oldResponseObj.actions;
                                 for(var i = 0; i < actionsFromOldResponse.length; i++) {
@@ -791,6 +793,7 @@
                                             var errsArr = []; 
                                             errsArr.push(actionWatched.nextError);
                                             actionsFromOldResponse[i].state = "ERROR";
+                                            //when action return with error, returnValue should be null
                                             actionsFromOldResponse[i].returnValue = null;
                                             actionsFromOldResponse[i].error = errsArr;
                                             responseWithError = true;
@@ -807,16 +810,35 @@
                                     } 
                                 }//end of looping over actionsFromOldResponse
                             }//end of oldResponseObj is valid and it has actions
+                            //replace context in oldResponseObj
                             if(responseWithError === true ) {
-                                //when action return with error, responseText should be null
-                                newResponseText = "null";
+                                //udpate context: 
+                                //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
+                                if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
+                                    var newGVP = [];
+                                    for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
+                                        var gvpj = oldResponseObj.context.globalValueProviders[j];
+                                        if( isTrueObject(gvpj) && gvpj.type ) {
+                                            if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
+                                                //we keep Local, Browser and Global ONLY
+                                                newGVP.push(gvpj);
+                                            } else {
+                                                //get rid of others
+                                            }
+                                        }
+                                    }
+                                    oldResponseObj.context.globalValueProviders = newGVP;
+                                }
+                                //update actions
+                                oldResponseObj.actions = actionsFromOldResponse;
+                                newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
                                 //move the actionCard from watch list to Processed
                                 //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
                                 $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                                         "id": actionWatchedId,
                                         "idtoWatch": actionWatched.idtoWatch,
                                         "state": "RESPONSEMODIFIED",
-                                        "error": actionWatched.nextError,
+                                        "error": actionWatched.nextError,//we don't show error on processed actionAcard, but pass it anyway
                                         "sentTime": performance.now()//do we need this?
                                 });
                                 delete actionsWatched[actionWatchedId];

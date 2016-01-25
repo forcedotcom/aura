@@ -96,8 +96,9 @@
         var panel = stack[stack.length - 1];
         if (panel && $A.util.isFunction(callback)) {
             callback(panel);
+        } else if($A.util.isFunction(callback)) {
+            callback(null);
         }
-        return panel;
     },
     /*
     * Sets the context in which the panel is created

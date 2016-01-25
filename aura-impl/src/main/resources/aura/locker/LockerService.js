@@ -133,6 +133,10 @@ function LockerService() {
 		},
 
 		showLockedNodes : function showLockedNodes(root) {
+			if (!root) {
+				root = document;
+			}
+			
 			if ($A.lockerService.util.isKeyed(root)) {
 				$A.util.addClass(root, "lockerizedNode");
 			}
@@ -153,6 +157,10 @@ function LockerService() {
 		var lockerNamespaceKeys = {};
 
 		function getKey(thing) {
+			if (!thing) {
+				return undefined;
+			}
+			
 			var f = thing["$lsKey"];
 			return f ? f($A.lockerService.masterKey) : undefined;
 		}

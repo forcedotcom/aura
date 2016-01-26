@@ -1,0 +1,290 @@
+/*
+ * Copyright (C) 2013 salesforce.com, inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.auraframework.integration.test.logging;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+import org.auraframework.Aura;
+import org.auraframework.def.ComponentDef;
+import org.auraframework.def.ControllerDef;
+import org.auraframework.def.DefDescriptor;
+import org.auraframework.def.HelperDef;
+import org.auraframework.def.StyleDef;
+import org.auraframework.http.CSPReporterServlet;
+import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.test.util.WebDriverTestCase.TargetBrowsers;
+import org.auraframework.test.util.WebDriverUtil.BrowserType;
+import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+
+@TargetBrowsers(BrowserType.GOOGLECHROME)
+@ThreadHostileTest
+public class CSPReportLoggingUITest extends WebDriverTestCase {
+
+    public CSPReportLoggingUITest(String name) {
+        super(name);
+    }
+
+    private Logger logger;
+    private LoggingTestAppender appender;
+    private Level originalLevel;
+
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+        appender = new LoggingTestAppender();
+
+        logger = Logger.getLogger("LoggingContextImpl");
+        // When we run integration tests, the logging level of logger LoggingContextImpl
+        // is WARN, setting it into INFO here so that we can get the log as we run the app.
+        originalLevel = logger.getLevel();
+        logger.setLevel(Level.INFO);
+        logger.addAppender(appender);
+        Logger.getRootLogger().addAppender(appender);
+    }
+
+    @Override
+    public void tearDown() throws Exception {
+        logger.removeAppender(appender);
+        logger.setLevel(originalLevel);
+        Logger.getRootLogger().removeAppender(appender);
+        super.tearDown();
+    }
+
+    public void testReportCSPViolationForClientRenderedCSS() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "render='client'",
+                        "<link href='http://www2.sfdcstatic.com/common/assets/css/min/standard-rwd-min.css' rel='stylesheet' type='text/css'/>"));
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+
+        open(uri);
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String externalUri = "http://www2.sfdcstatic.com";
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, externalUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "style-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+    }
+
+    public void testReportCSPViolationForServerRenderedCSS() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "",
+                "<link href='http://www2.sfdcstatic.com/common/assets/css/min/standard-rwd-min.css' rel='stylesheet' type='text/css'/>"));
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+
+        openNoAura(uri);
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String externalUri = "http://www2.sfdcstatic.com";
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, externalUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "style-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+    }
+
+    @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
+    public void testReportCSPViolationForClientRenderedIframe() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "render='client'",
+                        "<iframe src='http://www.salesforce.com'/>"));
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+
+        open(uri);
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String frameUri = "http://www.salesforce.com";
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, frameUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "frame-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+    }
+
+    @UnAdaptableTest("The CSP filter on SFDC handles iframes differently than standalone Aura")
+    public void testReportServerRenderedIframe() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag, "", "<iframe src='http://www.salesforce.com'/>"));
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+
+        openNoAura(uri);
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String frameUri = "http://www.salesforce.com";
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, frameUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "frame-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+    }
+
+    /*
+     * Fonts are allowed to be loaded from anywhere, so this should NOT generate a report. The test will generate
+     * trigger an intentional report after load and we will check that. If there is any report during load should
+     * have been received before it.
+     */
+    @UnAdaptableTest("The font policy on Aura OSS is different with on SFDC")
+    public void testAllowFontSrc() throws Exception {
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "", ""));
+        addSourceAutoCleanup(
+                Aura.getDefinitionService().getDefDescriptor(cmpDesc, DefDescriptor.CSS_PREFIX,
+                        StyleDef.class),
+                "@font-face {font-family: Gentium;src: url(http://example.com/fonts/Gentium.ttf);}");
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+
+        openNoAura(uri);
+        // trigger script violation to generate CSP logs.
+        auraUITestingUtil.getRawEval("var s=document.createElement('script');s.type='text/javascript';s.async=true;s.src='http://expectedreport.salesforce.com/';document.getElementsByTagName('head')[0].appendChild(s);");
+
+        List<String> logs = getCspReportLogs(appender, 1);
+        // only grab the first CSP log line. if hitting fonts violation,
+        // the log line will only contains fonts violation rather than script violation
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String scriptUri = "http://expectedreport.salesforce.com";
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, scriptUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "script-src 'self'");
+        assertThat("Could not find expected violated directive, perhaps fonts wasn't allowed", cspReport, containsString(exptectedViolatedDirective));
+    }
+
+    public void testReportJavaScript() throws Exception {
+        // This test loads script via its template, since <script> is not allowed in component markup
+        DefDescriptor<ComponentDef> templateDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag,
+                        "isTemplate='true' extensible='true' extends='aura:template'",
+                        "<aura:set attribute='extraScriptTags'>" +
+                        "    <script src='http://www2.sfdcstatic.com/common/assets/js/min/footer-min.js'></script>"+
+                        "</aura:set>"));
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(
+                ComponentDef.class,
+                String.format(baseComponentTag,
+                        String.format("render='client' template='%s'", templateDesc.getDescriptorName()), ""));
+        String uri = String.format("/%s/%s.cmp", cmpDesc.getNamespace(), cmpDesc.getName());
+        String externalUri = "http://www2.sfdcstatic.com";
+
+        open(uri);
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, externalUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "script-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+        String exptectedEffectiveDirective = String.format("%s=%s", CSPReporterServlet.EFFECTIVE_DIRECTIVE, "script-src");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedEffectiveDirective));
+    }
+
+    /**
+     * Automation for the connect-src CSP policy. With connect-src set to 'self' and http://invalid.salesforce.com,
+     * a report should be generated when an XHR is sent to invalid origin.
+     */
+    @UnAdaptableTest
+    public void testReportXHRConnect() throws Exception {
+        String externalUri = "http://www.example.com";
+        String externalUriString = String.format("'%s'",externalUri);
+        DefDescriptor<ComponentDef> cmpDesc = addSourceAutoCleanup(ComponentDef.class,
+                String.format(baseComponentTag, "","<ui:button press='{!c.post}' label='Send XHR' class='button'/>"));
+        DefDescriptor<HelperDef> helperDesc = Aura.getDefinitionService().getDefDescriptor(
+                cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, HelperDef.class);
+        addSourceAutoCleanup(helperDesc,
+                "({\n" +
+                "    request: function(url) {\n" +
+                "        var request = new XMLHttpRequest();\n" +
+                "        request.open(\"GET\", url, true);\n" +
+                "        request[\"onreadystatechange\"] = function() {\n" +
+                "            if (request[\"readyState\"] == 4) {\n" +
+                "                console.log(\"from action callback\");\n" +
+                "            }\n" +
+                "        };\n" +
+                "        request.send();\n" +
+                "    }\n" +
+                "})");
+
+        DefDescriptor<?> controllerDesc = Aura.getDefinitionService().getDefDescriptor(
+                cmpDesc, DefDescriptor.JAVASCRIPT_PREFIX, ControllerDef.class);
+        addSourceAutoCleanup(controllerDesc,"{post:function(c,e,h){h.request("+externalUriString+");}}");
+        String uri = getUrl(cmpDesc);
+
+        open(uri);
+        auraUITestingUtil.findDomElement(By.cssSelector(".button")).click();
+
+        List<String> logs = getCspReportLogs(appender, 1);
+        String cspReport = logs.get(0);
+
+        String expectedDocumentUri = String.format("%s=%s", CSPReporterServlet.DOCUMENT_URI, getAbsoluteURI(uri));
+        assertThat("Could not find expected violated directive", cspReport, containsString(expectedDocumentUri));
+        String expectedBlockedUri = String.format("%s=%s", CSPReporterServlet.BLOCKED_URI, externalUri);
+        assertThat("Could not find expected blocked URI", cspReport, containsString(expectedBlockedUri));
+        String exptectedViolatedDirective = String.format("%s=%s", CSPReporterServlet.VIOLATED_DIRECTIVE, "connect-src 'self'");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedViolatedDirective));
+        String exptectedEffectiveDirective = String.format("%s=%s", CSPReporterServlet.EFFECTIVE_DIRECTIVE, "connect-src");
+        assertThat("Could not find expected violated directive", cspReport, containsString(exptectedEffectiveDirective));
+    }
+
+    private List<String> getCspReportLogs(LoggingTestAppender appender, int expectedLogsSize) throws InterruptedException {
+        List<String> cspRecords = new ArrayList<>();
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                List<LoggingEvent> logs = appender.getLog();
+                synchronized(logs) {
+                    while (!logs.isEmpty()) {
+                        LoggingEvent log = logs.remove(0);
+                        if (log.getMessage().toString().contains(CSPReporterServlet.JSON_NAME)) {
+                            cspRecords.add(log.getMessage().toString());
+                            return cspRecords.size() == expectedLogsSize;
+                        }
+                    }
+                }
+                return false;
+            }
+        },
+        10,
+        "Did not find expected number of log lines (expected " + expectedLogsSize + ", found " + cspRecords.size() + ").");
+
+        return cspRecords;
+    }
+}

@@ -687,7 +687,7 @@ Component.prototype.destroy = function(async) {
 
         this.elements = undefined;
 
-        this.doDeIndex(this);
+        this.doDeIndex();
         $A.componentService.deIndex(globalId);
 
         var vp = this.valueProviders;
@@ -1361,8 +1361,8 @@ Component.prototype.getEvent = function(name) {
         return null;
     }
     if (!$A.clientService.allowAccess(eventDef,this)) {
-        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-        $A.warning("Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        $A.error("Access Check Failed! Component.getEvent():'" + name + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
         // #end
 
         return null;
@@ -1845,8 +1845,8 @@ Component.prototype.setupSuper = function(configAttributes) {
                 for (var i = 0; i < facets.length; i++) {
                     var facetDef = AttributeSet.getDef(facets[i]["descriptor"], this.componentDef);
                     if (!$A.clientService.allowAccess(facetDef[0], facetDef[1])) {
-                        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-                        $A.warning("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+                        // #if {"excludeModes" : ["PRODUCTION"]}
+                        $A.error("Access Check Failed! Component.setupSuper():'" + facets[i]["descriptor"] + "' of component '" + this + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
                         // #end
                         continue;
                     }
@@ -1936,8 +1936,8 @@ Component.prototype.setupAttributes = function(cmp, config, localCreation) {
         if (!setByDefault[attribute]){
             var def=AttributeSet.getDef(attribute,cmp.getDef());
             if(!$A.clientService.allowAccess(def[0],def[1])) {
-                // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-                $A.warning("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
+                // #if {"excludeModes" : ["PRODUCTION"]}
+                $A.error("Access Check Failed! Component.setupAttributes():'" + attribute + "' of component '" + cmp + "' is not visible to '" + $A.getContext().getCurrentAccess() + "'.");
                 // #end
 
                 continue;
@@ -2307,10 +2307,10 @@ Component.prototype.doIndex = function(cmp) {
     }
 };
 
-Component.prototype.doDeIndex = function(cmp) {
+Component.prototype.doDeIndex = function() {
     var localId = this.localId;
     if (localId) {
-        var valueProvider=cmp.getAttributeValueProvider();
+        var valueProvider=this.getAttributeValueProvider();
         if(valueProvider instanceof PassthroughValue){
             valueProvider=valueProvider.getComponent();
         }

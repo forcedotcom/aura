@@ -15,12 +15,15 @@
  */
 ({
     addInputDate: function(cmp, evt, helper) {
-        $A.newCmpAsync(this, function(newCmp) {
+        $A.createComponent("ui:inputDate", {
+            "value": cmp.getReference("v.addl"),
+            "displayDatePicker": true
+        }, function (newCmp) {
             var holder = cmp.find("additionalHolder");
             var body = holder.get("v.body");
             body.push(newCmp);
             holder.set("v.body", body);
-            cmp.set("v.count", cmp.get("v.count")+1)
-        }, { "componentDef":{"descriptor":"markup://ui:inputDate"}, "attributes":{"values":{"value":"{!v.addl}", "displayDatePicker":true } } });
+            cmp.set("v.count", cmp.get("v.count") + 1)
+        });
     }
 })

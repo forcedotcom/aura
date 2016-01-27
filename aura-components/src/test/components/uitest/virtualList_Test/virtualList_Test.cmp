@@ -22,7 +22,7 @@
     <aura:attribute name="pageSize" type="Integer" default="100"/>
     <aura:attribute name="currentPage" type="Integer" default="1"/>
     <aura:attribute name="totalPages" type="Integer" default="5"/>
-    
+
 
 <!--**********************************************************************************************************-->
 
@@ -46,7 +46,6 @@
                                                    pageSize="{!v.pageSize}"
                                                    currentPage="{!v.currentPage}"
                                                    totalPages="{!v.totalPages}"
-                                                   totalItems="{!v.totalItems}"
                                                    />
             </aura:set>
 

@@ -15,6 +15,12 @@
 	<aura:attribute name="renderItem" type="String" default="testAccessibiltyHeaderTagDefValue" />
 	<aura:attribute name="setFocus" type="Boolean" default="true" />
 
+	<aura:attribute name="acceptableDelta" type="Integer"/>
+	<aura:attribute name="dpTopDelta" type="Integer"/>
+	<aura:attribute name="dpLeftDelta" type="Integer"/>
+	<aura:attribute name="tpTopDelta" type="Integer"/>
+	<aura:attribute name="tpLeftDelta" type="Integer"/>
+
 	<div class="block">
 		<aura:if isTrue="{! v.renderItem == 'testSFXAccessibiltyHeaderTagDefValue'}">	
 		    <div>

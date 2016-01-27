@@ -225,7 +225,6 @@
         //trigger grid update name of weekdays
         var grid = this._getDatepickerGridCmp(cmp);
         var helper = grid.getDef().getHelper();
-        helper.updateNameOfWeekDays(cmp);
         helper.updateNameOfWeekDays(grid);
         helper.renderGrid(grid);
 

@@ -196,7 +196,15 @@
         
         for (i = 0; i < numberOfPages; i++) {
             page     = isPageModels ? pageModels[i] : pageComponents[i];
-            label    = page.label || page.get && page.get('v.label') || ('Page ' + i);
+            label    = page.label;
+            if($A.util.isComponent(page)){
+                if(page.isInstanceOf("ui:carouselPageIndicatorItem")){
+                    label=page.get('v.label');
+                }
+            }
+            if(!label){
+                label=('Page ' + i);
+            }
             selected = page.isSelected;
             
             tmpl     += this._createItem({

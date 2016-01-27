@@ -142,10 +142,12 @@
 		if (columns && sort) {
 			// Reset all columns.
 			$A.util.forEach(columns, function (c) {
-				var name = c.get('v.name'),
-					direction = sort[name] || '';
+				if(c.isInstanceOf("ui:dataGridColumn")) {
+					var name = c.get('v.name'),
+						direction = sort[name] || '';
 
-				c.set('v.direction', direction);
+					c.set('v.direction', direction);
+				}
 			});
 
 			this.selectAll(concrete, false);

@@ -17,6 +17,7 @@
 -->
 <aura:component extensible="true">
     <aura:attribute name="title" type="String"/>
+    <aura:attribute name="scrollContentClass" type="String"/>
     <aura:attribute name="subtitle" type="Aura.Component[]"/>
     <aura:attribute name="description" type="Aura.Component[]"/>
     <aura:attribute name="labels" type="Aura.Component[]"/>

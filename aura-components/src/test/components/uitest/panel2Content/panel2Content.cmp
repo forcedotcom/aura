@@ -25,7 +25,7 @@
     <div>
         <h1>panelType:2</h1>
         <div>
-            <p>{!v.title}</p>
+            <!--<p>{!v.title}</p>-->
             <p>Counter {!v.counter}</p>
             <ui:button aura:id="notify" label="Notify!" press="{!c.notify}"/>
             <ui:button aura:id="notifyAll" label="Notify All!" press="{!c.notifyAll}"/>

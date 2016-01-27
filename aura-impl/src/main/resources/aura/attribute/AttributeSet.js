@@ -94,8 +94,8 @@ AttributeSet.prototype.get = function(key, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0], defs[1])){
-        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-        $A.warning("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        $A.error("Access Check Failed! AttributeSet.get(): attribute '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
         return undefined;
     }
@@ -174,8 +174,8 @@ AttributeSet.prototype.set = function(key, value, component) {
     }
     var defs=AttributeSet.getDef(attribute,component);
     if(!$A.clientService.allowAccess(defs[0],defs[1])){
-        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-        $A.warning("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        $A.error("Access Check Failed! AttributeSet.set(): '"+attribute+"' of component '"+component+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
         // #end
 
         return;
@@ -481,3 +481,8 @@ AttributeSet.prototype.initialize = function(attributes) {
 };
 
 Aura.Attribute.AttributeSet = AttributeSet;
+
+
+
+
+

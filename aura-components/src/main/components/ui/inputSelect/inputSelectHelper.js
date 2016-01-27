@@ -50,7 +50,7 @@
             strat = this.optionsStrategy;
 
         if ($A.util.isEmpty(opts)) {
-            opts = cmp.get("v.body");
+            opts=this.getOptionsFromBody(cmp.get("v.body"));
             if (!$A.util.isEmpty(opts)) {
                 strat = this.bodyStrategy;
             } else {
@@ -59,6 +59,22 @@
         }
 
         return {options: opts, strategy: strat};
+    },
+
+    getOptionsFromBody:function(body){
+        var options=[];
+        if(body&&body.length){
+            for(var i=0;i<body.length;i++){
+                if($A.util.isComponent(body[i])){
+                    if(body[i].isInstanceOf("ui:inputSelectOption")){
+                        options.push(body[i]);
+                    }else{
+                        options=options.concat(this.getOptionsFromBody(body[i].get("v.body")));
+                    }
+                }
+            }
+        }
+        return options;
     },
 
     /**
@@ -239,7 +255,7 @@
             return values;
         },
         getValue: function (options, index) {
-            if (!$A.util.isUndefinedOrNull(options[index])) {
+            if (options[index]) {
                 return options[index].get("v.text");
             }
             return undefined;

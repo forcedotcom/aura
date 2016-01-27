@@ -12,6 +12,10 @@
 -->
 <aura:component>
 	<aura:attribute name="renderItem" type="String" default="none" />
+	<aura:attribute name="_tabSet" type="Object"/>
+	<aura:attribute name="_tab0" type="Object"/>
+	<aura:attribute name="_tab1" type="Object"/>
+	<aura:attribute name="_tabTitle" type="String"/>
 
 	<aura:if isTrue="{! v.renderItem == 'testAddTab'}">
 	<div class="block">
@@ -107,7 +111,6 @@
 	        <h2>Test Variables</h2>
 	        <div>
 	            <div><b>renderItem:</b> {!v.renderItem}</div>
-	            <div>{!v._extra}</div>
 	        </div>
 	    </div>
 	    <aura:if isTrue="{! v.renderItem == 'none'}">

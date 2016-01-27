@@ -32,8 +32,10 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.auraframework.util.IOUtil;
+import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.bson.Document;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,18 +51,12 @@ public final class PerfResultsUtil {
 
     private static final Logger LOG = Logger.getLogger(PerfResultsUtil.class.getSimpleName());
     public static final Date RUN_TIME = new Date();
-    //public static String MONGO_URI = System.getProperty("mongoURI");
-    //public static final String DEFAULT_MONGO_URI = "mongodb://localhost:27017";
     public static MongoClient MONGO_CLIENT; // TODO: Abstract this better
 
     private static MongoClient getMongoClient(String dbURI) {
         if (MONGO_CLIENT == null) {
             try {
-                LOG.info("Trying to connect to DB: " + dbURI);
-                // Default Mongo client to connect to default mongo host.
-                /*if(MONGO_URI == null){
-                	MONGO_URI = DEFAULT_MONGO_URI;
-                }*/               	
+                LOG.info("Trying to connect to DB: " + dbURI);              	
                 MongoClientURI uri = new MongoClientURI(dbURI);
                 MONGO_CLIENT = new MongoClient(uri);
             } catch (Exception e) {
@@ -72,7 +68,7 @@ public final class PerfResultsUtil {
     }
 
 
-    public static void writeToDb(String dbURI, PerfMetrics metrics, String test, String traceLog) {
+    public static void writeToDb(PerfExecutorTest test, String dbURI, PerfMetrics metrics,String traceLog) {
         try {
             MongoClient mongo = getMongoClient(dbURI);
             if (mongo != null) {
@@ -83,7 +79,7 @@ public final class PerfResultsUtil {
                 Document doc = Document.parse(json.toString());
                 
                 doc.append("timeline", traceLog);
-                doc.append("testName", test);
+                doc.append("testName", test.getComponentDef().getName());
                 doc.append("transaction", Document.parse((metrics.getMetricsServiceTransaction()).toString()));
                 doc.append("commonMetrics", Document.parse((metrics.getCommonMetrics()).toString()));
                 doc.append("customMetrics", Document.parse((metrics.getCustomMetrics()).toString()));
@@ -94,89 +90,6 @@ public final class PerfResultsUtil {
             e.printStackTrace();
         }
     }
-
-    @SuppressWarnings("unchecked")
-    public static File exportToCsv(PerfExecutorTest test, String dbURI) {
-        try {
-            MongoClient mongo = getMongoClient(dbURI);
-            if (mongo != null) {
-                MongoDatabase db = mongo.getDatabase("performance");
-                MongoCollection<Document> collection = db.getCollection("testRun");
-                FindIterable<Document> docList = collection.find();
-                MongoCursor<Document> cur = docList.iterator();
-                StringBuilder sb = new StringBuilder();
-                sb.append("id").append(",").append("testName").append(",")
-                .append("runTime").append(",").append("metricName")
-                .append(",").append("metricValue").append("\n");
-
-                while (cur.hasNext()) {
-                    Document doc = cur.next();
-                    Object id = doc.get("_id");
-                    List<Map<String, Object>> metrics = (List<Map<String, Object>>) doc.get("metrics");
-                    String testName = (String) doc.get("testName");
-                    Date run = (Date) doc.get("run");
-                    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    for (Map<String, Object> metricMap : metrics) {
-                        sb.append(id).append(",").append(testName).append(",").append(format.format(run));
-                        for (Map.Entry<String, Object> entry : metricMap.entrySet()) {
-                            if (!entry.getKey().equals("units"))
-                                sb.append(",").append(entry.getValue());
-                        }
-                        sb.append("\n");
-                    }
-                }
-
-                File file = PerfFilesUtil.getDbResultsDir(test.getExplicitPerfResultsFolder(), "data");
-                LOG.info("Perf results have been exported to csv at: " + file.toString());
-                return writeFile(file, sb.toString(), "metrics from mongodb");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * Writes the dev tools log for a perf test run to
-     * System.getProperty("aura.perf.results.dir")/timelines/testName_timeline.json
-     *
-     * @return the written file
-     */
-    /*public static File writeDevToolsLog(List<JSONObject> timeline, String fileName) {
-        File file = PerfFilesUtil.getTimelineResultsDir(fileName);
-        BufferedWriter writer = null;
-        try {
-            file.getParentFile().mkdirs();
-            writer = new BufferedWriter(new FileWriter(file));
-            writer.write('[');
-            for (JSONObject entry : timeline) {
-                writer.newLine();
-                writer.write(entry.toString());
-                writer.write(',');
-            }
-            writer.write("]");
-            writer.newLine();
-            LOG.info("wrote dev tools log: " + file.getAbsolutePath());
-        } catch (Exception e) {
-            LOG.log(Level.WARNING, "error writing " + file.getAbsolutePath(), e);
-        } finally {
-            IOUtil.close(writer);
-        }
-        return file;
-    }*/
-
-    /**
-     * @return the written file
-     */
-    /*public static File writeGoldFile(PerfMetrics metrics, String fileName) {
-        try {
-            ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
-        } catch (JSONException e) {
-            LOG.log(Level.WARNING, "error generating _all.json", e);
-        }
-        File file = PerfFilesUtil.getGoldfilesResultsDir(fileName);
-        return writeFile(file, PerfFilesUtil.toGoldFileText(metrics, false), "goldfiles");
-    }*/
 
     /**
      * Writes the dev tools log for a perf test run to
@@ -214,7 +127,6 @@ public final class PerfResultsUtil {
      */
     public static File writeGoldFile(PerfMetrics metrics, PerfExecutorTest test) {
     	String fileName = test.getComponentDef().getName();
-    	//String filePath = test.resolveComponentDirPath(test.getComponentDef()) + "/" + fileName;
         try {
             ALL_GOLDFILES_JSON.addGoldfile(fileName, metrics);
         } catch (JSONException e) {
@@ -270,7 +182,6 @@ public final class PerfResultsUtil {
         if (exceptionFound != null) {
             // add info about creating/updating log file in the assertion message
             Error error = new AssertionFailedError(message);
-            // error.setStackTrace(exceptionFound.getStackTrace());
             throw error;
         }
     }

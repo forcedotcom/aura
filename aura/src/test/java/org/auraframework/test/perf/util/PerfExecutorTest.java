@@ -21,7 +21,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,7 +67,8 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private PerfMetricsUtil perfMetricsUtil;
     private PerfRunsCollector runsCollector;
     private String dbURI;
-    private static String DEFAULT_DB_URI = "mongodb://localhost:27017";
+    private static String DEFAULT_DB_URI = "mongodb://byao-wsl5:27017";
+    private static String RUNNER_BASE_URL = "/performance/runner.app?";
     
     public PerfExecutorTest(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
     	super("perf_" + def.getDescriptorName());
@@ -133,9 +139,10 @@ public class PerfExecutorTest extends WebDriverTestCase {
 
         // wait for component loaded or aura error message
         final By componentRendered = By.cssSelector(".perfTestFinish");
+        //final By componentRendered = By.cssSelector("div[class*='container performanceRunner perfTestFinish']");
         final By auraErrorMessage = By.id("auraErrorMessage");
         ExpectedCondition<By> condition = prepareCondition(componentRendered, auraErrorMessage);
-        By locatorFound = new WebDriverWait(currentDriver, 60).withMessage("Error loading " + descriptor).until(
+        By locatorFound = new WebDriverWait(currentDriver, 360).withMessage("Error loading " + descriptor).until(
                 condition);
 
         if (locatorFound == auraErrorMessage) {
@@ -167,60 +174,113 @@ public class PerfExecutorTest extends WebDriverTestCase {
         return condition;
     }
 
-    private String generateUrl (DefDescriptor<BaseComponentDef> descriptor, PerfConfig config, Mode mode) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
-    	
+    private String generateUrl (DefDescriptor<BaseComponentDef> descriptor, Mode mode, String customUrl) throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {    	
+    	// If descriptor is application type, then build the url with .app extension
     	if (descriptor.getDefType() == DefType.APPLICATION) { 
-    		return "/" + descriptor.getNamespace() + "/" + descriptor.getName() + ".app?aura.mode=" + mode;
+    		return new StringBuilder().append("/").append(descriptor.getNamespace())
+    								.append("/").append(descriptor.getName())
+    								.append(".app?aura.mode=").append(mode)
+    								.append(customUrl).toString();
+    		//return "/" + descriptor.getNamespace() + "/" + descriptor.getName() + ".app?aura.mode=" + mode + "/" + customUrl;
     	}
     	
-        String relativeUrl = "/performance/runner.app?";
+    	// If descriptor is component type, then attach cmp def to url
+    	StringBuilder relativeUrl = new StringBuilder(RUNNER_BASE_URL);               
+        relativeUrl.append("aura.mode=").append(mode).append(customUrl);
         Map<String, String> hash = ImmutableMap.of("componentDef", descriptor.getQualifiedName());
-
-        relativeUrl += "aura.mode=" + mode;
-        relativeUrl += "#" + URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8");
-        String url = getAbsoluteURI(relativeUrl).toString();
+        relativeUrl.append("#").append(URLEncoder.encode(JsonEncoder.serialize(hash), "UTF-8"));        
+        String url = getAbsoluteURI(relativeUrl.toString()).toString();
         return url;
     }
 
-    public String generateUrl(){
+    public List<String> generateUrl(){
+    	List<String> customUrls = getCustomUrls();
+    	 
+    	List<String> urls = new ArrayList<>();
         try {
-            return generateUrl(def, config, Mode.STATS);
+	    	if(customUrls.size()==0) {
+	    		String url = generateUrl(def, Mode.STATS, "");
+	    		urls.add(url);
+	    		return urls;
+	    	}
+    	
+        	
+        	for(String customUrl: customUrls) {
+        		urls.add(generateUrl(def, Mode.STATS, customUrl));
+        	}
+            return urls;
         }catch (Exception e) {
-            return "";
+            return urls;
         }
     }
 
-    private void runWithPerfApp(DefDescriptor<BaseComponentDef> descriptor, PerfConfig config) throws Exception {
-        try {
-            Mode mode = Mode.STATS;
-            setupContext(mode, AuraContext.Format.JSON, descriptor);
-            String url = generateUrl(descriptor, config, mode);
-
-            logger.info("invoking runner.app: " + url);
-            Gson gson = new Gson();
-            String json = gson.toJson(config);
-            logger.info("component config:" + json);
-
-            try {
-                perfMetricsUtil.startCollecting();
-                loadComponent(url, descriptor);
-                perfMetricsUtil.stopCollecting(); //TODO handle case when component fails to load
-                PerfMetrics metrics = perfMetricsUtil.prepareResults();
-                runsCollector.addRun(metrics);
-            } catch (ThreadDeath td) {
-                throw td;
-            } catch (Throwable th) {
-                if (PerfWebDriverUtil.isInfrastructureError(th)) {
-                    // retry if a possible infrastructure error
-                    logger.log(Level.WARNING, "infrastructure error, retrying", th);
-                    loadComponent(url, descriptor);
-                } else {
-                    throw th;
-                }
-            }
-        } finally {
-            Aura.getContextService().endContext();
+    private void doRun(String url, DefDescriptor<BaseComponentDef> descriptor) throws Exception {
+    	try {
+	    	setupContext(Mode.STATS, AuraContext.Format.JSON, descriptor);
+	    	logger.info("invoking runner.app: " + url);
+	    	Gson gson = new Gson();
+	    	String json = gson.toJson(config);
+	    	logger.info("component config:" + json);
+	    	      
+	    	try {
+		    	perfMetricsUtil.startCollecting();
+		    	loadComponent(url, descriptor);
+		    	perfMetricsUtil.stopCollecting(); //TODO handle case when component fails to load
+		    	PerfMetrics metrics = perfMetricsUtil.prepareResults();
+		    	runsCollector.addRun(metrics);
+	    	} catch (ThreadDeath td) {
+	    		throw td;
+	    	} catch (Throwable th) {
+		    	if (PerfWebDriverUtil.isInfrastructureError(th)) {
+			    	// retry if a possible infrastructure error
+			    	logger.log(Level.WARNING, "infrastructure error, retrying", th);
+			    	//loadComponent(url, descriptor);
+		    	} else {
+		    		throw th;
+		    	}
+	    	}
+	    } finally {
+	    		Aura.getContextService().endContext();
+	    		quitDriver();
+	    }
+    }
+    
+    private List<String> getCustomUrls() {
+    	List<Map<String, Map<String, Object>>> options = config.getCustomOptions();
+    	List<String> urls = new ArrayList<>();
+    	
+        if(options!=null) {
+        	//For each custom option, generate a unique url
+        	for(Map<String, Map<String, Object>> map: options) {
+        		StringBuilder customUrl = new StringBuilder();
+        		for(Entry<String, Map<String, Object>> entry: map.entrySet()) {        			
+        			for(Entry<String, Object> item: entry.getValue().entrySet())
+        				customUrl.append("&").append(item.getKey()).append("=").append(item.getValue()); 	
+        		}
+        		urls.add(customUrl.toString());
+        	}
         }
+        
+        return urls;
+    }
+    
+    private void runWithPerfApp(DefDescriptor<BaseComponentDef> descriptor, PerfConfig config) throws Exception {
+        Mode mode = Mode.STATS;
+        String url = null;
+                   
+        List<Map<String, Map<String, Object>>> options = config.getCustomOptions();
+        if(options!=null) {
+        	List<String> urls = getCustomUrls();
+	        for(String custUrl: urls){
+	        	url = generateUrl(descriptor, mode, custUrl);
+				doRun(url, descriptor);
+				//evaluateResults();
+	        }
+	        return;
+        }
+        
+        url = generateUrl(descriptor, mode, "");
+        doRun(url, descriptor);
     }
 
     @Override

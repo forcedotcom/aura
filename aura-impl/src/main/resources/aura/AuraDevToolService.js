@@ -526,11 +526,19 @@ var AuraDevToolService = function() {
         	   // Checking for the data_aura_rendered_by attribute
          	   if(!$A.util.isEmpty(data_aura_rendered_by)){
                    var component = $A.getCmp(data_aura_rendered_by);
-                   if(!$A.util.isUndefinedOrNull(component)){
+                   if(!$A.util.isComponent(component)){
                 	   // This is to account for <img/> created both dynamically by image.cmp as well as the ones
                        // that are within a .cmp and are therefore created by aura through the html.cmp template.
-                       imgType = component.getAttributeValueProvider().get('v.imageType') || component.get('v.imageType');
-                       alt     = component.getAttributeValueProvider().get('v.alt') || component.get('v.alt');
+                       // we can skip ui:button images, they're hardcoded
+                       if(!component.isInstanceOf("ui:image")){
+                           component=component.getAttributeValueProvider();
+                       }
+                       if(!component.isInstanceOf("ui:image")){
+                           // We can't check non ui:image tags
+                           continue;
+                       }
+                       imgType = component.get('v.imageType');
+                       alt     = component.get('v.alt');
                    }
                 
          	    }
@@ -1353,9 +1361,19 @@ var AuraDevToolService = function() {
     ];
 
     Statement.prototype.query = function(){
-        var ret = s.select(this.criteria);
-        ret._priv["statement"] = this;
-        return ret;
+        var auraError=$A.error;
+        $A.error=function(message,error){
+            if(message.indexOf("Access Check Failed!")<0){
+                auraError.call($A,message,error);
+            }
+        };
+        try {
+            var ret = s.select(this.criteria);
+            ret._priv["statement"] = this;
+            return ret;
+        }finally{
+            $A.error=auraError;
+        }
     };
 
     ResultSet.prototype.diff = function(from){

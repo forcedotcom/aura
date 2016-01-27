@@ -75,12 +75,23 @@
     },
 
     testCaseSensitivity : {
-        test : function(cmp) {
-            $A.test.assertEquals('Aura', cmp.get("v.strAttributeWithDefaultValue"));
-            $A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
-            $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
-            $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
-        }
+        test : [
+            function(cmp) {
+                $A.test.assertEquals('Aura', cmp.get("v.strAttributeWithDefaultValue"));
+            },
+            function(cmp) {
+                $A.test.expectAuraError("Access Check Failed!");
+                $A.test.assertUndefined(cmp.get("v.StrAttributeWithDefaultValue"));
+            },
+            function(cmp) {
+                $A.test.expectAuraError("Access Check Failed!");
+                $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithDefaultValue"));
+            },
+            function(cmp) {
+                $A.test.expectAuraError("Access Check Failed!");
+                $A.test.assertUndefined(cmp.get("v.strATTRIBUTEWithNODefaultValue"));
+            }
+        ]
     },
 
     /**
@@ -338,7 +349,7 @@
 
     testDefaultValueOfDateTime : {
         test : function(cmp) {
-            $A.test.assertFalsy(cmp.get("v.datetimeDefaultWithNoValue"),
+            $A.test.assertFalsy(cmp.get("v.dateTimeDefaultWithNoValue"),
                     "Datetime attribute without defined default value should have falsy value.");
 
             $A.test.assertEquals("1970-01-01T00:00:00.000Z", cmp.get("v.dateTimeDefaultZero"));

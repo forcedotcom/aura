@@ -208,8 +208,7 @@
             pageConfig         = {
         		componentDef:         carouselPageCmp.componentDef.descriptor,
         		scrollerPlugins:      cmp.get('v.pageScrollerPlugins'),
-        		isScrollable:         cmp.get("v.isScrollable"),
-        		ignoreExistingAction: cmp.get("v.ignoreExistingAction")
+        		isScrollable:         cmp.get("v.isScrollable")
         	},
             i;
 

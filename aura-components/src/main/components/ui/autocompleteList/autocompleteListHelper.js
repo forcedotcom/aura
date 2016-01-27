@@ -557,7 +557,7 @@
         var updateAriaEvt = component.get("e.updateAriaAttributes");
         if (updateAriaEvt) {
             var obj = {
-                "aria-activedescendant": highlightedCmp.get("v.domId")
+                "aria-activedescendant": highlightedCmp.isInstanceOf("ui:autocompleteOption")?highlightedCmp.get("v.domId"):""
             };
             updateAriaEvt.setParams({
                 attrs: obj

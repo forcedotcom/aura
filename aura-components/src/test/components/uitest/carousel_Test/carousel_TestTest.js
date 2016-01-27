@@ -405,7 +405,7 @@
 					var isPageChangeActionCalled = $A.util.getBooleanValue(cmp.get("v.isPageChangeActionCalled"));
 					$A.test.assertTrue(isPageChangeActionCalled,
 							"Expected custom page change action to be called");
-					carousel.set("v.isPageChangeActionCalled",
+					cmp.set("v.isPageChangeActionCalled",
 							"false");
 				} ]
 	},

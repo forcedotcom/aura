@@ -26,6 +26,8 @@
 
     <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
 
+    <aura:attribute name="focusTriggerAfterSelected" type="Boolean" default="false" description="JBUCH: Access Check Failure. Assume necessary, based on menuItemController.js, line 27." />
+
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
     {!v.body}
 </aura:component>

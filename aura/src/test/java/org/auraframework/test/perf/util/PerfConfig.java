@@ -22,15 +22,17 @@ import java.util.Map;
 // This must exactly match the config param names
 public class PerfConfig {
 	private final List<String> browsers; //required
-	private final int numberOfRuns; //optional, default = 5
+	private final int numberOfRuns; //optional, default = 1
 	private final List<Map<String,Integer>> variability; //required
 	private final Map<String,String> options; //optional
+	private final List<Map<String, Map<String, Object>>> customOptions; //optional
 	
 	private PerfConfig(PerfConfigBuilder builder){
 		this.browsers = builder.browsers;
 		this.numberOfRuns = builder.numberOfRuns;
 		this.variability = builder.variability;
 		this.options = builder.options;
+		this.customOptions = builder.customOptions;
 	}
 	
 	public List<String> getBrowsers(){
@@ -49,6 +51,10 @@ public class PerfConfig {
 		return options;
 	}
 	
+	public List<Map<String, Map<String, Object>>> getCustomOptions(){
+		return customOptions;
+	}
+	
 	public Integer getVariability(String metric){
 		List<Map<String, Integer>> list = getVariability();
         for(Map<String, Integer> map: list){
@@ -63,6 +69,7 @@ public class PerfConfig {
 		private int numberOfRuns; 
 		private List<Map<String,Integer>> variability;
 		private Map<String,String> options;
+		private List<Map<String, Map<String, Object>>> customOptions;
 
 		public PerfConfigBuilder browsers(List<String> browsers){
 			this.browsers = browsers;
@@ -81,6 +88,11 @@ public class PerfConfig {
 		
 		public PerfConfigBuilder options(Map<String,String> options){
 			this.options = options;
+			return this;
+		}
+		
+		public PerfConfigBuilder customOptions(List<Map<String, Map<String, Object>>> customOptions){
+			this.customOptions = customOptions;
 			return this;
 		}
 		

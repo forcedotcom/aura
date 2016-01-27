@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -187,7 +188,16 @@ public class TestSetRunnerState {
                 }
 
                 if (t instanceof PerfExecutorTest) {
-                    url = ((PerfExecutorTest) t).generateUrl();
+                    //url = ((PerfExecutorTest) t).generateUrl();
+                	List<String> urls = ((PerfExecutorTest) t).generateUrl();
+                	if(urls.size()>1){
+                		for(String u: urls){
+                			testWithProps.put("jsConsole", u);
+                            testsWithPropsMap.put(t.toString(), testWithProps);       
+                		}
+                		return;
+                	} 
+                	url = urls.get(0);               	
                 }
 
                 testWithProps.put("jsConsole", url);

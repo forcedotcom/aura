@@ -360,6 +360,8 @@ public abstract class WebDriverTestCase extends IntegrationTestCase {
      */
     private void addPerfCapabilities(DesiredCapabilities capabilities) {
         if (PerfUtil.hasPerfCmpTestAnnotation(this)) {
+        	// Do not reuse browser
+        	capabilities.setCapability(WebDriverProvider.REUSE_BROWSER_PROPERTY, false);
             LoggingPreferences performance_prefs = new LoggingPreferences();
             performance_prefs.enable(LogType.PERFORMANCE, Level.ALL);
             capabilities.setCapability(CapabilityType.LOGGING_PREFS, performance_prefs);

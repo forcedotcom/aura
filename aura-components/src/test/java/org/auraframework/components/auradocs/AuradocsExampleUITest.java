@@ -17,6 +17,7 @@ package org.auraframework.components.auradocs;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -25,6 +26,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 /**
  * A webdriver test for auradoc examples.
  */
+@UnAdaptableTest("Docs will mostly be accessed via external website, just verify it runs in standalone")
 public class AuradocsExampleUITest extends WebDriverTestCase {
 
     public AuradocsExampleUITest(String name) {

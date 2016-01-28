@@ -117,10 +117,10 @@
                 // Make this more robust once we refactor this component
     			var concreteCmp = component.getConcreteComponent();
     			if (event.type === "keydown") {
-    				if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
+    				if (event.keyCode === 40) {  // down arrow key
     					event.preventDefault();
     					helper.setFocusToNextItem(concreteCmp, event);
-    				} else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
+    				} else if (event.keyCode === 38) {  // up arrow key
     					event.preventDefault();
     					helper.setFocusToPreviousItem(concreteCmp, event);
     				} else if (event.keyCode === 27) {  // Esc key

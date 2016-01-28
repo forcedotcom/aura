@@ -1,0 +1,39 @@
+<!--
+
+    Copyright (C) 2013 salesforce.com, inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<aura:interface support="beta" extends="ui:visible">
+
+    <!-- attributes needed by this component -->
+    <aura:attribute name="keyword" type="String" description="The keyword used to match list options."/>
+    <aura:attribute name="ignoredElements" type="Object" description="The DOM elements to ignore when we handle clicking outside. This is usually the text field so that the panel doesn't close prematurely."/>
+
+    <!-- events received by this component -->
+    <aura:registerEvent name="matchText" type="ui:matchText" description="The event fired when a text match occurs, e.g. user typed into the input field."/>
+    <aura:registerEvent name="pressOnHighlighted" type="ui:press" description="The event fired when a highlighted option is pressed, e.g. enter key."/>
+    <aura:registerEvent name="listHighlight" type="ui:listHighlight" description="The event fired when a list option is highlighted, e.g. keyboard navigation."/>
+
+    <!-- events sent by this component -->
+    <aura:registerEvent name="updateAriaAttributes" type="ui:updateAriaAttributes" description="The event fired when a new option is highlighted and aria attributes need to be updated on the input field."/>
+
+    <!-- methods which can be called on this component -->
+    <aura:method name="fetchData">
+        <aura:attribute name="options" type="Object" description="The options to be passed into the provider"/>
+        <aura:attribute name="index" type="Integer" description="The data provider to be used to fetch data"/>
+    </aura:method>
+
+</aura:interface>
+

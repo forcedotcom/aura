@@ -23,6 +23,12 @@
             inputCmp.addHandler("blur", component, "c.handleBlur");
         }
         helper.relayEvents(component);
+
+        var listCmp = helper.getListComponent(component);
+        if (listCmp && !listCmp.isInstanceOf("ui:autocompleteListInterface")) {
+            throw new AuraError("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
+        }
+
         // This calls a function (callback) in a delayed manner and it can be cancelled.
         component._delay = (function(){
             var timer = 0;
@@ -109,8 +115,8 @@
         optionSelectEvt.fire();
     },
     
-    matchText: function(component, event) {
-        var listCmp = component.find("list");
+    matchText: function(component, event, helper) {
+        var listCmp = helper.getListComponent(component);
         if (listCmp) {
             listCmp.set("v.keyword", event.getParam("keyword"));
             listCmp.get("e.matchText").fire();
@@ -144,10 +150,14 @@
         concreteHelper.handleListExpand(component, event);
     },
 
-    referenceElementChange: function(component) {
+    referenceElementChange: function(component, event, helper) {
+        // this is only supported if autocomplete is used with the default list, or if the custom list defines "listReferenceComponent"
+        if (!helper.isDefaultList(component)) {
+            throw new AuraError("ui:autocomplete: function 'referenceElementChange' is not supported with a custom list.");
+        }
         var usePanel = component.get('v.usePanel');
         if (!usePanel) {
-            var list = component.find("list");
+            var list = helper.getListComponent(component);
             var referenceComponent = component.get("v.listReferenceComponent");
             list.set("v.listReferenceComponent", referenceComponent);
         }

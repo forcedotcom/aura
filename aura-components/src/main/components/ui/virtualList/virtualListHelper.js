@@ -162,6 +162,22 @@
             container.addEventListener(events[i].type, delegate, events[i].useCapture);
         }
     },
+    appendVirtualRows: function (cmp, items) {
+        $A.metricsService.markStart(this.NS, this.NAME + ".appendVirtualRows", {auraid : cmp.getGlobalId()});
+        this.ignorePTVChanges(cmp, true);
+        var fragment  = document.createDocumentFragment(),
+            container = this.getListBody(cmp);
+
+        for (var i = 0; i < items.length; i++) {
+            var virtualItem = this._generateVirtualItem(cmp, items[i]);
+            cmp._virtualItems.push(virtualItem);
+            fragment.appendChild(virtualItem);
+        }
+        container.appendChild(fragment);
+        cmp.set('v.items', (cmp.get('v.items') || []).concat(items), true);
+        this.ignorePTVChanges(cmp, false);
+        $A.metricsService.markEnd(this.NS, this.NAME + ".appendVirtualRows");
+    },
     _findVirtualElementPosition: function (virtualElements, item, element) {
         for (var i = 0; i < virtualElements.length; i++) {
             var ve = virtualElements[i];
@@ -228,7 +244,11 @@
         }
 
         if (!handlers.length > 0) {
-        	return;
+            // TODO: This is a workaround to pass the correct virtual aura component back to the parent action handler. What is the correct approach?
+            //console.log("setting up shape", type, target);
+            //shape.getElement = function() {return target;};
+            //ptv.set(ref, item, true);
+            return;
         }
         
         if (item) {
@@ -260,5 +280,23 @@
             ptv.ignoreChanges = true;
             ptv.sync = false;
         }
+    },
+    getComponentForDOMElement: function(cmp, target) {
+        var shape     = cmp._shape,
+            ref       = cmp.get('v.itemVar'),
+            ptv       = cmp._ptv,
+            item, targetCmp;
+
+        while (target) {
+            if ((item = this._getItemAttached(target))) {
+                break;
+            }
+            target = target.parentElement;
+        }
+
+        shape.getElement = function() {return target;};
+        ptv.set(ref, item, true);
+
+        return shape;
     }
 })// eslint-disable-line semi

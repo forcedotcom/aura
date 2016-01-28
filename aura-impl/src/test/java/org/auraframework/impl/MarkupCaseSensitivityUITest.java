@@ -120,7 +120,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
                             		+findDomElement(By.className(outputDivClass)).getText();
                         }
                     },
-                    10,
+                    30,
                     "fail waiting on test app pick up new source in test_Library.lib");
         } else {
         	Assert.fail("expect to find 'test:test_Library' in auratest:testMarkupCaseSensitivityApp's import libs");

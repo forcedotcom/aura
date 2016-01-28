@@ -21,7 +21,9 @@ import java.util.List;
 
 import org.auraframework.test.util.WebDriverTestCase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 public class BasePillContainerAutoComplete extends WebDriverTestCase {
 
@@ -43,12 +45,12 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
         WebElement input = findDomElement(By.cssSelector(INPUT));
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
         auraUITestingUtil.pressEnter(input);
-        assertFalse("Auto complete List Content should not be visible", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should not be visible", false);
         input.sendKeys("test");
-        assertNotNull("Auto complete List Content should be visible", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should be visible", true);
         WebElement pill = findDomElement(By.cssSelector(".pill"));
         pill.click();
-        assertTrue("Auto complete List Content should be still visible after clicking on pill", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should be still visible after clicking on pill", true);
     }
     
     /*
@@ -61,13 +63,13 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
         WebElement input = findDomElement(By.cssSelector(INPUT));
         input.sendKeys("khDmXpDDmALzDqhYeCvJgqEmjUPJqV");
         auraUITestingUtil.pressEnter(input);
-        assertFalse("Auto complete List Content should not be visible", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should not be visible", false);
         input.sendKeys("test");
-        assertNotNull("Auto complete List Content should be visible", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should be visible", true);
         int listItem = 2;
         WebElement listItem2 = getAutoCompleteListOptions(listItem);
         listItem2.click();
-        assertFalse("Auto complete List Content should not be visible after click on pill 3", isListContentVisible());
+        verifyAutoCompleteListPresent("Auto complete List Content should not be visible after click on pill 3", false);
     }
 
 	private WebElement getAutoCompleteListOptions(int optionNumber) {
@@ -75,8 +77,17 @@ public class BasePillContainerAutoComplete extends WebDriverTestCase {
 		return listOfOptions.get(optionNumber);
 	}
 
-	private boolean isListContentVisible() throws InterruptedException {
-		waitFor(3);
-        return isElementPresent(By.cssSelector(LISTCONTENT_LOCATOR));
-	}
+	/**
+	 * Verify autocomplete list is expanded(Visible) 
+	 * @param failureMessage
+	 * @param isElemPresent
+	 */
+	private void verifyAutoCompleteListPresent(String failureMessage, boolean isElemPresent) {
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return isElementPresent(By.cssSelector(LISTCONTENT_LOCATOR)) == isElemPresent;
+            }
+        }, failureMessage);
+    }
 }

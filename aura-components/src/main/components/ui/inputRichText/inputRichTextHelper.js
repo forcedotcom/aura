@@ -156,8 +156,32 @@
 	setContent : function(cmp, content) {
 		var editorInstance = this.getEditorInstance(cmp);
 		if (editorInstance) {
-			editorInstance.setData(content);
+			/* W-2905193
+			   Setting the content before completion of the previous setContent causes a "Permission Denied" error
+			   in IE11. So we collect content in an array while other calls to setData are pending. Then we unwind
+			   the array one at a time.
+			 */
+			if (this._settingContent) {
+				if (!this._nextContent) {
+					this._nextContent = [];
+				}
+				this._nextContent.push(content);
+			} else {
+				this._settingContent = true;
+				this._setData(editorInstance, content);
+			}
 		}
+	},
+
+	_setData : function(editorInstance, content) {
+		var helper = this;
+		editorInstance.setData(content, function() {
+			if (!$A.util.isEmpty(helper._nextContent)) {
+				helper._setData(editorInstance,helper._nextContent.shift());
+			} else {
+				helper._settingContent = false;
+			}
+		} );
 	},
 
 	getLocale : function() {

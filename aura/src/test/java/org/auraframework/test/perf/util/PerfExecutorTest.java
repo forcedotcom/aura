@@ -22,11 +22,9 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -95,7 +93,8 @@ public class PerfExecutorTest extends WebDriverTestCase {
     }
     
     private void init(){
-        perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config.getOptions().get("metricsMode"));
+        //perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config.getOptions().get("metricsMode"));
+        perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config);
     }
     
     private void setDB(String dbURI){

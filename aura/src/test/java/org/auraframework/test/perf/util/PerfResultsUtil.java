@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -32,19 +31,15 @@ import java.util.logging.Logger;
 import junit.framework.AssertionFailedError;
 
 import org.auraframework.util.IOUtil;
-import org.auraframework.util.test.perf.metrics.PerfMetric;
 import org.auraframework.util.test.perf.metrics.PerfMetrics;
 import org.bson.Document;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.common.collect.Maps;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 
 public final class PerfResultsUtil {

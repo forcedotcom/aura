@@ -36,14 +36,16 @@ import org.openqa.selenium.WebDriver;
 
 public class PerfMetricsUtil {
     private final PerfExecutorTest test;
+    private final PerfConfig config;
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
     private Map<String, Map<String, Map<String, Long>>> auraStats;
     private String dbURI;
 
-    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, String metricsMode) {
+    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, PerfConfig config) {
         this.test = test;
         this.dbURI = dbURI;
+        this.config = config;
     }
 
     /**
@@ -162,18 +164,14 @@ public class PerfMetricsUtil {
         }
     }
 
-    private void prepareAllMetrics(PerfMetrics metrics) {
-        rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
-        prepareNetworkMetrics(metrics);
-        prepareTimelineMetrics(metrics);
-        prepareAuraMetrics(metrics);
-    }
-
-   
-
 	public PerfMetrics prepareResults() {
         PerfMetrics metrics = new PerfMetrics();
-        prepareAllMetrics(metrics);
+        if(!config.getOptions().get("timeline").equals("disable")) {           
+    		rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
+    		prepareNetworkMetrics(metrics);
+        	prepareTimelineMetrics(metrics);
+        }
+        prepareAuraMetrics(metrics);
         return metrics;
     }
 
@@ -185,7 +183,9 @@ public class PerfMetricsUtil {
     @SuppressWarnings("unchecked")
     public void stopCollecting() {
         WebDriver driver = test.getWebDriver();
-        notifications = test.getRDPNotifications();
+        if(!config.getOptions().get("timeline").equals("disable")) {
+        	notifications = test.getRDPNotifications();
+        }
         // TODO auraUITestingUtil unable to execute the js correctly
         Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.getResults()");
         auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;

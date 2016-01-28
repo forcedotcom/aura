@@ -1,0 +1,26 @@
+.THIS .log {
+    margin: 10px;
+}
+
+.THIS .field {
+    width: 75px;
+}
+
+.THIS label.uiLabel {
+    padding-right: 12px;
+}
+
+.THIS .field{
+  padding: 5px;
+  border: 1px solid #dce4ec;
+  border-radius: 2px;
+}
+
+.THIS td {
+  padding: 5px;
+  border: 1px solid gray;
+}
+
+.THIS .bold {
+    font-weight: bold;
+}

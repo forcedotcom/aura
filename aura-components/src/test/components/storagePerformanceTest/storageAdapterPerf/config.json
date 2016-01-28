@@ -1,0 +1,234 @@
+{
+  "browsers":[ "chrome" ],
+  "numberOfRuns" : 1,
+  "variability": [
+    { "Tracing.Painting.Paint" : 5 },
+    { "Tracing.Memory.jsHeapSizeUsed" : 5 },
+    { "Tracing.Memory.jsEventListeners" : 10 },
+    { "Tracing.Memory.documents" : 10 },
+    { "Tracing.Memory.nodes" : 10 },
+    { "Network.encodedDataLength" : 30 },
+    { "Aura.coql.afterRender.added" : 5 },
+    { "Network.numRequests" : 20 }
+  ],
+  "options" : { "metricsMode" : "foo", "timeline": "disable" },
+  "customOptions" : [
+        {
+          "crypto-4kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "4kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "crypto-4kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "4kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "crypto-4kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "4kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "crypto-64kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "64kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "crypto-64kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "64kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "crypto-64kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "64kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "crypto-512kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "512kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "crypto-512kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "512kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "crypto-512kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "crypto",
+                        "payload" : "512kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "mem-4kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "4kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "mem-4kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "4kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "mem-4kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "4kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "mem-64kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "64kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "mem-64kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "64kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "mem-64kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "64kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "mem-512kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "512kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "mem-512kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "512kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "mem-512kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "memory",
+                        "payload" : "512kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "idx-4kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "4kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "idx-4kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "4kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "idx-4kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "4kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "idx-64kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "64kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "idx-64kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "64kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "idx-64kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "64kb",
+                        "opsIterations" : "500"
+                      }
+          },
+          {
+          "idx-512kb-50" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "512kb",
+                        "opsIterations" : "50"
+                      }
+          },
+          {
+          "idx-512kb-100" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "512kb",
+                        "opsIterations" : "100"
+                      }
+          },
+          {
+          "idx-512kb-500" : {
+                  "adapterSize" : "4096",
+                  "adapterName" : "indexeddb",
+                        "payload" : "512kb",
+                        "opsIterations" : "500"
+                      }
+          }
+  ]
+
+}

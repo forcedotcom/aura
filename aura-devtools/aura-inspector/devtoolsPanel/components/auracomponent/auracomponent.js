@@ -99,19 +99,19 @@
         function resolve(current, parent, property) {
             if(!current) { return current; }
             if(typeof current === "object") {
-                if(current.hasOwnProperty("$serRefId")) {
-                    if(serializationMap.has(current["$serRefId"])) {
-                        return serializationMap.get(current["$serRefId"]);
+                if(current.hasOwnProperty("$serRefId$")) {
+                    if(serializationMap.has(current["$serRefId$"])) {
+                        return serializationMap.get(current["$serRefId$"]);
                     } else {
                         // Probably Out of order, so we'll do it after scanning the entire tree
-                        unresolvedReferences.push({ parent: parent, property: property, $serRefId: current["$serRefId"] });
+                        unresolvedReferences.push({ parent: parent, property: property, $serRefId$: current["$serRefId$"] });
                         return current;
                     }
                 }
 
-                if(current.hasOwnProperty("$serId")) {
-                    serializationMap.set(current["$serId"], current);
-                    delete current["$serId"];
+                if(current.hasOwnProperty("$serId$")) {
+                    serializationMap.set(current["$serId$"], current);
+                    delete current["$serId$"];
                 }
 
                 for(var property in current) {
@@ -131,7 +131,7 @@
         var unresolved;
         for(var c=0,length=unresolvedReferences.length;c<length;c++) {
             unresolved = unresolvedReferences[c];
-            unresolved.parent[unresolved.property] = serializationMap.get(unresolved["$serRefId"]);
+            unresolved.parent[unresolved.property] = serializationMap.get(unresolved["$serRefId$"]);
         }
 
 

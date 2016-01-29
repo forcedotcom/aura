@@ -343,29 +343,53 @@
                     };
 
                     if(configuration.attributes) {
+                        var auraError=$A.error;                       
                         var attributes = component.getDef().getAttributeDefs();
-                        attributes.each(function(attributeDef) {
-                            var key = attributeDef.getDescriptor().getName();
-                            var value;
-                            var rawValue;
-                            // If we don't want the body serialized, skip it.
-                            // We would only want the body if we are going to show
-                            // the components children.
-                            if(key === "body" && !configuration.body) { return; }
-                            try {
-                                rawValue = component._$getRawValue$(key);
-                                value = component.get("v." + key);
-                            } catch(e) {
-                                value = undefined;
-                            }
-                            if($A.util.isExpression(rawValue)) {
-                                output.expressions[key] = rawValue+"";
-                                output.attributes[key] = value;
-                            } else {
-                                output.attributes[key] = rawValue;
-                            }
-                        }.bind(this));
-                    } else if(!configuration.attributes && configuration.body) {
+
+                        try {
+                            // The Aura Inspector isn't special, it doesn't 
+                            // have access to the value if the access check
+                            // system prevents it. So we should notify we
+                            // do not have access.
+                            var accessCheckFailed;
+
+                            // Track Access Check failure on attribute access
+                            $A.error=function(message,error){
+                                if(message.indexOf("Access Check Failed!")===0){
+                                    accessCheckFailed = true;
+                                }
+                            };
+
+                            attributes.each(function(attributeDef) {
+                                var key = attributeDef.getDescriptor().getName();
+                                var value;
+                                var rawValue;
+                                accessCheckFailed = false;
+
+                                // If we don't want the body serialized, skip it.
+                                // We would only want the body if we are going to show
+                                // the components children.
+                                if(key === "body" && !configuration.body) { return; }
+                                try {
+                                    rawValue = component._$getRawValue$(key);
+                                    value = component.get("v." + key);
+                                } catch(e) {
+                                    value = undefined;
+                                }
+
+                                if($A.util.isExpression(rawValue)) {
+                                    output.expressions[key] = rawValue+"";
+                                    output.attributes[key] = accessCheckFailed ? "[ACCESS CHECK FAILED]" : value;
+                                } else {
+                                    output.attributes[key] = rawValue;
+                                }
+                            }.bind(this));
+                        } catch(e) {
+                            console.error(e);
+                        } finally {
+                            $A.error = auraError;
+                        }
+                    } else if(configuration.body) {
                         var rawValue;
                         var value;
                         try {

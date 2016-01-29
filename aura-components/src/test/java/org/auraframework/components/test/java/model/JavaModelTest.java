@@ -37,7 +37,6 @@ import org.auraframework.throwable.NoAccessException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.util.json.Json;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 
 /**
  * This class provides automation for Java models.
@@ -306,38 +305,5 @@ public class JavaModelTest extends AuraImplTestCase {
 
     public void testBadConstructor() throws Exception {
         checkInvalidModel(ModelBadConstructor.class, "No default constructor found");
-    }
-
-    @Annotations.Model(useAdapter = true)
-    public static class BeanModelPrivateConstructor {
-        private BeanModelPrivateConstructor() {
-        }
-    };
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBeanPrivateConstructor() throws Exception {
-        checkInvalidModel(BeanModelPrivateConstructor.class, "Default constructor is not public");
-    }
-
-    @Annotations.Model(useAdapter = true)
-    public static class BeanModelProtectedConstructor {
-        protected BeanModelProtectedConstructor() {
-        }
-    };
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBeanProtectedConstructor() throws Exception {
-        checkInvalidModel(BeanModelProtectedConstructor.class, "Default constructor is not public");
-    }
-
-    @Annotations.Model(useAdapter = true)
-    public static class BeanModelBadConstructor {
-        public BeanModelBadConstructor(String value) {
-        }
-    };
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBeanBadConstructor() throws Exception {
-        checkInvalidModel(BeanModelBadConstructor.class, "No default constructor found");
     }
 }

@@ -96,7 +96,7 @@ public class AuraStaticControllerDefRegistry extends StaticDefRegistryImpl<Contr
 
         Builder builder = new Builder();
         try {
-            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc, false));
+            builder.setActionMap(JavaControllerDefFactory.createActions(controller, controllerDesc));
         } catch (QuickFixException qfe) {
             throw new AuraUnhandledException("Broken Controller: " + qualifiedName, qfe);
         }

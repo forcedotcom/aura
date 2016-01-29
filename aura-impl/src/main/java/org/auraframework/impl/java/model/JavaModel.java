@@ -24,7 +24,6 @@ import java.util.Map;
 import org.auraframework.Aura;
 import org.auraframework.def.*;
 import org.auraframework.expression.PropertyReference;
-import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.java.type.JavaValueProvider;
 import org.auraframework.impl.javascript.testsuite.JavascriptMockHandler;
 import org.auraframework.instance.*;
@@ -62,11 +61,7 @@ public class JavaModel implements Model {
         iStack.setAttributeName("m");
         this.path = iStack.getPath();
         try {
-            if (modelDef.isUseAdapter()) {
-                this.bean = Aura.getBeanAdapter().getModelBean(modelDef);
-            } else {
-                this.bean = BeanAdapterImpl.buildValidatedClass(modelDef.getJavaType());
-            }
+            this.bean = modelDef.getJavaType().newInstance();
         } catch (AuraRuntimeException are) {
             throw are;
         } catch(Exception e){

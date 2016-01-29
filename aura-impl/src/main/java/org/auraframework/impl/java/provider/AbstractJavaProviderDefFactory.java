@@ -58,7 +58,6 @@ abstract class AbstractJavaProviderDefFactory<D extends Definition> extends Base
                     "@Provider annotation is required on all Providers.  Not found on %s", descriptor),
                     builder.getLocation());
         }
-        builder.setUseAdapter(ann.useAdapter());
         return builder;
     }
 }

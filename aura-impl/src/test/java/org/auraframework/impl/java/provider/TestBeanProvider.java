@@ -25,7 +25,7 @@ import org.auraframework.throwable.quickfix.QuickFixException;
 /**
  * A simple provider with useAdapter value set to true.
  */
-@Provider(useAdapter = true)
+@Provider
 public class TestBeanProvider implements ComponentDescriptorProvider {
     @Override
     public DefDescriptor<ComponentDef> provide() throws QuickFixException {

@@ -23,13 +23,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.JavaModelDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -52,16 +50,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         this.modelClass = builder.modelClass;
         this.memberMap = AuraUtil.immutableMap(builder.memberMap);
         this.useAdapter = builder.useAdapter;
-    }
-
-    @Override
-    public void validateDefinition() throws QuickFixException {
-        super.validateDefinition();
-        if (this.useAdapter) {
-            Aura.getBeanAdapter().validateModelBean(this);
-        } else {
-            BeanAdapterImpl.validateConstructor(this.modelClass);
-        }
     }
 
     /**

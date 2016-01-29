@@ -55,7 +55,6 @@ public class JavaModelDefFactory extends BaseJavaDefFactory<ModelDef> {
                     "@Model annotation is required on all Models.  Not found on %s", descriptor),
                     builder.getLocation());
         }
-        builder.setUseAdapter(ann.useAdapter());
         return builder;
     }
 }

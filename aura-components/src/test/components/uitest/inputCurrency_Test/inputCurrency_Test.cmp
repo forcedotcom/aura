@@ -15,7 +15,16 @@
     limitations under the License.
 
 -->
-<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">    
-    <ui:inputCurrency aura:id="inputCurrencyEmpty" value="{!m.stringEmpty}" /> <br/> 
-    <ui:inputCurrency aura:id="inputCurrencyNull" value="{!m.stringNull}" /> <br/> 
+<aura:component model="java://org.auraframework.components.test.java.model.TestJavaModel">
+
+    <!-- Attributes -->
+    <aura:attribute name="amount" type="string" default="350A"/>
+
+    <!--Layout -->
+    <div style="padding:15px;">
+        <ui:inputCurrency aura:id="inputCurrency" value="{! v.amount }" label="amount: " format="#,###.0000"/>
+        <h1>The value is : {! v.amount }</h1>
+        <ui:button label="set 5678" press="{! c.setNewValue }"></ui:button>
+    </div>
+
 </aura:component>

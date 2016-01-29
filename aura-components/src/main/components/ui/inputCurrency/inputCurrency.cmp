@@ -1,6 +1,6 @@
 <!--
 
-    Copyright (C) 2013 salesforce.com, inc.
+    Copyright (C) 2016 salesforce.com, inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -17,11 +17,27 @@
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputNumberComponent,ui:inputTextComponent" extensible="true"
                 defaultFlavor="default, input" description="An input field for entering a currency.">
+
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
-    <input type="{!v.type}"
+
+    <!-- Attributes -->
+    <aura:attribute name="input_value"           type="string"  access="private" default="" />
+    <aura:attribute name="last_value"            type="string"  access="private" default="" />
+    <aura:attribute name="updateWasFromOutside"  type="boolean" access="private" default="true" />
+
+
+
+    <!-- Envents handler -->
+    <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
+    <aura:handler name="change" value="{! v.value }" action="{! c.valueHasChanged }" />
+
+    <input type="text"
+           aura:id="input"
            id="{!v.domId}"
+           oninput="{! c.handleInputChange }"
+           onblur="{! c.handleOnBlur }"
            class="{!v.class + ' input'}"
-           value="{!v.value}"
+           value="{! v.input_value }"
            max="{!v.max}"
            min="{!v.min}"
            step="{!v.step}"

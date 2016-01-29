@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 salesforce.com, inc.
+ * Copyright (C) 2016 salesforce.com, inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,78 @@
  */
 function lib() { //eslint-disable-line no-unused-vars
 
-    var lib = { //eslint-disable-line no-shadow, no-unused-vars
+    // Todo : Make abbreviations dynamic
+    var abbreviations = {thousand: 'k', million: 'm', billion: 'b', trillion: 't'};
+
+    return { //eslint-disable-line no-shadow, no-unused-vars
         /**
-         * helper function for formatting a number
+         * @method formatNumber
+         * @desc Convert a computer number in formatted number base on localization or a defined format
+         * @param number
+         * 20000 => 20,000.00 (in US)
+         * 20000 => 20.000,00 (in Spain)
          */
-        formatValue: function(cmp, helper, defaultFormatter) {
-            if (!$A.util.isEmpty(cmp.get("v.value"))) {
-                // number fields only format the initial value
-                //todo helper.setAttribute(cmp, { key: 'doFormat', value: false, commit: true });
-                var el = helper.getInputElement(cmp);
-                if (!$A.util.isUndefinedOrNull(el)) {
-                    var num = helper.getNumber(cmp);
-                    if (!$A.util.isUndefinedOrNull(num)) {
-                        var formatter = cmp.get("v.format");
-                        if (!$A.util.isEmpty(formatter)) {
-                            var numberFormat;
-                            try {
-                                numberFormat = $A.localizationService.getNumberFormat(formatter);
-                            } catch (e) {
-                                el.value = "Invalid format attribute";
-                            }
-                            if (numberFormat && numberFormat.format) {
-                                el.value = numberFormat.format(num);
-                            }
-                        } else {
-                            el.value = defaultFormatter.format(num);
-                        }
-                    }
+        formatNumber: function (number, formatter) {
+            var numberFormat = this.getNumberFormat(formatter);
+            if (number) {
+                return numberFormat.format(number);
+            }
+        },
+        getNumberFormat: function (formatter) {
+            if (formatter && typeof formatter === 'string') {
+                try {
+                    return $A.localizationService.getNumberFormat(formatter);
+                } catch (e) {
+                    // invalid number format error
+                    // use default instead and show a warning on console
+                    console.warning('Invalid format attribute');
+                    return $A.localizationService.getDefaultNumberFormat();
                 }
             }
+            return $A.localizationService.getDefaultNumberFormat();
+        },
+        unFormatNumber: function (string, formatter) {
+            var numberFormat     = this.getNumberFormat(formatter);
+            var decimalSeparator = numberFormat.$symbols$.decimalSeparator;
+            var currencySymbol   = numberFormat.$symbols$.currency;
+
+            var stringOriginal = string,
+                thousandRegExp,
+                millionRegExp,
+                billionRegExp,
+                trillionRegExp;
+
+            if (this.isNumber(string)) {
+                return string;
+            }
+
+            if (decimalSeparator !== '.') {
+                string = string.replace(/\./g, '').replace(decimalSeparator, '.');
+            }
+
+            // see if abbreviations are there so that we can multiply to the correct number
+            thousandRegExp = new RegExp('[^a-zA-Z]' + abbreviations.thousand + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+            millionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.million + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+            billionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.billion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+            trillionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.trillion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+
+            // do some math to create our number
+            return ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) * ((stringOriginal.match(millionRegExp)) ? Math.pow(10, 6) : 1) * ((stringOriginal.match(billionRegExp)) ? Math.pow(10, 9) : 1) * ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) * ((string.indexOf('%') > -1) ? 0.01 : 1) * (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) * Number(string.replace(/[^0-9\.]+/g, ''));
+        },
+        isNumber: function (number) {
+            return Object.prototype.toString.call(number) === '[object Number]';
+        },
+        isFormattedNumber: function (string, formatter) {
+            var numberFormat      = this.getNumberFormat(formatter);
+            var decimalSeparator  = numberFormat.$symbols$.decimalSeparator;
+            var groupingSeparator = numberFormat.$symbols$.groupingSeparator;
+            var maxFractionDigits = numberFormat.$maxFractionDigits$;
+
+            var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
+
+            var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?(\\d+(\\' + groupingSeparator + '\\d*)*)*(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?(K|B|M|T)?\\s*$';
+            var reg = new RegExp(regString, 'i');
+            return reg.test(string);
         }
     };
-
-    return lib;
 }

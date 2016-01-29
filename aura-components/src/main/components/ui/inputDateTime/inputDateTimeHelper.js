@@ -124,12 +124,12 @@
     addDomHandler : function(component, event) {
         if (!this.isDesktopMode(component)) {
             var inputElement = this.getInputElement(component);
-            this.lib.interactive.attachDomHandlerToElement(component, inputElement, event);            
+            $A.util.on(inputElement, event, this.lib.interactive.domEventHandler);
         } else {
             var inputElements = component.getElement().getElementsByTagName('input');
             for (var i = 0; i < inputElements.length; i++) {
                 var element = inputElements[i];
-                this.lib.interactive.attachDomHandlerToElement(component, element, event);
+                $A.util.on(element, event, this.lib.interactive.domEventHandler);
             }
         }
     },

@@ -109,9 +109,7 @@
      */
     addDomHandler : function(component, event) {
         var el = this.getInputElement(component);
-        if(el) {
-            this.lib.interactive.attachDomHandlerToElement(component, el, event);
-        }
+        $A.util.on(el, event, this.lib.interactive.domEventHandler);
     },
 
     /**

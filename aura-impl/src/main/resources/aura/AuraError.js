@@ -60,9 +60,7 @@ function AuraError() {
 
         function getStackTrace(err) {
             var stack;
-            if(err["stackTrace"]) {
-                stack = err["stackTrace"];
-            } else if (err.stack) {
+            if (err.stack) {
                 stack = err.stack;
                 // Chrome adds the error message to the beginning of the stacktrace. Strip that we only want the the actual stack.
                 var chromeStart = err.name + ": " + err.message;

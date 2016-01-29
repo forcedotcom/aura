@@ -14,18 +14,6 @@
  * limitations under the License.
  */
 ({
-    // Store a unique id on the element to track for event deduping.
-    DATA_UID_KEY: "data-interactive-uid",
-
-	/**
-	 * We can't just add and remove the handler for dom events, we need
-	 * to wrap it in a getCallback() call. Which we then need to remove at a
-	 * later time. So we need to keep a reference from the component to the
-	 * event handler to properly remove it later.
-	 */
-	domEventMap: {},
-    interactiveUid: 1,
-
     /**
      * Adds an event handler for every DOM event for which this input has a Aura-equivalent handler
      */
@@ -43,60 +31,8 @@
      * Adds an event handler for the given DOM event
      */
     addDomHandler : function(component, event) {
-        var element = component.getElement();
-        var globalId = component.getGlobalId();
-        var elementId = this.getUid(element) || this.newUid(element);
-        
-        var handler = $A.getCallback(this.domEventHandler);
-        $A.util.on(element, event, handler);
-
-        // We're doing this cause of the $A.getCallback() we need to wrap domEventHandler in.
-        // Since its a new function, we lose native dom deduping. So we ensure we only add one per component
-        // per event.
-    	if(!this.domEventMap[globalId]) {
-    		this.domEventMap[globalId] = {};
-    	}
-    	
-        if(!this.domEventMap[globalId][elementId]) {
-        	this.domEventMap[globalId][elementId] = {};
-        }
-        
-        // Already present, so we'll need to remove it before adding it.
-        var existing = this.domEventMap[globalId][elementId][event];
-        if(existing) {
-        	// If we've already added a handler for this component / event combo, remove it first.
-        	$A.util.removeOn(element, event, existing);
-        }
-        
-        this.domEventMap[globalId][elementId][event] = handler;
-    },
-
-    /**
-     * Get the unique ID on the dom element. Does not add a unique ID if one does not exist.
-     */
-    getUid: function(element) {
-        return element.getAttribute(this.DATA_UID_KEY);
-    },
-
-    /**
-     * Generate a new UID on the dom element to track unique dom elements.
-     */
-    newUid: function(element) {
-        var nextUid = ++this.interactiveUid;
-        element.setAttribute(this.DATA_UID_KEY, nextUid);
-        return nextUid;
-    },
-
-    /**
-     * We track event listeners added from a component to its elements.
-     * When we unrender the component, we should delete our entries in the map so
-     * the Map doesn't continiously grow.
-     */
-    removeDomEventsFromMap:  function(component) {
-        var globalId = component.getGlobalId();
-        if(this.domEventMap.hasOwnProperty(globalId)) {
-            this.domEventMap[globalId] = undefined;
-        }
+        var el = component.getElement();
+        $A.util.on(el, event, this.domEventHandler);
     },
 
     /**

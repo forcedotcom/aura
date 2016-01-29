@@ -24,8 +24,8 @@
 		if (editorInstance) {
             editorInstance.on(event, this.editorEventHandler, cmp);
 		} else {
-			var element = this.getInputElement(cmp);
-            this.lib.interactive.attachDomHandlerToElement(cmp, element, event);
+			var el = this.getInputElement(cmp);
+	        $A.util.on(el, event, this.lib.interactive.domEventHandler);
 		}
 	},
 

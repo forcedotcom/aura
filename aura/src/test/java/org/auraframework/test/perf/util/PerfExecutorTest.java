@@ -67,6 +67,7 @@ public class PerfExecutorTest extends WebDriverTestCase {
     private String dbURI;
     private static String DEFAULT_DB_URI = "mongodb://byao-wsl5:27017";
     private static String RUNNER_BASE_URL = "/performance/runner.app?";
+    private static int DEFAULT_TIMEOUT = 60; // Webdriver timeout of 60 secs
     
     public PerfExecutorTest(DefDescriptor<BaseComponentDef> def, PerfConfig config, String db) {
     	super("perf_" + def.getDescriptorName());
@@ -80,6 +81,10 @@ public class PerfExecutorTest extends WebDriverTestCase {
     protected void superRunTest() throws Throwable {
     	try {
             int numberOfRuns = config.getNumberOfRuns();
+            String customTimeout = config.getOptions().get("timeout");
+            if(customTimeout!=null){
+            	DEFAULT_TIMEOUT = Integer.parseInt(customTimeout);
+            }
             runsCollector = new PerfRunsCollector();
             while(numberOfRuns-- > 0)
                 runWithPerfApp(def, config);
@@ -93,7 +98,6 @@ public class PerfExecutorTest extends WebDriverTestCase {
     }
     
     private void init(){
-        //perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config.getOptions().get("metricsMode"));
         perfMetricsUtil = new PerfMetricsUtil(this, this.dbURI, config);
     }
     
@@ -138,10 +142,9 @@ public class PerfExecutorTest extends WebDriverTestCase {
 
         // wait for component loaded or aura error message
         final By componentRendered = By.cssSelector(".perfTestFinish");
-        //final By componentRendered = By.cssSelector("div[class*='container performanceRunner perfTestFinish']");
         final By auraErrorMessage = By.id("auraErrorMessage");
         ExpectedCondition<By> condition = prepareCondition(componentRendered, auraErrorMessage);
-        By locatorFound = new WebDriverWait(currentDriver, 360).withMessage("Error loading " + descriptor).until(
+        By locatorFound = new WebDriverWait(currentDriver, DEFAULT_TIMEOUT).withMessage("Error loading " + descriptor).until(
                 condition);
 
         if (locatorFound == auraErrorMessage) {
@@ -180,7 +183,6 @@ public class PerfExecutorTest extends WebDriverTestCase {
     								.append("/").append(descriptor.getName())
     								.append(".app?aura.mode=").append(mode)
     								.append(customUrl).toString();
-    		//return "/" + descriptor.getNamespace() + "/" + descriptor.getName() + ".app?aura.mode=" + mode + "/" + customUrl;
     	}
     	
     	// If descriptor is component type, then attach cmp def to url
@@ -193,17 +195,14 @@ public class PerfExecutorTest extends WebDriverTestCase {
     }
 
     public List<String> generateUrl(){
-    	List<String> customUrls = getCustomUrls();
-    	 
+    	List<String> customUrls = getCustomUrls();    	 
     	List<String> urls = new ArrayList<>();
         try {
 	    	if(customUrls.size()==0) {
 	    		String url = generateUrl(def, Mode.STATS, "");
 	    		urls.add(url);
 	    		return urls;
-	    	}
-    	
-        	
+	    	}       	
         	for(String customUrl: customUrls) {
         		urls.add(generateUrl(def, Mode.STATS, customUrl));
         	}
@@ -233,7 +232,6 @@ public class PerfExecutorTest extends WebDriverTestCase {
 		    	if (PerfWebDriverUtil.isInfrastructureError(th)) {
 			    	// retry if a possible infrastructure error
 			    	logger.log(Level.WARNING, "infrastructure error, retrying", th);
-			    	//loadComponent(url, descriptor);
 		    	} else {
 		    		throw th;
 		    	}

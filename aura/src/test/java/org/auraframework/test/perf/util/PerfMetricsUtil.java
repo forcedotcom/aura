@@ -166,7 +166,8 @@ public class PerfMetricsUtil {
 
 	public PerfMetrics prepareResults() {
         PerfMetrics metrics = new PerfMetrics();
-        if(!config.getOptions().get("timeline").equals("disable")) {           
+        String timeline = config.getOptions().get("timeline");
+        if(timeline!=null && !timeline.equals("disable")) {           
     		rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
     		prepareNetworkMetrics(metrics);
         	prepareTimelineMetrics(metrics);
@@ -183,7 +184,8 @@ public class PerfMetricsUtil {
     @SuppressWarnings("unchecked")
     public void stopCollecting() {
         WebDriver driver = test.getWebDriver();
-        if(!config.getOptions().get("timeline").equals("disable")) {
+        String timeline = config.getOptions().get("timeline");
+        if(timeline!=null && !timeline.equals("disable")) {
         	notifications = test.getRDPNotifications();
         }
         // TODO auraUITestingUtil unable to execute the js correctly

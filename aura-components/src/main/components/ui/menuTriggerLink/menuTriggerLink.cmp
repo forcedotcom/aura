@@ -19,7 +19,7 @@
 
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
 
-    <aura:registerevent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
+    <aura:registerEvent access="GLOBAL" name="menuTriggerPress" type="ui:menuTriggerPress" description="The event that is fired when the trigger is clicked."/>
 
     <aura:registerEvent access="GLOBAL" name="blur" type="ui:blur" description="The event fired when the user moves off from the trigger."/>
     <aura:registerEvent access="GLOBAL" name="focus" type="ui:focus" description="The event fired when the user focuses on the trigger."/>
@@ -35,7 +35,6 @@
                         {!v.body}
                     </aura:set>
                 </aura:if>
-                <span class="assistiveText">{!v.title}</span>
             </a>
         </div>
     </aura:set>

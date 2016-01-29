@@ -33,7 +33,7 @@
         }
 
         // Show loading indicator
-        helper.showLoading(listCmp.getSuper(), true);
+        helper.showLoading(component.getSuper(), true);
         if (options) {
             component.set("v.keyword", options.keyword);
         }

@@ -138,12 +138,12 @@ function lib(w) { //eslint-disable-line no-unused-vars
                     this.lockFetchData();
                 }
 
-                if (payload.updatedInfiniteLoadingIdleLabel) {
-                    this.opts.infiniteLoadingConfig.labelIdle = payload.updatedInfiniteLoadingIdleLabel;
+                if (payload.labelIdle) {
+                    this.opts.infiniteLoadingConfig.labelIdle = payload.labelIdle;
                 }
 
-                if (payload.updatedInfiniteLoadingLoadingLabel) {
-                    this.opts.infiniteLoadingConfig.labelLoading = payload.updatedInfiniteLoadingLoadingLabel;
+                if (payload.labelLoading) {
+                    this.opts.infiniteLoadingConfig.labelLoading = payload.labelLoading;
                 }
             }
 
@@ -213,11 +213,11 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._ilNoMoreData = true;
         },
         updateLabels:function(payload) {
-            if (typeof(payload.updatedInfiniteLoadingIdleLabel) != "undefined") {
-                this.opts.infiniteLoadingConfig.labelIdle = payload.updatedInfiniteLoadingIdleLabel;
+            if (typeof(payload.labelIdle) != "undefined") {
+                this.opts.infiniteLoadingConfig.labelIdle = payload.labelIdle;
             }
-            if (typeof(payload.updatedInfiniteLoadingLoadingLabel) != "undefined") {
-                this.opts.infiniteLoadingConfig.labelLoading = payload.updatedInfiniteLoadingLoadingLabel;
+            if (typeof(payload.labelLoading) != "undefined") {
+                this.opts.infiniteLoadingConfig.labelLoading = payload.labelLoading;
             }
             // in order to redraw the label we have to call _setState
             this._setState(this._loading);

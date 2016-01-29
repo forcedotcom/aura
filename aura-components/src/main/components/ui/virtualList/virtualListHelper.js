@@ -244,10 +244,6 @@
         }
 
         if (!handlers.length > 0) {
-            // TODO: This is a workaround to pass the correct virtual aura component back to the parent action handler. What is the correct approach?
-            //console.log("setting up shape", type, target);
-            //shape.getElement = function() {return target;};
-            //ptv.set(ref, item, true);
             return;
         }
         
@@ -280,23 +276,5 @@
             ptv.ignoreChanges = true;
             ptv.sync = false;
         }
-    },
-    getComponentForDOMElement: function(cmp, target) {
-        var shape     = cmp._shape,
-            ref       = cmp.get('v.itemVar'),
-            ptv       = cmp._ptv,
-            item, targetCmp;
-
-        while (target) {
-            if ((item = this._getItemAttached(target))) {
-                break;
-            }
-            target = target.parentElement;
-        }
-
-        shape.getElement = function() {return target;};
-        ptv.set(ref, item, true);
-
-        return shape;
     }
 })// eslint-disable-line semi

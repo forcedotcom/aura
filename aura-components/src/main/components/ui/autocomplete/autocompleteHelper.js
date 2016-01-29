@@ -76,19 +76,8 @@
     },
 
     handleEnterkeyOnList: function(component, list) {
-        var isDefaultList = this.isDefaultList(component);
-        if (isDefaultList && list.get("v.headerSelected")) { // this option is only considered when aqutocomplete uses the defaultList
-            var optionSelectEvt = component.get("e.selectListOption");
-            optionSelectEvt.setParams({ option:  component.get("v.listHeader"), isHeader: true  });
-            optionSelectEvt.fire();
-        } else if (isDefaultList && list.get("v.footerSelected")) { // this option is only considered when aqutocomplete uses the defaultList
-            var optionSelectEvt = component.get("e.selectListOption");
-            optionSelectEvt.setParams({ option:  component.get("v.listFooter"), isFooter: true  });
-            optionSelectEvt.fire();
-        } else {
-            var pEvent = list.get("e.pressOnHighlighted");
-            pEvent.fire();
-        }
+        var pEvent = list.get("e.pressOnHighlighted");
+        pEvent.fire();
     },
 
     handleEnterKeyOnInput: function() {
@@ -210,7 +199,7 @@
 
     isDefaultList: function(component) {
         var listCmp = this.getListComponent(component);
-        return (listCmp && !listCmp.isInstanceOf("ui:autoCompleteList"));
+        return (listCmp && listCmp.isInstanceOf("ui:autoCompleteList"));
     }
 
 })// eslint-disable-line semi

@@ -34,7 +34,7 @@
 
 		// I'm still working on what the best pattern is here
 		// This seems sloppy
-    	this.shadowRoot.querySelector("header").textContent 		= model.actionName;
+    	this.shadowRoot.querySelector("#div_actionName").textContent 		= model.actionName;
     	this.shadowRoot.querySelector(".parameters").textContent 	= model.parameters;
     	this.shadowRoot.querySelector(".result").textContent 		= model.returnValue;
     	this.shadowRoot.querySelector(".storageKey").textContent = model.storageKey;
@@ -54,6 +54,7 @@
     	}
     	//let people decide what they would like to do once the actionCard is created inside watch list
     	if(this.getAttribute("toWatch") === "true") {
+    		this.shadowRoot.querySelector(".span_removeActionCard").style.display = "inline-block";
     		this.shadowRoot.querySelector(".dropOrModify").style.display = "block";
 			this.shadowRoot.querySelector(".card").classList.add("watch");
     		if(this.getAttribute("dropOrModify") === "modifyResponse") {//non-error response next time
@@ -91,6 +92,7 @@
     		shadowRoot.appendChild(clone);
 
     	shadowRoot.querySelector("#select_dropOrModify").addEventListener('change', dropOrModifyChanged.bind(this));
+    	shadowRoot.querySelector("#span_removeActionCard").addEventListener('click', removeActionCard.bind(this));
     	
 	};
 
@@ -102,8 +104,36 @@
 		prototype: actionCard
 	});
 
+	//we don't want to watch this action any more, remove it from pendding overrides
+	function removeActionCard() {
+		var actionId = this.getAttribute("id");
+		var actionName = this.getAttribute("name");
+		
+		if(actionId) {
+			//var actionParameter = JSON.parse(actionParameter);//obj
+			var dataToPublish = {
+							'actionName': actionName//necessary, as we use this as key in actionsToWatch AuraInspectorInjectedScript.js
+							};
+            dataToPublish = JSON.stringify(dataToPublish);
+            //console.log('dropNextAction, dataToPublish = ', dataToPublish);
+            //call AuraInspectorActionsView_OnEnqueueNextResponseForAction in AuraInspectorActionsView
+            var command = `
+               window[Symbol.for('AuraDevTools')].Inspector.
+                	publish("AuraInspector:RemoveActionFromWatchList", '${dataToPublish}');
+            `;
+            chrome.devtools.inspectedWindow.eval(command, function (response, exception) {
+	            if (exception) {
+	            	console.log('ERROR from removeActionCard, CMD:', command, exception);
+	            }
+	        });
+		} else {
+			console.err("removeActionCard, couldn't find actionId");
+		}
+		var that = this;
+		this.parentNode.removeChild(that);
+	}
 
-	//TODO: how to access function in AuraInspectorInjectedScript?
+
 	//This return true if the object is an array, and it's not empty
     function isNonEmptyArray(obj) {
         if(obj && typeof obj === "object" && obj instanceof Array && obj.length && obj.length > 0) {
@@ -113,8 +143,7 @@
         }
     }
 
-	//TODO: TODO: how to access function in AuraInspectorInjectedScript?
-    //This return true if the object is with type Object, but not an array or null/undefined
+	//This return true if the object is with type Object, but not an array or null/undefined
     function isTrueObject(obj) {
         if(obj && typeof obj === "object" && !(obj instanceof Array)) {
             return true;
@@ -123,7 +152,7 @@
         }
     }
 
-	//
+	//given an object, go through each property (if it's an object itself, keep digging in), return an array of key --> value
 	function getArrayOfObject(obj, resultArray, nextKey) {
 		if(typeof obj === "string" || typeof obj === "boolean" || typeof obj === "number" || obj === null || obj === undefined) {
 			if(nextKey != null && nextKey != undefined) {

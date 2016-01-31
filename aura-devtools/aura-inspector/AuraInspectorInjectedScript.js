@@ -20,16 +20,33 @@
     global[$Symbol] = $Aura;
 
     $Aura.actions = {
+
+        /* event handlder for OnActionToRemoveFromWatchEnqueue, this will remove one action from watch list
+        called by AuraInspectorActionsView_OnRemoveActionFromWatchList in AuraInspectorActionsView.js
+        data = {
+            'actionName': string
+        }
+        */
+        "AuraDevToolService.RemoveActionFromWatch": function(data) {
+            if(!data) {
+                console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
+            }
+            if(data.actionName && actionsToWatch[data.actionName]) {
+                delete actionsToWatch[data.actionName];
+            }
+        },
+
+
         /*the event handler for AuraInspector:OnActionToWatchEnqueue
         called by AuraInspectorActionsView.drop and AuraInspectorActionsView_OnEnqueueNextResponseForAction
-        var dataToPublish = { 
-                            'actionName': actionName, //no need
-                            'actionParameter':actionParameter, //no need for here...yet
-                            'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
-                            'actionIsStorable': actionIsStorable,
-                            'actionStorageKey': actionStorageKey,
-                            'nextResponse': nextResponse};
-                            */
+        data = { 
+                    'actionName': string, 
+                    'actionParameter':actionParameter, //no need for here...yet
+                    'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
+                    'actionIsStorable': actionIsStorable,
+                    'actionStorageKey': actionStorageKey,
+                    'nextResponse': nextResponse};
+        */
         "AuraDevToolService.AddActionToWatch": function(data) {
             if(!data) {
                 console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
@@ -69,24 +86,13 @@
             }//end of aleadyAdded is false
             
             actionsToWatch[data.actionName] = data; 
-            if(data.nextResponse) {
-                //override decode
-                //console.log("AddActionToWatch, nextResponse:", data.nextResponse);
-                $A.uninstallOverride("ClientService.decode", onDecode);
-                $A.installOverride("ClientService.decode", onDecode);
-            } else if(data.nextError) {
-                $A.uninstallOverride("ClientService.decode", onDecode);
-                $A.installOverride("ClientService.decode", onDecode);
-            } else {
-                //override send                
-                $A.uninstallOverride("ClientService.send", OnSendAction);
-                $A.installOverride("ClientService.send", OnSendAction);
-            }
         },
 
 
-
-        "AuraDevToolService.RemoveActionsToWatch": function() {
+        /*
+        handler for AuraInspector:OnActionToWatchClear, this will clear up all actions from watch list
+        */
+        "AuraDevToolService.RemoveActionsFromWatch": function() {
             actionsToWatch = {};
             $A.uninstallOverride("ClientService.send", OnSendAction);
             $A.installOverride("ClientService.send", OnSendAction);
@@ -241,7 +247,8 @@
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
     $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchEnqueue", $Aura.actions["AuraDevToolService.AddActionToWatch"]);
-    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsToWatch"])
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToRemoveFromWatchEnqueue", $Aura.actions["AuraDevToolService.RemoveActionFromWatch"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsFromWatch"])
 
     function AuraInspector() {
         var subscribers = new Map();
@@ -906,7 +913,7 @@
     }
 
     //go through actionToWatch, if we run into an action we are watching, either drop it
-    //or register with actionsWatched, and modify response later in onDecode
+    //or register with actionsWatched, so we can modify response later in onDecode
     function OnSendAction(config, auraXHR, actions, method, options) {
             if (actions) {
                 for(var c=0;c<actions.length;c++) {
@@ -976,6 +983,7 @@
         $A.installOverride("Action.abort", OnAbortAction);
         $A.installOverride("ClientService.send", OnSendAction);
         $A.installOverride("Action.runDeprecated", OnActionRunDeprecated);
+        $A.installOverride("ClientService.decode", onDecode);
 
         function OnEnqueueAction(config, action, scope) {
             var ret = config["fn"].call(config["scope"], action, scope);

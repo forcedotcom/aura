@@ -18,7 +18,7 @@ package org.auraframework.components.test.java.model;
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
 
-@Model (useAdapter=true)
+@Model
 public class TestModelBean {
     private int counter=-1;
     private boolean debug=false;

@@ -27,7 +27,6 @@ import org.auraframework.def.JavaProviderDef;
 import org.auraframework.def.Provider;
 import org.auraframework.def.RootDefinition;
 import org.auraframework.def.StaticComponentConfigProvider;
-import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.ComponentConfig;
@@ -39,40 +38,15 @@ import org.auraframework.util.json.Json;
 
 public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> implements JavaProviderDef {
     private static final long serialVersionUID = -4972842636058759316L;
-    private final boolean useAdapter;
     private final Class<ComponentConfigProvider> configProvider;
     private final Class<StaticComponentConfigProvider> staticConfigProvider;
     private final Class<ComponentDescriptorProvider> descriptorProvider;
 
     protected JavaProviderDefImpl(Builder builder) throws QuickFixException {
         super(builder);
-        this.useAdapter = builder.isUseAdapter();
         this.configProvider = builder.configProvider;
         this.staticConfigProvider = builder.staticConfigProvider;
         this.descriptorProvider = builder.descriptorProvider;
-    }
-
-    /**
-     * Validate that a bean, if present, is a valid class that can be instantiated.
-     */
-    private void validateBean(Class<?> beanClass) throws QuickFixException {
-        if (beanClass == null) {
-            return;
-        }
-        if (useAdapter) {
-            Aura.getBeanAdapter().validateProviderBean(this, beanClass);
-        } else {
-            BeanAdapterImpl.validateConstructor(beanClass);
-            BeanAdapterImpl.validateInstantiation(beanClass);
-        }
-    }
-
-    private <T> T getBean(Class<T> beanClass) {
-        if (useAdapter) {
-            return Aura.getBeanAdapter().getProviderBean(this, beanClass);
-        } else {
-            return BeanAdapterImpl.buildValidatedClass(beanClass);
-        }
     }
 
     /**
@@ -84,9 +58,6 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
     @Override
     public void validateDefinition() throws QuickFixException {
         super.validateDefinition();
-        validateBean(configProvider);
-        validateBean(descriptorProvider);
-        validateBean(staticConfigProvider);
         if (configProvider == null && descriptorProvider == null) {
             throw new InvalidDefinitionException("@Provider must have a provider interface.", location);
         }
@@ -100,11 +71,11 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
         loggingService.startTimer("java");
         try {
             if (configProvider != null) {
-                config = getBean(configProvider).provide();
+                config = configProvider.newInstance().provide();
                 loggingService.incrementNum("JavaCallCount");
             } else if (descriptorProvider != null) {
                 config = new ComponentConfig();
-                config.setDescriptor(getBean(descriptorProvider).provide());
+                config.setDescriptor(descriptorProvider.newInstance().provide());
                 loggingService.incrementNum("JavaCallCount");
             }
         } catch (Exception e) {
@@ -125,7 +96,7 @@ public class JavaProviderDefImpl extends DefinitionImpl<JavaProviderDef> impleme
         loggingService.startTimer("java");
 
         try {
-            config = getBean(staticConfigProvider).provide(ref);
+            config = staticConfigProvider.newInstance().provide(ref);
             loggingService.incrementNum("JavaCallCount");
         } catch (Exception e) {
             throw AuraExceptionUtil.wrapExecutionException(e, this.location);

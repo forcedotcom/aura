@@ -146,27 +146,6 @@ public class ExceptionHandlingUITest extends WebDriverTestCase {
     }
 
     /**
-     * Generic error message displayed in PRODUCTION if application provider instantiation throws.
-     */
-    @ThreadHostileTest("PRODUCTION")
-    public void testProdAppProviderThrowsDuringInstantiation() throws Exception {
-        setProdConfig();
-        openRaw(getAppUrl(
-                "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
-        assertNoStacktrace();
-    }
-
-    /**
-     * Error displayed if provider throws during instantiation.
-     */
-    public void testAppProviderThrowsDuringInstantiation() throws Exception {
-        setDevContextWithoutConfig();
-        openRaw(getAppUrl(
-                "provider='java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation'", ""));
-        assertStacktrace("that was intentional at org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation.");
-    }
-
-    /**
      * Generic error message displayed in PRODUCTION if component provider instantiation throws.
      */
     @ThreadHostileTest("PRODUCTION")

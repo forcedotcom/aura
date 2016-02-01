@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.auraframework.Aura;
-
 import org.auraframework.def.ActionDef;
 import org.auraframework.def.ControllerDef;
 import org.auraframework.def.DefDescriptor;
@@ -33,8 +31,8 @@ import org.auraframework.impl.system.SubDefDescriptorImpl;
 import org.auraframework.impl.util.AuraUtil;
 import org.auraframework.instance.Action;
 import org.auraframework.system.SubDefDescriptor;
+import org.auraframework.throwable.AuraRuntimeException;
 import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
-import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.json.Json;
 
 /**
@@ -43,22 +41,12 @@ import org.auraframework.util.json.Json;
 public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> implements JavaControllerDef {
     private static final long serialVersionUID = -8294844909051767366L;
     private final Class<?> controllerClass;
-    private final boolean useAdapter;
     private final Map<String, JavaActionDef> actionMap;
 
     protected JavaControllerDefImpl(Builder builder) {
         super(builder);
         this.controllerClass = builder.controllerClass;
         this.actionMap = AuraUtil.immutableMap(builder.actionMap);
-        this.useAdapter = builder.useAdapter;
-    }
-
-    @Override
-    public void validateDefinition() throws QuickFixException {
-        super.validateDefinition();
-        if (this.useAdapter) {
-            Aura.getBeanAdapter().validateControllerBean(this);
-        }
     }
 
     /**
@@ -106,15 +94,18 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
 
     @Override
     public Action createAction(String actionName, Map<String, Object> paramValues) throws DefinitionNotFoundException {
-    	JavaActionDef actionDef = actionMap.get(actionName);
-    	if(actionDef == null){
+        JavaActionDef actionDef = actionMap.get(actionName);
+        if(actionDef == null){
             DefDescriptor<ActionDef> desc = SubDefDescriptorImpl.getInstance(actionName, getDescriptor(), ActionDef.class);
             throw new DefinitionNotFoundException(desc);
         }
         Object controller = null;
-        if (useAdapter) {
-            controller = Aura.getBeanAdapter().getControllerBean(this);
+        try {
+            controller = this.getJavaType().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            // ignore since it's okay to pass in a null controller instance
         }
+
         return new JavaAction(getDescriptor(), actionDef, controller, paramValues);
     }
 
@@ -131,7 +122,6 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
 
         private Class<?> controllerClass;
         private Map<String, JavaActionDef> actionMap;
-        private boolean useAdapter;
 
         @Override
         public JavaControllerDefImpl build() {
@@ -143,10 +133,6 @@ public class JavaControllerDefImpl extends DefinitionImpl<ControllerDef> impleme
          */
         public void setControllerClass(Class<?> controllerClass) {
             this.controllerClass = controllerClass;
-        }
-
-        public void setUseAdapter(boolean useAdapter) {
-            this.useAdapter = useAdapter;
         }
 
         /**

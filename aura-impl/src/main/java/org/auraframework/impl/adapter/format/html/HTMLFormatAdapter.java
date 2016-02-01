@@ -47,13 +47,13 @@ public abstract class HTMLFormatAdapter<T> extends BaseFormatAdapter<T> {
     protected void writeHtmlStyles(List<String> urls, Appendable out) throws IOException {
         if (urls != null) {
             for (String url : urls) {
-                writeHtmlStyle(url,out);
+                writeHtmlStyle(url, out);
             }
         }
     }
 
     protected void writeHtmlScripts(List<String> scripts, Appendable out) throws IOException {
-    	writeHtmlScripts(scripts, false, out);
+        writeHtmlScripts(scripts, false, out);
     }
 
     protected void writeHtmlScripts(List<String> scripts, boolean lazy, Appendable out) throws IOException {

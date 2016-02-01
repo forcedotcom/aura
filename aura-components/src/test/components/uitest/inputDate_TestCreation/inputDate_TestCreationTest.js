@@ -15,23 +15,21 @@
  */
  ({
     testCreateComponent: {
-        test : [function(component) {
-            var a = component.get("c.addInputDate");
-            $A.enqueueAction(a);
-        }, function(component) {
-            //
-            // Must do this test in a wait, as the component is fetched
-            // asynchronously. Note that if we forced a dependency, this could
-            // revert to being direct. Not sure which is better.
-            //
-            $A.test.addWaitFor(1, function() { return component.get("v.count"); },
-                function() {
-                    var holder = component.find("additionalHolder");
-                    var body = holder.get("v.body");
-                    $A.test.assertEquals(1, body.length, "expected a single element in the body");
-                    var elt = body[0];
-                    $A.test.assertEquals("markup://ui:inputDate", elt.getDef().getDescriptor().getQualifiedName());
-                })
-        }]
-    },
+        test : function(cmp) {
+            cmp.addInputDate();
+
+            $A.test.addWaitFor(1, 
+                    function() {
+                        return cmp.get("v.count");
+                    },
+                    function() {
+                        var holder = cmp.find("additionalHolder");
+                        var body = holder.get("v.body");
+                        $A.test.assertEquals(1, body.length, "expected a single element in the body");
+                        var elt = body[0];
+                        $A.test.assertEquals("markup://ui:inputDate", elt.getDef().getDescriptor().getQualifiedName());
+                    }
+            );
+        }
+    }
 })

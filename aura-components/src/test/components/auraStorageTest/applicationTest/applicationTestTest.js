@@ -21,8 +21,8 @@
      * - When the refresh action returns it will be different than the stored action and the page should refresh.
      * - Finally verify the refresh happened via the 'aura:applicationRefreshed' handler.
      */
-    testApplicationRefreshedEvent: {
-        // TODO(W-2701964): Flapping in autobuilds, needs to be revisited
+    // TODO(W-2913533): Test is very flappy in autobuilds, needs to be revisited
+    _testApplicationRefreshedEvent: {
         labels: ["flapper"],
         test: [
             function loadIframe(cmp) {

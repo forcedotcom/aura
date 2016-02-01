@@ -21,11 +21,9 @@
     <aura:import library="ui:inputNumberLibrary" property="inputNumberLibrary"/>
 
     <!-- Attributes -->
-    <aura:attribute name="input_value"           type="string"  access="private" default="" />
-    <aura:attribute name="last_value"            type="string"  access="private" default="" />
+    <aura:attribute name="inputValue"           type="string"  access="private" default="" />
+    <aura:attribute name="lastValue"            type="string"  access="private" default="" />
     <aura:attribute name="updateWasFromOutside"  type="boolean" access="private" default="true" />
-
-
 
     <!-- Envents handler -->
     <aura:handler name="init"   value="{! this }"    action="{! c.initialize }" />
@@ -37,7 +35,7 @@
            oninput="{! c.handleInputChange }"
            onblur="{! c.handleOnBlur }"
            class="{!v.class + ' input'}"
-           value="{! v.input_value }"
+           value="{! v.inputValue }"
            max="{!v.max}"
            min="{!v.min}"
            step="{!v.step}"

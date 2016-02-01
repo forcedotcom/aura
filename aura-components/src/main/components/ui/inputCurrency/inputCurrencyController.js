@@ -15,24 +15,31 @@
  */
 ({
     initialize : function (cmp, event, helper) {
+        var formatter = cmp.get('v.format');
+        var value = cmp.get('v.value');
+
         cmp.set('v.updateOnDisabled', true);
-        helper.handleNewValue(cmp);
+
+        if (helper.isValueValid(value, formatter)) {
+            helper.handleNewValue(cmp);
+        } else {
+            helper.setInvalidValueError(cmp, value);
+        }
     },
     handleInputChange : function (cmp, event, helper) {
-        var input_value = event.target.value;
+        var inputValue = event.target.value;
         var lib = helper.inputNumberLibrary.number;
 
-        // is input empty ?
-        if (!input_value) {
-            helper.setValueNull(cmp);
+        // is input empty ? empty isn't consider 0
+        if (!inputValue) {
+            helper.setValue(cmp,'');
             return;
         }
 
-        if (lib.isFormattedNumber(input_value) && helper.isNumberInRange(input_value, cmp)) {
-            cmp.set('v.updateWasFromOutside',false);
-            cmp.set('v.value'      , lib.unFormatNumber(input_value));
+        if (lib.isFormattedNumber(inputValue) && helper.isNumberInRange(inputValue, cmp)) {
+            helper.setValue(cmp, lib.unFormatNumber(inputValue));
         } else {
-            event.target.value = cmp.get('v.last_value');
+            event.target.value = cmp.get('v.lastValue');
         }
     },
     handleOnBlur : function (cmp, event, helper) {

@@ -66,15 +66,20 @@ function lib() { //eslint-disable-line no-unused-vars
 
             // see if abbreviations are there so that we can multiply to the correct number
             thousandRegExp = new RegExp('[^a-zA-Z]' + abbreviations.thousand + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            millionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.million + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-            billionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.billion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+            millionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.million  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
+            billionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.billion  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
             trillionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.trillion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
 
             // do some math to create our number
-            return ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) * ((stringOriginal.match(millionRegExp)) ? Math.pow(10, 6) : 1) * ((stringOriginal.match(billionRegExp)) ? Math.pow(10, 9) : 1) * ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) * ((string.indexOf('%') > -1) ? 0.01 : 1) * (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) * Number(string.replace(/[^0-9\.]+/g, ''));
+            return ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) *
+                   ((stringOriginal.match(millionRegExp))  ? Math.pow(10, 6) : 1) *
+                   ((stringOriginal.match(billionRegExp))  ? Math.pow(10, 9) : 1) *
+                   ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) *
+                   (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
+                   Number(string.replace(/[^0-9\.]+/g, ''));
         },
         isNumber: function (number) {
-            return Object.prototype.toString.call(number) === '[object Number]';
+            return $A.util.isNumber(number);
         },
         isFormattedNumber: function (string, formatter) {
             var numberFormat      = this.getNumberFormat(formatter);
@@ -84,9 +89,21 @@ function lib() { //eslint-disable-line no-unused-vars
 
             var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
 
-            var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?(\\d+(\\' + groupingSeparator + '\\d*)*)*(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?(K|B|M|T)?\\s*$';
+            // This regexp math with any formatted number or any possible formatted number
+            // Match with :
+            // never start with letter(k,b,m,t,(decimalSeparator))
+            // everything that start with ( space* (+|-) spaces* )
+            // any repeat of #{1}(groupingSeparator)#{0,n}
+            // follow decimalSeparator #{0,maxFractionDigits} (not required)
+            // ended by any shortcut (K|B|M|T)
+            // it not case sensitive
+            var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
+                            '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
+                            '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
+                            '(K|B|M|T)?\\s*$';
             var reg = new RegExp(regString, 'i');
             return reg.test(string);
         }
     };
 }
+

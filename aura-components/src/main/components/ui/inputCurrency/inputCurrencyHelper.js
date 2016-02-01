@@ -11,7 +11,11 @@
     },
     isValueValid: function (number, formatter) {
         var lib = this.inputNumberLibrary.number;
-        return lib.isNumber(number) || number === '' || lib.formatNumber(lib.unFormatNumber(number, formatter), formatter) === number;
+        // we accept how VALID values
+        // - primitive Number
+        // - any not NaN (number strings, empty string or null)
+        // - right formatted string numbers like 3,500.00
+        return lib.isNumber(number) || !isNaN(number) || lib.formatNumber(lib.unFormatNumber(number, formatter), formatter) === number;
     },
     handleNewValue: function (cmp) {
         var lib = this.inputNumberLibrary.number;
@@ -20,15 +24,22 @@
         var value = cmp.get('v.value');
 
         if (this.isValueValid(value, formatter)) {
-            this.removeErrors(cmp);
+
             if (isFromOutSide) {
+                this.removeErrors(cmp);
+                // case is a valid formatted string number
+                // 1,234.00
+                if (isNaN(value)) {
+                    this.setValue(cmp,lib.unFormatNumber(value));
+                    return;
+                }
+
                 this.setAttributes(cmp);
-                cmp.set('v.updateWasFromOutside', true);
             } else {
-                cmp.set('v.last_value', this.getElementInput(cmp).value);
+                cmp.set('v.lastValue', this.getElementInput(cmp).value);
+                cmp.set('v.updateWasFromOutside', true);
             }
         } else {
-            this.setValueNull(cmp);
             this.setInvalidValueError(cmp, value);
         }
     },
@@ -37,8 +48,8 @@
         var formatter = cmp.get('v.format');
         var value = cmp.get('v.value') ? lib.formatNumber(cmp.get('v.value'), formatter) : cmp.get('v.value');
 
-        cmp.set('v.input_value', value);
-        cmp.set('v.last_value', value);
+        cmp.set('v.inputValue', value);
+        cmp.set('v.lastValue', value);
     },
     getElementInput: function (cmp) {
         return cmp.getElement().getElementsByTagName('input')[0];
@@ -49,9 +60,12 @@
         }]);
     },
     removeErrors: function (cmp) {
-        cmp.set('v.errors', []);
+        if (cmp.get('v.errors').length) {
+            cmp.set('v.errors', []);
+        }
     },
-    setValueNull: function (cmp) {
-        cmp.set('v.value', '');
+    setValue : function (cmp, newValue, isFromOutside) {
+        cmp.set('v.updateWasFromOutside', !!isFromOutside);
+        cmp.set('v.value', String(newValue), true);
     }
 })

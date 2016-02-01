@@ -46,7 +46,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                 <section>
                     <h1>Pending Overrides</h1>
                     <div id="actionsToWatch-pending" class="drop-zone">
-                        <span class="description">Drag actions here. Next time we see the action, we will not send it to server.</span>
+                        <span class="description">Drag actions here. Next time we see action with same name, we will either drop it, send back modified response, or error response.</span>
                     </div>
                 </section>
                 <section id="actionsToWatch-completed">
@@ -85,6 +85,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
         devtoolsPanel.subscribe("AuraInspector:OnPanelConnect", AuraInspectorActionsView_OnBootstrap.bind(this));
         devtoolsPanel.subscribe("AuraInspector:OnPanelAlreadyConnected", AuraInspectorActionsView_OnBootstrap.bind(this));
 
+        devtoolsPanel.subscribe("AuraInspector:RemoveActionFromWatchList", AuraInspectorActionsView_OnRemoveActionFromWatchList.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextResponseForAction", AuraInspectorActionsView_OnEnqueueNextResponseForAction.bind(this));
         devtoolsPanel.subscribe("AuraInspector:EnqueueNextErrorForAction", AuraInspectorActionsView_OnEnqueueNextErrorForAction.bind(this));
 
@@ -374,7 +375,20 @@ function AuraInspectorActionsView(devtoolsPanel) {
         _toWatch.appendChild(actionCard);        
     }
 
-    //handler for AuraInspector:EnqueueNextResponseForAction from acitonCard.saveNextResponse
+    //handler for AuraInspector:RemoveActionFromWatchList from actionCard.removeActionCard
+    //actionInfo = JSON.stringify ... {
+    //                        'actionName': string
+    //                       };
+    function AuraInspectorActionsView_OnRemoveActionFromWatchList(actionInfo) {
+        //console.log("AuraInspectorActionsView_OnRemoveActionFromWatchingList:", actionInfo);
+        var actionInfoObj = JSON.parse(actionInfo);
+        if( actionInfoObj && actionInfoObj.actionName) {
+            //call AuraInspectorInjectedScript.AddActionToWatch
+            devtoolsPanel.publish("AuraInspector:OnActionToRemoveFromWatchEnqueue", actionInfoObj);
+        }        
+    }
+
+    //handler for AuraInspector:EnqueueNextResponseForAction from actionCard.saveNextResponse
     //actionInfo = JSON.stringify ... { 
                             //'actionName': string, 
                             //'actionParameter': obj
@@ -384,7 +398,7 @@ function AuraInspectorActionsView(devtoolsPanel) {
                             //}};
     //then call AuraInspectorInjectedScript.AddActionToWatch
     function AuraInspectorActionsView_OnEnqueueNextResponseForAction(actionInfo) {
-        console.log("AuraInspectorActionsView_OnEnqueueNextResponseForAction:", actionInfo);
+        //console.log("AuraInspectorActionsView_OnEnqueueNextResponseForAction:", actionInfo);
         var actionInfoObj = JSON.parse(actionInfo);
         if( actionInfoObj && actionInfoObj.actionId && actionInfoObj.nextResponse ) {
             var action = actions.get(actionInfoObj.actionId);

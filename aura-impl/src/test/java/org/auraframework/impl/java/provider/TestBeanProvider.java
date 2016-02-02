@@ -23,7 +23,7 @@ import org.auraframework.system.Annotations.Provider;
 import org.auraframework.throwable.quickfix.QuickFixException;
 
 /**
- * A simple provider with useAdapter value set to true.
+ * A simple provider
  */
 @Provider
 public class TestBeanProvider implements ComponentDescriptorProvider {

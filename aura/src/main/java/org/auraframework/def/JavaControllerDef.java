@@ -28,13 +28,6 @@ package org.auraframework.def;
  * must be static methods. There is no reason to ever have instance methods, and there can be no state stored
  * on the controller.
  *
- * <li>Adapter Based Controllers:<br />
- * Adapter based controllers are annotated with {@link Controller} with useAdapter = true. These controllers must
- * have only instance methods (non-static). They can be instantiated once per context (request), and can assume that
- * multiple actions within a single context (e.g. chained actions) will be executed on the same instance. They
- * cannot assume anything about what other actions might have been executed in the same instance (i.e. multiple
- * actions in the same XHR request will be run on the same bean, but if they get split, they will not). If
- * this is not desired, use a static controller where no state is allowed.
  * </ul>
  *
  * Note that any methods not annotated with {@link AuraEnabled} are simply ignored.

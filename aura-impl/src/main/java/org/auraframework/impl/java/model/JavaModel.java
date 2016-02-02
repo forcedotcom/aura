@@ -37,11 +37,7 @@ import org.auraframework.util.json.Json;
 /**
  * A java model.
  *
- * A java model can have a 'useAdapter' flag similar to a controller, but the meaning here is subtly different.
- * If you set the bean flag on a model, it goes through the bean adapter just like a controller. This should
- * not be depended on in stand-alone aura, as a given implementation may change the semantics of BeanAdapter.
- *
- * In the event that you do not set the flag, the model is directly instantiated from the class (unlike controllers
+ * The model is directly instantiated from the class (unlike controllers
  * which are static).
  */
 public class JavaModel implements Model {

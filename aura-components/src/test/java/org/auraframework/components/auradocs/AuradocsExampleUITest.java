@@ -17,12 +17,16 @@ package org.auraframework.components.auradocs;
 
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.test.util.WebDriverTestCase;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 
 /**
  * A webdriver test for auradoc examples.
  */
+@UnAdaptableTest("Docs will mostly be accessed via external website, just verify it runs in standalone")
 public class AuradocsExampleUITest extends WebDriverTestCase {
 
     public AuradocsExampleUITest(String name) {
@@ -82,10 +86,17 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
     private long doReference(Mode mode) throws Exception {
         long start = System.currentTimeMillis();
         open("/auradocs#reference", mode);
-        WebElement sidebar = getAuraUITestingUtil().findDomElement(
-                By.xpath("//ol[contains(@class,'auradocsSidebar')]"));
-        assertEquals("We expect 8 sidebar menu items", 8,
-                sidebar.findElements(By.xpath("li")).size());
+        
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+            	WebElement sidebar = getAuraUITestingUtil().findDomElement(
+                        By.xpath("//ol[contains(@class,'auradocsSidebar')]"));
+                int totalMenuItems = sidebar.findElements(By.xpath("li")).size();
+            	return totalMenuItems == 8;
+            }
+        }, "We expect 8 sidebar menu items");
+        
         return System.currentTimeMillis() - start;
     }
 
@@ -93,10 +104,16 @@ public class AuradocsExampleUITest extends WebDriverTestCase {
         long start = System.currentTimeMillis();
         open("/auradocs#reference?descriptor=aura:component&defType=component",
                 mode);
-        WebElement tabset = getAuraUITestingUtil().findDomElement(
-                By.xpath("//ul[contains(@class,'tabs__nav')]"));
-        assertEquals("We expect 6 tabs in the component help", 6, tabset
-                .findElements(By.xpath("li")).size());
+        auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+            	WebElement tabset = getAuraUITestingUtil().findDomElement(
+                        By.xpath("//ul[contains(@class,'tabs__nav')]"));
+                int totalTabs = tabset.findElements(By.xpath("li")).size();
+            	return totalTabs == 6;
+            }
+        }, "We expect 6 tabs in the component help");
+        
         return System.currentTimeMillis() - start;
     }
 

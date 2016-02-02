@@ -394,8 +394,8 @@ AuraComponentService.prototype.newComponentDeprecated = function(config, attribu
         // var currentAccess = $A.getContext().getCurrentAccess();
         // Server should handle the case of an unknown def fetched "lazily"
         if(!$A.clientService.allowAccess(def) /* && currentAccess  */) {
-            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-            $A.warning("Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
+            // #if {"excludeModes" : ["PRODUCTION"]}
+            $A.error("Access Check Failed! AuraComponentService.newComponentDeprecated(): '" +
                 (def&&def.getDescriptor().getQualifiedName()) + "' is not visible to '" +
                 $A.getContext().getCurrentAccess() + "'.");
             // #end
@@ -594,8 +594,8 @@ AuraComponentService.prototype.newComponentAsync = function(callbackScope, callb
                 if($A.clientService.allowAccess(def)) {
                     collectComponent(this["newComponentDeprecated"](configItem, attributeValueProvider, localCreation, doForce),"SUCCESS","",i);
                 }else{
-                    // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-                    $A.warning("Access Check Failed! AuraComponentService.newComponentAsync(): '"+def.getDescriptor().getQualifiedName()+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
+                    // #if {"excludeModes" : ["PRODUCTION"]}
+                    $A.error("Access Check Failed! AuraComponentService.newComponentAsync(): '"+def.getDescriptor().getQualifiedName()+"' is not visible to '"+$A.getContext().getCurrentAccess()+"'.");
                     // #end
                     collectComponent(null,"ERROR","Unknown component '"+desc+"'.",i);
                 }
@@ -811,8 +811,8 @@ AuraComponentService.prototype.getDefinition = function(descriptor, callback) {
 
     if (def) {
         if(!$A.clientService.allowAccess(def)) {
-            // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-            $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
+            // #if {"excludeModes" : ["PRODUCTION"]}
+            $A.error("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
             // #end
             callback(null);
             return;
@@ -875,8 +875,8 @@ AuraComponentService.prototype.getDef = function(descriptor) {
     var def = this.getComponentDef(this.createDescriptorConfig(descriptor));
 
     if (def && !$A.clientService.allowAccess(def)) {
-        // #if {"excludeModes" : ["PRODUCTION","AUTOTESTING"]}
-        $A.warning("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
+        // #if {"excludeModes" : ["PRODUCTION"]}
+        $A.error("Access Check Failed! ComponentService.getDef():'" + def.getDescriptor().toString() + "' is not visible to '" + ($A.getContext()&&$A.getContext().getCurrentAccess()) + "'.");
         // #end
 
         return null;

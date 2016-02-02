@@ -552,7 +552,7 @@
         Skipping until, we upgrade
     -->
     <aura:if isTrue="{!v.caseToRender == 'ckeditor_test'}">
-        <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value="{!v.testContent}"/> <br/>
+        <ui:inputRichText aura:id="RICH_TEXT" label="label For Rich Text" value=""/> <br/>
     </aura:if>
 
     <!--test for radio buttons in fieldSets. All radio buttons with the same name should be in a fieldset. No errors-->

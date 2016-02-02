@@ -24,6 +24,7 @@
 	<aura:attribute name="header" type="Aura.Component[]"/>
 	<aura:attribute name="outputComponent" type="Aura.ComponentDefRef[]"/>
 	<aura:attribute name="body" type="Aura.ComponentDefRef[]"/>
+	<aura:attribute name="disabled" type="Boolean"/>
 
 	<aura:handler name="init" value="{!this}" action="{!c.init}"/>
 

@@ -18,8 +18,7 @@ package org.auraframework.def;
 /**
  * A definition for a java model.
  *
- * Similar to controllers and providers, you can either have a locally instantiated model POJO, or you can use
- * the useAdapter flag to indicate that the {@link BeanAdapter} will be instantiating the bean.
+ * Similar to controllers and providers, you can have a locally instantiated model POJO
  */
 public interface JavaModelDef extends ModelDef {
     Class<?> getJavaType();

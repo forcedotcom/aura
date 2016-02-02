@@ -184,8 +184,7 @@
      */
     testSingleModelNode : {
         test : function(cmp) {
-            cmp.find('searchTree').set('v.nodes', cmp.get('m.tree'));
-            // TODO(cconroy): sadly this doesn't seem to actually update the tree..
+            cmp.find('searchTree').set('v.tree', cmp.get('m.tree'));
         }
     }
 })

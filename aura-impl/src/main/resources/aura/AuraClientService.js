@@ -2661,7 +2661,7 @@ AuraClientService.prototype.allowAccess = function(definition, component) {
                 if(currentAccess){// && currentAccess.isValid()){
                     var accessDef=null;
                     var accessFacetDef=null;
-                    if(currentAccess instanceof Component){
+                    if(currentAccess.getComponentValueProvider&&currentAccess.getDef){
                         var accessFacetValueProvider = currentAccess.getComponentValueProvider();
                         accessFacetDef=accessFacetValueProvider&&accessFacetValueProvider.getDef();
                         accessDef=currentAccess.getDef();

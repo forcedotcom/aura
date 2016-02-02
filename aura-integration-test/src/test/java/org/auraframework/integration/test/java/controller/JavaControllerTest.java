@@ -38,9 +38,6 @@ import org.auraframework.impl.java.model.JavaValueDef;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.instance.Action;
 import org.auraframework.instance.Action.State;
-import org.auraframework.service.DefinitionService;
-import org.auraframework.system.Annotations.AuraEnabled;
-import org.auraframework.system.Annotations.Controller;
 import org.auraframework.system.Location;
 import org.auraframework.system.LoggingContext.KeyValueLogger;
 import org.auraframework.system.Message;
@@ -52,7 +49,6 @@ import org.auraframework.throwable.quickfix.DefinitionNotFoundException;
 import org.auraframework.throwable.quickfix.InvalidDefinitionException;
 import org.auraframework.throwable.quickfix.QuickFixException;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
-import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -132,15 +128,6 @@ public class JavaControllerTest extends AuraImplTestCase {
         assertNull("should not have doSomething", cont.getActionDefs().get("doSomething"));
         assertEquals("should have one method", 1, cont.getActionDefs().size());
         assertNotNull("should have doNothing", cont.getActionDefs().get("doNothing"));
-    }
-
-    /**
-     * Ensure that an action must be static.
-     */
-    public void testNonStaticAction() throws Exception {
-        assertControllerThrows("java://org.auraframework.impl.java.controller.TestControllerWithNonStaticAction",
-                InvalidDefinitionException.class, "Invalid non-static action in a controller: appendStrings",
-                "org.auraframework.impl.java.controller.TestControllerWithNonStaticAction");
     }
 
     public void testActionNoParameters() throws Exception {
@@ -610,65 +597,5 @@ public class JavaControllerTest extends AuraImplTestCase {
             this.key = key;
             this.value = value;
         }
-    }
-
-    private void checkInvalidBeanConstructor(Class<?> clazz, String message) {
-        DefDescriptor<ControllerDef> desc = DefDescriptorImpl.getInstance("java://" + clazz.getName(),
-                ControllerDef.class);
-        DefinitionService definitionService = Aura.getDefinitionService();
-        try {
-            definitionService.getDefinition(desc);
-            fail("Expected exception");
-        } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, message, clazz.getCanonicalName());
-        }
-    }
-
-    @Controller(useAdapter = true)
-    public static class BadBeanControllerConstructor {
-        public BadBeanControllerConstructor(String value) {
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBadBeanControllerConstructor() {
-        checkInvalidBeanConstructor(BadBeanControllerConstructor.class, "No default constructor found");
-    }
-
-    @Controller(useAdapter = true)
-    public static class PrivateBeanControllerConstructor {
-        private PrivateBeanControllerConstructor() {
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testPrivateBeanControllerConstructor() {
-        checkInvalidBeanConstructor(PrivateBeanControllerConstructor.class, "Default constructor is not public");
-    }
-
-    @Controller(useAdapter = true)
-    public static class ProtectedBeanControllerConstructor {
-        protected ProtectedBeanControllerConstructor() {
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testProtectedBeanControllerConstructor() {
-        checkInvalidBeanConstructor(ProtectedBeanControllerConstructor.class, "Default constructor is not public");
-    }
-
-    @Controller(useAdapter = true)
-    public static class StaticBeanControllerMethod {
-        public StaticBeanControllerMethod() {
-        }
-
-        @AuraEnabled
-        public static String getString() {
-            return "hi";
-        }
-    }
-
-    public void testStaticBeanControllerMethod() {
-        checkInvalidBeanConstructor(StaticBeanControllerMethod.class, "Invalid static action in a bean: getString");
     }
 }

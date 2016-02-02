@@ -72,19 +72,28 @@
 	  background-color: white;
 	  cursor: default;
 	}
-		header {
-			font-weight: 300;
+	.div_actionName {
+		font-weight: 300;
 			font-size: 1.125rem;
 			line-height: 1.25;
 			margin: .5rem;
 			overflow-wrap: break-word;
-		}
-		table, dl { margin: 0; width: 100%;}
-		dl{
+	}
+	.span_removeActionCard {
+		float: right;
+	    display: none;
+	    margin: 7px;
+	    padding: 2px 5px;
+	    color: #2E00FF;
+	    background-color: #EAEFF6;
+	    border: 1px solid #d8dde6;
+	    border-radius: 0.25rem;
+	}
+	dl{
 			display: flex;
 			flex-wrap: wrap;
-		}
-		th, dt {
+	}
+	th, dt {
 			font-weight: normal;
 			font-size: .75em;
 			padding: .5rem .5rem 0 .5rem;
@@ -93,102 +102,70 @@
 			line-height: 1.25;
 			letter-spacing: 0.0625em;
 			color: #54698d;
-		}
-		td, dd {
+	}
+	td, dd {
 			color: #16325c;
 			font-size: .75rem;
 			padding: 0 .5rem 0 .5rem;
 			margin: 0;
-		}
-		dd {
+	}
+	dd {
 			word-wrap: break-word;
-		}
+	}
     .div_actionParameter,
     .div_actionResponse
     {
       flex: 1 100%;
       min-width: 80px;
     }
-		code { margin: 5px; display: block; white-space: pre; }
-		/*.parameters:before {
-			color: #54698d;
-			content: 'Parameters';
-			display: inline-block;
-			flex: 0 0 auto;
-			font-size: 0.75rem;
-			line-height: 1.5;
-			width: 80px;
-			vertical-align: top;
-		}*/
-		/*.storageKey:before {
-			color: #54698d;
-			content: 'Storage Key';
-			display: inline-block;
-			flex: 0 0 auto;
-			font-size: 0.75rem;
-			line-height: 1.5;
-			width: 80px;
-			vertical-align: top;
-		}*/
-		/*.result:before {
-			content: 'Result';
-			display: inline-block;
-			color: #54698d;
-			display: inline-block;
-			flex: 0 0 auto;
-			font-size: 0.75rem;
-			line-height: 1.25;
-			letter-spacing: .0625em;
-			width: 80px;
-			vertical-align: top;
-		}*/
+	code { margin: 5px; display: block; white-space: pre; }
     .div_editActionResult {
 			display: none;
 			flex: auto;
 			padding: 0 .5rem;
     }
-		.div_editActionParameter {
+	.div_editActionParameter {
 			flex: auto;
 			padding: 0 .5rem;
     }
-		.code{
+	.code{
 			font-family: Menlo, monospace;
-		}
+	}
     .textarea_ActionResult,
-		.textarea_ActionParameter {
+	.textarea_ActionParameter {
       border: 1px solid #e0e5ee;
       width: 100%;
       box-sizing: border-box; /* Chrome, IE8, Opera, Safari 5.1*/
     }
-		textarea{
-			background-color: #fff;
-			color: #16325c;
-			border: 1px solid #d8dde6;
-			border-radius: .25rem;
-			width: 100%;
-			transition: border .1s linear,background-color .1s linear;
-			display: inline-block;
-			resize: vertical;
+	textarea{
+		background-color: #fff;
+		color: #16325c;
+		border: 1px solid #d8dde6;
+		border-radius: .25rem;
+		width: 100%;
+		transition: border .1s linear,background-color .1s linear;
+		display: inline-block;
+		resize: vertical;
     	padding: .5rem .75rem;
-		}
-		textarea:active,
-		textarea:focus {
+	}
+	textarea:active,
+	textarea:focus {
 	    outline: 0;
 	    border-color: #1589ee;
 	    background-color: #fff;
 	    box-shadow: 0 0 3px #0070D2;
-		}
+	}
     aurainspector-json {
 			/*margin: .5rem .5rem 0 0.5rem;*/
 			display: flex;
-		}
-		.watch .div_actionResponse,
-		.watch .div_actionParameter,
-		.watch aurainspector-json,
-		.watch dl.attributes{
+	}
+	.watch .div_actionResponse,
+	.watch .div_actionParameter,
+	.watch aurainspector-json,
+	.watch dl.attributes{
 			display: none;
-		}
-		.select {
+	}
+	.select {
 	    background-color: #fff;
 	    color: #16325c;
 	    border: 1px solid #d8dde6;
@@ -197,60 +174,60 @@
 	    -webkit-transition: border 0.1s linear,background-color 0.1s linear;
 	    transition: border 0.1s linear,background-color 0.1s linear;
 	    height: 2rem;
-		}
-		select:active,
-		select:focus {
+	}
+	select:active,
+	select:focus {
 	    outline: 0;
 	    border-color: #1589ee;
 	    background-color: #fff;
 	    box-shadow: 0 0 3px #0070D2;
-		}
-		.inline dd,
-		.inline dt{
+	}
+	.inline dd,
+	.inline dt{
       display: inline-block;
       vertical-align: middle;
 			padding: 0 .5rem 0 0;
-		}
-		.grid{
+	}
+	.grid{
 			display: flex;
-		}
-		.col {
+	}
+	.col {
 			flex: 1 1 auto;
 			min-width: 80px;
-		}
-		.shrink {
+	}
+	.shrink {
 			flex: 0 1 auto;
-		}
-		.p-around--xsmall{
+	}
+	.p-around--xsmall{
 			padding: .5rem;
-		}
-		.p-top--xxsmall{
+	}
+	.p-top--xxsmall{
 			padding-top: .25rem;
-		}
-		.m-top--xsmall{
+	}
+	.m-top--xsmall{
 			margin-top: .5rem;
-		}
-		.p-left--xsmall{
+	}
+	.p-left--xsmall{
 			padding-left: .5rem;
-		}
-		.p-right--xsmall{
+	}
+	.p-right--xsmall{
 			padding-right: .5rem;
-		}
-		.p-bottom--none{
+	}
+	.p-bottom--none{
 			padding-bottom: 0;
-		}
-		.hidden {
+	}
+	.hidden {
 			display: none;
-		}
-		.label {
+	}
+	.label {
 			color: #54698d;
 	    flex: 0 0 auto;
 	    font-size: 0.75rem;
 	    line-height: 1.5;
 	    width: 80px;
 	    vertical-align: top;
-		}
-		.toggle::before {
+	}
+	.toggle::before {
 		  content: '';
 		  display: inline-block;
 		  width: 0;
@@ -259,8 +236,8 @@
 		  border-left: 7px solid #777;
 		  border-bottom: 4px solid transparent;
 		  margin: 3px 3px 0 0;
-		}
-		.toggle.expanded::before {
+	}
+	.toggle.expanded::before {
 		  content: '';
 		  display: inline-block;
 		  width: 0;
@@ -271,101 +248,118 @@
 		  margin: 0 2px 0 0;
 		  position: relative;
 		  top: 4px;
-		}
+	}
 	</style>
 	<div class="card">
-    <header></header>
-
-    <div>
-		<dl class="inline">
-		<div class="div_actionParameter p-around--xsmall p-bottom--none grid">
-			<dt class="shink">Parameters</dt>
-			<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
-        </div>
-        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
-						<dt class="shrink">Result</dt>
-            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
-            <button id="button_editActionResponse">Modify</button>
-        </div>
+		<div>
+			<div class="div_actionName" id="div_actionName"></div>
+			<span id='span_removeActionCard' class='span_removeActionCard'>x</span>
+		</div>
+	    <div>
+			<dl class="inline">
+				<div class="div_actionParameter p-around--xsmall p-bottom--none grid">
+					<dt class="shink">Parameters</dt>
+					<dd class="col"><aurainspector-json class="parameters code" expandTo="0"></aurainspector-json></dd>
+		        </div>
+		        <div class="div_actionResponse p-around--xsmall p-bottom--none grid">
+					<dt class="shrink">Result</dt>
+		            <dd class="col"><aurainspector-json class="result code" expandTo="0" id="actionResultOld" ></aurainspector-json></dd>
+		            <dt class="shrink">Error</dt>
+		            <dd class="col"><aurainspector-json class="code" expandTo="0" id="actionError" ></aurainspector-json></dd>
+		        </div>
 			</dl>
-				<div class="p-around--xsmall p-bottom--none" id="actionParameter">
-					<button id="button_editActionParameter" class="button_editActionParameter toggle">
-						<label  for="actionParameter" class="label hidden">Match Parameters</label>
-					</button>
-				</div>
-        <div class="div_editActionParameter p-left--xsmall p-right--xsmall p-top--xxsmall" id="textarea_actionParameter">
-			<textarea name="actionParameter" id="text_actionParameter" class="textarea_ActionParameter code" rows="5" wrap="off">
-            </textarea>
-        </div>
-		<div class="p-around--xsmall p-bottom--none dropOrModify">
-			<select id="select_dropOrModify" class="select_dropOrModify select">
-			   	<option value="dropAction">Drop the Action</option>
-			    <option value="modifyResponse">Override the Result</option>
-			 </select>
-		</div>
-        <div class="div_editActionResult p-around--xsmall p-bottom--none">
-            <div class="div_textarea_ActionResult">
-            	<label for="actionResult" class="label">Key</label>
-            	<textarea name="actionResultKey" id="textarea_actionResultKey" class="textarea_ActionResult m-top--xsmall code" rows="1" wrap="off">
-            	</textarea>
-            	<label for="actionResult" class="label">New Value</label>
-            	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
-            	</textarea>
-        	</div>
-			<div class="div_actionButtons p-around--xsmall p-bottom--none">
-	            <button id="button_saveActionResult" class="button_saveActionResult text-button">Save Action Result</button>
-	            <button id="button_cancelChangeActionResult" class="button_cancelChangeActionResult text-button">Cancel</button>
+			<!--
+			<div class="p-around--xsmall p-bottom--none" id="matchActionParameter" class="matchActionParameter">
+				<button id="button_editActionParameter" class="button_editActionParameter toggle">
+					<label  for="actionParameter" class="label hidden">Match Parameters</label>
+				</button>
 			</div>
-        </div>
-		<div class="hidden">
-				<button id="button_saveActionParameter" class="text-button">Save</button>
-				<button id="button_cancelChangeActionParameter" class="button_cancelChangeActionParameter text-button">Cancel</button>
-		</div>
-    </div>
-    <!-- <aurainspector-json class="storageKey" expandTo="0"></aurainspector-json> -->
-    <dl class="attributes">
-			<div class="col">
-			     <dt>Id</dt>
-				<dd id="actionId"></dd>
+	        <div class="div_editActionParameter p-left--xsmall p-right--xsmall p-top--xxsmall" id="div_editActionParameter">
+				<textarea name="actionParameter" id="textarea_ActionParameter" class="textarea_ActionParameter code" rows="5" wrap="off">
+	            </textarea>
+	        </div>
+	        -->
+			<div class="p-around--xsmall p-bottom--none dropOrModify">
+				<select id="select_dropOrModify" class="select_dropOrModify select">
+				   	<option value="dropAction">Drop the Action</option>
+				    <option value="modifyResponse">Override the Result</option>
+				    <option value="errorResponseNextTime">Error Response Next Time</option>
+				</select>
 			</div>
-			<div class="col">
-            <dt>State</dt>
-						<dd id="actionState"></dd>
+	        <div class="div_editActionResult p-around--xsmall p-bottom--none">
+	            <div class="div_textarea_ActionResult">
+	            	<label for="actionResult" class="label">Key</label>
+	            	<select id="select_actionResultKey" class="select">
+	            	</select>
+	            	<label for="actionResult" class="label">New Value</label>
+	            	<textarea name="actionResultValue" id="textarea_actionResultValue" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	            	</textarea>
+	        	</div>
+				<div class="div_actionButtons p-around--xsmall p-bottom--none">
+		            <button id="button_saveActionResult" class="button_saveActionResult text-button">Save Action Result</button>
+		            <button id="button_cancelChangeActionResult" class="button_cancelChangeActionResult text-button">Cancel</button>
+				</div>
+	        </div>
+	        <div class="div_errorResponse p-around--xsmall p-bottom--none">
+	        	<label for="actionResult" class="label">Error Message</label>
+	        	<textarea name="actionErrorMessage" id="textarea_actionErrorMessage" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	            </textarea>
+	            <label for="actionResult" class="label">Error Stack</label>
+	            <textarea name="actionErrorStack" id="textarea_actionErrorStack" class="textarea_ActionResult m-top--xsmall code" rows="3" wrap="off">
+	            </textarea>
+	            <div class="div_actionButtons p-around--xsmall p-bottom--none">
+		            <button id="button_saveError" class="button_saveError text-button">Save Error</button>
+		            <button id="button_cancelError" class="button_cancelError text-button">Cancel</button>
+				</div>
+	        </div>
+			<div class="hidden">
+					<button id="button_saveActionParameter" class="text-button">Save</button>
+					<button id="button_cancelChangeActionParameter" class="button_cancelChangeActionParameter text-button">Cancel</button>
+			</div>
+	    </div>
+	    <dl class="attributes">
+				<div class="col">
+				     <dt>Id</dt>
+					<dd id="actionId"></dd>
 				</div>
 				<div class="col">
-            <dt>Abortable</dt>
-						<dd id="actionIsAbortable"></dd>
-				</div>
-				<div class="col">
-            <dt>Background</dt>
-						<dd id="actionIsBackground"></dd>
-				</div>
-				<div class="col">
-            <dt>Storable</dt>
-						<dd id="actionIsStorable"></dd>
-				</div>
-				<div class="col">
-            <dt>Storable Size Est.</dt>
-						<dd id="actionStorableSize"></dd>
-				</div>
-				<div class="col">
-            <dt>Storable Refresh</dt>
-						<dd id="actionIsRefresh"></dd>
-						</div>
-				<div class="col">
-            <dt>Storable Cache Hit</dt>
-						<dd id="actionFromStorage"></dd>
-				</div>
-				<div class="col">
-            <dt>Created Components</dt>
-						<dd id="statsCreated"></dd>
-				</div>
-				<div class="col">
-            <dt>Storage Key</dt>
-						<dd id=""><aurainspector-json class="storageKey code" expandTo="0"></aurainspector-json></dd>
-				</div>
-    </dl>
-</div>
+	            <dt>State</dt>
+							<dd id="actionState"></dd>
+					</div>
+					<div class="col">
+	            <dt>Abortable</dt>
+							<dd id="actionIsAbortable"></dd>
+					</div>
+					<div class="col">
+	            <dt>Background</dt>
+							<dd id="actionIsBackground"></dd>
+					</div>
+					<div class="col">
+	            <dt>Storable</dt>
+							<dd id="actionIsStorable"></dd>
+					</div>
+					<div class="col">
+	            <dt>Storable Size Est.</dt>
+							<dd id="actionStorableSize"></dd>
+					</div>
+					<div class="col">
+	            <dt>Storable Refresh</dt>
+							<dd id="actionIsRefresh"></dd>
+							</div>
+					<div class="col">
+	            <dt>Storable Cache Hit</dt>
+							<dd id="actionFromStorage"></dd>
+					</div>
+					<div class="col">
+	            <dt>Created Components</dt>
+							<dd id="statsCreated"></dd>
+					</div>
+					<div class="col">
+	            <dt>Storage Key</dt>
+							<dd id=""><aurainspector-json class="storageKey code" expandTo="0"></aurainspector-json></dd>
+					</div>
+	    </dl>
+	</div>
 
 
     

@@ -30,18 +30,13 @@ public class CryptoAdapterRegistrationRenderer implements Renderer {
     public void render(BaseComponent<?, ?> component, Appendable appendable) throws IOException, QuickFixException {
 
         Boolean debug = (Boolean) component.getAttributes().getValue("debugLoggingEnabled");
-        Boolean requireQueryParam = (Boolean) component.getAttributes().getValue("requireQueryParam");
 
         String encryptionKeyUrl = Aura.getConfigAdapter().getEncryptionKeyURL();
         appendable
             .append("<script>\n")
             .append("(function(){\n")
-            .append(   requireQueryParam ?  "  if (window.location.href.toLowerCase().indexOf('aura.crypto=true') === -1) {" : "")
-            .append(   requireQueryParam ?  "    $A.log('CryptoAdapter not registering because aura.crypto=true is absent');" : "")
-            .append(   requireQueryParam ?  "    return;" : "")
-            .append(   requireQueryParam ?  "  }" : "")
             .append(   debug ? "  $A.log('CryptoAdapter registering');\n" : "")
-            .append("  var CryptoAdapter = $A.storageService.CryptoAdapter;")
+            .append("  var CryptoAdapter = $A.storageService.CryptoAdapter;\n")
             .append("  CryptoAdapter.register();\n")
             .append("  if (!$A.storageService.isRegisteredAdapter(CryptoAdapter.NAME)) {\n")
             .append(     debug ? "    $A.log('CryptoAdapter was not registered');\n" : "")

@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-({
-    // TODO(W-2192746): There should be an error here saying that there is a problem with case sensitivity.
-    testCaseSensitivityWhenSettingParentAttributes:{
-        test:function(cmp){
-            $A.test.assertEquals(undefined, cmp.get('v.SIMPLEAttribute'),
-                "Attribute expression should be case sensitive.");
-            $A.test.assertEquals('parentY',cmp.get('v.SimpleAttribute'),
-                    "Attribute value must have been overriden by aura:set tag");
-        }
-    }
-})
+
+.THIS.bodyForChild {
+	display:block;
+	margin:30px;
+    padding:10px;
+    border: 2px solid green;
+}
+
+.THIS.bodyForParent {
+    margin:30px;
+    padding:10px;
+    border: 2px solid blue;
+}
+
+.THIS .title {
+    display: block;
+    margin:20px 10px 20px 10px
+}
+
+.THIS .parentlog {
+    display:block;
+    margin:10px;
+}
+
+.THIS .buttons {
+    margin: 10px
+}

@@ -80,9 +80,8 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                     "@Controller annotation is required on all Controllers.  Not found on %s", descriptor),
                     builder.getLocation());
         }
-        builder.setUseAdapter(ann.useAdapter());
         try {
-            builder.setActionMap(createActions(c, builder.getDescriptor(), ann.useAdapter()));
+            builder.setActionMap(createActions(c, builder.getDescriptor()));
         } catch (QuickFixException qfe) {
             builder.setParseError(qfe);
         }
@@ -194,7 +193,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
      * @param controllerDesc a descriptor for the class.
      */
     public static Map<String, JavaActionDef> createActions(Class<?> controllerClass,
-            DefDescriptor<ControllerDef> controllerDesc, boolean useAdapter) throws QuickFixException {
+            DefDescriptor<ControllerDef> controllerDesc) throws QuickFixException {
         Map<String, JavaActionDef> actions = Maps.newTreeMap();
         for (Method method : controllerClass.getMethods()) {
             if (method.isAnnotationPresent(AuraEnabled.class)) {
@@ -203,15 +202,7 @@ public class JavaControllerDefFactory extends BaseJavaDefFactory<ControllerDef> 
                 if (!Modifier.isPublic(modifiers)) {
                     throwControllerError("Invalid non-public action: ", controllerClass, method);
                 }
-                if (useAdapter) {
-                    if (Modifier.isStatic(modifiers)) {
-                        throwControllerError("Invalid static action in a bean: ", controllerClass, method);
-                    }
-                } else {
-                    if (!Modifier.isStatic(modifiers)) {
-                        throwControllerError("Invalid non-static action in a controller: ", controllerClass, method);
-                    }
-                }
+
                 JavaActionDef action = makeActionDef(method, controllerClass, controllerDesc);
 
                 if (action != null) {

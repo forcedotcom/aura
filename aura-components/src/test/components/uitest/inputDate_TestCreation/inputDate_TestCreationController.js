@@ -15,15 +15,16 @@
  */
 ({
     addInputDate: function(cmp, evt, helper) {
-        var attributes = {
-                "displayDatePicker": true
-        };
-        $A.createComponent("ui:inputDate", attributes, function(newCmp) {
+        $A.createComponent("ui:inputDate", {
+            "value": cmp.getReference("v.addl"),
+            "displayDatePicker": true
+        }, function (newCmp) {
             var holder = cmp.find("additionalHolder");
             var body = holder.get("v.body");
             body.push(newCmp);
             holder.set("v.body", body);
             cmp.set("v.count", cmp.get("v.count")+1)
+            cmp.set("v.count", cmp.get("v.count") + 1)
         });
     }
 })

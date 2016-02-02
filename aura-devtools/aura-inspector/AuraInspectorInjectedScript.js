@@ -20,16 +20,33 @@
     global[$Symbol] = $Aura;
 
     $Aura.actions = {
+
+        /* event handlder for OnActionToRemoveFromWatchEnqueue, this will remove one action from watch list
+        called by AuraInspectorActionsView_OnRemoveActionFromWatchList in AuraInspectorActionsView.js
+        data = {
+            'actionName': string
+        }
+        */
+        "AuraDevToolService.RemoveActionFromWatch": function(data) {
+            if(!data) {
+                console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
+            }
+            if(data.actionName && actionsToWatch[data.actionName]) {
+                delete actionsToWatch[data.actionName];
+            }
+        },
+
+
         /*the event handler for AuraInspector:OnActionToWatchEnqueue
         called by AuraInspectorActionsView.drop and AuraInspectorActionsView_OnEnqueueNextResponseForAction
-        var dataToPublish = { 
-                            'actionName': actionName, //no need
-                            'actionParameter':actionParameter, //no need for here...yet
-                            'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
-                            'actionIsStorable': actionIsStorable,
-                            'actionStorageKey': actionStorageKey,
-                            'nextResponse': nextResponse};
-                            */
+        data = { 
+                    'actionName': string, 
+                    'actionParameter':actionParameter, //no need for here...yet
+                    'actionId': actionId.substring(12, actionId.length), //action_card_713;a --> 713;a
+                    'actionIsStorable': actionIsStorable,
+                    'actionStorageKey': actionStorageKey,
+                    'nextResponse': nextResponse};
+        */
         "AuraDevToolService.AddActionToWatch": function(data) {
             if(!data) {
                 console.error("AuraDevToolService.AddActionToWatch receive no data from publisher");
@@ -69,23 +86,13 @@
             }//end of aleadyAdded is false
             
             actionsToWatch[data.actionName] = data; 
-            if(data.nextResponse) {
-                //override decode
-                //console.log("AddActionToWatch, nextResponse:", data.nextResponse);
-                $A.uninstallOverride("ClientService.decode", onDecode);
-                $A.installOverride("ClientService.decode", onDecode);
-            } else {
-                //override send                
-                //actionsToDrop.push(data);
-                //we need to keep a map between actionID --> action , right before send
-                $A.uninstallOverride("ClientService.send", OnSendAction);
-                $A.installOverride("ClientService.send", OnSendAction);
-            }
         },
 
 
-
-        "AuraDevToolService.RemoveActionsToWatch": function() {
+        /*
+        handler for AuraInspector:OnActionToWatchClear, this will clear up all actions from watch list
+        */
+        "AuraDevToolService.RemoveActionsFromWatch": function() {
             actionsToWatch = {};
             $A.uninstallOverride("ClientService.send", OnSendAction);
             $A.installOverride("ClientService.send", OnSendAction);
@@ -240,7 +247,8 @@
     $Aura.Inspector.subscribe("AuraInspector:OnHighlightComponentEnd", $Aura.actions["AuraDevToolService.RemoveHighlightElement"]);
 
     $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchEnqueue", $Aura.actions["AuraDevToolService.AddActionToWatch"]);
-    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsToWatch"])
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToRemoveFromWatchEnqueue", $Aura.actions["AuraDevToolService.RemoveActionFromWatch"]);
+    $Aura.Inspector.subscribe("AuraInspector:OnActionToWatchClear", $Aura.actions["AuraDevToolService.RemoveActionsFromWatch"])
 
     function AuraInspector() {
         var subscribers = new Map();
@@ -342,29 +350,53 @@
                     };
 
                     if(configuration.attributes) {
+                        var auraError=$A.error;                       
                         var attributes = component.getDef().getAttributeDefs();
-                        attributes.each(function(attributeDef) {
-                            var key = attributeDef.getDescriptor().getName();
-                            var value;
-                            var rawValue;
-                            // If we don't want the body serialized, skip it.
-                            // We would only want the body if we are going to show
-                            // the components children.
-                            if(key === "body" && !configuration.body) { return; }
-                            try {
-                                rawValue = component._$getRawValue$(key);
-                                value = component.get("v." + key);
-                            } catch(e) {
-                                value = undefined;
-                            }
-                            if($A.util.isExpression(rawValue)) {
-                                output.expressions[key] = rawValue+"";
-                                output.attributes[key] = value;
-                            } else {
-                                output.attributes[key] = rawValue;
-                            }
-                        }.bind(this));
-                    } else if(!configuration.attributes && configuration.body) {
+
+                        try {
+                            // The Aura Inspector isn't special, it doesn't 
+                            // have access to the value if the access check
+                            // system prevents it. So we should notify we
+                            // do not have access.
+                            var accessCheckFailed;
+
+                            // Track Access Check failure on attribute access
+                            $A.error=function(message,error){
+                                if(message.indexOf("Access Check Failed!")===0){
+                                    accessCheckFailed = true;
+                                }
+                            };
+
+                            attributes.each(function(attributeDef) {
+                                var key = attributeDef.getDescriptor().getName();
+                                var value;
+                                var rawValue;
+                                accessCheckFailed = false;
+
+                                // If we don't want the body serialized, skip it.
+                                // We would only want the body if we are going to show
+                                // the components children.
+                                if(key === "body" && !configuration.body) { return; }
+                                try {
+                                    rawValue = component._$getRawValue$(key);
+                                    value = component.get("v." + key);
+                                } catch(e) {
+                                    value = undefined;
+                                }
+
+                                if($A.util.isExpression(rawValue)) {
+                                    output.expressions[key] = rawValue+"";
+                                    output.attributes[key] = accessCheckFailed ? "[ACCESS CHECK FAILED]" : value;
+                                } else {
+                                    output.attributes[key] = rawValue;
+                                }
+                            }.bind(this));
+                        } catch(e) {
+                            console.error(e);
+                        } finally {
+                            $A.error = auraError;
+                        }
+                    } else if(configuration.body) {
                         var rawValue;
                         var value;
                         try {
@@ -430,9 +462,7 @@
                 "__proto__": null
             };
             var visited = new Set();
-            var toJSON = InvalidComponent.prototype.toJSON;
             var toJSONCmp = Component.prototype.toJSON;
-            delete InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
             var result = "{}";
             try {
@@ -490,7 +520,7 @@
                         }
                         else if(!$A.util.isEmpty(value)) {
                             visited.add(value);
-                            value.$serId = increment++;
+                            value.$serId$ = increment++;
                         }
                     }
 
@@ -504,11 +534,10 @@
 
             visited.forEach(function(item){
                 if("$serId$" in item) {
-                    delete item["$serId"];
+                    delete item["$serId$"];
                 }
             });
 
-            InvalidComponent.prototype.toJSON = toJSON;
             Component.prototype.toJSON = toJSONCmp;
 
             return result;
@@ -707,9 +736,7 @@
 
         function output(data) {
             var componentToJSON = Component.prototype.toJSON;
-            var invalidComponentToJSON = InvalidComponent.prototype.toJSON;
             delete Component.prototype.toJSON;
-            delete InvalidComponent.prototype.toJSON;
 
             var json = $Aura.Inspector.safeStringify(data, function(key, value){
                 if($A.util.isComponent(value)) {
@@ -721,23 +748,12 @@
             });
 
             Component.prototype.toJSON = componentToJSON;
-            InvalidComponent.prototype.toJSON = invalidComponentToJSON;
 
             return json;
         }
     }
 
-    //how expensive is JSON.parse?  can we save the trouble by just doing string.indexof
-    function containsActionsWeAreWatching(oldResponseText) {
-        for(actionWatched in actionsWatched) {
-            if(oldResponseText.indexOf(actionWatched) > 0 ) {
-                return true;
-                break;
-            }
-        }
-        return false;
-    }
-
+    //This return true if the object is an array, and it's not empty
     function isNonEmptyArray(obj) {
         if(obj && typeof obj === "object" && obj instanceof Array && obj.length && obj.length > 0) {
             return true;
@@ -746,6 +762,7 @@
         }
     }
 
+    //This return true if the object is with type Object, but not an array or null/undefined
     function isTrueObject(obj) {
         if(obj && typeof obj === "object" && !(obj instanceof Array)) {
             return true;
@@ -768,8 +785,7 @@
                     var returnValuek = returnValue[key];
                     if(nextResponse[key]) {
                         returnValue[key] = nextResponse[key];
-                        console.log("found a match, update response for "+key);
-                        //delete nextResponse[key];
+                        //console.log("found a match, update response for "+key);
                         return true;   
                     } else {
                         var res = replaceValueInObj(returnValuek, nextResponse);
@@ -790,30 +806,79 @@
             var oldResponseText = oldResponse["responseText"];
             var newResponseText = oldResponseText;
             var responseModified = false;//if we modify the response, set this to true
+            var responseWithError = false;//if we send back error response, set this to true
 
-            if( actionsWatched != {} ) {
+            if( Object.getOwnPropertyNames(actionsWatched).length > 0 ) {
                 for(actionWatchedId in actionsWatched) {
                     if(oldResponseText.indexOf(actionWatchedId) > 0) {
                         var actionWatched = actionsWatched[actionWatchedId];
-                        if(actionWatched.nextResponse && oldResponseText.startsWith("while(1);") ) {
+                        if( ( actionWatched.nextResponse || actionWatched.nextError) && oldResponseText.startsWith("while(1);") ) {
+                            //parse oldResponseObj out of oldResponseText
                             var oldResponseObj = JSON.parse(oldResponseText.substring(9, oldResponseText.length));
+                            //replace returnValue in oldResponseObj's actions
                             if(oldResponseObj && oldResponseObj.actions) {
                                 var actionsFromOldResponse = oldResponseObj.actions;
                                 for(var i = 0; i < actionsFromOldResponse.length; i++) {
-                                    var returnValue = actionsFromOldResponse[i].returnValue; 
-                                    responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
-
-                                    if(responseModified === true) {
-                                        //no need to continue, returnValue now contains new response
-                                        actionsFromOldResponse[i].returnValue = returnValue;
-                                        break; //get out of looping over actionsFromOldResponse
-                                    }
+                                    if(actionsFromOldResponse[i].id && actionsFromOldResponse[i].id === actionWatchedId) {
+                                        if(actionWatched.nextError) {//we would like to return error response 
+                                            var errsArr = []; 
+                                            errsArr.push(actionWatched.nextError);
+                                            actionsFromOldResponse[i].state = "ERROR";
+                                            //when action return with error, returnValue should be null
+                                            actionsFromOldResponse[i].returnValue = null;
+                                            actionsFromOldResponse[i].error = errsArr;
+                                            responseWithError = true;
+                                            break;//get out of looping over actionsFromOldResponse
+                                        } else {//we would like to return non-error response
+                                            var returnValue = actionsFromOldResponse[i].returnValue; 
+                                            responseModified = replaceValueInObj(returnValue, actionWatched.nextResponse);
+                                            if(responseModified === true) {
+                                                //no need to continue, returnValue now contains new response
+                                                actionsFromOldResponse[i].returnValue = returnValue;
+                                                break; //get out of looping over actionsFromOldResponse
+                                            }
+                                        }
+                                    } 
                                 }//end of looping over actionsFromOldResponse
                             }//end of oldResponseObj is valid and it has actions
-                            if(responseModified === true) {
+                            //replace context in oldResponseObj
+                            if(responseWithError === true ) {
+                                //udpate context: 
+                                //if response is ERROR, we shouldn't have any SERIAL_REFID or SERIAL_ID related object in context, or our real decode will explode
+                                if(oldResponseObj.context && oldResponseObj.context.globalValueProviders) {
+                                    var newGVP = [];
+                                    for(var j = 0; j < oldResponseObj.context.globalValueProviders.length; j++) {
+                                        var gvpj = oldResponseObj.context.globalValueProviders[j];
+                                        if( isTrueObject(gvpj) && gvpj.type ) {
+                                            if(gvpj.type === "$Locale" || gvpj.type === "$Browser" || gvpj.type === "$Global") {
+                                                //we keep Local, Browser and Global ONLY
+                                                newGVP.push(gvpj);
+                                            } else {
+                                                //get rid of others
+                                            }
+                                        }
+                                    }
+                                    oldResponseObj.context.globalValueProviders = newGVP;
+                                }
+                                //update actions
                                 oldResponseObj.actions = actionsFromOldResponse;
                                 newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
-                                //move the action from Watching to Processed
+                                //move the actionCard from watch list to Processed
+                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
+                                $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
+                                        "id": actionWatchedId,
+                                        "idtoWatch": actionWatched.idtoWatch,
+                                        "state": "RESPONSEMODIFIED",
+                                        "error": actionWatched.nextError,//we don't show error on processed actionAcard, but pass it anyway
+                                        "sentTime": performance.now()//do we need this?
+                                });
+                                delete actionsWatched[actionWatchedId];
+                                break;//get out of looping over actionsWatched
+                            } else if(responseModified === true) {
+                                oldResponseObj.actions = actionsFromOldResponse;
+                                newResponseText = "while(1);\n"+JSON.stringify(oldResponseObj);
+                                //move the actionCard from watch list to Processed
+                                //this will call AuraInspectorActionsView_OnActionStateChange in AuraInspectorActionsView.js
                                 $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                                         "id": actionWatchedId,
                                         "idtoWatch": actionWatched.idtoWatch,
@@ -828,7 +893,7 @@
                 }//end of looping over actionsWatched
             }//end of actionsWatched is not empty
 
-            if(responseModified === true) {
+            if(responseModified === true || responseWithError === true) {
                 var newHttpRequest = {};
                 newHttpRequest = $A.util.apply(newHttpRequest, oldResponse);
                 newHttpRequest["response"] = newResponseText;
@@ -836,23 +901,24 @@
 
                 var ret = config["fn"].call(config["scope"], newHttpRequest, noStrip);
                 return ret;
-            } else {
+            } else {//nothing happended, just send back oldResponse
                 var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
-                return oldResponse;
+                return ret;
             }
         } else {
             console.log("AuraInspectorInjectedScript.onDecode, receive bad response, just pass it along");
             var ret = config["fn"].call(config["scope"], oldResponse, noStrip);
-            return oldResponse;
+            return ret;
         }
     }
 
+    //go through actionToWatch, if we run into an action we are watching, either drop it
+    //or register with actionsWatched, so we can modify response later in onDecode
     function OnSendAction(config, auraXHR, actions, method, options) {
             if (actions) {
                 for(var c=0;c<actions.length;c++) {
-                    if(actionsToWatch !== {}) {
+                    if( Object.getOwnPropertyNames(actionsToWatch).length > 0) {
                         var action = actions[c];
-                        //for(var i=0; i<actionsToWatch.length; i++) {
                         for(key in actionsToWatch) {
                             var actionToWatch = actionsToWatch[key];
                             if(actionToWatch.actionName.indexOf(action.getDef().name) >= 0) {
@@ -861,11 +927,12 @@
                                     console.log("Error: we already watching this action:", action);
                                 } else {
                                     //copy nextResponse to actionWatched
+                                    action['nextError'] = actionToWatch.nextError;
                                     action['nextResponse'] = actionToWatch.nextResponse;
                                     action['idtoWatch'] = actionToWatch.actionId;
                                     actionsWatched[''+action.getId()] = action;
                                 }
-                                if(actionToWatch.nextResponse) { //we want to modify response, so let it stay in watch list
+                                if(actionToWatch.nextResponse || actionToWatch.nextError) { //we want to modify response, so let it stay in watch list
                                     console.log("action we want to modify response are send to server:"+actionToWatch.actionName, action);
                                     //still update the left side
                                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
@@ -873,8 +940,6 @@
                                         "state": "RUNNING",
                                         "sentTime": performance.now()
                                         });
-                                    //we already copy everything to actionToWatch, no need to keep it here
-                                    delete actionsToWatch[key];
                                 } else { //we want to drop it, so do it
                                     //move the action from Watching to Processed
                                     $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
@@ -885,19 +950,22 @@
                                     });
                                     //drop the action from auraXHR
                                     actions.splice(c, 1);
-                                    //remove it from actionsToWatch
-                                    delete actionsToWatch[key];
                                 }
+                                //remove from actionsToWatch
+                                //if we wanted to drop the action it's done alreay,
+                                //if we want to override response, we did copy everything to actionsWatched
+                                //no need to keep this actoinToWatch around
+                                delete actionsToWatch[key];
                             }
                         }
-                    }
+                    }//end if actionsToWatch is not empty
                     else {
                         $Aura.Inspector.publish("AuraInspector:OnActionStateChange", {
                         "id": actions[c].getId(),
                         "state": "RUNNING",
                         "sentTime": performance.now()
                         });
-                    }
+                    }//if actionsToWatch is empty
 
                 }
             }
@@ -915,6 +983,7 @@
         $A.installOverride("Action.abort", OnAbortAction);
         $A.installOverride("ClientService.send", OnSendAction);
         $A.installOverride("Action.runDeprecated", OnActionRunDeprecated);
+        $A.installOverride("ClientService.decode", onDecode);
 
         function OnEnqueueAction(config, action, scope) {
             var ret = config["fn"].call(config["scope"], action, scope);
@@ -955,6 +1024,7 @@
                 "state": action.getState(),
                 "fromStorage": action.isFromStorage(),
                 "returnValue": $Aura.Inspector.safeStringify(action.getReturnValue()),
+                "error": $Aura.Inspector.safeStringify(action.getError()),
                 "finishTime": performance.now(),
                 "stats": {
                     "created": $Aura.Inspector.getCount("component_created") - startCounts.created

@@ -23,13 +23,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.auraframework.Aura;
 import org.auraframework.def.DefDescriptor;
 import org.auraframework.def.JavaModelDef;
 import org.auraframework.def.ModelDef;
 import org.auraframework.def.TypeDef;
 import org.auraframework.def.ValueDef;
-import org.auraframework.impl.adapter.BeanAdapterImpl;
 import org.auraframework.impl.system.DefDescriptorImpl;
 import org.auraframework.impl.system.DefinitionImpl;
 import org.auraframework.impl.util.AuraUtil;
@@ -51,17 +49,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         super(builder);
         this.modelClass = builder.modelClass;
         this.memberMap = AuraUtil.immutableMap(builder.memberMap);
-        this.useAdapter = builder.useAdapter;
-    }
-
-    @Override
-    public void validateDefinition() throws QuickFixException {
-        super.validateDefinition();
-        if (this.useAdapter) {
-            Aura.getBeanAdapter().validateModelBean(this);
-        } else {
-            BeanAdapterImpl.validateConstructor(this.modelClass);
-        }
     }
 
     /**
@@ -71,14 +58,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         // FIXME: put all of our method dependencies in here...
-    }
-
-
-    /**
-     * is this model meant to be instantiated by the bean service.
-     */
-    public boolean isUseAdapter() {
-        return useAdapter;
     }
 
     /**
@@ -155,7 +134,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
 
         private Class<?> modelClass;
         private Map<String, JavaValueDef> memberMap;
-        private boolean useAdapter;
 
         public Builder setModelClass(Class<?> c) {
             this.modelClass = c;
@@ -169,10 +147,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
             JavaValueDef member = new JavaValueDef(name, method, typeDescriptor,
                     new Location(this.modelClass.getName() + "." + name, 0));
             this.memberMap.put(name, member);
-        }
-
-        public void setUseAdapter(boolean useAdapter) {
-            this.useAdapter = useAdapter;
         }
 
         @Override
@@ -197,5 +171,4 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     private static final long serialVersionUID = -1808570833698749554L;
     private final Class<?> modelClass;
     private final Map<String, JavaValueDef> memberMap;
-    private final boolean useAdapter;
 }

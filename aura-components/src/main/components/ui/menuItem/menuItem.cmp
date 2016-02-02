@@ -24,8 +24,9 @@
     <aura:attribute access="GLOBAL" name="type" type="String" description="The concrete type of the menu item. Accepted values are 'action', 'checkbox', 'radio', 'separator' or any namespaced component descriptor, e.g. ns:xxxxmenuItem."/>
     <aura:attribute access="GLOBAL" name="label" type="String" description="The text displayed on the component."/>
 
-    <!-- DO NOT USE. There's an attribute on menuList now that has the same role but for the whole menu list. -->
-    <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="false" description="Set to true to hide menu after the menu item is selected." />
+    <aura:attribute access="GLOBAL" name="hideMenuAfterSelected" type="Boolean" default="true" description="Set to true to hide menu after the menu item is selected." />
+
+    <aura:attribute name="focusTriggerAfterSelected" type="Boolean" default="false" description="JBUCH: Access Check Failure. Assume necessary, based on menuItemController.js, line 27." />
 
     <aura:handler name="mouseover" action="{!c.handleMouseover}"/>
     {!v.body}

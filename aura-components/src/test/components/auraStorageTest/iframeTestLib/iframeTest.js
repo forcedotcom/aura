@@ -48,8 +48,7 @@ function iframeTest() {
             $A.test.addWaitFor(true, function() {
                 return cmp._frameLoaded
                     && iframeWindow.$A
-                    && iframeWindow.$A.getRoot() !== undefined
-                    && !$A.test.isActionPending()
+                    && iframeWindow.$A.finishedInit === true
             });
         },
 

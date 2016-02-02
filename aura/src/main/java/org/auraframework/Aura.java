@@ -198,13 +198,6 @@ public class Aura {
     }
 
     /**
-     * Get the bean adapter for aura to create controller/model beans.
-     */
-    public static BeanAdapter getBeanAdapter() {
-        return Aura.get(BeanAdapter.class);
-    }
-    
-    /**
      * ServiceLocator is no longer the way to go, we now should be using Spring injection. 
      * It's not easy to do a one for one swap, but we should be moving away from using Aura.get() any more.
      * 

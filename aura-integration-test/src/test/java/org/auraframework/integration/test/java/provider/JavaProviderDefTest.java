@@ -495,51 +495,6 @@ public class JavaProviderDefTest extends AuraImplTestCase {
     }
 
     /**
-     * Provider with inaccessible constructor throws a AuraRuntimeException.
-     */
-    public void testProviderWithPrivateConstructor() throws Exception {
-        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.java.provider.TestProviderWithPrivateConstructor", ProviderDef.class);
-        try {
-            javaPrvdrDefDesc.getDef();
-            fail("Expected a InvalidDefinitionException");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Default constructor is not public.", javaPrvdrDefDesc.getDescriptorName());
-        }
-    }
-
-    /**
-     * Provider without no-arg constructor throws a AuraRuntimeException.
-     */
-    public void testProviderWithoutNoArgConstructor() throws Exception {
-        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.java.provider.TestProviderWithoutNoArgConstructor", ProviderDef.class);
-        try {
-            javaPrvdrDefDesc.getDef();
-            fail("Expected a InvalidDefinitionException");
-        } catch (Exception e) {
-            checkExceptionFull(e, InvalidDefinitionException.class,
-                    "No default constructor found.", javaPrvdrDefDesc.getDescriptorName());
-        }
-    }
-
-    /**
-     * Exception thrown during provider instantiation should be a InvalidDefinitionException.
-     */
-    public void testProviderThrowsDuringInstantiation() throws Exception {
-        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(
-                "java://org.auraframework.impl.java.provider.TestProviderThrowsDuringInstantiation", ProviderDef.class);
-        try {
-            javaPrvdrDefDesc.getDef();
-            fail("Expected an intentional error");
-        } catch (Throwable e) {
-            checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Unable to instantiate class", javaPrvdrDefDesc.getDescriptorName());
-        }
-    }
-
-    /**
      * Verify QuickFixExceptions thrown in the provide method are not swallowed.
      */
     public void testProviderThrowsQFE() throws Exception {
@@ -551,67 +506,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         }
     }
 
-    private void checkInvalidBeanConstructor(Class<?> clazz, String message) {
-        DefDescriptor<ProviderDef> desc = DefDescriptorImpl.getInstance("java://" + clazz.getName(),
-                ProviderDef.class);
-        DefinitionService definitionService = Aura.getDefinitionService();
-        try {
-            definitionService.getDefinition(desc);
-            fail("Expected exception");
-        } catch (Exception e) {
-            checkExceptionStart(e, InvalidDefinitionException.class, message, clazz.getCanonicalName());
-        }
-    }
-
-    @Provider(useAdapter = true)
-    public static class BadBeanProviderConstructor implements ComponentDescriptorProvider {
-        public BadBeanProviderConstructor(String value) {
-        }
-
-        @Override
-        public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-            return null;
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBadBeanProviderConstructor() {
-        checkInvalidBeanConstructor(BadBeanProviderConstructor.class, "No default constructor found");
-    }
-
-    @Provider(useAdapter = true)
-    public static class PrivateBeanProviderConstructor implements ComponentDescriptorProvider {
-        private PrivateBeanProviderConstructor() {
-        }
-
-        @Override
-        public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-            return null;
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testPrivateBeanProviderConstructor() {
-        checkInvalidBeanConstructor(PrivateBeanProviderConstructor.class, "Default constructor is not public");
-    }
-
-    @Provider(useAdapter = true)
-    public static class ProtectedBeanProviderConstructor implements ComponentDescriptorProvider {
-        protected ProtectedBeanProviderConstructor() {
-        }
-
-        @Override
-        public DefDescriptor<ComponentDef> provide() throws QuickFixException {
-            return null;
-        }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testProtectedBeanProviderConstructor() {
-        checkInvalidBeanConstructor(ProtectedBeanProviderConstructor.class, "Default constructor is not public");
-    }
-
-    @Provider(useAdapter = true)
+    @Provider
     public static class DefaultBeanProviderConstructor implements ComponentDescriptorProvider {
         @Override
         public DefDescriptor<ComponentDef> provide() throws QuickFixException {
@@ -648,20 +543,7 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         }
     }
 
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testBeanProviderThrowsDuringInstantiation() {
-        DefDescriptor<ProviderDef> javaPrvdrDefDesc = DefDescriptorImpl.getInstance(
-                "java://" + BeanProviderThrowsDuringInstantiation.class.getName(), ProviderDef.class);
-        try {
-            javaPrvdrDefDesc.getDef();
-            fail("Expected an intentional error");
-        } catch (Throwable e) {
-            checkExceptionFull(e, InvalidDefinitionException.class,
-                    "Unable to instantiate class", BeanProviderThrowsDuringInstantiation.class.getCanonicalName());
-        }
-    }
-
-    @Provider(useAdapter = true)
+    @Provider
     public abstract class AbstractBeanProvider implements ComponentDescriptorProvider {
         @Override
         public DefDescriptor<ComponentDef> provide() throws QuickFixException {
@@ -669,21 +551,11 @@ public class JavaProviderDefTest extends AuraImplTestCase {
         }
     }
 
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testAbstractBeanProvider() {
-        checkInvalidBeanConstructor(AbstractBeanProvider.class, "No default constructor found");
-    }
-
-    @Provider(useAdapter = true)
+    @Provider
     private static class NonPublicBeanProvider implements ComponentDescriptorProvider {
         @Override
         public DefDescriptor<ComponentDef> provide() throws QuickFixException {
             return null;
         }
-    }
-
-    @UnAdaptableTest("BeanAdapter might be different")
-    public void testNonPublicBeanProvider() {
-        checkInvalidBeanConstructor(NonPublicBeanProvider.class, "Default constructor is not public");
     }
 }

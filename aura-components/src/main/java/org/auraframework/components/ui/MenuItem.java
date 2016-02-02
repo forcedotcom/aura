@@ -34,7 +34,7 @@ public class MenuItem implements HasClassName, HasDisabled, HasLabel, HasSelecte
     private final boolean selected;
     private final String type;
     private final String value;
-    private final boolean hideMenuAfterSelected;
+    private final Boolean hideMenuAfterSelected;
     
     public MenuItem(String label, String type) {
         this(label, false, type);

@@ -117,10 +117,10 @@
                 // Make this more robust once we refactor this component
     			var concreteCmp = component.getConcreteComponent();
     			if (event.type === "keydown") {
-    				if (event.keyCode === 39 || event.keyCode === 40) {  // right or down arrow key
+    				if (event.keyCode === 40) {  // down arrow key
     					event.preventDefault();
     					helper.setFocusToNextItem(concreteCmp, event);
-    				} else if (event.keyCode === 37 || event.keyCode === 38) {  // left or up arrow key
+    				} else if (event.keyCode === 38) {  // up arrow key
     					event.preventDefault();
     					helper.setFocusToPreviousItem(concreteCmp, event);
     				} else if (event.keyCode === 27) {  // Esc key
@@ -264,22 +264,22 @@
     onMenuItemSelected: function(component, event) {
     	var concrete = component.getConcreteComponent();
 
-    	var hideMenu = event.getParam("hideMenu") || $A.util.getBooleanValue(component.get("v.hideMenuAfterSelected"));
+        var deselectSiblings = event.getParam("deselectSiblings");
+        if (deselectSiblings === true) {
+            this.deselectSiblings(component, event.getSource());
+        }
 
-    	var deselectSiblings = event.getParam("deselectSiblings");
-    	var focusTrigger = event.getParam("focusTrigger");
+        var hideMenu = event.getParam("hideMenu");
+        if (hideMenu === true) {
+            concrete.set("v.visible", false);
+        }
 
-    	if (deselectSiblings === true) {
-    		this.deselectSiblings(component, event.getSource());
-    	}
-    	if (hideMenu === true) {
-    		concrete.set("v.visible", false);
-    	}
-    	if (focusTrigger) {
-    		this.setFocusToTrigger(component);
-    	}
-    	var e = component.get("e.menuSelect");
-    	e.setParams(event.getParams()).fire();
+        var focusTrigger = event.getParam("focusTrigger");
+        if (focusTrigger === true) {
+            this.setFocusToTrigger(component);
+        }
+
+    	component.get("e.menuSelect").fire(event.getParams());
     },
 
     /**

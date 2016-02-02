@@ -942,7 +942,7 @@ TestInstance.prototype.assertAuraType = function(type, condition, assertMessage)
  * @function Test#fail
  */
 TestInstance.prototype.fail = function(assertMessage, extraInfoMessage) {
-    var msg = assertMessage || "Assertion failure";
+    var msg = assertMessage || "Assertion failure. Please provide assertion message.";
     if (extraInfoMessage) {
         msg += extraInfoMessage;
     }
@@ -2005,6 +2005,7 @@ TestInstance.prototype.runInternal = function(name) {
     var that = this;
 
     this.cmp = $A.getRoot();
+    $A.getContext().setCurrentAccess(this.cmp);
     var useLabel = function(labelName) {
         var suiteLevel = that.suite[labelName] || false;
         var testLevel = that.suite[name][labelName];

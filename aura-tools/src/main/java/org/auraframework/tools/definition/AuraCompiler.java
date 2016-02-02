@@ -121,6 +121,7 @@ public abstract class AuraCompiler {
             cll.error(rse.getMessage(), rse.getCause());
             System.exit(1);
         }
+        System.exit(0);
     }
 
 }

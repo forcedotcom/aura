@@ -215,12 +215,18 @@
 	},
 
 	getOptions : function(inputSelectCmp) {
-		var options = []
-		var inputSelectBody = inputSelectCmp.get("v.body");
-		for (var i=0; i<inputSelectBody.length; i++) {
-			var groupBody = inputSelectBody[i].get("v.body");
-			for (var j=0; j<groupBody.length; j++) {
-				options.push(groupBody[j]);
+		//JBUCH: TODO: THIS IS COPIED FROM inputSelectHelper.js, but inputSelect should really be fixed to provide access to all options
+		var body=inputSelectCmp.get("v.body");
+		var options=[];
+		if(body&&body.length){
+			for(var i=0;i<body.length;i++){
+				if($A.util.isComponent(body[i])){
+					if(body[i].isInstanceOf("ui:inputSelectOption")){
+						options.push(body[i]);
+					}else{
+						options=options.concat(this.getOptionsFromBody(body[i].get("v.body")));
+					}
+				}
 			}
 		}
 		return options;

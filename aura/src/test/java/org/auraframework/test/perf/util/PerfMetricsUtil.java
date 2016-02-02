@@ -36,14 +36,16 @@ import org.openqa.selenium.WebDriver;
 
 public class PerfMetricsUtil {
     private final PerfExecutorTest test;
+    private final PerfConfig config;
     private RDPAnalyzer rdpAnalyzer;
     private List<RDPNotification> notifications;
     private Map<String, Map<String, Map<String, Long>>> auraStats;
     private String dbURI;
 
-    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, String metricsMode) {
+    public PerfMetricsUtil(PerfExecutorTest test, String dbURI, PerfConfig config) {
         this.test = test;
         this.dbURI = dbURI;
+        this.config = config;
     }
 
     /**
@@ -62,13 +64,9 @@ public class PerfMetricsUtil {
         metrics.setCustomMetrics(median.getCustomMetrics());
 
         // Write the results into file
-        //String resultsFileName = writeResults(metrics);
         writeResults(metrics);
-        // TODO this is overwritten for every test, needs to be fixed.
-        PerfResultsUtil.exportToCsv(test, dbURI);
 
         // Diff the results file against an existing goldfile per component
-        //test.setExplicitGoldResultsFolder(resolveGoldFilePath(resultsFileName));
         PerfResultsUtil.assertPerfDiff(test, "goldfile.json", metrics);
     }
 
@@ -81,34 +79,22 @@ public class PerfMetricsUtil {
      */
     private void writeResults(PerfMetrics metrics) throws JSONException {
         // Write the metrics into result file
-        String resultsFileName = test.getComponentDef().getName();
-        //PerfResultsUtil.writeGoldFile(metrics, resultsFileName);
-
     	PerfResultsUtil.writeGoldFile(metrics, test);
     	
         // Write the timeline events
-        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), resultsFileName, test);
+        File traceLog = PerfResultsUtil.writeDevToolsLog(metrics.getDevToolsLog(), test.getComponentDef().getName(), test);
 
         // Write the results to Db
         try {
             InputStream is = new FileInputStream(traceLog);
             String traceJson = IOUtils.toString(is);
-            PerfResultsUtil.writeToDb(dbURI, metrics, resultsFileName, traceJson);
+            PerfResultsUtil.writeToDb(test, dbURI, metrics, traceJson);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        //return resultsFileName;
     }
-
-    /*private String resolveGoldFilePath(String resultsFileName) {
-        String path = AuraFiles.Core.getPath() + "/aura-components/src/test/components/";
-        String componentPath = test.getComponentDef().getNamespace() + "/" + resultsFileName;
-        String fullPath = path + componentPath;
-        Path resourcesSourceDir = Paths.get(fullPath);
-        return resourcesSourceDir.toString();
-    }*/
 
     private void prepareNetworkMetrics(PerfMetrics metrics) {
         for (PerfMetric metric : rdpAnalyzer.analyzeNetworkDomain()) {
@@ -178,18 +164,15 @@ public class PerfMetricsUtil {
         }
     }
 
-    private void prepareAllMetrics(PerfMetrics metrics) {
-        rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
-        prepareNetworkMetrics(metrics);
-        prepareTimelineMetrics(metrics);
-        prepareAuraMetrics(metrics);
-    }
-
-   
-
 	public PerfMetrics prepareResults() {
         PerfMetrics metrics = new PerfMetrics();
-        prepareAllMetrics(metrics);
+        String timeline = config.getOptions().get("timeline");
+        if(timeline!=null && !timeline.equals("disable")) {           
+    		rdpAnalyzer = new RDPAnalyzer(notifications, test.getPerfStartMarker(), test.getPerfEndMarker());
+    		prepareNetworkMetrics(metrics);
+        	prepareTimelineMetrics(metrics);
+        }
+        prepareAuraMetrics(metrics);
         return metrics;
     }
 
@@ -201,7 +184,10 @@ public class PerfMetricsUtil {
     @SuppressWarnings("unchecked")
     public void stopCollecting() {
         WebDriver driver = test.getWebDriver();
-        notifications = test.getRDPNotifications();
+        String timeline = config.getOptions().get("timeline");
+        if(timeline!=null && !timeline.equals("disable")) {
+        	notifications = test.getRDPNotifications();
+        }
         // TODO auraUITestingUtil unable to execute the js correctly
         Object obj = ((JavascriptExecutor) driver).executeScript("return $A.PerfRunner.getResults()");
         auraStats = (Map<String, Map<String, Map<String, Long>>>) obj;

@@ -73,14 +73,10 @@
         test:[
             function canNotUsePrivateAttribute(cmp){
                 // No access private attribute on facet
-                var expected="";
                 cmp.set("v.testType","Private");
+                $A.test.expectAuraError("Access Check Failed!");
 
                 cmp.find("testRemoteAttributes").getElement().click();
-
-                $A.test.addWaitFor(expected,function(){
-                    return $A.test.getTextByComponent(cmp.find("local"));
-                });
             },
             function canUsePublicAttribute(cmp){
                 var expected="PUBLIC";
@@ -199,6 +195,7 @@
                // Cannot access remote private event
                var expected = null;
                cmp.set("v.testType", "privateEvent");
+               $A.test.expectAuraError("Access Check Failed!");
 
                cmp.find("testRemoteEvent").getElement().click();
 
@@ -327,6 +324,13 @@
 
    testSetNonExistentAttribute: {
        test: function(cmp) {
+           // One for the get old value on the set
+           $A.test.expectAuraError("Access Check Failed!");
+           // One for the set new value
+           $A.test.expectAuraError("Access Check Failed!");
+           // One for the final read into v.output
+           $A.test.expectAuraError("Access Check Failed!");
+
            cmp.testSetNonExistentAttribute();
            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");
@@ -335,6 +339,13 @@
 
    testSetNonExistentRemoteAttribute: {
        test: function(cmp) {
+           // One for the get old value on the set
+           $A.test.expectAuraError("Access Check Failed!");
+           // One for the set new value
+           $A.test.expectAuraError("Access Check Failed!");
+           // One for the final read into v.output
+           $A.test.expectAuraError("Access Check Failed!");
+
            cmp.testSetNonExistentRemoteAttribute();
            $A.test.assertUndefined(cmp.get("v.output"), "Should not be able to set and retrieve attributes on a"
                    + " component that do not exist");

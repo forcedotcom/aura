@@ -42,7 +42,8 @@
 
     checkHeader: function(expectedText) {
         var header = document.getElementsByClassName("header")[0];
-        $A.test.assertStartsWith(expectedText, header.innerText, "Unexpected header text");
+        var text = $A.test.getText(header);
+        $A.test.assertStartsWith(expectedText, text, "Unexpected header text");
     },
 
     /**

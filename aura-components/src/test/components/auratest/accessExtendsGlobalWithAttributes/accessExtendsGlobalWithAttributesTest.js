@@ -21,7 +21,11 @@
     },
 
     testCanNotAccessPrivateAttributeOnBaseComponent: {
+
         test: function(cmp) {
+            // One for the final read into v.output
+            $A.test.expectAuraError("Access Check Failed!");
+
             cmp.testAttributeAccess("Private");
             $A.test.assertEquals(undefined, cmp.get("v.output"));
         }

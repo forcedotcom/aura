@@ -39,7 +39,6 @@ function lib() { //eslint-disable-line no-unused-vars
                 } catch (e) {
                     // invalid number format error
                     // use default instead and show a warning on console
-                    console.warning('Invalid format attribute');
                     return $A.localizationService.getDefaultNumberFormat();
                 }
             }

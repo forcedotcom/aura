@@ -48,4 +48,4 @@
     valueHasChanged : function (cmp, event, helper) {
         helper.handleNewValue(cmp);
     }
-})
+});

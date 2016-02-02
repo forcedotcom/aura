@@ -19,6 +19,6 @@
         this.superAfterRender();
         $A.util.on(element,'focus', function () {
             helper.removeErrors(cmp);
-        })
+        });
     }
-})
+});

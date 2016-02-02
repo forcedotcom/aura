@@ -51,7 +51,6 @@
             },
             function (cmp) {
                 cmp.set("v.value", 5678);
-                var value = cmp.helper.getInputElement(cmp).value;
                 $A.test.assertEquals(5678, cmp.get("v.value"), "Cmp value does not equal expected");
 
                 $A.test.addWaitFor("5,678.0000", function () {

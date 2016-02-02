@@ -28,9 +28,6 @@ package org.auraframework.def;
  * Simple providers are instantiated directly without using the bean adapter. This should generally only be used
  * for internal implementations that are intended for this.
  *
- * <li>Adapter Based Providers:<br />
- * Adapter based providers are annotated with {@link Provider} with useAdapter = true. These providers must
- * implement the appropriate interface.
  * </ul>
  */
 public interface JavaProviderDef extends ProviderDef {

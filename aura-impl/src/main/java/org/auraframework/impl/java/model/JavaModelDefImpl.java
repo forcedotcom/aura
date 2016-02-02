@@ -49,7 +49,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
         super(builder);
         this.modelClass = builder.modelClass;
         this.memberMap = AuraUtil.immutableMap(builder.memberMap);
-        this.useAdapter = builder.useAdapter;
     }
 
     /**
@@ -59,14 +58,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     public void appendDependencies(Set<DefDescriptor<?>> dependencies) {
         super.appendDependencies(dependencies);
         // FIXME: put all of our method dependencies in here...
-    }
-
-
-    /**
-     * is this model meant to be instantiated by the bean service.
-     */
-    public boolean isUseAdapter() {
-        return useAdapter;
     }
 
     /**
@@ -143,7 +134,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
 
         private Class<?> modelClass;
         private Map<String, JavaValueDef> memberMap;
-        private boolean useAdapter;
 
         public Builder setModelClass(Class<?> c) {
             this.modelClass = c;
@@ -157,10 +147,6 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
             JavaValueDef member = new JavaValueDef(name, method, typeDescriptor,
                     new Location(this.modelClass.getName() + "." + name, 0));
             this.memberMap.put(name, member);
-        }
-
-        public void setUseAdapter(boolean useAdapter) {
-            this.useAdapter = useAdapter;
         }
 
         @Override
@@ -185,5 +171,4 @@ public class JavaModelDefImpl extends DefinitionImpl<ModelDef> implements JavaMo
     private static final long serialVersionUID = -1808570833698749554L;
     private final Class<?> modelClass;
     private final Map<String, JavaValueDef> memberMap;
-    private final boolean useAdapter;
 }

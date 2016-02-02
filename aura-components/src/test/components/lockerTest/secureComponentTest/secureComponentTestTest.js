@@ -42,7 +42,8 @@
         }
     },
 
-    testDynamicallyCreatedComponentIsSecureComponent: {
+    // TODO: re-enable when $A.createComponents is exposed on SecureAura
+    _testDynamicallyCreatedComponentIsSecureComponent: {
         test: [function(cmp) {
             cmp.dynamicallyCreateCmps();
             $A.test.addWaitFor(true, function() {

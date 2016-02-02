@@ -12,7 +12,8 @@
       //       to return arbitrary code from actions, it should be legacy in the future.
       var returnableEx = /^\s*([{(["']|function\s*\()/;
       // TODO: improve first comment removal
-      var trimCommentsLeftEx = /^\/\/.*\n?/;
+      var trimFirstMultilineCommentEx = /^\/\*([\s\S]*?)\*\//;
+      var trimFirstLineCommentEx = /^\/\/.*\n?/;
       var hookFn = '$globalEvalIIFE$';
       var USE_STRICT = true;
 
@@ -48,7 +49,8 @@
           }
           // removing first line CSFR protection and other comments to facilitate
           // the detection of returnable code
-          src = src.replace(trimCommentsLeftEx, '');
+          src = src.replace(trimFirstMultilineCommentEx, '');
+          src = src.replace(trimFirstLineCommentEx, '');
           // only add return statement if source it starts with [, {, or (
           if (returnableEx.test(src)) src = 'return ' + src;
           if (useStrict) src = '"use strict";\n' + src;

@@ -23,6 +23,14 @@
         }
     },
 
+    relayPillEvent: function(component, event) {
+        var pillContainerEvent = component.getEvent(event.getName());
+        if (pillContainerEvent) {
+            pillContainerEvent.setParams(event.getParams());
+            pillContainerEvent.fire();
+        }
+    },
+
     onItemSelected: function(cmp, event, helper) {
         var newItem = event.getParam('value');
         if (newItem) {

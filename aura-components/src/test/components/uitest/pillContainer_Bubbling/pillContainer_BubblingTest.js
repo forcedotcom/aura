@@ -27,13 +27,14 @@
 
 
     testBlurEventBubble: {
-        labels : ["UnAdaptableTest"],
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             cmp.find("autocomplete").focus();
-            var result = cmp.find("result");
-            result.getElement().focus();
-            $A.test.assertEquals("blur",result.get("v.value"),"blur event didn't bubble");
+            var result = cmp.find("event");
+            cmp.getElement().getElementsByTagName("input")[0].blur();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return "blur" === result.get("v.value");
+            },"blur event didn't bubble");
         }
     },
 
@@ -41,10 +42,9 @@
         test: function (cmp) {
             var pillContainer = cmp.find("pillContainer");
             pillContainer.insertItems( [this.PILLS[0]] );
-            $A.test.assertEquals("inserted",cmp.find("result").get("v.value"),"insert event didn't bubble");
+            $A.test.assertEquals("pillInserted",cmp.find("event").get("v.value"),"insert event didn't bubble");
         }
     },
-
 
     testRemoveEventBubble: {
         test: function (cmp) {
@@ -53,8 +53,39 @@
             pillContainer.find("pill").getElement().getElementsByClassName("deleteIcon")[0].click();
             var that = this;
             $A.test.addWaitForWithFailureMessage(true, function() {
-                return cmp.find("result").get("v.value") === "removed";
+                return cmp.find("event").get("v.value") === "pillRemoved";
             }, "remove event didn't bubble");
+        }
+    },
+
+    testPillFocusBubble: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems( [this.PILLS[0]] );
+            var pill = pillContainer.find("pill");
+            pill.focus()
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return "focus" === cmp.find("event").get("v.value");
+            },"focus event didn't bubble");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return "ui$pillContainer" === cmp.find("component").get("v.value");
+            },"focus event was not from pillContainer");
+        }
+    },
+
+    testPillBlurBubble: {
+        test: function (cmp) {
+            var pillContainer = cmp.find("pillContainer");
+            pillContainer.insertItems( [this.PILLS[0]] );
+            var pill = pillContainer.find("pill");
+            pill.focus();
+            cmp.find("event").focus();
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return "blur" === cmp.find("event").get("v.value");
+            },"blur event didn't bubble");
+            $A.test.addWaitForWithFailureMessage(true, function() {
+                return "ui$pillContainer" === cmp.find("component").get("v.value");
+            },"blur event was not from pillContainer");
         }
     },
 

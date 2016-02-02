@@ -30,6 +30,9 @@
         helper.removeFocus(component);
     },
 
+    onFocus: function() {
+    },
+
     focus: function(component, event, helper) {
         helper.setFocus(component);
     },

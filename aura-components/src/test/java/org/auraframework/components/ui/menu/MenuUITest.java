@@ -110,8 +110,10 @@ public class MenuUITest extends WebDriverTestCase {
         // actionItem2 is not clickable as it's disabled via markup
         try {
             actionItem2Element.click();
-            // Looks like this fails on firefox in autobuild environments, disabling for now
-            // fail("Expected exception trying to click an unclickable element");
+            // The Firefox used in autobuild environments does not throw an exception. Passes locally on Firefox 42.
+            if (getBrowserType() != BrowserType.FIREFOX) {
+                fail("Expected exception trying to click an unclickable element");
+            }
         } catch (Exception e) {
             checkExceptionContains(e, WebDriverException.class, "Element is not clickable");
         }
@@ -598,7 +600,7 @@ public class MenuUITest extends WebDriverTestCase {
      *
      * @param actionMenu The WebElement on which to wait for the visible class to be present
      */
-    private void waitForMenuOpen(WebElement actionMenu) {
+    private void waitForMenuOpen(final WebElement actionMenu) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
@@ -612,7 +614,7 @@ public class MenuUITest extends WebDriverTestCase {
      *
      * @param actionMenu The WebElement on which to wait for the visible class to not be present on
      */
-    private void waitForMenuClose(WebElement actionMenu) {
+    private void waitForMenuClose(final WebElement actionMenu) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {
@@ -626,7 +628,7 @@ public class MenuUITest extends WebDriverTestCase {
      *
      * @param actionItemElement The WebElement on which to wait for focus
      */
-    private void waitForFocusOnMenuActionItem(WebElement actionItemElement) {
+    private void waitForFocusOnMenuActionItem(final WebElement actionItemElement) {
         String text = actionItemElement.toString();
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
@@ -644,7 +646,7 @@ public class MenuUITest extends WebDriverTestCase {
      * @param menuLabel The WebElement on which to verify the text on
      * @param expectedText The expected text
      */
-    private void waitForMenuText(WebElement menuLabel, String expectedText) {
+    private void waitForMenuText(final WebElement menuLabel, final String expectedText) {
         auraUITestingUtil.waitUntil(new ExpectedCondition<Boolean>() {
             @Override
             public Boolean apply(WebDriver d) {

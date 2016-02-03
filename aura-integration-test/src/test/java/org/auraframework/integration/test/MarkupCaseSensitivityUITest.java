@@ -30,6 +30,7 @@ import org.auraframework.system.AuraContext.Authentication;
 import org.auraframework.system.AuraContext.Format;
 import org.auraframework.system.AuraContext.Mode;
 import org.auraframework.util.test.annotation.ThreadHostileTest;
+import org.auraframework.util.test.annotation.UnAdaptableTest;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -56,6 +57,7 @@ public class MarkupCaseSensitivityUITest extends AbstractErrorUITestCase {
      * we modify test_Library.lib, change all basicFirst to BASICFirst (wrong case, BASICFirst.js doesn't exist)
      * then reload the testApp, it still loads fine, and what we changed is updated in lib too (verify through helper).
 	 */
+	@UnAdaptableTest("SFDC chrome autobuild doesn't pick up source change, not sure why.")
 	@ThreadHostileTest("We are messing up with source during the test, if you load other cmp/app at the same time, it might get wrong source")
 	public void testLibFileChangeAfterCached() throws Exception {
 		//load the test app, and verify the lib loads fine

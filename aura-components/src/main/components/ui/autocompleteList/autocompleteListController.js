@@ -24,9 +24,9 @@
     fetchData: function (component, event, helper) {
         var superCmp   = component.getSuper(),
             isExtended = superCmp.getDef().getDescriptor().getName() !== 'component',
-            arguments  = event.getParam('arguments'),
-            options    = arguments.options,
-            index      = arguments.index;
+            argumentsParam  = event.getParam('arguments'),
+            options    = argumentsParam.options,
+            index      = argumentsParam.index;
 
         if (isExtended) {
             component = superCmp;

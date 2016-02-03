@@ -26,7 +26,7 @@
 
         var listCmp = helper.getListComponent(component);
         if (listCmp && !listCmp.isInstanceOf("ui:autocompleteListInterface")) {
-            throw new AuraError("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
+            throw new $A.auraError("The autocomplete list must implement ui:autocompleteListInterface: " + listCmp);
         }
 
         // This calls a function (callback) in a delayed manner and it can be cancelled.
@@ -153,7 +153,7 @@
     referenceElementChange: function(component, event, helper) {
         // this is only supported if autocomplete is used with the default list, or if the custom list defines "listReferenceComponent"
         if (!helper.isDefaultList(component)) {
-            throw new AuraError("ui:autocomplete: function 'referenceElementChange' is not supported with a custom list.");
+            throw new $A.auraError("ui:autocomplete: function 'referenceElementChange' is not supported with a custom list.");
         }
         var usePanel = component.get('v.usePanel');
         if (!usePanel) {

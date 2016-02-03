@@ -213,10 +213,10 @@ function lib(w) { //eslint-disable-line no-unused-vars
             this._ilNoMoreData = true;
         },
         updateLabels:function(payload) {
-            if (typeof(payload.labelIdle) != "undefined") {
+            if (typeof (payload.labelIdle) !== "undefined") {
                 this.opts.infiniteLoadingConfig.labelIdle = payload.labelIdle;
             }
-            if (typeof(payload.labelLoading) != "undefined") {
+            if (typeof (payload.labelLoading) !== "undefined") {
                 this.opts.infiniteLoadingConfig.labelLoading = payload.labelLoading;
             }
             // in order to redraw the label we have to call _setState

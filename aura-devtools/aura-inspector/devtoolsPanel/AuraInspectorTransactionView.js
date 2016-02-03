@@ -75,12 +75,14 @@ function AuraInspectorTransactionView(devtoolsPanel) {
 		tabBody.classList.add("trans-panel");
 
 		devtoolsPanel.subscribe("Transactions:OnTransactionEnd", function(transactions){
-			this.addTransactions(transactions);
+			this.addTransactions(JSON.parse(transactions));
 		}.bind(this));
 	};
 
 	this.summarizeActions = function (t) {
 		var serverActions = t.marks.serverActions || [];
+		// Should be this, but it has issues too such as m.context.ids being null.
+		//var serverActions = t.marks.serverActions || t.marks.queuedActions || t.marks.actions || [];
 		return (serverActions.filter(function (m) {
 			return m.phase === 'stamp';
 		})).reduce(function (r, m) {

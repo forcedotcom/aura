@@ -1,4 +1,6 @@
-// Move component tree drawing into here.
+/**
+ * Component Tree Panel. Delegates drawing of the tree to the TreeView component in the treeview.js file.
+ */
 function AuraInspectorComponentTree(devtoolsPanel) {
     var treeElement;
     var treeComponent;
@@ -60,6 +62,10 @@ function AuraInspectorComponentTree(devtoolsPanel) {
         });
     };
 
+    /** 
+     * Possible to set the collection of items externally, but currently only done via this.refresh()
+     * Does not do a merge, does a complete replace. 
+     */
     this.setData = function(items) {
         if(items != _items || JSON.stringify(items) != JSON.stringify(_items)) {
             isDirty = true;

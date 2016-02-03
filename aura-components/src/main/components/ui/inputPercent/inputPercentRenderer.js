@@ -16,9 +16,12 @@
 ({
 
     afterRender: function(component, helper) {
+        var value = component.get('v.value');
+        var el    = helper.helper.getInputElement(component);
+
         this.superAfterRender();
         if (component.get("v.doFormat")) {
-            helper.inputNumberLibrary.number.formatValue( component, helper, $A.localizationService.getDefaultPercentFormat());
+            el.value = helper.inputNumberLibrary.number.formatNumber(value, $A.localizationService.getDefaultPercentFormat().jn);
         }
     }
 

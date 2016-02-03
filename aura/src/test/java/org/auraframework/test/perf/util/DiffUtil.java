@@ -18,7 +18,6 @@ package org.auraframework.test.perf.util;
 import java.io.IOException;
 import java.net.URL;
 
-
 public interface DiffUtil<T> {
 
     public URL getUrl();

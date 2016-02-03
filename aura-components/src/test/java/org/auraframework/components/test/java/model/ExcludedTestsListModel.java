@@ -28,7 +28,7 @@ import junit.framework.TestSuite;
 
 import org.auraframework.system.Annotations.AuraEnabled;
 import org.auraframework.system.Annotations.Model;
-import org.auraframework.test.ComponentJSTest;
+import org.auraframework.test.ComponentJSTestSuite;
 import org.auraframework.test.util.WebDriverProvider;
 import org.auraframework.test.util.WebDriverTestCase;
 import org.auraframework.test.util.WebDriverUtil;
@@ -105,7 +105,7 @@ public class ExcludedTestsListModel {
             for (int j = 0; j < ts1.testCount(); j++) {
                 TestSuite ts2 = (TestSuite) ts1.testAt(j);
                 for (int k = 0; k < ts2.testCount(); k++) {
-                    ComponentJSTest.ComponentTestCase test = (ComponentJSTest.ComponentTestCase) ts2
+                    ComponentJSTestSuite.ComponentTestCase test = (ComponentJSTestSuite.ComponentTestCase) ts2
                             .testAt(k);
                     Set<BrowserType> browserList = WebDriverUtil.getBrowserListForTestRun(test.getTargetBrowsers(),
                             test.getExcludedBrowsers());

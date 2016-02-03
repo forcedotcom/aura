@@ -56,13 +56,6 @@ public class Aura {
     }
 
     /**
-     * Get the Client Service: for contacting other Aura servers
-     */
-    public static ClientService getClientService() {
-        return Aura.get(ClientService.class);
-    }
-
-    /**
      * Get the Context Service: for creating or interacting with a {@link AuraContext} A AuraContext must be started
      * before working using any other service.
      */

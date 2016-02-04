@@ -400,6 +400,17 @@
 		touch = event.targetTouches[0];
 
 		if (deviceIsIOS) {
+
+			// Aura Patch for issue: https://github.com/ftlabs/fastclick/issues/268
+			var nodeName = targetElement.nodeName.toLowerCase();
+			var typeAttribute = targetElement.getAttribute("type");
+
+			if (nodeName === "select" || (nodeName === "input" && typeAttribute === "date") ||
+				(nodeName === "input" && typeAttribute === "datetime")) {
+				return false;
+			}
+			// Aura Patch: End
+
 			// Only trusted events will deselect text on iOS (issue #49)
 			selection = window.getSelection();
 			if (selection.rangeCount && !selection.isCollapsed) {

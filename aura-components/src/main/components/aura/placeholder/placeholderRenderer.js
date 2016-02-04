@@ -56,11 +56,12 @@
                 if(!config.hasOwnProperty("attributes")){
                     config["attributes"]={"values":{}};
                 }
-                $A.util.apply(config["attributes"]["values"],attributes);
-                newBody = $A.componentService.newComponentDeprecated(config, avp, false, false);
+                $A.util.apply(config["attributes"]["values"], attributes);
+                config["attributes"]["valueProvider"] = avp;
+                newBody = $A.createComponentFromConfig(config);
             } else {
                 var errors = a.getError();
-                newBody = $A.componentService.newComponentDeprecated("markup://aura:text", null, false, false);
+                newBody = $A.createComponentFromConfig({ "descriptor" : "markup://aura:text" });
                 if (errors) {
                     newBody.set("v.value", errors[0].message);
 //                    throw errors[0].message;

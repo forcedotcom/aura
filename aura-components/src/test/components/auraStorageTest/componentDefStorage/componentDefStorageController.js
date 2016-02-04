@@ -22,7 +22,7 @@
         cmp.set("v.status", "Creating Component");
         var load = cmp.get("v.load");
         try {
-            var newCmp = $A.componentService.newComponentDeprecated(load);
+            var newCmp = $A.componentService.createComponentFromConfig(load);
             if (newCmp) {
                 var type = " - Success!";
                 if (newCmp.getDef().getDescriptor().getQualifiedName().indexOf("placeholder") !== -1) {

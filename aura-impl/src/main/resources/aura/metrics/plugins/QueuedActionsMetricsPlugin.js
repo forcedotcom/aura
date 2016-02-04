@@ -160,7 +160,7 @@ QueuedActionsMetricsPlugin.prototype.postProcess = function (actionMarks) {
             }
         } else if (phase === 'end' && mark) {
             mark["context"]["state"] = actionMark["context"]["state"];
-            mark["duration"] = actionMark["ts"] - mark["ts"];
+            mark["duration"] = Math.round((actionMark["ts"] - mark["ts"]) * 100) / 100;
             processedMarks.push(mark);
             delete queue[id];
         }

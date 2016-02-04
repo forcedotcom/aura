@@ -28,7 +28,7 @@
  */
 var DomHandlersPlugin = function DomHandlersPlugin(config) {
     this.config = config;
-    this["enabled"] = false; // Do not enable it automatically
+    this["enabled"] = true; // Do not enable it automatically
 };
 
 DomHandlersPlugin.NAME = "domHandlers";
@@ -61,13 +61,16 @@ DomHandlersPlugin.prototype.disable = function () {
 DomHandlersPlugin.prototype.dispatchActionHook = function (original, action, event, cmp) {
     var localCmpId = cmp.getLocalId();
     var dispatchCmpId = action.getComponent().getLocalId();
-    var contextId = localCmpId && dispatchCmpId ? (localCmpId + ':' + dispatchCmpId) : dispatchCmpId || localCmpId;
 
-    $A.log({
-        "id": contextId,
-        "eventType": event.type,
-        "action" : action.getDef().getDescriptor().toString()
-    });
+    if (localCmpId && dispatchCmpId) {
+        var contextId = localCmpId + ':' + dispatchCmpId;
+
+        $A.log({
+            "id": contextId,
+            "eventType": event.type,
+            "action" : action.getDef().getDescriptor().toString()
+        });    
+    }
 
     var ret = original.apply(this, Array.prototype.slice.call(arguments, 1));
     return ret;

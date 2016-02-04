@@ -119,7 +119,7 @@
 
         if ($A.util.isExpression(valueExpression)) {
             var action = valueExpression.evaluate();
-            this.dispatchAction(action, event);
+            this.dispatchAction(action, event, ownerComponent);
         }
     },
 

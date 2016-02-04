@@ -1,7 +1,7 @@
 ({
     /**
      * Load an app in an iframe, emulate being offline, then reload and verify correct error is displayed to the user.
-     * 
+     *
      * See the template file of the component loaded in the iframe for logic relevant to emulating offline behavior
      * and how the storage is set up.
      */
@@ -20,8 +20,8 @@
                 var expectedMsg = "Failed to initialize application";
                 $A.test.addWaitForWithFailureMessage(true, function() {
                     var frame = document.getElementById("myFrame").contentWindow;
-                    var errorMsg = $A.test.getText(frame.document.getElementById("auraErrorMessage"));
-                    return errorMsg.indexOf(expectedMsg) > -1;
+                    var errorMsgElement = frame.document.getElementById("auraErrorMessage");
+                    return errorMsgElement !== null && $A.test.getText(errorMsgElement).indexOf(expectedMsg) > -1;
                 }, "Error box never received expected error message. Expected <" + expectedMsg + ">",
                 function() {
                     // Verify error box is visible to user

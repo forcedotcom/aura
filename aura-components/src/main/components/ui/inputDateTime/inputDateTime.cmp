@@ -16,13 +16,15 @@
 
 -->
 <aura:component access="GLOBAL" support="GA" extends="ui:input" implements="ui:inputDateTimeComponent" extensible="true" defaultFlavor="default, input, datetime"
-    controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
-    description="An input field for entering a date and time.">
+                provider="js://ui.inputDateTime" controller="java://org.auraframework.impl.controller.TimeZoneInfoController"
+                description="An input field for entering a date and time.">
 
     <aura:attribute name="useSingleInput" type="Boolean" default="false" description="Use single input mode, even on desktop view"/>
     <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
     <aura:attribute name="placeholder" type="String" description="The text that is displayed for date input by default. Set during init based on the 'format' value."/>
     <aura:attribute name="timePlaceholder" type="String" description="The text that is displayed for time input by default. Set during init based on the 'format' value."/>
+
+    <aura:dependency resource="markup://ui:inputDateTimeHtml" type="COMPONENT"/>
 
     <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
     <aura:registerEvent name="openPicker" type="ui:openPicker"/>

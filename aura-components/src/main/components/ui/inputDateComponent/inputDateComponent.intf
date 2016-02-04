@@ -16,12 +16,12 @@
 
 -->
 <aura:interface support="GA" description="Common interface across output date components">
-    <aura:attribute name="value" type="Date" access="GLOBAL" description="The input value of the date/time."/>
+    <aura:attribute name="value" type="String" access="GLOBAL" description="The input value of the date/time."/>
     <aura:attribute name="max" type="Date" description="Specifies the maximum date allowed. Works with HTML5 only."/>
     <aura:attribute name="min" type="Date" description="Specifies the minimum date allowed. Works with HTML5 only."/>
     <aura:attribute name="step" type="Integer" description="Specifies the legal date intervals. Works with HTML5 only."/>
     <aura:attribute name="displayDatePicker" type="Boolean" default="false" access="GLOBAL" description="Indicate if ui:datePicker is displayed."/>
-    
+
     <aura:attribute name="format" type="String" access="GLOBAL" description="The java.text.SimpleDateFormat style format string."/>
     <aura:attribute name="langLocale" type="String" access="GLOBAL" description="The language locale used to format date time."/>
 </aura:interface>

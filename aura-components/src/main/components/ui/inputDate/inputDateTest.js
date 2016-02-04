@@ -14,10 +14,25 @@
  * limitations under the License.
  */
 ({
+    /**
+     * Verify that the provided component is inputDateHtml on mobile/tablet, and inputDate on desktop
+     */
+    testCorrectComponentProvided: {
+        test: function (cmp) {
+            var isDesktop = $A.get('$Browser.formFactor').toLowerCase() === "desktop";
+            var providedCmpName = cmp.getDef().getDescriptor().getQualifiedName();
+            if (isDesktop) {
+                $A.test.assertEquals("markup://ui:inputDate", providedCmpName, "should use inputDate on desktop");
+            } else {
+                $A.test.assertEquals("markup://ui:inputDateHtml", providedCmpName, "should use inputDate on desktop");
+            }
+        }
+    },
+
     // TODO: W-1937288 Fix flapping
-    _testInitialValue:{
-        attributes : {displayDatePicker: 'true', value: '2012-09-10', format: 'MM/dd/yyyy'},
-        test: function(cmp){
+    _testInitialValue: {
+        attributes: {displayDatePicker: 'true', value: '2012-09-10', format: 'MM/dd/yyyy'},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("09/10/2012", inputDateStr, "Dates are not the same and they should be");
         }
@@ -26,9 +41,10 @@
     /**
      * Verify behavior when 'format' attribute is not assigned a value.
      */
-    testDefaultFormat:{
-        attributes : {displayDatePicker: 'true', value: '2012-09-10'},
-        test: function(cmp){
+    testDefaultFormat: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', value: '2012-09-10'},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
@@ -37,34 +53,37 @@
     /**
      * Verify behavior when 'format' attribute is assigned an empty string.
      */
-	testEmptyFormat:{
-	    attributes : {displayDatePicker:'true', value: '2012-09-10', format: ''},
-	    test: function(cmp){
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-    	    $A.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
+    testEmptyFormat: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', value: '2012-09-10', format: ''},
+        test: function (cmp) {
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            $A.test.assertEquals("Sep 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
     /**
      * Verify behavior when 'format' attribute is assigned a garbage value.
      */
-	testInvalidFormat:{
-	    attributes : {displayDatePicker:'true', format: 'KKKKKK'},
-	    test: [function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
-	    }, function(cmp){
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('KKKKKK');
-    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    testInvalidFormat: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', format: 'KKKKKK'},
+        test: [function (cmp) {
+            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+        }, function (cmp) {
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            var dt = moment().format('KKKKKK');
+            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
     /**
      * Verify behavior when 'langLocale' attribute is not assigned a value.
      */
-    testDefaultLangLocale:{
-        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10'},
-        test: function(cmp){
+    testDefaultLangLocale: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10'},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
@@ -73,9 +92,10 @@
     /**
      * Verify behavior when 'langLocale' attribute is assigned a different value.
      */
-    testLangLocale:{
-        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
-        test: function(cmp){
+    testLangLocale: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'es'},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("Septiembre 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
@@ -84,9 +104,10 @@
     /**
      * Verify behavior when 'langLocale' attribute is not assigned an empty string.
      */
-    testEmptyLangLocale:{
-        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: ''},
-        test: function(cmp){
+    testEmptyLangLocale: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: ''},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
@@ -95,56 +116,58 @@
     /**
      * Verify behavior when 'langLocale' attribute is not assigned an invalid value.
      */
-    testInvalidLangLocale:{
-        attributes : {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'xx'},
-        test: function(cmp){
+    testInvalidLangLocale: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', format: 'MMMM dd, yyyy', value: '2012-09-10', langLocale: 'xx'},
+        test: function (cmp) {
             var inputDateStr = cmp.find("inputText").getElement().value;
             $A.test.assertEquals("September 10, 2012", inputDateStr, "Dates are not the same and they should be");
         }
     },
 
-	/**
+    /**
      * Verify behavior of Today() with default 'format' value.
      */
     // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
-	_testToday:{
-	    attributes : {displayDatePicker:'true', format:'MMM dd, yyyy'},
-	    test: [function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
-	    }, function(cmp){
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('MMM DD, YYYY');
-    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    _testToday: {
+        attributes: {displayDatePicker: 'true', format: 'MMM dd, yyyy'},
+        test: [function (cmp) {
+            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+        }, function (cmp) {
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            var dt = moment().format('MMM DD, YYYY');
+            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
-	/**
+    /**
      * Verify behavior of Today() when 'format' is assigned a valid value.
      */
     // TODO(W-2671175): Fails due to GMT/PST timezone difference for user.timezone and actual timezone
-	_testTodayDifferentFormat:{
-	    attributes : {displayDatePicker:'true', format: 'DD/MM/YYYY'},
-	    test: [function(cmp){
-	        cmp.find("datePicker").get('c.selectToday').runDeprecated();
-	    }, function(cmp){
-	        var inputDateStr = cmp.find("inputText").getElement().value;
-	        var dt           = moment().format('DD/MM/YYYY');
-    	    $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
+    _testTodayDifferentFormat: {
+        attributes: {displayDatePicker: 'true', format: 'DD/MM/YYYY'},
+        test: [function (cmp) {
+            cmp.find("datePicker").get('c.selectToday').runDeprecated();
+        }, function (cmp) {
+            var inputDateStr = cmp.find("inputText").getElement().value;
+            var dt = moment().format('DD/MM/YYYY');
+            $A.test.assertEquals(dt, inputDateStr, "Dates are not the same and they should be");
         }]
     },
 
     /**
      * Test input date picker with label set.
      */
-    testDatePickerWithLabel:{
-    	attributes: {displayDatePicker: 'true', label: 'my date cmp'},
-    	test: function(cmp){
-    		var datePickerOpener = cmp.find("datePickerOpener");
-    	    $A.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");
-    		var datePicker = cmp.find("datePicker");
-    	    $A.test.assertNotNull(datePicker, "datePicker not present");
-    	}
+    testDatePickerWithLabel: {
+        browsers: ['DESKTOP'],
+        attributes: {displayDatePicker: 'true', label: 'my date cmp'},
+        test: function (cmp) {
+            var datePickerOpener = cmp.find("datePickerOpener");
+            $A.test.assertNotNull(datePickerOpener, "datePickerOpener anchor not present");
+            var datePicker = cmp.find("datePicker");
+            $A.test.assertNotNull(datePicker, "datePicker not present");
+        }
     }
-/*eslint-disable semi */
+    /*eslint-disable semi */
 })
 /*eslint-enable semi */

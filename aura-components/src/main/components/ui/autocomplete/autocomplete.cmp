@@ -16,11 +16,11 @@
 
 -->
 <aura:component extends="ui:input" support="proto" extensible="true" defaultFlavor="default, lookup" description="Represents an input field that suggests a list of values from the data provider as you type.">
-    <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components"/>
-    <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty"/>
-    <aura:attribute name="loadingIndicator" type="Aura.Component[]" description="Content to be shown while the list is loading"/>
+    <aura:attribute name="dataProvider" type="Aura.Component[]" required="true" description="A list of data provider components."/>
+    <aura:attribute name="emptyListContent" type="Aura.Component[]" description="Content to be shown if the list is empty."/>
+    <aura:attribute name="loadingIndicator" type="Aura.Component[]" description="Content to be shown while the list is loading."/>
     <aura:attribute name="inputClass" type="String" description="The css class for input component."/>
-    <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component. We support inputText and inputTextArea for now."/>
+    <aura:attribute name="inputType" type="String" default="inputText" description="The type of input component (inputText or inputTextArea)."/>
     <aura:attribute name="listOption" type="Aura.ComponentDefRef[]" required="true" description="A ComponentDefRef to use as the template for each generated option in the list."/>
     <aura:attribute name="optionVar" type="String" required="true" description="The name by which to refer to the current data object inside of the template for each option."/>
     <aura:attribute name="placeholder" type="String" default="" description="Text that is displayed when the input field is empty, to prompt the user for a valid entry."/>
@@ -29,13 +29,13 @@
     <aura:attribute name="matchFunc" type="Aura.Action" description="Overrides default list item update behavior to allow custom text matching."/>
     <aura:attribute name="autocompleteButton" type="Aura.Component[]" description="Optional button to render with this component."/>
 
-    <aura:attribute name="listHeader" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header"/>
-    <aura:attribute name="listFooter" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer"/>
-    <aura:attribute name="showListHeader" type="Boolean" default="true" description="When true the listHeader will be visible"/>
-    <aura:attribute name="showListFooter" type="Boolean" default="true" description="When true the listFooter will be visible"/>
-    <aura:attribute name="usePanel" type="boolean" default="false"/>
-    <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Indicate if the first option item should be highlighted by default."/>
-    <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the list is displayed under"/>
+    <aura:attribute name="listHeader" type="Aura.Component[]" description="A facet above the rendered list, for use as a list header."/>
+    <aura:attribute name="listFooter" type="Aura.Component[]" description="A facet below the rendered list, for use as a list footer."/>
+    <aura:attribute name="showListHeader" type="Boolean" default="true" description="Indicates whether the listHeader is visible. The default is true."/>
+    <aura:attribute name="showListFooter" type="Boolean" default="true" description="Indicates whether the listFooter is visible. The default is true."/>
+    <aura:attribute name="usePanel" type="boolean" default="false" description="Indicates whether to use ui:autocompletePanel for the lookup menu. The default is false."/>
+    <aura:attribute name="setDefaultHighlight" type="boolean" default="true" description="Indicates whether the first option item should be highlighted by default. The default is true."/>
+    <aura:attribute name="listReferenceComponent" type="Aura.Component[]" description="Sets the component that the lookup menu is displayed under."/>
     <aura:handler name="change" value="{!v.listReferenceComponent}" action="{!c.referenceElementChange}"/>
 
     <aura:registerEvent name="matchDone" type="ui:matchDone" description="The event fired when the matching is done."/>

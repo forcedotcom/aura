@@ -199,7 +199,7 @@
 
     isDefaultList: function(component) {
         var listCmp = this.getListComponent(component);
-        return (listCmp && listCmp.isInstanceOf("ui:autoCompleteList"));
+        return (listCmp && listCmp.isInstanceOf("ui:autocompleteList"));
     }
 
 })// eslint-disable-line semi

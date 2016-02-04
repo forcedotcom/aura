@@ -20,7 +20,7 @@ markup://ui:baseDOMEvent : 3Ed5j-HTYzJmWI45X-RPRQ
 aura://List : null
 css://aura.placeholder : kvkyys3VNLeU066RaKQMbA
 java://org.auraframework.def.DefDescriptor : null
-js://aura.placeholder : MhZJ25U0-XFIIfcxViVmxQ
+js://aura.placeholder : ete-W3YS7NLYddF-4OCQUA
 markup://aura:applicationEvent : o2iboZiE9E-Up-cxMvDhwQ
 markup://aura:html : O7nGtFWJWPxYzv-A9Qo4yg
 markup://aura:text : iMISc8xaxbWq72wXtgmLUg

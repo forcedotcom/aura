@@ -18,6 +18,17 @@ function lib() { //eslint-disable-line no-unused-vars
     // Todo : Make abbreviations dynamic
     var abbreviations = {thousand: 'k', million: 'm', billion: 'b', trillion: 't'};
 
+    function getMaxFractionDigits (pattern, symbols) {
+        var decimalSeparator = symbols && symbols.decimalSeparator ? symbols.decimalSeparator : '.';
+        var zero = symbols && symbols.zero ? symbols.zero : '0';
+        var patternSplit = pattern.split(decimalSeparator);
+        var reg = new RegExp('[^(#'+ zero + ']','g');
+        if (patternSplit.length) {
+            return patternSplit[1].replace(reg,'').length;
+        }
+        return 0;
+    }
+
     return { //eslint-disable-line no-shadow, no-unused-vars
         /**
          * @method formatNumber
@@ -33,7 +44,7 @@ function lib() { //eslint-disable-line no-unused-vars
             }
         },
         getNumberFormat: function (formatter) {
-            if (formatter && typeof formatter === 'string') {
+            if (typeof formatter === 'string') {
                 try {
                     return $A.localizationService.getNumberFormat(formatter);
                 } catch (e) {
@@ -45,9 +56,9 @@ function lib() { //eslint-disable-line no-unused-vars
             return $A.localizationService.getDefaultNumberFormat();
         },
         unFormatNumber: function (string, formatter) {
-            var numberFormat     = this.getNumberFormat(formatter);
-            var decimalSeparator = numberFormat.$symbols$.decimalSeparator;
-            var currencySymbol   = numberFormat.$symbols$.currency;
+            //var numberFormat     = this.getNumberFormat(formatter);
+            var decimalSeparator = $A.get("$Locale.decimal"); //numberFormat.$symbols$.decimalSeparator;
+            var currencySymbol   = $A.get("$Locale.currency"); //numberFormat.$symbols$.currency;
 
             var stringOriginal = string,
                 thousandRegExp,
@@ -68,12 +79,12 @@ function lib() { //eslint-disable-line no-unused-vars
             millionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.million  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
             billionRegExp  = new RegExp('[^a-zA-Z]' + abbreviations.billion  + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
             trillionRegExp = new RegExp('[^a-zA-Z]' + abbreviations.trillion + '(?:\\)|(\\' + currencySymbol + ')?(?:\\))?)?$', 'i');
-
             // do some math to create our number
             return ((stringOriginal.match(thousandRegExp)) ? Math.pow(10, 3) : 1) *
                    ((stringOriginal.match(millionRegExp))  ? Math.pow(10, 6) : 1) *
                    ((stringOriginal.match(billionRegExp))  ? Math.pow(10, 9) : 1) *
                    ((stringOriginal.match(trillionRegExp)) ? Math.pow(10, 12) : 1) *
+                   ((string.indexOf('%') > -1) ? 0.01 : 1) *
                    (((string.split('-').length + Math.min(string.split('(').length - 1, string.split(')').length - 1)) % 2) ? 1 : -1) *
                    Number(string.replace(/[^0-9\.]+/g, ''));
         },
@@ -82,9 +93,11 @@ function lib() { //eslint-disable-line no-unused-vars
         },
         isFormattedNumber: function (string, formatter) {
             var numberFormat      = this.getNumberFormat(formatter);
-            var decimalSeparator  = numberFormat.$symbols$.decimalSeparator;
-            var groupingSeparator = numberFormat.$symbols$.groupingSeparator;
-            var maxFractionDigits = numberFormat.$maxFractionDigits$;
+            var zero              = $A.get("$Locale.zero");
+            var decimalSeparator  = $A.get("$Locale.decimal");
+            var groupingSeparator = $A.get("$Locale.grouping");
+            var maxFractionDigits = getMaxFractionDigits(formatter, { decimalSeparator : decimalSeparator, zero : zero});
+            var prefix = numberFormat.prefix;
 
             var const1 = '(?!(K|B|M|T|\\' + decimalSeparator + '))';
 
@@ -96,7 +109,8 @@ function lib() { //eslint-disable-line no-unused-vars
             // follow decimalSeparator #{0,maxFractionDigits} (not required)
             // ended by any shortcut (K|B|M|T)
             // it not case sensitive
-            var regString = '^' + const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
+            var regString = '^(\\' + prefix + ')?' +
+                            const1 + '((\\s*(\\+|\\-)?\\s*)' + const1 + ')?' +
                             '(\\d+(\\' + groupingSeparator + '\\d*)*)*' +
                             '(\\' + decimalSeparator + '\\d{0,' + maxFractionDigits + '})?' +
                             '(K|B|M|T)?\\s*$';

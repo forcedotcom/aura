@@ -16,9 +16,8 @@
 ({
 
     afterRender: function(component, helper) {
-
         var value = component.get('v.value');
-        var el    = helper.helper.getInputElement(component);
+        var el    = helper.getInputElement(component);
 
         this.superAfterRender();
         if (component.get("v.doFormat")) {

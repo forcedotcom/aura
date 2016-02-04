@@ -17,11 +17,12 @@
 
     afterRender: function(component, helper) {
         var value = component.get('v.value');
-        var el    = helper.helper.getInputElement(component);
+        var formatter = component.get('v.format') || $A.get("$Locale.percentFormat");
+        var el    = helper.getInputElement(component);
 
         this.superAfterRender();
         if (component.get("v.doFormat")) {
-            el.value = helper.inputNumberLibrary.number.formatNumber(value, $A.localizationService.getDefaultPercentFormat().jn);
+            el.value = helper.inputNumberLibrary.number.formatNumber(value, formatter);
         }
     }
 
